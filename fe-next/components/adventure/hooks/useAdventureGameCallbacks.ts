@@ -149,9 +149,15 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       : 0;
     resetGame({ retainedScore });
     resetBossHealth(); resetPlayerHealth();
-    resetCinematics(); startGame();
+    resetCinematics();
+    // Boss levels: don't start game yet — boss intro dismissal triggers
+    // handleBossIntroStart which calls bossStartBattle() + startGame().
+    // Non-boss levels: start immediately.
+    if (!isBossLevel) {
+      startGame();
+    }
   }, [resetGame, startGame, clearSelection, resetBossHealth, resetPlayerHealth, resetCinematics,
-    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setRetriesUsed]);
+    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setRetriesUsed, isBossLevel]);
 
   return { handleCinematicComplete, handleContinue, handleRetry };
 }

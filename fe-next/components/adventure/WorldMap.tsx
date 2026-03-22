@@ -183,13 +183,13 @@ const WorldNode = memo(function WorldNode({
           )}
 
           {isComplete && (
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10">
+            <div className="absolute -bottom-1 -end-1 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10">
               <span className="text-neo-black font-black text-base sm:text-lg">✓</span>
             </div>
           )}
 
           {isNextWorld && !isComplete && (
-            <div className="absolute -top-2 -left-2 z-10 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm">
+            <div className="absolute -top-2 -start-2 z-10 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm">
               {t('adventure.next')}
             </div>
           )}
@@ -229,10 +229,10 @@ const WorldNode = memo(function WorldNode({
           {worldName}
         </h3>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 mt-2 whitespace-nowrap">
+        <div dir="ltr" className="flex items-center gap-1.5 sm:gap-2 mt-2 whitespace-nowrap">
           <Star className={cn(
             'w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0',
-            currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30'
+            currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/50 fill-neo-white/10'
           )} />
           <span className={cn(
             'text-xs sm:text-sm font-bold',
@@ -269,7 +269,8 @@ export default function WorldMap({
   completions,
   onWorldSelect,
 }: WorldMapProps): React.JSX.Element {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRtl = dir === 'rtl';
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
@@ -384,7 +385,7 @@ export default function WorldMap({
       {/* World trail */}
       <div className="relative z-10 py-8 sm:py-12 lg:max-w-4xl lg:mx-auto">
         {worldsData.map((data, index) => {
-          const isLeft = index % 2 === 0;
+          const isLeft = isRtl ? index % 2 !== 0 : index % 2 === 0;
 
           return (
             <React.Fragment key={data.world.id}>

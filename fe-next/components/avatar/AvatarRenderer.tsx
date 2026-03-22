@@ -44,7 +44,7 @@ const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'diamond', 'shield']);
 const CIRCULAR_BASES = new Set(['round', 'blob']);
 
 /** Bases that use elliptical shape */
-const ELLIPTICAL_BASES = new Set(['oval']);
+const ELLIPTICAL_BASES = new Set(['oval', 'oblong', 'pear', 'rectangular']);
 
 /** Get a blush color that works with the skin tone — warm pink for light skin, deeper rose for dark */
 function getBlushColor(skinColor: string): string {

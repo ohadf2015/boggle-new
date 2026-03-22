@@ -29,12 +29,13 @@ function Spiky({ fill }: HairPartProps) {
     <g>
       {/* Cap hugging the head */}
       <path d="M20 36 Q20 22 50 18 Q80 22 80 36" fill={fill} stroke="#000" strokeWidth={S} />
-      {/* Spikes emerging from cap */}
-      <path d="M24 32 L30 4 L36 26 L42 0 L50 22 L58 -2 L64 20 L72 2 L78 32"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M36 22 L38 10 M50 18 L52 4 M64 20 L66 8" stroke="#000" strokeWidth={0.8} opacity="0.15" />
-      <path d="M38 20 L40 8 M52 16 L54 2 M66 18 L68 8" stroke="#fff" strokeWidth={1.2} opacity="0.18" />
-      <path d="M30 28 Q32 20 34 14 M72 28 Q70 20 68 10" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      {/* Spikes — taller, more dramatic, wilder angles */}
+      <path d="M22 34 L26 -2 L34 24 L40 -8 L50 18 L60 -10 L66 16 L74 -4 L80 34"
+        fill={fill} stroke="#000" strokeWidth={3} strokeLinejoin="round" />
+      {/* Inner spike detail lines */}
+      <path d="M34 20 L36 4 M50 14 L52 -2 M66 14 L68 2" stroke="#000" strokeWidth={1} opacity="0.18" />
+      <path d="M36 18 L38 2 M52 12 L54 -4 M68 12 L70 0" stroke="#fff" strokeWidth={1.5} opacity="0.2" />
+      <path d="M28 26 Q30 16 32 8 M74 26 Q72 16 70 6" stroke="#000" strokeWidth={0.8} opacity="0.14" />
     </g>
   );
 }
@@ -44,17 +45,21 @@ function Curly({ fill }: HairPartProps) {
     <g>
       {/* Main curly volume — organic cloud shape with bumpy edges */}
       <path d="M10 40 C6 32 10 20 22 14 C28 10 36 8 42 10 C46 6 54 6 58 10 C64 8 72 10 78 14 C90 20 94 32 90 40 C94 48 92 58 86 64 C90 72 88 80 82 78 C84 72 82 64 78 58 Q50 32 22 58 C18 64 16 72 18 78 C12 80 10 72 14 64 C8 58 6 48 10 40Z"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Curl texture — S-curves for natural curly look */}
-      <path d="M26 18 C30 14 34 18 32 22 C30 26 26 22 26 18Z" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.15" />
-      <path d="M46 12 C50 8 54 12 52 16 C50 20 46 16 46 12Z" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.15" />
-      <path d="M66 18 C70 14 74 18 72 22 C70 26 66 22 66 18Z" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.15" />
-      <path d="M14 44 C18 40 20 44 18 48 M86 44 C82 40 80 44 82 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.12" />
-      <path d="M16 58 C20 54 22 58 20 62 M84 58 C80 54 78 58 80 62" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.12" />
+        fill={fill} stroke="#000" strokeWidth={3} strokeLinejoin="round" />
+      {/* Curl texture — bolder S-curves, more of them */}
+      <path d="M24 16 C29 11 35 16 32 22 C29 28 23 22 24 16Z" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.2" />
+      <path d="M44 10 C50 5 56 10 53 16 C50 22 44 17 44 10Z" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.2" />
+      <path d="M64 16 C70 11 76 16 73 22 C70 28 64 22 64 16Z" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.2" />
+      {/* Side curl texture — visible bouncy loops */}
+      <path d="M12 42 C17 37 21 42 18 48 C15 54 11 48 12 42Z" fill="none" stroke="#000" strokeWidth={1} opacity="0.16" />
+      <path d="M88 42 C83 37 79 42 82 48 C85 54 89 48 88 42Z" fill="none" stroke="#000" strokeWidth={1} opacity="0.16" />
+      <path d="M14 56 C19 51 23 56 20 62 M86 56 C81 51 77 56 80 62" fill="none" stroke="#000" strokeWidth={1} opacity="0.14" />
+      {/* Extra curl loops at crown */}
+      <path d="M34 12 C37 8 41 12 39 15 M60 12 C63 8 67 12 65 15" fill="none" stroke="#000" strokeWidth={0.9} opacity="0.15" />
       {/* Highlights */}
-      <path d="M30 14 Q40 8 50 10 Q60 8 70 14" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.15" />
-      <path d="M14 38 Q16 32 22 28" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
-      <path d="M86 38 Q84 32 78 28" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
+      <path d="M28 12 Q40 6 50 8 Q60 6 72 12" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
+      <path d="M12 36 Q15 30 22 26" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M88 36 Q85 30 78 26" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
     </g>
   );
 }
@@ -65,11 +70,16 @@ function Buzz({ fill }: HairPartProps) {
       {/* Tight cap following head shape */}
       <path d="M22 36 Q22 20 50 16 Q78 20 78 36" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <path d="M26 34 Q26 22 50 19 Q74 22 74 34" fill="#fff" opacity="0.06" />
-      {/* Stubble dots */}
-      {[{x:35,y:22},{x:42,y:26},{x:50,y:20},{x:58,y:26},{x:65,y:22},{x:30,y:28},{x:46,y:24},{x:54,y:20},{x:62,y:24},{x:70,y:28},{x:38,y:30},{x:56,y:30},{x:48,y:22}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1} fill="#000" opacity={0.12-(i%3)*0.02} />
+      {/* Dense stubble dots — more dots, varied sizes for realistic texture */}
+      {[
+        {x:30,y:24},{x:35,y:21},{x:40,y:24},{x:45,y:20},{x:50,y:18},{x:55,y:20},{x:60,y:24},{x:65,y:21},{x:70,y:24},
+        {x:28,y:28},{x:33,y:26},{x:38,y:28},{x:43,y:23},{x:48,y:22},{x:53,y:22},{x:58,y:23},{x:63,y:26},{x:68,y:28},{x:72,y:28},
+        {x:32,y:31},{x:37,y:30},{x:42,y:27},{x:47,y:25},{x:53,y:25},{x:58,y:27},{x:63,y:30},{x:68,y:31},
+        {x:35,y:33},{x:44,y:30},{x:50,y:24},{x:56,y:30},{x:65,y:33},
+      ].map((p,i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={1.2 - (i%4)*0.15} fill="#000" opacity={0.14-(i%3)*0.02} />
       ))}
-      <path d="M36 20 Q50 16 64 20" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M34 20 Q50 15 66 20" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.14" />
     </g>
   );
 }
@@ -208,11 +218,16 @@ function Long({ fill }: HairPartProps) {
 function Bob({ fill }: HairPartProps) {
   return (
     <g>
-      <path d="M12 36 Q12 16 50 12 Q88 16 88 36 L88 58 Q86 66 78 62 L78 40 Q50 26 22 40 L22 62 Q14 66 12 58Z"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M18 40 Q18 50 20 58 M82 40 Q82 50 80 58" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      <path d="M24 38 Q24 48 26 56 M76 38 Q76 48 74 56" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <path d="M20 58 Q22 62 26 60 M80 58 Q78 62 74 60" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      {/* Fuller bob — more volume, rounder sides, visible curl at tips */}
+      <path d="M10 36 Q10 14 50 10 Q90 14 90 36 L90 60 Q88 68 80 64 Q78 58 78 42 Q50 24 22 42 Q22 58 20 64 Q12 68 10 60Z"
+        fill={fill} stroke="#000" strokeWidth={3} strokeLinejoin="round" />
+      {/* Volume strand lines */}
+      <path d="M16 42 Q16 52 18 60 M84 42 Q84 52 82 60" stroke="#000" strokeWidth={0.8} opacity="0.12" />
+      <path d="M22 40 Q22 50 24 58 M78 40 Q78 50 76 58" stroke="#fff" strokeWidth={1.2} opacity="0.14" />
+      {/* Curl tips at the ends */}
+      <path d="M18 60 Q20 66 26 62 M82 60 Q80 66 74 62" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
+      {/* Subtle inner volume line */}
+      <path d="M30 18 Q50 12 70 18" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.15" />
     </g>
   );
 }
@@ -964,38 +979,42 @@ function Quiff({ fill }: HairPartProps) {
   );
 }
 
-/** Curly crop fade — skin fade sides with short curly texture on top */
+/** Curly crop fade — anchored at y=28 like other short styles, curly texture on top */
 function FadeCurly({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Fade gradient on sides — skin visible at bottom, denser up */}
-      {[{x:24,y:34},{x:27,y:33},{x:76,y:34},{x:73,y:33}].map((p,i) => (
-        <circle key={`f${i}`} cx={p.x} cy={p.y} r={0.7} fill={fill} opacity={0.12} />
+      {/* Fade dots on sides — skin visible at bottom, denser up */}
+      <path d="M22 36 Q22 30 28 26" fill="none" stroke={fill} strokeWidth={0.8} opacity="0.15" />
+      <path d="M78 36 Q78 30 72 26" fill="none" stroke={fill} strokeWidth={0.8} opacity="0.15" />
+      {[{x:24,y:34},{x:27,y:32},{x:76,y:34},{x:73,y:32}].map((p,i) => (
+        <circle key={`f${i}`} cx={p.x} cy={p.y} r={0.8} fill={fill} opacity={0.15} />
       ))}
-      {/* Medium density mid-side */}
-      {[{x:25,y:31},{x:28,y:29},{x:31,y:27},{x:75,y:31},{x:72,y:29},{x:69,y:27}].map((p,i) => (
-        <circle key={`m${i}`} cx={p.x} cy={p.y} r={1} fill={fill} opacity={0.25} />
+      {[{x:26,y:30},{x:29,y:28},{x:32,y:26},{x:74,y:30},{x:71,y:28},{x:68,y:26}].map((p,i) => (
+        <circle key={`m${i}`} cx={p.x} cy={p.y} r={1} fill={fill} opacity={0.3} />
       ))}
-      {/* Dense upper side — transition zone */}
-      {[{x:27,y:26},{x:30,y:24},{x:33,y:23},{x:73,y:26},{x:70,y:24},{x:67,y:23}].map((p,i) => (
-        <circle key={`d${i}`} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.4} />
-      ))}
-      {/* Fade demarcation line */}
-      <path d="M30 25 Q40 21 50 20 Q60 21 70 25" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.08" />
-      {/* Curly top volume — lower profile than fade, textured shape */}
-      <path d="M32 24 Q34 14 42 10 Q46 8 50 8 Q54 8 58 10 Q66 14 68 24 Q62 16 50 14 Q38 16 32 24Z"
+      {/* Main dome — solid filled cap anchored at y=28, no inner cutout */}
+      <path d="M30 28 Q32 8 42 2 Q46 0 50 0 Q54 0 58 2 Q68 8 70 28Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Curly texture bumps on top surface */}
-      <path d="M36 14 Q38 10 42 10" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      <path d="M42 10 Q45 7 48 9" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      <path d="M48 9 Q51 6 54 8" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      <path d="M54 8 Q57 7 60 10" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      <path d="M60 10 Q63 10 64 14" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
-      {/* Interior curl detail lines */}
-      <path d="M40 16 Q42 13 44 15 M46 14 Q48 11 50 13 M52 14 Q54 11 56 13 M58 16 Q60 13 62 16" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.1" />
-      {/* Highlights on curl peaks */}
-      <path d="M43 9 Q46 7 49 8" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.15" />
-      <path d="M53 8 Q56 7 58 9" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+      {/* Extra fill to ensure no gaps with face */}
+      <path d="M32 26 Q34 10 50 4 Q66 10 68 26Z"
+        fill={fill} stroke="none" />
+      {/* Curly texture bumps on crown — row 1 (top) */}
+      <path d="M36 6 Q38 2 42 1 Q44 0 46 2" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M45 1 Q48 0 50 0 Q52 0 55 1" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      <path d="M54 1 Q56 0 58 1 Q62 3 64 6" fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
+      {/* Curly bumps row 2 */}
+      <path d="M34 14 Q36 8 40 6 Q42 5 44 7" fill={fill} stroke="#000" strokeWidth={1.3} strokeLinejoin="round" />
+      <path d="M44 6 Q47 3 50 4 Q53 3 55 6" fill={fill} stroke="#000" strokeWidth={1.3} strokeLinejoin="round" />
+      <path d="M55 6 Q58 4 60 6 Q63 7 65 12" fill={fill} stroke="#000" strokeWidth={1.3} strokeLinejoin="round" />
+      {/* Curly bumps row 3 — lower detail */}
+      <path d="M34 20 Q37 14 40 12 Q43 11 45 14" fill={fill} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M45 13 Q48 10 51 11 Q54 10 56 13" fill={fill} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M56 13 Q58 10 61 12 Q63 14 65 18" fill={fill} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      {/* Fade demarcation */}
+      <path d="M30 26 Q40 22 50 20 Q60 22 70 26" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
+      {/* Highlights */}
+      <path d="M44 1 Q48 0 52 1" fill="none" stroke="#fff" strokeWidth={1} opacity="0.18" />
+      <path d="M38 7 Q42 4 46 6" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.14" />
     </g>
   );
 }

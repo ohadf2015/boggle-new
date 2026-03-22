@@ -1,6 +1,5 @@
 /**
- * Tests for BoardCard component
- * TDD: RED phase
+ * Tests for BoardCard component (default + compact variants)
  */
 
 import React from 'react';
@@ -23,6 +22,10 @@ jest.mock('@/components/Avatar', () => {
   return MockAvatar;
 });
 
+jest.mock('@/utils/share', () => ({
+  shareBoard: jest.fn(),
+}));
+
 const defaultBoard = {
   board_code: 'ABC123',
   title: 'My Awesome Board',
@@ -41,7 +44,7 @@ const defaultBoard = {
   creator_avatar: null,
 };
 
-describe('BoardCard', () => {
+describe('BoardCard (default variant)', () => {
   it('renders board title', () => {
     render(<BoardCard board={defaultBoard} />);
     expect(screen.getByText('My Awesome Board')).toBeInTheDocument();
@@ -79,7 +82,6 @@ describe('BoardCard', () => {
 
   it('shows average rating', () => {
     render(<BoardCard board={defaultBoard} />);
-    // rating_sum / rating_count = 38 / 10 = 3.8
     expect(screen.getByText('3.8')).toBeInTheDocument();
   });
 
@@ -100,7 +102,7 @@ describe('BoardCard', () => {
 
   it('shows personal best score when provided', () => {
     render(<BoardCard board={defaultBoard} personalBest={1500} />);
-    expect(screen.getByText('1500')).toBeInTheDocument();
+    expect(screen.getByText(/1500/)).toBeInTheDocument();
   });
 
   it('shows Improve button text when personalBest is provided', () => {
@@ -115,8 +117,71 @@ describe('BoardCard', () => {
     expect(onPlay).toHaveBeenCalledWith('ABC123');
   });
 
-  it('shows zero rating when rating_count is zero', () => {
+  it('shows no rating text when rating_count is zero', () => {
     render(<BoardCard board={{ ...defaultBoard, rating_count: 0, rating_sum: 0 }} />);
-    expect(screen.getByText('ugc.gallery.noRating')).toBeInTheDocument();
+    // When no ratings, star section just doesn't show (no avgRating)
+    expect(screen.queryByText('3.8')).not.toBeInTheDocument();
+  });
+
+  it('renders difficulty accent strip', () => {
+    const { container } = render(<BoardCard board={defaultBoard} />);
+    const strip = container.querySelector('.h-1\\.5');
+    expect(strip).toBeInTheDocument();
+  });
+});
+
+describe('BoardCard (compact variant)', () => {
+  it('renders board title in compact mode', () => {
+    render(<BoardCard board={defaultBoard} variant="compact" />);
+    expect(screen.getByText('My Awesome Board')).toBeInTheDocument();
+  });
+
+  it('renders as a button in compact mode', () => {
+    render(<BoardCard board={defaultBoard} variant="compact" />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('calls onPlay when compact card is clicked', () => {
+    const onPlay = jest.fn();
+    render(<BoardCard board={defaultBoard} variant="compact" onPlay={onPlay} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(onPlay).toHaveBeenCalledWith('ABC123');
+  });
+
+  it('shows difficulty badge in compact mode', () => {
+    render(<BoardCard board={defaultBoard} variant="compact" />);
+    expect(screen.getByText('ugc.difficulty.medium')).toBeInTheDocument();
+  });
+
+  it('shows play count in compact mode', () => {
+    render(<BoardCard board={defaultBoard} variant="compact" />);
+    expect(screen.getByText('42')).toBeInTheDocument();
+  });
+
+  it('shows staff pick badge in compact mode when featured', () => {
+    render(<BoardCard board={{ ...defaultBoard, featured: true }} variant="compact" />);
+    expect(screen.getByText('ugc.gallery.staffPick')).toBeInTheDocument();
+  });
+
+  it('shows personal best in compact mode', () => {
+    render(<BoardCard board={defaultBoard} variant="compact" personalBest={2000} />);
+    expect(screen.getByText('2000')).toBeInTheDocument();
+  });
+
+  it('crops grid to 3x3 center in compact mode', () => {
+    const largeBoard = {
+      ...defaultBoard,
+      grid: [
+        ['A', 'B', 'C', 'D'],
+        ['E', 'F', 'G', 'H'],
+        ['I', 'J', 'K', 'L'],
+        ['M', 'N', 'O', 'P'],
+      ],
+      grid_size: 4,
+    };
+    const { container } = render(<BoardCard board={largeBoard} variant="compact" />);
+    // Should show 3x3 = 9 cells, not 4x4 = 16
+    const cells = container.querySelectorAll('.w-5.h-5');
+    expect(cells.length).toBe(9);
   });
 });

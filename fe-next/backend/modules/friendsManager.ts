@@ -73,6 +73,33 @@ export async function areFriends(userAId: string, userBId: string): Promise<bool
 }
 
 /**
+ * Check if either user has blocked the other
+ */
+export async function isBlocked(userAId: string, userBId: string): Promise<boolean> {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) return false;
+
+    const { data, error } = await supabase
+      .from('friends')
+      .select('id')
+      .eq('status', 'blocked')
+      .or(`and(user_id.eq.${userAId},friend_id.eq.${userBId}),and(user_id.eq.${userBId},friend_id.eq.${userAId})`)
+      .limit(1);
+
+    if (error) {
+      logger.error('FRIENDS_MANAGER', `Error checking block status: ${error.message}`);
+      return false;
+    }
+
+    return (data?.length ?? 0) > 0;
+  } catch (error) {
+    logger.error('FRIENDS_MANAGER', `Exception checking block status: ${(error as Error).message}`);
+    return false;
+  }
+}
+
+/**
  * Send a friend request
  */
 export async function sendFriendRequest(

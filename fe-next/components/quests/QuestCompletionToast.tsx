@@ -20,6 +20,7 @@ interface QuestCompletionOptions {
   xpReward: number;
   goldReward?: number;
   isGrandSlam?: boolean;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 /**
@@ -31,9 +32,10 @@ export function showQuestCompletionToast({
   xpReward,
   goldReward,
   isGrandSlam = false,
+  t,
 }: QuestCompletionOptions) {
   toast.custom(
-    (t) => (
+    (toastInstance) => (
       <div
         className={cn(
           'relative overflow-hidden',
@@ -43,7 +45,7 @@ export function showQuestCompletionToast({
           isGrandSlam
             ? 'bg-gradient-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
             : 'bg-neo-navy',
-          t.visible ? 'animate-neo-pop' : 'opacity-0 scale-75',
+          toastInstance.visible ? 'animate-neo-pop' : 'opacity-0 scale-75',
           'transition-all duration-300',
         )}
         role="status"
@@ -82,7 +84,7 @@ export function showQuestCompletionToast({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <p className="font-neo-display text-sm font-black text-neo-white truncate">
-              {isGrandSlam ? 'GRAND SLAM!' : questName}
+              {isGrandSlam ? t('quests.completion.grandSlam') : questName}
             </p>
             <div className="flex items-center gap-3 mt-1">
               {/* XP reward */}
@@ -94,12 +96,12 @@ export function showQuestCompletionToast({
                 )}
               >
                 <Star className="w-3.5 h-3.5" aria-hidden="true" />
-                +{xpReward} XP
+                {t('quests.completion.xpReward', { xp: xpReward })}
               </span>
               {/* Gold reward */}
               {goldReward && goldReward > 0 && (
                 <span className="inline-flex items-center gap-1 font-neo-display text-xs font-black text-neo-yellow">
-                  +{goldReward} Gold
+                  {t('quests.completion.goldReward', { gold: goldReward })}
                 </span>
               )}
             </div>

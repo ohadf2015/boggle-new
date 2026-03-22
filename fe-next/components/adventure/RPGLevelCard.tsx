@@ -159,7 +159,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
                 <Star
                   key={i}
                   data-testid="star-empty"
-                  className="w-5 h-5 text-neo-white/25"
+                  className="w-5 h-5 text-neo-white/50 fill-neo-white/10"
                 />
               );
             })}

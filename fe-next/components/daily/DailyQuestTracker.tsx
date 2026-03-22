@@ -17,7 +17,7 @@ const QUEST_LABEL_KEYS: Record<string, string> = {
   reach_combo: 'dailyQuests.reachCombo',
 };
 
-function QuestRow({ quest, t }: { quest: QuestProgress; t: (key: string) => string }) {
+function QuestRow({ quest, t }: { quest: QuestProgress; t: (key: string, params?: Record<string, string | number>) => string }) {
   const progress = Math.min(quest.current / quest.target, 1);
 
   return (
@@ -39,7 +39,7 @@ function QuestRow({ quest, t }: { quest: QuestProgress; t: (key: string) => stri
               quest.complete ? 'text-neo-lime line-through' : 'text-neo-white'
             }`}
           >
-            {t(QUEST_LABEL_KEYS[quest.id])}
+            {t(QUEST_LABEL_KEYS[quest.id], { target: quest.target })}
           </span>
           <span className="text-xs font-mono text-neo-white/60 ms-2">
             {quest.current}/{quest.target}
@@ -105,11 +105,11 @@ export function DailyQuestTracker() {
             <div className="flex items-center justify-center gap-3 text-sm font-bold text-neo-lime">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4" />
-                {totalRewards.xp} XP
+                {t('dailyQuests.totalXp', { xp: totalRewards.xp })}
               </div>
               <div className="flex items-center gap-1">
                 <Coins className="w-4 h-4" />
-                {totalRewards.coins} {t('dailyQuests.reward')}
+                {t('dailyQuests.totalCoins', { coins: totalRewards.coins })}
               </div>
             </div>
           </AdaptiveMotion.div>

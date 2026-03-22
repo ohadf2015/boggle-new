@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -25,13 +26,14 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
   challenge,
   isDark,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
-    <a
-      href={`/challenge/${challenge.challengeCode}`}
+    <Link
+      href={`/${language}/challenge/${challenge.challengeCode}`}
       className={cn(
-        'flex items-center gap-3 p-2 rounded-neo transition-colors',
+        'flex items-center gap-3 p-2 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
+        'hover:shadow-hard hover:-translate-y-0.5',
         isDark ? 'bg-black/20 hover:bg-black/40' : 'bg-white/50 hover:bg-white/80'
       )}
     >
@@ -49,7 +51,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
         </p>
       </div>
       <Target className="w-5 h-5 text-neo-lime" />
-    </a>
+    </Link>
   );
 };
 

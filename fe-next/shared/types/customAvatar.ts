@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const AVATAR_GENDERS = ['male', 'female'] as const;
 
 // ==================== Face Base Shapes ====================
-export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'dragonHead', 'triangle', 'catFace'] as const;
+export const AVATAR_BASES = ['round', 'square', 'oval', 'heart', 'diamond', 'hexagon', 'blob', 'skull', 'shield', 'dragonHead', 'triangle', 'catFace', 'oblong', 'rectangular', 'pear'] as const;
 
 // ==================== Skin Colors (inclusive range) ====================
 export const AVATAR_SKIN_COLORS = [
@@ -60,7 +60,7 @@ export const AVATAR_EYE_STYLES = [
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
   'curious', 'determined', 'doe',
   'closed', 'catPupils', 'wide', 'squint', 'sad',
-  'wingedLiner', 'smokyEye', 'confident',
+  'wingedLiner', 'smokyEye', 'confident', 'relaxed', 'focused',
 ] as const;
 
 // ==================== Eyebrows ====================
@@ -82,7 +82,7 @@ export const AVATAR_MOUTH_STYLES = [
   'vampire', 'kiss', 'braces', 'drool', 'goldTooth', 'mustache', 'whistle',
   'zipper', 'blowfish', 'gap', 'pipe', 'dragon', 'diamond', 'glitch',
   'frown', 'pout', 'bubbleGum', 'buckTeeth', 'sideSmile',
-  'lipstick', 'lipGloss',
+  'lipstick', 'lipGloss', 'closedSmile', 'thinLips',
 ] as const;
 
 // ==================== Accessories ====================

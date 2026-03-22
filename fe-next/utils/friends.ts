@@ -194,6 +194,70 @@ export async function blockUser(targetUserId: string): Promise<{ success: boolea
 }
 
 /**
+ * Unblock a user (removes the blocked relationship)
+ */
+export async function unblockUser(targetUserId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  const { error } = await supabase
+    .from('friends')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('friend_id', targetUserId)
+    .eq('status', 'blocked');
+
+  if (error) {
+    logger.error('Error unblocking user:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+/**
+ * Get users blocked by the current user
+ */
+export async function getBlockedUsers(): Promise<Friend[]> {
+  const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: blocked, error } = await supabase
+    .from('friends')
+    .select('friend_id')
+    .eq('user_id', user.id)
+    .eq('status', 'blocked');
+
+  if (error || !blocked || blocked.length === 0) return [];
+
+  const blockedIds = blocked.map((b: { friend_id: string }) => b.friend_id);
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config')
+    .in('id', blockedIds);
+
+  if (!profiles) return [];
+
+  return profiles.map((p: ProfileRow) => ({
+    id: p.id,
+    odUserId: p.id,
+    username: p.username || 'Unknown',
+    displayName: p.display_name || p.username || 'Unknown',
+    avatarImage: p.avatar_image || undefined,
+    customAvatar: p.avatar_config || undefined,
+    isOnline: false,
+    totalGames: 0,
+  })) as Friend[];
+}
+
+/**
  * Get all accepted friends for the current user
  */
 export async function getFriends(): Promise<Friend[]> {

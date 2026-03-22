@@ -3,21 +3,35 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { cn } from '../../../lib/utils';
-import { useLanguage } from '../../../contexts/LanguageContext';
-import Header from '../../../components/Header';
+import { ArrowLeft, LayoutGrid, Package, Crown, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import Header from '@/components/Header';
 
 const BoardGallery = dynamic(
-  () => import('../../../components/ugc/BoardGallery'),
+  () => import('@/components/ugc/BoardGallery'),
   { ssr: false }
 );
 const WordPackGallery = dynamic(
-  () => import('../../../components/ugc/WordPackGallery'),
+  () => import('@/components/ugc/WordPackGallery'),
+  { ssr: false }
+);
+const UGCFeaturedStrip = dynamic(
+  () => import('@/components/ugc/UGCFeaturedStrip'),
+  { ssr: false }
+);
+const CreatorLeaderboard = dynamic(
+  () => import('@/components/ugc/CreatorLeaderboard'),
   { ssr: false }
 );
 
-type Tab = 'boards' | 'packs';
+type Tab = 'boards' | 'packs' | 'creators';
+
+const TAB_CONFIG: { key: Tab; icon: typeof LayoutGrid; labelKey: string }[] = [
+  { key: 'boards', icon: LayoutGrid, labelKey: 'ugc.community.tabBoards' },
+  { key: 'packs', icon: Package, labelKey: 'ugc.community.tabPacks' },
+  { key: 'creators', icon: Crown, labelKey: 'ugc.community.tabCreators' },
+];
 
 export default function CommunityPageClient() {
   const { t, dir } = useLanguage();
@@ -40,37 +54,60 @@ export default function CommunityPageClient() {
           <ArrowLeft className={cn('w-4 h-4', dir === 'rtl' && 'rotate-180')} />
           {t('common.back')}
         </button>
-        {/* Tab switcher */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('boards')}
-            className={cn(
-              'px-4 py-2 font-neo-display font-bold text-sm',
-              'border-3 border-neo-black rounded-neo',
-              'transition-all duration-100',
-              activeTab === 'boards'
-                ? 'bg-neo-lime text-neo-black shadow-hard'
-                : 'bg-neo-navy text-neo-white/60 hover:text-neo-white'
-            )}
-          >
-            {t('ugc.gallery.title')}
-          </button>
-          <button
-            onClick={() => setActiveTab('packs')}
-            className={cn(
-              'px-4 py-2 font-neo-display font-bold text-sm',
-              'border-3 border-neo-black rounded-neo',
-              'transition-all duration-100',
-              activeTab === 'packs'
-                ? 'bg-neo-lime text-neo-black shadow-hard'
-                : 'bg-neo-navy text-neo-white/60 hover:text-neo-white'
-            )}
-          >
-            {t('ugc.myPacks')}
-          </button>
+
+        {/* Hero header */}
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Sparkles className="w-5 h-5 text-neo-pink" />
+            <h1 className="font-neo-display font-bold text-2xl sm:text-3xl text-neo-white">
+              {t('ugc.community.title')}
+            </h1>
+          </div>
+          <p className="text-neo-white/60 font-neo-body text-sm max-w-md mx-auto">
+            {t('ugc.community.subtitle')}
+          </p>
         </div>
 
-        {activeTab === 'boards' ? <BoardGallery /> : <WordPackGallery />}
+        {/* Featured boards at the top — always visible */}
+        <div className="mb-6">
+          <UGCFeaturedStrip
+            titleKey="ugc.strip.featured"
+            sort="featured"
+            limit={3}
+            variant="default"
+            showCreateCTA
+            showViewAll={false}
+            minToShow={1}
+          />
+        </div>
+
+        {/* Tab switcher — 3 tabs with icons */}
+        <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide" role="tablist">
+          {TAB_CONFIG.map(({ key, icon: Icon, labelKey }) => (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={activeTab === key}
+              onClick={() => setActiveTab(key)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 font-neo-display font-bold text-sm',
+                'border-3 border-black rounded-neo whitespace-nowrap',
+                'transition-all duration-100',
+                activeTab === key
+                  ? 'bg-neo-lime text-black shadow-hard'
+                  : 'bg-neo-navy text-neo-white/60 hover:text-neo-white shadow-hard-sm hover:shadow-hard'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {t(labelKey)}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        {activeTab === 'boards' && <BoardGallery />}
+        {activeTab === 'packs' && <WordPackGallery />}
+        {activeTab === 'creators' && <CreatorLeaderboard />}
       </div>
     </div>
   );

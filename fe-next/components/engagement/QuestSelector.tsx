@@ -83,14 +83,14 @@ function QuestOption({
 
       {/* Description */}
       <p className="text-sm text-neo-white/90 font-medium">
-        {quest.description}
+        {t(quest.description, { target: quest.target })}
       </p>
 
       {/* Select button */}
       <button
         type="button"
         onClick={() => onSelect(quest.id)}
-        aria-label={`${t('weeklyQuest.selectQuest')} - ${quest.description}`}
+        aria-label={`${t('weeklyQuest.selectQuest')} - ${t(quest.description, { target: quest.target })}`}
         className={cn(
           'w-full py-1.5 rounded-neo text-sm font-black',
           'border-neo border-black shadow-hard-sm',
@@ -107,10 +107,11 @@ function QuestOption({
 }
 
 export const QuestSelector: React.FC<QuestSelectorProps> = memo(({ quests, onSelect }) => {
+  const { t } = useLanguage();
   if (!quests.length) return null;
 
   return (
-    <div className="flex flex-col gap-2" role="list" aria-label="Quest options">
+    <div className="flex flex-col gap-2" role="list" aria-label={t('quests.questOptions')}>
       {quests.map((quest) => (
         <QuestOption key={quest.id} quest={quest} onSelect={onSelect} />
       ))}

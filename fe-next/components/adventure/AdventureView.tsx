@@ -174,6 +174,12 @@ function AdventureView(): React.JSX.Element {
           await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
         } catch (err) {
           console.warn('Failed to save progress:', err instanceof Error ? err.message : String(err));
+          // Retry once before navigating away
+          try {
+            await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
+          } catch {
+            // Progress lost — still navigate so player isn't stuck
+          }
         }
         if (typeof window !== 'undefined') {
           window.history.back();

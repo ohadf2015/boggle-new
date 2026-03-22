@@ -14,6 +14,7 @@ jest.mock('../../utils/socialHelpers', () => ({
 
 jest.mock('../../modules/friendsManager', () => ({
   areFriends: jest.fn(),
+  isBlocked: jest.fn().mockResolvedValue(false),
 }));
 
 const mockSupabaseSelect = jest.fn();

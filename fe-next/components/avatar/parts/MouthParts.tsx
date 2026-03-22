@@ -10,14 +10,14 @@ const S = STROKE_INNER;
 function Smile() {
   return (
     <g>
-      <path d="M40 60 Q50 68 60 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M37 60 Q50 70 63 60" fill="#E85D75" stroke="#000" strokeWidth={S} strokeLinecap="round" />
       {/* Inner lip highlight */}
-      <path d="M42 61 Q50 66 58 61" fill="#FF8FA3" opacity="0.5" />
+      <path d="M39 61.5 Q50 68 61 61.5" fill="#FF8FA3" opacity="0.5" />
       {/* Lip shine */}
-      <path d="M44 60.5 Q50 63 56 60.5" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.45" strokeLinecap="round" />
+      <path d="M41 60.5 Q50 64 59 60.5" fill="none" stroke="#fff" strokeWidth={1} opacity="0.45" strokeLinecap="round" />
       {/* Dimple hints at corners */}
-      <circle cx="40" cy="60.5" r="0.6" fill="#000" opacity="0.12" />
-      <circle cx="60" cy="60.5" r="0.6" fill="#000" opacity="0.12" />
+      <circle cx="37" cy="60.5" r="0.8" fill="#000" opacity="0.15" />
+      <circle cx="63" cy="60.5" r="0.8" fill="#000" opacity="0.15" />
     </g>
   );
 }
@@ -25,14 +25,14 @@ function Smile() {
 function Grin() {
   return (
     <g>
-      <path d="M37 58 Q50 70 63 58" fill="#8B0000" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M37 58 Q50 62 63 58" fill="#fff" stroke="#000" strokeWidth={1} />
-      <line x1="43" y1="58" x2="43" y2="61" stroke="#000" strokeWidth={0.6} />
-      <line x1="48" y1="58" x2="48" y2="62" stroke="#000" strokeWidth={0.6} />
-      <line x1="52" y1="58" x2="52" y2="62" stroke="#000" strokeWidth={0.6} />
-      <line x1="57" y1="58" x2="57" y2="61" stroke="#000" strokeWidth={0.6} />
-      <path d="M38 59 Q50 61 62 59" fill="none" stroke="#FF9999" strokeWidth={0.8} opacity="0.5" />
-      <ellipse cx="50" cy="67" rx="5" ry="3" fill="#FF6B6B" opacity="0.6" />
+      <path d="M34 58 Q50 72 66 58" fill="#8B0000" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M34 58 Q50 63 66 58" fill="#fff" stroke="#000" strokeWidth={1.2} />
+      <line x1="41" y1="58" x2="41" y2="61.5" stroke="#000" strokeWidth={0.7} />
+      <line x1="47" y1="58" x2="47" y2="63" stroke="#000" strokeWidth={0.7} />
+      <line x1="53" y1="58" x2="53" y2="63" stroke="#000" strokeWidth={0.7} />
+      <line x1="59" y1="58" x2="59" y2="61.5" stroke="#000" strokeWidth={0.7} />
+      <path d="M36 59 Q50 62 64 59" fill="none" stroke="#FF9999" strokeWidth={1} opacity="0.5" />
+      <ellipse cx="50" cy="68" rx="6" ry="3.5" fill="#FF6B6B" opacity="0.6" />
     </g>
   );
 }
@@ -70,10 +70,10 @@ function Oh() {
 function Smirk() {
   return (
     <g>
-      <path d="M42 61 Q52 66 58 57" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M43 62 Q50 65 56 59" fill="#E85D75" opacity="0.3" />
-      <circle cx="59" cy="58" r="1" fill="#000" opacity="0.3" />
-      <path d="M60 56 Q62 58 60 60" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.25" />
+      <path d="M38 62 Q50 68 62 56" fill="none" stroke="#000" strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M39 63 Q50 67 60 58" fill="#E85D75" opacity="0.35" />
+      <circle cx="63" cy="57" r="1.2" fill="#000" opacity="0.3" />
+      <path d="M64 55 Q66.5 57.5 64 60" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.25" />
     </g>
   );
 }
@@ -81,10 +81,10 @@ function Smirk() {
 function Flat() {
   return (
     <g>
-      <line x1="40" y1="62" x2="60" y2="62" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M41 60.5 Q50 59.5 59 60.5" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.25" />
-      <line x1="42" y1="64" x2="44" y2="64" stroke="#000" strokeWidth={0.6} opacity="0.2" />
-      <line x1="56" y1="64" x2="58" y2="64" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+      <line x1="37" y1="62" x2="63" y2="62" stroke="#000" strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M38 60.5 Q50 59.5 62 60.5" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.25" />
+      <line x1="39" y1="64" x2="42" y2="64" stroke="#000" strokeWidth={0.7} opacity="0.2" />
+      <line x1="58" y1="64" x2="61" y2="64" stroke="#000" strokeWidth={0.7} opacity="0.2" />
     </g>
   );
 }
@@ -558,6 +558,37 @@ function LipGloss() {
   );
 }
 
+/** Closed smile — subtle, lips together, gentle content expression */
+function ClosedSmile() {
+  return (
+    <g>
+      {/* Upper lip */}
+      <path d="M40 60 Q44 58 50 58 Q56 58 60 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Lower lip — slight smile curve */}
+      <path d="M40 60 Q44 63 50 64 Q56 63 60 60" fill="#C0625A" opacity="0.35" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      {/* Cupid's bow */}
+      <path d="M46 58 Q48 57 50 58 Q52 57 54 58" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+      {/* Lip shine */}
+      <path d="M46 61 Q50 62 54 61" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.15" />
+    </g>
+  );
+}
+
+/** Thin lips — neutral/serious, straight, minimal */
+function ThinLips() {
+  return (
+    <g>
+      {/* Lip line — barely curved, thin */}
+      <path d="M40 61 Q50 60.5 60 61" fill="none" stroke="#000" strokeWidth={1.8} strokeLinecap="round" />
+      {/* Subtle lower lip shadow */}
+      <path d="M42 63 Q50 64 58 63" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      {/* Corner marks */}
+      <circle cx="40" cy="61.5" r="0.4" fill="#000" opacity="0.2" />
+      <circle cx="60" cy="61.5" r="0.4" fill="#000" opacity="0.2" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const MOUTH_PARTS = {
@@ -591,6 +622,8 @@ export const MOUTH_PARTS = {
   sideSmile: SideSmile,
   lipstick: Lipstick,
   lipGloss: LipGloss,
+  closedSmile: ClosedSmile,
+  thinLips: ThinLips,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

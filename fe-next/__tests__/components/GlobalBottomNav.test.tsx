@@ -382,11 +382,11 @@ describe('GlobalBottomNav', () => {
             expect(nav).toHaveClass('shadow-[0_-4px_0_0_rgba(0,0,0,1)]');
         });
 
-        it('should apply solid neo-navy background', () => {
+        it('should apply neo-navy background with opacity', () => {
             const { container } = render(<GlobalBottomNav />);
             const nav = container.querySelector('nav');
 
-            expect(nav).toHaveClass('bg-neo-navy');
+            expect(nav).toHaveClass('bg-neo-navy/95');
         });
 
         it('should apply border styling', () => {

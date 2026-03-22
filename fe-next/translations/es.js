@@ -3632,12 +3632,22 @@ const es = {
     "community": {
       "hero": "Taller Comunitario",
       "heroSub": "Juega, crea y comparte rompecabezas de palabras con la comunidad",
+      "title": "Taller Comunitario",
+      "subtitle": "Juega, crea y comparte rompecabezas personalizados",
       "tabBoards": "Tableros",
       "tabPacks": "Paquetes",
       "tabCreators": "Creadores",
       "searchPlaceholder": "Buscar tableros y paquetes...",
       "createNew": "Crear",
       "featuredCreator": "Creador destacado"
+    },
+    "strip": {
+      "title": "Tableros de la Comunidad",
+      "featured": "Tableros Destacados",
+      "tryCustom": "Prueba un tablero comunitario",
+      "viewAll": "Ver todos",
+      "createOwn": "Crea tu propio tablero",
+      "createDesc": "Diseña rompecabezas personalizados para la comunidad"
     }
   },
   "ranked": {
@@ -4675,6 +4685,12 @@ const es = {
     "sentRequests": "Solicitudes Enviadas",
     "signInRequired": "Debes iniciar sesión",
     "typeAtLeast2Chars": "Escribe al menos 2 caracteres",
+    "acceptRequest": "Aceptar",
+    "declineRequest": "Rechazar",
+    "sendGift": "Enviar regalo",
+    "blocked": "Bloqueado",
+    "blockedUsers": "Usuarios bloqueados",
+    "unblock": "Desbloquear",
     "messages": "Mensajes",
     "noMessages": "Aún no hay mensajes",
     "startConversation": "¡Inicia una conversación!",
@@ -8253,6 +8269,8 @@ const es = {
   },
   "notifications": {
     "title": "Notificaciones",
+    "bell": "Notificaciones",
+    "bellUnread": "{count} notificaciones sin leer",
     "empty": "Sin notificaciones aún",
     "emptyDesc": "Cuando recibas notificaciones, aparecerán aquí",
     "markAllRead": "Marcar todo como leído",
@@ -9155,7 +9173,13 @@ const es = {
       "gold": "+{{gold}} Oro"
     },
     "weeklyWordMastery": "Maestría Semanal de Palabras",
-    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana"
+    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana",
+    "questOptions": "Opciones de misión",
+    "completion": {
+      "grandSlam": "¡Grand Slam!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Oro"
+    }
   },
   "wotd": {
     "teaser": "Palabra del Dia",
@@ -9246,7 +9270,18 @@ const es = {
     "selectQuest": "Elegir",
     "active": "Misión activa",
     "endsIn": "Termina en {{time}}",
-    "newQuestMonday": "Nuevas misiones el lunes"
+    "newQuestMonday": "Nuevas misiones el lunes",
+    "desc": {
+      "playGames": "Juega {{target}} partidas esta semana",
+      "findWords": "Encuentra {{target}} palabras",
+      "dailyChallenges": "Completa {{target}} desafíos diarios",
+      "longWords": "Encuentra {{target}} palabras de 5+ letras",
+      "mpWins": "Gana {{target}} partidas multijugador",
+      "combo": "Alcanza combo {{target}}",
+      "findWordsSession": "Encuentra {{target}} palabras en una sesión",
+      "dailyMissionsStreak": "Completa todas las misiones diarias {{target}} días",
+      "highScore": "Consigue {{target}}+ puntos en una partida"
+    }
   },
   "battlePass": {
     "daysLeft": "{{count}} días restantes",
@@ -9258,7 +9293,12 @@ const es = {
   "dailyQuests": {
     "allComplete": "¡Misiones del día completadas!",
     "reward": "+{{amount}} XP",
-    "title": "Misiones diarias"
+    "title": "Misiones diarias",
+    "playGames": "Juega {{target}} partidas",
+    "findLongWord": "Encuentra una palabra de {{target}} letras",
+    "reachCombo": "Alcanza {{target}}x combo",
+    "totalXp": "+{{xp}} XP",
+    "totalCoins": "{{coins}} monedas"
   }
 };
 

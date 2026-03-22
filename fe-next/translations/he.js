@@ -3605,12 +3605,22 @@ const he = {
     "community": {
       "hero": "סדנת הקהילה",
       "heroSub": "שחקו, צרו ושתפו חידות מילים עם הקהילה",
+      "title": "סדנת הקהילה",
+      "subtitle": "שחקו, צרו ושתפו חידות מילים מותאמות",
       "tabBoards": "לוחות",
       "tabPacks": "חבילות מילים",
       "tabCreators": "יוצרים",
       "searchPlaceholder": "חיפוש לוחות וחבילות...",
       "createNew": "יצירה",
       "featuredCreator": "יוצר מומלץ"
+    },
+    "strip": {
+      "title": "לוחות הקהילה",
+      "featured": "לוחות מומלצים",
+      "tryCustom": "נסו לוח קהילתי",
+      "viewAll": "הכל",
+      "createOwn": "צרו לוח משלכם",
+      "createDesc": "עצבו חידות מותאמות לקהילה"
     }
   },
   "ranked": {
@@ -4643,6 +4653,12 @@ const he = {
     "sentRequests": "בקשות שנשלחו",
     "signInRequired": "צריך להתחבר כדי לראות חברים",
     "typeAtLeast2Chars": "הקלד לפחות 2 תווים",
+    "acceptRequest": "אשר",
+    "declineRequest": "דחה",
+    "sendGift": "שלח מתנה",
+    "blocked": "חסום",
+    "blockedUsers": "משתמשים חסומים",
+    "unblock": "בטל חסימה",
     "challenges": {
       "send": "שלח אתגר",
       "pending": "אתגר ממתין",
@@ -8214,6 +8230,8 @@ const he = {
   },
   "notifications": {
     "title": "התראות",
+    "bell": "התראות",
+    "bellUnread": "{count} התראות שלא נקראו",
     "empty": "אין התראות עדיין",
     "emptyDesc": "כשתקבלו התראות, הן יופיעו כאן",
     "markAllRead": "סמן הכל כנקרא",
@@ -9008,7 +9026,13 @@ const he = {
       "gold": "זהב {{gold}}+"
     },
     "weeklyWordMastery": "שליטה שבועית במילים",
-    "weeklyWordMasteryDesc": "שלוט ב-{target} מילים השבוע"
+    "weeklyWordMasteryDesc": "שלוט ב-{target} מילים השבוע",
+    "questOptions": "אפשרויות משימות",
+    "completion": {
+      "grandSlam": "!גרנד סלאם",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} זהב"
+    }
   },
   "wotd": {
     "teaser": "מילת היום",
@@ -9099,7 +9123,18 @@ const he = {
     "selectQuest": "בחירה",
     "active": "משימה פעילה",
     "endsIn": "נגמר בעוד {{time}}",
-    "newQuestMonday": "משימות חדשות ביום שני"
+    "newQuestMonday": "משימות חדשות ביום שני",
+    "desc": {
+      "playGames": "שחקו {{target}} משחקים השבוע",
+      "findWords": "מצאו {{target}} מילים",
+      "dailyChallenges": "השלימו {{target}} אתגרים יומיים",
+      "longWords": "מצאו {{target}} מילים בנות 5+ אותיות",
+      "mpWins": "נצחו {{target}} משחקים מרובי משתתפים",
+      "combo": "הגיעו לקומבו {{target}}",
+      "findWordsSession": "מצאו {{target}} מילים במשחק אחד",
+      "dailyMissionsStreak": "השלימו את כל המשימות היומיות {{target}} ימים",
+      "highScore": "השיגו {{target}}+ נקודות במשחק אחד"
+    }
   },
   "battlePass": {
     "daysLeft": "{{count}} ימים נותרו",
@@ -9111,7 +9146,12 @@ const he = {
   "dailyQuests": {
     "allComplete": "כל המשימות בוצעו! 🎉",
     "reward": "+{{amount}} XP",
-    "title": "משימות יומיות"
+    "title": "משימות יומיות",
+    "playGames": "שחקו {{target}} משחקים",
+    "findLongWord": "מצאו מילה בת {{target}} אותיות",
+    "reachCombo": "הגיעו לקומבו {{target}}x",
+    "totalXp": "+{{xp}} XP",
+    "totalCoins": "{{coins}} מטבעות"
   }
 };
 

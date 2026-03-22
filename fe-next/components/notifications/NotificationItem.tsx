@@ -31,11 +31,12 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={handleClick}
       className={`
         relative flex gap-3 p-3 cursor-pointer transition-all duration-200
-        border-b-2 border-black/10 last:border-b-0
+        border-b-2 border-black/10 last:border-b-0 w-full text-start
         hover:bg-neo-navy/50
         ${!notification.read ? 'bg-neo-navy/30' : 'bg-transparent'}
       `}
@@ -74,7 +75,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
         <button
           onClick={handleMarkAsRead}
           className="
-            absolute top-3 right-3
+            absolute top-3 end-3
             w-3 h-3 rounded-full bg-neo-yellow
             border border-black
             hover:scale-125 transition-transform
@@ -82,7 +83,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
           title={t('notifications.markAsRead')}
         />
       )}
-    </div>
+    </button>
   );
 }
 

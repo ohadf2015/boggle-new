@@ -18,6 +18,8 @@ import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStep
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
 import TomorrowPreview from '@/components/results/TomorrowPreview';
 
+const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -330,6 +332,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               gameLanguage={gameLanguage} gameDuration={results.gameDuration}
               variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
           )}
+          <UGCFeaturedStrip
+            titleKey="ugc.strip.tryCustom"
+            sort="popular"
+            limit={3}
+            variant="compact"
+            showCreateCTA
+            minToShow={1}
+          />
           <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={handleBackToLobby}>
             <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
           </Button>

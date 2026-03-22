@@ -46,21 +46,21 @@ export interface GameStats {
 // --- Quest Pools ---
 
 const EASY_QUESTS: Omit<QuestTemplate, 'id'>[] = [
-  { difficulty: 'easy', type: 'play_games', description: 'Play 3 games this week', target: 3, xpReward: 200 },
-  { difficulty: 'easy', type: 'find_words', description: 'Find 50 words', target: 50, xpReward: 200 },
-  { difficulty: 'easy', type: 'daily_challenges', description: 'Complete 2 daily challenges', target: 2, xpReward: 200 },
+  { difficulty: 'easy', type: 'play_games', description: 'weeklyQuest.desc.playGames', target: 3, xpReward: 200 },
+  { difficulty: 'easy', type: 'find_words', description: 'weeklyQuest.desc.findWords', target: 50, xpReward: 200 },
+  { difficulty: 'easy', type: 'daily_challenges', description: 'weeklyQuest.desc.dailyChallenges', target: 2, xpReward: 200 },
 ];
 
 const MEDIUM_QUESTS: Omit<QuestTemplate, 'id'>[] = [
-  { difficulty: 'medium', type: 'long_words', description: 'Find 20 words of 5+ letters', target: 20, xpReward: 500 },
-  { difficulty: 'medium', type: 'mp_wins', description: 'Win 3 multiplayer games', target: 3, xpReward: 500 },
-  { difficulty: 'medium', type: 'combo_15', description: 'Reach combo 15', target: 15, xpReward: 500 },
+  { difficulty: 'medium', type: 'long_words', description: 'weeklyQuest.desc.longWords', target: 20, xpReward: 500 },
+  { difficulty: 'medium', type: 'mp_wins', description: 'weeklyQuest.desc.mpWins', target: 3, xpReward: 500 },
+  { difficulty: 'medium', type: 'combo_15', description: 'weeklyQuest.desc.combo', target: 15, xpReward: 500 },
 ];
 
 const HARD_QUESTS: Omit<QuestTemplate, 'id'>[] = [
-  { difficulty: 'hard', type: 'find_words_session', description: 'Find 100 words in a single session', target: 100, xpReward: 1000 },
-  { difficulty: 'hard', type: 'daily_missions_streak', description: 'Complete all daily missions 3 days', target: 3, xpReward: 1000 },
-  { difficulty: 'hard', type: 'high_score', description: 'Score 500+ in one game', target: 500, xpReward: 1000 },
+  { difficulty: 'hard', type: 'find_words_session', description: 'weeklyQuest.desc.findWordsSession', target: 100, xpReward: 1000 },
+  { difficulty: 'hard', type: 'daily_missions_streak', description: 'weeklyQuest.desc.dailyMissionsStreak', target: 3, xpReward: 1000 },
+  { difficulty: 'hard', type: 'high_score', description: 'weeklyQuest.desc.highScore', target: 500, xpReward: 1000 },
 ];
 
 // --- Pure Helpers ---

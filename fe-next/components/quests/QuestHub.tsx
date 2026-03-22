@@ -212,7 +212,7 @@ function WeeklyQuestSection() {
               </span>
             </div>
             <p className="font-neo-body text-sm text-neo-white/90 font-medium">
-              {activeQuest.description}
+              {t(activeQuest.description, { target: activeQuest.target })}
             </p>
             {/* Reward preview */}
             <div className="flex items-center gap-3 text-xs">
@@ -286,12 +286,12 @@ function WeeklyQuestSection() {
                         {t(`weeklyQuest.${quest.difficulty}`)}
                       </span>
                       <span className="font-neo-body text-sm text-neo-white/80 text-start">
-                        {quest.description}
+                        {t(quest.description, { target: quest.target })}
                       </span>
                     </div>
                     <div className="flex flex-col items-end gap-0.5 ms-3 flex-shrink-0">
                       <span className="font-neo-display text-sm font-black text-neo-cyan">
-                        +{quest.xpReward} XP
+                        {t('quests.reward.xp', { xp: quest.xpReward })}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neo-pink">
                         <Puzzle className="w-2.5 h-2.5" aria-hidden="true" />

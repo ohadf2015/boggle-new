@@ -3693,12 +3693,22 @@ const en = {
     "community": {
       "hero": "Community Workshop",
       "heroSub": "Play, create, and share custom word puzzles with the community",
+      "title": "Community Workshop",
+      "subtitle": "Play, create, and share custom word puzzles",
       "tabBoards": "Boards",
       "tabPacks": "Word Packs",
       "tabCreators": "Creators",
       "searchPlaceholder": "Search boards & packs...",
       "createNew": "Create",
       "featuredCreator": "Featured Creator"
+    },
+    "strip": {
+      "title": "Community Boards",
+      "featured": "Featured Boards",
+      "tryCustom": "Try a Community Board",
+      "viewAll": "View All",
+      "createOwn": "Create Your Own Board",
+      "createDesc": "Design custom puzzles for the community"
     }
   },
   "ranked": {
@@ -4812,6 +4822,9 @@ const en = {
     "acceptRequest": "Accept",
     "declineRequest": "Decline",
     "sendGift": "Send Gift",
+    "blocked": "Blocked",
+    "blockedUsers": "Blocked Users",
+    "unblock": "Unblock",
     "messages": "Messages",
     "noMessages": "Nothing yet...",
     "startConversation": "Say hi!",
@@ -8801,7 +8814,13 @@ const en = {
       "gold": "+{{gold}} Gold"
     },
     "weeklyWordMastery": "Weekly Word Mastery",
-    "weeklyWordMasteryDesc": "Master {target} words this week"
+    "weeklyWordMasteryDesc": "Master {target} words this week",
+    "questOptions": "Quest options",
+    "completion": {
+      "grandSlam": "GRAND SLAM!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Gold"
+    }
   },
   "wotd": {
     "teaser": "Word of the Day",
@@ -8892,7 +8911,18 @@ const en = {
     "selectQuest": "Select",
     "active": "Active Quest",
     "endsIn": "Ends {{time}}",
-    "newQuestMonday": "New quests available Monday"
+    "newQuestMonday": "New quests available Monday",
+    "desc": {
+      "playGames": "Play {{target}} games this week",
+      "findWords": "Find {{target}} words",
+      "dailyChallenges": "Complete {{target}} daily challenges",
+      "longWords": "Find {{target}} words of 5+ letters",
+      "mpWins": "Win {{target}} multiplayer games",
+      "combo": "Reach combo {{target}}",
+      "findWordsSession": "Find {{target}} words in a single session",
+      "dailyMissionsStreak": "Complete all daily missions {{target}} days",
+      "highScore": "Score {{target}}+ in one game"
+    }
   },
   "battlePass": {
     "daysLeft": "{{count}} days left",
@@ -8904,7 +8934,12 @@ const en = {
   "dailyQuests": {
     "allComplete": "All quests done!",
     "reward": "+{{amount}} XP",
-    "title": "Daily Quests"
+    "title": "Daily Quests",
+    "playGames": "Play {{target}} Games",
+    "findLongWord": "Find a {{target}}-Letter Word",
+    "reachCombo": "Reach {{target}}x Combo",
+    "totalXp": "+{{xp}} XP",
+    "totalCoins": "{{coins}} Coins"
   },
   "education": {
     "achievements": {

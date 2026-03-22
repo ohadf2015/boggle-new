@@ -57,7 +57,7 @@ function ActiveQuestView({
 
       {/* Quest description */}
       <p className="text-sm text-neo-white/90 font-medium">
-        {quest.description}
+        {t(quest.description, { target: quest.target })}
       </p>
 
       {/* Progress bar */}

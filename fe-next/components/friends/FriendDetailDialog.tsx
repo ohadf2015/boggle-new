@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Target, Circle, UserMinus } from 'lucide-react';
+import { Target, Circle, UserMinus, ShieldOff, MessageCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,9 @@ interface FriendDetailDialogProps {
   onClose: () => void;
   onChallenge: (friend: Friend) => void;
   onUnfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string } | void>;
+  onMessage?: (friend: Friend) => void;
+  onUnblock?: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  isBlockedUser?: boolean;
   isDark: boolean;
   t: (key: string) => string;
 }
@@ -23,6 +26,9 @@ export function FriendDetailDialog({
   onClose,
   onChallenge,
   onUnfriend,
+  onMessage,
+  onUnblock,
+  isBlockedUser = false,
   isDark,
   t,
 }: FriendDetailDialogProps): React.JSX.Element {
@@ -30,12 +36,12 @@ export function FriendDetailDialog({
   const [h2h, setH2H] = useState<HeadToHeadRecord | null>(null);
 
   useEffect(() => {
-    if (friend?.odUserId) {
+    if (friend?.odUserId && !isBlockedUser) {
       getHeadToHead(friend.odUserId).then(setH2H);
     } else {
       setH2H(null);
     }
-  }, [friend?.odUserId]);
+  }, [friend?.odUserId, isBlockedUser]);
 
   const handleUnfriend = useCallback(async () => {
     if (!friend) return;
@@ -45,19 +51,35 @@ export function FriendDetailDialog({
     onClose();
   }, [friend, onUnfriend, onClose]);
 
+  const handleUnblock = useCallback(async () => {
+    if (!friend || !onUnblock) return;
+    setActionLoading(true);
+    await onUnblock(friend.odUserId);
+    setActionLoading(false);
+    onClose();
+  }, [friend, onUnblock, onClose]);
+
   return (
     <Dialog open={!!friend} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         noDescription
-        className={cn('max-w-sm', isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900')}
+        className={cn(
+          'max-w-sm border-3 border-neo-black shadow-hard-lg',
+          isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
+        )}
       >
         {friend && (
           <>
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <Avatar avatarImage={friend.avatarImage} customAvatar={friend.customAvatar} size="lg" />
+                <Avatar
+                  avatarImage={friend.avatarImage}
+                  customAvatar={friend.customAvatar}
+                  size="lg"
+                  className="border-3 border-neo-black shadow-hard-sm"
+                />
                 <div>
-                  <DialogTitle className="text-lg">
+                  <DialogTitle className="text-lg font-black">
                     {friend.displayName || friend.username}
                   </DialogTitle>
                   <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
@@ -71,44 +93,54 @@ export function FriendDetailDialog({
               {/* Online status */}
               <div className="flex items-center gap-2">
                 <Circle
-                  className={cn('w-3 h-3', friend.isOnline ? 'text-green-500 fill-green-500' : 'text-gray-400')}
+                  className={cn(
+                    'w-3 h-3',
+                    isBlockedUser
+                      ? 'text-red-500 fill-red-500'
+                      : friend.isOnline ? 'text-green-500 fill-green-500' : 'text-gray-400'
+                  )}
                 />
                 <span className={cn('text-sm', isDark ? 'text-gray-300' : 'text-gray-600')}>
-                  {friend.isOnline ? t('common.online') : t('common.offline')}
+                  {isBlockedUser
+                    ? t('friends.blocked')
+                    : friend.isOnline ? t('common.online') : t('common.offline')
+                  }
                 </span>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className={cn(
-                  'p-3 rounded-neo border-2 text-center',
-                  isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
-                )}>
-                  <p className={cn('text-xl font-black', isDark ? 'text-cyan-400' : 'text-cyan-600')}>
-                    {friend.totalGames || 0}
-                  </p>
-                  <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                    {t('stats.games')}
-                  </p>
+              {/* Stats (hide for blocked users) */}
+              {!isBlockedUser && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black text-center',
+                    isDark ? 'bg-slate-700/50' : 'bg-gray-50'
+                  )}>
+                    <p className="text-xl font-black text-neo-cyan">
+                      {friend.totalGames || 0}
+                    </p>
+                    <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                      {t('stats.games')}
+                    </p>
+                  </div>
+                  <div className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black text-center',
+                    isDark ? 'bg-slate-700/50' : 'bg-gray-50'
+                  )}>
+                    <p className="text-xl font-black text-neo-pink">
+                      {friend.currentLevel || 1}
+                    </p>
+                    <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                      {t('stats.level')}
+                    </p>
+                  </div>
                 </div>
-                <div className={cn(
-                  'p-3 rounded-neo border-2 text-center',
-                  isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
-                )}>
-                  <p className={cn('text-xl font-black', isDark ? 'text-purple-400' : 'text-purple-600')}>
-                    {friend.currentLevel || 1}
-                  </p>
-                  <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                    {t('stats.level')}
-                  </p>
-                </div>
-              </div>
+              )}
 
-              {/* Head to Head */}
-              {h2h && h2h.totalGames > 0 && (
+              {/* Head to Head (hide for blocked users) */}
+              {!isBlockedUser && h2h && h2h.totalGames > 0 && (
                 <div className={cn(
-                  'p-3 rounded-neo border-2',
-                  isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
+                  'p-3 rounded-neo border-2 border-neo-black',
+                  isDark ? 'bg-slate-700/50' : 'bg-gray-50'
                 )}>
                   <p className={cn('text-xs font-bold mb-2 uppercase tracking-wide', isDark ? 'text-gray-300' : 'text-gray-600')}>
                     {t('friends.headToHead.title')}
@@ -121,7 +153,7 @@ export function FriendDetailDialog({
                       </p>
                     </div>
                     <div>
-                      <p className={cn('text-lg font-black', isDark ? 'text-gray-400' : 'text-gray-400')}>{h2h.draws}</p>
+                      <p className="text-lg font-black text-gray-400">{h2h.draws}</p>
                       <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
                         {t('friends.headToHead.draws')}
                       </p>
@@ -141,35 +173,75 @@ export function FriendDetailDialog({
 
               {/* Actions */}
               <div className="flex gap-2">
-                <Button
-                  onClick={() => { onChallenge(friend); onClose(); }}
-                  className={cn(
-                    'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
-                    'border-2 border-neo-black shadow-hard-sm',
-                    'bg-neo-lime text-neo-black font-bold'
-                  )}
-                >
-                  <Target className="w-4 h-4" />
-                  {t('friends.challenge')}
-                </Button>
-                <Button
-                  onClick={handleUnfriend}
-                  disabled={actionLoading}
-                  variant="outline"
-                  className={cn(
-                    'flex items-center gap-2 py-2.5 rounded-neo border-2',
-                    isDark ? 'border-red-500/50 text-red-400 hover:bg-red-500/20' : 'border-red-300 text-red-600 hover:bg-red-50'
-                  )}
-                >
-                  {actionLoading ? (
-                    <Loader size="sm" />
-                  ) : (
-                    <>
-                      <UserMinus className="w-4 h-4" />
-                      {t('friends.remove')}
-                    </>
-                  )}
-                </Button>
+                {isBlockedUser ? (
+                  <Button
+                    onClick={handleUnblock}
+                    disabled={actionLoading}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
+                      'border-2 border-neo-black shadow-hard-sm',
+                      'bg-neo-cyan text-neo-black font-bold',
+                      'hover:shadow-hard hover:-translate-y-0.5 transition-all'
+                    )}
+                  >
+                    {actionLoading ? (
+                      <Loader size="sm" />
+                    ) : (
+                      <>
+                        <ShieldOff className="w-4 h-4" />
+                        {t('friends.unblock')}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => { onChallenge(friend); onClose(); }}
+                      className={cn(
+                        'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
+                        'border-2 border-neo-black shadow-hard-sm',
+                        'bg-neo-lime text-neo-black font-bold',
+                        'hover:shadow-hard hover:-translate-y-0.5 transition-all'
+                      )}
+                    >
+                      <Target className="w-4 h-4" />
+                      {t('friends.challenge')}
+                    </Button>
+                    {onMessage && (
+                      <Button
+                        onClick={() => { onMessage(friend); onClose(); }}
+                        className={cn(
+                          'flex items-center justify-center gap-2 py-2.5 rounded-neo',
+                          'border-2 border-neo-black shadow-hard-sm',
+                          'bg-neo-orange text-white font-bold',
+                          'hover:shadow-hard hover:-translate-y-0.5 transition-all'
+                        )}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        {t('friends.messages')}
+                      </Button>
+                    )}
+                    <Button
+                      onClick={handleUnfriend}
+                      disabled={actionLoading}
+                      className={cn(
+                        'flex items-center gap-2 py-2.5 rounded-neo',
+                        'border-2 border-neo-black shadow-hard-sm',
+                        'bg-neo-pink text-white font-bold',
+                        'hover:shadow-hard hover:-translate-y-0.5 transition-all'
+                      )}
+                    >
+                      {actionLoading ? (
+                        <Loader size="sm" />
+                      ) : (
+                        <>
+                          <UserMinus className="w-4 h-4" />
+                          {t('friends.remove')}
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </>

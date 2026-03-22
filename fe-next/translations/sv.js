@@ -3219,12 +3219,22 @@ const sv = {
     "community": {
       "hero": "Community Workshop",
       "heroSub": "Spela, skapa och dela ordpussel med gemenskapen",
+      "title": "Community Workshop",
+      "subtitle": "Spela, skapa och dela anpassade ordpussel",
       "tabBoards": "Bräden",
       "tabPacks": "Ordpaket",
       "tabCreators": "Skapare",
       "searchPlaceholder": "Sök bräden och paket...",
       "createNew": "Skapa",
       "featuredCreator": "Utvald skapare"
+    },
+    "strip": {
+      "title": "Community-bräden",
+      "featured": "Utvalda bräden",
+      "tryCustom": "Prova ett community-bräde",
+      "viewAll": "Visa alla",
+      "createOwn": "Skapa ditt eget bräde",
+      "createDesc": "Designa anpassade pussel för gemenskapen"
     }
   },
   "ranked": {
@@ -4632,6 +4642,12 @@ const sv = {
     "sentRequests": "Skickade förfrågningar",
     "signInRequired": "Logga in för att se vänner",
     "typeAtLeast2Chars": "Skriv minst 2 tecken",
+    "acceptRequest": "Acceptera",
+    "declineRequest": "Avvisa",
+    "sendGift": "Skicka gåva",
+    "blocked": "Blockerad",
+    "blockedUsers": "Blockerade användare",
+    "unblock": "Avblockera",
     "challenges": {
       "send": "Skicka Utmaning",
       "pending": "Väntande Utmaning",
@@ -8209,6 +8225,8 @@ const sv = {
   },
   "notifications": {
     "title": "Aviseringar",
+    "bell": "Aviseringar",
+    "bellUnread": "{count} olästa aviseringar",
     "empty": "Inga aviseringar än",
     "emptyDesc": "När du får aviseringar visas de här",
     "markAllRead": "Markera alla som lästa",
@@ -9003,7 +9021,13 @@ const sv = {
       "gold": "+{{gold}} Guld"
     },
     "weeklyWordMastery": "Veckans Ordmästerskap",
-    "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan"
+    "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan",
+    "questOptions": "Uppdragsalternativ",
+    "completion": {
+      "grandSlam": "Grand Slam!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Guld"
+    }
   },
   "wotd": {
     "teaser": "Dagens Ord",
@@ -9094,7 +9118,18 @@ const sv = {
     "selectQuest": "Välj",
     "active": "Aktivt uppdrag",
     "endsIn": "Slutar om {{time}}",
-    "newQuestMonday": "Nya uppdrag på måndag"
+    "newQuestMonday": "Nya uppdrag på måndag",
+    "desc": {
+      "playGames": "Spela {{target}} spel denna vecka",
+      "findWords": "Hitta {{target}} ord",
+      "dailyChallenges": "Klara {{target}} dagliga utmaningar",
+      "longWords": "Hitta {{target}} ord med 5+ bokstäver",
+      "mpWins": "Vinn {{target}} multiplayerspel",
+      "combo": "Nå kombo {{target}}",
+      "findWordsSession": "Hitta {{target}} ord i en session",
+      "dailyMissionsStreak": "Klara alla dagliga uppdrag {{target}} dagar",
+      "highScore": "Få {{target}}+ poäng i ett spel"
+    }
   },
   "battlePass": {
     "daysLeft": "{{count}} dagar kvar",
@@ -9106,7 +9141,12 @@ const sv = {
   "dailyQuests": {
     "allComplete": "Alla uppdrag klara!",
     "reward": "+{{amount}} XP",
-    "title": "Dagliga uppdrag"
+    "title": "Dagliga uppdrag",
+    "playGames": "Spela {{target}} spel",
+    "findLongWord": "Hitta ett {{target}}-bokstavsord",
+    "reachCombo": "Nå {{target}}x kombo",
+    "totalXp": "+{{xp}} XP",
+    "totalCoins": "{{coins}} mynt"
   }
 };
 

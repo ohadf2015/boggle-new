@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Target, ChevronRight, Wifi, WifiOff, Clock, Gift } from 'lucide-react';
+import { Target, ChevronRight, Clock, Gift, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,7 @@ interface FriendRowProps {
   compact?: boolean;
   onChallengeClick?: (friend: Friend) => void;
   onGiftClick?: (friend: Friend) => void;
+  onMessageClick?: (friend: Friend) => void;
   onClick?: () => void;
 }
 
@@ -51,24 +52,18 @@ const FriendStatusIndicator: React.FC<{
   size?: 'sm' | 'md';
 }> = ({ isOnline, size = 'md' }) => {
   const dotSize = size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3';
-  const iconSize = size === 'sm' ? 'w-2 h-2' : 'w-2.5 h-2.5';
 
   return (
     <div
       className={cn(
-        'absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-slate-800 flex items-center justify-center',
+        'absolute -bottom-0.5 -end-0.5 rounded-full border-2 border-slate-800',
         dotSize,
         isOnline
           ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]'
           : 'bg-gray-500'
       )}
-    >
-      {isOnline ? (
-        <Wifi className={cn(iconSize, 'text-white')} strokeWidth={3} />
-      ) : (
-        <WifiOff className={cn(iconSize, 'text-white')} strokeWidth={3} />
-      )}
-    </div>
+      aria-label={isOnline ? 'Online' : 'Offline'}
+    />
   );
 };
 
@@ -88,6 +83,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
   compact,
   onChallengeClick,
   onGiftClick,
+  onMessageClick,
   onClick,
 }) => {
   const { t } = useLanguage();
@@ -102,9 +98,18 @@ export const FriendRow: React.FC<FriendRowProps> = ({
 
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
       whileHover={{ x: compact ? 0 : 2, y: compact ? 0 : -1 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      aria-label={friend.displayName || friend.username}
       className={cn(
         'flex items-center gap-3 p-2 rounded-neo border-2 cursor-pointer transition-colors',
         isDark
@@ -152,6 +157,21 @@ export const FriendRow: React.FC<FriendRowProps> = ({
 
       {!compact && (
         <div className="flex items-center gap-1">
+          {onMessageClick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMessageClick(friend);
+              }}
+              aria-label={t('friends.sendMessage')}
+              className={cn(
+                'p-1.5 rounded-full transition-colors',
+                isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+              )}
+            >
+              <MessageCircle className="w-4 h-4 text-neo-cyan" />
+            </button>
+          )}
           {onGiftClick && (
             <button
               onClick={(e) => {
@@ -173,6 +193,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
                 e.stopPropagation();
                 onChallengeClick(friend);
               }}
+              aria-label={t('friends.challenges.send')}
               className={cn(
                 'p-1.5 rounded-full transition-colors',
                 isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'

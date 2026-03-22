@@ -10,24 +10,24 @@ const S = STROKE_INNER;
 function Round() {
   return (
     <g>
-      {/* Sclera with subtle upper lid shadow */}
-      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="62" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <path d="M33 40 Q38 37.5 43 40" fill="#000" opacity="0.06" />
-      <path d="M57 40 Q62 37.5 67 40" fill="#000" opacity="0.06" />
+      {/* Sclera — bigger for caricature feel */}
+      <circle cx="38" cy="42" r="6.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="6.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <path d="M31.5 40 Q38 36.5 44.5 40" fill="#000" opacity="0.06" />
+      <path d="M55.5 40 Q62 36.5 68.5 40" fill="#000" opacity="0.06" />
       {/* Iris — two-tone for depth */}
-      <circle cx="39" cy="41" r="3.2" fill="#4A6FA5" />
-      <circle cx="63" cy="41" r="3.2" fill="#4A6FA5" />
-      <circle cx="39" cy="42" r="2.8" fill="#3A5A8A" opacity="0.4" />
-      <circle cx="63" cy="42" r="2.8" fill="#3A5A8A" opacity="0.4" />
-      {/* Pupil */}
-      <circle cx="39" cy="41" r="2" fill="#000" />
-      <circle cx="63" cy="41" r="2" fill="#000" />
-      {/* Catchlight — two reflections for liveliness */}
-      <circle cx="37.5" cy="39.5" r="1.2" fill="#fff" />
-      <circle cx="61.5" cy="39.5" r="1.2" fill="#fff" />
-      <circle cx="40" cy="42.5" r="0.5" fill="#fff" opacity="0.5" />
-      <circle cx="64" cy="42.5" r="0.5" fill="#fff" opacity="0.5" />
+      <circle cx="39" cy="41.5" r="4.2" fill="#4A6FA5" />
+      <circle cx="63" cy="41.5" r="4.2" fill="#4A6FA5" />
+      <circle cx="39" cy="42.5" r="3.6" fill="#3A5A8A" opacity="0.4" />
+      <circle cx="63" cy="42.5" r="3.6" fill="#3A5A8A" opacity="0.4" />
+      {/* Pupil — 55% of iris */}
+      <circle cx="39" cy="41.5" r="2.5" fill="#000" />
+      <circle cx="63" cy="41.5" r="2.5" fill="#000" />
+      {/* Catchlight — bigger reflections for liveliness */}
+      <circle cx="36.8" cy="39.5" r="1.6" fill="#fff" />
+      <circle cx="60.8" cy="39.5" r="1.6" fill="#fff" />
+      <circle cx="40.5" cy="43" r="0.7" fill="#fff" opacity="0.5" />
+      <circle cx="64.5" cy="43" r="0.7" fill="#fff" opacity="0.5" />
     </g>
   );
 }
@@ -67,13 +67,15 @@ function Star() {
 function Wink() {
   return (
     <g>
-      <circle cx="38" cy="42" r="5" fill="#fff" stroke="#000" strokeWidth={S} />
-      <circle cx="39" cy="41" r="3.2" fill="#4A6FA5" />
-      <circle cx="39" cy="41" r="2" fill="#000" />
-      <circle cx="37.5" cy="39.5" r="1.2" fill="#fff" />
-      <path d="M57 42 Q62 38 67 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <line x1="59" y1="40" x2="58" y2="38" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
-      <line x1="65" y1="40" x2="66" y2="38" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      {/* Open eye — scaled up to match Round */}
+      <circle cx="38" cy="42" r="6.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="39" cy="41.5" r="4.2" fill="#4A6FA5" />
+      <circle cx="39" cy="41.5" r="2.5" fill="#000" />
+      <circle cx="36.8" cy="39.5" r="1.6" fill="#fff" />
+      {/* Winking eye — bolder arc */}
+      <path d="M56 42 Q62 37 68 42" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <line x1="58" y1="40" x2="57" y2="37.5" stroke="#000" strokeWidth={1.8} strokeLinecap="round" />
+      <line x1="66" y1="40" x2="67" y2="37.5" stroke="#000" strokeWidth={1.8} strokeLinecap="round" />
     </g>
   );
 }
@@ -800,6 +802,56 @@ function Confident() {
   );
 }
 
+/** Relaxed eyes — half-open, calm, green iris. Natural everyday look */
+function Relaxed() {
+  return (
+    <g>
+      {/* Semi-open sclera — heavy upper lid, relaxed */}
+      <path d="M33 42 Q38 39.5 43 42 Q38 45.5 33 42Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M57 42 Q62 39.5 67 42 Q62 45.5 57 42Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Heavy upper lid shadow */}
+      <path d="M33 42 Q38 39.5 43 42" fill="#000" opacity="0.1" />
+      <path d="M57 42 Q62 39.5 67 42" fill="#000" opacity="0.1" />
+      {/* Iris — hazel green */}
+      <circle cx="38" cy="42.5" r="2.5" fill="#5D7A3A" />
+      <circle cx="62" cy="42.5" r="2.5" fill="#5D7A3A" />
+      <circle cx="38" cy="42.5" r="1.8" fill="#4A6630" opacity="0.6" />
+      <circle cx="62" cy="42.5" r="1.8" fill="#4A6630" opacity="0.6" />
+      {/* Pupil */}
+      <circle cx="38" cy="42.5" r="1.4" fill="#000" />
+      <circle cx="62" cy="42.5" r="1.4" fill="#000" />
+      {/* Catchlight */}
+      <circle cx="37" cy="41.5" r="0.8" fill="#fff" />
+      <circle cx="61" cy="41.5" r="0.8" fill="#fff" />
+    </g>
+  );
+}
+
+/** Focused eyes — slightly narrowed, intense gaze, dark iris */
+function Focused() {
+  return (
+    <g>
+      {/* Narrowed sclera */}
+      <path d="M33 41 Q38 38.5 43 41 Q38 44.5 33 41Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M57 41 Q62 38.5 67 41 Q62 44.5 57 41Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Upper lid tension */}
+      <path d="M33 41 Q38 38.5 43 41" fill="#000" opacity="0.12" />
+      <path d="M57 41 Q62 38.5 67 41" fill="#000" opacity="0.12" />
+      {/* Iris — dark brown, larger for intense look */}
+      <circle cx="38" cy="41.5" r="3.2" fill="#3E2723" />
+      <circle cx="62" cy="41.5" r="3.2" fill="#3E2723" />
+      <circle cx="38" cy="41.5" r="2" fill="#000" />
+      <circle cx="62" cy="41.5" r="2" fill="#000" />
+      {/* Sharp catchlight */}
+      <circle cx="37" cy="40.5" r="1.1" fill="#fff" />
+      <circle cx="61" cy="40.5" r="1.1" fill="#fff" />
+      {/* Lower lid tension */}
+      <path d="M34 43.5 Q38 45 42 43.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.15" />
+      <path d="M58 43.5 Q62 45 66 43.5" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.15" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const EYE_PARTS = {
@@ -839,6 +891,8 @@ export const EYE_PARTS = {
   wingedLiner: WingedLiner,
   smokyEye: SmokyEye,
   confident: Confident,
+  relaxed: Relaxed,
+  focused: Focused,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

@@ -4,6 +4,7 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Home, Swords, ScrollText, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -106,7 +107,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[80]",
-                "bg-neo-navy", // Solid background, no transparency
+                "bg-neo-navy/95 backdrop-blur-sm", // Slight transparency with blur
                 "border-t-3 border-neo-black",
                 "shadow-[0_-4px_0_0_rgba(0,0,0,1)]", // Hard shadow upward
                 "sm:hidden", // Only visible on mobile (<sm breakpoint)
@@ -129,28 +130,38 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'home'
                             ? "text-neo-yellow"
-                            : "text-neo-white/60 hover:text-neo-white/80"
+                            : "text-neo-white/40 hover:text-neo-white/70"
                     )}
                     aria-label={t('nav.home')}
                     aria-current={activeTab === 'home' ? 'page' : undefined}
                 >
-                    <Home
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'home' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
+                    {/* Glow background */}
+                    {activeTab === 'home' && (
+                        <motion.div
+                            layoutId="tab-glow"
+                            className="absolute inset-0 rounded-xl bg-neo-yellow/10"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                        />
+                    )}
+                    <motion.div
+                        animate={{ scale: activeTab === 'home' ? 1.15 : 1, y: activeTab === 'home' ? -1 : 0 }}
+                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
+                        className="relative z-10"
+                    >
+                        <Home className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                    </motion.div>
                     <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
+                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
                         activeTab === 'home' && "text-neo-yellow"
                     )}>
                         {t('nav.home')}
                     </span>
                     {/* Active indicator */}
                     {activeTab === 'home' && (
-                        <div
+                        <motion.div
+                            layoutId="tab-indicator"
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-yellow rounded-b-full"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
                             aria-hidden="true"
                         />
                     )}
@@ -167,27 +178,36 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'play'
                             ? "text-neo-orange"
-                            : "text-neo-white/60 hover:text-neo-white/80"
+                            : "text-neo-white/40 hover:text-neo-white/70"
                     )}
                     aria-label={t('nav.play')}
                     aria-current={activeTab === 'play' ? 'page' : undefined}
                 >
-                    <Swords
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'play' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
+                    {activeTab === 'play' && (
+                        <motion.div
+                            layoutId="tab-glow"
+                            className="absolute inset-0 rounded-xl bg-neo-orange/10"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                        />
+                    )}
+                    <motion.div
+                        animate={{ scale: activeTab === 'play' ? 1.15 : 1, y: activeTab === 'play' ? -1 : 0 }}
+                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
+                        className="relative z-10"
+                    >
+                        <Swords className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                    </motion.div>
                     <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
+                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
                         activeTab === 'play' && "text-neo-orange"
                     )}>
                         {t('nav.play')}
                     </span>
                     {activeTab === 'play' && (
-                        <div
+                        <motion.div
+                            layoutId="tab-indicator"
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-orange rounded-b-full"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
                             aria-hidden="true"
                         />
                     )}
@@ -204,27 +224,36 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'quests'
                             ? "text-neo-lime"
-                            : "text-neo-white/60 hover:text-neo-white/80"
+                            : "text-neo-white/40 hover:text-neo-white/70"
                     )}
                     aria-label={t('nav.quests')}
                     aria-current={activeTab === 'quests' ? 'page' : undefined}
                 >
-                    <ScrollText
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'quests' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
+                    {activeTab === 'quests' && (
+                        <motion.div
+                            layoutId="tab-glow"
+                            className="absolute inset-0 rounded-xl bg-neo-lime/10"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                        />
+                    )}
+                    <motion.div
+                        animate={{ scale: activeTab === 'quests' ? 1.15 : 1, y: activeTab === 'quests' ? -1 : 0 }}
+                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
+                        className="relative z-10"
+                    >
+                        <ScrollText className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                    </motion.div>
                     <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
+                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
                         activeTab === 'quests' && "text-neo-lime"
                     )}>
                         {t('nav.quests')}
                     </span>
                     {activeTab === 'quests' && (
-                        <div
+                        <motion.div
+                            layoutId="tab-indicator"
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-lime rounded-b-full"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
                             aria-hidden="true"
                         />
                     )}
@@ -241,28 +270,37 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                         "relative",
                         activeTab === 'profile'
                             ? "text-neo-cyan"
-                            : "text-neo-white/60 hover:text-neo-white/80"
+                            : "text-neo-white/40 hover:text-neo-white/70"
                     )}
                     aria-label={t('nav.profile')}
                     aria-current={activeTab === 'profile' ? 'page' : undefined}
                 >
-                    <User
-                        className={cn(
-                            "w-6 h-6 mb-1",
-                            activeTab === 'profile' && "animate-neo-pop"
-                        )}
-                        aria-hidden="true"
-                    />
+                    {activeTab === 'profile' && (
+                        <motion.div
+                            layoutId="tab-glow"
+                            className="absolute inset-0 rounded-xl bg-neo-cyan/10"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                        />
+                    )}
+                    <motion.div
+                        animate={{ scale: activeTab === 'profile' ? 1.15 : 1, y: activeTab === 'profile' ? -1 : 0 }}
+                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
+                        className="relative z-10"
+                    >
+                        <User className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                    </motion.div>
                     <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide",
+                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
                         activeTab === 'profile' && "text-neo-cyan"
                     )}>
                         {t('nav.profile')}
                     </span>
                     {/* Active indicator */}
                     {activeTab === 'profile' && (
-                        <div
+                        <motion.div
+                            layoutId="tab-indicator"
                             className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-cyan rounded-b-full"
+                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
                             aria-hidden="true"
                         />
                     )}

@@ -13,7 +13,7 @@ import {
   type GiftType,
 } from '@/shared/utils/giftingRules';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
-import { areFriends } from '../modules/friendsManager';
+import { areFriends, isBlocked } from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { notifyGiftReceived } from '../modules/pushNotificationTriggers';
 import logger from '../utils/logger';
@@ -47,8 +47,14 @@ export async function handleGiftSend(
     return { success: false, error: 'Cannot send gift to yourself' };
   }
 
-  // Must be friends
-  const isFriend = await areFriends(senderId, params.recipientId);
+  // Must be friends and not blocked
+  const [isFriend, blocked] = await Promise.all([
+    areFriends(senderId, params.recipientId),
+    isBlocked(senderId, params.recipientId),
+  ]);
+  if (blocked) {
+    return { success: false, error: 'Cannot send gift to blocked user' };
+  }
   if (!isFriend) {
     return { success: false, error: 'Can only send gifts to friends' };
   }

@@ -10,6 +10,7 @@ import {
   MessageCircle,
   X,
   ChevronRight,
+  ShieldOff,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
@@ -62,6 +63,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
     declineRequest,
     cancelRequest,
     unfriend,
+    unblock,
+    blockedUsers,
     search,
   } = useFriends();
 
@@ -75,11 +78,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
     loadMessages,
     markAsRead,
     sendChallenge,
+    refreshThreads,
   } = useFriendMessages();
 
   const [activeTab, setActiveTab] = useState<TabType>('friends');
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [selectedBlockedUser, setSelectedBlockedUser] = useState<Friend | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
   const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
@@ -107,9 +112,44 @@ const FriendsList: React.FC<FriendsListProps> = ({
     loadMessages(thread.friendUserId);
   }, [loadMessages]);
 
-  const handleSendMessage = useCallback((text: string) => {
-    if (selectedThread) sendMessage(selectedThread.friendUserId, text);
-  }, [selectedThread, sendMessage]);
+  // Open a message thread for a friend (creates temporary thread if none exists)
+  const handleOpenMessageForFriend = useCallback((friend: Friend) => {
+    // Check if a thread already exists
+    const existingThread = threads.find(t => t.friendUserId === friend.odUserId);
+    if (existingThread) {
+      handleThreadClick(existingThread);
+    } else {
+      // Create a temporary thread object so MessageThread can render
+      const tempThread: MessageThreadType = {
+        conversationId: `temp_${friend.odUserId}`,
+        friendUserId: friend.odUserId,
+        friendUsername: friend.username,
+        friendDisplayName: friend.displayName,
+        friendAvatar: {
+          emoji: '',
+          color: '',
+          image: friend.avatarImage,
+          customAvatar: friend.customAvatar,
+        },
+        lastMessage: '',
+        lastMessageAt: Date.now(),
+        unreadCount: 0,
+        isOnline: friend.isOnline,
+      };
+      setSelectedThread(tempThread);
+      loadMessages(friend.odUserId);
+    }
+    // Switch to messages tab
+    setActiveTab('messages');
+  }, [threads, handleThreadClick, loadMessages]);
+
+  const handleSendMessage = useCallback(async (text: string) => {
+    if (selectedThread) {
+      await sendMessage(selectedThread.friendUserId, text);
+      // Refresh threads so new conversations appear in the list
+      refreshThreads();
+    }
+  }, [selectedThread, sendMessage, refreshThreads]);
 
   const handleMarkAsRead = useCallback(() => {
     if (selectedThread && messages.length > 0) {
@@ -315,6 +355,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     <FriendRow
                       friend={friend}
                       isDark={isDark}
+                      onMessageClick={handleOpenMessageForFriend}
                       onChallengeClick={() => setChallengeFriend(friend)}
                       onClick={() => setSelectedFriend(friend)}
                     />
@@ -330,6 +371,49 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 />
               )}
             </div>
+
+            {/* Blocked users section */}
+            {blockedUsers.length > 0 && (
+              <div className={cn('p-3 rounded-neo border-2 mt-4', isDark ? 'bg-red-500/10 border-red-500/30' : 'bg-red-50 border-red-300')}>
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldOff className="w-4 h-4 text-red-400" />
+                  <span className={cn('font-bold text-sm', isDark ? 'text-red-300' : 'text-red-700')}>
+                    {t('friends.blockedUsers')}
+                  </span>
+                  <span className={cn('text-xs px-1.5 py-0.5 rounded-full', isDark ? 'bg-red-500/20 text-red-300' : 'bg-red-100 text-red-600')}>
+                    {blockedUsers.length}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {blockedUsers.map(user => (
+                    <div
+                      key={user.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedBlockedUser(user)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedBlockedUser(user);
+                        }
+                      }}
+                      className={cn(
+                        'flex items-center gap-3 p-2 rounded-neo cursor-pointer',
+                        isDark ? 'bg-black/20 hover:bg-black/40' : 'bg-white/50 hover:bg-white/80'
+                      )}
+                    >
+                      <Avatar avatarImage={user.avatarImage} customAvatar={user.customAvatar} size="sm" />
+                      <span className={cn('flex-1 font-bold text-sm truncate', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                        {user.displayName || user.username}
+                      </span>
+                      <span className={cn('text-xs', isDark ? 'text-red-400' : 'text-red-500')}>
+                        {t('friends.blocked')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -419,7 +503,20 @@ const FriendsList: React.FC<FriendsListProps> = ({
         friend={selectedFriend}
         onClose={() => setSelectedFriend(null)}
         onChallenge={setChallengeFriend}
+        onMessage={handleOpenMessageForFriend}
         onUnfriend={unfriend}
+        isDark={isDark}
+        t={t}
+      />
+
+      {/* Blocked user detail dialog */}
+      <FriendDetailDialog
+        friend={selectedBlockedUser}
+        onClose={() => setSelectedBlockedUser(null)}
+        onChallenge={() => {}}
+        onUnfriend={() => Promise.resolve()}
+        onUnblock={unblock}
+        isBlockedUser
         isDark={isDark}
         t={t}
       />

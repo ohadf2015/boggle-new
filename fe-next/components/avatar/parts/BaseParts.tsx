@@ -12,7 +12,14 @@ interface BasePartProps {
 }
 
 const Nose = () => (
-  <path d="M48 54 Q50 58 52 54" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.45" />
+  <g>
+    {/* Ball-shaped nose tip for visibility */}
+    <ellipse cx="50" cy="56" rx="2.5" ry="2" fill="#000" opacity="0.08" />
+    <path d="M47 53 Q50 58 53 53" fill="none" stroke="#000" strokeWidth={2} opacity="0.5" strokeLinecap="round" />
+    {/* Nostril hints */}
+    <circle cx="48.5" cy="56.5" r="0.8" fill="#000" opacity="0.2" />
+    <circle cx="51.5" cy="56.5" r="0.8" fill="#000" opacity="0.2" />
+  </g>
 );
 
 function Round({ fill }: BasePartProps) {
@@ -300,6 +307,59 @@ function CatFace({ fill }: BasePartProps) {
   );
 }
 
+/** Oblong — tall narrow face, high forehead, narrow chin */
+function Oblong({ fill }: BasePartProps) {
+  return (
+    <g>
+      <ellipse cx="50" cy="50" rx="24" ry="36" fill={fill} stroke="#000" strokeWidth={S} />
+      {/* Forehead highlight */}
+      <ellipse cx="50" cy="28" rx="12" ry="6" fill="#fff" opacity="0.08" />
+      {/* Cheekbone shadows */}
+      <ellipse cx="32" cy="48" rx="4" ry="8" fill="#000" opacity="0.04" />
+      <ellipse cx="68" cy="48" rx="4" ry="8" fill="#000" opacity="0.04" />
+      {/* Chin contour */}
+      <path d="M42 78 Q50 86 58 78" fill="none" stroke="#000" strokeWidth={1} opacity="0.12" />
+      <Nose />
+    </g>
+  );
+}
+
+/** Rectangular — strong jawline, wide forehead, angular */
+function Rectangular({ fill }: BasePartProps) {
+  return (
+    <g>
+      <path d="M22 22 Q22 18 28 18 L72 18 Q78 18 78 22 L80 68 Q80 82 66 84 L50 86 L34 84 Q20 82 20 68Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Inner contour */}
+      <path d="M26 22 L74 22 L76 66 Q76 78 64 80 L50 82 L36 80 Q24 78 24 66Z"
+        fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
+      {/* Strong jawline shadow */}
+      <path d="M24 68 Q30 74 50 78 Q70 74 76 68" fill="#000" opacity="0.06" />
+      {/* Forehead highlight */}
+      <ellipse cx="50" cy="28" rx="18" ry="5" fill="#fff" opacity="0.07" />
+      <Nose />
+    </g>
+  );
+}
+
+/** Pear — narrow forehead, wide cheeks/jaw */
+function Pear({ fill }: BasePartProps) {
+  return (
+    <g>
+      <path d="M34 20 Q42 14 50 14 Q58 14 66 20 Q78 30 80 48 Q82 64 74 74 Q66 82 50 84 Q34 82 26 74 Q18 64 20 48 Q22 30 34 20Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Narrow temple shadow */}
+      <path d="M34 22 Q38 18 50 16 Q62 18 66 22" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      {/* Wide cheek highlights */}
+      <ellipse cx="30" cy="56" rx="6" ry="8" fill="#fff" opacity="0.06" />
+      <ellipse cx="70" cy="56" rx="6" ry="8" fill="#fff" opacity="0.06" />
+      {/* Jaw contour */}
+      <path d="M30 72 Q40 80 50 82 Q60 80 70 72" fill="#000" opacity="0.05" />
+      <Nose />
+    </g>
+  );
+}
+
 export const BASE_PARTS = {
   round: Round,
   square: Square,
@@ -313,6 +373,9 @@ export const BASE_PARTS = {
   dragonHead: DragonHead,
   triangle: Triangle,
   catFace: CatFace,
+  oblong: Oblong,
+  rectangular: Rectangular,
+  pear: Pear,
 } as const;
 
 export type BasePart = keyof typeof BASE_PARTS;

@@ -120,4 +120,53 @@ describe('WordPackCard', () => {
     render(<WordPackCard pack={packNoEmoji} />);
     expect(screen.getByText('Animal Kingdom')).toBeInTheDocument();
   });
+
+  it('renders accent strip at top', () => {
+    const { container } = render(<WordPackCard pack={basePack} />);
+    const strip = container.querySelector('.h-1\\.5');
+    expect(strip).toBeInTheDocument();
+  });
+
+  it('shows filled thumbs up icon when upvoted', () => {
+    const { container } = render(<WordPackCard pack={basePack} isUpvoted />);
+    const thumbIcon = container.querySelector('.fill-white');
+    expect(thumbIcon).toBeInTheDocument();
+  });
+});
+
+describe('WordPackCard (compact variant)', () => {
+  it('renders pack name in compact mode', () => {
+    render(<WordPackCard pack={basePack} variant="compact" />);
+    expect(screen.getByText('Animal Kingdom')).toBeInTheDocument();
+  });
+
+  it('renders as a button in compact mode', () => {
+    render(<WordPackCard pack={basePack} variant="compact" />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('calls onPlay when compact card is clicked', async () => {
+    const onPlay = jest.fn();
+    const user = userEvent.setup();
+    render(<WordPackCard pack={basePack} variant="compact" onPlay={onPlay} />);
+    await user.click(screen.getByRole('button'));
+    expect(onPlay).toHaveBeenCalledWith('pack-1');
+  });
+
+  it('shows word count in compact mode', () => {
+    render(<WordPackCard pack={basePack} variant="compact" />);
+    expect(screen.getByText(/25/)).toBeInTheDocument();
+  });
+
+  it('shows theme emoji in compact mode', () => {
+    render(<WordPackCard pack={basePack} variant="compact" />);
+    expect(screen.getByText('🦁')).toBeInTheDocument();
+  });
+
+  it('renders fallback icon when no emoji', () => {
+    const packNoEmoji = { ...basePack, theme_emoji: null };
+    const { container } = render(<WordPackCard pack={packNoEmoji} variant="compact" />);
+    // Should show a Hash icon inside a pink container
+    expect(container.querySelector('.text-neo-pink')).toBeInTheDocument();
+  });
 });

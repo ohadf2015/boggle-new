@@ -50,30 +50,30 @@ export const RequestRow: React.FC<RequestRowProps> = ({
           {request.fromUsername}
         </p>
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-1.5">
         <button
           onClick={onAccept}
           disabled={isLoading}
           aria-label={t('friends.acceptRequest')}
           className={cn(
-            'p-1.5 rounded-full transition-colors',
-            'bg-green-500 text-white hover:bg-green-600',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
+            'bg-neo-lime text-neo-black hover:shadow-hard hover:-translate-y-0.5',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard-sm disabled:hover:translate-y-0'
           )}
         >
-          {isLoading ? <Loader size="sm" /> : <Check className="w-4 h-4" />}
+          {isLoading ? <Loader size="sm" /> : <Check className="w-4 h-4" strokeWidth={3} />}
         </button>
         <button
           onClick={onDecline}
           disabled={isLoading}
           aria-label={t('friends.declineRequest')}
           className={cn(
-            'p-1.5 rounded-full transition-colors',
-            isDark ? 'bg-red-500/20 text-red-400 hover:bg-red-500/40' : 'bg-red-100 text-red-600 hover:bg-red-200',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
+            'bg-neo-pink text-white hover:shadow-hard hover:-translate-y-0.5',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard-sm disabled:hover:translate-y-0'
           )}
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" strokeWidth={3} />
         </button>
       </div>
     </div>

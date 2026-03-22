@@ -16,14 +16,19 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   HARD: 'bg-red-500',
 };
 
-function MiniGrid({ grid }: { grid: string[][] }) {
-  // Show max 3x3 center crop for a compact preview
+const DIFFICULTY_GLOW: Record<string, string> = {
+  EASY: 'shadow-[0_0_8px_rgba(34,197,94,0.3)]',
+  MEDIUM: 'shadow-[0_0_8px_rgba(255,107,53,0.3)]',
+  HARD: 'shadow-[0_0_8px_rgba(239,68,68,0.3)]',
+};
+
+function MiniGrid({ grid, difficulty }: { grid: string[][]; difficulty: string }) {
   const size = grid.length;
   const start = Math.max(0, Math.floor((size - 3) / 2));
   const rows = grid.slice(start, start + 3);
 
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className={cn('flex flex-col gap-0.5 rounded p-1', DIFFICULTY_GLOW[difficulty])}>
       {rows.map((row, ri) => (
         <div key={ri} className="flex gap-0.5">
           {row.slice(start, start + 3).map((cell, ci) => (
@@ -66,13 +71,12 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
       const data = await res.json();
       setBoards(data.boards ?? []);
     } catch {
-      // Silently fail — section just won't render
+      // Silent fail
     }
   }, []);
 
   useEffect(() => { fetchFeatured(); }, [fetchFeatured]);
 
-  // Don't render if no boards available
   if (boards.length === 0) return null;
 
   return (
@@ -103,7 +107,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
         </Link>
       </motion.div>
 
-      {/* Board cards — horizontal scroll on mobile, grid on tablet+ */}
+      {/* Board cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 lg:gap-4 xl:gap-5">
         {boards.map((board, i) => {
           const avgRating = board.rating_count > 0
@@ -126,11 +130,18 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
               }}
               className={cn(
                 'snap-center shrink-0 w-[75vw] sm:w-auto',
-                'bg-neo-navy border-3 border-black shadow-hard rounded-neo-lg',
+                'bg-neo-navy border-3 border-black shadow-hard rounded-neo',
                 'p-3 flex flex-col gap-2',
                 'cursor-pointer group relative overflow-hidden'
               )}
             >
+              {/* Difficulty accent strip */}
+              <div className={cn('absolute top-0 inset-x-0 h-1 bg-gradient-to-r', {
+                'from-green-500 to-green-600': board.difficulty === 'EASY',
+                'from-neo-orange to-amber-600': board.difficulty === 'MEDIUM',
+                'from-red-500 to-red-600': board.difficulty === 'HARD',
+              })} />
+
               {/* Staff pick badge */}
               {board.featured && (
                 <div className="absolute top-2 -end-5 z-10">
@@ -141,9 +152,9 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
               )}
 
               {/* Top row: grid preview + info */}
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 pt-1">
                 <div className="shrink-0">
-                  <MiniGrid grid={board.grid} />
+                  <MiniGrid grid={board.grid} difficulty={board.difficulty} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-neo-display font-bold text-sm text-neo-white leading-tight line-clamp-2">
@@ -153,7 +164,6 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <Avatar
                       customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
-
                       size="sm"
                     />
                     <span className="text-neo-white/50 text-[10px] font-neo-body truncate">
@@ -176,8 +186,8 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                     <Users size={10} /> {board.play_count}
                   </span>
                   {avgRating && (
-                    <span className="flex items-center gap-0.5 text-neo-white/60 text-[10px]">
-                      <Star size={10} /> {avgRating}
+                    <span className="flex items-center gap-0.5 text-neo-yellow text-[10px]">
+                      <Star size={10} className="fill-neo-yellow" /> {avgRating}
                     </span>
                   )}
                 </div>

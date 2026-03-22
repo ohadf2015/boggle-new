@@ -24,6 +24,8 @@ import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import MissedWords from '@/components/results/MissedWords';
 
+const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
+
 // ==============================================
 // TYPES
 // ==============================================
@@ -340,6 +342,24 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
         >
           <MissedWords missedWords={missedWords} maxDisplay={5} />
+        </motion.div>
+      )}
+
+      {/* Community Boards — post-game discovery surface */}
+      {scoreRevealComplete && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.6 }}
+        >
+          <UGCFeaturedStrip
+            titleKey="ugc.strip.tryCustom"
+            sort="popular"
+            limit={3}
+            variant="compact"
+            showCreateCTA
+            minToShow={1}
+          />
         </motion.div>
       )}
 

@@ -257,27 +257,41 @@ function FuManchu({ fill }: FacialHairProps) {
   );
 }
 
-/** Trimmed beard — clean cheek line, sculpted jaw, connected mustache */
+/** Trimmed beard — short stubble-textured, follows jawline, connected mustache */
 function TrimmedBeard({ fill }: FacialHairProps) {
   return (
     <g>
-      {/* Clean cheek line — sharp defined edge */}
-      <path d="M34 54 Q36 53 38 54 Q40 56 42 57 Q46 58 50 58 Q54 58 58 57 Q60 56 62 54 Q64 53 66 54 Q68 58 67 64 Q66 70 62 73 Q58 76 54 77 Q52 77.5 50 78 Q48 77.5 46 77 Q42 76 38 73 Q34 70 33 64 Q32 58 34 54Z"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Mustache — connected, natural width */}
-      <path d="M41 57 Q44 55.5 47 56.5 Q50 57.5 50 57.5 Q50 57.5 53 56.5 Q56 55.5 59 57"
-        fill="none" stroke="#000" strokeWidth={1.2} opacity="0.35" />
-      {/* Jaw grain — vertical hair direction */}
-      <path d="M38 60 Q38 64 39 68" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
-      <path d="M44 60 Q44 66 45 72" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
-      <path d="M50 60 L50 74" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
-      <path d="M56 60 Q56 66 55 72" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
-      <path d="M62 60 Q62 64 61 68" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
-      {/* Cheek line edge highlight — emphasizes clean shave above */}
-      <path d="M36 54 Q42 55 48 57" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.1" />
-      <path d="M64 54 Q58 55 52 57" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.1" />
-      {/* Chin contour shadow */}
-      <path d="M42 74 Q46 76 50 76.5 Q54 76 58 74" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" />
+      {/* Mustache — thin strip above the mouth */}
+      <path d="M42 57 Q44 55.5 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55.5 58 57"
+        fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M42 57 Q44 55.5 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55.5 58 57"
+        fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.25" />
+      {/* Cheek stubble — denser dots from mustache to jawline */}
+      {[
+        {x:34,y:58},{x:36,y:59},{x:35,y:61},{x:34,y:63},{x:36,y:65},{x:35,y:67},
+        {x:38,y:58},{x:37,y:60},{x:39,y:62},{x:38,y:64},{x:39,y:66},
+        {x:40,y:59},{x:40,y:61},{x:40,y:63},{x:41,y:65},
+        {x:66,y:58},{x:64,y:59},{x:65,y:61},{x:66,y:63},{x:64,y:65},{x:65,y:67},
+        {x:62,y:58},{x:63,y:60},{x:61,y:62},{x:62,y:64},{x:61,y:66},
+        {x:60,y:59},{x:60,y:61},{x:60,y:63},{x:59,y:65},
+      ].map((p,i) => (
+        <circle key={`ch${i}`} cx={p.x} cy={p.y} r={0.8} fill={fill} opacity={0.5} />
+      ))}
+      {/* Chin beard — dense stubble filling chin area */}
+      {[
+        {x:42,y:63},{x:44,y:64},{x:46,y:65},{x:48,y:66},{x:50,y:66},{x:52,y:66},{x:54,y:65},{x:56,y:64},{x:58,y:63},
+        {x:41,y:65},{x:43,y:66},{x:45,y:67},{x:47,y:68},{x:49,y:68},{x:51,y:68},{x:53,y:67},{x:55,y:66},{x:57,y:65},{x:59,y:65},
+        {x:42,y:67},{x:44,y:68},{x:46,y:69},{x:48,y:70},{x:50,y:70},{x:52,y:70},{x:54,y:69},{x:56,y:68},{x:58,y:67},
+        {x:44,y:71},{x:46,y:72},{x:48,y:72},{x:50,y:73},{x:52,y:72},{x:54,y:72},{x:56,y:71},
+        {x:46,y:74},{x:48,y:74},{x:50,y:75},{x:52,y:74},{x:54,y:74},
+      ].map((p,i) => (
+        <circle key={`cb${i}`} cx={p.x} cy={p.y} r={0.9} fill={fill} opacity={0.65} />
+      ))}
+      {/* Jawline contour — thicker band along the jaw */}
+      <path d="M34 66 Q38 70 42 72 Q46 74 50 75 Q54 74 58 72 Q62 70 66 66"
+        fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
+      <path d="M34 66 Q38 70 42 72 Q46 74 50 75 Q54 74 58 72 Q62 70 66 66"
+        fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.15" />
     </g>
   );
 }

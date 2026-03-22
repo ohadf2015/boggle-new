@@ -14,6 +14,8 @@ import {
   cancelFriendRequest,
   removeFriend,
   blockUser,
+  unblockUser,
+  getBlockedUsers,
   searchUsers,
   updateOnlineStatus,
   type Friend,
@@ -40,6 +42,9 @@ interface UseFriendsActions {
   cancelRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   unfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string }>;
   block: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  unblock: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  blockedUsers: Friend[];
+  refreshBlockedUsers: () => Promise<void>;
   search: (query: string) => Promise<Friend[]>;
 }
 
@@ -193,14 +198,40 @@ export function useFriends(): UseFriendsReturn {
     return result;
   }, [refresh, socket, isSocketConnected]);
 
+  // Blocked users state
+  const [blockedUsers, setBlockedUsers] = useState<Friend[]>([]);
+
+  const refreshBlockedUsers = useCallback(async () => {
+    if (!isAuthenticated) {
+      setBlockedUsers([]);
+      return;
+    }
+    try {
+      const blocked = await getBlockedUsers();
+      setBlockedUsers(blocked);
+    } catch {
+      // Silent fail
+    }
+  }, [isAuthenticated]);
+
   // Block user
   const block = useCallback(async (userId: string) => {
     const result = await blockUser(userId);
     if (result.success) {
       await refresh();
+      await refreshBlockedUsers();
     }
     return result;
-  }, [refresh]);
+  }, [refresh, refreshBlockedUsers]);
+
+  // Unblock user
+  const unblock = useCallback(async (userId: string) => {
+    const result = await unblockUser(userId);
+    if (result.success) {
+      await refreshBlockedUsers();
+    }
+    return result;
+  }, [refreshBlockedUsers]);
 
   // Search for users
   const search = useCallback(async (query: string): Promise<Friend[]> => {
@@ -265,6 +296,9 @@ export function useFriends(): UseFriendsReturn {
     cancelRequest,
     unfriend,
     block,
+    unblock,
+    blockedUsers,
+    refreshBlockedUsers,
     search,
   };
 }

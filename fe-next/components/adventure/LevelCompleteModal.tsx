@@ -299,8 +299,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   key={`star-${i}`}
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{
-                    scale: i < stars ? 1 : 0.7,
-                    opacity: i < stars ? 1 : 0.3,
+                    scale: i < stars ? 1 : 0.8,
+                    opacity: i < stars ? 1 : 0.5,
                   }}
                   transition={{
                     delay: 0.3 + i * 0.1,
@@ -314,7 +314,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                       'w-12 h-12 md:w-14 md:h-14',
                       i < stars
                         ? 'text-neo-yellow fill-neo-yellow'
-                        : 'text-neo-white/30 fill-transparent'
+                        : 'text-neo-white/50 fill-neo-white/10'
                     )}
                   />
                 </AdaptiveMotion.div>

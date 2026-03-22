@@ -249,7 +249,13 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const resetBossHealth = useCallback(() => {
     bossReset();
     setBattleResult('none');
-  }, [bossReset]);
+    firstAttackBlockedRef.current = false;
+    lowTimeTriggedRef.current = false;
+    // Reset boss intro so retry can re-trigger the battle start
+    if (isBossLevel && showBossIntroConfig) {
+      setShowBossIntro(true);
+    }
+  }, [bossReset, isBossLevel, showBossIntroConfig]);
 
   // Effect callbacks wired to actual game state
   const bossEffectCallbacks = useMemo(() => ({

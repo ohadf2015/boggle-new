@@ -3219,12 +3219,22 @@ const ja = {
     "community": {
       "hero": "コミュニティ工房",
       "heroSub": "コミュニティでワードパズルを遊んで、作って、共有しよう",
+      "title": "コミュニティ工房",
+      "subtitle": "カスタムワードパズルを遊んで、作って、共有しよう",
       "tabBoards": "ボード",
       "tabPacks": "ワードパック",
       "tabCreators": "クリエイター",
       "searchPlaceholder": "ボードやパックを検索...",
       "createNew": "作成",
       "featuredCreator": "注目のクリエイター"
+    },
+    "strip": {
+      "title": "コミュニティボード",
+      "featured": "おすすめボード",
+      "tryCustom": "コミュニティボードを試す",
+      "viewAll": "すべて見る",
+      "createOwn": "自分のボードを作る",
+      "createDesc": "コミュニティ向けのパズルをデザイン"
     }
   },
   "ranked": {
@@ -4696,6 +4706,12 @@ const ja = {
     "sentRequests": "送信済みリクエスト",
     "signInRequired": "サインインが必要です",
     "typeAtLeast2Chars": "2文字以上入力してください",
+    "acceptRequest": "承認",
+    "declineRequest": "拒否",
+    "sendGift": "ギフトを送る",
+    "blocked": "ブロック済み",
+    "blockedUsers": "ブロックしたユーザー",
+    "unblock": "ブロック解除",
     "messages": "メッセージ",
     "noMessages": "まだメッセージはありません",
     "startConversation": "会話を始めよう！",
@@ -8242,6 +8258,8 @@ const ja = {
   },
   "notifications": {
     "title": "通知",
+    "bell": "通知",
+    "bellUnread": "未読の通知が{count}件あります",
     "empty": "通知はまだありません",
     "emptyDesc": "通知を受け取ると、ここに表示されます",
     "markAllRead": "すべて既読にする",
@@ -9075,7 +9093,13 @@ const ja = {
       "gold": "+{{gold}} ゴールド"
     },
     "weeklyWordMastery": "週間単語習得",
-    "weeklyWordMasteryDesc": "今週{target}単語を習得する"
+    "weeklyWordMasteryDesc": "今週{target}単語を習得する",
+    "questOptions": "クエスト選択肢",
+    "completion": {
+      "grandSlam": "グランドスラム！",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} ゴールド"
+    }
   },
   "wotd": {
     "teaser": "今日の単語",
@@ -9166,7 +9190,18 @@ const ja = {
     "selectQuest": "選択",
     "active": "進行中のクエスト",
     "endsIn": "あと{{time}}",
-    "newQuestMonday": "月曜日に新しいクエスト"
+    "newQuestMonday": "月曜日に新しいクエスト",
+    "desc": {
+      "playGames": "今週{{target}}回ゲームをプレイ",
+      "findWords": "{{target}}個の単語を見つけよう",
+      "dailyChallenges": "デイリーチャレンジを{{target}}回クリア",
+      "longWords": "5文字以上の単語を{{target}}個見つけよう",
+      "mpWins": "マルチプレイヤーで{{target}}勝しよう",
+      "combo": "コンボ{{target}}を達成",
+      "findWordsSession": "1セッションで{{target}}個の単語を見つけよう",
+      "dailyMissionsStreak": "デイリーミッションを{{target}}日間全てクリア",
+      "highScore": "1ゲームで{{target}}点以上を獲得"
+    }
   },
   "battlePass": {
     "daysLeft": "あと{{count}}日",
@@ -9178,7 +9213,12 @@ const ja = {
   "dailyQuests": {
     "allComplete": "全クエスト達成！",
     "reward": "+{{amount}} XP",
-    "title": "デイリークエスト"
+    "title": "デイリークエスト",
+    "playGames": "{{target}}回ゲームをプレイ",
+    "findLongWord": "{{target}}文字の単語を見つけよう",
+    "reachCombo": "{{target}}xコンボを達成",
+    "totalXp": "+{{xp}} XP",
+    "totalCoins": "{{coins}} コイン"
   }
 };
 
