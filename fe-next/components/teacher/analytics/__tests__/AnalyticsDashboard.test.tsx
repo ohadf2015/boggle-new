@@ -30,7 +30,66 @@ const mockMetrics = {
   ],
 };
 
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, params?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'education.analytics.title': 'Class Analytics',
+        'education.analytics.subtitle': 'Track student progress and identify learning opportunities',
+        'education.analytics.loading': 'Loading analytics...',
+        'education.analytics.error': 'Failed to load analytics',
+        'education.analytics.retry': 'Retry',
+        'education.analytics.noData': 'No data yet',
+        'education.analytics.assignLessons': 'Assign lessons',
+        'education.analytics.studentsNeedingHelp': 'Students Needing Help',
+        'education.analytics.classAverageXp': 'Class Average XP',
+        'education.analytics.activeStudentsToday': 'Active Today',
+        'education.analytics.commonMistakes': 'Common Mistakes',
+        'education.analytics.viewStudents': 'View Students',
+        'education.analytics.createReviewLesson': 'Create Review Lesson',
+        'education.analytics.studentProgress': 'Student Progress',
+        'education.analytics.exportReport': 'Export Report',
+        'education.analytics.lessonEffectiveness': 'Lesson Effectiveness',
+        'education.analytics.noStudents': 'No students yet',
+      };
+      let result = translations[key] ?? key;
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          result = result.replace(`{${k}}`, String(v));
+        }
+      }
+      return result;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 jest.mock('@/hooks/useClassroomAnalytics');
+jest.mock('@/hooks/useStudentProgressMetrics', () => ({
+  useStudentProgressMetrics: () => ({
+    students: [],
+    isLoading: false,
+    error: null,
+    refresh: jest.fn(),
+  }),
+}));
+jest.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
+    open ? <div>{children}</div> : null,
+  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  DialogClose: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
+}));
+jest.mock('@/components/teacher/reports/StudentProgressReport', () => ({
+  StudentProgressReport: () => null,
+}));
+jest.mock('../LessonEffectivenessChart', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 // ============================================
 // TEST HELPERS
@@ -212,11 +271,12 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
     });
   });
 
-  it('does not render actionable buttons when callbacks not provided', () => {
+  it('renders View Students and Export Report buttons even when callbacks not provided', () => {
     renderDashboard({ classroomId: 'class-123' });
 
     const buttons = screen.queryAllByRole('button');
-    expect(buttons).toHaveLength(0);
+    // View Students + Export Report are always rendered
+    expect(buttons.length).toBeGreaterThanOrEqual(2);
   });
 });
 

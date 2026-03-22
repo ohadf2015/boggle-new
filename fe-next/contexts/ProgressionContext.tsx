@@ -167,22 +167,34 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       }
 
       try {
-        const response = await fetch('/api/adventure/complete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            world,
-            level,
-            stars,
-            score,
-            words,
-            ...(goldEarned !== undefined && { goldEarned }),
-            ...(longWords !== undefined && { longWords }),
-          }),
+        const requestBody = JSON.stringify({
+          world,
+          level,
+          stars,
+          score,
+          words,
+          ...(goldEarned !== undefined && { goldEarned }),
+          ...(longWords !== undefined && { longWords }),
         });
+
+        let response = await fetch('/api/adventure/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: requestBody,
+        });
+
+        // Retry once on transient 500/503 (cold start, timeout)
+        if (response.status >= 500 && response.status < 600) {
+          logger.warn('[ProgressionContext] Retrying completeLevel after', response.status);
+          await new Promise(r => setTimeout(r, 1000));
+          response = await fetch('/api/adventure/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: requestBody,
+          });
+        }
 
         if (!response.ok) {
           const errorBody = await response.text().catch(() => 'no body');

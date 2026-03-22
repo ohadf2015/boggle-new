@@ -58,11 +58,17 @@ function useAnimatedValue(target: number, duration = 350): number {
 // TYPE DEFINITIONS
 // ============================================
 
+export type LeaderboardVisibility = 'full' | 'top3' | 'personal_only' | 'hidden';
+
 export interface ClassroomLeaderboardProps {
   /** Classroom ID to fetch leaderboard for */
   classroomId: string;
   /** Current student's user ID (for highlighting) */
   currentUserId: string;
+  /** Current student's ID used to determine "me" for filtered views */
+  currentStudentId?: string;
+  /** Privacy visibility mode */
+  visibility?: LeaderboardVisibility;
   /** Additional CSS classes */
   className?: string;
 }
@@ -331,8 +337,54 @@ LeaderboardEntryRow.displayName = 'LeaderboardEntryRow';
 // MAIN COMPONENT
 // ============================================
 
+// ============================================
+// SEPARATOR ROW (for top3 mode gap)
+// ============================================
+
+const SeparatorRow = memo(() => (
+  <div
+    data-testid="leaderboard-separator"
+    className="flex items-center justify-center py-2 text-neo-white/40 font-neo-body font-bold text-lg tracking-widest"
+  >
+    ...
+  </div>
+));
+
+SeparatorRow.displayName = 'SeparatorRow';
+
+// ============================================
+// VISIBILITY FILTER
+// ============================================
+
+function filterByVisibility(
+  entries: LeaderboardEntryWithDelta[],
+  visibility: LeaderboardVisibility,
+  currentStudentId: string | undefined
+): { visible: LeaderboardEntryWithDelta[]; showSeparator: boolean } {
+  if (visibility === 'full') {
+    return { visible: entries, showSeparator: false };
+  }
+
+  if (visibility === 'personal_only') {
+    const me = entries.filter(e => e.userId === currentStudentId);
+    return { visible: me, showSeparator: false };
+  }
+
+  // top3
+  const top3 = entries.filter(e => e.rank <= 3);
+  const meInTop3 = top3.some(e => e.userId === currentStudentId);
+  if (meInTop3 || !currentStudentId) {
+    return { visible: top3, showSeparator: false };
+  }
+  const me = entries.find(e => e.userId === currentStudentId);
+  return {
+    visible: me ? [...top3, me] : top3,
+    showSeparator: !!me,
+  };
+}
+
 const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
-  ({ classroomId, currentUserId, className }) => {
+  ({ classroomId, currentUserId, currentStudentId, visibility = 'full', className }) => {
     const { t, dir } = useLanguage();
     const isRTL = dir === 'rtl';
 
@@ -342,6 +394,14 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
         currentUserId,
         initialTimeScope: 'weekly',
       });
+
+    const studentId = currentStudentId ?? currentUserId;
+    const { visible, showSeparator } = filterByVisibility(fullList, visibility, studentId);
+
+    // hidden mode — render nothing (after hooks to satisfy rules of hooks)
+    if (visibility === 'hidden') {
+      return null;
+    }
 
     // Loading state
     if (isLoading) {
@@ -402,7 +462,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
         {/* Time Scope Tabs */}
         <TimeScopeTabs timeScope={timeScope} onScopeChange={setTimeScope} />
 
-        {/* Full Student List */}
+        {/* Student List (filtered by visibility) */}
         <AdaptiveAnimatePresence mode="wait">
           <AdaptiveMotion.div
             key={timeScope}
@@ -412,14 +472,20 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
           >
-            {fullList.map((entry, index) => (
-              <LeaderboardEntryRow
-                key={entry.userId}
-                {...entry}
-                totalStudents={totalStudents}
-                index={index}
-              />
-            ))}
+            {visible.map((entry, index) => {
+              // In top3 mode, insert separator before the current student if not in top 3
+              const isSeparatorPoint = showSeparator && index === visible.length - 1;
+              return (
+                <div key={entry.userId}>
+                  {isSeparatorPoint && <SeparatorRow />}
+                  <LeaderboardEntryRow
+                    {...entry}
+                    totalStudents={totalStudents}
+                    index={index}
+                  />
+                </div>
+              );
+            })}
           </AdaptiveMotion.div>
         </AdaptiveAnimatePresence>
 

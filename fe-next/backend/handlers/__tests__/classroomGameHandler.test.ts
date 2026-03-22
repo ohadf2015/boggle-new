@@ -14,17 +14,22 @@ jest.mock('../../modules/gameStateManager');
 jest.mock('../../utils/rateLimiter', () => ({
   checkRateLimit: jest.fn(() => true),
 }));
-jest.mock('../../utils/socketValidation', () => ({
-  validatePayload: jest.fn((schema, data) => ({
-    success: true,
-    data,
-  })),
-  gameCodeSchema: expect.anything(),
-  usernameSchema: expect.anything(),
-}));
+jest.mock('../../utils/socketValidation', () => {
+  const { z } = require('zod');
+  return {
+    validatePayload: jest.fn((schema: unknown, data: unknown) => ({
+      success: true,
+      data,
+    })),
+    gameCodeSchema: z.string(),
+    usernameSchema: z.string(),
+  };
+});
 jest.mock('../../utils/logger', () => ({
   info: jest.fn(),
   error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
 }));
 
 describe('ClassroomGameHandler', () => {
@@ -41,7 +46,7 @@ describe('ClassroomGameHandler', () => {
       join: jest.fn(),
       handshake: {
         auth: {
-          authUserId: 'teacher-1',
+          authUserId: '00000000-0000-4000-8000-000000000001',
         },
       },
     };
@@ -70,10 +75,10 @@ describe('ClassroomGameHandler', () => {
       // GIVEN
       const gameData = {
         gameCode: 'ABC123',
-        classroomId: 'classroom-1',
-        teacherId: 'teacher-1',
-        teacherName: 'Mr. Smith',
-        lessonIds: ['lesson-1'],
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId: '00000000-0000-4000-8000-000000000001',
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
         lessonNames: ['Animals'],
         vocabularyWords: ['cat', 'dog'],
         settings: {
@@ -95,8 +100,22 @@ describe('ClassroomGameHandler', () => {
       // WHEN
       await createHandler(gameData);
 
-      // THEN
-      expect(classroomGameManager.createClassroomGame).toHaveBeenCalledWith(gameData);
+      // THEN - handler restructures payload before passing to createClassroomGame
+      expect(classroomGameManager.createClassroomGame).toHaveBeenCalledWith({
+        gameCode: gameData.gameCode,
+        classroomId: gameData.classroomId,
+        teacherId: gameData.teacherId,
+        teacherName: gameData.teacherName,
+        lessonIds: gameData.lessonIds,
+        lessonNames: gameData.lessonNames,
+        vocabularyWords: gameData.vocabularyWords,
+        settings: {
+          timerMinutes: gameData.settings.timerMinutes,
+          boardSize: gameData.settings.boardSize,
+          allowLateJoin: undefined,
+          gameMode: 'classic',
+        },
+      });
       expect(mockSocket.join).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);
       expect(mockIo.to).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);
       expect(mockIo.emit).toHaveBeenCalledWith('classroomGameCreated', {
@@ -114,10 +133,10 @@ describe('ClassroomGameHandler', () => {
       // GIVEN
       const gameData = {
         gameCode: 'ABC123',
-        classroomId: 'classroom-1',
-        teacherId: 'teacher-1',
-        teacherName: 'Mr. Smith',
-        lessonIds: ['lesson-1'],
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId: '00000000-0000-4000-8000-000000000001',
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
         lessonNames: ['Animals'],
         vocabularyWords: ['cat', 'dog'],
         settings: {},

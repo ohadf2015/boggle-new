@@ -8,7 +8,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { getAvailableQuests, getWeekStart, type QuestTemplate, type ActiveQuest } from '@/backend/modules/weeklyQuestManager';
+import { getAvailableQuests, getWeekStart, type QuestTemplate, type ActiveQuest } from '@/shared/weeklyQuestTemplates';
 
 interface UseWeeklyQuestReturn {
   activeQuest: ActiveQuest | null;

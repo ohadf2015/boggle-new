@@ -5,11 +5,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'league.rivals.title': 'Your League Rivals',
-        'league.rivals.ahead': '{{pts}} pts ahead',
-        'league.rivals.behind': '{{pts}} pts behind',
-        'league.rivals.you': 'You',
-        'league.rivals.noRivals': 'Climb the league to find rivals!',
+        'leagueRivals.title': 'Your League Rivals',
+        'leagueRivals.ahead': '{{pts}} pts ahead',
+        'leagueRivals.behind': '{{pts}} pts behind',
+        'leagueRivals.you': 'You',
+        'leagueRivals.noRivals': 'Climb the league to find rivals!',
       };
       return translations[key] ?? key;
     },

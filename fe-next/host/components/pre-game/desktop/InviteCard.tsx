@@ -4,8 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Check, Share2, Link as LinkIcon } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { getJoinUrl } from '../../../../utils/share';
+import { getJoinUrl, copyJoinUrl } from '../../../../utils/share';
 import { cn } from '../../../../lib/utils';
 
 // ==================== Types ====================
@@ -46,15 +45,12 @@ export function InviteCard({
   const joinUrl = getJoinUrl(gameCode);
 
   const handleCopyLink = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(joinUrl);
+    const success = await copyJoinUrl(gameCode, t);
+    if (success) {
       setLinkCopied(true);
-      toast.success(t('roomCode.linkCopied'), { duration: 1500, icon: '🔗' });
       setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      toast.error(t('common.error'));
     }
-  }, [joinUrl, t]);
+  }, [gameCode, t]);
 
   const handleNativeShare = useCallback(async () => {
     if (!navigator.share) {

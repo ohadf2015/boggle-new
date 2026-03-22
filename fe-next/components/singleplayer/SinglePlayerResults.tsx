@@ -10,6 +10,7 @@ import { AchievementBadge } from '@/components/AchievementBadge';
 
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
+import UnfinishedBoardTeaser from '@/components/results/UnfinishedBoardTeaser';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 
@@ -25,6 +26,7 @@ import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
@@ -140,6 +142,19 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   useWinStreakTracking({ mode, isWinner });
+
+  // Save unfinished board for carry-over feature
+  const { saveUnfinishedBoard } = useUnfinishedBoard();
+  const missedWordStrings = useMemo(
+    () => missedWords.map(w => w.word),
+    [missedWords]
+  );
+
+  useEffect(() => {
+    if (missedWordStrings.length >= 3 && results.grid) {
+      saveUnfinishedBoard(results.grid, missedWordStrings, mode, results.playerScore);
+    }
+  }, [missedWordStrings, results.grid, mode, results.playerScore, saveUnfinishedBoard]);
 
   const { showSignupModal, setShowSignupModal } = useSignupPrompt({
     isAuthenticated, hasUser: !!user, authLoading,
@@ -349,6 +364,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
         <div className="space-y-3">
           {missedWords.length > 0 && <MissedWords missedWords={missedWords} maxDisplay={5} />}
+          {missedWordStrings.length >= 3 && (
+            <UnfinishedBoardTeaser missedWords={missedWordStrings.slice(0, 3)} />
+          )}
           {mode === 'solo-bots' && botWordDetails.length > 0 && (
             <BotWordsSection botWordDetails={botWordDetails} language={gameLanguage}
               title={t('singlePlayer.botWordsFound')} t={t} defaultExpanded={false} />

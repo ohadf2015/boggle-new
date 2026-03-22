@@ -1,7 +1,41 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ClassroomLeaderboard from './ClassroomLeaderboard';
 import * as useClassroomLeaderboardHook from '@/hooks/useClassroomLeaderboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+
+// Mock LanguageContext with translations
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, params?: Record<string, string | number>) => {
+      const translations: Record<string, string> = {
+        'education.leaderboard.title': 'Class Rankings',
+        'education.leaderboard.weekly': 'Weekly',
+        'education.leaderboard.monthly': 'Monthly',
+        'education.leaderboard.allTime': 'All-Time',
+        'education.leaderboard.xp': '{xp} XP',
+        'education.leaderboard.level': 'Lv. {level}',
+        'education.leaderboard.inactive': 'Inactive',
+        'education.leaderboard.noStudentsYet': 'No one here yet!',
+        'education.leaderboard.studentsInClass': '{count} students',
+        'education.leaderboard.newEntry': 'NEW',
+        'education.leaderboard.top10': 'Top 10%',
+        'education.leaderboard.top25': 'Top 25%',
+        'education.leaderboard.top50': 'Top 50%',
+      };
+      let result = translations[key] ?? key;
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          result = result.replace(`{${k}}`, String(v));
+        }
+      }
+      return result;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // Mock the hook
 jest.mock('@/hooks/useClassroomLeaderboard');

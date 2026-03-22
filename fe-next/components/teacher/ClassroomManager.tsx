@@ -325,10 +325,10 @@ export default function ClassroomManager() {
                     'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
                   )}
                 >
-                  <option value="en">English</option>
-                  <option value="he">Hebrew</option>
-                  <option value="sv">Swedish</option>
-                  <option value="ja">Japanese</option>
+                  <option value="en">{t('languages.english')}</option>
+                  <option value="he">{t('languages.hebrew')}</option>
+                  <option value="sv">{t('languages.swedish')}</option>
+                  <option value="ja">{t('languages.japanese')}</option>
                 </select>
               </div>
 

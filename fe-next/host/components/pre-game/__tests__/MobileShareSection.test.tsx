@@ -34,6 +34,7 @@ jest.mock('../../../../components/icons/SocialIcons', () => ({
 // Mock share utils
 jest.mock('../../../../utils/share', () => ({
   getJoinUrl: jest.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
+  copyJoinUrl: jest.fn().mockResolvedValue(true),
   shareViaWhatsApp: jest.fn(),
   shareViaTelegram: jest.fn(),
 }));
@@ -103,6 +104,7 @@ describe('MobileShareSection', () => {
 
   describe('copy functionality', () => {
     it('copies link to clipboard when copy button is clicked', async () => {
+      const { copyJoinUrl } = require('../../../../utils/share');
       render(<MobileShareSection gameCode="COPY123" t={mockT} />);
 
       const copyButton = screen.getByTestId('mobile-copy-link-button');
@@ -110,10 +112,7 @@ describe('MobileShareSection', () => {
         fireEvent.click(copyButton);
       });
 
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        'https://lexiclash.com?room=COPY123&utm_source=mobile-lobby&utm_medium=share'
-      );
-      expect(toast.success).toHaveBeenCalledWith('Link copied!', { duration: 1500, icon: '🔗' });
+      expect(copyJoinUrl).toHaveBeenCalledWith('COPY123', mockT, 'mobile-lobby');
     });
 
     it('shows Copied! text after successful copy', async () => {
@@ -142,8 +141,9 @@ describe('MobileShareSection', () => {
       expect(screen.getByText('Copy Link')).toBeInTheDocument();
     });
 
-    it('shows error toast when clipboard fails', async () => {
-      (navigator.clipboard.writeText as jest.Mock).mockRejectedValueOnce(new Error('Clipboard error'));
+    it('does not show Copied! when copyJoinUrl fails', async () => {
+      const { copyJoinUrl } = require('../../../../utils/share');
+      copyJoinUrl.mockResolvedValueOnce(false);
 
       render(<MobileShareSection gameCode="FAIL123" t={mockT} />);
 
@@ -152,9 +152,7 @@ describe('MobileShareSection', () => {
         fireEvent.click(copyButton);
       });
 
-      await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Failed to copy');
-      });
+      expect(screen.queryByText('Copied!')).not.toBeInTheDocument();
     });
   });
 

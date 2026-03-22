@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LexiClash — Offline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px)
+               env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+      text-align: center;
+    }
+    .container {
+      max-width: 360px;
+      padding: 32px 24px;
+      border: 3px solid #000;
+      border-radius: 4px;
+      background: #16213e;
+      box-shadow: 4px 4px 0px #000;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #FFE135;
+    }
+    p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #b0b0cc;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #FFE135;
+      color: #1a1a2e;
+      border: 3px solid #000;
+      border-radius: 4px;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #000;
+      transition: transform 0.1s, box-shadow 0.1s;
+      min-height: 48px;
+      min-width: 48px;
+    }
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon" aria-hidden="true">&#9889;</div>
+    <h1 id="title">You're Offline</h1>
+    <p id="message">LexiClash needs an internet connection to play. Check your Wi-Fi or mobile data and try again.</p>
+    <button onclick="location.reload()" id="retry">Retry</button>
+  </div>
+  <script>
+    // Detect language and show localized text
+    (function() {
+      var lang = (navigator.language || '').slice(0, 2);
+      var i18n = {
+        he: { title: 'אין חיבור לאינטרנט', message: 'LexiClash דורש חיבור לאינטרנט. בדקו את ה-Wi-Fi או הנתונים הסלולריים ונסו שוב.', retry: 'נסה שוב', dir: 'rtl' },
+        sv: { title: 'Du är offline', message: 'LexiClash kräver internetanslutning. Kontrollera din Wi-Fi eller mobildata och försök igen.', retry: 'Försök igen', dir: 'ltr' },
+        ja: { title: 'オフラインです', message: 'LexiClashにはインターネット接続が必要です。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。', retry: '再試行', dir: 'ltr' },
+        es: { title: 'Sin conexión', message: 'LexiClash necesita conexión a internet. Revisa tu Wi-Fi o datos móviles e intenta de nuevo.', retry: 'Reintentar', dir: 'ltr' }
+      };
+      var t = i18n[lang];
+      if (t) {
+        document.getElementById('title').textContent = t.title;
+        document.getElementById('message').textContent = t.message;
+        document.getElementById('retry').textContent = t.retry;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = t.dir;
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -62,7 +62,9 @@ export function AnalyticsDashboard({
   const studentTableRef = useRef<HTMLDivElement>(null);
 
   const handleViewStudents = useCallback(() => {
-    studentTableRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (typeof studentTableRef.current?.scrollIntoView === 'function') {
+      studentTableRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
     onViewStudents?.('struggling');
   }, [onViewStudents]);
 
@@ -300,7 +302,7 @@ export function AnalyticsDashboard({
             <DialogTitle>{t('education.analytics.studentDetail')}</DialogTitle>
           </DialogHeader>
           {selectedStudentId && (
-            <StudentProgressReport studentId={selectedStudentId} />
+            <StudentProgressReport studentId={selectedStudentId} classroomId={classroomId} />
           )}
         </DialogContent>
       </Dialog>

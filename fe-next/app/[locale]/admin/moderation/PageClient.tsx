@@ -59,9 +59,18 @@ export default function ModerationPageClient() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
     try {
-      const res = await fetch(`/api/admin/invalid-words/${id}/${action}`, {
+      // Look up the item to get word + language for the backend
+      const item = queueItems?.find(i => i.id === id);
+      if (!item) {
+        logger.warn('Moderation action: item not found in queue', id);
+        return;
+      }
+      // Backend uses 'dismiss' not 'reject'
+      const endpoint = action === 'reject' ? 'dismiss' : action;
+      const res = await fetch(`/api/admin/invalid-words/${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: item.word, language: item.language }),
         signal: controller.signal,
       });
       if (!res.ok) {
@@ -82,7 +91,7 @@ export default function ModerationPageClient() {
       clearTimeout(timeoutId);
       setActionInProgress(null);
     }
-  }, [authToken, fetchQueue, actionInProgress]);
+  }, [authToken, fetchQueue, actionInProgress, queueItems]);
 
   const isProfileLoading = !authLoading && user && !profile;
 

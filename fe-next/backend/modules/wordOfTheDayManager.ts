@@ -110,12 +110,13 @@ export async function recordWotdAttempt(
   const supabase = getSupabase()!;
 
   try {
-    // Check if player already recorded for today (unique on player_id, date)
+    // Check if player already recorded for today (unique on player_id, date, language)
     const { data: existing } = await supabase
       .from('daily_word_of_day_players')
       .select('id')
       .eq('player_id', playerId)
       .eq('date', targetDate)
+      .eq('language', language)
       .single();
 
     if (existing) {

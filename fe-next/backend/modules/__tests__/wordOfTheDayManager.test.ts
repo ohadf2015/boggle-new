@@ -169,7 +169,7 @@ describe('wordOfTheDayManager', () => {
     });
 
     it('should record new attempt when player has not tried', async () => {
-      // First call: check existing (none)
+      // Call 1: check existing (none found)
       const selectChain = {
         eq: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
@@ -179,17 +179,33 @@ describe('wordOfTheDayManager', () => {
           }),
         }),
       };
-      const upsertMock = jest.fn().mockResolvedValue({ error: null });
       const insertMock = jest.fn().mockResolvedValue({ error: null });
+      const upsertMock = jest.fn().mockResolvedValue({ error: null });
+      // Calls 4/5: count queries return { count }
+      const countSelectChain = (count: number) => ({
+        eq: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({ count }),
+          count,
+        }),
+        count,
+      });
+      // Call 6: update chain
+      const updateChain = {
+        eq: jest.fn().mockReturnValue({
+          eq: jest.fn().mockResolvedValue({ error: null }),
+        }),
+      };
 
       let callCount = 0;
       mockFrom.mockImplementation(() => {
         callCount++;
         if (callCount === 1) return { select: jest.fn().mockReturnValue(selectChain) };
-        if (callCount === 2) return { upsert: upsertMock };
-        return { insert: insertMock };
+        if (callCount === 2) return { insert: insertMock };
+        if (callCount === 3) return { upsert: upsertMock };
+        if (callCount === 4) return { select: jest.fn().mockReturnValue(countSelectChain(1)) };
+        if (callCount === 5) return { select: jest.fn().mockReturnValue(countSelectChain(1)) };
+        return { update: jest.fn().mockReturnValue(updateChain) };
       });
-      mockRpc.mockResolvedValue({ error: null });
 
       const result = await recordWotdAttempt('player1', 'crystal', true, 'en', '2026-03-22');
       expect(result.success).toBe(true);

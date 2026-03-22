@@ -12,7 +12,7 @@ import React, { memo } from 'react';
 import { Target, Medal, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { QuestTemplate, QuestDifficulty } from '@/backend/modules/weeklyQuestManager';
+import type { QuestTemplate, QuestDifficulty } from '@/shared/weeklyQuestTemplates';
 
 interface QuestSelectorProps {
   quests: QuestTemplate[];

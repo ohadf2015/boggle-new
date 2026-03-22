@@ -1,0 +1,266 @@
+/**
+ * Ghost Rival Manager
+ * Weekly auto-matched skill-similar rivalry system.
+ * Every week, each player gets a "Ghost Rival" with similar total_score (±20%).
+ * All scores across all modes contribute to the weekly rivalry.
+ */
+
+import { getSupabase } from './supabaseServer';
+import logger from '../utils/logger';
+
+// ─── TYPES ──────────────────────────────────────────────────
+
+export interface RivalProfile {
+  id: string;
+  username: string;
+  avatar: string;
+  score: number;
+}
+
+export interface GhostRivalStatus {
+  rival: RivalProfile;
+  player: { score: number };
+  weekStart: string;
+  weekEnd: string;
+}
+
+// ─── WEEK HELPERS ───────────────────────────────────────────
+
+export function getWeekStart(): Date {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const start = new Date(now);
+  start.setDate(diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+export function getWeekEnd(): Date {
+  const start = getWeekStart();
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+  return end;
+}
+
+function toDateString(d: Date): string {
+  return d.toISOString().split('T')[0];
+}
+
+// ─── MATCHING ───────────────────────────────────────────────
+
+const SCORE_TOLERANCE = 0.2; // ±20%
+
+/**
+ * Find a skill-similar rival for the player.
+ * Looks for players with total_score within ±20%, excluding self
+ * and anyone already matched this week.
+ */
+async function findSkillSimilarRival(
+  playerId: string,
+  playerScore: number,
+  weekStartDate: string
+): Promise<{ id: string; username: string; avatar_image: string; total_score: number } | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const minScore = Math.floor(playerScore * (1 - SCORE_TOLERANCE));
+  const maxScore = Math.ceil(playerScore * (1 + SCORE_TOLERANCE));
+
+  // Find candidates within score range, not already matched this week
+  const { data: candidates, error } = await supabase
+    .from('profiles')
+    .select('id, username, avatar_image, total_score')
+    .neq('id', playerId)
+    .gte('total_score', minScore)
+    .lte('total_score', maxScore)
+    .order('total_score', { ascending: false })
+    .limit(20);
+
+  if (error || !candidates || candidates.length === 0) {
+    logger.debug('ghostRival', 'No candidates in score range', { playerId, minScore, maxScore });
+    return null;
+  }
+
+  // Filter out players already matched this week
+  const { data: alreadyMatched } = await supabase
+    .from('ghost_rivals')
+    .select('rival_id')
+    .eq('week_start', weekStartDate);
+
+  const matchedIds = new Set((alreadyMatched ?? []).map((r) => r.rival_id));
+
+  const available = candidates.filter((c) => !matchedIds.has(c.id));
+  if (available.length === 0) {
+    // Fall back to any candidate even if matched elsewhere
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  // Pick a random candidate from available pool for variety
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+// ─── CORE FUNCTIONS ─────────────────────────────────────────
+
+/**
+ * Get or create the weekly ghost rival for a player.
+ * If already matched this week, returns existing. Otherwise finds a new match.
+ */
+export async function getOrCreateWeeklyRival(
+  playerId: string
+): Promise<GhostRivalStatus | null> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Supabase client not initialized');
+
+  const weekStartDate = toDateString(getWeekStart());
+  const weekEndDate = toDateString(getWeekEnd());
+
+  // Check existing rivalry this week
+  const { data: existing } = await supabase
+    .from('ghost_rivals')
+    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, avatar_image, total_score)')
+    .eq('player_id', playerId)
+    .eq('week_start', weekStartDate)
+    .single();
+
+  if (existing?.rival) {
+    return {
+      rival: {
+        id: existing.rival.id,
+        username: existing.rival.username ?? 'Ghost',
+        avatar: existing.rival.avatar_image ?? '',
+        score: existing.rival_score ?? 0,
+      },
+      player: { score: existing.player_score ?? 0 },
+      weekStart: weekStartDate,
+      weekEnd: weekEndDate,
+    };
+  }
+
+  // Get player's total score for matching
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('total_score')
+    .eq('id', playerId)
+    .single();
+
+  const playerScore = profile?.total_score ?? 0;
+  const rival = await findSkillSimilarRival(playerId, playerScore, weekStartDate);
+
+  if (!rival) {
+    logger.warn('ghostRival', 'No rival found for player', { playerId });
+    return null;
+  }
+
+  // Create the rivalry
+  const { error: insertError } = await supabase
+    .from('ghost_rivals')
+    .insert({
+      player_id: playerId,
+      rival_id: rival.id,
+      week_start: weekStartDate,
+      player_score: 0,
+      rival_score: 0,
+    });
+
+  if (insertError) {
+    logger.error('ghostRival', 'Failed to create rivalry', { playerId, error: insertError });
+    throw insertError;
+  }
+
+  return {
+    rival: {
+      id: rival.id,
+      username: rival.username ?? 'Ghost',
+      avatar: rival.avatar_image ?? '',
+      score: 0,
+    },
+    player: { score: 0 },
+    weekStart: weekStartDate,
+    weekEnd: weekEndDate,
+  };
+}
+
+/**
+ * Add points to a player's weekly ghost rival score.
+ * Called after any game mode completes.
+ */
+export async function updateRivalScore(
+  playerId: string,
+  pointsEarned: number
+): Promise<{ newScore: number } | null> {
+  if (pointsEarned <= 0) return null;
+
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Supabase client not initialized');
+
+  const weekStartDate = toDateString(getWeekStart());
+
+  const { data, error } = await supabase.rpc('increment_ghost_rival_score', {
+    p_player_id: playerId,
+    p_week_start: weekStartDate,
+    p_points: pointsEarned,
+  });
+
+  // Fallback: manual update if RPC doesn't exist
+  if (error?.code === '42883') {
+    const { data: existing } = await supabase
+      .from('ghost_rivals')
+      .select('player_score')
+      .eq('player_id', playerId)
+      .eq('week_start', weekStartDate)
+      .single();
+
+    if (!existing) return null;
+
+    const newScore = (existing.player_score ?? 0) + pointsEarned;
+    await supabase
+      .from('ghost_rivals')
+      .update({ player_score: newScore })
+      .eq('player_id', playerId)
+      .eq('week_start', weekStartDate);
+
+    return { newScore };
+  }
+
+  if (error) {
+    logger.error('ghostRival', 'Failed to update score', { playerId, pointsEarned, error });
+    return null;
+  }
+
+  return { newScore: data ?? pointsEarned };
+}
+
+/**
+ * Get current weekly rivalry status for a player.
+ */
+export async function getWeeklyRivalStatus(
+  playerId: string
+): Promise<GhostRivalStatus | null> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error('Supabase client not initialized');
+
+  const weekStartDate = toDateString(getWeekStart());
+  const weekEndDate = toDateString(getWeekEnd());
+
+  const { data } = await supabase
+    .from('ghost_rivals')
+    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, avatar_image, total_score)')
+    .eq('player_id', playerId)
+    .eq('week_start', weekStartDate)
+    .single();
+
+  if (!data?.rival) return null;
+
+  return {
+    rival: {
+      id: data.rival.id,
+      username: data.rival.username ?? 'Ghost',
+      avatar: data.rival.avatar_image ?? '',
+      score: data.rival_score ?? 0,
+    },
+    player: { score: data.player_score ?? 0 },
+    weekStart: weekStartDate,
+    weekEnd: weekEndDate,
+  };
+}

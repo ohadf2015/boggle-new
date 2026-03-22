@@ -39,22 +39,35 @@ export function useBlastResultSaver(
 
     async function save() {
       try {
-        const response = await fetch('/api/blast/result', {
+        const requestBody = JSON.stringify({
+          score: results!.finalScore,
+          tilesCleared: results!.tilesCleared,
+          totalTiles: results!.totalTiles,
+          clearPercentage: results!.clearPercentage,
+          wordsFound: results!.wordsFound,
+          bestWord: results!.bestWord,
+          maxCombo: results!.maxCombo,
+          stars: results!.stars,
+          difficulty,
+          language,
+        });
+
+        let response = await fetch('/api/blast/result', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            score: results!.finalScore,
-            tilesCleared: results!.tilesCleared,
-            totalTiles: results!.totalTiles,
-            clearPercentage: results!.clearPercentage,
-            wordsFound: results!.wordsFound,
-            bestWord: results!.bestWord,
-            maxCombo: results!.maxCombo,
-            stars: results!.stars,
-            difficulty,
-            language,
-          }),
+          body: requestBody,
         });
+
+        // Retry once on transient 500/503
+        if (response.status >= 500 && response.status < 600) {
+          logger.warn('[useBlastResultSaver] Retrying after', response.status);
+          await new Promise(r => setTimeout(r, 1000));
+          response = await fetch('/api/blast/result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody,
+          });
+        }
 
         // 401 = guest user, save basic stats to localStorage as fallback
         if (response.status === 401) {

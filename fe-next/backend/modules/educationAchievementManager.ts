@@ -263,7 +263,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
       bronze: 2,
       silver: 3,
       gold: 4,
-      platinum: 4,
+      platinum: 7,
     },
   },
   {

@@ -105,6 +105,7 @@ export interface PracticeSessionXp {
 
     // Spelling Challenge specific (Phase 37)
     wordsSpelled?: number;
+    wordsAttempted?: number;
     spellingStreak?: number;
 
     // Timed Blitz specific (Phase 37)
@@ -336,7 +337,7 @@ function calculateSpellingXp(
   sessionData: PracticeSessionXp['sessionData'],
   breakdown: Record<string, number>
 ): number {
-  const { wordsSpelled = 0, spellingStreak = 0 } = sessionData;
+  const { wordsSpelled = 0, wordsAttempted, spellingStreak = 0 } = sessionData;
   let xp = 0;
 
   // Base spelling XP
@@ -349,10 +350,10 @@ function calculateSpellingXp(
     xp += breakdown.streakBonus;
   }
 
-  // Accuracy bonus (assume wordsSpelled represents accuracy if streak is high)
-  // For perfect spelling streak = wordsSpelled
-  if (wordsSpelled > 0) {
-    const accuracy = spellingStreak === wordsSpelled ? 100 : (wordsSpelled / 10) * 100; // Assume 10 total for accuracy calc
+  // Accuracy bonus — use wordsAttempted if available, fall back to wordsSpelled as denominator
+  const denominator = wordsAttempted ?? wordsSpelled;
+  if (wordsSpelled > 0 && denominator > 0) {
+    const accuracy = (wordsSpelled / denominator) * 100;
 
     const thresholds = Object.entries(EDUCATION_XP_CONFIG.SPELLING_ACCURACY_BONUS)
       .map(([threshold, bonus]) => ({ threshold: parseInt(threshold), bonus }))

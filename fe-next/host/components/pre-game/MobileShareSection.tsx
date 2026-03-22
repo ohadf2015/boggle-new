@@ -3,8 +3,7 @@
 import React, { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Link2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { getJoinUrl, shareViaWhatsApp, shareViaTelegram } from '../../../utils/share';
+import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTelegram } from '../../../utils/share';
 import { WhatsAppIcon, TelegramIcon } from '../../../components/icons/SocialIcons';
 import { cn } from '../../../lib/utils';
 
@@ -32,15 +31,12 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   const joinUrl = getJoinUrl(gameCode, 'mobile-lobby');
 
   const handleCopyLink = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(joinUrl);
+    const success = await copyJoinUrl(gameCode, t, 'mobile-lobby');
+    if (success) {
       setCopied(true);
-      toast.success(t('roomCode.linkCopied'), { duration: 1500, icon: '🔗' });
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error(t('common.error'));
     }
-  }, [joinUrl, t]);
+  }, [gameCode, t]);
 
   const handleWhatsAppShare = useCallback(() => {
     shareViaWhatsApp(gameCode, '', t);

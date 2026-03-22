@@ -217,7 +217,46 @@ export async function getWeeklyQuests(
 }
 
 /**
+ * Scale a challenge target based on student level.
+ * - Level 1-5 (easy): use base target as-is
+ * - Level 6-15 (medium): double the target
+ * - Level 16+ (hard): triple the target
+ */
+function scaleTarget(baseTarget: number, studentLevel: number): number {
+  if (studentLevel >= 16) return baseTarget * 3;
+  if (studentLevel >= 6) return baseTarget * 2;
+  return baseTarget;
+}
+
+/**
+ * Fetch the student's current education level from student_lesson_progress.
+ * Returns 1 if not found or on error.
+ */
+async function getStudentLevel(
+  playerId: string
+): Promise<number> {
+  try {
+    const db = getWriteClient();
+    if (!db) return 1;
+
+    const { data, error } = await db
+      .from('student_lesson_progress')
+      .select('current_level')
+      .eq('student_id', playerId)
+      .order('current_level', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return 1;
+    return data.current_level ?? 1;
+  } catch {
+    return 1;
+  }
+}
+
+/**
  * Assign daily challenges to a player (1 easy, 1 medium, 1 hard)
+ * Targets are scaled based on the student's current level.
  * @param playerId - Player UUID
  * @returns Array of created challenge rows
  */
@@ -243,6 +282,9 @@ export async function assignDailyChallenges(
       return { data: existing as DailyChallengeRow[], error: null };
     }
 
+    // Fetch student level for difficulty scaling
+    const studentLevel = await getStudentLevel(playerId);
+
     // Pick 1 random challenge from each tier
     const easyChallenges = EDUCATION_DAILY_CHALLENGES.easy;
     const mediumChallenges = EDUCATION_DAILY_CHALLENGES.medium;
@@ -254,7 +296,7 @@ export async function assignDailyChallenges(
       { ...pickRandom(hardChallenges), tier: 'hard' as ChallengeTier },
     ];
 
-    // Create challenge rows
+    // Create challenge rows with level-scaled targets
     const challengeRows = selectedChallenges.map((challenge) => ({
       player_id: playerId,
       challenge_date: today,
@@ -262,7 +304,7 @@ export async function assignDailyChallenges(
       challenge_tier: challenge.tier,
       title: challenge.title,
       description: challenge.description,
-      target_value: challenge.target,
+      target_value: scaleTarget(challenge.target, studentLevel),
       current_value: 0,
       xp_reward: challenge.xpReward,
       bonus_reward: TIER_BONUS_REWARDS[challenge.tier],

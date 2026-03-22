@@ -91,6 +91,18 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
         case 'profile':
           label = t('education.header.breadcrumbs.profile');
           break;
+        case 'duels':
+          label = t('education.header.breadcrumbs.duels');
+          break;
+        case 'analytics':
+          label = t('education.header.breadcrumbs.analytics');
+          break;
+        case 'curriculum':
+          label = t('education.header.breadcrumbs.curriculum');
+          break;
+        case 'reports':
+          label = t('education.header.breadcrumbs.reports');
+          break;
         default:
           // For dynamic segments like lesson IDs, try to get a readable name
           // or use a truncated version

@@ -12,8 +12,11 @@ interface WeeklyChallengeCardProps {
 export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps) {
   const { t } = useLanguage();
 
-  const progress = quest.requirements && typeof quest.requirements === 'object' && 'words_mastered' in quest.requirements
-    ? ((quest.current_progress as any).words_mastered / (quest.requirements as any).words_mastered) * 100
+  const requirementKey = quest.requirements && typeof quest.requirements === 'object'
+    ? Object.keys(quest.requirements as Record<string, unknown>)[0]
+    : null;
+  const progress = requirementKey
+    ? ((quest.current_progress as any)?.[requirementKey] / (quest.requirements as any)[requirementKey]) * 100
     : 0;
 
   const canClaim = quest.completed && !quest.claimed;
@@ -32,7 +35,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
 
       <h3 className="font-neo-display text-lg text-white mb-1">{t(quest.title)}</h3>
       <p className="text-sm text-neo-white/60 mb-3">
-        {t(quest.description).replace('{target}', String((quest.requirements as any)?.words_mastered || 0))}
+        {t(quest.description).replace('{target}', String(requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0))}
       </p>
 
       <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
@@ -43,7 +46,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
           transition={{ type: 'spring', stiffness: 100 }}
         />
         <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold">
-          {(quest.current_progress as any)?.words_mastered || 0} / {(quest.requirements as any)?.words_mastered || 0}
+          {requirementKey ? (quest.current_progress as any)?.[requirementKey] || 0 : 0} / {requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0}
         </div>
       </div>
 
