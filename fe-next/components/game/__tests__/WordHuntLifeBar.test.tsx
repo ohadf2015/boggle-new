@@ -22,7 +22,10 @@ jest.mock('framer-motion', () => {
     <div ref={ref} className={className} style={style} {...rest}>{children}</div>
   ));
   MotionDiv.displayName = 'MotionDiv';
-  return { motion: { div: MotionDiv } };
+  return {
+    motion: { div: MotionDiv },
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+  };
 });
 
 // Mock lucide-react

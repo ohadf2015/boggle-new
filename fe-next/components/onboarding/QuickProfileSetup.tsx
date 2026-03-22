@@ -2,10 +2,11 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Shuffle } from 'lucide-react';
+import { Shuffle, Pencil } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
@@ -25,9 +26,15 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const { t, dir } = useLanguage();
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState<CustomAvatarConfig>(getRandomAvatarConfig);
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
   const handleRandomize = useCallback(() => {
     setAvatar(getRandomAvatarConfig());
+  }, []);
+
+  const handleBuilderSave = useCallback((config: CustomAvatarConfig) => {
+    setAvatar(config);
+    setIsBuilderOpen(false);
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -52,11 +59,30 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           {t('onboarding.ftue.whatsYourName')}
         </p>
 
-        {/* Avatar + randomize */}
+        {/* Avatar (clickable to open builder) + randomize */}
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="w-16 h-16 rounded-full border-3 border-neo-black overflow-hidden bg-neo-white shadow-hard-sm">
+          <button
+            data-testid="avatar-edit-button"
+            onClick={() => setIsBuilderOpen(true)}
+            className={cn(
+              'relative group w-16 h-16 rounded-full border-3 border-neo-black',
+              'overflow-hidden bg-neo-white shadow-hard-sm',
+              'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
+              'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+              'transition-all duration-100'
+            )}
+            aria-label={t('onboarding.ftue.editAvatar', 'Customize avatar')}
+          >
             <Avatar customAvatar={avatar} size="xl" />
-          </div>
+            <div className={cn(
+              'absolute bottom-0 end-0 w-5 h-5',
+              'bg-neo-lime border-2 border-neo-black rounded-full',
+              'flex items-center justify-center shadow-hard-sm',
+              'group-hover:scale-110 transition-transform'
+            )}>
+              <Pencil className="w-2.5 h-2.5 text-neo-black" />
+            </div>
+          </button>
           <button
             onClick={handleRandomize}
             className={cn(
@@ -69,6 +95,13 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             <Shuffle className="w-5 h-5 text-neo-black" />
           </button>
         </div>
+
+        <AvatarBuilderModal
+          isOpen={isBuilderOpen}
+          onClose={() => setIsBuilderOpen(false)}
+          onSave={handleBuilderSave}
+          initialConfig={avatar}
+        />
 
         {/* Name input */}
         <input

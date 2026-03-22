@@ -128,13 +128,22 @@ describe('challenges module', () => {
       const mockCheckEq1 = jest.fn().mockReturnValue({ eq: mockCheckEq2 });
       const mockCheckSelect = jest.fn().mockReturnValue({ eq: mockCheckEq1 });
 
+      // Mock getStudentLevel query
+      const mockLevelMaybeSingle = jest.fn().mockResolvedValue({ data: { current_level: 1 }, error: null });
+      const mockLevelLimit = jest.fn().mockReturnValue({ maybeSingle: mockLevelMaybeSingle });
+      const mockLevelOrder = jest.fn().mockReturnValue({ limit: mockLevelLimit });
+      const mockLevelEq2 = jest.fn().mockReturnValue({ order: mockLevelOrder });
+      const mockLevelEq1 = jest.fn().mockReturnValue({ eq: mockLevelEq2 });
+      const mockLevelSelect = jest.fn().mockReturnValue({ eq: mockLevelEq1 });
+
       // Mock insert chain
       const mockInsertSelect = jest.fn().mockResolvedValue({ data: mockCreatedChallenges, error: null });
       const mockInsert = jest.fn().mockReturnValue({ select: mockInsertSelect });
 
       (supabase.from as jest.Mock)
         .mockReturnValueOnce({ select: mockCheckSelect }) // First call: check existing
-        .mockReturnValueOnce({ insert: mockInsert }); // Second call: insert
+        .mockReturnValueOnce({ select: mockLevelSelect }) // Second call: getStudentLevel
+        .mockReturnValueOnce({ insert: mockInsert }); // Third call: insert
 
       const result = await assignDailyChallenges(mockPlayerId);
 

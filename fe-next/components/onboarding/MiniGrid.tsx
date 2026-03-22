@@ -47,7 +47,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   onAutoTraceComplete,
   className,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selected, setSelected] = useState<SelectedCell[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showStartHint, setShowStartHint] = useState(false);
@@ -412,7 +412,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       {/* Word preview bar with animated progress */}
       <motion.div
         className="mt-5 text-center"
-        dir="ltr"
+        dir={language === 'he' ? 'rtl' : 'ltr'}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, ...SPRING_SOFT }}

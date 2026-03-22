@@ -25,7 +25,38 @@ jest.mock('framer-motion', () => {
 // Mock lucide-react
 jest.mock('lucide-react', () => ({
   Shuffle: () => <div data-testid="shuffle-icon" />,
+  Pencil: () => <div data-testid="pencil-icon" />,
   X: () => <div data-testid="x-icon" />,
+}));
+
+// Mock AvatarBuilderModal
+jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
+  __esModule: true,
+  default: ({ isOpen, onSave, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="avatar-builder-modal">
+        <button
+          data-testid="builder-save"
+          onClick={() =>
+            onSave({
+              gender: 'female',
+              base: 'round',
+              skinColor: '#8D5524',
+              hairStyle: 'long',
+              hairColor: '#FF0000',
+              eyes: 'happy',
+              mouth: 'grin',
+              accessory: 'glasses',
+            })
+          }
+        >
+          Save
+        </button>
+        <button data-testid="builder-close" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    ) : null,
 }));
 
 // Mock LanguageContext
@@ -123,5 +154,48 @@ describe('QuickProfileSetup', () => {
       'TestPlayer',
       expect.any(Object)
     );
+  });
+
+  describe('avatar builder integration', () => {
+    it('shows pencil edit indicator on avatar', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      expect(screen.getByTestId('pencil-icon')).toBeInTheDocument();
+    });
+
+    it('opens avatar builder modal when avatar is clicked', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      expect(screen.queryByTestId('avatar-builder-modal')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('avatar-edit-button'));
+      expect(screen.getByTestId('avatar-builder-modal')).toBeInTheDocument();
+    });
+
+    it('closes avatar builder modal on close', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      fireEvent.click(screen.getByTestId('avatar-edit-button'));
+      expect(screen.getByTestId('avatar-builder-modal')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('builder-close'));
+      expect(screen.queryByTestId('avatar-builder-modal')).not.toBeInTheDocument();
+    });
+
+    it('updates avatar when builder saves', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      fireEvent.click(screen.getByTestId('avatar-edit-button'));
+      fireEvent.click(screen.getByTestId('builder-save'));
+      // Modal should close after save
+      expect(screen.queryByTestId('avatar-builder-modal')).not.toBeInTheDocument();
+    });
+
+    it('uses saved avatar from builder in onComplete', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      // Open builder, save custom avatar
+      fireEvent.click(screen.getByTestId('avatar-edit-button'));
+      fireEvent.click(screen.getByTestId('builder-save'));
+      // Submit the form
+      fireEvent.click(screen.getByText("Let's go!"));
+      expect(defaultProps.onComplete).toHaveBeenCalledWith(
+        'Player',
+        expect.objectContaining({ gender: 'female', skinColor: '#8D5524' })
+      );
+    });
   });
 });

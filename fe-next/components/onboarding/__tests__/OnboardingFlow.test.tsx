@@ -25,10 +25,14 @@ jest.mock('framer-motion', () => {
 // Mock onboardingStorage
 const mockMarkComplete = jest.fn();
 const mockMarkSkipped = jest.fn();
+const mockConsumePendingRoom = jest.fn((): string | null => null);
+const mockHasPendingRoom = jest.fn(() => false);
 jest.mock('@/utils/onboardingStorage', () => ({
   markOnboardingComplete: (...args: any[]) => mockMarkComplete(...args),
   markOnboardingSkipped: (...args: any[]) => mockMarkSkipped(...args),
   hasCompletedOnboarding: () => false,
+  consumePendingRoomInvite: () => mockConsumePendingRoom(),
+  hasPendingRoomInvite: () => mockHasPendingRoom(),
 }));
 
 // Mock next/navigation
@@ -87,8 +91,11 @@ jest.mock('../ScoreReveal', () => {
 jest.mock('../ModeFork', () => {
   return {
     __esModule: true,
-    default: ({ onSelectMode }: any) => (
+    default: ({ onSelectMode, hasPendingInvite }: any) => (
       <div data-testid="mode-fork">
+        {hasPendingInvite && (
+          <button onClick={() => onSelectMode('joinRoom')}>Join Room</button>
+        )}
         <button onClick={() => onSelectMode('daily')}>Daily</button>
         <button onClick={() => onSelectMode('practice')}>Practice</button>
       </div>
@@ -165,5 +172,54 @@ describe('OnboardingFlow', () => {
     const flow = screen.getByTestId('onboarding-flow');
     expect(flow).toBeInTheDocument();
     expect(flow.className).toContain('fixed');
+  });
+
+  describe('pending room invite', () => {
+    const advanceToModeFork = () => {
+      fireEvent.click(screen.getByText('Complete Tutorial'));
+      fireEvent.click(screen.getByText('Set Profile'));
+      fireEvent.click(screen.getByText('Continue'));
+    };
+
+    it('redirects to multiplayer room when pending invite exists and daily selected', () => {
+      mockConsumePendingRoom.mockReturnValue('ABC123');
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToModeFork();
+      fireEvent.click(screen.getByText('Daily'));
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
+    });
+
+    it('redirects to multiplayer room when pending invite exists and practice selected', () => {
+      mockConsumePendingRoom.mockReturnValue('XYZ789');
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToModeFork();
+      fireEvent.click(screen.getByText('Practice'));
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=XYZ789');
+    });
+
+    it('redirects to multiplayer room when joinRoom selected', () => {
+      mockHasPendingRoom.mockReturnValue(true);
+      mockConsumePendingRoom.mockReturnValue('ROOM42');
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToModeFork();
+      fireEvent.click(screen.getByText('Join Room'));
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ROOM42');
+    });
+
+    it('redirects to daily when no pending invite and daily selected', () => {
+      mockConsumePendingRoom.mockReturnValue(null);
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToModeFork();
+      fireEvent.click(screen.getByText('Daily'));
+      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+    });
+
+    it('redirects to singleplayer when no pending invite and practice selected', () => {
+      mockConsumePendingRoom.mockReturnValue(null);
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToModeFork();
+      fireEvent.click(screen.getByText('Practice'));
+      expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=practice');
+    });
   });
 });

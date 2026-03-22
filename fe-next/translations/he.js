@@ -1427,12 +1427,14 @@ const he = {
       "niceWork": "כל הכבוד!",
       "whatsYourName": "איך לקרוא לך?",
       "randomize": "אווטאר אקראי",
+      "editAvatar": "התאמה אישית של אווטאר",
       "yourScore": "השגת {{score}} נקודות",
       "averageScore": "הממוצע היום הוא {{average}}",
       "tryAgain": "לנסות שוב?",
       "continue": "המשך",
       "dailyChallenge": "אתגר יומי",
       "practiceMode": "מצב תרגול",
+      "joinFriendsGame": "הצטרפו למשחק של חבר",
       "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
       "skip": "דלג",
       "letsGo": "יאללה!"
@@ -8957,7 +8959,7 @@ const he = {
   "urgency": {
     "streakAtRisk": "!הרצף של {{count}} ימים מסתיים בעוד {{hoursLeft}} שעות",
     "streakAction": "שחקו עכשיו כדי לשמור אותו",
-    "dailyUnsolved": "?{{solveRate}}% פתרו. תצליחו — {{puzzleNumber}}# אתגר יומי",
+    "dailyUnsolved": "אתגר יומי #{{puzzleNumber}} — רק {{solveRate}}% פתרו. תצליחו?",
     "dailyAction": "קבלו את האתגר"
   },
   "dailyMissions": {

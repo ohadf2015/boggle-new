@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { markOnboardingComplete } from '@/utils/onboardingStorage';
+import { markOnboardingComplete, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import TutorialGame from './TutorialGame';
@@ -74,19 +74,29 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   // Step 4: Mode selected — complete the onboarding
   const handleModeSelect = useCallback(
-    (mode: 'daily' | 'practice') => {
+    (mode: 'daily' | 'practice' | 'joinRoom') => {
       markOnboardingComplete({
         avatarId: 'custom',
         displayName: playerName || 'Player',
-        selectedMode: mode === 'daily' ? 'daily' : 'single',
+        selectedMode: mode === 'daily' ? 'daily' : mode === 'joinRoom' ? 'multi' : 'single',
       });
 
-      const route =
-        mode === 'daily'
-          ? `/${language}/daily`
-          : `/${language}/singleplayer?autoStart=practice`;
+      // Check for a pending room invite (saved before FTUE started)
+      const pendingRoom = consumePendingRoomInvite();
+      if (mode === 'joinRoom' && pendingRoom) {
+        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+      } else if (pendingRoom) {
+        // Even if they picked daily/practice, still redirect to the room
+        // since that was their original intent
+        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+      } else {
+        const route =
+          mode === 'daily'
+            ? `/${language}/daily`
+            : `/${language}/singleplayer?autoStart=practice`;
+        router.push(route);
+      }
 
-      router.push(route);
       onComplete();
     },
     [language, router, onComplete, playerName]
@@ -113,7 +123,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           />
         );
       case 'fork':
-        return <ModeFork onSelectMode={handleModeSelect} />;
+        return <ModeFork onSelectMode={handleModeSelect} hasPendingInvite={hasPendingRoomInvite()} />;
       default:
         return null;
     }

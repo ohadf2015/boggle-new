@@ -289,7 +289,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-auto transition-all duration-500 ease-in-out pb-16 lg:pb-4">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-2 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-0">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -308,7 +308,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-hidden">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -334,7 +334,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[80px] short:lg:min-h-[56px] xl:min-h-[130px]"
+                className="flex w-full items-center justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[80px] short:lg:min-h-[56px]"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -490,7 +490,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-start min-h-0 overflow-visible pt-1 md:pt-0 gap-2',
+              'flex-1 flex flex-col items-center justify-start min-h-0 overflow-visible lg:overflow-hidden pt-1 md:pt-0 gap-2',
               'transition-shadow duration-500',
               comboGlow
             )}

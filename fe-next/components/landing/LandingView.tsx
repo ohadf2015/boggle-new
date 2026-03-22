@@ -130,7 +130,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   // who may have cleared localStorage or are on a new device.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const { hasCompletedOnboarding, markOnboardingComplete } = require('@/utils/onboardingStorage');
+    const { hasCompletedOnboarding, markOnboardingComplete, savePendingRoomInvite } = require('@/utils/onboardingStorage');
     if (hasCompletedOnboarding()) return;
 
     // Authenticated user with games played = returning player, skip FTUE
@@ -141,6 +141,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         selectedMode: null,
       });
       return;
+    }
+
+    // Preserve room invite code so post-onboarding redirect can pick it up
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomCode = urlParams.get('room');
+    if (roomCode) {
+      savePendingRoomInvite(roomCode);
     }
 
     // Only show FTUE for truly new, unauthenticated users

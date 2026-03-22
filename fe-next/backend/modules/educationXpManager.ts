@@ -350,9 +350,9 @@ function calculateSpellingXp(
     xp += breakdown.streakBonus;
   }
 
-  // Accuracy bonus — use wordsAttempted if available, fall back to wordsSpelled as denominator
-  const denominator = wordsAttempted ?? wordsSpelled;
-  if (wordsSpelled > 0 && denominator > 0) {
+  // Accuracy bonus — only apply when wordsAttempted is explicitly provided
+  if (wordsAttempted != null && wordsAttempted > 0 && wordsSpelled > 0) {
+    const denominator = wordsAttempted;
     const accuracy = (wordsSpelled / denominator) * 100;
 
     const thresholds = Object.entries(EDUCATION_XP_CONFIG.SPELLING_ACCURACY_BONUS)

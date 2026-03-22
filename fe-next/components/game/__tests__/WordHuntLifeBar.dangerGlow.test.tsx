@@ -67,17 +67,24 @@ describe('WordHuntLifeBar Danger Glow', () => {
     expect(container.className).toContain('life-bar-danger-glow');
   });
 
-  it('should have shake class when life decreases', () => {
+  it('should NOT have shake class when life decreases (drip replaces shake)', () => {
     const { rerender } = render(<WordHuntLifeBar life={80} maxLife={100} />);
     rerender(<WordHuntLifeBar life={60} maxLife={100} />);
 
     const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('animate-neo-shake');
+    expect(container.className).not.toContain('animate-neo-shake');
   });
 
-  it('should not have shake class on initial render', () => {
+  it('should show drip droplets when life decreases', () => {
+    const { rerender } = render(<WordHuntLifeBar life={80} maxLife={100} />);
+    rerender(<WordHuntLifeBar life={60} maxLife={100} />);
+
+    const droplets = screen.getAllByTestId('life-drip-droplet');
+    expect(droplets.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should not show drip droplets on initial render', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
-    const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).not.toContain('animate-neo-shake');
+    expect(screen.queryAllByTestId('life-drip-droplet')).toHaveLength(0);
   });
 });

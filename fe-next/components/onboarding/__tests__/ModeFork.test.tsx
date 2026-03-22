@@ -46,6 +46,7 @@ jest.mock('framer-motion', () => {
 jest.mock('lucide-react', () => ({
   Trophy: () => <div data-testid="trophy-icon" />,
   Target: () => <div data-testid="target-icon" />,
+  Users: () => <div data-testid="users-icon" />,
 }));
 
 // Mock LanguageContext
@@ -55,6 +56,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
       const translations: Record<string, string> = {
         'onboarding.ftue.dailyChallenge': 'Daily Challenge',
         'onboarding.ftue.practiceMode': 'Practice Mode',
+        'onboarding.ftue.joinFriendsGame': "Join Friend's Game",
         'onboarding.ftue.moreModesUnlock': 'More modes unlock as you play!',
       };
       return translations[key] || key;
@@ -113,5 +115,36 @@ describe('ModeFork', () => {
   it('renders target icon for practice mode', () => {
     render(<ModeFork {...defaultProps} />);
     expect(screen.getByTestId('target-icon')).toBeInTheDocument();
+  });
+
+  describe('with pending room invite', () => {
+    it('shows "Join Friend\'s Game" button when hasPendingInvite is true', () => {
+      render(<ModeFork {...defaultProps} hasPendingInvite />);
+      expect(screen.getByText("Join Friend's Game")).toBeInTheDocument();
+      expect(screen.getByTestId('join-room-button')).toBeInTheDocument();
+    });
+
+    it('does not show join button when hasPendingInvite is false', () => {
+      render(<ModeFork {...defaultProps} hasPendingInvite={false} />);
+      expect(screen.queryByTestId('join-room-button')).not.toBeInTheDocument();
+    });
+
+    it('does not show join button when hasPendingInvite is omitted', () => {
+      render(<ModeFork {...defaultProps} />);
+      expect(screen.queryByTestId('join-room-button')).not.toBeInTheDocument();
+    });
+
+    it('calls onSelectMode with "joinRoom" when join button clicked', () => {
+      render(<ModeFork {...defaultProps} hasPendingInvite />);
+      fireEvent.click(screen.getByText("Join Friend's Game"));
+      expect(defaultProps.onSelectMode).toHaveBeenCalledWith('joinRoom');
+    });
+
+    it('still shows daily and practice options alongside join button', () => {
+      render(<ModeFork {...defaultProps} hasPendingInvite />);
+      expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
+      expect(screen.getByText('Practice Mode')).toBeInTheDocument();
+      expect(screen.getByText("Join Friend's Game")).toBeInTheDocument();
+    });
   });
 });

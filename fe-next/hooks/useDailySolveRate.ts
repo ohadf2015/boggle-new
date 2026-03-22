@@ -44,7 +44,9 @@ export function useDailySolveRate(language: string, options: UseDailySolveRateOp
 
       if (!error && data && data.length > 0) {
         const solved = data.filter((r: any) => r.solved).length;
-        setSolveRate(Math.round((solved / data.length) * 100));
+        const rate = Math.round((solved / data.length) * 100);
+        // Avoid showing "0% solved" when people actually solved it — show at least 1%
+        setSolveRate(solved > 0 && rate === 0 ? 1 : rate);
       }
       setLoading(false);
     }

@@ -9,9 +9,12 @@
  */
 
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUrgencyData, type UrgencyType } from '@/hooks/useUrgencyData';
+
+// Jelly spring: stiffness 200 + damping 8 = visible wobble that settles organically
+const JELLY_SPRING = { type: 'spring' as const, stiffness: 200, damping: 8 };
 
 interface UrgencyConfig {
   borderClass: string;
@@ -87,6 +90,7 @@ export function UrgencyCard() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const urgency = useUrgencyData();
+  const shouldReduceMotion = useReducedMotion();
 
   if (!urgency) return null;
 
@@ -95,6 +99,10 @@ export function UrgencyCard() {
   const handleClick = () => {
     router.push(config.href);
   };
+
+  const glowColor = urgency.type === 'streak-risk'
+    ? 'rgba(255, 20, 147, 0.4)'
+    : 'rgba(255, 225, 53, 0.4)';
 
   return (
     <AnimatePresence>
@@ -106,51 +114,88 @@ export function UrgencyCard() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -12 }}
         transition={{ duration: 0.3 }}
-        className={`
-          w-full max-w-4xl mx-auto
-          border-4 ${config.borderClass} ${config.bgClass}
-          rounded-neo-lg shadow-hard-lg
-          p-4 sm:p-5
-          flex items-center gap-3 sm:gap-4
-        `}
+        className="w-full max-w-4xl mx-auto"
       >
-        {/* Icon */}
-        <div
+      <motion.button
+        onClick={handleClick}
+        whileHover={shouldReduceMotion
+          ? { opacity: 0.9 }
+          : { scaleX: 1.03, scaleY: 0.97 }
+        }
+        whileTap={shouldReduceMotion
+          ? undefined
+          : { scaleX: 0.97, scaleY: 1.02 }
+        }
+        transition={shouldReduceMotion ? { duration: 0.15 } : JELLY_SPRING}
+        className={`
+          w-full relative overflow-hidden
+          border-3 border-neo-black ${config.bgClass}
+          rounded-neo shadow-hard
+          active:shadow-hard-pressed
+          p-3 sm:p-4
+          flex items-center gap-3
+          cursor-pointer transition-shadow duration-150
+          text-start
+        `}
+        style={!shouldReduceMotion ? {
+          boxShadow: `0 0 20px ${glowColor}, 4px 4px 0px rgb(var(--neo-black))`,
+        } : undefined}
+      >
+        {/* Periodic shimmer sweep — compositor-only (transform + opacity) */}
+        {!shouldReduceMotion && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            aria-hidden="true"
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -skew-x-12"
+              animate={{ x: ['-100%', '200%'] }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                repeatDelay: 4,
+                ease: 'easeInOut',
+              }}
+            />
+          </motion.div>
+        )}
+
+        {/* Icon with breathing pulse */}
+        <motion.div
           className={`
-            flex-shrink-0
-            ${config.pulseIcon ? 'animate-pulse' : ''}
+            flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12
+            flex items-center justify-center
+            rounded-full border-2 border-neo-black
+            bg-neo-navy/80 relative z-10
           `}
+          animate={shouldReduceMotion ? undefined : {
+            scale: [1, 1.12, 1],
+            rotate: [0, config.pulseIcon ? 8 : 3, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         >
           {config.icon}
-        </div>
+        </motion.div>
 
-        {/* Message */}
-        <div className="flex-1 min-w-0">
-          <p className="font-neo-display text-sm sm:text-base text-neo-white leading-snug">
+        {/* Message + CTA label */}
+        <div className="flex-1 min-w-0 relative z-10">
+          <p className="font-neo-display text-sm sm:text-base text-neo-white font-bold leading-snug">
             {t(config.messageKey, urgency.data)}
           </p>
+          <motion.p
+            data-testid="urgency-cta"
+            className="font-neo-display text-xs text-neo-yellow font-bold mt-0.5 uppercase tracking-wide"
+            animate={shouldReduceMotion ? undefined : { x: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+          >
+            {t(config.actionKey)} →
+          </motion.p>
         </div>
-
-        {/* CTA Button */}
-        <motion.button
-          data-testid="urgency-cta"
-          onClick={handleClick}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`
-            flex-shrink-0
-            px-4 py-2 sm:px-5 sm:py-2.5
-            font-neo-display text-sm sm:text-base font-bold
-            text-neo-navy bg-neo-yellow
-            border-3 border-black rounded-neo
-            shadow-hard-sm
-            hover:shadow-hard active:shadow-hard-pressed
-            transition-shadow duration-150
-            cursor-pointer
-          `}
-        >
-          {t(config.actionKey)}
-        </motion.button>
+      </motion.button>
       </motion.div>
     </AnimatePresence>
   );

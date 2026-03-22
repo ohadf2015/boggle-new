@@ -668,7 +668,7 @@ describe('educationXpManager', () => {
         type: 'spelling',
         sessionData: {
           wordsSpelled: 9,
-          // Assume 10 total attempts for 90% accuracy
+          wordsAttempted: 10, // 90% accuracy
         },
       };
 
@@ -686,6 +686,7 @@ describe('educationXpManager', () => {
         type: 'spelling',
         sessionData: {
           wordsSpelled: 8,
+          wordsAttempted: 10, // 80% accuracy
           spellingStreak: 5,
         },
       };

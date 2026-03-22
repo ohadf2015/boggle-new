@@ -88,3 +88,29 @@ export const markOnboardingSkipped = (): void => {
 export const isFirstTimeUser = (): boolean => {
   return !hasCompletedOnboarding();
 };
+
+// ── Pending Room Invite ──────────────────────────────────────────────
+// Preserves a multiplayer room code across the onboarding flow so users
+// who click an invite link before completing FTUE can join after.
+
+const PENDING_ROOM_KEY = 'lexiclash_pending_room_invite';
+
+/** Save a room code so post-onboarding redirect can pick it up. */
+export const savePendingRoomInvite = (roomCode: string): void => {
+  if (typeof window === 'undefined') return;
+  sessionStorage.setItem(PENDING_ROOM_KEY, roomCode);
+};
+
+/** Retrieve (and clear) a pending room invite code. */
+export const consumePendingRoomInvite = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  const code = sessionStorage.getItem(PENDING_ROOM_KEY);
+  if (code) sessionStorage.removeItem(PENDING_ROOM_KEY);
+  return code;
+};
+
+/** Check if a pending room invite exists without consuming it. */
+export const hasPendingRoomInvite = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return !!sessionStorage.getItem(PENDING_ROOM_KEY);
+};

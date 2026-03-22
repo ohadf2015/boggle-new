@@ -34,10 +34,15 @@ jest.mock('framer-motion', () => {
     <div ref={ref} {...props}>{children}</div>
   ));
   MockMDiv.displayName = 'MockMDiv';
+  const MockP = React.forwardRef(({ children, ...props }: any, ref: any) => (
+    <p ref={ref} {...props}>{children}</p>
+  ));
+  MockP.displayName = 'MockMotionP';
   return {
-    motion: { div: MockDiv, button: MockButton },
+    motion: { div: MockDiv, button: MockButton, p: MockP },
     m: { div: MockMDiv },
     AnimatePresence: ({ children }: any) => <>{children}</>,
+    useReducedMotion: () => false,
   };
 });
 
@@ -78,7 +83,7 @@ describe('UrgencyCard', () => {
       data: { streak: 7, hoursLeft: 3 },
     };
     render(<UrgencyCard />);
-    expect(screen.getByText('urgency.streakAction')).toBeInTheDocument();
+    expect(screen.getByTestId('urgency-cta')).toHaveTextContent('urgency.streakAction');
   });
 
   it('should navigate to singleplayer on streak-risk CTA click', () => {
@@ -106,7 +111,7 @@ describe('UrgencyCard', () => {
       data: { puzzleNumber: 42, solveRate: 65 },
     };
     render(<UrgencyCard />);
-    expect(screen.getByText('urgency.dailyAction')).toBeInTheDocument();
+    expect(screen.getByTestId('urgency-cta')).toHaveTextContent('urgency.dailyAction');
   });
 
   it('should navigate to daily on daily-unsolved CTA click', () => {
