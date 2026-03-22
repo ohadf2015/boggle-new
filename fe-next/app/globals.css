@@ -1924,6 +1924,12 @@ html {
   overflow-y: auto;
   overflow-x: clip;
   -webkit-overflow-scrolling: touch;
+  /* Enable compositor-thread scrolling so non-passive touch handlers
+     (e.g. pull-to-refresh onTouchMove) don't block scroll on every frame */
+  touch-action: pan-y pinch-zoom;
+  /* Prevent elastic overscroll bounce — lets pull-to-refresh work
+     without needing preventDefault() to block native scroll */
+  overscroll-behavior-y: contain;
 }
 
 /* Full-screen flex container - LOCKED (no scroll) */
