@@ -265,6 +265,14 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   }, [socket, tournamentData, t, setShowCancelTournamentDialog, setTournamentData, setGameType]);
 
   const handleStartNewGame = useCallback(() => {
+    // Reuse the same lock as startGame to prevent duplicate emissions
+    if (startGameLockRef.current) {
+      logger.warn('[HOST] handleStartNewGame already in progress, ignoring duplicate');
+      return;
+    }
+    startGameLockRef.current = true;
+    setTimeout(() => { startGameLockRef.current = false; }, 3000);
+
     socket?.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
       if (response?.success) {
         setFinalScores(null);

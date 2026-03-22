@@ -15,6 +15,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   type ReactNode,
 } from 'react';
 import logger from '@/utils/logger';
@@ -150,6 +151,9 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     await fetchProgression();
   }, [fetchProgression]);
 
+  // In-flight guard to prevent duplicate completeLevel calls (causes 429s)
+  const completeLevelInFlightRef = useRef<string | null>(null);
+
   // Complete a level
   const completeLevel = useCallback(
     async (
@@ -165,6 +169,14 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         // Guest users can't save progress — silently skip
         return;
       }
+
+      // Prevent duplicate in-flight calls for the same level (causes 429 rate limit)
+      const levelKey = `${world}-${level}`;
+      if (completeLevelInFlightRef.current === levelKey) {
+        logger.warn('[ProgressionContext] Skipping duplicate completeLevel for', levelKey);
+        return;
+      }
+      completeLevelInFlightRef.current = levelKey;
 
       try {
         const requestBody = JSON.stringify({
@@ -277,6 +289,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       } catch (err) {
         logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
         throw err;
+      } finally {
+        completeLevelInFlightRef.current = null;
       }
     },
     [user?.id]

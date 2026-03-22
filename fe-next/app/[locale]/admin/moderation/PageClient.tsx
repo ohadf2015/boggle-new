@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
+import { neoErrorToast } from '@/components/NeoToast';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { ModerationQueue } from '@/components/admin/moderation/ModerationQueue';
@@ -85,6 +86,7 @@ export default function ModerationPageClient() {
         ? 'Request timed out — please try again'
         : err instanceof Error ? err.message : 'Unknown error';
       logger.warn(`Moderation ${action} failed:`, message);
+      neoErrorToast(message, { icon: '⚠️', duration: 4000 });
       // Re-fetch to restore accurate state
       fetchQueue();
     } finally {
