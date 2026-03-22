@@ -33,7 +33,7 @@ const buttonVariants = cva(
     // Enhanced focus styling with visible ring
     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy',
     // Disabled state
-    'disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
+    'disabled:pointer-events-none disabled:opacity-70 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
     // SVG icons - responsive sizes
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     '[&_svg]:w-5 [&_svg]:h-5',

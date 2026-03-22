@@ -1811,6 +1811,13 @@ const en = {
     "adventure": "Next level preview loading... Come back to find out!",
     "seeYou": "See you tomorrow"
   },
+  "unfinishedBoard": {
+    "teaser": "3 words are waiting for you tomorrow",
+    "resumeTitle": "Your unfinished board",
+    "resumeDesc": "You found {{found}}/{{total}} words",
+    "resumeCta": "Resume Board",
+    "wordsWaiting": "words waiting"
+  },
   "practiceResults": {
     "playAgain": "Play Again",
     "orTrySomethingNew": "or try something new",
@@ -8735,6 +8742,32 @@ const en = {
     "description": "2x XP for the next 60 minutes!",
     "expired": "Boost Complete!",
     "badge": "{{time}}"
+  },
+  "vault": {
+    "title": "THE VAULT",
+    "open": "Vault is Open!",
+    "closesIn": "Closes in {{time}}",
+    "enterVault": "Enter the Vault",
+    "nextVault": "Next vault in {{time}}",
+    "leaderboard": "Top Scores",
+    "yourRank": "Your rank: #{{rank}}",
+    "completed": "Vaulted!",
+    "badge": "Vault Champion"
+  },
+  "ghostRival": {
+    "title": "Your Weekly Rival",
+    "you": "You",
+    "ahead": "{{pts}} pts ahead",
+    "behind": "{{pts}} pts behind",
+    "cta": "Play to close the gap!",
+    "endsIn": "Ends in {{time}}",
+    "ended": "Week ended!"
+  },
+  "friendsActivity": {
+    "title": "Friends Activity",
+    "beatYou": "Beat your score!",
+    "empty": "Add friends to see their activity",
+    "addFriends": "Find Friends"
   }
 };
 

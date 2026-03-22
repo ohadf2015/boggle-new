@@ -20,7 +20,7 @@ const toggleVariants = cva(
     "ring-offset-background",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
     // Disabled state
-    "disabled:pointer-events-none disabled:opacity-50",
+    "disabled:pointer-events-none disabled:opacity-70",
     // Transition
     "transition-all duration-100",
     // Active (selected) state - yellow with shadow

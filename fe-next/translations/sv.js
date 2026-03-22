@@ -1708,6 +1708,13 @@ const sv = {
     "adventure": "Förhandsgranskning av nästa nivå laddas... Kom tillbaka!",
     "seeYou": "Vi ses imorgon"
   },
+  "unfinishedBoard": {
+    "teaser": "3 ord väntar på dig imorgon",
+    "resumeTitle": "Ditt oavslutade bräde",
+    "resumeDesc": "Du hittade {{found}}/{{total}} ord",
+    "resumeCta": "Fortsätt spela",
+    "wordsWaiting": "ord väntar"
+  },
   "practiceResults": {
     "playAgain": "Spela igen",
     "orTrySomethingNew": "eller prova något nytt",
@@ -7603,7 +7610,7 @@ const sv = {
       "wordsAccepted": "Godkända ord",
       "wordsRejected": "Nekade ord",
       "xpEarned": "Intjänad XP",
-      "you": "Du",
+    "you": "Du",
       "youLose": "Du förlorade!",
       "youWin": "Du vann!"
     },
@@ -8681,19 +8688,43 @@ const sv = {
     "empty": "Spela spel för att hitta sällsynta ord!"
   },
   "leagueRivals": {
-
-      "title": "Dina ligarivaler",
-      "ahead": "{{pts}} poäng före",
-      "behind": "{{pts}} poäng efter",
-      "you": "Du",
-      "noRivals": "Klättra i ligan för att hitta rivaler!"
-    }
+    "title": "Dina ligarivaler",
+    "ahead": "{{pts}} poäng före",
+    "behind": "{{pts}} poäng efter",
+    "you": "Du",
+    "noRivals": "Klättra i ligan för att hitta rivaler!"
   },
   "powerHour": {
     "activated": "Power Hour aktiverad!",
     "description": "2x XP i 60 minuter!",
     "expired": "Boost klar!",
     "badge": "{{time}}"
+  },
+  "vault": {
+    "title": "VALVET",
+    "open": "Valvet är öppet!",
+    "closesIn": "Stänger om {{time}}",
+    "enterVault": "Gå in i Valvet",
+    "nextVault": "Nästa valv om {{time}}",
+    "leaderboard": "Toppoäng",
+    "yourRank": "Din rank: #{{rank}}",
+    "completed": "Valvat!",
+    "badge": "Valvmästare"
+  },
+  "ghostRival": {
+    "title": "Din veckorival",
+    "you": "Du",
+    "ahead": "{{pts}} poäng före",
+    "behind": "{{pts}} poäng efter",
+    "cta": "Spela för att stänga gapet!",
+    "endsIn": "Slutar om {{time}}",
+    "ended": "Veckan avslutad!"
+  },
+  "friendsActivity": {
+    "title": "Vänners aktivitet",
+    "beatYou": "Slog ditt resultat!",
+    "empty": "Lägg till vänner för att se aktivitet",
+    "addFriends": "Hitta vänner"
   }
 };
 

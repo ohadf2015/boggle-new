@@ -43,9 +43,9 @@ const gradients: Record<HeroVariant, string> = {
 };
 
 const badgeStyles: Record<string, string> = {
-  completion: 'bg-neo-cyan/20 border-neo-cyan/40 text-neo-cyan',
-  milestone: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/40 text-amber-400',
-  streak: 'bg-neo-orange/15 border-neo-orange/40 text-neo-orange',
+  completion: 'bg-neo-cyan/80 border-neo-cyan/40 text-neo-black',
+  milestone: 'bg-gradient-to-r from-amber-500/80 to-orange-500/80 border-amber-500/40 text-neo-black',
+  streak: 'bg-neo-orange/80 border-neo-orange/40 text-neo-black',
 };
 
 /**

@@ -11,6 +11,45 @@ const PLACEHOLDER_TIMESTAMPS_KEY = 'lexiclash_placeholder_ad_timestamps';
 const MAX_PLACEHOLDER_PER_HOUR = 3;
 const ONE_HOUR = 60 * 60 * 1000;
 
+// Daily ad view tracking
+const DAILY_AD_VIEWS_KEY = 'lexiclash_daily_ad_views';
+const MAX_DAILY_AD_VIEWS = 10;
+
+function getTodayKey(): string {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function getDailyViewCount(): number {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
+    if (!stored) return 0;
+    const data = JSON.parse(stored);
+    if (data.date !== getTodayKey()) return 0;
+    return data.count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+function recordDailyView(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const today = getTodayKey();
+    const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
+    let count = 0;
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.date === today) count = data.count ?? 0;
+    }
+    localStorage.setItem(DAILY_AD_VIEWS_KEY, JSON.stringify({ date: today, count: count + 1 }));
+  } catch { /* silent */ }
+}
+
+function isDailyLimitReached(): boolean {
+  return getDailyViewCount() >= MAX_DAILY_AD_VIEWS;
+}
+
 function isPlaceholderCapped(): boolean {
   if (typeof window === 'undefined') return false;
   try {
@@ -57,6 +96,14 @@ interface UseRewardedAdReturn {
   error: string | null;
   /** Amount of coins that will be rewarded */
   rewardAmount: number;
+  /** Whether the user can show another ad today */
+  canShowAd: boolean;
+  /** Number of ad views today */
+  viewsToday: number;
+  /** Maximum daily ad views allowed */
+  maxViews: number;
+  /** Whether the daily limit has been reached */
+  isDailyLimitReached: boolean;
 }
 
 /**
@@ -84,6 +131,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
+  const [dailyViewCount, setDailyViewCount] = useState(() => getDailyViewCount());
 
   // Use unified CoinContext for all coin operations
   const { awardWatchedAd, rewards } = useCoinContext();
@@ -131,6 +179,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         recordPlaceholderView();
         setPlaceholderCooldownFlag(isPlaceholderCapped());
       }
+      recordDailyView();
+      setDailyViewCount(getDailyViewCount());
       const result = await awardWatchedAd(platform);
       setStatus('completed');
       await onRewardEarned?.(result?.awarded ?? rewardAmount);
@@ -204,6 +254,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     showAd,
     error,
     rewardAmount,
+    canShowAd: !isDailyLimitReached(),
+    viewsToday: dailyViewCount,
+    maxViews: MAX_DAILY_AD_VIEWS,
+    isDailyLimitReached: isDailyLimitReached(),
   };
 }
 

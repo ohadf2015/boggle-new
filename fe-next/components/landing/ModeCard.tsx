@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy, Clock, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -55,6 +55,12 @@ interface ModeCardProps {
   highlighted?: boolean;
   /** Label for the highlighted badge (e.g., "Start Here") */
   highlightLabel?: string;
+  /** Duration label (e.g., "1-3 min") */
+  duration?: string;
+  /** Difficulty level 1-3 */
+  difficulty?: 1 | 2 | 3;
+  /** Difficulty label (e.g., "Easy", "Medium", "Hard") */
+  difficultyLabel?: string;
 }
 
 /**
@@ -79,6 +85,9 @@ const ModeCard: React.FC<ModeCardProps> = ({
   badge,
   highlighted = false,
   highlightLabel,
+  duration,
+  difficulty,
+  difficultyLabel,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -316,6 +325,38 @@ const ModeCard: React.FC<ModeCardProps> = ({
         >
           {description}
         </p>
+      )}
+
+      {/* Duration + Difficulty badges */}
+      {!secondary && (duration || difficulty) && (
+        <div className="flex flex-wrap" style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)', marginBottom: 'clamp(0.25rem, 1cqw, 0.5rem)' }}>
+          {duration && (
+            <span
+              className="inline-flex items-center bg-neo-navy/20 text-neo-black font-bold rounded-neo border-2 border-neo-black/30"
+              style={{
+                gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+                padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+              }}
+            >
+              <Clock style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }} />
+              {duration}
+            </span>
+          )}
+          {difficulty && difficultyLabel && (
+            <span
+              className="inline-flex items-center bg-neo-navy/20 text-neo-black font-bold rounded-neo border-2 border-neo-black/30"
+              style={{
+                gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+                padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+              }}
+            >
+              <Signal style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }} />
+              {difficultyLabel}
+            </span>
+          )}
+        </div>
       )}
 
       {/* Live Badge - shows open rooms and players only when meaningful (> 5) */}

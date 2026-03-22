@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, type LucideIcon } from 'lucide-react';
+import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, AlertCircle, type LucideIcon } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button } from '../ui/button';
@@ -361,7 +361,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               className="bg-red-500/20 border-2 border-red-500 rounded-neo p-3 mb-4 text-center"
               role="alert"
             >
-              <p className="text-sm font-bold text-red-300">{error}</p>
+              <p className="text-sm font-bold text-red-300 flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</p>
             </motion.div>
           )}
         </AnimatePresence>

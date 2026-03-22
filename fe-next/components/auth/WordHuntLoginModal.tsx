@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Wand2 } from 'lucide-react';
+import { Mail, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button as ButtonComponent } from '../ui/button';
 import {
@@ -257,7 +257,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               animate={{ opacity: 1 }}
               className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm"
             >
-              {error}
+              <AlertCircle className="w-4 h-4 shrink-0 inline-block me-1" />{error}
             </motion.div>
           )}
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Eye, EyeOff, Wand2, Shield } from 'lucide-react';
+import { X, Mail, Eye, EyeOff, Wand2, Shield, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button as ButtonComponent } from '../ui/button';
@@ -758,10 +758,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300"
+                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300 flex items-center gap-2"
                     role="alert"
                   >
-                    {error}
+                    <AlertCircle className="w-4 h-4 shrink-0" />{error}
                   </motion.div>
                 )}
               </AnimatePresence>

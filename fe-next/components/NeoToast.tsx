@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Bot } from 'lucide-react';
+import { Bot, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Loader } from '@/components/ui/Loader';
@@ -379,6 +379,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
 
 // Neo-Brutalist Success Toast (generic)
 export const neoSuccessToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <CheckCircle className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
@@ -393,17 +394,15 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ delay: 0.1, type: 'spring' }}
-                className="text-2xl"
-                aria-hidden="true"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.1, type: 'spring' }}
+              className="text-2xl"
+              aria-hidden="true"
+            >
+              {icon}
+            </motion.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
@@ -421,6 +420,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
 
 // Neo-Brutalist Error Toast (generic)
 export const neoErrorToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <XCircle className="w-6 h-6 text-neo-white" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
@@ -445,17 +445,15 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-                className="text-2xl"
-                aria-hidden="true"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
+              className="text-2xl"
+              aria-hidden="true"
+            >
+              {icon}
+            </motion.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
@@ -472,6 +470,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
 
 // Neo-Brutalist Info Toast
 export const neoInfoToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <Info className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
@@ -486,17 +485,15 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1, type: 'spring' }}
-                className="text-2xl"
-                aria-hidden="true"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring' }}
+              className="text-2xl"
+              aria-hidden="true"
+            >
+              {icon}
+            </motion.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
@@ -513,6 +510,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
 
 // Neo-Brutalist Warning Toast
 export const neoWarningToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <AlertTriangle className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
@@ -537,17 +535,15 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: [1, 1.2, 1] }}
-                transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
-                className="text-2xl"
-                aria-hidden="true"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: [1, 1.2, 1] }}
+              transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
+              className="text-2xl"
+              aria-hidden="true"
+            >
+              {icon}
+            </motion.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>

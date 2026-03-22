@@ -1709,6 +1709,13 @@ const ja = {
     "adventure": "次のレベルプレビュー読み込み中...戻ってきて確認！",
     "seeYou": "また明日"
   },
+  "unfinishedBoard": {
+    "teaser": "3つの単語が明日あなたを待っています",
+    "resumeTitle": "未完了のボード",
+    "resumeDesc": "{{found}}/{{total}}個の単語を発見済み",
+    "resumeCta": "ボードを再開",
+    "wordsWaiting": "個の単語が待機中"
+  },
   "practiceResults": {
     "playAgain": "もう一回",
     "orTrySomethingNew": "他のモードも試してみよう",
@@ -7679,7 +7686,7 @@ const ja = {
       "wordsAccepted": "正解した単語",
       "wordsRejected": "不正解の単語",
       "xpEarned": "獲得XP",
-      "you": "あなた",
+    "you": "あなた",
       "youLose": "負けた！",
       "youWin": "勝った！"
     },
@@ -8661,19 +8668,43 @@ const ja = {
     "empty": "ゲームをプレイしてレアな単語を発見しよう！"
   },
   "leagueRivals": {
-
-      "title": "リーグライバル",
-      "ahead": "{{pts}}ポイント上",
-      "behind": "{{pts}}ポイント下",
-      "you": "あなた",
-      "noRivals": "リーグを上がってライバルを見つけよう！"
-    }
+    "title": "リーグライバル",
+    "ahead": "{{pts}}ポイント上",
+    "behind": "{{pts}}ポイント下",
+    "you": "あなた",
+    "noRivals": "リーグを上がってライバルを見つけよう！"
   },
   "powerHour": {
     "activated": "パワーアワー発動！",
     "description": "60分間XP2倍！",
     "expired": "ブースト完了！",
     "badge": "{{time}}"
+  },
+  "vault": {
+    "title": "ヴォールト",
+    "open": "ヴォールト開放中！",
+    "closesIn": "あと{{time}}で閉鎖",
+    "enterVault": "ヴォールトに入る",
+    "nextVault": "次のヴォールトまで{{time}}",
+    "leaderboard": "トップスコア",
+    "yourRank": "あなたの順位: #{{rank}}",
+    "completed": "完了！",
+    "badge": "ヴォールトチャンピオン"
+  },
+  "ghostRival": {
+    "title": "今週のライバル",
+    "you": "あなた",
+    "ahead": "{{pts}}ポイント上",
+    "behind": "{{pts}}ポイント下",
+    "cta": "プレイして差を縮めよう！",
+    "endsIn": "あと{{time}}",
+    "ended": "今週は終了！"
+  },
+  "friendsActivity": {
+    "title": "フレンド活動",
+    "beatYou": "スコアを超えた！",
+    "empty": "フレンドを追加して活動を見よう",
+    "addFriends": "フレンドを探す"
   }
 };
 

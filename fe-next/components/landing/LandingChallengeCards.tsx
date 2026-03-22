@@ -65,6 +65,9 @@ export function LandingChallengeCards({
             personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
             highlighted={isFirstTimer}
             highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
+            duration={t('landing.duration').replace('{time}', '1-3')}
+            difficulty={1}
+            difficultyLabel={t('landing.difficultyEasy')}
           />
         </motion.div>
 
@@ -78,6 +81,9 @@ export function LandingChallengeCards({
             variant="pink"
             liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
             playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
+            duration={t('landing.duration').replace('{time}', '1-3')}
+            difficulty={2}
+            difficultyLabel={t('landing.difficultyMedium')}
           />
         </motion.div>
 
@@ -99,6 +105,9 @@ export function LandingChallengeCards({
             href={`/${language}/adventure`}
             icon={<Map className="w-6 h-6" />}
             variant="lime"
+            duration={t('landing.duration').replace('{time}', '2-5')}
+            difficulty={2}
+            difficultyLabel={t('landing.difficultyMedium')}
           />
         </motion.div>
 

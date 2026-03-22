@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
+import { trackReferralInviteSent } from '@/utils/viralTracking';
 
 /**
  * Translation function type
@@ -43,6 +44,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
       duration: 2000,
       icon: '✅',
     });
+    trackReferralInviteSent();
     return true;
   } catch (clipboardError) {
     // Fallback 1: execCommand for older browsers
@@ -64,6 +66,7 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
           duration: 2000,
           icon: '✅',
         });
+        trackReferralInviteSent();
         return true;
       }
       throw new Error('execCommand copy returned false');
@@ -114,6 +117,7 @@ export const shareViaWhatsApp = (gameCode: string, roomName: string = '', t: Tra
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
+  trackReferralInviteSent();
 };
 
 /**
@@ -402,6 +406,7 @@ export const shareResultsViaWhatsApp = (
   const message = generatePersonalizedShareMessage(gameCode, result, language);
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
+  trackReferralInviteSent();
 };
 
 /**

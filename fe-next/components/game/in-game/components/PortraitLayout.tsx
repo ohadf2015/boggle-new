@@ -36,6 +36,7 @@ import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { DynamicEnergyBackground } from '@/components/singleplayer/game/components/DynamicEnergyBackground';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
+import { useHapticsEnabled } from '@/contexts/AccessibilityContext';
 
 /** Stable empty array to avoid breaking GridComponent memo on every render */
 const EMPTY_HIGHLIGHTED_PATH: HighlightedCell[] = [];
@@ -203,6 +204,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 }) {
   // Combo event for leaderboard badges (from Zustand blastComboSync)
   const blastComboSync = useBlastComboSync();
+  const hapticsEnabled = useHapticsEnabled();
 
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
@@ -243,6 +245,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   const prevFeedbackRef = useRef(currentFeedback);
   useEffect(() => {
     if (
+      hapticsEnabled &&
       currentFeedback?.type === 'accepted' &&
       currentFeedback !== prevFeedbackRef.current
     ) {
@@ -250,7 +253,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       vibrateWordSubmit(wordLen, comboLevel, fireRoundActive);
     }
     prevFeedbackRef.current = currentFeedback;
-  }, [currentFeedback, comboLevel, fireRoundActive]);
+  }, [currentFeedback, comboLevel, fireRoundActive, hapticsEnabled]);
 
   return (
     <>

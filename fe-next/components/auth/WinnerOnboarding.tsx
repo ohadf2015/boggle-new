@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
-import { Trophy, Sparkles, Check } from 'lucide-react';
+import { Trophy, Sparkles, Check, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -305,7 +305,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   {displayName.length}/20 {t('daily.characters')}
                 </p>
                 {error && (
-                  <p className="text-xs text-red-500 font-semibold">{error}</p>
+                  <p className="text-xs text-red-500 font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3 shrink-0" />{error}</p>
                 )}
               </div>
             </div>

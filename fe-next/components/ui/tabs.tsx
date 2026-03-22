@@ -66,7 +66,7 @@ const TabsTrigger = React.forwardRef<
         // Common styles
         "inline-flex items-center justify-center whitespace-nowrap transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
-        "disabled:pointer-events-none disabled:opacity-50",
+        "disabled:pointer-events-none disabled:opacity-70",
         // Variant-specific styles
         variant === 'pill' && [
           "rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background",

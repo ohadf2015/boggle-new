@@ -157,7 +157,7 @@ export function WizardStep({
                 'hover:shadow-hard-lg hover:translate-y-[-2px]',
                 'active:shadow-hard-pressed active:translate-y-0',
                 'transition-all duration-150',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
+                'disabled:opacity-70 disabled:cursor-not-allowed',
                 'disabled:hover:translate-y-0',
                 isLoading && 'opacity-50'
               )}

@@ -1756,6 +1756,13 @@ const es = {
     "adventure": "Vista previa del siguiente nivel cargando... ¡Vuelve para descubrirlo!",
     "seeYou": "Nos vemos mañana"
   },
+  "unfinishedBoard": {
+    "teaser": "3 palabras te esperan mañana",
+    "resumeTitle": "Tu tablero sin terminar",
+    "resumeDesc": "Encontraste {{found}}/{{total}} palabras",
+    "resumeCta": "Reanudar tablero",
+    "wordsWaiting": "palabras esperando"
+  },
   "practiceResults": {
     "playAgain": "Jugar de nuevo",
     "orTrySomethingNew": "o prueba algo nuevo",
@@ -7730,7 +7737,7 @@ const es = {
       "typeWord": "Escribe una palabra...",
       "addWord": "Agregar Palabra",
       "vs": "vs",
-      "you": "Tú",
+    "you": "Tú",
       "duelHistory": "Historial de Duelos",
       "wins": "Victorias",
       "losses": "Derrotas",
@@ -8742,19 +8749,43 @@ const es = {
     "empty": "¡Juega para descubrir palabras raras!"
   },
   "leagueRivals": {
-
-      "title": "Tus rivales de liga",
-      "ahead": "{{pts}} pts adelante",
-      "behind": "{{pts}} pts detrás",
-      "you": "Tú",
-      "noRivals": "¡Sube en la liga para encontrar rivales!"
-    }
+    "title": "Tus rivales de liga",
+    "ahead": "{{pts}} pts adelante",
+    "behind": "{{pts}} pts detrás",
+    "you": "Tú",
+    "noRivals": "¡Sube en la liga para encontrar rivales!"
   },
   "powerHour": {
     "activated": "¡Hora de Poder activada!",
     "description": "¡2x XP durante 60 minutos!",
     "expired": "¡Boost completado!",
     "badge": "{{time}}"
+  },
+  "vault": {
+    "title": "LA BÓVEDA",
+    "open": "¡La Bóveda está abierta!",
+    "closesIn": "Cierra en {{time}}",
+    "enterVault": "Entrar a la Bóveda",
+    "nextVault": "Próxima bóveda en {{time}}",
+    "leaderboard": "Mejores puntuaciones",
+    "yourRank": "Tu rango: #{{rank}}",
+    "completed": "¡Guardado!",
+    "badge": "Campeón de la Bóveda"
+  },
+  "ghostRival": {
+    "title": "Tu rival semanal",
+    "you": "Tú",
+    "ahead": "{{pts}} pts adelante",
+    "behind": "{{pts}} pts detrás",
+    "cta": "¡Juega para cerrar la brecha!",
+    "endsIn": "Termina en {{time}}",
+    "ended": "¡Semana terminada!"
+  },
+  "friendsActivity": {
+    "title": "Actividad de amigos",
+    "beatYou": "¡Superó tu puntuación!",
+    "empty": "Agrega amigos para ver su actividad",
+    "addFriends": "Buscar amigos"
   }
 };
 

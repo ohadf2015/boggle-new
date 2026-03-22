@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useDisableFireRoundLights, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 interface FireRoundIndicatorProps {
   isActive: boolean;
@@ -25,6 +26,28 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
 }) => {
   const { t } = useLanguage();
   const isLandscape = useMobileLandscape();
+  const disableFireLights = useDisableFireRoundLights();
+  const reduceMotion = useShouldReduceMotion();
+
+  if (disableFireLights || reduceMotion) {
+    if (!isActive) return null;
+    return (
+      <div className="fixed z-40" style={{ top: 'calc(5rem + var(--cap-safe-area-top, env(safe-area-inset-top, 0px)))' }} role="status" aria-live="polite" aria-label={`${t('earthquake.fireRound')} - ${remainingSeconds}s`}>
+        <div className="relative bg-gradient-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg ltr:right-4 rtl:left-4">
+          <div className="relative z-10 flex items-center gap-2">
+            <span className="text-2xl">🔥</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">{t('earthquake.fireRound')}</span>
+              <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">{t('earthquake.multiplier')}</span>
+            </div>
+            <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
+              <span className="text-xl font-black text-neo-cream tabular-nums">{remainingSeconds}s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Determine position based on layout
   // Position below header to avoid overlapping with header controls

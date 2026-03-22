@@ -1727,6 +1727,13 @@ const he = {
     "adventure": "...התצוגה המקדימה של השלב הבא נטענת. חזרו כדי לגלות!",
     "seeYou": "נתראה מחר"
   },
+  "unfinishedBoard": {
+    "teaser": "3 מילים מחכות לכם מחר",
+    "resumeTitle": "הלוח שלא סיימתם",
+    "resumeDesc": "מצאתם {{found}}/{{total}} מילים",
+    "resumeCta": "חזרו ללוח",
+    "wordsWaiting": "מילים מחכות"
+  },
   "practiceResults": {
     "playAgain": "שחקו שוב",
     "orTrySomethingNew": "או נסו משהו חדש",
@@ -8686,19 +8693,43 @@ const he = {
     "empty": "שחקו משחקים כדי לגלות מילים נדירות!"
   },
   "leagueRivals": {
-
-      "title": "היריבים שלך בליגה",
-      "ahead": "{{pts}} נקודות מעליך",
-      "behind": "{{pts}} נקודות מתחתיך",
-      "you": "את/ה",
-      "noRivals": "טפסו בליגה כדי למצוא יריבים!"
-    }
+    "title": "היריבים שלך בליגה",
+    "ahead": "{{pts}} נקודות מעליך",
+    "behind": "{{pts}} נקודות מתחתיך",
+    "you": "את/ה",
+    "noRivals": "טפסו בליגה כדי למצוא יריבים!"
   },
   "powerHour": {
     "activated": "שעת כוח הופעלה!",
     "description": "XP כפול ל-60 דקות!",
     "expired": "הבוסט הסתיים!",
     "badge": "{{time}}"
+  },
+  "vault": {
+    "title": "הכספת",
+    "open": "הכספת פתוחה!",
+    "closesIn": "נסגרת בעוד {{time}}",
+    "enterVault": "היכנס לכספת",
+    "nextVault": "הכספת הבאה בעוד {{time}}",
+    "leaderboard": "תוצאות מובילות",
+    "yourRank": "הדירוג שלך: #{{rank}}",
+    "completed": "נכנס לכספת!",
+    "badge": "אלוף הכספת"
+  },
+  "ghostRival": {
+    "title": "היריב שלך השבוע",
+    "you": "את/ה",
+    "ahead": "{{pts}} נקודות מוביל/ה",
+    "behind": "{{pts}} נקודות מאחור",
+    "cta": "שחקו כדי לסגור את הפער!",
+    "endsIn": "נגמר בעוד {{time}}",
+    "ended": "השבוע נגמר!"
+  },
+  "friendsActivity": {
+    "title": "פעילות חברים",
+    "beatYou": "ניצח/ה אותך!",
+    "empty": "הוסיפו חברים כדי לראות פעילות",
+    "addFriends": "מצאו חברים"
   }
 };
 

@@ -41,10 +41,12 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
     prevScoreRef.current = score;
   }, [score]);
 
+  const scoreLabel = `${t('common.score')}: ${displayScore(score)}${rank ? `, #${rank}` : ''}`;
+
   // Landscape variant (simpler display)
   if (isLandscape) {
     return (
-      <div className="flex flex-col items-center relative">
+      <div className="flex flex-col items-center relative" role="status" aria-live="polite" aria-label={scoreLabel}>
         <AdaptiveMotion.div
           key={score}
           initial={{ scale: 1.4, color: '#BFFF00' }}
@@ -71,6 +73,9 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-4 py-1.5 min-w-[90px] overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)' }}
         whileHover={{ scale: 1.05 }}
+        role="status"
+        aria-live="polite"
+        aria-label={scoreLabel}
       >
         {/* Expanding pulse ring on score increase */}
         <AdaptiveAnimatePresence>
@@ -126,6 +131,9 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
       style={{
         background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
       }}
+      role="status"
+      aria-live="polite"
+      aria-label={scoreLabel}
     >
       {/* Expanding pulse ring on score increase */}
       <AdaptiveAnimatePresence>

@@ -3,7 +3,7 @@
  * Extracted from AuthModal.tsx for file size management.
  */
 import React from 'react';
-import { Mail, Eye, EyeOff, Wand2 } from 'lucide-react';
+import { Mail, Eye, EyeOff, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button as ButtonComponent } from '@/components/ui/button';
 import { cn } from '@/lib/utils';

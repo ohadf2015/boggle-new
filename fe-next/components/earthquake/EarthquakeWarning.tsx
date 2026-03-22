@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDisableEarthquakeEffects, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 interface EarthquakeWarningProps {
   isVisible: boolean;
@@ -19,6 +20,8 @@ interface EarthquakeWarningProps {
  */
 export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible }) => {
   const { t } = useLanguage();
+  const disableEarthquake = useDisableEarthquakeEffects();
+  const reduceMotion = useShouldReduceMotion();
 
   // Generate random distances for particle effects (once on mount)
   const [distances] = useState(() =>
@@ -43,6 +46,22 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
     }
     return undefined;
   }, [isVisible, t]);
+
+  if (disableEarthquake || reduceMotion) {
+    if (!isVisible) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none" role="alert" aria-live="assertive">
+        <div className="absolute inset-0 bg-neo-black/40" />
+        <div className="relative z-10 mx-4 max-w-lg bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6">
+          <div className="text-center mb-3"><span className="text-6xl">⚠️</span></div>
+          <div className="text-center">
+            <h2 className="text-3xl font-black uppercase text-neo-black mb-2 tracking-wide">{t('earthquake.warning')}</h2>
+            <p className="text-lg font-bold text-neo-black/80">{t('earthquake.brace')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -46,6 +46,9 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
           exit={{ opacity: 0, scale: 1.5, y: -10 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="absolute top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          role="status"
+          aria-live="assertive"
+          aria-label={`Combo ${comboLevel}x - ${milestone}`}
         >
           <div className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',

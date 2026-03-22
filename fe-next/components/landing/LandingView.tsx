@@ -33,6 +33,9 @@ const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser),
 const DailyMissionsHub = dynamic(() => import('./DailyMissionsHub').then(m => m.DailyMissionsHub), { ssr: false });
 const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
 const WordCollectionCard = dynamic(() => import('@/components/vocabulary/WordCollectionCard').then(m => m.WordCollectionCard), { ssr: false });
+const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
+// VaultCard and UnfinishedBoardCard need wrapper components — wired in follow-up
+const FriendsActivityFeed = dynamic(() => import('./FriendsActivityFeed').then(m => m.FriendsActivityFeed), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -248,6 +251,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           {hydrated && <DailyMissionsHub />}
         </div>
         {hydrated && <WordCollectionCard />}
+        {hydrated && <GhostRivalWidget />}
+        {hydrated && <FriendsActivityFeed />}
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards
