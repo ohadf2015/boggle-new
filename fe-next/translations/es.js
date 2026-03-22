@@ -8786,6 +8786,36 @@ const es = {
     "beatYou": "¡Superó tu puntuación!",
     "empty": "Agrega amigos para ver su actividad",
     "addFriends": "Buscar amigos"
+  },
+  "wordPact": {
+    "title": "Pacto de Palabras",
+    "withFriend": "Pacto con {{name}}",
+    "bothPlayed": "¡Ambos jugaron! 1.5x XP mañana",
+    "youPlayed": "¡Jugaste! {{name}} aún no",
+    "partnerPlayed": "¡{{name}} jugó! Tu turno",
+    "neitherPlayed": "Nadie ha jugado hoy todavía",
+    "formPact": "Crear un Pacto de Palabras",
+    "formDesc": "Juega a diario con un amigo para XP extra",
+    "dissolve": "Terminar pacto",
+    "streak": "Racha de {{count}} días",
+    "selectFriend": "Elige un amigo",
+    "invite": "Invitar",
+    "alreadyInPact": "Ya tiene un pacto",
+    "you": "Tú"
+  },
+  "weeklyQuest": {
+    "title": "Misión semanal",
+    "choose": "Elige tu misión semanal",
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil",
+    "progress": "{{current}}/{{target}}",
+    "xpReward": "+{{xp}} XP",
+    "complete": "¡Misión completada!",
+    "selectQuest": "Elegir",
+    "active": "Misión activa",
+    "endsIn": "Termina en {{time}}",
+    "newQuestMonday": "Nuevas misiones el lunes"
   }
 };
 

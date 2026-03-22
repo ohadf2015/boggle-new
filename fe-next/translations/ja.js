@@ -8705,6 +8705,36 @@ const ja = {
     "beatYou": "スコアを超えた！",
     "empty": "フレンドを追加して活動を見よう",
     "addFriends": "フレンドを探す"
+  },
+  "wordPact": {
+    "title": "ワードパクト",
+    "withFriend": "{{name}}とのパクト",
+    "bothPlayed": "両方プレイ済み！明日1.5倍XP",
+    "youPlayed": "プレイ済み！{{name}}はまだ",
+    "partnerPlayed": "{{name}}がプレイ済み！あなたの番",
+    "neitherPlayed": "今日はまだ誰もプレイしていません",
+    "formPact": "ワードパクトを結ぶ",
+    "formDesc": "フレンドと毎日プレイしてボーナスXPを獲得",
+    "dissolve": "パクト解消",
+    "streak": "{{count}}日連続パクト",
+    "selectFriend": "フレンドを選ぶ",
+    "invite": "招待",
+    "alreadyInPact": "すでにパクト中",
+    "you": "あなた"
+  },
+  "weeklyQuest": {
+    "title": "ウィークリークエスト",
+    "choose": "今週のクエストを選ぼう",
+    "easy": "イージー",
+    "medium": "ノーマル",
+    "hard": "ハード",
+    "progress": "{{current}}/{{target}}",
+    "xpReward": "+{{xp}} XP",
+    "complete": "クエスト達成！",
+    "selectQuest": "選択",
+    "active": "進行中のクエスト",
+    "endsIn": "あと{{time}}",
+    "newQuestMonday": "月曜日に新しいクエスト"
   }
 };
 

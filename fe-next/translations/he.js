@@ -8730,6 +8730,36 @@ const he = {
     "beatYou": "ניצח/ה אותך!",
     "empty": "הוסיפו חברים כדי לראות פעילות",
     "addFriends": "מצאו חברים"
+  },
+  "wordPact": {
+    "title": "ברית מילים",
+    "withFriend": "ברית עם {{name}}",
+    "bothPlayed": "שניכם שיחקתם! XP כפול 1.5 מחר",
+    "youPlayed": "שיחקת! {{name}} עדיין לא",
+    "partnerPlayed": "{{name}} שיחק/ה! תורך",
+    "neitherPlayed": "אף אחד עדיין לא שיחק היום",
+    "formPact": "יצירת ברית מילים",
+    "formDesc": "שחקו יומי עם חבר/ה לבונוס XP",
+    "dissolve": "סיום ברית",
+    "streak": "רצף ברית של {{count}} ימים",
+    "selectFriend": "בחרו חבר/ה",
+    "invite": "הזמנה",
+    "alreadyInPact": "כבר בברית",
+    "you": "את/ה"
+  },
+  "weeklyQuest": {
+    "title": "משימת השבוע",
+    "choose": "בחרו את משימת השבוע",
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה",
+    "progress": "{{current}}/{{target}}",
+    "xpReward": "+{{xp}} XP",
+    "complete": "המשימה הושלמה!",
+    "selectQuest": "בחירה",
+    "active": "משימה פעילה",
+    "endsIn": "נגמר בעוד {{time}}",
+    "newQuestMonday": "משימות חדשות ביום שני"
   }
 };
 

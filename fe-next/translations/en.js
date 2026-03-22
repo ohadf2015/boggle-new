@@ -8768,6 +8768,36 @@ const en = {
     "beatYou": "Beat your score!",
     "empty": "Add friends to see their activity",
     "addFriends": "Find Friends"
+  },
+  "wordPact": {
+    "title": "Word Pact",
+    "withFriend": "Pact with {{name}}",
+    "bothPlayed": "Both played! 1.5x XP tomorrow",
+    "youPlayed": "You played! {{name}} hasn't yet",
+    "partnerPlayed": "{{name}} played! Your turn",
+    "neitherPlayed": "Neither played yet today",
+    "formPact": "Form a Word Pact",
+    "formDesc": "Play daily with a friend for bonus XP",
+    "dissolve": "End Pact",
+    "streak": "{{count}}-day pact streak",
+    "selectFriend": "Choose a friend",
+    "invite": "Invite",
+    "alreadyInPact": "Already in a pact",
+    "you": "You"
+  },
+  "weeklyQuest": {
+    "title": "Weekly Quest",
+    "choose": "Choose Your Weekly Quest",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "progress": "{{current}}/{{target}}",
+    "xpReward": "+{{xp}} XP",
+    "complete": "Quest Complete!",
+    "selectQuest": "Select",
+    "active": "Active Quest",
+    "endsIn": "Ends {{time}}",
+    "newQuestMonday": "New quests available Monday"
   }
 };
 

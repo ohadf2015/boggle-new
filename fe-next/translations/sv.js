@@ -8725,6 +8725,36 @@ const sv = {
     "beatYou": "Slog ditt resultat!",
     "empty": "Lägg till vänner för att se aktivitet",
     "addFriends": "Hitta vänner"
+  },
+  "wordPact": {
+    "title": "Ordpakt",
+    "withFriend": "Pakt med {{name}}",
+    "bothPlayed": "Båda spelade! 1.5x XP imorgon",
+    "youPlayed": "Du spelade! {{name}} har inte än",
+    "partnerPlayed": "{{name}} spelade! Din tur",
+    "neitherPlayed": "Ingen har spelat ännu idag",
+    "formPact": "Skapa en Ordpakt",
+    "formDesc": "Spela dagligen med en vän för bonus-XP",
+    "dissolve": "Avsluta pakt",
+    "streak": "{{count}}-dagars paktsvit",
+    "selectFriend": "Välj en vän",
+    "invite": "Bjud in",
+    "alreadyInPact": "Redan i en pakt",
+    "you": "Du"
+  },
+  "weeklyQuest": {
+    "title": "Veckouppdrag",
+    "choose": "Välj ditt veckouppdrag",
+    "easy": "Lätt",
+    "medium": "Medel",
+    "hard": "Svårt",
+    "progress": "{{current}}/{{target}}",
+    "xpReward": "+{{xp}} XP",
+    "complete": "Uppdrag klart!",
+    "selectQuest": "Välj",
+    "active": "Aktivt uppdrag",
+    "endsIn": "Slutar om {{time}}",
+    "newQuestMonday": "Nya uppdrag på måndag"
   }
 };
 
