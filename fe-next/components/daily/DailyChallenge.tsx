@@ -9,8 +9,6 @@ import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntS
 import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyReadyScreen, { type ChallengeData } from './DailyReadyScreen';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
-import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -70,8 +68,6 @@ const DailyChallenge: React.FC = () => {
   const [, setGameResult] = useState<SurvivalGameResult | null>(null);
   const [wasReset, setWasReset] = useState(false);
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
-  const [showTrainingGateway, setShowTrainingGateway] = useState(false);
-  const [gatewayShownThisSession, setGatewayShownThisSession] = useState(false);
 
   // Retry challenge hook
   const { handleRetryChallenge, justResetRef } = useRetryChallenge({
@@ -106,25 +102,6 @@ const DailyChallenge: React.FC = () => {
     setCountdown(formatCountdown(seconds));
   }, []);
 
-  // Training gateway for new players
-  useEffect(() => {
-    if (phase !== 'ready' || gatewayShownThisSession) return;
-    const shouldShow = shouldShowTrainingGateway();
-    if (shouldShow) {
-      const timer = setTimeout(() => {
-        setShowTrainingGateway(true);
-        setGatewayShownThisSession(true);
-        markGatewaySeen();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    return;
-  }, [phase, gatewayShownThisSession]);
-
-  const handleSkipTrainingGateway = useCallback(() => {
-    markGatewaySkipped();
-    setShowTrainingGateway(false);
-  }, []);
 
   // Pull-to-refresh
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -411,12 +388,6 @@ const DailyChallenge: React.FC = () => {
         <DailyChallengeTutorial onComplete={handleTutorialComplete} onSkip={handleTutorialSkip} />
       )}
 
-      <TrainingGatewayModal
-        isOpen={showTrainingGateway}
-        onClose={() => setShowTrainingGateway(false)}
-        onSkip={handleSkipTrainingGateway}
-        returnTo="daily"
-      />
     </div>
   );
 };
