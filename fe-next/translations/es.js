@@ -3590,6 +3590,16 @@ const es = {
       "boardRated": "¡Tu tablero fue calificado!",
       "highScoreBeat": "¡Alguien superó el récord en tu tablero!",
       "milestone": "¡Alcanzaste un hito de creador!"
+    },
+    "community": {
+      "hero": "Taller Comunitario",
+      "heroSub": "Juega, crea y comparte rompecabezas de palabras con la comunidad",
+      "tabBoards": "Tableros",
+      "tabPacks": "Paquetes",
+      "tabCreators": "Creadores",
+      "searchPlaceholder": "Buscar tableros y paquetes...",
+      "createNew": "Crear",
+      "featuredCreator": "Creador destacado"
     }
   },
   "ranked": {
@@ -7899,7 +7909,9 @@ const es = {
       "viewLessons": "Lecciones",
       "viewVocabulary": "Vocabulario",
       "viewAssignments": "Tareas",
-      "backToClassroom": "Volver al Aula"
+      "backToClassroom": "Volver al Aula",
+      "exportReport": "Exportar Informe",
+      "studentDetail": "Detalle del Estudiante"
     },
     "reports": {
       "title": "Reportes de Progreso",
@@ -8151,6 +8163,23 @@ const es = {
       "maxLevel": "¡Nivel Máximo!",
       "level": "Nivel",
       "titleUnlocked": "Título Desbloqueado"
+    },
+    "starterPacks": {
+      "title": "Paquetes de Lecciones",
+      "subtitle": "Conjuntos de vocabulario listos para asignar",
+      "useThisPack": "Usar este paquete",
+      "commonEnglish": {
+        "name": "Palabras Comunes en Inglés",
+        "description": "30 palabras cotidianas esenciales para principiantes"
+      },
+      "academicVocab": {
+        "name": "Vocabulario Académico",
+        "description": "25 términos académicos clave para lectura y escritura"
+      },
+      "beginnerHebrew": {
+        "name": "Hebreo para Principiantes",
+        "description": "20 palabras básicas en hebreo con definiciones"
+      }
     }
   },
   "crazygames": {
@@ -8661,6 +8690,34 @@ const es = {
     "playAgain": "JUGAR DE NUEVO",
     "exit": "Salir",
     "shuffling": "MEZCLANDO..."
+  },
+  "urgency": {
+    "streakAtRisk": "¡Tu racha de {{count}} días termina en {{hoursLeft}} horas!",
+    "streakAction": "Juega ahora para salvarla",
+    "dailyUnsolved": "Desafío diario #{{puzzleNumber}} — {{solveRate}}% lo resolvieron. ¿Puedes tú?",
+    "dailyAction": "Acepta el desafío"
+  },
+  "dailyMissions": {
+    "title": "Misiones del día",
+    "grandSlam": "¡Grand Slam!",
+    "grandSlamDesc": "Completa las 4 para un bonus",
+    "grandSlamBonus": "+500 XP + Caja Misteriosa",
+    "wordHunt": "Caza de Palabras Diaria",
+    "brainDrill": "Entrenamiento Mental Diario",
+    "adventure": "Aventura Diaria",
+    "community": "Tablero Comunitario",
+    "completed": "¡Completado!",
+    "progress": "{{current}}/4 Misiones"
+  },
+  "wotd": {
+    "teaser": "Palabra del Dia",
+    "found": "La encontraste!",
+    "foundPercent": "Solo el {{percent}}% de los jugadores la encontraron!",
+    "missed": "Palabra del Dia",
+    "missedHint": "Intentalo manana!",
+    "share": "Comparte tu hallazgo",
+    "loading": "Cargando la Palabra del Dia...",
+    "play": "Jugar ahora"
   }
 };
 

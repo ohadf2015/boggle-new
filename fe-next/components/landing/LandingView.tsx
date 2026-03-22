@@ -28,6 +28,9 @@ import { LandingMobileCards } from './LandingMobileCards';
 
 // Below-the-fold sections — lazy load to speed up initial render
 const LiveActivityTicker = dynamic(() => import('./LiveActivityTicker').then(m => m.LiveActivityTicker), { ssr: false });
+const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
+const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser), { ssr: false });
+const DailyMissionsHub = dynamic(() => import('./DailyMissionsHub').then(m => m.DailyMissionsHub), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -221,6 +224,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
         {/* Below-fold sections deferred until after first paint */}
         {hydrated && <LiveActivityTicker />}
+
+        {hydrated && <UrgencyCard />}
+        {hydrated && <WotdTeaser />}
+        {hydrated && <DailyMissionsHub />}
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards

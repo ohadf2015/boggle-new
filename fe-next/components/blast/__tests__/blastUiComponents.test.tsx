@@ -29,6 +29,17 @@ jest.mock('@/hooks/useReducedMotion', () => ({
   default: () => false,
 }));
 
+// Mock AutoPlayCountdown — immediately call onCancel so tests see normal buttons
+jest.mock('@/components/results/AutoPlayCountdown', () => {
+  const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
+    const ReactMod = require('react');
+    ReactMod.useEffect(() => { onCancel(); }, [onCancel]);
+    return null;
+  };
+  MockAutoPlay.displayName = 'MockAutoPlayCountdown';
+  return MockAutoPlay;
+});
+
 jest.mock('@/components/shared/GameEmojiShareCard', () => ({
   GameEmojiShareCard: () => null,
 }));

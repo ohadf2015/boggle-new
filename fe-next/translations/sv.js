@@ -3177,6 +3177,16 @@ const sv = {
       "boardRated": "Ditt bräde betygsattes!",
       "highScoreBeat": "Någon slog rekordet på ditt bräde!",
       "milestone": "Du nådde en skaparmilstolpe!"
+    },
+    "community": {
+      "hero": "Community Workshop",
+      "heroSub": "Spela, skapa och dela ordpussel med gemenskapen",
+      "tabBoards": "Bräden",
+      "tabPacks": "Ordpaket",
+      "tabCreators": "Skapare",
+      "searchPlaceholder": "Sök bräden och paket...",
+      "createNew": "Skapa",
+      "featuredCreator": "Utvald skapare"
     }
   },
   "ranked": {
@@ -7859,6 +7869,8 @@ const sv = {
       "viewVocabulary": "Ordförråd",
       "viewAssignments": "Uppgifter",
       "backToClassroom": "Tillbaka till klassrum",
+      "exportReport": "Exportera rapport",
+      "studentDetail": "Elevdetaljer",
       "live": "Live",
       "offline": "Offline",
       "connecting": "Ansluter...",
@@ -8106,6 +8118,23 @@ const sv = {
       "mode_master": {
         "name": "Lägemästare",
         "description": "Genomför alla övningslägen"
+      }
+    },
+    "starterPacks": {
+      "title": "Startpaket för lektioner",
+      "subtitle": "Färdiga ordförrådsuppsättningar att tilldela",
+      "useThisPack": "Använd detta paket",
+      "commonEnglish": {
+        "name": "Vanliga engelska ord",
+        "description": "30 grundläggande vardagsord för nybörjare"
+      },
+      "academicVocab": {
+        "name": "Akademiskt ordförråd",
+        "description": "25 viktiga akademiska termer för läsning och skrivning"
+      },
+      "beginnerHebrew": {
+        "name": "Nybörjarhebreiska",
+        "description": "20 grundläggande hebreiska ord med definitioner"
       }
     }
   },
@@ -8600,6 +8629,34 @@ const sv = {
     "playAgain": "SPELA IGEN",
     "exit": "Avsluta",
     "shuffling": "BLANDAR..."
+  },
+  "urgency": {
+    "streakAtRisk": "Din {{count}}-dagarssvit slutar om {{hoursLeft}} timmar!",
+    "streakAction": "Spela nu för att rädda den",
+    "dailyUnsolved": "Daglig utmaning #{{puzzleNumber}} — {{solveRate}}% löste den. Klarar du?",
+    "dailyAction": "Anta utmaningen"
+  },
+  "dailyMissions": {
+    "title": "Dagens uppdrag",
+    "grandSlam": "Grand Slam!",
+    "grandSlamDesc": "Slutför alla 4 för en bonusbelöning",
+    "grandSlamBonus": "+500 XP + Mysterilåda",
+    "wordHunt": "Daglig Ordjakt",
+    "brainDrill": "Daglig Hjärnträning",
+    "adventure": "Dagligt Äventyr",
+    "community": "Gemenskapstavla",
+    "completed": "Klart!",
+    "progress": "{{current}}/4 Uppdrag"
+  },
+  "wotd": {
+    "teaser": "Dagens Ord",
+    "found": "Du hittade det!",
+    "foundPercent": "Bara {{percent}}% av spelarna hittade detta!",
+    "missed": "Dagens Ord",
+    "missedHint": "Försök igen imorgon!",
+    "share": "Dela din upptäckt",
+    "loading": "Laddar Dagens Ord...",
+    "play": "Spela nu"
   }
 };
 

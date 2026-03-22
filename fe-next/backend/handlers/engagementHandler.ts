@@ -40,6 +40,19 @@ import {
   getEngagementStatus,
 } from '../modules/engagementManager';
 
+import {
+  getDailyMissions,
+  completeMission,
+  checkAndClaimGrandSlam,
+  type MissionType,
+} from '../modules/dailyMissionsManager';
+
+import {
+  getWordOfTheDay,
+  recordWotdAttempt,
+  getWotdStats,
+} from '../modules/wordOfTheDayManager';
+
 import { safeEmit } from '../utils/socketHelpers';
 import { checkRateLimit } from '../utils/rateLimiter';
 import logger from '../utils/logger';
@@ -52,6 +65,11 @@ interface PlayerIdPayload {
 interface ClaimChallengePayload {
   playerId: string;
   challengeId: string;
+}
+
+interface CompleteMissionPayload {
+  playerId: string;
+  missionType: MissionType;
 }
 
 interface GameStats {
@@ -342,6 +360,69 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
+  // ==================== Daily Missions ====================
+
+  /**
+   * Get daily missions status for a player
+   */
+  socket.on('engagement:getDailyMissions', async (data: PlayerIdPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId } = data || {};
+    if (!playerId) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID required' });
+      return;
+    }
+
+    try {
+      const missions = await getDailyMissions(playerId);
+      safeEmit(socket, 'engagement:dailyMissions', { missions });
+      logger.debug('ENGAGEMENT', `Sent daily missions to ${playerId}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting daily missions: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get daily missions' });
+    }
+  });
+
+  /**
+   * Complete a daily mission
+   */
+  socket.on('engagement:completeMission', async (data: CompleteMissionPayload) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId, missionType } = data || {};
+    if (!playerId || !missionType) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID and mission type required' });
+      return;
+    }
+
+    try {
+      const missions = await completeMission(playerId, missionType);
+      safeEmit(socket, 'engagement:dailyMissions', { missions });
+
+      // Auto-check grand slam
+      if (missions.completedCount === 4 && !missions.grandSlamClaimed) {
+        const grandSlam = await checkAndClaimGrandSlam(playerId);
+        if (grandSlam.claimed) {
+          safeEmit(socket, 'engagement:grandSlamClaimed', grandSlam);
+        }
+      }
+
+      logger.info('ENGAGEMENT', `Mission ${missionType} completed by ${playerId}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error completing mission: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to complete mission' });
+    }
+  });
+
   // ==================== Full Engagement Status ====================
 
   /**
@@ -387,6 +468,71 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const err = error as Error;
       logger.error('ENGAGEMENT', `Error getting engagement status: ${err.message}`);
       safeEmit(socket, 'engagement:error', { message: 'Failed to get engagement status' });
+    }
+  });
+
+  // ==================== Word of the Day ====================
+
+  /**
+   * Get today's Word of the Day
+   */
+  socket.on('engagement:getWotd', async (data: { language: string; date?: string }) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { language, date } = data || {};
+    if (!language) {
+      safeEmit(socket, 'engagement:error', { message: 'Language required' });
+      return;
+    }
+
+    try {
+      const wotd = await getWordOfTheDay(language, date);
+      safeEmit(socket, 'engagement:wotd', wotd);
+      logger.debug('ENGAGEMENT', `Sent WOTD to socket ${socket.id}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error getting WOTD: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to get Word of the Day' });
+    }
+  });
+
+  /**
+   * Record player's WOTD attempt
+   */
+  socket.on('engagement:recordWotd', async (data: {
+    playerId: string;
+    word: string;
+    found: boolean;
+    language: string;
+    date?: string;
+  }) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const { playerId, word, language, found, date } = data || {};
+    if (!playerId || !word || !language) {
+      safeEmit(socket, 'engagement:error', { message: 'Player ID, word, and language required' });
+      return;
+    }
+
+    try {
+      const result = await recordWotdAttempt(playerId, word, found, language, date);
+      safeEmit(socket, 'engagement:wotdRecorded', result);
+
+      // Also send updated stats
+      const stats = await getWotdStats(language, date);
+      safeEmit(socket, 'engagement:wotdStats', stats);
+
+      logger.info('ENGAGEMENT', `WOTD attempt recorded for ${playerId}: found=${found}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('ENGAGEMENT', `Error recording WOTD: ${err.message}`);
+      safeEmit(socket, 'engagement:error', { message: 'Failed to record Word of the Day attempt' });
     }
   });
 }

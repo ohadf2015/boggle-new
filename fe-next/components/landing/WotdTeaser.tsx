@@ -1,0 +1,78 @@
+'use client';
+
+/**
+ * WotdTeaser — Landing page teaser for Word of the Day.
+ * Shows first letter only, rest blurred/masked. Links to /daily.
+ */
+
+import React from 'react';
+import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
+
+interface WotdTeaserProps {
+  className?: string;
+}
+
+/**
+ * Landing page Word of the Day teaser.
+ * Shows the first letter with remaining letters masked.
+ * Links to the daily challenge to play.
+ */
+export function WotdTeaser({ className }: WotdTeaserProps) {
+  const { t, language } = useLanguage();
+  const { word, loading } = useWordOfTheDay(language);
+
+  if (loading || !word) return null;
+
+  const firstLetter = word.charAt(0).toUpperCase();
+  const maskedRest = word.slice(1).replace(/./g, '_');
+
+  return (
+    <Link
+      href="/daily"
+      data-testid="wotd-teaser"
+      className={cn(
+        'block rounded-neo border-neo border-neo-yellow/40 bg-neo-navy/80',
+        'p-4 shadow-hard-sm hover:shadow-hard transition-shadow',
+        'group cursor-pointer',
+        className
+      )}
+    >
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 w-10 h-10 rounded-neo bg-neo-yellow/20 border-neo border-neo-yellow/30 flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-neo-yellow group-hover:animate-neo-wobble" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-neo-display font-bold text-neo-yellow/80 uppercase tracking-wider mb-0.5">
+            {t('wotd.teaser')}
+          </p>
+
+          <div className="flex items-center gap-1">
+            <span
+              data-testid="wotd-first-letter"
+              className="text-lg font-neo-display font-bold text-neo-white"
+            >
+              {firstLetter}
+            </span>
+            <span
+              data-testid="wotd-masked"
+              className="text-lg font-mono text-white/30 tracking-[0.25em] blur-[1px]"
+            >
+              {maskedRest}
+            </span>
+          </div>
+        </div>
+
+        <span className="text-xs font-neo-body text-neo-cyan group-hover:underline flex-shrink-0">
+          {t('wotd.play')}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+export default WotdTeaser;

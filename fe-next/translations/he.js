@@ -3563,6 +3563,16 @@ const he = {
       "boardRated": "הלוח שלך דורג!",
       "highScoreBeat": "מישהו שבר את השיא בלוח שלך!",
       "milestone": "הגעת לאבן דרך של יוצר!"
+    },
+    "community": {
+      "hero": "סדנת הקהילה",
+      "heroSub": "שחקו, צרו ושתפו חידות מילים עם הקהילה",
+      "tabBoards": "לוחות",
+      "tabPacks": "חבילות מילים",
+      "tabCreators": "יוצרים",
+      "searchPlaceholder": "חיפוש לוחות וחבילות...",
+      "createNew": "יצירה",
+      "featuredCreator": "יוצר מומלץ"
     }
   },
   "ranked": {
@@ -7864,6 +7874,8 @@ const he = {
       "viewVocabulary": "אוצר מילים",
       "viewAssignments": "מטלות",
       "backToClassroom": "חזרה לכיתה",
+      "exportReport": "ייצוא דוח",
+      "studentDetail": "פרטי תלמיד",
       "live": "שידור חי",
       "offline": "לא מקוון",
       "connecting": "מתחבר...",
@@ -8111,6 +8123,23 @@ const he = {
       "mode_master": {
         "name": "מומחה המצבים",
         "description": "השלם את כל מצבי האימון"
+      }
+    },
+    "starterPacks": {
+      "title": "חבילות שיעור מוכנות",
+      "subtitle": "ערכות אוצר מילים מוכנות להקצאה",
+      "useThisPack": "השתמש בחבילה",
+      "commonEnglish": {
+        "name": "מילים נפוצות באנגלית",
+        "description": "30 מילים יומיומיות חיוניות למתחילים"
+      },
+      "academicVocab": {
+        "name": "אוצר מילים אקדמי",
+        "description": "25 מונחים אקדמיים מרכזיים לקריאה וכתיבה"
+      },
+      "beginnerHebrew": {
+        "name": "עברית למתחילים",
+        "description": "20 מילים בסיסיות בעברית עם הגדרות"
       }
     }
   },
@@ -8605,6 +8634,34 @@ const he = {
     "playAgain": "שחקו שוב",
     "exit": "יציאה",
     "shuffling": "...מערבבים"
+  },
+  "urgency": {
+    "streakAtRisk": "!הרצף של {{count}} ימים מסתיים בעוד {{hoursLeft}} שעות",
+    "streakAction": "שחקו עכשיו כדי לשמור אותו",
+    "dailyUnsolved": "?{{solveRate}}% פתרו. תצליחו — {{puzzleNumber}}# אתגר יומי",
+    "dailyAction": "קבלו את האתגר"
+  },
+  "dailyMissions": {
+    "title": "משימות היום",
+    "grandSlam": "!גרנד סלאם",
+    "grandSlamDesc": "השלימו את כל 4 לבונוס",
+    "grandSlamBonus": "קופסת מסתורין + XP 500+",
+    "wordHunt": "ציד מילים יומי",
+    "brainDrill": "אימון מוח יומי",
+    "adventure": "הרפתקה יומית",
+    "community": "לוח קהילתי",
+    "completed": "!הושלם",
+    "progress": "משימות {{current}}/4"
+  },
+  "wotd": {
+    "teaser": "מילת היום",
+    "found": "!מצאתם את זה",
+    "foundPercent": "!רק {{percent}}% מהשחקנים מצאו את זה",
+    "missed": "מילת היום",
+    "missedHint": "!נסו שוב מחר",
+    "share": "שתפו את הגילוי",
+    "loading": "...טוען את מילת היום",
+    "play": "שחקו עכשיו"
   }
 };
 

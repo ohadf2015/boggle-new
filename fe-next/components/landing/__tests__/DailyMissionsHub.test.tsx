@@ -1,0 +1,156 @@
+/**
+ * Tests for DailyMissionsHub component
+ */
+
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { DailyMissionsHub } from '../DailyMissionsHub';
+
+// Mock hooks
+const mockUseDailyMissions = jest.fn();
+jest.mock('@/hooks/useDailyMissions', () => ({
+  useDailyMissions: () => mockUseDailyMissions(),
+}));
+
+const mockUseAuth = jest.fn();
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, params?: Record<string, string>) => {
+      if (params) {
+        let result = key;
+        for (const [k, v] of Object.entries(params)) {
+          result = result.replace(`{{${k}}}`, v);
+        }
+        return result;
+      }
+      return key;
+    },
+    dir: 'ltr',
+    language: 'en',
+  }),
+}));
+
+jest.mock('@/lib/utils', () => ({
+  cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
+}));
+
+const baseMissions = [
+  { type: 'wordHunt' as const, completed: false, href: '/daily' },
+  { type: 'brainDrill' as const, completed: false, href: '/drill' },
+  { type: 'adventure' as const, completed: false, href: '/adventure' },
+  { type: 'community' as const, completed: false, href: '/community' },
+];
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseAuth.mockReturnValue({ isAuthenticated: true });
+  mockUseDailyMissions.mockReturnValue({
+    missions: baseMissions,
+    completedCount: 0,
+    isGrandSlam: false,
+    grandSlamClaimed: false,
+    loading: false,
+    refresh: jest.fn(),
+  });
+});
+
+describe('DailyMissionsHub', () => {
+  it('renders nothing for unauthenticated users', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false });
+
+    const { container } = render(<DailyMissionsHub />);
+
+    expect(container.innerHTML).toBe('');
+  });
+
+  it('renders loading skeleton when loading', () => {
+    mockUseDailyMissions.mockReturnValue({
+      missions: baseMissions,
+      completedCount: 0,
+      isGrandSlam: false,
+      grandSlamClaimed: false,
+      loading: true,
+      refresh: jest.fn(),
+    });
+
+    render(<DailyMissionsHub />);
+
+    const loader = document.querySelector('[aria-busy="true"]');
+    expect(loader).toBeTruthy();
+  });
+
+  it('renders the title', () => {
+    render(<DailyMissionsHub />);
+
+    expect(screen.getByText('dailyMissions.title')).toBeTruthy();
+  });
+
+  it('renders all 4 mission rows', () => {
+    render(<DailyMissionsHub />);
+
+    expect(screen.getByText('dailyMissions.wordHunt')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.brainDrill')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.adventure')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.community')).toBeTruthy();
+  });
+
+  it('renders progress text', () => {
+    render(<DailyMissionsHub />);
+
+    expect(screen.getByText('dailyMissions.progress')).toBeTruthy();
+  });
+
+  it('renders grand slam description when not all complete', () => {
+    render(<DailyMissionsHub />);
+
+    expect(screen.getByText('dailyMissions.grandSlamDesc')).toBeTruthy();
+  });
+
+  it('renders grand slam badge when all missions complete', () => {
+    mockUseDailyMissions.mockReturnValue({
+      missions: baseMissions.map(m => ({ ...m, completed: true })),
+      completedCount: 4,
+      isGrandSlam: true,
+      grandSlamClaimed: false,
+      loading: false,
+      refresh: jest.fn(),
+    });
+
+    render(<DailyMissionsHub />);
+
+    expect(screen.getByText('dailyMissions.grandSlam')).toBeTruthy();
+    expect(screen.getByText('dailyMissions.grandSlamBonus')).toBeTruthy();
+  });
+
+  it('shows claimed state when grand slam already claimed', () => {
+    mockUseDailyMissions.mockReturnValue({
+      missions: baseMissions.map(m => ({ ...m, completed: true })),
+      completedCount: 4,
+      isGrandSlam: true,
+      grandSlamClaimed: true,
+      loading: false,
+      refresh: jest.fn(),
+    });
+
+    render(<DailyMissionsHub />);
+
+    // Should show "Grand Slam! Completed!" text
+    const texts = screen.getAllByText(/dailyMissions\.(grandSlam|completed)/);
+    expect(texts.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('mission rows have correct links', () => {
+    render(<DailyMissionsHub />);
+
+    const links = screen.getAllByRole('link');
+    const hrefs = links.map(l => l.getAttribute('href'));
+    expect(hrefs).toContain('/daily');
+    expect(hrefs).toContain('/drill');
+    expect(hrefs).toContain('/adventure');
+    expect(hrefs).toContain('/community');
+  });
+});

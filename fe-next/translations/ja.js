@@ -3177,6 +3177,16 @@ const ja = {
       "boardRated": "あなたのボードが評価されました!",
       "highScoreBeat": "誰かがあなたのボードのハイスコアを更新しました!",
       "milestone": "クリエイターのマイルストーンに到達しました!"
+    },
+    "community": {
+      "hero": "コミュニティ工房",
+      "heroSub": "コミュニティでワードパズルを遊んで、作って、共有しよう",
+      "tabBoards": "ボード",
+      "tabPacks": "ワードパック",
+      "tabCreators": "クリエイター",
+      "searchPlaceholder": "ボードやパックを検索...",
+      "createNew": "作成",
+      "featuredCreator": "注目のクリエイター"
     }
   },
   "ranked": {
@@ -7891,6 +7901,8 @@ const ja = {
       "viewVocabulary": "語彙",
       "viewAssignments": "課題",
       "backToClassroom": "クラスルームに戻る",
+      "exportReport": "レポートを出力",
+      "studentDetail": "生徒の詳細",
       "live": "ライブ",
       "offline": "オフライン",
       "connecting": "接続中...",
@@ -8138,6 +8150,23 @@ const ja = {
       "mode_master": {
         "name": "モードマスター",
         "description": "全練習モードを完了"
+      }
+    },
+    "starterPacks": {
+      "title": "スターターレッスンパック",
+      "subtitle": "すぐに使える語彙セット",
+      "useThisPack": "このパックを使う",
+      "commonEnglish": {
+        "name": "基本英単語",
+        "description": "初心者向けの日常英単語30語"
+      },
+      "academicVocab": {
+        "name": "学術語彙",
+        "description": "読み書きに必要な学術用語25語"
+      },
+      "beginnerHebrew": {
+        "name": "ヘブライ語入門",
+        "description": "定義付きの基本ヘブライ語20語"
       }
     }
   },
@@ -8580,6 +8609,34 @@ const ja = {
     "playAgain": "もう一度プレイ",
     "exit": "終了",
     "shuffling": "シャッフル中..."
+  },
+  "urgency": {
+    "streakAtRisk": "{{count}}日連続記録があと{{hoursLeft}}時間で終了！",
+    "streakAction": "今すぐプレイして守ろう",
+    "dailyUnsolved": "デイリーチャレンジ #{{puzzleNumber}} — {{solveRate}}%がクリア。あなたは？",
+    "dailyAction": "チャレンジする"
+  },
+  "dailyMissions": {
+    "title": "今日のミッション",
+    "grandSlam": "グランドスラム！",
+    "grandSlamDesc": "4つ全てクリアでボーナス",
+    "grandSlamBonus": "+500 XP + ミステリーボックス",
+    "wordHunt": "デイリーワードハント",
+    "brainDrill": "デイリー脳トレ",
+    "adventure": "デイリーアドベンチャー",
+    "community": "コミュニティボード",
+    "completed": "完了！",
+    "progress": "{{current}}/4 ミッション"
+  },
+  "wotd": {
+    "teaser": "今日の単語",
+    "found": "見つけた！",
+    "foundPercent": "{{percent}}%のプレイヤーだけが見つけました！",
+    "missed": "今日の単語",
+    "missedHint": "明日またチャレンジ！",
+    "share": "発見をシェア",
+    "loading": "今日の単語を読み込み中...",
+    "play": "今すぐプレイ"
   }
 };
 

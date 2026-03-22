@@ -104,6 +104,18 @@ jest.mock('@/hooks/useSaveCognitiveScore', () => ({
   }),
 }));
 
+// Mock AutoPlayCountdown — immediately call onCancel so NextStepPrompt renders
+jest.mock('@/components/results/AutoPlayCountdown', () => {
+  const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
+    // Simulate cancelled state so tests see NextStepPrompt
+    const React = require('react');
+    React.useEffect(() => { onCancel(); }, [onCancel]);
+    return null;
+  };
+  MockAutoPlay.displayName = 'MockAutoPlayCountdown';
+  return MockAutoPlay;
+});
+
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {

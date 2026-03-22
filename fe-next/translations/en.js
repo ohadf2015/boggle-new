@@ -3649,6 +3649,16 @@ const en = {
       "boardRated": "Your board was rated!",
       "highScoreBeat": "Someone beat the high score on your board!",
       "milestone": "You reached a creator milestone!"
+    },
+    "community": {
+      "hero": "Community Workshop",
+      "heroSub": "Play, create, and share custom word puzzles with the community",
+      "tabBoards": "Boards",
+      "tabPacks": "Word Packs",
+      "tabCreators": "Creators",
+      "searchPlaceholder": "Search boards & packs...",
+      "createNew": "Create",
+      "featuredCreator": "Featured Creator"
     }
   },
   "ranked": {
@@ -7907,7 +7917,9 @@ const en = {
       "viewLessons": "Lessons",
       "viewVocabulary": "Vocabulary",
       "viewAssignments": "Assignments",
-      "backToClassroom": "Back to Classroom"
+      "backToClassroom": "Back to Classroom",
+      "exportReport": "Export Report",
+      "studentDetail": "Student Detail"
     },
     "reports": {
       "title": "Progress Reports",
@@ -8148,6 +8160,23 @@ const en = {
       "mode_master": {
         "name": "Mode Master",
         "description": "Complete all practice modes"
+      }
+    },
+    "starterPacks": {
+      "title": "Starter Lesson Packs",
+      "subtitle": "Pre-built vocabulary sets ready to assign",
+      "useThisPack": "Use This Pack",
+      "commonEnglish": {
+        "name": "Common English Words",
+        "description": "30 essential everyday words for beginner learners"
+      },
+      "academicVocab": {
+        "name": "Academic Vocabulary",
+        "description": "25 key academic terms for reading and writing"
+      },
+      "beginnerHebrew": {
+        "name": "Beginner Hebrew",
+        "description": "20 foundational Hebrew words with definitions"
       }
     }
   },
@@ -8643,6 +8672,34 @@ const en = {
     "playAgain": "PLAY AGAIN",
     "exit": "Exit",
     "shuffling": "SHUFFLING..."
+  },
+  "urgency": {
+    "streakAtRisk": "Your {{count}}-day streak ends in {{hoursLeft}} hours!",
+    "streakAction": "Play now to save it",
+    "dailyUnsolved": "Daily Challenge #{{puzzleNumber}} — {{solveRate}}% solved. Can you?",
+    "dailyAction": "Take the challenge"
+  },
+  "dailyMissions": {
+    "title": "Today's Missions",
+    "grandSlam": "Grand Slam!",
+    "grandSlamDesc": "Complete all 4 for a bonus reward",
+    "grandSlamBonus": "+500 XP + Mystery Box",
+    "wordHunt": "Daily Word Hunt",
+    "brainDrill": "Daily Brain Drill",
+    "adventure": "Daily Adventure",
+    "community": "Community Board",
+    "completed": "Completed!",
+    "progress": "{{current}}/4 Missions"
+  },
+  "wotd": {
+    "teaser": "Word of the Day",
+    "found": "You found it!",
+    "foundPercent": "Only {{percent}}% of players found this!",
+    "missed": "Word of the Day",
+    "missedHint": "Try again tomorrow!",
+    "share": "Share your find",
+    "loading": "Loading Word of the Day...",
+    "play": "Play now"
   }
 };
 
