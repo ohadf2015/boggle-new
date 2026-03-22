@@ -143,6 +143,7 @@ export default function sitemap() {
   addForAllLocales('/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
   addForAllLocales('/profile', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.6 });
   addForAllLocales('/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
+  addForAllLocales('/sitemap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.4 });
 
   // ─── Legal pages ───
   addForAllLocales('/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });

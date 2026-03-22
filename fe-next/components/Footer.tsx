@@ -58,6 +58,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link href={`/${language}/guides`} className={footerLinkClass}>{t('footer.guides', 'Guides')}</Link></li>
               <li><Link href={`/${language}/glossary`} className={footerLinkClass}>{t('footer.glossary', 'Glossary')}</Link></li>
               <li><Link href={`/${language}/tools/word-solver`} className={footerLinkClass}>{t('footer.wordSolver')}</Link></li>
+              <li><Link href={`/${language}/sitemap`} className={footerLinkClass}>{t('footer.sitemap', 'Sitemap')}</Link></li>
             </ul>
           </nav>
 
