@@ -3664,7 +3664,33 @@ const es = {
     "glossary": "Glosario",
     "explore": "Explorar",
     "resources": "Recursos",
-    "connect": "Conectar"
+    "connect": "Conectar",
+    "sitemap": "Mapa del sitio"
+  },
+  "sitemap": {
+    "title": "Mapa del sitio",
+    "gameModes": "Modos de juego",
+    "singleplayer": "Un jugador",
+    "multiplayer": "Multijugador",
+    "daily": "Desafío diario",
+    "wordHunt": "Caza de palabras",
+    "wordWheel": "Rueda de palabras",
+    "blast": "Modo Blast",
+    "adventure": "Modo Aventura",
+    "brain": "Entrenamiento cerebral",
+    "tools": "Herramientas y recursos",
+    "words": "Listas de palabras",
+    "guides": "Guías y aprendizaje",
+    "classicStrategy": "Guía de estrategia clásica",
+    "blastStrategy": "Guía de estrategia Blast",
+    "wordHuntStrategy": "Guía de estrategia Caza de palabras",
+    "education": "Educación",
+    "community": "Comunidad y contenido",
+    "communityPage": "Comunidad",
+    "about": "Acerca de y legal",
+    "theWordNerd": "El Nerd de las Palabras",
+    "disclaimer": "Descargo de responsabilidad",
+    "accessibility": "Accesibilidad"
   },
   "support": {
     "kofiFooter": "Invítanos un Café",
@@ -4280,6 +4306,9 @@ const es = {
   },
   "wordHunt": {
     "title": "Caza de Palabras",
+    "welcome": {
+      "title": "Caza de Palabras Diaria"
+    },
     "alreadyGuessed": "¡Ya adivinaste esa palabra!",
     "guessTarget": "Adivina la palabra objetivo",
     "found": "¡Encontrada!",
@@ -8621,6 +8650,11 @@ const es = {
     "swedish": "Sueco",
     "japanese": "Japonés",
     "spanish": "Español"
+  },
+  "streakBar": {
+    "streak": "Racha de {{count}} días",
+    "streakAtRisk": "¡La racha termina esta noche!",
+    "level": "Nvl {{level}}"
   }
 };
 

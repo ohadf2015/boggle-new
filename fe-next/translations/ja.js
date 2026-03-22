@@ -3618,7 +3618,33 @@ const ja = {
     "glossary": "用語集",
     "explore": "探索",
     "resources": "リソース",
-    "connect": "つながる"
+    "connect": "つながる",
+    "sitemap": "サイトマップ"
+  },
+  "sitemap": {
+    "title": "サイトマップ",
+    "gameModes": "ゲームモード",
+    "singleplayer": "シングルプレイヤー",
+    "multiplayer": "マルチプレイヤー",
+    "daily": "デイリーチャレンジ",
+    "wordHunt": "ワードハント",
+    "wordWheel": "ワードホイール",
+    "blast": "ブラストモード",
+    "adventure": "アドベンチャーモード",
+    "brain": "脳トレ",
+    "tools": "ツール＆リソース",
+    "words": "単語リスト",
+    "guides": "ガイド＆学習",
+    "classicStrategy": "クラシック戦略ガイド",
+    "blastStrategy": "ブラスト戦略ガイド",
+    "wordHuntStrategy": "ワードハント戦略ガイド",
+    "education": "教育",
+    "community": "コミュニティ＆コンテンツ",
+    "communityPage": "コミュニティ",
+    "about": "概要＆法的情報",
+    "theWordNerd": "ワードナード",
+    "disclaimer": "免責事項",
+    "accessibility": "アクセシビリティ"
   },
   "support": {
     "kofiFooter": "コーヒーをおごる",
@@ -4296,6 +4322,9 @@ const ja = {
   },
   "wordHunt": {
     "title": "ワードハント",
+    "welcome": {
+      "title": "デイリーワードハント"
+    },
     "alreadyGuessed": "その単語は既に推測されています！",
     "guessTarget": "ターゲットワードを推測",
     "found": "見つけた！",
@@ -8540,6 +8569,11 @@ const ja = {
     "swedish": "スウェーデン語",
     "japanese": "日本語",
     "spanish": "スペイン語"
+  },
+  "streakBar": {
+    "streak": "{{count}}日連続",
+    "streakAtRisk": "今夜で連続記録が途切れます！",
+    "level": "Lv {{level}}"
   }
 };
 

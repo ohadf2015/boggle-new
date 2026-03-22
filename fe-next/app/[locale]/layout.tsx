@@ -32,6 +32,12 @@ const PushNotificationPrompt = nextDynamic(
   { loading: () => null }
 );
 
+// Lazy-load persistent streak bar — engagement status on every screen
+const StreakBar = nextDynamic(
+  () => import('@/components/engagement/StreakBar'),
+  { loading: () => null }
+);
+
 // Lazy-load cookie consent banner — only needed on first visit
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
@@ -722,8 +728,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
                 <link rel="apple-touch-icon" sizes="152x152" href="/icon-144.png" />
                 <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <meta name="theme-color" content="#667eea" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+                <meta name="theme-color" content="#1a1a2e" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -780,6 +786,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             className="relative z-10 main-content-safe flex-1 min-h-0 flex flex-col"
                             tabIndex={-1}
                         >
+                            <StreakBar />
                             <div className="flex-1 flex flex-col">
                                 {children}
                             </div>

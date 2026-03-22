@@ -139,4 +139,10 @@ export interface EngagementStatus {
   calendar: CalendarStatus;
   comeback: ComebackBonusInfo;
   gamesToday: number;
+  /** Player XP/level/gold from profiles table */
+  xp?: number;
+  level?: number;
+  xpToNextLevel?: number;
+  xpForCurrentLevel?: number;
+  gold?: number;
 }

@@ -3618,7 +3618,33 @@ const sv = {
     "glossary": "Ordlista",
     "explore": "Utforska",
     "resources": "Resurser",
-    "connect": "Kontakt"
+    "connect": "Kontakt",
+    "sitemap": "Webbkarta"
+  },
+  "sitemap": {
+    "title": "Webbkarta",
+    "gameModes": "Spellägen",
+    "singleplayer": "Enspelarläge",
+    "multiplayer": "Flerspelarläge",
+    "daily": "Daglig utmaning",
+    "wordHunt": "Ordjakt",
+    "wordWheel": "Ordhjulet",
+    "blast": "Blast-läge",
+    "adventure": "Äventyrsläge",
+    "brain": "Hjärnträning",
+    "tools": "Verktyg & resurser",
+    "words": "Ordlistor",
+    "guides": "Guider & lärande",
+    "classicStrategy": "Klassisk strategiguide",
+    "blastStrategy": "Blast-strategiguide",
+    "wordHuntStrategy": "Ordjakt-strategiguide",
+    "education": "Utbildning",
+    "community": "Community & innehåll",
+    "communityPage": "Community",
+    "about": "Om oss & juridiskt",
+    "theWordNerd": "Ordnörden",
+    "disclaimer": "Ansvarsfriskrivning",
+    "accessibility": "Tillgänglighet"
   },
   "support": {
     "kofiFooter": "Köp oss en kaffe",
@@ -4244,6 +4270,9 @@ const sv = {
   },
   "wordHunt": {
     "title": "Ordjakt",
+    "welcome": {
+      "title": "Daglig Ordjakt"
+    },
     "alreadyGuessed": "Du har redan gissat det ordet!",
     "guessTarget": "Gissa målordet",
     "found": "Hittad!",
@@ -8560,6 +8589,11 @@ const sv = {
     "swedish": "Svenska",
     "japanese": "Japanska",
     "spanish": "Spanska"
+  },
+  "streakBar": {
+    "streak": "{{count}} dagars svit",
+    "streakAtRisk": "Sviten slutar ikväll!",
+    "level": "Nivå {{level}}"
   }
 };
 

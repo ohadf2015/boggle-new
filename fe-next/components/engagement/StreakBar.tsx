@@ -1,0 +1,109 @@
+'use client';
+
+/**
+ * StreakBar - Persistent engagement status bar
+ *
+ * Shows streak count, XP progress, level, and gold balance
+ * on every screen. Pulses red when streak is at risk.
+ */
+
+import React, { memo } from 'react';
+import { Flame, Coins } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEngagementStatus } from '@/hooks/useEngagementStatus';
+import useReducedMotion from '@/hooks/useReducedMotion';
+import { cn } from '@/lib/utils';
+
+function formatNumber(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+export const StreakBar: React.FC = memo(() => {
+  const { t } = useLanguage();
+  const { user } = useAuth();
+  const status = useEngagementStatus();
+  const reducedMotion = useReducedMotion();
+
+  // Don't render while loading or for unauthenticated users with no data
+  if (status.loading) return null;
+  if (!user && status.streak === 0 && status.gold === 0) return null;
+
+  // Don't show bar if user has never played (all zeros)
+  const hasActivity = status.streak > 0 || status.xp > 0 || status.gold > 0 || status.gamesToday > 0;
+  if (!hasActivity) return null;
+
+  const xpPercent = Math.round(status.xpProgress * 100);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        data-testid="streak-bar"
+        initial={reducedMotion ? false : { opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className={cn(
+          'flex items-center justify-between gap-2 px-3 py-1.5 sm:px-4',
+          'bg-neo-navy-dark/80 backdrop-blur-sm',
+          'border-b border-neo-white/10',
+          'text-xs sm:text-sm font-bold',
+          'select-none',
+          status.streakAtRisk && 'streak-at-risk border-b-neo-pink/50 animate-pulse-subtle',
+        )}
+        role="status"
+        aria-label={t('streakBar.streak', { count: status.streak })}
+      >
+        {/* Streak */}
+        <div className="flex items-center gap-1.5">
+          <span
+            data-testid="streak-flame"
+            className={cn(
+              'text-neo-orange',
+              status.streakAtRisk && 'text-neo-pink',
+            )}
+          >
+            <Flame className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+          </span>
+          <span className={cn(
+            'font-black tabular-nums',
+            status.streakAtRisk ? 'text-neo-pink' : 'text-neo-orange',
+          )}>
+            {status.streak}
+          </span>
+        </div>
+
+        {/* XP Progress — center */}
+        <div className="flex items-center gap-2 flex-1 max-w-[200px] sm:max-w-[280px]">
+          <span className="text-neo-cyan/80 whitespace-nowrap">
+            {t('streakBar.level', { level: status.level })}
+          </span>
+          <div
+            className="flex-1 h-1.5 sm:h-2 bg-neo-white/10 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={xpPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`XP ${xpPercent}%`}
+          >
+            <div
+              className="h-full bg-neo-cyan rounded-full transition-all duration-500"
+              style={{ width: `${xpPercent}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Gold */}
+        <div className="flex items-center gap-1" data-testid="streak-gold">
+          <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-neo-yellow" />
+          <span className="text-neo-yellow font-black tabular-nums">
+            {formatNumber(status.gold)}
+          </span>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+});
+
+StreakBar.displayName = 'StreakBar';
+export default StreakBar;

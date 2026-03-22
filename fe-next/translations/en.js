@@ -3723,7 +3723,33 @@ const en = {
     "glossary": "Glossary",
     "explore": "Explore",
     "resources": "Resources",
-    "connect": "Connect"
+    "connect": "Connect",
+    "sitemap": "Sitemap"
+  },
+  "sitemap": {
+    "title": "Sitemap",
+    "gameModes": "Game Modes",
+    "singleplayer": "Single Player",
+    "multiplayer": "Multiplayer",
+    "daily": "Daily Challenge",
+    "wordHunt": "Word Hunt",
+    "wordWheel": "Word Wheel",
+    "blast": "Blast Mode",
+    "adventure": "Adventure Mode",
+    "brain": "Brain Training",
+    "tools": "Tools & Resources",
+    "words": "Word Lists",
+    "guides": "Guides & Learning",
+    "classicStrategy": "Classic Strategy Guide",
+    "blastStrategy": "Blast Strategy Guide",
+    "wordHuntStrategy": "Word Hunt Strategy Guide",
+    "education": "Education",
+    "community": "Community & Content",
+    "communityPage": "Community",
+    "about": "About & Legal",
+    "theWordNerd": "The Word Nerd",
+    "disclaimer": "Disclaimer",
+    "accessibility": "Accessibility"
   },
   "support": {
     "kofiFooter": "Buy Us a Coffee",
@@ -4342,6 +4368,9 @@ const en = {
   },
   "wordHunt": {
     "title": "Word Hunt",
+    "welcome": {
+      "title": "Daily Word Hunt"
+    },
     "alreadyGuessed": "Already tried that!",
     "guessTarget": "Guess the target word",
     "found": "Found it!",
@@ -8603,6 +8632,11 @@ const en = {
     "swedish": "Swedish",
     "japanese": "Japanese",
     "spanish": "Spanish"
+  },
+  "streakBar": {
+    "streak": "{{count}} day streak",
+    "streakAtRisk": "Streak ends tonight!",
+    "level": "Lvl {{level}}"
   }
 };
 

@@ -3637,7 +3637,33 @@ const he = {
     "glossary": "מילון מונחים",
     "explore": "גלו",
     "resources": "משאבים",
-    "connect": "התחברו"
+    "connect": "התחברו",
+    "sitemap": "מפת אתר"
+  },
+  "sitemap": {
+    "title": "מפת אתר",
+    "gameModes": "מצבי משחק",
+    "singleplayer": "שחקן יחיד",
+    "multiplayer": "מרובה משתתפים",
+    "daily": "אתגר יומי",
+    "wordHunt": "ציד מילים",
+    "wordWheel": "גלגל מילים",
+    "blast": "מצב פיצוץ",
+    "adventure": "מצב הרפתקה",
+    "brain": "אימון מוח",
+    "tools": "כלים ומשאבים",
+    "words": "רשימות מילים",
+    "guides": "מדריכים ולמידה",
+    "classicStrategy": "מדריך אסטרטגיה קלאסי",
+    "blastStrategy": "מדריך אסטרטגיית פיצוץ",
+    "wordHuntStrategy": "מדריך אסטרטגיית ציד מילים",
+    "education": "חינוך",
+    "community": "קהילה ותוכן",
+    "communityPage": "קהילה",
+    "about": "אודות ומשפטי",
+    "theWordNerd": "חנון המילים",
+    "disclaimer": "הבהרה",
+    "accessibility": "נגישות"
   },
   "support": {
     "kofiFooter": "קנה לנו קפה",
@@ -4255,6 +4281,9 @@ const he = {
   },
   "wordHunt": {
     "title": "ציד מילים",
+    "welcome": {
+      "title": "ציד מילים יומי"
+    },
     "alreadyGuessed": "כבר ניחשת את המילה הזאת!",
     "guessTarget": "נחש את מילת היעד",
     "found": "מצאת!",
@@ -8565,6 +8594,11 @@ const he = {
     "swedish": "שוודית",
     "japanese": "יפנית",
     "spanish": "ספרדית"
+  },
+  "streakBar": {
+    "streak": "רצף של {{count}} ימים",
+    "streakAtRisk": "!הרצף מסתיים הלילה",
+    "level": "רמה {{level}}"
   }
 };
 

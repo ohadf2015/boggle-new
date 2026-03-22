@@ -238,13 +238,39 @@ export async function logMysteryReward(playerId: string, gameCode: string, rewar
 
 export async function getEngagementStatus(playerId: string): Promise<EngagementStatus> {
   const supabase = getSupabase()!;
-  const { data: engagement } = await supabase
-    .from('player_engagement')
-    .select('current_streak, longest_streak, streak_freezes_available, calendar_month, calendar_year, calendar_days_claimed, last_played_at, comeback_bonus_claimed, comeback_bonus_expires_at, comeback_xp_multiplier, games_today')
-    .eq('player_id', playerId).single();
+
+  // Fetch engagement + profile data in parallel
+  const [engagementResult, profileResult] = await Promise.all([
+    supabase.from('player_engagement')
+      .select('current_streak, longest_streak, streak_freezes_available, calendar_month, calendar_year, calendar_days_claimed, last_played_at, comeback_bonus_claimed, comeback_bonus_expires_at, comeback_xp_multiplier, games_today')
+      .eq('player_id', playerId).single(),
+    supabase.from('profiles')
+      .select('total_xp, current_level, total_coins')
+      .eq('id', playerId).single(),
+  ]);
+
+  const engagement = engagementResult.data;
+  const profile = profileResult.data;
 
   const calendarStatus = await getCalendarStatus(playerId);
   const comebackInfo = await checkComebackBonus(playerId);
+
+  // Calculate XP progress within current level
+  // Inline XP formula to avoid cross-rootDir import (same as adventureXpUtils.getXpForLevel)
+  const getXpForLvl = (level: number): number => {
+    if (level <= 1) return 0;
+    const capped = Math.min(level, 50);
+    let total = 0;
+    for (let i = 2; i <= capped; i++) {
+      total += Math.floor((i + 300 * Math.pow(2, i / 7)) / 4);
+    }
+    return total;
+  };
+  const currentLevel = profile?.current_level || 1;
+  const totalXp = profile?.total_xp || 0;
+  const xpForCurrentLevel = getXpForLvl(currentLevel);
+  const xpForNextLevel = getXpForLvl(currentLevel + 1);
+  const xpToNextLevel = Math.max(0, xpForNextLevel - totalXp);
 
   return {
     streak: {
@@ -254,5 +280,10 @@ export async function getEngagementStatus(playerId: string): Promise<EngagementS
       freezesAvailable: engagement?.streak_freezes_available || 0,
     },
     calendar: calendarStatus, comeback: comebackInfo, gamesToday: engagement?.games_today || 0,
+    xp: totalXp,
+    level: currentLevel,
+    xpToNextLevel,
+    xpForCurrentLevel,
+    gold: profile?.total_coins || 0,
   };
 }
