@@ -272,6 +272,7 @@ const ja = {
     "leaderboard": "ランキング",
     "profile": "プロフィール",
     "play": "プレイ",
+    "quests": "クエスト",
     "howToPlay": "遊び方",
     "blog": "ブログ",
     "faq": "よくある質問",
@@ -1709,7 +1710,9 @@ const ja = {
     "streakOneWeek": "あと1日で1週間！",
     "streakTwoWeeks": "もうすぐ2週間！",
     "streakOneMonth": "あと1日で1ヶ月！",
-    "streakWeeks": "{{weeks}}週間連続！"
+    "streakWeeks": "{{weeks}}週間連続！",
+    "addFriend": "{name}をフレンドに追加",
+    "requestSent": "リクエスト送信済み！"
   },
   "nextStep": {
     "backToLobby": "ロビーに戻る",
@@ -8335,14 +8338,14 @@ const ja = {
         "silver": "シルバー"
       },
       "title": "実績",
-      "toNext": "次のランクまで{{xp}}",
+      "toNext": "{{tier}}まで{{percent}}%",
       "unlocked": "アンロック！",
       "unpin": "ピン解除",
       "upgraded": "バッジがランクアップ！"
     },
     "analytics": {
       "accuracy": "正解率",
-      "activeNow": "オンライン中",
+      "activeNow": "{{count}}人がアクティブ",
       "activeStudentsToday": "今日アクティブ",
       "assignLessons": "レッスンを割り当て",
       "assignLessonsHint": "クラスにレッスンを選んで",
@@ -9032,14 +9035,47 @@ const ja = {
   "dailyMissions": {
     "title": "今日のミッション",
     "grandSlam": "グランドスラム！",
-    "grandSlamDesc": "4つ全てクリアでボーナス",
+    "grandSlamDesc": "3つ全てクリアでボーナス",
     "grandSlamBonus": "+500 XP + ミステリーボックス",
     "wordHunt": "デイリーワードハント",
     "brainDrill": "デイリー脳トレ",
     "adventure": "デイリーアドベンチャー",
     "community": "コミュニティボード",
     "completed": "完了！",
-    "progress": "{{current}}/4 ミッション"
+    "progress": "{{current}}/3 ミッション"
+  },
+  "quests": {
+    "title": "クエスト",
+    "dailyTitle": "今日のクエスト",
+    "weeklyTitle": "ウィークリークエスト",
+    "grandSlam": "グランドスラム！",
+    "grandSlamBonus": "+500 XPボーナス",
+    "grandSlamAvatar": "+1 アバターパーツ",
+    "avatarReward": "+1 アバターパーツ",
+    "completedAll": "今日は全て完了！",
+    "progress": "{{completed}}/{{total}}",
+    "go": "GO",
+    "done": "完了！",
+    "daily": {
+      "wordHunt": {
+        "name": "デイリーワードハント",
+        "desc": "デイリーチャレンジで10個以上の単語を見つけよう"
+      },
+      "adventure": {
+        "name": "アドベンチャークエスト",
+        "desc": "アドベンチャーを1レベル以上クリアしよう"
+      },
+      "community": {
+        "name": "コミュニティプレイ",
+        "desc": "マルチプレイヤーゲームをプレイしよう"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} ゴールド"
+    },
+    "weeklyWordMastery": "週間単語習得",
+    "weeklyWordMasteryDesc": "今週{target}単語を習得する"
   },
   "wotd": {
     "teaser": "今日の単語",

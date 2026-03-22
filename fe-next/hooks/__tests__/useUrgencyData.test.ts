@@ -51,6 +51,10 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en' }),
 }));
 
+jest.mock('@/hooks/useFriendsActivity', () => ({
+  useFriendsActivity: () => ({ events: [], loading: false }),
+}));
+
 describe('useUrgencyData', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -107,7 +111,7 @@ describe('useUrgencyData', () => {
     const { result } = renderHook(() => useUrgencyData());
     expect(result.current).not.toBeNull();
     expect(result.current!.type).toBe('streak-risk');
-    expect(result.current!.data.streak).toBe(5);
+    expect(result.current!.data.count).toBe(5);
   });
 
   it('should return daily-unsolved when streak is not at risk', () => {

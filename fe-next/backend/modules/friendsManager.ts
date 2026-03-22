@@ -100,6 +100,13 @@ export async function sendFriendRequest(
           message: 'Already friends with this user',
         };
       }
+      if (existing.status === 'blocked') {
+        return {
+          success: false,
+          errorCode: 'USER_BLOCKED',
+          message: 'Cannot send request to this user',
+        };
+      }
       return {
         success: false,
         errorCode: 'REQUEST_ALREADY_EXISTS',

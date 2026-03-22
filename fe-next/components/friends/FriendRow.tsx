@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Target, ChevronRight, Wifi, WifiOff, Clock } from 'lucide-react';
+import { Target, ChevronRight, Wifi, WifiOff, Clock, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ interface FriendRowProps {
   isDark: boolean;
   compact?: boolean;
   onChallengeClick?: (friend: Friend) => void;
+  onGiftClick?: (friend: Friend) => void;
   onClick?: () => void;
 }
 
@@ -86,6 +87,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
   isDark,
   compact,
   onChallengeClick,
+  onGiftClick,
   onClick,
 }) => {
   const { t } = useLanguage();
@@ -148,19 +150,38 @@ export const FriendRow: React.FC<FriendRowProps> = ({
         )}
       </div>
 
-      {onChallengeClick && !compact && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onChallengeClick(friend);
-          }}
-          className={cn(
-            'p-1.5 rounded-full transition-colors',
-            isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+      {!compact && (
+        <div className="flex items-center gap-1">
+          {onGiftClick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onGiftClick(friend);
+              }}
+              aria-label={t('friends.sendGift')}
+              className={cn(
+                'p-1.5 rounded-full transition-colors',
+                isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+              )}
+            >
+              <Gift className="w-4 h-4 text-neo-orange" />
+            </button>
           )}
-        >
-          <Target className="w-4 h-4 text-neo-lime" />
-        </button>
+          {onChallengeClick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onChallengeClick(friend);
+              }}
+              className={cn(
+                'p-1.5 rounded-full transition-colors',
+                isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+              )}
+            >
+              <Target className="w-4 h-4 text-neo-lime" />
+            </button>
+          )}
+        </div>
       )}
 
       {!compact && <ChevronRight className={cn('w-4 h-4 rtl:rotate-180', isDark ? 'text-gray-500' : 'text-gray-400')} />}

@@ -98,15 +98,18 @@ describe('useFriendsActivity', () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'friends') return createSelectChain(mockFriendRows);
       if (table === 'game_sessions') {
-        return {
-          select: jest.fn().mockReturnValue({
-            in: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({ data: mockSessionRows, error: null }),
-              }),
+        // Must handle both the friend sessions (.in()) and myBestScores (.eq()) queries
+        const mockSelect = jest.fn().mockReturnValue({
+          in: jest.fn().mockReturnValue({
+            order: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue({ data: mockSessionRows, error: null }),
             }),
           }),
-        };
+          eq: jest.fn().mockReturnValue({
+            order: jest.fn().mockResolvedValue({ data: [{ mode: 'daily_challenge', score: 300 }], error: null }),
+          }),
+        });
+        return { select: mockSelect };
       }
       return createSelectChain(null);
     });
@@ -177,6 +180,9 @@ describe('useFriendsActivity', () => {
                 }),
               }),
             }),
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockResolvedValue({ data: [], error: null }),
+            }),
           }),
         };
       }
@@ -209,6 +215,9 @@ describe('useFriendsActivity', () => {
                   error: null,
                 }),
               }),
+            }),
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
         };

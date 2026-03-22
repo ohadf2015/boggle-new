@@ -257,6 +257,31 @@ function FuManchu({ fill }: FacialHairProps) {
   );
 }
 
+/** Trimmed beard — clean cheek line, sculpted jaw, connected mustache */
+function TrimmedBeard({ fill }: FacialHairProps) {
+  return (
+    <g>
+      {/* Clean cheek line — sharp defined edge */}
+      <path d="M34 54 Q36 53 38 54 Q40 56 42 57 Q46 58 50 58 Q54 58 58 57 Q60 56 62 54 Q64 53 66 54 Q68 58 67 64 Q66 70 62 73 Q58 76 54 77 Q52 77.5 50 78 Q48 77.5 46 77 Q42 76 38 73 Q34 70 33 64 Q32 58 34 54Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Mustache — connected, natural width */}
+      <path d="M41 57 Q44 55.5 47 56.5 Q50 57.5 50 57.5 Q50 57.5 53 56.5 Q56 55.5 59 57"
+        fill="none" stroke="#000" strokeWidth={1.2} opacity="0.35" />
+      {/* Jaw grain — vertical hair direction */}
+      <path d="M38 60 Q38 64 39 68" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
+      <path d="M44 60 Q44 66 45 72" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
+      <path d="M50 60 L50 74" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
+      <path d="M56 60 Q56 66 55 72" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.08" />
+      <path d="M62 60 Q62 64 61 68" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
+      {/* Cheek line edge highlight — emphasizes clean shave above */}
+      <path d="M36 54 Q42 55 48 57" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.1" />
+      <path d="M64 54 Q58 55 52 57" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.1" />
+      {/* Chin contour shadow */}
+      <path d="M42 74 Q46 76 50 76.5 Q54 76 58 74" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" />
+    </g>
+  );
+}
+
 export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() => null)> = {
   none: None,
   stubble: Stubble,
@@ -273,6 +298,7 @@ export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() =
   pencilMustache: PencilMustache,
   braidedBeard: BraidedBeard,
   fuManchu: FuManchu,
+  trimmedBeard: TrimmedBeard,
 };
 
 export type FacialHairPart = keyof typeof FACIAL_HAIR_PARTS;

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { Trophy, Target, Flame, Zap, BookOpen, Star, Sparkles } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -137,9 +137,15 @@ const LiveActivityTicker = memo(function LiveActivityTicker({ className }: { cla
     return Array.from({ length: repeats }, () => sourceEvents).flat();
   }, [sourceEvents]);
 
-  if (loading || displayEvents.length === 0) return null;
+  // Lock duration on first meaningful render — prevents animation restart on poll updates
+  const durationRef = useRef(0);
+  if (durationRef.current === 0 && displayEvents.length > 0) {
+    durationRef.current = Math.max(30, displayEvents.length * 4);
+  }
+  const duration = durationRef.current;
 
-  const duration = Math.max(30, displayEvents.length * 4);
+  if (loading || displayEvents.length === 0 || duration === 0) return null;
+
   const liveLabel = t('landing.tickerLive') || 'LIVE';
 
   return (
@@ -173,35 +179,29 @@ const LiveActivityTicker = memo(function LiveActivityTicker({ className }: { cla
         </span>
       </div>
 
-      {/* Scrolling content */}
-      <div
-        className={cn(
-          'inline-flex whitespace-nowrap py-2 pl-16',
-          reducedMotion && 'overflow-x-auto',
-        )}
-        style={!reducedMotion ? {
-          animation: `activity-ticker-scroll ${duration}s linear infinite`,
-        } : undefined}
-      >
-        {/* Render twice for seamless loop */}
-        {[0, 1].map((copy) => (
-          <span key={copy} className="inline-flex">
-            {displayEvents.map((event, i) => (
-              <span key={`${copy}-${i}`} className="inline-flex items-center">
-                <EventPill event={event} isFallback={!hasRealEvents} />
-                <span className="text-neo-white/15 text-xs mx-1" aria-hidden="true">/</span>
-              </span>
-            ))}
-          </span>
-        ))}
+      {/* Padding wrapper — keeps pl-16 outside the animated element so translateX(-50%) is exact */}
+      <div className={cn('whitespace-nowrap py-2 pl-16', reducedMotion && 'overflow-x-auto')}>
+        {/* Scrolling content — no padding here so -50% = exactly one copy width */}
+        <div
+          className="inline-flex"
+          style={!reducedMotion ? {
+            animation: `activity-ticker-scroll ${duration}s linear infinite`,
+            willChange: 'transform',
+          } : undefined}
+        >
+          {/* Render twice for seamless loop */}
+          {[0, 1].map((copy) => (
+            <span key={copy} className="inline-flex">
+              {displayEvents.map((event, i) => (
+                <span key={`${copy}-${i}`} className="inline-flex items-center">
+                  <EventPill event={event} isFallback={!hasRealEvents} />
+                  <span className="text-neo-white/15 text-xs mx-1" aria-hidden="true">/</span>
+                </span>
+              ))}
+            </span>
+          ))}
+        </div>
       </div>
-
-      <style>{`
-        @keyframes activity-ticker-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </div>
   );
 });

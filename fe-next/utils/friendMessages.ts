@@ -22,12 +22,29 @@ export async function sendMessage(
       return { success: false, error: 'Not authenticated' };
     }
 
+    // Verify friendship exists and no block in either direction (F-1, F-3)
+    const { data: friendship } = await supabase
+      .from('friends')
+      .select('status')
+      .or(`and(user_id.eq.${user.id},friend_id.eq.${recipientId}),and(user_id.eq.${recipientId},friend_id.eq.${user.id})`)
+      .single();
+
+    if (!friendship || friendship.status !== 'accepted') {
+      return { success: false, error: 'Can only message friends' };
+    }
+
+    // Validate message length server-side
+    const trimmed = message.trim();
+    if (trimmed.length === 0 || trimmed.length > 1000) {
+      return { success: false, error: 'Message must be 1-1000 characters' };
+    }
+
     const { data, error } = await supabase
       .from('friend_messages')
       .insert({
         sender_id: user.id,
         recipient_id: recipientId,
-        message: message.trim(),
+        message: trimmed,
       })
       .select()
       .single();
@@ -478,11 +495,18 @@ export async function acceptChallenge(challengeId: string): Promise<{ success: b
 export async function declineChallenge(challengeId: string): Promise<{ success: boolean }> {
   try {
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
+    if (!user) {
+      return { success: false };
+    }
+
+    // Only the challenged party can decline (F-2)
     const { error } = await supabase
       .from('friend_challenges')
       .update({ status: 'declined' })
-      .eq('id', challengeId);
+      .eq('id', challengeId)
+      .eq('challenged_id', user.id);
 
     if (error) {
       logger.error('FRIEND_MESSAGES', `Error declining challenge: ${error.message}`);

@@ -22,6 +22,7 @@ export const AVATAR_HAIR_STYLES = [
   'pixie', 'undercut', 'spaceBuns', 'straight', 'fade', 'cornrows', 'wolfCut',
   'curtainBangs', 'halfUp', 'himecut',
   'frenchBob', 'shag', 'flatTop', 'lob', 'fingerWaves', 'curlyBangs', 'quiff', 'sideSwept',
+  'fadeCurly',
 ] as const;
 
 /** Styles that look feminine — shown when gender is female */
@@ -38,7 +39,7 @@ export const MALE_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'buzz', 'mohawk', 'afro', 'topknot', 'dreads',
   'mullet', 'combover', 'elvis', 'ramen',
   'undercut', 'fade', 'cornrows', 'wolfCut', 'ponytail', 'bun', 'straight',
-  'flatTop', 'quiff', 'shag', 'sideSwept',
+  'flatTop', 'quiff', 'shag', 'sideSwept', 'fadeCurly',
 ] as const;
 
 /** Default hair when switching to female */
@@ -59,7 +60,7 @@ export const AVATAR_EYE_STYLES = [
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
   'curious', 'determined', 'doe',
   'closed', 'catPupils', 'wide', 'squint', 'sad',
-  'wingedLiner', 'smokyEye',
+  'wingedLiner', 'smokyEye', 'confident',
 ] as const;
 
 // ==================== Eyebrows ====================
@@ -72,7 +73,7 @@ export const AVATAR_EYEBROW_STYLES = [
 export const AVATAR_FACIAL_HAIR_STYLES = [
   'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard',
   'soulPatch', 'chinStrap', 'muttonChops', 'vanDyke', 'handlebar',
-  'wizardBeard', 'pencilMustache', 'braidedBeard', 'fuManchu',
+  'wizardBeard', 'pencilMustache', 'braidedBeard', 'fuManchu', 'trimmedBeard',
 ] as const;
 
 // ==================== Mouth ====================
@@ -167,6 +168,7 @@ export const DEFAULT_AVATAR_CONFIG: CustomAvatarConfig = {
 export const PREMIUM_EYE_STYLES = [
   'laser', 'hypno', 'money', 'alien',
   'cyclops', 'monocleEye',
+  'confident',
 ] as const;
 
 export const PREMIUM_MOUTH_STYLES = [
@@ -182,7 +184,7 @@ export const PREMIUM_ACCESSORIES = [
 
 export const PREMIUM_HAIR_STYLES = [
   'elvis', 'ramen', 'twintails',
-  'undercut', 'spaceBuns',
+  'undercut', 'spaceBuns', 'fadeCurly',
 ] as const;
 
 export const PREMIUM_BG_COLORS = ['#FF0000', '#000000', '#4B0082', '#FFD700'] as const;
@@ -201,7 +203,7 @@ export const EPIC_BASES = ['skull', 'shield', 'dragonHead'] as const;
 export const PREMIUM_EYEBROW_STYLES = ['arched', 'bushy', 'scarred'] as const;
 export const EPIC_EYEBROW_STYLES = ['angryThick'] as const;
 
-export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar', 'fuManchu'] as const;
+export const PREMIUM_FACIAL_HAIR_STYLES = ['vanDyke', 'handlebar', 'fuManchu', 'trimmedBeard'] as const;
 export const EPIC_FACIAL_HAIR_STYLES = ['wizardBeard', 'braidedBeard'] as const;
 
 // ==================== Per-Part Pricing ====================
@@ -229,6 +231,7 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'eyes:alien': 450,
   'eyes:cyclops': 400,
   'eyes:monocleEye': 350,
+  'eyes:confident': 400,
   // ── Mouth (VIP) ──
   'mouth:goldTooth': 500,
   'mouth:pipe': 450,
@@ -252,6 +255,7 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'hair:twintails': 500,
   'hair:undercut': 450,
   'hair:spaceBuns': 500,
+  'hair:fadeCurly': 500,
   // ── Eyebrows (VIP) ──
   'eyebrows:arched': 350,
   'eyebrows:bushy': 300,
@@ -260,6 +264,7 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'facialHair:vanDyke': 500,
   'facialHair:handlebar': 600,
   'facialHair:fuManchu': 500,
+  'facialHair:trimmedBeard': 450,
   // ── Bases (VIP) ──
   'base:diamond': 900,
   // ── Background Colors (VIP) ──

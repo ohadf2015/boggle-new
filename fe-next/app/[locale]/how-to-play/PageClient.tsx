@@ -141,7 +141,7 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
     return (
         <>
             <BreadcrumbJsonLd items={breadcrumbs} />
-            <GameModeJsonLd mode="classic" locale={locale} />
+            <GameModeJsonLd mode="classic" locale={locale} includeFaq />
             <GameModeJsonLd mode="blast" locale={locale} />
             <GameModeJsonLd mode="wordHunt" locale={locale} />
 

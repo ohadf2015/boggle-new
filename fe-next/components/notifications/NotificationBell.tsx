@@ -17,7 +17,7 @@ import type { NotificationData, NotificationBellProps } from './types';
 
 export function NotificationBell({ className = '' }: NotificationBellProps) {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { user } = useAuth();
   const {
     notifications,
@@ -88,7 +88,11 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
           focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
           cursor-pointer
         "
-        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+        aria-label={unreadCount > 0
+          ? t('notifications.bellUnread', { count: unreadCount })
+          : t('notifications.bell')}
+        aria-expanded={isDropdownOpen}
+        aria-haspopup="listbox"
       >
         <Bell size={18} />
 

@@ -303,6 +303,8 @@ export const presenceUpdateSchema = compiledSchemas?.presenceUpdateSchema || z.o
   username: usernameSchema.optional(),
   status: presenceStatusSchema.optional(),
   isWindowFocused: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isIdle: z.boolean().optional(),
   lastActivityAt: z.number().optional(),
 });
 

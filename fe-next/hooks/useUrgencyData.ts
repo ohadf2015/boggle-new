@@ -11,6 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useDailySolveRate } from '@/hooks/useDailySolveRate';
+import { useFriendsActivity } from '@/hooks/useFriendsActivity';
 
 export type UrgencyType =
   | 'streak-risk'
@@ -37,6 +38,7 @@ export function useUrgencyData(): UrgencyItem | null {
   const engagement = useEngagementStatus();
   const daily = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
   const { solveRate } = useDailySolveRate(language);
+  const { events: friendEvents } = useFriendsActivity();
 
   return useMemo(() => {
     if (!isAuthenticated) return null;
@@ -46,7 +48,7 @@ export function useUrgencyData(): UrgencyItem | null {
     if (engagement.streakAtRisk && engagement.streak > 0) {
       return {
         type: 'streak-risk' as const,
-        data: { streak: engagement.streak, hoursLeft: getHoursUntilMidnight() } as Record<string, number | string>,
+        data: { count: engagement.streak, hoursLeft: getHoursUntilMidnight() } as Record<string, number | string>,
       };
     }
 
@@ -58,7 +60,16 @@ export function useUrgencyData(): UrgencyItem | null {
       };
     }
 
-    // Priority 3-5: Not yet implemented
+    // Priority 3: Friend beat your score (E-4)
+    const beatEvent = friendEvents.find(e => e.beatPlayer);
+    if (beatEvent) {
+      return {
+        type: 'friend-beat' as const,
+        data: { friendName: beatEvent.friendName, mode: beatEvent.mode },
+      };
+    }
+
+    // Priority 4-5: league-drop not yet implemented
     return null;
   }, [
     isAuthenticated,
@@ -69,5 +80,6 @@ export function useUrgencyData(): UrgencyItem | null {
     daily.hasPlayed,
     daily.puzzleNumber,
     solveRate,
+    friendEvents,
   ]);
 }

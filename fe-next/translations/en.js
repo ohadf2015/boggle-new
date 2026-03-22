@@ -272,6 +272,7 @@ const en = {
     "leaderboard": "Ranks",
     "profile": "Profile",
     "play": "Play",
+    "quests": "Quests",
     "howToPlay": "How to Play",
     "blog": "Blog",
     "faq": "FAQ",
@@ -961,6 +962,8 @@ const en = {
     "confirmExit": "Exit? Someone else will become host.",
     "exitWarning": "Exit? Room closes for everyone.",
     "exitRoom": "Exit",
+    "addFriend": "Add {name}",
+    "requestSent": "Request Sent",
     "startNewGame": "New Game",
     "startNextRound": "Next Round",
     "playersReady": "Ready",
@@ -1811,7 +1814,9 @@ const en = {
     "streakOneWeek": "One day from a full week!",
     "streakTwoWeeks": "Almost two weeks!",
     "streakOneMonth": "One day from a full month!",
-    "streakWeeks": "{{weeks}} week streak!"
+    "streakWeeks": "{{weeks}} week streak!",
+    "addFriend": "Add {name} as friend",
+    "requestSent": "Request sent!"
   },
   "nextStep": {
     "backToLobby": "Back to Lobby",
@@ -4804,6 +4809,9 @@ const en = {
     "sentRequests": "Sent Requests",
     "signInRequired": "Sign in first to build your squad",
     "typeAtLeast2Chars": "Keep typing (2+ chars)",
+    "acceptRequest": "Accept",
+    "declineRequest": "Decline",
+    "sendGift": "Send Gift",
     "messages": "Messages",
     "noMessages": "Nothing yet...",
     "startConversation": "Say hi!",
@@ -8249,6 +8257,8 @@ const en = {
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications yet",
+    "bell": "Notifications",
+    "bellUnread": "{count} unread notifications",
     "emptyDesc": "When you receive notifications, they'll appear here",
     "markAllRead": "Mark all as read",
     "markAsRead": "Mark as read",
@@ -8751,14 +8761,47 @@ const en = {
   "dailyMissions": {
     "title": "Today's Missions",
     "grandSlam": "Grand Slam!",
-    "grandSlamDesc": "Complete all 4 for a bonus reward",
+    "grandSlamDesc": "Complete all 3 for a bonus reward",
     "grandSlamBonus": "+500 XP + Mystery Box",
     "wordHunt": "Daily Word Hunt",
     "brainDrill": "Daily Brain Drill",
     "adventure": "Daily Adventure",
     "community": "Community Board",
     "completed": "Completed!",
-    "progress": "{{current}}/4 Missions"
+    "progress": "{{current}}/3 Missions"
+  },
+  "quests": {
+    "title": "Quests",
+    "dailyTitle": "Today's Quests",
+    "weeklyTitle": "Weekly Quest",
+    "grandSlam": "Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Avatar Part",
+    "avatarReward": "+1 Avatar Part",
+    "completedAll": "All done for today!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "GO",
+    "done": "Done!",
+    "daily": {
+      "wordHunt": {
+        "name": "Daily Word Hunt",
+        "desc": "Find 10+ words in today's Daily Challenge"
+      },
+      "adventure": {
+        "name": "Adventure Quest",
+        "desc": "Complete at least 1 adventure level"
+      },
+      "community": {
+        "name": "Community Play",
+        "desc": "Play a multiplayer game with others"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Gold"
+    },
+    "weeklyWordMastery": "Weekly Word Mastery",
+    "weeklyWordMasteryDesc": "Master {target} words this week"
   },
   "wotd": {
     "teaser": "Word of the Day",
@@ -8886,14 +8929,14 @@ const en = {
         "silver": "Silver"
       },
       "title": "Achievements",
-      "toNext": "{{xp}} to next tier",
+      "toNext": "{{percent}}% to {{tier}}",
       "unlocked": "Unlocked!",
       "unpin": "Unpin",
       "upgraded": "Badge Upgraded!"
     },
     "analytics": {
       "accuracy": "Accuracy",
-      "activeNow": "Active Now",
+      "activeNow": "{{count}} active now",
       "activeStudentsToday": "Active Today",
       "assignLessons": "Assign Lessons",
       "assignLessonsHint": "Pick lessons for your class",

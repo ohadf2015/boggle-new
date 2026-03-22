@@ -10,7 +10,9 @@ import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { cleanProfanity } from '../utils/profanityFilter';
+import { sanitizeHtml } from '../utils/sanitize';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
+import { notifyDirectMessage } from '../modules/pushNotificationTriggers';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -21,18 +23,6 @@ const RATE_WEIGHTS = {
   DELETE_MESSAGE: 1,
   GET_THREADS: 2,
 };
-
-/**
- * Sanitize HTML to prevent XSS attacks
- */
-function sanitizeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 /**
  * Register friend messaging socket event handlers
@@ -93,6 +83,15 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
 
       // Real-time delivery to recipient via user room
       broadcastToUser(io, data.recipientUserId, 'friends:messageReceived', result.message);
+
+      // Push notification for offline recipients (N-1)
+      const senderProfile = await getUserProfile(authUserId);
+      notifyDirectMessage(
+        data.recipientUserId,
+        senderProfile?.username ?? 'Someone',
+        cleanMessage,
+        authUserId
+      ).catch(() => {});
 
       logger.info('MESSAGING', `Message sent from ${authUserId} to ${data.recipientUserId}`);
     } catch (error) {

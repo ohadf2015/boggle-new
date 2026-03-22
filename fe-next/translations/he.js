@@ -272,6 +272,7 @@ const he = {
     "leaderboard": "דירוג",
     "profile": "פרופיל",
     "play": "שחק",
+    "quests": "משימות",
     "howToPlay": "איך לשחק",
     "blog": "בלוג",
     "faq": "שאלות נפוצות",
@@ -1727,7 +1728,9 @@ const he = {
     "streakOneWeek": "יום אחד לשבוע שלם!",
     "streakTwoWeeks": "מחר שבועיים!",
     "streakOneMonth": "יום אחד לחודש!",
-    "streakWeeks": "{{weeks}} שבועות ברצף!"
+    "streakWeeks": "{{weeks}} שבועות ברצף!",
+    "addFriend": "הוספת {name} כחבר",
+    "requestSent": "הבקשה נשלחה!"
   },
   "nextStep": {
     "backToLobby": "חזרה ללובי",
@@ -8362,14 +8365,14 @@ const he = {
         "silver": "כסף"
       },
       "title": "הישגים",
-      "toNext": "{{xp}} לדרגה הבאה",
+      "toNext": "{{percent}}% ל{{tier}}",
       "unlocked": "נפתח!",
       "unpin": "בטל הצמדה",
       "upgraded": "התג שודרג! ⬆️"
     },
     "analytics": {
       "accuracy": "דיוק",
-      "activeNow": "פעילים כרגע",
+      "activeNow": "{{count}} פעילים כעת",
       "activeStudentsToday": "פעילים היום",
       "assignLessons": "הקצה שיעורים",
       "assignLessonsHint": "בחרו שיעורים לכיתה",
@@ -8965,14 +8968,47 @@ const he = {
   "dailyMissions": {
     "title": "משימות היום",
     "grandSlam": "!גרנד סלאם",
-    "grandSlamDesc": "השלימו את כל 4 לבונוס",
+    "grandSlamDesc": "השלימו את כל 3 לבונוס",
     "grandSlamBonus": "קופסת מסתורין + XP 500+",
     "wordHunt": "ציד מילים יומי",
     "brainDrill": "אימון מוח יומי",
     "adventure": "הרפתקה יומית",
     "community": "לוח קהילתי",
     "completed": "!הושלם",
-    "progress": "משימות {{current}}/4"
+    "progress": "משימות {{current}}/3"
+  },
+  "quests": {
+    "title": "משימות",
+    "dailyTitle": "המשימות של היום",
+    "weeklyTitle": "משימה שבועית",
+    "grandSlam": "!גרנד סלאם",
+    "grandSlamBonus": "בונוס XP 500+",
+    "grandSlamAvatar": "חלק אווטאר +1",
+    "avatarReward": "חלק אווטאר +1",
+    "completedAll": "!הכל הושלם להיום",
+    "progress": "{{completed}}/{{total}}",
+    "go": "GO",
+    "done": "!בוצע",
+    "daily": {
+      "wordHunt": {
+        "name": "ציד מילים יומי",
+        "desc": "מצאו 10+ מילים באתגר היומי"
+      },
+      "adventure": {
+        "name": "משימת הרפתקה",
+        "desc": "השלימו לפחות שלב אחד בהרפתקה"
+      },
+      "community": {
+        "name": "משחק קהילתי",
+        "desc": "שחקו משחק מרובה משתתפים"
+      }
+    },
+    "reward": {
+      "xp": "XP {{xp}}+",
+      "gold": "זהב {{gold}}+"
+    },
+    "weeklyWordMastery": "שליטה שבועית במילים",
+    "weeklyWordMasteryDesc": "שלוט ב-{target} מילים השבוע"
   },
   "wotd": {
     "teaser": "מילת היום",

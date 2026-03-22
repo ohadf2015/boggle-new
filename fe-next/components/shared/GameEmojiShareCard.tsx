@@ -119,7 +119,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t 
   const handleNativeShare = useCallback(async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ text: shareText });
+        await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
       } catch {
         // cancelled
         await handleCopy();

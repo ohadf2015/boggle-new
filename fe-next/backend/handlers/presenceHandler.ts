@@ -21,9 +21,13 @@ import { checkAutoKickInactive } from './kickHandler.js';
 import logger from '../utils/logger.js';
 import { validatePayload, presenceUpdateSchema } from '../utils/socketValidation.js';
 
-// Types for payloads
+// Types for payloads — matches what the client actually sends
 interface PresenceUpdatePayload {
-  status: PresenceStatus;
+  isWindowFocused?: boolean;
+  isActive?: boolean;
+  isIdle?: boolean;
+  // Legacy field for backward compatibility
+  status?: PresenceStatus;
 }
 
 /**
@@ -58,7 +62,7 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { status } = validation.data as PresenceUpdatePayload;
+    const payload = validation.data as PresenceUpdatePayload;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
@@ -67,8 +71,23 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game) return;
 
-    // Convert status to PresenceData - the updateUserPresence function determines final status
-    const presenceData = status === 'afk' ? { forceIdle: true } : { isWindowFocused: status === 'active' };
+    // Derive status from client's actual payload fields (R-10 fix)
+    // Client sends { isWindowFocused, isActive, isIdle }, not { status }
+    let derivedStatus: PresenceStatus;
+    if (payload.status) {
+      // Legacy path: client sent explicit status string
+      derivedStatus = payload.status;
+    } else if (payload.isIdle) {
+      derivedStatus = 'idle';
+    } else if (payload.isActive || payload.isWindowFocused) {
+      derivedStatus = 'active';
+    } else {
+      derivedStatus = 'idle';
+    }
+
+    const presenceData = derivedStatus === 'afk'
+      ? { forceIdle: true }
+      : { isWindowFocused: payload.isWindowFocused ?? (derivedStatus === 'active') };
 
     // Update user presence
     updateUserPresence(gameCode, username, presenceData);
@@ -76,11 +95,11 @@ function registerPresenceHandlers(io: Server, socket: Socket): void {
     // Broadcast to room (volatile — non-critical presence update)
     volatileBroadcastToRoom(io, getGameRoom(gameCode), 'userPresenceChanged', {
       username,
-      status,
+      status: derivedStatus,
       timestamp: Date.now()
     });
 
-    logger.debug('PRESENCE', `${username} in game ${gameCode} is now ${status}`);
+    logger.debug('PRESENCE', `${username} in game ${gameCode} is now ${derivedStatus}`);
   });
 
   // Handle presence heartbeat

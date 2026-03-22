@@ -272,6 +272,7 @@ const es = {
     "leaderboard": "Ranking",
     "profile": "Perfil",
     "play": "Jugar",
+    "quests": "Misiones",
     "howToPlay": "Cómo jugar",
     "blog": "Blog",
     "faq": "Preguntas frecuentes",
@@ -1735,7 +1736,9 @@ const es = {
     "streakOneWeek": "¡Un día para una semana completa!",
     "streakTwoWeeks": "¡Casi dos semanas!",
     "streakOneMonth": "¡Un día para un mes completo!",
-    "streakWeeks": "¡{{weeks}} semanas de racha!"
+    "streakWeeks": "¡{{weeks}} semanas de racha!",
+    "addFriend": "Agregar a {name} como amigo",
+    "requestSent": "¡Solicitud enviada!"
   },
   "nextStep": {
     "backToLobby": "Volver al Lobby",
@@ -8345,14 +8348,14 @@ const es = {
         "silver": "Plata"
       },
       "title": "Logros",
-      "toNext": "{{xp}} para el siguiente nivel",
+      "toNext": "{{percent}}% para {{tier}}",
       "unlocked": "¡Desbloqueado!",
       "unpin": "Desfijar",
       "upgraded": "¡Insignia mejorada!"
     },
     "analytics": {
       "accuracy": "Precisión",
-      "activeNow": "Activos ahora",
+      "activeNow": "{{count}} activos ahora",
       "activeStudentsToday": "Activos hoy",
       "assignLessons": "Asignar lecciones",
       "assignLessonsHint": "Elige lecciones para tu clase",
@@ -9112,14 +9115,47 @@ const es = {
   "dailyMissions": {
     "title": "Misiones del día",
     "grandSlam": "¡Grand Slam!",
-    "grandSlamDesc": "Completa las 4 para un bonus",
+    "grandSlamDesc": "Completa las 3 para un bonus",
     "grandSlamBonus": "+500 XP + Caja Misteriosa",
     "wordHunt": "Caza de Palabras Diaria",
     "brainDrill": "Entrenamiento Mental Diario",
     "adventure": "Aventura Diaria",
     "community": "Tablero Comunitario",
     "completed": "¡Completado!",
-    "progress": "{{current}}/4 Misiones"
+    "progress": "{{current}}/3 Misiones"
+  },
+  "quests": {
+    "title": "Misiones",
+    "dailyTitle": "Misiones de hoy",
+    "weeklyTitle": "Misión semanal",
+    "grandSlam": "¡Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Parte de Avatar",
+    "avatarReward": "+1 Parte de Avatar",
+    "completedAll": "¡Todo listo por hoy!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "IR",
+    "done": "¡Hecho!",
+    "daily": {
+      "wordHunt": {
+        "name": "Caza de Palabras Diaria",
+        "desc": "Encuentra 10+ palabras en el desafío diario"
+      },
+      "adventure": {
+        "name": "Misión de Aventura",
+        "desc": "Completa al menos 1 nivel de aventura"
+      },
+      "community": {
+        "name": "Juego Comunitario",
+        "desc": "Juega una partida multijugador"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Oro"
+    },
+    "weeklyWordMastery": "Maestría Semanal de Palabras",
+    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana"
   },
   "wotd": {
     "teaser": "Palabra del Dia",

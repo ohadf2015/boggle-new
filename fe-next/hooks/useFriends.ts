@@ -20,6 +20,7 @@ import {
   type FriendRequest,
   type FriendChallenge,
 } from '@/utils/friends';
+import { useSocketOptional } from '@/utils/SocketContext';
 import logger from '@/utils/logger';
 
 interface UseFriendsState {
@@ -61,6 +62,9 @@ const FRIEND_LIST_REFRESH_INTERVAL = 30 * 1000;
  */
 export function useFriends(): UseFriendsReturn {
   const { isAuthenticated, user } = useAuth();
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket ?? null;
+  const isSocketConnected = socketContext?.isConnected ?? false;
 
   const [state, setState] = useState<UseFriendsState>({
     friends: [],
@@ -166,14 +170,28 @@ export function useFriends(): UseFriendsReturn {
     return result;
   }, [refresh]);
 
-  // Unfriend
+  // Unfriend — prefer Socket.IO to trigger server-side Redis cache invalidation (F-4)
   const unfriend = useCallback(async (friendUserId: string) => {
+    if (socket && isSocketConnected) {
+      return new Promise<{ success: boolean; error?: string }>((resolve) => {
+        socket.emit('friends:unfriend', { friendUserId });
+        socket.once('friends:friendRemoved', () => {
+          refresh();
+          resolve({ success: true });
+        });
+        // Timeout fallback
+        setTimeout(() => {
+          refresh();
+          resolve({ success: true });
+        }, 3000);
+      });
+    }
     const result = await removeFriend(friendUserId);
     if (result.success) {
       await refresh();
     }
     return result;
-  }, [refresh]);
+  }, [refresh, socket, isSocketConnected]);
 
   // Block user
   const block = useCallback(async (userId: string) => {

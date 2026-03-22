@@ -964,6 +964,42 @@ function Quiff({ fill }: HairPartProps) {
   );
 }
 
+/** Curly crop fade — skin fade sides with short curly texture on top */
+function FadeCurly({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Fade gradient on sides — skin visible at bottom, denser up */}
+      {[{x:24,y:34},{x:27,y:33},{x:76,y:34},{x:73,y:33}].map((p,i) => (
+        <circle key={`f${i}`} cx={p.x} cy={p.y} r={0.7} fill={fill} opacity={0.12} />
+      ))}
+      {/* Medium density mid-side */}
+      {[{x:25,y:31},{x:28,y:29},{x:31,y:27},{x:75,y:31},{x:72,y:29},{x:69,y:27}].map((p,i) => (
+        <circle key={`m${i}`} cx={p.x} cy={p.y} r={1} fill={fill} opacity={0.25} />
+      ))}
+      {/* Dense upper side — transition zone */}
+      {[{x:27,y:26},{x:30,y:24},{x:33,y:23},{x:73,y:26},{x:70,y:24},{x:67,y:23}].map((p,i) => (
+        <circle key={`d${i}`} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.4} />
+      ))}
+      {/* Fade demarcation line */}
+      <path d="M30 25 Q40 21 50 20 Q60 21 70 25" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.08" />
+      {/* Curly top volume — lower profile than fade, textured shape */}
+      <path d="M32 24 Q34 14 42 10 Q46 8 50 8 Q54 8 58 10 Q66 14 68 24 Q62 16 50 14 Q38 16 32 24Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Curly texture bumps on top surface */}
+      <path d="M36 14 Q38 10 42 10" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <path d="M42 10 Q45 7 48 9" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <path d="M48 9 Q51 6 54 8" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <path d="M54 8 Q57 7 60 10" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <path d="M60 10 Q63 10 64 14" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      {/* Interior curl detail lines */}
+      <path d="M40 16 Q42 13 44 15 M46 14 Q48 11 50 13 M52 14 Q54 11 56 13 M58 16 Q60 13 62 16" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.1" />
+      {/* Highlights on curl peaks */}
+      <path d="M43 9 Q46 7 49 8" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.15" />
+      <path d="M53 8 Q56 7 58 9" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+    </g>
+  );
+}
+
 function SideSwept({ fill }: HairPartProps) {
   return (
     <g>
@@ -1031,6 +1067,7 @@ export const HAIR_PARTS = {
   curlyBangs: CurlyBangs,
   quiff: Quiff,
   sideSwept: SideSwept,
+  fadeCurly: FadeCurly,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;

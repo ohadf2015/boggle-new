@@ -15,7 +15,7 @@ jest.mock('../utils/socketValidation');
 
 const { registerChatHandlers } = require('../handlers/chatHandler');
 const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { volatileBroadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
+const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
 const { cleanProfanity } = require('../utils/profanityFilter');
 const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
@@ -77,7 +77,7 @@ describe('Chat Handler', () => {
         gameCode: 'ABCDEF'
       });
 
-      expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
+      expect(broadcastToRoom).toHaveBeenCalledWith(
         mockIo,
         'game:ABCDEF',
         'chatMessage',
@@ -116,7 +116,7 @@ describe('Chat Handler', () => {
         gameCode: 'ABCDEF'
       });
 
-      expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
+      expect(broadcastToRoom).toHaveBeenCalledWith(
         mockIo,
         'game:ABCDEF',
         'chatMessage',
@@ -159,7 +159,7 @@ describe('Chat Handler', () => {
       });
 
       expect(emitError).toHaveBeenCalled();
-      expect(volatileBroadcastToRoom).not.toHaveBeenCalled();
+      expect(broadcastToRoom).not.toHaveBeenCalled();
     });
 
     it('should check rate limit and block if exceeded', () => {
@@ -171,7 +171,7 @@ describe('Chat Handler', () => {
       });
 
       expect(mockSocket.emit).toHaveBeenCalledWith('rateLimited');
-      expect(volatileBroadcastToRoom).not.toHaveBeenCalled();
+      expect(broadcastToRoom).not.toHaveBeenCalled();
     });
 
     it('should not process when socket is migrating', () => {
@@ -182,7 +182,7 @@ describe('Chat Handler', () => {
         gameCode: 'ABCDEF'
       });
 
-      expect(volatileBroadcastToRoom).not.toHaveBeenCalled();
+      expect(broadcastToRoom).not.toHaveBeenCalled();
     });
   });
 
@@ -265,8 +265,8 @@ describe('Chat Handler', () => {
       });
 
       const afterTime = Date.now();
-      expect(volatileBroadcastToRoom).toHaveBeenCalled();
-      const broadcastedData = volatileBroadcastToRoom.mock.calls[0][3];
+      expect(broadcastToRoom).toHaveBeenCalled();
+      const broadcastedData = broadcastToRoom.mock.calls[0][3];
       expect(broadcastedData.timestamp).toBeGreaterThanOrEqual(beforeTime);
       expect(broadcastedData.timestamp).toBeLessThanOrEqual(afterTime);
     });

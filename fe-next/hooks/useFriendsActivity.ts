@@ -138,7 +138,26 @@ export function useFriendsActivity() {
           return;
         }
 
-        const mapped = (sessions as unknown as RawSession[]).map(mapSessionToEvent);
+        // Fetch user's best scores per mode to compute beatPlayer (E-3)
+        const { data: myBestScores } = await supabase!
+          .from('game_sessions')
+          .select('mode, score')
+          .eq('user_id', user!.id)
+          .order('score', { ascending: false });
+
+        const myBestByMode = new Map<string, number>();
+        for (const s of myBestScores || []) {
+          if (!myBestByMode.has(s.mode)) {
+            myBestByMode.set(s.mode, s.score);
+          }
+        }
+
+        const mapped = (sessions as unknown as RawSession[]).map((row) => {
+          const event = mapSessionToEvent(row);
+          const myBest = myBestByMode.get(row.mode) ?? 0;
+          event.beatPlayer = row.score > myBest && myBest > 0;
+          return event;
+        });
         setEvents(mapped);
       } catch {
         if (!cancelled) setEvents([]);
@@ -148,7 +167,14 @@ export function useFriendsActivity() {
     }
 
     fetchActivity();
-    return () => { cancelled = true; };
+
+    // Poll every 60 seconds for fresh activity (R-15)
+    const pollInterval = setInterval(fetchActivity, 60_000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(pollInterval);
+    };
   }, [isAuthenticated, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { events, loading };

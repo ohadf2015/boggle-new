@@ -767,6 +767,39 @@ function SmokyEye() {
   );
 }
 
+/** Confident eyes — slightly hooded, relaxed, brown iris. No built-in brows (uses eyebrow system) */
+function Confident() {
+  return (
+    <g>
+      {/* Slightly hooded sclera — flatter top than round, relaxed lower lid */}
+      <path d="M33 41.5 Q38 38 43 41.5 Q38 46 33 41.5Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M57 41.5 Q62 38 67 41.5 Q62 46 57 41.5Z" fill="#fff" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Upper lid weight — hooded shadow */}
+      <path d="M33 41.5 Q38 38 43 41.5" fill="#000" opacity="0.08" />
+      <path d="M57 41.5 Q62 38 67 41.5" fill="#000" opacity="0.08" />
+      {/* Lid crease above — the hooded fold */}
+      <path d="M33 39 Q38 36.5 43 39" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.2" strokeLinecap="round" />
+      <path d="M57 39 Q62 36.5 67 39" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.2" strokeLinecap="round" />
+      {/* Iris — warm brown, two-tone for depth */}
+      <circle cx="38" cy="42" r="3" fill="#5D4037" />
+      <circle cx="62" cy="42" r="3" fill="#5D4037" />
+      <circle cx="38" cy="42.5" r="2.4" fill="#4A3228" opacity="0.5" />
+      <circle cx="62" cy="42.5" r="2.4" fill="#4A3228" opacity="0.5" />
+      {/* Pupil */}
+      <circle cx="38" cy="42" r="1.8" fill="#000" />
+      <circle cx="62" cy="42" r="1.8" fill="#000" />
+      {/* Catchlights — slightly off-center for confident gaze */}
+      <circle cx="37" cy="41" r="1" fill="#fff" />
+      <circle cx="61" cy="41" r="1" fill="#fff" />
+      <circle cx="39.5" cy="43" r="0.4" fill="#fff" opacity="0.5" />
+      <circle cx="63.5" cy="43" r="0.4" fill="#fff" opacity="0.5" />
+      {/* Subtle lower lid line */}
+      <path d="M34 44 Q38 45.5 42 44" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" strokeLinecap="round" />
+      <path d="M58 44 Q62 45.5 66 44" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" strokeLinecap="round" />
+    </g>
+  );
+}
+
 function None() { return <g />; }
 
 export const EYE_PARTS = {
@@ -805,6 +838,7 @@ export const EYE_PARTS = {
   sad: Sad,
   wingedLiner: WingedLiner,
   smokyEye: SmokyEye,
+  confident: Confident,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

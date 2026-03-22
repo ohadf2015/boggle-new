@@ -97,6 +97,19 @@ export function shouldShowPushPrompt(): boolean {
 /**
  * Dismiss the push prompt for PROMPT_DISMISS_DAYS days
  */
+/**
+ * Increment the games-played counter so shouldShowPushPrompt can eventually trigger (N-16)
+ */
+export function incrementGamesPlayed(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = parseInt(localStorage.getItem(GAMES_PLAYED_KEY) || '0', 10);
+    localStorage.setItem(GAMES_PLAYED_KEY, String(current + 1));
+  } catch {
+    // localStorage not available
+  }
+}
+
 export function dismissPushPrompt(): void {
   if (typeof window === 'undefined') return;
 

@@ -2,9 +2,13 @@ import type { ReactNode } from 'react';
 
 const SITE_URL = 'https://www.lexiclash.live';
 
+type GameMode = 'classic' | 'blast' | 'wordHunt';
+
 interface GameModeJsonLdProps {
-    mode: 'classic' | 'blast' | 'wordHunt';
+    mode: GameMode;
     locale: string;
+    /** When true, emits a combined FAQPage schema covering all modes. Only set this on ONE instance per page to avoid duplicate FAQPage schemas. */
+    includeFaq?: boolean;
 }
 
 const GAME_MODE_DATA = {
@@ -67,10 +71,10 @@ const GAME_MODE_DATA = {
  * Generates HowTo + FAQ JSON-LD schema for a specific game mode.
  * All content is static constants — safe for dangerouslySetInnerHTML.
  */
-export function GameModeJsonLd({ mode, locale }: GameModeJsonLdProps): ReactNode {
+export function GameModeJsonLd({ mode, locale, includeFaq = false }: GameModeJsonLdProps): ReactNode {
     const data = GAME_MODE_DATA[mode];
 
-    const schemas = [
+    const schemas: Record<string, unknown>[] = [
         {
             '@context': 'https://schema.org',
             '@type': 'HowTo',
@@ -87,10 +91,17 @@ export function GameModeJsonLd({ mode, locale }: GameModeJsonLdProps): ReactNode
                 url: `${SITE_URL}/${locale}/how-to-play#${mode}-step-${i + 1}`,
             })),
         },
-        {
+    ];
+
+    // Emit a single combined FAQPage for all game modes to avoid duplicate FAQPage schemas
+    if (includeFaq) {
+        const allFaqEntries = (Object.keys(GAME_MODE_DATA) as GameMode[]).flatMap(
+            (m) => GAME_MODE_DATA[m].faq,
+        );
+        schemas.push({
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: data.faq.map((item) => ({
+            mainEntity: allFaqEntries.map((item) => ({
                 '@type': 'Question',
                 name: item.q,
                 acceptedAnswer: {
@@ -98,8 +109,8 @@ export function GameModeJsonLd({ mode, locale }: GameModeJsonLdProps): ReactNode
                     text: item.a,
                 },
             })),
-        },
-    ];
+        });
+    }
 
     // Safe: all content is from static constants, not user input
     return (

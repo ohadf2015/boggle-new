@@ -5,6 +5,7 @@ import { Check, X } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { FriendRequest } from '@/utils/friends';
 
 interface RequestRowProps {
@@ -31,8 +32,9 @@ export const RequestRow: React.FC<RequestRowProps> = ({
   isLoading,
   onAccept,
   onDecline,
-  language,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className={cn(
       'flex items-center gap-3 p-2 rounded-neo',
@@ -52,7 +54,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
         <button
           onClick={onAccept}
           disabled={isLoading}
-          aria-label="Accept"
+          aria-label={t('friends.acceptRequest')}
           className={cn(
             'p-1.5 rounded-full transition-colors',
             'bg-green-500 text-white hover:bg-green-600',
@@ -64,7 +66,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
         <button
           onClick={onDecline}
           disabled={isLoading}
-          aria-label="Decline"
+          aria-label={t('friends.declineRequest')}
           className={cn(
             'p-1.5 rounded-full transition-colors',
             isDark ? 'bg-red-500/20 text-red-400 hover:bg-red-500/40' : 'bg-red-100 text-red-600 hover:bg-red-200',

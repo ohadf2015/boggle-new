@@ -272,6 +272,7 @@ const sv = {
     "leaderboard": "Rankning",
     "profile": "Profil",
     "play": "Spela",
+    "quests": "Uppdrag",
     "howToPlay": "Hur man spelar",
     "blog": "Blogg",
     "faq": "Vanliga frågor",
@@ -1708,7 +1709,9 @@ const sv = {
     "streakOneWeek": "En dag från en hel vecka!",
     "streakTwoWeeks": "Nästan två veckor!",
     "streakOneMonth": "En dag från en hel månad!",
-    "streakWeeks": "{{weeks}} veckors svit!"
+    "streakWeeks": "{{weeks}} veckors svit!",
+    "addFriend": "Lägg till {name} som vän",
+    "requestSent": "Förfrågan skickad!"
   },
   "nextStep": {
     "backToLobby": "Tillbaka till Lobbyn",
@@ -8301,14 +8304,14 @@ const sv = {
         "silver": "Silver"
       },
       "title": "Prestationer",
-      "toNext": "{{xp}} till nästa nivå",
+      "toNext": "{{percent}}% till {{tier}}",
       "unlocked": "Upplåst!",
       "unpin": "Ta bort",
       "upgraded": "Märke uppgraderat!"
     },
     "analytics": {
       "accuracy": "Precision",
-      "activeNow": "Aktiva nu",
+      "activeNow": "{{count}} aktiva nu",
       "activeStudentsToday": "Aktiva idag",
       "assignLessons": "Tilldela lektioner",
       "assignLessonsHint": "Välj lektioner till din klass",
@@ -8960,14 +8963,47 @@ const sv = {
   "dailyMissions": {
     "title": "Dagens uppdrag",
     "grandSlam": "Grand Slam!",
-    "grandSlamDesc": "Slutför alla 4 för en bonusbelöning",
+    "grandSlamDesc": "Slutför alla 3 för en bonusbelöning",
     "grandSlamBonus": "+500 XP + Mysterilåda",
     "wordHunt": "Daglig Ordjakt",
     "brainDrill": "Daglig Hjärnträning",
     "adventure": "Dagligt Äventyr",
     "community": "Gemenskapstavla",
     "completed": "Klart!",
-    "progress": "{{current}}/4 Uppdrag"
+    "progress": "{{current}}/3 Uppdrag"
+  },
+  "quests": {
+    "title": "Uppdrag",
+    "dailyTitle": "Dagens uppdrag",
+    "weeklyTitle": "Veckouppdrag",
+    "grandSlam": "Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Avatardel",
+    "avatarReward": "+1 Avatardel",
+    "completedAll": "Allt klart för idag!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "KÖR",
+    "done": "Klart!",
+    "daily": {
+      "wordHunt": {
+        "name": "Daglig Ordjakt",
+        "desc": "Hitta 10+ ord i dagens utmaning"
+      },
+      "adventure": {
+        "name": "Äventyrsuppdrag",
+        "desc": "Klara minst 1 äventyrsnivå"
+      },
+      "community": {
+        "name": "Gemenskapsspel",
+        "desc": "Spela ett multiplayerspel"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Guld"
+    },
+    "weeklyWordMastery": "Veckans Ordmästerskap",
+    "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan"
   },
   "wotd": {
     "teaser": "Dagens Ord",

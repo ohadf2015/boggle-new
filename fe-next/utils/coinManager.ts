@@ -12,6 +12,7 @@ import {
   saveToLocalStorage,
 } from '@/utils/storageHelpers';
 import { getStreakCoinBonusPercent } from '@/lib/streakTierRewards';
+import { incrementGamesPlayed } from '@/utils/pushNotifications';
 
 const COINS_STORAGE_KEY = 'lexiclash_coins';
 const COINS_HISTORY_KEY = 'lexiclash_coins_history';
@@ -140,6 +141,9 @@ export function addCoins(amount: number, reason: string, details?: Record<string
     timestamp: new Date().toISOString(),
     details,
   });
+
+  // Increment games-played counter so push prompt eventually shows (N-16)
+  incrementGamesPlayed();
 
   return balance.total;
 }

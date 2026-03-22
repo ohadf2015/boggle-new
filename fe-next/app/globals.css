@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Live activity ticker — stable keyframe (not in JSX to avoid re-render flicker) */
+@keyframes activity-ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ====================================
    NEO-BRUTALIST "JACKBOX PARTY PACK" THEME
    ==================================== */

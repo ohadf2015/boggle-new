@@ -147,9 +147,9 @@ export async function acceptChallenge(
 }
 
 /**
- * Decline a challenge
+ * Decline a challenge (only the challenged party can decline)
  */
-export async function declineChallenge(challengeId: string): Promise<{ success: boolean }> {
+export async function declineChallenge(challengeId: string, userId: string): Promise<{ success: boolean }> {
   try {
     const supabase = getSupabase();
     if (!supabase) {
@@ -157,10 +157,12 @@ export async function declineChallenge(challengeId: string): Promise<{ success: 
       return { success: false };
     }
 
+    // Enforce that only the challenged party can decline (F-2)
     const { error } = await supabase
       .from('friend_challenges')
       .update({ status: 'declined' })
       .eq('id', challengeId)
+      .eq('challenged_id', userId)
       .eq('status', 'pending');
 
     if (error) {

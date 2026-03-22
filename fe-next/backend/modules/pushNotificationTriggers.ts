@@ -14,7 +14,29 @@ export type PushNotificationType =
   | 'game_invite'
   | 'turn_reminder'
   | 'achievement'
-  | 'daily_challenge';
+  | 'daily_challenge'
+  | 'direct_message'
+  | 'challenge_accepted'
+  | 'challenge_declined'
+  | 'gift_received'
+  | 'level_up';
+
+/**
+ * Map push types to notification_type for user_notifications table (N-7)
+ */
+const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
+  friend_request: 'social',
+  friend_accepted: 'social',
+  game_invite: 'social',
+  direct_message: 'social',
+  challenge_accepted: 'social',
+  challenge_declined: 'social',
+  gift_received: 'social',
+  turn_reminder: 'social',
+  achievement: 'achievement',
+  daily_challenge: 'system',
+  level_up: 'achievement',
+};
 
 /**
  * Save notification to user_notifications table for in-app history
@@ -34,7 +56,7 @@ async function saveNotificationHistory(
 
     const { error } = await supabase.from('user_notifications').insert({
       user_id: userId,
-      notification_type: type === 'friend_request' || type === 'friend_accepted' ? 'social' : 'system',
+      notification_type: NOTIFICATION_TYPE_MAP[type as PushNotificationType] || 'system',
       title: payload.title,
       body: payload.body,
       action_url: deepLink,
@@ -156,6 +178,109 @@ export async function notifyAchievement(
     data: {
       type: 'achievement',
       deepLink: '/adventure/achievements',
+    },
+  });
+}
+
+/**
+ * Notify user of a new direct message (N-1)
+ */
+export async function notifyDirectMessage(
+  toUserId: string,
+  fromUsername: string,
+  messagePreview: string,
+  fromUserId?: string
+): Promise<void> {
+  const preview = messagePreview.length > 50
+    ? messagePreview.substring(0, 47) + '...'
+    : messagePreview;
+
+  return triggerPush(toUserId, 'direct_message', {
+    title: `Message from ${fromUsername}`,
+    body: preview,
+    data: {
+      type: 'direct_message',
+      deepLink: '/friends?tab=messages',
+    },
+  }, fromUserId);
+}
+
+/**
+ * Notify challenger that their challenge was accepted (N-3)
+ */
+export async function notifyChallengeAccepted(
+  toUserId: string,
+  acceptorUsername: string,
+  roomCode: string,
+  acceptorUserId?: string
+): Promise<void> {
+  return triggerPush(toUserId, 'challenge_accepted', {
+    title: 'Challenge Accepted!',
+    body: `${acceptorUsername} accepted your challenge — join now!`,
+    data: {
+      type: 'challenge_accepted',
+      deepLink: `/join/${roomCode}`,
+    },
+  }, acceptorUserId);
+}
+
+/**
+ * Notify challenger that their challenge was declined (N-4)
+ */
+export async function notifyChallengeDeclined(
+  toUserId: string,
+  declinerUsername: string,
+  declinerUserId?: string
+): Promise<void> {
+  return triggerPush(toUserId, 'challenge_declined', {
+    title: 'Challenge Declined',
+    body: `${declinerUsername} declined your challenge`,
+    data: {
+      type: 'challenge_declined',
+      deepLink: '/friends',
+    },
+  }, declinerUserId);
+}
+
+/**
+ * Notify user they received a gift (N-1 gap / E-7)
+ */
+export async function notifyGiftReceived(
+  toUserId: string,
+  senderUsername: string,
+  giftType: string,
+  senderId?: string
+): Promise<void> {
+  const giftLabels: Record<string, string> = {
+    hints: 'a hint',
+    streak_freeze: 'a streak freeze',
+    coins: 'coins',
+  };
+  const label = giftLabels[giftType] || giftType;
+
+  return triggerPush(toUserId, 'gift_received', {
+    title: 'Gift Received!',
+    body: `${senderUsername} sent you ${label}!`,
+    data: {
+      type: 'gift_received',
+      deepLink: '/friends',
+    },
+  }, senderId);
+}
+
+/**
+ * Notify user of a level up (N-11)
+ */
+export async function notifyLevelUp(
+  toUserId: string,
+  newLevel: number
+): Promise<void> {
+  return triggerPush(toUserId, 'level_up', {
+    title: `Level ${newLevel}!`,
+    body: `Congratulations — you reached level ${newLevel}!`,
+    data: {
+      type: 'level_up',
+      deepLink: '/adventure',
     },
   });
 }

@@ -30,14 +30,14 @@ import { LandingMobileCards } from './LandingMobileCards';
 const LiveActivityTicker = dynamic(() => import('./LiveActivityTicker').then(m => m.LiveActivityTicker), { ssr: false });
 const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
 const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser), { ssr: false });
-const DailyMissionsHub = dynamic(() => import('./DailyMissionsHub').then(m => m.DailyMissionsHub), { ssr: false });
+// DailyMissionsHub removed — moved to dedicated /quests page
 const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
 const WordCollectionCard = dynamic(() => import('@/components/vocabulary/WordCollectionCard').then(m => m.WordCollectionCard), { ssr: false });
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
 const WordPactCard = dynamic(() => import('@/components/engagement/WordPactCard').then(m => m.WordPactCard), { ssr: false });
-const WeeklyQuestCard = dynamic(() => import('@/components/engagement/WeeklyQuestCard').then(m => m.WeeklyQuestCard), { ssr: false });
+// WeeklyQuestCard removed — moved to dedicated /quests page
 const FriendsActivityFeed = dynamic(() => import('./FriendsActivityFeed').then(m => m.FriendsActivityFeed), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
@@ -291,15 +291,11 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
             <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
               <WotdTeaser />
             </div>
-            <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '6rem' }}>
-              <DailyMissionsHub />
-            </div>
             <WordCollectionCard />
             <GhostRivalWidget />
             <VaultCardConnected />
             <UnfinishedBoardCardConnected />
             <WordPactCard />
-            <WeeklyQuestCard />
             <FriendsActivityFeed />
           </>
         )}

@@ -6,8 +6,9 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, ChatMessagePayload } from '@/shared/types';
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
-import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
 import { cleanProfanity } from '../utils/profanityFilter';
+import { sanitizeHtml } from '../utils/sanitize';
 import { emitError, ErrorMessages } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { inc } from '../utils/metrics';
@@ -25,18 +26,6 @@ interface ChatMessageData {
 
 interface ChatHistoryRequest {
   gameCode?: string;
-}
-
-/**
- * Sanitize HTML to prevent XSS attacks
- */
-function sanitizeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
 }
 
 /**
@@ -100,7 +89,8 @@ function registerChatHandlers(io: Server, socket: Socket): void {
       game.chatHistory = game.chatHistory.slice(-100);
     }
 
-    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
+    // Use non-volatile broadcast — chat messages must not be silently dropped (R-1)
+    broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
   });
 
   // Handle chat history request (for late joiners and page refresh)

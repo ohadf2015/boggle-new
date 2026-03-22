@@ -12,6 +12,7 @@ export {
   saveCategoryPreferences,
   shouldShowPushPrompt,
   dismissPushPrompt,
+  incrementGamesPlayed,
 } from './categoryPreferences';
 
 // Permission handling

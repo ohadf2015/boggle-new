@@ -3,7 +3,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, Swords, User } from 'lucide-react';
+import { Home, Swords, ScrollText, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -23,7 +23,7 @@ const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
  * - Smart hiding during gameplay to prevent accidental taps
  *
  * Features:
- * - Three primary tabs: Home, Brain, Profile
+ * - Four primary tabs: Home, Play, Quests, Profile
  * - Active state indication with neo-yellow highlight
  * - Safe area support for devices with notches/home indicators
  * - Automatic hiding during gameplay (via NavigationContext)
@@ -45,6 +45,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
+        if (cleanPath.startsWith('/quests')) return 'quests';
         if (cleanPath.startsWith('/profile')) return 'profile';
 
         return 'home'; // Default to home if no match
@@ -59,6 +60,9 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         router.push(`/${language}/multiplayer`);
     }, [router, language]);
 
+    const navigateToQuests = useCallback(() => {
+        router.push(`/${language}/quests`);
+    }, [router, language]);
 
     const navigateToProfile = useCallback(() => {
         // Profile requires authentication - show modal if not logged in
@@ -189,6 +193,42 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                     )}
                 </button>
 
+                {/* Quests Tab */}
+                <button
+                    onClick={navigateToQuests}
+                    className={cn(
+                        "flex flex-col items-center justify-center",
+                        "min-w-[64px] min-h-[48px]",
+                        "px-3 py-2",
+                        "transition-all duration-100",
+                        "relative",
+                        activeTab === 'quests'
+                            ? "text-neo-lime"
+                            : "text-neo-white/60 hover:text-neo-white/80"
+                    )}
+                    aria-label={t('nav.quests')}
+                    aria-current={activeTab === 'quests' ? 'page' : undefined}
+                >
+                    <ScrollText
+                        className={cn(
+                            "w-6 h-6 mb-1",
+                            activeTab === 'quests' && "animate-neo-pop"
+                        )}
+                        aria-hidden="true"
+                    />
+                    <span className={cn(
+                        "text-[10px] font-bold uppercase tracking-wide",
+                        activeTab === 'quests' && "text-neo-lime"
+                    )}>
+                        {t('nav.quests')}
+                    </span>
+                    {activeTab === 'quests' && (
+                        <div
+                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-lime rounded-b-full"
+                            aria-hidden="true"
+                        />
+                    )}
+                </button>
 
                 {/* Profile Tab */}
                 <button

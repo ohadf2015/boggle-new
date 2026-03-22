@@ -13,12 +13,15 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUrgencyData, type UrgencyType } from '@/hooks/useUrgencyData';
 
-// Jelly spring: stiffness 200 + damping 8 = visible wobble that settles organically
-const JELLY_SPRING = { type: 'spring' as const, stiffness: 200, damping: 8 };
+const JELLY_SPRING = { type: 'spring' as const, stiffness: 260, damping: 12 };
 
 interface UrgencyConfig {
-  borderClass: string;
-  bgClass: string;
+  glowColor: string;
+  /** Full Tailwind classes — no dynamic construction */
+  gradientClass: string;
+  stripeClass: string;
+  iconRingClass: string;
+  ctaBgClass: string;
   icon: React.ReactNode;
   messageKey: string;
   actionKey: string;
@@ -32,7 +35,7 @@ function FlameIcon() {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="w-7 h-7 text-neo-pink"
+      className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_0_6px_rgba(255,20,147,0.6)]"
       aria-hidden="true"
     >
       <path
@@ -50,7 +53,7 @@ function StarIcon() {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      className="w-7 h-7 text-neo-yellow"
+      className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_0_6px_rgba(255,225,53,0.6)]"
       aria-hidden="true"
     >
       <path
@@ -65,8 +68,11 @@ function StarIcon() {
 function getUrgencyConfig(type: UrgencyType, language: string): UrgencyConfig {
   const configs: Record<string, UrgencyConfig> = {
     'streak-risk': {
-      borderClass: 'border-neo-pink',
-      bgClass: 'bg-neo-pink/10',
+      glowColor: 'rgba(255, 20, 147, 0.35)',
+      gradientClass: 'bg-gradient-to-r from-neo-pink/15 via-neo-pink/5 to-transparent',
+      stripeClass: 'bg-neo-pink',
+      iconRingClass: 'border-neo-pink bg-neo-pink/10',
+      ctaBgClass: 'bg-neo-pink text-neo-white',
       icon: <FlameIcon />,
       messageKey: 'urgency.streakAtRisk',
       actionKey: 'urgency.streakAction',
@@ -74,8 +80,11 @@ function getUrgencyConfig(type: UrgencyType, language: string): UrgencyConfig {
       pulseIcon: true,
     },
     'daily-unsolved': {
-      borderClass: 'border-neo-yellow',
-      bgClass: 'bg-neo-yellow/10',
+      glowColor: 'rgba(255, 225, 53, 0.35)',
+      gradientClass: 'bg-gradient-to-r from-neo-yellow/15 via-neo-yellow/5 to-transparent',
+      stripeClass: 'bg-neo-yellow',
+      iconRingClass: 'border-neo-yellow bg-neo-yellow/10',
+      ctaBgClass: 'bg-neo-yellow text-neo-black',
       icon: <StarIcon />,
       messageKey: 'urgency.dailyUnsolved',
       actionKey: 'urgency.dailyAction',
@@ -87,10 +96,11 @@ function getUrgencyConfig(type: UrgencyType, language: string): UrgencyConfig {
 }
 
 export function UrgencyCard() {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const router = useRouter();
   const urgency = useUrgencyData();
   const shouldReduceMotion = useReducedMotion();
+  const isRTL = dir === 'rtl';
 
   if (!urgency) return null;
 
@@ -100,9 +110,7 @@ export function UrgencyCard() {
     router.push(config.href);
   };
 
-  const glowColor = urgency.type === 'streak-risk'
-    ? 'rgba(255, 20, 147, 0.4)'
-    : 'rgba(255, 225, 53, 0.4)';
+  const arrowChar = isRTL ? '←' : '→';
 
   return (
     <AnimatePresence>
@@ -110,92 +118,117 @@ export function UrgencyCard() {
         role="status"
         aria-live="polite"
         data-testid="urgency-card"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -12 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0, y: 16, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -12, scale: 0.97 }}
+        transition={shouldReduceMotion ? { duration: 0.2 } : { duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-4xl mx-auto"
       >
-      <motion.button
-        onClick={handleClick}
-        whileHover={shouldReduceMotion
-          ? { opacity: 0.9 }
-          : { scaleX: 1.03, scaleY: 0.97 }
-        }
-        whileTap={shouldReduceMotion
-          ? undefined
-          : { scaleX: 0.97, scaleY: 1.02 }
-        }
-        transition={shouldReduceMotion ? { duration: 0.15 } : JELLY_SPRING}
-        className={`
-          w-full relative overflow-hidden
-          border-3 border-neo-black ${config.bgClass}
-          rounded-neo shadow-hard
-          active:shadow-hard-pressed
-          p-3 sm:p-4
-          flex items-center gap-3
-          cursor-pointer transition-shadow duration-150
-          text-start
-        `}
-        style={!shouldReduceMotion ? {
-          boxShadow: `0 0 20px ${glowColor}, 4px 4px 0px rgb(var(--neo-black))`,
-        } : undefined}
-      >
-        {/* Periodic shimmer sweep — compositor-only (transform + opacity) */}
-        {!shouldReduceMotion && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            aria-hidden="true"
-          >
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -skew-x-12"
-              animate={{ x: ['-100%', '200%'] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatDelay: 4,
-                ease: 'easeInOut',
-              }}
-            />
-          </motion.div>
-        )}
-
-        {/* Icon with breathing pulse */}
-        <motion.div
-          className={`
-            flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12
-            flex items-center justify-center
-            rounded-full border-2 border-neo-black
-            bg-neo-navy/80 relative z-10
-          `}
-          animate={shouldReduceMotion ? undefined : {
-            scale: [1, 1.12, 1],
-            rotate: [0, config.pulseIcon ? 8 : 3, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+        <motion.button
+          onClick={handleClick}
+          whileHover={shouldReduceMotion
+            ? { opacity: 0.9 }
+            : { scaleX: 1.02, scaleY: 0.98 }
+          }
+          whileTap={shouldReduceMotion
+            ? undefined
+            : { scaleX: 0.98, scaleY: 1.01 }
+          }
+          transition={shouldReduceMotion ? { duration: 0.15 } : JELLY_SPRING}
+          className="
+            w-full relative overflow-hidden
+            border-3 border-neo-black
+            bg-neo-navy
+            rounded-neo shadow-hard
+            active:shadow-hard-pressed
+            active:translate-x-[2px] active:translate-y-[2px]
+            p-3 sm:p-4
+            flex items-center gap-3 sm:gap-4
+            cursor-pointer transition-shadow duration-150
+            text-start group
+          "
+          style={!shouldReduceMotion ? {
+            boxShadow: `0 0 24px ${config.glowColor}, 0 0 48px ${config.glowColor.replace('0.35', '0.15')}, 4px 4px 0px rgb(var(--neo-black))`,
+          } : undefined}
         >
-          {config.icon}
-        </motion.div>
+          {/* Accent gradient background */}
+          <div
+            className={`absolute inset-0 ${config.gradientClass} pointer-events-none`}
+            aria-hidden="true"
+          />
 
-        {/* Message + CTA label */}
-        <div className="flex-1 min-w-0 relative z-10">
-          <p className="font-neo-display text-sm sm:text-base text-neo-white font-bold leading-snug">
-            {t(config.messageKey, urgency.data)}
-          </p>
-          <motion.p
-            data-testid="urgency-cta"
-            className="font-neo-display text-xs text-neo-yellow font-bold mt-0.5 uppercase tracking-wide"
-            animate={shouldReduceMotion ? undefined : { x: [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+          {/* Accent edge stripe */}
+          <div
+            className={`absolute top-0 bottom-0 w-1 ${config.stripeClass} ${isRTL ? 'right-0' : 'left-0'}`}
+            aria-hidden="true"
+          />
+
+          {/* Periodic shimmer sweep */}
+          {!shouldReduceMotion && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              aria-hidden="true"
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  repeatDelay: 5,
+                  ease: 'easeInOut',
+                }}
+              />
+            </motion.div>
+          )}
+
+          {/* Icon with breathing pulse */}
+          <motion.div
+            className={`
+              flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12
+              flex items-center justify-center
+              rounded-full border-2 ${config.iconRingClass}
+              relative z-10
+            `}
+            animate={shouldReduceMotion ? undefined : {
+              scale: [1, 1.15, 1],
+              rotate: [0, config.pulseIcon ? 10 : 4, 0],
+            }}
+            transition={{
+              duration: 1.8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
           >
-            {t(config.actionKey)} →
-          </motion.p>
-        </div>
-      </motion.button>
+            {config.icon}
+          </motion.div>
+
+          {/* Message */}
+          <div className="flex-1 min-w-0 relative z-10">
+            <p className="font-neo-display text-sm sm:text-base text-neo-white font-bold leading-snug">
+              {t(config.messageKey, urgency.data)}
+            </p>
+          </div>
+
+          {/* CTA button */}
+          <motion.div
+            data-testid="urgency-cta"
+            className={`
+              flex-shrink-0 relative z-10
+              px-3 sm:px-4 py-1.5 sm:py-2
+              ${config.ctaBgClass}
+              font-neo-display font-bold text-xs sm:text-sm
+              border-2 border-neo-black rounded-neo
+              shadow-hard-sm
+              group-active:shadow-none group-active:translate-x-[1px] group-active:translate-y-[1px]
+              whitespace-nowrap
+            `}
+            animate={shouldReduceMotion ? undefined : { scale: [1, 1.04, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            {t(config.actionKey)} {arrowChar}
+          </motion.div>
+        </motion.button>
       </motion.div>
     </AnimatePresence>
   );

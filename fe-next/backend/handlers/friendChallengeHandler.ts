@@ -8,7 +8,7 @@ import { checkRateLimit } from '../utils/rateLimiter';
 import { emitError } from '../utils/errorHandler';
 import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
-import { notifyGameInvite } from '../modules/pushNotificationTriggers';
+import { notifyGameInvite, notifyChallengeAccepted, notifyChallengeDeclined } from '../modules/pushNotificationTriggers';
 import { getSupabase } from '../modules/supabaseServer';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
 
@@ -232,8 +232,14 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
         expiresAt: new Date(challenge.expires_at).getTime(),
       };
 
-      // Notify challenger
+      // Notify challenger via Socket.IO + push (N-3)
       broadcastToUser(io, challenge.challenger_id, 'friends:challengeAccepted', acceptedData);
+      notifyChallengeAccepted(
+        challenge.challenger_id,
+        challengedProfile.username,
+        result.roomCode!,
+        authUserId
+      ).catch(() => {});
 
       // Confirm to challenged user with room code
       socket.emit('friends:challengeAccepted', acceptedData);
@@ -293,7 +299,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
         return;
       }
 
-      const result = await friendsManager.declineChallenge(data.challengeId);
+      const result = await friendsManager.declineChallenge(data.challengeId, authUserId);
 
       if (!result.success) {
         socket.emit('friends:error', {
@@ -325,8 +331,13 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
         timestamp: Date.now(),
       };
 
-      // Notify challenger
+      // Notify challenger via Socket.IO + push (N-4)
       broadcastToUser(io, challenge.challenger_id, 'friends:challengeDeclined', declinedData);
+      notifyChallengeDeclined(
+        challenge.challenger_id,
+        challengedProfile?.username ?? 'Someone',
+        authUserId
+      ).catch(() => {});
 
       // Confirm to challenged user
       socket.emit('friends:challengeDeclined', declinedData);

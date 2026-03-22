@@ -31,6 +31,7 @@ import { ResultsModals } from '@/components/results/ResultsModals';
 import { ResultsMainContent } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
+const PostGameSocialActions = dynamic(() => import('@/components/results/PostGameSocialActions'), { ssr: false });
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -435,6 +436,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onShowDetails={() => setMobileActiveTab('details')}
         hideInlineCta={!isBotsOnlyGame}
       />
+      {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
+      {gameCode && sortedScores.length > 1 && (
+        <PostGameSocialActions
+          opponents={otherPlayers}
+          reducedMotion={null}
+        />
+      )}
     </>
   );
 
@@ -587,6 +595,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               {...mainContentProps}
               hideInlineCta={!!gameCode && !isBotsOnlyGame}
             />
+            {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
+            {gameCode && sortedScores.length > 1 && (
+              <PostGameSocialActions
+                opponents={otherPlayers}
+                reducedMotion={null}
+              />
+            )}
           </div>
 
           {/* Vertical divider */}

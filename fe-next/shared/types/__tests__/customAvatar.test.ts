@@ -254,6 +254,7 @@ describe('Premium Parts', () => {
     test('returns all premium eye styles (VIP + Epic)', () => {
       expect(getPremiumParts('eyes')).toEqual([
         'laser', 'hypno', 'money', 'alien', 'cyclops', 'monocleEye',
+        'confident',
         'galaxy', 'flame', 'robot', 'void', 'infinity',
       ]);
     });
@@ -273,7 +274,7 @@ describe('Premium Parts', () => {
     });
     test('returns all premium hair styles (VIP + Epic)', () => {
       expect(getPremiumParts('hair')).toEqual([
-        'elvis', 'ramen', 'twintails', 'undercut', 'spaceBuns',
+        'elvis', 'ramen', 'twintails', 'undercut', 'spaceBuns', 'fadeCurly',
         'flame', 'galaxy', 'neon',
       ]);
     });

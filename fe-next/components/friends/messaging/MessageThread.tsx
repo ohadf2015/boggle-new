@@ -200,9 +200,9 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
               </div>
             ) : (
               <>
-                {messages.map((message, index) => {
+                {messages.filter(m => !m.isDeleted).map((message, index, filtered) => {
                   const isMine = message.fromUserId === currentUserId;
-                  const showAvatar = index === messages.length - 1 || messages[index + 1]?.fromUserId !== message.fromUserId;
+                  const showAvatar = index === filtered.length - 1 || filtered[index + 1]?.fromUserId !== message.fromUserId;
 
                   return (
                     <motion.div

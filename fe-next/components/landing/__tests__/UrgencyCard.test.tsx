@@ -61,7 +61,7 @@ describe('UrgencyCard', () => {
   it('should render streak-risk card with correct role and aria-live', () => {
     mockUrgency = {
       type: 'streak-risk',
-      data: { streak: 7, hoursLeft: 3 },
+      data: { count: 7, hoursLeft: 3 },
     };
     render(<UrgencyCard />);
     const card = screen.getByRole('status');
@@ -71,7 +71,7 @@ describe('UrgencyCard', () => {
   it('should display streak-risk translation key', () => {
     mockUrgency = {
       type: 'streak-risk',
-      data: { streak: 7, hoursLeft: 3 },
+      data: { count: 7, hoursLeft: 3 },
     };
     render(<UrgencyCard />);
     expect(screen.getByText('urgency.streakAtRisk')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('UrgencyCard', () => {
   it('should display streak-risk action translation key', () => {
     mockUrgency = {
       type: 'streak-risk',
-      data: { streak: 7, hoursLeft: 3 },
+      data: { count: 7, hoursLeft: 3 },
     };
     render(<UrgencyCard />);
     expect(screen.getByTestId('urgency-cta')).toHaveTextContent('urgency.streakAction');
@@ -89,7 +89,7 @@ describe('UrgencyCard', () => {
   it('should navigate to singleplayer on streak-risk CTA click', () => {
     mockUrgency = {
       type: 'streak-risk',
-      data: { streak: 7, hoursLeft: 3 },
+      data: { count: 7, hoursLeft: 3 },
     };
     render(<UrgencyCard />);
     fireEvent.click(screen.getByRole('button'));
@@ -127,7 +127,7 @@ describe('UrgencyCard', () => {
   it('should have accessible button with test id', () => {
     mockUrgency = {
       type: 'streak-risk',
-      data: { streak: 5, hoursLeft: 2 },
+      data: { count: 5, hoursLeft: 2 },
     };
     render(<UrgencyCard />);
     expect(screen.getByTestId('urgency-cta')).toBeInTheDocument();

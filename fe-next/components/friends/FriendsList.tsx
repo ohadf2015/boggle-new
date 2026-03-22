@@ -241,8 +241,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
         </EnhancedButton>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 border-b-2 border-neo-black">
+      {/* Tab Navigation (Q-18: proper ARIA tab semantics) */}
+      <div role="tablist" aria-label={t('friends.title')} className="flex gap-2 border-b-2 border-neo-black">
         {(['friends', 'requests', 'messages'] as const).map((tab) => {
           const isActive = activeTab === tab;
           const icons = { friends: Users, requests: Bell, messages: MessageCircle };
@@ -255,6 +255,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
           return (
             <button
               key={tab}
+              role="tab"
+              id={`friends-tab-${tab}`}
+              aria-selected={isActive}
+              aria-controls={`friends-panel-${tab}`}
               onClick={() => setActiveTab(tab)}
               className={cn(
                 'flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all',
@@ -281,7 +285,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
+      <div role="tabpanel" id={`friends-panel-${activeTab}`} aria-labelledby={`friends-tab-${activeTab}`} className="min-h-[400px]">
         {activeTab === 'friends' && (
           <div className="space-y-4">
             {pendingChallenges.length > 0 && (

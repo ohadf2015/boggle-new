@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 4036,
+    "totalKeysInCode": 4060,
     "keyCountByLanguage": {
-      "en": 6617,
-      "he": 6558,
-      "sv": 6576,
-      "ja": 6654,
-      "es": 6667
+      "en": 6457,
+      "he": 6391,
+      "sv": 6409,
+      "ja": 6487,
+      "es": 6500
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 155,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 7,
@@ -159,9 +159,1698 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "results.accuracy",
+      "usages": [
+        {
+          "file": "components/results/CompactResultsStats.tsx",
+          "line": 161
+        },
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 249
+        },
+        {
+          "file": "components/results/MobileCompactStats.tsx",
+          "line": 73
+        },
+        {
+          "file": "components/results/PerformanceChartInner.tsx",
+          "line": 252
+        },
+        {
+          "file": "components/results/ResultsPlayerCard.tsx",
+          "line": 329
+        },
+        {
+          "file": "components/singleplayer/results/components/CelebrationHero.tsx",
+          "line": 218
+        }
+      ]
+    },
+    {
+      "key": "results.achievementsUnlocked",
+      "usages": [
+        {
+          "file": "components/results/RewardsSummary.tsx",
+          "line": 252
+        },
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 244
+        }
+      ]
+    },
+    {
+      "key": "results.achievementUnlocked",
+      "usages": [
+        {
+          "file": "components/results/RewardsSummary.tsx",
+          "line": 251
+        }
+      ]
+    },
+    {
+      "key": "results.aheadOf",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 381
+        }
+      ]
+    },
+    {
+      "key": "results.aiRejected",
+      "usages": [
+        {
+          "file": "components/results/WordChip.tsx",
+          "line": 186
+        }
+      ]
+    },
+    {
+      "key": "results.aiVerified",
+      "usages": [
+        {
+          "file": "components/results/WordChip.tsx",
+          "line": 280
+        }
+      ]
+    },
+    {
+      "key": "results.allPlayersReadyWaitingHost",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "results.allReadyHostCanStart",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 210
+        }
+      ]
+    },
+    {
+      "key": "results.appealed",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 366
+        }
+      ]
+    },
+    {
+      "key": "results.appealExplanation",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 390
+        }
+      ]
+    },
+    {
+      "key": "results.appealWord",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 363
+        },
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 369
+        }
+      ]
+    },
+    {
+      "key": "results.avg",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "key": "results.badges",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 320
+        },
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "key": "results.battleRankings",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 337
+        }
+      ]
+    },
+    {
+      "key": "results.best",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "key": "results.bestCombo",
+      "usages": [
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "key": "results.bestWord",
+      "usages": [
+        {
+          "file": "components/blast/BlastResults.tsx",
+          "line": 153
+        },
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 114
+        },
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 274
+        },
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 77
+        },
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 124
+        },
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "results.betterLuckNextTime",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 195
+        }
+      ]
+    },
+    {
+      "key": "results.bonuses",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "results.bronzeMedalist",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 217
+        }
+      ]
+    },
+    {
+      "key": "results.challengeFriends",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 439
+        }
+      ]
+    },
+    {
+      "key": "results.coinsEarned",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 292
+        },
+        {
+          "file": "components/singleplayer/results/components/CelebrationHero.tsx",
+          "line": 234
+        }
+      ]
+    },
+    {
+      "key": "results.comboBonus",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 141
+        },
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "key": "results.comparativeInsights.longestWord",
+      "usages": [
+        {
+          "file": "components/results/ComparativeInsights.tsx",
+          "line": 94
+        }
+      ]
+    },
+    {
+      "key": "results.comparativeInsights.scoreAbove",
+      "usages": [
+        {
+          "file": "components/results/ComparativeInsights.tsx",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "key": "results.comparativeInsights.scoreBelow",
+      "usages": [
+        {
+          "file": "components/results/ComparativeInsights.tsx",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "key": "results.comparativeInsights.title",
+      "usages": [
+        {
+          "file": "components/results/ComparativeInsights.tsx",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "key": "results.comparativeInsights.uniqueWords",
+      "usages": [
+        {
+          "file": "components/results/ComparativeInsights.tsx",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "key": "results.dailyPlayBonus",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 214
+        }
+      ]
+    },
+    {
+      "key": "results.defend.comingForYou",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "key": "results.defend.staySharp",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "results.defend.theyNeedAPlan",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "key": "results.defend.theyreStudying",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "key": "results.defend.thinIce",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "results.defend.untouchable",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 71
+        }
+      ]
+    },
+    {
+      "key": "results.defendTitle",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 325
+        }
+      ]
+    },
+    {
+      "key": "results.detailedAnalysis",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 346
+        }
+      ]
+    },
+    {
+      "key": "results.details",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 393
+        },
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 345
+        }
+      ]
+    },
+    {
+      "key": "results.duplicateRuleDisabled",
+      "usages": [
+        {
+          "file": "components/results/ResultsMainContent.tsx",
+          "line": 350
+        }
+      ]
+    },
+    {
+      "key": "results.eliminated",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 305
+        }
+      ]
+    },
+    {
+      "key": "results.everyoneReady",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "key": "results.exitRoom",
+      "usages": [
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 587
+        }
+      ]
+    },
+    {
+      "key": "results.exitWarning",
+      "usages": [
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 271
+        },
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 652
+        }
+      ]
+    },
+    {
+      "key": "results.finalScore",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 375
+        },
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 270
+        },
+        {
+          "file": "components/singleplayer/results/components/CelebrationHero.tsx",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "key": "results.finalScores",
+      "usages": [
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "key": "results.findingWouldHaveTied",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 294
+        }
+      ]
+    },
+    {
+      "key": "results.fireRoundBonus",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 150
+        },
+        {
+          "file": "components/results/WordChip.tsx",
+          "line": 258
+        },
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 135
+        }
+      ]
+    },
+    {
+      "key": "results.foundByYou",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 255
+        }
+      ]
+    },
+    {
+      "key": "results.foundWords",
+      "usages": [
+        {
+          "file": "components/results/ResultsDetailsContent.tsx",
+          "line": 166
+        }
+      ]
+    },
+    {
+      "key": "results.games",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "key": "results.greatBattle",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 348
+        }
+      ]
+    },
+    {
+      "key": "results.greatVictory",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 348
+        }
+      ]
+    },
+    {
+      "key": "results.guestSavePrompt",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 254
+        }
+      ]
+    },
+    {
+      "key": "results.imReady",
+      "usages": [
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 133
+        },
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 144
+        },
+        {
+          "file": "components/results/ResultsDetailsContent.tsx",
+          "line": 242
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 188
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 200
+        }
+      ]
+    },
+    {
+      "key": "results.invalid",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 343
+        }
+      ]
+    },
+    {
+      "key": "results.keepItUp",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "key": "results.largeRoomMode",
+      "usages": [
+        {
+          "file": "components/results/ResultsMainContent.tsx",
+          "line": 350
+        }
+      ]
+    },
+    {
+      "key": "results.leadChanges",
+      "usages": [
+        {
+          "file": "components/results/TurningPointCard.tsx",
+          "line": 132
+        }
+      ]
+    },
+    {
+      "key": "results.leaveRoom",
+      "usages": [
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 99
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 121
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 144
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 157
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 176
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 199
+        }
+      ]
+    },
+    {
+      "key": "results.levelUp",
+      "usages": [
+        {
+          "file": "shared/utils/xpUtils.ts",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "results.longest",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 104
+        },
+        {
+          "file": "components/results/ResultsPlayerCard.tsx",
+          "line": 321
+        }
+      ]
+    },
+    {
+      "key": "results.maxCombo",
+      "usages": [
+        {
+          "file": "components/blast/BlastResults.tsx",
+          "line": 163
+        }
+      ]
+    },
+    {
+      "key": "results.missedOnBoard",
+      "usages": [
+        {
+          "file": "components/results/MissedWords.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "results.noMissedWords",
+      "usages": [
+        {
+          "file": "components/results/MissedWords.tsx",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "results.noPoints",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 183
+        }
+      ]
+    },
+    {
+      "key": "results.noRewards",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 261
+        }
+      ]
+    },
+    {
+      "key": "results.of",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/hooks/useBannerConfig.ts",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "key": "results.otherPlayers",
+      "usages": [
+        {
+          "file": "components/results/ResultsDetailsContent.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "results.performanceDetails",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 358
+        },
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "key": "results.performanceHistory",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 360
+        },
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "results.personalBest",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 227
+        }
+      ]
+    },
+    {
+      "key": "results.personalTipLongWord",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 302
+        }
+      ]
+    },
+    {
+      "key": "results.personalTipShortWord",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 303
+        }
+      ]
+    },
+    {
+      "key": "results.playAgain",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 101
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 214
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "key": "results.players",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 340
+        }
+      ]
+    },
+    {
+      "key": "results.playersReady",
+      "usages": [
+        {
+          "file": "components/results/ResultsMainContent.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "results.points",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 196
+        },
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 274
+        },
+        {
+          "file": "components/results/MissedWords.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 435
+        },
+        {
+          "file": "components/results/WordChip.tsx",
+          "line": 260
+        },
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "key": "results.pointsBehind",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 393
+        },
+        {
+          "file": "components/results/RankHighlight.tsx",
+          "line": 120
+        },
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 277
+        }
+      ]
+    },
+    {
+      "key": "results.pointsFromFirst",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "key": "results.positionSwap",
+      "usages": [
+        {
+          "file": "components/results/ScoreRevealAnimation.tsx",
+          "line": 356
+        }
+      ]
+    },
+    {
+      "key": "results.rankings",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 239
+        }
+      ]
+    },
+    {
+      "key": "results.rarestAchievement",
+      "usages": [
+        {
+          "file": "components/results/ResultsDetailsContent.tsx",
+          "line": 222
+        }
+      ]
+    },
+    {
+      "key": "results.ready",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 131
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 169
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 230
+        }
+      ]
+    },
+    {
+      "key": "results.readyExplanation",
+      "usages": [
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 136
+        },
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 148
+        },
+        {
+          "file": "components/results/ResultsLandscapeLayout.tsx",
+          "line": 191
+        }
+      ]
+    },
+    {
+      "key": "results.results",
+      "usages": [
+        {
+          "file": "components/views/ResultsPage.tsx",
+          "line": 344
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.breathingDown",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.comebackArc",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.everyVillainNeedsOrigin",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.header",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 161
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.nextTimeItsPersonal",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.oneWordAway",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.runItBack",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.theyGotLucky",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.twoWordsFromGlory",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "key": "results.revenge.unfinishedBusiness",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "results.revengeRematch",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 129
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "key": "results.rewards",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 195
+        }
+      ]
+    },
+    {
+      "key": "results.rewardsEarned",
+      "usages": [
+        {
+          "file": "components/results/RewardsSummary.tsx",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "key": "results.risingContender",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 214
+        }
+      ]
+    },
+    {
+      "key": "results.scoringTip",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 298
+        }
+      ]
+    },
+    {
+      "key": "results.secondPlace",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 193
+        }
+      ]
+    },
+    {
+      "key": "results.series.gameCount",
+      "usages": [
+        {
+          "file": "components/results/SeriesStandingsBanner.tsx",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "key": "results.series.round",
+      "usages": [
+        {
+          "file": "components/results/SeriesStandingsBanner.tsx",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "key": "results.series.title",
+      "usages": [
+        {
+          "file": "components/results/SeriesStandingsBanner.tsx",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "key": "results.sessionStats.title",
+      "usages": [
+        {
+          "file": "components/results/SessionStatsCard.tsx",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "key": "results.share",
+      "usages": [
+        {
+          "file": "components/results/ShareButton.tsx",
+          "line": 33
+        },
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 298
+        },
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 301
+        }
+      ]
+    },
+    {
+      "key": "results.shared",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 263
+        }
+      ]
+    },
+    {
+      "key": "results.sharedWordsExplanation",
+      "usages": [
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 267
+        }
+      ]
+    },
+    {
+      "key": "results.shareNarrativeLoss",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 164
+        }
+      ]
+    },
+    {
+      "key": "results.shareNarrativeWin",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 160
+        }
+      ]
+    },
+    {
+      "key": "results.shareVictoryPrompt",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 285
+        }
+      ]
+    },
+    {
+      "key": "results.shareYourVictory",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 419
+        },
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 431
+        }
+      ]
+    },
+    {
+      "key": "results.showAllRankings",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 363
+        }
+      ]
+    },
+    {
+      "key": "results.silverMedalist",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 216
+        }
+      ]
+    },
+    {
+      "key": "results.skipReveal",
+      "usages": [
+        {
+          "file": "components/results/ScoreRevealAnimation.tsx",
+          "line": 370
+        }
+      ]
+    },
+    {
+      "key": "results.standings",
+      "usages": [
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 161
+        }
+      ]
+    },
+    {
+      "key": "results.streakOneMonth",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 258
+        }
+      ]
+    },
+    {
+      "key": "results.streakOneWeek",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 252
+        }
+      ]
+    },
+    {
+      "key": "results.streakTwoWeeks",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 255
+        }
+      ]
+    },
+    {
+      "key": "results.streakUrgency",
+      "usages": [
+        {
+          "file": "components/results/ResultsMainContent.tsx",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "key": "results.streakWeeks",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 262
+        }
+      ]
+    },
+    {
+      "key": "results.survived",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 334
+        }
+      ]
+    },
+    {
+      "key": "results.surviveLongerThan",
+      "usages": [
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "results.survivors",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 284
+        }
+      ]
+    },
+    {
+      "key": "results.targetWord",
+      "usages": [
+        {
+          "file": "components/results/PlacementHero.tsx",
+          "line": 241
+        }
+      ]
+    },
+    {
+      "key": "results.thirdPlace",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "key": "results.time",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeResults.tsx",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "key": "results.topPlayers",
+      "usages": [
+        {
+          "file": "components/results/Top3Leaderboard.tsx",
+          "line": 215
+        }
+      ]
+    },
+    {
+      "key": "results.turningPoint",
+      "usages": [
+        {
+          "file": "components/results/TurningPointCard.tsx",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "key": "results.turningPointOpponent",
+      "usages": [
+        {
+          "file": "components/results/TurningPointCard.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "results.turningPointYou",
+      "usages": [
+        {
+          "file": "components/results/TurningPointCard.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "results.ultimateChampion",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 214
+        },
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 219
+        }
+      ]
+    },
+    {
+      "key": "results.validWords",
+      "usages": [
+        {
+          "file": "components/results/ResultsPlayerCard.tsx",
+          "line": 313
+        },
+        {
+          "file": "components/results/WordPointsGroup.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "results.victory",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 370
+        }
+      ]
+    },
+    {
+      "key": "results.viewDetails",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 392
+        }
+      ]
+    },
+    {
+      "key": "results.viewXpBreakdown",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 357
+        }
+      ]
+    },
+    {
+      "key": "results.waiting",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "results.waitingForHost",
+      "usages": [
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "results.waitingForHostToStart",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "key": "results.waitingForPlayers",
+      "usages": [
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 104
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "key": "results.wellPlayed",
+      "usages": [
+        {
+          "file": "components/results/ShareWinPrompt.tsx",
+          "line": 371
+        }
+      ]
+    },
+    {
+      "key": "results.winner",
+      "usages": [
+        {
+          "file": "components/results/PerformanceChartInner.tsx",
+          "line": 257
+        }
+      ]
+    },
+    {
+      "key": "results.winnerAnnouncement",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 215
+        }
+      ]
+    },
+    {
+      "key": "results.winStreak",
+      "usages": [
+        {
+          "file": "components/results/MobileCompactRewards.tsx",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "key": "results.wordLengths",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 228
+        }
+      ]
+    },
+    {
+      "key": "results.words",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawerContent.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/results/CompactResultsStats.tsx",
+          "line": 142
+        },
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 238
+        },
+        {
+          "file": "components/results/MobileCompactStats.tsx",
+          "line": 60
+        },
+        {
+          "file": "components/results/PerformanceChartInner.tsx",
+          "line": 248
+        },
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 65
+        },
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 284
+        },
+        {
+          "file": "components/singleplayer/results/components/CelebrationHero.tsx",
+          "line": 203
+        }
+      ]
+    },
+    {
+      "key": "results.wordsFound",
+      "usages": [
+        {
+          "file": "components/game/MobileGameDrawer.tsx",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "key": "results.xp",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 358
+        }
+      ]
+    },
+    {
+      "key": "results.you",
+      "usages": [
+        {
+          "file": "components/results/FightCardLeaderboard.tsx",
+          "line": 210
+        },
+        {
+          "file": "components/results/MobileCompactLeaderboard.tsx",
+          "line": 150
+        },
+        {
+          "file": "components/results/PlayersReadyIndicator.tsx",
+          "line": 131
+        },
+        {
+          "file": "components/results/ResultsRevengeSection.tsx",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "key": "results.youAreReady",
+      "usages": [
+        {
+          "file": "components/results/ResultsCtaSection.tsx",
+          "line": 108
+        },
+        {
+          "file": "components/results/StickyReadyBar.tsx",
+          "line": 177
+        }
+      ]
+    },
+    {
+      "key": "results.yourPerformance",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 138
+        },
+        {
+          "file": "components/singleplayer/results/components/ResultsInfoCards.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "results.yourPlace",
+      "usages": [
+        {
+          "file": "components/results/ConsolidatedPlayerCard.tsx",
+          "line": 177
+        },
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "key": "results.yourPlaceSimple",
+      "usages": [
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 223
+        }
+      ]
+    },
+    {
+      "key": "results.yourWords",
+      "usages": [
+        {
+          "file": "components/results/ResultsWordsSection.tsx",
+          "line": 119
+        },
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 236
+        },
+        {
+          "file": "components/singleplayer/SinglePlayerResults.tsx",
+          "line": 355
+        },
+        {
+          "file": "components/singleplayer/results/components/MobileDetailsTab.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "results.youWon",
+      "usages": [
+        {
+          "file": "components/results/ResultsPlayerCard.tsx",
+          "line": 197
+        },
+        {
+          "file": "components/results/ResultsWinnerBanner.tsx",
+          "line": 192
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
+      "hostView.addFriend",
+      "hostView.requestSent",
+      "friends.acceptRequest",
+      "friends.declineRequest",
+      "friends.sendGift",
       "education.practice.submit",
       "education.practice.swipeExplain",
       "education.practice.swipeHint",
@@ -236,9 +1925,16 @@
       "education.xp.nextLevel",
       "education.xp.streak",
       "education.xp.totalXp",
-      "education.xp.xpGained"
+      "education.xp.xpGained",
+      "notifications.bell",
+      "notifications.bellUnread"
     ],
     "sv": [
+      "hostView.addFriend",
+      "hostView.requestSent",
+      "friends.acceptRequest",
+      "friends.declineRequest",
+      "friends.sendGift",
       "education.practice.submit",
       "education.practice.swipeExplain",
       "education.practice.swipeHint",
@@ -313,10 +2009,28 @@
       "education.xp.nextLevel",
       "education.xp.streak",
       "education.xp.totalXp",
-      "education.xp.xpGained"
+      "education.xp.xpGained",
+      "notifications.bell",
+      "notifications.bellUnread"
     ],
-    "ja": [],
-    "es": []
+    "ja": [
+      "hostView.addFriend",
+      "hostView.requestSent",
+      "friends.acceptRequest",
+      "friends.declineRequest",
+      "friends.sendGift",
+      "notifications.bell",
+      "notifications.bellUnread"
+    ],
+    "es": [
+      "hostView.addFriend",
+      "hostView.requestSent",
+      "friends.acceptRequest",
+      "friends.declineRequest",
+      "friends.sendGift",
+      "notifications.bell",
+      "notifications.bellUnread"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

@@ -78,7 +78,7 @@ export function SeedWordTags({
       <div
         className={cn(
           'flex flex-wrap gap-2 items-center',
-          'border-neo border-black bg-neo-navy rounded-neo px-3 py-2 min-h-[48px]',
+          'border-neo border-neo-white/30 bg-neo-navy-light/30 rounded-neo px-3 py-2 min-h-[48px]',
           'focus-within:ring-2 focus-within:ring-neo-cyan',
           disabled && 'opacity-50 pointer-events-none'
         )}

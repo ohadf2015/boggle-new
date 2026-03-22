@@ -88,10 +88,11 @@ export async function getMessages(
       return { messages: [], hasMore: false, oldestTimestamp: 0 };
     }
 
+    // Filter out messages deleted by the requesting user (F-20)
     let query = supabase
       .from('friend_messages')
       .select('*')
-      .or(`and(sender_id.eq.${userId},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${userId})`)
+      .or(`and(sender_id.eq.${userId},recipient_id.eq.${friendId},deleted_for_sender.eq.false),and(sender_id.eq.${friendId},recipient_id.eq.${userId},deleted_for_recipient.eq.false)`)
       .order('created_at', { ascending: false })
       .limit(limit + 1);
 

@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSocketOptional } from '@/utils/SocketContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Message, MessageThread, Challenge } from '@/shared/types/friends';
 import * as friendMessages from '@/utils/friendMessages';
 import logger from '@/utils/logger';
@@ -25,6 +26,9 @@ interface UseFriendMessagesReturn {
   refreshThreads: () => Promise<void>;
   setTyping: (recipientId: string, isTyping: boolean) => void;
 
+  // Typing
+  typingUsername: string | null;
+
   // Challenges
   sendChallenge: (friendId: string, type: 'new_game' | 'join_room', roomCode?: string) => Promise<void>;
   acceptChallenge: (challengeId: string) => Promise<string | null>;
@@ -33,6 +37,7 @@ interface UseFriendMessagesReturn {
 }
 
 export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
+  const { user } = useAuth();
   const socketContext = useSocketOptional();
   const socket = socketContext?.socket ?? null;
   const isConnected = socketContext?.isConnected ?? false;
@@ -45,6 +50,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     sent: [],
     received: [],
   });
+  const [typingUsername, setTypingUsername] = useState<string | null>(null);
 
   const threadsIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const messagesIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -108,10 +114,13 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     if (!text.trim()) return;
 
     const now = Date.now();
+    const currentUserId = user?.id ?? '';
     const tempMessage: Message = {
       messageId: tempId || `temp-${now}`,
-      conversationId: '', // Will be set by server
-      fromUserId: '', // Will be set by server
+      conversationId: currentUserId && recipientId
+        ? [currentUserId, recipientId].sort().join('_')
+        : '',
+      fromUserId: currentUserId, // Use real user ID so bubble renders on correct side (F-9)
       toUserId: recipientId,
       message: text.trim(),
       timestamp: now,
@@ -158,7 +167,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
       setMessages((prev) => prev.filter((msg) => msg.messageId !== tempMessage.messageId));
       setError('Failed to send message');
     }
-  }, [socket, isConnected, refreshThreads]);
+  }, [socket, isConnected, refreshThreads, user?.id]);
 
   /**
    * Mark messages as read
@@ -363,11 +372,23 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
       }));
     };
 
+    // Typing indicator (F-13 — was dead code because this listener was never registered)
+    const handleTyping = (data: { userId: string; username: string; isTyping: boolean }) => {
+      if (friendId && data.userId === friendId) {
+        setTypingUsername(data.isTyping ? data.username : null);
+        // Auto-clear after 4s in case stop-typing event is missed
+        if (data.isTyping) {
+          setTimeout(() => setTypingUsername(null), 4000);
+        }
+      }
+    };
+
     socket.on('friends:messageReceived', handleMessageReceived);
     socket.on('friends:messageSent', handleMessageSent);
     socket.on('friends:messagesRead', handleMessagesRead);
     socket.on('friends:challengeReceived', handleChallengeReceived);
     socket.on('friends:challengeAccepted', handleChallengeAccepted);
+    socket.on('friends:userTyping', handleTyping);
 
     return () => {
       socket.off('friends:messageReceived', handleMessageReceived);
@@ -375,6 +396,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
       socket.off('friends:messagesRead', handleMessagesRead);
       socket.off('friends:challengeReceived', handleChallengeReceived);
       socket.off('friends:challengeAccepted', handleChallengeAccepted);
+      socket.off('friends:userTyping', handleTyping);
     };
   }, [socket, friendId, refreshThreads]);
 
@@ -459,6 +481,7 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
     deleteMessage,
     refreshThreads,
     setTyping,
+    typingUsername,
     sendChallenge,
     acceptChallenge,
     declineChallenge,
