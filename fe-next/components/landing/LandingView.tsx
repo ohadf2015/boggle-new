@@ -74,7 +74,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile } = useAuth();
+  const { isAuthenticated, isAdmin, profile, user } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
@@ -266,16 +266,21 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
           {hydrated && <WotdTeaser />}
         </div>
-        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '6rem' }}>
-          {hydrated && <DailyMissionsHub />}
-        </div>
-        {hydrated && <WordCollectionCard />}
-        {hydrated && <GhostRivalWidget />}
-        {hydrated && <VaultCardConnected />}
-        {hydrated && <UnfinishedBoardCardConnected />}
-        {hydrated && <WordPactCard />}
-        {hydrated && <WeeklyQuestCard />}
-        {hydrated && <FriendsActivityFeed />}
+        {/* Retention features — gated to test account only */}
+        {hydrated && user?.email === 'ohadf2015@gmail.com' && (
+          <>
+            <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '6rem' }}>
+              <DailyMissionsHub />
+            </div>
+            <WordCollectionCard />
+            <GhostRivalWidget />
+            <VaultCardConnected />
+            <UnfinishedBoardCardConnected />
+            <WordPactCard />
+            <WeeklyQuestCard />
+            <FriendsActivityFeed />
+          </>
+        )}
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards

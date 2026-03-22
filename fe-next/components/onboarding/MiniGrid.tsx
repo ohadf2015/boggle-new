@@ -86,12 +86,28 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return () => timers.forEach(clearTimeout);
   }, [autoTrace, demoPath, letters, onAutoTraceComplete]);
 
+  // Reset state when the target word changes (new word to trace)
+  useEffect(() => {
+    setSelected([]);
+    setShowSuccess(false);
+    setShowStartHint(false);
+    setCellFlash(null);
+    if (successTimer.current) {
+      clearTimeout(successTimer.current);
+      successTimer.current = null;
+    }
+    if (autoFillTimer.current) {
+      clearTimeout(autoFillTimer.current);
+      autoFillTimer.current = null;
+    }
+  }, [demoWord]);
+
   // Show "start here" hint after a delay
   useEffect(() => {
     if (!showHints || autoTrace) return undefined;
     const timer = setTimeout(() => setShowStartHint(true), 2000);
     return () => clearTimeout(timer);
-  }, [showHints, autoTrace]);
+  }, [showHints, autoTrace, demoWord]);
 
   // Cleanup timers
   useEffect(() => {
