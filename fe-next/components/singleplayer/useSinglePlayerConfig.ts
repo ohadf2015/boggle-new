@@ -8,6 +8,7 @@ import {
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { useAuth } from '@/contexts/AuthContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -80,6 +81,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const { language: uiLanguage } = useLanguage();
   const { unlockAudio } = useMusic();
   const router = useRouter();
+  const { isAuthenticated, profile } = useAuth();
 
   const returnTo = searchParams?.get('returnTo') || null;
   const autoStart = searchParams?.get('autoStart') || null;
@@ -93,6 +95,17 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     const isNewPlayer = shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
     return isNewPlayer ? 'pre-game' : 'playing';
   });
+
+  // Skip pre-game tutorial for authenticated returning players
+  const hasSkippedForReturningRef = useRef(false);
+  useEffect(() => {
+    if (hasSkippedForReturningRef.current) return;
+    if (phase === 'pre-game' && isAuthenticated && profile?.total_games && profile.total_games > 0) {
+      hasSkippedForReturningRef.current = true;
+      markGuidanceShown('firstPlayTutorialCompleted');
+      setPhase('playing');
+    }
+  }, [phase, isAuthenticated, profile]);
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',

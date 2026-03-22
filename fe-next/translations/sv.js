@@ -1403,6 +1403,7 @@ const sv = {
     },
     "ftue": {
       "swipeToConnect": "Svep för att koppla bokstäver!",
+      "findMultipleWords": "Hitta 3 ord! Svep över bokstäver för att stava.",
       "wordsFound": "{{count}}/3 ord hittade",
       "amazing": "FANTASTISKT!",
       "keepGoing": "KOMBO!",

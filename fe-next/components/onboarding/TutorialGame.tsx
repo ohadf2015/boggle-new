@@ -88,10 +88,10 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         <Mascot variant="encouraging" size="sm" />
         <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard-sm relative max-w-xs">
           <span className="font-bold text-neo-black text-sm">
-            {t('onboarding.ftue.swipeToConnect')}
+            {t('onboarding.ftue.findMultipleWords')}
           </span>
-          {/* Speech bubble arrow */}
-          <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-3 h-3 bg-neo-cream border-l-3 border-b-3 border-neo-black rotate-45" />
+          {/* Speech bubble arrow — RTL-aware */}
+          <div className="absolute ltr:-left-2 rtl:-right-2 top-1/2 -translate-y-1/2 w-3 h-3 bg-neo-cream ltr:border-l-3 ltr:border-b-3 rtl:border-r-3 rtl:border-b-3 border-neo-black ltr:rotate-45 rtl:-rotate-45" />
         </div>
       </motion.div>
 
@@ -130,7 +130,8 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="mt-4 flex gap-2 flex-wrap justify-center"
+          className="mt-4 flex gap-3 flex-wrap justify-center"
+          dir={language === 'he' ? 'rtl' : 'ltr'}
         >
           {wordsFound.map((word) => (
             <motion.span
@@ -138,7 +139,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="bg-neo-lime border-2 border-neo-black rounded-neo px-3 py-1 font-bold text-neo-black text-sm shadow-hard-sm"
+              className="bg-neo-lime border-3 border-neo-black rounded-neo px-4 py-1.5 font-black text-neo-black text-base shadow-hard-sm"
             >
               {word}
             </motion.span>

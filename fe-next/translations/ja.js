@@ -1403,6 +1403,7 @@ const ja = {
     },
     "ftue": {
       "swipeToConnect": "スワイプで文字をつなげよう！",
+      "findMultipleWords": "3つの単語を見つけよう！文字をスワイプしてスペル！",
       "wordsFound": "{{count}}/3 単語発見",
       "amazing": "すごい！",
       "keepGoing": "コンボ！",

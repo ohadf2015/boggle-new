@@ -1506,6 +1506,7 @@ const en = {
     },
     "ftue": {
       "swipeToConnect": "Swipe to connect letters!",
+      "findMultipleWords": "Find 3 words! Swipe across letters to spell them.",
       "wordsFound": "{{count}}/3 words found",
       "amazing": "AMAZING!",
       "keepGoing": "COMBO!",

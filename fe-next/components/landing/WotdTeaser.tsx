@@ -22,13 +22,18 @@ interface WotdTeaserProps {
  * Links to the daily challenge to play.
  */
 export function WotdTeaser({ className }: WotdTeaserProps) {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { word, loading } = useWordOfTheDay(language);
+  const isRTL = dir === 'rtl';
 
   if (loading || !word) return null;
 
-  const firstLetter = word.charAt(0).toUpperCase();
-  const maskedRest = word.slice(1).replace(/./g, '_');
+  // For RTL languages, show the LAST letter (rightmost = first visually)
+  const revealLetter = isRTL
+    ? word.charAt(word.length - 1)
+    : word.charAt(0).toUpperCase();
+  const maskedCount = word.length - 1;
+  const maskedChars = '_ '.repeat(maskedCount).trim();
 
   return (
     <Link
@@ -51,19 +56,38 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
             {t('wotd.teaser')}
           </p>
 
-          <div className="flex items-center gap-1">
-            <span
-              data-testid="wotd-first-letter"
-              className="text-lg font-neo-display font-bold text-neo-white"
-            >
-              {firstLetter}
-            </span>
-            <span
-              data-testid="wotd-masked"
-              className="text-lg font-mono text-white/30 tracking-[0.25em] blur-[1px]"
-            >
-              {maskedRest}
-            </span>
+          <div className="flex items-center gap-1.5" dir={dir}>
+            {isRTL ? (
+              <>
+                <span
+                  data-testid="wotd-masked"
+                  className="text-lg font-neo-display text-white/30 tracking-[0.3em]"
+                >
+                  {maskedChars}
+                </span>
+                <span
+                  data-testid="wotd-first-letter"
+                  className="text-xl font-neo-display font-bold text-neo-white"
+                >
+                  {revealLetter}
+                </span>
+              </>
+            ) : (
+              <>
+                <span
+                  data-testid="wotd-first-letter"
+                  className="text-xl font-neo-display font-bold text-neo-white"
+                >
+                  {revealLetter}
+                </span>
+                <span
+                  data-testid="wotd-masked"
+                  className="text-lg font-mono text-white/30 tracking-[0.3em]"
+                >
+                  {maskedChars}
+                </span>
+              </>
+            )}
           </div>
         </div>
 

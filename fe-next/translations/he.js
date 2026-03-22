@@ -1420,6 +1420,7 @@ const he = {
     },
     "ftue": {
       "swipeToConnect": "החליקו לחיבור אותיות!",
+      "findMultipleWords": "מצאו 3 מילים! החליקו על אותיות כדי לאיית.",
       "wordsFound": "{{count}}/3 מילים נמצאו",
       "amazing": "מדהים!",
       "keepGoing": "קומבו!",

@@ -65,6 +65,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
     t: (key: string, fallback?: any) => {
       const translations: Record<string, string> = {
         'onboarding.ftue.swipeToConnect': 'Swipe to connect letters!',
+        'onboarding.ftue.findMultipleWords': 'Find 3 words! Swipe across letters to spell them.',
         'onboarding.ftue.wordsFound': '{{count}}/3 words found',
         'onboarding.ftue.amazing': 'AMAZING!',
         'onboarding.ftue.keepGoing': 'Keep going!',
@@ -115,9 +116,9 @@ describe('TutorialGame', () => {
     expect(grid).toHaveAttribute('data-size', '4');
   });
 
-  it('shows mascot speech bubble with swipe instruction', () => {
+  it('shows mascot speech bubble with find-multiple-words instruction', () => {
     render(<TutorialGame {...defaultProps} />);
-    expect(screen.getByText('Swipe to connect letters!')).toBeInTheDocument();
+    expect(screen.getByText('Find 3 words! Swipe across letters to spell them.')).toBeInTheDocument();
   });
 
   it('displays word counter showing 0/3', () => {

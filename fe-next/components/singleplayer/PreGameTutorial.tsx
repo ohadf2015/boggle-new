@@ -153,7 +153,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ delay: 0.4, duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-widest" dir="ltr">
+                  <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-widest" dir={isRTL ? 'rtl' : 'ltr'}>
                     {demoConfig.word}
                   </span>
                 </motion.div>

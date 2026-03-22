@@ -62,7 +62,7 @@ describe('WotdTeaser', () => {
 
     expect(screen.getByTestId('wotd-teaser')).toBeInTheDocument();
     expect(screen.getByTestId('wotd-first-letter')).toHaveTextContent('C');
-    expect(screen.getByTestId('wotd-masked')).toHaveTextContent('______');
+    expect(screen.getByTestId('wotd-masked')).toHaveTextContent('_ _ _ _ _ _');
   });
 
   it('should link to /daily', () => {
@@ -102,5 +102,23 @@ describe('WotdTeaser', () => {
 
     expect(screen.getByTestId('wotd-first-letter')).toHaveTextContent('H');
     expect(screen.getByTestId('wotd-masked')).toHaveTextContent('_');
+  });
+
+  it('should show last letter for RTL languages', () => {
+    // Override useLanguage to return RTL
+    jest.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
+      t: mockT, language: 'he', dir: 'rtl',
+    });
+    mockUseWordOfTheDay.mockReturnValue({
+      word: 'שמש', loading: false,
+      stats: { foundCount: 0, totalPlayers: 0, foundPercent: 0 },
+      playerFound: false, error: null,
+    });
+
+    render(<WotdTeaser />);
+
+    // RTL: reveals the last letter (visually first in RTL)
+    expect(screen.getByTestId('wotd-first-letter')).toHaveTextContent('ש');
+    expect(screen.getByTestId('wotd-masked')).toHaveTextContent('_ _');
   });
 });
