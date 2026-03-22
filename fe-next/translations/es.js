@@ -3234,6 +3234,24 @@ const es = {
       "daily": "Desafío diario",
       "multiplayer": "Multijugador",
       "adventure": "Aventura"
+    },
+    "ftue": {
+      "swipeToConnect": "¡Desliza para conectar letras!",
+      "wordsFound": "{{count}}/3 palabras encontradas",
+      "amazing": "¡INCREÍBLE!",
+      "keepGoing": "¡COMBO!",
+      "niceWork": "¡Buen trabajo!",
+      "whatsYourName": "¿Cómo te llamamos?",
+      "randomize": "Avatar aleatorio",
+      "yourScore": "Conseguiste {{score}} puntos",
+      "averageScore": "El promedio de hoy es {{average}}",
+      "tryAgain": "¿Intentar de nuevo?",
+      "continue": "Continuar",
+      "dailyChallenge": "Desafío Diario",
+      "practiceMode": "Modo Práctica",
+      "moreModesUnlock": "¡Más modos se desbloquean mientras juegas!",
+      "skip": "Omitir",
+      "letsGo": "¡Vamos!"
     }
   },
   "preGameTutorial": {

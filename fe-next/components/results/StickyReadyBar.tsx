@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Swords, Star, Check, Users } from 'lucide-react';
+import AutoPlayCountdown from './AutoPlayCountdown';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
@@ -62,6 +63,10 @@ export default function StickyReadyBar({
 
   const isRevenge = currentPlayerRank > 1 && !!winnerUsername;
   const allReady = readyCount === totalPlayers && totalPlayers > 0;
+
+  // Auto-advance: show countdown when all players are ready (host only)
+  const [autoAdvanceCancelled, setAutoAdvanceCancelled] = useState(false);
+  const showAutoAdvance = isHost && allReady && !autoAdvanceCancelled;
 
   // Map usernames to player info for avatar lookup
   const playerMap = useMemo(() => {
@@ -147,16 +152,24 @@ export default function StickyReadyBar({
               compact
             />
           )}
-          <motion.button
-            onClick={onStartGame}
-            whileTap={{ scale: 0.92 }}
-            animate={!reducedMotion ? breathingPulse : undefined}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-full bg-emerald-500 text-white font-black text-base px-4 py-3 min-h-[44px] uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
-          >
-            <Play className="w-5 h-5" />
-            {t('results.playAgain')}
-          </motion.button>
+          {showAutoAdvance ? (
+            <AutoPlayCountdown
+              duration={5}
+              onComplete={onStartGame}
+              onCancel={() => setAutoAdvanceCancelled(true)}
+            />
+          ) : (
+            <motion.button
+              onClick={onStartGame}
+              whileTap={{ scale: 0.92 }}
+              animate={!reducedMotion ? breathingPulse : undefined}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-full bg-emerald-500 text-white font-black text-base px-4 py-3 min-h-[44px] uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
+            >
+              <Play className="w-5 h-5" />
+              {t('results.playAgain')}
+            </motion.button>
+          )}
         </div>
       ) : isCurrentPlayerReady ? (
         <div className="flex items-center justify-center gap-2 py-2">

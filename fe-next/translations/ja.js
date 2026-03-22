@@ -1399,6 +1399,24 @@ const ja = {
       "daily": "デイリーチャレンジ",
       "multiplayer": "マルチプレイヤー",
       "adventure": "アドベンチャー"
+    },
+    "ftue": {
+      "swipeToConnect": "スワイプで文字をつなげよう！",
+      "wordsFound": "{{count}}/3 単語発見",
+      "amazing": "すごい！",
+      "keepGoing": "コンボ！",
+      "niceWork": "いいね！",
+      "whatsYourName": "あなたのニックネームは？",
+      "randomize": "アバターをランダムに",
+      "yourScore": "{{score}}点獲得",
+      "averageScore": "今日の平均は{{average}}点",
+      "tryAgain": "もう一回？",
+      "continue": "続ける",
+      "dailyChallenge": "デイリーチャレンジ",
+      "practiceMode": "練習モード",
+      "moreModesUnlock": "プレイするほど新しいモードが解放！",
+      "skip": "スキップ",
+      "letsGo": "レッツゴー！"
     }
   },
   "preGameTutorial": {

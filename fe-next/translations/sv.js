@@ -1399,6 +1399,24 @@ const sv = {
       "daily": "Daglig utmaning",
       "multiplayer": "Multiplayer",
       "adventure": "Äventyr"
+    },
+    "ftue": {
+      "swipeToConnect": "Svep för att koppla bokstäver!",
+      "wordsFound": "{{count}}/3 ord hittade",
+      "amazing": "FANTASTISKT!",
+      "keepGoing": "KOMBO!",
+      "niceWork": "Snyggt jobbat!",
+      "whatsYourName": "Vad ska vi kalla dig?",
+      "randomize": "Slumpmässig avatar",
+      "yourScore": "Du fick {{score}} poäng",
+      "averageScore": "Dagens snitt är {{average}}",
+      "tryAgain": "Försöka igen?",
+      "continue": "Fortsätt",
+      "dailyChallenge": "Daglig Utmaning",
+      "practiceMode": "Träningsläge",
+      "moreModesUnlock": "Fler lägen låses upp när du spelar!",
+      "skip": "Hoppa över",
+      "letsGo": "Kör igång!"
     }
   },
   "preGameTutorial": {

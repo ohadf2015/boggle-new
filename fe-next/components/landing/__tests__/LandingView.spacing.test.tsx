@@ -68,6 +68,11 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
+jest.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: () => true,
+  markOnboardingSkipped: jest.fn(),
+}));
+
 // Mock components that are lazy loaded
 jest.mock('@/components/daily/DailyChallengeBanner', () => {
   return function MockDailyChallengeBanner() {

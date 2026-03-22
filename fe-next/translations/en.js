@@ -1502,6 +1502,24 @@ const en = {
       "daily": "Daily Challenge",
       "multiplayer": "Multiplayer",
       "adventure": "Adventure"
+    },
+    "ftue": {
+      "swipeToConnect": "Swipe to connect letters!",
+      "wordsFound": "{{count}}/3 words found",
+      "amazing": "AMAZING!",
+      "keepGoing": "COMBO!",
+      "niceWork": "Nice work!",
+      "whatsYourName": "What should we call you?",
+      "randomize": "Randomize avatar",
+      "yourScore": "You scored {{score}}",
+      "averageScore": "Today's average is {{average}}",
+      "tryAgain": "Try again?",
+      "continue": "Continue",
+      "dailyChallenge": "Daily Challenge",
+      "practiceMode": "Practice Mode",
+      "moreModesUnlock": "More modes unlock as you play!",
+      "skip": "Skip",
+      "letsGo": "Let's go!"
     }
   },
   "preGameTutorial": {

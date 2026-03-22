@@ -1416,6 +1416,24 @@ const he = {
       "daily": "אתגר יומי",
       "multiplayer": "מרובה משתתפים",
       "adventure": "הרפתקה"
+    },
+    "ftue": {
+      "swipeToConnect": "החליקו לחיבור אותיות!",
+      "wordsFound": "{{count}}/3 מילים נמצאו",
+      "amazing": "מדהים!",
+      "keepGoing": "קומבו!",
+      "niceWork": "כל הכבוד!",
+      "whatsYourName": "איך לקרוא לך?",
+      "randomize": "אווטאר אקראי",
+      "yourScore": "השגת {{score}} נקודות",
+      "averageScore": "הממוצע היום הוא {{average}}",
+      "tryAgain": "לנסות שוב?",
+      "continue": "המשך",
+      "dailyChallenge": "אתגר יומי",
+      "practiceMode": "מצב תרגול",
+      "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
+      "skip": "דלג",
+      "letsGo": "יאללה!"
     }
   },
 

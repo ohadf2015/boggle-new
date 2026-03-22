@@ -80,3 +80,11 @@ export const markOnboardingSkipped = (): void => {
   saveToLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED, 'skipped');
   // Don't save data since user skipped
 };
+
+/**
+ * Check if this is a first-time user who should see the FTUE flow.
+ * Returns true only if onboarding was never completed AND never skipped.
+ */
+export const isFirstTimeUser = (): boolean => {
+  return !hasCompletedOnboarding();
+};

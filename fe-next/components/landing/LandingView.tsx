@@ -33,6 +33,8 @@ const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser),
 const DailyMissionsHub = dynamic(() => import('./DailyMissionsHub').then(m => m.DailyMissionsHub), { ssr: false });
 const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
 const WordCollectionCard = dynamic(() => import('@/components/vocabulary/WordCollectionCard').then(m => m.WordCollectionCard), { ssr: false });
+const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
+const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
 const WordPactCard = dynamic(() => import('@/components/engagement/WordPactCard').then(m => m.WordPactCard), { ssr: false });
 const WeeklyQuestCard = dynamic(() => import('@/components/engagement/WeeklyQuestCard').then(m => m.WeeklyQuestCard), { ssr: false });
@@ -57,6 +59,7 @@ const ShareReferralModal = dynamic(
   { ssr: false }
 );
 const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), { ssr: false });
+const OnboardingFlow = dynamic(() => import('@/components/onboarding/OnboardingFlow'), { ssr: false });
 const PlayfulBackground = dynamic(
   () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
   { ssr: false }
@@ -117,9 +120,19 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFTUE, setShowFTUE] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [, setIsAvatarBuilderOpen] = useState(false);
+
+  // Check if user is a first-timer who should see the FTUE flow
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const { hasCompletedOnboarding } = require('@/utils/onboardingStorage');
+    if (!hasCompletedOnboarding()) {
+      setShowFTUE(true);
+    }
+  }, []);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {
@@ -157,6 +170,11 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     puzzleNumber: dailyChallengeStatus.puzzleNumber,
     loading: dailyChallengeStatus.loading,
   };
+
+  // FTUE: Full-screen onboarding for first-time users
+  if (showFTUE) {
+    return <OnboardingFlow onComplete={() => setShowFTUE(false)} />;
+  }
 
   // Mobile landscape uses the compact card layout
   if (isLandscape && !isDesktopWidth) {
@@ -253,6 +271,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         </div>
         {hydrated && <WordCollectionCard />}
         {hydrated && <GhostRivalWidget />}
+        {hydrated && <VaultCardConnected />}
+        {hydrated && <UnfinishedBoardCardConnected />}
         {hydrated && <WordPactCard />}
         {hydrated && <WeeklyQuestCard />}
         {hydrated && <FriendsActivityFeed />}
