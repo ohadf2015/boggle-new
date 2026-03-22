@@ -8328,9 +8328,13 @@ const he = {
   "lostByForfeit": "הפסד בפרישה",
   "realtimeDuel": "דו-קרב בזמן אמת",
   "duelComplete": "הדו-קרב הסתיים!",
+  "education": {
+    "reviewDue": "{count} מילים לחזרה"
+  },
   "duels": {
     "addWord": "הוסף מילה",
     "backToLobby": "חזרה ללובי",
+    "rematch": "ריוואנש!",
     "challengeClassmate": "אתגר חבר לכיתה! 🎯",
     "draw": "תיקו!",
     "draws": "תיקו",

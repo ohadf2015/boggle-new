@@ -15,6 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/education/duels';
@@ -40,7 +41,8 @@ export interface DuelLobbyProps {
 // ============================================
 
 export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobbyProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
   const {
     joinLobby,
     leaveLobby,
@@ -112,8 +114,10 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
       acceptChallenge(duelId);
       // Remove from local pending list
       setPendingChallenges((prev) => prev.filter((c) => c.id !== duelId));
+      // U3 fix: Navigate to the duel game page after accepting
+      router.push(`/${language}/education/duels/${duelId}`);
     },
-    [acceptChallenge]
+    [acceptChallenge, router, language]
   );
 
   // Handle decline challenge

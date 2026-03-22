@@ -8267,9 +8267,13 @@ const sv = {
   "system": {
     "updatingToNewVersion": "Uppdaterar till ny version..."
   },
+  "education": {
+    "reviewDue": "{count} ord att repetera"
+  },
   "duels": {
     "addWord": "Lägg till ord",
     "backToLobby": "Tillbaka till lobbyn",
+    "rematch": "Återmatch!",
     "challengeClassmate": "Utmana en klasskompis!",
     "draw": "Oavgjort!",
     "draws": "Oavgjorda",

@@ -8300,9 +8300,13 @@ const ja = {
   "duelNotFound": "デュエルが見つかりません",
   "duelsTitle": "デュエル",
   "notParticipant": "このデュエルの参加者ではありません",
+  "education": {
+    "reviewDue": "復習する単語が{count}個あります"
+  },
   "duels": {
     "addWord": "単語を追加",
     "backToLobby": "ロビーに戻る",
+    "rematch": "リマッチ！",
     "challengeClassmate": "クラスメイトに挑戦！",
     "draw": "引き分け！",
     "draws": "引き分け",

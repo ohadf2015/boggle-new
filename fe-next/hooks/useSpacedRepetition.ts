@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   createWordReviewData,
   calculateNextReview,
@@ -57,11 +57,58 @@ function computeWordsForToday(schedule: Record<string, WordReviewData>): string[
 }
 
 /**
+ * Merge DB reviews into a local schedule. DB wins on conflict when
+ * its lastReviewDate is newer than the local copy.
+ */
+function mergeDbIntoLocal(
+  local: Record<string, WordReviewData>,
+  dbReviews: WordReviewData[]
+): Record<string, WordReviewData> {
+  const merged = { ...local };
+  for (const dbEntry of dbReviews) {
+    const localEntry = merged[dbEntry.word];
+    if (!localEntry || dbEntry.lastReviewDate > localEntry.lastReviewDate) {
+      merged[dbEntry.word] = dbEntry;
+    }
+  }
+  return merged;
+}
+
+/**
+ * Fetch review schedule from the API. Returns empty array on failure.
+ */
+async function fetchDbSchedule(lessonId: string): Promise<WordReviewData[]> {
+  try {
+    const res = await fetch(`/api/education/spaced-repetition?lessonId=${encodeURIComponent(lessonId)}`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.reviews ?? []) as WordReviewData[];
+  } catch (err) {
+    logger.error('useSpacedRepetition: failed to fetch from DB', err);
+    return [];
+  }
+}
+
+/**
+ * Background PATCH a single review to the DB. Fire-and-forget.
+ */
+function syncReviewToDb(lessonId: string, word: string, quality: number): void {
+  fetch('/api/education/spaced-repetition', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ lessonId, word, quality }),
+  }).catch(err => {
+    logger.error('useSpacedRepetition: failed to sync review to DB', err);
+  });
+}
+
+/**
  * Hook for managing spaced repetition schedule for a set of words.
  *
  * - Initializes review data for words not yet seen
  * - Persists schedule to localStorage (key: `sr_schedule_${lessonId}`)
- * - recordReview updates the schedule and persists it
+ * - Fetches from DB and merges (DB wins on conflict by lastReviewDate)
+ * - recordReview updates localStorage and syncs to DB in background
  * - wordsForToday: words whose nextReviewDate <= today
  */
 export function useSpacedRepetition(
@@ -77,12 +124,31 @@ export function useSpacedRepetition(
     computeWordsForToday(buildSchedule(words, loadSchedule(lessonId)))
   );
 
-  // Re-initialize when words or lessonId changes
+  const [isLoading, setIsLoading] = useState(false);
+  const hasFetchedRef = useRef(false);
+
+  // Re-initialize when words or lessonId changes, then fetch from DB
   useEffect(() => {
     const stored = loadSchedule(lessonId);
-    const schedule = buildSchedule(words, stored);
-    setReviewSchedule(schedule);
-    setWordsForToday(computeWordsForToday(schedule));
+    const localSchedule = buildSchedule(words, stored);
+    setReviewSchedule(localSchedule);
+    setWordsForToday(computeWordsForToday(localSchedule));
+
+    // Fetch from DB and merge
+    hasFetchedRef.current = false;
+    setIsLoading(true);
+    fetchDbSchedule(lessonId).then(dbReviews => {
+      if (dbReviews.length > 0) {
+        const freshLocal = loadSchedule(lessonId);
+        const freshSchedule = buildSchedule(words, freshLocal);
+        const merged = mergeDbIntoLocal(freshSchedule, dbReviews);
+        saveSchedule(lessonId, merged);
+        setReviewSchedule(merged);
+        setWordsForToday(computeWordsForToday(merged));
+      }
+      hasFetchedRef.current = true;
+      setIsLoading(false);
+    });
   }, [lessonId, words.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const recordReview = useCallback(
@@ -97,6 +163,9 @@ export function useSpacedRepetition(
         saveSchedule(lessonId, newSchedule);
         setWordsForToday(computeWordsForToday(newSchedule));
 
+        // Sync to DB in background
+        syncReviewToDb(lessonId, word, quality);
+
         return newSchedule;
       });
     },
@@ -107,6 +176,6 @@ export function useSpacedRepetition(
     reviewSchedule,
     wordsForToday,
     recordReview,
-    isLoading: false,
+    isLoading,
   };
 }

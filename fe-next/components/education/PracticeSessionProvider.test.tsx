@@ -549,7 +549,7 @@ describe('PracticeSessionProvider', () => {
       const useAchievementUnlockModule = jest.requireMock('@/hooks/useAchievementUnlock');
 
       // Set currentUnlock to a valid unlock payload
-      useAchievementUnlockModule.default.mockReturnValueOnce({
+      useAchievementUnlockModule.default.mockReturnValue({
         pendingUnlocks: [],
         currentUnlock: {
           achievementKey: 'test-achievement',

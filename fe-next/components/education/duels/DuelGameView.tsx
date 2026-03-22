@@ -47,6 +47,8 @@ interface DuelData {
   opponentAvatar: string | null;
   opponentId: string;
   isChallenger: boolean;
+  lessonId: string;
+  classroomId: string;
 }
 
 // ============================================
@@ -55,7 +57,7 @@ interface DuelData {
 
 export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewProps) {
   const { t } = useLanguage();
-  const { submitScore, onDuelCompleted, onScoreSubmitted, onError } = useDuelSocket();
+  const { submitScore, createChallenge, onDuelCompleted, onScoreSubmitted, onError } = useDuelSocket();
 
   // G4 fix: Async duel timer (3 minutes default)
   const DUEL_TIME_LIMIT_SECONDS = 180;
@@ -99,6 +101,8 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         opponentAvatar: opponent.avatar_url,
         opponentId: isChallenger ? data.opponent_id : data.challenger_id,
         isChallenger,
+        lessonId: data.lesson_id,
+        classroomId: data.classroom_id,
       });
 
       setPhase('playing');
@@ -288,13 +292,26 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </span>
         </div>
 
-        {/* Back Button */}
-        <button
-          onClick={onBackToLobby}
-          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
-        >
-          {t('duels.backToLobby')}
-        </button>
+        {/* G5 fix: Rematch + Back Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              if (duelData) {
+                createChallenge(duelData.opponentId, duelData.lessonId, duelData.classroomId);
+                onBackToLobby?.();
+              }
+            }}
+            className="px-6 py-3 bg-neo-orange text-neo-white font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          >
+            {t('duels.rematch')}
+          </button>
+          <button
+            onClick={onBackToLobby}
+            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          >
+            {t('duels.backToLobby')}
+          </button>
+        </div>
       </motion.div>
     );
   }

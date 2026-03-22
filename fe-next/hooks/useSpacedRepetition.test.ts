@@ -4,8 +4,13 @@
  * Tests for the spaced repetition schedule management hook.
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSpacedRepetition } from './useSpacedRepetition';
+
+// Mock fetch (spaced rep now syncs with DB)
+global.fetch = jest.fn(() =>
+  Promise.resolve({ ok: true, json: () => Promise.resolve({ reviews: [] }) })
+) as jest.Mock;
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -27,12 +32,14 @@ describe('useSpacedRepetition', () => {
   });
 
   describe('initialization', () => {
-    it('initializes review schedule for new words', () => {
+    it('initializes review schedule for new words', async () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple', 'banana', 'cherry'], 'lesson-1')
       );
 
-      expect(result.current.isLoading).toBe(false);
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
       expect(Object.keys(result.current.reviewSchedule)).toContain('apple');
       expect(Object.keys(result.current.reviewSchedule)).toContain('banana');
       expect(Object.keys(result.current.reviewSchedule)).toContain('cherry');
@@ -50,11 +57,16 @@ describe('useSpacedRepetition', () => {
       expect(appleData.repetitions).toBe(0);
     });
 
-    it('isLoading starts false (synchronous init from localStorage)', () => {
+    it('isLoading starts true then resolves to false after DB sync', async () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
       );
-      expect(result.current.isLoading).toBe(false);
+      // Initially true (DB fetch in progress)
+      expect(result.current.isLoading).toBe(true);
+      // Resolves after DB fetch completes
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
     });
   });
 

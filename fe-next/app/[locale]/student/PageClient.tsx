@@ -29,6 +29,9 @@ import { checkMilestoneCrossed, getMilestoneRewards } from '@/lib/supabase/educa
 import QuickPlayPanel from '@/components/student/QuickPlayPanel';
 import StreakCalendar from '@/components/student/StreakCalendar';
 import ActivityFeed from '@/components/student/ActivityFeed';
+import { ReviewDueBadge } from '@/components/education/ReviewDueBadge';
+import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
+import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { Trophy, Zap, Flame } from 'lucide-react';
 
@@ -280,6 +283,33 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
   );
 }
 
+// --- Review Due Badge with aggregated lesson words ---
+
+function StudentReviewBadge() {
+  const { lessons } = useStudentProgress();
+  const router = useRouter();
+  const { language } = useLanguage();
+
+  // Collect all words across all lessons, pick first lessonId for the hook
+  const firstLesson = lessons.find(l => l.lesson?.words?.length);
+  const words = useMemo(
+    () => (firstLesson?.lesson?.words ?? []).map(w => w.word),
+    [firstLesson]
+  );
+  const lessonId = firstLesson?.lessonId ?? '';
+
+  const { wordsForToday } = useSpacedRepetition(words, lessonId);
+
+  if (!lessonId || wordsForToday.length === 0) return null;
+
+  return (
+    <ReviewDueBadge
+      count={wordsForToday.length}
+      onStartReview={() => router.push(`/${language}/student/practice?lessonId=${lessonId}&mode=review`)}
+    />
+  );
+}
+
 export default function StudentPageClient() {
   const { user, isAuthenticated, loading, profile } = useAuth();
   const { t, language } = useLanguage();
@@ -347,6 +377,9 @@ export default function StudentPageClient() {
           <p className="text-neo-white/70 font-neo-body text-pretty ps-1">
             {t('student.dashboard.subtitle')}
           </p>
+          <div className="mt-3 ps-1">
+            <StudentReviewBadge />
+          </div>
         </motion.div>
 
         {/* Classroom Game Banner (if active) */}

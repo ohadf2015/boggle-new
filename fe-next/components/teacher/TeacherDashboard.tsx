@@ -441,7 +441,16 @@ export default function TeacherDashboard() {
                     {classroomSelect}
                   </div>
                 )}
-                {selectedClassroomId && <AnalyticsDashboard classroomId={selectedClassroomId} />}
+                {selectedClassroomId && (
+                  <AnalyticsDashboard
+                    classroomId={selectedClassroomId}
+                    onCreateReviewLesson={(words) => {
+                      // P11 fix: Pre-populate lesson builder with struggling words
+                      const wordsParam = encodeURIComponent(words.join(','));
+                      router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
+                    }}
+                  />
+                )}
               </HudSection>
             </motion.div>
           )}

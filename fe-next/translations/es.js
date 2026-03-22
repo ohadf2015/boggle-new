@@ -8311,9 +8311,13 @@ const es = {
   "system": {
     "updatingToNewVersion": "Actualizando a nueva versión..."
   },
+  "education": {
+    "reviewDue": "{count} palabras por repasar"
+  },
   "duels": {
     "addWord": "Agregar palabra",
     "backToLobby": "Volver a la sala",
+    "rematch": "¡Revancha!",
     "challengeClassmate": "¡Desafía a un compañero!",
     "draw": "¡Empate!",
     "draws": "Empates",

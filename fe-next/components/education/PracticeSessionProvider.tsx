@@ -20,6 +20,8 @@ import {
   useState,
   useCallback,
   useMemo,
+  useEffect,
+  useRef,
   type ReactNode,
 } from 'react';
 import useEducationXp, {
@@ -49,6 +51,7 @@ export interface CompletePracticeSessionData {
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];
+  wordsFound?: string[];
   newWordsFound?: string[];
   masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
 }
@@ -132,6 +135,51 @@ export function PracticeSessionProvider({
   const [totalPracticeSessions, setTotalPracticeSessions] = useState<number>(0);
   const [totalWordsMastered, setTotalWordsMastered] = useState<number>(0);
 
+  // Achievement tracking state — persisted to localStorage per student
+  const [perfectGames, setPerfectGames] = useState<number>(0);
+  const [morningPractices, setMorningPractices] = useState<number>(0);
+  const modesTriedRef = useRef<Set<string>>(new Set());
+  const [modesTriedCount, setModesTriedCount] = useState<number>(1);
+  const uniqueWordsRef = useRef<Set<string>>(new Set());
+  const [uniqueWordsCount, setUniqueWordsCount] = useState<number>(0);
+  const [practiceDaysThisMonth, setPracticeDaysThisMonth] = useState<number>(0);
+
+  // Initialize achievement trackers from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedPerfect = localStorage.getItem(`edu_perfect_games_${studentId}`);
+      if (storedPerfect) setPerfectGames(parseInt(storedPerfect, 10) || 0);
+
+      const storedMorning = localStorage.getItem(`edu_morning_practices_${studentId}`);
+      if (storedMorning) setMorningPractices(parseInt(storedMorning, 10) || 0);
+
+      const storedModes = localStorage.getItem(`education_modes_tried_${studentId}`);
+      if (storedModes) {
+        const parsed: string[] = JSON.parse(storedModes);
+        modesTriedRef.current = new Set(parsed);
+        setModesTriedCount(modesTriedRef.current.size || 1);
+      }
+
+      const storedWords = localStorage.getItem(`education_unique_words_${studentId}`);
+      if (storedWords) {
+        const parsed: string[] = JSON.parse(storedWords);
+        uniqueWordsRef.current = new Set(parsed);
+        setUniqueWordsCount(uniqueWordsRef.current.size);
+      }
+
+      const storedDays = localStorage.getItem(`edu_practice_days_${studentId}`);
+      if (storedDays) {
+        const parsed: string[] = JSON.parse(storedDays);
+        const now = new Date();
+        const thisMonth = `${now.getFullYear()}-${now.getMonth()}`;
+        const daysThisMonth = parsed.filter((d: string) => d.startsWith(thisMonth)).length;
+        setPracticeDaysThisMonth(daysThisMonth);
+      }
+    } catch {
+      // localStorage unavailable or corrupt — use defaults
+    }
+  }, [studentId]);
+
   /**
    * Complete a practice session and award XP
    * Handles XP calculation, level up detection, and database persistence
@@ -188,6 +236,63 @@ export function PracticeSessionProvider({
           setTotalWordsMastered(newWordsMastered);
         }
 
+        // --- Compute real achievement metrics ---
+
+        // wordsInGame: words found this session
+        const wordsInGame = sessionData.vocabularyWordsFound?.length
+          || sessionData.wordsFound?.length || 0;
+
+        // perfectGames: increment if 100% accuracy on flashcard session
+        let newPerfectGames = perfectGames;
+        if (
+          sessionData.type === 'flashcard' &&
+          sessionData.cardsReviewed &&
+          sessionData.cardsReviewed > 0 &&
+          sessionData.cardsCorrect === sessionData.cardsReviewed
+        ) {
+          newPerfectGames = perfectGames + 1;
+          setPerfectGames(newPerfectGames);
+          try { localStorage.setItem(`edu_perfect_games_${studentId}`, String(newPerfectGames)); } catch { /* noop */ }
+        }
+
+        // morningPractices: before 9 AM
+        let newMorningPractices = morningPractices;
+        if (new Date().getHours() < 9) {
+          newMorningPractices = morningPractices + 1;
+          setMorningPractices(newMorningPractices);
+          try { localStorage.setItem(`edu_morning_practices_${studentId}`, String(newMorningPractices)); } catch { /* noop */ }
+        }
+
+        // modesTried: track unique practice mode types
+        modesTriedRef.current.add(sessionData.type);
+        const newModesTriedCount = modesTriedRef.current.size;
+        setModesTriedCount(newModesTriedCount);
+        try { localStorage.setItem(`education_modes_tried_${studentId}`, JSON.stringify([...modesTriedRef.current])); } catch { /* noop */ }
+
+        // uniqueWords: cumulative unique words across sessions
+        const sessionWords = sessionData.vocabularyWordsFound || sessionData.wordsFound || [];
+        for (const word of sessionWords) {
+          uniqueWordsRef.current.add(word);
+        }
+        const newUniqueWordsCount = uniqueWordsRef.current.size;
+        setUniqueWordsCount(newUniqueWordsCount);
+        try { localStorage.setItem(`education_unique_words_${studentId}`, JSON.stringify([...uniqueWordsRef.current])); } catch { /* noop */ }
+
+        // daysThisMonth: record today's practice date
+        let newDaysThisMonth = practiceDaysThisMonth;
+        try {
+          const now = new Date();
+          const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+          const storedDays: string[] = JSON.parse(localStorage.getItem(`edu_practice_days_${studentId}`) || '[]');
+          if (!storedDays.includes(todayKey)) {
+            storedDays.push(todayKey);
+            localStorage.setItem(`edu_practice_days_${studentId}`, JSON.stringify(storedDays));
+          }
+          const thisMonthPrefix = `${now.getFullYear()}-${now.getMonth()}`;
+          newDaysThisMonth = storedDays.filter((d: string) => d.startsWith(thisMonthPrefix)).length;
+          setPracticeDaysThisMonth(newDaysThisMonth);
+        } catch { /* noop */ }
+
         // Check for achievement unlocks after XP is awarded
         checkForUnlocks({
           totalXp: totalXp + result.totalXp,
@@ -195,20 +300,19 @@ export function PracticeSessionProvider({
           currentLevel: result.newLevel || currentLevel,
           currentStreak: streak.currentStreak,
           practiceSessions: newSessionCount,
-          // Fields not tracked yet - default to 0
           lessonsCompleted: 1, // At least 1 if practicing
-          wordsInGame: 0,
-          perfectGames: 0,
-          bossesDefeated: 0,
-          combosAchieved: 0,
-          morningPractices: 0,
-          daysThisMonth: 0,
-          weeksWith5Days: 0,
+          wordsInGame,
+          perfectGames: newPerfectGames,
+          bossesDefeated: 0, // Not applicable in education context
+          combosAchieved: 0, // Not applicable in education context
+          morningPractices: newMorningPractices,
+          daysThisMonth: newDaysThisMonth,
+          weeksWith5Days: 0, // Requires weekly aggregation — not yet tracked
           longestStreak: streak.longestStreak || 0,
-          modesTried: 1, // At least 1 mode
+          modesTried: newModesTriedCount,
           lessonsCollected: 1,
           classroomsJoined: 1, // Assume 1 if in classroom
-          uniqueWords: 0,
+          uniqueWords: newUniqueWordsCount,
         });
       } catch (error) {
         logger.error('Error completing practice session:', error);
@@ -224,6 +328,10 @@ export function PracticeSessionProvider({
       checkForUnlocks,
       totalPracticeSessions,
       totalWordsMastered,
+      perfectGames,
+      morningPractices,
+      practiceDaysThisMonth,
+      studentId,
     ]
   );
 

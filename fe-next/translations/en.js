@@ -8309,9 +8309,13 @@ const en = {
   "system": {
     "updatingToNewVersion": "Updating to new version..."
   },
+  "education": {
+    "reviewDue": "{count} words due for review"
+  },
   "duels": {
     "addWord": "Add Word",
     "backToLobby": "Back to Lobby",
+    "rematch": "Rematch!",
     "challengeClassmate": "Challenge a Classmate!",
     "draw": "Draw!",
     "draws": "Draws",
