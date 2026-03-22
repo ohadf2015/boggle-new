@@ -577,14 +577,16 @@ describe('Duel Gameplay Handlers', () => {
         },
       });
 
-      // Verify XP awarded
+      // Verify XP awarded (B5 fix: lesson_id now passed)
       expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: 'user-2',
         p_xp_amount: 200,
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440001',
       });
       expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: 'user-1',
         p_xp_amount: 120,
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440001',
       });
     });
 
@@ -642,14 +644,16 @@ describe('Duel Gameplay Handlers', () => {
         },
       });
 
-      // Both get draw XP
+      // Both get draw XP (B5 fix: lesson_id now passed)
       expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: 'user-1',
         p_xp_amount: 175,
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440001',
       });
       expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('award_education_xp', {
         p_student_id: 'user-2',
         p_xp_amount: 175,
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440001',
       });
     });
 

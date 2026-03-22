@@ -11,8 +11,8 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 // Mock LanguageContext
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key, params) => {
-      const translations = {
+    t: (key: string, params?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
         'autoPlay.nextGameIn': `Next game in ${params?.seconds ?? 0}...`,
         'autoPlay.playAgain': 'PLAY AGAIN',
         'autoPlay.exit': 'Exit',

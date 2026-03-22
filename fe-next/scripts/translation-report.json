@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 3901,
+    "totalKeysInCode": 3993,
     "keyCountByLanguage": {
-      "en": 6670,
-      "he": 6700,
-      "sv": 6733,
-      "ja": 6720,
-      "es": 6731
+      "en": 6812,
+      "he": 6857,
+      "sv": 6890,
+      "ja": 6877,
+      "es": 6888
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -168,6 +168,21 @@
   },
   "keysNotInEnglish": {
     "he": [
+      "leadChange.tookTheLeadVerb",
+      "leadChange.tookLeadWitty_0",
+      "leadChange.tookLeadWitty_1",
+      "leadChange.tookLeadWitty_2",
+      "leadChange.tookLeadWitty_3",
+      "leadChange.lostLeadWitty_0",
+      "leadChange.lostLeadWitty_1",
+      "leadChange.lostLeadWitty_2",
+      "leadChange.lostLeadWitty_3",
+      "leadChange.otherTookLeadWitty_0",
+      "leadChange.otherTookLeadWitty_1",
+      "leadChange.otherTookLeadWitty_2",
+      "leadChange.otherTookLeadWitty_3",
+      "leadChange.pointsAhead",
+      "leadChange.wordsFound",
       "hostView.progressAnnouncement",
       "education.duels.addWord",
       "education.duels.backToLobby",
@@ -200,6 +215,21 @@
       "education.classroomGame.connecting"
     ],
     "sv": [
+      "leadChange.tookTheLeadVerb",
+      "leadChange.tookLeadWitty_0",
+      "leadChange.tookLeadWitty_1",
+      "leadChange.tookLeadWitty_2",
+      "leadChange.tookLeadWitty_3",
+      "leadChange.lostLeadWitty_0",
+      "leadChange.lostLeadWitty_1",
+      "leadChange.lostLeadWitty_2",
+      "leadChange.lostLeadWitty_3",
+      "leadChange.otherTookLeadWitty_0",
+      "leadChange.otherTookLeadWitty_1",
+      "leadChange.otherTookLeadWitty_2",
+      "leadChange.otherTookLeadWitty_3",
+      "leadChange.pointsAhead",
+      "leadChange.wordsFound",
       "hostView.progressAnnouncement",
       "admin.wordBank.filters.allValidationStatuses",
       "admin.wordBank.filters.pending",
@@ -265,6 +295,21 @@
       "education.classroomGame.connecting"
     ],
     "ja": [
+      "leadChange.tookTheLeadVerb",
+      "leadChange.tookLeadWitty_0",
+      "leadChange.tookLeadWitty_1",
+      "leadChange.tookLeadWitty_2",
+      "leadChange.tookLeadWitty_3",
+      "leadChange.lostLeadWitty_0",
+      "leadChange.lostLeadWitty_1",
+      "leadChange.lostLeadWitty_2",
+      "leadChange.lostLeadWitty_3",
+      "leadChange.otherTookLeadWitty_0",
+      "leadChange.otherTookLeadWitty_1",
+      "leadChange.otherTookLeadWitty_2",
+      "leadChange.otherTookLeadWitty_3",
+      "leadChange.pointsAhead",
+      "leadChange.wordsFound",
       "hostView.progressAnnouncement",
       "consent.modal.dataUsage.title",
       "consent.modal.dataUsage.items",
@@ -377,7 +422,22 @@
       "education.duels.winRate",
       "education.duels.recentDuels",
       "education.duels.noDuelsYet",
-      "education.duels.challengeClassmate"
+      "education.duels.challengeClassmate",
+      "leadChange.tookTheLeadVerb",
+      "leadChange.tookLeadWitty_0",
+      "leadChange.tookLeadWitty_1",
+      "leadChange.tookLeadWitty_2",
+      "leadChange.tookLeadWitty_3",
+      "leadChange.lostLeadWitty_0",
+      "leadChange.lostLeadWitty_1",
+      "leadChange.lostLeadWitty_2",
+      "leadChange.lostLeadWitty_3",
+      "leadChange.otherTookLeadWitty_0",
+      "leadChange.otherTookLeadWitty_1",
+      "leadChange.otherTookLeadWitty_2",
+      "leadChange.otherTookLeadWitty_3",
+      "leadChange.pointsAhead",
+      "leadChange.wordsFound"
     ]
   }
 }
