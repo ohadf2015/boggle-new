@@ -11,7 +11,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
-import { BookOpen, School } from 'lucide-react';
+import { BookOpen, School, LayoutGrid, Search, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -50,6 +50,9 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Game mode selection
+  const [gameMode, setGameMode] = useState<'classic' | 'wordHunt' | 'blast'>('classic');
 
   // Game settings with smart defaults
   const [settings, setSettings] = useState({
@@ -189,11 +192,12 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
         timerMinutes: settings.timerMinutes,
         boardSize: settings.boardSize,
         allowLateJoin: settings.allowLateJoin,
+        gameMode,
       },
     });
   }, [
     user, socket, selectedLessonIds, selectedClassroomId, gameCode,
-    classrooms, selectedLessons, allPlayableWords, settings, profile, language, t,
+    classrooms, selectedLessons, allPlayableWords, settings, gameMode, profile, language, t,
   ]);
 
   if (isLoading) {
@@ -264,6 +268,8 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       isStarting={isStarting}
       settings={settings}
       showAdvanced={showAdvanced}
+      gameMode={gameMode}
+      onGameModeChange={setGameMode}
       onCopyCode={handleCopyCode}
       onStartGame={handleStartGame}
       onBack={() => setCurrentStep(1)}

@@ -7129,6 +7129,12 @@ const he = {
       "scanToJoin": "סרקו להצטרפות"
     },
     "classroom": {
+      "gameModes": {
+        "title": "מצב משחק",
+        "classic": "קלאסי",
+        "wordHunt": "ציד מילים",
+        "blast": "בלאסט"
+      },
       "create": "צור כיתה",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",

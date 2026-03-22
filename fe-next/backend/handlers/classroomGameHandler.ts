@@ -13,8 +13,10 @@ import {
   getActiveClassroomGames,
   addPlayerToClassroomGame,
   removePlayerFromClassroomGame,
+  updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
+import { getSupabase } from '../modules/supabase/client.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -31,11 +33,28 @@ const createClassroomGameSchema = z.object({
   teacherId: z.string().uuid('teacherId must be a valid UUID'),
   teacherName: usernameSchema,
   gameCode: gameCodeSchema,
+  lessonIds: z.array(z.string().uuid()).max(20).optional(),
   lessonNames: z.array(z.string().max(200)).max(20).optional(),
   vocabularyWords: z.array(z.string().max(100)).max(500).optional(),
-  timerMinutes: z.number().int().min(1).max(30).optional(),
-  boardSize: z.enum(['small', 'medium', 'large']).optional(),
-  allowLateJoin: z.boolean().optional(),
+  settings: z.object({
+    timerMinutes: z.number().int().min(1).max(30).optional(),
+    boardSize: z.enum(['small', 'medium', 'large']).optional(),
+    allowLateJoin: z.boolean().optional(),
+    gameMode: z.enum(['classic', 'wordHunt', 'blast']).optional(),
+  }).optional(),
+});
+
+const startClassroomGameSchema = z.object({
+  gameCode: gameCodeSchema,
+});
+
+const endClassroomGameSchema = z.object({
+  gameCode: gameCodeSchema,
+  playerScores: z.array(z.object({
+    userId: z.string().uuid(),
+    score: z.number().min(0),
+    wordsFound: z.array(z.string()).optional(),
+  })).optional(),
 });
 
 const getActiveGamesSchema = z.object({
@@ -76,12 +95,17 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
 
     // Validate payload
-    const validation = validatePayload(createClassroomGameSchema, data);
+    const validation = createClassroomGameSchema.safeParse(data);
     if (!validation.success) {
-      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error}` });
+      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
       return;
     }
-    const payload = validation.data as z.infer<typeof createClassroomGameSchema>;
+    // Type assertion needed because gameCodeSchema/usernameSchema use compiled || fallback pattern
+    const payload = validation.data as {
+      classroomId: string; teacherId: string; teacherName: string; gameCode: string;
+      lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
+      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'wordHunt' | 'blast' };
+    };
 
     // Auth check: teacherId MUST match authenticated user (mandatory, not optional)
     const authUserId = getAuthUserId(socket);
@@ -95,8 +119,25 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
 
     try {
+      // Build game data with settings (including gameMode, default to 'classic')
+      const gameData: CreateClassroomGameData = {
+        gameCode: payload.gameCode,
+        classroomId: payload.classroomId,
+        teacherId: payload.teacherId,
+        teacherName: payload.teacherName,
+        lessonIds: payload.lessonIds || [],
+        lessonNames: payload.lessonNames || [],
+        vocabularyWords: payload.vocabularyWords || [],
+        settings: {
+          timerMinutes: payload.settings?.timerMinutes,
+          boardSize: payload.settings?.boardSize,
+          allowLateJoin: payload.settings?.allowLateJoin,
+          gameMode: payload.settings?.gameMode || 'classic',
+        },
+      };
+
       // Create the game in Redis
-      await createClassroomGame(payload as CreateClassroomGameData);
+      await createClassroomGame(gameData);
 
       // Join classroom room for notifications
       socket.join(`classroom:${payload.classroomId}`);
@@ -259,6 +300,218 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       logger.error('CLASSROOM_GAME', `Failed to leave game: ${error}`);
     }
   });
+
+  /**
+   * S2.7: Start a classroom game (teacher only)
+   * Validates teacher auth, updates status, emits start event to all players
+   */
+  socket.on('startClassroomGame', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const validation = startClassroomGameSchema.safeParse(data);
+    if (!validation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
+      return;
+    }
+    const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
+
+    const authUserId = getAuthUserId(socket);
+    if (!authUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+
+    try {
+      const game = await getClassroomGame(payload.gameCode);
+      if (!game) {
+        socket.emit('classroomGameError', { error: 'Game not found' });
+        return;
+      }
+
+      if (authUserId !== game.teacherId) {
+        socket.emit('classroomGameError', { error: 'Only the teacher can start this game' });
+        return;
+      }
+
+      if (game.status !== 'waiting') {
+        socket.emit('classroomGameError', { error: 'Game has already started or finished' });
+        return;
+      }
+
+      await updateClassroomGameStatus(payload.gameCode, 'playing');
+
+      io.to(`classroom:${game.classroomId}`).emit('classroomGameStarted', {
+        gameCode: payload.gameCode,
+        gameMode: game.settings.gameMode || 'classic',
+        settings: game.settings,
+        playerCount: game.players.length,
+      });
+
+      logger.info('CLASSROOM_GAME', `Teacher ${authUserId} started game ${payload.gameCode}`);
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Failed to start game: ${error}`);
+      socket.emit('classroomGameError', { error: 'Failed to start game' });
+    }
+  });
+
+  /**
+   * S2.7: End a classroom game early (teacher only)
+   * Validates teacher auth, ends game, triggers score persistence (S2.5)
+   */
+  socket.on('endClassroomGame', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const validation = endClassroomGameSchema.safeParse(data);
+    if (!validation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
+      return;
+    }
+    const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
+
+    const authUserId = getAuthUserId(socket);
+    if (!authUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+
+    try {
+      const game = await getClassroomGame(payload.gameCode);
+      if (!game) {
+        socket.emit('classroomGameError', { error: 'Game not found' });
+        return;
+      }
+
+      if (authUserId !== game.teacherId) {
+        socket.emit('classroomGameError', { error: 'Only the teacher can end this game' });
+        return;
+      }
+
+      await updateClassroomGameStatus(payload.gameCode, 'finished');
+
+      // Persist scores to Supabase (S2.5)
+      await persistClassroomGameScores(game, payload.playerScores);
+
+      io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
+        gameCode: payload.gameCode,
+      });
+
+      logger.info('CLASSROOM_GAME', `Teacher ${authUserId} ended game ${payload.gameCode}`);
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Failed to end game: ${error}`);
+      socket.emit('classroomGameError', { error: 'Failed to end game' });
+    }
+  });
+
+  /**
+   * S2.5: Classroom game end event (triggered by game completion)
+   * Persists player scores to practice_sessions and awards education XP
+   */
+  socket.on('classroomGameEnd', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    const validation = endClassroomGameSchema.safeParse(data);
+    if (!validation.success) {
+      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
+      return;
+    }
+    const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
+
+    try {
+      const game = await getClassroomGame(payload.gameCode);
+      if (!game) {
+        socket.emit('classroomGameError', { error: 'Game not found' });
+        return;
+      }
+
+      await updateClassroomGameStatus(payload.gameCode, 'finished');
+      await persistClassroomGameScores(game, payload.playerScores);
+
+      io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
+        gameCode: payload.gameCode,
+      });
+
+      logger.info('CLASSROOM_GAME', `Game ${payload.gameCode} ended, scores persisted`);
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Failed to handle game end: ${error}`);
+      socket.emit('classroomGameError', { error: 'Failed to persist game results' });
+    }
+  });
+}
+
+/**
+ * S2.5: Persist classroom game scores to Supabase
+ * Creates a practice_session row per player and awards education XP
+ */
+async function persistClassroomGameScores(
+  game: Awaited<ReturnType<typeof getClassroomGame>>,
+  playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }>
+): Promise<void> {
+  if (!game) return;
+
+  const supabase = getSupabase();
+  if (!supabase) {
+    logger.warn('CLASSROOM_GAME', 'Supabase not configured, skipping score persistence');
+    return;
+  }
+
+  const lessonId = game.lessonIds[0];
+  if (!lessonId) {
+    logger.warn('CLASSROOM_GAME', `Game ${game.gameCode} has no lesson IDs, skipping persistence`);
+    return;
+  }
+
+  for (const player of game.players) {
+    try {
+      // Find this player's score from the provided scores, or default to 0
+      const playerScore = playerScores?.find(ps => ps.userId === player.userId);
+      const score = playerScore?.score ?? 0;
+      const wordsFound = playerScore?.wordsFound ?? [];
+
+      // Create practice_session row
+      const { error: sessionError } = await supabase
+        .from('practice_sessions')
+        .insert({
+          student_id: player.userId,
+          lesson_id: lessonId,
+          practice_type: 'solo_board',
+          total_score: score,
+          words_found: wordsFound,
+          completed_at: new Date().toISOString(),
+        });
+
+      if (sessionError) {
+        logger.error('CLASSROOM_GAME', `Failed to create practice session for ${player.userId}: ${sessionError.message}`);
+        continue;
+      }
+
+      // Award education XP via RPC
+      if (score > 0) {
+        const xpAmount = Math.max(10, Math.floor(score / 10));
+        const { error: xpError } = await supabase.rpc('award_education_xp', {
+          p_student_id: player.userId,
+          p_xp_amount: xpAmount,
+          p_lesson_id: lessonId,
+        });
+
+        if (xpError) {
+          logger.error('CLASSROOM_GAME', `Failed to award XP for ${player.userId}: ${xpError.message}`);
+        } else {
+          logger.info('CLASSROOM_GAME', `Awarded ${xpAmount} XP to ${player.userId} for game ${game.gameCode}`);
+        }
+      }
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Error persisting score for player ${player.userId}: ${error}`);
+    }
+  }
 }
 
 export default registerClassroomGameHandlers;

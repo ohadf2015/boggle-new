@@ -11,9 +11,7 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket } from './types';
 import { z } from 'zod';
 import { getSupabase } from '@/backend/modules/supabase/client';
-import { isDictionaryWord } from '@/backend/dictionary';
-import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
-import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
+import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import { updateDuelChallengeProgress } from './realtime';
 import logger from '@/backend/utils/logger';
@@ -119,34 +117,27 @@ export function registerGameplayHandlers(
         return;
       }
 
-      // SERVER-SIDE WORD VALIDATION (CRITICAL ANTI-CHEAT)
+      // M2 fix: Use shared validation utility (same pipeline as main MP)
       const boardState = duel.board_state as string[][];
-      const language = lesson.language;
       const validatedWords: string[] = [];
+      let serverScore = 0;
       let rejectedCount = 0;
 
       for (const word of payload.wordsFound) {
-        // Check dictionary
-        const inDictionary = isDictionaryWord(word, language);
-        if (!inDictionary) {
+        const result = await validateAndScoreWord(
+          word,
+          boardState,
+          lesson.language,
+          validatedWords // use validated list as "already found" for dedup
+        );
+
+        if (!result.valid) {
           rejectedCount++;
           continue;
         }
 
-        // Check board path
-        const onBoard = await isWordOnBoardAsync(word, boardState);
-        if (!onBoard) {
-          rejectedCount++;
-          continue;
-        }
-
-        validatedWords.push(word);
-      }
-
-      // Calculate server-side score from validated words
-      let serverScore = 0;
-      for (const word of validatedWords) {
-        serverScore += calculateWordScore(word, 0); // No combo in async duels
+        validatedWords.push(result.normalizedWord);
+        serverScore += result.score;
       }
 
       // Insert duel turn

@@ -15,9 +15,9 @@
  * - RTL support
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Swords, Check, X, Trophy, Flame } from 'lucide-react';
+import { Swords, Check, X, Trophy, Flame, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '@/hooks/useDuelSocket';
@@ -57,6 +57,9 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   const { t } = useLanguage();
   const { submitScore, onDuelCompleted, onScoreSubmitted, onError } = useDuelSocket();
 
+  // G4 fix: Async duel timer (3 minutes default)
+  const DUEL_TIME_LIMIT_SECONDS = 180;
+
   // State
   const [phase, setPhase] = useState<GamePhase>('loading');
   const [duelData, setDuelData] = useState<DuelData | null>(null);
@@ -65,6 +68,9 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   const [validatedScore, setValidatedScore] = useState<ScoreSubmittedData | null>(null);
   const [result, setResult] = useState<DuelCompletedData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(DUEL_TIME_LIMIT_SECONDS);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoSubmitTriggered = useRef(false);
 
   // ============================================
   // EFFECTS
@@ -100,6 +106,48 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
     loadDuel();
   }, [duelId, studentId]);
+
+  // G4 fix: Countdown timer — auto-submits when time expires
+  useEffect(() => {
+    if (phase !== 'playing') {
+      // Clear timer when not in playing phase
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          // Time's up — auto-submit
+          if (!autoSubmitTriggered.current) {
+            autoSubmitTriggered.current = true;
+            // Use setTimeout to avoid state update during render
+            setTimeout(() => {
+              if (wordsFound.length > 0) {
+                submitScore(duelId, wordsFound);
+              } else {
+                // Submit empty to register a 0-score turn
+                submitScore(duelId, []);
+              }
+              setPhase('submitting');
+            }, 0);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [phase, duelId, wordsFound, submitScore]);
 
   // Socket event listeners
   useEffect(() => {
@@ -308,10 +356,23 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </h1>
         </div>
 
-        {/* Opponent Info */}
-        <div className="flex items-center gap-2">
-          <span className="text-neo-white/70 text-sm">{t('duels.vs')}</span>
-          <span className="text-neo-white font-bold">{duelData.opponentName}</span>
+        {/* Timer + Opponent Info */}
+        <div className="flex items-center gap-4">
+          {/* G4: Countdown timer */}
+          <div className={cn(
+            'flex items-center gap-1 px-3 py-1 rounded-neo border-neo font-neo-display font-bold',
+            timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
+            timeRemaining <= 60 ? 'bg-neo-orange text-neo-black' :
+            'bg-neo-yellow text-neo-black'
+          )}>
+            <Clock className="w-4 h-4" />
+            <span>{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-neo-white/70 text-sm">{t('duels.vs')}</span>
+            <span className="text-neo-white font-bold">{duelData.opponentName}</span>
+          </div>
         </div>
       </div>
 

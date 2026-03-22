@@ -110,29 +110,44 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
   // Isolates duel room state from default namespace game rooms
   const duelNamespace = io.of('/duel');
 
-  // Duel namespace authentication middleware
-  // Reads userId and displayName from handshake auth/query params
-  // so all duel handlers can rely on socket.data.userId and socket.data.displayName
-  duelNamespace.use((socket, next) => {
+  // M7/B16 fix: Duel namespace authentication middleware with JWT verification
+  // Previously accepted userId from handshake without verification — identity spoofing was possible.
+  // Now verifies Supabase JWT like the main namespace, then sets verified userId.
+  duelNamespace.use(async (socket, next) => {
     const auth = socket.handshake.auth || {};
     const query = socket.handshake.query || {};
-
-    const userId = (auth.userId || query.userId || '') as string;
+    const token = (auth.token || '') as string;
     const displayName = (auth.displayName || query.displayName || 'Anonymous') as string;
 
-    if (!userId) {
-      // Allow unauthenticated connections with a generated ID for now,
-      // so the game UI can still render. Handlers that need a real user
-      // will reject actions without a valid userId.
-      socket.data.userId = socket.id;
-    } else {
-      socket.data.userId = userId;
+    if (!token) {
+      // No JWT — reject for duel namespace (duels require authenticated users)
+      return next(new Error('Authentication required for duels'));
     }
 
-    socket.data.displayName = displayName;
-    socket.data.classroomIds = [];
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn('[DUEL] Auth middleware: Supabase not configured');
+      return next(new Error('Authentication service unavailable'));
+    }
 
-    next();
+    try {
+      const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey);
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+
+      if (error || !user) {
+        console.warn(`[DUEL] Invalid auth token from ${socket.id}: ${error?.message || 'no user'}`);
+        return next(new Error('Invalid authentication token'));
+      }
+
+      // Use verified userId — never trust client-supplied userId
+      socket.data.userId = user.id;
+      socket.data.verifiedUserId = user.id;
+      socket.data.displayName = displayName;
+      socket.data.classroomIds = [];
+      next();
+    } catch (err) {
+      console.error('[DUEL] Auth verification error:', err);
+      return next(new Error('Authentication error'));
+    }
   });
 
   // Register duel namespace connection handler

@@ -7155,6 +7155,12 @@ const ja = {
       "scanToJoin": "スキャンして参加"
     },
     "classroom": {
+      "gameModes": {
+        "title": "ゲームモード",
+        "classic": "クラシック",
+        "wordHunt": "ワードハント",
+        "blast": "ブラスト"
+      },
       "create": "クラス作成",
       "edit": "クラス編集",
       "delete": "クラス削除",

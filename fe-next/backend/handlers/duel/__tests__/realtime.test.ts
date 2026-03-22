@@ -116,7 +116,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: [],
         opponentWords: [],
         challengerScore: 0,
@@ -155,7 +155,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: [],
         opponentWords: [],
         challengerScore: 0,
@@ -196,7 +196,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: ['test'], // Already found
         opponentWords: [],
         challengerScore: 5,
@@ -237,7 +237,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: [],
         opponentWords: [],
         challengerScore: 0,
@@ -272,7 +272,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: [],
         opponentWords: [],
         challengerScore: 0,
@@ -321,7 +321,7 @@ describe('Real-Time Duel Handlers', () => {
         language: 'en',
         timeLimit: 180,
         startTime: new Date().toISOString(),
-        timer: null,
+
         challengerWords: [],
         opponentWords: [],
         challengerScore: 0,
@@ -442,9 +442,9 @@ describe('Real-Time Duel Handlers', () => {
 
       await startRealtimeDuel(mockNamespace as Namespace, duelId, duel);
 
-      // Verify timer started
+      // Verify game state created
       const gameState = realtimeGames.get(duelId);
-      expect(gameState?.timer).not.toBeNull();
+      expect(gameState).toBeDefined();
 
       // Fast-forward time to trigger completion
       jest.runAllTimers();

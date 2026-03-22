@@ -1,4 +1,4 @@
-import { Users, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, Copy, Check, ChevronDown, ChevronUp, LayoutGrid, Search, Zap } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,8 @@ interface GameSettings {
   allowLateJoin: boolean;
 }
 
+type GameMode = 'classic' | 'wordHunt' | 'blast';
+
 interface ClassroomReviewStepProps {
   gameCode: string;
   joinUrl: string;
@@ -17,6 +19,8 @@ interface ClassroomReviewStepProps {
   isStarting: boolean;
   settings: GameSettings;
   showAdvanced: boolean;
+  gameMode: GameMode;
+  onGameModeChange: (mode: GameMode) => void;
   onCopyCode: () => void;
   onStartGame: () => void;
   onBack: () => void;
@@ -33,6 +37,12 @@ function getBoardSizeLabel(size: string) {
   }
 }
 
+const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
+  { key: 'classic', icon: LayoutGrid, color: 'neo-cyan' },
+  { key: 'wordHunt', icon: Search, color: 'neo-yellow' },
+  { key: 'blast', icon: Zap, color: 'neo-pink' },
+];
+
 export function ClassroomReviewStep({
   gameCode,
   joinUrl,
@@ -40,6 +50,8 @@ export function ClassroomReviewStep({
   isStarting,
   settings,
   showAdvanced,
+  gameMode,
+  onGameModeChange,
   onCopyCode,
   onStartGame,
   onBack,
@@ -60,6 +72,30 @@ export function ClassroomReviewStep({
       isLoading={isStarting}
     >
       <div className="space-y-6">
+        {/* Game Mode Selector */}
+        <div className="p-4 rounded-neo border-neo border-neo-black bg-neo-navy/50">
+          <h4 className="text-neo-white font-bold mb-3">
+            {t('teacher.classroom.gameModes.title')}
+          </h4>
+          <div className="grid grid-cols-3 gap-3">
+            {GAME_MODES.map(({ key, icon: Icon, color }) => (
+              <button
+                key={key}
+                onClick={() => onGameModeChange(key)}
+                className={cn(
+                  'flex flex-col items-center gap-2 px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                  gameMode === key
+                    ? `bg-${color} text-neo-black shadow-hard`
+                    : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                )}
+              >
+                <Icon className="w-6 h-6" />
+                <span className="text-sm">{t(`classroom.gameModes.${key}`)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Game Code */}
         <div className="p-6 rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 shadow-hard-lg">
           <p className="text-sm text-neo-white/70 font-neo-body mb-2 text-center">

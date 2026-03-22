@@ -6,14 +6,13 @@
  */
 
 import type { Namespace } from 'socket.io';
-import type { Language } from '@/shared/types';
+// Language type no longer needed — validateAndScoreWord handles it internally
 import { type DuelSocket, type SubmitWordPayload, submitWordSchema } from './types';
 import { getSupabase } from '@/backend/modules/supabase/client';
-import { isDictionaryWord } from '@/backend/dictionary';
-import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
-import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
+import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import logger from '@/backend/utils/logger';
+import timerManager from '@/backend/utils/timerManager';
 
 // ==========================================
 // In-Memory Game State
@@ -27,7 +26,6 @@ interface RealtimeGameState {
   language: string;
   timeLimit: number;
   startTime: string;
-  timer: NodeJS.Timeout | null;
   challengerWords: string[];
   opponentWords: string[];
   challengerScore: number;
@@ -93,40 +91,26 @@ export function registerRealtimeHandlers(
       // Get player's words array
       const playerWords = isChallenger ? gameState.challengerWords : gameState.opponentWords;
 
-      // Check duplicate
-      if (playerWords.includes(payload.word.toLowerCase())) {
+      // M2 fix: Use shared validation utility (same pipeline as main MP)
+      const result = await validateAndScoreWord(
+        payload.word,
+        gameState.boardState,
+        gameState.language,
+        playerWords
+      );
+
+      if (!result.valid) {
         socket.emit('duel:word-rejected', {
           word: payload.word,
-          reason: 'Word already found (duplicate)',
+          reason: result.reason || 'invalid',
         });
         return;
       }
 
-      // Validate dictionary
-      const inDictionary = isDictionaryWord(payload.word, gameState.language as Language);
-      if (!inDictionary) {
-        socket.emit('duel:word-rejected', {
-          word: payload.word,
-          reason: 'not_in_dictionary',
-        });
-        return;
-      }
-
-      // Validate on board
-      const onBoard = await isWordOnBoardAsync(payload.word, gameState.boardState);
-      if (!onBoard) {
-        socket.emit('duel:word-rejected', {
-          word: payload.word,
-          reason: 'not_on_board',
-        });
-        return;
-      }
-
-      // Calculate score (no combo in real-time duels)
-      const points = calculateWordScore(payload.word, 0);
+      const points = result.score;
 
       // Update in-memory state
-      playerWords.push(payload.word.toLowerCase());
+      playerWords.push(result.normalizedWord);
       if (isChallenger) {
         gameState.challengerScore += points;
       } else {
@@ -207,7 +191,6 @@ export async function startRealtimeDuel(
       language: lesson.language,
       timeLimit: duel.time_limit || 180,
       startTime,
-      timer: null,
       challengerWords: [],
       opponentWords: [],
       challengerScore: 0,
@@ -226,8 +209,8 @@ export async function startRealtimeDuel(
       players: [duel.challenger_id, duel.opponent_id],
     });
 
-    // Start server-side timer
-    gameState.timer = setTimeout(async () => {
+    // M3 fix: Use timerManager instead of raw setTimeout (survives cleanup)
+    timerManager.setTimeout(`duel:${duelId}`, async () => {
       await completeRealtimeDuel(namespace, duelId);
     }, gameState.timeLimit * 1000);
 
@@ -386,9 +369,7 @@ async function completeRealtimeDuel(
     });
 
     // Cleanup: clear timer and remove from map
-    if (gameState.timer) {
-      clearTimeout(gameState.timer);
-    }
+    timerManager.clearTimer(`duel:${duelId}`);
     realtimeGames.delete(duelId);
   } catch (error) {
     logger.error('DUEL', `Error completing real-time duel ${duelId}: ${(error as Error).message}`);
@@ -400,7 +381,7 @@ async function completeRealtimeDuel(
  * Increments duel_played for both players, duel_wins for the winner only.
  */
 export async function updateDuelChallengeProgress(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   supabaseClient: any,
   challengerId: string,
   opponentId: string,

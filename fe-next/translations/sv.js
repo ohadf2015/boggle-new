@@ -7104,6 +7104,12 @@ const sv = {
       "scanToJoin": "Skanna för att gå med"
     },
     "classroom": {
+      "gameModes": {
+        "title": "Spelläge",
+        "classic": "Klassiskt",
+        "wordHunt": "Ordjakt",
+        "blast": "Blast"
+      },
       "create": "Skapa klassrum",
       "edit": "Redigera klassrum",
       "delete": "Ta bort klassrum",

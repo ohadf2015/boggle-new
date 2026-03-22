@@ -7170,6 +7170,12 @@ const es = {
       "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
+      "gameModes": {
+        "title": "Modo de juego",
+        "classic": "Clásico",
+        "wordHunt": "Caza de palabras",
+        "blast": "Blast"
+      },
       "create": "Crear Aula",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",

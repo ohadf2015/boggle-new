@@ -7183,6 +7183,12 @@ const en = {
       "scanToJoin": "Scan to join"
     },
     "classroom": {
+      "gameModes": {
+        "title": "Game Mode",
+        "classic": "Classic",
+        "wordHunt": "Word Hunt",
+        "blast": "Blast"
+      },
       "create": "Create Classroom",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
