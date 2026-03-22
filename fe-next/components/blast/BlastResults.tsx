@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
 // canvas-confetti is lazy-loaded (only fires on 3 stars or retrigger)
@@ -15,6 +16,7 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { StarRating, StatCard, WaveBreakdown } from './BlastResultsComponents';
 import { BlastSkillBreakdown } from './BlastSkillBreakdown';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
+import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 interface BlastResultsProps {
   results: BlastResultsData;
@@ -47,6 +49,17 @@ function useCountUp(finalValue: number): number {
  */
 export function BlastResults({ results, difficulty = 'medium', language = 'en', onPlayAgain, onBackToHome }: BlastResultsProps) {
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
+  const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
+
+  const handleBackToHome = useCallback(() => {
+    setShowTomorrowPreview(true);
+  }, []);
+
+  const handleTomorrowDismiss = useCallback(() => {
+    setShowTomorrowPreview(false);
+    onBackToHome();
+  }, [onBackToHome]);
+
   const { t } = useLanguage();
   const { showInterstitial } = useAdPlacement();
   const { isNewBestScore, isNewBestCombo } = useBlastResultSaver(results, difficulty, language);
@@ -230,7 +243,7 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
             <Button
               variant="outline"
               size="lg"
-              onClick={onBackToHome}
+              onClick={handleBackToHome}
               className="w-full min-h-[48px] font-bold uppercase border-3 border-neo-black shadow-hard-sm bg-neo-navy text-white hover:shadow-hard hover:-translate-y-0.5 transition-all"
             >
               <Home className="me-2 h-5 w-5" />
@@ -248,10 +261,16 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
       >
         <NextStepPrompt
           currentMode="blast"
-          onBackToLobby={onBackToHome}
+          onBackToLobby={handleBackToHome}
           variant="mobile"
         />
       </AdaptiveMotion.div>
+
+      <AnimatePresence>
+        {showTomorrowPreview && (
+          <TomorrowPreview mode="blast" onDismiss={handleTomorrowDismiss} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

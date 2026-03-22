@@ -31,6 +31,8 @@ const LiveActivityTicker = dynamic(() => import('./LiveActivityTicker').then(m =
 const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
 const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser), { ssr: false });
 const DailyMissionsHub = dynamic(() => import('./DailyMissionsHub').then(m => m.DailyMissionsHub), { ssr: false });
+const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
+const WordCollectionCard = dynamic(() => import('@/components/vocabulary/WordCollectionCard').then(m => m.WordCollectionCard), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -222,12 +224,30 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           languages={langCount}
         />
 
-        {/* Below-fold sections deferred until after first paint */}
-        {hydrated && <LiveActivityTicker />}
+        {/* Below-fold sections deferred until after first paint.
+            min-h reserves space to prevent CLS when components hydrate. */}
+        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '3rem' }}>
+          {hydrated && <LiveActivityTicker />}
+        </div>
 
-        {hydrated && <UrgencyCard />}
-        {hydrated && <WotdTeaser />}
-        {hydrated && <DailyMissionsHub />}
+        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '5rem' }}>
+          {hydrated && <UrgencyCard />}
+        </div>
+
+        {/* Named Rivals — social pressure from nearby league players */}
+        {isAuthenticated && (
+          <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
+            {hydrated && <LeagueRivalsCard />}
+          </div>
+        )}
+
+        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
+          {hydrated && <WotdTeaser />}
+        </div>
+        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '6rem' }}>
+          {hydrated && <DailyMissionsHub />}
+        </div>
+        {hydrated && <WordCollectionCard />}
 
         {/* Challenge / Mode Cards */}
         <LandingChallengeCards

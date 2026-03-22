@@ -47,6 +47,7 @@ import {
   getOrCreateLeague,
   addXpToLeague,
   getLeagueStandings,
+  getLeagueRivals,
   processWeeklyReset,
   type LeagueTier,
   type LeagueMember,
@@ -365,6 +366,96 @@ describe('LeagueManager', () => {
 
       const result = await processWeeklyReset();
       expect(result.relegated).toBe(0);
+    });
+  });
+
+  // ─── GET LEAGUE RIVALS ──────────────────────────────────────
+
+  describe('getLeagueRivals', () => {
+    function makeStandingsMembers(count: number) {
+      return Array.from({ length: count }, (_, i) => ({
+        user_id: `u${i}`,
+        weekly_xp: 1000 - i * 30,
+        joined_at: '2026-03-01T00:00:00Z',
+        display_name: `Player${i}`,
+      }));
+    }
+
+    it('should return player above and below in standings', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { league_id: 'league-1', user_id: 'u5' },
+        error: null,
+      });
+      mockOrder.mockResolvedValueOnce({
+        data: makeStandingsMembers(10),
+        error: null,
+      });
+
+      const result = await getLeagueRivals('u5');
+      expect(result.player.position).toBe(6);
+      expect(result.above).not.toBeNull();
+      expect(result.above!.username).toBe('Player4');
+      expect(result.above!.position).toBe(5);
+      expect(result.below).not.toBeNull();
+      expect(result.below!.username).toBe('Player6');
+      expect(result.below!.position).toBe(7);
+    });
+
+    it('should return null above when player is first', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { league_id: 'league-1', user_id: 'u0' },
+        error: null,
+      });
+      mockOrder.mockResolvedValueOnce({
+        data: makeStandingsMembers(5),
+        error: null,
+      });
+
+      const result = await getLeagueRivals('u0');
+      expect(result.above).toBeNull();
+      expect(result.below).not.toBeNull();
+      expect(result.player.position).toBe(1);
+    });
+
+    it('should return null below when player is last', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { league_id: 'league-1', user_id: 'u4' },
+        error: null,
+      });
+      mockOrder.mockResolvedValueOnce({
+        data: makeStandingsMembers(5),
+        error: null,
+      });
+
+      const result = await getLeagueRivals('u4');
+      expect(result.below).toBeNull();
+      expect(result.above).not.toBeNull();
+      expect(result.player.position).toBe(5);
+    });
+
+    it('should return both null for solo player', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { league_id: 'league-1', user_id: 'u0' },
+        error: null,
+      });
+      mockOrder.mockResolvedValueOnce({
+        data: [{ user_id: 'u0', weekly_xp: 100, joined_at: '2026-03-01T00:00:00Z', display_name: 'Solo' }],
+        error: null,
+      });
+
+      const result = await getLeagueRivals('u0');
+      expect(result.above).toBeNull();
+      expect(result.below).toBeNull();
+      expect(result.player.position).toBe(1);
+      expect(result.player.score).toBe(100);
+    });
+
+    it('should throw when player not in a league', async () => {
+      mockSingle.mockResolvedValueOnce({ data: null, error: null });
+
+      await expect(getLeagueRivals('no-league-user')).rejects.toThrow(
+        'Player not in a league'
+      );
     });
   });
 

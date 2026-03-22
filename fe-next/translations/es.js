@@ -1750,6 +1750,12 @@ const es = {
     "brainTraining": "Gym Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
   },
+  "tomorrowPreview": {
+    "singleplayer": "¡La cuadrícula de mañana tiene una letra rara. Grandes puntos te esperan!",
+    "blast": "¡El Blast de mañana tiene nuevos patrones de combo. ¿Listo?",
+    "adventure": "Vista previa del siguiente nivel cargando... ¡Vuelve para descubrirlo!",
+    "seeYou": "Nos vemos mañana"
+  },
   "practiceResults": {
     "playAgain": "Jugar de nuevo",
     "orTrySomethingNew": "o prueba algo nuevo",
@@ -3759,6 +3765,10 @@ const es = {
     "shareNativeTitle": "Únete a LexiClash",
     "playNowFree": "¡Juega ahora — Gratis!",
     "letsPlay": "¡A jugar!",
+    "duration": "{time} min",
+    "difficultyEasy": "Fácil",
+    "difficultyMedium": "Medio",
+    "difficultyHard": "Difícil",
     "gameModes": "Modos de juego",
     "languages": "Idiomas",
     "activePlayers": "Jugadores activos",
@@ -8491,7 +8501,7 @@ const es = {
     "you": "Tú",
     "noParticipants": "Sin participantes todavía"
   },
-  "league": {
+  "leagueRivals": {
     "title": "Liga Semanal",
     "bronze": "Bronce",
     "silver": "Plata",
@@ -8718,6 +8728,33 @@ const es = {
     "share": "Comparte tu hallazgo",
     "loading": "Cargando la Palabra del Dia...",
     "play": "Jugar ahora"
+  },
+  "vocabulary": {
+    "title": "Colección de Palabras",
+    "dueForReview": "¡{{count}} palabras para revisar!",
+    "totalCollected": "{{count}} palabras recopiladas",
+    "mastered": "{{count}} dominadas",
+    "reviewNow": "Revisar ahora",
+    "iKnowIt": "Lo sé",
+    "somewhat": "Algo",
+    "forgot": "Olvidé",
+    "reviewComplete": "¡Revisión completa!",
+    "empty": "¡Juega para descubrir palabras raras!"
+  },
+  "leagueRivals": {
+
+      "title": "Tus rivales de liga",
+      "ahead": "{{pts}} pts adelante",
+      "behind": "{{pts}} pts detrás",
+      "you": "Tú",
+      "noRivals": "¡Sube en la liga para encontrar rivales!"
+    }
+  },
+  "powerHour": {
+    "activated": "¡Hora de Poder activada!",
+    "description": "¡2x XP durante 60 minutos!",
+    "expired": "¡Boost completado!",
+    "badge": "{{time}}"
   }
 };
 

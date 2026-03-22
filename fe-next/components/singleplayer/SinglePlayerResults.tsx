@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
@@ -15,6 +15,7 @@ import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
+import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -81,6 +82,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
+  const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
+
+  const handleBackToLobby = useCallback(() => {
+    setShowTomorrowPreview(true);
+  }, []);
+
+  const handleTomorrowDismiss = useCallback(() => {
+    setShowTomorrowPreview(false);
+    onBackToLobby();
+  }, [onBackToLobby]);
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
@@ -218,7 +229,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {!autoPlayCancelled ? (
             <AutoPlayCountdown onComplete={onPlayAgain} onCancel={() => setAutoPlayCancelled(true)} duration={5} className="mt-auto" />
           ) : (
-            <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
+            <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" className="mt-auto" />
           )}
         </div>
         <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
@@ -298,13 +309,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       ) : (
         <>
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
           {results.grid && (
             <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
               gameLanguage={gameLanguage} gameDuration={results.gameDuration}
               variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
           )}
-          <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={onBackToLobby}>
+          <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={handleBackToLobby}>
             <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
           </Button>
         </>
@@ -382,9 +393,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
       {!isDesktop && (
         <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 backdrop-blur-sm border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" />
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" />
         </div>
       )}
+
+      <AnimatePresence>
+        {showTomorrowPreview && (
+          <TomorrowPreview mode={mode === 'practice' ? 'singleplayer' : mode as 'singleplayer'} onDismiss={handleTomorrowDismiss} />
+        )}
+      </AnimatePresence>
 
       {showWordValidation && wordValidationQueue.length > 0 && (
         <WordFeedbackModal isOpen={showWordValidation} word={wordValidationQueue[0] || ''} submittedBy="Bot"

@@ -1702,6 +1702,12 @@ const sv = {
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Vässa hjärnan"
   },
+  "tomorrowPreview": {
+    "singleplayer": "Morgondagens rutnät har en sällsynt bokstav. Stora poäng väntar!",
+    "blast": "Morgondagens Blast har nya kombomönster. Redo?",
+    "adventure": "Förhandsgranskning av nästa nivå laddas... Kom tillbaka!",
+    "seeYou": "Vi ses imorgon"
+  },
   "practiceResults": {
     "playAgain": "Spela igen",
     "orTrySomethingNew": "eller prova något nytt",
@@ -3714,6 +3720,10 @@ const sv = {
     "shareNativeTitle": "Gå med i LexiClash",
     "playNowFree": "Spela nu — Gratis!",
     "letsPlay": "Nu kör vi!",
+    "duration": "{time} min",
+    "difficultyEasy": "Lätt",
+    "difficultyMedium": "Medel",
+    "difficultyHard": "Svårt",
     "gameModes": "Spellägen",
     "languages": "Språk",
     "activePlayers": "Aktiva spelare",
@@ -8468,7 +8478,7 @@ const sv = {
     "you": "Du",
     "noParticipants": "Inga deltagare ännu"
   },
-  "league": {
+  "leagueRivals": {
     "title": "Veckoliga",
     "bronze": "Brons",
     "silver": "Silver",
@@ -8657,6 +8667,33 @@ const sv = {
     "share": "Dela din upptäckt",
     "loading": "Laddar Dagens Ord...",
     "play": "Spela nu"
+  },
+  "vocabulary": {
+    "title": "Ordsamling",
+    "dueForReview": "{{count}} ord att repetera!",
+    "totalCollected": "{{count}} ord samlade",
+    "mastered": "{{count}} behärskade",
+    "reviewNow": "Repetera nu",
+    "iKnowIt": "Jag kan det",
+    "somewhat": "Delvis",
+    "forgot": "Glömt",
+    "reviewComplete": "Repetition klar!",
+    "empty": "Spela spel för att hitta sällsynta ord!"
+  },
+  "leagueRivals": {
+
+      "title": "Dina ligarivaler",
+      "ahead": "{{pts}} poäng före",
+      "behind": "{{pts}} poäng efter",
+      "you": "Du",
+      "noRivals": "Klättra i ligan för att hitta rivaler!"
+    }
+  },
+  "powerHour": {
+    "activated": "Power Hour aktiverad!",
+    "description": "2x XP i 60 minuter!",
+    "expired": "Boost klar!",
+    "badge": "{{time}}"
   }
 };
 

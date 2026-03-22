@@ -48,6 +48,19 @@ export interface LeagueAssignment {
   tier: LeagueTier;
 }
 
+export interface LeagueRivalPlayer {
+  username: string;
+  avatar: string;
+  score: number;
+  position: number;
+}
+
+export interface LeagueRivalsResult {
+  above: LeagueRivalPlayer | null;
+  below: LeagueRivalPlayer | null;
+  player: { position: number; score: number };
+}
+
 export interface WeeklyResetResult {
   leaguesProcessed: number;
   promoted: number;
@@ -274,6 +287,47 @@ export async function getLeagueStandings(leagueId: string): Promise<LeagueStandi
     zone: getZone(i + 1, sorted.length),
     joinedAt: m.joined_at,
   }));
+}
+
+/**
+ * Get the 2 players directly above and below the current player in standings.
+ * Used for the "Named Rivals" feature on the landing page.
+ */
+export async function getLeagueRivals(playerId: string): Promise<LeagueRivalsResult> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Supabase client not initialized");
+
+  // Find player's current league
+  const { data: membership } = await supabase
+    .from('league_members')
+    .select('league_id, user_id')
+    .eq('user_id', playerId)
+    .single();
+
+  if (!membership) throw new Error('Player not in a league');
+
+  // Get standings for the league
+  const standings = await getLeagueStandings(membership.league_id);
+  const playerIdx = standings.findIndex((s) => s.userId === playerId);
+
+  if (playerIdx === -1) throw new Error('Player not in a league');
+
+  const playerStanding = standings[playerIdx];
+  const aboveStanding = playerIdx > 0 ? standings[playerIdx - 1] : null;
+  const belowStanding = playerIdx < standings.length - 1 ? standings[playerIdx + 1] : null;
+
+  const toRival = (s: LeagueStanding): LeagueRivalPlayer => ({
+    username: s.displayName,
+    avatar: '',
+    score: s.weeklyXp,
+    position: s.position,
+  });
+
+  return {
+    above: aboveStanding ? toRival(aboveStanding) : null,
+    below: belowStanding ? toRival(belowStanding) : null,
+    player: { position: playerStanding.position, score: playerStanding.weeklyXp },
+  };
 }
 
 /**

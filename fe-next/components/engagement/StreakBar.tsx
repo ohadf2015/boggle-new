@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
+import { PowerHourBadge } from './PowerHourBadge';
 
 function formatNumber(n: number): string {
   return n.toLocaleString('en-US');
@@ -92,6 +93,9 @@ export const StreakBar: React.FC = memo(() => {
             />
           </div>
         </div>
+
+        {/* Power Hour Badge */}
+        <PowerHourBadge />
 
         {/* Gold */}
         <div className="flex items-center gap-1" data-testid="streak-gold">

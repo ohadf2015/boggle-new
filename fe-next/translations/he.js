@@ -1721,6 +1721,12 @@ const he = {
     "brainTraining": "אימון מוחי",
     "brainTrainingDesc": "שדרגו את המוח"
   },
+  "tomorrowPreview": {
+    "singleplayer": "ללוח של מחר יש אות נדירה. נקודות גדולות מחכות!",
+    "blast": "לבלאסט של מחר יש דפוסי קומבו חדשים. מוכנים?",
+    "adventure": "...התצוגה המקדימה של השלב הבא נטענת. חזרו כדי לגלות!",
+    "seeYou": "נתראה מחר"
+  },
   "practiceResults": {
     "playAgain": "שחקו שוב",
     "orTrySomethingNew": "או נסו משהו חדש",
@@ -3733,6 +3739,10 @@ const he = {
     "shareNativeTitle": "הצטרף ל-LexiClash",
     "playNowFree": "שחקו עכשיו — חינם!",
     "letsPlay": "בואו נשחק!",
+    "duration": "{time} דק׳",
+    "difficultyEasy": "קל",
+    "difficultyMedium": "בינוני",
+    "difficultyHard": "קשה",
     "gameModes": "מצבי משחק",
     "languages": "שפות",
     "activePlayers": "שחקנים פעילים",
@@ -8473,7 +8483,7 @@ const he = {
     "you": "את/ה",
     "noParticipants": "אין משתתפים עדיין"
   },
-  "league": {
+  "leagueRivals": {
     "title": "ליגה שבועית",
     "bronze": "ארד",
     "silver": "כסף",
@@ -8662,6 +8672,33 @@ const he = {
     "share": "שתפו את הגילוי",
     "loading": "...טוען את מילת היום",
     "play": "שחקו עכשיו"
+  },
+  "vocabulary": {
+    "title": "אוסף מילים",
+    "dueForReview": "{{count}} מילים לסקירה!",
+    "totalCollected": "{{count}} מילים נאספו",
+    "mastered": "{{count}} נשלטו",
+    "reviewNow": "סקרו עכשיו",
+    "iKnowIt": "אני יודע/ת",
+    "somewhat": "קצת",
+    "forgot": "שכחתי",
+    "reviewComplete": "הסקירה הושלמה!",
+    "empty": "שחקו משחקים כדי לגלות מילים נדירות!"
+  },
+  "leagueRivals": {
+
+      "title": "היריבים שלך בליגה",
+      "ahead": "{{pts}} נקודות מעליך",
+      "behind": "{{pts}} נקודות מתחתיך",
+      "you": "את/ה",
+      "noRivals": "טפסו בליגה כדי למצוא יריבים!"
+    }
+  },
+  "powerHour": {
+    "activated": "שעת כוח הופעלה!",
+    "description": "XP כפול ל-60 דקות!",
+    "expired": "הבוסט הסתיים!",
+    "badge": "{{time}}"
   }
 };
 

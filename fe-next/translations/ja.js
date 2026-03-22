@@ -1703,6 +1703,12 @@ const ja = {
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
   },
+  "tomorrowPreview": {
+    "singleplayer": "明日のグリッドにはレアな文字が。大量ポイントが待ってる！",
+    "blast": "明日のブラストには新コンボパターン。準備は？",
+    "adventure": "次のレベルプレビュー読み込み中...戻ってきて確認！",
+    "seeYou": "また明日"
+  },
   "practiceResults": {
     "playAgain": "もう一回",
     "orTrySomethingNew": "他のモードも試してみよう",
@@ -3714,6 +3720,10 @@ const ja = {
     "shareNativeTitle": "LexiClashに参加",
     "playNowFree": "今すぐプレイ — 無料！",
     "letsPlay": "さあ、遊ぼう！",
+    "duration": "{time}分",
+    "difficultyEasy": "かんたん",
+    "difficultyMedium": "ふつう",
+    "difficultyHard": "むずかしい",
     "gameModes": "ゲームモード",
     "languages": "言語",
     "activePlayers": "アクティブプレイヤー",
@@ -8448,7 +8458,7 @@ const ja = {
     "you": "あなた",
     "noParticipants": "まだ参加者がいません"
   },
-  "league": {
+  "leagueRivals": {
     "title": "ウィークリーリーグ",
     "bronze": "ブロンズ",
     "silver": "シルバー",
@@ -8637,6 +8647,33 @@ const ja = {
     "share": "発見をシェア",
     "loading": "今日の単語を読み込み中...",
     "play": "今すぐプレイ"
+  },
+  "vocabulary": {
+    "title": "単語コレクション",
+    "dueForReview": "復習待ち{{count}}語！",
+    "totalCollected": "{{count}}語収集済み",
+    "mastered": "{{count}}語マスター",
+    "reviewNow": "今すぐ復習",
+    "iKnowIt": "知ってる",
+    "somewhat": "まあまあ",
+    "forgot": "忘れた",
+    "reviewComplete": "復習完了！",
+    "empty": "ゲームをプレイしてレアな単語を発見しよう！"
+  },
+  "leagueRivals": {
+
+      "title": "リーグライバル",
+      "ahead": "{{pts}}ポイント上",
+      "behind": "{{pts}}ポイント下",
+      "you": "あなた",
+      "noRivals": "リーグを上がってライバルを見つけよう！"
+    }
+  },
+  "powerHour": {
+    "activated": "パワーアワー発動！",
+    "description": "60分間XP2倍！",
+    "expired": "ブースト完了！",
+    "badge": "{{time}}"
   }
 };
 

@@ -1805,6 +1805,12 @@ const en = {
     "brainTraining": "Brain Gym",
     "brainTrainingDesc": "Level up your mental game"
   },
+  "tomorrowPreview": {
+    "singleplayer": "Tomorrow's grid has a rare letter. Big points await!",
+    "blast": "Tomorrow's Blast has new combo patterns. Ready?",
+    "adventure": "Next level preview loading... Come back to find out!",
+    "seeYou": "See you tomorrow"
+  },
   "practiceResults": {
     "playAgain": "Play Again",
     "orTrySomethingNew": "or try something new",
@@ -3819,6 +3825,10 @@ const en = {
     "shareNativeTitle": "Join LexiClash",
     "playNowFree": "Play Now — Free!",
     "letsPlay": "Let's Play!",
+    "duration": "{time} min",
+    "difficultyEasy": "Easy",
+    "difficultyMedium": "Medium",
+    "difficultyHard": "Hard",
     "gameModes": "Game Modes",
     "languages": "Languages",
     "activePlayers": "Active Players",
@@ -8511,7 +8521,7 @@ const en = {
     "you": "You",
     "noParticipants": "No participants yet"
   },
-  "league": {
+  "leagueRivals": {
     "title": "Weekly League",
     "bronze": "Bronze",
     "silver": "Silver",
@@ -8700,6 +8710,31 @@ const en = {
     "share": "Share your find",
     "loading": "Loading Word of the Day...",
     "play": "Play now"
+  },
+  "vocabulary": {
+    "title": "Word Collection",
+    "dueForReview": "{{count}} words due for review!",
+    "totalCollected": "{{count}} words collected",
+    "mastered": "{{count}} mastered",
+    "reviewNow": "Review Now",
+    "iKnowIt": "I know it",
+    "somewhat": "Somewhat",
+    "forgot": "Forgot",
+    "reviewComplete": "Review complete!",
+    "empty": "Play games to discover rare words!"
+  },
+  "leagueRivals": {
+    "title": "Your League Rivals",
+    "ahead": "{{pts}} pts ahead",
+    "behind": "{{pts}} pts behind",
+    "you": "You",
+    "noRivals": "Climb the league to find rivals!"
+  },
+  "powerHour": {
+    "activated": "Power Hour Activated!",
+    "description": "2x XP for the next 60 minutes!",
+    "expired": "Boost Complete!",
+    "badge": "{{time}}"
   }
 };
 
