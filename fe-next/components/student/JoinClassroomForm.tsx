@@ -148,7 +148,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(
-                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pr-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
+                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
                       codeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
                   />
@@ -160,7 +160,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                           size="icon"
                           variant="outline"
                           onClick={handlePaste}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-neo border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-hard-pressed transition-all"
+                          className="absolute end-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-neo border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-hard-pressed transition-all"
                           aria-label={t('education.student.join.pasteButton')}
                         >
                           <ClipboardPaste className="w-4 h-4" />

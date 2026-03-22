@@ -123,10 +123,10 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
       className={cn(
         'rounded-neo-xl border-4 border-black bg-neo-navy overflow-hidden shadow-hard-lg',
         // Party mode: thick left accent when collapsed
-        !isOpen && cn('border-l-[10px]', {
-          yellow: 'border-l-neo-yellow',
-          pink: 'border-l-neo-pink',
-          cyan: 'border-l-neo-cyan',
+        !isOpen && cn('border-s-[10px]', {
+          yellow: 'border-s-neo-yellow',
+          pink: 'border-s-neo-pink',
+          cyan: 'border-s-neo-cyan',
         }[badgeColor])
       )}
     >

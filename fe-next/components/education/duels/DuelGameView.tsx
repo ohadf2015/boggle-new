@@ -16,7 +16,7 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords, Check, X, Trophy, Flame, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getDuelById } from '@/lib/supabase/education/duels';
@@ -219,9 +219,15 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
         <X className="w-12 h-12 text-red-500 mb-4" />
-        <p className="text-neo-white text-lg" data-testid="duel-error">
+        <p className="text-neo-white text-lg mb-6" data-testid="duel-error">
           {error}
         </p>
+        <button
+          onClick={onBackToLobby}
+          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+        >
+          {t('duels.backToLobby')}
+        </button>
       </div>
     );
   }
@@ -240,13 +246,13 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
     const xp = isWinner ? result.xpAwarded.winner : result.xpAwarded.loser;
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center min-h-[500px] text-center p-8"
       >
         {/* Result Badge */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
@@ -260,7 +266,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           ) : (
             <Swords className="w-16 h-16 text-neo-white" />
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Result Text */}
         <h2 className="text-4xl font-neo-display font-bold text-neo-white mb-4">
@@ -312,7 +318,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             {t('duels.backToLobby')}
           </button>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
@@ -322,7 +328,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
   if (phase === 'waiting' && validatedScore) {
     return (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center min-h-[500px] text-center p-8"
@@ -354,7 +360,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <p className="text-neo-white/70 text-sm">
           {t('duels.scoreToBeat')}: <span className="font-bold">{validatedScore.score}</span>
         </p>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
@@ -442,7 +448,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
           {/* Found Words List */}
           <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {wordsFound.length === 0 ? (
                 <p className="text-neo-white/50 text-sm text-center py-8">
                   {t('duels.typeWord')}
@@ -450,7 +456,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {wordsFound.map((word, idx) => (
-                    <motion.div
+                    <AdaptiveMotion.div
                       key={idx}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -458,11 +464,11 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                       className="px-3 py-1 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard-sm"
                     >
                       {word}
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   ))}
                 </div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
           </div>
 
           {/* Submit Button */}

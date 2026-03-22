@@ -355,7 +355,7 @@ export default function ClassroomManager() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
+                className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
                 aria-label={t('common.close')}
               >
                 <X className="w-4 h-4" />

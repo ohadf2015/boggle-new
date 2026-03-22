@@ -144,7 +144,7 @@ export default function DuelChallengeModal({
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black',
                 'shadow-hard-sm transition-all',
-                'text-left',
+                'text-start',
                 duelType === 'async'
                   ? 'bg-neo-yellow text-neo-black shadow-hard'
                   : 'bg-neo-navy text-neo-white hover:shadow-hard'
@@ -163,7 +163,7 @@ export default function DuelChallengeModal({
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black',
                 'shadow-hard-sm transition-all',
-                'text-left',
+                'text-start',
                 duelType === 'realtime'
                   ? 'bg-neo-yellow text-neo-black shadow-hard'
                   : 'bg-neo-navy text-neo-white hover:shadow-hard'

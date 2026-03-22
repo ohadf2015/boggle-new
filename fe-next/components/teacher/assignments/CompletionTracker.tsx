@@ -8,9 +8,15 @@ import { cn } from '@/lib/utils';
 import { CheckCircle, Circle, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 
+interface StudentRosterEntry {
+  student_id: string;
+  display_name: string;
+}
+
 interface CompletionTrackerProps {
   assignmentId: string;
   totalStudents: number;
+  studentRoster?: StudentRosterEntry[];
 }
 
 interface ExtendedCompletion extends AssignmentCompletion {
@@ -26,6 +32,7 @@ interface StrugglingWord {
 export default function CompletionTracker({
   assignmentId,
   totalStudents,
+  studentRoster,
 }: CompletionTrackerProps) {
   const { t } = useLanguage();
   const [completions, setCompletions] = useState<ExtendedCompletion[]>([]);
@@ -74,6 +81,15 @@ export default function CompletionTracker({
 
   // Sort: completed students first (by score DESC), then not-completed
   const sortedCompletions = [...completions].sort((a, b) => b.score - a.score);
+
+  // Determine which students haven't completed the assignment
+  const completedStudentIds = new Set(completions.map((c) => c.student_id));
+  const nonCompletingStudents = studentRoster
+    ? studentRoster.filter((s) => !completedStudentIds.has(s.student_id))
+    : [];
+  const anonymousNotCompleted = studentRoster
+    ? 0
+    : Math.max(0, totalStudents - completions.length);
 
   if (isLoading) {
     return (
@@ -131,8 +147,24 @@ export default function CompletionTracker({
           </div>
         ))}
 
-        {/* Not completed students (placeholder - we don't have student roster here) */}
-        {Array.from({ length: Math.max(0, totalStudents - completions.length) }).map((_, i) => (
+        {/* Not completed students — named if roster provided, anonymous fallback */}
+        {nonCompletingStudents.map((student) => (
+          <div
+            key={`pending-${student.student_id}`}
+            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-black/30"
+          >
+            <div className="flex items-center gap-3">
+              <Circle className="w-5 h-5 text-neo-white/30" />
+              <div className="font-neo-body text-neo-white/50">
+                {student.display_name}
+              </div>
+            </div>
+            <span className="text-xs text-neo-white/30 font-neo-body">
+              {t('teacher.completion.notCompleted')}
+            </span>
+          </div>
+        ))}
+        {Array.from({ length: anonymousNotCompleted }).map((_, i) => (
           <div
             key={`pending-${i}`}
             className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-black/30"

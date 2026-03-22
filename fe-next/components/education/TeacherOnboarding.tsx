@@ -1,7 +1,8 @@
 'use client';
 
-import { memo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo, useCallback, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   GraduationCap,
   Users,
@@ -90,6 +91,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
 }) => {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const {
     shouldShowOnboarding,
@@ -99,6 +101,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
     complete,
     skip,
   } = useTeacherOnboardingState();
+
+  useFocusTrap(modalRef, shouldShowOnboarding, onSkip);
 
   // Handle next/finish
   const handleNext = useCallback(() => {
@@ -131,14 +135,15 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
   const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
 
   return (
-    <AnimatePresence>
-      <motion.div
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4"
       >
-        <motion.div
+        <AdaptiveMotion.div
+          ref={modalRef}
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -149,6 +154,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
             'rounded-neo-lg shadow-hard-xl',
             'overflow-hidden'
           )}
+          role="dialog"
+          aria-modal="true"
         >
           {/* Skip button */}
           <button
@@ -182,8 +189,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           </div>
 
           {/* Step content */}
-          <AnimatePresence mode="wait">
-            <motion.div
+          <AdaptiveAnimatePresence mode="wait">
+            <AdaptiveMotion.div
               key={step.id}
               initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -223,8 +230,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
                   {t('education.onboarding.of')} {ONBOARDING_STEPS.length}
                 </span>
               </div>
-            </motion.div>
-          </AnimatePresence>
+            </AdaptiveMotion.div>
+          </AdaptiveAnimatePresence>
 
           {/* Navigation buttons */}
           <div className={cn(
@@ -274,15 +281,15 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           </div>
 
           {/* Decorative sparkles */}
-          <div className="absolute top-8 left-8 text-neo-yellow/30">
+          <div className="absolute top-8 start-8 text-neo-yellow/30">
             <Sparkles className="w-6 h-6" />
           </div>
-          <div className="absolute bottom-12 right-12 text-neo-pink/30">
+          <div className="absolute bottom-12 end-12 text-neo-pink/30">
             <Sparkles className="w-4 h-4" />
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </AdaptiveMotion.div>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 });
 

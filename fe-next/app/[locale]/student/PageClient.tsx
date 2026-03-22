@@ -33,7 +33,8 @@ import { ReviewDueBadge } from '@/components/education/ReviewDueBadge';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
-import { Trophy, Zap, Flame } from 'lucide-react';
+import { Trophy, Zap, Flame, UserPlus } from 'lucide-react';
+import Link from 'next/link';
 
 // --- Animation variants ---
 
@@ -381,6 +382,32 @@ export default function StudentPageClient() {
             <StudentReviewBadge />
           </div>
         </motion.div>
+
+        {/* Join Classroom CTA (when no classroom) */}
+        {!classroomId && (
+          <motion.div
+            className="mb-6 bg-neo-yellow text-neo-black border-3 border-black rounded-neo shadow-hard p-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <UserPlus className="w-8 h-8 text-neo-black" />
+              <h2 className="text-xl font-neo-display font-black">
+                {t('student.joinClassroom')}
+              </h2>
+            </div>
+            <p className="font-neo-body text-neo-black/70 mb-4">
+              {t('student.joinClassroomDescription')}
+            </p>
+            <Link
+              href={`/${language}/student/join`}
+              className="inline-block px-6 py-3 bg-neo-black text-neo-yellow font-neo-display font-bold rounded-neo border-3 border-black shadow-hard-sm hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            >
+              {t('student.joinClassroom')}
+            </Link>
+          </motion.div>
+        )}
 
         {/* Classroom Game Banner (if active) */}
         {classroomId && (

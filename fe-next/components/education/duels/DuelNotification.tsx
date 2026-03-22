@@ -86,7 +86,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
           className={cn(
             'fixed z-50',
             // Position: bottom-right on desktop, top-right on mobile
-            'bottom-6 right-6 md:bottom-8 md:right-8',
+            'bottom-6 end-6 md:bottom-8 md:end-8',
             'max-w-sm w-full'
           )}
         >

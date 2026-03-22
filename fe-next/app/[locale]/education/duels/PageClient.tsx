@@ -71,12 +71,16 @@ export default function DuelsPageClient() {
     <div className="min-h-dvh bg-neo-navy p-4 sm:p-6">
       <DuelNotification classroomId={classroom.id} />
 
-      <div className="flex gap-1 mb-6 border-b-2 border-neo-white/10">
+      <div className="flex gap-1 mb-6 border-b-2 border-neo-white/10" role="tablist">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`tabpanel-${tab.id}`}
+              id={`tab-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'flex items-center gap-2 px-6 py-3 font-bold transition-all',
@@ -93,20 +97,28 @@ export default function DuelsPageClient() {
       </div>
 
       {activeTab === 'lobby' && (
-        <DuelLobby
-          classroomId={classroom.id}
-          studentId={user.id}
-          lessons={lessonOptions}
-        />
+        <div role="tabpanel" id="tabpanel-lobby" aria-labelledby="tab-lobby">
+          <DuelLobby
+            classroomId={classroom.id}
+            studentId={user.id}
+            lessons={lessonOptions}
+          />
+        </div>
       )}
-      {activeTab === 'history' && <DuelHistory studentId={user.id} />}
+      {activeTab === 'history' && (
+        <div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
+          <DuelHistory studentId={user.id} />
+        </div>
+      )}
       {activeTab === 'classmates' && (
-        <ClassmatesList
-          classmates={classmates}
-          classroomId={classroom.id}
-          lessons={lessonOptions}
-          currentUserId={user.id}
-        />
+        <div role="tabpanel" id="tabpanel-classmates" aria-labelledby="tab-classmates">
+          <ClassmatesList
+            classmates={classmates}
+            classroomId={classroom.id}
+            lessons={lessonOptions}
+            currentUserId={user.id}
+          />
+        </div>
       )}
     </div>
   );
