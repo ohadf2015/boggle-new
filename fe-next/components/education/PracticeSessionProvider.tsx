@@ -221,8 +221,6 @@ export function PracticeSessionProvider({
       streak,
       currentLevel,
       totalXp,
-      studentId,
-      lessonId,
       checkForUnlocks,
       totalPracticeSessions,
       totalWordsMastered,
