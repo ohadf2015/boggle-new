@@ -7,6 +7,7 @@ import { RotateCcw, Home, Trophy, Zap, Grid3X3, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
+import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
@@ -45,6 +46,7 @@ function useCountUp(finalValue: number): number {
  * Shows star rating, animated score count-up, confetti on 3 stars, and retrigger button.
  */
 export function BlastResults({ results, difficulty = 'medium', language = 'en', onPlayAgain, onBackToHome }: BlastResultsProps) {
+  const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const { t } = useLanguage();
   const { showInterstitial } = useAdPlacement();
   const { isNewBestScore, isNewBestCombo } = useBlastResultSaver(results, difficulty, language);
@@ -208,24 +210,34 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
         transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 1.0 }}
         className="flex flex-col gap-3 w-full max-w-sm lg:max-w-md"
       >
-        <Button
-          variant="success"
-          size="lg"
-          onClick={onPlayAgain}
-          className="w-full min-h-[52px] font-black text-lg uppercase border-3 border-neo-black shadow-hard"
-        >
-          <RotateCcw className="me-2 h-5 w-5" />
-          {t('common.playAgain')}
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onBackToHome}
-          className="w-full min-h-[48px] font-bold uppercase border-3 border-neo-black shadow-hard-sm bg-neo-navy text-white hover:shadow-hard hover:-translate-y-0.5 transition-all"
-        >
-          <Home className="me-2 h-5 w-5" />
-          {t('common.home')}
-        </Button>
+        {!autoPlayCancelled ? (
+          <AutoPlayCountdown
+            onComplete={onPlayAgain}
+            onCancel={() => setAutoPlayCancelled(true)}
+            duration={5}
+          />
+        ) : (
+          <>
+            <Button
+              variant="success"
+              size="lg"
+              onClick={onPlayAgain}
+              className="w-full min-h-[52px] font-black text-lg uppercase border-3 border-neo-black shadow-hard"
+            >
+              <RotateCcw className="me-2 h-5 w-5" />
+              {t('common.playAgain')}
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={onBackToHome}
+              className="w-full min-h-[48px] font-bold uppercase border-3 border-neo-black shadow-hard-sm bg-neo-navy text-white hover:shadow-hard hover:-translate-y-0.5 transition-all"
+            >
+              <Home className="me-2 h-5 w-5" />
+              {t('common.home')}
+            </Button>
+          </>
+        )}
       </AdaptiveMotion.div>
 
       <AdaptiveMotion.div

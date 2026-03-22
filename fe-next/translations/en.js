@@ -8637,6 +8637,12 @@ const en = {
     "streak": "{{count}} day streak",
     "streakAtRisk": "Streak ends tonight!",
     "level": "Lvl {{level}}"
+  },
+  "autoPlay": {
+    "nextGameIn": "Next game in {{seconds}}...",
+    "playAgain": "PLAY AGAIN",
+    "exit": "Exit",
+    "shuffling": "SHUFFLING..."
   }
 };
 

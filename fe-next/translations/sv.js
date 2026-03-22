@@ -8594,6 +8594,12 @@ const sv = {
     "streak": "{{count}} dagars svit",
     "streakAtRisk": "Sviten slutar ikväll!",
     "level": "Nivå {{level}}"
+  },
+  "autoPlay": {
+    "nextGameIn": "Nästa spel om {{seconds}}...",
+    "playAgain": "SPELA IGEN",
+    "exit": "Avsluta",
+    "shuffling": "BLANDAR..."
   }
 };
 

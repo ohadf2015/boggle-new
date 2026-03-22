@@ -419,6 +419,15 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       totalPlayers: result.totalPlayers,
       readyUsernames: result.readyUsernames
     });
+
+    // Auto-advance: when ALL non-host players are ready, notify the host
+    if (result.readyCount >= result.totalPlayers && result.totalPlayers > 0) {
+      logger.info('SOCKET', `All non-host players ready in ${gameCode} — notifying host to auto-advance`);
+      broadcastToRoom(io, getGameRoom(gameCode), 'allPlayersReady', {
+        readyCount: result.readyCount,
+        totalPlayers: result.totalPlayers,
+      });
+    }
   });
 
   // Handle player toggling lobby ready state

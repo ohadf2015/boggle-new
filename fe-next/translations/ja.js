@@ -8574,6 +8574,12 @@ const ja = {
     "streak": "{{count}}日連続",
     "streakAtRisk": "今夜で連続記録が途切れます！",
     "level": "Lv {{level}}"
+  },
+  "autoPlay": {
+    "nextGameIn": "次のゲームまで {{seconds}}秒...",
+    "playAgain": "もう一度プレイ",
+    "exit": "終了",
+    "shuffling": "シャッフル中..."
   }
 };
 

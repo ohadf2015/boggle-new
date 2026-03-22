@@ -8655,6 +8655,12 @@ const es = {
     "streak": "Racha de {{count}} días",
     "streakAtRisk": "¡La racha termina esta noche!",
     "level": "Nvl {{level}}"
+  },
+  "autoPlay": {
+    "nextGameIn": "Siguiente juego en {{seconds}}...",
+    "playAgain": "JUGAR DE NUEVO",
+    "exit": "Salir",
+    "shuffling": "MEZCLANDO..."
   }
 };
 

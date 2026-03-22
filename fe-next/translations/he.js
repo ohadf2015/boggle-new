@@ -8599,6 +8599,12 @@ const he = {
     "streak": "רצף של {{count}} ימים",
     "streakAtRisk": "!הרצף מסתיים הלילה",
     "level": "רמה {{level}}"
+  },
+  "autoPlay": {
+    "nextGameIn": "...{{seconds}} המשחק הבא בעוד",
+    "playAgain": "שחקו שוב",
+    "exit": "יציאה",
+    "shuffling": "...מערבבים"
   }
 };
 

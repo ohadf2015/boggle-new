@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
@@ -14,6 +14,7 @@ import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
+import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,10 +76,11 @@ interface SinglePlayerResultsProps {
 const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   results,
   mode,
-  onPlayAgain: _onPlayAgain,
+  onPlayAgain,
   onQuickRematch: _onQuickRematch,
   onBackToLobby,
 }) => {
+  const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
@@ -213,7 +215,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {missedWords.length > 0 && (
             <MissedWords missedWords={missedWords} maxDisplay={5} className="text-sm" />
           )}
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
+          {!autoPlayCancelled ? (
+            <AutoPlayCountdown onComplete={onPlayAgain} onCancel={() => setAutoPlayCancelled(true)} duration={5} className="mt-auto" />
+          ) : (
+            <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant="landscape" className="mt-auto" />
+          )}
         </div>
         <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
       </div>
@@ -284,15 +290,25 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const ctaBlock = (
     <div className="space-y-3">
-      <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
-      {results.grid && (
-        <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
-          gameLanguage={gameLanguage} gameDuration={results.gameDuration}
-          variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
+      {!autoPlayCancelled ? (
+        <AutoPlayCountdown
+          onComplete={onPlayAgain}
+          onCancel={() => setAutoPlayCancelled(true)}
+          duration={5}
+        />
+      ) : (
+        <>
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={onBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
+          {results.grid && (
+            <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
+              gameLanguage={gameLanguage} gameDuration={results.gameDuration}
+              variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
+          )}
+          <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={onBackToLobby}>
+            <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
+          </Button>
+        </>
       )}
-      <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={onBackToLobby}>
-        <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
-      </Button>
     </div>
   );
 
