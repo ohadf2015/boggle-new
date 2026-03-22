@@ -282,7 +282,7 @@ describe('PracticeSessionProvider', () => {
       });
     });
 
-    it('calls Supabase to persist XP on session complete', async () => {
+    it('does NOT call Supabase directly — XP persistence is server-side only (C2 fix)', async () => {
       const user = userEvent.setup();
 
       render(
@@ -293,9 +293,9 @@ describe('PracticeSessionProvider', () => {
 
       await user.click(screen.getByTestId('complete-btn'));
 
-      await waitFor(() => {
-        expect(mockSupabaseUpsert).toHaveBeenCalled();
-      });
+      // C2 fix: persistToSupabase was removed — client should NOT write XP directly
+      // All XP persistence goes through PATCH /api/education/practice server-side
+      expect(mockSupabaseUpsert).not.toHaveBeenCalled();
     });
   });
 

@@ -8528,6 +8528,20 @@ const en = {
     "you": "You",
     "noParticipants": "No participants yet"
   },
+  "league": {
+    "standings": "Standings",
+    "yourPosition": "Your Position",
+    "xp": "XP",
+    "noLeague": "Join a league to compete!",
+    "positionOf": "{position} of {total}",
+    "xpToPromote": "{xp} XP to promote",
+    "xpAboveRelegation": "{xp} XP above relegation",
+    "promotionZone": "Promotion Zone",
+    "safeZone": "Safe Zone",
+    "relegationZone": "Relegation Zone",
+    "finalResults": "Final Results",
+    "coinsEarned": "Coins Earned"
+  },
   "leagueRivals": {
     "title": "Weekly League",
     "bronze": "Bronze",

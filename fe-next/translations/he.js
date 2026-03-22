@@ -8490,6 +8490,20 @@ const he = {
     "you": "את/ה",
     "noParticipants": "אין משתתפים עדיין"
   },
+  "league": {
+    "standings": "טבלת דירוג",
+    "yourPosition": "המיקום שלך",
+    "xp": "XP",
+    "noLeague": "הצטרפו לליגה כדי להתחרות!",
+    "positionOf": "{position} מתוך {total}",
+    "xpToPromote": "{xp} XP לעלייה",
+    "xpAboveRelegation": "{xp} XP מעל ירידה",
+    "promotionZone": "אזור עלייה",
+    "safeZone": "אזור בטוח",
+    "relegationZone": "אזור ירידה",
+    "finalResults": "תוצאות סופיות",
+    "coinsEarned": "מטבעות שהרווחת"
+  },
   "leagueRivals": {
     "title": "ליגה שבועית",
     "bronze": "ארד",

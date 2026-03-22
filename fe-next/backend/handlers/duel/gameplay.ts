@@ -15,6 +15,7 @@ import { isDictionaryWord } from '@/backend/dictionary';
 import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
+import { updateDuelChallengeProgress } from './realtime';
 import logger from '@/backend/utils/logger';
 
 // ==========================================
@@ -212,7 +213,8 @@ export function registerGameplayHandlers(
           updatedDuel.challenger_id,
           updatedDuel.opponent_id,
           challengerScore,
-          opponentScore
+          opponentScore,
+          duel.lesson_id
         );
       }
 
@@ -243,7 +245,8 @@ async function completeDuel(
   challengerId: string,
   opponentId: string,
   challengerScore: number,
-  opponentScore: number
+  opponentScore: number,
+  lessonId: string
 ): Promise<void> {
   const supabase = getSupabase();
   if (!supabase) {
@@ -300,10 +303,12 @@ async function completeDuel(
         supabase.rpc('award_education_xp', {
           p_student_id: challengerId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_DRAW,
+          p_lesson_id: lessonId,
         }),
         supabase.rpc('award_education_xp', {
           p_student_id: opponentId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_DRAW,
+          p_lesson_id: lessonId,
         }),
       ]);
 
@@ -323,10 +328,12 @@ async function completeDuel(
         supabase.rpc('award_education_xp', {
           p_student_id: winnerId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_WIN_ASYNC,
+          p_lesson_id: lessonId,
         }),
         supabase.rpc('award_education_xp', {
           p_student_id: loserId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_LOSS_ASYNC,
+          p_lesson_id: lessonId,
         }),
       ]);
 
@@ -335,6 +342,11 @@ async function completeDuel(
         `Duel ${duelId} completed - Winner: ${winnerId} (${EDUCATION_XP_CONFIG.DUEL_WIN_ASYNC} XP), Loser: ${loserId} (${EDUCATION_XP_CONFIG.DUEL_LOSS_ASYNC} XP)`
       );
     }
+
+    // B12 fix: Update daily challenge progress for duel completion
+    updateDuelChallengeProgress(supabase, challengerId, opponentId, winnerId).catch(err =>
+      logger.error('DUEL', `Failed to update challenge progress: ${(err as Error).message}`)
+    );
 
     // Emit completion to duel room
     const duelRoom = `duel:${duelId}`;

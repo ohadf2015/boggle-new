@@ -8508,6 +8508,20 @@ const es = {
     "you": "Tú",
     "noParticipants": "Sin participantes todavía"
   },
+  "league": {
+    "standings": "Clasificación",
+    "yourPosition": "Tu posición",
+    "xp": "XP",
+    "noLeague": "¡Únete a una liga para competir!",
+    "positionOf": "{position} de {total}",
+    "xpToPromote": "{xp} XP para ascender",
+    "xpAboveRelegation": "{xp} XP sobre el descenso",
+    "promotionZone": "Zona de ascenso",
+    "safeZone": "Zona segura",
+    "relegationZone": "Zona de descenso",
+    "finalResults": "Resultados finales",
+    "coinsEarned": "Monedas ganadas"
+  },
   "leagueRivals": {
     "title": "Liga Semanal",
     "bronze": "Bronce",

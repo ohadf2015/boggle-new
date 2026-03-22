@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
+import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
 
 // Validation schemas
 const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz']);
@@ -26,7 +27,7 @@ const updateSessionSchema = z.object({
   wordsCorrect: z.number().min(0).optional(),
   accuracy: z.number().min(0).max(1).optional(),
   maxCombo: z.number().min(0).optional(),
-  xpAwarded: z.number().min(0).optional(),
+  // xpAwarded removed (B7 fix) — server always computes XP, never trusts client
   // Common
   timeSpentSeconds: z.number().min(0).optional(),
   completed: z.boolean().optional(),
@@ -309,7 +310,6 @@ export async function PATCH(request: NextRequest) {
     if (updateData.wordsCorrect !== undefined) updateObj.words_correct = updateData.wordsCorrect;
     if (updateData.accuracy !== undefined) updateObj.accuracy = updateData.accuracy;
     if (updateData.maxCombo !== undefined) updateObj.max_combo = updateData.maxCombo;
-    if (updateData.xpAwarded !== undefined) updateObj.xp_awarded = updateData.xpAwarded;
     if (updateData.timeSpentSeconds !== undefined) updateObj.time_spent_seconds = updateData.timeSpentSeconds;
     if (completed) updateObj.completed_at = new Date().toISOString();
 
@@ -352,15 +352,28 @@ export async function PATCH(request: NextRequest) {
         },
       };
 
-      const { totalXp: serverCalculatedXp } = calculatePracticeXp(xpSession);
+      // B1 fix: Fetch student's current streak for streak bonus calculation
+      const { data: progressData } = await supabase
+        .from('student_lesson_progress')
+        .select('current_streak')
+        .eq('student_id', session.student_id)
+        .eq('lesson_id', session.lesson_id)
+        .single();
+
+      const streakDays = progressData?.current_streak ?? 0;
+      const { totalXp: serverCalculatedXp } = calculatePracticeXp({
+        ...xpSession,
+        streakDays,
+      });
+
+      // Always write server-calculated XP (even if 0) to prevent client value sticking (B7 fix)
+      await supabase
+        .from('practice_sessions')
+        .update({ xp_awarded: serverCalculatedXp })
+        .eq('id', sessionId);
+      session.xp_awarded = serverCalculatedXp;
 
       if (serverCalculatedXp > 0) {
-        // Update the session with server-calculated XP
-        await supabase
-          .from('practice_sessions')
-          .update({ xp_awarded: serverCalculatedXp })
-          .eq('id', sessionId);
-
         const { error: xpError } = await supabase.rpc('award_education_xp', {
           p_student_id: session.student_id,
           p_xp_amount: serverCalculatedXp,
@@ -372,12 +385,20 @@ export async function PATCH(request: NextRequest) {
         } else {
           logger.info(
             'EDUCATION',
-            `Awarded ${serverCalculatedXp} XP (server-calculated) to student ${session.student_id} for lesson ${session.lesson_id}`
+            `Awarded ${serverCalculatedXp} XP (server-calculated, streak=${streakDays}d) to student ${session.student_id} for lesson ${session.lesson_id}`
           );
         }
+      }
 
-        // Return updated session with server XP
-        session.xp_awarded = serverCalculatedXp;
+      // B12 fix: Update daily challenge progress after practice completion
+      // Fire-and-forget — don't block the response
+      updateEducationChallengeProgress(session.student_id, 'practice_session', 1).catch(err =>
+        logger.error('Failed to update challenge progress:', err)
+      );
+      if (serverCalculatedXp > 0) {
+        updateEducationChallengeProgress(session.student_id, 'xp_earned', serverCalculatedXp).catch(err =>
+          logger.error('Failed to update XP challenge progress:', err)
+        );
       }
     }
 

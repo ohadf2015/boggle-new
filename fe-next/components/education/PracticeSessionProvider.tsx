@@ -14,7 +14,7 @@
  * Design: Mastery-focused (research pitfall 1 - intrinsic > extrinsic)
  */
 
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -28,7 +28,7 @@ import useEducationXp, {
 } from '@/hooks/useEducationXp';
 import useAchievementUnlock from '@/hooks/useAchievementUnlock';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
-import { supabase } from '@/lib/supabase';
+// supabase import removed — XP persistence handled server-side only
 import logger from '@/utils/logger';
 
 // ============================================
@@ -174,14 +174,8 @@ export function PracticeSessionProvider({
           });
         }
 
-        // Persist to Supabase
-        await persistToSupabase(
-          studentId,
-          lessonId,
-          totalXp + result.totalXp,
-          streak.currentStreak,
-          Math.max(streak.longestStreak, streak.currentStreak)
-        );
+        // XP persistence is handled server-side by PATCH /api/education/practice
+        // Do NOT call persistToSupabase() here — it bypasses server validation (C2 fix)
 
         // Increment session counter
         const newSessionCount = totalPracticeSessions + 1;
@@ -324,43 +318,8 @@ export function usePracticeSession(): PracticeSessionContextValue {
  * Persist XP and streak to Supabase
  * Uses upsert to handle both new and existing records
  */
-async function persistToSupabase(
-  studentId: string,
-  lessonId: string,
-  newTotalXp: number,
-  currentStreak: number,
-  longestStreak: number
-): Promise<void> {
-  if (!supabase) {
-    logger.warn('Supabase not configured, skipping XP persistence');
-    return;
-  }
-
-  try {
-    const today = new Date().toISOString().split('T')[0];
-
-    const { error } = await supabase.from('student_lesson_progress').upsert(
-      {
-        student_id: studentId,
-        lesson_id: lessonId,
-        total_xp: newTotalXp,
-        current_streak: currentStreak,
-        longest_streak: longestStreak,
-        last_practice_date: today,
-        // total_practice_sessions incremented via DB trigger or RPC
-      },
-      {
-        onConflict: 'student_id,lesson_id',
-      }
-    );
-
-    if (error) {
-      logger.error('Error persisting XP to Supabase:', error);
-    }
-  } catch (error) {
-    logger.error('Error in persistToSupabase:', error);
-  }
-}
+// persistToSupabase removed (C2 fix) — all XP persistence goes through
+// PATCH /api/education/practice which uses server-side award_education_xp RPC
 
 // ============================================
 // EXPORTS

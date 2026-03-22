@@ -22,6 +22,7 @@ import logger from '@/backend/utils/logger';
 interface RealtimeGameState {
   challengerId: string;
   opponentId: string;
+  lessonId: string;
   boardState: string[][];
   language: string;
   timeLimit: number;
@@ -201,6 +202,7 @@ export async function startRealtimeDuel(
     const gameState: RealtimeGameState = {
       challengerId: duel.challenger_id,
       opponentId: duel.opponent_id,
+      lessonId: duel.lesson_id,
       boardState: duel.board_state as string[][],
       language: lesson.language,
       timeLimit: duel.time_limit || 180,
@@ -268,7 +270,7 @@ async function completeRealtimeDuel(
     // null = draw
 
     // Atomic DB update (race condition protection)
-    const { data: updated, error: updateError, count } = await supabase
+    const { data: updated, error: updateError } = await supabase
       .from('student_duels')
       .update({
         status: 'completed',
@@ -287,8 +289,8 @@ async function completeRealtimeDuel(
       return;
     }
 
-    // If count is 0, race condition detected (already completed)
-    if (!count || count === 0) {
+    // If no rows returned, race condition detected (already completed)
+    if (!updated || updated.length === 0) {
       logger.warn('DUEL', `Duel ${duelId} already completed - skipping`);
       return;
     }
@@ -326,10 +328,12 @@ async function completeRealtimeDuel(
         supabase.rpc('award_education_xp', {
           p_student_id: gameState.challengerId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_DRAW,
+          p_lesson_id: gameState.lessonId,
         }),
         supabase.rpc('award_education_xp', {
           p_student_id: gameState.opponentId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_DRAW,
+          p_lesson_id: gameState.lessonId,
         }),
       ]);
 
@@ -352,10 +356,12 @@ async function completeRealtimeDuel(
         supabase.rpc('award_education_xp', {
           p_student_id: winnerId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_WIN_REALTIME,
+          p_lesson_id: gameState.lessonId,
         }),
         supabase.rpc('award_education_xp', {
           p_student_id: loserId,
           p_xp_amount: EDUCATION_XP_CONFIG.DUEL_LOSS_REALTIME,
+          p_lesson_id: gameState.lessonId,
         }),
       ]);
 
@@ -364,6 +370,11 @@ async function completeRealtimeDuel(
         `Real-time duel ${duelId} completed - Winner: ${winnerId} (${EDUCATION_XP_CONFIG.DUEL_WIN_REALTIME} XP), Loser: ${loserId} (${EDUCATION_XP_CONFIG.DUEL_LOSS_REALTIME} XP)`
       );
     }
+
+    // B12 fix: Update daily challenge progress for duel completion
+    updateDuelChallengeProgress(supabase, gameState.challengerId, gameState.opponentId, winnerId).catch(err =>
+      logger.error('DUEL', `Failed to update challenge progress: ${(err as Error).message}`)
+    );
 
     // Emit completion to room
     const duelRoom = `duel:${duelId}`;
@@ -381,5 +392,44 @@ async function completeRealtimeDuel(
     realtimeGames.delete(duelId);
   } catch (error) {
     logger.error('DUEL', `Error completing real-time duel ${duelId}: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * B12 fix: Update daily challenge progress after a duel completes.
+ * Increments duel_played for both players, duel_wins for the winner only.
+ */
+export async function updateDuelChallengeProgress(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabaseClient: any,
+  challengerId: string,
+  opponentId: string,
+  winnerId: string | null
+): Promise<void> {
+  const today = new Date().toISOString().split('T')[0];
+  const players = [challengerId, opponentId];
+
+  for (const playerId of players) {
+    const types = ['duel_played'];
+    if (winnerId === playerId) types.push('duel_wins');
+
+    const { data: challenges } = await supabaseClient
+      .from('daily_challenges')
+      .select('id, current_value, target_value, challenge_type')
+      .eq('player_id', playerId)
+      .eq('challenge_date', today)
+      .eq('completed', false)
+      .in('challenge_type', types);
+
+    if (!challenges) continue;
+
+    for (const c of challenges) {
+      const newVal = c.current_value + 1;
+      const isCompleted = newVal >= c.target_value;
+      await supabaseClient.from('daily_challenges').update({
+        current_value: newVal,
+        ...(isCompleted ? { completed: true, completed_at: new Date().toISOString() } : {}),
+      }).eq('id', c.id);
+    }
   }
 }

@@ -8465,6 +8465,20 @@ const ja = {
     "you": "あなた",
     "noParticipants": "まだ参加者がいません"
   },
+  "league": {
+    "standings": "順位表",
+    "yourPosition": "あなたの順位",
+    "xp": "XP",
+    "noLeague": "リーグに参加して競おう！",
+    "positionOf": "{total}人中{position}位",
+    "xpToPromote": "昇格まであと{xp} XP",
+    "xpAboveRelegation": "降格ラインより{xp} XP上",
+    "promotionZone": "昇格ゾーン",
+    "safeZone": "安全ゾーン",
+    "relegationZone": "降格ゾーン",
+    "finalResults": "最終結果",
+    "coinsEarned": "獲得コイン"
+  },
   "leagueRivals": {
     "title": "ウィークリーリーグ",
     "bronze": "ブロンズ",

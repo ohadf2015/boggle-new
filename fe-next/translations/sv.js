@@ -8485,6 +8485,20 @@ const sv = {
     "you": "Du",
     "noParticipants": "Inga deltagare ännu"
   },
+  "league": {
+    "standings": "Ställning",
+    "yourPosition": "Din position",
+    "xp": "XP",
+    "noLeague": "Gå med i en liga för att tävla!",
+    "positionOf": "{position} av {total}",
+    "xpToPromote": "{xp} XP till avancemang",
+    "xpAboveRelegation": "{xp} XP ovanför nedflyttning",
+    "promotionZone": "Uppflyttningszon",
+    "safeZone": "Säker zon",
+    "relegationZone": "Nedflyttningszon",
+    "finalResults": "Slutresultat",
+    "coinsEarned": "Intjänade mynt"
+  },
   "leagueRivals": {
     "title": "Veckoliga",
     "bronze": "Brons",

@@ -11,7 +11,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -213,11 +213,11 @@ export default function TeacherDashboard() {
   const { classrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
 
-  useState(() => {
-    if (classrooms.length === 1 && !selectedClassroomId) {
+  useEffect(() => {
+    if (classrooms.length >= 1 && !selectedClassroomId) {
       setSelectedClassroomId(classrooms[0].id);
     }
-  });
+  }, [classrooms, selectedClassroomId]);
 
   const handleQuickStart = useCallback(
     (config: GameConfiguration) => {

@@ -46,6 +46,7 @@ interface DuelData {
   opponentName: string;
   opponentAvatar: string | null;
   opponentId: string;
+  isChallenger: boolean;
 }
 
 // ============================================
@@ -91,6 +92,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         opponentName: opponent.display_name,
         opponentAvatar: opponent.avatar_url,
         opponentId: isChallenger ? data.opponent_id : data.challenger_id,
+        isChallenger,
       });
 
       setPhase('playing');
@@ -218,14 +220,14 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <div className="text-neo-white">
             <p className="text-sm opacity-70">{t('duels.you')}</p>
             <p className="text-3xl font-bold">
-              {isWinner || isDraw ? result.challengerScore : result.opponentScore}
+              {duelData.isChallenger ? result.challengerScore : result.opponentScore}
             </p>
           </div>
-          <div className="text-neo-white text-3xl">vs</div>
+          <div className="text-neo-white text-3xl">{t('duels.vs')}</div>
           <div className="text-neo-white">
             <p className="text-sm opacity-70">{duelData.opponentName}</p>
             <p className="text-3xl font-bold">
-              {isWinner || isDraw ? result.opponentScore : result.challengerScore}
+              {duelData.isChallenger ? result.opponentScore : result.challengerScore}
             </p>
           </div>
         </div>

@@ -111,6 +111,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'user-1',
         opponentId: 'user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
@@ -149,6 +150,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'user-1',
         opponentId: 'user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
@@ -189,6 +191,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'user-1',
         opponentId: 'user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
@@ -229,6 +232,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'other-user-1',
         opponentId: 'other-user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
@@ -263,6 +267,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'user-1',
         opponentId: 'user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
@@ -311,6 +316,7 @@ describe('Real-Time Duel Handlers', () => {
       realtimeGames.set('550e8400-e29b-41d4-a716-446655440001', {
         challengerId: 'user-1',
         opponentId: 'user-2',
+        lessonId: 'lesson-1',
         boardState: [['T', 'E', 'S', 'T']],
         language: 'en',
         timeLimit: 180,
