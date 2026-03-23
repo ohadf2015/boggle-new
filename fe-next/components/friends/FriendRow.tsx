@@ -57,8 +57,7 @@ const FriendStatusIndicator: React.FC<{
   return (
     <div
       className={cn(
-        'absolute -bottom-0.5 -end-0.5 rounded-full border-2',
-        isDark ? 'border-slate-800' : 'border-white',
+        'absolute -bottom-0.5 -end-0.5 rounded-full border-2 border-slate-800',
         dotSize,
         isOnline
           ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]'

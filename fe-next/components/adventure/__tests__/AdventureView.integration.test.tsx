@@ -152,6 +152,18 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Mock NavigationContext - AdventureView uses useHideNavigation
+jest.mock('@/contexts/NavigationContext', () => ({
+  useNavigation: () => ({
+    isInGame: false,
+    setIsInGame: jest.fn(),
+    activeTab: 'home',
+    setActiveTab: jest.fn(),
+  }),
+  useHideNavigation: () => jest.fn(),
+  NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // Mock MusicContext - adventure mode stops global music when it starts
 jest.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({

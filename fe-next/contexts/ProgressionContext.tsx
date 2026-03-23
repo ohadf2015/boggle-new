@@ -41,7 +41,7 @@ interface ProgressionContextType {
   error: Error | null;
   /** Refresh progression data from API */
   refreshProgression: () => Promise<void>;
-  /** Complete a level and update progression */
+  /** Complete a level and update progression. Returns true if saved, false if save failed (guest/network/auth). */
   completeLevel: (
     world: number,
     level: number,
@@ -50,7 +50,7 @@ interface ProgressionContextType {
     words: number,
     goldEarned?: number,
     longWords?: number
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
     world: number,
@@ -166,15 +166,15 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       longWords?: number
     ) => {
       if (!user?.id) {
-        // Guest users can't save progress — silently skip
-        return;
+        // Guest users can't save progress
+        return false;
       }
 
       // Prevent duplicate in-flight calls for the same level (causes 429 rate limit)
       const levelKey = `${world}-${level}`;
       if (completeLevelInFlightRef.current === levelKey) {
         logger.warn('[ProgressionContext] Skipping duplicate completeLevel for', levelKey);
-        return;
+        return false;
       }
       completeLevelInFlightRef.current = levelKey;
 
@@ -215,18 +215,22 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         const data = await response.json();
 
-        if (data.success && data.progression && data.completion) {
-          // Merge progression data with existing completions
-          setProgression((prev) => {
-            if (!prev) {
-              // No previous progression - create new one with the completion
-              return {
-                userId: user.id,
-                playerLevel: data.progression.playerLevel,
-                xp: data.progression.xp,
-                currentWorld: data.progression.currentWorld,
-                currentLevel: data.progression.currentLevel,
-                totalStars: data.progression.totalStars,
+        if (!data.success || !data.progression || !data.completion) {
+          logger.warn('[ProgressionContext] Server returned unexpected response for completeLevel');
+          return false;
+        }
+
+        // Merge progression data with existing completions
+        setProgression((prev) => {
+          if (!prev) {
+            // No previous progression - create new one with the completion
+            return {
+              userId: user.id,
+              playerLevel: data.progression.playerLevel,
+              xp: data.progression.xp,
+              currentWorld: data.progression.currentWorld,
+              currentLevel: data.progression.currentLevel,
+              totalStars: data.progression.totalStars,
                 completions: [
                   {
                     world: data.completion.world,
@@ -285,10 +289,11 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
               updatedAt: new Date().toISOString(),
             };
           });
-        }
+
+        return true;
       } catch (err) {
         logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
-        throw err;
+        return false;
       } finally {
         completeLevelInFlightRef.current = null;
       }

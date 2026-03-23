@@ -132,6 +132,8 @@ export function TrailPath({
   isUnlocked: boolean;
   fromLeft: boolean;
 }): React.JSX.Element {
+  // SVG coordinates are physical (not affected by CSS dir), so isLeft inversion
+  // for RTL is handled by the parent (WorldMap) before passing fromLeft.
   const leftX = 30;
   const rightX = 70;
 

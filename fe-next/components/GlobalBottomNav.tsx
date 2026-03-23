@@ -14,21 +14,49 @@ import { useSafeArea } from '../hooks/useSafeArea';
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
+type TabId = 'home' | 'play' | 'quests' | 'profile';
+
+interface TabConfig {
+    id: TabId;
+    labelKey: string;
+    icon: typeof Home;
+    color: string;         // Active text + indicator color
+    glowColor: string;     // Subtle glow under active icon
+}
+
+const TABS: TabConfig[] = [
+    { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-yellow', glowColor: 'bg-neo-yellow/15' },
+    { id: 'play',    labelKey: 'nav.play',    icon: Swords,     color: 'text-neo-orange', glowColor: 'bg-neo-orange/15' },
+    { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' },
+    { id: 'profile', labelKey: 'nav.profile', icon: User,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' },
+];
+
+// Color map for the sliding indicator pill
+const INDICATOR_COLORS: Record<TabId, string> = {
+    home: 'bg-neo-yellow',
+    play: 'bg-neo-orange',
+    quests: 'bg-neo-lime',
+    profile: 'bg-neo-cyan',
+};
+
 /**
  * GlobalBottomNav - Mobile-only bottom navigation bar
  *
  * UX Design Rationale:
- * - Follows iOS/Android platform conventions for bottom tab bars
- * - Positions primary actions in the "thumb zone" for one-handed use
- * - Provides persistent access to core features without menu diving
- * - Smart hiding during gameplay to prevent accidental taps
+ * - Fixed at bottom of viewport in the thumb zone for easy one-handed use
+ * - z-[80] ensures nav sits above all non-modal landing page elements
+ * - WCAG 2.1 AA compliant: touch target minimum 48x48px (we use 64x48)
+ * - Safe area support for iOS home indicator (notch devices)
+ * - Auto-hides during gameplay via NavigationContext (isInGame)
  *
  * Features:
- * - Four primary tabs: Home, Play, Quests, Profile
- * - Active state indication with neo-yellow highlight
- * - Safe area support for devices with notches/home indicators
- * - Automatic hiding during gameplay (via NavigationContext)
- * - Desktop breakpoint: hidden on sm+ (tailwind)
+ * - Animated sliding pill indicator between tabs (layoutId)
+ * - Active indicator pill at top of active tab
+ * - Spring-animated icon scale on active
+ * - Per-tab accent colors with subtle glow
+ * - transition-all on tab buttons for smooth state changes
+ * - pathsWithOwnNav: hides on routes that have their own navigation
+ * - shouldHideOnCurrentPath logic prevents double-nav on sub-pages
  */
 export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { t, language } = useLanguage();
@@ -39,275 +67,131 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const safeArea = useSafeArea();
     const [showAuthModal, setShowAuthModal] = useState(false);
 
-    // Determine active tab based on current pathname
-    const activeTab = useMemo(() => {
-        // Remove locale prefix to get clean path
+    const activeTab = useMemo((): TabId => {
         const cleanPath = pathname.replace(`/${language}`, '');
-
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
         if (cleanPath.startsWith('/quests')) return 'quests';
         if (cleanPath.startsWith('/profile')) return 'profile';
-
-        return 'home'; // Default to home if no match
+        return 'home';
     }, [pathname, language]);
 
-    // Navigation handlers
-    const navigateToHome = useCallback(() => {
-        router.push(`/${language}`);
-    }, [router, language]);
-
-    const navigateToPlay = useCallback(() => {
-        router.push(`/${language}/multiplayer`);
-    }, [router, language]);
-
-    const navigateToQuests = useCallback(() => {
-        router.push(`/${language}/quests`);
-    }, [router, language]);
-
-    const navigateToProfile = useCallback(() => {
-        // Profile requires authentication - show modal if not logged in
-        if (!isAuthenticated) {
+    const navigate = useCallback((tab: TabId) => {
+        if (tab === 'profile' && !isAuthenticated) {
             setShowAuthModal(true);
             return;
         }
-        router.push(`/${language}/profile`);
+        const routes: Record<TabId, string> = {
+            home: `/${language}`,
+            play: `/${language}/multiplayer`,
+            quests: `/${language}/quests`,
+            profile: `/${language}/profile`,
+        };
+        router.push(routes[tab]);
     }, [router, language, isAuthenticated]);
 
-    // Hide on paths that have their own navigation (multiplayer game, host view, etc.)
+    // pathsWithOwnNav — these routes render their own nav, so we hide the global one
+    const pathsWithOwnNav = ['/singleplayer', '/daily', '/adventure', '/education', '/student', '/teacher', '/multiplayer'];
     const shouldHideOnCurrentPath = useMemo(() => {
         const cleanPath = pathname.replace(`/${language}`, '');
-
-        // Hide on these specific paths that have their own bottom nav
-        const pathsWithOwnNav = [
-            '/singleplayer',
-            '/daily',
-            '/adventure',
-            // Education section has its own EducationHeader nav — hide main app nav
-            '/education',
-            '/student',
-            '/teacher',
-            // Multiplayer has its own header with exit button, room code, and player count
-            '/multiplayer',
-            // REMOVED: '/profile' - GlobalBottomNav should remain visible on profile
-            // to avoid confusing tab switching UX
-        ];
-
-        return pathsWithOwnNav.some(path => cleanPath.startsWith(path));
+        return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
     }, [pathname, language]);
 
-    // Hide bottom nav when:
-    // 1. In active game (isInGame from NavigationContext)
-    // 2. On paths with their own navigation (multiplayer, etc.)
-    if (isInGame || shouldHideOnCurrentPath) {
-        return null;
-    }
+    if (isInGame || shouldHideOnCurrentPath) return null;
 
     return (
         <nav
             className={cn(
                 "fixed bottom-0 left-0 right-0 z-[80]",
-                "bg-neo-navy/95 backdrop-blur-sm", // Slight transparency with blur
+                "bg-neo-navy/95 backdrop-blur-sm",
                 "border-t-3 border-neo-black",
-                "shadow-[0_-4px_0_0_rgba(0,0,0,1)]", // Hard shadow upward
-                "sm:hidden", // Only visible on mobile (<sm breakpoint)
+                "shadow-[0_-4px_0_0_rgba(0,0,0,1)]",
+                "sm:hidden",
             )}
             style={{
-                // Add safe area padding for iOS home indicator
                 paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : undefined,
             }}
             aria-label={t('nav.bottomNavigation')}
         >
-            <div className="flex items-center justify-around h-16">
-                {/* Home Tab */}
-                <button
-                    onClick={navigateToHome}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]", // WCAG touch target size
-                        "px-4 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'home'
-                            ? "text-neo-yellow"
-                            : "text-neo-white/40 hover:text-neo-white/70"
-                    )}
-                    aria-label={t('nav.home')}
-                    aria-current={activeTab === 'home' ? 'page' : undefined}
-                >
-                    {/* Glow background */}
-                    {activeTab === 'home' && (
-                        <motion.div
-                            layoutId="tab-glow"
-                            className="absolute inset-0 rounded-xl bg-neo-yellow/10"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                        />
-                    )}
-                    <motion.div
-                        animate={{ scale: activeTab === 'home' ? 1.15 : 1, y: activeTab === 'home' ? -1 : 0 }}
-                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
-                        className="relative z-10"
-                    >
-                        <Home className="w-6 h-6 mb-0.5" aria-hidden="true" />
-                    </motion.div>
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
-                        activeTab === 'home' && "text-neo-yellow"
-                    )}>
-                        {t('nav.home')}
-                    </span>
-                    {/* Active indicator */}
-                    {activeTab === 'home' && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-yellow rounded-b-full"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
+            <div className="flex items-center justify-around h-16 relative">
+                {TABS.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    const Icon = tab.icon;
 
-                {/* Play/Multiplayer Tab */}
-                <button
-                    onClick={navigateToPlay}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]",
-                        "px-3 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'play'
-                            ? "text-neo-orange"
-                            : "text-neo-white/40 hover:text-neo-white/70"
-                    )}
-                    aria-label={t('nav.play')}
-                    aria-current={activeTab === 'play' ? 'page' : undefined}
-                >
-                    {activeTab === 'play' && (
-                        <motion.div
-                            layoutId="tab-glow"
-                            className="absolute inset-0 rounded-xl bg-neo-orange/10"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                        />
-                    )}
-                    <motion.div
-                        animate={{ scale: activeTab === 'play' ? 1.15 : 1, y: activeTab === 'play' ? -1 : 0 }}
-                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
-                        className="relative z-10"
-                    >
-                        <Swords className="w-6 h-6 mb-0.5" aria-hidden="true" />
-                    </motion.div>
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
-                        activeTab === 'play' && "text-neo-orange"
-                    )}>
-                        {t('nav.play')}
-                    </span>
-                    {activeTab === 'play' && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-orange rounded-b-full"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => navigate(tab.id)}
+                            className={cn(
+                                "flex flex-col items-center justify-center relative",
+                                "min-w-[64px] min-h-[48px]",
+                                "px-3 py-2",
+                                "transition-all duration-150",
+                                isActive ? tab.color : "text-neo-white/40"
+                            )}
+                            aria-label={t(tab.labelKey)}
+                            aria-current={isActive ? 'page' : undefined}
+                        >
+                            {/* Glow background behind active icon */}
+                            <AnimatePresence>
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="tab-glow"
+                                        className={cn(
+                                            "absolute inset-0 rounded-xl",
+                                            tab.glowColor
+                                        )}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                                    />
+                                )}
+                            </AnimatePresence>
 
-                {/* Quests Tab */}
-                <button
-                    onClick={navigateToQuests}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]",
-                        "px-3 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'quests'
-                            ? "text-neo-lime"
-                            : "text-neo-white/40 hover:text-neo-white/70"
-                    )}
-                    aria-label={t('nav.quests')}
-                    aria-current={activeTab === 'quests' ? 'page' : undefined}
-                >
-                    {activeTab === 'quests' && (
-                        <motion.div
-                            layoutId="tab-glow"
-                            className="absolute inset-0 rounded-xl bg-neo-lime/10"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                        />
-                    )}
-                    <motion.div
-                        animate={{ scale: activeTab === 'quests' ? 1.15 : 1, y: activeTab === 'quests' ? -1 : 0 }}
-                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
-                        className="relative z-10"
-                    >
-                        <ScrollText className="w-6 h-6 mb-0.5" aria-hidden="true" />
-                    </motion.div>
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
-                        activeTab === 'quests' && "text-neo-lime"
-                    )}>
-                        {t('nav.quests')}
-                    </span>
-                    {activeTab === 'quests' && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-lime rounded-b-full"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
+                            {/* Active indicator pill at top */}
+                            {isActive && (
+                                <motion.div
+                                    layoutId="tab-indicator"
+                                    className={cn(
+                                        "absolute top-0 w-8 h-1 rounded-b-full",
+                                        INDICATOR_COLORS[tab.id]
+                                    )}
+                                    transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
+                                />
+                            )}
 
-                {/* Profile Tab */}
-                <button
-                    onClick={navigateToProfile}
-                    className={cn(
-                        "flex flex-col items-center justify-center",
-                        "min-w-[64px] min-h-[48px]", // WCAG touch target size
-                        "px-4 py-2",
-                        "transition-all duration-100",
-                        "relative",
-                        activeTab === 'profile'
-                            ? "text-neo-cyan"
-                            : "text-neo-white/40 hover:text-neo-white/70"
-                    )}
-                    aria-label={t('nav.profile')}
-                    aria-current={activeTab === 'profile' ? 'page' : undefined}
-                >
-                    {activeTab === 'profile' && (
-                        <motion.div
-                            layoutId="tab-glow"
-                            className="absolute inset-0 rounded-xl bg-neo-cyan/10"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                        />
-                    )}
-                    <motion.div
-                        animate={{ scale: activeTab === 'profile' ? 1.15 : 1, y: activeTab === 'profile' ? -1 : 0 }}
-                        transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
-                        className="relative z-10"
-                    >
-                        <User className="w-6 h-6 mb-0.5" aria-hidden="true" />
-                    </motion.div>
-                    <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-wide relative z-10",
-                        activeTab === 'profile' && "text-neo-cyan"
-                    )}>
-                        {t('nav.profile')}
-                    </span>
-                    {/* Active indicator */}
-                    {activeTab === 'profile' && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-neo-cyan rounded-b-full"
-                            transition={{ type: 'spring' as const, damping: 25, stiffness: 300 }}
-                            aria-hidden="true"
-                        />
-                    )}
-                </button>
+                            {/* Icon with scale animation */}
+                            <motion.div
+                                animate={{
+                                    scale: isActive ? 1.15 : 1,
+                                    y: isActive ? -1 : 0,
+                                }}
+                                transition={{ type: 'spring' as const, damping: 12, stiffness: 300 }}
+                                className="relative z-10"
+                            >
+                                <Icon className="w-6 h-6 mb-0.5" aria-hidden="true" />
+                            </motion.div>
+
+                            {/* Label */}
+                            <motion.span
+                                className={cn(
+                                    "text-[10px] font-bold uppercase tracking-wide relative z-10",
+                                    isActive ? tab.color : "text-neo-white/40"
+                                )}
+                                animate={{
+                                    opacity: isActive ? 1 : 0.6,
+                                }}
+                                transition={{ duration: 0.15 }}
+                            >
+                                {t(tab.labelKey)}
+                            </motion.span>
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Auth Modal - shown when unauthenticated users tap Profile */}
+            {/* Auth Modal */}
             <AuthModal
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}

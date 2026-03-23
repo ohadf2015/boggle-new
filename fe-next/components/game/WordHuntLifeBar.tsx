@@ -78,10 +78,7 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
   return (
     <div
       data-testid="word-hunt-life-bar"
-      className={cn(
-        "flex items-center gap-2 w-full py-1",
-        colors.glow
-      )}
+      className="flex items-center gap-2 w-full py-1"
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
@@ -101,8 +98,8 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
         <Heart data-testid="heart-icon" className="w-4 h-4 text-white fill-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.4)]" />
       </motion.div>
 
-      {/* Bar container — allow overflow for drips */}
-      <div className="flex-1 relative">
+      {/* Bar container — allow overflow for drips; glow scoped here to avoid parent jitter */}
+      <div data-testid="word-hunt-life-bar-track" className={cn("flex-1 relative", colors.glow)}>
         <motion.div
           className={cn(
             "h-7 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",

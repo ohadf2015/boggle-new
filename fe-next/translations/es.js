@@ -241,6 +241,7 @@ const es = {
     "and": "y",
     "closeMenu": "Cerrar",
     "openMenu": "Menú",
+    "swipeToClose": "Desliza para cerrar",
     "account": "Cuenta",
     "valid": "Válido",
     "invalid": "Inválido",
@@ -4758,7 +4759,10 @@ const es = {
     "confirmBlock": "¿Bloquear usuario? No podrá contactarte.",
     "block": "Bloquear",
     "filterFriends": "Buscar amigos...",
-    "noMatchingFriends": "No se encontraron amigos"
+    "noMatchingFriends": "No se encontraron amigos",
+    "blocked": "Bloqueado",
+    "blockedUsers": "Usuarios bloqueados",
+    "unblock": "Desbloquear"
   },
   "multiplayer": {
     "mode": "Modo",
@@ -5759,6 +5763,7 @@ const es = {
     "starsToUnlock": "{{count}} más para desbloquear",
     "exitToMap": "Salir al mapa",
     "startLevel": "Iniciar nivel",
+    "progressNotSaved": "No se pudo guardar tu progreso. ¡Inicia sesión para conservar tu aventura!",
     "levelComplete": "¡Nivel completado!",
     "starsEarned": "Estrellas ganadas",
     "continueToNext": "Continuar",

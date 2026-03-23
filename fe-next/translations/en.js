@@ -250,6 +250,7 @@ const en = {
     "collapse": "Collapse",
     "closeMenu": "Close",
     "openMenu": "Menu",
+    "swipeToClose": "Swipe to close",
     "account": "Account",
     "later": "Later",
     "skip": "Skip",
@@ -4890,7 +4891,10 @@ const en = {
     "confirmBlock": "Block this user? They won't be able to contact you.",
     "block": "Block",
     "filterFriends": "Search friends...",
-    "noMatchingFriends": "No matching friends"
+    "noMatchingFriends": "No matching friends",
+    "blocked": "Blocked",
+    "blockedUsers": "Blocked Users",
+    "unblock": "Unblock"
   },
   "reveal": {
     "revealWord": "Reveal",
@@ -5979,6 +5983,7 @@ const en = {
     "starsToUnlock": "{{count}} more to unlock",
     "exitToMap": "Exit to Map",
     "startLevel": "Start Level",
+    "progressNotSaved": "Couldn't save your progress. Sign in to keep your adventure!",
     "levelComplete": "Level Complete!",
     "starsEarned": "Stars Earned",
     "continueToNext": "Continue",

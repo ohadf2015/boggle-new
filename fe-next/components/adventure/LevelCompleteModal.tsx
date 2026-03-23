@@ -242,7 +242,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     scale: i < stars ? 1 : 0.8,
                     opacity: i < stars ? 1 : 0.5,
                   }}
-                  transition={{ delay: 0.3 + i * 0.1, type: 'spring', stiffness: 300, damping: 20 }}
+                  transition={{
+                    delay: 0.3 + i * 0.1,
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 20,
+                  }}
                 >
                   <Star
                     className={cn(

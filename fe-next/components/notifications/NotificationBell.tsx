@@ -89,8 +89,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
           cursor-pointer
         "
         aria-label={unreadCount > 0
-          ? t('notifications.bellUnread', { count: unreadCount })
-          : t('notifications.bell')}
+          ? t('notifications.bellUnread', 'Notifications', { count: unreadCount })
+          : t('notifications.bell', 'Notifications')}
         aria-expanded={isDropdownOpen}
         aria-haspopup="listbox"
       >

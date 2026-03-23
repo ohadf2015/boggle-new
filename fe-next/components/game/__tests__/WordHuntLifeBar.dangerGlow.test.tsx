@@ -51,20 +51,20 @@ import { WordHuntLifeBar } from '../WordHuntLifeBar';
 describe('WordHuntLifeBar Danger Glow', () => {
   it('should not have danger glow when life is above 33%', () => {
     render(<WordHuntLifeBar life={80} maxLife={100} />);
-    const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).not.toContain('life-bar-danger-glow');
+    const track = screen.getByTestId('word-hunt-life-bar-track');
+    expect(track.className).not.toContain('life-bar-danger-glow');
   });
 
   it('should have danger glow class when life is at or below 33%', () => {
     render(<WordHuntLifeBar life={25} maxLife={100} />);
-    const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('life-bar-danger-glow');
+    const track = screen.getByTestId('word-hunt-life-bar-track');
+    expect(track.className).toContain('life-bar-danger-glow');
   });
 
   it('should have danger glow at exactly 33%', () => {
     render(<WordHuntLifeBar life={33} maxLife={100} />);
-    const container = screen.getByTestId('word-hunt-life-bar');
-    expect(container.className).toContain('life-bar-danger-glow');
+    const track = screen.getByTestId('word-hunt-life-bar-track');
+    expect(track.className).toContain('life-bar-danger-glow');
   });
 
   it('should NOT have shake class when life decreases (drip replaces shake)', () => {

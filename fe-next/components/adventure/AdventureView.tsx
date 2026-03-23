@@ -6,10 +6,12 @@ import { Loader2 } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
@@ -59,6 +61,7 @@ function AdventureView(): React.JSX.Element {
   const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
 
   const { stopMusic: stopGlobalMusic } = useMusic();
+  const setIsInGame = useHideNavigation();
 
   const hasCompletions = (progression?.completions?.length ?? 0) > 0;
   const {
@@ -73,6 +76,13 @@ function AdventureView(): React.JSX.Element {
   });
 
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
+
+  // Hide main header during active gameplay
+  useEffect(() => {
+    const playing = viewState === 'playing';
+    setIsInGame(playing);
+    return () => setIsInGame(false);
+  }, [viewState, setIsInGame]);
 
   const currentMusicWorld = selectedWorld || 1;
   useAdventureMusic({
@@ -171,16 +181,9 @@ function AdventureView(): React.JSX.Element {
   const handleLevelComplete = useCallback(
     async (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => {
       if (selectedWorld && selectedLevel) {
-        try {
-          await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
-        } catch (err) {
-          console.warn('Failed to save progress:', err instanceof Error ? err.message : String(err));
-          // Retry once before navigating away
-          try {
-            await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
-          } catch {
-            // Progress lost — still navigate so player isn't stuck
-          }
+        const saved = await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
+        if (!saved) {
+          toast.error(t('adventure.progressNotSaved'));
         }
         if (typeof window !== 'undefined') {
           window.history.back();
@@ -190,7 +193,7 @@ function AdventureView(): React.JSX.Element {
         }
       }
     },
-    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel]
+    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t]
   );
 
   const handleGameExit = useCallback(() => {

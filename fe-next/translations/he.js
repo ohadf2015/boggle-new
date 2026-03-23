@@ -250,6 +250,7 @@ const he = {
     "and": "ו",
     "closeMenu": "סגור תפריט",
     "openMenu": "פתח תפריט",
+    "swipeToClose": "החלק לסגירה",
     "account": "חשבון",
     "valid": "תקין",
     "invalid": "לא תקין",
@@ -4721,7 +4722,10 @@ const he = {
     "confirmBlock": "לחסום משתמש? לא יוכל ליצור קשר.",
     "block": "חסום",
     "filterFriends": "חפש חברים...",
-    "noMatchingFriends": "אין חברים תואמים"
+    "noMatchingFriends": "אין חברים תואמים",
+    "blocked": "חסום",
+    "blockedUsers": "משתמשים חסומים",
+    "unblock": "בטל חסימה"
   },
   "reveal": {
     "revealWord": "חשוף",
@@ -5774,6 +5778,7 @@ const he = {
     "starsToUnlock": "עוד {{count}} לפתיחה",
     "exitToMap": "יציאה למפה",
     "startLevel": "התחל שלב",
+    "progressNotSaved": "לא הצלחנו לשמור את ההתקדמות. התחבר כדי לשמור את ההרפתקה!",
     "levelComplete": "השלב הושלם!",
     "starsEarned": "כוכבים שנצברו",
     "continueToNext": "המשך",

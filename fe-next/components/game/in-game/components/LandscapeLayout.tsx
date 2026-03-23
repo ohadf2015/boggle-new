@@ -313,7 +313,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             )}
             {/* Word Hunt UI — above grid in landscape */}
             {gameMode === 'word-hunt' && wordHuntTargetLength && onWordHuntGuess && (
-              <div className="flex-shrink-0 w-full max-w-xs mx-auto flex flex-col gap-1">
+              <div className="flex-shrink-0 w-full max-w-xs mx-auto flex flex-col gap-1 relative z-20">
                 <WordHuntLifeBar life={wordHuntLife ?? 100} maxLife={100} />
                 {wordHuntPlayerLives && Object.keys(wordHuntPlayerLives).length > 0 && (
                   <WordHuntPlayerLives

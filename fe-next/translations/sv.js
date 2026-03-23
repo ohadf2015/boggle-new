@@ -247,6 +247,7 @@ const sv = {
     "and": "och",
     "closeMenu": "Stäng",
     "openMenu": "Meny",
+    "swipeToClose": "Svep för att stänga",
     "account": "Konto",
     "valid": "Giltig",
     "invalid": "Ogiltig",
@@ -4710,7 +4711,10 @@ const sv = {
     "confirmBlock": "Blockera användare? De kan inte kontakta dig.",
     "block": "Blockera",
     "filterFriends": "Sök vänner...",
-    "noMatchingFriends": "Inga matchande vänner"
+    "noMatchingFriends": "Inga matchande vänner",
+    "blocked": "Blockerad",
+    "blockedUsers": "Blockerade användare",
+    "unblock": "Avblockera"
   },
   "multiplayer": {
     "mode": "Läge",
@@ -5727,6 +5731,7 @@ const sv = {
     "starsToUnlock": "{{count}} till för att låsa upp",
     "exitToMap": "Avsluta till karta",
     "startLevel": "Starta nivå",
+    "progressNotSaved": "Kunde inte spara framstegen. Logga in för att behålla ditt äventyr!",
     "levelComplete": "Nivå klar!",
     "starsEarned": "Stjärnor intjänade",
     "continueToNext": "Fortsätt",

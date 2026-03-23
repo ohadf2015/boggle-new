@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Target, Circle, UserMinus, ShieldOff, ShieldBan, MessageCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Target, Circle, UserMinus, ShieldOff } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,8 +14,6 @@ interface FriendDetailDialogProps {
   onClose: () => void;
   onChallenge: (friend: Friend) => void;
   onUnfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string } | void>;
-  onMessage?: (friend: Friend) => void;
-  onBlock?: (userId: string) => Promise<{ success: boolean; error?: string }>;
   onUnblock?: (userId: string) => Promise<{ success: boolean; error?: string }>;
   isBlockedUser?: boolean;
   isDark: boolean;
@@ -28,8 +25,6 @@ export function FriendDetailDialog({
   onClose,
   onChallenge,
   onUnfriend,
-  onMessage,
-  onBlock,
   onUnblock,
   isBlockedUser = false,
   isDark,
@@ -47,11 +42,6 @@ export function FriendDetailDialog({
     }
   }, [friend?.odUserId, isBlockedUser]);
 
-  // Reset confirm state when dialog opens/closes
-  useEffect(() => {
-    setConfirmAction(null);
-  }, [friend?.odUserId]);
-
   const handleUnfriend = useCallback(async () => {
     if (!friend) return;
     if (confirmAction !== 'unfriend') {
@@ -61,31 +51,16 @@ export function FriendDetailDialog({
     setActionLoading(true);
     await onUnfriend(friend.odUserId);
     setActionLoading(false);
-    toast.success(t('friends.removedSuccess'));
     onClose();
-  }, [friend, onUnfriend, onClose, confirmAction, t]);
-
-  const handleBlock = useCallback(async () => {
-    if (!friend || !onBlock) return;
-    if (confirmAction !== 'block') {
-      setConfirmAction('block');
-      return;
-    }
-    setActionLoading(true);
-    await onBlock(friend.odUserId);
-    setActionLoading(false);
-    toast.success(t('friends.blockedSuccess'));
-    onClose();
-  }, [friend, onBlock, onClose, confirmAction, t]);
+  }, [friend, onUnfriend, onClose, confirmAction]);
 
   const handleUnblock = useCallback(async () => {
     if (!friend || !onUnblock) return;
     setActionLoading(true);
     await onUnblock(friend.odUserId);
     setActionLoading(false);
-    toast.success(t('friends.unblockedSuccess'));
     onClose();
-  }, [friend, onUnblock, onClose, t]);
+  }, [friend, onUnblock, onClose]);
 
   return (
     <Dialog open={!!friend} onOpenChange={(open) => !open && onClose()}>
@@ -225,14 +200,12 @@ export function FriendDetailDialog({
                       {t('common.cancel')}
                     </Button>
                     <Button
-                      onClick={confirmAction === 'unfriend' ? handleUnfriend : handleBlock}
+                      onClick={handleUnfriend}
                       disabled={actionLoading}
                       className={cn(
                         'px-4 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
                         'font-bold text-sm',
-                        confirmAction === 'block'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-neo-pink text-white'
+                        'bg-neo-pink text-white'
                       )}
                     >
                       {actionLoading ? <Loader size="sm" /> : t('common.confirm')}
@@ -277,50 +250,25 @@ export function FriendDetailDialog({
                       <Target className="w-4 h-4" />
                       {t('friends.challenge')}
                     </Button>
-                    {onMessage && (
-                      <Button
-                        onClick={() => { onMessage(friend); onClose(); }}
-                        className={cn(
-                          'flex items-center justify-center gap-2 py-2.5 rounded-neo',
-                          'border-2 border-neo-black shadow-hard-sm',
-                          'bg-neo-orange text-white font-bold',
-                          'hover:shadow-hard hover:-translate-y-0.5 transition-all'
-                        )}
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        {t('friends.messages')}
-                      </Button>
-                    )}
-                    <div className="flex gap-1">
-                      <Button
-                        onClick={handleUnfriend}
-                        disabled={actionLoading}
-                        title={t('friends.remove')}
-                        className={cn(
-                          'flex items-center gap-1 py-2.5 px-2 rounded-neo',
-                          'border-2 border-neo-black shadow-hard-sm',
-                          'bg-neo-pink text-white font-bold',
-                          'hover:shadow-hard hover:-translate-y-0.5 transition-all'
-                        )}
-                      >
-                        <UserMinus className="w-4 h-4" />
-                      </Button>
-                      {onBlock && (
-                        <Button
-                          onClick={handleBlock}
-                          disabled={actionLoading}
-                          title={t('friends.block')}
-                          className={cn(
-                            'flex items-center gap-1 py-2.5 px-2 rounded-neo',
-                            'border-2 border-neo-black shadow-hard-sm',
-                            'bg-red-600 text-white font-bold',
-                            'hover:shadow-hard hover:-translate-y-0.5 transition-all'
-                          )}
-                        >
-                          <ShieldBan className="w-4 h-4" />
-                        </Button>
+                    <Button
+                      onClick={handleUnfriend}
+                      disabled={actionLoading}
+                      className={cn(
+                        'flex items-center gap-2 py-2.5 rounded-neo',
+                        'border-2 border-neo-black shadow-hard-sm',
+                        'bg-neo-pink text-white font-bold',
+                        'hover:shadow-hard hover:-translate-y-0.5 transition-all'
                       )}
-                    </div>
+                    >
+                      {actionLoading ? (
+                        <Loader size="sm" />
+                      ) : (
+                        <>
+                          <UserMinus className="w-4 h-4" />
+                          {t('friends.remove')}
+                        </>
+                      )}
+                    </Button>
                   </>
                 )}
               </div>

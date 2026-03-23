@@ -23,11 +23,12 @@ const mockAttemptsResponse = {
   json: async () => ({ success: true, attempts: [] }),
 };
 
-// Mock AuthContext
+// Mock AuthContext with mutable user for per-test overrides
+let mockAuthUser: { id: string } | null = { id: 'test-user-123' };
 jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: 'test-user-123' },
-    isLoading: false,
+    user: mockAuthUser,
+    loading: false,
   }),
 }));
 
@@ -88,6 +89,7 @@ function createFetchMock(progressionResponse: object | null) {
 describe('ProgressionContext', () => {
   beforeEach(() => {
     mockFetch.mockClear();
+    mockAuthUser = { id: 'test-user-123' };
   });
 
   describe('Initial Loading', () => {
@@ -440,6 +442,142 @@ describe('ProgressionContext', () => {
       expect(() => {
         renderHook(() => useProgression());
       }).toThrow('useProgression must be used within ProgressionProvider');
+    });
+  });
+
+  describe('completeLevel return value', () => {
+    it('should return false for guest users (no auth)', async () => {
+      // GIVEN — set auth user to null (guest)
+      mockAuthUser = null;
+      mockFetch.mockImplementation(() =>
+        Promise.resolve({ ok: true, json: async () => ({}) })
+      );
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      // WHEN
+      let saved: boolean = true;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 1, 3, 500, 10);
+      });
+
+      // THEN — guest user should return false, no fetch called for /complete
+      expect(saved).toBe(false);
+      const completeCalls = mockFetch.mock.calls.filter(
+        (call: string[]) => call[0]?.includes('/api/adventure/complete')
+      );
+      expect(completeCalls).toHaveLength(0);
+    });
+
+    it('should return true on successful save', async () => {
+      // GIVEN
+      const mockProgression = createMockProgression();
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              success: true,
+              progression: { ...mockProgression, totalStars: 28 },
+              completion: { world: 1, level: 3, stars: 3, bestScore: 600, bestWords: 18, completedAt: new Date().toISOString() },
+            }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      // WHEN
+      let saved: boolean = false;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 3, 3, 600, 18);
+      });
+
+      // THEN
+      expect(saved).toBe(true);
+    });
+
+    it('should return false on network error', async () => {
+      // GIVEN
+      const mockProgression = createMockProgression();
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.reject(new TypeError('Failed to fetch'));
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      // WHEN
+      let saved: boolean = true;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 1, 2, 300, 8);
+      });
+
+      // THEN
+      expect(saved).toBe(false);
+    });
+
+    it('should return false on server error after retry', async () => {
+      // GIVEN — server returns 500 on both attempts
+      const mockProgression = createMockProgression();
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.resolve({
+            ok: false,
+            status: 500,
+            text: async () => 'Internal Server Error',
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      // WHEN
+      let saved: boolean = true;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 1, 1, 200, 5);
+      });
+
+      // THEN
+      expect(saved).toBe(false);
     });
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useEffect, type ReactNode } from 'react';
 
 /**
  * Navigation Context
@@ -28,6 +28,17 @@ interface NavigationProviderProps {
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const [isInGame, setIsInGame] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'brain' | 'profile'>('home');
+
+  // Lock body scroll during gameplay to prevent content from scrolling behind sticky headers
+  useEffect(() => {
+    if (isInGame) {
+      document.body.classList.add('screen-fit-locked');
+      document.body.classList.remove('screen-fit');
+    } else {
+      document.body.classList.remove('screen-fit-locked');
+      document.body.classList.add('screen-fit');
+    }
+  }, [isInGame]);
 
   const value = useMemo(() => ({
     isInGame,

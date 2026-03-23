@@ -12,7 +12,6 @@ import {
   X,
   ChevronRight,
   ShieldOff,
-  Search,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
@@ -68,7 +67,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
     declineRequest,
     cancelRequest,
     unfriend,
-    block,
     unblock,
     blockedUsers,
     search,
@@ -84,7 +82,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
   const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
   const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
-  const [friendFilter, setFriendFilter] = useState('');
 
   const socketContext = useSocketOptional();
   const giftSocket = socketContext?.socket ?? null;
@@ -104,14 +101,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
     deleteMessage,
   } = useFriendMessages(selectedThread?.friendUserId);
 
-  // Filter friends by search query
-  const filteredFriends = useMemo(() => {
-    if (!friendFilter) return friends;
-    const q = friendFilter.toLowerCase();
-    return friends.filter(f =>
-      (f.displayName || f.username).toLowerCase().includes(q)
-    );
-  }, [friends, friendFilter]);
 
   const handleAccept = useCallback(async (requestId: string) => {
     setActionLoading(requestId);
@@ -391,31 +380,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
               </div>
             )}
 
-            {/* Search filter (show when 5+ friends) */}
-            {friends.length >= 5 && (
-              <div className="relative">
-                <Search className={cn(
-                  'absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4',
-                  isDark ? 'text-gray-500' : 'text-gray-400'
-                )} />
-                <input
-                  type="text"
-                  value={friendFilter}
-                  onChange={(e) => setFriendFilter(e.target.value)}
-                  placeholder={t('friends.filterFriends')}
-                  className={cn(
-                    'w-full ps-10 pe-4 py-2 rounded-neo border-2 text-sm font-medium',
-                    isDark
-                      ? 'bg-slate-700/50 border-white/10 text-white placeholder:text-gray-500'
-                      : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
-                  )}
-                />
-              </div>
-            )}
-
             <div className="space-y-2">
-              {filteredFriends.length > 0 ? (
-                filteredFriends.map((friend, i) => (
+              {friends.length > 0 ? (
+                friends.map((friend, i) => (
                   <motion.div
                     key={friend.id}
                     initial={{ opacity: 0, x: -12 }}
@@ -434,10 +401,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 ))
               ) : (
                 <EnhancedEmptyState
-                  title={friendFilter ? t('friends.noMatchingFriends') : t('friends.noFriendsYet')}
-                  description={friendFilter ? '' : t('friends.addFriendsToChallenge')}
-                  icon={friendFilter ? 'search' : 'sparkles'}
-                  action={friendFilter ? undefined : { label: t('friends.add'), onClick: () => setShowAddFriend(true), variant: 'primary' }}
+                  title={t('friends.noFriendsYet')}
+                  description={t('friends.addFriendsToChallenge')}
+                  icon="sparkles"
+                  action={{ label: t('friends.add'), onClick: () => setShowAddFriend(true), variant: 'primary' }}
                   compact
                 />
               )}
@@ -580,9 +547,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         friend={selectedFriend}
         onClose={() => setSelectedFriend(null)}
         onChallenge={setChallengeFriend}
-        onMessage={handleOpenMessageForFriend}
         onUnfriend={unfriend}
-        onBlock={block}
         isDark={isDark}
         t={t}
       />

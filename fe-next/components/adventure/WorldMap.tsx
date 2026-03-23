@@ -281,8 +281,7 @@ export default function WorldMap({
   completions,
   onWorldSelect,
 }: WorldMapProps): React.JSX.Element {
-  const { t, dir } = useLanguage();
-  const isRtl = dir === 'rtl';
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
@@ -397,7 +396,7 @@ export default function WorldMap({
       {/* World trail */}
       <div className="relative z-10 py-8 sm:py-12 lg:max-w-4xl lg:mx-auto">
         {worldsData.map((data, index) => {
-          const isLeft = isRtl ? index % 2 !== 0 : index % 2 === 0;
+          const isLeft = index % 2 === 0;
 
           return (
             <React.Fragment key={data.world.id}>

@@ -249,6 +249,7 @@ const ja = {
     "and": "と",
     "closeMenu": "閉じる",
     "openMenu": "メニュー",
+    "swipeToClose": "スワイプして閉じる",
     "account": "アカウント",
     "valid": "有効",
     "invalid": "無効",
@@ -4779,7 +4780,10 @@ const ja = {
     "confirmBlock": "ブロックしますか？連絡できなくなります。",
     "block": "ブロック",
     "filterFriends": "フレンドを検索...",
-    "noMatchingFriends": "該当するフレンドがいません"
+    "noMatchingFriends": "該当するフレンドがいません",
+    "blocked": "ブロック中",
+    "blockedUsers": "ブロックしたユーザー",
+    "unblock": "ブロック解除"
   },
   "reveal": {
     "revealWord": "表示",
@@ -5779,6 +5783,7 @@ const ja = {
     "starsToUnlock": "あと{{count}}個で解放",
     "exitToMap": "マップに戻る",
     "startLevel": "レベル開始",
+    "progressNotSaved": "進行状況を保存できませんでした。サインインして冒険を続けよう！",
     "levelComplete": "レベルクリア！",
     "starsEarned": "獲得した星",
     "continueToNext": "続ける",

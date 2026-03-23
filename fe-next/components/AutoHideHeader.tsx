@@ -2,6 +2,7 @@
 
 import Header from './Header';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
+import { useNavigation } from '@/contexts/NavigationContext';
 
 interface AutoHideHeaderProps {
   className?: string;
@@ -12,15 +13,17 @@ interface AutoHideHeaderProps {
 /**
  * AutoHideHeader - Header wrapper component
  *
- * The header is always visible except in fullscreen mode (TV broadcast).
+ * Hides the header during:
+ * - TV fullscreen mode (broadcast)
+ * - Active gameplay (game pages have their own in-game controls)
  * In landscape mode it uses static positioning (handled by the Header component's landscape:static class).
  */
 export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeaderProps) {
-  // Listen for TV fullscreen mode to hide the header
   const isTvFullscreen = useTvFullscreenListener();
+  const { isInGame } = useNavigation();
 
-  // Hide header in fullscreen mode
-  if (isTvFullscreen) {
+  // Hide header in fullscreen mode or during active gameplay
+  if (isTvFullscreen || isInGame) {
     if (onVisibilityChange) {
       onVisibilityChange(false);
     }

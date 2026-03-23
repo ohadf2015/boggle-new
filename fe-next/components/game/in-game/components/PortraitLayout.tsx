@@ -469,7 +469,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Word Hunt UI — above grid */}
           {gameMode === 'word-hunt' && wordHuntTargetLength && onWordHuntGuess && (
-            <div className="w-full max-w-md mx-auto px-2 flex flex-col gap-2">
+            <div className="w-full max-w-md mx-auto px-2 flex flex-col gap-2 relative z-20">
               <WordHuntLifeBar life={wordHuntLife ?? 100} maxLife={100} />
               {wordHuntPlayerLives && Object.keys(wordHuntPlayerLives).length > 0 && (
                 <WordHuntPlayerLives

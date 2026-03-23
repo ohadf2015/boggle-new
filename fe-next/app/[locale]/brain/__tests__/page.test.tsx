@@ -25,6 +25,18 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
+// Mock NavigationContext - AutoHideHeader uses useNavigation
+jest.mock('@/contexts/NavigationContext', () => ({
+  useNavigation: () => ({
+    isInGame: false,
+    setIsInGame: jest.fn(),
+    activeTab: 'brain',
+    setActiveTab: jest.fn(),
+  }),
+  useHideNavigation: () => jest.fn(),
+  NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseBrainScore = useBrainScore as jest.MockedFunction<typeof useBrainScore>;
 const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;

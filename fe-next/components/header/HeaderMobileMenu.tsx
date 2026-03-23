@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Brain, BarChart3, Info, HelpCircle, Mail, Cookie, Gift, Users } from 'lucide-react';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -24,12 +24,43 @@ interface HeaderMobileMenuProps {
     onSignUp: () => void;
 }
 
+// --- Animation config ---
+const SWIPE_CLOSE_THRESHOLD = 80;
+
+const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+};
+
+const staggerContainer = {
+    visible: {
+        transition: { staggerChildren: 0.04, delayChildren: 0.1 },
+    },
+    exit: {
+        transition: { staggerChildren: 0.02, staggerDirection: -1 },
+    },
+};
+
+const staggerItem = {
+    hidden: { opacity: 0, x: 24 },
+    visible: { opacity: 1, x: 0, transition: { type: 'spring' as const, damping: 22, stiffness: 260 } },
+    exit: { opacity: 0, x: 24, transition: { duration: 0.12 } },
+};
+
+const staggerItemRtl = {
+    hidden: { opacity: 0, x: -24 },
+    visible: { opacity: 1, x: 0, transition: { type: 'spring' as const, damping: 22, stiffness: 260 } },
+    exit: { opacity: 0, x: -24, transition: { duration: 0.12 } },
+};
+
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user } = useAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const isRtl = language === 'he';
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -46,7 +77,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showMobileMenu]);
 
-    // Close mobile menu on escape key
+    // Close on escape
     useEffect(() => {
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') setShowMobileMenu(false);
@@ -57,19 +88,36 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         return () => document.removeEventListener('keydown', handleEscape);
     }, [showMobileMenu]);
 
+    // Lock body scroll when menu is open
+    useEffect(() => {
+        if (showMobileMenu) {
+            document.body.style.overflow = 'hidden';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [showMobileMenu]);
+
     const closeMenu = useCallback(() => setShowMobileMenu(false), []);
 
     const handleSignIn = useCallback(() => { closeMenu(); onSignIn(); }, [closeMenu, onSignIn]);
     const handleSignUp = useCallback(() => { closeMenu(); onSignUp(); }, [closeMenu, onSignUp]);
     const handleOpenGift = useCallback(() => { closeMenu(); onOpenGiftModal(); }, [closeMenu, onOpenGiftModal]);
 
+    // Swipe-to-close handler (RTL-aware)
+    const handleDragEnd = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+        const shouldClose = isRtl
+            ? info.offset.x < -SWIPE_CLOSE_THRESHOLD
+            : info.offset.x > SWIPE_CLOSE_THRESHOLD;
+        if (shouldClose) setShowMobileMenu(false);
+    }, [isRtl]);
+
     const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
     const avatarConfig = profile?.avatar_config ?? guestAvatar;
+    const itemVariants = isRtl ? staggerItemRtl : staggerItem;
 
     return (
         <>
             {/* Mobile: Avatar + Volume + Notifications + Hamburger */}
-            <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
+            <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0">
                 <Link
                     href={`/${language}/profile`}
                     className="flex-shrink-0 rounded-full border-2 border-neo-black shadow-hard-sm"
@@ -84,6 +132,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 </Link>
                 <MusicControls />
                 {isAuthenticated && <NotificationBell />}
+
+                {/* Animated Hamburger Button */}
                 <button
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
                     className={cn(
@@ -97,10 +147,14 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                         "transition-all duration-100"
                     )}
                     aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
-                    title={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
                     aria-expanded={showMobileMenu}
                 >
-                    {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+                    <motion.div
+                        animate={{ rotate: showMobileMenu ? 90 : 0 }}
+                        transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                    >
+                        {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+                    </motion.div>
                 </button>
             </div>
 
@@ -109,194 +163,312 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 <AnimatePresence>
                     {showMobileMenu && (
                         <>
-                            {/* Backdrop overlay */}
+                            {/* Backdrop */}
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
+                                variants={backdropVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
                                 transition={{ duration: 0.2 }}
-                                className="fixed inset-0 bg-neo-black/50 z-70 sm:hidden"
+                                className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70 sm:hidden"
                                 onClick={closeMenu}
                             />
-                            {/* Slide-out pane */}
+
+                            {/* Slide-out pane with swipe-to-close */}
                             <motion.div
                                 ref={mobileMenuRef}
-                                initial={{ x: language === 'he' ? '-100%' : '100%' }}
+                                initial={{ x: isRtl ? '-100%' : '100%' }}
                                 animate={{ x: 0 }}
-                                exit={{ x: language === 'he' ? '-100%' : '100%' }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                exit={{ x: isRtl ? '-100%' : '100%' }}
+                                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                                drag="x"
+                                dragConstraints={{ left: isRtl ? -200 : 0, right: isRtl ? 0 : 200 }}
+                                dragElastic={0.15}
+                                onDragEnd={handleDragEnd}
                                 className={cn(
-                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-80 sm:hidden",
-                                    "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
-                                    "shadow-hard-xl overflow-y-auto",
+                                    "fixed top-0 bottom-0 w-[300px] max-w-[88vw] z-80 sm:hidden",
+                                    "bg-neo-navy border-neo-black",
+                                    "shadow-hard-xl overflow-y-auto overflow-x-hidden",
                                     "pb-[max(env(safe-area-inset-bottom),1rem)]",
-                                    language === 'he'
+                                    isRtl
                                         ? "left-0 border-r-4 rounded-r-neo-lg"
                                         : "right-0 border-l-4 rounded-l-neo-lg"
                                 )}
+                                style={{ touchAction: 'pan-y' }}
                             >
-                                {/* Pane Header */}
-                                <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
-                                    <span className="text-lg font-bold text-neo-black dark:text-white">
-                                        {t('common.menu')}
-                                    </span>
+                                {/* ── Close button (top corner) ── */}
+                                <div className={cn(
+                                    "absolute top-3 z-10",
+                                    isRtl ? "right-3" : "left-3"
+                                )}>
                                     <button
                                         onClick={closeMenu}
                                         className={cn(
                                             "flex items-center justify-center",
-                                            "min-w-[48px] min-h-[48px] w-12 h-12",
-                                            "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
-                                            "border-3 border-neo-black dark:border-slate-500",
-                                            "rounded-neo shadow-hard-sm",
-                                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                            "w-9 h-9",
+                                            "bg-neo-white/10 text-neo-white/70",
+                                            "border-2 border-neo-white/20",
+                                            "rounded-full",
+                                            "hover:bg-neo-white/20 hover:text-neo-white",
+                                            "active:scale-90",
                                             "transition-all duration-100"
                                         )}
                                         aria-label={t('common.closeMenu')}
                                     >
-                                        <X className="text-xl" size={20} />
+                                        <X size={16} />
                                     </button>
                                 </div>
 
-                                {/* Menu content */}
-                                <div className="flex flex-col gap-3 p-4">
-                                    {/* Coin Balance */}
-                                    {isAuthenticated && profile && (
-                                        <>
-                                            <MobileMenuSection label={t('profile.coins')}>
-                                                <MobileMenuLink href={`/${language}/profile`} onClick={closeMenu}>
-                                                    <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} />
-                                                    <span className="ms-auto text-neo-black/60 dark:text-slate-400">
-                                                        {t('profile.viewProfile')}
-                                                    </span>
-                                                </MobileMenuLink>
-                                            </MobileMenuSection>
-                                            <MenuDivider />
-                                        </>
-                                    )}
+                                {/* ── Profile Hero Section ── */}
+                                <div className={cn(
+                                    "relative px-5 pt-12 pb-5",
+                                    "bg-gradient-to-b from-neo-purple/30 via-neo-navy to-neo-navy",
+                                    "border-b-3 border-neo-black/40"
+                                )}>
+                                    {/* Decorative dots */}
+                                    <div className="absolute top-2 right-4 flex gap-1 opacity-30">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-pink" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-cyan" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-lime" />
+                                    </div>
 
-                                    {/* Gift Notification */}
-                                    {isAuthenticated && unclaimedCount > 0 && (
-                                        <>
-                                            <MobileMenuSection label={t('gift.rewards')}>
-                                                <button
-                                                    onClick={handleOpenGift}
-                                                    className={cn(
-                                                        "relative flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                        "bg-amber-400 hover:bg-amber-500 text-neo-black",
-                                                        "shadow-hard-sm hover:shadow-hard"
+                                    {isAuthenticated && profile ? (
+                                        <Link href={`/${language}/profile`} onClick={closeMenu} className="block group">
+                                            <div className="flex items-center gap-3.5">
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="rounded-full border-3 border-neo-lime shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors">
+                                                        <Avatar
+                                                            customAvatar={avatarConfig}
+                                                            avatarImage={profile.avatar_image}
+                                                            userId={user?.id}
+                                                            size="lg"
+                                                        />
+                                                    </div>
+                                                    {/* Level badge */}
+                                                    {profile.current_level != null && (
+                                                        <div className="absolute -bottom-1 -right-1 bg-neo-lime text-neo-black text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">
+                                                            {profile.current_level}
+                                                        </div>
                                                     )}
-                                                >
-                                                    <MobileMenuIcon className="bg-white/30">
-                                                        <Gift className="w-4 h-4" aria-hidden="true" />
-                                                    </MobileMenuIcon>
-                                                    <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
-                                                    <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
-                                                </button>
-                                            </MobileMenuSection>
-                                            <MenuDivider />
-                                        </>
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-base font-black text-neo-white truncate">
+                                                        {profile.display_name || profile.username}
+                                                    </span>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} />
+                                                    </div>
+                                                    {profile.total_games != null && profile.total_games > 0 && (
+                                                        <span className="text-[10px] text-neo-white/40 mt-0.5 font-bold">
+                                                            {profile.total_games} {t('profile.gamesPlayed')}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <ChevronRight className={cn(
+                                                    "ms-auto w-4 h-4 text-neo-white/30 group-hover:text-neo-white/60 transition-colors flex-shrink-0",
+                                                    isRtl && "rotate-180"
+                                                )} />
+                                            </div>
+                                        </Link>
+                                    ) : (
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="rounded-full border-3 border-neo-white/20 shadow-hard-sm p-0.5 bg-neo-navy">
+                                                    <Avatar
+                                                        customAvatar={avatarConfig}
+                                                        userId="guest"
+                                                        size="lg"
+                                                    />
+                                                </div>
+                                                <span className="text-base font-black text-neo-white/60">
+                                                    {t('common.guest')}
+                                                </span>
+                                            </div>
+                                            <AuthButton
+                                                inline
+                                                onClose={closeMenu}
+                                                onSignInClick={handleSignIn}
+                                                onSignUpClick={handleSignUp}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* ── Menu Items (Staggered) ── */}
+                                <motion.div
+                                    className="flex flex-col gap-1.5 p-4"
+                                    variants={staggerContainer}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                >
+                                    {/* Gift Notification - highlighted */}
+                                    {isAuthenticated && unclaimedCount > 0 && (
+                                        <motion.div variants={itemVariants}>
+                                            <button
+                                                onClick={handleOpenGift}
+                                                className={cn(
+                                                    "relative flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
+                                                    "bg-gradient-to-r from-amber-500/90 to-amber-400/90 text-neo-black",
+                                                    "border-3 border-neo-black shadow-hard-sm",
+                                                    "hover:shadow-hard hover:translate-y-[-1px]",
+                                                    "active:translate-y-[1px] active:shadow-none",
+                                                    "transition-all duration-100"
+                                                )}
+                                            >
+                                                <MenuIcon className="bg-white/30 border-neo-black/30">
+                                                    <Gift className="w-4 h-4" aria-hidden="true" />
+                                                </MenuIcon>
+                                                <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
+                                                <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
+                                                <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white/50 animate-pulse" aria-hidden="true" />
+                                            </button>
+                                        </motion.div>
                                     )}
 
-                                    {/* Account Section */}
-                                    <MobileMenuSection label={t('common.account')}>
-                                        <AuthButton
-                                            inline
-                                            onClose={closeMenu}
-                                            onSignInClick={handleSignIn}
-                                            onSignUpClick={handleSignUp}
-                                        />
-                                    </MobileMenuSection>
+                                    {/* ─ Settings Section ─ */}
+                                    <motion.div variants={itemVariants}>
+                                        <SectionLabel>{t('settings.title')}</SectionLabel>
+                                    </motion.div>
 
-                                    <MenuDivider />
-
-                                    {/* Settings Section */}
-                                    <MobileMenuSection label={t('settings.title')}>
-                                        <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
-                                            <span className="text-sm font-bold text-neo-black dark:text-white">
+                                    <motion.div variants={itemVariants}>
+                                        <div className={cn(
+                                            "flex items-center gap-3 px-4 py-3 rounded-neo",
+                                            "bg-neo-white/5 border-2 border-neo-white/10"
+                                        )}>
+                                            <span className="text-sm font-bold text-neo-white/80">
                                                 {t('settings.language')}
                                             </span>
                                             <div className="ms-auto">
                                                 <QuickLanguageSwitcher showLabel />
                                             </div>
                                         </div>
+                                    </motion.div>
 
-                                        <MobileMenuLink href={`/${language}/settings#accessibility`} onClick={closeMenu}>
-                                            <MobileMenuIcon className="bg-neo-cyan/50">
-                                                <Accessibility className="w-4 h-4" aria-hidden="true" />
-                                            </MobileMenuIcon>
+                                    <motion.div variants={itemVariants}>
+                                        <MenuLink href={`/${language}/settings#accessibility`} onClick={closeMenu} accentColor="cyan">
+                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
+                                                <Accessibility className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
+                                            </MenuIcon>
                                             <span>{t('settings.accessibility')}</span>
-                                        </MobileMenuLink>
+                                        </MenuLink>
+                                    </motion.div>
 
-                                        <MobileMenuLink href={`/${language}/settings`} onClick={closeMenu}>
-                                            <MobileMenuIcon className="bg-neo-cyan/50">
-                                                <Settings className="w-4 h-4" aria-hidden="true" />
-                                            </MobileMenuIcon>
+                                    <motion.div variants={itemVariants}>
+                                        <MenuLink href={`/${language}/settings`} onClick={closeMenu} accentColor="cyan">
+                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
+                                                <Settings className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
+                                            </MenuIcon>
                                             <span>{t('settings.moreSettings')}</span>
-                                        </MobileMenuLink>
-                                    </MobileMenuSection>
+                                        </MenuLink>
+                                    </motion.div>
 
-                                    <MenuDivider />
+                                    {/* ─ Community ─ */}
+                                    <motion.div variants={itemVariants}>
+                                        <SectionLabel>{t('ugc.nav.community')}</SectionLabel>
+                                    </motion.div>
 
-                                    {/* Community */}
-                                    <MobileMenuSection label={t('ugc.nav.community')}>
-                                        <MobileMenuLink href={`/${language}/community`} onClick={closeMenu}>
-                                            <MobileMenuIcon className="bg-neo-pink/50">
-                                                <Users className="w-4 h-4" aria-hidden="true" />
-                                            </MobileMenuIcon>
+                                    <motion.div variants={itemVariants}>
+                                        <MenuLink href={`/${language}/community`} onClick={closeMenu} accentColor="pink">
+                                            <MenuIcon className="bg-neo-pink/20 border-neo-pink/40">
+                                                <Users className="w-4 h-4 text-neo-pink" aria-hidden="true" />
+                                            </MenuIcon>
                                             <span>{t('ugc.nav.community')}</span>
-                                        </MobileMenuLink>
-                                    </MobileMenuSection>
+                                        </MenuLink>
+                                    </motion.div>
 
-                                    <MenuDivider />
-
-                                    {/* Brain Training - hidden, feature temporarily disabled */}
-                                    {false && isAuthenticated && (
-                                        <MobileMenuSection label={t('landing.brainTraining')}>
-                                            <Link
-                                                href={`/${language}/brain`}
-                                                onClick={closeMenu}
-                                                className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                    "bg-gradient-to-r from-neo-purple/80 to-purple-400/80 hover:from-neo-purple hover:to-purple-400 text-neo-black",
-                                                    "shadow-hard-sm hover:shadow-hard"
-                                                )}
-                                            >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-purple-light">
-                                                    <Brain className="w-4 h-4" aria-hidden="true" />
-                                                </span>
-                                                <span>{t('brain.nav.dashboard')}</span>
-                                            </Link>
-                                        </MobileMenuSection>
-                                    )}
-
-                                    {/* Admin Controls */}
+                                    {/* ─ Admin ─ */}
                                     {isAdmin && (
                                         <>
-                                            <MenuDivider />
-                                            <MobileMenuSection label={t('common.admin')}>
+                                            <motion.div variants={itemVariants}>
+                                                <SectionLabel>{t('common.admin')}</SectionLabel>
+                                            </motion.div>
+                                            <motion.div variants={itemVariants}>
                                                 <Link
                                                     href={`/${language}/admin`}
                                                     onClick={closeMenu}
                                                     className={cn(
-                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                        "bg-gradient-to-r from-neo-pink to-pink-400 hover:from-neo-pink/90 hover:to-pink-400/90 text-white",
-                                                        "shadow-hard-sm hover:shadow-hard"
+                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
+                                                        "bg-gradient-to-r from-neo-pink/30 to-neo-pink/10 text-neo-white",
+                                                        "border-2 border-neo-pink/40",
+                                                        "hover:border-neo-pink/60 hover:from-neo-pink/40",
+                                                        "active:scale-[0.98]",
+                                                        "transition-all duration-100"
                                                     )}
                                                 >
-                                                    <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-navy border-3 border-neo-black text-neo-pink">
-                                                        <BarChart3 className="w-4 h-4" aria-hidden="true" />
-                                                    </span>
+                                                    <MenuIcon className="bg-neo-pink/30 border-neo-pink/50">
+                                                        <Sparkles className="w-4 h-4 text-neo-pink" aria-hidden="true" />
+                                                    </MenuIcon>
                                                     <span>{t('common.adminDashboard')}</span>
                                                 </Link>
-                                            </MobileMenuSection>
+                                            </motion.div>
                                         </>
                                     )}
 
-                                    <MenuDivider />
+                                    {/* ─ Info Links ─ */}
+                                    <motion.div variants={itemVariants}>
+                                        <SectionLabel>{t('common.info')}</SectionLabel>
+                                    </motion.div>
 
-                                    {/* Info Links */}
-                                    <MobileInfoLinks language={language} t={t} onClose={closeMenu} />
-                                </div>
+                                    <motion.div variants={itemVariants}>
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
+                                            <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-yellow/20 text-neo-yellow">{t('footer.faq')}</InfoLink>
+                                            <InfoLink href={`/${language}/leaderboard`} onClick={closeMenu} icon={<Trophy className="w-3.5 h-3.5" />} color="bg-neo-lime/20 text-neo-lime">{t('footer.leaderboard')}</InfoLink>
+                                            <InfoLink href={`/${language}/contact`} onClick={closeMenu} icon={<Mail className="w-3.5 h-3.5" />} color="bg-neo-white/10 text-neo-white/60">{t('footer.contact')}</InfoLink>
+                                            <InfoLink href={`/${language}/legal`} onClick={closeMenu} icon={<ScrollText className="w-3.5 h-3.5" />} color="bg-neo-pink/20 text-neo-pink-light">{t('legal.title')}</InfoLink>
+                                            <InfoLinkExternal href="https://ko-fi.com/lexiclash" onClick={closeMenu} icon={<Coffee className="w-3.5 h-3.5" />} color="bg-neo-pink/30 text-neo-pink" label={t('common.opensInNewTab')}>{t('support.kofiFooter')}</InfoLinkExternal>
+                                        </div>
+                                    </motion.div>
+
+                                    <motion.div variants={itemVariants}>
+                                        <div className="flex items-center gap-1.5">
+                                            <a
+                                                href="https://www.instagram.com/lexi.clash"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={closeMenu}
+                                                aria-label="Instagram"
+                                                className={cn(
+                                                    "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo",
+                                                    "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-neo-white/70",
+                                                    "border-2 border-neo-white/10",
+                                                    "hover:border-neo-white/20 hover:text-neo-white",
+                                                    "transition-all duration-100"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                                                    <InstagramIcon className="w-3 h-3" size="0.75em" />
+                                                </span>
+                                                <span>Instagram</span>
+                                            </a>
+                                            <div
+                                                onClick={closeMenu}
+                                                className={cn(
+                                                    "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo cursor-pointer",
+                                                    "bg-neo-white/5 text-neo-white/70",
+                                                    "border-2 border-neo-white/10",
+                                                    "hover:border-neo-white/20 hover:text-neo-white",
+                                                    "transition-all duration-100"
+                                                )}
+                                            >
+                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-lime/20 text-neo-lime">
+                                                    <Cookie className="w-3 h-3" aria-hidden="true" />
+                                                </span>
+                                                <ManageCookiesButton />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Swipe hint */}
+                                    <motion.div variants={itemVariants} className="flex justify-center pt-2 pb-1">
+                                        <span className="text-[10px] text-neo-white/20 font-bold">
+                                            {isRtl ? '← ' : ''}
+                                            {t('common.swipeToClose') || 'Swipe to close'}
+                                            {!isRtl ? ' →' : ''}
+                                        </span>
+                                    </motion.div>
+                                </motion.div>
                             </motion.div>
                         </>
                     )}
@@ -313,38 +485,53 @@ export default HeaderMobileMenu;
 
 // --- Helper sub-components ---
 
-function MenuDivider() {
-    return <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />;
-}
-
-function MobileMenuSection({ label, children }: { label: string; children: React.ReactNode }) {
+function SectionLabel({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                {label}
+        <div className="flex items-center gap-2 pt-3 pb-1 px-1">
+            <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
+                {children}
             </span>
-            {children}
+            <div className="flex-1 h-px bg-neo-white/10" />
         </div>
     );
 }
 
-function MobileMenuIcon({ className, children }: { className: string; children: React.ReactNode }) {
+function MenuIcon({ className, children }: { className: string; children: React.ReactNode }) {
     return (
-        <span className={cn("flex items-center justify-center w-7 h-7 rounded-md border-3 border-neo-black text-neo-black dark:text-white", className)}>
+        <span className={cn(
+            "flex items-center justify-center w-7 h-7 rounded-lg border-2 flex-shrink-0",
+            className
+        )}>
             {children}
         </span>
     );
 }
 
-function MobileMenuLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
+function MenuLink({ href, onClick, accentColor, children }: {
+    href: string;
+    onClick: () => void;
+    accentColor: 'cyan' | 'pink' | 'lime' | 'purple';
+    children: React.ReactNode;
+}) {
+    const hoverColors = {
+        cyan: 'hover:border-neo-cyan/40',
+        pink: 'hover:border-neo-pink/40',
+        lime: 'hover:border-neo-lime/40',
+        purple: 'hover:border-neo-purple/40',
+    };
+
     return (
         <Link
             href={href}
             onClick={onClick}
             className={cn(
-                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
-                "bg-white dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
-                "shadow-hard-sm hover:shadow-hard"
+                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
+                "bg-neo-white/5 text-neo-white/90",
+                "border-2 border-neo-white/10",
+                hoverColors[accentColor],
+                "hover:bg-neo-white/8",
+                "active:scale-[0.98]",
+                "transition-all duration-100"
             )}
         >
             {children}
@@ -352,81 +539,62 @@ function MobileMenuLink({ href, onClick, children }: { href: string; onClick: ()
     );
 }
 
-const infoLinkClass = cn(
-    "flex items-center gap-2.5 px-3 py-2 text-xs font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-    "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
-    "shadow-hard-sm hover:shadow-hard"
-);
-
-function SmallIcon({ className, children }: { className: string; children: React.ReactNode }) {
+function InfoLink({ href, onClick, icon, color, children }: {
+    href: string;
+    onClick: () => void;
+    icon: React.ReactNode;
+    color: string;
+    children: React.ReactNode;
+}) {
     return (
-        <span className={cn("flex items-center justify-center w-6 h-6 rounded-md border-2 border-neo-black text-neo-black", className)}>
-            {children}
-        </span>
+        <Link
+            href={href}
+            onClick={onClick}
+            className={cn(
+                "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
+                "bg-neo-white/5 text-neo-white/70",
+                "border-2 border-neo-white/10",
+                "hover:border-neo-white/20 hover:text-neo-white",
+                "active:scale-[0.97]",
+                "transition-all duration-100"
+            )}
+        >
+            <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>
+                {icon}
+            </span>
+            <span className="truncate">{children}</span>
+        </Link>
     );
 }
 
-function MobileInfoLinks({ language, t, onClose }: { language: string; t: (key: string) => string; onClose: () => void }) {
+function InfoLinkExternal({ href, onClick, icon, color, label, children }: {
+    href: string;
+    onClick: () => void;
+    icon: React.ReactNode;
+    color: string;
+    label: string;
+    children: React.ReactNode;
+}) {
     return (
-        <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                {t('common.info')}
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClick}
+            aria-label={`${children} (${label})`}
+            className={cn(
+                "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
+                "bg-neo-white/5 text-neo-white/70",
+                "border-2 border-neo-white/10",
+                "hover:border-neo-white/20 hover:text-neo-white",
+                "active:scale-[0.97]",
+                "transition-all duration-100"
+            )}
+        >
+            <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>
+                {icon}
             </span>
-            <div className="flex flex-col gap-1.5">
-                <Link href={`/${language}/about`} onClick={onClose} className={infoLinkClass}>
-                    <SmallIcon className="bg-neo-cyan"><Info className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <span>{t('footer.about')}</span>
-                </Link>
-                <Link href={`/${language}/faq`} onClick={onClose} className={infoLinkClass}>
-                    <SmallIcon className="bg-neo-yellow"><HelpCircle className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <span>{t('footer.faq')}</span>
-                </Link>
-                <Link href={`/${language}/leaderboard`} onClick={onClose} className={infoLinkClass}>
-                    <SmallIcon className="bg-neo-lime"><Trophy className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <span>{t('footer.leaderboard')}</span>
-                </Link>
-                <Link href={`/${language}/contact`} onClick={onClose} className={infoLinkClass}>
-                    <SmallIcon className="bg-neo-cream"><Mail className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <span>{t('footer.contact')}</span>
-                </Link>
-                <Link href={`/${language}/legal`} onClick={onClose} className={cn(infoLinkClass, "hover:bg-neo-lime/50")}>
-                    <SmallIcon className="bg-neo-pink-light"><ScrollText className="w-3.5 h-3.5 text-neo-black" aria-hidden="true" /></SmallIcon>
-                    <span>{t('legal.title')}</span>
-                </Link>
-                <a
-                    href="https://ko-fi.com/lexiclash"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={onClose}
-                    aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab')})`}
-                    className={cn(infoLinkClass, "bg-neo-pink/20 hover:bg-neo-pink/40")}
-                >
-                    <SmallIcon className="bg-neo-pink text-white"><Coffee className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <span>{t('support.kofiFooter')}</span>
-                    <span className="sr-only">({t('common.opensInNewTab')})</span>
-                </a>
-                <a
-                    href="https://www.instagram.com/lexi.clash"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={onClose}
-                    aria-label="Instagram"
-                    className={cn(infoLinkClass, "hover:bg-neo-pink/30")}
-                >
-                    <span className="flex items-center justify-center w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-neo-black text-white">
-                        <InstagramIcon className="w-3.5 h-3.5" size="0.875em" />
-                    </span>
-                    <span>Instagram</span>
-                    <span className="sr-only">({t('common.opensInNewTab')})</span>
-                </a>
-                <div
-                    onClick={onClose}
-                    className={infoLinkClass}
-                >
-                    <SmallIcon className="bg-neo-lime"><Cookie className="w-3.5 h-3.5" aria-hidden="true" /></SmallIcon>
-                    <ManageCookiesButton />
-                </div>
-            </div>
-        </div>
+            <span className="truncate">{children}</span>
+        </a>
     );
 }
