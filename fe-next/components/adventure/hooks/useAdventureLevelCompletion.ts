@@ -53,6 +53,16 @@ export interface UseAdventureLevelCompletionProps {
     isCompletion: boolean
   ) => void;
   recordCompletion: (data: any) => void;
+  /** Eagerly save completion to DB (ProgressionContext.completeLevel) — called as soon as level ends */
+  saveCompletion: (
+    world: number,
+    level: number,
+    stars: 0 | 1 | 2 | 3,
+    score: number,
+    words: number,
+    goldEarned?: number,
+    longWords?: number
+  ) => Promise<boolean>;
   /** Update word album with words found this level */
   updateWordAlbum?: (words: string[]) => void;
   endAIDirector: () => void;
@@ -96,6 +106,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const [earnedGold, setEarnedGold] = useState<number>(0);
   const [nonBossCompleted, setNonBossCompleted] = useState(false);
   const completionProcessedRef = useRef(false);
+  /** Tracks whether the DB save has been fired to prevent double-saves */
+  const completionSavedRef = useRef(false);
 
   // Track if player ever took damage (for BOSS_NO_DAMAGE achievement)
   const playerTookDamageRef = useRef(false);
@@ -108,6 +120,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   // Store callbacks in refs for stable references
   const recordAttemptRef = useRef(recordAttempt);
   const recordCompletionRef = useRef(recordCompletion);
+  const saveCompletionRef = useRef(props.saveCompletion);
   const endAIDirectorRef = useRef(endAIDirector);
   const handleEarnAchievementRef = useRef(handleEarnAchievement);
   const updateWordAlbumRef = useRef(props.updateWordAlbum);
@@ -116,12 +129,14 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   useEffect(() => {
     recordAttemptRef.current = recordAttempt;
     recordCompletionRef.current = recordCompletion;
+    saveCompletionRef.current = props.saveCompletion;
     endAIDirectorRef.current = endAIDirector;
     handleEarnAchievementRef.current = handleEarnAchievement;
     updateWordAlbumRef.current = props.updateWordAlbum;
     completionProcessedRef.current = false;
+    completionSavedRef.current = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
-  }, [recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
+  }, [recordAttempt, recordCompletion, props.saveCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
 
   // Award XP and gold on level completion
   useEffect(() => {
@@ -243,7 +258,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     }
   }, [isBossActive, isBossLevel, bossHealthPhase, playerIsDead, endBossBattle, triggerBossTaunt, timeRemaining, timerSeconds, props.playerHealthPercent]);
 
-  // Achievement & Progress Recording
+  // Achievement & Progress Recording + Eager DB Save
   useEffect(() => {
     if (!completionProcessedRef.current) return;
     if (!gameState.isComplete && timeRemaining > 0) return;
@@ -273,6 +288,22 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       retainedScore: props.retainedScore ?? 0,
     });
 
+    // Eagerly save completion to DB — don't wait for Continue button click.
+    // This ensures progress is persisted even if user navigates away (browser back, exit).
+    if (gameState.stars > 0 && !completionSavedRef.current) {
+      completionSavedRef.current = true;
+      const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
+      saveCompletionRef.current(
+        levelConfig.world, levelConfig.level,
+        gameState.stars as 0 | 1 | 2 | 3,
+        gameState.score, gameState.wordsFound.length,
+        earnedGold, longWords
+      ).catch(() => {
+        // Reset flag so Continue button can retry
+        completionSavedRef.current = false;
+      });
+    }
+
     endAIDirectorRef.current();
 
     // Update word album with words found this level
@@ -280,7 +311,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       updateWordAlbumRef.current?.(gameState.wordsFound);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound accessed via ref; wordsFound.length in deps is sufficient
-  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
+  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore, earnedGold]);
 
   const handleLevelUpClose = useCallback(() => {
     setLevelUpData(null);
@@ -294,6 +325,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     setEarnedGold(0);
     setNonBossCompleted(false);
     completionProcessedRef.current = false;
+    completionSavedRef.current = false;
   }, []);
 
   return {
@@ -306,5 +338,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     handleLevelUpClose,
     resetRewards,
     completionProcessedRef,
+    /** Whether the completion has been eagerly saved to DB */
+    completionSavedRef,
   };
 }

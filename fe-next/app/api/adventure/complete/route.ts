@@ -103,9 +103,9 @@ function validateRequestBody(body: Record<string, unknown>): {
  * Complete a level and update progression
  */
 export async function POST(request: NextRequest) {
-  // Rate limit: 10 requests per minute
+  // Rate limit: 20 requests per minute (players can complete levels quickly in early worlds)
   const rateLimitResult = checkApiRateLimit(request, 'adventure-complete', {
-    maxRequests: 10,
+    maxRequests: 20,
     windowMs: 60_000,
   });
   if (!rateLimitResult.success) {

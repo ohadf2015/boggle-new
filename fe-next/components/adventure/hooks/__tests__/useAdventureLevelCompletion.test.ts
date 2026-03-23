@@ -25,6 +25,7 @@ describe('useAdventureLevelCompletion', () => {
   const mockShowVictory = jest.fn();
   const mockShowDefeat = jest.fn();
   const mockCompleteLevel = jest.fn();
+  const mockSaveCompletion = jest.fn().mockResolvedValue(true);
   const mockEndBossBattle = jest.fn();
   const mockTriggerBossTaunt = jest.fn();
 
@@ -46,6 +47,7 @@ describe('useAdventureLevelCompletion', () => {
     addGold: mockAddGold,
     recordAttempt: mockRecordAttempt,
     recordCompletion: mockRecordCompletion,
+    saveCompletion: mockSaveCompletion,
     endAIDirector: mockEndAIDirector,
     handleEarnAchievement: mockHandleEarnAchievement,
     pauseGame: mockPauseGame,

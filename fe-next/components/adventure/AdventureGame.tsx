@@ -106,7 +106,15 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
-    const { recordAttempt, getLevelAttempt, progression, updateWordAlbum } = useProgression();
+    const { recordAttempt, getLevelAttempt, progression, updateWordAlbum, completeLevel: persistCompletion } = useProgression();
+    // Wrap to ensure correct return type for saveCompletion prop
+    const saveCompletionToDb = useCallback(
+      async (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number): Promise<boolean> => {
+        const result = await persistCompletion(world, level, stars, score, words, goldEarned, longWords);
+        return result ?? false;
+      },
+      [persistCompletion]
+    );
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
@@ -283,7 +291,7 @@ const AdventureGame = memo<AdventureGameProps>(
       bonusGoldMultiplier: init.runeEffects.goldMultiplier * init.streakMultiplier,
       isFirstCompletion: !bestAttempt,
       awardXp: init.awardXp, addGold: init.addGold,
-      recordAttempt, recordCompletion: init.recordCompletion, updateWordAlbum,
+      recordAttempt, recordCompletion: init.recordCompletion, saveCompletion: saveCompletionToDb, updateWordAlbum,
       endAIDirector: init.endAIDirector, handleEarnAchievement: init.handleEarnAchievement,
       pauseGame, completeLevel, showVictory: cinematics.showVictory, showDefeat: cinematics.showDefeat,
       showLevelComplete, showVictoryCinematic: cinematics.showVictoryCinematic,

@@ -59,7 +59,7 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1",
+        "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1 overflow-x-clip",
         isDamaged && "animate-neo-shake",
         tier.glow
       )}

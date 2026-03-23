@@ -249,7 +249,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe pt-3 sm:pt-2"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
-        ['--game-chrome-height' as string]: '280px',
+        ['--game-chrome-height' as string]: '340px',
       } as React.CSSProperties}
     >
       {/* Top bar */}
@@ -262,21 +262,23 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
 
       {/* Target word clue boxes */}
-      <SurvivalClueBoxes
-        ref={actions.clueContainerRef}
-        currentHint={state.currentHint}
-        targetWord={targetWord}
-        attempts={state.attempts}
-        accumulatedClues={state.accumulatedClues}
-        revealedLetters={state.revealedLetters}
-        knownLetters={state.knownLetters}
-        latestAttemptFeedback={state.latestAttemptFeedback}
-        showFeedbackOverlay={state.showFeedbackOverlay}
-        isClueGaining={state.isClueGaining}
-        skipAnimations={skipAnimations}
-        gameDir={actions.gameDir}
-        t={t}
-      />
+      <div className="flex-shrink-0">
+        <SurvivalClueBoxes
+          ref={actions.clueContainerRef}
+          currentHint={state.currentHint}
+          targetWord={targetWord}
+          attempts={state.attempts}
+          accumulatedClues={state.accumulatedClues}
+          revealedLetters={state.revealedLetters}
+          knownLetters={state.knownLetters}
+          latestAttemptFeedback={state.latestAttemptFeedback}
+          showFeedbackOverlay={state.showFeedbackOverlay}
+          isClueGaining={state.isClueGaining}
+          skipAnimations={skipAnimations}
+          gameDir={actions.gameDir}
+          t={t}
+        />
+      </div>
 
       {/* Category and example hints (if unlocked) */}
       {state.showCategory && (
@@ -294,29 +296,33 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      {/* Life bar */}
-      <SurvivalLifeBar
-        lifePoints={state.lifePoints}
-        isGameOver={state.isGameOver}
-        isLifeGaining={state.isLifeGaining}
-        lifeGainAmount={state.lifeGainAmount}
-        skipAnimations={skipAnimations}
-        onLifeGainComplete={() => actions.setLifeGainAmount(null)}
-      />
+      {/* Life bar — overflow-x clips sideways particles, overflow-y visible for gain animation */}
+      <div className="flex-shrink-0 overflow-x-clip">
+        <SurvivalLifeBar
+          lifePoints={state.lifePoints}
+          isGameOver={state.isGameOver}
+          isLifeGaining={state.isLifeGaining}
+          lifeGainAmount={state.lifeGainAmount}
+          skipAnimations={skipAnimations}
+          onLifeGainComplete={() => actions.setLifeGainAmount(null)}
+        />
+      </div>
 
-      {/* Game Grid */}
-      <SurvivalGridSection
-        grid={grid}
-        isGameOver={state.isGameOver}
-        eliminatedLetters={state.eliminatedLetters}
-        onWordSubmit={actions.handleWordSubmit}
-        onWordChange={actions.handleWordChange}
-        highlightedPath={keyboardInput.highlightedCells}
-        t={t}
-      />
+      {/* Game Grid — flex-1 lets it shrink to fit remaining space */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <SurvivalGridSection
+          grid={grid}
+          isGameOver={state.isGameOver}
+          eliminatedLetters={state.eliminatedLetters}
+          onWordSubmit={actions.handleWordSubmit}
+          onWordChange={actions.handleWordChange}
+          highlightedPath={keyboardInput.highlightedCells}
+          t={t}
+        />
+      </div>
 
       {/* Word Feedback — inline WordFormingArea */}
-      <div className="flex justify-center py-1">
+      <div className="flex justify-center py-1 flex-shrink-0">
         <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
       </div>
 

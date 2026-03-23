@@ -196,10 +196,13 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           body: requestBody,
         });
 
-        // Retry once on transient 500/503 (cold start, timeout)
-        if (response.status >= 500 && response.status < 600) {
+        // Retry on transient errors: 429 (rate limit) with backoff, 500/503 (cold start)
+        if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+          const retryAfter = response.status === 429
+            ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
+            : 1000;
           logger.warn('[ProgressionContext] Retrying completeLevel after', response.status);
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, retryAfter));
           response = await fetch('/api/adventure/complete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

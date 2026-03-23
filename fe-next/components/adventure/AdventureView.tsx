@@ -180,17 +180,21 @@ function AdventureView(): React.JSX.Element {
 
   const handleLevelComplete = useCallback(
     async (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => {
-      if (selectedWorld && selectedLevel) {
-        const saved = await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords);
-        if (!saved) {
+      // The eager save in useAdventureLevelCompletion fires as soon as the level ends.
+      // This callback is a fallback — if the eager save failed or hasn't fired yet, retry here.
+      if (selectedWorld && selectedLevel && stars > 0) {
+        // completeLevel's in-flight guard prevents duplicate API calls for the same level,
+        // so this is safe to call even if the eager save already succeeded.
+        const saved = await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords) as boolean | void;
+        if (saved === false) {
           toast.error(t('adventure.progressNotSaved'));
         }
-        if (typeof window !== 'undefined') {
-          window.history.back();
-        } else {
-          setViewState('levelGrid');
-          setSelectedLevel(null);
-        }
+      }
+      if (typeof window !== 'undefined') {
+        window.history.back();
+      } else {
+        setViewState('levelGrid');
+        setSelectedLevel(null);
       }
     },
     [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t]

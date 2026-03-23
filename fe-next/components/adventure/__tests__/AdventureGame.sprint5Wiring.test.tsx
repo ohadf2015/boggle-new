@@ -153,6 +153,7 @@ describe('Fix 2 & 3: completion payload includes lootDrops and retainedScore', (
       addGold: jest.fn(),
       recordAttempt: jest.fn(),
       recordCompletion,
+      saveCompletion: jest.fn().mockResolvedValue(true),
       endAIDirector: jest.fn(),
       handleEarnAchievement: jest.fn(() => false),
       pauseGame: jest.fn(),
