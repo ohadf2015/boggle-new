@@ -109,13 +109,21 @@ export function useHostGameEvents({
   onGameStart,
   setPlayersReady,
 }: UseHostGameEventsProps): UseHostGameEventsReturn {
-  // Use refs to avoid stale closure issues
+  // Use refs to avoid stale closure issues and prevent useEffect re-runs
   const onShowResultsRef = useRef(onShowResults);
+  const onGameStartRef = useRef(onGameStart);
+  const gameStartedRef = useRef(gameStarted);
   const tableDataRef = useRef<any>(null);
 
   useEffect(() => {
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
+  useEffect(() => {
+    onGameStartRef.current = onGameStart;
+  }, [onGameStart]);
+  useEffect(() => {
+    gameStartedRef.current = gameStarted;
+  }, [gameStarted]);
 
   // Track when we entered waiting state to prevent flickering
   const waitingStartTimeRef = useRef<number | null>(null);
@@ -238,7 +246,7 @@ export function useHostGameEvents({
       sendStartGameAck(socket, data, 'HOST');
 
       // Trigger music
-      onGameStart?.();
+      onGameStartRef.current?.();
     };
 
     const handleTimeUpdate = (data: any) => {
@@ -250,13 +258,14 @@ export function useHostGameEvents({
 
       // Skip timer sync while 3-2-1-GO countdown is playing.
       // gameStarted becomes true only after the countdown animation completes.
-      if (!gameStarted) {
+      // Uses ref to avoid stale closure — prevents useEffect re-registration on every gameStarted change.
+      if (!gameStartedRef.current) {
         return;
       }
 
       setRemainingTime(data.remainingTime);
 
-      if (data.remainingTime === 0 && gameStarted) {
+      if (data.remainingTime === 0 && gameStartedRef.current) {
         setGameStarted(false);
         setShowStartAnimation(false);
         setWaitingForResults(true);
@@ -270,7 +279,7 @@ export function useHostGameEvents({
 
     const handleEndGame = () => {
       logger.log('[HOST] Received endGame event');
-      if (gameStarted) {
+      if (gameStartedRef.current) {
         setGameStarted(false);
         setRemainingTime(0);
         setShowStartAnimation(false);
@@ -485,7 +494,7 @@ export function useHostGameEvents({
   }, [
     socket,
     t,
-    gameStarted,
+    // gameStarted and onGameStart accessed via refs to prevent effect re-registration
     setGameStarted,
     setShowStartAnimation,
     setTableData,
@@ -505,9 +514,8 @@ export function useHostGameEvents({
     resetComboState,
     handleRoomClosedDueToInactivity,
     earthquakeHandlers,
-    onGameStart,
     setPlayersReady,
-  ]); // hostPlaying accessed via hostPlayingRef for event handlers
+  ]); // hostPlaying, onGameStart, gameStarted accessed via refs for event handlers
 
   return { gameSessionIdRef, gameSessionId };
 }

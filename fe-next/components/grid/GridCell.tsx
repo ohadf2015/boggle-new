@@ -105,6 +105,7 @@ const GridCell = memo<GridCellProps>(({
         y: isSelected ? (escalation?.liftY ?? -2) : 0,
         x: 0,
         rotateX: 0,
+        opacity: 1,
       }
     }
     whileTap={effectiveRenderMode === 'minimal' ? undefined : { scale: 0.92 }}
