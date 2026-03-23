@@ -109,9 +109,13 @@ export async function POST(request: NextRequest) {
     windowMs: 60_000,
   });
   if (!rateLimitResult.success) {
+    const retryAfter = rateLimitResult.retryAfter ?? 60;
     return NextResponse.json(
       { success: false, error: 'Too many requests' },
-      { status: 429 }
+      {
+        status: 429,
+        headers: { 'Retry-After': String(retryAfter) },
+      }
     );
   }
 

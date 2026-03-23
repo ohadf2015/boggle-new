@@ -42,6 +42,13 @@ interface UseAdventureGameCallbacksParams {
   upgradeRetryScoreRetention: number;
   // Parent callbacks
   onLevelComplete: (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => void;
+  /** Ref indicating the eager DB save failed — retry on Continue */
+  completionSaveFailedRef: React.RefObject<boolean>;
+  /** Re-save completion to DB (ProgressionContext.completeLevel) */
+  saveCompletion: (
+    world: number, level: number, stars: 0 | 1 | 2 | 3,
+    score: number, words: number, goldEarned?: number, longWords?: number
+  ) => Promise<boolean>;
   // Other
   totalStars?: number;
   clearSelection: () => void;
@@ -73,6 +80,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     recordBossHighHealth, recordFullComboLevel,
     handleEarnAchievement, upgradeRetryScoreRetention,
     onLevelComplete, totalStars, clearSelection, resetGame, startGame,
+    completionSaveFailedRef, saveCompletion,
     storyBeat, showLootOrComplete,
     setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
     t, hintsUsed,
@@ -131,13 +139,25 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     if (isBossLevel && worldNumber === 10 && gameStars > 0) {
       handleEarnAchievement('ALL_BOSSES');
     }
+
+    // Retry DB save if the eager save failed (e.g. due to 429)
+    if (completionSaveFailedRef.current && gameStars > 0) {
+      const longWords = wordsFoundList.filter(w => w.length >= 6).length;
+      saveCompletion(
+        worldNumber, levelNumber, gameStars as 0 | 1 | 2 | 3,
+        gameScore, wordsFoundList.length, earnedGold, longWords
+      ).catch(() => { /* best-effort retry — progress saved next session via fetchProgression */ });
+      completionSaveFailedRef.current = false;
+    }
+
     setShowLevelComplete(false);
     const longWords = wordsFoundList.filter(w => w.length >= 6).length;
     onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
   }, [gameStars, gameScore, wordsFoundList, comboCount, earnedGold, onLevelComplete,
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,
-    totalStars, handleEarnAchievement, worldNumber, setShowLevelComplete, hintsUsed]);
+    totalStars, handleEarnAchievement, worldNumber, levelNumber, setShowLevelComplete, hintsUsed,
+    completionSaveFailedRef, saveCompletion]);
 
   const handleRetry = useCallback(() => {
     setShowLevelComplete(false);

@@ -108,6 +108,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const completionProcessedRef = useRef(false);
   /** Tracks whether the DB save has been fired to prevent double-saves */
   const completionSavedRef = useRef(false);
+  /** Tracks whether the eager DB save failed (so Continue/Retry can retry) */
+  const completionSaveFailedRef = useRef(false);
 
   // Track if player ever took damage (for BOSS_NO_DAMAGE achievement)
   const playerTookDamageRef = useRef(false);
@@ -135,6 +137,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     updateWordAlbumRef.current = props.updateWordAlbum;
     completionProcessedRef.current = false;
     completionSavedRef.current = false;
+    completionSaveFailedRef.current = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
   }, [recordAttempt, recordCompletion, props.saveCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
 
@@ -298,9 +301,12 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         gameState.stars as 0 | 1 | 2 | 3,
         gameState.score, gameState.wordsFound.length,
         earnedGold, longWords
-      ).catch(() => {
-        // Reset flag so Continue button can retry
-        completionSavedRef.current = false;
+      ).then((success) => {
+        if (!success) completionSaveFailedRef.current = true;
+      }).catch(() => {
+        // Mark as failed so Continue/Retry can retry — do NOT reset
+        // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
+        completionSaveFailedRef.current = true;
       });
     }
 
@@ -326,6 +332,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     setNonBossCompleted(false);
     completionProcessedRef.current = false;
     completionSavedRef.current = false;
+    completionSaveFailedRef.current = false;
   }, []);
 
   return {
@@ -340,5 +347,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     completionProcessedRef,
     /** Whether the completion has been eagerly saved to DB */
     completionSavedRef,
+    /** Whether the eager save failed (for Continue/Retry to retry) */
+    completionSaveFailedRef,
   };
 }

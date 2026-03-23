@@ -74,7 +74,23 @@ const games: Record<string, GameState> = {};
 // Persistence helpers (bound to games object)
 const persistGameState = (gameCode: string): void => doPersist(gameCode, games);
 const persistGameStateNow = (gameCode: string): Promise<void> => doPersistNow(gameCode, games);
-const restoreGameFromRedis = (gameCode: string): Promise<GameState | null> => doRestore(gameCode, games);
+
+// Per-game restoration lock to prevent duplicate concurrent restores
+const restoreLocks = new Map<string, Promise<GameState | null>>();
+const restoreGameFromRedis = (gameCode: string): Promise<GameState | null> => {
+  // If game already exists in memory, no need to restore
+  if (games[gameCode]) return Promise.resolve(games[gameCode]);
+
+  // If a restore is already in-flight for this game, return the same promise
+  const existing = restoreLocks.get(gameCode);
+  if (existing) return existing;
+
+  const promise = doRestore(gameCode, games).finally(() => {
+    restoreLocks.delete(gameCode);
+  });
+  restoreLocks.set(gameCode, promise);
+  return promise;
+};
 
 // Type casting helper for sub-module calls
 const asBase = <T>(game: GameState | null | undefined): T => game as unknown as T;

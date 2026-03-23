@@ -74,9 +74,18 @@ export class WordValidatorPool {
     if (this.isInitialized) return;
     if (this.initPromise) return this.initPromise;
 
-    this.initPromise = this._initWorkers();
+    this.initPromise = this._initWorkers()
+      .then(() => {
+        this.isInitialized = true;
+      })
+      .catch((error) => {
+        // Reset so next call can retry instead of returning the rejected promise forever
+        this.initPromise = null;
+        console.error('[WORKER POOL] Initialization failed, will retry on next call:', error);
+        // Fall back to sync mode for this attempt
+        this.syncOnly = true;
+      });
     await this.initPromise;
-    this.isInitialized = true;
   }
 
   private async _initWorkers(): Promise<void> {

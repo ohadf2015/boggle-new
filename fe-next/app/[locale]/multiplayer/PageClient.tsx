@@ -84,12 +84,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>>([]);
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
-  // Hide global footer when in multiplayer
   const setIsInGame = useHideNavigation();
-  useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
 
   // Pre-select game mode from URL param (e.g., ?mode=word-hunt)
   useEffect(() => {
@@ -138,6 +133,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     pendingGameStart, setPendingGameStart, setGameStartTime,
     gameDuration, handleShowResults, handleReturnToRoom, handleUpgradeToPlayer,
   } = useMultiplayerGameFlow({ socketRef, gameCode, isAuthenticated, refreshProfile });
+
+  // Hide global footer only when in a game room or viewing results (not the lobby)
+  useEffect(() => {
+    setIsInGame(isActive || showResults);
+  }, [setIsInGame, isActive, showResults]);
+  useEffect(() => {
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const seriesTracker = useSeriesTracker();
 

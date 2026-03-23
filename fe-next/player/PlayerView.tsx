@@ -42,7 +42,6 @@ import {
   useGameMode,
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
-import { useHideNavigation } from '@/contexts/NavigationContext';
 
 import type { Player, WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -71,8 +70,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const { queueAchievement } = useAchievementQueue();
   const inputRef = useRef<HTMLInputElement>(null);
   const intentionalExitRef = useRef<boolean>(false);
-  const setIsInGame = useHideNavigation();
-
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
 
@@ -407,12 +404,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Also covers the transition period between countdown ending and gameActive being set
   const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
   const showGameView = gameActive || (hasGameData && !waitingForResults);
-
-  // Hide bottom navigation during gameplay
-  useEffect(() => {
-    setIsInGame(showModeReveal || showStartAnimation || !!showGameView);
-    return () => setIsInGame(false);
-  }, [showModeReveal, showStartAnimation, showGameView, setIsInGame]);
 
   // Map game mode to display label
   const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : t('countdown.modeReveal.classic');

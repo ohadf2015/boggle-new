@@ -36,7 +36,6 @@ import {
   type Player,
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
-import { useHideNavigation } from '../contexts/NavigationContext';
 
 // ==========================================
 // Props
@@ -94,8 +93,6 @@ const HostView: React.FC<HostViewProps> = memo(({
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
-  const setIsInGame = useHideNavigation();
-
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
   const currentGameMode = useGameMode();
@@ -416,12 +413,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
 
-  // Hide bottom navigation during gameplay
-  useEffect(() => {
-    const isGameActive = runtime.showStartAnimation || ((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults);
-    setIsInGame(!!isGameActive);
-    return () => setIsInGame(false);
-  }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
+  // Navigation hiding is managed by PageClient based on isActive/showResults
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
