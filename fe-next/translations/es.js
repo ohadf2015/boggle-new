@@ -3268,6 +3268,7 @@ const es = {
       "dailyChallenge": "Desafío Diario",
       "practiceMode": "Modo Práctica",
       "joinFriendsGame": "Unirse al juego de un amigo",
+      "homePage": "Página Principal",
       "moreModesUnlock": "¡Más modos se desbloquean mientras juegas!",
       "skip": "Omitir",
       "letsGo": "¡Vamos!"

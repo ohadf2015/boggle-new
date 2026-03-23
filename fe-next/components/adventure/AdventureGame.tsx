@@ -388,7 +388,6 @@ const AdventureGame = memo<AdventureGameProps>(
       handleCinematicCompleteBase: cinematics.handleCinematicComplete,
       showWorldUnlock: cinematics.showWorldUnlock, resetCinematics: cinematics.resetCinematics,
       earnedGold: levelCompletion.earnedGold, resetRewards: levelCompletion.resetRewards,
-      completionSaveFailedRef: levelCompletion.completionSaveFailedRef, saveCompletion: saveCompletionToDb,
       recordLevelPerfect: chapterQuests.recordLevelPerfect,
       recordBossDefeatedNoHint: chapterQuests.recordBossDefeatedNoHint,
       recordScoreChallenge: chapterQuests.recordScoreChallenge,

@@ -1448,6 +1448,7 @@ const he = {
       "dailyChallenge": "אתגר יומי",
       "practiceMode": "מצב תרגול",
       "joinFriendsGame": "הצטרפו למשחק של חבר",
+      "homePage": "דף הבית",
       "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
       "skip": "דלג",
       "letsGo": "יאללה!"

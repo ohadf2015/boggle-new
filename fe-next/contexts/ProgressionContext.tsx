@@ -151,8 +151,10 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     await fetchProgression();
   }, [fetchProgression]);
 
-  // In-flight guard to prevent duplicate completeLevel calls (causes 429s)
+  // In-flight dedup: store the key AND the promise so subsequent callers
+  // await the same result instead of being rejected with `false`.
   const completeLevelInFlightRef = useRef<string | null>(null);
+  const completeLevelPromiseRef = useRef<Promise<boolean> | null>(null);
 
   // Complete a level
   const completeLevel = useCallback(
@@ -170,14 +172,15 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return false;
       }
 
-      // Prevent duplicate in-flight calls for the same level (causes 429 rate limit)
+      // If an identical save is already in-flight, piggyback on it
       const levelKey = `${world}-${level}`;
-      if (completeLevelInFlightRef.current === levelKey) {
-        logger.warn('[ProgressionContext] Skipping duplicate completeLevel for', levelKey);
-        return false;
+      if (completeLevelInFlightRef.current === levelKey && completeLevelPromiseRef.current) {
+        logger.info('[ProgressionContext] Piggy-backing on in-flight completeLevel for', levelKey);
+        return completeLevelPromiseRef.current;
       }
       completeLevelInFlightRef.current = levelKey;
 
+      const promise = (async (): Promise<boolean> => {
       try {
         const requestBody = JSON.stringify({
           world,
@@ -299,7 +302,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return false;
       } finally {
         completeLevelInFlightRef.current = null;
+        completeLevelPromiseRef.current = null;
       }
+      })();
+
+      completeLevelPromiseRef.current = promise;
+      return promise;
     },
     [user?.id]
   );

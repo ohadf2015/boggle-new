@@ -1431,6 +1431,7 @@ const ja = {
       "dailyChallenge": "デイリーチャレンジ",
       "practiceMode": "練習モード",
       "joinFriendsGame": "フレンドのゲームに参加",
+      "homePage": "ホームページ",
       "moreModesUnlock": "プレイするほど新しいモードが解放！",
       "skip": "スキップ",
       "letsGo": "レッツゴー！"

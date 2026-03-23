@@ -20,7 +20,7 @@ const STORAGE_KEYS = {
 export interface OnboardingData {
   avatarId: string;
   displayName: string;
-  selectedMode: 'single' | 'multi' | 'daily' | null;
+  selectedMode: 'single' | 'multi' | 'daily' | 'home' | null;
   completedAt: string; // ISO timestamp
 }
 

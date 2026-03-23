@@ -74,11 +74,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   // Step 4: Mode selected — complete the onboarding
   const handleModeSelect = useCallback(
-    (mode: 'daily' | 'practice' | 'joinRoom') => {
+    (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => {
       markOnboardingComplete({
         avatarId: 'custom',
         displayName: playerName || 'Player',
-        selectedMode: mode === 'daily' ? 'daily' : mode === 'joinRoom' ? 'multi' : 'single',
+        selectedMode: mode === 'daily' ? 'daily' : mode === 'joinRoom' ? 'multi' : mode === 'home' ? 'home' : 'single',
       });
 
       // Check for a pending room invite (saved before FTUE started)
@@ -89,6 +89,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         // Even if they picked daily/practice, still redirect to the room
         // since that was their original intent
         router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+      } else if (mode === 'home') {
+        router.push(`/${language}`);
       } else {
         const route =
           mode === 'daily'

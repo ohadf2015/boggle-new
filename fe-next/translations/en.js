@@ -1534,6 +1534,7 @@ const en = {
       "dailyChallenge": "Daily Challenge",
       "practiceMode": "Practice Mode",
       "joinFriendsGame": "Join Friend's Game",
+      "homePage": "Home Page",
       "moreModesUnlock": "More modes unlock as you play!",
       "skip": "Skip",
       "letsGo": "Let's go!"

@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Target, Users } from 'lucide-react';
+import { Trophy, Target, Users, Home } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 interface ModeForkProps {
-  onSelectMode: (mode: 'daily' | 'practice' | 'joinRoom') => void;
+  onSelectMode: (mode: 'daily' | 'practice' | 'home' | 'joinRoom') => void;
   hasPendingInvite?: boolean;
 }
 
@@ -94,6 +94,29 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
         <div>
           <div className="font-black text-neo-black text-lg uppercase">
             {t('onboarding.ftue.practiceMode')}
+          </div>
+        </div>
+      </motion.button>
+
+      {/* Home Page card */}
+      <motion.button
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: hasPendingInvite ? 0.35 : 0.3, type: 'spring', stiffness: 300, damping: 26 }}
+        onClick={() => onSelectMode('home')}
+        className={cn(
+          'w-full p-5 bg-neo-navy border-3 border-neo-white/30 rounded-neo',
+          'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed',
+          'transition-all active:translate-y-[2px]',
+          'flex items-center gap-4 text-start'
+        )}
+      >
+        <div className="w-12 h-12 bg-neo-white/10 border-2 border-neo-white/30 rounded-neo flex items-center justify-center shrink-0">
+          <Home className="w-7 h-7 text-neo-white" />
+        </div>
+        <div>
+          <div className="font-black text-neo-white text-lg uppercase">
+            {t('onboarding.ftue.homePage')}
           </div>
         </div>
       </motion.button>

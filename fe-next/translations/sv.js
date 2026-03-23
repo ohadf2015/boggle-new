@@ -1431,6 +1431,7 @@ const sv = {
       "dailyChallenge": "Daglig Utmaning",
       "practiceMode": "Träningsläge",
       "joinFriendsGame": "Gå med i väns spel",
+      "homePage": "Startsidan",
       "moreModesUnlock": "Fler lägen låses upp när du spelar!",
       "skip": "Hoppa över",
       "letsGo": "Kör igång!"

@@ -47,6 +47,7 @@ jest.mock('lucide-react', () => ({
   Trophy: () => <div data-testid="trophy-icon" />,
   Target: () => <div data-testid="target-icon" />,
   Users: () => <div data-testid="users-icon" />,
+  Home: () => <div data-testid="home-icon" />,
 }));
 
 // Mock LanguageContext
@@ -56,6 +57,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
       const translations: Record<string, string> = {
         'onboarding.ftue.dailyChallenge': 'Daily Challenge',
         'onboarding.ftue.practiceMode': 'Practice Mode',
+        'onboarding.ftue.homePage': 'Home Page',
         'onboarding.ftue.joinFriendsGame': "Join Friend's Game",
         'onboarding.ftue.moreModesUnlock': 'More modes unlock as you play!',
       };
@@ -82,10 +84,11 @@ describe('ModeFork', () => {
     expect(screen.getByTestId('mode-fork')).toBeInTheDocument();
   });
 
-  it('shows exactly 2 mode options', () => {
+  it('shows all 3 mode options', () => {
     render(<ModeFork {...defaultProps} />);
     expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
     expect(screen.getByText('Practice Mode')).toBeInTheDocument();
+    expect(screen.getByText('Home Page')).toBeInTheDocument();
   });
 
   it('shows unlock subtitle', () => {
@@ -117,6 +120,17 @@ describe('ModeFork', () => {
     expect(screen.getByTestId('target-icon')).toBeInTheDocument();
   });
 
+  it('renders home icon for home page', () => {
+    render(<ModeFork {...defaultProps} />);
+    expect(screen.getByTestId('home-icon')).toBeInTheDocument();
+  });
+
+  it('calls onSelectMode with "home" when Home Page clicked', () => {
+    render(<ModeFork {...defaultProps} />);
+    fireEvent.click(screen.getByText('Home Page'));
+    expect(defaultProps.onSelectMode).toHaveBeenCalledWith('home');
+  });
+
   describe('with pending room invite', () => {
     it('shows "Join Friend\'s Game" button when hasPendingInvite is true', () => {
       render(<ModeFork {...defaultProps} hasPendingInvite />);
@@ -140,10 +154,11 @@ describe('ModeFork', () => {
       expect(defaultProps.onSelectMode).toHaveBeenCalledWith('joinRoom');
     });
 
-    it('still shows daily and practice options alongside join button', () => {
+    it('still shows all mode options alongside join button', () => {
       render(<ModeFork {...defaultProps} hasPendingInvite />);
       expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
       expect(screen.getByText('Practice Mode')).toBeInTheDocument();
+      expect(screen.getByText('Home Page')).toBeInTheDocument();
       expect(screen.getByText("Join Friend's Game")).toBeInTheDocument();
     });
   });
