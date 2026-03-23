@@ -264,6 +264,8 @@ const ja = {
     "opensInNewTab": "新しいタブで開きます",
     "press": "押す",
     "toResume": "再開する",
+    "delete": "削除",
+    "gold": "ゴールド",
     "aria": {
       "levelProgress": "レベル進捗",
       "overallProgress": "全体の進捗",
@@ -346,6 +348,7 @@ const ja = {
     "wordsReplayed": "保留中の単語を送信しました！"
   },
   "game": {
+    "foundByOther": "${player}が見つけました",
     "combo": "コンボ",
     "comboHint": "素早く単語を見つけてコンボ！",
     "calculatingResults": "結果を計算中...",
@@ -1076,7 +1079,9 @@ const ja = {
     "presetDrawerLetters": "文字",
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
     "difficultyTooltipTimer": "長い時間＝たくさん見つかる",
-    "bot": "ボット"
+    "bot": "ボット",
+    "addFriend": "{name}を追加",
+    "requestSent": "リクエスト送信済み"
   },
   "tvBroadcast": {
     "liveGameInProgress": "ライブゲーム進行中",
@@ -3647,6 +3652,8 @@ const ja = {
     "streakUnlocked": "連勝解除！"
   },
   "wordFeedback": {
+    "invalid": "無効な単語です",
+    "duplicate": "発見済みです",
     "dictionaryTitle": "辞書を作ろう",
     "submittedBy": "提出者",
     "skipHint": "ESCでスキップ",
@@ -4770,7 +4777,9 @@ const ja = {
     "unblockedSuccess": "ブロック解除",
     "confirmRemove": "フレンドを削除しますか？元に戻せません。",
     "confirmBlock": "ブロックしますか？連絡できなくなります。",
-    "block": "ブロック"
+    "block": "ブロック",
+    "filterFriends": "フレンドを検索...",
+    "noMatchingFriends": "該当するフレンドがいません"
   },
   "reveal": {
     "revealWord": "表示",
@@ -5290,7 +5299,10 @@ const ja = {
     "title": "クイックプレイ",
     "creating": "作成中...",
     "hostAndPlay": "ホスト＆プレイ",
-    "subtitle": "即座にルーム作成 • QRで友達が参加"
+    "subtitle": "即座にルーム作成 • QRで友達が参加",
+    "ariaLabel": "クイックプレイ — すぐにゲーム開始",
+    "play": "今すぐプレイ",
+    "seconds": "約{{count}}秒"
   },
   "theme": {
     "sundayFunday": "日曜日のお楽しみ",
@@ -5739,6 +5751,7 @@ const ja = {
       }
     },
     "title": "アドベンチャーモード",
+    "worldMap": "ワールドマップ",
     "subtitle": "10のテーマワールドを旅し、100レベルを制覇して、究極のワードマスターになろう！",
     "adminOnly": "管理者のみ",
     "adminOnlyMessage": "アドベンチャーモードは管理者のみが利用できます。",
@@ -9272,6 +9285,12 @@ const ja = {
   },
   "asyncChallenge": {
     "title": "ボードチャレンジ",
+    "yourTurn": "あなたの番です！",
+    "ariaLabel": "フレンドからの待機中チャレンジ",
+    "playAriaLabel": "{{name}}からのチャレンジをプレイ",
+    "moreCount": "+{{count}}件",
+    "emptyDesc": "待機中のチャレンジはありません。フレンドに送ろう！",
+    "unknown": "不明なプレイヤー",
     "pending": "あなたの番です！",
     "pendingCount": "{{count}}件のチャレンジが待っています",
     "challengeFrom": "{{name}}からのチャレンジ",
@@ -9297,6 +9316,11 @@ const ja = {
   },
   "wordClub": {
     "title": "ワードクラブ",
+    "ariaLabel": "ワードクラブランキング",
+    "emptyDesc": "クラブに参加して友達と毎週のワードバトル！",
+    "join": "参加する",
+    "leaderboard": "クラブランキング",
+    "memberCount": "{{count}}人のメンバー",
     "myClub": "マイクラブ",
     "weeklyLeaderboard": "週間ランキング",
     "weeklyXp": "今週{{xp}} XP",
@@ -9323,6 +9347,21 @@ const ja = {
     "noClub": "クラブに参加して毎週のワードバトルを楽しもう！",
     "you": "あなた",
     "rank": "#{{rank}}"
+  },
+  "recap": {
+    "title": "あなたのまとめ",
+    "ariaLabel": "プレイヤー統計のまとめ",
+    "shareAriaLabel": "まとめを共有",
+    "shareTitle": "LexiClashのまとめ",
+    "weekly": "週間",
+    "monthly": "月間",
+    "games": "ゲーム",
+    "words": "単語",
+    "longestWord": "最長の単語",
+    "bestScore": "ベストスコア",
+    "bestCombo": "ベストコンボ",
+    "streak": "連続記録",
+    "vsLast": "前期間比"
   },
   "playerRecap": {
     "title": "今週のまとめ",
@@ -9352,11 +9391,15 @@ const ja = {
   "quickPlay": {
     "title": "クイックプレイ",
     "subtitle": "すぐにプレイ！",
+    "creating": "作成中...",
+    "hostAndPlay": "ホスト＆プレイ",
+    "ariaLabel": "クイックプレイ — すぐにゲーム開始",
+    "play": "今すぐプレイ",
     "daily": "デイリーパズル",
     "classic": "クラシック",
     "blast": "ブラストモード",
     "wordHunt": "ワードハント",
-    "seconds": "約{{sec}}秒"
+    "seconds": "約{{count}}秒"
   },
   "rankedTier": {
     "title": "ランクマッチ",
@@ -9377,6 +9420,9 @@ const ja = {
     "playRanked": "ランクをプレイ"
   },
   "seasonalEvent": {
+    "ariaLabel": "シーズンイベント",
+    "score": "スコア",
+    "progressAriaLabel": "イベント進捗",
     "title": "期間限定イベント",
     "active": "開催中",
     "upcoming": "近日開催",
@@ -9394,6 +9440,9 @@ const ja = {
     "nextEvent": "次のイベントをお楽しみに！"
   },
   "reengagement": {
+    "ariaLabel": "復帰ボーナス",
+    "bonusMessage": "{{days}}日間お休みでしたね。復帰ボーナスをどうぞ！",
+    "rewardsAriaLabel": "ボーナス報酬",
     "welcomeBack": "おかえりなさい！",
     "missedYou": "お待ちしていました！復帰ボーナスをどうぞ。",
     "streakRisk": "連続記録が途切れそうです！今すぐプレイして維持しよう。",

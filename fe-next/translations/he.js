@@ -348,6 +348,7 @@ const he = {
     "wordsReplayed": "מילים בתור נשלחו!"
   },
   "game": {
+    "foundByOther": "נמצא על ידי ${player}",
     "combo": "קומבו",
     "comboHint": "מצא מילים מהר לקומבו!",
     "calculatingResults": "מחשב תוצאות...",
@@ -8672,7 +8673,98 @@ const he = {
       "soloBoard": "לוח עצמאי",
       "spellTheWord": "איית את המילה",
       "spelling": "כתיב",
-      "streak": "רצף {{count}}"
+      "streak": "רצף {{count}}",
+      "submit": "שלח",
+      "swipeExplain": "החלק ימינה אם ידעת, שמאלה לדלג",
+      "swipeHint": "החלק כדי לענות",
+      "tapCard": "הקש על הכרטיס לחשיפה",
+      "tapToFlip": "הקש להפיכה",
+      "time": "זמן",
+      "timesUp": "הזמן נגמר!",
+      "title": "מצב תרגול",
+      "total": "סה״כ",
+      "trackOnly": "מעקב בלבד",
+      "tryAgain": "נסה שוב",
+      "typeAnswer": "הקלד את תשובתך",
+      "typeWord": "הקלד את המילה...",
+      "vocab": "אוצר מילים",
+      "vocabulary": "אוצר מילים",
+      "vocabularyWords": "מילות אוצר מילים",
+      "vocabularyWordsFound": "מילות אוצר מילים שנמצאו",
+      "warmup": "חימום",
+      "word": "מילה",
+      "wordCount": "מספר מילים",
+      "wordList": "רשימת מילים",
+      "wordsFound": "מילים שנמצאו"
+    },
+    "starterPacks": {
+      "title": "חבילות התחלה",
+      "subtitle": "סטים מוכנים של אוצר מילים",
+      "useThisPack": "השתמש בחבילה",
+      "academicVocab": {
+        "name": "אוצר מילים אקדמי"
+      },
+      "beginnerHebrew": {
+        "name": "עברית למתחילים"
+      },
+      "commonEnglish": {
+        "name": "אנגלית נפוצה"
+      }
+    },
+    "student": {
+      "join": {
+        "alreadyMember": "כבר בכיתה!",
+        "button": "הצטרף",
+        "clipboardError": "לא ניתן לקרוא מהלוח",
+        "codeHint": "6 תווים מהמורה",
+        "codeLabel": "קוד כיתה",
+        "codePasted": "הודבק!",
+        "emptyClipboard": "אין מה להדביק",
+        "invalidCode": "קוד לא תקין",
+        "joining": "מצטרף...",
+        "pasteButton": "הדבק",
+        "subtitle": "הכנס את הקוד מהמורה",
+        "success": "נכנסת!",
+        "title": "הצטרף לכיתה"
+      },
+      "lessonsAssigned": "שיעורים שהוקצו"
+    },
+    "students": "תלמידים",
+    "template": {
+      "allowLateJoin": "אפשר הצטרפות מאוחרת",
+      "allowLateJoinDesc": "שחקנים יכולים להצטרף באמצע המשחק",
+      "boardPreview": "תצוגה מקדימה של הלוח",
+      "boardSize": "גודל לוח",
+      "create": "צור תבנית",
+      "description": "הגדרות תבנית",
+      "difficulty": "רמת קושי",
+      "edit": "ערוך תבנית",
+      "lateJoin": "הצטרפות מאוחרת",
+      "minWordLength": "אורך מילה מינימלי",
+      "name": "שם התבנית",
+      "namePlaceholder": "למשל, חזרה מהירה",
+      "nameRequired": "שם הוא שדה חובה",
+      "save": "שמור",
+      "saved": "נשמר!",
+      "saving": "שומר...",
+      "setDefault": "קבע כברירת מחדל",
+      "setDefaultDesc": "השתמש בהגדרות אלה כברירת מחדל",
+      "settings": "הגדרות",
+      "startGame": "התחל משחק",
+      "timer": "טיימר"
+    },
+    "xp": {
+      "continue": "המשך",
+      "keepGoing": "ממשיכים!",
+      "level": "רמה",
+      "levelUp": "עלית רמה!",
+      "maxLevel": "רמה מקסימלית",
+      "newLevel": "רמה חדשה",
+      "newTitleUnlocked": "תואר חדש נפתח!",
+      "nextLevel": "הרמה הבאה",
+      "streak": "רצף ימים",
+      "totalXp": "סה״כ XP",
+      "xpGained": "XP שנצבר"
     }
   },
   "duels": {
@@ -9323,11 +9415,15 @@ const he = {
   "quickPlay": {
     "title": "משחק מהיר",
     "subtitle": "קפוץ ישר לפעולה!",
+    "creating": "יוצר...",
+    "hostAndPlay": "ארח ושחק",
+    "ariaLabel": "משחק מהיר — קפוץ למשחק",
+    "play": "שחק עכשיו",
     "daily": "אתגר יומי",
     "classic": "משחק קלאסי",
     "blast": "מצב בלאסט",
     "wordHunt": "ציד מילים",
-    "seconds": "~{{sec}} שניות"
+    "seconds": "~{{count}} שניות"
   },
   "rankedTier": {
     "title": "מדורג",

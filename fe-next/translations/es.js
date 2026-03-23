@@ -263,6 +263,8 @@ const es = {
     "continue": "Continuar",
     "press": "Presiona",
     "toResume": "para continuar",
+    "delete": "Eliminar",
+    "gold": "Oro",
     "aria": {
       "levelProgress": "Progreso del nivel: {percent}%",
       "overallProgress": "Progreso total: {percent}%",
@@ -346,6 +348,7 @@ const es = {
     "wordsReplayed": "¡Palabras en cola enviadas!"
   },
   "game": {
+    "foundByOther": "Encontrada por ${player}",
     "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",
     "calculatingResults": "Calculando resultados...",
@@ -1094,7 +1097,9 @@ const es = {
     "presetDrawerLetters": "letras",
     "difficultyTooltipGrid": "El tamaño afecta la dificultad",
     "difficultyTooltipTimer": "Más tiempo = más palabras",
-    "bot": "Bot"
+    "bot": "Bot",
+    "addFriend": "Agregar a {name}",
+    "requestSent": "Solicitud enviada"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Juego en Vivo en Progreso",
@@ -3693,6 +3698,8 @@ const es = {
     "streakUnlocked": "¡Racha Desbloqueada!"
   },
   "wordFeedback": {
+    "invalid": "Palabra no válida",
+    "duplicate": "Ya encontrada",
     "dictionaryTitle": "Construye Nuestro Diccionario",
     "submittedBy": "Enviado por",
     "skipHint": "Presiona ESC para saltar",
@@ -4749,7 +4756,9 @@ const es = {
     "unblockedSuccess": "Usuario desbloqueado",
     "confirmRemove": "¿Eliminar amigo? No se puede deshacer.",
     "confirmBlock": "¿Bloquear usuario? No podrá contactarte.",
-    "block": "Bloquear"
+    "block": "Bloquear",
+    "filterFriends": "Buscar amigos...",
+    "noMatchingFriends": "No se encontraron amigos"
   },
   "multiplayer": {
     "mode": "Modo",
@@ -5583,7 +5592,10 @@ const es = {
     "title": "Juego rápido",
     "creating": "Creando...",
     "hostAndPlay": "Crear y jugar",
-    "subtitle": "Sala instantánea • Amigos se unen via QR"
+    "subtitle": "Sala instantánea • Amigos se unen via QR",
+    "ariaLabel": "Juego rápido — salta a jugar",
+    "play": "Jugar ahora",
+    "seconds": "~{{count}}s"
   },
   "theme": {
     "sundayFunday": "Domingo de diversión",
@@ -5723,6 +5735,7 @@ const es = {
       }
     },
     "title": "Modo Aventura",
+    "worldMap": "Mapa del mundo",
     "subtitle": "¡Viaja por 10 mundos temáticos, conquista 100 niveles y conviértete en el maestro de palabras definitivo!",
     "adminOnly": "Solo administradores",
     "adminOnlyMessage": "El modo aventura solo está disponible para administradores.",
@@ -9352,6 +9365,12 @@ const es = {
   },
   "asyncChallenge": {
     "title": "Desafíos de tablero",
+    "yourTurn": "¡Tu turno!",
+    "ariaLabel": "Desafíos pendientes de amigos",
+    "playAriaLabel": "Jugar desafío de {{name}}",
+    "moreCount": "+{{count}} más",
+    "emptyDesc": "No hay desafíos pendientes. ¡Envía uno a un amigo!",
+    "unknown": "Jugador desconocido",
     "pending": "¡Tu turno!",
     "pendingCount": "{{count}} desafíos esperando",
     "challengeFrom": "Desafío de {{name}}",
@@ -9377,6 +9396,11 @@ const es = {
   },
   "wordClub": {
     "title": "Club de palabras",
+    "ariaLabel": "Clasificación del club de palabras",
+    "emptyDesc": "¡Únete a un club para batallas de palabras semanales con amigos!",
+    "join": "Unirse",
+    "leaderboard": "Clasificación del club",
+    "memberCount": "{{count}} miembros",
     "myClub": "Mi club",
     "weeklyLeaderboard": "Clasificación semanal",
     "weeklyXp": "{{xp}} XP esta semana",
@@ -9403,6 +9427,21 @@ const es = {
     "noClub": "¡Únete a un club para batallas de palabras semanales!",
     "you": "Tú",
     "rank": "#{{rank}}"
+  },
+  "recap": {
+    "title": "Tu resumen",
+    "ariaLabel": "Resumen de estadísticas",
+    "shareAriaLabel": "Compartir tu resumen",
+    "shareTitle": "Mi resumen de LexiClash",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "games": "Partidas",
+    "words": "Palabras",
+    "longestWord": "Palabra más larga",
+    "bestScore": "Mejor puntuación",
+    "bestCombo": "Mejor combo",
+    "streak": "Racha",
+    "vsLast": "vs periodo anterior"
   },
   "playerRecap": {
     "title": "Tu semana en resumen",
@@ -9432,11 +9471,15 @@ const es = {
   "quickPlay": {
     "title": "Juego rápido",
     "subtitle": "¡Salta directamente!",
+    "creating": "Creando...",
+    "hostAndPlay": "Crear y jugar",
+    "ariaLabel": "Juego rápido — salta a jugar",
+    "play": "Jugar ahora",
     "daily": "Puzzle diario",
     "classic": "Partida clásica",
     "blast": "Modo Blast",
     "wordHunt": "Caza de palabras",
-    "seconds": "~{{sec}}s para jugar"
+    "seconds": "~{{count}}s"
   },
   "rankedTier": {
     "title": "Clasificatoria",
@@ -9457,6 +9500,9 @@ const es = {
     "playRanked": "Jugar clasificatoria"
   },
   "seasonalEvent": {
+    "ariaLabel": "Evento de temporada",
+    "score": "Puntuación",
+    "progressAriaLabel": "Progreso del evento",
     "title": "Evento limitado",
     "active": "En vivo",
     "upcoming": "Próximamente",
@@ -9474,6 +9520,9 @@ const es = {
     "nextEvent": "¡Vuelve pronto para el próximo evento!"
   },
   "reengagement": {
+    "ariaLabel": "Bono de bienvenida",
+    "bonusMessage": "Estuviste {{days}} días fuera. ¡Aquí tienes un bono de bienvenida!",
+    "rewardsAriaLabel": "Recompensas de bono",
     "welcomeBack": "¡Bienvenido de vuelta!",
     "missedYou": "¡Te echamos de menos! Aquí tienes un bono para volver al juego.",
     "streakRisk": "¡Tu racha está a punto de expirar! Juega ahora para mantenerla.",

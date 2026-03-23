@@ -264,6 +264,8 @@ const sv = {
     "opensInNewTab": "öppnas i ny flik",
     "press": "Tryck",
     "toResume": "för att fortsätta",
+    "delete": "Radera",
+    "gold": "Guld",
     "aria": {
       "levelProgress": "Nivåprogression",
       "overallProgress": "Övergripande progression",
@@ -346,6 +348,7 @@ const sv = {
     "wordsReplayed": "Köade ord har skickats!"
   },
   "game": {
+    "foundByOther": "Hittades av ${player}",
     "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo!",
     "calculatingResults": "Beräknar resultat...",
@@ -1076,7 +1079,9 @@ const sv = {
     "presetDrawerLetters": "bokstäver",
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
     "difficultyTooltipTimer": "Längre tid = fler ord hittade",
-    "bot": "Bot"
+    "bot": "Bot",
+    "addFriend": "Lägg till {name}",
+    "requestSent": "Förfrågan skickad"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Livespel pågår",
@@ -3647,6 +3652,8 @@ const sv = {
     "streakUnlocked": "Svit upplåst!"
   },
   "wordFeedback": {
+    "invalid": "Ogiltigt ord",
+    "duplicate": "Redan hittad",
     "dictionaryTitle": "Bygg vår ordbok",
     "submittedBy": "Skickad av",
     "skipHint": "Tryck ESC för att hoppa över",
@@ -5549,7 +5556,10 @@ const sv = {
     "title": "Snabbspel",
     "creating": "Skapar...",
     "hostAndPlay": "Skapa & Spela",
-    "subtitle": "Direkt rum • Vänner går med via QR"
+    "subtitle": "Direkt rum • Vänner går med via QR",
+    "ariaLabel": "Snabbspel — hoppa in i ett spel",
+    "play": "Spela nu",
+    "seconds": "~{{count}}s"
   },
   "theme": {
     "sundayFunday": "Söndagsmys",
@@ -5689,6 +5699,7 @@ const sv = {
       }
     },
     "title": "Äventyrsläge",
+    "worldMap": "Världskarta",
     "subtitle": "Res genom 10 temavärldar, erövra 100 nivåer och bli den ultimata ordmästaren!",
     "adminOnly": "Endast admin",
     "adminOnlyMessage": "Äventyrsläge är endast tillgängligt för administratörer.",
@@ -8601,7 +8612,98 @@ const sv = {
       "soloBoard": "Solobräde",
       "spellTheWord": "Stava ordet",
       "spelling": "Stavning",
-      "streak": "{{count}} i svit"
+      "streak": "{{count}} i svit",
+      "submit": "Skicka",
+      "swipeExplain": "Svep höger för Kan, vänster för Hoppa över",
+      "swipeHint": "Svep för att svara",
+      "tapCard": "Tryck på kort för att visa",
+      "tapToFlip": "Tryck för att vända",
+      "time": "Tid",
+      "timesUp": "Tiden är ute!",
+      "title": "Övningsläge",
+      "total": "Totalt",
+      "trackOnly": "Bara spåra",
+      "tryAgain": "Försök igen",
+      "typeAnswer": "Skriv ditt svar",
+      "typeWord": "Skriv ordet...",
+      "vocab": "Ordförråd",
+      "vocabulary": "Ordförråd",
+      "vocabularyWords": "Ordförrådsord",
+      "vocabularyWordsFound": "Ordförrådsord hittade",
+      "warmup": "Uppvärmning",
+      "word": "Ord",
+      "wordCount": "Antal ord",
+      "wordList": "Ordlista",
+      "wordsFound": "Hittade ord"
+    },
+    "starterPacks": {
+      "title": "Startpaket",
+      "subtitle": "Färdiga ordförrådsset",
+      "useThisPack": "Använd detta paket",
+      "academicVocab": {
+        "name": "Akademiskt ordförråd"
+      },
+      "beginnerHebrew": {
+        "name": "Hebreiska för nybörjare"
+      },
+      "commonEnglish": {
+        "name": "Vanlig engelska"
+      }
+    },
+    "student": {
+      "join": {
+        "alreadyMember": "Redan i denna klass!",
+        "button": "Gå med",
+        "clipboardError": "Kunde inte läsa urklipp",
+        "codeHint": "6 tecken från din lärare",
+        "codeLabel": "Klasskod",
+        "codePasted": "Klistrad!",
+        "emptyClipboard": "Inget att klistra in",
+        "invalidCode": "Ogiltig kod",
+        "joining": "Går med...",
+        "pasteButton": "Klistra in",
+        "subtitle": "Ange din lärares kod",
+        "success": "Du är med!",
+        "title": "Gå med i en klass"
+      },
+      "lessonsAssigned": "Tilldelade lektioner"
+    },
+    "students": "Elever",
+    "template": {
+      "allowLateJoin": "Tillåt sen anslutning",
+      "allowLateJoinDesc": "Spelare kan gå med mitt i spelet",
+      "boardPreview": "Förhandsgranskning av brädet",
+      "boardSize": "Brädstorlek",
+      "create": "Skapa mall",
+      "description": "Mallinställningar",
+      "difficulty": "Svårighetsgrad",
+      "edit": "Redigera mall",
+      "lateJoin": "Sen anslutning",
+      "minWordLength": "Min ordlängd",
+      "name": "Mallnamn",
+      "namePlaceholder": "t.ex. Snabb repetition",
+      "nameRequired": "Namn krävs",
+      "save": "Spara",
+      "saved": "Sparat!",
+      "saving": "Sparar...",
+      "setDefault": "Ställ in som standard",
+      "setDefaultDesc": "Använd dessa inställningar som standard",
+      "settings": "Inställningar",
+      "startGame": "Starta spel",
+      "timer": "Timer"
+    },
+    "xp": {
+      "continue": "Fortsätt",
+      "keepGoing": "Fortsätt kämpa!",
+      "level": "Nivå",
+      "levelUp": "Nivå upp!",
+      "maxLevel": "Maxnivå",
+      "newLevel": "Ny nivå",
+      "newTitleUnlocked": "Ny titel upplåst!",
+      "nextLevel": "Nästa nivå",
+      "streak": "Daglig svit",
+      "totalXp": "Totalt XP",
+      "xpGained": "XP intjänat"
     }
   },
   "duels": {
@@ -9202,6 +9304,12 @@ const sv = {
   },
   "asyncChallenge": {
     "title": "Brädutmaningar",
+    "yourTurn": "Din tur!",
+    "ariaLabel": "Väntande utmaningar från vänner",
+    "playAriaLabel": "Spela utmaning från {{name}}",
+    "moreCount": "+{{count}} till",
+    "emptyDesc": "Inga väntande utmaningar. Skicka en till en vän!",
+    "unknown": "Okänd spelare",
     "pending": "Din tur!",
     "pendingCount": "{{count}} utmaningar väntar",
     "challengeFrom": "Utmaning från {{name}}",
@@ -9227,6 +9335,11 @@ const sv = {
   },
   "wordClub": {
     "title": "Ordklubb",
+    "ariaLabel": "Ordklubbens topplista",
+    "emptyDesc": "Gå med i en klubb för veckovisa ordstrider med vänner!",
+    "join": "Gå med",
+    "leaderboard": "Klubbens topplista",
+    "memberCount": "{{count}} medlemmar",
     "myClub": "Min klubb",
     "weeklyLeaderboard": "Veckotoppen",
     "weeklyXp": "{{xp}} XP denna vecka",
@@ -9253,6 +9366,21 @@ const sv = {
     "noClub": "Gå med i en klubb för veckostrider!",
     "you": "Du",
     "rank": "#{{rank}}"
+  },
+  "recap": {
+    "title": "Din sammanfattning",
+    "ariaLabel": "Spelarstatistik",
+    "shareAriaLabel": "Dela din sammanfattning",
+    "shareTitle": "Min LexiClash-sammanfattning",
+    "weekly": "Veckovis",
+    "monthly": "Månadsvis",
+    "games": "Spel",
+    "words": "Ord",
+    "longestWord": "Längsta ord",
+    "bestScore": "Bästa poäng",
+    "bestCombo": "Bästa kombo",
+    "streak": "Svit",
+    "vsLast": "jämfört med förra perioden"
   },
   "playerRecap": {
     "title": "Din vecka i korthet",
@@ -9282,11 +9410,15 @@ const sv = {
   "quickPlay": {
     "title": "Snabbspel",
     "subtitle": "Hoppa rakt in!",
+    "creating": "Skapar...",
+    "hostAndPlay": "Skapa & Spela",
+    "ariaLabel": "Snabbspel — hoppa in i ett spel",
+    "play": "Spela nu",
     "daily": "Dagligt pussel",
     "classic": "Klassiskt spel",
     "blast": "Blast-läge",
     "wordHunt": "Ordjakt",
-    "seconds": "~{{sec}}s att spela"
+    "seconds": "~{{count}}s"
   },
   "rankedTier": {
     "title": "Rankat",
@@ -9307,6 +9439,9 @@ const sv = {
     "playRanked": "Spela rankat"
   },
   "seasonalEvent": {
+    "ariaLabel": "Säsongsevent",
+    "score": "Poäng",
+    "progressAriaLabel": "Eventframsteg",
     "title": "Tidsbegränsat event",
     "active": "Live nu",
     "upcoming": "Kommer snart",
@@ -9324,6 +9459,9 @@ const sv = {
     "nextEvent": "Kolla tillbaka snart för nästa event!"
   },
   "reengagement": {
+    "ariaLabel": "Välkomstbonus",
+    "bonusMessage": "Du har varit borta i {{days}} dagar. Här är en bonus!",
+    "rewardsAriaLabel": "Bonusbelöningar",
     "welcomeBack": "Välkommen tillbaka!",
     "missedYou": "Vi saknade dig! Här är en bonus för att komma igång igen.",
     "streakRisk": "Din svit håller på att gå ut! Spela nu för att behålla den.",
