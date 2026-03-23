@@ -10,6 +10,7 @@ import HeaderMobileMenu from './header/HeaderMobileMenu';
 
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 const AdminGiftModal = dynamic(() => import('./gift/AdminGiftModal').then(m => m.AdminGiftModal), { ssr: false });
+const LeaguePositionBadge = dynamic(() => import('@/components/leagues/LeaguePositionBadge').then(m => m.LeaguePositionBadge), { ssr: false });
 
 interface HeaderProps {
     className?: string;
@@ -69,7 +70,11 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "min-w-0"
                 )}
             >
-                <HeaderLogo />
+                <div className="flex items-center gap-2 min-w-0">
+                    <HeaderLogo />
+                    {/* Compact league badge — constant awareness without clutter */}
+                    <div className="hidden sm:block"><LeaguePositionBadge /></div>
+                </div>
 
                 <HeaderDesktopControls
                     unclaimedCount={unclaimedCount}

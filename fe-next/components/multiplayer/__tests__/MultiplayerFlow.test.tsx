@@ -25,9 +25,14 @@ jest.mock('@/utils/profileStorage', () => ({
 
 jest.mock('@/hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    isReady: true, // Changed to true to allow component to render in tests
+    isReady: true,
     inviteRoomId: null,
     isInstantMultiplayer: false,
+    showInviteButton: jest.fn(),
+    hideInviteButton: jest.fn(),
+    createInviteLink: jest.fn(),
+    isInviteButtonVisible: false,
+    isInviteJoin: false,
   }),
 }));
 

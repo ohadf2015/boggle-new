@@ -3,6 +3,7 @@
 import Script from 'next/script';
 import { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
 import { useCrazyGamesViewport, type CrazyGamesDeviceType } from '@/hooks/useCrazyGamesViewport';
+import { useCrazyGamesScrollPrevention } from '@/hooks/useCrazyGamesScrollPrevention';
 
 // CrazyGames SDK Type Definitions
 declare global {
@@ -253,6 +254,9 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   // Use viewport hook for CrazyGames-specific viewport handling
   const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
 
+  // Prevent page scrolling in CrazyGames iframe (delegates to dedicated hook)
+  useCrazyGamesScrollPrevention(CRAZYGAMES_ENABLED);
+
   // Initialize SDK and set up CrazyGames-specific handlers
   useEffect(() => {
     if (!CRAZYGAMES_ENABLED) {
@@ -262,142 +266,6 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
     // Add CrazyGames-specific CSS class to body for mobile optimizations
     document.body.classList.add('crazygames-embed');
-
-    // Prevent page scrolling (CrazyGames requirement)
-    // But allow scrolling within scrollable containers
-    const preventScroll = (event: WheelEvent) => {
-      // Check if the event target or any parent is a scrollable container
-      let target = event.target as HTMLElement | null;
-
-      while (target && target !== document.body) {
-        const style = window.getComputedStyle(target);
-        const overflowY = style.overflowY;
-        const overflowX = style.overflowX;
-
-        // Check if this element is scrollable
-        const isScrollableY = (overflowY === 'auto' || overflowY === 'scroll') && target.scrollHeight > target.clientHeight;
-        const isScrollableX = (overflowX === 'auto' || overflowX === 'scroll') && target.scrollWidth > target.clientWidth;
-
-        if (isScrollableY || isScrollableX) {
-          // Check if we can scroll in the direction the user is trying to scroll
-          if (event.deltaY !== 0 && isScrollableY) {
-            const canScrollUp = target.scrollTop > 0;
-            const canScrollDown = target.scrollTop < target.scrollHeight - target.clientHeight;
-
-            if ((event.deltaY < 0 && canScrollUp) || (event.deltaY > 0 && canScrollDown)) {
-              // Allow this scroll event - we're inside a scrollable container
-              return;
-            }
-          }
-
-          if (event.deltaX !== 0 && isScrollableX) {
-            const canScrollLeft = target.scrollLeft > 0;
-            const canScrollRight = target.scrollLeft < target.scrollWidth - target.clientWidth;
-
-            if ((event.deltaX < 0 && canScrollLeft) || (event.deltaX > 0 && canScrollRight)) {
-              // Allow this scroll event - we're inside a scrollable container
-              return;
-            }
-          }
-        }
-
-        target = target.parentElement;
-      }
-
-      // Prevent page-level scrolling
-      event.preventDefault();
-    };
-
-    const preventKeyScroll = (event: KeyboardEvent) => {
-      // Check if the active element or event target is within a scrollable container
-      const activeElement = document.activeElement as HTMLElement | null;
-      const target = (event.target as HTMLElement) || activeElement;
-
-      if (target) {
-        let element: HTMLElement | null = target;
-
-        while (element && element !== document.body) {
-          const style = window.getComputedStyle(element);
-          const overflowY = style.overflowY;
-
-          // If we're inside a scrollable container, allow keyboard scrolling
-          if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
-            return;
-          }
-
-          element = element.parentElement;
-        }
-      }
-
-      // Only prevent keyboard scroll for page-level scrolling
-      if (['ArrowUp', 'ArrowDown', ' ', 'PageUp', 'PageDown'].includes(event.key)) {
-        event.preventDefault();
-      }
-    };
-
-    // Helper to check if an element is a scrollable container
-    const isScrollableElement = (element: HTMLElement | null): boolean => {
-      while (element && element !== document.body) {
-        const style = window.getComputedStyle(element);
-        const overflowY = style.overflowY;
-
-        if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
-          return true;
-        }
-
-        element = element.parentElement;
-      }
-      return false;
-    };
-
-    // Track touch start position for touch scroll prevention
-    let touchStartY = 0;
-    let touchStartElement: HTMLElement | null = null;
-
-    const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        touchStartY = event.touches[0].clientY;
-        touchStartElement = event.target as HTMLElement;
-      }
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      if (event.touches.length !== 1 || !touchStartElement) return;
-
-      // Check if we're inside a scrollable container
-      if (isScrollableElement(touchStartElement)) {
-        // Find the scrollable container
-        let element: HTMLElement | null = touchStartElement;
-        while (element && element !== document.body) {
-          const style = window.getComputedStyle(element);
-          const overflowY = style.overflowY;
-
-          if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
-            const touchY = event.touches[0].clientY;
-            const deltaY = touchStartY - touchY;
-
-            const canScrollUp = element.scrollTop > 0;
-            const canScrollDown = element.scrollTop < element.scrollHeight - element.clientHeight;
-
-            // Allow scroll if we can scroll in that direction
-            if ((deltaY > 0 && canScrollDown) || (deltaY < 0 && canScrollUp)) {
-              return; // Allow scroll
-            }
-            break;
-          }
-
-          element = element.parentElement;
-        }
-      }
-
-      // Prevent page-level touch scrolling
-      event.preventDefault();
-    };
-
-    window.addEventListener('wheel', preventScroll, { passive: false });
-    window.addEventListener('keydown', preventKeyScroll);
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     const checkSDK = async () => {
       // Wait for SDK to load
@@ -425,12 +293,23 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const instantMultiplayer = window.CrazyGames.SDK.game.isInstantMultiplayer;
           setIsInstantMultiplayer(!!instantMultiplayer);
 
+          // Persist invite params to sessionStorage so they survive route changes
+          const params = window.CrazyGames.SDK.game.inviteParams;
+          if (params && Object.keys(params).length > 0) {
+            try {
+              sessionStorage.setItem('cg_invite_params', JSON.stringify(params));
+            } catch { /* sessionStorage unavailable */ }
+          }
+
           // Signal loading lifecycle to CrazyGames
           if (env === 'crazygames') {
-            // sdkGameLoadingStart must be called before sdkGameLoadingStop
-            // This signals to CrazyGames that the game is actively loading
+            // sdkGameLoadingStart signals the game is loading assets/hydrating.
+            // sdkGameLoadingStop is deferred until the app is interactive (next frame).
+            // This gives CrazyGames a meaningful "time to playable" metric.
             window.CrazyGames.SDK.game.sdkGameLoadingStart();
-            window.CrazyGames.SDK.game.sdkGameLoadingStop();
+            requestAnimationFrame(() => {
+              window.CrazyGames?.SDK?.game?.sdkGameLoadingStop();
+            });
           }
         } catch {
           setIsAvailable(false);
@@ -443,10 +322,6 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
     return () => {
       document.body.classList.remove('crazygames-embed');
-      window.removeEventListener('wheel', preventScroll);
-      window.removeEventListener('keydown', preventKeyScroll);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
@@ -612,15 +487,30 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
   const getInviteParam = useCallback((paramName: string): string | null => {
     if (isAvailable && window.CrazyGames?.SDK) {
-      return window.CrazyGames.SDK.game.getInviteParam(paramName);
+      const value = window.CrazyGames.SDK.game.getInviteParam(paramName);
+      if (value) return value;
     }
+    // Fallback: check sessionStorage (invite params persisted on SDK init)
+    try {
+      const stored = sessionStorage.getItem('cg_invite_params');
+      if (stored) {
+        const params = JSON.parse(stored) as Record<string, string>;
+        return params[paramName] ?? null;
+      }
+    } catch { /* sessionStorage unavailable */ }
     return null;
   }, [isAvailable]);
 
   const getInviteParams = useCallback((): Record<string, string> | null => {
     if (isAvailable && window.CrazyGames?.SDK) {
-      return window.CrazyGames.SDK.game.inviteParams ?? null;
+      const params = window.CrazyGames.SDK.game.inviteParams;
+      if (params && Object.keys(params).length > 0) return params;
     }
+    // Fallback: check sessionStorage
+    try {
+      const stored = sessionStorage.getItem('cg_invite_params');
+      if (stored) return JSON.parse(stored) as Record<string, string>;
+    } catch { /* sessionStorage unavailable */ }
     return null;
   }, [isAvailable]);
 
@@ -670,10 +560,18 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     }
   }, [isAvailable]);
 
-  // Server-side auth token
+  // Server-side auth token (validated non-empty before returning)
   const getUserToken = useCallback(async (): Promise<string | null> => {
     if (isAvailable && window.CrazyGames?.SDK) {
-      return window.CrazyGames.SDK.user.getUserToken();
+      try {
+        const token = await window.CrazyGames.SDK.user.getUserToken();
+        if (token && typeof token === 'string' && token.length > 0) {
+          return token;
+        }
+        return null;
+      } catch {
+        return null;
+      }
     }
     return null;
   }, [isAvailable]);

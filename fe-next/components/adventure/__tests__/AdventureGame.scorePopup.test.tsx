@@ -13,14 +13,15 @@ jest.mock('@/hooks/useAdventureGame');
 jest.mock('@/hooks/useAdventureWordValidation');
 jest.mock('@/hooks/useAdventureSelection');
 // Note: useDevicePerformance is mocked globally in jest.setup.js
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const value = {
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return { useLanguage: () => value, useLanguageSafe: () => value };
+});
 
 // Mock useAdaptiveDifficulty hook
 jest.mock('@/hooks/useAdaptiveDifficulty', () => ({

@@ -6,6 +6,7 @@ describe('cloudSave', () => {
   let mockRemoveData: jest.Mock;
 
   const mockSaveDataValue: SaveData = {
+    version: 1,
     adventureProgress: {
       worldId: 2,
       levelId: 5,
@@ -98,6 +99,7 @@ describe('cloudSave', () => {
 
     it('should save minimal data correctly', async () => {
       const minimalData: SaveData = {
+        version: 1,
         adventureProgress: {
           worldId: 1,
           levelId: 1,
@@ -128,6 +130,7 @@ describe('cloudSave', () => {
 
     it('should save maximum data correctly', async () => {
       const maxData: SaveData = {
+        version: 1,
         adventureProgress: {
           worldId: 10,
           levelId: 50,

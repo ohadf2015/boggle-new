@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
 import { useTheme } from '@/utils/ThemeContext';
@@ -15,6 +15,7 @@ interface MessageThreadListProps {
   isLoading: boolean;
   unreadCount: number;
   onThreadClick: (thread: MessageThread) => void;
+  onStartConversation?: () => void;
   className?: string;
 }
 
@@ -50,8 +51,8 @@ function formatRelativeTime(now: number, timestamp: number, t: (key: string) => 
 export const MessageThreadList: React.FC<MessageThreadListProps> = ({
   threads,
   isLoading,
-  unreadCount,
   onThreadClick,
+  onStartConversation,
   className,
 }) => {
   const { t, language } = useLanguage();
@@ -87,9 +88,22 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
         <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
           {t('friends.noMessages')}
         </p>
-        <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
+        <p className={cn('text-sm mt-1 mb-3', isDark ? 'text-gray-400' : 'text-gray-500')}>
           {t('friends.startConversation')}
         </p>
+        {onStartConversation && (
+          <button
+            onClick={onStartConversation}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
+              'hover:shadow-hard hover:-translate-y-0.5 transition-all',
+              'bg-neo-cyan text-neo-black font-bold text-sm'
+            )}
+          >
+            <Send className="w-4 h-4" />
+            {t('friends.sendMessage')}
+          </button>
+        )}
       </div>
     );
   }
@@ -126,7 +140,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           {/* Message content */}
           <div className={cn('flex-1 min-w-0', isRTL && 'text-right')}>
             <div className="flex items-center justify-between mb-1">
-              <p className={cn('font-black text-white truncate', 'ms-2')}>
+              <p className={cn('font-black truncate ms-2', isDark ? 'text-white' : 'text-gray-900')}>
                 {thread.friendDisplayName || thread.friendUsername}
               </p>
               <span className={cn(

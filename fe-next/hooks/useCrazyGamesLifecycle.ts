@@ -198,6 +198,10 @@ export function useCrazyGamesLifecycle({
       hasEndedRef.current = false;
       hasTriggeredHappyTimeRef.current = false;
       isPlayingRef.current = true;
+      // Reset threshold tracking refs so happyTime triggers fresh each game
+      lastScoreRef.current = 0;
+      lastMaxComboRef.current = 0;
+      lastWordsFoundRef.current = 0;
       gameplayStart();
       onGameplayStart?.();
 

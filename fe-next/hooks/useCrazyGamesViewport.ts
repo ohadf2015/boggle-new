@@ -90,10 +90,17 @@ export function useCrazyGamesViewport(): CrazyGamesViewportInfo {
     };
   }, []);
 
-  const [viewportInfo, setViewportInfo] = useState<CrazyGamesViewportInfo>(calculateViewportInfo);
+  // Use SSR-safe default for initial render to prevent hydration mismatch.
+  // The useEffect below updates to real viewport dimensions after mount.
+  const [viewportInfo, setViewportInfo] = useState<CrazyGamesViewportInfo>({
+    isIframeEmbed: false,
+    viewportSize: { width: 768, height: 1024 },
+    isLandscape: false,
+    deviceType: 'tablet',
+  });
 
   useEffect(() => {
-    // Initial calculation after mount
+    // Calculate real viewport on mount (after hydration)
     setViewportInfo(calculateViewportInfo());
 
     let timeoutId: NodeJS.Timeout;

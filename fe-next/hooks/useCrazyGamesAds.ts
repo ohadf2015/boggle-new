@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
@@ -61,6 +61,10 @@ export function useCrazyGamesAds() {
   const [hasAdblock, setHasAdblock] = useState(false);
   const [adsDisabled, setAdsDisabled] = useState(false);
 
+  // Client-side debounce to prevent spamming SDK with rapid ad requests
+  const AD_DEBOUNCE_MS = 500; // 500ms debounce between ad requests
+  const lastAdRequestRef = useRef(0);
+
   // Check for adblock on mount
   useEffect(() => {
     const checkForAdblock = async () => {
@@ -85,24 +89,33 @@ export function useCrazyGamesAds() {
   const requestMidgameAd = useCallback(async (): Promise<boolean> => {
     if (!isAvailable || hasAdblock || adsDisabled) return false;
 
+    // Client-side cooldown — prevent rapid re-requests after ad completes
+    const now = Date.now();
+    if (isAdPlaying || now - lastAdRequestRef.current < AD_DEBOUNCE_MS) return false;
+    lastAdRequestRef.current = now;
+
     setIsAdPlaying(true);
     gameplayStop();
 
     return new Promise((resolve) => {
+      let settled = false;
+      const settle = (success: boolean) => {
+        if (settled) return;
+        settled = true;
+        try { Howler.mute(false); } catch { /* Howler not initialized */ }
+        gameplayStart();
+        setIsAdPlaying(false);
+        // Clear debounce so next ad can be requested immediately after completion
+        lastAdRequestRef.current = 0;
+        resolve(success);
+      };
+
       showMidgameAd({
         adStarted: () => {
-          Howler.mute(true);
+          try { Howler.mute(true); } catch { /* Howler not initialized */ }
         },
-        adFinished: () => {
-          Howler.mute(false);
-          gameplayStart();
-          setIsAdPlaying(false);
-          resolve(true);
-        },
+        adFinished: () => settle(true),
         adError: (_error, errorData) => {
-          Howler.mute(false);
-          gameplayStart();
-          setIsAdPlaying(false);
           const code = extractAdErrorCode(errorData);
           if (code === 'adsDisabledBasicLaunch') {
             setAdsDisabled(true);
@@ -111,11 +124,11 @@ export function useCrazyGamesAds() {
           } else if (code !== 'adCooldown' && code !== 'unfilled') {
             console.warn('Midgame ad error:', code, errorData);
           }
-          resolve(false);
+          settle(false);
         },
       });
     });
-  }, [isAvailable, hasAdblock, adsDisabled, showMidgameAd, gameplayStop, gameplayStart]);
+  }, [isAvailable, hasAdblock, adsDisabled, isAdPlaying, showMidgameAd, gameplayStop, gameplayStart]);
 
   /**
    * Request a rewarded ad for optional player boosts (extra lives, XP, etc.).
@@ -125,24 +138,33 @@ export function useCrazyGamesAds() {
   const requestRewardedAd = useCallback(async (): Promise<boolean> => {
     if (!isAvailable || hasAdblock || adsDisabled) return false;
 
+    // Client-side cooldown — prevent rapid re-requests after ad completes
+    const now = Date.now();
+    if (isAdPlaying || now - lastAdRequestRef.current < AD_DEBOUNCE_MS) return false;
+    lastAdRequestRef.current = now;
+
     setIsAdPlaying(true);
     gameplayStop();
 
     return new Promise((resolve) => {
+      let settled = false;
+      const settle = (success: boolean) => {
+        if (settled) return;
+        settled = true;
+        try { Howler.mute(false); } catch { /* Howler not initialized */ }
+        gameplayStart();
+        setIsAdPlaying(false);
+        // Clear debounce so next ad can be requested immediately after completion
+        lastAdRequestRef.current = 0;
+        resolve(success);
+      };
+
       showRewardedAd({
         adStarted: () => {
-          Howler.mute(true);
+          try { Howler.mute(true); } catch { /* Howler not initialized */ }
         },
-        adFinished: () => {
-          Howler.mute(false);
-          gameplayStart();
-          setIsAdPlaying(false);
-          resolve(true);
-        },
+        adFinished: () => settle(true),
         adError: (_error, errorData) => {
-          Howler.mute(false);
-          gameplayStart();
-          setIsAdPlaying(false);
           const code = extractAdErrorCode(errorData);
           if (code === 'adsDisabledBasicLaunch') {
             setAdsDisabled(true);
@@ -151,11 +173,11 @@ export function useCrazyGamesAds() {
           } else if (code !== 'adCooldown' && code !== 'unfilled') {
             console.warn('Rewarded ad error:', code, errorData);
           }
-          resolve(false);
+          settle(false);
         },
       });
     });
-  }, [isAvailable, hasAdblock, adsDisabled, showRewardedAd, gameplayStop, gameplayStart]);
+  }, [isAvailable, hasAdblock, adsDisabled, isAdPlaying, showRewardedAd, gameplayStop, gameplayStart]);
 
   return {
     /** Request midgame ad at natural break point */

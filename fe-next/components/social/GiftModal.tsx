@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Lightbulb, Shield, Coins } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -53,25 +53,25 @@ const GiftModal: React.FC<GiftModalProps> = ({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 shadow-hard-xl w-full max-w-md mx-4"
+        className="bg-slate-800 border-3 border-neo-black rounded-neo p-5 shadow-hard-xl w-full max-w-md mx-4"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black text-neo-black uppercase">
+          <h2 className="text-xl font-black text-white uppercase">
             {t('socialGift.title', 'Send a Gift')}
           </h2>
           <button
             data-testid="close-gift-modal"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo bg-neo-red text-neo-white shadow-hard-sm"
+            className="w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard-sm"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <p className="text-sm text-neo-black/70 mb-3">
-          {t('socialGift.sendTo', 'Send to')} <span className="font-bold">{recipientName}</span>
+        <p className="text-sm text-gray-300 mb-3">
+          {t('socialGift.sendTo', 'Send to')} <span className="font-bold text-white">{recipientName}</span>
         </p>
 
         {/* Gift type cards */}
@@ -94,15 +94,15 @@ const GiftModal: React.FC<GiftModalProps> = ({
                   isSelected
                     ? 'bg-neo-lime scale-105'
                     : canAfford
-                      ? 'bg-white hover:bg-neo-yellow/20'
-                      : 'bg-neo-black/10 opacity-50 cursor-not-allowed'
+                      ? 'bg-slate-700 hover:bg-slate-600'
+                      : 'bg-slate-900 opacity-50 cursor-not-allowed'
                 )}
               >
-                <Icon className="w-6 h-6 mb-1 text-neo-black" />
-                <span className="text-xs font-bold text-neo-black capitalize">
+                <Icon className="w-6 h-6 mb-1 text-white" />
+                <span className="text-xs font-bold text-white capitalize">
                   {t(`socialGift.type.${type}`, type.replace('_', ' '))}
                 </span>
-                <span className="text-[10px] text-neo-black/60 mt-0.5">
+                <span className="text-[10px] text-gray-400 mt-0.5">
                   {type === 'coins' ? `${GIFT_TYPES.coins.minAmount}-${GIFT_TYPES.coins.maxAmount}` : `${config.cost}`} {t('socialGift.coins', 'coins')}
                 </span>
               </button>
@@ -112,8 +112,8 @@ const GiftModal: React.FC<GiftModalProps> = ({
 
         {/* Coin amount slider (shown when coins selected) */}
         {selectedType === 'coins' && (
-          <div className="mb-4 p-3 bg-white border-2 border-neo-black rounded-neo">
-            <label className="text-xs font-bold text-neo-black block mb-2">
+          <div className="mb-4 p-3 bg-slate-700 border-2 border-neo-black rounded-neo">
+            <label className="text-xs font-bold text-white block mb-2">
               {t('socialGift.amount', 'Amount')}: {coinAmount} {t('socialGift.coins', 'coins')}
             </label>
             <input
@@ -129,9 +129,9 @@ const GiftModal: React.FC<GiftModalProps> = ({
         )}
 
         {/* Remaining gifts */}
-        <div className="flex items-center justify-between mb-4 text-xs text-neo-black/60">
+        <div className="flex items-center justify-between mb-4 text-xs text-gray-400">
           <span>{t('socialGift.remaining', 'Daily gifts remaining')}:</span>
-          <span data-testid="gifts-remaining" className="font-bold text-neo-black">
+          <span data-testid="gifts-remaining" className="font-bold text-white">
             {giftsRemaining}/{DAILY_GIFT_LIMIT}
           </span>
         </div>
@@ -145,7 +145,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
             'w-full py-3 border-3 border-neo-black rounded-neo font-black text-lg uppercase shadow-hard transition-all',
             selectedType && giftsRemaining > 0
               ? 'bg-neo-lime text-neo-black hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5'
-              : 'bg-neo-black/20 text-neo-black/40 cursor-not-allowed'
+              : 'bg-slate-700 text-gray-500 cursor-not-allowed'
           )}
         >
           {t('socialGift.send', 'Send Gift')}

@@ -92,14 +92,15 @@ jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
 }));
 
 // Mock all dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const value = {
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return { useLanguage: () => value, useLanguageSafe: () => value };
+});
 
 jest.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, ChevronLeft } from 'lucide-react';
+import { X, Target, ChevronLeft, Trash2 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
@@ -19,6 +19,8 @@ interface MessageThreadProps {
   typingUsername?: string;
   onClose: () => void;
   onSendMessage: (text: string) => void;
+  onTyping?: (isTyping: boolean) => void;
+  onDeleteMessage?: (messageId: string) => void;
   onChallenge?: () => void;
   onMarkAsRead: () => void;
   currentUserId: string;
@@ -44,6 +46,8 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   typingUsername,
   onClose,
   onSendMessage,
+  onTyping,
+  onDeleteMessage,
   onChallenge,
   onMarkAsRead,
   currentUserId,
@@ -56,23 +60,32 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const prevMessageCountRef = useRef(0);
+  const [deleteMenuId, setDeleteMenuId] = useState<string | null>(null);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
-   * Auto-scroll to bottom on new messages
+   * Auto-scroll to bottom on new messages or thread open
    */
   useEffect(() => {
-    if (messages.length > 0 && !hasScrolledToBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      setHasScrolledToBottom(true);
+    if (messages.length > 0) {
+      const isNewMessage = messages.length > prevMessageCountRef.current;
+      const isFirstLoad = prevMessageCountRef.current === 0;
+      prevMessageCountRef.current = messages.length;
+
+      if (isFirstLoad || isNewMessage) {
+        messagesEndRef.current?.scrollIntoView({
+          behavior: isFirstLoad ? 'instant' : 'smooth',
+        });
+      }
     }
-  }, [messages, hasScrolledToBottom]);
+  }, [messages.length]);
 
   /**
-   * Reset scroll state when thread changes
+   * Reset message count when thread changes
    */
   useEffect(() => {
-    setHasScrolledToBottom(false);
+    prevMessageCountRef.current = 0;
   }, [thread?.conversationId]);
 
   /**
@@ -145,7 +158,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                     className="border-2 border-neo-black"
                   />
                   {thread.isOnline && (
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-neo-black rounded-full" />
+                    <span className="absolute bottom-0 end-0 w-2.5 h-2.5 bg-green-500 border-2 border-neo-black rounded-full" />
                   )}
                 </div>
                 <div>
@@ -229,12 +242,69 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                       {/* Message bubble */}
                       <div
                         className={cn(
-                          'max-w-[70%] p-3 rounded-neo border-2 border-neo-black',
+                          'max-w-[70%] p-3 rounded-neo border-2 border-neo-black relative',
                           isMine
                             ? 'bg-neo-cyan text-neo-black shadow-hard'
                             : (isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900') + ' shadow-hard'
                         )}
+                        onContextMenu={(e) => {
+                          if (isMine && onDeleteMessage) {
+                            e.preventDefault();
+                            setDeleteMenuId(message.messageId);
+                          }
+                        }}
+                        onTouchStart={() => {
+                          if (isMine && onDeleteMessage) {
+                            longPressTimerRef.current = setTimeout(() => {
+                              setDeleteMenuId(message.messageId);
+                            }, 500);
+                          }
+                        }}
+                        onTouchEnd={() => {
+                          if (longPressTimerRef.current) {
+                            clearTimeout(longPressTimerRef.current);
+                          }
+                        }}
+                        onTouchMove={() => {
+                          if (longPressTimerRef.current) {
+                            clearTimeout(longPressTimerRef.current);
+                          }
+                        }}
                       >
+                        {/* Delete action menu */}
+                        {deleteMenuId === message.messageId && isMine && onDeleteMessage && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className={cn(
+                              'absolute -top-10 end-0 z-10 flex gap-1'
+                            )}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteMessage(message.messageId);
+                                setDeleteMenuId(null);
+                              }}
+                              className="flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black bg-red-500 text-white text-xs font-bold shadow-hard-sm"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              {t('common.delete')}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteMenuId(null);
+                              }}
+                              className={cn(
+                                'px-2 py-1 rounded-neo border-2 border-neo-black text-xs font-bold shadow-hard-sm',
+                                isDark ? 'bg-slate-600 text-white' : 'bg-gray-200 text-gray-900'
+                              )}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </motion.div>
+                        )}
                         <p className="break-words whitespace-pre-wrap text-sm">
                           {message.message}
                         </p>
@@ -313,6 +383,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           )}>
             <MessageComposer
               onSend={onSendMessage}
+              onTyping={onTyping}
               disabled={isLoading}
               placeholder={t('friends.typeMessage')}
             />

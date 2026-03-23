@@ -10,8 +10,8 @@ import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const value = {
     t: (key: string) => {
       const translations: Record<string, string> = {
         'adventure.lexi.longWord.default': 'Wow! Long word!',
@@ -27,8 +27,9 @@ jest.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return { useLanguage: () => value, useLanguageSafe: () => value };
+});
 
 jest.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

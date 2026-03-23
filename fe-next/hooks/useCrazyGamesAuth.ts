@@ -78,32 +78,37 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
       return;
     }
 
+    let mounted = true;
+
     const checkUser = async () => {
       try {
         // Check if accounts are available
         const accountAvailable = await isUserAccountAvailable();
+        if (!mounted) return;
         setIsAccountAvailable(accountAvailable);
 
         // Get current user if logged in
         const currentUser = await getUser();
+        if (!mounted) return;
         if (currentUser) {
           setUser(currentUser);
         }
       } catch (error) {
         console.error('Error checking CrazyGames user:', error);
       } finally {
-        setHasCheckedUser(true);
+        if (mounted) setHasCheckedUser(true);
       }
     };
 
     checkUser();
+    return () => { mounted = false; };
   }, [isAvailable, isLoading, getUser, isUserAccountAvailable]);
 
   // Listen for mid-session login (user logs into CrazyGames while playing)
   useEffect(() => {
     if (!isAvailable) return;
 
-    const handleAuthChange = (cgUser: { username: string }) => {
+    const handleAuthChange = (cgUser: { username: string; profilePictureUrl: string }) => {
       setUser(cgUser);
     };
 

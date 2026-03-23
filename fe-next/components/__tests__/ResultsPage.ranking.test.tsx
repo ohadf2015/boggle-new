@@ -218,6 +218,15 @@ jest.mock('@/components/CrazyGamesBanner', () => ({
 
 jest.mock('@/components/CrazyGamesSDK', () => ({
   shouldHideExternalLogin: jest.fn(() => false),
+  useCrazyGames: jest.fn(() => ({
+    isAvailable: false,
+    isOnCrazyGamesPlatform: false,
+    showMidgameAd: jest.fn(),
+    showRewardedAd: jest.fn(),
+    hasAdblock: jest.fn(async () => false),
+    gameplayStart: jest.fn(),
+    gameplayStop: jest.fn(),
+  })),
 }));
 
 jest.mock('@/utils/confettiUtils', () => ({

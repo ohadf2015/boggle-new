@@ -20,6 +20,7 @@ import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
@@ -65,9 +66,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
   const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
 
   useEffect(() => {
     showInterstitial('daily-complete');
+    requestMidgameAd();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const {

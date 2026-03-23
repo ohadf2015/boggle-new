@@ -50,13 +50,15 @@ function getRelativeTimeString(lastSeen: string | undefined, t: (key: string, pa
 const FriendStatusIndicator: React.FC<{
   isOnline: boolean;
   size?: 'sm' | 'md';
-}> = ({ isOnline, size = 'md' }) => {
+  isDark?: boolean;
+}> = ({ isOnline, size = 'md', isDark = true }) => {
   const dotSize = size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3';
 
   return (
     <div
       className={cn(
-        'absolute -bottom-0.5 -end-0.5 rounded-full border-2 border-slate-800',
+        'absolute -bottom-0.5 -end-0.5 rounded-full border-2',
+        isDark ? 'border-slate-800' : 'border-white',
         dotSize,
         isOnline
           ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]'
@@ -127,6 +129,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
         <FriendStatusIndicator
           isOnline={friend.isOnline}
           size={compact ? 'sm' : 'md'}
+          isDark={isDark}
         />
       </div>
 

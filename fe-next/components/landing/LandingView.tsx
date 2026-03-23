@@ -27,18 +27,14 @@ import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingMobileCards } from './LandingMobileCards';
 
 // Below-the-fold sections — lazy load to speed up initial render
-const LiveActivityTicker = dynamic(() => import('./LiveActivityTicker').then(m => m.LiveActivityTicker), { ssr: false });
+// LiveActivityTicker moved out to reduce landing clutter
 const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
-const WotdTeaser = dynamic(() => import('./WotdTeaser').then(m => m.WotdTeaser), { ssr: false });
-// DailyMissionsHub removed — moved to dedicated /quests page
-const LeagueRivalsCard = dynamic(() => import('@/components/leagues/LeagueRivalsCard').then(m => m.LeagueRivalsCard), { ssr: false });
-const WordCollectionCard = dynamic(() => import('@/components/vocabulary/WordCollectionCard').then(m => m.WordCollectionCard), { ssr: false });
+// Engagement widgets — only high-value conditional ones on landing
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
-const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
+const AsyncChallengeCard = dynamic(() => import('@/components/growth/AsyncChallengeCard').then(m => m.AsyncChallengeCard), { ssr: false });
+const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
 const WordPactCard = dynamic(() => import('@/components/engagement/WordPactCard').then(m => m.WordPactCard), { ssr: false });
-// WeeklyQuestCard removed — moved to dedicated /quests page
-const FriendsActivityFeed = dynamic(() => import('./FriendsActivityFeed').then(m => m.FriendsActivityFeed), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -46,7 +42,7 @@ const LandingHallOfFame = dynamic(() => import('./LandingHallOfFame').then(m => 
 const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
 const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), { ssr: false });
 const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
-import { LeaguePositionBadge } from '@/components/leagues/LeaguePositionBadge';
+// LeaguePositionBadge, WotdTeaser, WordPact, FriendsActivity moved to dedicated pages
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
@@ -257,10 +253,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           isMobilePortrait={isMobilePortrait}
         />
 
-        {/* League Position Badge — social pressure for retention */}
-        {isAuthenticated && <LeaguePositionBadge />}
-
-        {/* Social Proof Bar */}
+        {/* Social Proof Bar — compact stats, immediately below hero */}
         <LandingSocialProofBar
           activePlayers={activePlayers}
           gamesToday={gamesToday}
@@ -268,39 +261,19 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           languages={langCount}
         />
 
-        {/* Below-fold sections deferred until after first paint.
-            min-h reserves space to prevent CLS when components hydrate. */}
-        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '3rem' }}>
-          {hydrated && <LiveActivityTicker />}
-        </div>
-
-        <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '5rem' }}>
-          {hydrated && <UrgencyCard />}
-        </div>
-
-        {/* Named Rivals — social pressure from nearby league players */}
-        {isAuthenticated && (
-          <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
-            {hydrated && <LeagueRivalsCard />}
+        {/* Action prompts — ONLY render when there's something to act on */}
+        {hydrated && isAuthenticated && (
+          <div className="flex flex-col gap-3 max-w-4xl mx-auto w-full">
+            {/* "It's your turn!" — only when pending challenges exist */}
+            <AsyncChallengeCard />
+            {/* "Resume your game" — only when unfinished board exists */}
+            <UnfinishedBoardCardConnected />
+            {/* "Your pact partner is waiting" — only when pact active + not played today */}
+            <WordPactCard />
           </div>
         )}
 
-        {/* Retention features — admin only */}
-        {hydrated && isAdmin && (
-          <>
-            <div className={cn('transition-opacity duration-300', hydrated ? 'opacity-100' : 'opacity-0')} style={{ minHeight: hydrated ? undefined : '4rem' }}>
-              <WotdTeaser />
-            </div>
-            <WordCollectionCard />
-            <GhostRivalWidget />
-            <VaultCardConnected />
-            <UnfinishedBoardCardConnected />
-            <WordPactCard />
-            <FriendsActivityFeed />
-          </>
-        )}
-
-        {/* Challenge / Mode Cards */}
+        {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
         <LandingChallengeCards
           language={language}
           isAdmin={isAdmin}
@@ -313,6 +286,15 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           dailyChallengeStats={dailyChallengeStats}
           solveRate={solveRate}
         />
+
+        {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
+        {hydrated && isAuthenticated && (
+          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
+            <UrgencyCard />
+            <GhostRivalWidget />
+            <VaultCardConnected />
+          </div>
+        )}
 
         {/* Below-fold sections — deferred until after first paint */}
         {hydrated && (

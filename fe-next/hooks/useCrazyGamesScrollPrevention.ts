@@ -49,8 +49,18 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
     };
 
     const preventKeyScroll = (event: KeyboardEvent) => {
-      const activeElement = document.activeElement as HTMLElement | null;
-      const target = (event.target as HTMLElement) || activeElement;
+      // Allow normal keyboard behavior in form controls (typing spaces, arrow navigation)
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        active instanceof HTMLSelectElement ||
+        (active as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      const target = (event.target as HTMLElement) || (active as HTMLElement);
 
       if (target) {
         let element: HTMLElement | null = target;

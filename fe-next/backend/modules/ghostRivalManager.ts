@@ -38,9 +38,7 @@ export function getWeekStart(): Date {
 
 export function getWeekEnd(): Date {
   const start = getWeekStart();
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7);
-  return end;
+  return new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
 }
 
 function toDateString(d: Date): string {

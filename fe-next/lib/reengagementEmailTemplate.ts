@@ -1,6 +1,6 @@
 /**
  * Re-engagement Email HTML Template
- * Neo-brutalist design with a large first-letter tile as the hero element
+ * Neo-brutalist design with RTL support and localized content
  */
 
 import { EMAIL_COLORS } from '@/lib/email';
@@ -22,46 +22,58 @@ const LOCALIZED_STRINGS: Record<string, {
   cta: string;
   footerReason: string;
   socialProof: string;
+  unsubscribe: string;
+  privacy: string;
 }> = {
   en: {
     greeting: (name) => `We miss you, ${name}!`,
     teaser: "Today's word starts with...",
     question: 'Can you figure it out?',
-    cta: 'REVEAL THE WORD',
+    cta: 'Play Now',
     footerReason: 'You subscribed to daily challenges.',
     socialProof: 'Join thousands of word hunters playing daily',
+    unsubscribe: 'Unsubscribe',
+    privacy: 'Privacy',
   },
   he: {
     greeting: (name) => `!${name} ,התגעגענו אליך`,
     teaser: '...המילה של היום מתחילה ב',
     question: '?תצליח/י לגלות',
-    cta: 'גלו את המילה',
+    cta: 'שחקו עכשיו',
     footerReason: '.נרשמת לאתגר היומי',
-    socialProof: '\u{1F30D} הצטרפו לאלפי שחקנים שמשחקים כל יום',
+    socialProof: 'הצטרפו לאלפי שחקנים שמשחקים כל יום',
+    unsubscribe: 'ביטול הרשמה',
+    privacy: 'פרטיות',
   },
   sv: {
     greeting: (name) => `Vi saknar dig, ${name}!`,
     teaser: 'Dagens ord börjar med...',
     question: 'Kan du lista ut det?',
-    cta: 'AVSLÖJA ORDET',
+    cta: 'Spela nu',
     footerReason: 'Du prenumererar på dagliga utmaningar.',
     socialProof: 'Tusentals ordspelare spelar varje dag',
+    unsubscribe: 'Avprenumerera',
+    privacy: 'Integritet',
   },
   ja: {
     greeting: (name) => `${name}さん、お待ちしています！`,
     teaser: '今日の単語の最初の文字は...',
     question: 'わかりますか？',
-    cta: '単語を確認する',
+    cta: '今すぐプレイ',
     footerReason: 'デイリーチャレンジに登録しています。',
     socialProof: '毎日何千人ものワードハンターがプレイ中',
+    unsubscribe: '配信停止',
+    privacy: 'プライバシー',
   },
   es: {
     greeting: (name) => `¡Te extrañamos, ${name}!`,
     teaser: 'La palabra de hoy empieza con...',
     question: '¿Puedes adivinarla?',
-    cta: 'DESCUBRE LA PALABRA',
+    cta: 'Jugar ahora',
     footerReason: 'Te suscribiste al desafío diario.',
     socialProof: 'Miles de cazadores de palabras juegan a diario',
+    unsubscribe: 'Cancelar suscripción',
+    privacy: 'Privacidad',
   },
 };
 
@@ -149,6 +161,14 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const subject = getReengagementSubject(language, firstLetter, recipientName);
   const currentYear = new Date().getFullYear();
   const shadowDir = isRTL ? '-' : '';
+  const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
+  const privacyUrl = `${baseUrl}/${locale}/privacy`;
+  // Flip gradient direction for RTL so colors flow naturally
+  const gradDeg = isRTL ? '270deg' : '90deg';
+  // Flip play arrow for RTL
+  const playArrow = isRTL ? '&#9664;' : '&#9654;';
+  // Mystery tile opacities — fade from bright to dim for intrigue
+  const mysteryOpacities = ['0.85', '0.65', '0.45', '0.3'];
 
   const html = `
 <!DOCTYPE html>
@@ -170,47 +190,38 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
     * { box-sizing: border-box; }
     body {
       margin: 0; padding: 0;
-      background-color: ${colors.navy};
+      background-color: #0f0f23;
       font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    .button-cta:hover {
-      transform: translate(2px, 2px);
-      box-shadow: 3px 3px 0px ${colors.black} !important;
-    }
-    @keyframes glow-pulse {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,20,147,0.3), 0 0 40px rgba(255,107,53,0.1); }
-      50% { box-shadow: 0 0 30px rgba(255,20,147,0.5), 0 0 60px rgba(255,107,53,0.2); }
-    }
-    .cta-glow { animation: glow-pulse 2s ease-in-out infinite; }
+    a.cta-link:hover { transform: translate(2px, 2px) !important; }
     @media only screen and (max-width: 600px) {
-      .container { padding: 16px !important; }
-      .main-card { padding: 24px 16px 28px !important; }
+      .container { padding: 12px !important; }
+      .main-card { padding: 28px 18px 32px !important; }
       .word-tile { width: 48px !important; height: 48px !important; font-size: 24px !important; line-height: 42px !important; }
-      .mascot-img { width: 90px !important; height: 90px !important; }
-      .mascot-glow { width: 110px !important; height: 110px !important; }
-      .greeting-text { font-size: 22px !important; }
-      .speech-bubble { padding: 12px 16px !important; }
+      .mascot-img { width: 80px !important; height: 80px !important; }
+      .greeting-text { font-size: 24px !important; }
+      .teaser-text { font-size: 14px !important; }
+      .cta-link { padding: 16px 36px !important; font-size: 18px !important; }
     }
   </style>
 </head>
 <body>
-  <!-- Preheader text (hidden) -->
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: ${colors.navy};">
+  <!-- Preheader -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0f0f23;">
     ${strings.teaser} ${firstLetter} — ${strings.question} &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
-  <!-- Email Container -->
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: ${colors.navy};">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0f0f23;">
     <tr>
-      <td align="center" class="container" style="padding: 40px 20px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px;">
+      <td align="center" class="container" style="padding: 32px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 520px;">
 
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding-bottom: 24px;">
-              <a href="${baseUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="160" style="display: block; max-width: 160px; height: auto;" />
+            <td align="center" style="padding-bottom: 28px;">
+              <a href="${playUrl}" target="_blank" style="text-decoration: none;">
+                <img src="${logoUrl}" alt="LexiClash" width="140" style="display: block; max-width: 140px; height: auto;" />
               </a>
             </td>
           </tr>
@@ -218,78 +229,66 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           <!-- Main Card -->
           <tr>
             <td>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #252545; border: 4px solid ${colors.black}; border-radius: 20px; box-shadow: ${shadowDir}8px 8px 0px ${colors.black}; overflow: hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: linear-gradient(180deg, #1c1c38 0%, #222248 100%); border: 3px solid #2e2e55; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; overflow: hidden;">
 
-                <!-- Decorative Header Bar -->
+                <!-- Top gradient bar (flips for RTL) -->
                 <tr>
-                  <td style="background: linear-gradient(90deg, ${colors.pink} 0%, ${colors.purple} 50%, ${colors.cyan} 100%); height: 6px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td style="background: linear-gradient(${gradDeg}, ${colors.lime} 0%, ${colors.cyan} 50%, ${colors.pink} 100%); height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
                 </tr>
 
-                <!-- Card Content -->
                 <tr>
-                  <td class="main-card" style="padding: 32px 28px 36px;">
+                  <td class="main-card" style="padding: 36px 32px 40px;">
 
-                    <!-- Mascot with glow backdrop -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 8px;">
+                    <!-- Mascot -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center">
-                          <div class="mascot-glow" style="width: 130px; height: 130px; border-radius: 50%; display: inline-block; text-align: center; line-height: 0; padding-top: 5px;">
-                            <img src="${mascotUrl}" alt="Lexi the mascot waving hello" width="120" height="120" class="mascot-img" style="display: inline-block; width: 120px; height: 120px;" />
-                          </div>
+                        <td align="center" style="padding-bottom: 20px;">
+                          <img src="${mascotUrl}" alt="Lexi" width="96" height="96" class="mascot-img" style="display: block; width: 96px; height: 96px;" />
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Speech bubble greeting -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                    <!-- Greeting -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center">
-                          <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid #333355; margin-bottom: 0;">&nbsp;</div>
-                          <div class="speech-bubble" style="background-color: #333355; border: 2px solid #444470; border-radius: 16px; padding: 16px 24px; display: inline-block; max-width: 420px;">
-                            <h1 class="greeting-text" style="color: ${colors.white}; font-size: 26px; margin: 0 0 4px 0; font-weight: 700; text-align: center; line-height: 1.3;">
-                              ${strings.greeting(recipientName)}
-                            </h1>
-                            <p style="color: #D1D5DB; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500;">
-                              ${strings.teaser}
-                            </p>
-                          </div>
+                        <td align="center" dir="${dir}" style="padding-bottom: 6px;">
+                          <h1 class="greeting-text" style="color: ${colors.white}; font-size: 28px; margin: 0; font-weight: 700; text-align: center; line-height: 1.3; direction: ${dir};">
+                            ${strings.greeting(recipientName)}
+                          </h1>
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Decorative sparkle divider -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                    <!-- Teaser -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center">
-                          <span style="color: ${colors.grayDark}; font-size: 11px; letter-spacing: 6px;">&#10022; &#10022; &#10022;</span>
+                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
+                          <p class="teaser-text" style="color: #9999bb; font-size: 16px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
+                            ${strings.teaser}
+                          </p>
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Word Hunt Tile Row -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                    <!-- Tile Row -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center">
+                        <td align="center" style="padding-bottom: 20px;">
                           <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
                             <tr>
                               ${Array.from({ length: WORD_TILE_COUNT }, (_, i) => {
                                 const isFirst = isRTL ? i === WORD_TILE_COUNT - 1 : i === 0;
                                 if (isFirst) {
                                   return `<td style="padding: 0 4px;">
-                                    <div class="word-tile" style="width: 64px; height: 64px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}4px 4px 0px ${colors.black}; text-align: center; line-height: 58px; font-size: 36px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                    <div class="word-tile" style="width: 56px; height: 56px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}4px 4px 0px ${colors.black}; text-align: center; line-height: 50px; font-size: 30px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
                                       ${firstLetter}
                                     </div>
                                   </td>`;
                                 }
-                                const accentColors = [
-                                  { bg: '#333355', border: '#444470' },
-                                  { bg: '#2d2d50', border: '#3d3d65' },
-                                  { bg: '#333355', border: '#444470' },
-                                  { bg: '#2d2d50', border: '#3d3d65' },
-                                ];
-                                const accent = accentColors[(isRTL ? WORD_TILE_COUNT - 1 - i : i) - 1] || accentColors[0];
+                                const idx = isRTL ? WORD_TILE_COUNT - 1 - i : i;
+                                const opacity = mysteryOpacities[idx - 1] || '0.3';
                                 return `<td style="padding: 0 4px;">
-                                  <div class="word-tile" style="width: 64px; height: 64px; background: ${accent.bg}; border: 3px solid ${accent.border}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 58px; font-size: 28px; font-weight: 700; color: ${colors.grayLight}; font-family: 'Fredoka', Arial, sans-serif;">
+                                  <div class="word-tile" style="width: 56px; height: 56px; background: #282850; border: 2px solid rgba(100, 100, 170, ${opacity}); border-radius: 10px; text-align: center; line-height: 50px; font-size: 22px; font-weight: 600; color: rgba(150, 150, 200, ${opacity}); font-family: 'Fredoka', Arial, sans-serif;">
                                     ?
                                   </div>
                                 </td>`;
@@ -301,23 +300,29 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     </table>
 
                     <!-- Question -->
-                    <p style="color: ${colors.cyan}; font-size: 17px; text-align: center; margin: 0 0 28px 0; font-weight: 600;">
-                      ${strings.question}
-                    </p>
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
+                          <p style="color: ${colors.cyan}; font-size: 15px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
+                            ${strings.question}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
 
                     <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td align="center">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:62px;v-text-anchor:middle;width:320px;" arcsize="14%" stroke="t" strokecolor="${colors.black}" strokeweight="4px" fillcolor="${colors.pink}">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:56px;v-text-anchor:middle;width:260px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
                             <w:anchorlock/>
-                            <center style="color:${colors.white};font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">&#9654; ${strings.cta}</center>
+                            <center style="color:#000;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;">${playArrow} ${strings.cta}</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-button button-cta cta-glow" style="display: inline-block; background: linear-gradient(135deg, ${colors.pink} 0%, ${colors.orange} 100%); color: ${colors.white}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 52px; border: 4px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; letter-spacing: 2px; font-family: 'Fredoka', Arial, sans-serif; text-transform: uppercase;">
-                            &#9654;&nbsp;&nbsp;${strings.cta}
+                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 16px 52px; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir};">
+                            ${playArrow}&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
                         </td>
@@ -326,55 +331,52 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
 
                   </td>
                 </tr>
+
+                <!-- Bottom gradient bar (flips for RTL) -->
+                <tr>
+                  <td style="background: linear-gradient(${gradDeg}, ${colors.pink} 0%, ${colors.cyan} 50%, ${colors.lime} 100%); height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+                </tr>
               </table>
             </td>
           </tr>
 
           <!-- Social Proof -->
           <tr>
-            <td style="padding-top: 28px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
-                <tr>
-                  <td align="center">
-                    <span style="color: ${colors.grayLight}; font-size: 13px; font-weight: 500;">
-                      ${strings.socialProof}
-                    </span>
-                  </td>
-                </tr>
-              </table>
+            <td align="center" dir="${dir}" style="padding: 24px 0 16px;">
+              <span style="color: #707095; font-size: 13px; font-weight: 500; direction: ${dir};">${strings.socialProof}</span>
+            </td>
+          </tr>
 
-              <!-- Divider -->
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
-                <tr>
-                  <td style="border-top: 1px solid ${colors.grayDark};">&nbsp;</td>
-                </tr>
-              </table>
-
-              <!-- Footer Links -->
+          <!-- Divider -->
+          <tr>
+            <td style="padding: 0 40px;">
               <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <td align="center">
-                    <p style="color: ${colors.gray}; font-size: 12px; margin: 0 0 12px 0; line-height: 1.6;">
-                      ${strings.footerReason}
-                    </p>
-                    <p style="color: ${colors.gray}; font-size: 12px; margin: 0; line-height: 1.6;">
-                      <a href="${unsubscribeUrl}" target="_blank" style="color: ${colors.grayLight}; text-decoration: underline;">Unsubscribe</a>
-                      <span style="color: ${colors.grayDark};">&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-                      <a href="${baseUrl}" target="_blank" style="color: ${colors.grayLight}; text-decoration: underline;">LexiClash</a>
-                      <span style="color: ${colors.grayDark};">&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-                      <a href="${baseUrl}/${language === 'he' ? 'he' : language === 'sv' ? 'sv' : language === 'ja' ? 'ja' : language === 'es' ? 'es' : 'en'}/privacy" target="_blank" style="color: ${colors.grayLight}; text-decoration: underline;">Privacy</a>
-                    </p>
-                  </td>
+                  <td style="border-top: 1px solid #252545;">&nbsp;</td>
                 </tr>
               </table>
+            </td>
+          </tr>
 
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 24px;">
-                <tr>
-                  <td align="center">
-                    <span style="color: ${colors.grayDark}; font-size: 11px;">&copy; ${currentYear} LexiClash</span>
-                  </td>
-                </tr>
-              </table>
+          <!-- Footer -->
+          <tr>
+            <td align="center" dir="${dir}" style="padding: 16px 0 8px;">
+              <p style="color: #505070; font-size: 12px; margin: 0 0 10px 0; line-height: 1.6; direction: ${dir};">
+                ${strings.footerReason}
+              </p>
+              <p style="color: #505070; font-size: 12px; margin: 0; line-height: 1.6;">
+                <a href="${unsubscribeUrl}" target="_blank" style="color: #707095; text-decoration: underline;">${strings.unsubscribe}</a>
+                <span style="color: #333355;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
+                <a href="${playUrl}" target="_blank" style="color: #707095; text-decoration: underline;">LexiClash</a>
+                <span style="color: #333355;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
+                <a href="${privacyUrl}" target="_blank" style="color: #707095; text-decoration: underline;">${strings.privacy}</a>
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding: 12px 0 0;">
+              <span style="color: #333355; font-size: 11px;">&copy; ${currentYear} LexiClash</span>
             </td>
           </tr>
 
@@ -401,10 +403,10 @@ ${strings.question}
 
 ---
 
-${strings.socialProof} \u{1F30D}
+${strings.socialProof}
 
 ${strings.footerReason}
-Unsubscribe: ${unsubscribeUrl}
+${strings.unsubscribe}: ${unsubscribeUrl}
 LexiClash: ${baseUrl}
 
 \u00A9 ${currentYear} LexiClash

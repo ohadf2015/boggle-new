@@ -1,0 +1,127 @@
+// @ts-nocheck
+/**
+ * CrazyGames Token Verification API Route Tests
+ *
+ * Verifies JWT validation, error handling, and user claim extraction.
+ */
+
+// Mock next/server
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+  },
+}));
+
+// Mock jose
+const mockJwtVerify = jest.fn();
+jest.mock('jose', () => ({
+  createRemoteJWKSet: jest.fn(() => 'mock-jwks'),
+  jwtVerify: (...args: unknown[]) => mockJwtVerify(...args),
+}));
+
+jest.mock('@/utils/sentry', () => ({
+  captureApiError: jest.fn(),
+}));
+
+import { POST } from '../route';
+
+function makeRequest(body: Record<string, unknown>) {
+  return { json: async () => body } as any;
+}
+
+describe('POST /api/auth/verify-crazygames', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns 400 when token is missing', async () => {
+    const res = await POST(makeRequest({}));
+    expect(res.status).toBe(400);
+    expect(res.data.error).toBe('Missing or invalid token');
+  });
+
+  it('returns 400 when token is not a string', async () => {
+    const res = await POST(makeRequest({ token: 123 }));
+    expect(res.status).toBe(400);
+  });
+
+  it('returns verified user data on valid token', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: {
+        sub: 'cg-user-123',
+        username: 'TestPlayer',
+        profilePictureUrl: 'https://example.com/avatar.png',
+      },
+    });
+
+    const res = await POST(makeRequest({ token: 'valid-jwt-token' }));
+    expect(res.status).toBe(200);
+    expect(res.data).toEqual({
+      valid: true,
+      userId: 'cg-user-123',
+      username: 'TestPlayer',
+      profilePictureUrl: 'https://example.com/avatar.png',
+    });
+  });
+
+  it('verifies token with correct options', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { sub: 'user-1', username: 'Player1' },
+    });
+
+    await POST(makeRequest({ token: 'some-token' }));
+
+    expect(mockJwtVerify).toHaveBeenCalledWith('some-token', 'mock-jwks', {
+      issuer: 'crazygames.com',
+      algorithms: ['RS256'],
+    });
+  });
+
+  it('returns 401 when token has no user identifier', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { username: 'NoIdUser' },
+    });
+
+    const res = await POST(makeRequest({ token: 'token-no-sub' }));
+    expect(res.status).toBe(401);
+    expect(res.data.error).toBe('Token missing user identifier');
+  });
+
+  it('returns 401 on expired token', async () => {
+    mockJwtVerify.mockRejectedValue(new Error('JWT expired'));
+
+    const res = await POST(makeRequest({ token: 'expired-token' }));
+    expect(res.status).toBe(401);
+    expect(res.data.error).toBe('Invalid or expired token');
+  });
+
+  it('returns 401 on invalid signature', async () => {
+    mockJwtVerify.mockRejectedValue(new Error('JWS signature verification failed'));
+
+    const res = await POST(makeRequest({ token: 'bad-sig-token' }));
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 500 on unexpected server error', async () => {
+    mockJwtVerify.mockRejectedValue(new Error('Network timeout'));
+
+    const res = await POST(makeRequest({ token: 'some-token' }));
+    expect(res.status).toBe(500);
+    expect(res.data.error).toBe('Token verification failed');
+  });
+
+  it('handles missing optional fields gracefully', async () => {
+    mockJwtVerify.mockResolvedValue({
+      payload: { sub: 'user-minimal' },
+    });
+
+    const res = await POST(makeRequest({ token: 'minimal-token' }));
+    expect(res.status).toBe(200);
+    expect(res.data).toEqual({
+      valid: true,
+      userId: 'user-minimal',
+      username: null,
+      profilePictureUrl: null,
+    });
+  });
+});

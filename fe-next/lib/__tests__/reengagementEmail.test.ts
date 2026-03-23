@@ -261,7 +261,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('/mascot/waving-nobg.gif');
-    expect(html).toContain('alt="Lexi the mascot waving hello"');
+    expect(html).toContain('alt="Lexi"');
   });
 
   test('should use logo image with LexiClash branding', () => {
@@ -278,7 +278,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('alt="LexiClash"');
   });
 
-  test('should include speech bubble, mini tiles, hero image, and CTA', () => {
+  test('should include greeting, tiles, mascot, and CTA', () => {
     const { html } = generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
@@ -288,16 +288,16 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    // Speech bubble with greeting
-    expect(html).toContain('speech-bubble');
+    // Greeting text
+    expect(html).toContain('We miss you');
     // Word hunt tile row with mystery tiles
     expect(html).toContain('word-tile');
-    // CTA glow animation
-    expect(html).toContain('cta-glow');
-    // Mascot glow backdrop
-    expect(html).toContain('mascot-glow');
+    // CTA link
+    expect(html).toContain('cta-link');
+    // Mascot image
+    expect(html).toContain('mascot-img');
     // Accessible mascot alt text
-    expect(html).toContain('alt="Lexi the mascot waving hello"');
+    expect(html).toContain('alt="Lexi"');
   });
 
   test('should use Hebrew logo for Hebrew language', () => {
@@ -328,7 +328,15 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('ש');
     expect(html).toContain('התגעגענו');
     // RTL shadow direction (negative x offset)
-    expect(html).toContain('-8px 8px 0px');
+    expect(html).toContain('-6px 6px 0px');
+    // RTL gradient direction (flipped)
+    expect(html).toContain('270deg');
+    // RTL play arrow (left-pointing)
+    expect(html).toContain('&#9664;');
+    // Localized footer links
+    expect(html).toContain('ביטול הרשמה');
+    expect(html).toContain('פרטיות');
+    expect(html).toContain('/he/privacy');
   });
 
   test('should generate Swedish template', () => {
@@ -371,6 +379,57 @@ describe('generateReengagementEmailHtml', () => {
 
     expect(html).toContain('Maria');
     expect(html).toContain('Te extrañamos');
+  });
+
+  test('should have localized footer links for all languages', () => {
+    // Spanish
+    const { html: esHtml } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'es',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+    expect(esHtml).toContain('Cancelar suscripción');
+    expect(esHtml).toContain('Privacidad');
+    expect(esHtml).toContain('/es/privacy');
+
+    // Japanese
+    const { html: jaHtml } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'ja',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+    expect(jaHtml).toContain('配信停止');
+    expect(jaHtml).toContain('プライバシー');
+  });
+
+  test('should use LTR play arrow for non-RTL and RTL arrow for Hebrew', () => {
+    const { html: enHtml } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'A',
+      language: 'en',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+    // LTR play arrow (right-pointing)
+    expect(enHtml).toContain('&#9654;');
+
+    const { html: heHtml } = generateReengagementEmailHtml({
+      recipientName: 'Test',
+      firstLetter: 'א',
+      language: 'he',
+      unsubscribeUrl: '#',
+      playUrl: '#',
+      baseUrl: 'https://example.com',
+    });
+    // RTL play arrow (left-pointing)
+    expect(heHtml).toContain('&#9664;');
   });
 
   test('should default to English for unknown language', () => {

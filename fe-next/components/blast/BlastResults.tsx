@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
 import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import type { BlastResultsData, BlastDifficulty } from './types';
 import { useBlastResultSaver } from './hooks/useBlastResultSaver';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
@@ -62,12 +63,14 @@ export function BlastResults({ results, difficulty = 'medium', language = 'en', 
 
   const { t } = useLanguage();
   const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
   const { isNewBestScore, isNewBestCombo } = useBlastResultSaver(results, difficulty, language);
   const displayScore = useCountUp(results.finalScore);
 
-  // Show interstitial ad on mount
+  // Show interstitial ad on mount (AdSense or CrazyGames)
   useEffect(() => {
     showInterstitial('blast-complete');
+    requestMidgameAd();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-fire confetti on mount when 3 stars — only once

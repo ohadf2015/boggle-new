@@ -27,6 +27,7 @@ import { registerWordHuntHandlers } from './wordHuntHandler.js';
 import { registerWordPackHandler } from './wordPackHandler.js';
 import { registerKickHandler } from './kickHandler.js';
 import { registerReactionHandlers } from './reactionHandler.js';
+import { registerGiftHandlers } from './giftHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -59,6 +60,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerWordPackHandler(io, socket);
   registerKickHandler(io, socket);
   registerReactionHandlers(io, socket);
+  registerGiftHandlers(io, socket);
 }
 
 export {

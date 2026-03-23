@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
   Users,
   UserPlus,
@@ -11,6 +12,7 @@ import {
   X,
   ChevronRight,
   ShieldOff,
+  Search,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
@@ -31,8 +33,11 @@ import { MessageThread } from './messaging/MessageThread';
 import { ChallengeInviteDialog } from './ChallengeInviteDialog';
 import { AddFriendDialog } from './AddFriendDialog';
 import { FriendDetailDialog } from './FriendDetailDialog';
+import GiftModal from '@/components/social/GiftModal';
+import { useSocketOptional } from '@/utils/SocketContext';
 import type { Friend } from '@/utils/friends';
 import type { MessageThread as MessageThreadType } from '@/shared/types/friends';
+import { DAILY_GIFT_LIMIT, type GiftPayload } from '@/shared/utils/giftingRules';
 
 interface FriendsListProps {
   onChallengeClick?: (friend: Friend) => void;
@@ -63,12 +68,27 @@ const FriendsList: React.FC<FriendsListProps> = ({
     declineRequest,
     cancelRequest,
     unfriend,
+    block,
     unblock,
     blockedUsers,
     search,
   } = useFriends();
 
   const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<TabType>('friends');
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [selectedBlockedUser, setSelectedBlockedUser] = useState<Friend | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
+  const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
+  const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
+  const [friendFilter, setFriendFilter] = useState('');
+
+  const socketContext = useSocketOptional();
+  const giftSocket = socketContext?.socket ?? null;
+  const isGiftSocketConnected = socketContext?.isConnected ?? false;
 
   const {
     threads,
@@ -79,33 +99,42 @@ const FriendsList: React.FC<FriendsListProps> = ({
     markAsRead,
     sendChallenge,
     refreshThreads,
-  } = useFriendMessages();
+    setTyping,
+    typingUsername,
+    deleteMessage,
+  } = useFriendMessages(selectedThread?.friendUserId);
 
-  const [activeTab, setActiveTab] = useState<TabType>('friends');
-  const [showAddFriend, setShowAddFriend] = useState(false);
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const [selectedBlockedUser, setSelectedBlockedUser] = useState<Friend | null>(null);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
-  const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
+  // Filter friends by search query
+  const filteredFriends = useMemo(() => {
+    if (!friendFilter) return friends;
+    const q = friendFilter.toLowerCase();
+    return friends.filter(f =>
+      (f.displayName || f.username).toLowerCase().includes(q)
+    );
+  }, [friends, friendFilter]);
 
   const handleAccept = useCallback(async (requestId: string) => {
     setActionLoading(requestId);
-    await acceptRequest(requestId);
+    const result = await acceptRequest(requestId);
     setActionLoading(null);
-  }, [acceptRequest]);
+    if (result?.success !== false) {
+      toast.success(t('friends.requestAccepted'));
+    }
+  }, [acceptRequest, t]);
 
   const handleDecline = useCallback(async (requestId: string) => {
     setActionLoading(requestId);
     await declineRequest(requestId);
     setActionLoading(null);
-  }, [declineRequest]);
+    toast(t('friends.requestDeclined'), { icon: '👋' });
+  }, [declineRequest, t]);
 
   const handleCancelRequest = useCallback(async (requestId: string) => {
     setActionLoading(requestId);
     await cancelRequest(requestId);
     setActionLoading(null);
-  }, [cancelRequest]);
+    toast(t('friends.requestCancelled'), { icon: '✕' });
+  }, [cancelRequest, t]);
 
   const handleThreadClick = useCallback((thread: MessageThreadType) => {
     setSelectedThread(thread);
@@ -115,7 +144,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
   // Open a message thread for a friend (creates temporary thread if none exists)
   const handleOpenMessageForFriend = useCallback((friend: Friend) => {
     // Check if a thread already exists
-    const existingThread = threads.find(t => t.friendUserId === friend.odUserId);
+    const existingThread = threads.find(thr => thr.friendUserId === friend.odUserId);
     if (existingThread) {
       handleThreadClick(existingThread);
     } else {
@@ -164,6 +193,24 @@ const FriendsList: React.FC<FriendsListProps> = ({
     await sendChallenge(friendId, challengeType);
     setChallengeFriend(null);
   }, [sendChallenge]);
+
+  // Gift sending via Socket.IO
+  const handleSendGift = useCallback((gift: GiftPayload) => {
+    if (!giftFriend || !giftSocket || !isGiftSocketConnected) return;
+    giftSocket.emit('gift:send', {
+      recipientId: giftFriend.odUserId,
+      giftType: gift.type,
+      amount: gift.amount,
+    });
+    giftSocket.once('gift:sendResult', (result: { success: boolean; error?: string }) => {
+      if (result.success) {
+        toast.success(t('socialGift.sent'));
+      } else {
+        toast.error(result.error || t('socialGift.error'));
+      }
+    });
+    setGiftFriend(null);
+  }, [giftFriend, giftSocket, isGiftSocketConnected, t]);
 
   const notificationCount = pendingRequests.length + pendingChallenges.length;
 
@@ -343,9 +390,32 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Search filter (show when 5+ friends) */}
+            {friends.length >= 5 && (
+              <div className="relative">
+                <Search className={cn(
+                  'absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4',
+                  isDark ? 'text-gray-500' : 'text-gray-400'
+                )} />
+                <input
+                  type="text"
+                  value={friendFilter}
+                  onChange={(e) => setFriendFilter(e.target.value)}
+                  placeholder={t('friends.filterFriends')}
+                  className={cn(
+                    'w-full ps-10 pe-4 py-2 rounded-neo border-2 text-sm font-medium',
+                    isDark
+                      ? 'bg-slate-700/50 border-white/10 text-white placeholder:text-gray-500'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
+                  )}
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
-              {friends.length > 0 ? (
-                friends.map((friend, i) => (
+              {filteredFriends.length > 0 ? (
+                filteredFriends.map((friend, i) => (
                   <motion.div
                     key={friend.id}
                     initial={{ opacity: 0, x: -12 }}
@@ -356,6 +426,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       friend={friend}
                       isDark={isDark}
                       onMessageClick={handleOpenMessageForFriend}
+                      onGiftClick={() => setGiftFriend(friend)}
                       onChallengeClick={() => setChallengeFriend(friend)}
                       onClick={() => setSelectedFriend(friend)}
                     />
@@ -363,10 +434,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 ))
               ) : (
                 <EnhancedEmptyState
-                  title={t('friends.noFriendsYet')}
-                  description={t('friends.addFriendsToChallenge')}
-                  icon="sparkles"
-                  action={{ label: t('friends.add'), onClick: () => setShowAddFriend(true), variant: 'primary' }}
+                  title={friendFilter ? t('friends.noMatchingFriends') : t('friends.noFriendsYet')}
+                  description={friendFilter ? '' : t('friends.addFriendsToChallenge')}
+                  icon={friendFilter ? 'search' : 'sparkles'}
+                  action={friendFilter ? undefined : { label: t('friends.add'), onClick: () => setShowAddFriend(true), variant: 'primary' }}
                   compact
                 />
               )}
@@ -485,7 +556,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
         )}
 
         {activeTab === 'messages' && (
-          <MessageThreadList threads={threads} isLoading={false} unreadCount={unreadCount} onThreadClick={handleThreadClick} />
+          <MessageThreadList
+            threads={threads}
+            isLoading={false}
+            unreadCount={unreadCount}
+            onThreadClick={handleThreadClick}
+            onStartConversation={friends.length > 0 ? () => handleOpenMessageForFriend(friends[0]) : undefined}
+          />
         )}
       </div>
 
@@ -505,6 +582,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         onChallenge={setChallengeFriend}
         onMessage={handleOpenMessageForFriend}
         onUnfriend={unfriend}
+        onBlock={block}
         isDark={isDark}
         t={t}
       />
@@ -526,8 +604,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
         messages={messages}
         isLoading={false}
         isOpen={!!selectedThread}
+        typingUsername={typingUsername ?? undefined}
         onClose={() => setSelectedThread(null)}
         onSendMessage={handleSendMessage}
+        onTyping={selectedThread ? (isTyping: boolean) => setTyping(selectedThread.friendUserId, isTyping) : undefined}
+        onDeleteMessage={deleteMessage}
         onChallenge={selectedThread ? () => {
           const friend = friends.find(f => f.odUserId === selectedThread.friendUserId);
           if (friend) { setChallengeFriend(friend); setSelectedThread(null); }
@@ -543,6 +624,17 @@ const FriendsList: React.FC<FriendsListProps> = ({
           friendId={challengeFriend.odUserId}
           onClose={() => setChallengeFriend(null)}
           onSendChallenge={handleSendChallenge}
+        />
+      )}
+
+      {giftFriend && (
+        <GiftModal
+          isOpen={!!giftFriend}
+          onClose={() => setGiftFriend(null)}
+          onSend={handleSendGift}
+          recipientName={giftFriend.displayName || giftFriend.username}
+          senderBalance={profile?.total_coins ?? 0}
+          giftsRemaining={DAILY_GIFT_LIMIT}
         />
       )}
     </div>

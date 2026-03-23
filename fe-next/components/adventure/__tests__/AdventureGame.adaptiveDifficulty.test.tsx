@@ -13,8 +13,8 @@ import type { DifficultyTier } from '@/types/difficulty';
 import type { HintData } from '@/lib/adaptiveDifficulty';
 
 // Mock all dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const value = {
     t: (key: string, params?: Record<string, string | number>) => {
       if (key.startsWith('difficulty.hint.')) {
         return `Hint: ${JSON.stringify(params)}`;
@@ -24,8 +24,9 @@ jest.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return { useLanguage: () => value, useLanguageSafe: () => value };
+});
 
 // Mock framer-motion
 jest.mock('framer-motion', () => {

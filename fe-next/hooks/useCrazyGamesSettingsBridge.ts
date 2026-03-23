@@ -19,7 +19,7 @@ export function useCrazyGamesSettingsBridge() {
   // Sync muteAudio to Howler global mute
   useEffect(() => {
     if (!isReady) return;
-    Howler.mute(shouldMuteAudio);
+    try { Howler.mute(shouldMuteAudio); } catch { /* Howler not initialized */ }
   }, [shouldMuteAudio, isReady]);
 
   return { shouldDisableChat };

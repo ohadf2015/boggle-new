@@ -67,14 +67,15 @@ const mockTranslations: Record<string, string> = {
   'adventure.achievements.longWord6.desc': 'Find a 6+ letter word',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
+jest.mock('@/contexts/LanguageContext', () => {
+  const value = {
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
     setLanguage: jest.fn(),
-  }),
-}));
+  };
+  return { useLanguage: () => value, useLanguageSafe: () => value };
+});
 
 // Mock SoundEffectsContext for AchievementToast
 const mockPlayAchievementSound = jest.fn();

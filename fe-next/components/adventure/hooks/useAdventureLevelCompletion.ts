@@ -150,9 +150,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
       const bonusGold = props.bonusGoldMultiplier ?? 1;
-      // Perfect clear mastery bonus: +50% gold for 3-star completions (scales with all multipliers)
-      const perfectMasteryMultiplier = isPerfectClear ? 1.5 : 1;
-      const computedGold = Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold * perfectMasteryMultiplier);
+      const computedGold = Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold);
       setEarnedGold(computedGold);
       addGold(computedGold);
 

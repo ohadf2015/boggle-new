@@ -10,11 +10,18 @@ export async function GET(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
 
+  const previewNames: Record<string, string> = {
+    he: 'Fish', sv: 'Erik', ja: 'Yuki', es: 'Carlos',
+  };
+  const previewLetters: Record<string, string> = {
+    he: 'צ', ja: 'あ', sv: 'S', es: 'P',
+  };
+
   const { html } = generateReengagementEmailHtml({
-    recipientName: 'Preview User',
-    firstLetter: language === 'he' ? 'ש' : language === 'ja' ? 'あ' : 'W',
+    recipientName: previewNames[language] || 'Alex',
+    firstLetter: previewLetters[language] || 'W',
     language,
-    unsubscribeUrl: '#preview-unsubscribe',
+    unsubscribeUrl: `${baseUrl}/${locale}/unsubscribe`,
     playUrl: `${baseUrl}/${locale}/daily`,
     baseUrl,
   });
