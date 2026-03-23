@@ -58,6 +58,7 @@ import type { QueryGameBase } from './gameQueryManager';
 import type { HostGameBase, TransferHostResult } from './hostManager';
 
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
+import timerManager from '../utils/timerManager';
 
 const logger = require('../utils/logger');
 const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
@@ -153,6 +154,8 @@ function deleteGame(gameCode: string): void {
   // Clear any pending delayed engagement timeouts to prevent
   // orphaned Supabase queries from disconnected sockets
   clearEngagementTimeouts(gameCode);
+  // Clear tracked spam cooldown timers for this game
+  timerManager.clearTimersWithPrefix(`spam:cooldown:${gameCode}:`);
 
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);

@@ -90,10 +90,14 @@ function handleSpamDetection(socket: Socket, gameCode: string, username: string,
 
     case PenaltyTier.PENALTY:
       if (result.penaltyApplied && result.penaltyApplied > 0) {
-        // Apply point deduction
-        const currentScore = game.playerScores?.[username] || 0;
-        const newScore = Math.max(0, currentScore - result.penaltyApplied);
-        updatePlayerScore(gameCode, username, newScore, false);
+        // Apply point deduction using atomic delta to avoid race with concurrent valid word updates
+        updatePlayerScore(gameCode, username, -result.penaltyApplied, true);
+        // Clamp to 0 — score should never go negative
+        const postPenaltyScore = game.playerScores?.[username] || 0;
+        if (postPenaltyScore < 0) {
+          updatePlayerScore(gameCode, username, 0, false);
+        }
+        const newScore = Math.max(0, postPenaltyScore);
 
         socket.emit('spamPenalty', {
           invalidCount: result.invalidCount,
@@ -115,11 +119,14 @@ function handleSpamDetection(socket: Socket, gameCode: string, username: string,
           tier: 'cooldown'
         });
 
-        // Schedule cooldown end notification
-        setTimeout(() => {
-          socket.emit('spamCooldownEnd', {
-            message: 'cooldown_ended_you_can_submit_words_again'
-          });
+        // Schedule cooldown end notification (tracked by timerManager for cleanup on game delete)
+        const cooldownKey = `spam:cooldown:${gameCode}:${username}`;
+        timerManager.setTimeout(cooldownKey, () => {
+          if (socket.connected) {
+            socket.emit('spamCooldownEnd', {
+              message: 'cooldown_ended_you_can_submit_words_again'
+            });
+          }
         }, result.cooldownDuration);
       }
       break;
@@ -391,11 +398,20 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const gameCode = providedGameCode || getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      if (!gameCode) return;
+      if (!gameCode) {
+        socket.emit('voteRecorded', { word, success: false, error: 'Not in a game' });
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game) return;
-      if (!username) return;
+      if (!game) {
+        socket.emit('voteRecorded', { word, success: false, error: 'Game not found' });
+        return;
+      }
+      if (!username) {
+        socket.emit('voteRecorded', { word, success: false, error: 'Player not found' });
+        return;
+      }
 
       const userData = game.users?.[username];
       const userId = userData?.authUserId || null;
@@ -403,6 +419,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       if (!userId && !guestId) {
         logger.debug('VOTE', `No voter identifier for ${username}`);
+        socket.emit('voteRecorded', { word, success: false, error: 'No voter identity' });
         return;
       }
 
@@ -457,11 +474,20 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       const gameCode = providedGameCode || getGameBySocketId(socket.id);
       const username = getUsernameBySocketId(socket.id);
 
-      if (!gameCode) return;
-      if (!username) return;
+      if (!gameCode) {
+        socket.emit('peerVoteRecorded', { word, success: false, error: 'Not in a game' });
+        return;
+      }
+      if (!username) {
+        socket.emit('peerVoteRecorded', { word, success: false, error: 'Player not found' });
+        return;
+      }
 
       const game = getGame(gameCode);
-      if (!game) return;
+      if (!game) {
+        socket.emit('peerVoteRecorded', { word, success: false, error: 'Game not found' });
+        return;
+      }
 
       const result: PeerValidationResult = recordPeerValidationVote(gameCode, username, isValid);
 

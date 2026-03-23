@@ -91,7 +91,8 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={handleOpen}
             className={cn(
-              'fixed bottom-20 right-3 z-30',
+              'fixed right-3 z-30',
+              'bottom-[calc(5rem+env(safe-area-inset-bottom))]',
               'w-10 h-10 min-w-[44px] min-h-[44px]',
               'flex items-center justify-center',
               'bg-neo-navy/90 border-2 border-neo-lime/60 rounded-full',
