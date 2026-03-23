@@ -18,6 +18,32 @@ import { getSupabase } from '../modules/supabaseServer';
 import { notifyGiftReceived } from '../modules/pushNotificationTriggers';
 import logger from '../utils/logger';
 
+// In-memory dedup: prevent double-click double-spend within 5s window
+const recentGifts = new Map<string, number>();
+const GIFT_DEDUP_WINDOW_MS = 5000;
+
+function isDuplicateGift(senderId: string, recipientId: string, giftType: string): boolean {
+  const key = `${senderId}:${recipientId}:${giftType}`;
+  const lastSent = recentGifts.get(key);
+  if (lastSent && Date.now() - lastSent < GIFT_DEDUP_WINDOW_MS) {
+    return true;
+  }
+  recentGifts.set(key, Date.now());
+  // Cleanup old entries periodically (every 100 gifts)
+  if (recentGifts.size > 500) {
+    const now = Date.now();
+    for (const [k, ts] of recentGifts) {
+      if (now - ts > GIFT_DEDUP_WINDOW_MS) recentGifts.delete(k);
+    }
+  }
+  return false;
+}
+
+/** Clear dedup cache (for testing) */
+export function clearGiftDedup(): void {
+  recentGifts.clear();
+}
+
 interface GiftSendParams {
   recipientId: string;
   giftType: GiftType;
@@ -40,6 +66,11 @@ export async function handleGiftSend(
 
   if (!senderId) {
     return { success: false, error: 'Must be authenticated to send gifts' };
+  }
+
+  // Dedup: reject rapid duplicate gifts (same sender→recipient→type within 5s)
+  if (isDuplicateGift(senderId, params.recipientId, params.giftType)) {
+    return { success: false, error: 'Gift already processing, please wait' };
   }
 
   // Cannot gift yourself

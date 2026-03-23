@@ -1,4 +1,4 @@
-import { handleGiftSend } from '../giftHandler';
+import { handleGiftSend, clearGiftDedup } from '../giftHandler';
 
 // Mock dependencies
 jest.mock('../../utils/logger', () => {
@@ -53,6 +53,7 @@ describe('giftHandler', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    clearGiftDedup();
     (getAuthUserId as jest.Mock).mockReturnValue('user-1');
     (areFriends as jest.Mock).mockResolvedValue(true);
     mockSupabaseSelect.mockResolvedValue({ count: 0, error: null });

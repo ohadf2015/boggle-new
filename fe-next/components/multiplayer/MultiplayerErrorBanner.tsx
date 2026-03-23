@@ -64,7 +64,7 @@ export const MultiplayerErrorBanner: React.FC<MultiplayerErrorBannerProps> = ({
         <button
           onClick={onDismiss}
           aria-label={t('common.dismiss')}
-          className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-neo-black/10 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="w-7 h-7 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-neo-black/10 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
           <X className="w-4 h-4" />
         </button>
