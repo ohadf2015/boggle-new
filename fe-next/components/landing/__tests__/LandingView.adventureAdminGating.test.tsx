@@ -73,13 +73,6 @@ jest.mock('@/hooks/useMobilePortrait', () => ({
 
   useMobilePortrait: () => false,
 }));
-jest.mock('@/hooks/usePullToRefresh', () => ({
-
-  usePullToRefresh: () => ({
-    pullToRefreshHandlers: {},
-    pullState: { pullDistance: 0, isRefreshing: false },
-  }),
-}));
 jest.mock('@/hooks/useTiltEffect', () => ({
 
   useTiltEffect: () => ({

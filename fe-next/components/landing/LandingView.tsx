@@ -10,14 +10,12 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { useDailySolveRate } from '@/hooks/useDailySolveRate';
 import { useHallOfFame } from '@/hooks/useHallOfFame';
-import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { AdPlaceholder } from '@/components/ads';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
@@ -104,16 +102,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
-
-  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
-    onRefresh: async () => {
-      liveRoomStats.refresh();
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const { default: toast } = await import('react-hot-toast');
-      toast.success(t('common.refreshed'), { duration: 2000 });
-    },
-    threshold: 60,
-  });
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFTUE, setShowFTUE] = useState(false);
@@ -223,11 +211,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
       className={cn(
         'flex-1 flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe',
       )}
-      {...pullToRefreshHandlers}
     >
       {hydrated && enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
-      <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />

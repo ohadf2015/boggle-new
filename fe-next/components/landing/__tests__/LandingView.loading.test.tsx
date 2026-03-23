@@ -50,14 +50,6 @@ jest.mock('@/hooks/useLiveRoomStats', () => ({
   }),
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
-
-  usePullToRefresh: () => ({
-    pullToRefreshHandlers: {},
-    pullState: { pullDistance: 0, isRefreshing: false },
-  }),
-}));
-
 jest.mock('@/hooks/useTiltEffect', () => ({
 
   useMouseParallax: () => ({ x: 0, y: 0 }),
@@ -140,11 +132,6 @@ jest.mock('@/components/Header', () => {
 jest.mock('@/components/ui/PlayfulBackground', () => ({
 
   PlayfulBackground: () => <div data-testid="playful-background">Background</div>,
-}));
-
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
-
-  PullToRefreshIndicator: () => <div data-testid="pull-to-refresh">Pull to Refresh</div>,
 }));
 
 jest.mock('@/components/ui/InteractiveMascot', () => ({

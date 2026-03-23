@@ -104,19 +104,6 @@ jest.mock('@/utils/ThemeContext', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-// Mock pull to refresh hook
-jest.mock('@/hooks/usePullToRefresh', () => ({
-  usePullToRefresh: () => ({
-    pullToRefreshHandlers: {},
-    pullState: { isRefreshing: false, progress: 0 },
-  }),
-}));
-
-// Mock PullToRefreshIndicator
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
-  PullToRefreshIndicator: () => null,
-}));
-
 // Mock react-hot-toast
 jest.mock('react-hot-toast', () => ({
   __esModule: true,
