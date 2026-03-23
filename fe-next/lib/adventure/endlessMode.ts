@@ -6,6 +6,69 @@
 
 import type { LevelObjective } from '@/types/adventure';
 
+// ==============================================
+// MINI-EVENTS (every 10 floors to prevent repetition fatigue)
+// ==============================================
+
+export type EndlessMiniEvent = {
+  id: string;
+  nameKey: string;
+  descriptionKey: string;
+  /** Effect modifiers applied to the floor */
+  effects: {
+    timerBonus?: number;
+    scoreMultiplier?: number;
+    goldMultiplier?: number;
+    extraMechanic?: string;
+    specialTileBoost?: number;
+  };
+};
+
+const MINI_EVENTS: EndlessMiniEvent[] = [
+  {
+    id: 'double_gold',
+    nameKey: 'adventure.endlessMode.events.doubleGold',
+    descriptionKey: 'adventure.endlessMode.events.doubleGoldDesc',
+    effects: { goldMultiplier: 2 },
+  },
+  {
+    id: 'time_surge',
+    nameKey: 'adventure.endlessMode.events.timeSurge',
+    descriptionKey: 'adventure.endlessMode.events.timeSurgeDesc',
+    effects: { timerBonus: 30 },
+  },
+  {
+    id: 'gem_rush',
+    nameKey: 'adventure.endlessMode.events.gemRush',
+    descriptionKey: 'adventure.endlessMode.events.gemRushDesc',
+    effects: { specialTileBoost: 5 },
+  },
+  {
+    id: 'dual_mechanic',
+    nameKey: 'adventure.endlessMode.events.dualMechanic',
+    descriptionKey: 'adventure.endlessMode.events.dualMechanicDesc',
+    effects: { extraMechanic: 'palindromes', scoreMultiplier: 1.5 },
+  },
+  {
+    id: 'score_frenzy',
+    nameKey: 'adventure.endlessMode.events.scoreFrenzy',
+    descriptionKey: 'adventure.endlessMode.events.scoreFrenzyDesc',
+    effects: { scoreMultiplier: 2 },
+  },
+];
+
+/** Get the mini-event for a given floor (deterministic based on floor number) */
+export function getEndlessMiniEvent(floor: number): EndlessMiniEvent | null {
+  if (floor < 10 || floor % 10 !== 0) return null;
+  // Cycle through events deterministically: floor 10 = event 0, floor 20 = event 1, etc.
+  const eventIndex = (Math.floor(floor / 10) - 1) % MINI_EVENTS.length;
+  return MINI_EVENTS[eventIndex];
+}
+
+// ==============================================
+// DIFFICULTY CONFIG
+// ==============================================
+
 export const ENDLESS_MODE_CONFIG = {
   startingGridSize: 4 as 4 | 5 | 6 | 7,
   startingTimerSeconds: 120,
@@ -58,12 +121,17 @@ export function getEndlessDifficulty(floor: number): EndlessDifficulty {
   return { gridSize, timerSeconds, specialTileCount, scoreTarget, mechanic };
 }
 
-/** Generate a level config for an endless floor */
+/** Generate a level config for an endless floor (with mini-event modifiers) */
 export function generateEndlessFloor(floor: number) {
   const diff = getEndlessDifficulty(floor);
+  const miniEvent = getEndlessMiniEvent(floor);
+
+  // Apply mini-event modifiers
+  const timerSeconds = diff.timerSeconds + (miniEvent?.effects.timerBonus ?? 0);
+  const scoreTarget = Math.round(diff.scoreTarget * (miniEvent?.effects.scoreMultiplier ?? 1));
 
   const objectives: LevelObjective[] = [
-    { type: 'scoreTarget', target: diff.scoreTarget, isPrimary: true },
+    { type: 'scoreTarget', target: scoreTarget, isPrimary: true },
   ];
 
   // Add word count objective at higher floors
@@ -75,7 +143,7 @@ export function generateEndlessFloor(floor: number) {
     world: 0, // endless mode uses world 0
     level: floor,
     gridSize: diff.gridSize,
-    timerSeconds: diff.timerSeconds,
+    timerSeconds,
     objectives,
     specialTiles: [], // populated at runtime by grid generator
     difficulty: floor <= 5 ? 'EASY' as const : floor <= 15 ? 'MEDIUM' as const : 'HARD' as const,
@@ -84,5 +152,7 @@ export function generateEndlessFloor(floor: number) {
     levelInChapter: 1 as const,
     isBossLevel: floor % 10 === 0, // boss every 10 floors
     minWordLength: floor >= 10 ? 3 : undefined,
+    /** Active mini-event for this floor (null if none) */
+    miniEvent: miniEvent ?? undefined,
   };
 }

@@ -15,6 +15,8 @@ interface AdventureViewHeaderProps {
   onBack: () => void;
   onOpenShop: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** Current world name for breadcrumb (only shown on levelGrid) */
+  worldName?: string;
 }
 
 export default function AdventureViewHeader({
@@ -26,6 +28,7 @@ export default function AdventureViewHeader({
   onBack,
   onOpenShop,
   t,
+  worldName,
 }: AdventureViewHeaderProps): React.JSX.Element {
   return (
     <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
@@ -41,7 +44,7 @@ export default function AdventureViewHeader({
               'transition-colors shadow-hard-sm'
             )}
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">
               {t('common.back')}
             </span>
@@ -56,18 +59,25 @@ export default function AdventureViewHeader({
               'transition-colors shadow-hard-sm'
             )}
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back')}</span>
           </Link>
         )}
 
-        {/* Title */}
-        <div className="hidden sm:flex items-center gap-2">
-          <Map className="w-6 h-6 text-neo-lime" />
-          <h1 className="text-xl font-black text-neo-white uppercase tracking-tight">
-            {t('adventure.title')}
-          </h1>
-          <Sparkles className="w-6 h-6 text-neo-yellow" />
+        {/* Title + Breadcrumb */}
+        <div className="hidden sm:flex flex-col items-center">
+          <div className="flex items-center gap-2">
+            <Map className="w-6 h-6 text-neo-lime" />
+            <h1 className="text-xl font-black text-neo-white uppercase tracking-tight">
+              {t('adventure.title')}
+            </h1>
+            <Sparkles className="w-6 h-6 text-neo-yellow" />
+          </div>
+          {viewState === 'levelGrid' && worldName && (
+            <p className="text-xs text-neo-white/50 font-bold mt-0.5">
+              {t('adventure.worldMap')} › {worldName}
+            </p>
+          )}
         </div>
 
         {/* Player Stats and Controls */}

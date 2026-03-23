@@ -69,6 +69,7 @@ const WorldNode = memo(function WorldNode({
   isLeft,
   isNextWorld,
   fogState = 'none',
+  playerTotalStars = 0,
 }: {
   world: WorldConfig;
   isUnlocked: boolean;
@@ -81,6 +82,7 @@ const WorldNode = memo(function WorldNode({
   isLeft: boolean;
   isNextWorld?: boolean;
   fogState?: 'none' | 'shimmer' | 'heavy';
+  playerTotalStars?: number;
 }): React.JSX.Element {
   const { t } = useLanguage();
   const isFinalWorld = world.id === 10;
@@ -248,13 +250,23 @@ const WorldNode = memo(function WorldNode({
           </span>
         </div>
 
-        {!isUnlocked && (
-          <div className="flex items-center gap-1.5 mt-2.5 text-xs text-neo-white/50 whitespace-nowrap">
-            <Lock className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>{unlockRequirement}</span>
-            <Star className="w-3.5 h-3.5 flex-shrink-0 text-neo-yellow/50" />
-          </div>
-        )}
+        {!isUnlocked && (() => {
+          const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
+          return (
+            <div className="mt-2.5 space-y-1">
+              <div className="flex items-center gap-1.5 text-xs text-neo-white/50 whitespace-nowrap">
+                <Lock className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>{unlockRequirement}</span>
+                <Star className="w-3.5 h-3.5 flex-shrink-0 text-neo-yellow/50" />
+              </div>
+              {starsNeeded > 0 && starsNeeded <= unlockRequirement && (
+                <p className="text-[10px] font-bold text-neo-cyan/70">
+                  {t('adventure.starsToUnlock', { count: starsNeeded })}
+                </p>
+              )}
+            </div>
+          );
+        })()}
       </AdaptiveMotion.div>
     </AdaptiveMotion.div>
   );
@@ -400,6 +412,7 @@ export default function WorldMap({
                 index={index}
                 isLeft={isLeft}
                 isNextWorld={data.world.id === nextWorldId}
+                playerTotalStars={totalStars}
                 fogState={
                   data.isUnlocked ? 'none'
                     : data.world.id === furthestUnlockedId + 1 ? 'shimmer'

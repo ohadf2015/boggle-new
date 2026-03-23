@@ -533,18 +533,28 @@ describe('Grid-aware objective generation', () => {
         ['M', 'N', 'O', 'P'],
       ];
 
-      // Level 3 in world 1 normally gets longWords
-      const objectives = generateObjectives(1, 3, grid);
+      // Level 4 in world 1 gets longWords (level 3 is breather — no secondary objectives)
+      const objectives = generateObjectives(1, 4, grid);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
 
       expect(hasLongWords).toBe(true);
     });
 
     it('should still work without grid (backward compatibility)', () => {
-      // Without grid, longWords is always added for level >= 3
-      const objectives = generateObjectives(1, 3);
+      // Without grid, longWords is always added for level >= 3 (non-breather)
+      const objectives = generateObjectives(1, 4);
       const hasLongWords = objectives.some((o) => o.type === 'longWords');
       expect(hasLongWords).toBe(true);
+    });
+
+    it('should skip secondary objectives on breather levels (3, 5)', () => {
+      const obj3 = generateObjectives(1, 3);
+      const obj5 = generateObjectives(2, 5);
+      // Breather levels only have primary objective
+      expect(obj3).toHaveLength(1);
+      expect(obj3[0].isPrimary).toBe(true);
+      expect(obj5).toHaveLength(1);
+      expect(obj5[0].isPrimary).toBe(true);
     });
   });
 });

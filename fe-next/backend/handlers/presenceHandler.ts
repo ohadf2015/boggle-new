@@ -17,7 +17,7 @@ import {
 
 import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
-import { checkAutoKickInactive } from './kickHandler.js';
+import { checkAutoKickInactive, checkAfkWarnings } from './kickHandler.js';
 import logger from '../utils/logger.js';
 import { validatePayload, presenceUpdateSchema } from '../utils/socketValidation.js';
 
@@ -146,7 +146,8 @@ function startConnectionHealthCheck(io: Server): void {
       }
     });
 
-    // Auto-kick AFK players in lobby rooms
+    // Warn AFK players approaching kick threshold, then auto-kick
+    checkAfkWarnings(io, forEachGame);
     checkAutoKickInactive(io, forEachGame);
   }, HEALTH_CHECK_INTERVAL);
 }

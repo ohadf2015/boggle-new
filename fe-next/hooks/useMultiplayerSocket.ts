@@ -394,6 +394,15 @@ export function useMultiplayerSocket(
       kickedReloadTimerRef.current = setTimeout(() => window.location.reload(), 2000);
     });
 
+    socketInstance.on('afkWarning', (data: { secondsRemaining: number }) => {
+      const opts = optionsRef.current;
+      toast(opts.t('hostView.afkWarning').replace('{{seconds}}', String(data.secondsRemaining)), {
+        icon: '⚠️',
+        duration: Math.min(data.secondsRemaining * 1000, 10000),
+        id: 'afk-warning',
+      });
+    });
+
     socketInstance.on('playerKicked', (data: { username: string; reason: string }) => {
       const opts = optionsRef.current;
       toast(opts.t('hostView.playerKicked').replace('{{name}}', data.username), {

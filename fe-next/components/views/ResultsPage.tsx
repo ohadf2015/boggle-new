@@ -24,6 +24,7 @@ import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 // Dynamic import for landscape layout
 const ResultsLandscapeLayout = dynamic(() => import('@/components/results/ResultsLandscapeLayout'), { ssr: false });
+const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 // Shared result components
@@ -35,7 +36,9 @@ const PostGameSocialActions = dynamic(() => import('@/components/results/PostGam
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
@@ -54,12 +57,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [setIsInGame]);
 
   const { showInterstitial } = useAdPlacement();
+  const { requestMidgameAd } = useCrazyGamesAds();
   useEffect(() => {
     showInterstitial('multiplayer-round-complete');
+    // Show CrazyGames midgame ad at this natural break between rounds
+    requestMidgameAd();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);
+
+  // Desktop keyboard shortcuts: R=rematch, Escape=exit (enabled after score reveal)
+  useGameKeyboardShortcuts({
+    onRematch: onReturnToRoom || undefined,
+    onEscape: () => setShowExitConfirm(true),
+    enabled: scoreRevealComplete,
+  });
   // Game mode override for host (results page lets host change mode before next game)
   const resolvedGameMode = useGameMode();
   // Persist the game mode that was just played (so "Play Again" keeps the same mode)
@@ -602,6 +615,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 reducedMotion={null}
               />
             )}
+            {/* Post-game engagement: league rivals, WOTD, word collection */}
+            <PostGameEngagement />
           </div>
 
           {/* Vertical divider */}

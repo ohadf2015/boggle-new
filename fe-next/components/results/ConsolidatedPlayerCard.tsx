@@ -209,7 +209,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             >
               <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cyan" />
               <span className="text-[10px] sm:text-xs font-bold text-neo-cyan">
-                {t('results.pointsFromFirst', { points: pointsFromWinner }) || `Just ${pointsFromWinner} pts from 1st!`}
+                {t('results.pointsFromFirst', { points: pointsFromWinner })}
               </span>
             </motion.div>
           )}
@@ -235,7 +235,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{validWords.length}</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.words')}</div>
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">{t('results.words')}</div>
             </div>
 
             {/* Accuracy */}
@@ -246,7 +246,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{summaryStats?.accuracy || 0}%</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">{t('results.accuracy')}</div>
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">{t('results.accuracy')}</div>
             </div>
 
             {/* Best Word - Hidden on mobile (available in details), shown on sm+ */}
@@ -270,7 +270,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                   ))
                 ) : '-'}
               </div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-slate-300">
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">
                 {bestWord?.score ? `${bestWord.score} ${t('results.points')}` : (t('results.bestWord'))}
               </div>
             </div>

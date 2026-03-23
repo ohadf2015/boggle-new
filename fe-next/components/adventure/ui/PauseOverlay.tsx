@@ -175,7 +175,7 @@ export const PauseOverlay = memo(function PauseOverlay({
                 'transition-colors duration-200'
               )}
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-5 h-5 rtl:scale-x-[-1]" />
               {t('common.exit')}
             </AdaptiveMotion.button>
           </div>

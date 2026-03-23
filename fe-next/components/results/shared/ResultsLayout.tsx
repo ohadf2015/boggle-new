@@ -65,12 +65,12 @@ export function ResultsLayout({
       'flex-1 min-h-0 flex flex-col items-center overflow-y-auto overscroll-contain scrollable-area',
       className,
     )}>
-      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl py-4 px-4">
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl py-4 px-4">
         {/* Zone 1: Hero — always full width */}
         {hero}
 
-        {/* Desktop: 2-column layout for zones 2+3 */}
-        <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-6 lg:items-start mt-4">
+        {/* Desktop: 2-column layout for zones 2+3 — sidebar scales with viewport */}
+        <div className="lg:grid lg:grid-cols-[1fr_minmax(320px,400px)] xl:grid-cols-[1fr_minmax(360px,440px)] lg:gap-6 lg:items-start mt-4">
           {/* Left column: actions + analysis */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}

@@ -194,7 +194,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                   )}>
                     {nearMiss.remaining}
                   </span>
-                  <p className="text-[8px] text-white/60 uppercase font-bold">
+                  <p className="text-[10px] text-white/60 uppercase font-bold">
                     {t('nearMiss.more')}
                   </p>
                 </div>

@@ -35,6 +35,7 @@ import AdventureShopFAB from './AdventureShopFAB';
 import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 import { useAdventureHistory } from './useAdventureHistory';
+import { AdventureGameErrorBoundary } from './AdventureGameErrorBoundary';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 
@@ -216,16 +217,28 @@ function AdventureView(): React.JSX.Element {
             <span className="text-3xl">!</span>
           </div>
           <p className="text-neo-white font-bold">{t('adventure.loadError')}</p>
-          <Link
-            href="/"
-            className={cn(
-              'px-4 py-2 bg-neo-purple text-neo-white font-bold',
-              'border-3 border-neo-black rounded-neo shadow-hard',
-              'hover:bg-neo-purple-light transition-colors'
-            )}
-          >
-            {t('common.back')}
-          </Link>
+          <div className="flex gap-3">
+            <button
+              onClick={() => window.location.reload()}
+              className={cn(
+                'px-4 py-2 bg-neo-lime text-neo-black font-bold',
+                'border-3 border-neo-black rounded-neo shadow-hard',
+                'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
+              )}
+            >
+              {t('common.retry')}
+            </button>
+            <Link
+              href="/"
+              className={cn(
+                'px-4 py-2 bg-neo-purple text-neo-white font-bold',
+                'border-3 border-neo-black rounded-neo shadow-hard',
+                'hover:bg-neo-purple-light transition-colors'
+              )}
+            >
+              {t('common.back')}
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -244,6 +257,7 @@ function AdventureView(): React.JSX.Element {
           onBack={historyBack}
           onOpenShop={() => setShowShop(true)}
           t={t}
+          worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}
         />
       )}
 
@@ -305,13 +319,17 @@ function AdventureView(): React.JSX.Element {
 
           {viewState === 'playing' && levelConfig && gameGrid && (
             <motion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
-              <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
+              <AdventureGameErrorBoundary onExit={handleGameExit}>
+                <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
+              </AdventureGameErrorBoundary>
             </motion.div>
           )}
 
           {viewState === 'weeklyChallenge' && (
             <motion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
-              <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} />
+              <AdventureGameErrorBoundary onExit={() => setViewState('hub')}>
+                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} />
+              </AdventureGameErrorBoundary>
             </motion.div>
           )}
         </AnimatePresence>

@@ -27,7 +27,7 @@ const es = {
       "title": "Tu Perfil y Estadísticas",
       "description": "Ve tu perfil de LexiClash, estadísticas de juego, logros y progreso.",
       "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
-      "ogDescription": "Rastrea tus logros y estadísticas de juegos de palabras."
+      "ogDescription": "Mira tus logros y estadísticas de juegos de palabras."
     },
     "studentProfile": {
       "title": "Perfil de Estudiante y Progreso",
@@ -141,6 +141,11 @@ const es = {
     "shareViaWhatsApp": "Compartir por WhatsApp",
     "shareViaTelegram": "Compartir por Telegram",
     "close": "Cerrar",
+    "ordinal1": "1°",
+    "ordinal2": "2°",
+    "ordinal3": "3°",
+    "ordinalN": "{n}°",
+    "chat": "Chat",
     "showAll": "Mostrar todo",
     "claim": "Reclamar",
     "looksGood": "Se ve bien",
@@ -682,9 +687,9 @@ const es = {
     "wordNotOnBoard": "No puedes formar esa palabra en el tablero",
     "wordAlreadyFound": "¡Ya encontraste esa!",
     "submissionFailed": "No pudimos enviar la palabra. ¡Intenta de nuevo!",
-    "validationFailed": "Algo no está bien. Revisa tu entrada",
-    "invalidRequest": "Solicitud inválida",
-    "missingField": "Falta información requerida",
+    "validationFailed": "Algo no está bien. Revisa lo que pusiste",
+    "invalidRequest": "Eso no funcionó",
+    "missingField": "Te faltó llenar algo",
     "ipBlocked": "Demasiadas solicitudes. ¡Tómate un respiro!",
     "authRequired": "Inicia sesión para continuar",
     "invalidToken": "Sesión inválida. Inicia sesión de nuevo",
@@ -704,7 +709,7 @@ const es = {
     "heading": "¿Perdido en el laberinto de palabras?",
     "message": "¡Esta página se salió del tablero! Vamos a llevarte de vuelta al juego.",
     "button": "Volver al juego",
-    "mascotTooltip": "¡Haz clic para obtener direcciones!"
+    "mascotTooltip": "¡Haz clic para volver al camino!"
   },
   "validation": {
     "enterGameCode": "¿Tienes código? Ponlo aquí",
@@ -712,7 +717,7 @@ const es = {
     "usernameTooShort": "Necesitas al menos 2 caracteres",
     "usernameTooLong": "Máximo 20 caracteres",
     "usernameInvalidChars": "¡Solo letras, números y espacios!",
-    "invalidEmail": "El formato del email no se ve bien - busca errores de tipeo",
+    "invalidEmail": "El formato del email no se ve bien - algo no cuadra",
     "invalidCharacters": "¡Solo letras, crack!"
   },
   "profileCustomization": {
@@ -951,7 +956,7 @@ const es = {
   },
   "hostView": {
     "lobby": "Cuartel",
-    "waitingForPlayers": "Reuniendo guerreros...",
+    "waitingForPlayers": "Esperando que llegue la banda...",
     "startGame": "¡GO!",
     "startBattle": "¡Iniciar batalla!",
     "commandersJoined": "Comandantes unidos",
@@ -970,6 +975,7 @@ const es = {
     "playerKicked": "{{name}} fue expulsado de la sala",
     "youWereKicked": "Fuiste expulsado de la sala",
     "youWereKickedInactive": "Fuiste removido por inactividad",
+    "afkWarning": "Serás removido en {{seconds}}s por inactividad — ¡toca en cualquier lugar para quedarte!",
     "shareCodeHint": "¡Comparte el código de sala de arriba para que tus amigos se unan!",
     "battleMode": "Modo de batalla",
     "preset": "Configuración",
@@ -1043,12 +1049,12 @@ const es = {
     "cancelTournament": "Cancelar Torneo",
     "confirmCancelTournament": "¿Cancelar Torneo?",
     "cancelTournamentWarning": "¿Seguro que quieres cancelar el torneo? Todo el progreso se perderá.",
-    "minWordLength": "Longitud Mínima de Palabra",
+    "minWordLength": "Largo mínimo",
     "wordsAutoValidated": "palabras auto-validadas",
     "gameTypeSelector": "Elige Modo de Juego",
     "regularGame": "Juego Regular",
     "tournament": "Torneo",
-    "numberOfRounds": "Número de Rondas",
+    "numberOfRounds": "Rondas",
     "creatingTournament": "Creando torneo...",
     "increaseRounds": "Aumentar número de rondas",
     "decreaseRounds": "Disminuir número de rondas",
@@ -1261,7 +1267,7 @@ const es = {
         "the-philosopher": {
           "title": "EL FILÓSOFO",
           "stat": "largo promedio",
-          "quip1": "¿Para qué usar palabras cortas si las largas molan más?",
+          "quip1": "¿Para qué usar palabras cortas si las largas están mucho mejor?",
           "quip2": "El jugador pensante. Palabras grandes, cerebro grande.",
           "quip3": "Mientras otros escribían 'sol', este escribía 'solsticio'.",
           "quip4": "Calidad sobre cantidad. Siempre."
@@ -1494,7 +1500,7 @@ const es = {
     }
   },
   "lateJoiner": {
-    "welcomeTitle": "¡Ya empezaron sin ti!",
+    "welcomeTitle": "¡Llegas tarde, pero llegas!",
     "welcomeMessage": "Llegaste a mitad. Aquí va lo importante:",
     "timeRemaining": "Queda",
     "currentLeaders": "Van ganando",
@@ -1648,7 +1654,7 @@ const es = {
     "performanceHistory": "Historial de Rendimiento",
     "goToLobby": "Ir al lobby",
     "you": "(Tú)",
-    "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
+    "betterLuckNextTime": "¡La próxima te desquitas!",
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "readyExplanation": "Marca listo para la siguiente ronda",
@@ -1707,11 +1713,11 @@ const es = {
     "pointsFromFirst": "{points} pts del 1°",
     "potentialScore": "+{points} pts potencial",
     "comparativeInsights": {
-      "title": "Cómo te comparaste",
+      "title": "Cómo te fue vs. los demás",
       "uniqueWords": "¡Encontraste {count} palabra(s) que nadie más encontró!",
       "longestWord": "Tu palabra más larga fue {count} letra(s) más larga que el promedio",
-      "scoreAbove": "Puntuaste {pct}% más que el promedio",
-      "scoreBelow": "Puntuaste {pct}% menos que el promedio"
+      "scoreAbove": "Le sacaste {pct}% al promedio",
+      "scoreBelow": "Quedaste {pct}% abajo del promedio"
     },
     "sessionStats": {
       "title": "Momentos de la Sesión",
@@ -1789,7 +1795,7 @@ const es = {
     },
     "subtitle": {
       "legendary": "¡Estás en racha — mantén el impulso!",
-      "great": "Tienes habilidades de palabras serias",
+      "great": "Tienes un vocabulario de miedo",
       "nice": "Cada juego te hace mejor",
       "warmup": "¡La práctica hace al maestro — vas por buen camino!"
     }
@@ -2209,7 +2215,7 @@ const es = {
     "late": "Final",
     "fastStart": "Inicio Rápido",
     "strongFinish": "Final Fuerte",
-    "momentum": "Construyendo Momentum",
+    "momentum": "Agarrando vuelo",
     "steady": "Ritmo Constante",
     "fadeOut": "Explosión Inicial",
     "midGamePeak": "Pico a Mitad de Juego",
@@ -2978,7 +2984,7 @@ const es = {
     }
   },
   "comebackBonus": {
-    "title": "¡Bienvenido de vuelta!",
+    "title": "¡Mira quién volvió!",
     "close": "Cerrar bono de regreso",
     "xpBonus": "Bono XP",
     "daysAway": "Estuviste ausente {days} días",
@@ -3090,7 +3096,7 @@ const es = {
     "emptyCollection": "¡Aún no hay coleccionables!",
     "earnByPlaying": "Gana monedas jugando",
     "shopComingSoon": "¡Tienda próximamente! Colecciona avatares, insignias y títulos especiales.",
-    "owned": "Poseído",
+    "owned": "Obtenido",
     "locked": "Bloqueado",
     "unlocked": "Desbloqueado",
     "equipped": "Equipado",
@@ -4195,7 +4201,7 @@ const es = {
     "copiedToClipboard": "¡Copiado al portapapeles!",
     "home": "Inicio",
     "close": "Cerrar",
-    "oneAttempt": "¡Una sola oportunidad — hazla valer!",
+    "oneAttempt": "¡Un solo tiro — que cuente!",
     "dayStreak": "días de racha",
     "daysStreak": "días de racha",
     "playNow": "JUGAR AHORA",
@@ -4466,7 +4472,7 @@ const es = {
       "tierNice": "¡Bien!",
       "tierPhew": "¡Uf!",
       "targetWord": "Palabra Objetivo",
-      "betterLuckNextTime": "¡Mejor suerte la próxima vez!",
+      "betterLuckNextTime": "¡La próxima te desquitas!",
       "nextChallengeIn": "Próximo desafío en",
       "rankOutOf": "#{rank} de {total} jugadores",
       "outOf": "de {total}",
@@ -4734,7 +4740,16 @@ const es = {
       "hoursAgo": "Hace {count}h",
       "daysAgo": "Hace {count}d",
       "longAgo": "Hace tiempo"
-    }
+    },
+    "requestAccepted": "¡Amigo añadido!",
+    "requestDeclined": "Solicitud rechazada",
+    "requestCancelled": "Solicitud cancelada",
+    "removedSuccess": "Amigo eliminado",
+    "blockedSuccess": "Usuario bloqueado",
+    "unblockedSuccess": "Usuario desbloqueado",
+    "confirmRemove": "¿Eliminar amigo? No se puede deshacer.",
+    "confirmBlock": "¿Bloquear usuario? No podrá contactarte.",
+    "block": "Bloquear"
   },
   "multiplayer": {
     "mode": "Modo",
@@ -5153,7 +5168,7 @@ const es = {
     },
     "empty": {
       "title": "¡Empieza a Entrenar!",
-      "description": "Juega partidas para construir tu Puntuación Cerebral y rastrea la mejora cognitiva con el tiempo.",
+      "description": "Juega partidas para construir tu Puntuación Cerebral y ver cómo mejoras.",
       "playNow": "Jugar Ahora"
     },
     "errors": {
@@ -5162,7 +5177,7 @@ const es = {
     },
     "guestView": {
       "title": "Rastrea tu Progreso",
-      "description": "Inicia sesión para rastrear tu rendimiento cognitivo a lo largo del tiempo y ver información detallada sobre tus habilidades de búsqueda de palabras."
+      "description": "Inicia sesión para ver cómo avanza tu cerebro y descubrir tus fortalezas."
     },
     "progressHistory": "Historial de Progreso",
     "startTracking": "Empezar a Registrar",
@@ -5728,6 +5743,7 @@ const es = {
     "devPreview": "Vista previa de desarrollo",
     "devPreviewDesc": "El Modo Aventura está en desarrollo. Esta vista previa muestra el mapa del mundo y la configuración de niveles.",
     "next": "SIGUIENTE",
+    "starsToUnlock": "{{count}} más para desbloquear",
     "exitToMap": "Salir al mapa",
     "startLevel": "Iniciar nivel",
     "levelComplete": "¡Nivel completado!",
@@ -5779,7 +5795,19 @@ const es = {
       "startRun": "Iniciar carrera",
       "subtitle": "¿Hasta dónde puedes llegar?",
       "timeLimit": "Límite de tiempo",
-      "title": "Modo infinito"
+      "title": "Modo infinito",
+      "events": {
+        "doubleGold": "¡Fiebre del oro!",
+        "doubleGoldDesc": "Todas las recompensas de oro duplicadas en este piso",
+        "timeSurge": "¡Oleada de tiempo!",
+        "timeSurgeDesc": "+30 segundos de bonificación para encontrar palabras",
+        "gemRush": "¡Fiebre de gemas!",
+        "gemRushDesc": "Fichas especiales extra en el tablero",
+        "dualMechanic": "¡Doble mecánica!",
+        "dualMechanicDesc": "Dos mecánicas de mundo activas a la vez",
+        "scoreFrenzy": "¡Frenesí de puntos!",
+        "scoreFrenzyDesc": "Todas las puntuaciones duplicadas en este piso"
+      }
     },
     "bossRush": {
       "backToHub": "Volver al centro",
@@ -5821,6 +5849,27 @@ const es = {
       "fullComboLevels": "Combo completo"
     },
     "loadError": "Error al cargar el progreso",
+    "prestige": {
+      "title": "Prestigio",
+      "available": "¡Prestigio disponible!",
+      "description": "Reinicia tus mundos y gana bonificaciones permanentes",
+      "confirm": "¿Estás seguro? Tu progreso en los mundos se reiniciará, pero conservas mejoras, oro y tu álbum de palabras.",
+      "activate": "Prestigiar ahora",
+      "cancel": "Aún no",
+      "ranks": { "bronze": "Bronce", "silver": "Plata", "gold": "Oro", "platinum": "Platino", "diamond": "Diamante" },
+      "titles": { "wordSmith": "Forjador de palabras", "lexiconAdept": "Adepto del léxico", "wordMaster": "Maestro de palabras", "grandLexicon": "Gran léxico", "eternalWordsmith": "Forjador eterno" },
+      "bonusXp": "+{{percent}}% XP",
+      "bonusGold": "+{{percent}}% Oro",
+      "keeps": "Conservas",
+      "resets": "Se reinicia",
+      "lifetimeStars": "Estrellas acumuladas"
+    },
+    "gameError": {
+      "title": "Algo salió mal",
+      "description": "El juego encontró un error. Tu progreso ha sido guardado.",
+      "returnToLevels": "Volver a los niveles",
+      "retry": "Intentar de nuevo"
+    },
     "boss": "Jefe",
     "allStars": "Todas las Estrellas",
     "continue": "Continuar",
@@ -5948,33 +5997,33 @@ const es = {
           "finalExam": "Examen Final"
         },
         "taunts": {
-          "start1": "¡La clase ha comenzado! Veamos si habéis estudiado...",
-          "start2": "¡Examen sorpresa! ¡Espero que estéis preparados!",
-          "goodWord1": "Aceptable. Pero no esperéis puntos extra por lo mínimo.",
-          "goodWord2": "Hmm, no está terrible. Quizás aprobéis después de todo.",
-          "badWord1": "¡Eso no es una palabra! Esto va a vuestro expediente permanente.",
-          "badWord2": "¿Habéis ESTUDIADO siquiera? Descuento puntos.",
-          "mechanic1": "¿Habéis LEÍDO la tarea siquiera? ¡Pedí {requirement}!",
-          "mechanic2": "¡Seguid los requisitos! ¡Esto no es tiempo libre!",
+          "start1": "¡La clase ha comenzado! Veamos si han estudiado...",
+          "start2": "¡Examen sorpresa! ¡Espero que estén preparados!",
+          "goodWord1": "Aceptable. Pero no esperen puntos extra por lo mínimo.",
+          "goodWord2": "Hmm, no está terrible. Quizás aprueben después de todo.",
+          "badWord1": "¡Eso no es una palabra! Esto va a su expediente permanente.",
+          "badWord2": "¿Han ESTUDIADO siquiera? Descuento puntos.",
+          "mechanic1": "¿Han LEÍDO la tarea siquiera? ¡Pedí {requirement}!",
+          "mechanic2": "¡Sigan los requisitos! ¡Esto no es tiempo libre!",
           "lowTime1": "¡El tiempo casi se acaba! Como un estudiante que no estudió...",
-          "victory": "Vaya, vaya... parece que SÍ podéis seguir instrucciones. ¡Una estrella dorada!",
-          "defeat": "Venid a verme después de clase... para vocabulario de refuerzo."
+          "victory": "Vaya, vaya... parece que SÍ pueden seguir instrucciones. ¡Una estrella dorada!",
+          "defeat": "Vengan a verme después de clase... para vocabulario de refuerzo."
         }
       },
       "spellingBee": {
         "name": "La Abeja Ortográfica",
         "mechanic": "Caos de la colmena - ¡Fichas pegajosas y desafíos de sinónimos!",
         "taunts": {
-          "start1": "Bienvenidos a MI colmena. Espero que os guste la miel... y el FRACASO.",
-          "start2": "¡Buzz buzz! Ese es el sonido de vuestro destino. Además soy una abeja.",
+          "start1": "Bienvenidos a MI colmena. Espero que les guste la miel... y el FRACASO.",
+          "start2": "¡Buzz buzz! Ese es el sonido de su destino. Además soy una abeja.",
           "goodWord1": "No está mal para un no-abeja. Lo permito.",
-          "goodWord2": "Oh, ¿encontrasteis un sinónimo? Qué increíble-abeja-mente adecuado.",
+          "goodWord2": "Oh, ¿encontraron un sinónimo? Qué increíble-abeja-mente adecuado.",
           "badWord1": "¿Esa palabra? Cariño, por favor.",
           "badWord2": "Mis obreras encontraron mejores palabras, y tienen cerebros diminutos.",
-          "mechanic1": "¡Encontrad sinónimos para despegar las fichas, cariño!",
+          "mechanic1": "¡Encuentren sinónimos para despegar las fichas, cariño!",
           "mechanic2": "¡La colmena exige SINÓNIMOS! ¡Palabras grandes que SIGNIFIQUEN algo!",
           "lowTime1": "¡Tic tac! ¡Ni mi miel tarda tanto en cuajar!",
-          "victory": "¿Me... vencisteis? ¿A la REINA? Volveré. (¿Lo pilláis? Abeja? Soy una abeja.)",
+          "victory": "¿Me... vencieron? ¿A la REINA? Volveré. (¿Lo pillan? Abeja? Soy una abeja.)",
           "defeat": "¡Otro picado! Mi récord de colmena sigue INVICTO."
         }
       },
@@ -5983,101 +6032,101 @@ const es = {
         "mechanic": "Excavación etimológica - ¡Las palabras con raíces compartidas crean combos!",
         "taunts": {
           "start1": "Ah, ¡un retador se acerca! ¿O debería decir, un adversario avanza?",
-          "start2": "He olvidado más palabras de las que jamás aprenderéis. Literalmente. Soy muy viejo.",
+          "start2": "He olvidado más palabras de las que jamás aprenderán. Literalmente. Soy muy viejo.",
           "goodWord1": "Adecuado. O debería decir, satisfactorio, aceptable, suficiente...",
           "goodWord2": "Esa palabra es del siglo XII. Un poco moderna, pero la acepto.",
-          "badWord1": "Vuestro léxico parece... limitado. Restringido. Circunscrito.",
-          "badWord2": "Encontrasteis 'andar.' ¡Pedestre! ¿Quizás probar 'deambular'?",
-          "mechanic1": "¡Buscad raíces compartidas! Bio, graf, tele - ¡la etimología es CLAVE!",
-          "mechanic2": "¡Las letras comunes se entierran! ¡Cavad más profundo, jóvenes eruditos!",
-          "lowTime1": "El tiempo mengua, expira, disminuye... ¿entendéis, verdad?",
-          "victory": "¡Lo admito! Habéis demostrado considerable... ugh... 'habilidad.'",
-          "defeat": "Volved cuando vuestro vocabulario haya... madurado. Desarrollado. Florecido."
+          "badWord1": "Su léxico parece... limitado. Restringido. Circunscrito.",
+          "badWord2": "Encontraron 'andar.' ¡Pedestre! ¿Quizás probar 'deambular'?",
+          "mechanic1": "¡Busquen raíces compartidas! Bio, graf, tele - ¡la etimología es CLAVE!",
+          "mechanic2": "¡Las letras comunes se entierran! ¡Caven más profundo, jóvenes eruditos!",
+          "lowTime1": "El tiempo mengua, expira, disminuye... ¿entienden, verdad?",
+          "victory": "¡Lo admito! Han demostrado considerable... ugh... 'habilidad.'",
+          "defeat": "Vuelvan cuando su vocabulario haya... madurado. Desarrollado. Florecido."
         }
       },
       "captainMetaphor": {
         "name": "Capitán Metáfora",
-        "mechanic": "Batalla de la flota figurativa - ¡Encontrad las palabras literales de mis modismos!",
+        "mechanic": "Batalla de la flota figurativa - ¡Encuentren las palabras literales de mis modismos!",
         "taunts": {
-          "start1": "¡Alto! ¡Estáis ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
-          "start2": "¡Temblad mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
+          "start1": "¡Alto! ¡Están ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
+          "start2": "¡Tiemblen ante mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
           "goodWord1": "¡Por mis barbas! ¡Esa palabra dio en el clavo!",
-          "goodWord2": "¡Un diamante en bruto! ¡A propósito, encontrad DIAMANTE!",
+          "goodWord2": "¡Un diamante en bruto! ¡A propósito, encuentren DIAMANTE!",
           "badWord1": "¡Eso es una caza de gansos salvajes! ¡Pájaro totalmente equivocado!",
-          "badWord2": "¡No contéis los pollos antes de nacer! ¡Necesito POLLO, CONTAR y ANTES!",
-          "mechanic1": "¡Están lloviendo gatos y perros! ¡Encontrad LLUVIA, GATOS y PERROS!",
-          "mechanic2": "¡Romped una pierna! ¡No literalmente! ¡Encontrad las PALABRAS del modismo!",
+          "badWord2": "¡No cuenten los pollos antes de nacer! ¡Necesito POLLO, CONTAR y ANTES!",
+          "mechanic1": "¡Están lloviendo gatos y perros! ¡Encuentren LLUVIA, GATOS y PERROS!",
+          "mechanic2": "¡Rómpanse una pierna! ¡No literalmente! ¡Encuentren las PALABRAS del modismo!",
           "lowTime1": "¡El tiempo vuela! ¡A diferencia de mi barco! ¡Que también vuela! ¡Es una metáfora!",
-          "victory": "¡Hundisteis mi barco! Espera, juego equivocado. ¡Vencisteis mis modismos!",
-          "defeat": "¡El que madruga atrapa el gusano, y VOSOTROS sois el gusano! ¡Arr!"
+          "victory": "¡Hundieron mi barco! Espera, juego equivocado. ¡Vencieron mis modismos!",
+          "defeat": "¡El que madruga atrapa el gusano, y USTEDES son el gusano! ¡Arr!"
         }
       },
       "baronBuildaword": {
         "name": "Barón Construyepalabras",
-        "mechanic": "Asalto de la línea de ensamblaje - ¡Construid palabras compuestas para bonos enormes!",
+        "mechanic": "Asalto de la línea de ensamblaje - ¡Construyan palabras compuestas para bonos enormes!",
         "taunts": {
-          "start1": "¡INEFICIENTE! ¡Podríais estar COMPONIENDO! ¡Pensad MARIPOSA, no 'mari'!",
-          "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos vuestra ingeniería!",
+          "start1": "¡INEFICIENTE! ¡Podrían estar COMPONIENDO! ¡Piensen MARIPOSA, no 'mari'!",
+          "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos su ingeniería!",
           "goodWord1": "¡No está mal! ¿Pero es COMPUESTA? ¡Todo debería ser compuesto!",
           "goodWord2": "¡Producción aceptable! Mis máquinas aprueban. Marginalmente.",
           "badWord1": "¡Eso no es compuesto! Es simplemente... una palabra. ¡Qué poco ingenieril!",
-          "badWord2": "¡Mi Ensambla-Palabras 3000 RECHAZA esto! ¡Intentad más!",
-          "mechanic1": "¡La cinta transportadora se mueve! ¡Atrapad las letras antes de que pasen!",
-          "mechanic2": "¡COMPONED! ¡COMPONED! ¡GIRASOL! ¡MARIPOSA! ¡RASCACIELOS!",
+          "badWord2": "¡Mi Ensambla-Palabras 3000 RECHAZA esto! ¡Intenten más!",
+          "mechanic1": "¡La cinta transportadora se mueve! ¡Atrapen las letras antes de que pasen!",
+          "mechanic2": "¡COMPONGAN! ¡COMPONGAN! ¡GIRASOL! ¡MARIPOSA! ¡RASCACIELOS!",
           "lowTime1": "¡La línea de ensamblaje no espera a nadie! ¡MÁS RÁPIDO!",
-          "victory": "¿Habéis... superado mi ingeniería? ¡IMPOSIBLE! ¡Construiré mejor!",
+          "victory": "¿Han... superado mi ingeniería? ¡IMPOSIBLE! ¡Construiré mejor!",
           "defeat": "¡Otro retador ineficiente derrotado! ¡La máquina gana de nuevo!"
         }
       },
       "puzzleMaster": {
         "name": "Maestro del Puzzle",
-        "mechanic": "Realidad revuelta - ¡Las letras se mezclan! ¡Encontrad anagramas para bonos!",
+        "mechanic": "Realidad revuelta - ¡Las letras se mezclan! ¡Encuentren anagramas para bonos!",
         "taunts": {
-          "start1": "Reordenad 'NOTAS' y decidme qué encontráis. Esperaré. Tengo nueve vidas.",
+          "start1": "Reordenen 'NOTAS' y díganme qué encuentran. Esperaré. Tengo nueve vidas.",
           "start2": "Todo es un puzzle. Incluso esta frase. Especialmente esta frase.",
-          "goodWord1": "Encontrasteis una palabra. ¿Pero visteis su ANAGRAMA escondido?",
-          "goodWord2": "Listo. Pero 'ARCO' tiene amigos: ROCA, CARO. ¿Los encontrasteis todos?",
+          "goodWord1": "Encontraron una palabra. ¿Pero vieron su ANAGRAMA escondido?",
+          "goodWord2": "Listo. Pero 'ARCO' tiene amigos: ROCA, CARO. ¿Los encontraron todos?",
           "badWord1": "¿Una respuesta directa? Qué ABURRIDO.",
-          "badWord2": "Eso no es una palabra en NINGÚN orden. Confiad en mí, los comprobé todos.",
-          "mechanic1": "¡La realidad se mezcla! ¡Las letras cambian! ¿Podéis seguir el ritmo?",
-          "mechanic2": "¡Encontrad el par de anagramas! ¡Están esperando!",
+          "badWord2": "Eso no es una palabra en NINGÚN orden. Confíen en mí, los comprobé todos.",
+          "mechanic1": "¡La realidad se mezcla! ¡Las letras cambian! ¿Pueden seguir el ritmo?",
+          "mechanic2": "¡Encuentren el par de anagramas! ¡Están esperando!",
           "lowTime1": "El tiempo se acaba... ¿o empieza? Depende del anagrama.",
-          "victory": "¿Resolvisteis mi puzzle?! Estoy... genuinamente impresionado. No se lo digáis a nadie.",
-          "defeat": "¡El puzzle sigue sin resolver! Volved cuando podáis pensar lateralmente."
+          "victory": "¿Resolvieron mi puzzle?! Estoy... genuinamente impresionado. No se lo digan a nadie.",
+          "defeat": "¡El puzzle sigue sin resolver! Vuelvan cuando puedan pensar lateralmente."
         }
       },
       "reflectionKing": {
         "name": "Rey del Reflejo",
-        "mechanic": "Caos del combate espejo - ¡La cuadrícula se refleja! ¡Encontrad palíndromos para poder!",
+        "mechanic": "Caos del combate espejo - ¡La cuadrícula se refleja! ¡Encuentren palíndromos para poder!",
         "taunts": {
-          "start1": "¡Contemplad mi perfección! También buscad palíndromos - ¡las únicas palabras bastante hermosas!",
+          "start1": "¡Contemplen mi perfección! También busquen palíndromos - ¡las únicas palabras bastante hermosas!",
           "start2": "¡Esta batalla será LEGENDARIA! Escribirán EPOPEYAS sobre... principalmente yo.",
           "goodWord1": "¡Una palabra digna! ¡Casi tan magnífica como mi reflejo!",
           "goodWord2": "¡No está mal! ¿Pero es un palíndromo? ¡Solo la PERFECCIÓN se lee en ambos sentidos!",
-          "badWord1": "¿Agrietáis mi hielo? ¡La TRAGEDIA! ...De hecho, hacedlo otra vez.",
-          "badWord2": "¡Esa palabra no es digna de mi palacio de espejos! ¡Intentad más!",
-          "mechanic1": "¡El espejo refleja! ¡Vuestros movimientos afectan AMBOS lados!",
-          "mechanic2": "¡Encontrad palíndromos para Reflejos Perfectos!",
-          "lowTime1": "¡Ni mi belleza puede detener el tiempo! ¡Daos prisa!",
-          "victory": "¿Habéis... empañado mi reflejo?! Necesito un momento. Y un espejo.",
-          "defeat": "¡POR SUPUESTO que gané! ¿Me habéis VISTO? ¡La perfección es inevitable!"
+          "badWord1": "¿Agrietan mi hielo? ¡La TRAGEDIA! ...De hecho, háganlo otra vez.",
+          "badWord2": "¡Esa palabra no es digna de mi palacio de espejos! ¡Intenten más!",
+          "mechanic1": "¡El espejo refleja! ¡Sus movimientos afectan AMBOS lados!",
+          "mechanic2": "¡Encuentren palíndromos para Reflejos Perfectos!",
+          "lowTime1": "¡Ni mi belleza puede detener el tiempo! ¡Dense prisa!",
+          "victory": "¿Han... empañado mi reflejo?! Necesito un momento. Y un espejo.",
+          "defeat": "¡POR SUPUESTO que gané! ¿Me han VISTO? ¡La perfección es inevitable!"
         }
       },
       "cosmicWordsmith": {
         "name": "Forjador Cósmico de Palabras",
         "mechanic": "Forja estelar de palabras - ¡Las letras evolucionan! ¡Letras raras crean supernovas!",
         "taunts": {
-          "start1": "Estuve PRESENTE cuando vuestros ancestros gruñeron sus primeras palabras. Esperaba más.",
-          "start2": "Usáis 'literalmente' para decir 'figuradamente.' Inventé ambas. La ironía es CÓSMICA.",
+          "start1": "Estuve PRESENTE cuando sus ancestros gruñeron sus primeras palabras. Esperaba más.",
+          "start2": "Usan 'literalmente' para decir 'figuradamente.' Inventé ambas. La ironía es CÓSMICA.",
           "goodWord1": "¿Esa palabra? Trabajé diecisiete versiones. De nada.",
           "goodWord2": "Uso aceptable de MI creación. Permito que exista.",
           "badWord1": "He visto estrellas morir con más elocuencia que ese intento de palabra.",
           "badWord2": "Incluso los agujeros negros tienen más sustancia que esa... no-palabra.",
           "mechanic1": "¡Las letras evolucionan! ¡A se convierte en E se convierte en I! ¡El cosmos exige adaptación!",
-          "mechanic2": "¡Usad Q, X o Z para una SUPERNOVA! ¡Las letras raras tienen poder cósmico!",
+          "mechanic2": "¡Usen Q, X o Z para una SUPERNOVA! ¡Las letras raras tienen poder cósmico!",
           "lowTime1": "Ni yo puedo frenar el tiempo. Y soy literalmente cósmico. Literalmente literalmente.",
-          "victory": "¿Habéis... dominado MIS palabras?! Quizás los mortales no son completamente inútiles.",
-          "defeat": "Volved en un milenio. Necesitáis más... práctica. Eones de ella."
+          "victory": "¿Han... dominado MIS palabras?! Quizás los mortales no son completamente inútiles.",
+          "defeat": "Vuelvan en un milenio. Necesitan más... práctica. Eones de ella."
         }
       },
       "linguistSage": {
@@ -6090,28 +6139,28 @@ const es = {
           "goodWord2": "¡Magnifique! ¡Wunderbar! ¡Subarashii! ...Quizás mezclo idiomas otra vez.",
           "badWord1": "Esa palabra existe en CERO idiomas. Lo comprobé. Todos.",
           "badWord2": "Incluso mis amigos cabras encuentran mejores palabras. Y comen latas.",
-          "mechanic1": "¡El idioma cambia! ¡Adaptad vuestro vocabulario!",
-          "mechanic2": "¡Encontrad palabras que funcionen en MÚLTIPLES idiomas para Comprensión Universal!",
+          "mechanic1": "¡El idioma cambia! ¡Adapten su vocabulario!",
+          "mechanic2": "¡Encuentren palabras que funcionen en MÚLTIPLES idiomas para Comprensión Universal!",
           "lowTime1": "¡El tiempo se acaba en TODOS los idiomas! ¡Schnell! ¡Hayaku! ¡Rapido!",
-          "victory": "¡Habláis el idioma universal de la victoria! Qué... iluminador.",
-          "defeat": "La cumbre permanece sin escalar. Volved cuando hayáis estudiado más idiomas."
+          "victory": "¡Hablan el idioma universal de la victoria! Qué... iluminador.",
+          "defeat": "La cumbre permanece sin escalar. Vuelvan cuando hayan estudiado más idiomas."
         }
       },
       "lexiconDragon": {
         "name": "Dragón del Léxico",
-        "mechanic": "La Última Palabra - ¡TODAS las mecánicas combinadas! ¡Construid el GOLPE LÉXICO!",
+        "mechanic": "La Última Palabra - ¡TODAS las mecánicas combinadas! ¡Construyan el GOLPE LÉXICO!",
         "taunts": {
-          "start1": "¡GUAU UN RETADOR! ¿Queréis ver mi diario de palabras? ¡Son solo 47 tomos!",
-          "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TEMEDME! ¡Rawr!",
-          "goodWord1": "¡Encontrasteis 'DRAGÓN'! ¡ESE SOY YO! ¡Ahora encontrad 'MAGNÍFICO' porque ESO TAMBIÉN soy yo!",
+          "start1": "¡GUAU UN RETADOR! ¿Quieren ver mi diario de palabras? ¡Son solo 47 tomos!",
+          "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TÉMANME! ¡Rawr!",
+          "goodWord1": "¡Encontraron 'DRAGÓN'! ¡ESE SOY YO! ¡Ahora encuentren 'MAGNÍFICO' porque ESO TAMBIÉN soy yo!",
           "goodWord2": "¡INCREÍBLE palabra! ¡La escribo en mi diario! ¡Tomo 48!",
-          "badWord1": "¡Eso no es una palabra! ...¿O SÍ? Dejadme revisar tomos 1 al 47...",
+          "badWord1": "¡Eso no es una palabra! ...¿O SÍ? Déjenme revisar tomos 1 al 47...",
           "badWord2": "¡De verdad quiero aceptar eso pero mi nerd interior de palabras dice NO!",
-          "mechanic1": "¡Cambio de fase! ¡Una nueva mecánica emerge! ¿Podéis con TODAS?",
-          "mechanic2": "¡El GOLPE LÉXICO se carga! ¡Seguid encontrando grandes palabras!",
+          "mechanic1": "¡Cambio de fase! ¡Una nueva mecánica emerge! ¿Pueden con TODAS?",
+          "mechanic2": "¡El GOLPE LÉXICO se carga! ¡Sigan encontrando grandes palabras!",
           "lowTime1": "¡OH NO se acaba el tiempo! ¡Pero me estaba divirtiendo TANTO!",
-          "victory": "¡GANASTEIS! ¿Eso significa que ahora somos AMIGOS?! ¡Mejor día de TODOS!",
-          "defeat": "Gané pero... ¿me siento mal? ¿Queréis revancha? ¡Por favor decid que sí!"
+          "victory": "¡GANARON! ¿Eso significa que ahora somos AMIGOS?! ¡Mejor día de TODOS!",
+          "defeat": "Gané pero... ¿me siento mal? ¿Quieren revancha? ¡Por favor digan que sí!"
         }
       },
       "mechanicProgress": "Progreso de mecánica",
@@ -8254,17 +8303,17 @@ const es = {
   },
   "crazygames": {
     "ads": {
-      "watchForReward": "Watch ad for {{reward}}",
-      "adPlaying": "Ad playing...",
-      "adError": "Ad unavailable",
-      "adblockDetected": "Adblock detected - some features may be limited",
-      "thanksForWatching": "Thanks for watching!"
+      "watchForReward": "Ver anuncio por {{reward}}",
+      "adPlaying": "Reproduciendo anuncio...",
+      "adError": "Anuncio no disponible",
+      "adblockDetected": "Adblock detectado — algunas funciones pueden estar limitadas",
+      "thanksForWatching": "¡Gracias por ver!"
     },
     "cloudSave": {
-      "syncing": "Syncing progress...",
-      "syncSuccess": "Progress synced!",
-      "syncError": "Sync failed - will retry",
-      "conflictResolved": "Progress updated from cloud"
+      "syncing": "Sincronizando progreso...",
+      "syncSuccess": "¡Progreso sincronizado!",
+      "syncError": "Falló la sincronización — lo intentaremos de nuevo",
+      "conflictResolved": "Progreso actualizado desde la nube"
     }
   },
   "notifications": {
@@ -8966,7 +9015,8 @@ const es = {
     "remaining": "Regalos diarios restantes",
     "send": "Enviar Regalo",
     "sent": "¡Regalo Enviado!",
-    "limitReached": "Límite diario alcanzado"
+    "limitReached": "Límite diario alcanzado",
+    "error": "Regalo fallido. ¿Intentar de nuevo?"
   },
   "faq": {
     "title": "Preguntas frecuentes",
@@ -9182,13 +9232,13 @@ const es = {
     }
   },
   "wotd": {
-    "teaser": "Palabra del Dia",
+    "teaser": "Palabra del Día",
     "found": "La encontraste!",
     "foundPercent": "Solo el {{percent}}% de los jugadores la encontraron!",
-    "missed": "Palabra del Dia",
-    "missedHint": "Intentalo manana!",
+    "missed": "Palabra del Día",
+    "missedHint": "¡Inténtalo mañana!",
     "share": "Comparte tu hallazgo",
-    "loading": "Cargando la Palabra del Dia...",
+    "loading": "Cargando la Palabra del Día...",
     "play": "Jugar ahora"
   },
   "vocabulary": {
@@ -9299,6 +9349,146 @@ const es = {
     "reachCombo": "Alcanza {{target}}x combo",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} monedas"
+  },
+  "asyncChallenge": {
+    "title": "Desafíos de tablero",
+    "pending": "¡Tu turno!",
+    "pendingCount": "{{count}} desafíos esperando",
+    "challengeFrom": "Desafío de {{name}}",
+    "theirScore": "Su puntuación: {{score}}",
+    "playNow": "Jugar ahora",
+    "challengeFriend": "Desafiar a un amigo",
+    "challengeFriendDesc": "Juega un tablero y envíalo a un amigo para que supere tu puntuación",
+    "sendChallenge": "Enviar desafío",
+    "selectFriend": "Elegir oponente",
+    "yourScore": "Tu puntuación: {{score}}",
+    "won": "¡Ganaste por {{points}} puntos!",
+    "lost": "Ellos ganaron por {{points}} puntos",
+    "tied": "¡Empate!",
+    "expired": "Desafío expirado",
+    "declined": "Desafío rechazado",
+    "noMessage": "Sin mensaje",
+    "addMessage": "Añadir mensaje (opcional)",
+    "empty": "No hay desafíos pendientes",
+    "emptyCta": "¡Envía un desafío de tablero a un amigo!",
+    "resultTitle": "Resultado del desafío",
+    "bestWord": "Mejor palabra: {{word}}",
+    "wordsFound": "{{count}} palabras encontradas"
+  },
+  "wordClub": {
+    "title": "Club de palabras",
+    "myClub": "Mi club",
+    "weeklyLeaderboard": "Clasificación semanal",
+    "weeklyXp": "{{xp}} XP esta semana",
+    "gamesPlayed": "{{count}} partidas",
+    "bestWord": "Mejor: {{word}}",
+    "createClub": "Crear un club",
+    "createClubDesc": "Crea un club e invita amigos para competir semanalmente",
+    "joinClub": "Unirse a un club",
+    "joinByCode": "Introduce código de invitación",
+    "joinButton": "Unirse",
+    "leaveClub": "Abandonar club",
+    "inviteCode": "Código: {{code}}",
+    "copyCode": "Copiar código",
+    "codeCopied": "¡Código copiado!",
+    "members": "{{count}}/{{max}} miembros",
+    "owner": "Propietario",
+    "admin": "Admin",
+    "member": "Miembro",
+    "clubName": "Nombre del club",
+    "clubDesc": "Descripción (opcional)",
+    "maxMembers": "Máximo de miembros",
+    "create": "Crear",
+    "resetsIn": "Se reinicia {{time}}",
+    "noClub": "¡Únete a un club para batallas de palabras semanales!",
+    "you": "Tú",
+    "rank": "#{{rank}}"
+  },
+  "playerRecap": {
+    "title": "Tu semana en resumen",
+    "monthlyTitle": "Tu mes en resumen",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "gamesPlayed": "Partidas jugadas",
+    "wordsFound": "Palabras encontradas",
+    "bestScore": "Mejor puntuación",
+    "longestWord": "Palabra más larga",
+    "rarestWord": "Hallazgo más raro",
+    "bestCombo": "Mejor combo",
+    "streakDays": "Días de racha",
+    "gamesWon": "Victorias",
+    "uniqueWords": "Palabras únicas",
+    "favoriteMode": "Modo favorito",
+    "improvement": "{{percent}}% de mejora",
+    "declined": "{{percent}}% de bajada",
+    "rankUp": "Rango ↑{{change}}",
+    "rankDown": "Rango ↓{{change}}",
+    "share": "Compartir resumen",
+    "shareText": "Mi semana en LexiClash: {{games}} partidas, {{words}} palabras, mejor puntuación {{score}}. ¡{{streak}} días de racha! ¡Supéralo! 🎮",
+    "shareMonthlyText": "Mi mes en LexiClash: {{games}} partidas, {{words}} palabras, palabra más larga: {{word}}. ¡{{improvement}}% de mejora! 🔥",
+    "noData": "¡Juega algunas partidas para ver tu resumen!",
+    "copied": "¡Resumen copiado!"
+  },
+  "quickPlay": {
+    "title": "Juego rápido",
+    "subtitle": "¡Salta directamente!",
+    "daily": "Puzzle diario",
+    "classic": "Partida clásica",
+    "blast": "Modo Blast",
+    "wordHunt": "Caza de palabras",
+    "seconds": "~{{sec}}s para jugar"
+  },
+  "rankedTier": {
+    "title": "Clasificatoria",
+    "rating": "Puntuación: {{rating}}",
+    "peakRating": "Máximo: {{rating}}",
+    "tier": "{{tier}}",
+    "bronze": "Bronce",
+    "silver": "Plata",
+    "gold": "Oro",
+    "platinum": "Platino",
+    "diamond": "Diamante",
+    "master": "Maestro",
+    "progress": "{{percent}}% para el siguiente nivel",
+    "gamesPlayed": "{{count}} partidas clasificatorias",
+    "winRate": "{{percent}}% de victorias",
+    "ratingChange": "{{change}}",
+    "unranked": "¡Juega partidas clasificatorias para ganar un rango!",
+    "playRanked": "Jugar clasificatoria"
+  },
+  "seasonalEvent": {
+    "title": "Evento limitado",
+    "active": "En vivo",
+    "upcoming": "Próximamente",
+    "ended": "Evento finalizado",
+    "endsIn": "Termina en {{time}}",
+    "startsIn": "Comienza en {{time}}",
+    "joinEvent": "Unirse al evento",
+    "continuePlaying": "Seguir jugando",
+    "yourScore": "Tu puntuación: {{score}}",
+    "yourRank": "Rango #{{rank}}",
+    "rewards": "Recompensas",
+    "topReward": "1er puesto",
+    "claimRewards": "Reclamar recompensas",
+    "noEvents": "No hay eventos activos ahora",
+    "nextEvent": "¡Vuelve pronto para el próximo evento!"
+  },
+  "reengagement": {
+    "welcomeBack": "¡Bienvenido de vuelta!",
+    "missedYou": "¡Te echamos de menos! Aquí tienes un bono para volver al juego.",
+    "streakRisk": "¡Tu racha está a punto de expirar! Juega ahora para mantenerla.",
+    "socialTrigger": "¡{{friendCount}} amigos jugaron mientras estabas fuera!",
+    "lossAversion": "¡Tu rango de liga está bajando! Una partida rápida ayudará.",
+    "incentive": "¡Bienvenido de vuelta! Aquí tienes {{coins}} monedas y un congelador de racha.",
+    "majorIncentive": "¡Guardamos tu progreso! Vuelve a 3 días de funciones premium gratis.",
+    "emailOnly": "¡Revisa tu correo para una oferta especial!",
+    "claimBonus": "Reclamar bono",
+    "daysAway": "{{count}} días fuera",
+    "bonusRewards": "Tus recompensas de bienvenida:",
+    "coins": "{{count}} monedas",
+    "streakFreeze": "{{count}} congelador de racha",
+    "premiumDays": "{{count}} días premium",
+    "dismiss": "Quizás después"
   }
 };
 

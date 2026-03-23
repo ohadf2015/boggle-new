@@ -142,6 +142,11 @@ const sv = {
     "shareViaWhatsApp": "Dela via WhatsApp",
     "shareViaTelegram": "Dela via Telegram",
     "close": "Stäng",
+    "ordinal1": "1:a",
+    "ordinal2": "2:a",
+    "ordinal3": "3:e",
+    "ordinalN": "{n}:e",
+    "chat": "Chatt",
     "showAll": "Visa alla",
     "claim": "Hämta",
     "looksGood": "Ser bra ut",
@@ -150,7 +155,7 @@ const sv = {
     "playAgain": "Spela igen",
     "exit": "Avsluta",
     "adminDashboard": "Administratörspanel",
-    "awesome": "Fantastiskt!",
+    "awesome": "Snyggt!",
     "admin": "Admin",
     "understood": "Kör!",
     "refresh": "Uppdatera",
@@ -175,7 +180,7 @@ const sv = {
     "chat": "Chatt",
     "connecting": "Ansluter...",
     "signIn": "Logga in",
-    "connectedToServer": "Redo för strid!",
+    "connectedToServer": "Redo!",
     "connectingToServer": "Värmer upp...",
     "gameStarted": "KÖR!",
     "preparingGame": "Förbereder spelet...",
@@ -411,7 +416,7 @@ const sv = {
     "largeLettersDescription": "Använd större bokstäver på spelplanen för enklare visning"
   },
   "combo": {
-    "shieldUsed": "Skölden räddade din streak!",
+    "shieldUsed": "Skölden räddade din svit!",
     "explanationTitle": "Kombokraft!",
     "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!"
   },
@@ -475,7 +480,7 @@ const sv = {
     "controls": "Musikkontroller",
     "musicVolumeSlider": "Musikvolymreglage",
     "sfxVolumeSlider": "Ljudeffektvolymreglage",
-    "haptics": "Haptik",
+    "haptics": "Vibration",
     "toggleHaptics": "Växla haptisk feedback",
     "sound": "Ljud",
     "soundOn": "Ljud på",
@@ -519,7 +524,7 @@ const sv = {
     "linkCopied": "Länk kopierad! 🔗",
     "copyError": "Gick inte - tryck igen",
     "manualCopy": "Kopiera denna länk:",
-    "inviteMessage": "Ordstrid pågår NU! Hoppa in 🔥",
+    "inviteMessage": "Vi spelar just nu! Häng på 🔥",
     "room": "Rum",
     "code": "Kod",
     "joinViaLink": "Tryck för att gå med",
@@ -542,8 +547,8 @@ const sv = {
     "beatMyScore": "Kan du slå mitt resultat?",
     "text": "Gå med i mitt spel med kod: {{code}}",
     "inviteTitle": "Ordkrig pågår! 🎮",
-    "shareVictory": "Skryt!",
-    "scanToJoin": "Skanna för action",
+    "shareVictory": "Dela resultat",
+    "scanToJoin": "Skanna och häng med",
     "twitter": "X",
     "discord": "Discord",
     "email": "E-post",
@@ -562,7 +567,7 @@ const sv = {
     "telegram": "Telegram",
     "moreWays": "Fler sätt att dela",
     "invite": "Bjud in",
-    "emailSubjectPostGame": "Jag krossade det i LexiClash!",
+    "emailSubjectPostGame": "Jag hade en bra runda i LexiClash!",
     "emailSubjectInvite": "Spela LexiClash med mig!",
     "challengeLinkCopied": "Utmaningslänk kopierad!",
     "errorCreatingChallenge": "Fel vid skapande av utmaning",
@@ -846,7 +851,7 @@ const sv = {
       "invitePrompt": "Starta en fest genom att skicka en inbjudan",
       "inviteFriends": "Bjud in vänner",
       "noRoomsYet": "Inga strider pågår",
-      "beTheLegend": "Bli legenden som startar den första striden!",
+      "beTheLegend": "Var först att starta ett spel!",
       "hostAndPlay": "Var värd & spela — Dela koden med vänner",
       "startBattle": "Starta en strid",
       "inProgress": "Live",
@@ -905,7 +910,7 @@ const sv = {
       "creating": "Skapar arena..."
     },
     "joinForm": {
-      "title": "Hoppa in i action",
+      "title": "Hoppa in",
       "progress": "2 av 2",
       "profileLabel": "Du",
       "codeLabel": "Har du kod?",
@@ -952,6 +957,7 @@ const sv = {
     "playerKicked": "{{name}} sparkades från rummet",
     "youWereKicked": "Du sparkades från rummet",
     "youWereKickedInactive": "Du togs bort på grund av inaktivitet",
+    "afkWarning": "Du tas bort om {{seconds}}s på grund av inaktivitet — tryck var som helst för att stanna!",
     "shareCodeHint": "Dela rumskoden ovan så att vänner kan gå med!",
     "battleMode": "Stridsläge",
     "preset": "Förinställning",
@@ -959,7 +965,7 @@ const sv = {
     "roomCode": "Kod",
     "host": "Värd",
     "inviteFriends": "Samla gänget!",
-    "inviteWarriors": "Bjud in krigare",
+    "inviteWarriors": "Bjud in spelare",
     "invitePlayer": "Bjud in spelare",
     "battleFeed": "Stridsflöde",
     "roomChat": "Rumschatt",
@@ -1097,10 +1103,10 @@ const sv = {
       "rareWord": "LEGENDARISK FYND!",
       "combo5x": "VÄRMS UPP!",
       "combo10x": "OSTOPPBAR!",
-      "combo15x": "ABSOLUT BEST!",
-      "combo20x": "COMBOROYALTY!",
+      "combo15x": "HELT SJUKT!",
+      "combo20x": "KOMBOKUNG!",
       "comboBroken": "SVIT BRUTEN!",
-      "firstBlood": "FÖRSTA BLODET!",
+      "firstBlood": "FÖRSTA ORDET!",
       "overtake": "KLÄTTRAR!",
       "comeback": "FRÅN ASKAN!",
       "photoFinish": "JÄMNSPEL!",
@@ -1165,7 +1171,7 @@ const sv = {
     "wordWizard": "ORDTROLLKARL",
     "comboKing": "COMBOKUNG",
     "loneWolf": "ENSAMVARG",
-    "clutchPlayer": "CLUTCHSPELARE",
+    "clutchPlayer": "AVSLUTAREN",
     "playersReady": "REDO!",
     "startNewGame": "NYTT SPEL",
     "nextRound": "NÄSTA RUNDA",
@@ -1197,13 +1203,13 @@ const sv = {
     "explorer": "UTFORSKARE",
     "mostVariety": "Mest variation i ordlängder!",
     "lengths": "längder",
-    "steadyEddie": "STABIL EDDIE",
+    "steadyEddie": "STABILA STANSEN",
     "mostConsistent": "Mest jämnt tempo!",
     "shortAndSweet": "KORT & GOTT",
     "most3LetterWords": "Mästare på 3-bokstavsord!",
-    "bigBrain": "STORHJÄRNA",
+    "bigBrain": "KLIPPAN",
     "highestAvgScore": "Högsta genomsnittliga ordpoäng!",
-    "socialButterfly": "SOCIAL FJÄRIL",
+    "socialButterfly": "SÄLLSKAPSDJURET",
     "mostSharedWords": "Mest populära ordval!",
     "mascotComments": {
       "awardsIntro1": "Och priserna går till...",
@@ -1320,7 +1326,7 @@ const sv = {
     "waitingForPlayers": "Samlar utmanare...",
     "oneMoreNeeded": "Trumma ihop gänget!",
     "readyToStart": "Redo att köra! Ju fler, desto roligare!",
-    "fullHouse": "Proppfullt! Nu smäller det!"
+    "fullHouse": "Alla är här! Nu kör vi!"
   },
   "roomCode": {
     "title": "Rumskod",
@@ -1444,7 +1450,7 @@ const sv = {
     "step": "Steg {current} av {total}"
   },
   "tips": {
-    "header": "Pro Tips",
+    "header": "Bra att veta",
     "tryIt": "Testa!"
   },
   "lateJoiner": {
@@ -1456,7 +1462,7 @@ const sv = {
     "quickTip2": "Släpp för att skicka",
     "quickTip3": "Längre ord = fler poäng!",
     "gotIt": "Fattar, kör!",
-    "badge": "Fashionably late"
+    "badge": "Lagom sen"
   },
   "spectator": {
     "upgraded": "Du är med! Kör hårt!",
@@ -1512,8 +1518,8 @@ const sv = {
     "viewDetails": "Djupdykning",
     "viewAllWords": "Alla ord",
     "viewXpBreakdown": "XP-uppdelning",
-    "rewardsEarned": "Byte insamlat",
-    "achievementUnlocked": "Trofé upplåst!",
+    "rewardsEarned": "Belöningar",
+    "achievementUnlocked": "Prestation upplåst!",
     "achievementsUnlocked": "Prestationer upplåsta",
     "details": "Detaljer",
     "performanceDetails": "Prestandadetaljer",
@@ -2361,7 +2367,7 @@ const sv = {
       "wordStormDesc": "Ibland vinner mängden!",
       "clutchFinisher": "Avgörande Avslutare",
       "clutchFinisherDesc": "Du sparade det bästa till sist. Tryck skapar diamanter.",
-      "firstBlood": "Första Blod",
+      "firstBlood": "Första Hugget",
       "firstBloodDesc": "Du kom ut svingandes. Tidig aggression sätter tonen.",
       "slowBurn": "Långsam Brand",
       "slowBurnDesc": "Startade sakta, slutade starkt. Sköldpaddan visste.",
@@ -2407,7 +2413,7 @@ const sv = {
       "unlucky": {
         "headline": "Dålig Lott!",
         "message": "Tuffa bokstäver. Händer alla!",
-        "tip": "Leta efter mönster: -ING, -AR, -ER, -LY."
+        "tip": "Leta efter mönster: -AR, -ER, -NING, -ANDE."
       },
       "thinking": {
         "headline": "Perfektionistfällan",
@@ -2499,7 +2505,7 @@ const sv = {
     "youFound": "Du hittade en mysteriebelöning!",
     "opening": "Öppnar...",
     "revealing": "Avslöjar...",
-    "awesome": "Fantastiskt!",
+    "awesome": "Snyggt!",
     "gameCompletion": "Spelslutbonus",
     "winBonus": "Vinnarbonus",
     "longWord": "Långordsbonus",
@@ -2577,7 +2583,7 @@ const sv = {
     },
     "wordHunt": {
       "loginTitle": "Snabb inloggning, sen kör vi!",
-      "loginSubtitle": "Tar 10 sekunder – din streak tackar dig",
+      "loginSubtitle": "Tar 10 sekunder – din svit tackar dig",
       "skipCta": "Hoppa över för nu",
       "gateTitle": "Ett litet steg till dagens pussel",
       "gateSubtitle": "Vi behöver veta vem som krossar det"
@@ -2629,8 +2635,8 @@ const sv = {
         "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!",
         "joinWordNerds": "Gå med i ordnördarna! Det är roligare när du sparar din framsteg!",
         "scoresTooGood": "Dina poäng är för bra för att försvinna! Spara dem för alltid!",
-        "streakProtector": "Skydda din streak! Registrera dig innan den försvinner!",
-        "makeMomProud": "Gör mamma stolt - visa upp dina ordkunskaper på topplistan!"
+        "streakProtector": "Skydda din svit! Registrera dig innan den försvinner!",
+        "makeMomProud": "Säkra din plats på topplistan!"
       }
     },
     "magicLink": {
@@ -2669,14 +2675,14 @@ const sv = {
     },
     "overview": "Översikt",
     "stats": "Statistik",
-    "memberSince": "Clashar sedan",
-    "totalGames": "Strider",
+    "memberSince": "Spelar sedan",
+    "totalGames": "Spelade spel",
     "wins": "Vinster",
-    "wordsFound": "Ord krossade",
+    "wordsFound": "Hittade ord",
     "totalScore": "Total poäng",
-    "timePlayed": "Tid i arenan",
+    "timePlayed": "Speltid",
     "achievements": "Prestationer",
-    "hallOfFame": "Hall of Fame",
+    "hallOfFame": "Ärepallen",
     "hallOfFameDescription": "Elitprestationer som kräver exceptionell skicklighet eller hängivenhet",
     "chooseAvatar": "Välj din avatar",
     "selectAvatar": "Välj",
@@ -2915,7 +2921,7 @@ const sv = {
     "noFreezes": "Inga frysningar tillgängliga. Tjäna 1 gratis frysning per vecka!",
     "freezeShields": "{count} Frysningssköld",
     "freezeShields_plural": "{count} Frysningssköldar",
-    "freezeShieldActive": "Streak Skyddad!",
+    "freezeShieldActive": "Svit skyddad!",
     "freezeShieldHint": "Sköldar aktiveras automatiskt om du missar en dag"
   },
   "partyScreen": {
@@ -3074,7 +3080,7 @@ const sv = {
     "createBoard": "Skapa bräda",
     "myPacks": "Mina paket",
     "nav": {
-      "community": "Community",
+      "community": "Gemenskap",
       "create": "Skapa"
     },
     "board": {
@@ -3217,9 +3223,9 @@ const sv = {
       "milestone": "Du nådde en skaparmilstolpe!"
     },
     "community": {
-      "hero": "Community Workshop",
+      "hero": "Gemenskapens Verkstad",
       "heroSub": "Spela, skapa och dela ordpussel med gemenskapen",
-      "title": "Community Workshop",
+      "title": "Gemenskapens Verkstad",
       "subtitle": "Spela, skapa och dela anpassade ordpussel",
       "tabBoards": "Bräden",
       "tabPacks": "Ordpaket",
@@ -3553,7 +3559,7 @@ const sv = {
       "community": {
         "title": "Vår gemenskap",
         "content": "LexiClash-gemenskapen är mångfaldig, välkomnande och växer varje dag. Från avslappnade familjespelavällar till intensiva tävlingsturneringar spänner våra spelare alla åldrar, färdighetsnivåer och bakgrunder. Vi anordnar dagliga utmaningar där alla spelar samma pussel, veckovisa topplisteåterställningar som håller tävlingen fräsch, och särskilda temaevenemang under helgdagar och kulturella firanden.",
-        "content2": "Vi tror att de bästa spelen formas av sina spelare. Därför lyssnar vi aktivt på gemenskapens feedback genom våra sociala mediekanaler och feedbackverktyg i spelet. Många av våra mest populära funktioner — inklusive Blast Mode och streak-systemet — inspirerades av spelarförslag. Gå med tusentals ordspelsentusiaster från över 30 länder som har gjort LexiClash till sitt favoritordspel."
+        "content2": "Vi tror att de bästa spelen formas av sina spelare. Därför lyssnar vi aktivt på gemenskapens feedback genom våra sociala mediekanaler och feedbackverktyg i spelet. Många av våra mest populära funktioner — inklusive Blast Mode och svit-systemet — inspirerades av spelarförslag. Gå med tusentals ordspelsentusiaster från över 30 länder som har gjort LexiClash till sitt favoritordspel."
       },
       "values": {
         "title": "Vad vi står för",
@@ -3809,7 +3815,7 @@ const sv = {
     "tickerFun11": "hittade ett lurigt långt ord",
     "tickerFun12": "har en fantastisk session",
     "todaysTopWords": "Dagens toppord",
-    "hallOfFame": "Hall of Fame",
+    "hallOfFame": "Ärepallen",
     "careerPoints": "Karriärpoäng",
     "gamesToday": "Spel idag",
     "gameModes": "Spellägen",
@@ -3829,7 +3835,7 @@ const sv = {
       "feature1Title": "Multiplayer i realtid",
       "feature1Desc": "Tavla mot 2-20 spelare samtidigt. Skapa ett rum, dela koden och borja spela direkt.",
       "feature2Title": "Dagliga utmaningar",
-      "feature2Desc": "Samma pussel for alla varlden over, varje dag. Folj din streak och dela emoji-resultat — precis som Wordle.",
+      "feature2Desc": "Samma pussel for alla varlden over, varje dag. Folj din svit och dela emoji-resultat — precis som Wordle.",
       "feature3Title": "Aventyrslage",
       "feature3Desc": "100 nivaer i 10 tematicerade varldar. Specialbrickor, bossstrider och power-ups haller varje omgang frask.",
       "feature4Title": "5 sprak",
@@ -3857,7 +3863,7 @@ const sv = {
       "gameModesTitle": "Spellägen förklarade",
       "gameModesMultiplayer": "Multiplayerrum — Skapa ett privat rum och dela koden med upp till 20 vänner. Alla ser samma bokstavsrutnät och tävlar om att hitta ord innan tiden tar slut. Spelaren med högst poäng vinner. Perfekt för fester, klassrum och teambuilding på distans.",
       "gameModesSingle": "Enspelare mot bottar — Öva dina ordletarfärdigheter mot AI-motståndare med varierande svårighetsgrad. Slå personliga rekord, samla prestationer och skärp din strategi utan pressen av live-tävling.",
-      "gameModesDaily": "Daglig utmaning — Ett nytt pussel varje dag, identiskt för alla spelare världen över. Slutför det för att hålla din streak igång och jämför ditt resultat med det globala communityt. Dela dina resultat med emoji-rutnät, precis som Wordle.",
+      "gameModesDaily": "Daglig utmaning — Ett nytt pussel varje dag, identiskt för alla spelare världen över. Slutför det för att hålla din svit igång och jämför ditt resultat med det globala communityt. Dela dina resultat med emoji-rutnät, precis som Wordle.",
       "gameModesAdventure": "Äventyrsläge — Resa genom 10 temavärldar med 100 nivåer av ökande svårighetsgrad. Stöt på speciella bricktyper som is, eld, bomber och regnbågsbrickor. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.",
       "educationTitle": "Byggt för lärande",
       "educationContent": "Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt — inklusive områden ansvariga för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på fem språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam konkurrens som motiverar elever att naturligt utöka sin ordkunskap.",
@@ -4171,8 +4177,8 @@ const sv = {
     "quitConfirmTitle": "Avsluta utmaning?",
     "imSure": "Jag är säker",
     "wordsFound": "{count} ord hittade",
-    "streak": "Streak",
-    "streakDays": "{count} dagars streak!",
+    "streak": "Svit",
+    "streakDays": "{count} dagars svit!",
     "streakCinematic": {
       "streakDays": "{count} dagars svit!",
       "milestone": "MILSTOLPE!",
@@ -4185,8 +4191,8 @@ const sv = {
     "home": "Hem",
     "close": "Stäng",
     "oneAttempt": "Ett skott — gör det räknas!",
-    "dayStreak": "dagars streak",
-    "daysStreak": "dagars streak",
+    "dayStreak": "dagars svit",
+    "daysStreak": "dagars svit",
     "playNow": "SPELA NU",
     "today": "IDAG",
     "loading": "Laddar daglig utmaning...",
@@ -4290,9 +4296,9 @@ const sv = {
       "cta": "Tror du att du kan slå det här? 🎮",
       "header": "LexiClash Daglig #{number}",
       "stats": "{words} ord • {score} poäng",
-      "streak": "🔥 {days} dagars streak!",
-      "streakMilestone7": "🔥 En veckas streak! Kan du fortsätta?",
-      "streakMilestone30": "🔥 30 dagars streak! Legendarisk!"
+      "streak": "🔥 {days} dagars svit!",
+      "streakMilestone7": "🔥 En veckas svit! Kan du fortsätta?",
+      "streakMilestone30": "🔥 30 dagars svit! Legendarisk!"
     },
     "errorWordTooShort": "Ordet måste ha minst {min} bokstäver",
     "errorWordTooLong": "Ordet får ha max {max} bokstäver",
@@ -4686,7 +4692,18 @@ const sv = {
       "hoursAgo": "{count}t sedan",
       "daysAgo": "{count}d sedan",
       "longAgo": "För länge sedan"
-    }
+    },
+    "requestAccepted": "Vän tillagd!",
+    "requestDeclined": "Förfrågan nekad",
+    "requestCancelled": "Förfrågan avbruten",
+    "removedSuccess": "Vän borttagen",
+    "blockedSuccess": "Användare blockerad",
+    "unblockedSuccess": "Användare avblockerad",
+    "confirmRemove": "Ta bort vän? Kan inte ångras.",
+    "confirmBlock": "Blockera användare? De kan inte kontakta dig.",
+    "block": "Blockera",
+    "filterFriends": "Sök vänner...",
+    "noMatchingFriends": "Inga matchande vänner"
   },
   "multiplayer": {
     "mode": "Läge",
@@ -4987,8 +5004,8 @@ const sv = {
       "fewDays": "Redo att fortsätta klättra?",
       "currentScore": "Nu",
       "personalBest": "Bäst",
-      "bestStreak": "Bästa streak",
-      "rebuildStreak": "Dags att bygga streaken igen! 🔥",
+      "bestStreak": "Bästa svit",
+      "rebuildStreak": "Dags att bygga sviten igen! 🔥",
       "keepGrowing": "Vi stärker hjärnan! 💪",
       "reachTier": "Kan du nå {tier}-nivå igen?",
       "beatBest": "Ditt bästa är {score}. Kan du slå det?",
@@ -5696,6 +5713,7 @@ const sv = {
     "devPreview": "Utvecklingsförhandsgranskning",
     "devPreviewDesc": "Äventyrsläge är under utveckling. Denna förhandsgranskning visar världskartan och nivåkonfiguration.",
     "next": "NÄSTA",
+    "starsToUnlock": "{{count}} till för att låsa upp",
     "exitToMap": "Avsluta till karta",
     "startLevel": "Starta nivå",
     "levelComplete": "Nivå klar!",
@@ -5747,7 +5765,19 @@ const sv = {
       "startRun": "Starta körning",
       "subtitle": "Hur långt kan du nå?",
       "timeLimit": "Tidsgräns",
-      "title": "Oändligt läge"
+      "title": "Oändligt läge",
+      "events": {
+        "doubleGold": "Guldrusch!",
+        "doubleGoldDesc": "Alla guldbelöningar fördubblas denna våning",
+        "timeSurge": "Tidsvåg!",
+        "timeSurgeDesc": "+30 bonussekunder att hitta ord",
+        "gemRush": "Ädelstensrusch!",
+        "gemRushDesc": "Extra specialrutor på brädet",
+        "dualMechanic": "Dubbel mekanik!",
+        "dualMechanicDesc": "Två världsmekaniker aktiva samtidigt",
+        "scoreFrenzy": "Poängfrossa!",
+        "scoreFrenzyDesc": "Alla poäng fördubblas denna våning"
+      }
     },
     "bossRush": {
       "backToHub": "Tillbaka till hubben",
@@ -5789,6 +5819,27 @@ const sv = {
       "fullComboLevels": "Full combo"
     },
     "loadError": "Kunde inte ladda framsteg",
+    "prestige": {
+      "title": "Prestige",
+      "available": "Prestige tillgänglig!",
+      "description": "Återställ dina världar och tjäna permanenta bonusar",
+      "confirm": "Är du säker? Dina världsframsteg återställs, men du behåller uppgraderingar, guld och ditt ordalbum.",
+      "activate": "Prestige nu",
+      "cancel": "Inte än",
+      "ranks": { "bronze": "Brons", "silver": "Silver", "gold": "Guld", "platinum": "Platina", "diamond": "Diamant" },
+      "titles": { "wordSmith": "Ordsmed", "lexiconAdept": "Lexikonadept", "wordMaster": "Ordmästare", "grandLexicon": "Storlexikon", "eternalWordsmith": "Evig ordsmed" },
+      "bonusXp": "+{{percent}}% XP",
+      "bonusGold": "+{{percent}}% Guld",
+      "keeps": "Du behåller",
+      "resets": "Återställs",
+      "lifetimeStars": "Livstidsstjärnor"
+    },
+    "gameError": {
+      "title": "Något gick fel",
+      "description": "Spelet stötte på ett fel. Dina framsteg har sparats.",
+      "returnToLevels": "Tillbaka till nivåer",
+      "retry": "Försök igen"
+    },
     "allStars": "Alla stjärnor",
     "continue": "Fortsätt",
     "perfect": "Perfekt!",
@@ -6702,7 +6753,7 @@ const sv = {
       "flash": {
         "title": "Blixtutmaning!",
         "longWord": "Hitta ett ord med {param}+ bokstäver",
-        "comboStreak": "Bygg en streak med {param} ord",
+        "comboStreak": "Bygg en svit med {param} ord",
         "specificLetter": "Använd bokstaven {param}",
         "fastWord": "Hitta ett ord på {param}s",
         "startsWith": "Hitta ett ord som börjar med {param}",
@@ -7659,7 +7710,7 @@ const sv = {
       "waitingForOpponent": "Väntar på motståndare...",
       "winRate": "Vinstprocent",
       "wins": "Vinster",
-      "winStreak": "Vinstreak",
+      "winStreak": "Vinsvit",
       "wordsAccepted": "Godkända ord",
       "wordsRejected": "Nekade ord",
       "xpEarned": "Intjänad XP",
@@ -8210,17 +8261,17 @@ const sv = {
   },
   "crazygames": {
     "ads": {
-      "watchForReward": "Watch ad for {{reward}}",
-      "adPlaying": "Ad playing...",
-      "adError": "Ad unavailable",
-      "adblockDetected": "Adblock detected - some features may be limited",
-      "thanksForWatching": "Thanks for watching!"
+      "watchForReward": "Se reklam för {{reward}}",
+      "adPlaying": "Reklam spelas...",
+      "adError": "Reklam ej tillgänglig",
+      "adblockDetected": "Annonsblockerare upptäckt - vissa funktioner kan vara begränsade",
+      "thanksForWatching": "Tack för att du tittade!"
     },
     "cloudSave": {
-      "syncing": "Syncing progress...",
-      "syncSuccess": "Progress synced!",
-      "syncError": "Sync failed - will retry",
-      "conflictResolved": "Progress updated from cloud"
+      "syncing": "Synkroniserar...",
+      "syncSuccess": "Framsteg synkade!",
+      "syncError": "Synkning misslyckades - försöker igen",
+      "conflictResolved": "Framsteg uppdaterade från molnet"
     }
   },
   "notifications": {
@@ -8275,14 +8326,14 @@ const sv = {
     },
     "prompt": {
       "title": "Håll dig i spelet!",
-      "body": "Få påminnelser om dagliga utmaningar och streak-varningar",
+      "body": "Få påminnelser om dagliga utmaningar och svit-varningar",
       "enable": "Aktivera aviseringar",
       "notNow": "Inte nu"
     },
     "preferences": {
       "title": "Aviseringsinställningar",
       "dailyChallenge": "Daglig utmaningspåminnelse",
-      "streakWarning": "Varning för hotad streak",
+      "streakWarning": "Varning för hotad svit",
       "friendInvites": "Kompis-utmaningar",
       "weeklySummary": "Veckosammanfattning"
     }
@@ -8574,7 +8625,7 @@ const sv = {
     "waitingForOpponent": "Väntar på motståndare...",
     "winRate": "Vinstprocent",
     "wins": "Vinster",
-    "winStreak": "Vinstreak",
+    "winStreak": "Vinsvit",
     "wordsAccepted": "Godkända ord",
     "wordsRejected": "Nekade ord",
     "xpEarned": "Intjänad XP",
@@ -8852,7 +8903,8 @@ const sv = {
     "remaining": "Dagliga gåvor kvar",
     "send": "Skicka gåva",
     "sent": "Gåva skickad!",
-    "limitReached": "Daglig gräns nådd"
+    "limitReached": "Daglig gräns nådd",
+    "error": "Gåvan misslyckades. Försök igen?"
   },
   "faq": {
     "title": "Vanliga frågor",
@@ -8934,10 +8986,10 @@ const sv = {
     }
   },
   "encouragement": {
-    "gameStart": "Kör! Du klarar det! 🎯",
+    "gameStart": "Kör! 🎯",
     "firstWord": "Snyggt! Fortsätt hitta ord!",
     "longWord": "Fantastiskt! Långa ord ger mer!",
-    "combo": "Combo! Du är i elden!",
+    "combo": "Kombo! Nu rullar det!",
     "halfway": "Halvvägs, fortsätt!",
     "almostDone": "Slutspurten! Hitta fler ord!"
   },
@@ -9147,6 +9199,146 @@ const sv = {
     "reachCombo": "Nå {{target}}x kombo",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} mynt"
+  },
+  "asyncChallenge": {
+    "title": "Brädutmaningar",
+    "pending": "Din tur!",
+    "pendingCount": "{{count}} utmaningar väntar",
+    "challengeFrom": "Utmaning från {{name}}",
+    "theirScore": "Deras poäng: {{score}}",
+    "playNow": "Spela nu",
+    "challengeFriend": "Utmana en vän",
+    "challengeFriendDesc": "Spela ett bräde och skicka det till en vän att slå ditt resultat",
+    "sendChallenge": "Skicka utmaning",
+    "selectFriend": "Välj motståndare",
+    "yourScore": "Din poäng: {{score}}",
+    "won": "Du vann med {{points}} poäng!",
+    "lost": "De vann med {{points}} poäng!",
+    "tied": "Oavgjort!",
+    "expired": "Utmaningen har löpt ut",
+    "declined": "Utmaningen nekades",
+    "noMessage": "Inget meddelande",
+    "addMessage": "Lägg till meddelande (valfritt)",
+    "empty": "Inga väntande utmaningar",
+    "emptyCta": "Skicka en brädutmaning till en vän!",
+    "resultTitle": "Utmaningsresultat",
+    "bestWord": "Bästa ord: {{word}}",
+    "wordsFound": "{{count}} ord hittade"
+  },
+  "wordClub": {
+    "title": "Ordklubb",
+    "myClub": "Min klubb",
+    "weeklyLeaderboard": "Veckotoppen",
+    "weeklyXp": "{{xp}} XP denna vecka",
+    "gamesPlayed": "{{count}} spel",
+    "bestWord": "Bäst: {{word}}",
+    "createClub": "Skapa en klubb",
+    "createClubDesc": "Starta en klubb och bjud in vänner för veckotävling",
+    "joinClub": "Gå med i en klubb",
+    "joinByCode": "Ange inbjudningskod",
+    "joinButton": "Gå med",
+    "leaveClub": "Lämna klubb",
+    "inviteCode": "Inbjudningskod: {{code}}",
+    "copyCode": "Kopiera kod",
+    "codeCopied": "Kod kopierad!",
+    "members": "{{count}}/{{max}} medlemmar",
+    "owner": "Ägare",
+    "admin": "Admin",
+    "member": "Medlem",
+    "clubName": "Klubbnamn",
+    "clubDesc": "Beskrivning (valfritt)",
+    "maxMembers": "Max medlemmar",
+    "create": "Skapa",
+    "resetsIn": "Återställs {{time}}",
+    "noClub": "Gå med i en klubb för veckostrider!",
+    "you": "Du",
+    "rank": "#{{rank}}"
+  },
+  "playerRecap": {
+    "title": "Din vecka i korthet",
+    "monthlyTitle": "Din månad i korthet",
+    "weekly": "Veckovis",
+    "monthly": "Månadsvis",
+    "gamesPlayed": "Spelade spel",
+    "wordsFound": "Hittade ord",
+    "bestScore": "Bästa poäng",
+    "longestWord": "Längsta ord",
+    "rarestWord": "Sällsyntaste fynd",
+    "bestCombo": "Bästa kombo",
+    "streakDays": "Svitdagar",
+    "gamesWon": "Vinster",
+    "uniqueWords": "Unika ord",
+    "favoriteMode": "Favoritläge",
+    "improvement": "{{percent}}% förbättring",
+    "declined": "{{percent}}% nedgång",
+    "rankUp": "Rank ↑{{change}}",
+    "rankDown": "Rank ↓{{change}}",
+    "share": "Dela sammanfattning",
+    "shareText": "Min LexiClash-vecka: {{games}} spel, {{words}} ord hittade, bästa poäng {{score}}. {{streak}} dagars svit! Slå det! 🎮",
+    "shareMonthlyText": "Min LexiClash-månad: {{games}} spel, {{words}} ord hittade, längsta ord: {{word}}. {{improvement}}% förbättring! 🔥",
+    "noData": "Spela några spel för att se din sammanfattning!",
+    "copied": "Sammanfattning kopierad!"
+  },
+  "quickPlay": {
+    "title": "Snabbspel",
+    "subtitle": "Hoppa rakt in!",
+    "daily": "Dagligt pussel",
+    "classic": "Klassiskt spel",
+    "blast": "Blast-läge",
+    "wordHunt": "Ordjakt",
+    "seconds": "~{{sec}}s att spela"
+  },
+  "rankedTier": {
+    "title": "Rankat",
+    "rating": "Rating: {{rating}}",
+    "peakRating": "Topp: {{rating}}",
+    "tier": "{{tier}}",
+    "bronze": "Brons",
+    "silver": "Silver",
+    "gold": "Guld",
+    "platinum": "Platina",
+    "diamond": "Diamant",
+    "master": "Mästare",
+    "progress": "{{percent}}% till nästa nivå",
+    "gamesPlayed": "{{count}} rankade spel",
+    "winRate": "{{percent}}% vinstprocent",
+    "ratingChange": "{{change}}",
+    "unranked": "Spela rankade spel för att få en nivå!",
+    "playRanked": "Spela rankat"
+  },
+  "seasonalEvent": {
+    "title": "Tidsbegränsat event",
+    "active": "Live nu",
+    "upcoming": "Kommer snart",
+    "ended": "Event avslutat",
+    "endsIn": "Slutar om {{time}}",
+    "startsIn": "Börjar om {{time}}",
+    "joinEvent": "Gå med i event",
+    "continuePlaying": "Fortsätt spela",
+    "yourScore": "Din poäng: {{score}}",
+    "yourRank": "Rank #{{rank}}",
+    "rewards": "Belöningar",
+    "topReward": "1:a plats",
+    "claimRewards": "Hämta belöningar",
+    "noEvents": "Inga aktiva event just nu",
+    "nextEvent": "Kolla tillbaka snart för nästa event!"
+  },
+  "reengagement": {
+    "welcomeBack": "Välkommen tillbaka!",
+    "missedYou": "Vi saknade dig! Här är en bonus för att komma igång igen.",
+    "streakRisk": "Din svit håller på att gå ut! Spela nu för att behålla den.",
+    "socialTrigger": "{{friendCount}} vänner spelade medan du var borta!",
+    "lossAversion": "Din ligaplacering sjunker! Ett snabbt spel hjälper.",
+    "incentive": "Välkommen tillbaka! Här är {{coins}} mynt och en svitfrys på oss.",
+    "majorIncentive": "Vi sparade dina framsteg! Kom tillbaka till 3 dagars premium gratis.",
+    "emailOnly": "Kolla din e-post för ett specialerbjudande!",
+    "claimBonus": "Hämta bonus",
+    "daysAway": "{{count}} dagar borta",
+    "bonusRewards": "Dina välkomstbelöningar:",
+    "coins": "{{count}} mynt",
+    "streakFreeze": "{{count}} svitfrys",
+    "premiumDays": "{{count}} dagar premium",
+    "dismiss": "Kanske senare"
   }
 };
 

@@ -284,8 +284,9 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 className={cn(
                   'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
+                  'hover:bg-neo-black/10',
                   isMe
-                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
+                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan hover:bg-neo-cyan/40'
                     : 'bg-neo-black/5 border border-neo-black/20'
                 )}
               >

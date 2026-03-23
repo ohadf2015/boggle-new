@@ -31,6 +31,8 @@ import logger from '../utils/logger.js';
 
 // Auto-kick: players with AFK presence for this long in lobby get kicked
 const AUTO_KICK_AFK_MS = parseInt(process.env.AUTO_KICK_AFK_MS || '180000'); // 3 minutes
+// Warn players 30 seconds before auto-kick
+const AFK_WARNING_BEFORE_KICK_MS = 30000;
 
 interface KickPlayerPayload {
   targetUsername: string;
@@ -145,4 +147,51 @@ function checkAutoKickInactive(io: Server, forEachGame: (cb: (gameCode: string, 
   });
 }
 
-export { registerKickHandler, executeKick, checkAutoKickInactive };
+/**
+ * Check all games for AFK players approaching kick threshold and warn them.
+ * Called periodically from presenceHandler's health check interval.
+ * Sends afkWarning event 30s before auto-kick so the player can act.
+ */
+function checkAfkWarnings(io: Server, forEachGame: (cb: (gameCode: string, game: any) => void) => void): void {
+  const now = Date.now();
+  const warningThresholdMs = AUTO_KICK_AFK_MS - AFK_WARNING_BEFORE_KICK_MS;
+
+  forEachGame((gameCode: string, game: any) => {
+    if (game.gameState !== 'waiting') return;
+
+    const usernames = Object.keys(game.users || {});
+    for (const username of usernames) {
+      const user = game.users[username];
+      if (!user || user.isHost || user.isBot || user.disconnected) continue;
+
+      const lastActivity = user.lastActivity || user.lastHeartbeat || 0;
+      if (lastActivity <= 0) continue;
+
+      const inactiveMs = now - lastActivity;
+
+      // Already past kick threshold — checkAutoKickInactive handles this
+      if (inactiveMs >= AUTO_KICK_AFK_MS) continue;
+
+      // In warning zone (between warning threshold and kick threshold)
+      if (inactiveMs >= warningThresholdMs && !user._afkWarned) {
+        const secondsRemaining = Math.round((AUTO_KICK_AFK_MS - inactiveMs) / 1000);
+        const targetSocketId = getSocketIdByUsername(gameCode, username);
+        if (targetSocketId) {
+          const targetSocket = getSocketById(io, targetSocketId);
+          if (targetSocket) {
+            safeEmit(targetSocket, 'afkWarning', { secondsRemaining });
+            user._afkWarned = true;
+            logger.info('KICK', `AFK warning sent to ${username} in ${gameCode} (${secondsRemaining}s remaining)`);
+          }
+        }
+      }
+
+      // Reset warning flag if player became active again
+      if (inactiveMs < warningThresholdMs && user._afkWarned) {
+        user._afkWarned = false;
+      }
+    }
+  });
+}
+
+export { registerKickHandler, executeKick, checkAutoKickInactive, checkAfkWarnings };

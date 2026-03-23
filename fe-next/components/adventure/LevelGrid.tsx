@@ -186,7 +186,7 @@ export default function LevelGrid({
           className="absolute inset-0 level-grid-parallax-layer level-grid-parallax-css-scaled"
           style={{ '--parallax-depth': '0.12', '--parallax-scale': '1.15' } as React.CSSProperties}
         >
-          <Image src={worldImage} alt="" fill sizes="100vw" className="object-cover opacity-[0.45]" priority />
+          <Image src={worldImage} alt="" role="presentation" fill sizes="100vw" className="object-cover opacity-[0.45]" priority />
           <div className="absolute inset-0" style={{ backgroundColor: 'rgba(10, 10, 30, 0.4)' }} />
         </div>
 

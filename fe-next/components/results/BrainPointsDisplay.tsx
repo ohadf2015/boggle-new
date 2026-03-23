@@ -62,7 +62,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     <Brain className={cn("w-3 h-3", iconColor)} />
                     <span className={cn("font-black", textColor)}>{sign}{reward.scoreDelta}</span>
                 </div>
-                <div className={cn("text-[8px] font-bold uppercase", subTextColor)}>
+                <div className={cn("text-[10px] font-bold uppercase", subTextColor)}>
                     {t('brain.points')}
                 </div>
             </div>

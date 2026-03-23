@@ -6,9 +6,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 const COMEBACK_TIERS = [
-  { minDays: 3, maxDays: 6, xpMultiplier: 1.5, durationHours: 24, hints: 1, streakFreezes: 0 },
-  { minDays: 7, maxDays: 13, xpMultiplier: 2.0, durationHours: 48, hints: 3, streakFreezes: 1 },
-  { minDays: 14, maxDays: 29, xpMultiplier: 2.5, durationHours: 72, hints: 5, streakFreezes: 2 },
+  { minDays: 3, maxDays: 6, xpMultiplier: 1.5, durationHours: 48, hints: 2, streakFreezes: 1 },
+  { minDays: 7, maxDays: 13, xpMultiplier: 2.0, durationHours: 72, hints: 3, streakFreezes: 1 },
+  { minDays: 14, maxDays: 29, xpMultiplier: 2.5, durationHours: 96, hints: 5, streakFreezes: 2 },
   { minDays: 30, maxDays: Infinity, xpMultiplier: 3.0, durationHours: 168, hints: 10, streakFreezes: 3, title: 'THE_RETURNED' },
 ] as const;
 

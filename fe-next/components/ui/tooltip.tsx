@@ -56,8 +56,8 @@ const TooltipContent = React.forwardRef<
         "shadow-hard-sm",
         // Typography
         "px-3 py-2 text-sm font-bold",
-        // Constrain max width to prevent overflow
-        "max-w-[min(300px,calc(100vw-32px))]",
+        // Constrain max width — wider on desktop to avoid unnecessary wrapping
+        "max-w-[min(300px,calc(100vw-32px))] lg:max-w-[min(420px,calc(100vw-32px))]",
         // Animations
         "animate-in fade-in-0 zoom-in-95",
         "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",

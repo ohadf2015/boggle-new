@@ -13,6 +13,7 @@ import {
 import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PageLoader } from '@/components/ui/PageLoader';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -82,6 +83,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     isReady: isCrazyGamesReady,
     inviteRoomId,
     isInstantMultiplayer,
+    showInviteButton: cgShowInvite,
   } = useCrazyGamesInvite({
     // When player joins via CrazyGames invite link with roomId
     onInviteJoin: (roomId) => {
@@ -229,8 +231,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
       // Pass username as override to avoid stale closure in handleJoin
       handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername);
+
+      // Show CrazyGames invite button so host can invite friends
+      cgShowInvite(gameCode);
     },
-    [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]
+    [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]
   );
 
   // Handle quick play - dual mode with sensible defaults
@@ -252,6 +257,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // Pass username as override to avoid stale closure in handleJoin
     handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername);
 
+    // Show CrazyGames invite button so host can invite friends
+    cgShowInvite(gameCode);
+
     // Auto-copy invite link to clipboard for easy sharing
     try {
       const joinUrl = getJoinUrl(gameCode, 'quick-play');
@@ -260,13 +268,13 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     } catch {
       // Clipboard API not available — no-op
     }
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t]);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t, cgShowInvite]);
 
-  // Show brief loading while CrazyGames SDK initializes (prevents flash of wrong UI)
+  // Show branded loading while CrazyGames SDK initializes (prevents flash of wrong UI)
   if (!isCrazyGamesReady) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-neo-navy">
-        <div className="text-neo-cream text-lg font-bold">Loading...</div>
+        <PageLoader size="md" />
       </div>
     );
   }

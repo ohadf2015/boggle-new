@@ -399,6 +399,11 @@ export function generateObjectives(
   // =============================================
   const globalLevel = (world - 1) * LEVELS_PER_WORLD + level;
 
+  // Breather levels: positions 3 and 5 have reduced objectives
+  // Creates pacing valleys between difficulty peaks (boss at 7, chapter ends)
+  const isBreatherLevel = level === 3 || level === 5;
+  const breatherMultiplier = isBreatherLevel ? 0.75 : 1;
+
   // Primary objective: Alternate between wordCount and scoreTarget
   const timerSeconds = getTimerDuration(world);
 
@@ -406,6 +411,9 @@ export function generateObjectives(
     // Odd levels: word count
     // Base: 8 words, +2 every 5 global levels, max 25
     let target = Math.min(8 + Math.floor(globalLevel / 5) * 2, 25);
+
+    // Breather reduction for levels 3/5
+    target = Math.max(5, Math.round(target * breatherMultiplier));
 
     // Backpressure: cap wordCount based on available timer
     // 1 word per 4 seconds is very fast; cap at 80% of that
@@ -428,7 +436,7 @@ export function generateObjectives(
     // Level progression bonus: +1.5% per global level beyond first
     const levelBonus = 1 + (globalLevel - 1) * 0.015;
     const target = Math.min(
-      Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus),
+      Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus * breatherMultiplier),
       1500
     );
     objectives.push({
@@ -439,6 +447,8 @@ export function generateObjectives(
   }
 
   // Secondary objectives based on level progression
+  // Breather levels skip secondary objectives for a relaxed experience
+  if (isBreatherLevel) return objectives;
 
   // Long words objective (level 3+)
   // Only add if grid supports paths of LONG_WORD_LENGTH (5)

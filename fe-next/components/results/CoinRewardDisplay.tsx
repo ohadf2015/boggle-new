@@ -102,7 +102,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
           <Coins className="w-3 h-3 text-neo-black" />
           <span className="font-black text-neo-black">+{reward.awarded}</span>
         </div>
-        <div className="text-[8px] font-bold uppercase text-neo-black/70">
+        <div className="text-[10px] font-bold uppercase text-neo-black/70">
           {t('reveal.coins')}
         </div>
       </div>
@@ -223,7 +223,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
           <Lock className="w-3 h-3 text-neo-cream/70" />
           <span className="font-bold text-neo-cream/70 text-xs">+{reward.awarded}</span>
         </div>
-        <div className="text-[7px] font-bold text-neo-cream/50">
+        <div className="text-[9px] font-bold text-neo-cream/50">
           {t('coins.signInShort')}
         </div>
       </div>

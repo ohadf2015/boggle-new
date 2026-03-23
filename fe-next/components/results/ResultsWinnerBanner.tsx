@@ -9,6 +9,7 @@ import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import type { PlayerResult } from '@/types/components';
+import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 
 /** Animated score counter that counts up from 0 */
 const ScoreCounter: React.FC<{ target: number; className?: string }> = ({ target, className }) => {
@@ -195,12 +196,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
     return t('results.betterLuckNextTime');
   };
 
-  // Get ordinal suffix for rank display (1st, 2nd, 3rd, 4th, etc.)
-  const getOrdinalSuffix = (n: number): string => {
-    const s = ['th', 'st', 'nd', 'rd'];
-    const v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-  };
+  // Ordinal formatting delegated to i18n utility
 
   // Get the appropriate announcement text
   const getAnnouncementText = () => {
@@ -350,7 +346,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     rounded-full font-black flex items-center justify-center shadow-hard-sm
                     ${compact ? 'w-7 h-7 text-[11px]' : 'w-8 h-8 text-xs sm:w-9 sm:h-9 sm:text-sm'}
                   `}>
-                    {getOrdinalSuffix(rank)}
+                    {formatRankOrdinal(rank, t)}
                   </span>
                 </div>
               </motion.div>

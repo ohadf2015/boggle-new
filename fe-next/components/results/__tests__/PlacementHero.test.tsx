@@ -82,12 +82,13 @@ describe('PlacementHero — Podium Celebration', () => {
 
   it('renders rank badge with ordinal', () => {
     render(<PlacementHero {...defaultProps} />);
-    expect(screen.getByText('1st')).toBeInTheDocument();
+    // t() mock returns key — formatRankOrdinal(1, t) returns t('common.ordinal1')
+    expect(screen.getByText('common.ordinal1')).toBeInTheDocument();
   });
 
   it('renders ordinal placement text', () => {
     render(<PlacementHero {...defaultProps} />);
-    expect(screen.getByText(/1st/)).toBeInTheDocument();
+    expect(screen.getByText(/common\.ordinal1/)).toBeInTheDocument();
   });
 
   it('renders score counter starting at 0', () => {
@@ -171,13 +172,14 @@ describe('PlacementHero — Podium Celebration', () => {
 
   it('renders correct ordinal for 2nd, 3rd, 4th', () => {
     const { rerender } = render(<PlacementHero {...defaultProps} rank={2} />);
-    expect(screen.getByText(/2nd/)).toBeInTheDocument();
+    expect(screen.getByText(/common\.ordinal2/)).toBeInTheDocument();
 
     rerender(<PlacementHero {...defaultProps} rank={3} />);
-    expect(screen.getByText(/3rd/)).toBeInTheDocument();
+    expect(screen.getByText(/common\.ordinal3/)).toBeInTheDocument();
 
     rerender(<PlacementHero {...defaultProps} rank={4} />);
-    expect(screen.getByText(/4th/)).toBeInTheDocument();
+    // rank >= 4 uses ordinalN with {n} param — mock t returns key as-is
+    expect(screen.getByText(/common\.ordinalN/)).toBeInTheDocument();
   });
 
   it('renders Word Hunt target word when wordHuntData provided', () => {

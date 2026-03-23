@@ -193,11 +193,21 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
         </div>
       )}
 
-      {/* Next tier preview */}
+      {/* Next tier preview with delta highlight */}
       {!isMaxed && tier < maxTier && (
-        <div className="text-xs text-neo-white/40 font-neo-body flex items-center gap-1">
-          <ChevronRight className="w-3 h-3 rtl:scale-x-[-1]" />
-          <span>{t(upgrade.tiers[tier].effectKey)}</span>
+        <div className="text-xs font-neo-body">
+          <div className="flex items-center gap-1 text-neo-white/40">
+            <ChevronRight className="w-3 h-3 rtl:scale-x-[-1]" />
+            <span>{t(upgrade.tiers[tier].effectKey)}</span>
+          </div>
+          {/* Delta badge: shows current → next value */}
+          {tier > 0 && (
+            <div dir="ltr" className="mt-1 ms-4 inline-flex items-center gap-1 px-1.5 py-0.5 bg-neo-lime/10 border border-neo-lime/30 rounded text-[10px] font-bold text-neo-lime">
+              <span>{upgrade.tiers[tier - 1].value}</span>
+              <span className="text-neo-white/30">→</span>
+              <span>{upgrade.tiers[tier].value}</span>
+            </div>
+          )}
         </div>
       )}
 

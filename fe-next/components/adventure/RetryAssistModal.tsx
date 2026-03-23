@@ -272,7 +272,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                     'transition-all duration-200'
                   )}
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 rtl:scale-x-[-1]" />
                   {t('common.exit')}
                 </button>
               </div>

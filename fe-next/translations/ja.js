@@ -19,7 +19,7 @@ const ja = {
     "language": "Japanese",
     "leaderboard": {
       "title": "グローバルリーダーボード - トッププレイヤー",
-      "description": "LexiClashグローバルリーダーボードで上位ランクのプレイヤーを見る。世界中のワードゲーム愛好家と競い合い、進捗を追跡しましょう。",
+      "description": "LexiClashグローバルリーダーボードでトッププレイヤーをチェック。世界中のワードゲーム愛好家と競い合い、自分の成長を記録しよう。",
       "ogTitle": "グローバルリーダーボード - トップワードゲームプレイヤー",
       "ogDescription": "最高のワードゲームプレイヤーの中で自分のランクを確認しよう。LexiClashに参加してトップを目指そう！"
     },
@@ -142,6 +142,11 @@ const ja = {
     "shareViaWhatsApp": "WhatsAppでシェア",
     "shareViaTelegram": "Telegramでシェア",
     "close": "閉じる",
+    "ordinal1": "1位",
+    "ordinal2": "2位",
+    "ordinal3": "3位",
+    "ordinalN": "{n}位",
+    "chat": "チャット",
     "showAll": "すべて表示",
     "claim": "受け取る",
     "looksGood": "良さそう",
@@ -289,7 +294,7 @@ const ja = {
     "paths": {
       "power": "パワー",
       "strategy": "戦略",
-      "utility": "ユーティリティ"
+      "utility": "便利技"
     },
     "powerStrike": {
       "name": "パワーストライク"
@@ -332,7 +337,7 @@ const ja = {
     "checkConnection": "オフラインみたい！",
     "retry": "再接続",
     "retryNow": "再接続！",
-    "scoreSafe": "スコアはサーバーに保存されています",
+    "scoreSafe": "スコアはちゃんと保存されてるよ",
     "qualityExcellent": "接続状態：優良",
     "qualityGood": "接続状態：良好",
     "qualityPoor": "接続状態：遅い",
@@ -431,7 +436,7 @@ const ja = {
   "effects": {
     "preferenceTitle": "アニメーション設定",
     "preferenceSubtitle": "初めてですか？",
-    "preferenceDescription": "お知らせ！画面の揺れと点滅は勝利を祝うためのもの。無効にしますか？",
+    "preferenceDescription": "画面の揺れや点滅は勝利の演出だよ！苦手なら無効にできるよ",
     "earthquakeShake": "画面の揺れ",
     "fireRoundLights": "点滅ライト",
     "keepAnimations": "効果を維持",
@@ -485,7 +490,7 @@ const ja = {
     "title": "設定",
     "appearance": "外観",
     "language": "言語",
-    "audio": "オーディオ",
+    "audio": "音声",
     "music": "音楽",
     "soundEffects": "効果音",
     "accessibility": "アクセシビリティ",
@@ -609,7 +614,7 @@ const ja = {
     "goHome": "ホームへ",
     "failedToLoadLeaderboard": "ランキングの読み込みに失敗",
     "failedToLoadProfile": "プロフィールの読み込みに失敗",
-    "unableToLoadData": "データを読み込めませんでした。もう一度お試しください。",
+    "unableToLoadData": "データが読み込めなかった。もう一回試してみて！",
     "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",
     "rateLimited": "落ち着いて、スプリンター！",
@@ -846,7 +851,7 @@ const ja = {
       "invitePrompt": "招待リンクを送ってパーティーを始めよう",
       "inviteFriends": "友達を招待",
       "noRoomsYet": "進行中のバトルはありません",
-      "beTheLegend": "最初のバトルを始める伝説になろう！",
+      "beTheLegend": "最初にバトルを始めた伝説になろう！",
       "hostAndPlay": "ホスト＆プレイ — コードを友達とシェア",
       "startBattle": "バトルを始める",
       "inProgress": "進行中",
@@ -927,8 +932,8 @@ const ja = {
       "invalidCode": "コードが無効かルームが閉じてる。確認してもう一度！",
       "connectionLost": "接続が切断されました。再接続中...",
       "hostLeft": "ホストがゲームを離れました。ロビーに戻ります...",
-      "invalidUsername": "ユーザー名は2〜20文字にしてください。",
-      "serverError": "サーバーエラー。もう一度お試しください。"
+      "invalidUsername": "ユーザー名は2〜20文字にしてね",
+      "serverError": "サーバーエラー。もう一回試してみて！"
     }
   },
   "hostView": {
@@ -952,6 +957,7 @@ const ja = {
     "playerKicked": "{{name}}がルームから追放されました",
     "youWereKicked": "ルームから追放されました",
     "youWereKickedInactive": "非アクティブのため退出されました",
+    "afkWarning": "{{seconds}}秒後に非アクティブのため退出されます — タップして滞在！",
     "shareCodeHint": "上のルームコードを共有して友達を招待しよう！",
     "battleMode": "バトルモード",
     "preset": "プリセット",
@@ -1002,7 +1008,7 @@ const ja = {
     "broadcastModeDesc": "ホストは観戦のみ",
     "broadcastModeHint": "4人以上のプレイヤーに最適！テレビに表示するには有効にしてください",
     "scanOrShare": "QRコードをスキャンまたはリンクを共有",
-    "broadcastSuggestion": "4人以上のプレイヤーがいますか？テレビモードで大画面に表示してみましょう！",
+    "broadcastSuggestion": "4人以上いる？テレビモードで大画面に映すと盛り上がるよ！",
     "advancedSettings": "詳細設定",
     "roomClosedInactivity": "非アクティブのためルームが閉じられました",
     "gameOverCheckScores": "ゲームオーバー！最終スコアを確認してください",
@@ -1024,7 +1030,7 @@ const ja = {
     "tournamentCreateFailed": "トーナメントの作成に失敗しました。もう一度お試しください。",
     "cancelTournament": "トーナメントをキャンセル",
     "confirmCancelTournament": "トーナメントをキャンセルしますか？",
-    "cancelTournamentWarning": "トーナメントをキャンセルしてもよろしいですか？すべての進行状況が失われ、元に戻すことはできません。",
+    "cancelTournamentWarning": "トーナメントをキャンセルする？進行状況は全部消えて元に戻せないよ。",
     "minWordLength": "最小文字数",
     "wordsAutoValidated": "単語が自動検証されました",
     "gameTypeSelector": "ゲームモードを選択",
@@ -1182,11 +1188,11 @@ const ja = {
     "onFire": "絶好調!",
     "pointsApart": "差!",
     "bonusPts": "ボーナス",
-    "fastestFirstWord": "記録的な速さの最初の単語!",
+    "fastestFirstWord": "最速の一手！",
     "highestAccuracy": "完璧な精度!",
     "mostLongWords": "長い単語のマスター!",
     "bestComboStreak": "止められない連続!",
-    "mostUniqueFinds": "誰も見つけられなかった単語を発見!",
+    "mostUniqueFinds": "誰も見つけなかった言葉を発掘！",
     "strongFinisher": "最後の数秒を制覇!",
     "vocabularyVirtuoso": "語彙の達人",
     "longestSingleWord": "最長の単語を発見!",
@@ -1199,9 +1205,9 @@ const ja = {
     "lengths": "種類",
     "steadyEddie": "安定王",
     "mostConsistent": "最も安定したペース!",
-    "shortAndSweet": "ショート＆スイート",
+    "shortAndSweet": "短くてキレイ",
     "most3LetterWords": "3文字単語のマスター!",
-    "bigBrain": "ビッグブレイン",
+    "bigBrain": "頭脳派",
     "highestAvgScore": "最高平均単語スコア!",
     "socialButterfly": "みんなの人気者",
     "mostSharedWords": "最も人気の単語選び!",
@@ -1217,7 +1223,7 @@ const ja = {
     "spotlight": {
       "heading": "🎭 プレイヤースポットライト",
       "mascotIntro1": "どんなプレイヤーがいるか見てみましょう！",
-      "mascotIntro2": "すべてのプレイヤーにストーリーがあります。これがあなたの！",
+      "mascotIntro2": "みんなにドラマがある。これがあなたの物語！",
       "mascotIntro3": "キャラクターたちに会う時間です！",
       "mascotIntro4": "誰がどうプレイした？見てみましょう！",
       "mascotIntro5": "スポットライトはあなたに！",
@@ -1266,7 +1272,7 @@ const ja = {
     "aiValidating": "AIが確認中...",
     "leaderboard": "リーダーボード",
     "noPlayersYet": "まだプレイヤーがいません",
-    "wordTooShort": "単語が短すぎます！（最低2文字）",
+    "wordTooShort": "短すぎ！（2文字以上必要）",
     "wordTooShortMin": "単語が短すぎます！（最低${min}文字）",
     "errorOccurred": "おっと！もう一回",
     "tooFast": "ゆっくり！送信が速すぎます",
@@ -1343,7 +1349,7 @@ const ja = {
     "step2Text": "長い単語 = もっとポイント。ユニークな単語を見つけよう！",
     "welcome": {
       "title": "LexiClashへようこそ！",
-      "subtitle": "スワイプ。スペル。制覇。",
+      "subtitle": "なぞって。つなげて。勝ち取れ。",
       "demoInstruction": "やってみよう！スワイプで綴ろう:",
       "demoWord": "CAT",
       "demoHint": "隣接する文字をつなげよう",
@@ -1363,7 +1369,7 @@ const ja = {
     },
     "profile": {
       "title": "装備せよ！",
-      "subtitle": "アバター + 名前 = バトル準備完了",
+      "subtitle": "アバターと名前を決めたら出撃準備OK！",
       "deferredTitle": "進捗を保存しますか？",
       "deferredSubtitle": "プロフィールを設定して統計を保存しよう！",
       "tapToCustomize": "タップしてカスタマイズ"
@@ -1376,7 +1382,7 @@ const ja = {
       "tip1TitleDesktop": "文字を選択",
       "tip1TextDesktop": "クリック、入力、またはドラッグで単語を作ろう",
       "tip2Title": "長い＝良い",
-      "tip2Text": "長い単語は指数関数的に高得点",
+      "tip2Text": "長い単語ほどポイントが爆上がり",
       "tip3Title": "スピードが大事",
       "tip3Text": "素早く見つけてコンボでボーナス獲得"
     },
@@ -1627,7 +1633,7 @@ const ja = {
     "readyForNextRound": "次のラウンドの準備はいい？",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
-    "defendTitle": "タイトルを防衛せよ！",
+    "defendTitle": "王座を守れ！",
     "aheadOf": "{player}より上",
     "findingWouldHaveTied": "{words}を見つけていれば同点だった！",
     "showAllRankings": "+{count}人のプレイヤー",
@@ -1682,10 +1688,10 @@ const ja = {
     "potentialScore": "+{points}点の可能性",
     "comparativeInsights": {
       "title": "あなたの比較",
-      "uniqueWords": "他の誰も見つけなかった{count}つの単語を見つけました！",
+      "uniqueWords": "あなただけが見つけた単語が{count}個！",
       "longestWord": "あなたの最長単語は平均より{count}文字長かった",
-      "scoreAbove": "平均より{pct}%多くスコアしました",
-      "scoreBelow": "平均より{pct}%少なくスコアしました"
+      "scoreAbove": "平均を{pct}%上回った！",
+      "scoreBelow": "平均を{pct}%下回った"
     },
     "sessionStats": {
       "title": "セッションハイライト",
@@ -2347,7 +2353,7 @@ const ja = {
     "midGamePeak": "中盤ピーク",
     "burstMode": "バーストモード",
     "slowStarter": "スロースターター",
-    "secondWind": "セカンドウィンド",
+    "secondWind": "二度目の風",
     "accuracy": "正確性",
     "story": {
       "precisionSpeed": "スピードと精度",
@@ -2374,7 +2380,7 @@ const ja = {
       "burstModeDesc": "一つの爆発的なフェーズで圧倒。質が安定性に勝る！",
       "slowStarter": "スロースターター",
       "slowStarterDesc": "リズムを見つけるのに時間がかかった。見つけたら止まらない。",
-      "secondWind": "セカンドウィンド",
+      "secondWind": "二度目の風",
       "secondWindDesc": "中盤の落ち込み？問題なし。強く復活した。",
       "wordsmith": "ワードスミス",
       "wordsmithDesc": "短い単語では満足しない。",
@@ -2412,8 +2418,8 @@ const ja = {
       },
       "thinking": {
         "headline": "完璧主義の罠",
-        "message": "時には良いで十分。送信しよう！",
-        "tip": "まず送信、後で考える。ペナルティなし！"
+        "message": "完璧じゃなくていい。とりあえず送ってみよう！",
+        "tip": "迷ったらまず送信！ペナルティないから安心して"
       },
       "warmup": {
         "headline": "ウォームアップ",
@@ -2442,10 +2448,10 @@ const ja = {
     "titles": {
       "wordSeeker": "ワードシーカー",
       "letterHunter": "レターハンター",
-      "vocabularian": "ボキャブラリアン",
+      "vocabularian": "語彙の達人",
       "wordsmith": "ワードスミス",
-      "lexiconAdept": "レキシコンアデプト",
-      "linguisticLegend": "リングイスティックレジェンド"
+      "lexiconAdept": "辞書の使い手",
+      "linguisticLegend": "言葉の伝説"
     },
     "xpBonus": "+{{percent}}% XP",
     "compactLevel": "Lv",
@@ -2598,7 +2604,7 @@ const ja = {
       },
       "default": {
         "title": "ようこそチャンピオン！",
-        "subtitle": "プロフィールをカスタマイズしてリーダーボードで輝きましょう"
+        "subtitle": "プロフィールを作ってランキングで目立とう！"
       },
       "chooseAvatar": "アバターを選択",
       "displayName": "表示名",
@@ -2608,7 +2614,7 @@ const ja = {
       "avatarAssigned": "アバター設定完了"
     },
     "inlineSignup": {
-      "title": "ワードウォリアーズに参加しよう！",
+      "title": "言葉のバトルに参加しよう！",
       "subtitle": "このスコアを失うのはもったいない！",
       "orContinueWith": "またはメールで続ける",
       "emailPlaceholder": "メールアドレス",
@@ -2960,10 +2966,10 @@ const ja = {
     },
     "rarity": {
       "common": "コモン",
-      "uncommon": "アンコモン",
+      "uncommon": "珍しい",
       "rare": "レア",
       "epic": "エピック",
-      "legendary": "レジェンダリー"
+      "legendary": "伝説"
     },
     "avatar_fire": {
       "name": "炎の精霊",
@@ -3971,7 +3977,7 @@ const ja = {
       "intenseDesc": "大きいボード、3分",
       "friendly": "フレンドリー",
       "friendlyDesc": "イージーモード、ボット1体",
-      "competitive": "コンペティティブ",
+      "competitive": "ガチ勝負",
       "competitiveDesc": "ミディアム、ボット2体",
       "battle": "バトル",
       "battleDesc": "ハードモード、ボット3体",
@@ -4755,7 +4761,16 @@ const ja = {
       "hoursAgo": "{count}時間前",
       "daysAgo": "{count}日前",
       "longAgo": "しばらく前"
-    }
+    },
+    "requestAccepted": "フレンド追加！",
+    "requestDeclined": "リクエスト拒否",
+    "requestCancelled": "リクエスト取消",
+    "removedSuccess": "フレンド削除",
+    "blockedSuccess": "ユーザーをブロック",
+    "unblockedSuccess": "ブロック解除",
+    "confirmRemove": "フレンドを削除しますか？元に戻せません。",
+    "confirmBlock": "ブロックしますか？連絡できなくなります。",
+    "block": "ブロック"
   },
   "reveal": {
     "revealWord": "表示",
@@ -5178,7 +5193,7 @@ const ja = {
     },
     "guestView": {
       "title": "進捗を追跡",
-      "description": "サインインして認知パフォーマンスを経時的に追跡し、単語発見スキルに関する詳細な洞察を確認できます。"
+      "description": "サインインすると、言葉探しの実力がどう変わったか記録できるよ！"
     },
     "progressHistory": "進捗履歴",
     "startTracking": "記録開始",
@@ -5748,6 +5763,7 @@ const ja = {
     "devPreview": "開発プレビュー",
     "devPreviewDesc": "アドベンチャーモードは開発中です。このプレビューではワールドマップとレベル設定を表示しています。",
     "next": "次へ",
+    "starsToUnlock": "あと{{count}}個で解放",
     "exitToMap": "マップに戻る",
     "startLevel": "レベル開始",
     "levelComplete": "レベルクリア！",
@@ -5799,7 +5815,19 @@ const ja = {
       "startRun": "ランを開始",
       "subtitle": "どこまで行けるか？",
       "timeLimit": "制限時間",
-      "title": "エンドレスモード"
+      "title": "エンドレスモード",
+      "events": {
+        "doubleGold": "ゴールドラッシュ！",
+        "doubleGoldDesc": "このフロアのゴールド報酬が2倍",
+        "timeSurge": "タイムサージ！",
+        "timeSurgeDesc": "+30秒のボーナスタイム",
+        "gemRush": "ジェムラッシュ！",
+        "gemRushDesc": "ボードに特殊タイルが追加",
+        "dualMechanic": "デュアルメカニック！",
+        "dualMechanicDesc": "2つのワールドメカニックが同時発動",
+        "scoreFrenzy": "スコアフィーバー！",
+        "scoreFrenzyDesc": "このフロアのスコアが2倍"
+      }
     },
     "bossRush": {
       "backToHub": "ハブに戻る",
@@ -5841,6 +5869,27 @@ const ja = {
       "fullComboLevels": "フルコンボ"
     },
     "loadError": "進捗の読み込みに失敗しました",
+    "prestige": {
+      "title": "プレステージ",
+      "available": "プレステージ可能！",
+      "description": "ワールドをリセットして永久ボーナスを獲得",
+      "confirm": "本当にリセットしますか？ワールドの進捗はリセットされますが、アップグレード、ゴールド、ワードアルバムは保持されます。",
+      "activate": "プレステージする",
+      "cancel": "まだしない",
+      "ranks": { "bronze": "ブロンズ", "silver": "シルバー", "gold": "ゴールド", "platinum": "プラチナ", "diamond": "ダイヤモンド" },
+      "titles": { "wordSmith": "ワードスミス", "lexiconAdept": "レキシコンの達人", "wordMaster": "ワードマスター", "grandLexicon": "グランドレキシコン", "eternalWordsmith": "永遠のワードスミス" },
+      "bonusXp": "+{{percent}}% XP",
+      "bonusGold": "+{{percent}}% ゴールド",
+      "keeps": "保持されるもの",
+      "resets": "リセットされるもの",
+      "lifetimeStars": "累計スター"
+    },
+    "gameError": {
+      "title": "エラーが発生しました",
+      "description": "ゲームでエラーが発生しました。進捗は保存されています。",
+      "returnToLevels": "レベル選択に戻る",
+      "retry": "もう一度試す"
+    },
     "cinematics": {
       "victory": "勝利！",
       "timesUp": "タイムアップ！",
@@ -6688,7 +6737,7 @@ const ja = {
       "paths": {
         "power": "パワー",
         "strategy": "戦略",
-        "utility": "ユーティリティ"
+        "utility": "便利技"
       },
       "locked": "ロック中",
       "unlocked": "スキル解放！",
@@ -8924,7 +8973,8 @@ const ja = {
     "remaining": "残りの日間ギフト",
     "send": "ギフトを送る",
     "sent": "ギフト送信完了！",
-    "limitReached": "日間上限に達しました"
+    "limitReached": "日間上限に達しました",
+    "error": "ギフト送信失敗。もう一度？"
   },
   "faq": {
     "title": "よくある質問",
@@ -9219,6 +9269,146 @@ const ja = {
     "reachCombo": "{{target}}xコンボを達成",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} コイン"
+  },
+  "asyncChallenge": {
+    "title": "ボードチャレンジ",
+    "pending": "あなたの番です！",
+    "pendingCount": "{{count}}件のチャレンジが待っています",
+    "challengeFrom": "{{name}}からのチャレンジ",
+    "theirScore": "相手のスコア: {{score}}",
+    "playNow": "今すぐプレイ",
+    "challengeFriend": "友達にチャレンジ",
+    "challengeFriendDesc": "ボードをプレイして、友達にスコアを超えるよう送ろう",
+    "sendChallenge": "チャレンジを送信",
+    "selectFriend": "対戦相手を選ぶ",
+    "yourScore": "あなたのスコア: {{score}}",
+    "won": "{{points}}ポイント差で勝利！",
+    "lost": "{{points}}ポイント差で敗北",
+    "tied": "引き分け！",
+    "expired": "チャレンジの期限切れ",
+    "declined": "チャレンジが辞退されました",
+    "noMessage": "メッセージなし",
+    "addMessage": "メッセージを追加（任意）",
+    "empty": "保留中のチャレンジはありません",
+    "emptyCta": "友達にボードチャレンジを送ろう！",
+    "resultTitle": "チャレンジ結果",
+    "bestWord": "ベストワード: {{word}}",
+    "wordsFound": "{{count}}語発見"
+  },
+  "wordClub": {
+    "title": "ワードクラブ",
+    "myClub": "マイクラブ",
+    "weeklyLeaderboard": "週間ランキング",
+    "weeklyXp": "今週{{xp}} XP",
+    "gamesPlayed": "{{count}}ゲーム",
+    "bestWord": "ベスト: {{word}}",
+    "createClub": "クラブを作成",
+    "createClubDesc": "クラブを作って友達を招待し、毎週競い合おう",
+    "joinClub": "クラブに参加",
+    "joinByCode": "招待コードを入力",
+    "joinButton": "参加",
+    "leaveClub": "クラブを退会",
+    "inviteCode": "招待コード: {{code}}",
+    "copyCode": "コードをコピー",
+    "codeCopied": "コピーしました！",
+    "members": "{{count}}/{{max}}人",
+    "owner": "オーナー",
+    "admin": "管理者",
+    "member": "メンバー",
+    "clubName": "クラブ名",
+    "clubDesc": "説明（任意）",
+    "maxMembers": "最大人数",
+    "create": "作成",
+    "resetsIn": "リセットまで{{time}}",
+    "noClub": "クラブに参加して毎週のワードバトルを楽しもう！",
+    "you": "あなた",
+    "rank": "#{{rank}}"
+  },
+  "playerRecap": {
+    "title": "今週のまとめ",
+    "monthlyTitle": "今月のまとめ",
+    "weekly": "週間",
+    "monthly": "月間",
+    "gamesPlayed": "プレイ数",
+    "wordsFound": "発見した単語",
+    "bestScore": "ベストスコア",
+    "longestWord": "最長の単語",
+    "rarestWord": "最もレアな発見",
+    "bestCombo": "ベストコンボ",
+    "streakDays": "連続日数",
+    "gamesWon": "勝利数",
+    "uniqueWords": "ユニークワード",
+    "favoriteMode": "お気に入りモード",
+    "improvement": "{{percent}}%向上",
+    "declined": "{{percent}}%低下",
+    "rankUp": "ランク↑{{change}}",
+    "rankDown": "ランク↓{{change}}",
+    "share": "まとめを共有",
+    "shareText": "LexiClashの今週: {{games}}ゲーム、{{words}}語発見、ベストスコア{{score}}。{{streak}}日連続！これを超えてみて！🎮",
+    "shareMonthlyText": "LexiClashの今月: {{games}}ゲーム、{{words}}語発見、最長の単語: {{word}}。{{improvement}}%向上！🔥",
+    "noData": "まとめを見るにはゲームをプレイしよう！",
+    "copied": "クリップボードにコピーしました！"
+  },
+  "quickPlay": {
+    "title": "クイックプレイ",
+    "subtitle": "すぐにプレイ！",
+    "daily": "デイリーパズル",
+    "classic": "クラシック",
+    "blast": "ブラストモード",
+    "wordHunt": "ワードハント",
+    "seconds": "約{{sec}}秒"
+  },
+  "rankedTier": {
+    "title": "ランクマッチ",
+    "rating": "レーティング: {{rating}}",
+    "peakRating": "最高: {{rating}}",
+    "tier": "{{tier}}",
+    "bronze": "ブロンズ",
+    "silver": "シルバー",
+    "gold": "ゴールド",
+    "platinum": "プラチナ",
+    "diamond": "ダイヤモンド",
+    "master": "マスター",
+    "progress": "次のティアまで{{percent}}%",
+    "gamesPlayed": "{{count}}ランクマッチ",
+    "winRate": "勝率{{percent}}%",
+    "ratingChange": "{{change}}",
+    "unranked": "ランクマッチをプレイしてティアを獲得しよう！",
+    "playRanked": "ランクをプレイ"
+  },
+  "seasonalEvent": {
+    "title": "期間限定イベント",
+    "active": "開催中",
+    "upcoming": "近日開催",
+    "ended": "イベント終了",
+    "endsIn": "残り{{time}}",
+    "startsIn": "開始まで{{time}}",
+    "joinEvent": "イベントに参加",
+    "continuePlaying": "プレイを続ける",
+    "yourScore": "あなたのスコア: {{score}}",
+    "yourRank": "ランク #{{rank}}",
+    "rewards": "報酬",
+    "topReward": "1位",
+    "claimRewards": "報酬を受け取る",
+    "noEvents": "現在開催中のイベントはありません",
+    "nextEvent": "次のイベントをお楽しみに！"
+  },
+  "reengagement": {
+    "welcomeBack": "おかえりなさい！",
+    "missedYou": "お待ちしていました！復帰ボーナスをどうぞ。",
+    "streakRisk": "連続記録が途切れそうです！今すぐプレイして維持しよう。",
+    "socialTrigger": "あなたがいない間に{{friendCount}}人の友達がプレイしました！",
+    "lossAversion": "リーグランクが下がっています！1ゲームで回復できます。",
+    "incentive": "おかえりなさい！{{coins}}コインとストリークフリーズをプレゼント。",
+    "majorIncentive": "進捗を保存しました！3日間のプレミアム機能を無料でお試し。",
+    "emailOnly": "メールで特別オファーをご確認ください！",
+    "claimBonus": "ボーナスを受け取る",
+    "daysAway": "{{count}}日間不在",
+    "bonusRewards": "復帰報酬:",
+    "coins": "{{count}}コイン",
+    "streakFreeze": "ストリークフリーズ×{{count}}",
+    "premiumDays": "プレミアム{{count}}日間",
+    "dismiss": "後で"
   }
 };
 

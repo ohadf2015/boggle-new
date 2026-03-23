@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { usePreviousValue } from '@/hooks/usePreviousValue';
 import { useAdventureBossNew, type BossAttack } from '@/hooks/useAdventureBossNew';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 import { useBossMechanics } from '@/hooks/useBossMechanics';
@@ -45,12 +46,12 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     isBossLevel && showBossIntroConfig === true
   );
 
-  // Boss defeat fireworks
-  const [showBossFireworks, setShowBossFireworks] = useState(false);
-  const [defeatedBossTier, setDefeatedBossTier] = useState<BossTier>('standard');
-
-  // Victory/defeat tracking
-  const [battleResult, setBattleResult] = useState<'none' | 'victory' | 'defeat'>('none');
+  // Battle result + fireworks (consolidated — always change together)
+  const [battleState, setBattleState] = useState<{
+    result: 'none' | 'victory' | 'defeat';
+    showFireworks: boolean;
+    defeatedTier: BossTier;
+  }>({ result: 'none', showFireworks: false, defeatedTier: 'standard' });
 
   // Player health (for boss levels with player damage) — must be before handleAttack
   const playerHealth = usePlayerHealth(isBossLevel ? 100 : 0);
@@ -61,6 +62,13 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Edge vignette flash on boss attacks
   const [showEdgeVignette, setShowEdgeVignette] = useState(false);
   const vignetteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup vignetteTimeout on unmount to prevent setState on unmounted component
+  useEffect(() => {
+    return () => {
+      if (vignetteTimeoutRef.current) clearTimeout(vignetteTimeoutRef.current);
+    };
+  }, []);
 
   // Boss grid effect state (triggered on phase transitions)
   const [gridEffectTrigger, setGridEffectTrigger] = useState<{ name: string; id: number } | null>(null);
@@ -100,28 +108,19 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
 
   // Victory handler
   const handleVictory = useCallback(() => {
-    setBattleResult('victory');
-
-    // Determine boss tier based on world progression
-    // worldId 1-3 = mini, 4-6 = standard, 7+ = elite
     let tier: BossTier = 'mini';
-    if (worldId && worldId >= 7) {
-      tier = 'elite';
-    } else if (worldId && worldId >= 4) {
-      tier = 'standard';
-    }
-    setDefeatedBossTier(tier);
-    setShowBossFireworks(true);
+    if (worldId && worldId >= 7) tier = 'elite';
+    else if (worldId && worldId >= 4) tier = 'standard';
 
-    const durations: Record<BossTier, number> = {
-      mini: 3500, standard: 5500, elite: 8500,
-    };
-    setTimeout(() => setShowBossFireworks(false), durations[tier]);
+    setBattleState({ result: 'victory', showFireworks: true, defeatedTier: tier });
+
+    const durations: Record<BossTier, number> = { mini: 3500, standard: 5500, elite: 8500 };
+    setTimeout(() => setBattleState(prev => ({ ...prev, showFireworks: false })), durations[tier]);
   }, [worldId]);
 
   // Defeat handler
   const handleDefeat = useCallback(() => {
-    setBattleResult('defeat');
+    setBattleState(prev => ({ ...prev, result: 'defeat' }));
   }, []);
 
   // Boss twist mechanics (palindrome, anagram, etymology, etc.)
@@ -153,19 +152,14 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const { bossHit } = useHaptics();
 
   // Phase change drama: freeze timer, screen shake, taunt
-  const prevPhaseRef = useRef(bossPhaseValue);
+  const prevBossPhase = usePreviousValue(bossPhaseValue);
   useEffect(() => {
-    if (prevPhaseRef.current !== bossPhaseValue && bossIsActive) {
-      // Phase changed — trigger drama sequence
+    if (prevBossPhase !== undefined && prevBossPhase !== bossPhaseValue && bossIsActive) {
       shake(4);
       bossTriggerTaunt('onMechanic');
-
-      // Compensate for 1.5s timer freeze by adding time back
-      // The visual "freeze" is achieved by the shake + taunt disruption
       addTime(1.5);
     }
-    prevPhaseRef.current = bossPhaseValue;
-  }, [bossPhaseValue, bossIsActive, shake, bossTriggerTaunt, addTime]);
+  }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime]);
 
   // Low time taunt
   const lowTimeTriggedRef = useRef(false);
@@ -237,18 +231,18 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   const bossHealthState = useMemo(() => ({
     currentHP: bossHP,
     maxHP: bossMaxHP,
-    phase: battleResult === 'victory' ? 'victory' as const
-      : battleResult === 'defeat' ? 'defeat' as const
+    phase: battleState.result === 'victory' ? 'victory' as const
+      : battleState.result === 'defeat' ? 'defeat' as const
       : bossIsActive ? 'active' as const
       : 'intro' as const,
     totalDamageDealt: bossMaxHP - bossHP,
     isActive: bossIsActive,
-  }), [bossHP, bossMaxHP, bossIsActive, battleResult]);
+  }), [bossHP, bossMaxHP, bossIsActive, battleState.result]);
 
   // Reset functions
   const resetBossHealth = useCallback(() => {
     bossReset();
-    setBattleResult('none');
+    setBattleState({ result: 'none', showFireworks: false, defeatedTier: 'standard' });
     firstAttackBlockedRef.current = false;
     lowTimeTriggedRef.current = false;
     // Reset boss intro so retry can re-trigger the battle start
@@ -287,8 +281,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     isEnraged: bossPhaseValue === 'desperate',
     bossState: {},
     showBossIntro,
-    showBossFireworks,
-    defeatedBossTier,
+    showBossFireworks: battleState.showFireworks,
+    defeatedBossTier: battleState.defeatedTier,
 
     // New boss state (for simplified BossOverlay)
     bossPhase: bossPhaseValue,

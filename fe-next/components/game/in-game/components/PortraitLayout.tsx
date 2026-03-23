@@ -22,6 +22,7 @@ import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
 import { GameLeaderboard } from './GameLeaderboard';
 import { GameWordList } from './GameWordList';
+import { MobileChatFab } from './MobileChatFab';
 import { ScoreDisplay } from './ScoreDisplay';
 import FloatingScoreAnimation from '../../FloatingScoreAnimation';
 import type { LetterGrid, Language, GameModeSelection, BlastTileOverlay, LetterFeedback } from '@/shared/types/game';
@@ -609,6 +610,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           </div>
         )}
       </div>
+
+      {/* Mobile Chat FAB — non-intrusive, auto-shrinks after 4s */}
+      {isPlaying && !gameplayFocusMode && (
+        <MobileChatFab
+          username={username}
+          isHost={isHost}
+          gameCode={gameCode}
+        />
+      )}
     </>
   );
 });

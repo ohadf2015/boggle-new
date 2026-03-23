@@ -193,7 +193,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
             aria-label={t('common.exit')}
           >
-            <LogOut className="w-4 h-4 text-neo-black" />
+            <LogOut className="w-4 h-4 text-neo-black rtl:scale-x-[-1]" />
           </button>
         </div>
       </div>

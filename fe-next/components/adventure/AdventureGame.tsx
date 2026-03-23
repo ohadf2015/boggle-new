@@ -2,6 +2,7 @@
 'use client';
 
 import React, { memo, useCallback, useState, useEffect, useMemo, useRef } from 'react';
+import { usePreviousValue } from '@/hooks/usePreviousValue';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
@@ -135,14 +136,13 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const [lastWordTileTypes, setLastWordTileTypes] = useState<string[]>([]);
-    const prevWordsFoundLenRef = useRef(gameState.wordsFound.length);
+    const prevWordsFoundLen = usePreviousValue(gameState.wordsFound.length);
     useEffect(() => {
-      if (gameState.wordsFound.length > prevWordsFoundLenRef.current) {
+      if (prevWordsFoundLen !== undefined && gameState.wordsFound.length > prevWordsFoundLen) {
         const activatedTypes = tiles.filter(t => t.activationEffect).map(t => t.type);
         setLastWordTileTypes(activatedTypes);
       }
-      prevWordsFoundLenRef.current = gameState.wordsFound.length;
-    }, [gameState.wordsFound.length, tiles]);
+    }, [gameState.wordsFound.length, prevWordsFoundLen, tiles]);
 
     const flashChallenge = useFlashChallenge({
       worldId: levelConfig.world,
@@ -185,15 +185,13 @@ const AdventureGame = memo<AdventureGameProps>(
     // SFX: gate sounds to active gameplay, countdown beep in last 10s
     useEffect(() => { setGameActive(isPlaying); return () => setGameActive(false); }, [isPlaying, setGameActive]);
     useEffect(() => { if (isPlaying && timeRemaining <= 10 && timeRemaining > 0) playCountdownBeep(timeRemaining); }, [isPlaying, timeRemaining, playCountdownBeep]);
-    // SFX: play word accepted sound when a new word is found
-    const prevWordsCountRef = useRef(0);
+    // SFX: play word accepted sound when a new word is found (reuses prevWordsFoundLen from above)
     useEffect(() => {
-      if (gameState.wordsFound.length > prevWordsCountRef.current && isPlaying) {
+      if (prevWordsFoundLen !== undefined && gameState.wordsFound.length > prevWordsFoundLen && isPlaying) {
         playWordAcceptedSound();
         if (gameState.comboCount >= 2) playComboSound(gameState.comboCount);
       }
-      prevWordsCountRef.current = gameState.wordsFound.length;
-    }, [gameState.wordsFound, gameState.comboCount, isPlaying, playWordAcceptedSound, playComboSound]);
+    }, [gameState.wordsFound.length, prevWordsFoundLen, gameState.comboCount, isPlaying, playWordAcceptedSound, playComboSound]);
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
       isGameOver: gameState.isComplete,

@@ -125,7 +125,7 @@ const en = {
     "email": "Email",
     "loading": "Shuffling letters...",
     "error": "Whoops!",
-    "errorOccurred": "An error occurred",
+    "errorOccurred": "Something broke!",
     "retry": "Try Again",
     "creating": "Creating...",
     "guest": "Guest",
@@ -148,6 +148,11 @@ const en = {
     "valid": "Valid",
     "invalid": "Invalid",
     "close": "Close",
+    "ordinal1": "1st",
+    "ordinal2": "2nd",
+    "ordinal3": "3rd",
+    "ordinalN": "{n}th",
+    "chat": "Chat",
     "showAll": "Show All",
     "claim": "Claim",
     "looksGood": "Looks Good",
@@ -259,6 +264,8 @@ const en = {
     "opensInNewTab": "opens in new tab",
     "press": "Press",
     "toResume": "to resume",
+    "delete": "Delete",
+    "gold": "Gold",
     "aria": {
       "levelProgress": "Level progress",
       "overallProgress": "Overall progress",
@@ -341,9 +348,10 @@ const en = {
     "wordsReplayed": "Queued words submitted!"
   },
   "game": {
+    "foundByOther": "Found by ${player}",
     "combo": "Combo",
     "comboHint": "Find words fast for combo!",
-    "calculatingResults": "Calculating Results...",
+    "calculatingResults": "Tallying the scores...",
     "gestureTutorial": "Swipe letters to form words",
     "drawer": {
       "content": "Game content",
@@ -592,11 +600,11 @@ const en = {
     "updateProgress": "Takes 2 seconds!",
     "globalErrorEncouragement": "Don't worry - your game's secure!",
     "goHome": "Go Home",
-    "failedToLoadLeaderboard": "Failed to load leaderboard",
-    "failedToLoadProfile": "Failed to load profile",
-    "unableToLoadData": "Unable to load data. Please try again.",
+    "failedToLoadLeaderboard": "Leaderboard took a detour — refresh?",
+    "failedToLoadProfile": "Profile went AWOL — try again?",
+    "unableToLoadData": "Couldn't grab that — try again!",
     "tryAgainButton": "Try again",
-    "connectionTimeout": "Taking too long to connect",
+    "connectionTimeout": "Connection's dragging — hang tight!",
     "rateLimited": "Slow down, speedster!",
     "connectionLost": "Lost connection - reconnecting",
     "notConnected": "Can't reach the server",
@@ -611,14 +619,14 @@ const en = {
     "notInGame": "You're not in this game",
     "hostOnly": "Only the host can do that",
     "alreadyInGame": "You're already in a game",
-    "kicked": "You've been removed from the game",
+    "kicked": "You got kicked from the game",
     "invalidUsername": "Invalid username format",
     "invalidWord": "Not a valid word",
     "wordTooShort": "Word too short - need more letters!",
     "wordNotOnBoard": "Can't make that word on this board",
     "wordAlreadyFound": "You already found that one!",
     "submissionFailed": "Couldn't submit word. Try again!",
-    "validationFailed": "Something's not right. Check your input",
+    "validationFailed": "Hmm, that doesn't look right",
     "invalidRequest": "Invalid request",
     "missingField": "Missing required info",
     "ipBlocked": "Too many requests. Take a breather!",
@@ -629,12 +637,12 @@ const en = {
     "tournamentStarted": "Tournament already started",
     "tournamentInvalidState": "Can't do that right now",
     "internal": "Server hiccup! We're on it",
-    "serviceUnavailable": "Service temporarily unavailable",
-    "networkError": "Network error. Your progress is saved locally.",
+    "serviceUnavailable": "Servers are taking a breather",
+    "networkError": "You went offline, but your progress is safe!",
     "leaderboardFailed": "Couldn't load leaderboard. Try refreshing!",
-    "resultSubmissionFailed": "Failed to save your result. Your progress is saved locally.",
-    "resetFailed": "Server reset failed. Please try again.",
-    "loadFailed": "Failed to load data. Please try again."
+    "resultSubmissionFailed": "Couldn't save your score online, but it's safe on your device.",
+    "resetFailed": "Reset didn't work — give it another shot!",
+    "loadFailed": "Couldn't load that — tap to retry!"
   },
   "notFound": {
     "heading": "Lost in the Word Maze?",
@@ -907,13 +915,13 @@ const en = {
       "pasteButton": "Paste Code"
     },
     "errors": {
-      "roomFull": "This room is full. Try another one or create your own.",
-      "roomClosed": "This room has ended. Return to lobby and find another game.",
-      "invalidCode": "Invalid code or room closed. Check the code and try again.",
-      "connectionLost": "Connection lost. Reconnecting...",
-      "hostLeft": "Host left the game. Returning to lobby...",
-      "invalidUsername": "Username must be 2-20 characters.",
-      "serverError": "Server error. Please try again."
+      "roomFull": "Room's packed! Jump into another or start your own.",
+      "roomClosed": "This room's done! Back to the lobby for more action.",
+      "invalidCode": "Bad code or room's closed. Double-check and retry!",
+      "connectionLost": "Lost ya — getting you back in!",
+      "hostLeft": "Host bounced! Heading back to the lobby...",
+      "invalidUsername": "Name needs to be 2-20 characters!",
+      "serverError": "Server hiccup! Try again."
     }
   },
   "hostView": {
@@ -934,9 +942,10 @@ const en = {
     "botCount": "{{count}} bot(s) in room",
     "kickPlayer": "Kick",
     "kickConfirm": "Kick {{name}} from the room?",
-    "playerKicked": "{{name}} was kicked from the room",
-    "youWereKicked": "You were kicked from the room",
-    "youWereKickedInactive": "You were removed for being inactive",
+    "playerKicked": "{{name}} got the boot!",
+    "youWereKicked": "You got kicked!",
+    "youWereKickedInactive": "Kicked for going AFK!",
+    "afkWarning": "You'll be removed in {{seconds}}s for inactivity — tap anywhere to stay!",
     "shareCodeHint": "Share the room code above so friends can join!",
     "battleMode": "Battle Mode",
     "preset": "Preset",
@@ -987,11 +996,11 @@ const en = {
     "broadcastModeTitle": "TV/Projector Mode",
     "broadcastModeDescription": "Display the game on a big screen while you spectate (you won't play)",
     "broadcastModeDesc": "Host watches, not plays",
-    "broadcastModeHint": "Perfect for 4+ players! Enable to show the game on a TV",
+    "broadcastModeHint": "Got 4+ players? Throw the game on a TV!",
     "scanOrShare": "Scan QR code or share link",
     "broadcastSuggestion": "Got 4+ players? Try TV Mode to display the game on a big screen!",
     "advancedSettings": "Advanced Settings",
-    "roomClosedInactivity": "Room closed due to inactivity",
+    "roomClosedInactivity": "Room timed out — everyone went quiet!",
     "gameOverCheckScores": "Game Over! Check final scores",
     "youAreNowHost": "You are now the host!",
     "newHostAssigned": "is now the host",
@@ -1010,7 +1019,7 @@ const en = {
     "tournamentCreateFailed": "Failed to create tournament. Please try again.",
     "cancelTournament": "Cancel Tournament",
     "confirmCancelTournament": "Cancel Tournament?",
-    "cancelTournamentWarning": "Are you sure you want to cancel the tournament? All progress will be lost and this cannot be undone.",
+    "cancelTournamentWarning": "Cancel the tournament? All progress goes poof — no take-backs!",
     "minWordLength": "Minimum Word Length",
     "wordsAutoValidated": "words auto-validated",
     "gameTypeSelector": "Mode",
@@ -1365,16 +1374,16 @@ const en = {
     "wordNotInList": "Word not available",
     "roomClosed": "Room closed",
     "exitConfirmation": "Exit room?",
-    "exitWarning": "Are you sure you want to leave? You will lose your progress in the current game.",
+    "exitWarning": "Bail now? You'll lose your progress in this game.",
     "exit": "Exit",
     "exitRoom": "Exit Room",
-    "waitForGameStart": "Wait for game start",
+    "waitForGameStart": "Hang tight — game's about to start!",
     "clickToWakeUp": "Tap to say hi!",
-    "calculatingScores": "Calculating Scores...",
+    "calculatingScores": "Crunching the numbers...",
     "aiValidating": "AI checking...",
     "leaderboard": "Leaderboard",
     "noPlayersYet": "No players yet",
-    "wordTooShort": "Word too short! (min 2 letters)",
+    "wordTooShort": "Too short! Need 2+ letters",
     "wordTooShortMin": "Word too short! (min ${min} letters)",
     "errorOccurred": "Oops! Try again",
     "tooFast": "Slow down! Submitting too fast",
@@ -1391,30 +1400,30 @@ const en = {
     "readyConfirmed": "Ready!",
     "editName": "Change name",
     "editAvatar": "Change avatar",
-    "hostDisconnected": "Host disconnected. Waiting for reconnection...",
+    "hostDisconnected": "Host dropped! Waiting for them to come back...",
     "isNowHost": "is now the host",
     "disconnected": "disconnected. Waiting for reconnection...",
     "reconnected": "reconnected",
     "leftRoom": "left the room",
     "weakConnection": "has weak connection",
     "connectionRecovered": "connection recovered",
-    "sessionMovedToAnotherTab": "Session moved to another tab",
-    "sessionMovedToAnotherRoom": "Session moved to another room",
+    "sessionMovedToAnotherTab": "You opened LexiClash in another tab!",
+    "sessionMovedToAnotherRoom": "You joined a different room!",
     "validatingWord": "Checking:",
     "rankings": "Rankings",
     "showLeaderboard": "Show leaderboard",
-    "slowDown": "Slow down! Words are being processed.",
-    "submittingTooFast": "You're submitting words too fast",
+    "slowDown": "Easy, speedster! Still crunching your words.",
+    "submittingTooFast": "Whoa there! Slow your roll.",
     "words": "Words",
     "invalidWord": "Invalid word",
     "notInDictionary": "Not in dictionary",
     "pendingValidation": "Being checked...",
     "validation": {
-      "scanning": "Scanning words...",
-      "checking": "Checking dictionary...",
-      "verifying": "Verifying with AI...",
-      "scoring": "Calculating scores...",
-      "finalizing": "Finalizing results..."
+      "scanning": "Hunting for fakes...",
+      "checking": "Consulting the word gods...",
+      "verifying": "AI judge is deliberating...",
+      "scoring": "Adding up the damage...",
+      "finalizing": "Drumroll..."
     },
     "mobileNavigation": "Mobile Navigation"
   },
@@ -1611,7 +1620,7 @@ const en = {
     "share": "Brag",
     "yourProgress": "How You Did",
     "topPlayers": "Podium",
-    "otherPlayers": "Also Played",
+    "otherPlayers": "The Rest",
     "foundWords": "found",
     "yourPerformance": "Your Game",
     "viewDetails": "Deep Dive",
@@ -1666,19 +1675,19 @@ const en = {
     "winStreak": "Streak",
     "finalScore": "Final Score",
     "coinsEarned": "Coins Earned",
-    "detailedAnalysis": "Detailed Analysis",
+    "detailedAnalysis": "Full Breakdown",
     "gameStats": "Game Stats",
     "accuracy": "Accuracy",
     "yourPerformance": "Your Performance",
     "rewards": "Rewards",
     "standings": "Standings",
-    "guestSavePrompt": "Sign in to save rewards",
+    "guestSavePrompt": "Sign in so your loot doesn't vanish!",
     "keepItUp": "Keep it up!",
     "dailyPlayBonus": "Daily Play Bonus",
     "best": "Best",
     "avg": "Avg",
     "games": "Games",
-    "noRewards": "Play more to earn rewards!",
+    "noRewards": "Keep playing to unlock loot!",
     "time": "Time",
     "place": "Place",
     "words": "Words",
@@ -2559,7 +2568,7 @@ const en = {
       "achieved": "Prestige Achieved!",
       "rewardsUnlocked": "Your rewards have been unlocked!",
       "warning": "Warning!",
-      "warningText": "This will reset you to Level 1. All current XP will be reset, but you will gain all rewards below.",
+      "warningText": "This resets you to Level 1 and wipes your XP — but you'll snag all the rewards below.",
       "cancel": "Cancel",
       "confirmPrestige": "Confirm Prestige",
       "currentLevel": "Current Level",
@@ -3748,6 +3757,8 @@ const en = {
     "streakUnlocked": "Streak Started!"
   },
   "wordFeedback": {
+    "invalid": "Not a valid word",
+    "duplicate": "Already found",
     "dictionaryTitle": "Build Our Dictionary",
     "submittedBy": "Submitted by",
     "skipHint": "Press ESC to skip",
@@ -4020,7 +4031,7 @@ const en = {
     "victory": "Victory!",
     "gameOver": "Game Over",
     "progressAnnouncement": "Found {found} words — {missed} more were hiding!",
-    "verifyingWords": "Checking your words...",
+    "verifyingWords": "Grading your words...",
     "practiceComplete": "Nice practice!",
     "newHighScore": "New Record!",
     "noWordsFound": "No words found",
@@ -4791,10 +4802,10 @@ const en = {
     "playerJoined": "joined the game!",
     "playerLeft": "left the game",
     "playerEliminated": "has been eliminated!",
-    "youEliminated": "You have been eliminated!",
+    "youEliminated": "You're out!",
     "playerLastLife": "is on their last life!",
     "yourLastLife": "FINAL LIFE!",
-    "botsJoined": "{{count}} opponents joined — no humans around, so you got bots!"
+    "botsJoined": "No humans? {{count}} bots jumped in to keep you company!"
   },
   "stats": {
     "games": "Games",
@@ -4868,7 +4879,18 @@ const en = {
       "hoursAgo": "{count}h ago",
       "daysAgo": "{count}d ago",
       "longAgo": "A while ago"
-    }
+    },
+    "requestAccepted": "Friend added!",
+    "requestDeclined": "Request declined",
+    "requestCancelled": "Request cancelled",
+    "removedSuccess": "Friend removed",
+    "blockedSuccess": "User blocked",
+    "unblockedSuccess": "User unblocked",
+    "confirmRemove": "Remove this friend? This can't be undone.",
+    "confirmBlock": "Block this user? They won't be able to contact you.",
+    "block": "Block",
+    "filterFriends": "Search friends...",
+    "noMatchingFriends": "No matching friends"
   },
   "reveal": {
     "revealWord": "Reveal",
@@ -5614,7 +5636,10 @@ const en = {
     "title": "Quick Play",
     "creating": "Creating...",
     "hostAndPlay": "Host & Play",
-    "subtitle": "Instant room • Friends join via QR"
+    "subtitle": "Instant room • Friends join via QR",
+    "ariaLabel": "Quick play — jump into a game",
+    "play": "Play Now",
+    "seconds": "~{{count}}s"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -5668,7 +5693,7 @@ const en = {
     "feedbackLine": "Your voice matters to us!",
     "thankYouLine": "A special thank you from us!",
     "customLine": "A message just for you!",
-    "claimError": "Failed to claim gift. Please try again.",
+    "claimError": "Couldn't grab your gift — try again!",
     "badge": "Badge",
     "newTotal": "New total",
     "currentBalance": "Current"
@@ -5754,6 +5779,7 @@ const en = {
       }
     },
     "title": "Adventure Mode",
+    "worldMap": "World Map",
     "subtitle": "10 worlds. 100 levels. One ultimate word master.",
     "adminOnly": "Admin Only",
     "adminOnlyMessage": "Adventure mode is only available to administrators.",
@@ -5950,6 +5976,7 @@ const en = {
       }
     },
     "next": "NEXT",
+    "starsToUnlock": "{{count}} more to unlock",
     "exitToMap": "Exit to Map",
     "startLevel": "Start Level",
     "levelComplete": "Level Complete!",
@@ -6001,7 +6028,19 @@ const en = {
       "startRun": "Start Run",
       "subtitle": "How far can you go?",
       "timeLimit": "Time Limit",
-      "title": "Endless Mode"
+      "title": "Endless Mode",
+      "events": {
+        "doubleGold": "Gold Rush!",
+        "doubleGoldDesc": "All gold rewards doubled this floor",
+        "timeSurge": "Time Surge!",
+        "timeSurgeDesc": "+30 bonus seconds to find words",
+        "gemRush": "Gem Rush!",
+        "gemRushDesc": "Extra special tiles on the board",
+        "dualMechanic": "Dual Mechanic!",
+        "dualMechanicDesc": "Two world mechanics active at once",
+        "scoreFrenzy": "Score Frenzy!",
+        "scoreFrenzyDesc": "All scores doubled this floor"
+      }
     },
     "bossRush": {
       "backToHub": "Back to Hub",
@@ -6043,6 +6082,39 @@ const en = {
       "fullComboLevels": "Full Combo"
     },
     "loadError": "Failed to load progress",
+    "prestige": {
+      "title": "Prestige",
+      "available": "Prestige Available!",
+      "description": "Reset your worlds and earn permanent bonuses",
+      "confirm": "Are you sure? Your world progress will reset, but you keep upgrades, gold, and your word album.",
+      "activate": "Prestige Now",
+      "cancel": "Not Yet",
+      "ranks": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum",
+        "diamond": "Diamond"
+      },
+      "titles": {
+        "wordSmith": "Word Smith",
+        "lexiconAdept": "Lexicon Adept",
+        "wordMaster": "Word Master",
+        "grandLexicon": "Grand Lexicon",
+        "eternalWordsmith": "Eternal Wordsmith"
+      },
+      "bonusXp": "+{{percent}}% XP",
+      "bonusGold": "+{{percent}}% Gold",
+      "keeps": "You keep",
+      "resets": "Resets",
+      "lifetimeStars": "Lifetime Stars"
+    },
+    "gameError": {
+      "title": "Something went wrong",
+      "description": "The game encountered an error. Your progress has been saved.",
+      "returnToLevels": "Return to levels",
+      "retry": "Try again"
+    },
     "cinematics": {
       "victory": "VICTORY!",
       "timesUp": "Time's Up!",
@@ -6934,7 +7006,7 @@ const en = {
     "stars3": "Perfect!",
     "cleared": "Cleared",
     "endGameConfirmTitle": "End Game?",
-    "endGameConfirmMessage": "Your current score will be saved. Are you sure you want to end this game?",
+    "endGameConfirmMessage": "Your score will be saved. End this run?",
     "gridLabel": "Letter grid",
     "helpTitle": "How to Play",
     "helpDrag": "Drag across letters to form words. Words must be at least 2 letters long.",
@@ -8645,7 +8717,8 @@ const en = {
     "remaining": "Daily gifts remaining",
     "send": "Send Gift",
     "sent": "Gift Sent!",
-    "limitReached": "Daily limit reached"
+    "limitReached": "Daily limit reached",
+    "error": "Gift failed. Try again?"
   },
   "faq": {
     "title": "FAQ",
@@ -9286,6 +9359,60 @@ const en = {
       "totalXp": "Total XP",
       "xpGained": "XP Earned"
     }
+  },
+  "asyncChallenge": {
+    "title": "Board Challenges",
+    "yourTurn": "Your Turn!",
+    "ariaLabel": "Async challenges from friends",
+    "playAriaLabel": "Play challenge from {{name}}",
+    "playNow": "Play Now",
+    "challengeFriend": "Challenge a Friend",
+    "emptyDesc": "No pending challenges. Send one to a friend!",
+    "moreCount": "+{{count}} more",
+    "unknown": "Unknown player"
+  },
+  "recap": {
+    "title": "Your Recap",
+    "ariaLabel": "Player stats recap",
+    "shareAriaLabel": "Share your recap",
+    "shareTitle": "My LexiClash Recap",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "games": "Games",
+    "words": "Words",
+    "longestWord": "Longest Word",
+    "bestScore": "Best Score",
+    "bestCombo": "Best Combo",
+    "streak": "Streak",
+    "vsLast": "vs last period"
+  },
+  "rankedTier": {
+    "title": "Ranked",
+    "progress": "{{percent}}% to next tier"
+  },
+  "seasonalEvent": {
+    "ariaLabel": "Seasonal event",
+    "rewards": "Rewards",
+    "score": "Score",
+    "progressAriaLabel": "Event progress",
+    "joinEvent": "Join Event",
+    "continuePlaying": "Continue Playing"
+  },
+  "reengagement": {
+    "ariaLabel": "Welcome back bonus",
+    "bonusMessage": "You've been away for {{days}} days. Here's a bonus to welcome you back!",
+    "rewardsAriaLabel": "Bonus rewards",
+    "claimBonus": "Claim Bonus",
+    "dismiss": "Maybe later"
+  },
+  "wordClub": {
+    "title": "Word Club",
+    "ariaLabel": "Word club leaderboard",
+    "emptyDesc": "Join a club for weekly word battles with friends!",
+    "create": "Create Club",
+    "join": "Join Club",
+    "leaderboard": "Club leaderboard",
+    "memberCount": "{{count}} members"
   }
 };
 

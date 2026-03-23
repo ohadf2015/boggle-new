@@ -52,7 +52,7 @@ export function LandingDesktopCards({
 
   return (
     <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
-      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch px-4 lg:px-6">
+      <div className="w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 items-stretch px-4 lg:px-6 xl:px-8">
         {/* Single Player (cyan) */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}

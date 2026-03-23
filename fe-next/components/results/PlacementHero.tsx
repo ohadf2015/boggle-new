@@ -141,14 +141,10 @@ const AnimatedScore: React.FC<{ target: number; className?: string; delay?: numb
 };
 
 // ============================================================
-// ORDINAL SUFFIX
+// ORDINAL — uses i18n keys (common.ordinal1, ordinal2, ordinal3, ordinalN)
 // ============================================================
 
-function getOrdinalSuffix(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
+import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 
 // ============================================================
 // MAIN COMPONENT — Podium Celebration Hero
@@ -275,7 +271,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
             >
               <Icon className={`${theme.badgeText} w-5 h-5 sm:w-6 sm:h-6`} />
               <span className={`absolute -bottom-1.5 -end-1.5 bg-neo-black text-neo-cream border-2 border-neo-cream rounded-full font-black text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shadow-hard-sm`}>
-                {getOrdinalSuffix(rank)}
+                {formatRankOrdinal(rank, t)}
               </span>
             </AdaptiveMotion.div>
 

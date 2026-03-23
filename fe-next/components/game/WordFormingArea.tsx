@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
@@ -76,6 +77,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   compact = false,
   feedback,
 }) => {
+  const { t } = useLanguageSafe();
   const [visibleFeedback, setVisibleFeedback] = useState<WordFeedback | null>(null);
   const [lastWord, setLastWord] = useState<string>('');
   const [lastLetterCount, setLastLetterCount] = useState<number>(0);
@@ -272,11 +274,11 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               )}
             >
               {showFeedback && visibleFeedback?.type === 'rejected'
-                ? (visibleFeedback.message || 'Invalid')
+                ? (visibleFeedback.message || t('wordFeedback.invalid'))
                 : showFeedback && visibleFeedback?.type === 'duplicate'
-                  ? (visibleFeedback.message || 'Already found')
+                  ? (visibleFeedback.message || t('wordFeedback.duplicate'))
                   : showFeedback && visibleFeedback?.type === 'foundByOther'
-                    ? (visibleFeedback.message || `Found by ${visibleFeedback.foundBy || 'another player'}`)
+                    ? (visibleFeedback.message || t('game.foundByOther').replace('${player}', visibleFeedback.foundBy || ''))
                     : displayWord}
             </span>
 

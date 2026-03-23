@@ -210,12 +210,12 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
           {isCurrentPlayer ? t('results.you').replace(/[()]/g, '') : participant.name}
         </p>
         {isCurrentPlayer && !eliminated && (
-          <p className={cn('text-[7px] sm:text-[8px] font-black uppercase tracking-wider', accent.textColor)}>
+          <p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', accent.textColor)}>
             {rank === 1 ? t('results.ultimateChampion') : t('results.risingContender')}
           </p>
         )}
         {rank === 1 && !isCurrentPlayer && !eliminated && (
-          <p className="text-[7px] sm:text-[8px] font-black uppercase tracking-wider text-neo-lime">
+          <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-neo-lime">
             {t('results.ultimateChampion')}
           </p>
         )}
