@@ -100,7 +100,16 @@ function setupDbMocks({
         }),
         insert: jest.fn().mockResolvedValue({ error: null }),
         update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: updateError }),
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: updateError ? null : (progressionData ?? mockProgression),
+                  error: updateError,
+                }),
+              }),
+            }),
+          }),
         }),
       };
     }
@@ -342,6 +351,57 @@ describe('POST /api/adventure/complete', () => {
     });
   });
 
+  // ===== SECURITY: LEVEL SKIP-AHEAD =====
+  describe('SECURITY: Level skip-ahead prevention', () => {
+    it('rejects completing a level in a world the player has not reached', async () => {
+      setupDbMocks({
+        progressionData: { ...mockProgression, current_world: 1, current_level: 3 },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // Player is at W1L3 but tries to complete W5L1
+      const res = await POST(makeRequest({ ...validBody, world: 5, level: 1 }));
+      expect(res.status).toBe(403);
+      expect(res.data.error).toContain('not unlocked');
+    });
+
+    it('rejects completing a level ahead of current in same world', async () => {
+      setupDbMocks({
+        progressionData: { ...mockProgression, current_world: 3, current_level: 2 },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      // Player is at W3L2 but tries to complete W3L5
+      const res = await POST(makeRequest({ ...validBody, world: 3, level: 5 }));
+      expect(res.status).toBe(403);
+    });
+
+    it('allows completing the current level', async () => {
+      setupDbMocks({
+        progressionData: { ...mockProgression, current_world: 2, current_level: 3 },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      const res = await POST(makeRequest({ ...validBody, world: 2, level: 3 }));
+      expect(res.status).toBe(200);
+    });
+
+    it('allows replaying a previously completed level', async () => {
+      setupDbMocks({
+        progressionData: { ...mockProgression, current_world: 5, current_level: 1 },
+        // Level already completed
+        completionData: { stars: 2, best_score: 300, best_words: 8 },
+      });
+
+      // Replay W1L1 (earlier than current)
+      const res = await POST(makeRequest({ ...validBody, world: 1, level: 1 }));
+      expect(res.status).toBe(200);
+    });
+  });
+
   // ===== HAPPY PATH =====
   describe('Happy path', () => {
     it('completes a new level successfully', async () => {
@@ -402,6 +462,7 @@ describe('POST /api/adventure/complete', () => {
 
     it('completing world 10 level 10 caps next world/level', async () => {
       setupDbMocks({
+        progressionData: { ...mockProgression, current_world: 10, current_level: 10 },
         completionData: null,
         completionError: { code: 'PGRST116', message: 'not found' },
       });
@@ -410,6 +471,75 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
       expect(res.data.progression.currentWorld).toBe(10);
       expect(res.data.progression.currentLevel).toBe(10);
+    });
+  });
+
+  // ===== SECURITY: CONCURRENT GOLD FARMING =====
+  describe('SECURITY: Optimistic lock on gold', () => {
+    it('returns 409 when gold was modified concurrently (optimistic lock)', async () => {
+      // Simulate optimistic lock failure: update returns 0 rows (gold changed between read and write)
+      let updateCallCount = 0;
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'player_progression') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockProgression,
+                  error: null,
+                }),
+              }),
+            }),
+            insert: jest.fn().mockResolvedValue({ error: null }),
+            update: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  select: jest.fn().mockReturnValue({
+                    single: jest.fn().mockResolvedValue({
+                      // null data = 0 rows updated (optimistic lock conflict)
+                      data: null,
+                      error: null,
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === 'level_completions') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  eq: jest.fn().mockReturnValue({
+                    single: jest.fn().mockResolvedValue({
+                      data: null,
+                      error: { code: 'PGRST116', message: 'not found' },
+                    }),
+                  }),
+                }),
+              }),
+            }),
+            upsert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: {
+                    world: 1, level: 1, stars: 3,
+                    best_score: 500, best_words: 10,
+                    completed_at: '2026-01-01T00:00:00Z',
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      const res = await POST(makeRequest(validBody));
+      expect(res.status).toBe(409);
+      expect(res.data.error).toContain('Concurrent');
     });
   });
 
@@ -447,8 +577,9 @@ describe('POST /api/adventure/complete', () => {
     });
 
     it('retries without gold column if gold column missing', async () => {
-      // First update fails with gold error, retry succeeds
-      let callCount = 0;
+      // First update fails with gold error (via optimistic lock chain),
+      // retry succeeds (simple .eq() without gold lock)
+      let updateCallCount = 0;
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_progression') {
           return {
@@ -463,10 +594,21 @@ describe('POST /api/adventure/complete', () => {
             insert: jest.fn().mockResolvedValue({ error: null }),
             update: jest.fn().mockReturnValue({
               eq: jest.fn().mockImplementation(() => {
-                callCount++;
-                if (callCount === 1) {
-                  return Promise.resolve({ error: { code: 'PGRST204', message: 'gold column not found' } });
+                updateCallCount++;
+                if (updateCallCount === 1) {
+                  // First call: optimistic lock chain → gold column error
+                  return {
+                    eq: jest.fn().mockReturnValue({
+                      select: jest.fn().mockReturnValue({
+                        single: jest.fn().mockResolvedValue({
+                          data: null,
+                          error: { code: 'PGRST204', message: 'gold column not found' },
+                        }),
+                      }),
+                    }),
+                  };
                 }
+                // Second call: simple retry without gold lock → success
                 return Promise.resolve({ error: null });
               }),
             }),
@@ -505,7 +647,7 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest(validBody));
       expect(res.status).toBe(200);
-      expect(callCount).toBe(2);
+      expect(updateCallCount).toBe(2);
     });
   });
 });

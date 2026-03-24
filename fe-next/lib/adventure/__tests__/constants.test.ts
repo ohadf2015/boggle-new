@@ -152,15 +152,15 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(4)).toBe(33);
     });
 
-    it('should require 45 stars for world 10', () => {
-      // Final world — lowered from 60 to 45 to reduce late-game churn
-      expect(getWorldUnlockRequirement(10)).toBe(45);
+    it('should require 99 stars for world 10 (same formula as other worlds: 11 * 9)', () => {
+      // World 10 uses the standard formula to prevent early skip-ahead
+      expect(getWorldUnlockRequirement(10)).toBe(99);
     });
 
     it('should handle invalid world numbers', () => {
       expect(getWorldUnlockRequirement(0)).toBe(0);
       expect(getWorldUnlockRequirement(-1)).toBe(0);
-      expect(getWorldUnlockRequirement(11)).toBe(45);
+      expect(getWorldUnlockRequirement(11)).toBe(99);
     });
   });
 
@@ -175,9 +175,9 @@ describe('World Unlock Functions', () => {
       expect(isWorldUnlocked(2, 21)).toBe(true);
     });
 
-    it('should unlock world 10 with 45+ stars', () => {
-      expect(isWorldUnlocked(10, 44)).toBe(false);
-      expect(isWorldUnlocked(10, 45)).toBe(true);
+    it('should unlock world 10 with 99+ stars', () => {
+      expect(isWorldUnlocked(10, 98)).toBe(false);
+      expect(isWorldUnlocked(10, 99)).toBe(true);
     });
   });
 

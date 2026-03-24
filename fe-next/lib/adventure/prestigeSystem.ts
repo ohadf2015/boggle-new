@@ -98,18 +98,18 @@ export function getPrestigeRank(level: number): PrestigeRank | null {
   return PRESTIGE_RANKS[level - 1];
 }
 
-/** Get the cumulative XP multiplier from prestige */
+/** Get the cumulative XP multiplier from prestige (stacks all ranks up to current) */
 export function getPrestigeXpMultiplier(prestigeLevel: number): number {
   if (prestigeLevel <= 0) return 1;
-  const rank = getPrestigeRank(Math.min(prestigeLevel, MAX_PRESTIGE_LEVEL));
-  return 1 + (rank?.xpBonus ?? 0);
+  const capped = Math.min(prestigeLevel, MAX_PRESTIGE_LEVEL);
+  return 1 + PRESTIGE_RANKS.slice(0, capped).reduce((sum, r) => sum + r.xpBonus, 0);
 }
 
-/** Get the cumulative gold multiplier from prestige */
+/** Get the cumulative gold multiplier from prestige (stacks all ranks up to current) */
 export function getPrestigeGoldMultiplier(prestigeLevel: number): number {
   if (prestigeLevel <= 0) return 1;
-  const rank = getPrestigeRank(Math.min(prestigeLevel, MAX_PRESTIGE_LEVEL));
-  return 1 + (rank?.goldBonus ?? 0);
+  const capped = Math.min(prestigeLevel, MAX_PRESTIGE_LEVEL);
+  return 1 + PRESTIGE_RANKS.slice(0, capped).reduce((sum, r) => sum + r.goldBonus, 0);
 }
 
 /** Check if player is eligible to prestige (completed all worlds) */

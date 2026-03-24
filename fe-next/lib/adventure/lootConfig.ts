@@ -47,7 +47,7 @@ export function generateLootChest(
   }
 
   // Extra Bonus Gold (boss levels with 3 stars — boss trophy reward)
-  const isBossLevel = levelNumber === 5 || levelNumber === 7;
+  const isBossLevel = levelNumber === 7;
   if (isBossLevel && stars === 3) {
     const trophyGold = Math.floor(30 * worldId * goldMultiplier);
     drops.push({ type: 'bonusGold', amount: trophyGold, nameKey: 'adventure.loot.bossTrophy', rarity: 'epic' });

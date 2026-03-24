@@ -194,6 +194,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
     }
 
+    // Security: Prevent level skip-ahead
+    // Allow replaying already-completed levels, but reject levels not yet unlocked
+    const playerWorld = existingProgression?.current_world ?? 1;
+    const playerLevel = existingProgression?.current_level ?? 1;
+    if (!existingCompletion) {
+      // New level — must be within or before current progression
+      if (world > playerWorld || (world === playerWorld && level > playerLevel)) {
+        return NextResponse.json(
+          { error: 'Level not unlocked — cannot skip ahead' },
+          { status: 403 }
+        );
+      }
+    }
+
     const previousStars = existingCompletion?.stars ?? 0;
     const previousBestScore = existingCompletion?.best_score ?? 0;
     const previousBestWords = existingCompletion?.best_words ?? 0;
@@ -294,24 +308,37 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    let { error: updateError } = await supabase
+    // Optimistic lock: only update if gold hasn't changed since we read it
+    // This prevents concurrent requests from doubling gold rewards
+    const { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update(updatePayload)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('gold', currentGold)
+      .select()
+      .single();
 
-    // If gold column doesn't exist yet (migration pending), retry without it
+    // If gold column doesn't exist yet (migration pending), retry without gold lock
     if (updateError && (updateError.code === 'PGRST204' || updateError.message?.includes('gold'))) {
       console.warn('[ADVENTURE COMPLETE API] gold column not found, retrying without gold');
       delete updatePayload.gold;
-      ({ error: updateError } = await supabase
+      const { error: retryError } = await supabase
         .from('player_progression')
         .update(updatePayload)
-        .eq('user_id', userId));
-    }
-
-    if (updateError) {
+        .eq('user_id', userId);
+      if (retryError) {
+        console.error('[ADVENTURE COMPLETE API] Progression update error:', retryError);
+        return NextResponse.json({ error: 'Failed to update progression' }, { status: 500 });
+      }
+    } else if (updateError) {
       console.error('[ADVENTURE COMPLETE API] Progression update error:', updateError);
       return NextResponse.json({ error: 'Failed to update progression' }, { status: 500 });
+    } else if (!updatedRow) {
+      // Optimistic lock conflict: gold was modified by a concurrent request
+      return NextResponse.json(
+        { error: 'Concurrent modification detected — please retry' },
+        { status: 409 }
+      );
     }
 
     // Check for level up

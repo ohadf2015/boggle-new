@@ -80,12 +80,10 @@ export const STARS_TO_UNLOCK_NEXT_LEVEL = 1;
 export const STARS_TO_UNLOCK_NEXT_WORLD = 11;
 
 /**
- * Total stars required to unlock the final world (World 10)
- * Special requirement: needs 45 total stars regardless of distribution
- * (45 = ~48% of 9 worlds × 21 stars = ~24% of total 189, achievable with 2-star average)
- * Previously 60 which required near-perfect play across all 9 worlds.
+ * Legacy constant — World 10 now uses the standard formula (11 * 9 = 99 stars).
+ * Kept for backward compatibility with any code that references this constant.
  */
-export const TOTAL_STARS_FOR_FINAL_WORLD = 45;
+export const TOTAL_STARS_FOR_FINAL_WORLD = 99;
 
 /**
  * Maximum stars per level
@@ -260,10 +258,11 @@ export function getTimerDuration(world: number): number {
  */
 export function getWorldUnlockRequirement(world: number): number {
   if (world <= 1) return 0; // World 1 always unlocked
-  if (world >= 10) return TOTAL_STARS_FOR_FINAL_WORLD; // World 10 needs 80 total stars
 
-  // Worlds 2-9: Need 15 stars per previous world
-  return STARS_TO_UNLOCK_NEXT_WORLD * (world - 1);
+  // All worlds (2-10) use the same formula: 11 stars per previous world
+  // World 10 requires 11 * 9 = 99 stars, ensuring players have progressed through most worlds
+  const clamped = Math.min(world, WORLDS_COUNT);
+  return STARS_TO_UNLOCK_NEXT_WORLD * (clamped - 1);
 }
 
 /**

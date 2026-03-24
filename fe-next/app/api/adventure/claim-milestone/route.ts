@@ -85,7 +85,8 @@ export async function POST(request: NextRequest) {
     const newXp = (prog.xp as number ?? 0) + milestone.xp;
     const newClaimed = [...claimed, milestone.target];
 
-    const { error: updateError } = await supabase
+    // Optimistic lock: only update if gold hasn't changed (prevents double-claim race)
+    const { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update({
         gold: newGold,
@@ -93,11 +94,21 @@ export async function POST(request: NextRequest) {
         word_album_claimed_milestones: newClaimed,
         updated_at: new Date().toISOString(),
       })
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .eq('gold', prog.gold as number ?? 0)
+      .select()
+      .single();
 
     if (updateError) {
       console.error('[CLAIM MILESTONE API] Update error:', updateError);
       return NextResponse.json({ error: 'Failed to claim milestone' }, { status: 500 });
+    }
+
+    if (!updatedRow) {
+      return NextResponse.json(
+        { error: 'Concurrent modification detected — please retry' },
+        { status: 409 }
+      );
     }
 
     return NextResponse.json({

@@ -76,13 +76,24 @@ describe('prestigeSystem', () => {
     });
 
     it('returns 1.1x XP and 1.1x gold at bronze (level 1)', () => {
-      expect(getPrestigeXpMultiplier(1)).toBe(1.1);
-      expect(getPrestigeGoldMultiplier(1)).toBe(1.1);
+      expect(getPrestigeXpMultiplier(1)).toBeCloseTo(1.1);
+      expect(getPrestigeGoldMultiplier(1)).toBeCloseTo(1.1);
     });
 
-    it('returns 1.5x XP and 1.3x gold at diamond (level 5)', () => {
-      expect(getPrestigeXpMultiplier(5)).toBe(1.5);
-      expect(getPrestigeGoldMultiplier(5)).toBeCloseTo(1.3);
+    it('accumulates XP bonus across prestige levels (not just current rank)', () => {
+      // Level 1: +0.1, Level 2: +0.2 → cumulative = 1 + 0.1 + 0.2 = 1.3
+      expect(getPrestigeXpMultiplier(2)).toBeCloseTo(1.3);
+      // Level 3: +0.3 → cumulative = 1 + 0.1 + 0.2 + 0.3 = 1.6
+      expect(getPrestigeXpMultiplier(3)).toBeCloseTo(1.6);
+      // Level 5: all bonuses → 1 + 0.1 + 0.2 + 0.3 + 0.4 + 0.5 = 2.5
+      expect(getPrestigeXpMultiplier(5)).toBeCloseTo(2.5);
+    });
+
+    it('accumulates gold bonus across prestige levels', () => {
+      // Level 2: 1 + 0.1 + 0.15 = 1.25
+      expect(getPrestigeGoldMultiplier(2)).toBeCloseTo(1.25);
+      // Level 5: 1 + 0.1 + 0.15 + 0.2 + 0.25 + 0.3 = 2.0
+      expect(getPrestigeGoldMultiplier(5)).toBeCloseTo(2.0);
     });
   });
 

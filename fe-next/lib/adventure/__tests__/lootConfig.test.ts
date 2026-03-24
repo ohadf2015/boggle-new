@@ -59,6 +59,24 @@ describe('generateLootChest', () => {
     expect(epic).toBeUndefined();
   });
 
+  it('does not award boss trophy on level 5 (only level 7 is boss)', () => {
+    const chest = generateLootChest(3, 5, 3, 500, 1);
+    const epic = chest.drops.find(d => d.rarity === 'epic');
+    expect(epic).toBeUndefined();
+  });
+
+  it('awards boss trophy only on level 7 (the actual boss level)', () => {
+    for (let lvl = 1; lvl <= 7; lvl++) {
+      const chest = generateLootChest(3, lvl, 3, 500, 1);
+      const hasEpic = chest.drops.some(d => d.rarity === 'epic');
+      if (lvl === 7) {
+        expect(hasEpic).toBe(true);
+      } else {
+        expect(hasEpic).toBe(false);
+      }
+    }
+  });
+
   it('bonus gold scales with world number', () => {
     const w1 = generateLootChest(1, 1, 3, 100, 1);
     const w5 = generateLootChest(5, 1, 3, 100, 1);
