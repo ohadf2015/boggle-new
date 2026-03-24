@@ -46,6 +46,7 @@ export default function ConsolationRows({
           >
             <div className="flex items-center gap-3">
               {crown && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={crown.image}
                   alt=""

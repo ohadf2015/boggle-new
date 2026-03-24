@@ -304,7 +304,7 @@ const DailyChallenge: React.FC = () => {
       completedAt: new Date().toISOString(),
     });
     setPhase('completed');
-  }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated]);
+  }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
 
   const handleTutorialComplete = useCallback(() => {
     const tutorialKey = getWordHuntTutorialKey(gameLanguage);
