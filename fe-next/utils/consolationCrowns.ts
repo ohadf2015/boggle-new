@@ -136,10 +136,15 @@ export function assignConsolationCrowns(
       return p.longestWordLength || 0; // Best single word
     },
     tank: (p) => {
-      // Most consistent = lowest variance, but we want highest scorer here
-      // Use total words * score as proxy for consistency
-      const words = p.wordsFoundCount || p.allWords?.length || 0;
-      return words > 0 ? p.score / Math.max(1, Math.abs(p.score / words - (p.score / words))) : p.score;
+      const words = p.allWords;
+      if (!words || words.length < 2) return p.score; // fallback to raw score
+      const scores = words.map(w => w.score);
+      const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+      if (mean === 0) return 0;
+      const variance = scores.reduce((sum, s) => sum + (s - mean) ** 2, 0) / scores.length;
+      const cv = Math.sqrt(variance) / mean;
+      // Lower CV = more consistent. Invert so higher = better for ranking
+      return 1 / (cv + 0.01);
     },
   };
 

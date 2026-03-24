@@ -107,21 +107,6 @@ const AnimatedScore: React.FC<{
 };
 
 // ============================================================
-// PULSE RING KEYFRAMES (injected via style tag)
-// ============================================================
-
-const PULSE_RING_STYLE = `
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.15); opacity: 0.15; }
-  100% { transform: scale(1); opacity: 0.4; }
-}
-.animate-pulse-ring {
-  animation: pulse-ring 2s ease-in-out infinite;
-}
-`;
-
-// ============================================================
 // RANK LABEL HELPER
 // ============================================================
 
@@ -145,7 +130,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
     rank,
     score,
     username,
-    avatar: _avatar,
+    avatar,
     winnerScore,
     totalPlayers: _totalPlayers,
     isWordHunt,
@@ -184,8 +169,6 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
         };
 
     return (
-      <>
-        <style>{PULSE_RING_STYLE}</style>
         <motion.section
           {...motionProps}
           className="flex flex-col items-center text-center relative pt-6 pb-4"
@@ -249,6 +232,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             >
               <Avatar
                 userId={username}
+                customAvatar={(avatar as any)?.customAvatar}
                 size="2xl"
                 className="w-full h-full rounded-full"
               />
@@ -315,15 +299,11 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                   'opacity-70',
                 )}
               >
-                {t('results.soClose') ?? 'So close!'}{' '}
-                {t('results.justBehind')
-                  ? `${t('results.justBehind')} `.replace('{pts}', String(gap))
-                  : `Just ${gap} pts behind #1.`}
+                {(t('results.soClose') ?? 'So close!').replace('{points}', String(gap)) || `So close! Just ${gap} pts behind #1.`}
               </p>
             )}
           </div>
         </motion.section>
-      </>
     );
   },
 );

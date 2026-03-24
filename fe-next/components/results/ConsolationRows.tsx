@@ -52,9 +52,11 @@ export default function ConsolationRows({
                   className={cn(
                     'w-8 h-8 rounded-lg shrink-0',
                     crown.id === 'sniper' && 'shadow-[0_0_8px_rgba(0,255,255,0.3)]',
-                    crown.id === 'speedster' && 'shadow-[0_0_8px_rgba(255,107,53,0.3)]',
-                    crown.id === 'wordsmith' && 'shadow-[0_0_8px_rgba(255,20,147,0.3)]',
-                    crown.id === 'explorer' && 'shadow-[0_0_8px_rgba(255,225,53,0.3)]'
+                    crown.id === 'speedDemon' && 'shadow-[0_0_8px_rgba(255,107,53,0.3)]',
+                    crown.id === 'scholar' && 'shadow-[0_0_8px_rgba(255,20,147,0.3)]',
+                    crown.id === 'explorer' && 'shadow-[0_0_8px_rgba(255,225,53,0.3)]',
+                    crown.id === 'clutch' && 'shadow-[0_0_8px_rgba(255,20,147,0.3)]',
+                    crown.id === 'tank' && 'shadow-[0_0_8px_rgba(0,255,255,0.3)]'
                   )}
                 />
               )}

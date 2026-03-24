@@ -4,6 +4,7 @@ import { Crown, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
+import Avatar from '../Avatar';
 
 interface ResultsPodiumProps {
   /** Top 3 players sorted by rank */
@@ -114,8 +115,6 @@ export default function ResultsPodium({
           const displayName = isCurrentUser
             ? (t('results.you') || 'YOU')
             : player.username;
-          const avatarEmoji = (player.avatar as any)?.emoji;
-          const avatarColor = (player.avatar as any)?.color || '#334155';
           const isFirst = config.place === 1;
 
           const scoreDisplay = isWordHunt
@@ -146,17 +145,13 @@ export default function ResultsPodium({
                     config.avatarSize,
                     isFirst ? 'border-3 border-neo-lime' : cn(config.borderWidth, config.borderClass)
                   )}
-                  style={{ backgroundColor: avatarColor }}
                 >
-                  {avatarEmoji ? (
-                    <span className={cn(isFirst ? 'text-2xl' : 'text-xl')}>
-                      {avatarEmoji}
-                    </span>
-                  ) : (
-                    <span className="font-black text-white text-sm">
-                      {getInitials(player.username)}
-                    </span>
-                  )}
+                  <Avatar
+                    userId={player.username}
+                    customAvatar={(player.avatar as any)?.customAvatar}
+                    size={isFirst ? 'lg' : 'md'}
+                    className={cn('w-full h-full rounded-full')}
+                  />
                 </div>
 
                 {/* Crown for 1st, badge for 2nd/3rd */}

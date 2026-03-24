@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -121,6 +121,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   const isWordHunt = gameMode === 'word-hunt';
   const isMultiplayer = sortedScores.length > 1;
 
+  // Auto-complete score reveal for single-player/bots
+  useEffect(() => {
+    if (!isMultiplayer && !scoreRevealComplete) {
+      setScoreRevealComplete(true);
+    }
+  }, [isMultiplayer, scoreRevealComplete, setScoreRevealComplete]);
+
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
   const consolationPlayers = useMemo(() => sortedScores.slice(3), [sortedScores]);
@@ -226,7 +233,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           )}
 
           {/* 3. CONSOLATION ROWS (4th+ with archetype titles) */}
-          {consolationPlayers.length > 0 && consolationCrowns.size > 0 && (
+          {consolationPlayers.length > 0 && (
             <ConsolationRows
               players={consolationPlayers}
               crowns={consolationCrowns}
@@ -241,7 +248,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           )}
 
           {/* 5. REVENGE CARD */}
-          {isMultiplayer && currentPlayerRank > 1 && currentPlayerData && (
+          {isMultiplayer && currentPlayerData && sortedScores.length > 1 && (
             <ResultsRevengeSection
               sortedScores={sortedScores}
               currentPlayerData={currentPlayerData}

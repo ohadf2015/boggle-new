@@ -388,7 +388,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     })),
     allPlayerWords,
     gameDuration,
-    playerArchetypes,
     wordHuntSummary,
   };
 
@@ -685,6 +684,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               winnerUsername={sortedScores[0]?.username}
               readyCount={readyUsernames.length}
               totalPlayers={sortedScores.length}
+              readyUsernames={readyUsernames}
+              players={sortedScores.map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot }))}
               onStartGame={handleStartGame}
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}
