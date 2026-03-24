@@ -24,12 +24,12 @@ const PODIUM_CONFIG = [
     borderClass: 'border-neo-cyan',
     textClass: 'text-neo-cyan',
     ptOffset: 'pt-8',
-    avatarSize: 'w-14 h-14',
+    avatarSize: 'w-12 h-12 sm:w-14 sm:h-14',
     badgeSize: 'w-6 h-6 text-[10px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
     barHeight: 'h-20',
-    barText: 'text-4xl',
+    barText: 'text-2xl sm:text-4xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
   },
@@ -40,12 +40,12 @@ const PODIUM_CONFIG = [
     borderClass: 'border-neo-lime',
     textClass: 'text-neo-lime',
     ptOffset: '',
-    avatarSize: 'w-16 h-16',
+    avatarSize: 'w-14 h-14 sm:w-16 sm:h-16',
     badgeSize: '',
     nameSize: 'text-[11px]',
     scoreSize: 'text-[10px]',
     barHeight: 'h-32',
-    barText: 'text-5xl',
+    barText: 'text-3xl sm:text-5xl',
     shadow: 'shadow-hard',
     borderWidth: 'border-2',
   },
@@ -56,12 +56,12 @@ const PODIUM_CONFIG = [
     borderClass: 'border-neo-orange',
     textClass: 'text-neo-orange',
     ptOffset: 'pt-14',
-    avatarSize: 'w-12 h-12',
+    avatarSize: 'w-10 h-10 sm:w-12 sm:h-12',
     badgeSize: 'w-5 h-5 text-[9px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
     barHeight: 'h-12',
-    barText: 'text-3xl',
+    barText: 'text-xl sm:text-3xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
   },
@@ -98,7 +98,7 @@ export default function ResultsPodium({
         </span>
       </div>
 
-      <div className="grid grid-cols-3 items-end gap-1 px-1">
+      <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
           const config = PODIUM_CONFIG[configIdx];
           const player = top3[configIdx];
@@ -129,9 +129,10 @@ export default function ResultsPodium({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 15,
                 delay: layoutIdx * 0.15,
-                duration: 0.4,
-                ease: 'easeOut',
               }}
             >
               {/* Avatar */}
@@ -160,9 +161,14 @@ export default function ResultsPodium({
 
                 {/* Crown for 1st, badge for 2nd/3rd */}
                 {isFirst ? (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-neo-lime drop-shadow-md">
+                  <motion.div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 text-neo-lime drop-shadow-md"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', delay: 0.6, stiffness: 300, damping: 12 }}
+                  >
                     <Crown className="w-5 h-5 fill-neo-lime" />
-                  </div>
+                  </motion.div>
                 ) : (
                   <div
                     className={cn(

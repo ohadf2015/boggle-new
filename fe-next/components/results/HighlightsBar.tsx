@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface HighlightsBarProps {
@@ -16,7 +17,10 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
   if (!stats.length) return null;
 
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6, duration: 0.4 }}
       className={cn(
         'flex justify-around items-center py-4 rounded-neo',
         'bg-neo-navy-light/40 border-y border-white/5',
@@ -44,6 +48,6 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
           </div>
         </div>
       ))}
-    </section>
+    </motion.section>
   );
 }

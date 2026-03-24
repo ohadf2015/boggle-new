@@ -157,7 +157,7 @@ export default function StickyReadyBar({
           </motion.button>
           <button
             onClick={() => setAutoAdvanceCancelled(true)}
-            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
+            className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
             aria-label={t('autoPlay.exit')}
           >
             <X className="w-4 h-4" />
@@ -230,7 +230,7 @@ export default function StickyReadyBar({
           <button
             data-testid="auto-ready-cancel"
             onClick={() => setAutoReadyCancelled(true)}
-            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
+            className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
             aria-label={t('autoPlay.exit')}
           >
             <X className="w-4 h-4" />
@@ -269,7 +269,7 @@ export default function StickyReadyBar({
   }
 
   return (
-    <div className="flex flex-col gap-3 flex-1 min-w-0">
+    <div className="flex flex-col gap-3 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
         {/* Game mode chip (host only) */}
         {isHost && selectedGameMode !== undefined && onSelectGameMode && (
           <div className="relative">

@@ -39,8 +39,8 @@ export default function ConsolationRows({
         return (
           <motion.div
             key={player.username}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -12, y: 0 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
             transition={{ delay: index * 0.06, duration: 0.3 }}
             className="flex items-center justify-between py-4"
           >

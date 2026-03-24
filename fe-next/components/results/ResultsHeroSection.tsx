@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import React, { useEffect, useRef, memo } from 'react';
+import { motion, useMotionValue, useSpring, useInView, animate } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '../Avatar';
@@ -82,30 +82,28 @@ const AnimatedScore: React.FC<{
   className?: string;
   skipAnimation?: boolean;
 }> = ({ target, className, skipAnimation }) => {
-  const motionVal = useMotionValue(0);
-  const rounded = useTransform(motionVal, (v) => Math.round(v));
-  const [display, setDisplay] = useState(skipAnimation ? target : 0);
+  const scoreRef = useRef<HTMLSpanElement>(null);
+  const scoreMotionValue = useMotionValue(0);
+  const scoreSpring = useSpring(scoreMotionValue, { stiffness: 100, damping: 30 });
+  const scoreInView = useInView(scoreRef, { once: true });
 
   useEffect(() => {
-    if (skipAnimation) {
-      setDisplay(target);
+    if (!scoreInView || skipAnimation) {
+      if (scoreRef.current) scoreRef.current.textContent = target.toLocaleString();
       return;
     }
-    const controls = animate(motionVal, target, {
-      type: 'spring',
-      stiffness: 60,
-      damping: 18,
-      mass: 0.8,
-      delay: 0.6,
-    });
-    const unsub = rounded.on('change', (v) => setDisplay(v));
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [target, motionVal, rounded, skipAnimation]);
+    const controls = animate(scoreMotionValue, target, { duration: 1.5 });
+    return controls.stop;
+  }, [scoreInView, target, skipAnimation, scoreMotionValue]);
 
-  return <span className={className}>{display.toLocaleString()}</span>;
+  useEffect(() => {
+    const unsub = scoreSpring.on('change', (v) => {
+      if (scoreRef.current) scoreRef.current.textContent = Math.round(v).toLocaleString();
+    });
+    return unsub;
+  }, [scoreSpring]);
+
+  return <span ref={scoreRef} className={className}>0</span>;
 };
 
 // ============================================================
@@ -198,7 +196,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             {isEliminated ? (
               <span
                 className={cn(
-                  'font-neo-display font-black text-7xl sm:text-9xl leading-none',
+                  'font-neo-display font-black text-4xl xs:text-6xl sm:text-9xl leading-none',
                   'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
@@ -207,7 +205,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             ) : (
               <span
                 className={cn(
-                  'text-9xl sm:text-[11rem] font-neo-display font-black leading-none',
+                  'text-6xl xs:text-8xl sm:text-[11rem] font-neo-display font-black leading-none',
                   displayAccent.text,
                   displayAccent.glow,
                 )}
@@ -243,7 +241,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             )}
             <div
               className={cn(
-                'relative w-40 h-40 rounded-full border-4 p-1 bg-neo-navy',
+                'relative w-28 h-28 sm:w-40 sm:h-40 rounded-full border-4 p-1 bg-neo-navy',
                 displayAccent.border,
                 isEliminated ? 'grayscale ring-8 ring-red-500/5' : '',
                 `shadow-[0_0_40px_rgba(0,255,255,0.3)]`,
@@ -257,7 +255,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             </div>
             <div
               className={cn(
-                'absolute -bottom-2 left-1/2 -translate-x-1/2',
+                'absolute -bottom-2 left-1/2 -translate-x-1/2 max-w-[80vw]',
                 'bg-neo-navy border-2 px-5 py-1.5 rounded-full shadow-hard-sm',
                 displayAccent.border,
               )}
@@ -279,7 +277,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               <AnimatedScore
                 target={score}
                 skipAnimation={reducedMotion}
-                className="font-neo-display text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
+                className="font-neo-display text-4xl xs:text-5xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
               />
               <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                 {t('results.totalPoints') ?? 'Total Points'}
@@ -288,8 +286,8 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
 
             {/* Word Hunt target badges */}
             {isWordHunt && (
-              <div className="flex items-center gap-4 mt-4">
-                <div className="bg-neo-black/40 border-2 border-white/10 px-4 py-1.5 rounded-neo">
+              <div className="flex items-center gap-2 sm:gap-4 mt-4">
+                <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
                   <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
                     {t('results.target') || 'Target'}
                   </p>
@@ -297,7 +295,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                     {wordHuntTarget || '—'}
                   </p>
                 </div>
-                <div className="bg-neo-black/40 border-2 border-white/10 px-4 py-1.5 rounded-neo">
+                <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
                   <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
                     {t('results.wordsFound') || 'Your Words'}
                   </p>
