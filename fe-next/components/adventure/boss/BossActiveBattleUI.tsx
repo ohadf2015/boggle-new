@@ -17,6 +17,7 @@ import BossDialogue from '../BossDialogue';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BossConfig } from '@/types/boss';
 import type { BossPhaseNew } from '@/hooks/useAdventureBossNew';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // ==============================================
 // TYPES
@@ -64,6 +65,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
   currentTaunt,
 }) => {
   const { t } = useLanguage();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Boss avatar reaction: detect HP drops
   const [bossReaction, setBossReaction] = useState<'idle' | 'hit'>('idle');
@@ -118,12 +120,12 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
                 </div>
               )}
 
-              {/* Desperate glow */}
+              {/* Desperate glow — static border when reduced motion preferred */}
               {phase === 'desperate' && (
                 <AdaptiveMotion.div
                   className="absolute inset-0 border-2 border-neo-red rounded-neo"
-                  animate={{ opacity: [0.4, 0.8, 0.4] }}
-                  transition={{ repeat: Infinity, duration: 0.6 }}
+                  animate={prefersReducedMotion ? { opacity: 0.7 } : { opacity: [0.4, 0.8, 0.4] }}
+                  transition={prefersReducedMotion ? { duration: 0 } : { repeat: Infinity, duration: 0.6 }}
                   data-testid="boss-avatar-desperate-glow"
                 />
               )}

@@ -6441,7 +6441,9 @@ const es = {
       "shuffleUsed": "¡Tablero mezclado! ({remaining} restantes)",
       "freezeTimer": "Congelar temporizador",
       "timerFrozen": "¡Temporizador congelado por {seconds}s!",
-      "shieldBlocked": "¡Escudo bloqueó {percent}% de daño!"
+      "shieldBlocked": "¡Escudo bloqueó {percent}% de daño!",
+      "allObjectivesComplete": "¡Todos los objetivos completados!",
+      "gridAriaLabel": "Tablero de juego de aventura"
     },
     "hints": {
       "minLetters2": "2+ letras",

@@ -426,6 +426,13 @@ const AdventureGame = memo<AdventureGameProps>(
     }, [init.hintData, currentHint, levelConfig.gridSize, isFrozen, init.upgradeEffects.freezeHighlightsWord, remainingHintWords, findPathForWord, gemDetectorHighlights]);
 
 
+    // Exit confirmation — prevents accidental game loss from stray taps
+    const handleExitWithConfirm = useCallback(() => {
+      // Skip confirmation if game is already complete
+      if (showLevelComplete) { onExit(); return; }
+      if (window.confirm(t('adventure.game.confirmExitDesc'))) onExit();
+    }, [onExit, showLevelComplete, t]);
+
     if (!isValidConfig) {
       return (
         <div data-testid="adventure-game" role="main" className="flex items-center justify-center h-full">
@@ -442,7 +449,7 @@ const AdventureGame = memo<AdventureGameProps>(
           header={
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
               score={gameState.score} timerStore={timerStore} isPaused={isPaused}
-              onPauseToggle={gridInteraction.handlePauseToggle} onExit={onExit}
+              onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100} />
           }
           gridArea={

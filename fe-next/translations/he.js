@@ -6117,7 +6117,9 @@ const he = {
       "shuffleUsed": "הלוח עורבב! ({remaining} נותרו)",
       "freezeTimer": "הקפאת טיימר",
       "timerFrozen": "הטיימר הוקפא ל-{seconds} שניות!",
-      "shieldBlocked": "המגן חסם {percent}% נזק!"
+      "shieldBlocked": "המגן חסם {percent}% נזק!",
+      "allObjectivesComplete": "כל המשימות הושלמו!",
+      "gridAriaLabel": "לוח משחק הרפתקה"
     },
     "hints": {
       "minLetters2": "2+ אותיות",

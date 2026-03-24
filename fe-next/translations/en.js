@@ -6183,7 +6183,9 @@ const en = {
       "shuffleUsed": "Board shuffled! ({remaining} left)",
       "freezeTimer": "Freeze Timer",
       "timerFrozen": "Timer frozen for {seconds}s!",
-      "shieldBlocked": "Shield blocked {percent}% damage!"
+      "shieldBlocked": "Shield blocked {percent}% damage!",
+      "allObjectivesComplete": "All Objectives Complete!",
+      "gridAriaLabel": "Adventure game board"
     },
     "hints": {
       "minLetters2": "2+ letters",

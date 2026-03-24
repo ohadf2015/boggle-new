@@ -8,7 +8,8 @@
  * their best metrics even when they haven't completed a level.
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
@@ -86,7 +87,14 @@ function validateAttemptBody(body: Record<string, unknown>): {
  * POST /api/adventure/attempt
  * Record a level attempt with partial progress
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-attempt', {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     // Get authenticated user
     const authSupabase = await createClient();

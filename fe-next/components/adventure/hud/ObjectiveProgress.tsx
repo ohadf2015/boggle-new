@@ -18,6 +18,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Check, Target, FileText, Zap, Clock, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -87,6 +88,7 @@ type ObjectiveType = keyof typeof OBJECTIVE_COLORS;
 export const ObjectiveProgress = memo<ObjectiveProgressProps>(
   ({ objectives, className }) => {
     const prefersReducedMotion = usePrefersReducedMotion();
+    const { t } = useLanguage();
 
     // Calculate progress for each objective
     const objectivesWithProgress = useMemo(() => {
@@ -106,7 +108,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
         <ul
           role="list"
           className={cn('flex flex-col gap-2', className)}
-          aria-label="Level objectives"
+          aria-label={t('adventure.game.objectives')}
         />
       );
     }
@@ -130,7 +132,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
               )}
             >
               <Trophy className="w-4 h-4" />
-              <span>All Objectives Complete!</span>
+              <span>{t('adventure.game.allObjectivesComplete')}</span>
               <Sparkles className="w-4 h-4" />
             </AdaptiveMotion.div>
           )}
@@ -139,7 +141,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
         <ul
           role="list"
           className="flex flex-col gap-1.5"
-          aria-label="Level objectives"
+          aria-label={t('adventure.game.objectives')}
         >
           {objectivesWithProgress.map((objective) => {
             const Icon = OBJECTIVE_ICONS[objective.type];

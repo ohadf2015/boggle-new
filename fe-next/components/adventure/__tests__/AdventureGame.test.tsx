@@ -682,9 +682,10 @@ describe('AdventureGame', () => {
   });
 
   describe('Exit Functionality', () => {
-    it('should call onExit when exit button is clicked from pause menu', () => {
+    it('should call onExit when exit button is clicked and user confirms', () => {
       // GIVEN
       const onExit = jest.fn();
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
       render(<AdventureGame {...defaultProps} onExit={onExit} />);
 
       // WHEN - pause then exit (may have multiple exit buttons due to responsive design)
@@ -694,7 +695,26 @@ describe('AdventureGame', () => {
       fireEvent.click(exitButtons[0]);
 
       // THEN
+      expect(window.confirm).toHaveBeenCalled();
       expect(onExit).toHaveBeenCalledTimes(1);
+      (window.confirm as jest.Mock).mockRestore();
+    });
+
+    it('should NOT call onExit when user cancels exit confirmation', () => {
+      // GIVEN
+      const onExit = jest.fn();
+      jest.spyOn(window, 'confirm').mockReturnValue(false);
+      render(<AdventureGame {...defaultProps} onExit={onExit} />);
+
+      // WHEN - pause then exit, user cancels
+      fireEvent.click(screen.getByRole('button', { name: /pause/i }));
+      const exitButtons = screen.getAllByRole('button', { name: /exit/i });
+      fireEvent.click(exitButtons[0]);
+
+      // THEN
+      expect(window.confirm).toHaveBeenCalled();
+      expect(onExit).not.toHaveBeenCalled();
+      (window.confirm as jest.Mock).mockRestore();
     });
   });
 

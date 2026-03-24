@@ -378,7 +378,7 @@ const AdventureGrid = memo(
           ref={containerRef}
           dir="ltr"
           role="grid"
-          aria-label="Adventure game board"
+          aria-label={t('adventure.game.gridAriaLabel')}
           onMouseUp={interactive ? handleMouseUp : undefined}
           /* touchmove registered as native non-passive listener in useGridGestures */
           onTouchEnd={interactive ? handleTouchEnd : undefined}

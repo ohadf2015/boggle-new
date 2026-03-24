@@ -26,6 +26,7 @@ import { Swords } from 'lucide-react';
 import PhaseIndicator from './PhaseIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // ==============================================
 // TYPES
@@ -133,6 +134,7 @@ interface SegmentProps {
  * Individual HP segment with animated fill and RPG-style chunked look.
  */
 const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
   return (
     <div
       data-segment={id}
@@ -151,12 +153,12 @@ const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
         initial={{ width: `${fill}%` }}
         animate={{
           width: `${fill}%`,
-          // Pulse opacity when HP is critically low
-          opacity: isLowHP && fill > 0 ? [1, 0.55, 1] : 1,
+          // Pulse opacity when HP is critically low (disabled for reduced motion)
+          opacity: isLowHP && fill > 0 && !prefersReducedMotion ? [1, 0.55, 1] : 1,
         }}
         transition={{
           width: { type: 'spring', stiffness: 200, damping: 20 },
-          opacity: isLowHP && fill > 0
+          opacity: isLowHP && fill > 0 && !prefersReducedMotion
             ? { duration: 0.7, repeat: Infinity, ease: 'easeInOut' }
             : { duration: 0 },
         }}
@@ -235,6 +237,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
 }) => {
   const { t } = useLanguage();
   const bossFightTheme = useBossFightTheme();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const hpPercentage = useMemo(
     () => calculateHpPercentage(currentHP, maxHP),
@@ -326,8 +329,8 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
           {/* Swords icon when enraged */}
           {phase === 'enraged' && (
             <AdaptiveMotion.span
-              animate={{ rotate: [-8, 8, -8], scale: [1, 1.15, 1] }}
-              transition={{ duration: 0.4, repeat: Infinity }}
+              animate={prefersReducedMotion ? {} : { rotate: [-8, 8, -8], scale: [1, 1.15, 1] }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.4, repeat: Infinity }}
               aria-hidden="true"
             >
               <Swords className="w-3.5 h-3.5 text-neo-red flex-shrink-0" />
@@ -392,8 +395,8 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         <Divider threshold={33} />
         <Divider threshold={66} />
 
-        {/* Low HP outer glow — intensifies as HP decreases */}
-        {isLowHP && (
+        {/* Low HP outer glow — intensifies as HP decreases (static for reduced motion) */}
+        {isLowHP && !prefersReducedMotion && (
           <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             animate={{
@@ -405,6 +408,9 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
             }}
             transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
           />
+        )}
+        {isLowHP && prefersReducedMotion && (
+          <div className="absolute inset-0 rounded-neo pointer-events-none border-2 border-neo-red" />
         )}
 
         {/* Floating damage numbers */}

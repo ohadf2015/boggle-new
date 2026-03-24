@@ -6092,7 +6092,9 @@ const sv = {
       "shuffleUsed": "Brädet blandat! ({remaining} kvar)",
       "freezeTimer": "Frys timer",
       "timerFrozen": "Timer frusen i {seconds}s!",
-      "shieldBlocked": "Sköld blockerade {percent}% skada!"
+      "shieldBlocked": "Sköld blockerade {percent}% skada!",
+      "allObjectivesComplete": "Alla mål uppnådda!",
+      "gridAriaLabel": "Äventyrsspelbräde"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",

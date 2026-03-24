@@ -5,7 +5,8 @@
  * POST - Create initial progression for new user
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
@@ -78,7 +79,14 @@ function transformCompletion(dbRow: Record<string, unknown>): LevelCompletion {
  * GET /api/adventure/progress
  * Retrieve user's adventure progression
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-progress', {
+    maxRequests: 60,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     // Get authenticated user using proper Supabase SSR auth
     const authSupabase = await createClient();

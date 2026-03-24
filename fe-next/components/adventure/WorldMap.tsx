@@ -18,6 +18,7 @@ import {
   getWorldGlow,
   type WorldConfig,
 } from '@/lib/adventure';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { WorldMapBackground } from './WorldMapBackground';
 import { WorldOrbitingLetters, TrailPath } from './WorldMapDecorations';
 
@@ -90,6 +91,8 @@ const WorldNode = memo(function WorldNode({
   const worldName = t(`adventure.worlds.${world.name}`) || world.name;
   const worldImage = WORLD_IMAGES[world.id];
   const glowColor = getWorldGlow(world.colorPrimary);
+
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
     <AdaptiveMotion.div
@@ -177,8 +180,8 @@ const WorldNode = memo(function WorldNode({
           {isFinalWorld && isUnlocked && (
             <AdaptiveMotion.div
               className="absolute -top-5 left-1/2 -translate-x-1/2"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={prefersReducedMotion ? {} : { y: [0, -4, 0] }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
             >
               <Crown className="w-9 h-9 sm:w-10 sm:h-10 text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]" />
             </AdaptiveMotion.div>
@@ -196,12 +199,15 @@ const WorldNode = memo(function WorldNode({
             </div>
           )}
 
-          {isUnlocked && !isComplete && (
+          {isUnlocked && !isComplete && !prefersReducedMotion && (
             <AdaptiveMotion.div
               className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow"
               animate={{ scale: [1, 1.18, 1], opacity: [0.7, 0, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
+          )}
+          {isUnlocked && !isComplete && prefersReducedMotion && (
+            <div className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow/50" />
           )}
         </AdaptiveMotion.button>
         </div>

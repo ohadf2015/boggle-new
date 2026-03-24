@@ -6143,7 +6143,9 @@ const ja = {
       "shuffleUsed": "シャッフル完了！ (残り{remaining}回)",
       "freezeTimer": "タイマー凍結",
       "timerFrozen": "タイマーが{seconds}秒間凍結！",
-      "shieldBlocked": "シールドが{percent}%のダメージをブロック！"
+      "shieldBlocked": "シールドが{percent}%のダメージをブロック！",
+      "allObjectivesComplete": "すべての目標を達成！",
+      "gridAriaLabel": "アドベンチャーゲームボード"
     },
     "hints": {
       "minLetters2": "2文字以上",
