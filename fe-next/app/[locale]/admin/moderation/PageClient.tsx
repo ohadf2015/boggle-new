@@ -75,8 +75,11 @@ export default function ModerationPageClient() {
         signal: controller.signal,
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Failed to ${action}`);
+        const data = await res.json().catch(() => null);
+        const errorMsg = (data && typeof data.error === 'string' && data.error)
+          ? data.error
+          : `Failed to ${action} (HTTP ${res.status})`;
+        throw new Error(errorMsg);
       }
       // Remove from local state for instant feedback
       setQueueItems(prev => prev?.filter(item => item.id !== id) ?? []);

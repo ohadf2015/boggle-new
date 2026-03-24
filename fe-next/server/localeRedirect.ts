@@ -30,7 +30,7 @@ export const COUNTRY_TO_LOCALE: Record<string, string> = {
 };
 
 export const SUPPORTED_LOCALES: string[] = ['he', 'en', 'sv', 'ja', 'es'];
-export const DEFAULT_LOCALE: string = 'he';
+export const DEFAULT_LOCALE: string = 'en';
 
 // Social media crawler user agents
 const SOCIAL_CRAWLERS: string[] = [
@@ -38,6 +38,15 @@ const SOCIAL_CRAWLERS: string[] = [
   'linkedinbot', 'slackbot', 'telegrambot', 'discordbot',
   'pinterest', 'redditbot', 'embedly', 'quora link preview',
   'outbrain', 'vkshare', 'w3c_validator'
+];
+
+// SEO search engine crawler user agents
+const SEO_CRAWLERS: string[] = [
+  'googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
+  'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
+  'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
+  'google-inspectiontool', 'google-extended', 'bytespider',
+  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot'
 ];
 
 /**
@@ -48,6 +57,23 @@ const SOCIAL_CRAWLERS: string[] = [
 export function isSocialCrawler(userAgent: string): boolean {
   const ua = (userAgent || '').toLowerCase();
   return SOCIAL_CRAWLERS.some(bot => ua.includes(bot));
+}
+
+/**
+ * Detect if request is from an SEO search engine crawler
+ * @param userAgent - User agent string
+ * @returns Whether the request is from an SEO bot
+ */
+export function isSeoCrawler(userAgent: string): boolean {
+  const ua = (userAgent || '').toLowerCase();
+  return SEO_CRAWLERS.some(bot => ua.includes(bot));
+}
+
+/**
+ * Detect if request is from any type of bot (social or SEO)
+ */
+export function isBot(userAgent: string): boolean {
+  return isSocialCrawler(userAgent) || isSeoCrawler(userAgent);
 }
 
 /**
@@ -93,17 +119,20 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   const locale = determineLocale(req);
   const queryString = parsedUrl.search || '';
 
-  // For social crawlers: rewrite internally (don't redirect)
-  if (isSocialCrawler(userAgent)) {
-    console.log(`[Crawler] Social crawler detected -> rewriting to /${locale}${queryString}`);
-    parsedUrl.pathname = `/${locale}`;
-    req.url = `/${locale}${queryString}`;
+  // For any bot (social or SEO): rewrite internally (don't redirect)
+  // Redirects waste crawl budget — serve content directly
+  if (isBot(userAgent)) {
+    // SEO bots always get x-default locale (en) to match sitemap canonical
+    const botLocale = isSeoCrawler(userAgent) ? 'en' : locale;
+    console.log(`[Crawler] Bot detected -> rewriting to /${botLocale}${queryString}`);
+    parsedUrl.pathname = `/${botLocale}`;
+    req.url = `/${botLocale}${queryString}`;
     return false; // Continue to Next.js handler
   }
 
-  // For regular users: redirect
+  // For regular users: 301 permanent redirect (locale structure is permanent)
   console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
-  res.writeHead(307, { Location: `/${locale}${queryString}` });
+  res.writeHead(301, { Location: `/${locale}${queryString}` });
   res.end();
   return true; // Request handled
 }

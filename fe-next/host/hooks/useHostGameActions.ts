@@ -135,7 +135,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
     // Validate socket connection
     if (!socket || !socket.connected) {
-      logger.error('[HOST] Cannot start game: socket not connected');
+      logger.warn('[HOST] Cannot start game: socket not connected');
       neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: '🔌', duration: 4000 });
       return;
     }

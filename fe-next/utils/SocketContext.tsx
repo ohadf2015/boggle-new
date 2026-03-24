@@ -237,11 +237,14 @@ export function SocketProvider({ children }: SocketProviderProps) {
       // Only log non-empty errors to reduce noise
       if (error && typeof error === 'object' && Object.keys(error).length > 0) {
         const code = (error as Record<string, unknown>).code;
-        const expectedErrors = ['GAME_NOT_FOUND', 'NOT_IN_GAME', 'ROOM_NOT_FOUND'];
+        const expectedErrors = [
+          'GAME_NOT_FOUND', 'NOT_IN_GAME', 'ROOM_NOT_FOUND',
+          'GAME_NOT_IN_PROGRESS', 'GAME_ALREADY_IN_PROGRESS', 'INTERNAL_ERROR',
+        ];
         if (typeof code === 'string' && expectedErrors.includes(code)) {
           logger.log('[SOCKET.IO] Expected error:', error);
         } else {
-          logger.error('[SOCKET.IO] Socket error event:', error);
+          logger.warn('[SOCKET.IO] Socket error event:', JSON.stringify(error));
         }
       }
     };

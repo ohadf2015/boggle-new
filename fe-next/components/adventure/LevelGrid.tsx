@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 import { Sparkles, Star } from 'lucide-react';
@@ -56,7 +56,7 @@ const LEVEL_GRID_PARALLAX_OPTIONS = {
  * Features: Shield header, decluttered RPG cards, boss card, milestone dividers,
  * god-rays, Lucide icon particles, bottom mist
  */
-export default function LevelGrid({
+const LevelGrid = memo(function LevelGrid({
   world,
   completions,
   onLevelSelect,
@@ -88,16 +88,14 @@ export default function LevelGrid({
     }));
   }, [world.id, completions]);
 
-  // Aggregate stats
+  // Aggregate stats — reuse levels array instead of re-filtering completions
   const { worldStars, maxWorldStars, completedLevels, worldColors, glowColor } = useMemo(() => ({
-    worldStars: completions
-      .filter((c) => c.world === world.id)
-      .reduce((sum, c) => sum + c.stars, 0),
+    worldStars: levels.reduce((sum, l) => sum + l.stars, 0),
     maxWorldStars: LEVELS_PER_WORLD * MAX_STARS_PER_LEVEL,
-    completedLevels: completions.filter((c) => c.world === world.id).length,
+    completedLevels: levels.filter((l) => l.stars > 0).length,
     worldColors: getWorldColors(world.colorPrimary),
     glowColor: getWorldGlow(world.colorPrimary),
-  }), [world.id, world.colorPrimary, completions]);
+  }), [levels, world.colorPrimary]);
 
   const worldImage = WORLD_IMAGES[world.id];
 
@@ -280,4 +278,7 @@ export default function LevelGrid({
       </div>
     </div>
   );
-}
+});
+
+LevelGrid.displayName = 'LevelGrid';
+export default LevelGrid;

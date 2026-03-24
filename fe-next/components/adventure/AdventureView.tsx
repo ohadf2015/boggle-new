@@ -53,12 +53,21 @@ function AdventureView(): React.JSX.Element {
   const isRTL = dir === 'rtl';
   const { progression, isLoading, error, completeLevel, updateCurrency } = useProgression();
 
+  const router = useRouter();
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
 
   const [showShop, setShowShop] = useState(false);
   const [showWordAlbum, setShowWordAlbum] = useState(false);
   const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
+
+  // Stable callbacks for modal toggles — prevents child re-renders via memo
+  const openShop = useCallback(() => setShowShop(true), []);
+  const closeShop = useCallback(() => setShowShop(false), []);
+  const openWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(true), []);
+  const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
+  const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
+  const handleBossRush = useCallback(() => router.push(`/${language}/adventure/boss-rush`), [router, language]);
 
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
@@ -99,24 +108,27 @@ function AdventureView(): React.JSX.Element {
   const totalStars = progression?.totalStars ?? 0;
   const playerLevel = progression?.playerLevel ?? 1;
   const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);
-  const router = useRouter();
   // Boss rush unlocks after defeating at least 1 boss (level 7 in any world)
   const hasBossDefeat = useMemo(() => completions.some(c => c.level === LEVELS_PER_WORLD && c.stars >= 1), [completions]);
   const streakDays = progression?.streak?.currentStreak ?? 0;
   const bestStreak = progression?.streak?.bestStreak ?? 0;
 
-  // Compute per-world mastery tiers from available progression data
+  // Compute per-world mastery tiers — single O(n) pass over completions
   const masteryTiers = useMemo(() => {
+    // Aggregate counts in one pass instead of 3 × filter per world
+    const completed: Record<number, number> = {};
+    const perfect: Record<number, number> = {};
+    for (const c of completions) {
+      if (c.stars >= 1) completed[c.world] = (completed[c.world] ?? 0) + 1;
+      if (c.stars === 3) perfect[c.world] = (perfect[c.world] ?? 0) + 1;
+    }
+
     const tiers: Record<number, MasteryTier> = {};
     for (const wc of WORLD_CONFIGS) {
       const wId = wc.id;
-      const wCompletions = completions.filter(c => c.world === wId);
-      const completed = wCompletions.filter(c => c.stars >= 1).length;
-      const perfect = wCompletions.filter(c => c.stars === 3).length;
       const criteria: MasteryCriteria = {
-        allLevelsCompleted: completed >= LEVELS_PER_WORLD,
-        allLevelsPerfect: perfect >= LEVELS_PER_WORLD,
-        // Quest/boss/flash data not available at map level — defaults to false
+        allLevelsCompleted: (completed[wId] ?? 0) >= LEVELS_PER_WORLD,
+        allLevelsPerfect: (perfect[wId] ?? 0) >= LEVELS_PER_WORLD,
         allQuestsCompleted: false,
         bossHighHealth: false,
         flashChallengesMastered: false,
@@ -134,9 +146,12 @@ function AdventureView(): React.JSX.Element {
 
   const selectedWorldConfig = selectedWorld ? getWorldConfig(selectedWorld) : null;
 
-  const gameGrid = selectedWorld && selectedLevel
-    ? generateAdventureGrid(getGridSize(selectedWorld) as 4 | 5 | 6 | 7, getLevelSeed(selectedWorld, selectedLevel), language)
-    : null;
+  const gameGrid = useMemo(
+    () => selectedWorld && selectedLevel
+      ? generateAdventureGrid(getGridSize(selectedWorld) as 4 | 5 | 6 | 7, getLevelSeed(selectedWorld, selectedLevel), language)
+      : null,
+    [selectedWorld, selectedLevel, language]
+  );
 
   const levelConfig = selectedWorld && selectedLevel
     ? getLevelConfig(selectedWorld, selectedLevel, gameGrid ?? undefined)
@@ -262,7 +277,7 @@ function AdventureView(): React.JSX.Element {
           playerLevel={playerLevel}
           gold={gold}
           onBack={historyBack}
-          onOpenShop={() => setShowShop(true)}
+          onOpenShop={openShop}
           t={t}
           worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}
         />
@@ -278,9 +293,9 @@ function AdventureView(): React.JSX.Element {
         selectedWorld={selectedWorld}
         wordAlbum={progression?.wordAlbum ?? []}
         wordAlbumClaimedMilestones={progression?.wordAlbumClaimedMilestones ?? []}
-        onCloseShop={() => setShowShop(false)}
-        onCloseWordAlbum={() => setShowWordAlbum(false)}
-        onCloseWeeklyChallenge={() => setShowWeeklyChallenge(false)}
+        onCloseShop={closeShop}
+        onCloseWordAlbum={closeWordAlbum}
+        onCloseWeeklyChallenge={closeWeeklyChallenge}
         onPlayWeeklyChallenge={handlePlayWeeklyChallenge}
         onShopPurchase={handleShopPurchase}
         t={t}
@@ -303,10 +318,10 @@ function AdventureView(): React.JSX.Element {
                 currentWorld={progression?.currentWorld ?? 1}
                 onOpenWorldMap={openWorldMapFromHub}
                 onPlayLevel={selectLevel}
-                onOpenShop={() => setShowShop(true)}
+                onOpenShop={openShop}
                 wordAlbumCount={progression?.wordAlbum?.length ?? 0}
-                onWeeklyChallenge={() => setShowWeeklyChallenge(true)}
-                onBossRush={() => router.push(`/${language}/adventure/boss-rush`)}
+                onWeeklyChallenge={openWeeklyChallenge}
+                onBossRush={handleBossRush}
                 hasBossDefeat={hasBossDefeat}
               />
             </motion.div>
@@ -343,7 +358,7 @@ function AdventureView(): React.JSX.Element {
       </div>
 
       {(viewState === 'worldMap' || viewState === 'levelGrid') && (
-        <AdventureShopFAB isRTL={isRTL} gold={gold} onOpenShop={() => setShowShop(true)} t={t} />
+        <AdventureShopFAB isRTL={isRTL} gold={gold} onOpenShop={openShop} t={t} />
       )}
     </div>
     </AdventureThemeProvider>

@@ -333,7 +333,7 @@ export function useMultiplayerSocket(
       if (expected) {
         logger.log('[SOCKET.IO] Expected error:', errorMessage || errorCode);
       } else {
-        logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
+        logger.warn('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
         captureSocketError(errorToCapture, {
           event: 'error',
           gameCode: optionsRef.current.gameCode || undefined,

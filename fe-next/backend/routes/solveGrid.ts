@@ -96,8 +96,8 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
       .eq('language', language);
 
     if (error) {
-      logger.error('SOLVE-GRID', `Blacklist query error: ${error.message}`);
-      return words; // Return unfiltered on error
+      logger.warn('SOLVE-GRID', `Blacklist query error (returning unfiltered): ${error.message}`);
+      return words; // Return unfiltered on error — graceful degradation
     }
 
     const blacklistedSet = new Set(
@@ -111,7 +111,7 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
     };
   } catch (err) {
     const error = err as Error;
-    logger.error('SOLVE-GRID', `Blacklist filter error: ${error.message}`);
+    logger.warn('SOLVE-GRID', `Blacklist filter error (returning unfiltered): ${error.message}`);
     return words; // Graceful degradation
   }
 }

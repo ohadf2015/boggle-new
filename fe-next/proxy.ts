@@ -4,14 +4,32 @@ import { createServerClient } from '@supabase/ssr';
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const DEFAULT_LOCALE = 'en';
 
+// SEO and social bot user-agent fragments (lowercase)
+const BOT_SIGNATURES = [
+  // SEO crawlers
+  'googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
+  'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
+  'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
+  'google-inspectiontool', 'google-extended', 'bytespider',
+  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot',
+  // Social crawlers
+  'whatsapp', 'facebookexternalhit', 'facebot', 'twitterbot',
+  'linkedinbot', 'slackbot', 'telegrambot', 'discordbot',
+  'pinterest', 'redditbot',
+];
+
+function isBotRequest(request: NextRequest): boolean {
+  const ua = (request.headers.get('user-agent') || '').toLowerCase();
+  return BOT_SIGNATURES.some(sig => ua.includes(sig));
+}
+
 /**
  * Next.js Proxy (formerly Middleware)
  * Handles:
+ * - SEO bot detection (rewrite instead of redirect to preserve crawl budget)
  * - Supabase auth session refresh
  * - Locale detection and redirection
  * - Security headers
- * - Request logging (dev only)
- * - Performance optimizations
  */
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -33,18 +51,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Create Supabase client for session refresh
+  const isBot = isBotRequest(request);
+
+  // Create Supabase client for session refresh (skip for bots — no session)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // Refresh Supabase session if configured
-  if (supabaseUrl && supabaseAnonKey) {
+  if (!isBot && supabaseUrl && supabaseAnonKey) {
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
@@ -60,39 +79,32 @@ export async function proxy(request: NextRequest) {
     });
 
     try {
-      // Session refresh happens automatically via cookie handling above
-      // Calling getSession() ensures tokens are refreshed on every request
       await supabase.auth.getSession();
     } catch {
-      // Silently handle auth errors in proxy - let client handle them
+      // Silently handle auth errors in proxy
     }
   }
 
-  // Handle root path - redirect to default locale
-  if (pathname === '/') {
-    const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;
-    return NextResponse.redirect(
-      new URL(`/${locale}${search}`, request.url)
-    );
-  }
-
-  // If pathname doesn't have a locale, add default locale
+  // Handle paths without locale prefix
   if (!pathnameHasLocale) {
     const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname}${search}`, request.url)
-    );
+    const targetPath = pathname === '/' ? `/${locale}${search}` : `/${locale}${pathname}${search}`;
+
+    // Bots: internal rewrite (no redirect = saves crawl budget)
+    if (isBot) {
+      return NextResponse.rewrite(new URL(targetPath, request.url));
+    }
+
+    // Users: 301 permanent redirect (locale structure is permanent)
+    return NextResponse.redirect(new URL(targetPath, request.url), 301);
   }
 
   // Add security headers
-  // Security headers (complement to next.config.mjs)
   response.headers.set('X-DNS-Prefetch-Control', 'on');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
-  // Performance headers
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-  
+
   return response;
 }
 

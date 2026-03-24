@@ -303,7 +303,8 @@ function AuthCallbackContent(): React.JSX.Element {
         const oauthErrorDescription = searchParams.get('error_description');
         if (oauthError) {
           const errorMessage = oauthErrorDescription || oauthError;
-          logger.warn(`Auth callback: OAuth provider returned error: ${oauthError}`, {
+          // User denied OAuth consent or provider returned error — expected, not a bug
+          logger.log(`Auth callback: OAuth provider returned error: ${oauthError}`, {
             error: oauthError,
             description: oauthErrorDescription
           });

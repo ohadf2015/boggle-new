@@ -137,7 +137,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       // Network errors during navigation are expected on mobile
       const isNetworkError = err instanceof TypeError && err.message === 'Failed to fetch';
       if (!isNetworkError) {
-        console.error('[ProgressionContext] Fetch error:', err);
+        logger.warn('[ProgressionContext] Fetch error:', err instanceof Error ? err.message : err);
       }
       setError(err instanceof Error ? err : new Error('Failed to fetch progression'));
     } finally {
@@ -328,25 +328,40 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       }
 
       try {
-        const response = await fetch('/api/adventure/attempt', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            world,
-            level,
-            words,
-            score,
-            timeRemaining,
-            objectiveProgress,
-            isCompletion,
-          }),
+        const requestBody = JSON.stringify({
+          world,
+          level,
+          words,
+          score,
+          timeRemaining,
+          objectiveProgress,
+          isCompletion,
         });
 
+        let response = await fetch('/api/adventure/attempt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: requestBody,
+        });
+
+        // Retry on 429 (rate limit) or 5xx (transient server errors)
+        if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+          const retryAfter = response.status === 429
+            ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
+            : 1000;
+          logger.warn('[ProgressionContext] Retrying recordAttempt after', response.status);
+          await new Promise(r => setTimeout(r, retryAfter));
+          response = await fetch('/api/adventure/attempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: requestBody,
+          });
+        }
+
         if (!response.ok) {
-          console.error('[ProgressionContext] Record attempt failed:', response.status);
+          logger.warn('[ProgressionContext] Record attempt failed:', response.status);
           return null;
         }
 
@@ -377,7 +392,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
         return null;
       } catch (err) {
-        console.error('[ProgressionContext] Record attempt error:', err);
+        logger.warn('[ProgressionContext] Record attempt error:', err instanceof Error ? err.message : err);
         return null;
       }
     },
@@ -469,7 +484,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             credentials: 'include',
             body: JSON.stringify({ chapterQuestProgress: updated }),
           }).catch((err) => {
-            console.error('[ProgressionContext] Quest progress persist error:', err);
+            logger.warn('[ProgressionContext] Quest progress persist error:', err instanceof Error ? err.message : err);
           });
         }
         return { ...prev, chapterQuestProgress: updated };
@@ -540,7 +555,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             fetchProgression();
           }
         } catch (err) {
-          console.error('[ProgressionContext] Purchase persist error:', err);
+          logger.warn('[ProgressionContext] Purchase persist error:', err instanceof Error ? err.message : err);
           fetchProgression();
         }
       }

@@ -282,7 +282,7 @@ const WorldNode = memo(function WorldNode({
  * WorldMap - Trail-based adventure map with word game elements
  * Features: dynamic SVG trails, floating clouds & letters, scrollable world navigation
  */
-export default function WorldMap({
+const WorldMap = memo(function WorldMap({
   totalStars,
   completions,
   onWorldSelect,
@@ -463,4 +463,7 @@ export default function WorldMap({
       </div>
     </div>
   );
-}
+});
+
+WorldMap.displayName = 'WorldMap';
+export default WorldMap;

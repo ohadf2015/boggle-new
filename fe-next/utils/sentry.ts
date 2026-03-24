@@ -185,6 +185,7 @@ const EXPECTED_ERROR_PATTERNS = [
   /not in progress/i,
   /not in a game/i,
   /not a word-hunt game/i,
+  /already in progress/i,
 
   // Socket reconnection (normal lifecycle)
   /transport close/i,
