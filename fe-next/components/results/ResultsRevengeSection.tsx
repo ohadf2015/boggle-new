@@ -120,9 +120,10 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
         initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
-        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-pink p-4 rounded-neo shadow-hard-sm relative"
+        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-pink p-4 rounded-neo shadow-hard-sm shadow-[0_0_15px_rgba(255,20,147,0.15)] relative animate-[borderShimmer_3s_ease-in-out_infinite]"
       >
-        <div className="flex items-center gap-4">
+        <div className="absolute inset-0 bg-neo-pink/5 rounded-neo pointer-events-none" />
+        <div className="flex items-center gap-4 relative">
           {/* VS badge: two overlapping avatars with pink diamond VS */}
           <div className="relative flex items-center justify-center w-20 h-10 shrink-0">
             <div className="absolute left-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
@@ -186,7 +187,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
         initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
-        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-lime p-4 rounded-neo shadow-hard-sm relative"
+        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-lime p-4 rounded-neo shadow-hard-sm shadow-[0_0_15px_rgba(191,255,0,0.15)] relative"
       >
         <div className="flex items-center gap-4">
           {/* VS badge: two overlapping avatars with lime diamond */}

@@ -45,6 +45,19 @@ export default function ConsolationRows({
             className="flex items-center justify-between py-4"
           >
             <div className="flex items-center gap-3">
+              {crown && (
+                <img
+                  src={crown.image}
+                  alt=""
+                  className={cn(
+                    'w-8 h-8 rounded-lg shrink-0',
+                    crown.id === 'sniper' && 'shadow-[0_0_8px_rgba(0,255,255,0.3)]',
+                    crown.id === 'speedster' && 'shadow-[0_0_8px_rgba(255,107,53,0.3)]',
+                    crown.id === 'wordsmith' && 'shadow-[0_0_8px_rgba(255,20,147,0.3)]',
+                    crown.id === 'explorer' && 'shadow-[0_0_8px_rgba(255,225,53,0.3)]'
+                  )}
+                />
+              )}
               <div
                 className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-sm shrink-0"
                 style={{ backgroundColor: avatarColor }}
@@ -61,27 +74,14 @@ export default function ConsolationRows({
                   {player.username}
                 </p>
                 {crown && (
-                  <div
+                  <span
                     className={cn(
-                      'mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 border rounded-full w-fit',
-                      crown.bg,
-                      crown.border
+                      'text-[9px] font-black uppercase tracking-widest',
+                      crown.color
                     )}
                   >
-                    <img
-                      src={crown.image}
-                      alt=""
-                      className="w-4 h-4 rounded-sm"
-                    />
-                    <span
-                      className={cn(
-                        'text-[9px] font-black uppercase tracking-widest',
-                        crown.color
-                      )}
-                    >
-                      {t(`crowns.${crown.id}`) || crown.name}
-                    </span>
-                  </div>
+                    {t(`crowns.${crown.id}`) || crown.name}
+                  </span>
                 )}
               </div>
             </div>

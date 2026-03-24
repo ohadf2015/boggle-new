@@ -20,7 +20,9 @@ const PODIUM_CONFIG = [
   {
     order: 1,
     place: 2,
-    color: 'neo-cyan',
+    bgClass: 'bg-neo-cyan',
+    borderClass: 'border-neo-cyan',
+    textClass: 'text-neo-cyan',
     ptOffset: 'pt-8',
     avatarSize: 'w-14 h-14',
     badgeSize: 'w-6 h-6 text-[10px]',
@@ -34,7 +36,9 @@ const PODIUM_CONFIG = [
   {
     order: 0,
     place: 1,
-    color: 'neo-lime',
+    bgClass: 'bg-neo-lime',
+    borderClass: 'border-neo-lime',
+    textClass: 'text-neo-lime',
     ptOffset: '',
     avatarSize: 'w-16 h-16',
     badgeSize: '',
@@ -48,7 +52,9 @@ const PODIUM_CONFIG = [
   {
     order: 2,
     place: 3,
-    color: 'neo-orange',
+    bgClass: 'bg-neo-orange',
+    borderClass: 'border-neo-orange',
+    textClass: 'text-neo-orange',
     ptOffset: 'pt-14',
     avatarSize: 'w-12 h-12',
     badgeSize: 'w-5 h-5 text-[9px]',
@@ -137,7 +143,7 @@ export default function ResultsPodium({
                   className={cn(
                     'relative rounded-full flex items-center justify-center bg-neo-navy',
                     config.avatarSize,
-                    isFirst ? 'border-3 border-neo-lime' : `${config.borderWidth} border-${config.color}`
+                    isFirst ? 'border-3 border-neo-lime' : cn(config.borderWidth, config.borderClass)
                   )}
                   style={{ backgroundColor: avatarColor }}
                 >
@@ -162,7 +168,7 @@ export default function ResultsPodium({
                     className={cn(
                       'absolute -top-1.5 -right-1.5 text-black rounded-full flex items-center justify-center border-2 border-black shadow-sm font-black',
                       config.badgeSize,
-                      `bg-${config.color}`
+                      config.bgClass
                     )}
                   >
                     {config.place}
@@ -184,7 +190,7 @@ export default function ResultsPodium({
                   className={cn(
                     'font-black mt-0.5',
                     config.scoreSize,
-                    `text-${config.color}`
+                    config.textClass
                   )}
                 >
                   {scoreDisplay}
@@ -199,8 +205,8 @@ export default function ResultsPodium({
                   config.barText,
                   config.borderWidth,
                   config.shadow,
-                  'border-black',
-                  `bg-${config.color}`
+                  'border-black rounded-t-neo',
+                  config.bgClass
                 )}
                 initial={{ scaleY: 0 }}
                 animate={{ scaleY: 1 }}

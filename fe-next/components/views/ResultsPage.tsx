@@ -503,7 +503,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   return (
     <>
       {overlayModals}
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative">
+      <div
+        className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"
+        style={{ background: 'radial-gradient(circle at center, #1e1e3f 0%, #1a1a2e 70%)' }}
+      >
         {/* Subtle dot pattern */}
         <div
           className="fixed inset-0 pointer-events-none opacity-[0.04]"
@@ -512,6 +515,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             backgroundSize: '10px 10px',
           }}
         />
+
+      {/* Subtle top gradient overlay */}
+      <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-neo-cyan/5 to-transparent pointer-events-none" />
 
       {/* Floating emoji reactions overlay */}
       <div className="absolute inset-0 pointer-events-none z-40">
@@ -524,8 +530,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* MOBILE VIEW — single scroll, no tabs */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
-        {/* Exit button */}
-        <div className="flex-shrink-0 w-full flex items-center justify-end px-2 py-2">
+        {/* Header with pulsing indicator + exit */}
+        <div className="flex-shrink-0 w-full flex items-center justify-between px-2 py-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-neo-cyan rounded-full animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+              {t('results.matchResults') || 'Match Summary'}
+            </span>
+          </div>
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 
@@ -534,7 +546,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-w-lg mx-auto space-y-3">
+          <div className="max-w-lg mx-auto space-y-10">
             {renderResultsTab()}
             {/* Other players' details (inline, no tab switch needed) */}
             {renderDetailsTab()}

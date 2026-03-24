@@ -27,14 +27,14 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
         <div key={stat.label} className="contents">
           {index > 0 && <div className="w-px h-8 bg-white/5 shrink-0" />}
           <div className="text-center px-2 shrink-0">
-            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1">
+            <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest mb-1">
               {stat.label}
             </p>
             <div className="flex items-center justify-center gap-1.5">
               <span className={cn('text-xs', stat.color)}>{stat.icon}</span>
               <span
                 className={cn(
-                  'text-sm font-black uppercase tracking-tight',
+                  'text-base font-black uppercase tracking-tight tabular-nums',
                   stat.color
                 )}
               >

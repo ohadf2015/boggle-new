@@ -199,7 +199,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               <span
                 className={cn(
                   'font-neo-display font-black text-7xl sm:text-9xl leading-none',
-                  'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)]',
+                  'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
                 {t('results.eliminated') ?? 'ELIMINATED'}
@@ -245,7 +245,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               className={cn(
                 'relative w-40 h-40 rounded-full border-4 p-1 bg-neo-navy',
                 displayAccent.border,
-                isEliminated ? 'grayscale' : '',
+                isEliminated ? 'grayscale ring-8 ring-red-500/5' : '',
                 `shadow-[0_0_40px_rgba(0,255,255,0.3)]`,
               )}
             >
@@ -286,18 +286,26 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               </p>
             </div>
 
-            {/* Word Hunt extras */}
-            {isWordHunt && wordHuntTarget && (
-              <p className="text-sm font-bold text-white/60 uppercase tracking-widest">
-                {t('results.targetWord') ?? 'Target'}:{' '}
-                <span className="text-white">{wordHuntTarget}</span>
-              </p>
-            )}
-            {isWordHunt && wordsFound !== undefined && (
-              <p className="text-sm font-bold text-white/60 uppercase tracking-widest">
-                {t('results.wordsFound') ?? 'Words Found'}:{' '}
-                <span className="text-white">{wordsFound}</span>
-              </p>
+            {/* Word Hunt target badges */}
+            {isWordHunt && (
+              <div className="flex items-center gap-4 mt-4">
+                <div className="bg-neo-black/40 border-2 border-white/10 px-4 py-1.5 rounded-neo">
+                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
+                    {t('results.target') || 'Target'}
+                  </p>
+                  <p className="text-xl font-neo-display font-black text-white uppercase">
+                    {wordHuntTarget || '—'}
+                  </p>
+                </div>
+                <div className="bg-neo-black/40 border-2 border-white/10 px-4 py-1.5 rounded-neo">
+                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
+                    {t('results.wordsFound') || 'Your Words'}
+                  </p>
+                  <p className={cn('text-xl font-neo-display font-black uppercase', displayAccent.text)}>
+                    {wordsFound ?? 0}
+                  </p>
+                </div>
+              </div>
             )}
 
             {/* Gap text */}

@@ -179,7 +179,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   }, [isWordHunt, wordHuntSummary, username]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Score Reveal Animation (before everything) */}
       {isMultiplayer && !scoreRevealComplete && (
         <ScoreRevealAnimation
