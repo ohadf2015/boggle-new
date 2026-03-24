@@ -93,29 +93,29 @@ const WORLD_QUEST_DEFS: Record<number, QuestDef[]> = {
     { chapter: 3, type: 'longWordCount', target: 15, coins: 220, xp: 110, idSuffix: 'long' },
     { chapter: 3, type: 'streakMaster', target: 10, coins: 230, xp: 115, badge: 'badge-idiom-islander', idSuffix: 'streak' },
   ],
-  // World 5 — Compound Canyon: scoreChallenge, longWords, bossHighHealth
+  // World 5 — Compound Canyon: scoreChallenge, longWords, bossHighHealth (Ch3 only — boss at level 7)
   5: [
     { chapter: 1, type: 'scoreChallenge', target: 500, coins: 150, xp: 75, idSuffix: 'score' },
     { chapter: 1, type: 'longWordCount', target: 10, coins: 160, xp: 80, idSuffix: 'long' },
-    { chapter: 1, type: 'bossHighHealth', target: 1, coins: 180, xp: 90, idSuffix: 'bossHP' },
+    { chapter: 1, type: 'streakMaster', target: 4, coins: 180, xp: 90, idSuffix: 'streak' },
     { chapter: 2, type: 'scoreChallenge', target: 800, coins: 200, xp: 100, idSuffix: 'score' },
     { chapter: 2, type: 'longWordCount', target: 15, coins: 210, xp: 105, idSuffix: 'long' },
-    { chapter: 2, type: 'bossHighHealth', target: 1, coins: 230, xp: 115, idSuffix: 'bossHP' },
+    { chapter: 2, type: 'perfectLevels', target: 2, coins: 230, xp: 115, idSuffix: 'perfect' },
     { chapter: 3, type: 'scoreChallenge', target: 1200, coins: 240, xp: 120, idSuffix: 'score' },
-    { chapter: 3, type: 'longWordCount', target: 20, coins: 250, xp: 125, idSuffix: 'long' },
-    { chapter: 3, type: 'bossHighHealth', target: 2, coins: 270, xp: 135, badge: 'badge-canyon-crusher', idSuffix: 'bossHP' },
+    { chapter: 3, type: 'bossHighHealth', target: 1, coins: 250, xp: 125, idSuffix: 'bossHP' },
+    { chapter: 3, type: 'longWordCount', target: 20, coins: 270, xp: 135, badge: 'badge-canyon-crusher', idSuffix: 'long' },
   ],
-  // World 6 — Anagram Labyrinth: wordCount, flashChallengeMaster, perfectLevels
+  // World 6 — Anagram Labyrinth: wordCount, flashChallengeMaster (capped to levels×2), perfectLevels
   6: [
     { chapter: 1, type: 'wordCountChapter', target: 35, coins: 160, xp: 80, idSuffix: 'words' },
     { chapter: 1, type: 'flashChallengeMaster', target: 3, coins: 180, xp: 90, idSuffix: 'flash' },
     { chapter: 1, type: 'perfectLevels', target: 2, coins: 170, xp: 85, idSuffix: 'perfect' },
     { chapter: 2, type: 'wordCountChapter', target: 50, coins: 200, xp: 100, idSuffix: 'words' },
-    { chapter: 2, type: 'flashChallengeMaster', target: 5, coins: 230, xp: 115, idSuffix: 'flash' },
-    { chapter: 2, type: 'perfectLevels', target: 3, coins: 210, xp: 105, idSuffix: 'perfect' },
+    { chapter: 2, type: 'flashChallengeMaster', target: 4, coins: 230, xp: 115, idSuffix: 'flash' },
+    { chapter: 2, type: 'perfectLevels', target: 2, coins: 210, xp: 105, idSuffix: 'perfect' },
     { chapter: 3, type: 'wordCountChapter', target: 60, coins: 240, xp: 120, idSuffix: 'words' },
-    { chapter: 3, type: 'flashChallengeMaster', target: 8, coins: 270, xp: 135, idSuffix: 'flash' },
-    { chapter: 3, type: 'perfectLevels', target: 4, coins: 250, xp: 125, badge: 'badge-labyrinth-legend', idSuffix: 'perfect' },
+    { chapter: 3, type: 'flashChallengeMaster', target: 5, coins: 270, xp: 135, idSuffix: 'flash' },
+    { chapter: 3, type: 'perfectLevels', target: 3, coins: 250, xp: 125, badge: 'badge-labyrinth-legend', idSuffix: 'perfect' },
   ],
   // World 7 — Mirror Palace: worldMechanicUse (palindromes), bossNoHint (Ch3 only), scoreChallenge
   7: [
@@ -132,36 +132,36 @@ const WORLD_QUEST_DEFS: Record<number, QuestDef[]> = {
   // World 8 — Neologism Nebula: longWords, flashChallengeMaster, streakMaster
   8: [
     { chapter: 1, type: 'longWordCount', target: 12, coins: 200, xp: 100, idSuffix: 'long' },
-    { chapter: 1, type: 'flashChallengeMaster', target: 5, coins: 220, xp: 110, idSuffix: 'flash' },
+    { chapter: 1, type: 'flashChallengeMaster', target: 4, coins: 220, xp: 110, idSuffix: 'flash' },
     { chapter: 1, type: 'streakMaster', target: 8, coins: 210, xp: 105, idSuffix: 'streak' },
     { chapter: 2, type: 'longWordCount', target: 18, coins: 260, xp: 130, idSuffix: 'long' },
-    { chapter: 2, type: 'flashChallengeMaster', target: 8, coins: 280, xp: 140, idSuffix: 'flash' },
+    { chapter: 2, type: 'flashChallengeMaster', target: 4, coins: 280, xp: 140, idSuffix: 'flash' },
     { chapter: 2, type: 'streakMaster', target: 12, coins: 270, xp: 135, idSuffix: 'streak' },
     { chapter: 3, type: 'longWordCount', target: 25, coins: 310, xp: 155, idSuffix: 'long' },
-    { chapter: 3, type: 'flashChallengeMaster', target: 10, coins: 330, xp: 165, badge: 'badge-nebula-navigator', idSuffix: 'flash' },
+    { chapter: 3, type: 'flashChallengeMaster', target: 6, coins: 330, xp: 165, badge: 'badge-nebula-navigator', idSuffix: 'flash' },
     { chapter: 3, type: 'streakMaster', target: 15, coins: 320, xp: 160, idSuffix: 'streak' },
   ],
-  // World 9 — Polyglot Peaks: wordCount, scoreChallenge, bossHighHealth
+  // World 9 — Polyglot Peaks: wordCount, scoreChallenge, bossHighHealth (Ch3 only)
   9: [
     { chapter: 1, type: 'wordCountChapter', target: 40, coins: 220, xp: 110, idSuffix: 'words' },
     { chapter: 1, type: 'scoreChallenge', target: 1000, coins: 250, xp: 125, idSuffix: 'score' },
-    { chapter: 1, type: 'bossHighHealth', target: 1, coins: 240, xp: 120, idSuffix: 'bossHP' },
+    { chapter: 1, type: 'streakMaster', target: 6, coins: 240, xp: 120, idSuffix: 'streak' },
     { chapter: 2, type: 'wordCountChapter', target: 55, coins: 280, xp: 140, idSuffix: 'words' },
     { chapter: 2, type: 'scoreChallenge', target: 1500, coins: 310, xp: 155, idSuffix: 'score' },
-    { chapter: 2, type: 'bossHighHealth', target: 2, coins: 300, xp: 150, idSuffix: 'bossHP' },
+    { chapter: 2, type: 'longWordCount', target: 15, coins: 300, xp: 150, idSuffix: 'long' },
     { chapter: 3, type: 'wordCountChapter', target: 70, coins: 330, xp: 165, idSuffix: 'words' },
     { chapter: 3, type: 'scoreChallenge', target: 2000, coins: 360, xp: 180, idSuffix: 'score' },
-    { chapter: 3, type: 'bossHighHealth', target: 3, coins: 350, xp: 175, badge: 'badge-polyglot-pinnacle', idSuffix: 'bossHP' },
+    { chapter: 3, type: 'bossHighHealth', target: 1, coins: 350, xp: 175, badge: 'badge-polyglot-pinnacle', idSuffix: 'bossHP' },
   ],
-  // World 10 — Lexicon Throne: perfectLevels, bossNoHint (Ch3 only), worldMechanicUse
+  // World 10 — Lexicon Throne: perfectLevels (capped to chapter size), bossNoHint (Ch3 only), worldMechanicUse
   10: [
-    { chapter: 1, type: 'perfectLevels', target: 3, coins: 250, xp: 125, idSuffix: 'perfect' },
+    { chapter: 1, type: 'perfectLevels', target: 2, coins: 250, xp: 125, idSuffix: 'perfect' },
     { chapter: 1, type: 'worldMechanicUse', target: 8, coins: 260, xp: 130, idSuffix: 'mechanic' },
     { chapter: 1, type: 'scoreChallenge', target: 1500, coins: 280, xp: 140, idSuffix: 'score' },
-    { chapter: 2, type: 'perfectLevels', target: 4, coins: 320, xp: 160, idSuffix: 'perfect' },
+    { chapter: 2, type: 'perfectLevels', target: 2, coins: 320, xp: 160, idSuffix: 'perfect' },
     { chapter: 2, type: 'worldMechanicUse', target: 12, coins: 330, xp: 165, idSuffix: 'mechanic' },
     { chapter: 2, type: 'streakMaster', target: 12, coins: 350, xp: 175, idSuffix: 'streak' },
-    { chapter: 3, type: 'perfectLevels', target: 5, coins: 380, xp: 190, idSuffix: 'perfect' },
+    { chapter: 3, type: 'perfectLevels', target: 3, coins: 380, xp: 190, idSuffix: 'perfect' },
     { chapter: 3, type: 'defeatBossNoHint', target: 1, coins: 400, xp: 200, badge: 'badge-lexicon-lord', idSuffix: 'boss' },
     { chapter: 3, type: 'worldMechanicUse', target: 15, coins: 370, xp: 185, badge: 'badge-throne-ascended', idSuffix: 'mechanic' },
   ],

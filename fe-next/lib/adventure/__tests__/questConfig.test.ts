@@ -66,13 +66,47 @@ describe('questConfig', () => {
     }
   });
 
+  it('bossHighHealth quests only appear in Chapter 3 (where the boss is)', () => {
+    for (let world = 1; world <= 10; world++) {
+      for (let chapter = 1; chapter <= 2; chapter++) {
+        const quests = getQuestsForChapter(world, chapter);
+        const bossQuests = quests.filter(q => q.type === 'bossHighHealth');
+        expect(bossQuests).toHaveLength(0);
+      }
+    }
+  });
+
+  it('perfectLevels target never exceeds chapter level count', () => {
+    // Chapter 1: 2 levels, Chapter 2: 2 levels, Chapter 3: 3 levels
+    const CHAPTER_LEVELS = [0, 2, 2, 3]; // index 1-3
+    for (const quest of CHAPTER_QUESTS) {
+      if (quest.type === 'perfectLevels') {
+        const maxLevels = CHAPTER_LEVELS[quest.chapterNumber];
+        expect(quest.target).toBeLessThanOrEqual(maxLevels);
+      }
+    }
+  });
+
+  it('flashChallengeMaster target is achievable (max 2 per level × chapter levels)', () => {
+    const CHAPTER_LEVELS = [0, 2, 2, 3];
+    const MAX_FLASH_PER_LEVEL = 2;
+    for (const quest of CHAPTER_QUESTS) {
+      if (quest.type === 'flashChallengeMaster') {
+        const maxFlash = CHAPTER_LEVELS[quest.chapterNumber] * MAX_FLASH_PER_LEVEL;
+        expect(quest.target).toBeLessThanOrEqual(maxFlash);
+      }
+    }
+  });
+
   it('world-specific quest types match their mechanics', () => {
     const w7Types = getQuestsForChapter(7, 1).map(q => q.type);
     expect(w7Types).toContain('worldMechanicUse');
 
     const w5Types = getQuestsForChapter(5, 1).map(q => q.type);
     expect(w5Types).toContain('scoreChallenge');
-    expect(w5Types).toContain('bossHighHealth');
+    // bossHighHealth moved to chapter 3 where the boss is
+    const w5c3Types = getQuestsForChapter(5, 3).map(q => q.type);
+    expect(w5c3Types).toContain('bossHighHealth');
 
     const w10Types = getQuestsForChapter(10, 3).map(q => q.type);
     expect(w10Types).toContain('worldMechanicUse');

@@ -30,8 +30,8 @@ export function generateLootChest(
 ): LootChest {
   const drops: LootDrop[] = [];
 
-  // Gold (always)
-  const baseGold = 10 * stars;
+  // Gold (always) — scales with world to prevent late-game gold drought
+  const baseGold = (10 + worldId * 3) * stars;
   const perfectBonus = stars === 3 ? 50 : 0;
   const gold = Math.floor((baseGold + perfectBonus) * goldMultiplier);
   drops.push({ type: 'gold', amount: gold, nameKey: 'adventure.loot.gold', rarity: 'common' });

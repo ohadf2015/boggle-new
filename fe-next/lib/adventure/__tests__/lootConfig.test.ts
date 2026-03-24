@@ -1,25 +1,33 @@
 import { generateLootChest, type LootChest, type LootDrop } from '../lootConfig';
 
 describe('generateLootChest', () => {
-  it('always includes a gold drop with correct formula', () => {
+  it('always includes a gold drop with world-scaled formula', () => {
     const chest = generateLootChest(1, 1, 2, 300, 1);
     const gold = chest.drops.find(d => d.type === 'gold');
     expect(gold).toBeDefined();
-    // baseGold = 10*2 = 20, perfectBonus = 0, multiplier = 1 → 20
-    expect(gold!.amount).toBe(20);
+    // baseGold = (10 + 1*3) * 2 = 26, perfectBonus = 0, multiplier = 1 → 26
+    expect(gold!.amount).toBe(26);
   });
 
   it('applies goldMultiplier', () => {
     const chest = generateLootChest(1, 1, 2, 300, 2);
     const gold = chest.drops.find(d => d.type === 'gold');
-    expect(gold!.amount).toBe(40);
+    // (10 + 3) * 2 * 2 = 52
+    expect(gold!.amount).toBe(52);
   });
 
   it('gives perfect bonus for 3-star gold', () => {
     const chest = generateLootChest(1, 1, 3, 100, 1);
     const gold = chest.drops.find(d => d.type === 'gold');
-    // baseGold = 30, perfectBonus = 50, multiplier = 1 → 80
-    expect(gold!.amount).toBe(80);
+    // baseGold = (10+3)*3 = 39, perfectBonus = 50, multiplier = 1 → 89
+    expect(gold!.amount).toBe(89);
+  });
+
+  it('gold scales significantly with world number', () => {
+    const w1Gold = generateLootChest(1, 1, 3, 100, 1).drops.find(d => d.type === 'gold')!.amount;
+    const w10Gold = generateLootChest(10, 1, 3, 100, 1).drops.find(d => d.type === 'gold')!.amount;
+    // W1: (10+3)*3+50 = 89, W10: (10+30)*3+50 = 170
+    expect(w10Gold).toBeGreaterThan(w1Gold * 1.5);
   });
 
   it('always includes XP', () => {

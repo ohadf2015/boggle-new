@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 4155,
+    "totalKeysInCode": 4158,
     "keyCountByLanguage": {
-      "en": 6786,
-      "he": 6913,
-      "sv": 6931,
-      "ja": 6934,
-      "es": 6947
+      "en": 6788,
+      "he": 6915,
+      "sv": 6933,
+      "ja": 6936,
+      "es": 6949
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -98,7 +98,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 327,
+        "line": 330,
         "context": "{t(bossName) || bossName}",
         "type": "variable_key"
       },
@@ -106,7 +106,7 @@
         "pattern": "t(bossName)",
         "variable": "bossName",
         "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 359,
+        "line": 362,
         "context": "aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}",
         "type": "variable_key"
       },

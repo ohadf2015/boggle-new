@@ -134,9 +134,11 @@ export function generateEndlessFloor(floor: number) {
     { type: 'scoreTarget', target: scoreTarget, isPrimary: true },
   ];
 
-  // Add word count objective at higher floors
+  // Add word count objective at higher floors — capped to what's achievable in the time
   if (floor >= 5) {
-    objectives.push({ type: 'wordCount', target: 10 + floor * 2 });
+    const maxAchievable = Math.floor(timerSeconds / 4); // ~1 word per 4 seconds
+    const rawTarget = 10 + floor * 2;
+    objectives.push({ type: 'wordCount', target: Math.min(rawTarget, maxAchievable) });
   }
 
   return {

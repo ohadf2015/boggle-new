@@ -224,8 +224,8 @@ describe('POST /api/adventure/complete', () => {
       // Client sends goldEarned but server ignores it
       const res = await POST(makeRequest({ ...validBody, goldEarned: 999999 }));
       expect(res.status).toBe(200);
-      // Server formula: 10 * 3 + 50 = 80 (not 999999)
-      expect(res.data.goldEarned).toBe(80);
+      // Server formula: (10 + 1*3) * 3 + 50 = 89 (not 999999)
+      expect(res.data.goldEarned).toBe(89);
     });
   });
 
@@ -240,8 +240,8 @@ describe('POST /api/adventure/complete', () => {
       // Attacker sends goldEarned=999999 but server ignores it
       const res = await POST(makeRequest({ ...validBody, goldEarned: 999999 }));
       expect(res.status).toBe(200);
-      // Server formula: 10 * 3 + 50 = 80 (client value ignored)
-      expect(res.data.goldEarned).toBe(80);
+      // Server formula: (10+3)*3 + 50 = 89 (client value ignored)
+      expect(res.data.goldEarned).toBe(89);
     });
 
     it('calculates gold server-side on first completion (3 stars = 80)', async () => {
@@ -252,8 +252,8 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // 10 * 3 + 50 (perfect bonus) = 80
-      expect(res.data.goldEarned).toBe(80);
+      // (10 + 1*3) * 3 + 50 (perfect bonus) = 89
+      expect(res.data.goldEarned).toBe(89);
     });
 
     it('awards gold on repeat completion (not just first)', async () => {
@@ -263,8 +263,8 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // Repeat completion: 10 * 3 + 50 = 80 (same formula as first)
-      expect(res.data.goldEarned).toBe(80);
+      // Repeat completion: (10+3)*3 + 50 = 89 (same formula as first)
+      expect(res.data.goldEarned).toBe(89);
     });
 
     it('awards gold on repeat with same stars', async () => {
@@ -274,8 +274,8 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 2 }));
       expect(res.status).toBe(200);
-      // 10 * 2 = 20 (no perfect bonus for 2 stars)
-      expect(res.data.goldEarned).toBe(20);
+      // (10+3)*2 = 26 (no perfect bonus for 2 stars)
+      expect(res.data.goldEarned).toBe(26);
     });
 
     it('server gold formula: 0 stars = 0 gold', async () => {
@@ -289,7 +289,7 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(0);
     });
 
-    it('server gold formula: 2 stars = 20 gold (no perfect bonus)', async () => {
+    it('server gold formula: 2 stars = 26 gold (no perfect bonus)', async () => {
       setupDbMocks({
         completionData: null,
         completionError: { code: 'PGRST116', message: 'not found' },
@@ -297,7 +297,8 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 2 }));
       expect(res.status).toBe(200);
-      expect(res.data.goldEarned).toBe(20);
+      // (10 + 1*3) * 2 = 26
+      expect(res.data.goldEarned).toBe(26);
     });
 
     it('applies luckyPickaxe upgrade bonus from DB', async () => {
@@ -310,8 +311,8 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // base=80, with 25% bonus = 100
-      expect(res.data.goldEarned).toBe(100);
+      // base=89, with 25% bonus = round(89*1.25) = 111
+      expect(res.data.goldEarned).toBe(111);
       expect(mockGetUpgradeEffect).toHaveBeenCalledWith({ luckyPickaxe: 2 }, 'luckyPickaxe');
       mockGetUpgradeEffect.mockReturnValue(0); // reset
     });
@@ -330,8 +331,8 @@ describe('POST /api/adventure/complete', () => {
       // 3 long words (6+ letters)
       const res = await POST(makeRequest({ ...validBody, stars: 2, longWords: 3 }));
       expect(res.status).toBe(200);
-      // base=20, longWordBonus=5*3=15, total=35
-      expect(res.data.goldEarned).toBe(35);
+      // base=(10+3)*2=26, longWordBonus=5*3=15, total=41
+      expect(res.data.goldEarned).toBe(41);
       mockGetUpgradeEffect.mockReturnValue(0);
     });
 
@@ -444,8 +445,8 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
       expect(res.data.xpEarned).toBe(0);
       expect(res.data.starsGained).toBe(0);
-      // Gold is always awarded: 10 * 1 = 10
-      expect(res.data.goldEarned).toBe(10);
+      // Gold is always awarded: (10+3)*1 = 13
+      expect(res.data.goldEarned).toBe(13);
     });
 
     it('improving stars on existing completion awards only new stars XP', async () => {

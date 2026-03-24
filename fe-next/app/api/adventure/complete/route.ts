@@ -268,7 +268,8 @@ export async function POST(request: NextRequest) {
     // Calculate gold earned server-side (never trust client value)
     // Gold is always awarded — not gated by isFirstCompletion
     const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
-    const baseGold = 10 * stars;
+    // Gold scales with world to prevent late-game gold drought
+    const baseGold = (10 + world * 3) * stars;
     const perfectClearGoldBonus = stars === 3 ? 50 : 0;
     const longWordBonus = (longWords ?? 0) * getUpgradeEffect(playerUpgrades, 'cargoBay');
     let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus;
