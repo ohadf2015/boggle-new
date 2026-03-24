@@ -5862,7 +5862,20 @@ const ja = {
       "subtitle": "全ボスを連続で倒せ！",
       "title": "ボスラッシュ",
       "tryAgain": "もう一度",
-      "xpEarned": "獲得XP"
+      "xpEarned": "獲得XP",
+      "bossesDefeated": "倒したボス",
+      "totalScore": "合計スコア",
+      "timeTaken": "タイム"
+    },
+    "mastery": {
+      "label": "マスタリー",
+      "tier": {
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "platinum": "プラチナ",
+        "diamond": "ダイヤモンド"
+      }
     },
     "share": {
       "bossDefeated": "{{world}}で{{boss}}を倒した！",

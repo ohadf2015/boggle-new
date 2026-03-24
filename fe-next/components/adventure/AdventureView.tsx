@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -22,14 +21,12 @@ import {
   generateAdventureGrid,
   getLevelSeed,
   getGridSize,
-  LEVELS_PER_WORLD,
-  WORLD_CONFIGS,
 } from '@/lib/adventure';
-import { calculateMasteryTier } from '@/lib/adventure/mastery';
-import type { MasteryCriteria, MasteryTier } from '@/types/adventure';
 import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 
+import { calculateWorldMastery } from '@/lib/adventure/mastery';
+import type { MasteryTier } from '@/types/adventure';
 import AdventureHub from './AdventureHub';
 import AdventureViewHeader from './AdventureViewHeader';
 import AdventureViewModals from './AdventureViewModals';
@@ -38,6 +35,8 @@ import WorldMap from './WorldMap';
 import LevelGrid from './LevelGrid';
 import { useAdventureHistory } from './useAdventureHistory';
 import { AdventureGameErrorBoundary } from './AdventureGameErrorBoundary';
+import { useBossRush } from './hooks/useBossRush';
+import BossRushResults from './BossRushResults';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 
@@ -53,7 +52,6 @@ function AdventureView(): React.JSX.Element {
   const isRTL = dir === 'rtl';
   const { progression, isLoading, error, completeLevel, updateCurrency } = useProgression();
 
-  const router = useRouter();
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
 
@@ -67,8 +65,6 @@ function AdventureView(): React.JSX.Element {
   const openWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(true), []);
   const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
   const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
-  const handleBossRush = useCallback(() => router.push(`/${language}/adventure/boss-rush`), [router, language]);
-
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
 
@@ -88,7 +84,7 @@ function AdventureView(): React.JSX.Element {
 
   // Hide main header during active gameplay
   useEffect(() => {
-    const playing = viewState === 'playing';
+    const playing = viewState === 'playing' || viewState === 'bossRush';
     setIsInGame(playing);
     return () => setIsInGame(false);
   }, [viewState, setIsInGame]);
@@ -103,41 +99,49 @@ function AdventureView(): React.JSX.Element {
     enabled: true,
   });
 
-  const handleTimerStateChange = setGameTimerState;
-
   const totalStars = progression?.totalStars ?? 0;
   const playerLevel = progression?.playerLevel ?? 1;
   const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);
-  // Boss rush unlocks after defeating at least 1 boss (level 7 in any world)
-  const hasBossDefeat = useMemo(() => completions.some(c => c.level === LEVELS_PER_WORLD && c.stars >= 1), [completions]);
-  const streakDays = progression?.streak?.currentStreak ?? 0;
-  const bestStreak = progression?.streak?.bestStreak ?? 0;
 
-  // Compute per-world mastery tiers — single O(n) pass over completions
   const masteryTiers = useMemo(() => {
-    // Aggregate counts in one pass instead of 3 × filter per world
-    const completed: Record<number, number> = {};
-    const perfect: Record<number, number> = {};
-    for (const c of completions) {
-      if (c.stars >= 1) completed[c.world] = (completed[c.world] ?? 0) + 1;
-      if (c.stars === 3) perfect[c.world] = (perfect[c.world] ?? 0) + 1;
-    }
-
     const tiers: Record<number, MasteryTier> = {};
-    for (const wc of WORLD_CONFIGS) {
-      const wId = wc.id;
-      const criteria: MasteryCriteria = {
-        allLevelsCompleted: (completed[wId] ?? 0) >= LEVELS_PER_WORLD,
-        allLevelsPerfect: (perfect[wId] ?? 0) >= LEVELS_PER_WORLD,
-        allQuestsCompleted: false,
-        bossHighHealth: false,
-        flashChallengesMastered: false,
-      };
-      const tier = calculateMasteryTier(criteria);
-      if (tier > 0) tiers[wId] = tier;
+    for (let worldId = 1; worldId <= 10; worldId++) {
+      const mastery = calculateWorldMastery(worldId, completions, [], false, 0);
+      tiers[worldId] = mastery.tier;
     }
     return tiers;
   }, [completions]);
+
+  // Boss Rush
+  const bossRush = useBossRush(completions);
+
+  const handleStartBossRush = useCallback(() => {
+    bossRush.startRush();
+    setViewState('bossRush');
+  }, [bossRush, setViewState]);
+
+  const handleBossRushBossDefeated = useCallback((_stars: number, score: number) => {
+    bossRush.addScore(score);
+    bossRush.advanceToNextBoss();
+  }, [bossRush]);
+
+  const handleBossRushFailed = useCallback(() => {
+    bossRush.failRush();
+  }, [bossRush]);
+
+  const handleBossRushRetry = useCallback(() => {
+    bossRush.resetRush();
+    bossRush.startRush();
+    setViewState('bossRush');
+  }, [bossRush, setViewState]);
+
+  const handleBossRushExit = useCallback(() => {
+    bossRush.resetRush();
+    setViewState('hub');
+  }, [bossRush, setViewState]);
+
+  const streakDays = progression?.streak?.currentStreak ?? 0;
+  const bestStreak = progression?.streak?.bestStreak ?? 0;
 
   const { quests: dailyQuests } = useDailyQuests({
     initialProgress: progression?.dailyQuestProgress,
@@ -280,6 +284,7 @@ function AdventureView(): React.JSX.Element {
           onOpenShop={openShop}
           t={t}
           worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}
+          hasHub={hasCompletions}
         />
       )}
 
@@ -321,8 +326,8 @@ function AdventureView(): React.JSX.Element {
                 onOpenShop={openShop}
                 wordAlbumCount={progression?.wordAlbum?.length ?? 0}
                 onWeeklyChallenge={openWeeklyChallenge}
-                onBossRush={handleBossRush}
-                hasBossDefeat={hasBossDefeat}
+                onBossRush={handleStartBossRush}
+                canBossRush={bossRush.canStartBossRush}
               />
             </motion.div>
           )}
@@ -342,7 +347,7 @@ function AdventureView(): React.JSX.Element {
           {viewState === 'playing' && levelConfig && gameGrid && (
             <motion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
               <AdventureGameErrorBoundary onExit={handleGameExit}>
-                <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
+                <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} onTimerStateChange={setGameTimerState} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
               </AdventureGameErrorBoundary>
             </motion.div>
           )}
@@ -350,10 +355,40 @@ function AdventureView(): React.JSX.Element {
           {viewState === 'weeklyChallenge' && (
             <motion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
               <AdventureGameErrorBoundary onExit={() => setViewState('hub')}>
-                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} onTimerStateChange={handleTimerStateChange} totalStars={totalStars} />
+                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} onTimerStateChange={setGameTimerState} totalStars={totalStars} />
               </AdventureGameErrorBoundary>
             </motion.div>
           )}
+
+          {viewState === 'bossRush' && (() => {
+            const rushConfig = bossRush.getLevelConfigForCurrentBoss();
+            const rushWorldId = bossRush.getCurrentBossWorldId();
+            const rushGrid = rushWorldId
+              ? generateAdventureGrid(getGridSize(rushWorldId) as 4 | 5 | 6 | 7, getLevelSeed(rushWorldId, 7), language)
+              : null;
+
+            // Show results if rush is complete or failed
+            if (bossRush.state.isComplete || bossRush.state.isFailed) {
+              return (
+                <motion.div key="boss-rush-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
+                  <BossRushResults state={bossRush.state} onRetry={handleBossRushRetry} onExit={handleBossRushExit} />
+                </motion.div>
+              );
+            }
+
+            // Active boss fight
+            if (rushConfig && rushGrid) {
+              return (
+                <motion.div key={`boss-rush-${bossRush.state.currentBossIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+                  <AdventureGameErrorBoundary onExit={handleBossRushExit}>
+                    <AdventureGame levelConfig={rushConfig} initialGrid={rushGrid} onLevelComplete={handleBossRushBossDefeated} onExit={handleBossRushFailed} onTimerStateChange={setGameTimerState} totalStars={totalStars} />
+                  </AdventureGameErrorBoundary>
+                </motion.div>
+              );
+            }
+
+            return null;
+          })()}
         </AnimatePresence>
       </div>
 

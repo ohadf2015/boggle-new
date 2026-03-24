@@ -579,5 +579,180 @@ describe('ProgressionContext', () => {
       // THEN
       expect(saved).toBe(false);
     });
+
+    it('should retry on 409 (optimistic lock conflict) and succeed', async () => {
+      // GIVEN — server returns 409 first, then 200 on retry
+      const mockProgression = createMockProgression();
+      let completeCallCount = 0;
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          completeCallCount++;
+          if (completeCallCount === 1) {
+            // First call: 409 optimistic lock conflict
+            return Promise.resolve({
+              ok: false,
+              status: 409,
+              text: async () => 'Concurrent modification detected',
+            });
+          }
+          // Second call: success
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              success: true,
+              progression: { ...mockProgression, totalStars: 28, gold: 150 },
+              completion: { world: 1, level: 1, stars: 3, bestScore: 500, bestWords: 15, completedAt: new Date().toISOString() },
+            }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // WHEN
+      let saved: boolean = false;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 1, 3, 500, 15);
+      });
+
+      // THEN — should have retried and succeeded
+      expect(saved).toBe(true);
+      expect(completeCallCount).toBe(2);
+    });
+
+    it('should retry on 403 (stale level) by refreshing progression first', async () => {
+      // GIVEN — server returns 403 "Level not unlocked" first,
+      // then after refreshing progression, the retry succeeds
+      const mockProgression = createMockProgression({ currentWorld: 1, currentLevel: 2 });
+      let completeCallCount = 0;
+      let stateCallCount = 0;
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          stateCallCount++;
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          completeCallCount++;
+          if (completeCallCount === 1) {
+            // First call: 403 — stale current_level in DB
+            return Promise.resolve({
+              ok: false,
+              status: 403,
+              text: async () => JSON.stringify({ error: 'Level not unlocked' }),
+            });
+          }
+          // Second call: success (after progression refresh updated DB)
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              success: true,
+              progression: { ...mockProgression, currentLevel: 3, totalStars: 28 },
+              completion: { world: 1, level: 2, stars: 2, bestScore: 350, bestWords: 12, completedAt: new Date().toISOString() },
+            }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // WHEN
+      let saved: boolean = false;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 2, 2, 350, 12);
+      });
+
+      // THEN — should have refreshed progression and retried
+      expect(saved).toBe(true);
+      expect(completeCallCount).toBe(2);
+      // State was fetched once on mount + once on refresh before retry
+      expect(stateCallCount).toBe(2);
+    });
+
+    it('should retry quest progress saves on transient errors', async () => {
+      // GIVEN — quest progress endpoint fails with 500 first, then succeeds
+      const mockProgression = createMockProgression();
+      let questCallCount = 0;
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/quest-progress')) {
+          questCallCount++;
+          if (questCallCount === 1) {
+            return Promise.resolve({ ok: false, status: 500 });
+          }
+          return Promise.resolve({ ok: true, json: async () => ({}) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // WHEN — update quest progress (this triggers fire-and-forget with retry)
+      act(() => {
+        result.current.updateChapterQuestProgress('wordsFound', 5, ['quest-1']);
+      });
+
+      // THEN — first call happens immediately
+      await waitFor(() => expect(questCallCount).toBe(1));
+
+      // Wait for retry (1s base delay)
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1200));
+      });
+
+      // THEN — retried after transient 500
+      expect(questCallCount).toBe(2);
+    });
+
+    it('should return false when 409 retry also fails', async () => {
+      // GIVEN — server returns 409 on both attempts
+      const mockProgression = createMockProgression();
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ progression: mockProgression, attempts: [] }),
+          });
+        }
+        if (url.includes('/api/adventure/complete')) {
+          return Promise.resolve({
+            ok: false,
+            status: 409,
+            text: async () => 'Concurrent modification detected',
+          });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // WHEN
+      let saved: boolean = true;
+      await act(async () => {
+        saved = await result.current.completeLevel(1, 1, 3, 500, 15);
+      });
+
+      // THEN — both attempts failed, should return false
+      expect(saved).toBe(false);
+    });
   });
 });

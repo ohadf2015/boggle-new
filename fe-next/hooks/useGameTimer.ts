@@ -195,8 +195,10 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
       };
       animationFrameRef.current = requestAnimationFrame(tick);
     } else {
-      // Interval mode for normal gameplay — check every 200ms (vs 60fps RAF)
-      // 200ms gives accurate second-level display while reducing CPU by ~92%
+      // Interval mode for normal gameplay — check every 1000ms
+      // Display only shows whole seconds, so 1s interval is sufficient.
+      // Switches to RAF for final 10s where sub-second precision matters.
+      // Saves ~80% CPU vs 200ms interval (5 fewer wakeups/sec).
       intervalRef.current = setInterval(() => {
         const newTime = computeAndApplyTime();
         // Switch to RAF when crossing threshold
@@ -212,7 +214,7 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
         } else if (newTime <= 0) {
           clearTimers();
         }
-      }, 200);
+      }, 1000);
     }
 
     return () => {

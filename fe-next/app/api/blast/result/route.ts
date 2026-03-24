@@ -173,11 +173,36 @@ export async function POST(request: NextRequest) {
       console.error('[BLAST API] Profile stats update error (non-fatal):', profileError);
     }
 
+    // Award XP based on difficulty and score performance
+    // Easy: 30, Medium: 50, Hard: 80 base + score bonus (capped at 150)
+    const BLAST_XP_BASE: Record<string, number> = { easy: 30, medium: 50, hard: 80 };
+    const baseXp = BLAST_XP_BASE[data.difficulty] ?? 30;
+    const scoreBonus = Math.min(70, Math.floor(data.score / 100));
+    const xpToAward = Math.min(Math.round(baseXp + scoreBonus), 150);
+    let xpAwarded = 0;
+
+    if (xpToAward > 0) {
+      const { data: xpData, error: xpError } = await supabase
+        .rpc('increment_player_xp', {
+          p_player_id: userId,
+          p_xp_amount: xpToAward,
+        });
+
+      if (xpError) {
+        console.error('[BLAST API] XP award error (non-fatal):', xpError);
+      } else if (xpData && (xpData as unknown[]).length > 0) {
+        xpAwarded = (xpData as Record<string, unknown>[])[0].xp_granted as number ?? xpToAward;
+      } else {
+        xpAwarded = xpToAward;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       personalBests: updated,
       isNewBestScore,
       isNewBestCombo,
+      xpAwarded,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/blast/result', { method: 'POST' });

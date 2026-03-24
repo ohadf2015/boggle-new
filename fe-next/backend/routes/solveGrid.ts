@@ -96,7 +96,9 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
       .eq('language', language);
 
     if (error) {
-      logger.warn('SOLVE-GRID', `Blacklist query error (returning unfiltered): ${error.message}`);
+      // Truncate error message — Supabase 502s return full HTML pages as error.message
+      const errMsg = error.message.startsWith('<!') ? 'Supabase 502 Bad Gateway' : error.message.slice(0, 200);
+      logger.warn('SOLVE-GRID', `Blacklist query error (returning unfiltered): ${errMsg}`);
       return words; // Return unfiltered on error — graceful degradation
     }
 

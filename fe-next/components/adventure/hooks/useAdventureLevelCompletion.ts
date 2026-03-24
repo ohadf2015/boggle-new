@@ -104,8 +104,15 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const [lootDrops, setLootDrops] = useState<LootDrop[]>([]);
   const [earnedXp, setEarnedXp] = useState<number>(0);
   const [earnedGold, setEarnedGold] = useState<number>(0);
+  // Ref mirror of earnedGold — used by the eager DB save effect which fires
+  // in the same React commit phase as the gold-awarding effect. useState updates
+  // are batched to the next render, so the save effect's closure sees stale 0.
+  // The ref is written synchronously and always has the correct value.
+  const earnedGoldRef = useRef<number>(0);
   const [nonBossCompleted, setNonBossCompleted] = useState(false);
   const completionProcessedRef = useRef(false);
+  /** Tracks whether recordAttempt has been fired to prevent duplicate API calls */
+  const attemptRecordedRef = useRef(false);
   /** Tracks whether the DB save has been fired to prevent double-saves */
   const completionSavedRef = useRef(false);
   /** Tracks whether the eager DB save failed (so Continue/Retry can retry) */
@@ -136,6 +143,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     handleEarnAchievementRef.current = handleEarnAchievement;
     updateWordAlbumRef.current = props.updateWordAlbum;
     completionProcessedRef.current = false;
+    attemptRecordedRef.current = false;
     completionSavedRef.current = false;
     completionSaveFailedRef.current = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
@@ -169,6 +177,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
       const bonusGold = props.bonusGoldMultiplier ?? 1;
       const computedGold = Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold);
+      earnedGoldRef.current = computedGold;
       setEarnedGold(computedGold);
       addGold(computedGold);
 
@@ -239,8 +248,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     if (!completionProcessedRef.current) return;
     if (!isBossActive || !isBossLevel) return;
 
-    const playerDied = playerIsDead;
-    const isVictory = bossHealthPhase === 'victory' && !playerDied;
+    const isVictory = bossHealthPhase === 'victory' && !playerIsDead;
 
     if (bossHealthPhase !== 'victory' && bossHealthPhase !== 'defeat') {
       endBossBattle(isVictory);
@@ -255,7 +263,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
         handleEarnAchievementRef.current('BOSS_SPEEDRUN');
       }
       // Boss No Damage: defeat boss without ever taking damage during the fight
-      if (!playerDied && !playerTookDamageRef.current) {
+      if (!playerIsDead && !playerTookDamageRef.current) {
         handleEarnAchievementRef.current('BOSS_NO_DAMAGE');
       }
     }
@@ -270,54 +278,60 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       handleEarnAchievementRef.current('PERFECT_LEVEL');
     }
 
-    const objectiveProgress: Record<string, number> = {};
-    for (const obj of objectives) {
-      objectiveProgress[obj.type] = obj.current ?? 0;
-    }
+    // Guard: only record attempt once per level completion to prevent
+    // duplicate API calls that cause 429 rate limits (Sentry JAVASCRIPT-NEXTJS-9K)
+    if (!attemptRecordedRef.current) {
+      attemptRecordedRef.current = true;
 
-    recordAttemptRef.current(
-      levelConfig.world, levelConfig.level,
-      gameState.wordsFound.length, gameState.score,
-      timeRemaining, objectiveProgress, gameState.stars > 0
-    );
+      const objectiveProgress: Record<string, number> = {};
+      for (const obj of objectives) {
+        objectiveProgress[obj.type] = obj.current ?? 0;
+      }
 
-    recordCompletionRef.current({
-      isCompletion: gameState.stars > 0,
-      timeRemaining,
-      timerSeconds,
-      score: gameState.score,
-      words: gameState.wordsFound.length,
-      lootDrops,
-      retainedScore: props.retainedScore ?? 0,
-    });
-
-    // Eagerly save completion to DB — don't wait for Continue button click.
-    // This ensures progress is persisted even if user navigates away (browser back, exit).
-    if (gameState.stars > 0 && !completionSavedRef.current) {
-      completionSavedRef.current = true;
-      const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
-      saveCompletionRef.current(
+      recordAttemptRef.current(
         levelConfig.world, levelConfig.level,
-        gameState.stars as 0 | 1 | 2 | 3,
-        gameState.score, gameState.wordsFound.length,
-        earnedGold, longWords
-      ).then((success) => {
-        if (!success) completionSaveFailedRef.current = true;
-      }).catch(() => {
-        // Mark as failed so Continue/Retry can retry — do NOT reset
-        // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
-        completionSaveFailedRef.current = true;
+        gameState.wordsFound.length, gameState.score,
+        timeRemaining, objectiveProgress, gameState.stars > 0
+      );
+
+      recordCompletionRef.current({
+        isCompletion: gameState.stars > 0,
+        timeRemaining,
+        timerSeconds,
+        score: gameState.score,
+        words: gameState.wordsFound.length,
+        lootDrops,
+        retainedScore: props.retainedScore ?? 0,
       });
-    }
 
-    endAIDirectorRef.current();
+      // Eagerly save completion to DB — don't wait for Continue button click.
+      // This ensures progress is persisted even if user navigates away (browser back, exit).
+      if (gameState.stars > 0 && !completionSavedRef.current) {
+        completionSavedRef.current = true;
+        const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
+        saveCompletionRef.current(
+          levelConfig.world, levelConfig.level,
+          gameState.stars as 0 | 1 | 2 | 3,
+          gameState.score, gameState.wordsFound.length,
+          earnedGoldRef.current, longWords
+        ).then((success) => {
+          if (!success) completionSaveFailedRef.current = true;
+        }).catch(() => {
+          // Mark as failed so Continue/Retry can retry — do NOT reset
+          // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
+          completionSaveFailedRef.current = true;
+        });
+      }
 
-    // Update word album with words found this level
-    if (gameState.wordsFound.length > 0) {
-      updateWordAlbumRef.current?.(gameState.wordsFound);
+      endAIDirectorRef.current();
+
+      // Update word album with words found this level
+      if (gameState.wordsFound.length > 0) {
+        updateWordAlbumRef.current?.(gameState.wordsFound);
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound accessed via ref; wordsFound.length in deps is sufficient
-  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore, earnedGold]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- wordsFound via ref (.length sufficient); earnedGoldRef instead of earnedGold state (stale closure)
+  }, [gameState.isComplete, gameState.stars, gameState.wordsFound.length, gameState.score, timeRemaining, objectives, levelConfig.world, levelConfig.level, timerSeconds, lootDrops, props.retainedScore]);
 
   const handleLevelUpClose = useCallback(() => {
     setLevelUpData(null);
@@ -329,8 +343,10 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     setLootDrops([]);
     setEarnedXp(0);
     setEarnedGold(0);
+    earnedGoldRef.current = 0;
     setNonBossCompleted(false);
     completionProcessedRef.current = false;
+    attemptRecordedRef.current = false;
     completionSavedRef.current = false;
     completionSaveFailedRef.current = false;
   }, []);

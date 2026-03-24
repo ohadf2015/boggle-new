@@ -73,7 +73,12 @@ export function BlastReactiveBackground({ intensity }: BlastReactiveBackgroundPr
       const ring = document.createElement('div');
       ring.className = 'blast-energy-pulse-ring';
       pulseRef.current.appendChild(ring);
-      const timerId = setTimeout(() => ring.remove(), 1200);
+      const timerId = setTimeout(() => {
+        ring.remove();
+        // Remove completed timer from tracking array to prevent unbounded growth
+        const idx = pulseTimersRef.current.indexOf(timerId);
+        if (idx !== -1) pulseTimersRef.current.splice(idx, 1);
+      }, 1200);
       pulseTimersRef.current.push(timerId);
     }
     prevIntensityRef.current = intensity;

@@ -52,18 +52,30 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
     updateChapterQuestProgress(type, amount, matchingIds);
   }, [quests, updateChapterQuestProgress]);
 
+  // Stable callbacks — prevent re-renders in consumers that depend on these
+  const recordWordsFound = useCallback((count: number) => increment('wordCountChapter', count), [increment]);
+  const recordLevelPerfect = useCallback(() => increment('perfectLevels'), [increment]);
+  const recordBossDefeatedNoHint = useCallback(() => increment('defeatBossNoHint'), [increment]);
+  const recordLongWord = useCallback(() => increment('longWordCount'), [increment]);
+  const recordWorldMechanicUse = useCallback(() => increment('worldMechanicUse'), [increment]);
+  const recordStreakMaster = useCallback(() => increment('streakMaster'), [increment]);
+  const recordBossHighHealth = useCallback(() => increment('bossHighHealth'), [increment]);
+  const recordFlashChallengeMaster = useCallback(() => increment('flashChallengeMaster'), [increment]);
+  const recordScoreChallenge = useCallback((score: number) => increment('scoreChallenge', score), [increment]);
+  const recordFullComboLevel = useCallback(() => increment('fullComboLevels'), [increment]);
+
   return {
     quests,
     progress,
-    recordWordsFound: (count: number) => increment('wordCountChapter', count),
-    recordLevelPerfect: () => increment('perfectLevels'),
-    recordBossDefeatedNoHint: () => increment('defeatBossNoHint'),
-    recordLongWord: () => increment('longWordCount'),
-    recordWorldMechanicUse: () => increment('worldMechanicUse'),
-    recordStreakMaster: () => increment('streakMaster'),
-    recordBossHighHealth: () => increment('bossHighHealth'),
-    recordFlashChallengeMaster: () => increment('flashChallengeMaster'),
-    recordScoreChallenge: (score: number) => increment('scoreChallenge', score),
-    recordFullComboLevel: () => increment('fullComboLevels'),
+    recordWordsFound,
+    recordLevelPerfect,
+    recordBossDefeatedNoHint,
+    recordLongWord,
+    recordWorldMechanicUse,
+    recordStreakMaster,
+    recordBossHighHealth,
+    recordFlashChallengeMaster,
+    recordScoreChallenge,
+    recordFullComboLevel,
   };
 }

@@ -30,9 +30,11 @@ jest.mock('@/utils/supabase/server', () => ({
 
 // Mock supabase service client
 const mockFrom = jest.fn();
+const mockRpc = jest.fn();
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn().mockReturnValue({
     from: (...args: unknown[]) => mockFrom(...args),
+    rpc: (...args: unknown[]) => mockRpc(...args),
   }),
 }));
 
@@ -147,6 +149,11 @@ describe('POST /api/blast/result', () => {
     jest.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
+      error: null,
+    });
+    // Default RPC mock — XP awarding is non-fatal so most tests don't care
+    mockRpc.mockResolvedValue({
+      data: [{ new_total_xp: 100, new_level: 2, xp_granted: 50 }],
       error: null,
     });
   });
@@ -345,6 +352,60 @@ describe('POST /api/blast/result', () => {
       const res = await POST(makeRequest(validBody));
       expect(res.status).toBe(200);
       expect(res.data.migrationPending).toBe(true);
+    });
+  });
+
+  // ===== XP AWARDING =====
+  describe('XP awarding', () => {
+    beforeEach(() => {
+      mockRpc.mockResolvedValue({
+        data: [{ new_total_xp: 1000, new_level: 5, xp_granted: 40 }],
+        error: null,
+      });
+    });
+
+    it('calls increment_player_xp RPC after saving result', async () => {
+      setupDbMocks();
+      const res = await POST(makeRequest(validBody));
+      expect(res.status).toBe(200);
+      expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', {
+        p_player_id: 'user-1',
+        p_xp_amount: expect.any(Number),
+      });
+    });
+
+    it('awards higher XP for hard difficulty than easy', async () => {
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'easy' }));
+      const easyXp = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+
+      mockRpc.mockClear();
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, difficulty: 'hard' }));
+      const hardXp = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+
+      expect(hardXp).toBeGreaterThan(easyXp);
+    });
+
+    it('includes xpAwarded in the response', async () => {
+      setupDbMocks();
+      const res = await POST(makeRequest(validBody));
+      expect(res.data.xpAwarded).toBe(40);
+    });
+
+    it('XP RPC failure is non-fatal — result still succeeds', async () => {
+      setupDbMocks();
+      mockRpc.mockResolvedValue({ data: null, error: { message: 'RPC failed' } });
+      const res = await POST(makeRequest(validBody));
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
+    });
+
+    it('caps XP at a maximum to prevent farming', async () => {
+      setupDbMocks();
+      await POST(makeRequest({ ...validBody, score: 999999 }));
+      const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
+      expect(xpAmount).toBeLessThanOrEqual(150);
     });
   });
 

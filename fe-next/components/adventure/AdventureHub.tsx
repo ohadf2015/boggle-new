@@ -10,7 +10,8 @@
 
 import { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen } from 'lucide-react';
+import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen, Home, Swords } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
@@ -59,10 +60,10 @@ interface AdventureHubProps {
   wordAlbumCount?: number;
   /** Navigate to weekly challenge */
   onWeeklyChallenge?: () => void;
-  /** Navigate to boss rush mode */
+  /** Start Boss Rush mode */
   onBossRush?: () => void;
-  /** Whether player has defeated a boss */
-  hasBossDefeat?: boolean;
+  /** Whether Boss Rush is available (player has defeated at least 1 boss) */
+  canBossRush?: boolean;
 }
 
 // ==============================================
@@ -83,6 +84,8 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenShop,
   wordAlbumCount = 0,
   onWeeklyChallenge,
+  onBossRush,
+  canBossRush = false,
   xp = 0,
 }) => {
   const { t } = useLanguageSafe();
@@ -99,6 +102,22 @@ const AdventureHub = memo<AdventureHubProps>(({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-56px)] px-4 py-8 gap-6 max-w-lg mx-auto">
+
+      {/* Home link */}
+      <div className="w-full flex justify-start">
+        <Link
+          href="/"
+          className={cn(
+            'flex items-center gap-2 px-4 py-2',
+            'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
+            'text-neo-white font-bold hover:bg-neo-navy-light',
+            'transition-colors shadow-hard-sm'
+          )}
+        >
+          <Home className="w-5 h-5" />
+          <span>{t('common.home')}</span>
+        </Link>
+      </div>
 
       {/* Streak Section */}
       <AdaptiveMotion.div
@@ -296,6 +315,29 @@ const AdventureHub = memo<AdventureHubProps>(({
             </span>
           </div>
           <ChevronRight className="w-6 h-6 rtl:scale-x-[-1]" />
+        </AdaptiveMotion.button>
+      )}
+
+      {/* Boss Rush Button */}
+      {canBossRush && onBossRush && (
+        <AdaptiveMotion.button
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.55, type: 'spring', stiffness: 200 }}
+          onClick={onBossRush}
+          className={cn(
+            'w-full py-3 px-6',
+            'flex items-center justify-center gap-2',
+            'bg-neo-orange/15 text-neo-orange',
+            'font-black text-base uppercase tracking-tight',
+            'border-3 border-neo-orange/40 rounded-neo shadow-hard',
+            'hover:bg-neo-orange/25 hover:shadow-hard-sm',
+            'active:translate-y-0.5 active:shadow-hard-pressed',
+            'transition-all duration-150'
+          )}
+        >
+          <Swords className="w-5 h-5" />
+          {t('adventure.bossRush.startRush')}
         </AdaptiveMotion.button>
       )}
 

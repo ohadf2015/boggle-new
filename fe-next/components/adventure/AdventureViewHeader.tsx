@@ -17,6 +17,8 @@ interface AdventureViewHeaderProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Current world name for breadcrumb (only shown on levelGrid) */
   worldName?: string;
+  /** Whether the player came from the hub (returning player) — affects worldMap back target */
+  hasHub?: boolean;
 }
 
 export default function AdventureViewHeader({
@@ -29,12 +31,17 @@ export default function AdventureViewHeader({
   onOpenShop,
   t,
   worldName,
+  hasHub,
 }: AdventureViewHeaderProps): React.JSX.Element {
+  // On worldMap: returning players (hasHub) go back to hub via onBack;
+  // new players go to home page via Link
+  const worldMapUsesHistoryBack = viewState === 'worldMap' && hasHub;
+
   return (
     <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Back button */}
-        {viewState !== 'worldMap' ? (
+        {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (
           <button
             onClick={onBack}
             className={cn(

@@ -5810,7 +5810,20 @@ const sv = {
       "subtitle": "Besegra alla bossar i rad!",
       "title": "Bossrush",
       "tryAgain": "Försök igen",
-      "xpEarned": "XP intjänat"
+      "xpEarned": "XP intjänat",
+      "bossesDefeated": "Bossar besegrade",
+      "totalScore": "Totalpoäng",
+      "timeTaken": "Tid"
+    },
+    "mastery": {
+      "label": "Mästerskap",
+      "tier": {
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "platinum": "Platina",
+        "diamond": "Diamant"
+      }
     },
     "share": {
       "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",

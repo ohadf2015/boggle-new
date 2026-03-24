@@ -18,12 +18,12 @@
   }
 }
 
-/* Optimized star element */
+/* Optimized star element — no will-change to avoid excessive GPU layer allocation.
+ * CSS animations on opacity+transform are compositor-promoted automatically by browsers. */
 .world-map-star {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  will-change: opacity, transform;
   animation: star-twinkle var(--star-duration, 3s) ease-in-out infinite;
   animation-delay: var(--star-delay, 0s);
 }
@@ -59,7 +59,6 @@
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  will-change: opacity, transform;
   animation: nebula-breathe var(--nebula-duration, 12s) ease-in-out infinite;
 }
 
@@ -88,7 +87,6 @@
   background: white;
   border-radius: 50%;
   pointer-events: none;
-  will-change: transform, opacity;
   animation: shooting-star var(--shooting-duration, 2s) ease-out infinite;
   animation-delay: var(--shooting-delay, 0s);
   box-shadow:
@@ -111,7 +109,6 @@
   position: absolute;
   pointer-events: none;
   opacity: 0.6;
-  will-change: transform;
   animation: cloud-float var(--cloud-duration, 15s) ease-in-out infinite;
 }
 
@@ -229,7 +226,6 @@
   top: 50%;
   pointer-events: none;
   font-weight: 900;
-  will-change: transform, opacity;
   text-shadow: 0 0 8px currentColor;
 }
 
@@ -261,7 +257,6 @@
   border-radius: 50%;
   border: 2px solid #ffe135;
   pointer-events: none;
-  will-change: transform, opacity;
   animation: pulse-ring 2s ease-in-out infinite;
 }
 
@@ -279,7 +274,6 @@
   position: absolute;
   top: -16px;
   left: 50%;
-  will-change: transform;
   animation: crown-bob 2s ease-in-out infinite;
 }
 
@@ -294,7 +288,6 @@
 }
 
 .world-map-mascot {
-  will-change: transform;
   animation: mascot-bob 2s ease-in-out infinite;
 }
 
@@ -316,7 +309,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  will-change: transform;
   animation: scroll-hint-bob 1.5s ease-in-out infinite;
 }
 

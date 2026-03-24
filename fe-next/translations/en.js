@@ -6062,7 +6062,20 @@ const en = {
       "subtitle": "Defeat every boss in a row!",
       "title": "Boss Rush",
       "tryAgain": "Try Again",
-      "xpEarned": "XP Earned"
+      "xpEarned": "XP Earned",
+      "bossesDefeated": "Bosses Defeated",
+      "totalScore": "Total Score",
+      "timeTaken": "Time"
+    },
+    "mastery": {
+      "label": "Mastery",
+      "tier": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum",
+        "diamond": "Diamond"
+      }
     },
     "weeklyChallenge": {
       "title": "Weekly Challenge",

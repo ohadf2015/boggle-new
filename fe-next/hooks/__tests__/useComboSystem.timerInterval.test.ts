@@ -18,14 +18,14 @@ describe('useComboSystem — timerIntervalMs option', () => {
     jest.useRealTimers();
   });
 
-  it('should use 250ms interval by default', () => {
+  it('should use 500ms interval by default', () => {
     const setIntervalSpy = jest.spyOn(global, 'setInterval');
     const { result } = renderHook(() => useComboSystem());
 
     activateCombo(result);
 
     const intervalCalls = setIntervalSpy.mock.calls.filter(
-      ([, ms]) => ms === 250
+      ([, ms]) => ms === 500
     );
     expect(intervalCalls.length).toBeGreaterThan(0);
 

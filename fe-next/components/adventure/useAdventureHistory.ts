@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 // View state type for navigation — hub is the initial entry point
-export type ViewState = 'hub' | 'worldMap' | 'levelGrid' | 'playing' | 'weeklyChallenge';
+export type ViewState = 'hub' | 'worldMap' | 'levelGrid' | 'playing' | 'weeklyChallenge' | 'bossRush';
 
 // History state interface for browser back button support
 interface AdventureHistoryState {
@@ -22,12 +22,13 @@ export function useAdventureHistory(initialView: ViewState) {
   const isHandlingPopstateRef = useRef(false);
   const historyInitializedRef = useRef(false);
   const popstateFlagTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initialViewRef = useRef(initialView);
 
   // Push initial history state on mount
   useEffect(() => {
     if (typeof window === 'undefined' || historyInitializedRef.current) return;
     const initialState: AdventureHistoryState = {
-      adventureView: 'worldMap',
+      adventureView: initialViewRef.current,
       worldId: null,
       levelId: null,
     };
@@ -86,10 +87,6 @@ export function useAdventureHistory(initialView: ViewState) {
     pushHistoryState('worldMap', null, null);
   }, [pushHistoryState]);
 
-  const navigateToHub = useCallback(() => {
-    setViewState('hub');
-  }, []);
-
   const selectWorld = useCallback((worldId: number) => {
     setSelectedWorld(worldId);
     setViewState('levelGrid');
@@ -132,7 +129,6 @@ export function useAdventureHistory(initialView: ViewState) {
     selectedLevel,
     setSelectedLevel,
     navigateToWorldMap,
-    navigateToHub,
     selectWorld,
     selectLevel,
     openWorldMapFromHub,

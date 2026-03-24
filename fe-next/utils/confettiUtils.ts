@@ -13,6 +13,10 @@ import confettiLib, { type CreateTypes, type Options, type Shape } from 'canvas-
 let confettiCanvas: HTMLCanvasElement | null = null;
 let myConfetti: CreateTypes | null = null;
 let resizeHandler: (() => void) | null = null;
+let autoCleanupTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Auto-cleanup delay: destroy canvas 3s after last confetti fire to free memory */
+const AUTO_CLEANUP_DELAY_MS = 3000;
 
 // ==================== Z-Index Constants ====================
 
@@ -103,12 +107,17 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
       useWorker: false,
     });
 
-    // Handle window resize to update canvas dimensions (with cleanup capability)
+    // Handle window resize to update canvas dimensions (throttled to prevent jank)
+    let resizeRaf: number | null = null;
     resizeHandler = () => {
-      if (confettiCanvas) {
-        confettiCanvas.width = window.innerWidth;
-        confettiCanvas.height = window.innerHeight;
-      }
+      if (resizeRaf !== null) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        if (confettiCanvas) {
+          confettiCanvas.width = window.innerWidth;
+          confettiCanvas.height = window.innerHeight;
+        }
+      });
     };
     window.addEventListener('resize', resizeHandler);
   }
@@ -133,6 +142,14 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
     console.warn('[Confetti] Failed to initialize confetti canvas');
     return null;
   }
+
+  // Schedule auto-cleanup: destroy canvas after no confetti fires for 3s.
+  // Prevents the global singleton from leaking memory in long sessions.
+  if (autoCleanupTimer) clearTimeout(autoCleanupTimer);
+  autoCleanupTimer = setTimeout(() => {
+    autoCleanupTimer = null;
+    cleanupConfetti();
+  }, AUTO_CLEANUP_DELAY_MS);
 
   try {
     return myConfetti({
@@ -160,6 +177,10 @@ export function resetConfetti(): void {
  * Removes resize listener and canvas to prevent memory leaks
  */
 export function cleanupConfetti(): void {
+  if (autoCleanupTimer) {
+    clearTimeout(autoCleanupTimer);
+    autoCleanupTimer = null;
+  }
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);
     resizeHandler = null;

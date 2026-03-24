@@ -5,6 +5,10 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
+// Pre-allocated index arrays — prevents [...Array(N)] allocation on every render
+const SPARKLE_INDICES = [0, 1, 2, 3, 4, 5] as const;
+const TRAIL_INDICES = [0, 1, 2] as const;
+
 interface FloatingScoreAnimationProps {
   /** Score to display (triggers animation when changes to > 0) */
   score: number | null;
@@ -187,8 +191,8 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
           </AdaptiveMotion.div>
         </AdaptiveMotion.div>
 
-        {/* Sparkle burst at start position */}
-        {[...Array(6)].map((_, i) => (
+        {/* Sparkle burst at start position — static array to avoid allocation per render */}
+        {SPARKLE_INDICES.map((i) => (
           <AdaptiveMotion.div
             key={`sparkle-${i}`}
             className={`absolute w-2 h-2 rounded-full ${
@@ -214,8 +218,8 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
           />
         ))}
 
-        {/* Plus particles trailing behind */}
-        {[...Array(3)].map((_, i) => (
+        {/* Plus particles trailing behind — static array to avoid allocation per render */}
+        {TRAIL_INDICES.map((i) => (
           <AdaptiveMotion.div
             key={`trail-${i}`}
             className={`absolute text-lg font-bold ${

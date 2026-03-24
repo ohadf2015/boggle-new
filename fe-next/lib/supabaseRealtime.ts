@@ -131,7 +131,7 @@ function getOrCreateClassroomProgressChannel(classroomId: string): RealtimeChann
       if (status === REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR || status === REALTIME_SUBSCRIBE_STATES.TIMED_OUT) {
         if (connectionRetryCount < MAX_RETRY_COUNT) {
           const delay = getRetryDelay(connectionRetryCount);
-          logger.warn(`[Realtime] Classroom progress connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
+          logger.info(`[Realtime] Classroom progress connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
           connectionRetryCount++;
           setTimeout(() => {
             // Remove and recreate channel
@@ -199,7 +199,7 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
       if (status === REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR || status === REALTIME_SUBSCRIBE_STATES.TIMED_OUT) {
         if (connectionRetryCount < MAX_RETRY_COUNT) {
           const delay = getRetryDelay(connectionRetryCount);
-          logger.warn(`[Realtime] Leaderboard connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
+          logger.info(`[Realtime] Leaderboard connection failed, retrying in ${delay}ms (attempt ${connectionRetryCount + 1}/${MAX_RETRY_COUNT})`);
           connectionRetryCount++;
           setTimeout(() => {
             // Remove and recreate channel

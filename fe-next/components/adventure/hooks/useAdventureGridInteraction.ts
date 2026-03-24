@@ -40,6 +40,9 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
     tiles, cascadePhase, lastSubmittedWordRef, gridRef, gridSize, effects,
   } = params;
 
+  // Destructure effects for stable deps — the effects object itself is recreated every render
+  const { currentPopup, handlePopupComplete: effectsHandlePopupComplete } = effects;
+
   const calculateTileCenter = useCallback((row: number, col: number) => {
     if (!gridRef.current) return { x: 0, y: 0 };
     const gridRect = gridRef.current.getBoundingClientRect();
@@ -116,16 +119,16 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
   const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handlePopupComplete = useCallback(() => {
     if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); popupQueueTimeoutRef.current = null; }
-    effects.handlePopupComplete();
-  }, [effects]);
+    effectsHandlePopupComplete();
+  }, [effectsHandlePopupComplete]);
 
   useEffect(() => {
     if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); popupQueueTimeoutRef.current = null; }
-    if (effects.currentPopup) {
-      popupQueueTimeoutRef.current = setTimeout(() => { effects.handlePopupComplete(); popupQueueTimeoutRef.current = null; }, 3000);
+    if (currentPopup) {
+      popupQueueTimeoutRef.current = setTimeout(() => { effectsHandlePopupComplete(); popupQueueTimeoutRef.current = null; }, 3000);
     }
     return () => { if (popupQueueTimeoutRef.current) { clearTimeout(popupQueueTimeoutRef.current); } };
-  }, [effects]);
+  }, [currentPopup, effectsHandlePopupComplete]);
 
   return {
     handlePauseToggle, handleTileSelect, handleDragStart, handleDragEnter, handleDragEnd,

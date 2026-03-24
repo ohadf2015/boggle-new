@@ -8,6 +8,8 @@ import { Star, Lock, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { MasteryTier } from '@/types/adventure';
+import { MasteryBadge } from './MasteryBadge';
 import { useParallax } from '@/hooks/useParallax';
 import {
   LEVELS_PER_WORLD,
@@ -19,6 +21,7 @@ import {
   type WorldConfig,
 } from '@/lib/adventure';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { WorldMapBackground } from './WorldMapBackground';
 import { WorldOrbitingLetters, TrailPath } from './WorldMapDecorations';
 
@@ -26,7 +29,7 @@ interface WorldMapProps {
   totalStars: number;
   completions: Array<{ world: number; level: number; stars: number }>;
   onWorldSelect: (worldId: number) => void;
-  masteryTiers?: Record<number, number>;
+  masteryTiers?: Record<number, MasteryTier>;
 }
 
 // Motion variants - extracted to constants to prevent re-creation on every render
@@ -34,12 +37,12 @@ const NOOP = () => {};
 const WORLD_HOVER_VARIANT = { scale: 1.08, y: -4, rotate: 2 };
 const WORLD_TAP_VARIANT = { scale: 0.95, rotate: -1 };
 
-// Extracted to module-level constant to prevent useParallax re-subscribing RAF/listeners every render
-const WORLD_MAP_PARALLAX_OPTIONS = {
+// Base parallax options — ambient is conditionally disabled on low-end devices
+// to prevent a continuous 60fps RAF loop that drains battery.
+const WORLD_MAP_PARALLAX_BASE = {
   intensity: 0.8,
   enableGyroscope: true,
   enableGesture: true,
-  enableAmbient: true,
   ambientSpeed: 0.5,
 } as const;
 
@@ -71,6 +74,7 @@ const WorldNode = memo(function WorldNode({
   isNextWorld,
   fogState = 'none',
   playerTotalStars = 0,
+  masteryTier,
 }: {
   world: WorldConfig;
   isUnlocked: boolean;
@@ -84,6 +88,7 @@ const WorldNode = memo(function WorldNode({
   isNextWorld?: boolean;
   fogState?: 'none' | 'shimmer' | 'heavy';
   playerTotalStars?: number;
+  masteryTier?: MasteryTier;
 }): React.JSX.Element {
   const { t } = useLanguage();
   const isFinalWorld = world.id === 10;
@@ -256,6 +261,12 @@ const WorldNode = memo(function WorldNode({
           </span>
         </div>
 
+        {masteryTier != null && masteryTier > 0 && (
+          <div className="mt-1.5">
+            <MasteryBadge tier={masteryTier} />
+          </div>
+        )}
+
         {!isUnlocked && (() => {
           const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
           return (
@@ -286,8 +297,10 @@ const WorldMap = memo(function WorldMap({
   totalStars,
   completions,
   onWorldSelect,
+  masteryTiers,
 }: WorldMapProps): React.JSX.Element {
   const { t } = useLanguage();
+  const { enableComplexAnimations } = useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
@@ -334,7 +347,12 @@ const WorldMap = memo(function WorldMap({
   const starsY = useTransform(scrollProgress, [0, 1], [0, -100]);
   const cloudsY = useTransform(scrollProgress, [0, 1], [0, -150]);
 
-  const { x: parallaxX, y: parallaxY } = useParallax(WORLD_MAP_PARALLAX_OPTIONS);
+  // Disable ambient drift on low-end devices — saves continuous 60fps RAF loop
+  const parallaxOptions = useMemo(() => ({
+    ...WORLD_MAP_PARALLAX_BASE,
+    enableAmbient: enableComplexAnimations,
+  }), [enableComplexAnimations]);
+  const { x: parallaxX, y: parallaxY } = useParallax(parallaxOptions);
 
   // Prepare worlds data (World 10 at top, World 1 at bottom)
   const worldsData = useMemo(() => {
@@ -418,11 +436,13 @@ const WorldMap = memo(function WorldMap({
                 isLeft={isLeft}
                 isNextWorld={data.world.id === nextWorldId}
                 playerTotalStars={totalStars}
+                masteryTier={masteryTiers?.[data.world.id]}
                 fogState={
-                  data.isUnlocked ? 'none'
-                    : data.world.id === furthestUnlockedId + 1 ? 'shimmer'
-                    : data.world.id > furthestUnlockedId + 1 ? 'heavy'
-                    : 'none'
+                  data.isUnlocked
+                    ? 'none'
+                    : data.world.id === furthestUnlockedId + 1
+                      ? 'shimmer'
+                      : 'heavy'
                 }
               />
 
@@ -445,8 +465,7 @@ const WorldMap = memo(function WorldMap({
             className={cn(
               'mx-auto max-w-[200px] p-4 rounded-neo border-3 border-dashed',
               'border-neo-purple/40 bg-neo-purple/10',
-              'text-center',
-              furthestUnlockedId >= 5 ? 'opacity-70' : 'opacity-30'
+              'text-center opacity-70'
             )}
           >
             <div className="text-2xl mb-1">∞</div>
@@ -465,5 +484,4 @@ const WorldMap = memo(function WorldMap({
   );
 });
 
-WorldMap.displayName = 'WorldMap';
 export default WorldMap;

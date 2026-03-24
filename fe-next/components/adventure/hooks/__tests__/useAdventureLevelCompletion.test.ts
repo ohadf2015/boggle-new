@@ -319,6 +319,46 @@ describe('useAdventureLevelCompletion', () => {
     });
   });
 
+  describe('eager DB save', () => {
+    it('should call saveCompletion with correct earnedGold (not stale 0)', () => {
+      // GIVEN — level completes with 2 stars on world 1 level 3
+      // Gold: 2 * (10 + 1*3) = 26 (no perfect bonus, no long words)
+      renderHook(() =>
+        useAdventureLevelCompletion({
+          ...defaultProps,
+          gameState: { ...defaultProps.gameState, isComplete: true, stars: 2 },
+        })
+      );
+
+      // THEN — saveCompletion should be called with earnedGold=26, not 0
+      expect(mockSaveCompletion).toHaveBeenCalledWith(
+        1, // world
+        3, // level
+        2, // stars
+        100, // score
+        2, // wordsFound.length
+        26, // earnedGold — must NOT be 0 (the race condition bug)
+        0  // longWords (no words >= 6 chars)
+      );
+    });
+
+    it('should call saveCompletion with perfect clear gold', () => {
+      // GIVEN — 3 stars: gold = 3*(10+3) + 50 = 89
+      renderHook(() =>
+        useAdventureLevelCompletion({
+          ...defaultProps,
+          gameState: { ...defaultProps.gameState, isComplete: true, stars: 3 },
+        })
+      );
+
+      expect(mockSaveCompletion).toHaveBeenCalledWith(
+        1, 3, 3, 100, 2,
+        89, // 3*13 + 50 perfect bonus
+        0
+      );
+    });
+  });
+
   describe('handleLevelUpClose', () => {
     it('should clear levelUpData', () => {
       mockAwardXp.mockReturnValue({ leveledUp: true, newLevel: 2 });

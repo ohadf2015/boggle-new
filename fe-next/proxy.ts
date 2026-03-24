@@ -37,10 +37,11 @@ export async function proxy(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  // Skip proxy for static files, API routes, and Next.js internals
+  // Skip proxy entirely for static files and Next.js internals
+  // NOTE: API routes are NOT skipped — they need Supabase session refresh
+  // to prevent silent 401s after ~1h of play (PKCE token expiry).
   if (
     pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
     pathname.includes('.') ||
     pathname.startsWith('/favicon.ico') ||
@@ -79,7 +80,11 @@ export async function proxy(request: NextRequest) {
     });
 
     try {
-      await supabase.auth.getSession();
+      // IMPORTANT: Use getUser() not getSession(). getSession() only reads
+      // the local JWT without validating it server-side. getUser() contacts
+      // the Supabase auth server and refreshes the token if needed.
+      // Without this, tokens expire after ~1h and all API calls get 401.
+      await supabase.auth.getUser();
     } catch {
       // Silently handle auth errors in proxy
     }

@@ -136,8 +136,8 @@ describe('POST /api/adventure/attempt', () => {
       expect(res.data.error).toContain('Invalid world');
     });
 
-    it('rejects level > 7 with 400', async () => {
-      const res = await POST(makeRequest({ ...validBody, level: 8 }));
+    it('rejects level > 10 with 400', async () => {
+      const res = await POST(makeRequest({ ...validBody, level: 11 }));
       expect(res.status).toBe(400);
       expect(res.data.error).toContain('Invalid level');
     });

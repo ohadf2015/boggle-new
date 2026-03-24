@@ -107,10 +107,21 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
     updateCSSProperties(x, y, opts.cssTarget);
   }, [motionX, motionY, opts.cssTarget]);
 
-  // Visibility API - pause RAF when tab is hidden
+  // Visibility API - fully stop/restart RAF when tab is hidden/shown
+  // (Just skipping work inside RAF still wakes the CPU 60x/sec)
+  const restartAmbientRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     const handleVisibilityChange = () => {
-      isVisibleRef.current = document.visibilityState === 'visible';
+      const visible = document.visibilityState === 'visible';
+      isVisibleRef.current = visible;
+      if (visible && restartAmbientRef.current) {
+        // Restart ambient RAF loop after tab becomes visible
+        restartAmbientRef.current();
+      } else if (!visible && animationFrameRef.current) {
+        // Fully cancel RAF when hidden — CPU can sleep
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -209,19 +220,17 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
   }, [opts.enableGesture, opts.intensity, isMobile, prefersReducedMotion, enableComplexAnimations, updateOutput]);
 
   // Ambient drift (always-on Lissajous oscillation)
+  // RAF is fully cancelled when tab is hidden (via visibilitychange handler above)
+  // and restarted when tab becomes visible again — zero CPU cost while backgrounded.
   useEffect(() => {
     if (!opts.enableAmbient || prefersReducedMotion) {
+      restartAmbientRef.current = null;
       return;
     }
 
     startTimeRef.current = performance.now();
 
     const animate = (time: number) => {
-      if (!isVisibleRef.current) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
       const elapsed = time - startTimeRef.current;
       const speed = opts.ambientSpeed;
       const intensity = opts.intensity;
@@ -242,11 +251,25 @@ export function useParallax(options: ParallaxOptions = {}): ParallaxOutput {
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    const startLoop = () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      startTimeRef.current = performance.now();
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    // Store restart function so visibility handler can call it
+    restartAmbientRef.current = startLoop;
+
+    // Only start if tab is visible
+    if (isVisibleRef.current) {
+      startLoop();
+    }
 
     return () => {
+      restartAmbientRef.current = null;
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
   }, [opts.enableAmbient, opts.ambientSpeed, opts.intensity, prefersReducedMotion, updateOutput]);

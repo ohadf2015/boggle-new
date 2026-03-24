@@ -18,7 +18,6 @@ import {
   calculateComboChainWindow,
   calculateComboTimeout,
   calculateAvailableShields,
-  VALID_WORDS_PER_SHIELD,
 } from '@/shared/utils/comboUtils';
 // ==================== Types ====================
 
@@ -41,7 +40,7 @@ export interface UseComboSystemOptions {
   onComboMilestone?: (level: number) => void;
   /** Callback when danger state changes */
   onDangerStateChange?: (isDanger: boolean) => void;
-  /** Timer update interval in ms (default 250). Use 500 for low-end devices. */
+  /** Timer update interval in ms (default 500). Reduced from 250ms to cut CPU wakeups in half while still providing smooth visual feedback for the combo bar. */
   timerIntervalMs?: number;
 }
 
@@ -90,7 +89,7 @@ export function useComboSystem(options: UseComboSystemOptions = {}): ComboSystem
     onComboSaved,
     onComboMilestone,
     onDangerStateChange,
-    timerIntervalMs = 250,
+    timerIntervalMs = 500,
   } = options;
 
   // State

@@ -27,6 +27,44 @@ import {
 } from '@/lib/adventure';
 
 // ==============================================
+// HELPERS
+// ==============================================
+
+/**
+ * Fire-and-forget fetch with retry for background saves (quests, word album).
+ * Retries up to `maxRetries` times on transient failures (429, 5xx, network errors).
+ */
+function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 2,
+  baseDelay = 1000,
+): void {
+  const attempt = (retryCount: number) => {
+    fetch(url, options)
+      .then((res) => {
+        if (res.ok) return;
+        // Retry on transient errors
+        if (retryCount < maxRetries && (res.status === 429 || res.status >= 500)) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          setTimeout(() => attempt(retryCount + 1), delay);
+          return;
+        }
+        logger.warn(`[ProgressionContext] ${url} failed:`, res.status);
+      })
+      .catch((err) => {
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          setTimeout(() => attempt(retryCount + 1), delay);
+          return;
+        }
+        logger.warn(`[ProgressionContext] ${url} error after ${maxRetries} retries:`, err instanceof Error ? err.message : err);
+      });
+  };
+  attempt(0);
+}
+
+// ==============================================
 // TYPES
 // ==============================================
 
@@ -199,13 +237,27 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           body: requestBody,
         });
 
-        // Retry on transient errors: 429 (rate limit) with backoff, 500/503 (cold start)
-        if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+        // Retry on transient errors: 429 (rate limit), 5xx (cold start), 409 (optimistic lock conflict)
+        if (response.status === 429 || response.status === 409 || (response.status >= 500 && response.status < 600)) {
           const retryAfter = response.status === 429
             ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
-            : 1000;
-          logger.warn('[ProgressionContext] Retrying completeLevel after', response.status);
+            : 500;
+          logger.info('[ProgressionContext] Retrying completeLevel after', response.status);
           await new Promise(r => setTimeout(r, retryAfter));
+          response = await fetch('/api/adventure/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: requestBody,
+          });
+        }
+
+        // Retry on 403 "Level not unlocked" — stale DB state from a prior failed save.
+        // Refresh progression (which updates the server's view) and retry once.
+        if (response.status === 403) {
+          logger.info('[ProgressionContext] 403 on completeLevel — refreshing progression and retrying');
+          await fetchProgression();
+          await new Promise(r => setTimeout(r, 300));
           response = await fetch('/api/adventure/complete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -309,7 +361,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       completeLevelPromiseRef.current = promise;
       return promise;
     },
-    [user?.id]
+    [user?.id, fetchProgression]
   );
 
   // Record a level attempt (including failed attempts)
@@ -350,7 +402,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           const retryAfter = response.status === 429
             ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
             : 1000;
-          logger.warn('[ProgressionContext] Retrying recordAttempt after', response.status);
+          logger.info('[ProgressionContext] Retrying recordAttempt after', response.status);
           await new Promise(r => setTimeout(r, retryAfter));
           response = await fetch('/api/adventure/attempt', {
             method: 'POST',
@@ -361,7 +413,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
 
         if (!response.ok) {
-          logger.warn('[ProgressionContext] Record attempt failed:', response.status);
+          logger.info('[ProgressionContext] Record attempt failed:', response.status);
           return null;
         }
 
@@ -476,15 +528,13 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         for (const id of questIds) {
           updated[id] = (updated[id] ?? 0) + amount;
         }
-        // Persist to server (fire-and-forget)
+        // Persist to server with retry on transient failures
         if (user?.id) {
-          fetch('/api/adventure/quest-progress', {
+          fetchWithRetry('/api/adventure/quest-progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ chapterQuestProgress: updated }),
-          }).catch((err) => {
-            logger.warn('[ProgressionContext] Quest progress persist error:', err instanceof Error ? err.message : err);
           });
         }
         return { ...prev, chapterQuestProgress: updated };
@@ -510,14 +560,14 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
         if (!added) return prev;
         const updatedAlbum = Array.from(existing);
-        // Fire-and-forget persist
+        // Persist with retry on transient failures
         if (user?.id) {
-          fetch('/api/adventure/quest-progress', {
+          fetchWithRetry('/api/adventure/quest-progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ wordAlbum: updatedAlbum }),
-          }).catch(() => {});
+          });
         }
         return { ...prev, wordAlbum: updatedAlbum };
       });

@@ -621,10 +621,11 @@ describe('AdventureView Integration', () => {
       expect(screen.getByText('Adventure')).toBeInTheDocument();
     });
 
-    it('should display back link to home on world map', () => {
+    it('should display back button to hub on world map for returning players', () => {
       renderAdventureView();
-      const backLink = screen.getByRole('link', { name: /back/i });
-      expect(backLink).toHaveAttribute('href', '/');
+      // Returning players (with completions) see a back button that navigates to hub
+      const backButton = screen.getByRole('button', { name: /back/i });
+      expect(backButton).toBeInTheDocument();
     });
   });
 

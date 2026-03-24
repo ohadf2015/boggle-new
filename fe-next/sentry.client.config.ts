@@ -131,6 +131,12 @@ Sentry.init({
     // JSON-LD @context TypeError from browser extensions (SEO analyzers, schema validators)
     // Not first-party code - no application code calls .toLowerCase() on @context
     /\["@context"\]\.toLowerCase/i,
+    // OAuth access_denied — user cancelled consent screen, not a bug
+    /OAuth provider returned error.*access_denied/i,
+    // Realtime connection retries — expected transient behavior with auto-recovery
+    /\[Realtime\].*connection failed.*retrying/i,
+    // Progression duplicate/retry — handled gracefully with dedup guards
+    /\[ProgressionContext\].*Skipping duplicate/i,
   ],
 
   denyUrls: [

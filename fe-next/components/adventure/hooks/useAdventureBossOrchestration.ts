@@ -62,11 +62,13 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
   // Edge vignette flash on boss attacks
   const [showEdgeVignette, setShowEdgeVignette] = useState(false);
   const vignetteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fireworksTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup vignetteTimeout on unmount to prevent setState on unmounted component
+  // Cleanup timeouts on unmount to prevent setState on unmounted component
   useEffect(() => {
     return () => {
       if (vignetteTimeoutRef.current) clearTimeout(vignetteTimeoutRef.current);
+      if (fireworksTimeoutRef.current) clearTimeout(fireworksTimeoutRef.current);
     };
   }, []);
 
@@ -115,7 +117,8 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     setBattleState({ result: 'victory', showFireworks: true, defeatedTier: tier });
 
     const durations: Record<BossTier, number> = { mini: 3500, standard: 5500, elite: 8500 };
-    setTimeout(() => setBattleState(prev => ({ ...prev, showFireworks: false })), durations[tier]);
+    if (fireworksTimeoutRef.current) clearTimeout(fireworksTimeoutRef.current);
+    fireworksTimeoutRef.current = setTimeout(() => setBattleState(prev => ({ ...prev, showFireworks: false })), durations[tier]);
   }, [worldId]);
 
   // Defeat handler

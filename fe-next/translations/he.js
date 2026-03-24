@@ -5857,7 +5857,20 @@ const he = {
       "subtitle": "הביסו את כל הבוסים ברצף!",
       "title": "מרוץ בוסים",
       "tryAgain": "נסו שוב",
-      "xpEarned": "ניסיון שנצבר"
+      "xpEarned": "ניסיון שנצבר",
+      "bossesDefeated": "בוסים שהובסו",
+      "totalScore": "ניקוד כולל",
+      "timeTaken": "זמן"
+    },
+    "mastery": {
+      "label": "שליטה",
+      "tier": {
+        "bronze": "ארד",
+        "silver": "כסף",
+        "gold": "זהב",
+        "platinum": "פלטינה",
+        "diamond": "יהלום"
+      }
     },
     "share": {
       "bossDefeated": "ניצחתי את {{boss}} ב{{world}}!",

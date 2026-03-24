@@ -5842,7 +5842,20 @@ const es = {
       "subtitle": "¡Derrota a todos los jefes seguidos!",
       "title": "Carrera de Jefes",
       "tryAgain": "Intentar de nuevo",
-      "xpEarned": "XP ganado"
+      "xpEarned": "XP ganado",
+      "bossesDefeated": "Jefes derrotados",
+      "totalScore": "Puntuación total",
+      "timeTaken": "Tiempo"
+    },
+    "mastery": {
+      "label": "Maestría",
+      "tier": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino",
+        "diamond": "Diamante"
+      }
     },
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
