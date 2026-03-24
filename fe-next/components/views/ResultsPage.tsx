@@ -4,7 +4,8 @@ import React, { useMemo, useEffect, useState, useCallback, useDeferredValue } fr
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
-import { Trophy, BarChart2 } from 'lucide-react';
+import { Smile } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,7 +26,7 @@ import { useQuickReactions } from '@/hooks/useQuickReactions';
 // Dynamic import for landscape layout
 const ResultsLandscapeLayout = dynamic(() => import('@/components/results/ResultsLandscapeLayout'), { ssr: false });
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
-import { MobileTabBar } from '@/components/layout/MobileTabBar';
+// MobileTabBar replaced by inline floating pill for results page
 
 // Shared result components
 import { ResultsModals } from '@/components/results/ResultsModals';
@@ -45,7 +46,7 @@ const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHu
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const setIsInGame = useHideNavigation();
@@ -111,9 +112,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     username: username || '',
   });
 
-  // Mobile tab navigation state - Consolidated to 2 tabs for reduced cognitive load
-  type MobileTab = 'results' | 'details';
-  const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('results');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // Extract all data processing logic into a custom hook
   const {
@@ -134,6 +133,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     finalScores,
     username,
     gameDuration,
+    gameMode: resolvedGameMode,
+    wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
 
   // Extract all side effects into a custom hook
@@ -248,6 +249,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return wordMap;
   }, [deferredFinalScoresForWords]);
 
+  // Pre-generate next grid during results (Brawl Stars-style: zero delay on start)
+  const preGeneratedGrid = useMemo(() => {
+    const difficultyConfig = DIFFICULTIES.MEDIUM;
+    return generateRandomTable(difficultyConfig.rows, difficultyConfig.cols, roomLanguage, []);
+  }, [roomLanguage]);
+
   // Handle host starting a new game directly from results page
   // Must reset game state first (like handleStartNewGame in useHostGameActions)
   const handleStartGame = useCallback(() => {
@@ -259,19 +266,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       if (response?.success) {
         logger.log('[RESULTS] Game reset confirmed, starting new game');
 
-        const difficultyConfig = DIFFICULTIES.MEDIUM;
-        const newTable = generateRandomTable(
-          difficultyConfig.rows,
-          difficultyConfig.cols,
-          roomLanguage,
-          []
-        );
-
-        const timerSeconds = 180;
-
         socket.emit('startGame', {
-          letterGrid: newTable,
-          timerSeconds: timerSeconds,
+          letterGrid: preGeneratedGrid,
+          timerSeconds: 180,
           language: roomLanguage,
           hostPlaying: true,
           minWordLength: 3,
@@ -283,7 +280,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         logger.error('[RESULTS] Game reset failed:', response?.error);
       }
     });
-  }, [socket, isHost, roomLanguage, selectedGameMode]);
+  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid]);
 
   // Overlay modals that should render regardless of orientation
   // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
@@ -352,12 +349,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     );
   }
 
-  // Mobile tab configuration - Consolidated to 2 tabs for reduced cognitive load
-  const mobileTabs = [
-    { id: 'results' as MobileTab, icon: <Trophy className="w-5 h-5" />, label: t('results.results') },
-    { id: 'details' as MobileTab, icon: <BarChart2 className="w-5 h-5" />, label: t('results.details') },
-  ];
-
   // Shared props for main content component
   const mainContentProps = {
     sortedScores,
@@ -395,6 +386,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       username: r.username,
       timestamp: 0,
     })),
+    allPlayerWords,
+    gameDuration,
+    playerArchetypes,
+    wordHuntSummary,
   };
 
   // Word Hunt results data (shared between tabs)
@@ -429,7 +424,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Render Results Tab Content using shared component
   const renderResultsTab = () => (
     <>
-      {/* Game mode summary on top for immediate context */}
+      <ResultsMainContent
+        {...mainContentProps}
+        hideInlineCta={!isBotsOnlyGame}
+      />
+      {/* Game mode summary after hero banner — hero stays on top */}
       {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
         <div className="mb-3">
           <WordHuntResultsSummary {...wordHuntResultsData} />
@@ -444,11 +443,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           />
         </div>
       )}
-      <ResultsMainContent
-        {...mainContentProps}
-        onShowDetails={() => setMobileActiveTab('details')}
-        hideInlineCta={!isBotsOnlyGame}
-      />
       {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
       {gameCode && sortedScores.length > 1 && (
         <PostGameSocialActions
@@ -510,12 +504,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     <>
       {overlayModals}
       <div className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative">
-        {/* Neo-brutalist halftone dot pattern overlay */}
+        {/* Subtle dot pattern */}
         <div
-          className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
+          className="fixed inset-0 pointer-events-none opacity-[0.04]"
           style={{
             backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-            backgroundSize: '8px 8px',
+            backgroundSize: '10px 10px',
           }}
         />
 
@@ -528,64 +522,95 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </AnimatePresence>
       </div>
 
-      {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
+      {/* MOBILE VIEW — single scroll, no tabs */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
-        {/* Exit Button Header */}
+        {/* Exit button */}
         <div className="flex-shrink-0 w-full flex items-center justify-end px-2 py-2">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
         </div>
 
-        {/* Tab Content - Scrollable area */}
+        {/* Scrollable content — everything in one flow */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-52 sm:pb-56 bg-neo-navy"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-w-lg mx-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={mobileActiveTab}
-                initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
-                transition={{ duration: 0.15 }}
-              >
-                {mobileActiveTab === 'results' && renderResultsTab()}
-                {mobileActiveTab === 'details' && renderDetailsTab()}
-              </motion.div>
-            </AnimatePresence>
+          <div className="max-w-lg mx-auto space-y-3">
+            {renderResultsTab()}
+            {/* Other players' details (inline, no tab switch needed) */}
+            {renderDetailsTab()}
           </div>
         </div>
 
-        {/* Fixed Bottom Area — reactions + tab bar + StickyReadyBar */}
-        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
-          {/* Quick Reactions row — compact strip at top */}
-          {sortedScores.length > 1 && (
-            <div className="flex justify-center py-1 border-b border-neo-white/10">
-              <QuickReactions onReaction={sendReaction} layout="bar" />
-            </div>
-          )}
-          <MobileTabBar
-            tabs={mobileTabs}
-            activeTab={mobileActiveTab}
-            onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
-          />
-          {/* Sticky Ready Bar — full-width CTA pinned to bottom */}
-          {gameCode && onReturnToRoom && scoreRevealComplete && !isBotsOnlyGame && (
-            <StickyReadyBar
-              isHost={isHost}
-              isCurrentPlayerReady={isCurrentPlayerReady}
-              currentPlayerRank={currentPlayerRank}
-              winnerUsername={sortedScores[0]?.username}
-              readyCount={readyUsernames.length}
-              totalPlayers={sortedScores.length}
-              readyUsernames={readyUsernames}
-              players={sortedScores}
-              onStartGame={handleStartGame}
-              onMarkReady={handleMarkReady}
-              selectedGameMode={selectedGameMode}
-              onSelectGameMode={isHost ? setSelectedGameMode : undefined}
-            />
-          )}
+        {/* Floating bottom bar — just CTA + emoji */}
+        <div className="flex-shrink-0 fixed bottom-3 inset-x-3 z-50 text-neo-cream">
+          {/* Emoji popover */}
+          <AnimatePresence>
+            {showEmojiPicker && sortedScores.length > 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                className="flex justify-center mb-2"
+              >
+                <div className="bg-neo-navy/95 backdrop-blur-xl rounded-xl border border-neo-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.4)] p-1.5">
+                  <QuickReactions
+                    onReaction={(id) => { sendReaction(id); setShowEmojiPicker(false); }}
+                    layout="bar"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.div
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.1 }}
+            className="flex items-center gap-1.5 p-1.5 bg-neo-navy/90 backdrop-blur-xl rounded-2xl border border-neo-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+          >
+            {/* Ready bar */}
+            {gameCode && onReturnToRoom && !isBotsOnlyGame ? (
+              <StickyReadyBar
+                isHost={isHost}
+                isCurrentPlayerReady={isCurrentPlayerReady}
+                currentPlayerRank={currentPlayerRank}
+                winnerUsername={sortedScores[0]?.username}
+                readyCount={readyUsernames.length}
+                totalPlayers={sortedScores.length}
+                readyUsernames={readyUsernames}
+                players={sortedScores}
+                onStartGame={handleStartGame}
+                onMarkReady={handleMarkReady}
+                selectedGameMode={selectedGameMode}
+                onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+              />
+            ) : (
+              <div className="flex-1" />
+            )}
+
+            {/* Emoji trigger */}
+            {sortedScores.length > 1 && (
+              <>
+                <div className="w-px h-7 bg-neo-white/[0.06] shrink-0" />
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  aria-expanded={showEmojiPicker}
+                  aria-label={t('reactions.label')}
+                  className={cn(
+                    'w-9 h-9 flex items-center justify-center rounded-xl transition-all shrink-0',
+                    showEmojiPicker
+                      ? 'bg-neo-yellow/15 text-neo-yellow'
+                      : 'text-neo-white/30 hover:text-neo-white/60 hover:bg-neo-white/5'
+                  )}
+                >
+                  <Smile className="w-4 h-4" />
+                </button>
+              </>
+            )}
+          </motion.div>
+
+          <div className="safe-area-bottom" />
         </div>
       </div>
 
@@ -640,7 +665,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
       {gameCode && onReturnToRoom && !isBotsOnlyGame && (
         <div className="hidden md:block fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}
               isCurrentPlayerReady={isCurrentPlayerReady}
@@ -648,8 +673,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               winnerUsername={sortedScores[0]?.username}
               readyCount={readyUsernames.length}
               totalPlayers={sortedScores.length}
-              readyUsernames={readyUsernames}
-              players={sortedScores}
               onStartGame={handleStartGame}
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}

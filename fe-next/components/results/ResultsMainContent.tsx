@@ -1,30 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useReducedMotion } from 'framer-motion';
-import { useEntranceChoreography } from '@/hooks/useEntranceChoreography';
+import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Player } from '@/components/results/types';
+import { Sparkles, Type, Zap } from 'lucide-react';
+import type { Player, WordObject } from '@/components/results/types';
+import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 
-// Dynamic imports for heavy components
-const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
-const FightCardLeaderboard = dynamic(() => import('@/components/results/FightCardLeaderboard'), { ssr: false });
+// New cinematic components
+import ResultsHeroSection from '@/components/results/ResultsHeroSection';
+import ResultsPodium from '@/components/results/ResultsPodium';
+import ConsolationRows from '@/components/results/ConsolationRows';
+import HighlightsBar from '@/components/results/HighlightsBar';
+import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
+
+// Keep existing components for stats/words detail
 const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
-const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
-const WordMarqueeTicker = dynamic(() => import('@/components/results/WordMarqueeTicker'), { ssr: false });
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
 import type { GameModeOption } from '@/components/GameModeSelector';
-import type { NearMiss } from '@/components/results/NearMissCard';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
-import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
-import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import MissedWords from '@/components/results/MissedWords';
-
-const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -40,54 +39,9 @@ interface WinStreakData {
 /** Translation function type */
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
 
-/** Streak urgency countdown — shows time remaining to keep streak alive */
-const StreakUrgencyDisplay: React.FC<{
-  currentStreak: number;
-  t: TFunction;
-}> = ({ currentStreak, t }) => {
-  const [hoursLeft, setHoursLeft] = React.useState(() => {
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    return Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60));
-  });
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
-      setHoursLeft(Math.ceil((midnight.getTime() - now.getTime()) / (1000 * 60 * 60)));
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (currentStreak < 1) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className="flex items-center justify-center gap-2 px-3 py-2 bg-neo-orange/15 border-2 border-neo-orange/40 rounded-neo"
-    >
-      <motion.span
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-        className="text-base"
-      >
-        🔥
-      </motion.span>
-      <span className="text-xs font-bold text-neo-orange">
-        {t('results.streakUrgency', { streak: currentStreak, hours: hoursLeft })}
-      </span>
-    </motion.div>
-  );
-};
-
 export interface ResultsMainContentProps {
   sortedScores: Player[];
-  nearMisses: NearMiss[];
+  nearMisses: any[];
   isHost: boolean;
   onStartGame: () => void;
   onMarkReady: () => void;
@@ -115,11 +69,20 @@ export interface ResultsMainContentProps {
   seriesStandings?: SeriesStanding[];
   seriesRoundNumber?: number;
   gameMode?: string;
-  /** Words found by others that this player missed */
   missedWords?: Array<{ word: string; score: number; foundBy: string[] }>;
   emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
-  /** Hide inline CTA section (when StickyReadyBar handles it on mobile) */
   hideInlineCta?: boolean;
+  allPlayerWords?: Record<string, WordObject[]>;
+  gameDuration?: number;
+  /** All player words for crown + MVP computation */
+  /** Word Hunt summary */
+  wordHuntSummary?: {
+    targetWord: string;
+    playerLives: Record<string, number>;
+    eliminatedPlayers: string[];
+    targetFoundBy: string | null;
+    survivalTime?: number;
+  };
 }
 
 // ==============================================
@@ -127,18 +90,12 @@ export interface ResultsMainContentProps {
 // ==============================================
 
 /**
- * ResultsMainContent - Reusable main results view content
+ * ResultsMainContent - Cinematic results view
  *
- * Contains winner banner, stats, leaderboard, and action buttons.
- * Used across mobile, desktop, and landscape layouts.
+ * YOU-FIRST order: Hero → Podium → ConsolationRows → Highlights → Revenge → Details
  */
 export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   sortedScores,
-  nearMisses,
-  isHost,
-  onStartGame,
-  onMarkReady,
-  onExit,
   currentPlayerData,
   currentPlayerValidWords,
   currentPlayerRank,
@@ -146,230 +103,188 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   setScoreRevealComplete,
   normalizeUsername,
   username,
-  gameCode,
-  onReturnToRoom,
-  isBotsOnlyGame,
-  isCurrentPlayerReady,
-  readyUsernames,
-  duplicateRuleDisabled,
-  winStreakData,
-  t,
-  selectedGameMode,
-  onSelectGameMode,
+  gameMode,
+  missedWords,
   seriesStandings,
   seriesRoundNumber,
-  gameMode,
-  emojiReactions,
-  missedWords,
-  hideInlineCta = false,
+  t,
+  allPlayerWords,
+  gameDuration: _gameDuration,
+  wordHuntSummary,
 }) => {
-  // Derived state
-  const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
+  const reducedMotion = useReducedMotion();
+  const { dir: _dir } = useLanguage();
 
-  // Calculate gap to winner for PlacementHero
+  // Derived data
   const winnerScore = sortedScores[0]?.score ?? 0;
   const gapToWinner = currentPlayerRank > 1 ? winnerScore - (currentPlayerData?.score ?? 0) : 0;
+  const isWordHunt = gameMode === 'word-hunt';
+  const isMultiplayer = sortedScores.length > 1;
 
-  const reducedMotion = useReducedMotion();
-  const { dir } = useLanguage();
-  const shadowX = dir === 'rtl' ? '-6px' : '6px';
-  const shadowXLg = dir === 'rtl' ? '-8px' : '8px';
-  const breathingShadow = [
-    `${shadowX} 6px 0px black`,
-    `${shadowXLg} 8px 0px black`,
-    `${shadowX} 6px 0px black`,
-  ];
-  const { isVisible, getDelay } = useEntranceChoreography(
-    ['hero', 'leaderboard', 'revenge', 'cta', 'stats', 'words'],
-    { baseDelay: 200, stagger: 150 }
-  );
+  // Split players: top 3 for podium, 4th+ for consolation rows
+  const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
+  const consolationPlayers = useMemo(() => sortedScores.slice(3), [sortedScores]);
+
+  // Assign consolation crowns to 4th+ players
+  const consolationCrowns = useMemo(() => {
+    const topThree = podiumPlayers.map(p => p.username);
+    const playersWithStats = sortedScores.map(p => {
+      const words = allPlayerWords?.[p.username]?.map(w => ({
+        word: typeof w === 'string' ? w : (w as any).word || '',
+        score: typeof w === 'string' ? 0 : (w as any).score || 0,
+      }));
+      return {
+        username: p.username,
+        score: p.score,
+        wordsFoundCount: words?.length || p.allWords?.length || 0,
+        allWords: words || p.allWords?.map(w => ({ word: w.word, score: w.score || 0 })),
+      };
+    });
+    return assignConsolationCrowns(playersWithStats, topThree);
+  }, [sortedScores, podiumPlayers, allPlayerWords]);
+
+  // Compute highlights stats
+  const highlightStats = useMemo(() => {
+    if (!currentPlayerData) return [];
+    const longestWord = currentPlayerValidWords.reduce(
+      (best, w) => (w.word.length > best.length ? w.word : best),
+      ''
+    );
+    return [
+      {
+        label: t('results.bestWord') || 'Best Word',
+        value: longestWord.toUpperCase() || '—',
+        icon: <Sparkles className="w-3 h-3" />,
+        color: 'text-neo-pink',
+      },
+      {
+        label: t('results.wordsFound') || 'Words Found',
+        value: currentPlayerValidWords.length,
+        icon: <Type className="w-3 h-3" />,
+        color: 'text-neo-lime',
+      },
+      {
+        label: t('results.score') || 'Score',
+        value: currentPlayerData.score.toLocaleString(),
+        icon: <Zap className="w-3 h-3" />,
+        color: 'text-neo-orange',
+      },
+    ];
+  }, [currentPlayerData, currentPlayerValidWords, t]);
+
+  // Word Hunt status for current player
+  const wordHuntStatus = useMemo(() => {
+    if (!isWordHunt || !wordHuntSummary || !username) return undefined;
+    return wordHuntSummary.eliminatedPlayers.includes(username) ? 'eliminated' as const : 'survived' as const;
+  }, [isWordHunt, wordHuntSummary, username]);
 
   return (
-    <div className="space-y-3">
-      {/* Placement Hero — gold podium celebration for current player */}
-      {sortedScores.length > 1 && scoreRevealComplete && currentPlayerData && (
-        <PlacementHero
-          rank={currentPlayerRank}
-          score={currentPlayerData.score}
-          totalPlayers={sortedScores.length}
-          username={currentPlayerData.username}
-          avatar={currentPlayerData.avatar}
-          gapToWinner={gapToWinner}
-        />
-      )}
-
-      {/* Revenge Face-Off / Defend Title — moved up for emotional impact */}
-      {scoreRevealComplete && sortedScores.length > 1 && isVisible('revenge') && currentPlayerData && (
-        <ResultsRevengeSection
-          sortedScores={sortedScores}
-          currentPlayerData={currentPlayerData}
-          currentPlayerRank={currentPlayerRank}
-          gapToWinner={gapToWinner}
-          gameMode={gameMode}
-          reducedMotion={reducedMotion}
-          revengeDelay={getDelay('revenge')}
-          t={t}
-          missedWords={missedWords}
-        />
-      )}
-
-      {/* Word Marquee Ticker — scrolling word display */}
-      {scoreRevealComplete && currentPlayerValidWords.length > 0 && (
-        <WordMarqueeTicker
-          words={currentPlayerValidWords}
-          gameMode={gameMode}
-        />
-      )}
-
-      {/* Fight Card Leaderboard — ranked list (deferred, revealed on scroll) */}
-      {sortedScores.length > 1 && (
-        scoreRevealComplete ? (
-          <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
-            animate={isVisible('leaderboard') ? { opacity: 1, y: 0 } : undefined}
-            transition={{ type: 'spring', stiffness: 120, damping: 20, delay: getDelay('leaderboard') }}
-          >
-            <FightCardLeaderboard
-              participants={sortedScores.map(p => ({
-                name: p.username,
-                score: p.score,
-                isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-                avatar: p.avatar,
-              }))}
-              currentUsername={username}
-              gameMode={gameMode}
-              emojiReactions={emojiReactions}
-              deferRankings
-            />
-          </motion.div>
-        ) : (
-          <ScoreRevealAnimation
-            players={sortedScores.map(p => ({
-              username: p.username,
-              finalScore: p.score,
-              avatar: p.avatar,
-              isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-            }))}
-            currentUsername={username}
-            duration={2500}
-            onComplete={() => setScoreRevealComplete(true)}
-          />
-        )
-      )}
-
-      {/* Primary CTA — cascaded entrance (hidden on mobile when StickyReadyBar is present) */}
-      {gameCode && onReturnToRoom && isVisible('cta') && !hideInlineCta && (
-        <ResultsCtaSection
-          sortedScores={sortedScores}
-          currentPlayerData={currentPlayerData}
-          currentPlayerRank={currentPlayerRank}
-          currentPlayerValidWords={currentPlayerValidWords}
-          hasZeroScore={hasZeroScore}
-          isHost={isHost}
-          onStartGame={onStartGame}
-          onMarkReady={onMarkReady}
-          onExit={onExit}
-          isBotsOnlyGame={isBotsOnlyGame}
-          isCurrentPlayerReady={isCurrentPlayerReady}
-          normalizeUsername={normalizeUsername}
-          username={username}
-          selectedGameMode={selectedGameMode}
-          onSelectGameMode={onSelectGameMode}
-          breathingShadow={breathingShadow}
-          reducedMotion={reducedMotion}
-          ctaDelay={getDelay('cta')}
-          t={t}
-        />
-      )}
-
-      {/* Ready status — only on desktop (mobile has StickyReadyBar) */}
-      {!hideInlineCta && gameCode && sortedScores.length > 1 && readyUsernames.length > 0 && (
-        <div className="text-center" aria-live="polite">
-          <span className="text-xs text-neo-cream/60 font-bold">
-            {t('results.playersReady', { count: readyUsernames.length, total: sortedScores.length })}
-          </span>
-        </div>
-      )}
-
-      {/* Streak Urgency (singleplayer only — never show in multiplayer) */}
-      {!gameCode && winStreakData && winStreakData.currentStreak >= 1 && (
-        <StreakUrgencyDisplay
-          currentStreak={winStreakData.currentStreak}
-          t={t}
-        />
-      )}
-
-      {/* Series Standings */}
-      {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
-        <SeriesStandingsBanner
-          standings={seriesStandings}
-          roundNumber={seriesRoundNumber}
+    <div className="space-y-8">
+      {/* Score Reveal Animation (before everything) */}
+      {isMultiplayer && !scoreRevealComplete && (
+        <ScoreRevealAnimation
+          players={sortedScores.map(p => ({
+            username: p.username,
+            finalScore: p.score,
+            avatar: p.avatar,
+            isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
+          }))}
           currentUsername={username}
-          t={t}
+          duration={2500}
+          onComplete={() => setScoreRevealComplete(true)}
         />
       )}
 
-      {/* Near-Miss Notifications */}
-      {nearMisses.length > 0 && (
-        <NearMissCard
-          nearMisses={nearMisses}
-          t={t}
-          onPlayAgain={isHost ? onStartGame : onMarkReady}
-          compact
-        />
-      )}
-
-      {/* Stats + Achievements + Words */}
-      {currentPlayerData && (
-        <ResultsWordsSection
-          currentPlayerData={currentPlayerData}
-          currentPlayerValidWords={currentPlayerValidWords}
-          currentPlayerRank={currentPlayerRank}
-          reducedMotion={reducedMotion}
-          statsDelay={getDelay('stats')}
-          wordsDelay={getDelay('words')}
-          isStatsVisible={isVisible('stats')}
-          isWordsVisible={isVisible('words')}
-          t={t}
-        />
-      )}
-
-      {/* Words You Missed — promotes discovery and replay motivation */}
-      {missedWords && missedWords.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
-        >
-          <MissedWords missedWords={missedWords} maxDisplay={5} />
-        </motion.div>
-      )}
-
-      {/* Community Boards — post-game discovery surface */}
+      {/* After reveal: cinematic results in YOU-FIRST order */}
       {scoreRevealComplete && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.6 }}
-        >
-          <UGCFeaturedStrip
-            titleKey="ugc.strip.tryCustom"
-            sort="popular"
-            limit={3}
-            variant="compact"
-            showCreateCTA
-            minToShow={1}
-          />
-        </motion.div>
-      )}
+        <>
+          {/* 1. YOUR RESULT HERO */}
+          {currentPlayerData && (
+            <ResultsHeroSection
+              rank={currentPlayerRank}
+              score={currentPlayerData.score}
+              username={currentPlayerData.username}
+              avatar={currentPlayerData.avatar}
+              winnerScore={winnerScore}
+              totalPlayers={sortedScores.length}
+              isWordHunt={isWordHunt}
+              wordHuntStatus={wordHuntStatus}
+              wordHuntTarget={wordHuntSummary?.targetWord}
+              wordsFound={currentPlayerValidWords.length}
+              t={t}
+            />
+          )}
 
-      {/* Large Room Notice */}
-      {duplicateRuleDisabled && (
-        <div className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-2 text-center">
-          <span className="text-xs text-neo-cyan font-bold">
-            {t('results.largeRoomMode')} - {t('results.duplicateRuleDisabled')}
-          </span>
-        </div>
+          {/* 2. TOP 3 PODIUM */}
+          {isMultiplayer && podiumPlayers.length >= 2 && (
+            <ResultsPodium
+              players={podiumPlayers}
+              currentUsername={username}
+              isWordHunt={isWordHunt}
+              t={t}
+            />
+          )}
+
+          {/* 3. CONSOLATION ROWS (4th+ with archetype titles) */}
+          {consolationPlayers.length > 0 && consolationCrowns.size > 0 && (
+            <ConsolationRows
+              players={consolationPlayers}
+              crowns={consolationCrowns}
+              currentUsername={username}
+              t={t}
+            />
+          )}
+
+          {/* 4. HIGHLIGHTS BAR */}
+          {currentPlayerData && (
+            <HighlightsBar stats={highlightStats} />
+          )}
+
+          {/* 5. REVENGE CARD */}
+          {isMultiplayer && currentPlayerRank > 1 && currentPlayerData && (
+            <ResultsRevengeSection
+              sortedScores={sortedScores}
+              currentPlayerData={currentPlayerData}
+              currentPlayerRank={currentPlayerRank}
+              gapToWinner={gapToWinner}
+              gameMode={gameMode}
+              reducedMotion={reducedMotion}
+              revengeDelay={0.3}
+              t={t}
+              missedWords={missedWords}
+            />
+          )}
+
+          {/* Series Standings */}
+          {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
+            <SeriesStandingsBanner
+              standings={seriesStandings}
+              roundNumber={seriesRoundNumber}
+              currentUsername={username}
+              t={t}
+            />
+          )}
+
+          {/* Stats + Words Detail */}
+          {currentPlayerData && (
+            <ResultsWordsSection
+              currentPlayerData={currentPlayerData}
+              currentPlayerValidWords={currentPlayerValidWords}
+              currentPlayerRank={currentPlayerRank}
+              reducedMotion={reducedMotion}
+              statsDelay={0.4}
+              wordsDelay={0.5}
+              isStatsVisible
+              isWordsVisible
+              t={t}
+            />
+          )}
+
+          {/* Missed Words */}
+          {missedWords && missedWords.length > 0 && (
+            <MissedWords missedWords={missedWords} maxDisplay={5} />
+          )}
+        </>
       )}
     </div>
   );

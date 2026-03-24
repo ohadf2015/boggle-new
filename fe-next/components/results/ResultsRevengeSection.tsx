@@ -2,7 +2,6 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Swords, Flame, Zap, Target } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import type { Player } from '@/components/results/types';
 
@@ -89,7 +88,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
   currentPlayerData,
   currentPlayerRank,
   gapToWinner,
-  gameMode,
+  gameMode: _gameMode,
   reducedMotion,
   revengeDelay,
   t,
@@ -110,212 +109,70 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
   }, [missedWords, gapToWinner]);
 
   // ============================================================
-  // LOSER — 1v1 Revenge Card (dramatic, witty, personal)
+  // LOSER — Slim Revenge Card
   // ============================================================
   if (currentPlayerRank > 1 && sortedScores.length > 1 && sortedScores[0] && currentPlayerData) {
     const winner = sortedScores[0];
     const prompt = getRevengePrompt(gapToWinner, winner.username, solvableWords.length, t);
-    const isWordHunt = gameMode === 'word-hunt';
 
     return (
-      <motion.div
-        initial={reducedMotion ? undefined : { opacity: 0, scale: 0.92, y: 24 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 180, damping: 16, delay: revengeDelay }}
-        className="relative overflow-hidden"
+      <motion.section
+        initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
+        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-pink p-4 rounded-neo shadow-hard-sm relative"
       >
-        {/* Outer container with animated border pulse */}
-        <div className="bg-gradient-to-br from-neo-navy via-neo-navy/95 to-neo-pink/10 border-3 border-neo-pink/60 shadow-hard-xl p-4 sm:p-6 relative overflow-hidden">
-
-          {/* Animated border glow */}
-          {!reducedMotion && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none z-[1]"
-              animate={{
-                boxShadow: [
-                  'inset 0 0 0px transparent',
-                  'inset 0 0 30px rgba(255,20,147,0.15)',
-                  'inset 0 0 0px transparent',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
-
-          {/* Diagonal battle stripes */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03]"
-            style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 12px, #fff 12px, #fff 14px)' }}
-          />
-
-          {/* FIGHT CARD HEADER */}
-          <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: revengeDelay + 0.1 }}
-            className="relative z-10 text-center mb-4 sm:mb-5"
-          >
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-neo-pink" />
-              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-neo-pink/70">
-                {t('results.revenge.header')}
-              </span>
-              <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-neo-pink" />
+        <div className="flex items-center gap-4">
+          {/* VS badge: two overlapping avatars with pink diamond VS */}
+          <div className="relative flex items-center justify-center w-20 h-10 shrink-0">
+            <div className="absolute left-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
+              <Avatar
+                userId={currentPlayerData.username}
+                customAvatar={currentPlayerData.avatar?.customAvatar}
+                size="sm"
+                className="w-full h-full"
+              />
             </div>
-            <h3 className="font-neo-display text-xl sm:text-2xl text-neo-cream uppercase tracking-tight leading-none">
-              {prompt.title}
-            </h3>
-          </motion.div>
-
-          {/* 1v1 FACE-OFF */}
-          <div className="relative z-10 flex items-center justify-center gap-4 sm:gap-6 mb-4 sm:mb-5">
-            {/* YOUR side */}
-            <motion.div
-              initial={reducedMotion ? undefined : { x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: revengeDelay + 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-              className="flex flex-col items-center gap-1.5 sm:gap-2"
-            >
-              <div className="relative">
-                <div className="border-3 border-neo-cyan rounded-full shadow-hard bg-slate-900 overflow-hidden">
-                  <Avatar
-                    userId={currentPlayerData.username}
-                    customAvatar={currentPlayerData.avatar?.customAvatar}
-                    size="lg"
-                    className="w-14 h-14 sm:w-16 sm:h-16"
-                  />
-                </div>
-                {/* Score tag */}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-neo-cyan text-neo-black px-2 py-0.5 border-2 border-neo-black text-[9px] sm:text-[10px] font-black whitespace-nowrap shadow-hard-sm">
-                  {currentPlayerData.score}
-                </div>
-              </div>
-              <span className="text-[10px] sm:text-xs font-black uppercase text-neo-cyan mt-1">
-                {t('results.you')}
-              </span>
-            </motion.div>
-
-            {/* VS badge — dramatic, pulsing */}
-            <motion.div
-              initial={reducedMotion ? undefined : { scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: revengeDelay + 0.35, type: 'spring', stiffness: 300, damping: 12 }}
-              className="relative shrink-0"
-            >
-              <motion.div
-                animate={!reducedMotion ? { scale: [1, 1.12, 1], rotate: [0, 3, -3, 0] } : undefined}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="bg-neo-pink border-3 border-neo-black w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-hard-lg"
-                style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
-              >
-                <span className="font-neo-display text-neo-black text-lg sm:text-2xl font-black">VS</span>
-              </motion.div>
-              {/* Spark lines */}
-              {!reducedMotion && (
-                <>
-                  <motion.div
-                    className="absolute -top-1 -start-1 text-neo-orange"
-                    animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                  >
-                    <Zap className="w-3 h-3" />
-                  </motion.div>
-                  <motion.div
-                    className="absolute -bottom-1 -end-1 text-neo-orange"
-                    animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.9 }}
-                  >
-                    <Zap className="w-3 h-3" />
-                  </motion.div>
-                </>
-              )}
-            </motion.div>
-
-            {/* WINNER side */}
-            <motion.div
-              initial={reducedMotion ? undefined : { x: 30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: revengeDelay + 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-              className="flex flex-col items-center gap-1.5 sm:gap-2"
-            >
-              <div className="relative">
-                <div className="border-3 border-neo-lime rounded-full shadow-hard bg-slate-900 overflow-hidden">
-                  <Avatar
-                    userId={winner.username}
-                    customAvatar={winner.avatar?.customAvatar}
-                    size="lg"
-                    className="w-14 h-14 sm:w-16 sm:h-16"
-                  />
-                </div>
-                {/* Score tag */}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-neo-lime text-neo-black px-2 py-0.5 border-2 border-neo-black text-[9px] sm:text-[10px] font-black whitespace-nowrap shadow-hard-sm">
-                  {winner.score}
-                </div>
-              </div>
-              <span className="text-[10px] sm:text-xs font-black uppercase text-neo-lime mt-1 truncate max-w-[70px] sm:max-w-[90px]">
-                {winner.username}
-              </span>
-            </motion.div>
+            <div className="relative z-30 bg-neo-pink border-2 border-black w-6 h-6 rotate-45 flex items-center justify-center shadow-hard-sm">
+              <span className="font-neo-display text-[9px] font-black text-white -rotate-45 leading-none">VS</span>
+            </div>
+            <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
+              <Avatar
+                userId={winner.username}
+                customAvatar={winner.avatar?.customAvatar}
+                size="sm"
+                className="w-full h-full"
+              />
+            </div>
           </div>
 
-          {/* WITTY SUBTITLE + GAP */}
-          <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: revengeDelay + 0.45, type: 'spring', stiffness: 200, damping: 18 }}
-            className="relative z-10 text-center space-y-2"
-          >
-            <p className="text-sm sm:text-base font-bold text-neo-cream/80 italic">
-              &ldquo;{prompt.subtitle}&rdquo;
+          {/* Text Content */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white leading-tight">{prompt.title}</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase mt-0.5 tracking-wide">
+              {prompt.subtitle}
             </p>
-
-            {/* Gap callout */}
-            {!isWordHunt && gapToWinner > 0 && (
-              <div className="inline-flex items-center gap-1.5 bg-neo-pink/15 border-2 border-neo-pink/30 px-3 py-1.5 rounded-neo">
-                <Target className="w-3.5 h-3.5 text-neo-pink" />
-                <span className="text-xs font-black uppercase text-neo-pink tracking-wider">
-                  {t('results.pointsBehind', { points: gapToWinner })}
-                </span>
-              </div>
-            )}
-
-            {isWordHunt && (
-              <div className="inline-flex items-center gap-1.5 bg-neo-pink/15 border-2 border-neo-pink/30 px-3 py-1.5 rounded-neo">
-                <Target className="w-3.5 h-3.5 text-neo-pink" />
-                <span className="text-xs font-black uppercase text-neo-pink tracking-wider">
-                  {t('results.surviveLongerThan', { player: winner.username })}
-                </span>
-              </div>
-            )}
-
             {/* Solvable words hint */}
             {solvableWords.length > 0 && solvableWords.length <= 4 && (
-              <p className="text-[10px] sm:text-xs font-bold text-neo-cream/50 mt-1">
+              <p className="text-[9px] font-bold text-white/30 mt-0.5">
                 {t('results.findingWouldHaveTied', {
                   words: solvableWords.map(w => w.word.toUpperCase()).join(` ${t('common.and')} `),
                 })}
               </p>
             )}
-          </motion.div>
+          </div>
 
-          {/* Mascot motivator */}
-          {!reducedMotion && (
-            <motion.div
-              className="absolute -bottom-1 -end-1 opacity-25 pointer-events-none"
-              animate={{ y: [0, -4, 0], rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/mascot/flexing-nobg.gif" alt="" width={56} height={56} className="object-contain" loading="eager" />
-            </motion.div>
-          )}
+          {/* Action */}
+          <button className="shrink-0 bg-neo-pink px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-white">
+            {t('results.rematch')}
+          </button>
         </div>
-      </motion.div>
+      </motion.section>
     );
   }
 
   // ============================================================
-  // WINNER — Defend Title Card (enhanced, witty)
+  // WINNER — Defend Title Card (lime left border)
   // ============================================================
   if (currentPlayerRank === 1 && sortedScores.length > 1) {
     const runnerUp = sortedScores[1];
@@ -325,70 +182,57 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
       : { title: t('results.defendTitle'), subtitle: '' };
 
     return (
-      <motion.div
-        initial={reducedMotion ? undefined : { opacity: 0, scale: 0.92, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 16, delay: revengeDelay }}
-        className="relative overflow-hidden"
+      <motion.section
+        initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 18, delay: revengeDelay }}
+        className="bg-neo-gray border-2 border-black border-l-4 border-l-neo-lime p-4 rounded-neo shadow-hard-sm relative"
       >
-        <div className="bg-gradient-to-br from-neo-lime/15 via-slate-800/95 to-neo-lime/5 border-3 border-neo-lime/50 shadow-hard-xl p-4 sm:p-5 relative overflow-hidden">
-          {/* Shimmer sweep */}
-          {!reducedMotion && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none z-[1]"
-              style={{ background: 'linear-gradient(105deg, transparent 35%, rgba(191,255,0,0.1) 50%, transparent 65%)', backgroundSize: '200% 100%' }}
-              animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
-              transition={{ duration: 3, ease: 'linear', repeat: Infinity }}
-            />
-          )}
-
-          {/* Halftone texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[length:8px_8px]" />
-
-          <div className="relative z-10 flex items-center gap-3 sm:gap-4">
-            {/* Avatar with crown glow */}
-            <motion.div
-              animate={!reducedMotion ? {
-                boxShadow: ['0 0 0px var(--neo-lime)', '0 0 20px var(--neo-lime)', '0 0 0px var(--neo-lime)'],
-              } : undefined}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="border-3 border-neo-lime rounded-full shadow-hard bg-slate-900 overflow-hidden shrink-0"
-            >
+        <div className="flex items-center gap-4">
+          {/* VS badge: two overlapping avatars with lime diamond */}
+          <div className="relative flex items-center justify-center w-20 h-10 shrink-0">
+            <div className="absolute left-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
               <Avatar
                 userId={currentPlayerData.username}
                 customAvatar={currentPlayerData.avatar?.customAvatar}
-                size="lg"
-                className="w-14 h-14 sm:w-16 sm:h-16"
+                size="sm"
+                className="w-full h-full"
               />
-            </motion.div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Trophy className="w-5 h-5 text-neo-lime shrink-0" />
-                <span className="font-neo-display text-base sm:text-lg uppercase text-neo-lime leading-none">
-                  {prompt.title}
-                </span>
-              </div>
-              {prompt.subtitle && (
-                <p className="text-xs sm:text-sm font-bold text-neo-cream/60 italic">
-                  &ldquo;{prompt.subtitle}&rdquo;
-                </p>
-              )}
-              {dominanceMargin > 0 && runnerUp && (
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <Flame className="w-3.5 h-3.5 text-neo-orange" />
-                  <span className="text-[10px] sm:text-xs font-black uppercase text-neo-orange">
-                    +{dominanceMargin} {t('results.aheadOf', { player: runnerUp.username })}
-                  </span>
-                </div>
-              )}
             </div>
-
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mascot/trophy-nobg.gif" alt="" width={44} height={44} className="object-contain shrink-0" loading="eager" />
+            <div className="relative z-30 bg-neo-lime border-2 border-black w-6 h-6 rotate-45 flex items-center justify-center shadow-hard-sm">
+              <span className="font-neo-display text-[9px] font-black text-neo-black -rotate-45 leading-none">VS</span>
+            </div>
+            {runnerUp && (
+              <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
+                <Avatar
+                  userId={runnerUp.username}
+                  customAvatar={runnerUp.avatar?.customAvatar}
+                  size="sm"
+                  className="w-full h-full"
+                />
+              </div>
+            )}
           </div>
+
+          {/* Text Content */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white leading-tight">{prompt.title}</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase mt-0.5 tracking-wide">
+              {prompt.subtitle}
+            </p>
+            {dominanceMargin > 0 && runnerUp && (
+              <p className="text-[9px] font-bold text-neo-lime/60 mt-0.5 uppercase tracking-wide">
+                +{dominanceMargin} {t('results.aheadOf', { player: runnerUp.username })}
+              </p>
+            )}
+          </div>
+
+          {/* Action */}
+          <button className="shrink-0 bg-neo-lime px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-neo-black">
+            {t('results.defendTitle')}
+          </button>
         </div>
-      </motion.div>
+      </motion.section>
     );
   }
 

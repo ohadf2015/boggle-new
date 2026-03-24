@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play, Swords, Star, Check, Users } from 'lucide-react';
-import AutoPlayCountdown from './AutoPlayCountdown';
+import { Play, Crown, Check, ChevronUp, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { GameModeSelector, type GameModeOption } from '@/components/GameModeSelector';
+import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, type GameModeOption } from '@/components/GameModeSelector';
+import { cn } from '@/lib/utils';
 import type { Avatar as AvatarType } from '@/types';
 
 interface PlayerInfo {
@@ -30,19 +30,12 @@ interface StickyReadyBarProps {
   onSelectGameMode?: (mode: GameModeOption) => void;
 }
 
-function makeBreathingPulse(dir: 'ltr' | 'rtl') {
-  const x = dir === 'rtl' ? '-4px' : '4px';
-  const xLg = dir === 'rtl' ? '-6px' : '6px';
-  return {
-    scale: [1, 1.02, 1],
-    boxShadow: [
-      `${x} 4px 0px black`,
-      `${xLg} 6px 0px black`,
-      `${x} 4px 0px black`,
-    ],
-  };
-}
+const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
 
+/**
+ * Inline ready bar — renders as flex items inside a parent floating bar.
+ * No fixed positioning or background — the parent ResultsPage handles that.
+ */
 export default function StickyReadyBar({
   isHost,
   isCurrentPlayerReady,
@@ -50,156 +43,325 @@ export default function StickyReadyBar({
   winnerUsername,
   readyCount,
   totalPlayers,
+  readyUsernames = [],
+  players = [],
   onStartGame,
   onMarkReady,
   selectedGameMode,
   onSelectGameMode,
-  readyUsernames = [],
-  players = [],
 }: StickyReadyBarProps) {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
-  const breathingPulse = makeBreathingPulse(dir);
 
   const isRevenge = currentPlayerRank > 1 && !!winnerUsername;
   const allReady = readyCount === totalPlayers && totalPlayers > 0;
 
-  // Auto-advance: show countdown when all players are ready (host only)
   const [autoAdvanceCancelled, setAutoAdvanceCancelled] = useState(false);
   const showAutoAdvance = isHost && allReady && !autoAdvanceCancelled;
 
-  // Map usernames to player info for avatar lookup
+  // --- Brawl Stars-style auto-ready countdown for non-host players ---
+  const AUTO_READY_SECONDS = 15;
+  const [autoReadyCancelled, setAutoReadyCancelled] = useState(false);
+  const [autoReadySecondsLeft, setAutoReadySecondsLeft] = useState(AUTO_READY_SECONDS);
+  const autoReadyCompletedRef = useRef(false);
+  const showAutoReady = !isHost && !isCurrentPlayerReady && !autoReadyCancelled && totalPlayers > 0;
+
+  const [showModeMenu, setShowModeMenu] = useState(false);
+
   const playerMap = useMemo(() => {
     const map = new Map<string, PlayerInfo>();
     for (const p of players) map.set(p.username, p);
     return map;
   }, [players]);
 
+  const winnerAvatar = winnerUsername ? playerMap.get(winnerUsername)?.avatar : undefined;
+
+  // ---------- Inline auto-advance countdown ----------
+  const [secondsLeft, setSecondsLeft] = useState(5);
+  const completedRef = useRef(false);
+
+  const handleCountdownComplete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onStartGame();
+  }, [onStartGame]);
+
+  useEffect(() => {
+    if (!showAutoAdvance || reducedMotion) return;
+    completedRef.current = false;
+    setSecondsLeft(5);
+
+    const interval = setInterval(() => {
+      setSecondsLeft(prev => {
+        if (prev <= 1) {
+          handleCountdownComplete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showAutoAdvance, reducedMotion, handleCountdownComplete]);
+
+  // ---------- Auto-ready countdown for non-host players ----------
+  const handleAutoReadyComplete = useCallback(() => {
+    if (autoReadyCompletedRef.current) return;
+    autoReadyCompletedRef.current = true;
+    onMarkReady();
+  }, [onMarkReady]);
+
+  useEffect(() => {
+    if (!showAutoReady) return;
+    autoReadyCompletedRef.current = false;
+    setAutoReadySecondsLeft(AUTO_READY_SECONDS);
+
+    const interval = setInterval(() => {
+      setAutoReadySecondsLeft(prev => {
+        if (prev <= 1) {
+          handleAutoReadyComplete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showAutoReady, handleAutoReadyComplete]);
+
+  // ---------- Render helpers ----------
+
+  /** Contextual CTA button content */
+  function renderCtaButton() {
+    const btnBase = 'w-full h-16 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
+
+    // Auto-advance (host, all ready)
+    if (showAutoAdvance) {
+      return (
+        <div className="flex items-center gap-2">
+          <motion.button
+            onClick={handleCountdownComplete}
+            className={cn(btnBase, 'bg-neo-yellow text-neo-black relative overflow-hidden')}
+            whileTap={{ scale: 0.95 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-neo-black/15 origin-right"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 5, ease: 'linear' }}
+            />
+            <span className="relative z-10 flex items-center gap-2">
+              <Play className="w-5 h-5" />
+              <span className="tabular-nums">{secondsLeft}</span>
+            </span>
+          </motion.button>
+          <button
+            onClick={() => setAutoAdvanceCancelled(true)}
+            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
+            aria-label={t('autoPlay.exit')}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    // Host — PLAY AGAIN
+    if (isHost) {
+      return (
+        <motion.button
+          onClick={onStartGame}
+          whileTap={{ scale: 0.95 }}
+          className={cn(btnBase, 'bg-neo-lime text-neo-black')}
+        >
+          <Play className="w-5 h-5 shrink-0" />
+          <span>{t('results.playAgain')}</span>
+        </motion.button>
+      );
+    }
+
+    // Already ready — green check status
+    if (isCurrentPlayerReady) {
+      return (
+        <div className={cn(btnBase, 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 pointer-events-none')}>
+          <Check className="w-5 h-5 shrink-0" />
+          <span>{t('results.youAreReady')}</span>
+        </div>
+      );
+    }
+
+    // Auto-ready countdown (non-host, not ready)
+    if (showAutoReady) {
+      return (
+        <div className="flex items-center gap-2" data-testid="auto-ready-countdown">
+          <motion.button
+            data-testid="auto-ready-cta"
+            onClick={onMarkReady}
+            className={cn(
+              btnBase,
+              isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black',
+              'relative overflow-hidden'
+            )}
+            whileTap={{ scale: 0.95 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-neo-black/15 origin-right"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: AUTO_READY_SECONDS, ease: 'linear' }}
+            />
+            <span className="relative z-10 flex items-center gap-3">
+              {isRevenge && winnerUsername ? (
+                <>
+                  <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
+                    <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
+                  </div>
+                  <span className="truncate">{t('results.revengeRematch', { player: winnerUsername })}</span>
+                </>
+              ) : (
+                <>
+                  <Crown className="w-5 h-5 shrink-0" />
+                  <span className="truncate">{t('results.defendTitle')}</span>
+                </>
+              )}
+              <span className="tabular-nums text-sm opacity-70">{autoReadySecondsLeft}</span>
+            </span>
+          </motion.button>
+          <button
+            data-testid="auto-ready-cancel"
+            onClick={() => setAutoReadyCancelled(true)}
+            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
+            aria-label={t('autoPlay.exit')}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    // Loser — REVENGE vs WinnerName
+    if (isRevenge && winnerUsername) {
+      return (
+        <motion.button
+          onClick={onMarkReady}
+          whileTap={{ scale: 0.95 }}
+          className={cn(btnBase, 'bg-neo-pink text-white')}
+        >
+          <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
+            <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
+          </div>
+          <span className="truncate">{t('results.revengeRematch', { player: winnerUsername })}</span>
+        </motion.button>
+      );
+    }
+
+    // Winner — DEFEND TITLE
+    return (
+      <motion.button
+        onClick={onMarkReady}
+        whileTap={{ scale: 0.95 }}
+        className={cn(btnBase, 'bg-neo-lime text-neo-black')}
+      >
+        <Crown className="w-5 h-5 shrink-0" />
+        <span className="truncate">{t('results.defendTitle')}</span>
+      </motion.button>
+    );
+  }
+
   return (
-    <motion.div
-      initial={reducedMotion ? undefined : { y: 80 }}
-      animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-      className="bg-neo-navy/95 backdrop-blur-sm px-3 py-2"
-    >
-      {/* Player ready indicator — above the CTA */}
-      {(readyCount > 0 || isHost) && (
-        <div className="mb-2" aria-live="polite">
-          {/* Progress bar */}
-          <div className="flex items-center gap-2 mb-1.5">
-            <Users className="w-3.5 h-3.5 text-neo-cream/60 shrink-0" />
-            <div className="flex-1 h-2 bg-neo-black/40 rounded-full overflow-hidden border border-white/10">
-              <motion.div
-                className={`h-full rounded-full ${allReady ? 'bg-emerald-400' : 'bg-neo-cyan/70'}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${totalPlayers > 0 ? (readyCount / totalPlayers) * 100 : 0}%` }}
-                transition={{ type: 'spring', stiffness: 100, damping: 15 }}
-              />
+    <div className="flex flex-col gap-3 flex-1 min-w-0">
+        {/* Game mode chip (host only) */}
+        {isHost && selectedGameMode !== undefined && onSelectGameMode && (
+          <div className="relative">
+            <button
+              onClick={() => setShowModeMenu(!showModeMenu)}
+              aria-expanded={showModeMenu}
+              aria-haspopup="listbox"
+              aria-label={getModeLabel(selectedGameMode, t)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase rounded-xl border border-neo-black/50 transition-all',
+                MODE_ACTIVE_COLORS[selectedGameMode],
+                showModeMenu && 'ring-2 ring-neo-yellow/40'
+              )}
+            >
+              {MODE_ICONS[selectedGameMode]}
+              <span>{getModeLabel(selectedGameMode, t)}</span>
+              <ChevronUp className={cn('w-3 h-3 transition-transform', showModeMenu && 'rotate-180')} />
+            </button>
+
+            <AnimatePresence>
+              {showModeMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowModeMenu(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute bottom-full mb-2 start-0 z-50 bg-neo-navy/95 backdrop-blur-xl border border-neo-white/15 rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] p-1 min-w-[140px]"
+                    role="listbox"
+                  >
+                    {ALL_MODES.map((mode) => {
+                      const isActive = selectedGameMode === mode;
+                      return (
+                        <button
+                          key={mode}
+                          role="option"
+                          aria-selected={isActive}
+                          onClick={() => { onSelectGameMode(mode); setShowModeMenu(false); }}
+                          className={cn(
+                            'w-full flex items-center gap-2 px-2.5 py-2 text-xs font-bold uppercase rounded-lg transition-all',
+                            isActive
+                              ? cn(MODE_ACTIVE_COLORS[mode], 'border border-current/20')
+                              : 'text-neo-cream/60 hover:text-neo-cream hover:bg-neo-white/8 border border-transparent'
+                          )}
+                        >
+                          {MODE_ICONS[mode]}
+                          <span className="flex-1 text-start">{getModeLabel(mode, t)}</span>
+                          {isActive && <Check className="w-3 h-3 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Contextual CTA button */}
+        {renderCtaButton()}
+
+        {/* Status Footer — ready avatar stack */}
+        {totalPlayers > 0 && (
+          <div className="flex items-center justify-center gap-4" aria-live="polite" aria-label={`${readyCount}/${totalPlayers}`}>
+            {/* Avatar dots with colored rings */}
+            <div className="flex -space-x-1.5 rtl:space-x-reverse">
+              {players.slice(0, 4).map((player) => {
+                const isReady = readyUsernames.includes(player.username);
+                return (
+                  <div
+                    key={player.username}
+                    className={cn(
+                      'w-6 h-6 rounded-full border-2 overflow-hidden',
+                      isReady ? 'border-neo-lime' : 'border-white/10 opacity-40'
+                    )}
+                  >
+                    <Avatar
+                      customAvatar={player.avatar?.customAvatar}
+                      userId={player.username}
+                      size="sm"
+                      className="w-full h-full rounded-full"
+                    />
+                  </div>
+                );
+              })}
             </div>
-            <span className={`text-xs font-bold tabular-nums shrink-0 ${allReady ? 'text-emerald-400' : 'text-neo-cream/60'}`}>
-              {readyCount}/{totalPlayers}
+            <span className="text-[11px] font-black text-neo-lime uppercase tracking-widest">
+              {readyCount} / {totalPlayers} {t('results.ready')}
             </span>
           </div>
-          {/* Ready player avatars */}
-          {readyUsernames.length > 0 ? (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <AnimatePresence mode="popLayout">
-                {readyUsernames.slice(0, 6).map(name => {
-                  const player = playerMap.get(name);
-                  return (
-                    <motion.span
-                      key={name}
-                      layout
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 ps-0.5 pe-1.5 py-0.5 rounded-full border border-emerald-500/20"
-                    >
-                      <Avatar
-                        customAvatar={player?.avatar?.customAvatar}
-                        userId={name}
-                        size="sm"
-                        className="w-5 h-5 rounded-full border border-emerald-500/30"
-                      />
-                      <Check className="w-2.5 h-2.5 shrink-0" />
-                      {name}
-                    </motion.span>
-                  );
-                })}
-              </AnimatePresence>
-              {readyUsernames.length > 6 && (
-                <span className="text-[11px] text-neo-cream/50">+{readyUsernames.length - 6}</span>
-              )}
-            </div>
-          ) : readyCount === 0 && isHost ? (
-            <p className="text-[11px] text-neo-cream/40">
-              {t('results.waitingForPlayers')}
-            </p>
-          ) : null}
-        </div>
-      )}
-
-      {/* Game mode selector + CTA — full width */}
-      {isHost ? (
-        <div className="space-y-1.5">
-          {selectedGameMode !== undefined && onSelectGameMode && (
-            <GameModeSelector
-              selectedMode={selectedGameMode}
-              onSelectMode={onSelectGameMode}
-              t={t}
-              showRandom
-              compact
-            />
-          )}
-          {showAutoAdvance ? (
-            <AutoPlayCountdown
-              duration={5}
-              onComplete={onStartGame}
-              onCancel={() => setAutoAdvanceCancelled(true)}
-            />
-          ) : (
-            <motion.button
-              onClick={onStartGame}
-              whileTap={{ scale: 0.92 }}
-              animate={!reducedMotion ? breathingPulse : undefined}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-full bg-emerald-500 text-white font-black text-base px-4 py-3 min-h-[44px] uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
-            >
-              <Play className="w-5 h-5" />
-              {t('results.playAgain')}
-            </motion.button>
-          )}
-        </div>
-      ) : isCurrentPlayerReady ? (
-        <div className="flex items-center justify-center gap-2 py-2">
-          <Check className="w-5 h-5 text-emerald-400" />
-          <span className="font-black text-sm uppercase text-emerald-400">{t('results.youAreReady')}</span>
-          <span className="text-xs text-neo-cream/50">— {t('results.waitingForHostToStart')}</span>
-        </div>
-      ) : isRevenge ? (
-        <motion.button
-          onClick={onMarkReady}
-          whileTap={{ scale: 0.92 }}
-          animate={!reducedMotion ? breathingPulse : undefined}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-full bg-neo-pink text-white font-black text-base px-4 py-3 min-h-[44px] uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
-        >
-          <Swords className="w-5 h-5" />
-          {t('results.revengeRematch', { player: winnerUsername })}
-        </motion.button>
-      ) : (
-        <motion.button
-          onClick={onMarkReady}
-          whileTap={{ scale: 0.92 }}
-          animate={!reducedMotion ? breathingPulse : undefined}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-full bg-neo-lime text-neo-black font-black text-base px-4 py-3 min-h-[44px] uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
-        >
-          <Star className="w-5 h-5" />
-          {t('results.imReady')}
-        </motion.button>
-      )}
-    </motion.div>
+        )}
+    </div>
   );
 }
