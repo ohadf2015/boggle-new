@@ -148,9 +148,9 @@ describe('DailyMissionsHub', () => {
 
     const links = screen.getAllByRole('link');
     const hrefs = links.map(l => l.getAttribute('href'));
-    expect(hrefs).toContain('/daily');
-    expect(hrefs).toContain('/drill');
-    expect(hrefs).toContain('/adventure');
-    expect(hrefs).toContain('/community');
+    expect(hrefs).toContain('/en/daily');
+    expect(hrefs).toContain('/en/drill');
+    expect(hrefs).toContain('/en/adventure');
+    expect(hrefs).toContain('/en/community');
   });
 });

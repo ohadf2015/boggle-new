@@ -10,6 +10,11 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
+import { useDailyMissions } from '../hooks/useDailyMissions';
+
+// 3 daily missions shown in the Quests tab (no brain drill)
+const QUEST_MISSION_TYPES = ['wordHunt', 'adventure', 'community'] as const;
+const QUEST_TOTAL = QUEST_MISSION_TYPES.length;
 
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
@@ -66,6 +71,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const pathname = usePathname();
     const safeArea = useSafeArea();
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const { missions } = useDailyMissions();
+
+    // Count completed quests (3 shown: wordHunt, adventure, community — no brain drill)
+    const questsCompleted = useMemo(() =>
+        missions.filter(m => QUEST_MISSION_TYPES.includes(m.type as typeof QUEST_MISSION_TYPES[number]) && m.completed).length,
+    [missions]);
 
     const activeTab = useMemo((): TabId => {
         const cleanPath = pathname.replace(`/${language}`, '');
@@ -171,6 +182,43 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 className="relative z-10"
                             >
                                 <Icon className="w-6 h-6 mb-0.5" aria-hidden="true" />
+
+                                {/* Quest progress badge — circular ring on Quests tab */}
+                                {tab.id === 'quests' && questsCompleted > 0 && (
+                                    <span
+                                        className="absolute -top-1.5 -end-2.5 flex items-center justify-center"
+                                        aria-label={t('quests.progress', { completed: questsCompleted, total: QUEST_TOTAL })}
+                                        data-testid="quest-progress-badge"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 18 18" className="rotate-[-90deg]">
+                                            {/* Background ring */}
+                                            <circle
+                                                cx="9" cy="9" r="7"
+                                                fill="#1a1a2e"
+                                                stroke="rgba(255,255,255,0.15)"
+                                                strokeWidth="2.5"
+                                            />
+                                            {/* Progress arc */}
+                                            <circle
+                                                cx="9" cy="9" r="7"
+                                                fill="none"
+                                                stroke={questsCompleted === QUEST_TOTAL ? '#84cc16' : '#00FFFF'}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeDasharray={2 * Math.PI * 7}
+                                                strokeDashoffset={2 * Math.PI * 7 * (1 - questsCompleted / QUEST_TOTAL)}
+                                            />
+                                        </svg>
+                                        {/* Count text */}
+                                        <span className={cn(
+                                            "absolute inset-0 flex items-center justify-center",
+                                            "text-[8px] font-black leading-none",
+                                            questsCompleted === QUEST_TOTAL ? "text-neo-lime" : "text-neo-white"
+                                        )}>
+                                            {questsCompleted}
+                                        </span>
+                                    </span>
+                                )}
                             </motion.div>
 
                             {/* Label */}

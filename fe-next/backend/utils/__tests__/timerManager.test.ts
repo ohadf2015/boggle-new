@@ -266,7 +266,7 @@ describe('deprecated _timers getter', () => {
     expect(map).toBe(timerManager._timers); // same reference
   });
 
-  it('direct _timers.set does NOT auto-clear previous timer (race condition risk)', () => {
+  it('setGameTimer clears previous timer before registering new one (leak fixed)', () => {
     const cb1 = jest.fn();
     const cb2 = jest.fn();
     const id1 = setInterval(cb1, 100) as any;
@@ -274,12 +274,12 @@ describe('deprecated _timers getter', () => {
 
     // First call through convenience function
     setGameTimer('RACE', id1);
-    // Second call overwrites map entry but does NOT clearInterval(id1)
+    // Second call now clears id1 before registering id2
     setGameTimer('RACE', id2);
 
     jest.advanceTimersByTime(100);
-    // BOTH fire — id1 was never cleared. This is the leak.
-    expect(cb1).toHaveBeenCalledTimes(1);
+    // Only cb2 fires — cb1 was properly cleared to prevent leaks
+    expect(cb1).toHaveBeenCalledTimes(0);
     expect(cb2).toHaveBeenCalledTimes(1);
   });
 });

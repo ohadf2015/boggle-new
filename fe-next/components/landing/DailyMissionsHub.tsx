@@ -84,17 +84,19 @@ function MissionRow({
   completed,
   href,
   t,
+  language,
 }: {
   config: MissionConfig;
   completed: boolean;
   href: string;
   t: (key: string) => string;
+  language: string;
 }) {
   const Icon = config.icon;
 
   return (
     <Link
-      href={href}
+      href={`/${language}${href}`}
       className={cn(
         'flex items-center gap-3 p-3 rounded-neo',
         'border-3 border-neo-black border-s-4',
@@ -167,7 +169,7 @@ function GrandSlamBadge({ t }: { t: (key: string) => string }) {
 }
 
 export function DailyMissionsHub() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
   const { missions, completedCount, isGrandSlam, grandSlamClaimed, loading } = useDailyMissions();
 
@@ -232,6 +234,7 @@ export function DailyMissionsHub() {
               completed={mission?.completed ?? false}
               href={mission?.href ?? '/'}
               t={t}
+              language={language}
             />
           );
         })}

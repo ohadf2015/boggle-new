@@ -190,6 +190,20 @@ describe('QuestHub', () => {
     expect(screen.getByText('Weekly Quest')).toBeInTheDocument();
   });
 
+  it('renders quest links with locale prefix', () => {
+    render(<QuestHub />);
+    // QuestCard should prepend /${language} to hrefs
+    const links = screen.getAllByRole('link');
+    const hrefs = links.map(link => link.getAttribute('href'));
+    expect(hrefs).toContain('/en/daily');
+    expect(hrefs).toContain('/en/adventure');
+    expect(hrefs).toContain('/en/community');
+    // Should NOT have locale-less paths
+    expect(hrefs).not.toContain('/daily');
+    expect(hrefs).not.toContain('/adventure');
+    expect(hrefs).not.toContain('/community');
+  });
+
   it('shows overall progress count', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,

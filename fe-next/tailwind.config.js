@@ -473,6 +473,17 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // Forge shop FAB — ember glow pulse
+        "ember-pulse": {
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(1.06)" },
+        },
+        // Forge shop FAB — tiny spark flicker
+        "spark": {
+          "0%, 100%": { opacity: "0", transform: "scale(0.5)" },
+          "30%": { opacity: "1", transform: "scale(1.2)" },
+          "60%": { opacity: "0.6", transform: "scale(0.8)" },
+        },
         // Game mode card animations
         "mode-glow-breathe": {
           "0%, 100%": { opacity: "0.4" },

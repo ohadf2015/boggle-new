@@ -427,17 +427,21 @@ export function generateObjectives(
     });
   } else {
     // Even levels: score target calibrated to realistic word output
-    // Average word ~3.5 letters => score ~45 pts (3.5 * 10 * ~1.25 multiplier)
-    const AVERAGE_WORD_SCORE = 45;
+    // Average word ~3.5 letters => base ~45 pts, but gold tiles (3×) and
+    // rainbow tiles (+25%) are common in adventure — effective avg ~65 pts
+    const AVERAGE_WORD_SCORE = 65;
     const estimatedWordsInTime = timerSeconds / 5; // ~1 word per 5 seconds
-    // difficultyFactor scales from 0.5 (world 1) to 0.85 (world 10)
-    // Higher range compensates for shorter timers in later worlds
-    const difficultyFactor = 0.5 + (world - 1) * (0.35 / 9);
+    // difficultyFactor scales from 0.7 (world 1) to 1.1 (world 10)
+    // Players should need ~70% of estimated output in W1, full output by W10
+    const difficultyFactor = 0.7 + (world - 1) * (0.4 / 9);
     // Level progression bonus: +1.5% per global level beyond first
     const levelBonus = 1 + (globalLevel - 1) * 0.015;
+    // Cap scales linearly per world so late worlds still have progression
+    // W1: 1500 → W10: 3000 (~167 per world)
+    const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
     const target = Math.min(
       Math.round(estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * levelBonus * breatherMultiplier),
-      1500
+      worldCap
     );
     objectives.push({
       type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,

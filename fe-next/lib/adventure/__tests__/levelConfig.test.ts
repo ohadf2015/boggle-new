@@ -692,13 +692,12 @@ describe('Score target calibration (Fix 1)', () => {
     const objectives = generateObjectives(1, 2);
     const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
 
-    // Average word ~3.5 letters => score ~45 pts
-    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.5
-    // expected ~ 24 * 45 * 0.5 = 540
-    // Should be reasonable, not the old formula (200 + 2*30 = 260)
+    // Average word ~65 pts (accounts for gold/rainbow tile multipliers)
+    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.7
+    // expected ~ 24 * 65 * 0.7 * 1.015 = ~1108
     expect(scoreObj).toBeDefined();
-    expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
-    expect(scoreObj!.target).toBeLessThanOrEqual(700);
+    expect(scoreObj!.target).toBeGreaterThanOrEqual(900);
+    expect(scoreObj!.target).toBeLessThanOrEqual(1300);
   });
 
   it('should produce higher score targets in later worlds', () => {
@@ -715,14 +714,15 @@ describe('Score target calibration (Fix 1)', () => {
     expect(s10).toBeGreaterThan(s5);
   });
 
-  it('should cap score targets at a reasonable maximum', () => {
-    // Even in the hardest levels, score target should not exceed 1500
+  it('should cap score targets at per-world maximum', () => {
+    // Cap scales linearly: W1=1500 → W10=3000
     for (let world = 1; world <= 10; world++) {
+      const worldCap = Math.round(1500 + (world - 1) * (1500 / 9));
       for (let level = 2; level <= 6; level += 2) {
         const objectives = generateObjectives(world, level);
         const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
         if (scoreObj) {
-          expect(scoreObj.target).toBeLessThanOrEqual(1500);
+          expect(scoreObj.target).toBeLessThanOrEqual(worldCap);
         }
       }
     }

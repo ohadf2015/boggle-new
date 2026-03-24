@@ -38,11 +38,11 @@ export function QuestCard({
   iconColorClass,
   xpReward = 50,
 }: QuestCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <Link
-      href={href}
+      href={`/${language}${href}`}
       className={cn(
         'group relative flex items-center gap-3 p-3.5 sm:p-4',
         'rounded-neo-lg border-3 border-neo-black',

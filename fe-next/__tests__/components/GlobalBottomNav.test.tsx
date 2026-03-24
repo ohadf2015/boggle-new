@@ -30,6 +30,11 @@ jest.mock('../../hooks/useSafeArea', () => ({
     useSafeArea: jest.fn(),
 }));
 
+const mockUseDailyMissions = jest.fn();
+jest.mock('../../hooks/useDailyMissions', () => ({
+    useDailyMissions: () => mockUseDailyMissions(),
+}));
+
 jest.mock('../../utils/ThemeContext', () => ({
     useTheme: jest.fn(() => ({ theme: 'dark' })),
 }));
@@ -43,13 +48,15 @@ jest.mock('../../components/auth/AuthModal', () => ({
 
 describe('GlobalBottomNav', () => {
     const mockPush = jest.fn();
-    const mockT = jest.fn((key: string) => {
+    const mockT = jest.fn((key: string, params?: Record<string, unknown>) => {
         const translations: Record<string, string> = {
             'nav.bottomNavigation': 'Bottom navigation',
             'nav.home': 'Home',
             'nav.play': 'Play',
+            'nav.quests': 'Quests',
             'nav.leaderboard': 'Leaderboard',
             'nav.profile': 'Profile',
+            'quests.progress': `${params?.completed ?? 0}/${params?.total ?? 0}`,
         };
         return translations[key] || key;
     });
@@ -75,6 +82,19 @@ describe('GlobalBottomNav', () => {
             bottom: 0,
             left: 0,
             right: 0,
+        });
+        mockUseDailyMissions.mockReturnValue({
+            missions: [
+                { type: 'wordHunt', completed: false, href: '/daily' },
+                { type: 'brainDrill', completed: false, href: '/drill' },
+                { type: 'adventure', completed: false, href: '/adventure' },
+                { type: 'community', completed: false, href: '/community' },
+            ],
+            completedCount: 0,
+            isGrandSlam: false,
+            grandSlamClaimed: false,
+            loading: false,
+            refresh: jest.fn(),
         });
     });
 
@@ -371,6 +391,75 @@ describe('GlobalBottomNav', () => {
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
+        });
+    });
+
+    describe('Quest Progress Badge', () => {
+        it('should not show badge when no quests completed', () => {
+            render(<GlobalBottomNav />);
+            expect(screen.queryByTestId('quest-progress-badge')).not.toBeInTheDocument();
+        });
+
+        it('should show progress badge when some quests completed', () => {
+            mockUseDailyMissions.mockReturnValue({
+                missions: [
+                    { type: 'wordHunt', completed: true, href: '/daily' },
+                    { type: 'brainDrill', completed: false, href: '/drill' },
+                    { type: 'adventure', completed: false, href: '/adventure' },
+                    { type: 'community', completed: true, href: '/community' },
+                ],
+                completedCount: 2,
+                isGrandSlam: false,
+                grandSlamClaimed: false,
+                loading: false,
+                refresh: jest.fn(),
+            });
+
+            render(<GlobalBottomNav />);
+            const badge = screen.getByTestId('quest-progress-badge');
+            expect(badge).toBeInTheDocument();
+            expect(badge).toHaveTextContent('2');
+        });
+
+        it('should show full progress when all 3 quests completed (excludes brain drill)', () => {
+            mockUseDailyMissions.mockReturnValue({
+                missions: [
+                    { type: 'wordHunt', completed: true, href: '/daily' },
+                    { type: 'brainDrill', completed: false, href: '/drill' },
+                    { type: 'adventure', completed: true, href: '/adventure' },
+                    { type: 'community', completed: true, href: '/community' },
+                ],
+                completedCount: 3,
+                isGrandSlam: false,
+                grandSlamClaimed: false,
+                loading: false,
+                refresh: jest.fn(),
+            });
+
+            render(<GlobalBottomNav />);
+            const badge = screen.getByTestId('quest-progress-badge');
+            expect(badge).toBeInTheDocument();
+            expect(badge).toHaveTextContent('3');
+        });
+
+        it('should not count brain drill toward quest progress', () => {
+            mockUseDailyMissions.mockReturnValue({
+                missions: [
+                    { type: 'wordHunt', completed: false, href: '/daily' },
+                    { type: 'brainDrill', completed: true, href: '/drill' },
+                    { type: 'adventure', completed: false, href: '/adventure' },
+                    { type: 'community', completed: false, href: '/community' },
+                ],
+                completedCount: 1,
+                isGrandSlam: false,
+                grandSlamClaimed: false,
+                loading: false,
+                refresh: jest.fn(),
+            });
+
+            render(<GlobalBottomNav />);
+            // Brain drill alone should not show badge
+            expect(screen.queryByTestId('quest-progress-badge')).not.toBeInTheDocument();
         });
     });
 
