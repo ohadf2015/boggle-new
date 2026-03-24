@@ -412,6 +412,12 @@ export function cleanupUserMappings(game: GameBase | null, gameCode: string): vo
   if (!game) return;
 
   for (const username of Object.keys(game.users)) {
+    const userData = game.users[username];
+    // Clean auth user connections for this game
+    if (userData && userData.authUserId) {
+      authUserConnections.delete(userData.authUserId);
+    }
+
     const key = `${gameCode}:${username}`;
     const socketId = usernameToSocket.get(key);
     if (socketId) {
@@ -420,6 +426,21 @@ export function cleanupUserMappings(game: GameBase | null, gameCode: string): vo
       usernameToSocket.delete(key);
     }
   }
+}
+
+/**
+ * Remove stale auth user connections whose games no longer exist.
+ * Should be called periodically (e.g., every 5 minutes) to prevent unbounded growth.
+ */
+export function cleanupStaleAuthConnections(activeGameCodes: Set<string>): number {
+  let cleaned = 0;
+  for (const [authUserId, conn] of authUserConnections.entries()) {
+    if (!activeGameCodes.has(conn.gameCode)) {
+      authUserConnections.delete(authUserId);
+      cleaned++;
+    }
+  }
+  return cleaned;
 }
 
 // CommonJS exports for backward compatibility
@@ -447,6 +468,7 @@ module.exports = {
   clearSocketMappings,
   clearSocketMappingsForLeave,
   cleanupUserMappings,
+  cleanupStaleAuthConnections,
 
   // Expose maps for testing
   _socketToGame: socketToGame,

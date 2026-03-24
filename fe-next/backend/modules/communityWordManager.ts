@@ -298,7 +298,9 @@ export function updatePendingCache(word: string, language: string, voteType: 'li
   cache.set(normalized, existing);
   if (existing.netScore >= PROMINENT_THRESHOLD) {
     cache.delete(normalized);
-    addToCommunityCache(word, lang).catch(() => {});
+    addToCommunityCache(word, lang).catch((err: Error) => {
+      logger.error('COMMUNITY', `Failed to add word to community cache: ${err.message}`);
+    });
   }
 }
 

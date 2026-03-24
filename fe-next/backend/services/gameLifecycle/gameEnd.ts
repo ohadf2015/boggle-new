@@ -102,29 +102,34 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     const gameLang = game.language || 'en';
 
     setTimeout(() => {
-      for (const { username, socketId } of userSnapshot) {
-        const wordsForPlayer = getWordsForPlayer(
-          nonDictWords,
-          username,
-          gameLang,
-          wordsPerPlayer
-        );
+      try {
+        for (const { username, socketId } of userSnapshot) {
+          const wordsForPlayer = getWordsForPlayer(
+            nonDictWords,
+            username,
+            gameLang,
+            wordsPerPlayer
+          );
 
-        if (wordsForPlayer.length > 0) {
-          const playerSocket = getSocketById(io, socketId);
-          if (playerSocket) {
-            safeEmit(playerSocket, 'showWordFeedback', {
-              word: wordsForPlayer[0].word,
-              submittedBy: wordsForPlayer[0].submittedBy,
-              submitterAvatar: wordsForPlayer[0].submitterAvatar,
-              voteInfo: wordsForPlayer[0].voteInfo,
-              wordQueue: wordsForPlayer,
-              timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
-              gameCode,
-              language: gameLang,
-            });
+          if (wordsForPlayer.length > 0) {
+            const playerSocket = getSocketById(io, socketId);
+            if (playerSocket) {
+              safeEmit(playerSocket, 'showWordFeedback', {
+                word: wordsForPlayer[0].word,
+                submittedBy: wordsForPlayer[0].submittedBy,
+                submitterAvatar: wordsForPlayer[0].submitterAvatar,
+                voteInfo: wordsForPlayer[0].voteInfo,
+                wordQueue: wordsForPlayer,
+                timeoutSeconds: FEEDBACK_TIMEOUT_SECONDS,
+                gameCode,
+                language: gameLang,
+              });
+            }
           }
         }
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('GAME', `Error sending word feedback for ${gameCode}: ${err.message}`);
       }
     }, 20000); // 20 second delay to allow players to review results first
   }

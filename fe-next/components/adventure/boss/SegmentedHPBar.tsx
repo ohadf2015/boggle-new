@@ -273,6 +273,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
   const [isPhaseFlashing, setIsPhaseFlashing] = useState(false);
   const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const phaseFlashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const damageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Floating damage numbers state
   const [damageNumbers, setDamageNumbers] = useState<{ id: number; amount: number }[]>([]);
@@ -293,7 +294,8 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
       // Floating damage number
       const newId = ++damageIdRef.current;
       setDamageNumbers(prev => [...prev, { id: newId, amount: delta }]);
-      setTimeout(() => {
+      if (damageTimeoutRef.current) clearTimeout(damageTimeoutRef.current);
+      damageTimeoutRef.current = setTimeout(() => {
         setDamageNumbers(prev => prev.filter(n => n.id !== newId));
       }, 900);
 
@@ -313,6 +315,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
     return () => {
       if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
       if (phaseFlashTimeoutRef.current) clearTimeout(phaseFlashTimeoutRef.current);
+      if (damageTimeoutRef.current) clearTimeout(damageTimeoutRef.current);
     };
   }, [currentHP, hpPercentage]);
 

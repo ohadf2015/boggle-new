@@ -378,7 +378,8 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
         setTypingUsername(data.isTyping ? data.username : null);
         // Auto-clear after 4s in case stop-typing event is missed
         if (data.isTyping) {
-          setTimeout(() => setTypingUsername(null), 4000);
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => setTypingUsername(null), 4000);
         }
       }
     };

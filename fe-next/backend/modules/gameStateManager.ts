@@ -233,6 +233,20 @@ function resetGameForNewRound(gameCode: string): boolean {
   peerValidationManager.resetPeerValidation(asBase<PeerValidationGameBase>(game));
   readyStateManager.clearPlayersReadyForNextGame(asBase<ReadyStateGameBase>(game));
 
+  // Clear all player reconnection timeouts to prevent orphaned timeouts
+  // from removing players from the NEW game after reset
+  for (const [, userData] of Object.entries(game.users)) {
+    if (userData && (userData as any).reconnectionTimeout) {
+      clearTimeout((userData as any).reconnectionTimeout);
+      (userData as any).reconnectionTimeout = null;
+    }
+  }
+  // Also clear host reconnection timeout
+  if (game.hostReconnectionTimeout) {
+    clearTimeout(game.hostReconnectionTimeout);
+    game.hostReconnectionTimeout = null;
+  }
+
   game.earthquakeTriggered = false;
   game.letterGrid = null;
   game.lastActivity = Date.now();
@@ -252,6 +266,14 @@ function cleanupEmptyRooms(): number {
     console.log(`[CLEANUP] Removing empty room: ${code}`);
     deleteGame(code);
   }
+
+  // Piggyback: clean stale auth connections whose games no longer exist
+  const activeGameCodes = new Set(Object.keys(games));
+  const staleAuthCleaned = userManager.cleanupStaleAuthConnections(activeGameCodes);
+  if (staleAuthCleaned > 0) {
+    logger.info('CLEANUP', `Removed ${staleAuthCleaned} stale auth user connections`);
+  }
+
   return emptyRooms.length;
 }
 

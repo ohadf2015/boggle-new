@@ -274,7 +274,9 @@ function handlePeerRejection(io: Server, gameCode: string, game: GameState, resu
 
   // Record rejected word for admin review (if not a bot word)
   if (!result.isBot && isSupabaseConfigured()) {
-    recordPlayerWrongWord(word, game.language || 'en', 'peer_rejected').catch(() => {});
+    recordPlayerWrongWord(word, game.language || 'en', 'peer_rejected').catch((err: Error) => {
+      logger.error('WORD', `Failed to record peer-rejected word "${word}": ${err.message}`);
+    });
   }
 
   // Blacklist bot words

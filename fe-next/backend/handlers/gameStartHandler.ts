@@ -217,6 +217,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       validTimer = BLAST_MP_DEFAULT_TIMER;
     }
 
+    // CRITICAL: Transition state FIRST to guard against concurrent startGame calls.
+    // Only the first caller wins; all others bail out before any side effects.
+    const transitionResult = transitionGameState(gameCode, 'START');
+    if (!transitionResult.success) {
+      logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
+      emitError(socket, 'Failed to start game');
+      return;
+    }
+
     broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', {
       gameMode: resolvedMode,
     });
@@ -263,13 +272,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       gameMode: resolvedMode,
       modeHistory: [...(game.modeHistory || []), resolvedMode]
     });
-
-    const transitionResult = transitionGameState(gameCode, 'START');
-    if (!transitionResult.success) {
-      logger.error('SOCKET', `Failed to start game ${gameCode}: ${transitionResult.error}`);
-      emitError(socket, 'Failed to start game');
-      return;
-    }
 
     const positions = makePositionsMap(letterGrid);
     const current = getGame(gameCode);
@@ -371,6 +373,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       playerCount: playerUsernames.length,
       timerSeconds: validTimer,
       isRanked: game.isRanked || false
-    }).catch(() => {});
+    }).catch((err: Error) => {
+      logger.error('SOCKET', `Failed to notify game started for ${gameCode}: ${err.message}`);
+    });
   });
 }

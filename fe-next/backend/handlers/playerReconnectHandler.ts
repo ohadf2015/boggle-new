@@ -71,10 +71,15 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
         // Use existing username to prevent duplicates
         oldSocket.data = oldSocket.data || {};
         oldSocket.data.migrating = true;
+        // Clear any existing migration timeout to prevent leak from rapid reconnects
+        if (oldSocket.data.migrationTimeout) {
+          clearTimeout(oldSocket.data.migrationTimeout);
+        }
         // Auto-clear migration flag after 10 seconds (safety net for crashed tabs)
         oldSocket.data.migrationTimeout = setTimeout(() => {
           if (oldSocket.data) {
             oldSocket.data.migrating = false;
+            oldSocket.data.migrationTimeout = null;
           }
         }, 10000);
         safeEmit(oldSocket, 'sessionTakenOver', {

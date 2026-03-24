@@ -196,7 +196,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         hostUsername: hostUsername || 'Host',
         isAuthenticated: !!authUserId,
         isRanked: isRanked || false
-      }).catch(() => {});
+      }).catch((err: Error) => {
+        logger.error('SOCKET', `Failed to notify room created for ${gameCode}: ${err.message}`);
+      });
     } catch (error: unknown) {
       const err = error as Error;
       logger.error('SOCKET', `Unhandled error in createGame handler: ${err.message}`, {

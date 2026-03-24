@@ -284,7 +284,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
         // Record invalid word submission for admin review (non-blocking)
         if (isSupabaseConfigured()) {
-          recordPlayerWrongWord(normalizedWord, game.language || 'en', 'not_on_board').catch(() => {});
+          recordPlayerWrongWord(normalizedWord, game.language || 'en', 'not_on_board').catch((err: Error) => {
+            logger.error('WORD', `Failed to record wrong word "${normalizedWord}": ${err.message}`);
+          });
         }
         await releaseGraceLockIfNeeded();
         return;

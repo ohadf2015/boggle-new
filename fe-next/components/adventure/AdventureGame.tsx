@@ -84,7 +84,7 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
     const { t, language } = useLanguage();
-    const { playWordAcceptedSound, playComboSound, playComboBreakSound, setGameActive, playCountdownBeep } = useSoundEffects();
+    const { playWordAcceptedSound, playComboSound, setGameActive, playCountdownBeep } = useSoundEffects();
 
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,

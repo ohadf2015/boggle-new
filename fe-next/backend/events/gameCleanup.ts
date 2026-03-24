@@ -23,20 +23,39 @@ class GameCleanupEmitter extends EventEmitter {
 
   /**
    * Emit game end cleanup event
-   * Called when a game ends to trigger cleanup in all subscribed handlers
+   * Called when a game ends to trigger cleanup in all subscribed handlers.
+   * Each listener is wrapped in try-catch so a failing subscriber cannot
+   * block the rest of the game-end sequence.
    */
   emitGameEnd(gameCode: string): void {
     logger.debug('CLEANUP', `Emitting gameEnd cleanup for ${gameCode}`);
-    this.emit('gameEnd', { gameCode });
+    const listeners = this.listeners('gameEnd');
+    for (const listener of listeners) {
+      try {
+        listener({ gameCode });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('CLEANUP', `gameEnd listener threw for ${gameCode}: ${err.message}`);
+      }
+    }
   }
 
   /**
    * Emit game reset cleanup event
-   * Called when a game is reset/restarted
+   * Called when a game is reset/restarted.
+   * Each listener is wrapped in try-catch for safety.
    */
   emitGameReset(gameCode: string): void {
     logger.debug('CLEANUP', `Emitting gameReset cleanup for ${gameCode}`);
-    this.emit('gameReset', { gameCode });
+    const listeners = this.listeners('gameReset');
+    for (const listener of listeners) {
+      try {
+        listener({ gameCode });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('CLEANUP', `gameReset listener threw for ${gameCode}: ${err.message}`);
+      }
+    }
   }
 
   /**

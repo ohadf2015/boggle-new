@@ -187,7 +187,13 @@ export async function handleGiftSend(
  */
 export function registerGiftHandlers(io: Server, socket: Socket): void {
   socket.on('gift:send', async (data: GiftSendParams) => {
-    const result = await handleGiftSend(socket, io, data);
-    socket.emit('gift:sendResult', result);
+    try {
+      const result = await handleGiftSend(socket, io, data);
+      socket.emit('gift:sendResult', result);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('GIFT', `gift:send handler failed: ${err.message}`);
+      socket.emit('gift:sendResult', { success: false, error: 'Internal error' });
+    }
   });
 }

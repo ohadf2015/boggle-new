@@ -14,7 +14,6 @@ import {
   getGameUsers,
   getActiveRooms,
   deleteGame,
-  updateHostSocketId,
   isRoomEmpty,
   getNextEligibleHost,
   transferHost
@@ -24,9 +23,6 @@ import {
   broadcastToRoom,
   broadcastActiveRooms,
   getGameRoom,
-  safeEmit,
-  getSocketById,
-  leaveAllGameRooms
 } from '../utils/socketHelpers.js';
 
 import { clearGameTimer } from '../utils/timerManager.js';
@@ -163,44 +159,49 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
   // Start grace period for host reconnection
   game.hostReconnectionTimeout = setTimeout(() => {
-    const currentGame = getGame(gameCode);
-    if (!currentGame) return;
+    try {
+      const currentGame = getGame(gameCode);
+      if (!currentGame) return;
 
-    // Check if host is still disconnected (socket hasn't changed)
-    if (currentGame.hostSocketId === socket.id) {
-      // Try one more time to find an eligible host
-      const finalNextHost = getNextEligibleHost(gameCode, username);
+      // Check if host is still disconnected (socket hasn't changed)
+      if (currentGame.hostSocketId === socket.id) {
+        // Try one more time to find an eligible host
+        const finalNextHost = getNextEligibleHost(gameCode, username);
 
-      if (finalNextHost) {
-        const finalTransferResult = transferHost(gameCode, finalNextHost);
-        if (finalTransferResult.success) {
-          broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
-            previousHost: username,
-            newHost: finalNextHost,
-            message: `${username} did not reconnect. ${finalNextHost} is now the host.`
-          });
-          broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-            users: getGameUsers(gameCode) as GameUser[]
-          });
-          broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
-          return;
+        if (finalNextHost) {
+          const finalTransferResult = transferHost(gameCode, finalNextHost);
+          if (finalTransferResult.success) {
+            broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+              previousHost: username,
+              newHost: finalNextHost,
+              message: `${username} did not reconnect. ${finalNextHost} is now the host.`
+            });
+            broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+              users: getGameUsers(gameCode) as GameUser[]
+            });
+            broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
+            return;
+          }
         }
+
+        logger.info('SOCKET', `Host reconnection timeout for game ${gameCode} - closing room`);
+
+        // Stop timer and bots
+        clearGameTimer(gameCode);
+        cleanupGameBots(gameCode);
+
+        // Notify all players
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+          message: 'Host did not reconnect. Room is closing.'
+        });
+
+        // Clean up game
+        deleteGame(gameCode);
+        broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
       }
-
-      logger.info('SOCKET', `Host reconnection timeout for game ${gameCode} - closing room`);
-
-      // Stop timer and bots
-      clearGameTimer(gameCode);
-      cleanupGameBots(gameCode);
-
-      // Notify all players
-      broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-        message: 'Host did not reconnect. Room is closing.'
-      });
-
-      // Clean up game
-      deleteGame(gameCode);
-      broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('SOCKET', `Error in host reconnection timeout for ${gameCode}: ${err.message}`);
     }
   }, HOST_RECONNECTION_GRACE_PERIOD);
 
@@ -261,38 +262,43 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
 
     // Start player reconnection grace period
     const reconnectionTimeout = setTimeout(() => {
-      const currentGame = getGame(gameCode);
-      if (!currentGame) return;
+      try {
+        const currentGame = getGame(gameCode);
+        if (!currentGame) return;
 
-      const currentUserData: GameUserWithTimeout | undefined = currentGame.users?.[username] as unknown as GameUserWithTimeout | undefined;
-      if (currentUserData && currentUserData.disconnected) {
-        logger.info('SOCKET', `Player ${username} reconnection timeout - removing from game ${gameCode}`);
+        const currentUserData: GameUserWithTimeout | undefined = currentGame.users?.[username] as unknown as GameUserWithTimeout | undefined;
+        if (currentUserData && currentUserData.disconnected) {
+          logger.info('SOCKET', `Player ${username} reconnection timeout - removing from game ${gameCode}`);
 
-        // Clean up player data
-        cleanupPlayerData(currentGame, username);
-        removeUserFromGame(gameCode, username);
+          // Clean up player data
+          cleanupPlayerData(currentGame, username);
+          removeUserFromGame(gameCode, username);
 
-        // Check if room is now empty and close it immediately
-        if (isRoomEmpty(gameCode)) {
-          logger.info('SOCKET', `Room ${gameCode} is empty after ${username} timeout - closing immediately`);
-          clearGameTimer(gameCode);
-          cleanupGameBots(gameCode);
-          deleteGame(gameCode);
+          // Check if room is now empty and close it immediately
+          if (isRoomEmpty(gameCode)) {
+            logger.info('SOCKET', `Room ${gameCode} is empty after ${username} timeout - closing immediately`);
+            clearGameTimer(gameCode);
+            cleanupGameBots(gameCode);
+            deleteGame(gameCode);
+            broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
+            return;
+          }
+
+          // Notify remaining players
+          broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+            username,
+            message: `${username} did not reconnect and was removed.`
+          });
+
+          broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+            users: getGameUsers(gameCode) as GameUser[]
+          });
+
           broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
-          return;
         }
-
-        // Notify remaining players
-        broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
-          username,
-          message: `${username} did not reconnect and was removed.`
-        });
-
-        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-          users: getGameUsers(gameCode) as GameUser[]
-        });
-
-        broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('SOCKET', `Error in player reconnection timeout for ${username} in ${gameCode}: ${err.message}`);
       }
     }, PLAYER_RECONNECTION_GRACE_PERIOD);
 

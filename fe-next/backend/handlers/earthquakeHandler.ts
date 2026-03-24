@@ -169,38 +169,43 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
   // Phase 3: FIRE ROUND START (after 3 seconds = 2s warning + 1s shake)
   const fireStartTimer = setTimeout(() => {
-    // Generate new grid based on game settings
-    const difficulty = game.difficulty || 'MEDIUM';
-    const difficultyConfig: DifficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
-    const language = game.language || 'en';
+    try {
+      // Generate new grid based on game settings
+      const difficulty = game.difficulty || 'MEDIUM';
+      const difficultyConfig: DifficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
+      const language = game.language || 'en';
 
-    // Generate new grid with embedded words
-    const newGrid: LetterGrid = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      language,
-      [] // Empty array - let it generate random words to embed
-    );
+      // Generate new grid with embedded words
+      const newGrid: LetterGrid = generateRandomTable(
+        difficultyConfig.rows,
+        difficultyConfig.cols,
+        language,
+        [] // Empty array - let it generate random words to embed
+      );
 
-    // Generate new letter positions map for word validation
-    const newPositions = makePositionsMap(newGrid, language);
+      // Generate new letter positions map for word validation
+      const newPositions = makePositionsMap(newGrid, language);
 
-    // Update game state with new grid AND positions map
-    // CRITICAL: letterPositions MUST be updated along with letterGrid
-    // otherwise word validation will fail (words won't be found on new grid)
-    updateGame(gameCode, { letterGrid: newGrid, letterPositions: newPositions });
+      // Update game state with new grid AND positions map
+      // CRITICAL: letterPositions MUST be updated along with letterGrid
+      // otherwise word validation will fail (words won't be found on new grid)
+      updateGame(gameCode, { letterGrid: newGrid, letterPositions: newPositions });
 
-    // Mark fire round active in server game state (source of truth for scoring)
-    updateGame(gameCode, { fireRoundActive: true });
+      // Mark fire round active in server game state (source of truth for scoring)
+      updateGame(gameCode, { fireRoundActive: true });
 
-    // Broadcast fire round start with new grid
-    broadcastToRoom(io, room, 'fireRoundStart', {
-      gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
-      grid: newGrid,
-      duration: EARTHQUAKE_CONFIG.fireRoundDurationSeconds,
-    });
+      // Broadcast fire round start with new grid
+      broadcastToRoom(io, room, 'fireRoundStart', {
+        gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
+        grid: newGrid,
+        duration: EARTHQUAKE_CONFIG.fireRoundDurationSeconds,
+      });
 
-    logger.info('EARTHQUAKE', `Game ${gameCode}: FIRE ROUND started (15s, 2x multiplier)`);
+      logger.info('EARTHQUAKE', `Game ${gameCode}: FIRE ROUND started (15s, 2x multiplier)`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('EARTHQUAKE', `Fire round start failed for ${gameCode}: ${err.message}`);
+    }
   }, EARTHQUAKE_CONFIG.warningDurationMs + EARTHQUAKE_CONFIG.shakeDurationMs);
 
   timers.push(fireStartTimer);

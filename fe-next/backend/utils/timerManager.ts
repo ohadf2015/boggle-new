@@ -149,9 +149,14 @@ class TimerManager {
 const timerManager = new TimerManager();
 
 // Convenience functions for game timers
+// Registers an externally-created interval with the timer manager for proper tracking/cleanup
 export const setGameTimer = (gameCode: string, intervalId: ReturnType<typeof setInterval>): void => {
-  timerManager._timers.set(`game:${gameCode}`, {
-    type: 'interval',
+  const key = `game:${gameCode}`;
+  // Clear any existing timer first to prevent leaks
+  timerManager.clearTimer(key);
+  // Register via internal map (interval was already created externally)
+  timerManager['timers'].set(key, {
+    type: 'interval' as TimerType,
     id: intervalId,
     ref: intervalId
   });

@@ -179,16 +179,17 @@ export function useFriends(): UseFriendsReturn {
   const unfriend = useCallback(async (friendUserId: string) => {
     if (socket && isSocketConnected) {
       return new Promise<{ success: boolean; error?: string }>((resolve) => {
+        let resolved = false;
+        const done = () => {
+          if (resolved) return;
+          resolved = true;
+          refresh();
+          resolve({ success: true });
+        };
         socket.emit('friends:unfriend', { friendUserId });
-        socket.once('friends:friendRemoved', () => {
-          refresh();
-          resolve({ success: true });
-        });
-        // Timeout fallback
-        setTimeout(() => {
-          refresh();
-          resolve({ success: true });
-        }, 3000);
+        socket.once('friends:friendRemoved', done);
+        // Timeout fallback — only fires if socket event didn't arrive
+        setTimeout(done, 3000);
       });
     }
     const result = await removeFriend(friendUserId);
