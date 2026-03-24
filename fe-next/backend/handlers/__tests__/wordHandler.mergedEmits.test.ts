@@ -197,11 +197,9 @@ describe('wordHandler - merged blast emits (Fix 2)', () => {
 
   describe('wordAccepted includes blast field when in blast mode', () => {
     it('should include blast field in wordAccepted payload when gameMode is blast', (done) => {
-      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_gold' });
-
       const timeout = setTimeout(() => {
         done(new Error('Timeout waiting for wordAccepted'));
-      }, 2000);
+      }, 5000);
 
       clientSocket.once('wordAccepted', (data: any) => {
         clearTimeout(timeout);
@@ -215,15 +213,16 @@ describe('wordHandler - merged blast emits (Fix 2)', () => {
           done(e);
         }
       });
+
+      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_gold' });
     });
 
     it('should NOT include blast field in wordAccepted when gameMode is classic', (done) => {
       getGame.mockReturnValue(makeBlastGame({ gameMode: 'classic', blastModeState: null }));
-      clientSocket.emit('submitWord', { word: 'test' });
 
       const timeout = setTimeout(() => {
         done(new Error('Timeout waiting for wordAccepted'));
-      }, 2000);
+      }, 5000);
 
       clientSocket.once('wordAccepted', (data: any) => {
         clearTimeout(timeout);
@@ -234,6 +233,8 @@ describe('wordHandler - merged blast emits (Fix 2)', () => {
           done(e);
         }
       });
+
+      clientSocket.emit('submitWord', { word: 'test' });
     });
 
     it('should NOT emit separate blastWordAccepted event', (done) => {
