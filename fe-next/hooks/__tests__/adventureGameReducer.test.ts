@@ -231,6 +231,180 @@ describe('UPDATE_OBJECTIVE action', () => {
   });
 });
 
+// ==============================================
+// TICK, ADD_TIME, ACTIVATE_TIME_FREEZE, USE_SHUFFLE, TIMER_EXPIRED
+// ==============================================
+
+describe('TICK action', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('decrements time by 1 when playing', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const ticked = gameReducer(started, { type: 'TICK' });
+    expect(ticked.timeRemaining).toBe(started.timeRemaining - 1);
+  });
+
+  it('does nothing when not playing', () => {
+    const state = createInitialState(levelConfig, grid);
+    const ticked = gameReducer(state, { type: 'TICK' });
+    expect(ticked.timeRemaining).toBe(state.timeRemaining);
+  });
+
+  it('ends game when time reaches 0', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    // Set time to 1 so next tick = 0
+    const nearEnd = { ...started, timeRemaining: 1 };
+    const expired = gameReducer(nearEnd, { type: 'TICK' });
+    expect(expired.timeRemaining).toBe(0);
+    expect(expired.isPlaying).toBe(false);
+    expect(expired.gameState.isComplete).toBe(true);
+  });
+
+  it('decrements freezeRemaining instead of timer when frozen', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const frozen = gameReducer(started, { type: 'ACTIVATE_TIME_FREEZE', payload: { seconds: 5 } });
+    const ticked = gameReducer(frozen, { type: 'TICK' });
+    expect(ticked.freezeRemaining).toBe(4);
+    expect(ticked.timeRemaining).toBe(started.timeRemaining); // unchanged
+  });
+});
+
+describe('ADD_TIME action', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('adds seconds to timer', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'ADD_TIME', payload: { seconds: 10 } });
+    expect(result.timeRemaining).toBe(started.timeRemaining + 10);
+  });
+
+  it('caps at MAX_TIMER_SECONDS (180)', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const highTime = { ...started, timeRemaining: 170 };
+    const result = gameReducer(highTime, { type: 'ADD_TIME', payload: { seconds: 999 } });
+    expect(result.timeRemaining).toBe(180);
+  });
+
+  it('does not go below 0', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'ADD_TIME', payload: { seconds: -999 } });
+    expect(result.timeRemaining).toBe(0);
+  });
+});
+
+describe('ACTIVATE_TIME_FREEZE action', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('sets freezeRemaining and marks freezeUsed', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'ACTIVATE_TIME_FREEZE', payload: { seconds: 10 } });
+    expect(result.freezeRemaining).toBe(10);
+    expect(result.freezeUsed).toBe(true);
+  });
+
+  it('is a no-op if already used', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const first = gameReducer(started, { type: 'ACTIVATE_TIME_FREEZE', payload: { seconds: 10 } });
+    const second = gameReducer(first, { type: 'ACTIVATE_TIME_FREEZE', payload: { seconds: 5 } });
+    expect(second.freezeRemaining).toBe(10); // unchanged
+  });
+});
+
+describe('USE_SHUFFLE action', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('decrements shufflesRemaining', () => {
+    const state = createInitialState(levelConfig, grid, { shuffleUses: 2 });
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'USE_SHUFFLE' });
+    expect(result.shufflesRemaining).toBe(1);
+  });
+
+  it('is a no-op when no shuffles remaining', () => {
+    const state = createInitialState(levelConfig, grid, { shuffleUses: 0 });
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'USE_SHUFFLE' });
+    expect(result.shufflesRemaining).toBe(0);
+  });
+});
+
+describe('TIMER_EXPIRED action', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [makeObjective({ isPrimary: true, target: 100 })],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  it('ends the game with isComplete=true and calculates stars', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const result = gameReducer(started, { type: 'TIMER_EXPIRED' });
+    expect(result.timeRemaining).toBe(0);
+    expect(result.isPlaying).toBe(false);
+    expect(result.gameState.isComplete).toBe(true);
+  });
+});
+
+describe('SUBMIT_WORD duplicate rejection', () => {
+  const levelConfig = {
+    world: 1, level: 1, gridSize: 4, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [{ type: 'wordCount', target: 50, isPrimary: true }],
+  } as LevelConfig;
+  const grid = [['H', 'E', 'L', 'P'], ['A', 'B', 'C', 'D'], ['E', 'F', 'G', 'I'], ['J', 'K', 'L', 'M']];
+
+  it('rejects duplicate word submission', () => {
+    const state = createInitialState(levelConfig, grid);
+    const started = gameReducer(state, { type: 'START_GAME' });
+    const first = gameReducer(started, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'HELP', score: 20, path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }] },
+    });
+    const scoreBefore = first.gameState.score;
+    const second = gameReducer(first, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'HELP', score: 20, path: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }] },
+    });
+    expect(second.gameState.score).toBe(scoreBefore); // no change
+    expect(second.gameState.wordsFound).toHaveLength(1);
+  });
+});
+
 describe('SUBMIT_WORD with detonate (Word Dynamite T3)', () => {
   const levelConfig = {
     world: 5,
