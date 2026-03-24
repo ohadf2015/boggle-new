@@ -5783,7 +5783,8 @@ const es = {
       "worldMap": "Mapa del mundo",
       "wordAlbum": "Álbum de palabras",
       "bossRush": "Carrera de Jefes",
-      "bossRushLocked": "Derrota a todos los jefes para desbloquear Carrera de Jefes"
+      "bossRushLocked": "Derrota a todos los jefes para desbloquear Carrera de Jefes",
+      "allQuestsComplete": "¡Todas las misiones diarias completas! ¡Bonus!"
     },
     "album": {
       "title": "Álbum de palabras",
@@ -6418,6 +6419,7 @@ const es = {
       "keepTrying": "¡Sigue intentando! ¡Estás mejorando!",
       "soClose": "¡Casi!",
       "soCloseDesc": "Llegaste a {{current}}/{{target}} — ¡solo un poco más!",
+      "more": "más",
       "hint": "Pista",
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",

@@ -18,6 +18,7 @@ import { getNextUnlockedLevel } from '@/lib/adventure/constants';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import type { DailyQuest } from '@/lib/adventure/dailyQuests';
 import type { LevelCompletion } from '@/types/adventure';
+import AdventureXpProgressBar from './meta/AdventureXpProgressBar';
 
 // ==============================================
 // TYPES
@@ -42,6 +43,8 @@ interface AdventureHubProps {
   playerLevel: number;
   /** Gold amount */
   gold: number;
+  /** Total XP for progress bar */
+  xp?: number;
   /** Level completions for determining next level */
   completions: LevelCompletion[];
   /** Current world the player is on */
@@ -80,6 +83,7 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenShop,
   wordAlbumCount = 0,
   onWeeklyChallenge,
+  xp = 0,
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
@@ -248,6 +252,24 @@ const AdventureHub = memo<AdventureHubProps>(({
           <span className="text-sm font-bold text-neo-orange">{gold}</span>
         </button>
       </AdaptiveMotion.div>
+
+      {/* XP Progress Bar */}
+      {xp > 0 && (
+        <AdventureXpProgressBar totalXp={xp} size="sm" className="w-full" />
+      )}
+
+      {/* Daily Quest Completion Bonus */}
+      {completedQuestCount === 3 && dailyQuests.length === 3 && (
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full p-3 rounded-neo border-2 border-neo-lime bg-neo-lime/15 text-center"
+        >
+          <span className="text-neo-lime font-black text-sm uppercase">
+            {t('adventure.hub.allQuestsComplete')}
+          </span>
+        </AdaptiveMotion.div>
+      )}
 
       {/* Continue Button — primary CTA */}
       {nextLevel && nextWorldConfig && (

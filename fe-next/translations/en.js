@@ -6001,7 +6001,8 @@ const en = {
       "worldMap": "World Map",
       "wordAlbum": "Word Album",
       "bossRush": "Boss Rush",
-      "bossRushLocked": "Defeat all bosses to unlock Boss Rush"
+      "bossRushLocked": "Defeat all bosses to unlock Boss Rush",
+      "allQuestsComplete": "All daily quests complete! Bonus earned!"
     },
     "retryLevel": "Retry",
     "freeRetry": "Free Retry",
@@ -6160,6 +6161,7 @@ const en = {
       "keepTrying": "Keep trying! You're getting better!",
       "soClose": "So Close!",
       "soCloseDesc": "You reached {{current}}/{{target}} — just a little more!",
+      "more": "more",
       "hint": "Hint",
       "hintAvailable": "Need a hint?",
       "hintUsed": "Try this word!",

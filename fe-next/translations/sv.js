@@ -5751,7 +5751,8 @@ const sv = {
       "worldMap": "Världskarta",
       "wordAlbum": "Ordalbum",
       "bossRush": "Bossrush",
-      "bossRushLocked": "Besegra alla bossar för att låsa upp Bossrush"
+      "bossRushLocked": "Besegra alla bossar för att låsa upp Bossrush",
+      "allQuestsComplete": "Alla dagliga uppdrag klara! Bonus!"
     },
     "album": {
       "title": "Ordalbum",
@@ -6073,6 +6074,7 @@ const sv = {
       "keepTrying": "Fortsätt försöka! Du blir bättre!",
       "soClose": "Så nära!",
       "soCloseDesc": "Du nådde {{current}}/{{target}} — bara lite till!",
+      "more": "till",
       "hint": "Tips",
       "hintAvailable": "Behöver du ett tips?",
       "hintUsed": "Prova det här ordet!",

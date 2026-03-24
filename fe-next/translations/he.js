@@ -5798,7 +5798,8 @@ const he = {
       "worldMap": "מפת עולם",
       "wordAlbum": "אלבום מילים",
       "bossRush": "מרוץ בוסים",
-      "bossRushLocked": "נצחו את כל הבוסים כדי לפתוח מרוץ בוסים"
+      "bossRushLocked": "נצחו את כל הבוסים כדי לפתוח מרוץ בוסים",
+      "allQuestsComplete": "כל המשימות היומיות הושלמו! בונוס!"
     },
     "album": {
       "title": "אלבום מילים",
@@ -6094,6 +6095,7 @@ const he = {
       "keepTrying": "המשיכו לנסות! אתם משתפרים!",
       "soClose": "כמעט!",
       "soCloseDesc": "הגעתם ל-{{current}}/{{target}} — עוד קצת!",
+      "more": "עוד",
       "hint": "רמז",
       "hintAvailable": "צריכים רמז?",
       "hintUsed": "נסו את המילה הזו!",

@@ -23,9 +23,22 @@ describe('adventureStreak', () => {
       expect(after2.currentStreak).toBe(2);
     });
 
-    it('should reset streak on skipped day', () => {
+    it('should maintain streak within 36h grace period (play day+1 late evening)', () => {
       const after1 = updateStreak(baseState, '2026-03-14');
-      const after3 = updateStreak(after1, '2026-03-16'); // skipped 03-15
+      // Skipping exactly 1 day is still consecutive with grace period
+      const after2 = updateStreak(after1, '2026-03-15');
+      expect(after2.currentStreak).toBe(2);
+    });
+
+    it('should maintain streak with 2-day gap (grace period)', () => {
+      const after1 = updateStreak(baseState, '2026-03-14');
+      const after2 = updateStreak(after1, '2026-03-16'); // 2-day gap — within grace
+      expect(after2.currentStreak).toBe(2);
+    });
+
+    it('should reset streak when 3+ days gap', () => {
+      const after1 = updateStreak(baseState, '2026-03-14');
+      const after3 = updateStreak(after1, '2026-03-17'); // 3-day gap — beyond grace
       expect(after3.currentStreak).toBe(1);
     });
 

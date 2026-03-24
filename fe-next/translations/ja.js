@@ -5803,7 +5803,8 @@ const ja = {
       "worldMap": "ワールドマップ",
       "wordAlbum": "ワードアルバム",
       "bossRush": "ボスラッシュ",
-      "bossRushLocked": "全ボスを倒してボスラッシュを解放"
+      "bossRushLocked": "全ボスを倒してボスラッシュを解放",
+      "allQuestsComplete": "デイリークエスト全達成！ボーナス獲得！"
     },
     "album": {
       "title": "ワードアルバム",
@@ -6120,6 +6121,7 @@ const ja = {
       "keepTrying": "頑張って！上達してるよ！",
       "soClose": "惜しい！",
       "soCloseDesc": "{{current}}/{{target}}まで到達 — あと少し！",
+      "more": "あと",
       "hint": "ヒント",
       "hintAvailable": "ヒントが必要？",
       "hintUsed": "この言葉を試してみて！",
