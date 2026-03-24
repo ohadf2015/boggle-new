@@ -16,6 +16,8 @@ interface MobileTabBarProps {
   activeTab: string | null;
   onTabChange: (tabId: string) => void;
   className?: string;
+  /** Optional slot rendered at the trailing edge of the tab bar */
+  endSlot?: React.ReactNode;
 }
 
 /**
@@ -27,6 +29,7 @@ export function MobileTabBar({
   activeTab,
   onTabChange,
   className,
+  endSlot,
 }: MobileTabBarProps) {
   return (
     <nav className={cn('mobile-tab-bar md:hidden', className)}>
@@ -67,6 +70,11 @@ export function MobileTabBar({
           </button>
         );
       })}
+      {endSlot && (
+        <div className="ms-auto flex items-center pe-2">
+          {endSlot}
+        </div>
+      )}
     </nav>
   );
 }

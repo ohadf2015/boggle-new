@@ -318,7 +318,23 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       return;
     }
 
-    logger.log('[PLAYER] Processing pending game start:', pendingGameStart);
+    const isReconnect = !!(pendingGameStart as any).reconnect;
+    logger.log('[PLAYER] Processing pending game start:', isReconnect ? '(reconnect)' : '(new game)');
+
+    // On reconnect, only restore grid/timer — do NOT reset words, replay animations, or re-ACK.
+    // This prevents the "game restarted" visual glitch on brief network blips.
+    if (isReconnect) {
+      logger.log('[PLAYER] Reconnect restore — restoring grid and timer only');
+      if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
+      if (pendingGameStart.timerSeconds) {
+        totalGameTimeRef.current = pendingGameStart.timerSeconds;
+        gameTimer.setTime(pendingGameStart.timerSeconds);
+      }
+      if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
+      if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
+      onGameStartConsumed();
+      return;
+    }
 
     setFoundWords([]);
 

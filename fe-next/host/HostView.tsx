@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo, useRef, useMemo } from 'react';
-import { Button } from '../components/ui/button';
+import React, { useEffect, useState, memo, useRef } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
 import { useSocket } from '../utils/SocketContext';
@@ -88,7 +87,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   onGameStartConsumed,
   lessonData,
 }) => {
-  const { t, language, dir } = useLanguage();
+  const { t, language } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
@@ -271,12 +270,12 @@ const HostView: React.FC<HostViewProps> = memo(({
 
     socket.on('playersReadyUpdate', handlePlayersReadyUpdate);
     socket.on('resetGame', handleResetGame);
-    socket.on('startGame', handleResetGame);
+    // Note: startGame ready-state reset is handled inside useHostGameEvents.handleStartGame
+    // to avoid a duplicate listener that fires on reconnect and clears state mid-game.
 
     return () => {
       socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
       socket.off('resetGame', handleResetGame);
-      socket.off('startGame', handleResetGame);
     };
   }, [socket]);
 
@@ -340,7 +339,7 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   useEffect(() => {
     const handleRoomExitRequest = (event: CustomEvent) => {
-      const { gameCode: requestedCode, username: requestedUsername, source } = event.detail;
+      const { gameCode: requestedCode, username: requestedUsername } = event.detail;
 
       // Verify the request is for this game session
       if (requestedCode === gameCode && requestedUsername === username) {
@@ -387,28 +386,6 @@ const HostView: React.FC<HostViewProps> = memo(({
       // State updates handled by socket events
     },
   });
-
-  // Build leaderboard for waiting view — memoized to avoid re-sorting on every timer tick
-  const leaderboard = useMemo(() => state.players.playersReady
-    .map((player) => {
-      const name = typeof player === 'string' ? player : player.username;
-      return {
-        username: name,
-        score: state.players.playerScores[name] || 0,
-        wordCount: state.players.playerWordCounts[name] || 0,
-        avatar: typeof player === 'object' ? player.avatar : undefined,
-        isHost: typeof player === 'object' ? (player as any).isHost : false,
-      };
-    })
-    .filter(p => {
-      // Filter out Host if they have 0 words (Broadcast Mode)
-      if ((p.username === username || p.isHost) && p.wordCount === 0) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => b.score - a.score),
-  [state.players.playersReady, state.players.playerScores, state.players.playerWordCounts, username]);
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;

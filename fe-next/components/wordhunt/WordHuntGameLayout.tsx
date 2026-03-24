@@ -7,7 +7,7 @@ import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSec
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
-import { WordHuntGameOverOverlay, type GameOverReason } from './WordHuntGameOverOverlay';
+import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
 import type { LetterGrid } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
@@ -111,9 +111,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-x-hidden overflow-y-auto">
       {/* Main game area */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden">
         {/* Score + Quit — compact */}
         <WordHuntMPHeader
           score={score}
@@ -152,7 +152,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* Grid — fills remaining space, auto-scales to fit */}
-        <div className="flex-1 min-h-0 px-1 relative overflow-hidden">
+        <div className="flex-1 min-h-[40dvh] px-1 relative overflow-hidden">
           <SurvivalGridSection
             grid={grid}
             isGameOver={isGameOver}

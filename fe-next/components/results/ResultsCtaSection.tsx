@@ -73,8 +73,8 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
             {isHost ? (
               <div className="space-y-2">
                 {selectedGameMode !== undefined && onSelectGameMode && (
-                  <div className="bg-neo-navy-light/50 border-2 border-neo-white/10 rounded-neo p-2">
-                    <p className="text-[9px] font-black uppercase text-neo-cream/50 tracking-widest mb-1.5">
+                  <div className="bg-neo-navy/60 border-2 border-slate-700/40 rounded-neo p-2.5">
+                    <p className="text-[9px] font-black uppercase text-neo-cream/40 tracking-[0.2em] mb-1.5">
                       {t('gameModes.nextMode')}
                     </p>
                     <GameModeSelector

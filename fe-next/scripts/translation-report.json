@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 4167,
+    "totalKeysInCode": 4165,
     "keyCountByLanguage": {
-      "en": 6797,
-      "he": 6924,
-      "sv": 6942,
-      "ja": 6945,
-      "es": 6958
+      "en": 6835,
+      "he": 6962,
+      "sv": 6980,
+      "ja": 6983,
+      "es": 6996
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 7,
+      "templateLiterals": 8,
       "fallbackUsages": 0,
       "variableKeys": 10
     }
@@ -51,6 +51,13 @@
         "file": "components/engagement/PrestigeModal.tsx",
         "line": 54,
         "context": "const pm = (key: string) => t(`xp.prestigeModal.${key}`);",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "crowns.${crown.id}",
+        "file": "components/results/ConsolationRows.tsx",
+        "line": 85,
+        "context": "{t(`crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },
       {

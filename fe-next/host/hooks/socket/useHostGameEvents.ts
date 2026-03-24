@@ -2,7 +2,7 @@
  * Host Game Events Hook
  * Handles core game lifecycle socket events: startGame, endGame, timeUpdate, validationComplete, resetGame
  */
-import { useEffect, useCallback, useRef, useMemo, useState, MutableRefObject } from 'react';
+import { useEffect, useCallback, useRef, useMemo, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
@@ -52,14 +52,14 @@ interface UseHostGameEventsProps {
   setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
 
   // Combo refs and setters (for reset)
-  comboLevelRef: MutableRefObject<number>;
-  lastWordTimeRef: MutableRefObject<number | null>;
+  comboLevelRef: RefObject<number>;
+  lastWordTimeRef: RefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
   setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
-  comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
+  comboTimeoutRef: RefObject<NodeJS.Timeout | null>;
 
   // Exit ref
-  intentionalExitRef: MutableRefObject<boolean>;
+  intentionalExitRef: RefObject<boolean>;
 
   // Callbacks
   onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
@@ -67,7 +67,7 @@ interface UseHostGameEventsProps {
 }
 
 interface UseHostGameEventsReturn {
-  gameSessionIdRef: MutableRefObject<number>;
+  gameSessionIdRef: RefObject<number>;
   gameSessionId: number;
 }
 
@@ -173,19 +173,22 @@ export function useHostGameEvents({
     if (!socket) return;
 
     const handleStartGame = (data: StartGameBroadcast) => {
+      const extData = data as StartGameBroadcast & { gameSessionId?: number; reconnect?: boolean; gameMode?: string; blastTileOverlay?: any; blastSeed?: number | null; wordHuntTargetLength?: number; wordHuntPlayerLives?: Record<string, number>; wordHuntEliminatedPlayers?: string[] };
+
       // Validate session ID - ignore stale startGame from previous sessions
-      if (gameSessionIdRef.current !== null && (data as any).gameSessionId !== undefined &&
-          (data as any).gameSessionId < gameSessionIdRef.current) {
-        logger.log('[HOST] Ignoring stale startGame from old session:', (data as any).gameSessionId);
+      if (gameSessionIdRef.current !== null && extData.gameSessionId !== undefined &&
+          extData.gameSessionId < gameSessionIdRef.current) {
+        logger.log('[HOST] Ignoring stale startGame from old session:', extData.gameSessionId);
         return;
       }
 
-      logger.log('[HOST] Received startGame event from server');
+      const isReconnect = !!extData.reconnect;
+      logger.log('[HOST] Received startGame event from server', isReconnect ? '(reconnect)' : '(new game)');
 
       // Track game session ID
-      if ((data as any).gameSessionId !== undefined) {
-        gameSessionIdRef.current = (data as any).gameSessionId;
-        setGameSessionId((data as any).gameSessionId);
+      if (extData.gameSessionId !== undefined) {
+        gameSessionIdRef.current = extData.gameSessionId;
+        setGameSessionId(extData.gameSessionId);
       }
 
       if (data.letterGrid) {
@@ -203,30 +206,41 @@ export function useHostGameEvents({
       }
 
       // Sync resolved game mode from server (handles random → actual mode)
-      if ((data as any).gameMode) {
-        useGameStore.getState().setGameMode((data as any).gameMode);
+      if (extData.gameMode) {
+        useGameStore.getState().setGameMode(extData.gameMode);
       }
 
       // Set blast tile overlay if present (mirrors player handler)
-      if ((data as any).blastTileOverlay) {
-        useGameStore.getState().setBlastTileOverlay((data as any).blastTileOverlay);
-        useGameStore.getState().setBlastMovesUsed(0);
-        // Store seed for deterministic multiplayer refills
-        if ((data as any).blastSeed != null) {
-          useGameStore.getState().setBlastSeed((data as any).blastSeed);
+      if (extData.blastTileOverlay) {
+        const store = useGameStore.getState();
+        store.setBlastTileOverlay(extData.blastTileOverlay);
+        store.setBlastMovesUsed(0);
+        if (extData.blastSeed != null) {
+          store.setBlastSeed(extData.blastSeed);
         }
       }
 
       // Set word hunt target length if present (mirrors player handler)
-      if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
+      if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0) {
         const store = useGameStore.getState();
-        store.setWordHuntTargetLength((data as any).wordHuntTargetLength);
+        store.setWordHuntTargetLength(extData.wordHuntTargetLength);
         store.setWordHuntMyLife(100);
-        store.setWordHuntPlayerLives((data as any).wordHuntPlayerLives || {});
+        store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
         store.setWordHuntTargetAttempts([]);
         store.setWordHuntTargetFound(false);
-        store.setWordHuntEliminatedPlayers((data as any).wordHuntEliminatedPlayers || []);
+        store.setWordHuntEliminatedPlayers(extData.wordHuntEliminatedPlayers || []);
         useGameStore.setState({ wordHuntDiscoveryClues: [], wordHuntKnownLetters: [] });
+      }
+
+      // On reconnect, only restore grid/timer state — do NOT reset scores or replay animations.
+      // This prevents the "game restarted for no reason" bug when a brief network blip occurs.
+      if (isReconnect) {
+        logger.log('[HOST] Reconnect restore — skipping score reset and countdown animation');
+        // Ensure game is marked as started (skips countdown)
+        if (!gameStartedRef.current) {
+          setGameStarted(true);
+        }
+        return;
       }
 
       // Reset state for new game

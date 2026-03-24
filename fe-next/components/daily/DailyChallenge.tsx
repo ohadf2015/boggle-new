@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useWinStreak } from '@/hooks/useWinStreak';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
   generateDailyPuzzle,
@@ -41,6 +42,7 @@ const DailyChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
   const { unlockAudio } = useMusic();
+  const { recordWin: recordStreak } = useWinStreak();
 
   // Game language state
   const urlLocale = language as Language;
@@ -290,6 +292,9 @@ const DailyChallenge: React.FC = () => {
 
     const updatedStreak = saveWordHuntResult(wordHuntResult, isAuthenticated);
     wordHuntResult.streakDays = updatedStreak.currentStreak;
+
+    // Record to universal play streak (tracks consecutive days across all game modes)
+    recordStreak();
 
     setGameResult(result);
     setStoredResult({

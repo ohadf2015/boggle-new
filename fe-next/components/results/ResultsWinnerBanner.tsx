@@ -342,9 +342,9 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     className={`${styles.iconTextClass} ${compact ? 'w-5 h-5' : 'w-6 h-6 sm:w-7 sm:h-7'}`}
                   />
                   <span className={`
-                    absolute -bottom-1.5 -end-1.5 bg-neo-black text-neo-cream border-2 border-neo-cream
-                    rounded-full font-black flex items-center justify-center shadow-hard-sm
-                    ${compact ? 'w-7 h-7 text-[11px]' : 'w-8 h-8 text-xs sm:w-9 sm:h-9 sm:text-sm'}
+                    absolute -bottom-2 -end-2 bg-neo-black text-neo-cream border-2 border-neo-cream
+                    rounded-neo font-black flex items-center justify-center shadow-hard-sm leading-none
+                    ${compact ? 'px-1.5 py-0.5 min-w-[28px] text-[11px]' : 'px-2 py-1 min-w-[32px] text-xs sm:min-w-[36px] sm:text-sm'}
                   `}>
                     {formatRankOrdinal(rank, t)}
                   </span>

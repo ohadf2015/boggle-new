@@ -1,6 +1,12 @@
 /**
- * Win Streak Hook
- * Tracks consecutive wins for gamification and retention
+ * Play Streak Hook (legacy name: "Win Streak")
+ *
+ * Tracks consecutive days played for gamification and retention.
+ * Despite the name, this is now a PLAY streak — any game completion counts,
+ * not just wins. The "win" naming is kept for backwards compatibility with
+ * localStorage keys and existing call sites.
+ *
+ * TODO: Rename to usePlayStreak / recordPlay across the codebase.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';

@@ -62,8 +62,9 @@ export function calculateGameScores(
 ): PlayerScoreResult[] {
   const { playerCount = 0, gameMode } = options;
 
-  // Disable duplicate rule for large rooms (more than 7 players)
-  const duplicateRuleDisabled = playerCount > 7;
+  // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
+  // In Word Hunt, finding the same board words as opponents is fine — the goal is the target word
+  const duplicateRuleDisabled = playerCount > 7 || gameMode === 'word-hunt';
 
   // Blast mode skips rarity multiplier — tile bonuses already reward unique paths
   const rarityDisabled = gameMode === 'blast';

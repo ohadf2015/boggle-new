@@ -90,6 +90,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // API routes: allow through after auth refresh — never locale-redirect
+  if (pathname.startsWith('/api')) {
+    return response;
+  }
+
   // Handle paths without locale prefix
   if (!pathnameHasLocale) {
     const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;

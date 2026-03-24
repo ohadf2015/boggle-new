@@ -1,12 +1,14 @@
 /**
  * useWinStreakTracking Hook Tests
  *
- * Tests for the hook that tracks win streaks in competitive game modes.
+ * Tests for the hook that tracks play streaks across all game modes.
+ * The streak is a "consecutive days played" streak, not a win streak.
+ *
  * This specifically tests the fix for the race condition where streak data
  * was read before localStorage was loaded, causing static "1 day streak" display.
  */
 
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock useWinStreak hook directly to control isLoaded state
 let mockStreakData = {
@@ -114,13 +116,13 @@ describe('useWinStreakTracking', () => {
      *
      * FIX: useWinStreakTracking now waits for isLoaded=true before processing.
      */
-    it('should correctly continue streak when user already has a 5-day streak', async () => {
+    it('should correctly continue streak when user has a 5-day streak', async () => {
       // GIVEN: User has an existing 5-day streak from yesterday
       simulateLoadedStreak(5, 5);
 
-      // WHEN: User wins a game in solo-bots mode
+      // WHEN: User completes any game
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: true })
+        useWinStreakTracking({ isGameComplete: true })
       );
 
       // Wait for state to stabilize
@@ -138,9 +140,9 @@ describe('useWinStreakTracking', () => {
       // GIVEN: User has a 6-day streak
       simulateLoadedStreak(6, 6);
 
-      // WHEN: User wins
+      // WHEN: User completes a game
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: true })
+        useWinStreakTracking({ isGameComplete: true })
       );
 
       await waitFor(() => {
@@ -152,58 +154,44 @@ describe('useWinStreakTracking', () => {
       expect(result.current.winStreakData?.isNewMilestone).toBe(true);
     });
 
-    it('should not process win before isLoaded is true', async () => {
+    it('should not process before isLoaded is true', async () => {
       // GIVEN: Data is NOT loaded yet (isLoaded = false)
       // mockStreakData.isLoaded is already false from beforeEach
 
-      // WHEN: Hook renders with isWinner=true
+      // WHEN: Hook renders with isGameComplete=true
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: true })
+        useWinStreakTracking({ isGameComplete: true })
       );
 
-      // THEN: Should NOT have processed the win yet
+      // THEN: Should NOT have processed yet
       expect(result.current.winStreakData).toBeNull();
       expect(mockRecordWin).not.toHaveBeenCalled();
     });
   });
 
-  describe('practice mode', () => {
-    it('should not track wins in practice mode', async () => {
+  describe('game not complete', () => {
+    it('should not track when game is not complete', async () => {
       simulateLoadedStreak(3);
 
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'practice', isWinner: true })
+        useWinStreakTracking({ isGameComplete: false })
       );
 
-      // winStreakData should remain null in practice mode
+      // winStreakData should remain null when game not complete
       expect(result.current.winStreakData).toBeNull();
       expect(mockRecordWin).not.toHaveBeenCalled();
     });
   });
 
-  describe('loss handling', () => {
-    it('should not track losses', async () => {
-      simulateLoadedStreak(3);
-
-      const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: false })
-      );
-
-      // winStreakData should remain null for losses
-      expect(result.current.winStreakData).toBeNull();
-      expect(mockRecordWin).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('same-day wins', () => {
-    it('should not increment streak for multiple wins on same day', async () => {
-      // GIVEN: User already won today with a 5-day streak
+  describe('same-day completions', () => {
+    it('should not increment streak for multiple completions on same day', async () => {
+      // GIVEN: User already played today with a 5-day streak
       const today = new Date().toISOString();
       simulateLoadedStreak(5, 5, today);
 
-      // WHEN: User wins again today
+      // WHEN: User completes another game today
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: true })
+        useWinStreakTracking({ isGameComplete: true })
       );
 
       await waitFor(() => {
@@ -228,9 +216,9 @@ describe('useWinStreakTracking', () => {
         isLoaded: true,
       };
 
-      // WHEN: User wins
+      // WHEN: User completes a game
       const { result } = renderHook(() =>
-        useWinStreakTracking({ mode: 'solo-bots', isWinner: true })
+        useWinStreakTracking({ isGameComplete: true })
       );
 
       await waitFor(() => {

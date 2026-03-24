@@ -79,17 +79,15 @@ describe('ResultsPage mobile bottom safe zone', () => {
   });
 
   describe('ResultsPage mobile scroll container', () => {
-    test('should have sufficient bottom padding to clear fixed tab bar', () => {
-      // The scrollable content area needs enough bottom padding
-      // to ensure content isn't hidden behind the fixed tab bar + StickyReadyBar.
-      // pb-52 = 208px, which clears the tab bar (~76px) + StickyReadyBar (~80px) plus safe area.
-      expect(resultsPageTSX).toContain('pb-52');
+    test('should have sufficient bottom padding to clear floating pill bar', () => {
+      // pb-24 = 96px clearance for the floating pill (~56px + 12px bottom offset + safe area).
+      expect(resultsPageTSX).toContain('pb-24');
     });
 
-    test('fixed bottom tab bar wrapper should have appropriate styling', () => {
-      // The fixed bottom element should be properly positioned
-      expect(resultsPageTSX).toContain('fixed bottom-0');
-      expect(resultsPageTSX).toContain('inset-x-0');
+    test('floating pill bar should have fixed positioning', () => {
+      // The floating bar uses fixed positioning with margin offset
+      expect(resultsPageTSX).toContain('fixed bottom-3');
+      expect(resultsPageTSX).toContain('inset-x-3');
     });
   });
 

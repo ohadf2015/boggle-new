@@ -10,14 +10,8 @@ jest.mock('framer-motion', () => {
       div: (() => { const MotionDiv = React.forwardRef(({ children, className, onClick, style, 'data-testid': dataTestId }: React.PropsWithChildren<{ className?: string; onClick?: () => void; style?: React.CSSProperties; 'data-testid'?: string }>, ref: React.Ref<HTMLDivElement>) => (
         <div ref={ref} className={className} onClick={onClick} style={style} data-testid={dataTestId}>{children}</div>
       )); MotionDiv.displayName = 'motion.div'; return MotionDiv; })(),
-      h1: (() => { const MotionH1 = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLHeadingElement>) => (
-        <h1 ref={ref} className={className}>{children}</h1>
-      )); MotionH1.displayName = 'motion.h1'; return MotionH1; })(),
-      p: (() => { const MotionP = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLParagraphElement>) => (
-        <p ref={ref} className={className}>{children}</p>
-      )); MotionP.displayName = 'motion.p'; return MotionP; })(),
-      span: (() => { const MotionSpan = React.forwardRef(({ children, className, 'aria-label': ariaLabel }: React.PropsWithChildren<{ className?: string; 'aria-label'?: string }>, ref: React.Ref<HTMLSpanElement>) => (
-        <span ref={ref} className={className} aria-label={ariaLabel}>{children}</span>
+      span: (() => { const MotionSpan = React.forwardRef(({ children, className }: React.PropsWithChildren<{ className?: string }>, ref: React.Ref<HTMLSpanElement>) => (
+        <span ref={ref} className={className}>{children}</span>
       )); MotionSpan.displayName = 'motion.span'; return MotionSpan; })(),
     },
     useMotionValue: (initial: number) => ({
@@ -60,15 +54,7 @@ jest.mock('../../Avatar', () => ({
   default: ({ size, className }: { size: string; className?: string }) => <div data-testid="avatar" data-size={size} className={className} />,
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
-  CelebrationMascotWithEntrance: ({ variant }: { variant: string }) => <div data-testid="celebration-mascot" data-variant={variant} />,
-}));
-
-jest.mock('@/components/ui/Mascot', () => ({
-  MascotWithEntrance: ({ variant }: { variant: string }) => <div data-testid="mascot" data-variant={variant} />,
-}));
-
-describe('PlacementHero — Podium Celebration', () => {
+describe('PlacementHero — Clean Compact Layout', () => {
 
   const PlacementHero = require('../PlacementHero').default;
 
@@ -80,13 +66,7 @@ describe('PlacementHero — Podium Celebration', () => {
     avatar: { customAvatar: null },
   };
 
-  it('renders rank badge with ordinal', () => {
-    render(<PlacementHero {...defaultProps} />);
-    // t() mock returns key — formatRankOrdinal(1, t) returns t('common.ordinal1')
-    expect(screen.getByText('common.ordinal1')).toBeInTheDocument();
-  });
-
-  it('renders ordinal placement text', () => {
+  it('renders rank ordinal in badge', () => {
     render(<PlacementHero {...defaultProps} />);
     expect(screen.getByText(/common\.ordinal1/)).toBeInTheDocument();
   });
@@ -96,69 +76,49 @@ describe('PlacementHero — Podium Celebration', () => {
     expect(screen.getByText('0')).toBeInTheDocument();
   });
 
-  it('renders FINAL SCORE label', () => {
+  it('renders points label', () => {
     render(<PlacementHero {...defaultProps} />);
-    expect(screen.getByText('results.finalScore')).toBeInTheDocument();
+    expect(screen.getByText('results.points')).toBeInTheDocument();
   });
 
-  it('renders GREAT VICTORY for 1st place', () => {
+  it('renders rank message in badge for 1st place', () => {
     render(<PlacementHero {...defaultProps} rank={1} />);
-    expect(screen.getByText('results.greatVictory')).toBeInTheDocument();
+    expect(screen.getByText(/results\.youWon/)).toBeInTheDocument();
   });
 
-  it('renders GREAT BATTLE for non-winners', () => {
+  it('renders rank message for 2nd place', () => {
     render(<PlacementHero {...defaultProps} rank={2} />);
-    expect(screen.getByText('results.greatBattle')).toBeInTheDocument();
+    expect(screen.getByText(/results\.secondPlace/)).toBeInTheDocument();
   });
 
-  it('renders GREAT BATTLE for 4th+ place', () => {
+  it('renders rank message for non-podium', () => {
     render(<PlacementHero {...defaultProps} rank={5} />);
-    expect(screen.getByText('results.greatBattle')).toBeInTheDocument();
+    expect(screen.getByText(/results\.betterLuckNextTime/)).toBeInTheDocument();
   });
 
   it('shows gap to winner for non-winners', () => {
     render(<PlacementHero {...defaultProps} rank={2} gapToWinner={85} />);
-    expect(screen.getByText(/results\.pointsBehind/)).toBeInTheDocument();
+    expect(screen.getByText(/-85/)).toBeInTheDocument();
   });
 
-  it('does not show gap to winner for 1st place', () => {
+  it('does not show gap for 1st place', () => {
     render(<PlacementHero {...defaultProps} rank={1} gapToWinner={0} />);
-    expect(screen.queryByText('results.pointsBehind')).not.toBeInTheDocument();
+    expect(screen.queryByText(/-0/)).not.toBeInTheDocument();
   });
 
-  it('renders avatar when provided', () => {
+  it('renders avatar', () => {
     render(<PlacementHero {...defaultProps} />);
     expect(screen.getByTestId('avatar')).toBeInTheDocument();
   });
 
-  it('renders avatar with 2xl size', () => {
+  it('renders avatar with xl size', () => {
     render(<PlacementHero {...defaultProps} />);
-    expect(screen.getByTestId('avatar')).toHaveAttribute('data-size', '2xl');
+    expect(screen.getByTestId('avatar')).toHaveAttribute('data-size', 'xl');
   });
 
   it('renders username', () => {
     render(<PlacementHero {...defaultProps} />);
     expect(screen.getByText('TestPlayer')).toBeInTheDocument();
-  });
-
-  it('renders celebration mascot for podium finishers', () => {
-    render(<PlacementHero {...defaultProps} rank={1} />);
-    expect(screen.getByTestId('celebration-mascot')).toBeInTheDocument();
-  });
-
-  it('renders encouraging mascot for non-podium', () => {
-    render(<PlacementHero {...defaultProps} rank={5} />);
-    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
-  });
-
-  it('renders oops mascot for zero score', () => {
-    render(<PlacementHero {...defaultProps} rank={5} score={0} />);
-    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'oops');
-  });
-
-  it('renders rank message badge', () => {
-    render(<PlacementHero {...defaultProps} rank={1} />);
-    expect(screen.getByText('results.youWon')).toBeInTheDocument();
   });
 
   it('fires confetti for top 3', () => {
@@ -170,7 +130,7 @@ describe('PlacementHero — Podium Celebration', () => {
     jest.useRealTimers();
   });
 
-  it('renders correct ordinal for 2nd, 3rd, 4th', () => {
+  it('renders correct ordinals for 2nd, 3rd, 4th', () => {
     const { rerender } = render(<PlacementHero {...defaultProps} rank={2} />);
     expect(screen.getByText(/common\.ordinal2/)).toBeInTheDocument();
 
@@ -178,7 +138,6 @@ describe('PlacementHero — Podium Celebration', () => {
     expect(screen.getByText(/common\.ordinal3/)).toBeInTheDocument();
 
     rerender(<PlacementHero {...defaultProps} rank={4} />);
-    // rank >= 4 uses ordinalN with {n} param — mock t returns key as-is
     expect(screen.getByText(/common\.ordinalN/)).toBeInTheDocument();
   });
 
@@ -191,14 +150,5 @@ describe('PlacementHero — Podium Celebration', () => {
     expect(screen.getByText('SPECTRE')).toBeInTheDocument();
     expect(screen.getByText('results.foundByYou')).toBeInTheDocument();
     expect(screen.getByText('results.targetWord')).toBeInTheDocument();
-  });
-
-  it('does not render title text when wordHuntData provided', () => {
-    render(<PlacementHero {...defaultProps} wordHuntData={{
-      targetWord: 'SPECTRE',
-      foundTarget: false,
-      survivalTime: 90,
-    }} />);
-    expect(screen.queryByText('results.greatVictory')).not.toBeInTheDocument();
   });
 });

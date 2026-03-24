@@ -128,13 +128,8 @@ export function useMultiplayerSocket(
     const socketInstance = isReusingSocket ? existingSocket : getSharedSocket();
     socketRef.current = socketInstance;
 
-    // For existing connected sockets, set state immediately and request active rooms
-    if (isReusingSocket) {
-      setSocket(socketInstance);
-      setIsConnected(true);
-      socketInstance.emit('getActiveRooms');
-    } else if (socketInstance.connected) {
-      // Socket was connecting in background and is now connected — sync state immediately
+    // For already-connected sockets, set state immediately and request active rooms
+    if (socketInstance.connected) {
       setSocket(socketInstance);
       setIsConnected(true);
       socketInstance.emit('getActiveRooms');
@@ -164,6 +159,7 @@ export function useMultiplayerSocket(
       'hostTransferred',
       'kicked',
       'playerKicked',
+      'afkWarning',
       'pong',
     ];
     eventNames.forEach((event) => socketInstance.off(event));
@@ -259,17 +255,9 @@ export function useMultiplayerSocket(
           socketInstance.emit('requestGameState');
         }, 3000);
         reconnectFallbackTimerRef.current = fallbackTimer;
-
-        // Cancel fallback if we receive startGame before timeout
-        const cancelFallback = () => {
-          if (reconnectFallbackTimerRef.current) {
-            clearTimeout(reconnectFallbackTimerRef.current);
-            reconnectFallbackTimerRef.current = null;
-          }
-        };
-        socketInstance.once('startGame', cancelFallback);
-        socketInstance.once('resetGame', cancelFallback);
-        socketInstance.once('disconnect', cancelFallback);
+        // The fallback is cancelled in the main startGame/resetGame handlers below
+        // via reconnectFallbackTimerRef — no once() listeners needed, which avoids
+        // stale listener accumulation and event interception on rapid reconnects.
       }
     });
 
@@ -358,6 +346,11 @@ export function useMultiplayerSocket(
 
     socketInstance.on('startGame', (data) => {
       logger.log('[SOCKET.IO] startGame received:', data);
+      // Cancel reconnect fallback timer — we got the startGame we were waiting for
+      if (reconnectFallbackTimerRef.current) {
+        clearTimeout(reconnectFallbackTimerRef.current);
+        reconnectFallbackTimerRef.current = null;
+      }
       addGameBreadcrumb('game_started', {
         language: data.language,
         timerSeconds: data.timerSeconds,
@@ -368,6 +361,11 @@ export function useMultiplayerSocket(
 
     socketInstance.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
+      // Cancel reconnect fallback timer — game was reset, no need to request state
+      if (reconnectFallbackTimerRef.current) {
+        clearTimeout(reconnectFallbackTimerRef.current);
+        reconnectFallbackTimerRef.current = null;
+      }
       optionsRef.current.onGameReset();
     });
 

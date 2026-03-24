@@ -188,3 +188,27 @@ export function calculateWordScoreByLength(
   const dummyWord = 'A'.repeat(wordLength);
   return calculateWordScore(dummyWord, comboLevel, fireRoundMultiplier);
 }
+
+// ==============================================
+// WORD HUNT RANKING
+// ==============================================
+
+/**
+ * Sort players so the Word Hunt target finder ranks first, with ties broken by score.
+ * Used by both server (gameScores.ts) and client (useResultsData.ts) to ensure consistency.
+ *
+ * @param items - Array of objects with `username` and a score field
+ * @param targetFinder - Username of the player who found the target word
+ * @param getScore - Accessor for the score field (default: `item.score`)
+ */
+export function sortWithWordHuntWinner<T extends { username: string }>(
+  items: T[],
+  targetFinder: string,
+  getScore: (item: T) => number = (item: T) => (item as any).score ?? (item as any).totalScore ?? 0,
+): T[] {
+  return [...items].sort((a, b) => {
+    if (a.username === targetFinder && b.username !== targetFinder) return -1;
+    if (b.username === targetFinder && a.username !== targetFinder) return 1;
+    return getScore(b) - getScore(a);
+  });
+}

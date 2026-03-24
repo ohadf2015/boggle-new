@@ -329,20 +329,20 @@ export function useResultsSideEffects({
       isFirstGame
     );
 
-    // Record win and update streak
-    if (isCurrentUserWinner) {
-      const alreadyWonToday =
+    // Record game completion for streak (any game mode, win or loss)
+    {
+      const alreadyPlayedToday =
         lastWinDate && new Date(lastWinDate).toDateString() === new Date().toDateString();
 
       const prevStreak = currentStreak;
       setPreviousStreak(prevStreak);
       recordWin();
 
-      const newStreak = alreadyWonToday ? currentStreak : prevStreak + 1;
+      const newStreak = alreadyPlayedToday ? currentStreak : prevStreak + 1;
       trackStreakMilestone(newStreak);
 
       const tierThresholds = [3, 7, 14, 30];
-      const isNewMilestone = !alreadyWonToday && tierThresholds.some((t) => newStreak === t);
+      const isNewMilestone = !alreadyPlayedToday && tierThresholds.some((t) => newStreak === t);
 
       setWinStreakData({
         currentStreak: newStreak,

@@ -21,6 +21,7 @@ import {
 } from '@/utils/playerArchetypes';
 import type { WordObject } from '@/components/results/types';
 import type { Avatar } from '@/shared/types/game';
+import { sortWithWordHuntWinner } from '@/shared/utils/scoring';
 
 // ==============================================
 // TYPES
@@ -54,6 +55,10 @@ export interface UseResultsDataConfig {
   username: string | undefined;
   /** Game duration in seconds (for archetype calculation) */
   gameDuration?: number;
+  /** Game mode (e.g. 'word-hunt', 'blast') */
+  gameMode?: string;
+  /** Username of the player who found the Word Hunt target (winner override) */
+  wordHuntTargetFoundBy?: string | null;
 }
 
 /** Data returned from useResultsData hook */
@@ -146,6 +151,8 @@ export function useResultsData({
   finalScores,
   username,
   gameDuration = 180,
+  gameMode,
+  wordHuntTargetFoundBy,
 }: UseResultsDataConfig): UseResultsDataReturn {
   // ==============================================
   // USERNAME NORMALIZATION
@@ -163,10 +170,15 @@ export function useResultsData({
   // SCORE SORTING & RANKING
   // ==============================================
 
-  /** Sort scores by score (descending) */
+  /** Sort scores by score (descending). In Word Hunt, target finder ranks first. */
   const sortedScores = useMemo(() => {
-    return finalScores ? [...finalScores].sort((a, b) => b.score - a.score) : [];
-  }, [finalScores]);
+    if (!finalScores) return [];
+    const sorted = [...finalScores].sort((a, b) => b.score - a.score);
+    if (gameMode === 'word-hunt' && wordHuntTargetFoundBy) {
+      return sortWithWordHuntWinner(sorted, wordHuntTargetFoundBy, (p) => p.score);
+    }
+    return sorted;
+  }, [finalScores, gameMode, wordHuntTargetFoundBy]);
 
   /** Winning player (highest score) */
   const winner = sortedScores[0];

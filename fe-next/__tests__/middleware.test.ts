@@ -11,7 +11,7 @@
 const mockGetUser = jest.fn();
 const mockGetSession = jest.fn();
 jest.mock('@supabase/ssr', () => ({
-  createServerClient: jest.fn((_url: string, _key: string, opts: { cookies: { setAll: (cookies: unknown[]) => void } }) => {
+  createServerClient: jest.fn((_url: string, _key: string, _opts: { cookies: { setAll: (cookies: unknown[]) => void } }) => {
     return {
       auth: {
         getUser: mockGetUser,
@@ -86,6 +86,13 @@ describe('Proxy — Supabase Auth Refresh', () => {
   it('should refresh auth on API routes (not skip them)', async () => {
     await proxy(makeRequest('/api/adventure/complete'));
     expect(mockGetUser).toHaveBeenCalledTimes(1);
+  });
+
+  it('should NOT locale-redirect API routes', async () => {
+    await proxy(makeRequest('/api/adventure/state'));
+    // API routes must return NextResponse.next(), never redirect/rewrite
+    expect(NextResponse.redirect).not.toHaveBeenCalled();
+    expect(NextResponse.rewrite).not.toHaveBeenCalled();
   });
 
   it('should skip static files entirely', async () => {

@@ -146,7 +146,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     currentStreak,
   });
 
-  useWinStreakTracking({ mode, isWinner });
+  useWinStreakTracking({ isGameComplete: true });
 
   // Save unfinished board for carry-over feature
   const { saveUnfinishedBoard } = useUnfinishedBoard();

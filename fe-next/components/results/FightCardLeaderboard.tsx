@@ -1,12 +1,11 @@
 'use client';
 
-import React, { memo, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ShieldCheck, Skull, Trophy } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ShieldCheck, Skull, Trophy, Crown, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Avatar from '../Avatar';
-import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import { ScoreCountUp } from '@/components/results/shared';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -44,43 +43,28 @@ interface FightCardLeaderboardProps {
 }
 
 // ============================================================
-// EMOJI BUBBLE
+// RANK ACCENTS — minimal color per rank
 // ============================================================
 
-function EmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onDone, 2500);
-    return () => clearTimeout(timer);
-  }, [onDone]);
-
-  return (
-    <motion.div
-      initial={{ scale: 0, y: 10, opacity: 0 }}
-      animate={{ scale: 1, y: -8, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-      className="absolute -top-2 end-10 z-20 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
-    >
-      {emoji}
-      <div className="absolute -bottom-1.5 end-3 w-3 h-3 bg-neo-cream border-b-3 border-s-3 border-neo-black rotate-45" />
-    </motion.div>
-  );
+interface RankAccent {
+  borderColor: string;
+  textColor: string;
+  rankBg: string;
+  rankText: string;
 }
 
-// ============================================================
-// RANK ACCENT CONFIG
-// ============================================================
-
-const RANK_ACCENTS: Record<number, { borderColor: string; textColor: string; rankBoxBorder: string }> = {
-  1: { borderColor: 'border-s-neo-lime', textColor: 'text-neo-lime', rankBoxBorder: 'border-neo-lime' },
-  2: { borderColor: 'border-s-neo-cyan', textColor: 'text-neo-cyan', rankBoxBorder: 'border-neo-cyan' },
-  3: { borderColor: 'border-s-neo-orange', textColor: 'text-neo-orange', rankBoxBorder: 'border-neo-orange' },
+const RANK_ACCENTS: Record<number, RankAccent> = {
+  1: { borderColor: 'border-neo-lime/40', textColor: 'text-neo-lime', rankBg: 'bg-neo-lime', rankText: 'text-neo-black' },
+  2: { borderColor: 'border-neo-cyan/30', textColor: 'text-neo-cyan', rankBg: 'bg-neo-cyan', rankText: 'text-neo-black' },
+  3: { borderColor: 'border-neo-orange/30', textColor: 'text-neo-orange', rankBg: 'bg-neo-orange', rankText: 'text-neo-black' },
 };
 
-const DEFAULT_ACCENT = { borderColor: 'border-s-slate-700', textColor: 'text-slate-400', rankBoxBorder: 'border-slate-700' };
+const DEFAULT_ACCENT: RankAccent = {
+  borderColor: 'border-slate-700/30', textColor: 'text-slate-400', rankBg: 'bg-slate-700', rankText: 'text-slate-300',
+};
 
 // ============================================================
-// PLAYER ROW — Fight Card Style (responsive)
+// PLAYER ROW — Clean, minimal
 // ============================================================
 
 interface PlayerRowProps {
@@ -91,139 +75,60 @@ interface PlayerRowProps {
   index: number;
   showProgressBar?: boolean;
   eliminated?: boolean;
-  emojiReactions: EmojiReaction[];
-  onDismissBubble: (id: string) => void;
   t: (key: string) => string;
 }
 
 const PlayerRow: React.FC<PlayerRowProps> = ({
   participant, rank, isCurrentPlayer, reducedMotion, index,
-  showProgressBar, eliminated, emojiReactions, onDismissBubble, t,
+  showProgressBar, eliminated, t,
 }) => {
   const accent = RANK_ACCENTS[rank] ?? DEFAULT_ACCENT;
 
-  // Fight card scaling: rank 1 larger, dramatic falloff for lower ranks
-  const scaleDown = rank === 1 ? 1.02 : rank === 2 ? 0.98 : rank === 3 ? 0.95 : 0.9;
-  const opacityDown = rank === 1 ? 1 : rank === 2 ? 0.9 : rank === 3 ? 0.75 : 0.55;
-
-  const rowBubbles = emojiReactions.filter(r => r.username === participant.name);
-
   return (
     <motion.div
-      initial={reducedMotion ? undefined : {
-        opacity: 0,
-        y: 30 + index * 4,
-        x: rank === 1 ? -15 : 0,
-        scale: 0.85,
-        rotate: rank === 1 ? -2 : index % 2 === 0 ? 1 : -1,
-      }}
-      animate={{
-        opacity: opacityDown,
-        y: 0,
-        x: 0,
-        scale: eliminated ? 0.93 : scaleDown,
-        rotate: 0,
-      }}
-      transition={{
-        type: 'spring',
-        stiffness: 260,
-        damping: 14,
-        delay: reducedMotion ? 0 : 0.1 * index,
-      }}
+      initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+      animate={{ opacity: eliminated ? 0.4 : 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 22, delay: reducedMotion ? 0 : 0.06 * index }}
       className={cn(
-        'relative flex items-center gap-2 sm:gap-3 border-3 border-neo-black',
-        // Rank 1: larger padding + thicker left accent
-        rank === 1 ? 'p-3 sm:p-4 shadow-hard-xl border-s-[8px] sm:border-s-[10px]' : 'p-2.5 sm:p-3 shadow-hard border-s-[5px] sm:border-s-[6px]',
+        'flex items-center gap-2.5 rounded-neo border-2 p-2.5 sm:p-3',
         accent.borderColor,
-        isCurrentPlayer && !eliminated ? 'bg-neo-cyan/10' : rank === 1 ? 'bg-slate-800/70' : 'bg-slate-800/20',
-        eliminated && 'filter grayscale',
+        isCurrentPlayer && !eliminated && 'bg-neo-white/[0.04] border-neo-cyan/40',
+        eliminated && 'opacity-40',
       )}
-      style={eliminated ? { opacity: 0.5 } : undefined}
     >
-      {/* Current player: pulsing cyan border glow */}
-      {isCurrentPlayer && !eliminated && !reducedMotion && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none border-2 border-neo-cyan rounded-[1px]"
-          animate={{
-            borderColor: ['var(--neo-cyan)', '#fff', 'var(--neo-cyan)'],
-            boxShadow: ['0 0 0px var(--neo-cyan)', '0 0 10px var(--neo-cyan)', '0 0 0px var(--neo-cyan)'],
-          }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+      {/* Rank */}
+      <div className={cn(
+        'shrink-0 flex items-center justify-center rounded-neo font-black w-7 h-7 text-xs',
+        accent.rankBg, accent.rankText,
+      )}>
+        {rank === 1 ? <Crown className="w-4 h-4" /> : rank}
+      </div>
+
+      {/* Avatar */}
+      <div className={cn(
+        'rounded-full border-2 overflow-hidden shrink-0 w-9 h-9',
+        rank === 1 ? 'border-neo-lime/40 bg-neo-cream' : 'border-slate-700 bg-slate-800',
+      )}>
+        <Avatar
+          customAvatar={participant.avatar?.customAvatar}
+          userId={participant.name}
+          size="md"
         />
-      )}
-
-      {/* Winner: trophy watermark + diagonal energy stripes */}
-      {rank === 1 && !eliminated && (
-        <>
-          <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 14px, #fff 14px, #fff 16px)' }} />
-          <div className="absolute top-0 end-0 p-1.5 sm:p-2 opacity-[0.08] pointer-events-none">
-            <Trophy className="w-10 h-10 sm:w-14 sm:h-14 text-white" />
-          </div>
-        </>
-      )}
-
-      {/* Emoji speech bubbles */}
-      <AnimatePresence>
-        {rowBubbles.map(r => (
-          <EmojiBubble key={r.id} emoji={r.emoji} onDone={() => onDismissBubble(r.id)} />
-        ))}
-      </AnimatePresence>
-
-      {/* Rank box — responsive sizing */}
-      <div className={cn(
-        'shrink-0 flex items-center justify-center border-3 bg-neo-black font-neo-display',
-        rank === 1 ? 'w-8 h-8 sm:w-10 sm:h-10 text-lg sm:text-xl' : 'w-7 h-7 sm:w-8 sm:h-8 text-base sm:text-lg',
-        accent.rankBoxBorder,
-      )}>
-        <span className={accent.textColor}>{rank}</span>
       </div>
 
-      {/* Avatar — larger for better recognition */}
-      <div className={cn(
-        'rounded-full border-3 border-neo-black overflow-hidden shrink-0',
-        rank === 1 ? 'w-12 h-12 sm:w-14 sm:h-14 bg-neo-cream' : isCurrentPlayer ? 'w-10 h-10 sm:w-12 sm:h-12 bg-neo-cyan/20' : 'w-10 h-10 sm:w-12 sm:h-12 bg-slate-700',
-      )}>
-        <PlayerProfileTooltip
-          player={{
-            username: participant.name,
-            customAvatar: participant.avatar?.customAvatar,
-            score: participant.score,
-          }}
-          isCurrentUser={isCurrentPlayer}
-          side="right"
-        >
-          <Avatar
-            customAvatar={participant.avatar?.customAvatar}
-            userId={participant.name}
-            size={rank === 1 ? 'lg' : 'md'}
-          />
-        </PlayerProfileTooltip>
-      </div>
-
-      {/* Name + subtitle + optional progress bar */}
+      {/* Name */}
       <div className="flex-1 min-w-0">
         <p className={cn(
-          'font-neo-display uppercase leading-none truncate',
-          rank === 1 ? 'text-base sm:text-xl text-white' : 'text-sm sm:text-lg',
-          isCurrentPlayer ? 'text-white' : eliminated ? 'text-white/60' : 'text-white',
+          'font-neo-display uppercase leading-none truncate text-xs sm:text-sm',
+          isCurrentPlayer ? 'text-white' : eliminated ? 'text-white/40' : 'text-neo-cream/80',
         )}>
           {isCurrentPlayer ? t('results.you').replace(/[()]/g, '') : participant.name}
         </p>
-        {isCurrentPlayer && !eliminated && (
-          <p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', accent.textColor)}>
-            {rank === 1 ? t('results.ultimateChampion') : t('results.risingContender')}
-          </p>
-        )}
-        {rank === 1 && !isCurrentPlayer && !eliminated && (
-          <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-neo-lime">
-            {t('results.ultimateChampion')}
-          </p>
-        )}
-        {/* Word Hunt: progress bar with animated fill */}
+        {/* Word Hunt: life bar */}
         {showProgressBar && participant.lifeRemaining !== undefined && (
-          <div className="w-full h-1 sm:h-1.5 bg-neo-black mt-1 border-[1px] border-slate-700">
+          <div className="w-full h-1 bg-slate-800 mt-1 rounded-full overflow-hidden">
             <motion.div
-              className={cn('h-full', isCurrentPlayer ? 'bg-neo-cyan' : 'bg-neo-lime')}
+              className={cn('h-full rounded-full', isCurrentPlayer ? 'bg-neo-cyan' : 'bg-neo-lime')}
               initial={{ width: 0 }}
               animate={{ width: `${Math.max(0, Math.min(100, participant.lifeRemaining * 100))}%` }}
               transition={{ delay: 0.3 + index * 0.1, duration: 0.6, ease: 'easeOut' }}
@@ -232,38 +137,44 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         )}
       </div>
 
-      {/* Score — animate only rank 1 + current player to reduce visual noise */}
-      <div className="text-end shrink-0">
-        <span className={cn(
-          'font-neo-display tabular-nums',
-          rank === 1 ? 'text-xl sm:text-2xl' : 'text-base sm:text-xl',
-          rank === 1 ? accent.textColor : isCurrentPlayer ? 'text-white' : 'text-white/40',
-        )}>
-          {(rank === 1 || isCurrentPlayer) ? (
-            <ScoreCountUp to={participant.score} duration={1200} delay={reducedMotion ? 0 : 80 * index + 200} />
-          ) : (
-            participant.score.toLocaleString()
-          )}
-        </span>
-      </div>
+      {/* Score */}
+      <span className={cn(
+        'shrink-0 font-neo-display font-black tabular-nums text-sm sm:text-base',
+        rank === 1 ? accent.textColor : isCurrentPlayer ? 'text-white' : 'text-neo-cream/40',
+      )}>
+        {(rank === 1 || isCurrentPlayer) ? (
+          <ScoreCountUp to={participant.score} duration={1000} delay={reducedMotion ? 0 : 60 * index + 200} />
+        ) : (
+          participant.score.toLocaleString()
+        )}
+      </span>
     </motion.div>
   );
 };
+
+// ============================================================
+// SECTION HEADER
+// ============================================================
+
+function SectionHeader({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) {
+  return (
+    <div className="flex items-center gap-2 px-1 mb-1.5">
+      {icon}
+      <h2 className={cn('font-black text-[10px] uppercase tracking-[0.15em]', color)}>{label}</h2>
+    </div>
+  );
+}
 
 // ============================================================
 // MAIN COMPONENT
 // ============================================================
 
 const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
-  participants, currentUsername, gameMode, emojiReactions = [], className, deferRankings = false,
+  participants, currentUsername, gameMode, className, deferRankings = false,
 }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
-  const [dismissedBubbles, setDismissedBubbles] = useState<Set<string>>(new Set());
   const [expanded, setExpanded] = useState(false);
-
-  const activeBubbles = emojiReactions.filter(r => !dismissedBubbles.has(r.id));
-  const handleDismiss = (id: string) => setDismissedBubbles(prev => new Set(prev).add(id));
 
   if (participants.length === 0) return null;
 
@@ -275,44 +186,32 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
     const eliminated = participants.filter(p => p.survived === false);
 
     return (
-      <div className={cn('space-y-4 sm:space-y-5', className)}>
+      <div className={cn('border-3 border-neo-black rounded-neo bg-neo-navy/50 shadow-hard overflow-hidden', className)}>
         {survivors.length > 0 && (
-          <div className="space-y-1.5 sm:space-y-2">
-            <div className="flex items-center gap-2 px-1">
-              <ShieldCheck className="w-4 h-4 text-neo-lime" />
-              <h2 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] text-neo-lime">
-                {t('results.survivors')}
-              </h2>
-            </div>
+          <div className="p-2.5 sm:p-3 space-y-1.5">
+            <SectionHeader icon={<ShieldCheck className="w-3.5 h-3.5 text-neo-lime" />} label={t('results.survivors')} color="text-neo-lime" />
             {survivors.map((p, i) => {
               const globalRank = participants.indexOf(p) + 1;
               return (
                 <PlayerRow
                   key={p.name} participant={p} rank={globalRank}
                   isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
-                  reducedMotion={reducedMotion} index={i} showProgressBar
-                  emojiReactions={activeBubbles} onDismissBubble={handleDismiss} t={t}
+                  reducedMotion={reducedMotion} index={i} showProgressBar t={t}
                 />
               );
             })}
           </div>
         )}
         {eliminated.length > 0 && (
-          <div className="space-y-1.5 sm:space-y-2">
-            <div className="flex items-center gap-2 px-1">
-              <Skull className="w-4 h-4 text-neo-red" />
-              <h2 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] text-neo-red">
-                {t('results.eliminated')}
-              </h2>
-            </div>
+          <div className={cn('p-2.5 sm:p-3 space-y-1.5', survivors.length > 0 && 'border-t-2 border-slate-700/30')}>
+            <SectionHeader icon={<Skull className="w-3.5 h-3.5 text-neo-red" />} label={t('results.eliminated')} color="text-neo-red" />
             {eliminated.map((p, i) => {
               const globalRank = participants.indexOf(p) + 1;
               return (
                 <PlayerRow
                   key={p.name} participant={p} rank={globalRank}
                   isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
-                  reducedMotion={reducedMotion} index={survivors.length + i} eliminated
-                  emojiReactions={activeBubbles} onDismissBubble={handleDismiss} t={t}
+                  reducedMotion={reducedMotion} index={survivors.length + i} eliminated t={t}
                 />
               );
             })}
@@ -322,47 +221,50 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
     );
   }
 
-  // Deferred rankings: show top 2 + current player, collapse the rest
+  // Deferred rankings: show top 2 + current player (always visible), collapse the rest
   const shouldDefer = deferRankings && participants.length > 3 && !expanded;
   const visibleParticipants = shouldDefer
     ? participants.filter((p, i) => i < 2 || p.isCurrentPlayer || p.name === currentUsername)
     : participants;
   const hiddenCount = participants.length - visibleParticipants.length;
 
-  // Classic / Blast: single ranked list
   return (
-    <div className={cn('space-y-1.5 sm:space-y-2', className)}>
-      <div className="flex items-center justify-between px-1 mb-2 sm:mb-2.5">
-        <h2 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] text-neo-cream/50">
-          {t('results.battleRankings')}
-        </h2>
-        <span className="text-[9px] sm:text-[10px] font-black bg-neo-black px-2 py-0.5 border-3 border-slate-700 uppercase text-white/50 shadow-hard-sm tracking-wider">
+    <div className={cn('border-3 border-neo-black rounded-neo bg-neo-navy/50 shadow-hard overflow-hidden', className)}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b-2 border-slate-700/30">
+        <div className="flex items-center gap-1.5">
+          <Trophy className="w-3.5 h-3.5 text-neo-cream/30" />
+          <h2 className="font-black text-[10px] uppercase tracking-[0.15em] text-neo-cream/40">
+            {t('results.battleRankings')}
+          </h2>
+        </div>
+        <span className="text-[9px] font-bold text-neo-cream/30">
           {participants.length} {t('results.players')}
         </span>
       </div>
-      {visibleParticipants.map((p) => {
-        const originalIndex = participants.indexOf(p);
-        return (
-          <PlayerRow
-            key={p.name} participant={p} rank={originalIndex + 1}
-            isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
-            reducedMotion={reducedMotion} index={originalIndex}
-            emojiReactions={activeBubbles} onDismissBubble={handleDismiss} t={t}
-          />
-        );
-      })}
-      {/* Expand button for deferred rankings */}
-      {shouldDefer && hiddenCount > 0 && (
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          onClick={() => setExpanded(true)}
-          className="w-full py-2.5 border-3 border-dashed border-slate-600 text-xs font-black uppercase tracking-wider text-neo-cream/50 hover:text-neo-cream hover:border-neo-cream/40 transition-colors"
-        >
-          {t('results.showAllRankings', { count: hiddenCount })}
-        </motion.button>
-      )}
+
+      {/* Rows */}
+      <div className="p-2 sm:p-2.5 space-y-1.5">
+        {visibleParticipants.map((p) => {
+          const originalIndex = participants.indexOf(p);
+          return (
+            <PlayerRow
+              key={p.name} participant={p} rank={originalIndex + 1}
+              isCurrentPlayer={p.isCurrentPlayer ?? p.name === currentUsername}
+              reducedMotion={reducedMotion} index={originalIndex} t={t}
+            />
+          );
+        })}
+        {shouldDefer && hiddenCount > 0 && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="w-full py-2 rounded-neo border-2 border-dashed border-slate-700/40 text-[10px] font-black uppercase tracking-wider text-neo-cream/30 hover:text-neo-cream/60 hover:border-neo-cream/20 transition-colors flex items-center justify-center gap-1"
+          >
+            <ChevronDown className="w-3 h-3" />
+            {t('results.showAllRankings', { count: hiddenCount })}
+          </button>
+        )}
+      </div>
     </div>
   );
 });

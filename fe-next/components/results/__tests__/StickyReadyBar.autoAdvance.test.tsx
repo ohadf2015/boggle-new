@@ -1,7 +1,8 @@
 /**
  * StickyReadyBar Auto-Advance Tests
  *
- * Tests for the host auto-advance countdown when all non-host players are ready.
+ * Tests for the host auto-advance inline countdown when all players are ready.
+ * The countdown is now built into StickyReadyBar (no external AutoPlayCountdown).
  */
 
 import React from 'react';
@@ -15,9 +16,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'results.playAgain': 'START GAME',
         'results.imReady': "I'M READY",
         'results.youAreReady': 'YOU ARE READY',
-        'results.waitingForHostToStart': 'Waiting for host...',
-        'results.waitingForPlayers': 'Waiting for players...',
         'results.revengeRematch': `Revenge on ${params?.player ?? ''}!`,
+        'autoPlay.exit': 'Exit',
       };
       return translations[key] ?? key;
     },
@@ -28,13 +28,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
-      <div className={className} {...props}>{children}</div>
+    div: ({ children, className, style, ...props }: any) => (
+      <div className={className} style={style} {...props}>{children}</div>
     ),
-    button: React.forwardRef(function MotionButton({ children, ...props }: any, ref: any) {
-      return <button ref={ref} {...props}>{children}</button>;
+    button: React.forwardRef(function MotionButton({ children, style, ...props }: any, ref: any) {
+      return <button ref={ref} style={style} {...props}>{children}</button>;
     }),
-    span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode }) => (
+    span: ({ children, className, ...props }: any) => (
       <span className={className} {...props}>{children}</span>
     ),
   },
@@ -42,28 +42,18 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-// Mock AutoPlayCountdown
-const mockOnComplete = jest.fn();
-const mockOnCancel = jest.fn();
-jest.mock('../AutoPlayCountdown', () => ({
-  __esModule: true,
-  default: ({ onComplete, onCancel }: { onComplete: () => void; onCancel: () => void }) => (
-    <div data-testid="auto-play-countdown">
-      <button data-testid="countdown-complete" onClick={onComplete}>Complete</button>
-      <button data-testid="countdown-cancel" onClick={onCancel}>Cancel</button>
-    </div>
-  ),
-}));
-
 // Mock Avatar
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
-  default: () => <div data-testid="avatar" />,
+  default: ({ userId }: { userId?: string }) => <div data-testid={`avatar-${userId}`} />,
 }));
 
-// Mock GameModeSelector
+// Mock GameModeSelector exports
 jest.mock('@/components/GameModeSelector', () => ({
   GameModeSelector: () => <div data-testid="game-mode-selector" />,
+  MODE_ICONS: { random: '🔀', classic: '📄', blast: '💣', 'word-hunt': '🎯' },
+  MODE_ACTIVE_COLORS: { random: '', classic: '', blast: '', 'word-hunt': '' },
+  getModeLabel: (mode: string) => mode,
 }));
 
 import StickyReadyBar from '../StickyReadyBar';
@@ -77,12 +67,15 @@ describe('StickyReadyBar auto-advance', () => {
     totalPlayers: 3,
     onStartGame: jest.fn(),
     onMarkReady: jest.fn(),
-    readyUsernames: [] as string[],
-    players: [],
   };
 
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('shows normal start button when not all players are ready', () => {
@@ -95,10 +88,9 @@ describe('StickyReadyBar auto-advance', () => {
     );
 
     expect(screen.getByText('START GAME')).toBeInTheDocument();
-    expect(screen.queryByTestId('auto-play-countdown')).not.toBeInTheDocument();
   });
 
-  it('shows AutoPlayCountdown when all non-host players are ready', () => {
+  it('shows inline countdown when all players are ready (host)', () => {
     render(
       <StickyReadyBar
         {...baseProps}
@@ -107,10 +99,15 @@ describe('StickyReadyBar auto-advance', () => {
       />
     );
 
-    expect(screen.getByTestId('auto-play-countdown')).toBeInTheDocument();
+    // Should show the countdown number (starts at 5)
+    expect(screen.getByText('5')).toBeInTheDocument();
+    // Should show exit button
+    expect(screen.getByLabelText('Exit')).toBeInTheDocument();
+    // Should NOT show START GAME text
+    expect(screen.queryByText('START GAME')).not.toBeInTheDocument();
   });
 
-  it('auto-calls onStartGame when countdown completes', () => {
+  it('calls onStartGame when countdown reaches zero', () => {
     const onStartGame = jest.fn();
     render(
       <StickyReadyBar
@@ -121,7 +118,27 @@ describe('StickyReadyBar auto-advance', () => {
       />
     );
 
-    fireEvent.click(screen.getByTestId('countdown-complete'));
+    // Advance through 5 seconds
+    act(() => { jest.advanceTimersByTime(5000); });
+
+    expect(onStartGame).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onStartGame immediately when countdown button is clicked', () => {
+    const onStartGame = jest.fn();
+    render(
+      <StickyReadyBar
+        {...baseProps}
+        readyCount={3}
+        totalPlayers={3}
+        onStartGame={onStartGame}
+      />
+    );
+
+    // Click the countdown button to start immediately
+    const countdownNumber = screen.getByText('5');
+    fireEvent.click(countdownNumber.closest('button')!);
+
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
@@ -135,11 +152,10 @@ describe('StickyReadyBar auto-advance', () => {
     );
 
     // Cancel the countdown
-    fireEvent.click(screen.getByTestId('countdown-cancel'));
+    fireEvent.click(screen.getByLabelText('Exit'));
 
     // Should now show the normal start button
     expect(screen.getByText('START GAME')).toBeInTheDocument();
-    expect(screen.queryByTestId('auto-play-countdown')).not.toBeInTheDocument();
   });
 
   it('does not show countdown for non-host players', () => {
@@ -153,7 +169,7 @@ describe('StickyReadyBar auto-advance', () => {
       />
     );
 
-    expect(screen.queryByTestId('auto-play-countdown')).not.toBeInTheDocument();
+    expect(screen.getByText('YOU ARE READY')).toBeInTheDocument();
   });
 
   it('does not show countdown when totalPlayers is 0', () => {
@@ -165,6 +181,6 @@ describe('StickyReadyBar auto-advance', () => {
       />
     );
 
-    expect(screen.queryByTestId('auto-play-countdown')).not.toBeInTheDocument();
+    expect(screen.getByText('START GAME')).toBeInTheDocument();
   });
 });

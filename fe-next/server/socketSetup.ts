@@ -67,6 +67,12 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  // Create Supabase client once and reuse across all auth checks
+  // (previously recreated per connection — unnecessary overhead)
+  const supabase = supabaseUrl && supabaseServiceKey
+    ? createSupabaseClient(supabaseUrl, supabaseServiceKey)
+    : null;
+
   io.use(async (socket, next) => {
     const token = socket.handshake.auth?.token as string | undefined;
 
@@ -76,14 +82,13 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       return next();
     }
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabase) {
       console.warn('[SOCKET.IO] Auth middleware: Supabase not configured, skipping verification');
       socket.data.verifiedUserId = null;
       return next();
     }
 
     try {
-      const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey);
       const { data: { user }, error } = await supabase.auth.getUser(token);
 
       if (error || !user) {
@@ -124,13 +129,12 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       return next(new Error('Authentication required for duels'));
     }
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabase) {
       console.warn('[DUEL] Auth middleware: Supabase not configured');
       return next(new Error('Authentication service unavailable'));
     }
 
     try {
-      const supabase = createSupabaseClient(supabaseUrl, supabaseServiceKey);
       const { data: { user }, error } = await supabase.auth.getUser(token);
 
       if (error || !user) {

@@ -21,14 +21,14 @@ interface GameModeSelectorProps {
   compact?: boolean;
 }
 
-const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
+export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   random: <Shuffle className="w-4 h-4" />,
   classic: <FileText className="w-4 h-4" />,
   blast: <Bomb className="w-4 h-4" />,
   'word-hunt': <Target className="w-4 h-4" />,
 };
 
-const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
+export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   random: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
   classic: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
   blast: 'bg-neo-orange/30 text-neo-orange border-neo-orange/60',
@@ -42,7 +42,7 @@ const MODE_GLOW: Record<GameModeOption, string> = {
   'word-hunt': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
 };
 
-function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
+export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
   const labels: Record<GameModeOption, string> = {
     random: t('gameModes.random'),
     classic: t('gameModes.classic.name'),

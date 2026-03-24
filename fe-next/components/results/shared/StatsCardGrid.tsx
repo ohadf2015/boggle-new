@@ -23,12 +23,12 @@ interface StatsCardGridProps {
 }
 
 const accentBg: Record<string, string> = {
-  lime: 'bg-neo-lime/10 border-neo-lime/25 border-t-neo-lime',
-  pink: 'bg-neo-pink/10 border-neo-pink/25 border-t-neo-pink',
-  orange: 'bg-neo-orange/10 border-neo-orange/25 border-t-neo-orange',
-  cyan: 'bg-neo-cyan/10 border-neo-cyan/25 border-t-neo-cyan',
-  amber: 'bg-amber-500/10 border-amber-500/25 border-t-amber-500',
-  default: 'bg-slate-800/50 border-slate-700/50 border-t-slate-500',
+  lime: 'bg-neo-lime/8 border-neo-lime/30',
+  pink: 'bg-neo-pink/8 border-neo-pink/30',
+  orange: 'bg-neo-orange/8 border-neo-orange/30',
+  cyan: 'bg-neo-cyan/8 border-neo-cyan/30',
+  amber: 'bg-amber-500/8 border-amber-500/30',
+  default: 'bg-slate-800/40 border-slate-700/40',
 };
 
 const container = {
@@ -69,7 +69,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
         animate="show"
         data-testid="stats-grid"
         className={cn(
-          'bg-slate-800/50 rounded-xl border border-slate-700/50 p-3',
+          'bg-neo-navy/60 rounded-neo border-2 border-slate-700/40 p-3',
           className,
         )}
       >
@@ -105,7 +105,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
     );
   }
 
-  // Grid variant — neo-brutalist cards
+  // Grid variant — clean neo-brutalist cards
   return (
     <motion.div
       variants={container}
@@ -122,32 +122,18 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
         <motion.div
           key={card.label}
           variants={prefersReduced ? cardReduced : cardVariant}
-          whileHover={prefersReduced ? undefined : { y: -3, scale: 1.04, rotate: 1 }}
-          whileTap={prefersReduced ? undefined : { scale: 0.96, rotate: -1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 10 }}
           className={cn(
-            'rounded-neo border-3 border-t-4 p-3 text-center cursor-default relative overflow-hidden shadow-hard-sm',
+            'rounded-neo border-2 p-2.5 text-center',
             accentBg[card.accent ?? 'default'],
           )}
         >
-          {/* Halftone texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
-          {/* Top glow */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(ellipse_at_top,#fff_0%,transparent_50%)]" />
           {card.icon && (
-            <motion.div
-              className="text-xl mb-1 relative z-10"
-              initial={prefersReduced ? undefined : { scale: 0, rotate: -15 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 12, delay: 0.35 }}
-            >
-              {card.icon}
-            </motion.div>
+            <div className="text-lg mb-0.5">{card.icon}</div>
           )}
-          <div className="text-2xl font-black text-white tabular-nums relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+          <div className="text-xl font-black text-white tabular-nums">
             {card.value}
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
             {card.label}
           </div>
         </motion.div>

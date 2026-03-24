@@ -15,6 +15,7 @@ import {
 } from '../../modules/communityWordManager';
 import { validateWordsWithAI, isAIServiceAvailable } from '../../modules/aiValidationService';
 import { calculateGameScores, type PlayerScoreResult } from '../../modules/scoringEngine';
+import { sortWithWordHuntWinner } from '@/shared/utils/scoring';
 import {
   awardFinalAchievements,
   ACHIEVEMENT_ICONS,
@@ -128,11 +129,11 @@ export async function calculateAndBroadcastFinalScores(
   // Get player count for duplicate rule logic
   const playerCount = Object.keys(game.users || {}).length;
 
-  // Disable duplicate rule for large rooms (more than 7 players)
-  const duplicateRuleDisabled = playerCount > 7;
+  // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
+  const duplicateRuleDisabled = playerCount > 7 || game.gameMode === 'word-hunt';
 
   // Calculate final scores
-   
+
   const finalScores: PlayerScoreResult[] = calculateGameScores(
     game as any,
     wordCountMap,
@@ -141,6 +142,14 @@ export async function calculateAndBroadcastFinalScores(
     aiValidatedWords,
     { playerCount, gameMode: game.gameMode }
   );
+
+  // In Word Hunt, the player who found the target word is the winner
+  // Re-sort so target finder ranks first, others by score
+  if (game.gameMode === 'word-hunt' && game.wordHuntState?.targetFoundBy) {
+    const sorted = sortWithWordHuntWinner(finalScores, game.wordHuntState.targetFoundBy, (p) => p.totalScore);
+    finalScores.length = 0;
+    finalScores.push(...sorted);
+  }
 
   // Update game state with final scores
   for (const playerResult of finalScores) {
