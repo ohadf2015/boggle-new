@@ -369,10 +369,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Main Content - uses isolate-scroll-daily on mobile for fixed tab bar compatibility */}
-      {/* Note: isolate-scroll-daily only subtracts AutoHideHeader (60px), not GlobalBottomNav (64px) */}
-      {/* because daily pages hide GlobalBottomNav and have their own MobileTabBar with pb-[--mobile-bottom-safe] */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area isolate-scroll-daily px-3 pb-[--mobile-bottom-safe] md:pb-6">
+      {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
+      {/* Bottom padding accounts for fixed MobileTabBar (--mobile-bottom-safe = 80px + safe-area) */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[--mobile-bottom-safe] md:pb-6">
         {/* Mobile: Tab-based content */}
         <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}

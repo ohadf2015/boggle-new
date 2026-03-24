@@ -219,23 +219,22 @@ describe('DailyWordHuntResults Mobile Scroll with Fixed Tab Bar', () => {
   const source = readFileSync(sourcePath, 'utf-8');
 
   describe('Mobile scroll isolation', () => {
-    it('should have an isolated scroll container that works independently of body scroll', () => {
+    it('should have a flex-based scroll container that fills remaining space', () => {
       // CRITICAL BUG FIX:
       // When content has a fixed bottom tab bar, the scrollable area needs to:
-      // 1. Be isolated from parent scroll context (not rely on body scroll)
-      // 2. Have explicit height constraints (h-full or fixed height formula)
-      // 3. Handle the fixed tab bar spacing correctly
+      // 1. Use flex-1 min-h-0 to fill remaining space after sibling elements
+      // 2. Have overflow-y-auto to enable scrolling
+      // 3. Have bottom padding for the fixed tab bar
       //
-      // The problem: screen-fit-content has `overflow: visible !important` which
-      // delegates scrolling to the body. But with a fixed bottom tab bar that
-      // overlays content, we need the content area itself to scroll.
+      // Previously used isolate-scroll-daily with a fixed CSS height calculation,
+      // but that didn't account for the compact header bar between AutoHideHeader
+      // and the scroll area, causing bottom content to be unreachable.
       //
-      // Solution: On mobile, use fixed height classes or isolate-scroll pattern
-      // to create an isolated scroll context that doesn't rely on body scroll.
+      // Solution: Use flex-1 min-h-0 overflow-y-auto — the browser automatically
+      // calculates remaining space after all sibling elements (header, etc.)
 
-      // Check that the main scrollable content area has isolate-scroll class on mobile
-      // This class creates an isolated scroll container that works with fixed tab bars
-      const scrollablePattern = /overflow-y-auto[^"]*(?:isolate-scroll|h-\[calc|max-h-\[calc)/;
+      // Check that the main scrollable content area uses flex-based sizing
+      const scrollablePattern = /flex-1[^"]*min-h-0[^"]*overflow-y-auto/;
       expect(source).toMatch(scrollablePattern);
     });
 
@@ -296,39 +295,24 @@ describe('DailyWordHuntResults Daily-specific Scroll Isolation', () => {
   const sourcePath = resolve(process.cwd(), 'components/daily/DailyWordHuntResults.tsx');
   const source = readFileSync(sourcePath, 'utf-8');
 
-  describe('Daily pages use correct isolate-scroll variant', () => {
-    it('should NOT use base isolate-scroll class which subtracts GlobalBottomNav padding', () => {
+  describe('Daily pages should NOT use fixed-height isolate-scroll classes', () => {
+    it('should NOT use isolate-scroll or isolate-scroll-daily (use flex-1 min-h-0 instead)', () => {
       // CRITICAL BUG FIX:
-      // The base `isolate-scroll` class subtracts 64px for `main.pb-16` (GlobalBottomNav space).
-      // But on /daily pages:
-      // 1. GlobalBottomNav is hidden
-      // 2. `main` doesn't have pb-16 padding
-      // 3. DailyWordHuntResults has its own MobileTabBar with pb-[--mobile-bottom-safe]
+      // isolate-scroll-daily uses a fixed CSS height: calc(100dvh - 60px - safe-area).
+      // This doesn't account for the compact header bar (back button + score badge)
+      // that sits between AutoHideHeader and the scroll area, making bottom content
+      // unreachable behind the fixed MobileTabBar.
       //
-      // This causes the scroll container to be 64px shorter than needed, cutting off content.
-      //
-      // SOLUTION: Use `isolate-scroll-daily` variant that only subtracts AutoHideHeader (60px)
-      // and lets the component handle its own bottom padding via pb-[--mobile-bottom-safe].
+      // SOLUTION: Use flex-1 min-h-0 overflow-y-auto — the browser automatically
+      // calculates remaining space after all sibling elements. No hardcoded heights needed.
 
-      // Find the scrollable container with overflow-y-auto and isolate-scroll
-      const scrollableContainerPattern = /overflow-y-auto[^"]*isolate-scroll[^"]*"/g;
-      const matches = source.match(scrollableContainerPattern) || [];
+      // Should NOT use any isolate-scroll class
+      const hasIsolateScroll = /\bisolate-scroll\b/.test(source);
+      expect(hasIsolateScroll).toBe(false);
 
-      // Should have at least one scrollable container
-      expect(matches.length).toBeGreaterThan(0);
-
-      // ASSERTION: Should NOT use base `isolate-scroll` (which subtracts 64px for GlobalBottomNav)
-      // Should use `isolate-scroll-daily` which is designed for daily pages without GlobalBottomNav
-      matches.forEach((match) => {
-        // Must NOT have just "isolate-scroll" without the daily variant
-        // Pattern: isolate-scroll followed by space or end of string (not isolate-scroll-daily)
-        const hasBaseIsolateScroll = /\bisolate-scroll\b(?!-)/.test(match);
-        const hasDailyVariant = /\bisolate-scroll-daily\b/.test(match);
-
-        // Should use the daily variant, NOT the base class
-        expect(hasDailyVariant).toBe(true);
-        expect(hasBaseIsolateScroll).toBe(false);
-      });
+      // Should use flex-based scroll isolation instead
+      const flexScrollPattern = /flex-1[^"]*min-h-0[^"]*overflow-y-auto/;
+      expect(source).toMatch(flexScrollPattern);
     });
   });
 });
