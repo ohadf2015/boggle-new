@@ -97,8 +97,8 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
-      // 3 stars * 10 base + 50 perfect bonus = 80
-      expect(mockAddGold).toHaveBeenCalledWith(80);
+      // 3 stars * (10 + world*3) base + 50 perfect bonus = 3*13 + 50 = 89
+      expect(mockAddGold).toHaveBeenCalledWith(89);
     });
 
     it('should not award perfect clear bonus for less than 3 stars', () => {
@@ -109,8 +109,8 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
-      // 2 stars * 10 base = 20
-      expect(mockAddGold).toHaveBeenCalledWith(20);
+      // 2 stars * (10 + world*3) base = 2*13 = 26
+      expect(mockAddGold).toHaveBeenCalledWith(26);
     });
 
     it('should apply XP bonus multiplier from upgrades', () => {

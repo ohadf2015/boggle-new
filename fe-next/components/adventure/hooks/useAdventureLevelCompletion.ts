@@ -162,7 +162,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const oldLevel = currentLevel;
       const levelUpResult = awardXp(computedXp);
 
-      const baseGold = 10 * gameState.stars;
+      const baseGold = (10 + levelConfig.world * 3) * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
       const longWordBonus = (upgradeEffects?.longWordGoldBonus ?? 0) * gameState.wordsFound.filter(w => w.length >= 6).length;
       const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
