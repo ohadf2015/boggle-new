@@ -11,6 +11,7 @@ import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
+import { completeMission } from '@/backend/modules/dailyMissionsManager';
 
 /**
  * XP awarded per star earned (new stars only)
@@ -37,6 +38,7 @@ function validateRequestBody(body: Record<string, unknown>): {
     longWords?: number;
     lootDrops?: unknown[];
     retainedScore?: number;
+    wordsFound?: string[];
   };
 } {
   const { world, level, stars, score, words, longWords, lootDrops, retainedScore } = body;
@@ -85,6 +87,7 @@ function validateRequestBody(body: Record<string, unknown>): {
       ...(typeof longWords === 'number' && longWords >= 0 && { longWords }),
       ...(Array.isArray(lootDrops) && { lootDrops }),
       ...(typeof retainedScore === 'number' && { retainedScore }),
+      ...(Array.isArray(body.wordsFound) && { wordsFound: body.wordsFound as string[] }),
     },
   };
 }
@@ -250,20 +253,27 @@ export async function POST(request: NextRequest) {
     const newPlayerLevel = getLevelFromXp(newTotalXp);
 
     // Calculate gold earned server-side (never trust client value)
-    // Gold is always awarded — not gated by isFirstCompletion
+    const isReplay = !!existingCompletion;
     const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
     // Gold scales with world to prevent late-game gold drought
     const baseGold = (10 + world * 3) * stars;
     const perfectClearGoldBonus = stars === 3 ? 50 : 0;
     // Cap longWords to a plausible maximum (max ~25 words in a level, not all can be long)
     const clampedLongWords = Math.min(longWords ?? 0, 20);
-    const longWordBonus = clampedLongWords * getUpgradeEffect(playerUpgrades, 'cargoBay');
+    const cargoBayEffect = getUpgradeEffect(playerUpgrades, 'cargoBay') || 0;
+    const longWordBonus = clampedLongWords * cargoBayEffect;
     let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus;
 
-    // Apply luckyPickaxe upgrade bonus from DB if player has it
-    const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe');
+    // Apply luckyPickaxe as ADDITIVE bonus (not multiplicative — prevents economy inflation)
+    const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe') || 0;
     if (luckyPickaxeBonus > 0) {
-      goldEarned = Math.round(goldEarned * (1 + luckyPickaxeBonus));
+      goldEarned = Math.round(goldEarned + baseGold * luckyPickaxeBonus);
+    }
+
+    // Replay penalty: 50% gold on previously completed levels
+    // Prevents unlimited gold farming while still rewarding replays
+    if (isReplay) {
+      goldEarned = Math.floor(goldEarned * 0.5);
     }
 
     // Cap gold per level to prevent edge-case abuse
@@ -284,6 +294,28 @@ export async function POST(request: NextRequest) {
       nextLevel = 7;
     }
 
+    // Persist word album (words validated by game grid — safe to store)
+    // Merge new words into existing album, capped at 5000
+    const MAX_ALBUM_SIZE = 5000;
+    let wordAlbumUpdate: string[] | undefined;
+    if (words > 0 && Array.isArray(validation.data.wordsFound)) {
+      const { data: albumRow } = await supabase
+        .from('player_progression')
+        .select('word_album')
+        .eq('user_id', userId)
+        .single();
+      const existingAlbum = new Set<string>(
+        ((albumRow?.word_album as string[]) ?? []).map((w: string) => w.toUpperCase())
+      );
+      for (const w of validation.data.wordsFound!) {
+        if (existingAlbum.size >= MAX_ALBUM_SIZE) break;
+        if (typeof w === 'string' && w.length >= 3 && w.length <= 15) {
+          existingAlbum.add(w.toUpperCase());
+        }
+      }
+      wordAlbumUpdate = Array.from(existingAlbum);
+    }
+
     // Update progression in database
     const updatePayload: Record<string, unknown> = {
       player_level: newPlayerLevel,
@@ -294,6 +326,10 @@ export async function POST(request: NextRequest) {
       current_level: Math.max(existingProgression?.current_level ?? 1, nextLevel),
       updated_at: new Date().toISOString(),
     };
+
+    if (wordAlbumUpdate) {
+      updatePayload.word_album = wordAlbumUpdate;
+    }
 
     // Optimistic lock: only update if gold hasn't changed since we read it
     // This prevents concurrent requests from doubling gold rewards
@@ -322,14 +358,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update progression' }, { status: 500 });
     } else if (!updatedRow) {
       // Optimistic lock conflict: gold was modified by a concurrent request.
-      // Re-read current gold and retry with fresh value to avoid losing stars/progression.
+      // Re-read current gold AND upgrades to recalculate gold with fresh state.
       const { data: freshProg } = await supabase
         .from('player_progression')
-        .select('gold')
+        .select('gold, upgrades')
         .eq('user_id', userId)
         .single();
       if (freshProg) {
-        updatePayload.gold = (freshProg.gold as number) + goldEarned;
+        // Recalculate gold with fresh upgrade state to avoid stale bonus
+        const freshUpgrades = (freshProg.upgrades as UpgradeState) ?? {};
+        const freshCargoBay = getUpgradeEffect(freshUpgrades, 'cargoBay') || 0;
+        const freshLongWordBonus = clampedLongWords * freshCargoBay;
+        let freshGoldEarned = baseGold + perfectClearGoldBonus + freshLongWordBonus;
+        const freshPickaxe = getUpgradeEffect(freshUpgrades, 'luckyPickaxe') || 0;
+        if (freshPickaxe > 0) {
+          freshGoldEarned = Math.round(freshGoldEarned + baseGold * freshPickaxe);
+        }
+        freshGoldEarned = Math.min(freshGoldEarned, MAX_GOLD_PER_LEVEL);
+        updatePayload.gold = (freshProg.gold as number) + freshGoldEarned;
         const { data: retryRow, error: retryError } = await supabase
           .from('player_progression')
           .update(updatePayload)
@@ -356,6 +402,11 @@ export async function POST(request: NextRequest) {
     const previousLevel = existingProgression?.player_level ?? 1;
     const leveledUp = newPlayerLevel > previousLevel;
 
+    // Mark daily mission as complete (fire-and-forget)
+    completeMission(userId, 'adventure').catch((err) => {
+      console.error('[ADVENTURE COMPLETE API] Daily mission update failed:', err);
+    });
+
     // Update weekly quest progress (fire-and-forget, don't block response)
     const questStats: GameStats = {
       gamesPlayed: 1,
@@ -379,6 +430,7 @@ export async function POST(request: NextRequest) {
       },
       xpEarned,
       goldEarned,
+      isReplay,
       starsGained,
       progression: {
         playerLevel: newPlayerLevel,

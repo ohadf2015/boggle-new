@@ -5,7 +5,7 @@
  * REFACTORED: Now uses GameStateContext instead of massive prop drilling
  * Reduced from 20+ state setter props to just a few local state props
  */
-import { useEffect, useRef, useMemo, MutableRefObject } from 'react';
+import { useEffect, useRef, useMemo, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
@@ -34,18 +34,18 @@ interface UsePlayerGameEventsProps {
   setFireRoundRemaining: React.Dispatch<React.SetStateAction<number>>;
 
   // Combo refs (TODO: refactor to use context actions)
-  comboLevelRef: MutableRefObject<number>;
-  lastWordTimeRef: MutableRefObject<number | null>;
+  comboLevelRef: RefObject<number>;
+  lastWordTimeRef: RefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
   setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
-  comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
-  comboShieldsUsedRef: MutableRefObject<number>;
+  comboTimeoutRef: RefObject<NodeJS.Timeout | null>;
+  comboShieldsUsedRef: RefObject<number>;
 
   // Exit ref
-  intentionalExitRef: MutableRefObject<boolean>;
+  intentionalExitRef: RefObject<boolean>;
 
   // Music ref for tracking total game time
-  totalGameTimeRef?: MutableRefObject<number>;
+  totalGameTimeRef?: RefObject<number>;
 
   // Timer for multiplayer sync
   gameTimer?: GameTimerReturn;
@@ -55,7 +55,7 @@ interface UsePlayerGameEventsProps {
 }
 
 interface UsePlayerGameEventsReturn {
-  gameSessionIdRef: MutableRefObject<number>;
+  gameSessionIdRef: RefObject<number>;
 }
 
 /**
@@ -222,7 +222,7 @@ export function usePlayerGameEvents({
         storeUpdates.gameDuration = data.timerSeconds;
       }
       if (data.language) storeUpdates.gameLanguage = data.language;
-      if (data.minWordLength) storeUpdates.minWordLength = data.minWordLength;
+      storeUpdates.minWordLength = data.minWordLength ?? 2;
       if ((data as any).boardTheme) storeUpdates.boardTheme = (data as any).boardTheme;
       if (data.gameMode) storeUpdates.gameMode = data.gameMode;
       if ((data as any).blastTileOverlay) {

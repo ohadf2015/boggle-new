@@ -267,111 +267,111 @@ Panicking at the end. When that timer hits 30 seconds, something in your brain j
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
-    title: 'Hur Jag Gick Fran 30 Poang till 200+ i Klassiskt Lage (Och Hur Du Ocksa Kan)',
-    subtitle: 'Riktiga strategier fran nagon som pinsamt nog loggat 500+ timmar stirrandes pa bokstavsrutnat.',
+    title: 'Hur Jag Gick Från 30 Poäng till 200+ i Klassiskt Läge (Och Hur Du Också Kan)',
+    subtitle: 'Riktiga strategier från någon som pinsamt nog loggat 500+ timmar stirrandes på bokstavsrutnät.',
     category: 'Strategi',
-    readTime: '8 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Jag spelar Klassiskt lage alldeles for mycket. Mina vanner har slutat bjuda mig pa spelkvaallar. Vart det.',
+    readTime: '8 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Jag spelar Klassiskt läge alldeles för mycket. Mina vänner har slutat bjuda mig på spelkvällar. Värt det.',
     quickTips: [
-      'Borja fran hornen. Pa riktigt. Jag ignorerade det har radet i manader och mina poang led av det.',
-      'Trana ogonen att hitta O-, FOR-, UT- och -ING, -NING, -AR. Nar du vaal ser dem kan du inte sluta.',
-      'Skicka in korta ord forst. Fa poangen att ticka upaat. De langa orden kommer.',
-      'Tvinga dig att bara TITTA i 15 sekunder innan du ror nagot. Det kanns fel. Gor det andaa.',
-      'Vokal-konsonant-kluster ar din basta van. Ett ensamt Q i ett horn? Skippa det.',
-      'Diagonaler! Jag missade sakert 30% av mina ord de forsta hundra timmarna for att jag glomde att de finns.',
-      'Sista 30 sekunderna? Panik-lage. Skicka varje 3-bokstavsord dina ogon landar pa. Ingen skam.',
+      'Börja från hörnen. På riktigt. Jag ignorerade det här rådet i månader och mina poäng led av det.',
+      'Träna ögonen att hitta O-, FOR-, UT- och -ING, -NING, -AR. När du väl ser dem kan du inte sluta.',
+      'Skicka in korta ord först. Få poängen att ticka uppåt. De långa orden kommer.',
+      'Tvinga dig att bara TITTA i 15 sekunder innan du rör något. Det känns fel. Gör det ändå.',
+      'Vokal-konsonant-kluster är din bästa vän. Ett ensamt Q i ett hörn? Skippa det.',
+      'Diagonaler! Jag missade säkert 30% av mina ord de första hundra timmarna för att jag glömde att de finns.',
+      'Sista 30 sekunderna? Panik-läge. Skicka varje 3-bokstavsord dina ögon landar på. Ingen skam.',
     ],
     scoringTable,
     sections: [
       {
-        title: 'Sa Du Vill Bli Bra pa Klassiskt Lage',
-        content: `Har ar grejen. Klassiskt lage ger dig ett rutnat, en klocka och ett vagt hopp om att hjarnan ska samarbeta. Du kopplar ihop intilliggande plattor for att stava ord. Horisontellt, vertikalt, diagonalt. Varje platta anvands en gang per ord, minst 3 bokstaver. Enkelt nog.
+        title: 'Så Du Vill Bli Bra på Klassiskt Läge',
+        content: `Här är grejen. Klassiskt läge ger dig ett rutnät, en klocka och ett vagt hopp om att hjärnan ska samarbeta. Du kopplar ihop intilliggande plattor för att stava ord. Horisontellt, vertikalt, diagonalt. Varje platta används en gång per ord, minst 3 bokstäver. Enkelt nog.
 
-Poangsattning? Langre ord = mer poang. Ett 3-bokstavsord ger 2 poang, ett 8-bokstavsord ger 7. Det ar bara ordlangd minus ett. Du fattade det formodligen redan. Men att kunna poangsattningen ar inte det som gor dig bra. Jag kunde poangsattningen i manader innan jag konsekvent slog 100 poang.
+Poängsättning? Längre ord = mer poäng. Ett 3-bokstavsord ger 2 poäng, ett 8-bokstavsord ger 7. Det är bara ordlängd minus ett. Du fattade det förmodligen redan. Men att kunna poängsättningen är inte det som gör dig bra. Jag kunde poängsättningen i månader innan jag konsekvent slog 100 poäng.
 
-Det som faktiskt spelar roll ar hur du laser bradet. Jag brukade bara... stirra pa det och hoppas att ord skulle dyka upp. Ibland gjorde de det! Oftast inte. Skillnaden mellan mig pa 30 poang och mig pa 200+ var att lara sig skanna systematiskt istallet for att slumpmassigt hoppas pa det basta.`,
+Det som faktiskt spelar roll är hur du läser brädet. Jag brukade bara... stirra på det och hoppas att ord skulle dyka upp. Ibland gjorde de det! Oftast inte. Skillnaden mellan mig på 30 poäng och mig på 200+ var att lära sig skanna systematiskt istället för att slumpmässigt hoppas på det bästa.`,
       },
       {
-        title: 'Horn Forst (Lita Pa Mig Har)',
-        content: `OK sa det har ar den enskilt storsta forbattringen jag nagonsin gjorde. Borja med hornen.
+        title: 'Hörn Först (Lita På Mig Här)',
+        content: `OK så det här är den enskilt största förbättringen jag någonsin gjorde. Börja med hörnen.
 
-Varfor? Hornplattor roor bara 3 andra plattor. Centerplattor roor 8. Det betyder att nar du borjar fran ett horn finns det mycket farre vagar att bli forvirrad av. Hjarnan kan faktiskt folja ordet utan att gaa vilse. Jag brukade borja i mitten varje omgang och undra varfor jag tappade bort mig mitt i ett ord.
+Varför? Hornplattor rör bara 3 andra plattor. Centerplattor rör 8. Det betyder att när du börjar från ett hörn finns det mycket färre vägar att bli förvirrad av. Hjärnan kan faktiskt följa ordet utan att gå vilse. Jag brukade börja i mitten varje omgång och undra varför jag tappade bort mig mitt i ett ord.
 
-Efter hornen, ta kanterna. Kantplattor ansluter till 5 grannar. Inte lika latt som horn men mycket mer hanterbart an mitten. Manga hoppar direkt fran horn till center. Gor inte det. Jag har hittat nagra av mina basta ord med start fran kanter, och i multiplayer ignorerar dina motstandare troligtvis dem ocksa.
+Efter hörnen, ta kanterna. Kantplattor ansluter till 5 grannar. Inte lika lätt som hörn men mycket mer hanterbart än mitten. Många hoppar direkt från hörn till center. Gör inte det. Jag här hittat några av mina bästa ord med start från kanter, och i multiplayer ignorerar dina motståndare troligtvis dem också.
 
-Centerplattor sist. De ar en rora av kopplingar och mojligheter, vilket later bra tills du ar tre bokstaver in och inte minns aat vilket hall du var pa vag. Nar du vaal kommer till center har du redan internaliserat var allt ar fran dina horn- och kantsvep. Gor enorm skillnad.
+Centerplattor sist. De är en röra av kopplingar och möjligheter, vilket låter bra tills du är tre bokstäver in och inte minns åt vilket håll du var på väg. När du väl kommer till center här du redan internaliserat var allt är från dina horn- och kantsvep. Gör enorm skillnad.
 
-Hela den har svepningen tar mig ungefar 30-40 sekunder nu. Tog over en minut nar jag larde mig.`,
+Hela den här svepningen tar mig ungefär 30-40 sekunder nu. Tog över en minut när jag lärde mig.`,
       },
       {
-        title: 'Prefix/Suffix-Tricket Som Andrade Allt',
-        content: `Jag larde mig det har fran att bli totalt forstord av nagon i multiplayer som hittade 6-bokstavsord som om det var ingenting. Efter matchen fragade jag vad de gjorde annorlunda. Svaret: "Jag letar inte efter ord. Jag letar efter orddelar."
+        title: 'Prefix/Suffix-Tricket Som Ändrade Allt',
+        content: `Jag lärde mig det här från att bli totalt förstörd av någon i multiplayer som hittade 6-bokstavsord som om det var ingenting. Efter matchen frågade jag vad de gjorde annorlunda. Svaret: "Jag letar inte efter ord. Jag letar efter orddelar."
 
-Det klickade for mig. Istallet for att skanna efter hela ord, skanna efter borjan: O-, FOR-, UT-, AV-, AN-. Sekunden du ser en sadan kombination pa bradet, borja folja framat. Vad kan komma efter FOR? FORD, FORM, FORT. Ogonen larar sig gora det automatiskt efter ett tag.
+Det klickade för mig. Istället för att skanna efter hela ord, skanna efter början: O-, FOR-, UT-, AV-, AN-. Sekunden du ser en sådan kombination på brädet, börja följa framåt. Vad kan komma efter FOR? FORD, FORM, FORT. Ögonen lär sig gora det automatiskt efter ett tag.
 
-Samma sak funkar baklangees med suffix: -ING, -NING, -AR, -ER, -EN, -ANDE, -TION, -SKAP. Ser du ett -ING-kluster? Folj nu baklangees fran det.
+Samma sak funkar baklänges med suffix: -ING, -NING, -AR, -ER, -EN, -ANDE, -TION, -SKAP. Ser du ett -ING-kluster? Följ nu baklänges från det.
 
-Det riktigt smarta draget ar "brobyggande". Du ser FOR- pa vanstra sidan av bradet och -ING pa hogra. Kan du koppla ihop dem genom mitten? Sa hittas i princip varje 6+ bokstavsord. Det kandes omojligt forst. Nu gor jag det utan att tanka.
+Det riktigt smarta draget är "brobyggande". Du ser FOR- på vänstra sidan av brädet och -ING på högra. Kan du koppla ihop dem genom mitten? Så hittas i princip varje 6+ bokstavsord. Det kändes omöjligt först. Nu gör jag det utan att tänka.
 
-Och bokstaven S. Glom aldrig S. Alla ord du redan hittat kan ha ett S precis intill sin sista bokstav. Gratis pluraler. Gratis verbformer. Jag far formodligen 15-20% av mina poang bara genom att lagga till S pa ord jag redan skickat.`,
+Och bokstaven S. Glöm aldrig S. Alla ord du redan hittat kan ha ett S precis intill sin sista bokstav. Gratis pluraler. Gratis verbformer. Jag får förmodligen 15-20% av mina poäng bara genom att lägga till S på ord jag redan skickat.`,
       },
       {
-        title: 'Hur Jag Faktiskt Anvander Min Tid (De 3 Faserna)',
-        content: `Jag slosade sa manga omgangar innan jag fattade tempot. Antingen brande jag all tid pa att jaga ett enda stort ord, eller sa skickade jag hektiskt in smaa ord hela rundan och missade det bra. Det visar sig att det finns en rytm.
+        title: 'Hur Jag Faktiskt Använder Min Tid (De 3 Faserna)',
+        content: `Jag slösade så många omgångar innan jag fattade tempot. Antingen brände jag all tid på att jaga ett enda stort ord, eller så skickade jag hektiskt in små ord hela rundan och missade det bra. Det visar sig att det finns en rytm.
 
-Forsta 30% av klockan - kor bara. Skicka allt. Ser du TRE? Skicka. Ser du AT? Skicka. Tank inte pa om ett 3-bokstavsord ar "vart det." Det ar det. Du bankar poang och far en kansla for bradet samtidigt. Mina fingrar ar i princip pa autopilot under den har fasen.
+Första 30% av klockan - kör bara. Skicka allt. Ser du TRE? Skicka. Ser du AT? Skicka. Tänk inte på om ett 3-bokstavsord är "värt det." Det är det. Du bankar poäng och får en känsla för brädet samtidigt. Mina fingrar är i princip på autopilot under den här fasen.
 
-Mellersta 40% - sakta nu ner. Det har ar din jaktfas. Tillampaa prefix/suffix-grejen. Titta pa kluster du inte rort. Prova konstiga diagonalvagar. Jag hittar de flesta av mina 5+ bokstavsord har. Det ar den delen av spelet som faktiskt kanns som ett pussel.
+Mellersta 40% - sakta nu ner. Det här är din jaktfas. Tillämpa prefix/suffix-grejen. Titta på kluster du inte rort. Prova konstiga diagonalvägar. Jag hittar de flesta av mina 5+ bokstavsord här. Det är den delen av spelet som faktiskt känns som ett pussel.
 
-Sista 30% - oka farten igen. Gaa tillbaka till horn du bara glansade aat. Prova starta fran plattor du inte anvant. Skicka allt som ser ut som att det kanske ar ett ord. Fel gissningar kostar dig knappt nagot, men ett ord du inte skickade kostar dig allt.
+Sista 30% - öka farten igen. Gå tillbaka till hörn du bara glänste åt. Prova starta från plattor du inte använt. Skicka allt som ser ut som att det kanske är ett ord. Fel gissningar kostar dig knappt något, men ett ord du inte skickade kostar dig allt.
 
-En sak jag fortfarande kampar med: att fastna i mellanfasen. Om du inte hittat nagot nytt pa 10 sekunder, FLYTTA. Att stirra hardare pa samma sex plattor far inte ett ord att dyka upp. Jag maste ibland fysiskt tvinga ogonen till en annan del av bradet.`,
+En sak jag fortfarande kämpar med: att fastna i mellanfasen. Om du inte hittat något nytt på 10 sekunder, FLYTTA. Att stirra hårdare på samma sex plattor får inte ett ord att dyka upp. Jag måste ibland fysiskt tvinga ögonen till en annan del av brädet.`,
       },
       {
-        title: 'Att Trana Ogonen Att Se Kluster',
-        content: `Det har ar delen som tar riktig ovning, och arligt talat blir jag fortfarande battre pa det. Maalet ar att sluta lasa enskilda bokstaver och borja se bitar.
+        title: 'Att Träna Ögonen Att Se Kluster',
+        content: `Det här är delen som tar riktig övning, och ärligt talat blir jag fortfarande bättre på det. Målet är att sluta läsa enskilda bokstäver och börja se bitar.
 
-Nar jag ser ST pa ett brade nu processar inte min hjarna "S... T..." Den gar bara "STEN STOL STOR STARK STALL." Det ar automatiskt. Samma med AN, ER, IN, OR, EN. De har tvaa-bokstavskombinationerna ar sa vanliga pa svenska att de borde trigga en direkt mental kaskad av ord. Det tar tid. Tog mig kanske 50 timmars spelande innan det borjade kannas naturligt.
+När jag ser ST på ett bräde nu processar inte min hjärna "S... T..." Den går bara "STEN STOL STOR STARK STALL." Det är automatiskt. Samma med AN, ER, IN, OR, EN. De här två-bokstavskombinationerna är så vanliga på svenska att de borde trigga en direkt mental kaskad av ord. Det tar tid. Tog mig kanske 50 timmars spelande innan det började kännas naturligt.
 
-Vokalgrupper ar guld. Tvaa eller tre vokaler intill varandra? Det ar karnan i ett dussin ord. A-I ihop? Tank VAIT, AIR. O-R tillsammans? ORD, ORT, ORM. Jag blir exalterad nar jag ser vokal-oar nu. Mina vanner tycker det ar konstigt.
+Vokalgrupper är guld. Två eller tre vokaler intill varandra? Det är karnan i ett dussin ord. A-I ihop? Tänk VAIT, AIR. O-R tillsammans? ORD, ORT, ORM. Jag blir exalterad när jag ser vokal-oar nu. Mina vänner tycker det är konstigt.
 
-Konsonantblandningar i borjan av ord: BL, BR, DR, FL, FR, GL, GR, KL, KR, PL, PR, SK, SL, SM, SN, SP, ST, SV, TR. Nar du ser en, folj framat. Nagot finns nastan alltid dar.
+Konsonantblandningar i början av ord: BL, BR, DR, FL, FR, GL, GR, KL, KR, PL, PR, SK, SL, SM, SN, SP, ST, SV, TR. När du ser en, följ framåt. Något finns nästan alltid där.
 
-Och sa finns det doda zoner. QX intill varandra. ZJ. VV. Ibland ar en del av bradet bara oanvandbar. Att kanna igen det SNABBT sparar dig fran att slosa 15 sekunder pa att forsoka gora "QXVZ" till ett ord. Allt pa bradet vill inte samarbeta.`,
+Och så finns det döda zoner. QX intill varandra. ZJ. VV. Ibland är en del av brädet bara oanvandbar. Att känna igen det SNABBT sparar dig från att slösa 15 sekunder på att försöka gora "QXVZ" till ett ord. Allt på brädet vill inte samarbeta.`,
       },
       {
-        title: 'Misstag Jag Gjorde (Sa Du Slipper)',
-        content: `Tunnelseende. Det har ar det stora. Jag tillbringade en gang 20 sekunder med att forsoka fa UNDERBAR att funka pa ett brade dar det var fysiskt omojligt. Tjugo sekunder! Det ar en evighet. Om du stirrat pa samma stalle i 5 sekunder, lamna. Bradet har massor av ord. Gift dig inte med ett.
+        title: 'Misstag Jag Gjorde (Så Du Slipper)',
+        content: `Tunnelseende. Det här är det stora. Jag tillbringade en gång 20 sekunder med att försöka få UNDERBAR att funka på ett bräde där det var fysiskt omöjligt. Tjugo sekunder! Det är en evighet. Om du stirrat på samma ställe i 5 sekunder, lämna. Brådet här massor av ord. Gift dig inte med ett.
 
-Skippa korta ord. Jag brukade tycka att 3-bokstavsord var under min vardighet. "Jag letar efter de stora." Bra strategi, jag. Forutom att tio 3-bokstavsord ger 20 poang och tvaa 6-bokstavsord ger 10. Volym vinner. Jag fick svalja min stolthet dar.
+Skippa korta ord. Jag brukade tycka att 3-bokstavsord var under min värdighet. "Jag letar efter de stora." Bra strategi, jag. Förutom att tio 3-bokstavsord ger 20 poäng och två 6-bokstavsord ger 10. Volym vinner. Jag fick svälja min stolthet där.
 
-Ignorera diagonaler. Den har ar pinsam. Alldeles for lange skannade jag i princip bara horisontellt och vertikalt. Visar sig att ungefar 40% av alla ord anvander minst en diagonal koppling. Jag lamnade nastan halva bradet pa bordet.
+Ignorera diagonaler. Den här är pinsam. Alldeles för länge skannade jag i princip bara horisontellt och vertikalt. Visar sig att ungefär 40% av alla ord använder minst en diagonal koppling. Jag lämnade nästan halva brädet på bordet.
 
-Att inte lasa bradet forst. Visa braden dranks i vokaler och vill att du hittar massor av korta ord. Andra har konstiga konsonantkluster som gommer nagra monster. Du kan oftast avgora pa 10 sekunder vilken typ av brade du har. Anpassa dig. Jag brukade spela varje brade pa samma satt.
+Att inte läsa brädet först. Visa bräden dränks i vokaler och vill att du hittar massor av korta ord. Andra här konstiga konsonantkluster som gömmer några mönster. Du kan oftast avgöra på 10 sekunder vilken typ av bräde du här. Anpassa dig. Jag brukade spela varje bräde på samma sätt.
 
-Panik pa slutet. Nar timern visar 30 sekunder gar nagot sonder i hjarnan. Du fryser eller borjar vilt trycka pa slumpmassiga plattor. Ingetdera hjalper. Fall tillbaka till fas 3. Svep omraden du hoppat over. Skicka snabbt. Hall lugnet. (Jag far fortfarande panik ibland. Det ar ett pagaende arbete.)`,
+Panik på slutet. När timern visar 30 sekunder går något sönder i hjärnan. Du fryser eller börjar vilt trycka på slumpmassiga plattor. Ingetdera hjälper. Fall tillbaka till fas 3. Svep områden du hoppat över. Skicka snabbt. Håll lugnet. (Jag får fortfarande panik ibland. Det är ett pågående arbete.)`,
       },
     ],
     faq: [
       {
-        question: 'Vad ar den basta startstrategin for Klassiskt lage i LexiClash?',
-        answer: 'Horn forst, alltid. De har farre kopplingar sa hjarnan kan faktiskt folja vagar utan att gaa vilse. Sen kanter, sen den roriga mitten. Och lagg 15 sekunder pa att bara titta pa bradet innan du borjar trycka. Det kanns bakvaant men det funkar.',
+        question: 'Vad är den bästa startstrategin för Klassiskt läge i LexiClash?',
+        answer: 'Hörn först, alltid. De här färre kopplingar så hjärnan kan faktiskt följa vägar utan att gå vilse. Sen kanter, sen den roriga mitten. Och lägg 15 sekunder på att bara titta på brädet innan du börjar trycka. Det känns bakvänt men det funkar.',
       },
       {
-        question: 'Hur fungerar poangsattningen i LexiClash Klassiskt lage?',
-        answer: 'Det ar ordlangd minus ett, helt enkelt. Ett 3-bokstavsord ger 2 poang, 4 bokstaver ger 3, och sa vidare upaat. Langre ord ger mer per ord, men arligt talat far du mer totalt genom att skicka en massa korta ord an att pina dig over ett enda langt.',
+        question: 'Hur fungerar poängsättningen i LexiClash Klassiskt läge?',
+        answer: 'Det är ordlängd minus ett, helt enkelt. Ett 3-bokstavsord ger 2 poäng, 4 bokstäver ger 3, och så vidare uppåt. Längre ord ger mer per ord, men ärligt talat får du mer totalt genom att skicka en massa korta ord än att pina dig över ett enda långt.',
       },
       {
-        question: 'Hur hittar jag langre ord pa rutnatet?',
-        answer: 'Sluta leta efter hela ord och borja leta efter orddelar. Ser du O- eller FOR- pa bradet? Folj framat. Ser du -ING eller -NING? Folj baklangees. Sen forsok bygga en bro fran prefix till suffix genom mellanplattorna. I princip varje 6+ bokstavsord jag hittar kommer fran den tekniken.',
+        question: 'Hur hittar jag längre ord på rutnatet?',
+        answer: 'Sluta leta efter hela ord och börja leta efter orddelar. Ser du O- eller FOR- på brädet? Följ framåt. Ser du -ING eller -NING? Följ baklänges. Sen försök bygga en bro från prefix till suffix genom mellanplattorna. I princip varje 6+ bokstavsord jag hittar kommer från den tekniken.',
       },
       {
-        question: 'Ar det battre att skicka korta ord eller leta efter langa ord?',
-        answer: 'Bada, men korta ord forst. Las in poangen. Tio 3-bokstavsord (20 poang) slaar tre 5-bokstavsord (12 poang) varje gang. Vinnarstrategin ar en stadig strom av korta ord med naat langt inslanggt nar du ser det.',
+        question: 'Är det bättre att skicka korta ord eller leta efter långa ord?',
+        answer: 'Bada, men korta ord först. Läs in poängen. Tio 3-bokstavsord (20 poäng) slår tre 5-bokstavsord (12 poäng) varje gång. Vinnarstrategin är en stadig ström av korta ord med något långt inslanggt när du ser det.',
       },
     ],
-    ctaText: 'Testa det har nu direkt',
+    ctaText: 'Testa det här nu direkt',
     ctaLink: '/singleplayer',
     backToGuides: 'Tillbaka till guider',
   },

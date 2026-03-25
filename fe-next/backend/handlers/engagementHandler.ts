@@ -549,6 +549,11 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
   if (!playerId) return;
 
   try {
+    // Mark community daily mission as complete (fire-and-forget)
+    completeMission(playerId, 'community').catch((err) => {
+      logger.error('ENGAGEMENT', `Daily mission update failed for ${playerId}: ${(err as Error).message}`);
+    });
+
     // Update daily challenge progress
     const challengeUpdate = await updateChallengeProgress(playerId, gameStats);
 

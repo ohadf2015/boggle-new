@@ -49,7 +49,6 @@ function makeRequest(body: unknown): NextRequest {
 
 function setupDbMocks({
   existingProgress = {} as Record<string, number>,
-  existingAlbum = [] as string[],
   selectError = null as { code?: string; message?: string } | null,
   updateError = null as { code?: string; message?: string } | null,
 } = {}) {
@@ -61,14 +60,21 @@ function setupDbMocks({
             single: jest.fn().mockResolvedValue({
               data: selectError
                 ? null
-                : { chapter_quest_progress: existingProgress, word_album: existingAlbum },
+                : { chapter_quest_progress: existingProgress },
               error: selectError,
             }),
           }),
         }),
         update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
-            error: updateError,
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: updateError ? null : { user_id: 'user-1' },
+                  error: updateError,
+                }),
+              }),
+            }),
           }),
         }),
       };
@@ -136,7 +142,7 @@ describe('POST /api/adventure/quest-progress', () => {
       expect(payload.chapter_quest_progress).toEqual({ q1: 7, q2: 5, q3: 1 });
     });
 
-    it('merges word album (union, uppercased)', async () => {
+    it('ignores wordAlbum (words only accepted via /api/adventure/complete)', async () => {
       setupDbMocks({
         existingAlbum: ['HELLO', 'WORLD'],
       });
@@ -150,12 +156,8 @@ describe('POST /api/adventure/quest-progress', () => {
 
       const updateCall = mockFrom.mock.results[1].value.update;
       const payload = updateCall.mock.calls[0][0];
-      const album = payload.word_album as string[];
-      expect(album).toContain('HELLO');
-      expect(album).toContain('WORLD');
-      expect(album).toContain('TEST');
-      expect(album).toContain('NEW');
-      expect(album).toHaveLength(4);
+      // word_album should NOT be in the update payload
+      expect(payload.word_album).toBeUndefined();
     });
   });
 

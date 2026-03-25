@@ -6501,6 +6501,7 @@ const es = {
       "alreadyFound": "Esta palabra ya fue encontrada",
       "notInDictionary": "La palabra no está en el diccionario",
       "validationFailed": "No se pudo validar la palabra",
+      "validationTimeout": "La validación tardó demasiado — inténtalo de nuevo",
       "validationCancelled": "La validación fue cancelada"
     },
     "game": {

@@ -37,6 +37,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid floor' }, { status: 400 });
     }
 
+    // Validate sequential progression: floor must be <= currentHigh + 1
+    const { data: progression, error: progError } = await supabase
+      .from('player_progression')
+      .select('endless_high_floor')
+      .eq('user_id', user.id)
+      .single();
+
+    if (progError && progError.code !== 'PGRST116') {
+      console.error('[ENDLESS HIGHFLOOR API] Progression fetch error:', progError);
+      return NextResponse.json({ error: 'Failed to validate floor' }, { status: 500 });
+    }
+
+    const currentHigh = (progression?.endless_high_floor as number) ?? 0;
+    // Allow replaying lower floors, but new records must be sequential
+    if (floor > currentHigh + 1) {
+      return NextResponse.json(
+        { error: `Floor must be sequential: max allowed ${currentHigh + 1}, got ${floor}` },
+        { status: 400 }
+      );
+    }
+
     // Only update if new floor beats current record (SQL-level guard)
     const { data, error } = await supabase
       .from('player_progression')

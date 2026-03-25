@@ -700,6 +700,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const hasType = state.objectives.some(o => o.type === objectiveType);
       if (!hasType) return state;
 
+      // Check if update would actually change anything — bail early to prevent re-render loops
+      const target = state.objectives.find(o => o.type === objectiveType);
+      if (target) {
+        const newCurrent = mode === 'set' ? value : (target.current ?? 0) + value;
+        if (newCurrent === target.current) return state;
+      }
+
       const newObjectives = state.objectives.map((obj) => {
         if (obj.type !== objectiveType) return obj;
         const newCurrent = mode === 'set' ? value : (obj.current ?? 0) + value;

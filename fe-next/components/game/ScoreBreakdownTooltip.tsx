@@ -26,7 +26,7 @@ const SCORING_RULES = [
  */
 const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
   t,
-  minWordLength = 3,
+  minWordLength = 2,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 

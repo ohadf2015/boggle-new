@@ -30,9 +30,7 @@ const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCar
 // Engagement widgets — only high-value conditional ones on landing
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
-const AsyncChallengeCard = dynamic(() => import('@/components/growth/AsyncChallengeCard').then(m => m.AsyncChallengeCard), { ssr: false });
 const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
-const WordPactCard = dynamic(() => import('@/components/engagement/WordPactCard').then(m => m.WordPactCard), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -250,12 +248,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         {/* Action prompts — ONLY render when there's something to act on */}
         {hydrated && isAuthenticated && (
           <div className="flex flex-col gap-3 max-w-4xl mx-auto w-full">
-            {/* "It's your turn!" — only when pending challenges exist */}
-            <AsyncChallengeCard />
             {/* "Resume your game" — only when unfinished board exists */}
             <UnfinishedBoardCardConnected />
-            {/* "Your pact partner is waiting" — only when pact active + not played today */}
-            <WordPactCard />
           </div>
         )}
 

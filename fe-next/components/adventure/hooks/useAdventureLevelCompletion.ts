@@ -61,7 +61,8 @@ export interface UseAdventureLevelCompletionProps {
     score: number,
     words: number,
     goldEarned?: number,
-    longWords?: number
+    longWords?: number,
+    wordsFound?: string[]
   ) => Promise<boolean>;
   /** Update word album with words found this level */
   updateWordAlbum?: (words: string[]) => void;
@@ -91,7 +92,7 @@ export interface UseAdventureLevelCompletionProps {
 export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionProps) {
   const {
     gameState, timeRemaining, timerSeconds, levelConfig, objectives,
-    currentLevel, upgradeBonuses, upgradeEffects, awardXp, addGold,
+    currentLevel, upgradeBonuses, awardXp,
     recordAttempt, recordCompletion, endAIDirector, handleEarnAchievement,
     pauseGame, completeLevel, showVictory, showDefeat,
     showLevelComplete, showVictoryCinematic, showDefeatCinematic,
@@ -149,7 +150,9 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
   }, [recordAttempt, recordCompletion, props.saveCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
 
-  // Award XP and gold on level completion
+  // Calculate estimated XP and gold for UI display on level completion.
+  // Actual state updates happen server-side via ProgressionContext.completeLevel().
+  // This eliminates client/server gold+XP divergence (C1 audit fix).
   useEffect(() => {
     if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars > 0) {
       const difficultyMap: Record<number, 'easy' | 'medium' | 'hard'> = {
@@ -159,6 +162,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const isPerfectClear = gameState.stars === 3;
       const hasTimeBonus = timeRemaining > (timerSeconds * 0.5);
 
+      // Estimated XP for UI display — server is the source of truth
       const baseXp = calculateAdventureXp(
         difficulty,
         Math.max(1, gameState.comboCount),
@@ -167,19 +171,21 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       const computedXp = Math.floor(baseXp * upgradeBonuses.xpBonus);
       setEarnedXp(computedXp);
 
+      // awardXp for level-up detection only (uses functional updater to avoid stale closure)
       const oldLevel = currentLevel;
       const levelUpResult = awardXp(computedXp);
+      if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
+        setLevelUpData({ oldLevel, newLevel: levelUpResult.newLevel, newTitles: [] });
+      }
 
+      // Estimated gold for UI display — server calculates the real value
       const baseGold = (10 + levelConfig.world * 3) * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
-      const longWordBonus = (upgradeEffects?.longWordGoldBonus ?? 0) * gameState.wordsFound.filter(w => w.length >= 6).length;
-      const goldMultiplier = upgradeEffects?.goldMultiplier ?? 1;
-      const doubleFirst = upgradeEffects?.doubleFirstCompletionGold ? 2 : 1;
-      const bonusGold = props.bonusGoldMultiplier ?? 1;
-      const computedGold = Math.floor((baseGold + perfectClearGoldBonus + longWordBonus) * goldMultiplier * doubleFirst * bonusGold);
+      const computedGold = baseGold + perfectClearGoldBonus;
       earnedGoldRef.current = computedGold;
       setEarnedGold(computedGold);
-      addGold(computedGold);
+      // NOTE: addGold() is NOT called — gold is updated from server response
+      // in ProgressionContext.completeLevel() to prevent client/server divergence
 
       // Generate loot drops
       const drops = generateLevelLoot({
@@ -192,19 +198,13 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       });
       setLootDrops(drops);
 
-      if (levelUpResult.leveledUp && levelUpResult.newLevel !== undefined) {
-        setLevelUpData({ oldLevel, newLevel: levelUpResult.newLevel, newTitles: [] });
-      }
-
       setHasAwardedLevelRewards(true);
     }
-    // Failure gold (Salvage Claw) — award consolation gold on 0-star attempts
+    // Failure gold (Salvage Claw) — server handles via complete endpoint
     if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars === 0) {
-      const failureGold = upgradeEffects?.failureGold ?? 0;
-      if (failureGold > 0) addGold(failureGold);
       setHasAwardedLevelRewards(true);
     }
-  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, addGold, currentLevel, upgradeBonuses.xpBonus, upgradeEffects, isBossLevel, props.isFirstCompletion, props.bonusGoldMultiplier]);
+  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, currentLevel, upgradeBonuses.xpBonus, isBossLevel, props.isFirstCompletion]);
 
   // Victory/Defeat Detection & Cinematic Trigger
   useEffect(() => {
@@ -229,6 +229,26 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     if (isBossLevel) {
       if (isVictory) showVictory();
       else showDefeat();
+
+      // Boss battle completion — handled in same effect as victory/defeat detection
+      // to eliminate implicit ordering dependency on completionProcessedRef (M6 fix)
+      if (isBossActive) {
+        if (bossHealthPhase !== 'victory' && bossHealthPhase !== 'defeat') {
+          endBossBattle(isVictory);
+        }
+
+        triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
+
+        if (isVictory) {
+          handleEarnAchievementRef.current('BOSS_SLAYER');
+          if (timeRemaining > timerSeconds * 0.5) {
+            handleEarnAchievementRef.current('BOSS_SPEEDRUN');
+          }
+          if (!playerIsDead && !playerTookDamageRef.current) {
+            handleEarnAchievementRef.current('BOSS_NO_DAMAGE');
+          }
+        }
+      }
     }
 
     // Ensure reducer marks game as complete (sets isComplete=true + calculates stars).
@@ -241,33 +261,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
     pauseGame();
     setNonBossCompleted(!isBossLevel);
-  }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, completeLevel, isBossLevel, bossHealthPhase, playerIsDead, showVictory, showDefeat]);
-
-  // Boss Battle Completion
-  useEffect(() => {
-    if (!completionProcessedRef.current) return;
-    if (!isBossActive || !isBossLevel) return;
-
-    const isVictory = bossHealthPhase === 'victory' && !playerIsDead;
-
-    if (bossHealthPhase !== 'victory' && bossHealthPhase !== 'defeat') {
-      endBossBattle(isVictory);
-    }
-
-    triggerBossTaunt(isVictory ? 'onVictory' : 'onDefeat');
-
-    if (isVictory) {
-      handleEarnAchievementRef.current('BOSS_SLAYER');
-      // Boss Speedrun: defeat boss with >50% time remaining
-      if (timeRemaining > timerSeconds * 0.5) {
-        handleEarnAchievementRef.current('BOSS_SPEEDRUN');
-      }
-      // Boss No Damage: defeat boss without ever taking damage during the fight
-      if (!playerIsDead && !playerTookDamageRef.current) {
-        handleEarnAchievementRef.current('BOSS_NO_DAMAGE');
-      }
-    }
-  }, [isBossActive, isBossLevel, bossHealthPhase, playerIsDead, endBossBattle, triggerBossTaunt, timeRemaining, timerSeconds, props.playerHealthPercent]);
+  }, [showLevelComplete, showVictoryCinematic, showDefeatCinematic, gameState.isComplete, gameState.stars, timeRemaining, pauseGame, completeLevel, isBossLevel, isBossActive, bossHealthPhase, playerIsDead, showVictory, showDefeat, endBossBattle, triggerBossTaunt, timerSeconds]);
 
   // Achievement & Progress Recording + Eager DB Save
   useEffect(() => {
@@ -313,7 +307,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
           levelConfig.world, levelConfig.level,
           gameState.stars as 0 | 1 | 2 | 3,
           gameState.score, gameState.wordsFound.length,
-          earnedGoldRef.current, longWords
+          earnedGoldRef.current, longWords, gameState.wordsFound
         ).then((success) => {
           if (!success) completionSaveFailedRef.current = true;
         }).catch(() => {

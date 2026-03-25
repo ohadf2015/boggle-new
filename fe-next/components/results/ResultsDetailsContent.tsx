@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { Users, Check } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
-import MissedWords from '@/components/results/MissedWords';
 import type {
   WordObject,
   Player,
@@ -108,28 +107,18 @@ export interface ResultsDetailsContentProps {
  * Used across mobile, desktop, and landscape layouts.
  */
 export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
-  currentPlayerData,
-  currentPlayerRank,
   sortedScores,
-  winner,
   allPlayerWords,
-  xpGainedData,
-  levelUpData,
-  currentPlayerArchetype,
   duplicateRuleDisabled,
-  isCurrentUserWinner,
   username,
-  currentPlayerValidWords,
   achievements,
   gameCode,
-  shareCardStats,
   otherPlayers,
   playerArchetypes,
   missedWords,
   isHost,
-  currentStreakCount,
   t,
-  hideRankAndScore = false,
+  hideRankAndScore: _hideRankAndScore = false,
   gameMode,
   blastResults,
   wordHuntResults,
@@ -196,10 +185,6 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         </CollapsibleSection>
       )}
 
-      {/* Top 5 Words You Missed */}
-      {missedWords.length > 0 && (
-        <MissedWords missedWords={missedWords} maxDisplay={5} />
-      )}
 
       {/* Rarest Achievement */}
       {achievements && achievements.length > 0 && (() => {

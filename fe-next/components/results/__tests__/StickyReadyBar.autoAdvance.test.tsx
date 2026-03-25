@@ -1,8 +1,8 @@
 /**
  * StickyReadyBar Auto-Advance Tests
  *
- * Tests for the host auto-advance inline countdown when all players are ready.
- * The countdown is now built into StickyReadyBar (no external AutoPlayCountdown).
+ * Tests for the unified 15s countdown for all players (host and non-host).
+ * Host: auto-starts game. Non-host: auto-readies.
  */
 
 import React from 'react';
@@ -17,7 +17,9 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'results.imReady': "I'M READY",
         'results.youAreReady': 'YOU ARE READY',
         'results.revengeRematch': `Revenge on ${params?.player ?? ''}!`,
+        'results.defendTitle': 'DEFEND TITLE',
         'autoPlay.exit': 'Exit',
+        'results.ready': 'Ready',
       };
       return translations[key] ?? key;
     },
@@ -58,7 +60,9 @@ jest.mock('@/components/GameModeSelector', () => ({
 
 import StickyReadyBar from '../StickyReadyBar';
 
-describe('StickyReadyBar auto-advance', () => {
+const AUTO_SECONDS = 15;
+
+describe('StickyReadyBar auto-advance (host)', () => {
   const baseProps = {
     isHost: true,
     isCurrentPlayerReady: false,
@@ -78,87 +82,61 @@ describe('StickyReadyBar auto-advance', () => {
     jest.useRealTimers();
   });
 
-  it('shows normal start button when not all players are ready', () => {
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        readyCount={1}
-        totalPlayers={3}
-      />
-    );
+  it('shows 15s countdown for host (defend title as rank 1)', () => {
+    render(<StickyReadyBar {...baseProps} />);
 
-    expect(screen.getByText('START GAME')).toBeInTheDocument();
+    expect(screen.getByTestId('auto-countdown')).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS))).toBeInTheDocument();
+    expect(screen.getByText('DEFEND TITLE')).toBeInTheDocument();
   });
 
-  it('shows inline countdown when all players are ready (host)', () => {
+  it('shows revenge button for host who is not first place', () => {
     render(
       <StickyReadyBar
         {...baseProps}
-        readyCount={3}
-        totalPlayers={3}
+        currentPlayerRank={2}
+        winnerUsername="champion"
       />
     );
 
-    // Should show the countdown number (starts at 5)
-    expect(screen.getByText('5')).toBeInTheDocument();
-    // Should show exit button
-    expect(screen.getByLabelText('Exit')).toBeInTheDocument();
-    // Should NOT show START GAME text
-    expect(screen.queryByText('START GAME')).not.toBeInTheDocument();
+    expect(screen.getByText('Revenge on champion!')).toBeInTheDocument();
   });
 
   it('calls onStartGame when countdown reaches zero', () => {
     const onStartGame = jest.fn();
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        readyCount={3}
-        totalPlayers={3}
-        onStartGame={onStartGame}
-      />
-    );
+    render(<StickyReadyBar {...baseProps} onStartGame={onStartGame} />);
 
-    // Advance through 5 seconds
-    act(() => { jest.advanceTimersByTime(5000); });
+    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
 
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
   it('calls onStartGame immediately when countdown button is clicked', () => {
     const onStartGame = jest.fn();
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        readyCount={3}
-        totalPlayers={3}
-        onStartGame={onStartGame}
-      />
-    );
+    render(<StickyReadyBar {...baseProps} onStartGame={onStartGame} />);
 
-    // Click the countdown button to start immediately
-    const countdownNumber = screen.getByText('5');
-    fireEvent.click(countdownNumber.closest('button')!);
+    const btn = screen.getByTestId('auto-countdown-cta');
+    fireEvent.click(btn);
 
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
-  it('shows normal start button when countdown is cancelled', () => {
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        readyCount={3}
-        totalPlayers={3}
-      />
-    );
+  it('shows manual start button when countdown is cancelled', () => {
+    render(<StickyReadyBar {...baseProps} />);
 
-    // Cancel the countdown
     fireEvent.click(screen.getByLabelText('Exit'));
 
-    // Should now show the normal start button
-    expect(screen.getByText('START GAME')).toBeInTheDocument();
+    // Should now show the manual start button (defend title for rank 1)
+    expect(screen.queryByTestId('auto-countdown')).not.toBeInTheDocument();
   });
 
-  it('does not show countdown for non-host players', () => {
+  it('does not show countdown when totalPlayers is 0', () => {
+    render(<StickyReadyBar {...baseProps} totalPlayers={0} />);
+
+    expect(screen.queryByTestId('auto-countdown')).not.toBeInTheDocument();
+  });
+
+  it('does not show countdown for already-ready non-host', () => {
     render(
       <StickyReadyBar
         {...baseProps}
@@ -170,17 +148,5 @@ describe('StickyReadyBar auto-advance', () => {
     );
 
     expect(screen.getByText('YOU ARE READY')).toBeInTheDocument();
-  });
-
-  it('does not show countdown when totalPlayers is 0', () => {
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        readyCount={0}
-        totalPlayers={0}
-      />
-    );
-
-    expect(screen.getByText('START GAME')).toBeInTheDocument();
   });
 });

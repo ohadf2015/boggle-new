@@ -117,7 +117,7 @@ function getUnfoundWords(game: Game, username: string): string[] {
   if (!game.letterGrid) return [];
 
   const language = game.language || 'en';
-  const minLength = game.minWordLength || 3;
+  const minLength = game.minWordLength || 2;
 
   // Get all valid words on board using boggleSolver
   const wordsResult: WordsByDifficulty = findWordsForBots(game.letterGrid, language, { minLength });
@@ -152,11 +152,7 @@ async function generateHintForWord(targetWord: string, language: Language): Prom
   // Try to use AI service if available
   try {
     // Dynamic import to avoid circular dependencies
-    const aiServicePath = require.resolve('../../lib/ai-service');
-    delete require.cache[aiServicePath]; // Clear cache for fresh import
-
-    // Try importing the AI service
-    const { gameAIService } = await import('../../lib/ai-service.js') as { gameAIService: GameAIService };
+    const { gameAIService } = require('../../lib/ai-service') as { gameAIService: GameAIService };
 
     if (await gameAIService.isConfigured()) {
       const hintLevel = length <= 4 ? 1 : length <= 6 ? 2 : 3;

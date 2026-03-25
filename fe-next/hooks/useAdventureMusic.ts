@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
 import { useMusic } from '@/contexts/MusicContext';
@@ -98,6 +98,13 @@ export function useAdventureMusic({
 
   // State refs
   const currentTrackRef = useRef<1 | 2 | null>(null);
+  // Reactive state for consumers that need re-renders on track changes
+  const [currentTrackState, setCurrentTrackState] = useState<1 | 2 | null>(null);
+  /** Set both ref (for callbacks) and state (for reactivity) */
+  const setCurrentTrack = useCallback((track: 1 | 2 | null) => {
+    currentTrackRef.current = track;
+    setCurrentTrackState(track);
+  }, []);
   const hasSwitchedToTrack2Ref = useRef(false);
   const worldNumberRef = useRef(worldNumber);
   const isPlayingRef = useRef(isPlaying);
@@ -116,6 +123,15 @@ export function useAdventureMusic({
 
   // Track crossfade timeouts for cleanup (prevents memory leaks)
   const crossfadeTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  /** Schedule a timeout that self-prunes from the tracking array when it fires */
+  const scheduleCrossfadeTimeout = useCallback((fn: () => void, ms: number) => {
+    const timeoutId = setTimeout(() => {
+      fn();
+      crossfadeTimeoutsRef.current = crossfadeTimeoutsRef.current.filter(id => id !== timeoutId);
+    }, ms);
+    crossfadeTimeoutsRef.current.push(timeoutId);
+  }, []);
 
   // Keep refs in sync
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -301,10 +317,10 @@ export function useAdventureMusic({
     track2Ref.current = createHowl(paths.track2, `World ${worldNumber} Track 2`);
 
     // Reset state
-    currentTrackRef.current = null;
+    setCurrentTrack(null);
     hasSwitchedToTrack2Ref.current = false;
     worldNumberRef.current = worldNumber;
-  }, [worldNumber, createHowl]);
+  }, [worldNumber, createHowl, setCurrentTrack]);
 
   /**
    * Start playing track 1
@@ -323,16 +339,15 @@ export function useAdventureMusic({
     // Fade out track 2 if playing
     if (track2Ref.current?.playing()) {
       track2Ref.current.fade(track2Ref.current.volume(), 0, CROSSFADE_MS);
-      const timeoutId = setTimeout(() => track2Ref.current?.stop(), CROSSFADE_MS);
-      crossfadeTimeoutsRef.current.push(timeoutId);
+      scheduleCrossfadeTimeout(() => track2Ref.current?.stop(), CROSSFADE_MS);
     }
 
     // Start track 1
     track1Ref.current.volume(0);
     track1Ref.current.play();
     track1Ref.current.fade(0, targetVolume, CROSSFADE_MS);
-    currentTrackRef.current = 1;
-  }, [getEffectiveVolume]);
+    setCurrentTrack(1);
+  }, [getEffectiveVolume, scheduleCrossfadeTimeout, setCurrentTrack]);
 
   /**
    * Switch to track 2
@@ -352,16 +367,15 @@ export function useAdventureMusic({
     // Crossfade from track 1 to track 2
     if (track1Ref.current?.playing()) {
       track1Ref.current.fade(track1Ref.current.volume(), 0, CROSSFADE_MS);
-      const timeoutId = setTimeout(() => track1Ref.current?.stop(), CROSSFADE_MS);
-      crossfadeTimeoutsRef.current.push(timeoutId);
+      scheduleCrossfadeTimeout(() => track1Ref.current?.stop(), CROSSFADE_MS);
     }
 
     // Start track 2
     track2Ref.current.volume(0);
     track2Ref.current.play();
     track2Ref.current.fade(0, targetVolume, CROSSFADE_MS);
-    currentTrackRef.current = 2;
-  }, [getEffectiveVolume]);
+    setCurrentTrack(2);
+  }, [getEffectiveVolume, scheduleCrossfadeTimeout, setCurrentTrack]);
 
   /**
    * Stop all music
@@ -371,16 +385,14 @@ export function useAdventureMusic({
 
     if (track1Ref.current?.playing()) {
       track1Ref.current.fade(track1Ref.current.volume(), 0, fadeOutMs);
-      const timeoutId = setTimeout(() => track1Ref.current?.stop(), fadeOutMs);
-      crossfadeTimeoutsRef.current.push(timeoutId);
+      scheduleCrossfadeTimeout(() => track1Ref.current?.stop(), fadeOutMs);
     }
     if (track2Ref.current?.playing()) {
       track2Ref.current.fade(track2Ref.current.volume(), 0, fadeOutMs);
-      const timeoutId = setTimeout(() => track2Ref.current?.stop(), fadeOutMs);
-      crossfadeTimeoutsRef.current.push(timeoutId);
+      scheduleCrossfadeTimeout(() => track2Ref.current?.stop(), fadeOutMs);
     }
-    currentTrackRef.current = null;
-  }, []);
+    setCurrentTrack(null);
+  }, [scheduleCrossfadeTimeout, setCurrentTrack]);
 
   // ==============================================
   // EFFECTS
@@ -497,7 +509,7 @@ export function useAdventureMusic({
 
   return {
     /** Current track number (1, 2, or null) */
-    currentTrack: currentTrackRef.current,
+    currentTrack: currentTrackState,
     /** Stop all music with optional fade */
     stopMusic,
     /** Whether this world has music tracks */

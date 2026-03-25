@@ -330,7 +330,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         totalGameTimeRef.current = pendingGameStart.timerSeconds;
         gameTimer.setTime(pendingGameStart.timerSeconds);
       }
-      if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
+      setMinWordLength(pendingGameStart.minWordLength ?? 2);
       if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
       onGameStartConsumed();
       return;
@@ -355,7 +355,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         gameTimer.reset();
         gameTimer.setTime(pendingGameStart.timerSeconds);
       }
-      if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
+      setMinWordLength(pendingGameStart.minWordLength ?? 2);
       // Show mode reveal first, which will trigger countdown animation after 2s
       setShowModeReveal(true);
 

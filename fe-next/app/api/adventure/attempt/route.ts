@@ -47,9 +47,9 @@ function validateAttemptBody(body: Record<string, unknown>): {
     return { valid: false, error: 'Invalid world: must be between 1 and 10' };
   }
 
-  // Validate level range (1-10) — aligned with complete/route.ts
-  if (level < 1 || level > 10) {
-    return { valid: false, error: 'Invalid level: must be between 1 and 10' };
+  // Validate level range (1-7) — aligned with complete/route.ts (LEVELS_PER_WORLD)
+  if (level < 1 || level > 7) {
+    return { valid: false, error: 'Invalid level: must be between 1 and 7' };
   }
 
   // Validate non-negative values

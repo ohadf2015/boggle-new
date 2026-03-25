@@ -6177,6 +6177,7 @@ const he = {
       "alreadyFound": "המילה כבר נמצאה",
       "notInDictionary": "המילה לא במילון",
       "validationFailed": "לא ניתן לאמת את המילה",
+      "validationTimeout": "האימות נכשל — נסו שוב",
       "validationCancelled": "האימות בוטל"
     },
 "game": {

@@ -171,14 +171,14 @@ export function usePlayerHealth(initialMaxHP: number = DEFAULT_MAX_HP): UsePlaye
     setCurrentHP((prevHP) => Math.min(prevHP, newMax));
   }, []);
 
-  // Construct health state object
-  const healthState: PlayerHealthState = {
+  // Construct health state object — memoized to prevent re-render cascades
+  const healthState: PlayerHealthState = useMemo(() => ({
     currentHP,
     maxHP,
     isDead,
     isLowHealth,
     totalDamageTaken,
-  };
+  }), [currentHP, maxHP, isDead, isLowHealth, totalDamageTaken]);
 
   return {
     healthState,

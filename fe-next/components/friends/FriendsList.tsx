@@ -12,6 +12,7 @@ import {
   X,
   ChevronRight,
   ShieldOff,
+  Handshake,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
@@ -33,6 +34,7 @@ import { ChallengeInviteDialog } from './ChallengeInviteDialog';
 import { AddFriendDialog } from './AddFriendDialog';
 import { FriendDetailDialog } from './FriendDetailDialog';
 import GiftModal from '@/components/social/GiftModal';
+import { PactFriendSelector } from '@/components/engagement/PactFriendSelector';
 import { useSocketOptional } from '@/utils/SocketContext';
 import type { Friend } from '@/utils/friends';
 import type { MessageThread as MessageThreadType } from '@/shared/types/friends';
@@ -82,6 +84,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
   const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
   const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
+  const [showPactSelector, setShowPactSelector] = useState(false);
 
   const socketContext = useSocketOptional();
   const giftSocket = socketContext?.socket ?? null;
@@ -311,10 +314,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
             </span>
           )}
         </div>
-        <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black">
-          <UserPlus className="w-4 h-4" />
-          {t('friends.add')}
-        </EnhancedButton>
+        <div className="flex items-center gap-2">
+          <EnhancedButton onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white">
+            <Handshake className="w-4 h-4" />
+            {t('wordPact.formPact')}
+          </EnhancedButton>
+          <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black">
+            <UserPlus className="w-4 h-4" />
+            {t('friends.add')}
+          </EnhancedButton>
+        </div>
       </div>
 
       {/* Tab Navigation (Q-18: proper ARIA tab semantics) */}
@@ -601,6 +610,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
           senderBalance={profile?.total_coins ?? 0}
           giftsRemaining={DAILY_GIFT_LIMIT}
         />
+      )}
+
+      {showPactSelector && (
+        <PactFriendSelector onClose={() => setShowPactSelector(false)} />
       )}
     </div>
   );

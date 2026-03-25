@@ -102,7 +102,7 @@ interface StartGamePayload {
   timerSeconds?: number;     // 30-600 (default: 180)
   language?: Language;
   difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
-  minWordLength?: number;    // 2-5 (default: 3)
+  minWordLength?: number;    // 2-5 (default: 2)
 }
 
 // Server Response

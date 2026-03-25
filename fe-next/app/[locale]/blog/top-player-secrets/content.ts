@@ -165,7 +165,7 @@ The 14-year-old who beat me in my fifth game was kind about it, at least. "You h
 
 Visual word recognition keeps improving in adults. What looks like "natural talent" in expert players is almost always accumulated practice. Our brains are more flexible than we give them credit for. You don't need to become a tournament player to benefit from thinking like one.
 
-Now if you'll excuse me, I have 90,000 Collins words to learn before my next tournament. Diane's not going to beat me twice.`,
+Somewhere out there, Diane is practicing right now. And next time we meet across a tournament board, I'll be ready.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -319,7 +319,7 @@ Collins כולל כ-280,000 מילים. TWL כ-190,000. זה 90,000 מילים �
 
 המחקר מראה שזיהוי מילים ויזואלי ממשיך להשתפר אצל מבוגרים. מה שנראה כמו "כישרון טבעי" הוא כמעט תמיד תרגול מצטבר — והוכחה שהמוח שלנו גמיש יותר ממה שנותנים לו קרדיט.
 
-עכשיו אם תסלחו לי, יש לי 90,000 מילים של Collins ללמוד לפני הטורניר הבא. דינה לא תנצח אותי פעמיים.`,
+איפשהו שם בחוץ, דינה מתרגלת עכשיו. ובפעם הבאה שניפגש מול לוח טורניר, אני אהיה מוכן.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -473,7 +473,7 @@ Och den sociala dynamiken. Tävlings-Scrabble är paradoxalt nog en av de ensamm
 
 Forskningen visar att visuell ordigenkänning fortsätter att förbättras hos vuxna. Det som ser ut som "naturlig talang" är nästan alltid ackumulerad övning — och bevis på att våra hjärnor är mer flexibla än vi ger dem kredit för.
 
-Nu om ni ursäktar mig har jag 90 000 Collins-ord att lära mig. Birgitta ska inte slå mig två gånger.`,
+Någonstans där ute tränar Birgitta just nu. Och nästa gång vi möts över ett turneringsbräde kommer jag vara redo.`,
       },
     ],
     backToBlog: 'Tillbaka till Bloggen',
@@ -627,7 +627,7 @@ Collinsは約28万語。TWLは約19万語。国際プレイでは9万語多く�
 
 研究は視覚的単語認識が大人でも改善し続けることを示している。エキスパートの「自然な才能」に見えるものは、ほぼ常に蓄積された練習——そして脳が私たちが思う以上に柔軟であることの証拠だ。
 
-では失礼。次の大会までにCollinsの9万語を覚えなければ。あの人には二度と負けない。`,
+どこかであの人は今も練習している。次にトーナメントのボードを挟んで向かい合う時、準備はできている。`,
       },
     ],
     backToBlog: 'ブログに戻る',
@@ -781,7 +781,7 @@ La chica de 14 años que me ganó en mi quinto juego fue amable al respecto. "Ti
 
 La investigación muestra que el reconocimiento visual de palabras sigue mejorando en adultos. Lo que parece "talento natural" en jugadores expertos es casi siempre práctica acumulada — y prueba de que nuestros cerebros son más flexibles de lo que les damos crédito.
 
-Ahora si me disculpan, tengo 90.000 palabras de Collins que aprender antes de mi próximo torneo. Carmen no me va a ganar dos veces.`,
+En algún lugar, Carmen está practicando ahora mismo. Y la próxima vez que nos encontremos frente a un tablero de torneo, estaré listo.`,
       },
     ],
     backToBlog: 'Volver al Blog',

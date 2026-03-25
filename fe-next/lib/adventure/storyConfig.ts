@@ -37,6 +37,31 @@ export const STORY_BEATS: StoryBeat[] = [
   { worldId: 5, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w5.after2' },
   { worldId: 5, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w5.after4' },
   { worldId: 5, afterLevel: 7, characterKey: 'adventure.story.w5.boss', dialogueKey: 'adventure.story.w5.postBoss' },
+
+  // World 6 — Anagram Labyrinth
+  { worldId: 6, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w6.after2' },
+  { worldId: 6, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w6.after4' },
+  { worldId: 6, afterLevel: 7, characterKey: 'adventure.story.w6.boss', dialogueKey: 'adventure.story.w6.postBoss' },
+
+  // World 7 — Mirror Palace
+  { worldId: 7, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w7.after2' },
+  { worldId: 7, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w7.after4' },
+  { worldId: 7, afterLevel: 7, characterKey: 'adventure.story.w7.boss', dialogueKey: 'adventure.story.w7.postBoss' },
+
+  // World 8 — Neologism Nebula
+  { worldId: 8, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w8.after2' },
+  { worldId: 8, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w8.after4' },
+  { worldId: 8, afterLevel: 7, characterKey: 'adventure.story.w8.boss', dialogueKey: 'adventure.story.w8.postBoss' },
+
+  // World 9 — Polyglot Peaks
+  { worldId: 9, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w9.after2' },
+  { worldId: 9, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w9.after4' },
+  { worldId: 9, afterLevel: 7, characterKey: 'adventure.story.w9.boss', dialogueKey: 'adventure.story.w9.postBoss' },
+
+  // World 10 — Lexicon Throne
+  { worldId: 10, afterLevel: 2, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w10.after2' },
+  { worldId: 10, afterLevel: 4, characterKey: 'adventure.story.lexi', dialogueKey: 'adventure.story.w10.after4' },
+  { worldId: 10, afterLevel: 7, characterKey: 'adventure.story.w10.boss', dialogueKey: 'adventure.story.w10.postBoss' },
 ];
 
 /** Get story beat for a world/level, or null if none */

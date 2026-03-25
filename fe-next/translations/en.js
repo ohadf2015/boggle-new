@@ -6243,6 +6243,7 @@ const en = {
       "alreadyFound": "Word already found",
       "notInDictionary": "Word not in dictionary",
       "validationFailed": "Could not validate word",
+      "validationTimeout": "Validation timed out — try again",
       "validationCancelled": "Validation was cancelled"
     },
 "game": {

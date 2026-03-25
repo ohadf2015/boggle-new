@@ -26,6 +26,7 @@ import {
   isValidDateFormat,
   isValidLanguage,
 } from './utils';
+import { completeMission } from '../../modules/dailyMissionsManager';
 
 const router: Router = express.Router();
 
@@ -192,6 +193,13 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     }
 
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${data.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}`);
+
+    // Mark daily mission as complete for authenticated users (fire-and-forget)
+    if (playerId) {
+      completeMission(playerId, 'word_hunt').catch((err) => {
+        logger.error('API', `[WordHunt] Daily mission update failed for ${playerId}: ${(err as Error).message}`);
+      });
+    }
 
     // Update profile stats for authenticated users (all attempts count for games played)
     if (playerId) {

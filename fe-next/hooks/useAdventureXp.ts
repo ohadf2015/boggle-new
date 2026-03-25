@@ -81,29 +81,32 @@ export function useAdventureXp(
         return { leveledUp: false };
       }
 
-      // Calculate new XP total
-      const newTotalXp = totalXp + amount;
+      // Use functional updaters to avoid stale closure over totalXp/currentLevel.
+      // This prevents double-fire in React Strict Mode from silently dropping XP.
+      let levelUpResult: { leveledUp: boolean; newLevel?: number } = { leveledUp: false };
 
-      // Calculate new level
-      const newLevel = getLevelFromXp(newTotalXp);
+      setTotalXp(prevXp => {
+        const newTotalXp = prevXp + amount;
+        const newLevel = getLevelFromXp(newTotalXp);
 
-      // Check for level up
-      const levelUpCheck = checkLevelUp(currentLevel, newLevel);
+        setCurrentLevel(prevLevel => {
+          levelUpResult = checkLevelUp(prevLevel, newLevel);
+          return newLevel;
+        });
 
-      // Update state
-      setTotalXp(newTotalXp);
-      setCurrentLevel(newLevel);
+        // Create pending update for database persistence
+        setPendingUpdate({
+          userId,
+          totalXp: newTotalXp,
+          level: getLevelFromXp(newTotalXp),
+        });
 
-      // Create pending update for database persistence
-      setPendingUpdate({
-        userId,
-        totalXp: newTotalXp,
-        level: newLevel,
+        return newTotalXp;
       });
 
-      return levelUpCheck;
+      return levelUpResult;
     },
-    [totalXp, currentLevel, userId]
+    [userId]
   );
 
   /**

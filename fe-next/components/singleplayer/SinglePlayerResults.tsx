@@ -9,7 +9,6 @@ import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { AchievementBadge } from '@/components/AchievementBadge';
 
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
-import MissedWords from '@/components/results/MissedWords';
 import UnfinishedBoardTeaser from '@/components/results/UnfinishedBoardTeaser';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
@@ -243,9 +242,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {mode === 'solo-bots' && allParticipants.length > 1 && (
             <RankingsSection participants={allParticipants} maxDisplay={4} title={t('results.rankings')} />
           )}
-          {missedWords.length > 0 && (
-            <MissedWords missedWords={missedWords} maxDisplay={5} className="text-sm" />
-          )}
           {!autoPlayCancelled ? (
             <AutoPlayCountdown onComplete={onPlayAgain} onCancel={() => setAutoPlayCancelled(true)} duration={5} className="mt-auto" />
           ) : (
@@ -376,7 +372,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           </CollapsibleSection>
         </div>
         <div className="space-y-3">
-          {missedWords.length > 0 && <MissedWords missedWords={missedWords} maxDisplay={5} />}
           {missedWordStrings.length >= 3 && (
             <UnfinishedBoardTeaser missedWords={missedWordStrings.slice(0, 3)} />
           )}

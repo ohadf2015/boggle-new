@@ -49,9 +49,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many skills' }, { status: 400 });
     }
     for (const [key, value] of entries) {
-      if (typeof key !== 'string' || key.length > 50 || typeof value !== 'number' || value < 0) {
+      if (typeof key !== 'string' || key.length > 50 || typeof value !== 'number' || value < 0 || value > 100) {
         return NextResponse.json({ error: 'Invalid skill entry' }, { status: 400 });
       }
+    }
+
+    // Server-side budget validation: 1 skill point earned per level (level 1 = 0 points)
+    const { data: progression, error: progError } = await supabase
+      .from('player_progression')
+      .select('player_level')
+      .eq('user_id', user.id)
+      .single();
+
+    if (progError || !progression) {
+      console.error('[SKILL TREE API] Failed to fetch player level:', progError);
+      return NextResponse.json({ error: 'Failed to validate skill points' }, { status: 500 });
+    }
+
+    const maxPoints = (progression.player_level as number) - 1;
+    const totalAllocated = entries.reduce((sum, [, v]) => sum + v, 0);
+    if (totalAllocated + (skillPoints as number) > maxPoints) {
+      return NextResponse.json(
+        { error: `Skill point budget exceeded: ${totalAllocated + (skillPoints as number)} > ${maxPoints} (level ${progression.player_level})` },
+        { status: 400 }
+      );
     }
 
     const { error: updateError } = await supabase

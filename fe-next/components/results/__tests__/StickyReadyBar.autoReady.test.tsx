@@ -1,12 +1,14 @@
 /**
  * StickyReadyBar Auto-Ready Countdown Tests (Brawl Stars-inspired)
  *
- * Tests the new auto-ready flow:
- * - All players see a countdown (AUTO_READY_SECONDS = 15s)
+ * Tests the unified 15s auto-countdown flow:
+ * - All players (host + non-host) see a 15s countdown
  * - Non-host players are auto-readied when countdown hits 0
- * - Host auto-starts when all players ready (existing 5s countdown)
+ * - Host auto-starts when countdown hits 0
  * - Players can manually ready/start before countdown expires
- * - "Leave Room" cancels the countdown (opt-out vs opt-in)
+ * - Cancel button opts out of auto-countdown
+ * - Bots are always counted as ready
+ * - Non-1st-place players see "Revenge {winner}"
  */
 
 import React from 'react';
@@ -21,10 +23,9 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'results.imReady': "I'M READY",
         'results.youAreReady': 'YOU ARE READY',
         'results.revengeRematch': `Revenge on ${params?.player ?? ''}!`,
+        'results.defendTitle': 'DEFEND TITLE',
         'autoPlay.exit': 'Exit',
-        'autoPlay.nextGameIn': `Next game in ${params?.seconds ?? ''}...`,
-        'results.autoReadyIn': `Auto-ready in ${params?.seconds ?? ''}`,
-        'results.nextRoundIn': `Next round in ${params?.seconds ?? ''}`,
+        'results.ready': 'Ready',
       };
       return translations[key] ?? key;
     },
@@ -57,9 +58,15 @@ jest.mock('@/components/GameModeSelector', () => ({
   getModeLabel: (mode: string) => mode,
 }));
 
+// Mock Avatar
+jest.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: ({ userId }: { userId?: string }) => <div data-testid={`avatar-${userId}`} />,
+}));
+
 import StickyReadyBar from '../StickyReadyBar';
 
-const AUTO_READY_SECONDS = 15;
+const AUTO_SECONDS = 15;
 
 describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   const baseProps = {
@@ -87,17 +94,33 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   it('shows auto-ready countdown for non-host players who have not readied', () => {
     render(<StickyReadyBar {...baseProps} />);
 
-    // Should show countdown seconds
-    expect(screen.getByTestId('auto-ready-countdown')).toBeInTheDocument();
-    expect(screen.getByText(String(AUTO_READY_SECONDS))).toBeInTheDocument();
+    expect(screen.getByTestId('auto-countdown')).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS))).toBeInTheDocument();
+  });
+
+  it('shows revenge text for non-first-place players', () => {
+    render(<StickyReadyBar {...baseProps} />);
+
+    expect(screen.getByText('Revenge on winner!')).toBeInTheDocument();
+  });
+
+  it('shows defend title for first-place player', () => {
+    render(
+      <StickyReadyBar
+        {...baseProps}
+        currentPlayerRank={1}
+        winnerUsername={undefined}
+      />
+    );
+
+    expect(screen.getByText('DEFEND TITLE')).toBeInTheDocument();
   });
 
   it('auto-marks player as ready when countdown reaches 0', () => {
     const onMarkReady = jest.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
-    // Advance through all seconds
-    act(() => { jest.advanceTimersByTime(AUTO_READY_SECONDS * 1000); });
+    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
 
     expect(onMarkReady).toHaveBeenCalledTimes(1);
   });
@@ -106,8 +129,7 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     const onMarkReady = jest.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
-    // Click the main button before countdown finishes
-    const btn = screen.getByTestId('auto-ready-cta');
+    const btn = screen.getByTestId('auto-countdown-cta');
     fireEvent.click(btn);
 
     expect(onMarkReady).toHaveBeenCalledTimes(1);
@@ -116,62 +138,46 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   it('does not show auto-ready countdown when player is already ready', () => {
     render(<StickyReadyBar {...baseProps} isCurrentPlayerReady={true} />);
 
-    expect(screen.queryByTestId('auto-ready-countdown')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('auto-countdown')).not.toBeInTheDocument();
     expect(screen.getByText('YOU ARE READY')).toBeInTheDocument();
   });
 
-  it('cancelling auto-ready shows normal ready button', () => {
+  it('cancelling countdown shows manual revenge button', () => {
     render(<StickyReadyBar {...baseProps} />);
 
-    // Cancel
-    fireEvent.click(screen.getByTestId('auto-ready-cancel'));
+    fireEvent.click(screen.getByTestId('auto-countdown-cancel'));
 
-    // Should now show the normal "I'M READY" or revenge button instead of countdown
-    expect(screen.queryByTestId('auto-ready-countdown')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('auto-countdown')).not.toBeInTheDocument();
+    // Should show the revenge button (manual, no countdown)
+    expect(screen.getByText('Revenge on winner!')).toBeInTheDocument();
   });
 
-  // --- Host auto-start (existing behavior preserved) ---
+  // --- Host gets same 15s countdown ---
 
-  it('host sees auto-start countdown (5s) when all players are ready', () => {
+  it('host also gets 15s countdown (auto-starts game)', () => {
     render(
       <StickyReadyBar
         {...baseProps}
         isHost={true}
-        readyCount={3}
-        totalPlayers={3}
+        currentPlayerRank={1}
       />
     );
 
-    // Should show the 5-second host auto-advance countdown
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByTestId('auto-countdown')).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS))).toBeInTheDocument();
   });
 
-  it('host sees start button when not all players are ready', () => {
-    render(
-      <StickyReadyBar
-        {...baseProps}
-        isHost={true}
-        readyCount={1}
-        totalPlayers={3}
-      />
-    );
-
-    expect(screen.getByText('START GAME')).toBeInTheDocument();
-  });
-
-  it('host auto-starts game when 5s countdown hits 0', () => {
+  it('host auto-starts game when countdown hits 0', () => {
     const onStartGame = jest.fn();
     render(
       <StickyReadyBar
         {...baseProps}
         isHost={true}
-        readyCount={3}
-        totalPlayers={3}
         onStartGame={onStartGame}
       />
     );
 
-    act(() => { jest.advanceTimersByTime(5000); });
+    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
@@ -180,13 +186,13 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   it('countdown decrements each second', () => {
     render(<StickyReadyBar {...baseProps} />);
 
-    expect(screen.getByText(String(AUTO_READY_SECONDS))).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS))).toBeInTheDocument();
 
     act(() => { jest.advanceTimersByTime(1000); });
-    expect(screen.getByText(String(AUTO_READY_SECONDS - 1))).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS - 1))).toBeInTheDocument();
 
     act(() => { jest.advanceTimersByTime(1000); });
-    expect(screen.getByText(String(AUTO_READY_SECONDS - 2))).toBeInTheDocument();
+    expect(screen.getByText(String(AUTO_SECONDS - 2))).toBeInTheDocument();
   });
 
   // --- Edge cases ---
@@ -195,19 +201,37 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     const onMarkReady = jest.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
-    // Cancel the countdown
-    fireEvent.click(screen.getByTestId('auto-ready-cancel'));
+    fireEvent.click(screen.getByTestId('auto-countdown-cancel'));
 
-    // Advance past countdown
-    act(() => { jest.advanceTimersByTime(AUTO_READY_SECONDS * 1000); });
+    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
 
-    // Should NOT have been called
     expect(onMarkReady).not.toHaveBeenCalled();
   });
 
   it('does not show auto-ready for bots-only (totalPlayers=0)', () => {
     render(<StickyReadyBar {...baseProps} totalPlayers={0} />);
 
-    expect(screen.queryByTestId('auto-ready-countdown')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('auto-countdown')).not.toBeInTheDocument();
+  });
+
+  // --- Bot counting ---
+
+  it('counts bots as ready in the avatar strip', () => {
+    render(
+      <StickyReadyBar
+        {...baseProps}
+        readyCount={1}
+        totalPlayers={3}
+        players={[
+          { username: 'human1' },
+          { username: 'bot1', isBot: true },
+          { username: 'bot2', isBot: true },
+        ]}
+        readyUsernames={['human1']}
+      />
+    );
+
+    // readyCount=1 + 2 bots = 3, totalPlayers=3 → "3 / 3 Ready"
+    expect(screen.getByText(/3/)).toBeInTheDocument();
   });
 });

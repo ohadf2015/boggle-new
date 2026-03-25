@@ -249,6 +249,7 @@ function resetGameForNewRound(gameCode: string): boolean {
 
   game.earthquakeTriggered = false;
   game.letterGrid = null;
+  game.minWordLength = undefined;
   game.lastActivity = Date.now();
   game.gameEndedAt = null;
   game.wordHuntState = null;

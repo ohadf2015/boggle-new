@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Play, Crown, Check, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,18 +31,26 @@ interface StickyReadyBarProps {
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
+const AUTO_SECONDS = 15;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
  * No fixed positioning or background — the parent ResultsPage handles that.
+ *
+ * All players (host + non-host) get a 15s auto-countdown.
+ * - Host: auto-starts game after 15s
+ * - Non-host: auto-marks ready after 15s
+ * - Non-1st-place players see "Revenge {winner}"
+ * - 1st-place sees "Defend Title"
+ * - Bots are always counted as ready
  */
 export default function StickyReadyBar({
   isHost,
   isCurrentPlayerReady,
   currentPlayerRank,
   winnerUsername,
-  readyCount,
-  totalPlayers,
+  readyCount: rawReadyCount,
+  totalPlayers: rawTotalPlayers,
   readyUsernames = [],
   players = [],
   onStartGame,
@@ -51,20 +59,15 @@ export default function StickyReadyBar({
   onSelectGameMode,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
-  const reducedMotion = useReducedMotion();
 
   const isRevenge = currentPlayerRank > 1 && !!winnerUsername;
-  const allReady = readyCount === totalPlayers && totalPlayers > 0;
 
-  const [autoAdvanceCancelled, setAutoAdvanceCancelled] = useState(false);
-  const showAutoAdvance = isHost && allReady && !autoAdvanceCancelled;
+  // Count bots as always-ready for display purposes
+  const botCount = useMemo(() => players.filter(p => p.isBot).length, [players]);
+  const readyCount = rawReadyCount + botCount;
+  const totalPlayers = rawTotalPlayers;
 
-  // --- Brawl Stars-style auto-ready countdown for non-host players ---
-  const AUTO_READY_SECONDS = 15;
-  const [autoReadyCancelled, setAutoReadyCancelled] = useState(false);
-  const [autoReadySecondsLeft, setAutoReadySecondsLeft] = useState(AUTO_READY_SECONDS);
-  const autoReadyCompletedRef = useRef(false);
-  const showAutoReady = !isHost && !isCurrentPlayerReady && !autoReadyCancelled && totalPlayers > 0;
+  const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
 
   const playerMap = useMemo(() => {
     const map = new Map<string, PlayerInfo>();
@@ -74,20 +77,31 @@ export default function StickyReadyBar({
 
   const winnerAvatar = winnerUsername ? playerMap.get(winnerUsername)?.avatar : undefined;
 
-  // ---------- Inline auto-advance countdown ----------
-  const [secondsLeft, setSecondsLeft] = useState(5);
+  // ---------- Unified 15s countdown for ALL players ----------
+  const [cancelled, setCancelled] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(AUTO_SECONDS);
   const completedRef = useRef(false);
+
+  // Determine if we should show auto-countdown
+  // Host: always (auto-starts game)
+  // Non-host: only if not yet ready
+  const needsAction = isHost ? true : !isCurrentPlayerReady;
+  const showCountdown = needsAction && !cancelled && totalPlayers > 0;
 
   const handleCountdownComplete = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
-    onStartGame();
-  }, [onStartGame]);
+    if (isHost) {
+      onStartGame();
+    } else {
+      onMarkReady();
+    }
+  }, [isHost, onStartGame, onMarkReady]);
 
   useEffect(() => {
-    if (!showAutoAdvance || reducedMotion) return;
+    if (!showCountdown) return;
     completedRef.current = false;
-    setSecondsLeft(5);
+    setSecondsLeft(AUTO_SECONDS);
 
     const interval = setInterval(() => {
       setSecondsLeft(prev => {
@@ -100,32 +114,7 @@ export default function StickyReadyBar({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showAutoAdvance, reducedMotion, handleCountdownComplete]);
-
-  // ---------- Auto-ready countdown for non-host players ----------
-  const handleAutoReadyComplete = useCallback(() => {
-    if (autoReadyCompletedRef.current) return;
-    autoReadyCompletedRef.current = true;
-    onMarkReady();
-  }, [onMarkReady]);
-
-  useEffect(() => {
-    if (!showAutoReady) return;
-    autoReadyCompletedRef.current = false;
-    setAutoReadySecondsLeft(AUTO_READY_SECONDS);
-
-    const interval = setInterval(() => {
-      setAutoReadySecondsLeft(prev => {
-        if (prev <= 1) {
-          handleAutoReadyComplete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [showAutoReady, handleAutoReadyComplete]);
+  }, [showCountdown, handleCountdownComplete]);
 
   // ---------- Render helpers ----------
 
@@ -133,53 +122,8 @@ export default function StickyReadyBar({
   function renderCtaButton() {
     const btnBase = 'w-full h-14 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
 
-    // Auto-advance (host, all ready)
-    if (showAutoAdvance) {
-      return (
-        <div className="flex items-center gap-2">
-          <motion.button
-            onClick={handleCountdownComplete}
-            className={cn(btnBase, 'bg-neo-yellow text-neo-black relative overflow-hidden')}
-            whileTap={{ scale: 0.95 }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-neo-black/15 origin-right"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 5, ease: 'linear' }}
-            />
-            <span className="relative z-10 flex items-center gap-2">
-              <Play className="w-5 h-5" />
-              <span className="tabular-nums">{secondsLeft}</span>
-            </span>
-          </motion.button>
-          <button
-            onClick={() => setAutoAdvanceCancelled(true)}
-            className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
-            aria-label={t('autoPlay.exit')}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      );
-    }
-
-    // Host — PLAY AGAIN
-    if (isHost) {
-      return (
-        <motion.button
-          onClick={onStartGame}
-          whileTap={{ scale: 0.95 }}
-          className={cn(btnBase, 'bg-neo-lime text-neo-black')}
-        >
-          <Play className="w-5 h-5 shrink-0" />
-          <span>{t('results.playAgain')}</span>
-        </motion.button>
-      );
-    }
-
-    // Already ready — green check status
-    if (isCurrentPlayerReady) {
+    // Already ready (non-host) — green check status
+    if (!isHost && isCurrentPlayerReady) {
       return (
         <div className={cn(btnBase, 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 pointer-events-none')}>
           <Check className="w-5 h-5 shrink-0" />
@@ -188,25 +132,23 @@ export default function StickyReadyBar({
       );
     }
 
-    // Auto-ready countdown (non-host, not ready)
-    if (showAutoReady) {
+    // Active countdown (both host and non-host)
+    if (showCountdown) {
+      const btnColor = isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black';
+
       return (
-        <div className="flex items-center gap-2" data-testid="auto-ready-countdown">
+        <div className="flex items-center gap-2" data-testid="auto-countdown">
           <motion.button
-            data-testid="auto-ready-cta"
-            onClick={onMarkReady}
-            className={cn(
-              btnBase,
-              isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black',
-              'relative overflow-hidden'
-            )}
+            data-testid="auto-countdown-cta"
+            onClick={handleCountdownComplete}
+            className={cn(btnBase, btnColor, 'relative overflow-hidden')}
             whileTap={{ scale: 0.95 }}
           >
             <motion.div
               className="absolute inset-0 bg-neo-black/15 origin-right"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: AUTO_READY_SECONDS, ease: 'linear' }}
+              transition={{ duration: AUTO_SECONDS, ease: 'linear' }}
             />
             <span className="relative z-10 flex items-center gap-3">
               {isRevenge && winnerUsername ? (
@@ -222,12 +164,12 @@ export default function StickyReadyBar({
                   <span className="truncate">{t('results.defendTitle')}</span>
                 </>
               )}
-              <span className="tabular-nums text-sm opacity-70">{autoReadySecondsLeft}</span>
+              <span className="tabular-nums text-sm opacity-70">{secondsLeft}</span>
             </span>
           </motion.button>
           <button
-            data-testid="auto-ready-cancel"
-            onClick={() => setAutoReadyCancelled(true)}
+            data-testid="auto-countdown-cancel"
+            onClick={() => setCancelled(true)}
             className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
             aria-label={t('autoPlay.exit')}
           >
@@ -237,7 +179,34 @@ export default function StickyReadyBar({
       );
     }
 
-    // Loser — REVENGE vs WinnerName
+    // Countdown cancelled — manual buttons
+
+    // Host — manual PLAY AGAIN
+    if (isHost) {
+      return (
+        <motion.button
+          onClick={onStartGame}
+          whileTap={{ scale: 0.95 }}
+          className={cn(btnBase, isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black')}
+        >
+          {isRevenge && winnerUsername ? (
+            <>
+              <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
+                <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
+              </div>
+              <span className="truncate">{t('results.revengeRematch', { player: winnerUsername })}</span>
+            </>
+          ) : (
+            <>
+              <Play className="w-5 h-5 shrink-0" />
+              <span>{t('results.playAgain')}</span>
+            </>
+          )}
+        </motion.button>
+      );
+    }
+
+    // Non-host, not ready, countdown cancelled — manual ready
     if (isRevenge && winnerUsername) {
       return (
         <motion.button
@@ -296,13 +265,13 @@ export default function StickyReadyBar({
         {/* Contextual CTA button */}
         {renderCtaButton()}
 
-        {/* Status Footer — ready avatar stack */}
+        {/* Status Footer — ready avatar stack (show ALL players including host) */}
         {totalPlayers > 0 && (
           <div className="flex items-center justify-center gap-4" aria-live="polite" aria-label={`${readyCount}/${totalPlayers}`}>
-            {/* Avatar dots with colored rings */}
+            {/* Avatar dots with colored rings — bots always show as ready */}
             <div className="flex -space-x-1.5 rtl:space-x-reverse">
-              {players.slice(0, 4).map((player) => {
-                const isReady = readyUsernames.includes(player.username);
+              {players.slice(0, 6).map((player) => {
+                const isReady = player.isBot || readySet.has(player.username);
                 return (
                   <div
                     key={player.username}

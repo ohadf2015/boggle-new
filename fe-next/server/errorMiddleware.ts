@@ -59,6 +59,11 @@ export function errorHandler(
     });
   }
 
+  // If response already sent, delegate to Express default handler (closes connection)
+  if (res.headersSent) {
+    return _next(error);
+  }
+
   // Send response to client
   if (error instanceof AppError) {
     // AppError has structured error info

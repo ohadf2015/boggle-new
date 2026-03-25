@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     const newXp = (prog.xp as number ?? 0) + milestone.xp;
     const newClaimed = [...claimed, milestone.target];
 
-    // Optimistic lock: only update if gold hasn't changed (prevents double-claim race)
+    // Optimistic lock: check both gold AND claimed milestones to prevent double-claim race
     const { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update({
@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
       })
       .eq('user_id', user.id)
       .eq('gold', prog.gold as number ?? 0)
+      .contains('word_album_claimed_milestones', claimed)
       .select()
       .single();
 

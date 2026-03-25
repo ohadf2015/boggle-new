@@ -271,117 +271,117 @@ My most important piece of advice: consistency crushes peaks. A player who holds
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
-    title: 'Blast-lage: Kombos, Kedjor och Hur Jag Slutade Choka pa Niva 7',
-    subtitle: 'Allt jag lart mig om kombos, platteffekter och att inte ga i staa efter 1 000+ braden.',
+    title: 'Blast-läge: Kombos, Kedjor och Hur Jag Slutade Choka på Nivå 7',
+    subtitle: 'Allt jag lärt mig om kombos, platteffekter och att inte gå i stå efter 1 000+ bräden.',
     category: 'Strategi',
-    readTime: '9 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Har rensat over 1 000 Blast-braden och natt kombiniva 15+. Handerna skakade de forsta gangerna.',
+    readTime: '9 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Har rensat över 1 000 Blast-bräden och nått kombinivå 15+. Handerna skakade de första gångerna.',
     quickTips: [
-      'Hastighet over allt. Ditt nasta ord ar viktigare an ditt basta ord.',
-      'Spara redan nasta ord medan det nuvarande valideras. Den har vanan andrade mina poang totalt.',
-      'Korta ord (3-4 bokstaver) ar kombolim. Jag brukade ignorera dem. Enormt misstag.',
-      'Eldplattor rensar rader, is fryser grannar, bomber sprangger 3x3. Lar dig vad varje farg betyder.',
-      'Kombofonstret krymper till 1 sekund pa hoga nivaer. Har du inte ett reservord redo ar du kord.',
-      'Innan du skickar nagot, hitta 3-4 latta ord forst. Den landningsbanan raddaar dig.',
-      'Langre ord ger storre kombotimer-aterstaallning. Bra for att hamta andan mitt i en kedja.',
+      'Hastighet över allt. Ditt nästa ord är viktigare än ditt bästa ord.',
+      'Spara redan nästa ord medan det nuvarande valideras. Den här vanan ändrade mina poäng totalt.',
+      'Korta ord (3-4 bokstäver) är kombolim. Jag brukade ignorera dem. Enormt misstag.',
+      'Eldplattor rensar rader, is fryser grannar, bomber spränger 3x3. Lär dig vad varje färg betyder.',
+      'Kombofönstret krymper till 1 sekund på höga nivåer. Har du inte ett reservord redo är du körd.',
+      'Innan du skickar något, hitta 3-4 lätta ord först. Den landningsbanan räddar dig.',
+      'Längre ord ger större kombotimer-återställning. Bra för att hämta andan mitt i en kedja.',
     ],
     comboTable,
     sections: [
       {
-        title: 'Varfor Blast-lage Korde Sonder Min Hjarna (Pa Ett Bra Satt)',
-        content: `Jag spelade Klassiskt lage i manader innan jag provade Blast. Trodde jag var ganska bra pa ordspel. Sen spelade jag min forsta Blast-runda och fick typ 200 poang. Odmjukande ar for milt uttryckt.
+        title: 'Varför Blast-läge Körde Sönder Min Hjärna (På Ett Bra Sätt)',
+        content: `Jag spelade Klassiskt läge i månader innan jag provade Blast. Trodde jag var ganska bra på ordspel. Sen spelade jag min första Blast-runda och fick typ 200 poäng. Ödmjukande är för milt uttryckt.
 
-Det som gor Blast helt annorlunda: det finns ett kombosystem som koor under allt. Du skickar ett ord, en timer borjar ticka. Fa in ett till ord innan den gar ut sa gar din multiplikator upp. Missa fonstret och du ar tillbaka pa 1x. Enkelt koncept. Otroligt svart att gora bra.
+Det som gör Blast helt annorlunda: det finns ett kombosystem som kör under allt. Du skickar ett ord, en timer börjar ticka. Få in ett till ord innan den går ut så går din multiplikator upp. Missa fönstret och du är tillbaka på 1x. Enkelt koncept. Otroligt svårt att göra bra.
 
-Det har vanderpp ordspelsstrategi totalt. I Klassiskt lage kunde jag gladligen lagga 15 sekunder pa att jaga ett underbart 7-bokstavsord. I Blast hade de 15 sekundernas tystnad mordat en kombokedja vard mycket mer poang. Det handlar inte om att hitta det basta ordet langre. Det handlar om att aldrig sluta.
+Det här vänder upp ordspelsstrategi totalt. I Klassiskt läge kunde jag gladligen lägga 15 sekunder på att jaga ett underbart 7-bokstavsord. I Blast hade de 15 sekundernas tystnad mordat en kombokedja värd mycket mer poäng. Det handlar inte om att hitta det bästa ordet längre. Det handlar om att aldrig sluta.
 
-Oja, och sa finns det speciella platteffekter. Eld, is, bomber, blixt. De sprangger delar av bradet och regnar ner farska bokstaver. Forsta gangen jag av misstag utloste en bombplatta mitt i en kombokedja tror jag att jag faktiskt skrek hogt. Vi kommer till dem.`,
+Oja, och så finns det speciella platteffekter. Eld, is, bomber, blixt. De spränger delar av brädet och regnar ner färska bokstäver. Första gången jag av misstag utlöste en bombplatta mitt i en kombokedja tror jag att jag faktiskt skrek högt. Vi kommer till dem.`,
       },
       {
         title: 'Hur Kombosystemet Faktiskt Fungerar',
-        content: `OK lat mig bryta ner kombomatten, for nar jag vaal fattade siffrorna andrades hela min approach.
+        content: `OK låt mig bryta ner kombomatten, för när jag väl fattade siffrorna andrades hela min approach.
 
-Du skickar ett ord, du ar pa kombiniva 1. Det ar bara 1x, inget speciellt. Fa in ett till ord inom 3 sekunder och du hoppar till niva 2 (1.5x). Fortsatt: niva 3 ar 2x, niva 4 ar 2.5x, niva 5 ar 3x. Det fortsatter uppaat darifran.
+Du skickar ett ord, du är på kombinivå 1. Det är bara 1x, inget speciellt. Få in ett till ord inom 3 sekunder och du hoppar till nivå 2 (1.5x). Fortsatt: nivå 3 är 2x, nivå 4 är 2.5x, nivå 5 är 3x. Det fortsatter uppåt därifrån.
 
-Men den otacka delen: kombofonstret krymper nar du klattrar. Pa niva 2 far du bekvama 3 sekunder. Vid niva 5 ar det nere pa 1.5 sekunder. Niva 7 och uppaat? En. Enda. Sekund. Dina fingrar maste veta vad de gor, for hjarnan hinner inte diskutera.
+Men den otäcka delen: kombofönstret krymper när du klattrar. På nivå 2 får du bekväma 3 sekunder. Vid nivå 5 är det nere på 1.5 sekunder. Nivå 7 och uppåt? En. Enda. Sekund. Dina fingrar måste veta vad de gör, för hjärnan hinner inte diskutera.
 
-Nu grejen som sprangde mitt sinne nar jag vaal raknade. Sag att du hittar ett fint 5-bokstavsord vart 4 baspoang. Pa kombiniva 5 med 3x multiplikator ar det 12 poang. Solitt, eller hur? Men tannk om du istallet hade avfyrat fyra snabba 3-bokstavsord (2 baspoang var) pa nivaer 2 till 5? Det ar 2 + 3 + 4 + 5 = 14 poang. OCH din kombo lever fortfarande for vad som an kommer harnast.
+Nu grejen som sprangde mitt sinne när jag väl räknade. Sag att du hittar ett fint 5-bokstavsord värt 4 baspoäng. På kombinivå 5 med 3x multiplikator är det 12 poäng. Solitt, eller hur? Men tänk om du istället hade avfyrat fyra snabba 3-bokstavsord (2 baspoäng var) på nivåer 2 till 5? Det är 2 + 3 + 4 + 5 = 14 poäng. OCH din kombo lever fortfarande för vad som än kommer härnäst.
 
-Jag ska vara arlig, det har var kontraintuitivt for mig lunge. Min ordspelshjarna skrek "hitta det stora ordet!" Men matten ljuger inte. Att halla kedjor vid liv med korta ord mellan stora fynd slaar att jaga ett perfekt ord nastan varje gang.`,
+Jag ska våra ärlig, det här var kontraintuitivt för mig länge. Min ordspelshjärna skrek "hitta det stora ordet!" Men matten ljuger inte. Att halla kedjor vid liv med korta ord mellan stora fynd slår att jaga ett perfekt ord nästan varje gång.`,
       },
       {
-        title: 'Platteffekter (Darfor Skrek Jag Precis Aat Min Telefon)',
-        content: `Specialplattor dyker upp pa bradet med smaa visuella ledtradar. Att lara sig kanna igen dem snabbt och anvanda dem medvetet (inte av misstag som jag gjorde mina forsta 200 matcher) ar en game changer.
+        title: 'Platteffekter (Därför Skrek Jag Precis Aat Min Telefon)',
+        content: `Specialplattor dyker upp på brädet med små visuella ledtrådar. Att lära sig känna igen dem snabbt och använda dem medvetet (inte av misstag som jag gjorde mina första 200 matcher) är en game changer.
 
-Eldplattor har en rod glod. Anvand en i ett ord och den utplanar hela raden. Alla bokstaver forsvinner, nya faller ner ovifran. Jag alskar att trigga dem nar bradet kanns uttorkat och jag har ont om uppenbara ord. Omedelbar uppfrasning.
+Eldplattor här en röd glöd. Använd en i ett ord och den utplanar hela raden. Alla bokstäver försvinner, nya faller ner ovanifrån. Jag älskar att trigga dem när brädet känns uttorkat och jag här ont om uppenbara ord. Omedelbar uppfräschning.
 
-Isplattor skimrar blatt. Nar du triggar en fryser den plattorna intill pa plats. De ror sig inte nar andra plattor rensas. Later trakigt jamfort med explosioner, eller hur? Fel. Att frysa en killer-bokstavskombination pa plats sa du kan anvanda den i nasta ord ar lojligt kraftfullt nar du vaal borjar gora det med flit.
+Isplattor skimrar blått. När du triggar en fryser den plattorna intill på plats. De rör sig inte när andra plattor rensas. Later trakigt jämfört med explosioner, eller hur? Fel. Att frysa en killer-bokstavskombination på plats så du kan använda den i nästa ord är löjligt kraftfullt när du väl börjar gora det med flit.
 
-Bombplattor pulserar, och de ar mina favoriter. De sprangger allt i ett 3x3-omrade runt dem. Nio plattor borta, nio farska plattor faller ner. Nar bradet ar en rora av Q:n och X utan vokaler i sikte ar en bombplatta din basta van.
+Bombplattor pulserar, och de är mina favoriter. De spränger allt i ett 3x3-område runt dem. Nio plattor borta, nio färska plattor faller ner. När brädet är en röra av Q:n och X utan vokaler i sikte är en bombplatta din bästa vän.
 
-Blixtplattor gnistar gult och rensar en hel kolumn. Kombinera en med en eldplatta i samma ord och du rensade precis en hel rad OCH en hel kolumn i ett drag. Kaskaden som foljer ar vackert kaos.
+Blixtplattor gnistar gult och rensar en hel kolumn. Kombinera en med en eldplatta i samma ord och du rensade precis en hel rad OCH en hel kolumn i ett drag. Kaskaden som följer är vackert kaos.
 
-Det riktiga profsdraget: bygg ord som innehaller flera effektplattor. Bada effekterna triggas. Jag traffade en gang ett ord med eld + bomb och det ersatte i princip halva bradet. Min kombo var pa niva 6 och de farska plattorna gav mig tre latta ord i rad. Det ar drommen.`,
+Det riktiga profsdraget: bygg ord som innehåller flera effektplattor. Båda effekterna triggas. Jag traffade en gång ett ord med eld + bomb och det ersatte i princip halva brädet. Min kombo var på nivå 6 och de färska plattorna gav mig tre lätta ord i rad. Det är drommen.`,
       },
       {
         title: 'Att Komma In I Zonen (Kedjestrategi)',
-        content: `Det finns ett tillstand du hamnar i efter nagra hundra Blast-matcher dar ord bara... dyker upp. Fingrarna borjar rora sig innan det medvetna tankandet ens registrerar vad du stavar. Forsta gangen det hande mig naddee jag kombiniva 8 och handerna skakade bokstavligt talat.
+        content: `Det finns ett tillstånd du hamnar i efter några hundra Blast-matcher där ord bara... dyker upp. Fingrarna börjar röra sig innan det medvetna tänkandet ens registrerar vad du stavar. Första gången det hande mig nådde jag kombinivå 8 och handerna skakade bokstavligt talat.
 
-Forladda ar fardigheten. Medan ditt nuvarande ord gor sin lilla valideringsanimation borde dina ogon redan vara laasta pa nasta ord. Du sparar det i samma sekund bradet later dig. Ogon ett ord fore fingrarna, alltid. Jag kan inte overdriva hur mycket det har spelar roll. Det AR Blast-lage-fardigheten.
+Forladda är färdigheten. Medan ditt nuvarande ord gör sin lilla valideringsanimation borde dina ögon redan våra låsta på nästa ord. Du sparar det i samma sekund brädet låter dig. Ögon ett ord fore fingrarna, alltid. Jag kan inte överdriva hur mycket det här spelar roll. Det ÄR Blast-läge-färdigheten.
 
-Jag anvander vad jag kallar 3-Ords Bufferten. Innan jag skickar nagot hittar jag minst tre latta ord pa bradet. Jag avfyrar det forsta, och medan det valideras bekraftar jag det andra i huvudet. Nar det forsta rensar och nya plattor faller ar ord tre redo att kora. Den bufferten ger mig andrum att hitta ord fyra medan handerna ar pa autopilot.
+Jag använder vad jag kallar 3-Ords Bufferten. Innan jag skickar något hittar jag minst tre lätta ord på brädet. Jag avfyrar det första, och medan det valideras bekraftar jag det andra i huvudet. När det första rensar och nya plattor faller är ord tre redo att kora. Den bufferten ger mig andrum att hitta ord fyra medan handerna är på autopilot.
 
-Rytm spelar roll ocksa. Jag vaxlar korta och langa ord. Snabbt 3-bokstavsord for att halla komboen vid liv, sen ett bastant 5-6 bokstavsord for stora poang med multiplikatorn, sen direkt tillbaka till ett kort ord medan jag skannar efter nasta stora. Kort-langt-kort-langt. Det ar nastan musikaliskt nar det flyter.
+Rytm spelar roll också. Jag växlar korta och långa ord. Snabbt 3-bokstavsord för att halla komboen vid liv, sen ett bastant 5-6 bokstavsord för stora poäng med multiplikatorn, sen direkt tillbaka till ett kort ord medan jag skannar efter nästa stora. Kort-långt-kort-långt. Det är nästan musikaliskt när det flyter.
 
-Hall ett nodord i bakfickan. Pa riktigt. Jag vet alltid var minst ett latt 3-bokstavsord finns pa bradet. Om jag blankar skickar jag det ordet for att kopa ett nytt kombofonstre. Har raddat min kedja fler ganger an jag kan rakna.
+Håll ett nödord i bakfickan. På riktigt. Jag vet alltid var minst ett lätt 3-bokstavsord finns på brädet. Om jag blankar skickar jag det ordet för att köpa ett nytt kombofönster. Här räddat min kedja fler gånger än jag kan räkna.
 
-Och nar din kombo gar sonder (det kommer handa, jag tappar fortfarande kombos konstant), fa inte panik. Andas. Lagg 2-3 sekunder pa att skanna. Hitta dina nasta tre startord. Kor igen. En ren ny kedja slaar alltid att desperat skicka skrap for att forsoka radda en doende.`,
+Och när din kombo går sönder (det kommer handa, jag tappar fortfarande kombos konstant), få inte panik. Andas. Lägg 2-3 sekunder på att skanna. Hitta dina nästa tre startord. Kör igen. En ren ny kedja slår alltid att desperat skicka skrap för att försöka rädda en döende.`,
       },
       {
-        title: 'Blast-drag: Sluta Slosa Dem',
-        content: `Jag brukade elda igenom mina Blanda- och Ledtrad-krafter under de forsta 30 sekunderna varje match. Usel strategi. Lat mig radda dig fran mina misstag.
+        title: 'Blast-drag: Sluta Slösa Dem',
+        content: `Jag brukade elda igenom mina Blanda- och Ledtrad-krafter under de första 30 sekunderna varje match. Usel strategi. Låt mig rädda dig från mina misstag.
 
-Blanda omarrangerar hela bradet. Anvand bara nar bradet ar genuint dott. Typ, du har skannat varje horn och det finns ingenting. Och kritiskt, blanda bara nar din kombo redan ar noll. Att blanda mitt i en kombo dodar din kedja, och det ar att kasta bort poang.
+Blanda omarrangerar hela brädet. Använd bara när brädet är genuint dott. Typ, du här skannat varje hörn och det finns ingenting. Och kritiskt, blanda bara när din kombo redan är noll. Att blanda mitt i en kombo dödar din kedja, och det är att kasta bort poäng.
 
-Ledtrad markerar ett ord du kan skicka. Det de flesta gor fel: att anvanda en Ledtrad pa kombiniva 1 ar i princip vardelost. Spara den till nar du ar pa hog kombiniva och kanner att den glider ivag. En Ledtrad pa niva 6 eller 7 ger dig inte bara ett ord, den bevarar din massiva multiplikator. Dar ligger det riktiga vardet.
+Ledtråd markerar ett ord du kan skicka. Det de flesta gör fel: att använda en Ledtråd på kombinivå 1 är i princip värdelöst. Spara den till när du är på hog kombinivå och känner att den glider ivag. En Ledtråd på nivå 6 eller 7 ger dig inte bara ett ord, den bevarar din massiva multiplikator. Där ligger det riktiga värdet.
 
-Tidsfrys pausar spelklockan ett tag. Jag anvander den nar jag har en bra kombo pa gang och behover en sekund att hitta nasta ord. Varning dock: kombotimern koor fortfarande under en frys. Sa du kan inte bara sitta dar. Du maste hitta och skicka ett ord innan frysen tar slut.
+Tidsfrys pausar spelklockan ett tag. Jag använder den när jag här en bra kombo på gång och behöver en sekund att hitta nästa ord. Varning dock: kombotimern kör fortfarande under en frys. Så du kan inte bara sitta där. Du måste hitta och skicka ett ord innan frysen tar slut.
 
-Min generella regel: behandla Blast-drag som att de okar i varde over tid. En Ledtrad pa kombiniva 7 (4x multiplikator) ar bokstavligen vard fyra ganger mer an pa niva 1. Hamstra dina drag. Var snaal. Utdelningen for talamod ar enorm.`,
+Min generella regel: behandla Blast-drag som att de ökar i värde över tid. En Ledtråd på kombinivå 7 (4x multiplikator) är bokstavligen vard fyra gånger mer än på nivå 1. Hamstra dina drag. Var snål. Utdelningen för tålamod är enorm.`,
       },
       {
-        title: 'Poangtrick Jag Onskade Att Jag Visste Tidigare',
-        content: `Efter ungefar 500 matcher borjade jag marka monster som faktiskt flyttade nalen pa mina poang.
+        title: 'Poängtrick Jag Önskade Att Jag Visste Tidigare',
+        content: `Efter ungefär 500 matcher började jag märka mönster som faktiskt flyttade nålen på mina poäng.
 
-Pa kombiniva 7 och uppaat ar ditt enda jobb att halla kedjan vid liv. Skicka vad som helst giltigt. Jag bryr mig inte om det ar "den." Ett 3-bokstavsord med 5x multiplikator ar 10 poang. Ett 6-bokstavsord utan kombo ar 5 poang. Multiplikatorn gor aven smaa ord vardefulla. Jag kallar det kombosurfning och det ar dar de riktigt stora poangen kommer fran.
+På kombinivå 7 och uppåt är ditt enda jobb att halla kedjan vid liv. Skicka vad som helst giltigt. Jag bryr mig inte om det är "den." Ett 3-bokstavsord med 5x multiplikator är 10 poäng. Ett 6-bokstavsord utan kombo är 5 poäng. Multiplikatorn gör även små ord värdefulla. Jag kallar det kombosurfning och det är där de riktigt stora poängen kommer från.
 
-Effektkedjning ar nasta niva. Ibland droppar en bomb-kaskad en eldplatta pa precis ratt stalle. Om du kan se den mojligheten innan den hander och planera ett ord som traffar eldplattan pa nasta drag spelar du i princip 4D-schack. Jag lyckas med det kanske en gang per tio matcher. Det ar otroligt tillfredsstaallande.
+Effektkedjning är nästa nivå. Ibland droppar en bomb-kaskad en eldplatta på precis rätt ställe. Om du kan se den möjligheten innan den händer och planera ett ord som träffar eldplattan på nästa drag spelar du i princip 4D-schack. Jag lyckas med det kanske en gång per tio matcher. Det är otroligt tillfredsställande.
 
-Ibland ar det ratta draget att skicka ett ord for bradposition, inte poang. Att rensa plattor pa en strategisk punkt kan oppna en helt ny del av bradet. Jag tanker pa det som schack, offra ett lagvardes-drag for att sta upp nagot storre.
+Ibland är det ratta draget att skicka ett ord för bradposition, inte poäng. Att rensa plattor på en strategisk punkt kan öppna en helt ny del av brädet. Jag tänker på det som schack, offra ett lågvärdes-drag för att stå upp något större.
 
-Mitt viktigaste rad: konsekvens krossar toppar. En spelare som haller kombiniva 4-5 genom hela matchen kommer overpoanga nagon som naar niva 8 en gang och spelar resten pa 1-2. Jag foljer mitt genomsnittliga kombiniva nu, inte mitt toppvarde. Den mentalitetsandringen pushade mina poang mer an nagon enskild teknik.`,
+Mitt viktigaste rad: konsekvens krossar toppar. En spelare som håller kombinivå 4-5 genom hela matchen kommer överpoänga någon som när nivå 8 en gång och spelar resten på 1-2. Jag följer mitt genomsnittliga kombinivå nu, inte mitt toppvarde. Den mentalitetsändringen pushade mina poäng mer än någon enskild teknik.`,
       },
     ],
     faq: [
       {
-        question: 'Hur fungerar kombosystemet i LexiClash Blast-lage?',
-        answer: 'Du skickar ord i foljd inom ett krympande tidsfonstre. Varje nytt ord bumpar din kombiniva, som okar din poangmultiplikator fran 1x hela vagen upp till 5x+ pa niva 8. Fonstret borjar pa bekvama 3 sekunder men krymper till bara 1 sekund pa de hogsta nivaerna. Det blir intensivt.',
+        question: 'Hur fungerar kombosystemet i LexiClash Blast-läge?',
+        answer: 'Du skickar ord i följd inom ett krympande tidsfönster. Varje nytt ord bumpar din kombinivå, som ökar din poängmultiplikator från 1x hela vägen upp till 5x+ på nivå 8. Fonstret börjar på bekväma 3 sekunder men krymper till bara 1 sekund på de högsta nivåerna. Det blir intensivt.',
       },
       {
-        question: 'Vad ar platteffekter i Blast-lage?',
-        answer: 'Specialplattor som gor nagot dramatiskt nar du anvander dem i ett ord. Eldplattor utplanar en hel rad, isplattor fryser grannar pa plats, bombplattor sprangger ett 3x3-omrade, och blixtplattor rensar en hel kolumn. Lyckas du traffa tvaa effektplattor i ett ord triggas bada. Totalt kaos pa basta satt.',
+        question: 'Vad är platteffekter i Blast-läge?',
+        answer: 'Specialplattor som gör något dramatiskt när du använder dem i ett ord. Eldplattor utplanar en hel rad, isplattor fryser grannar på plats, bombplattor spränger ett 3x3-område, och blixtplattor rensar en hel kolumn. Lyckas du traffa två effektplattor i ett ord triggas bada. Totalt kaos på bästa sätt.',
       },
       {
-        question: 'Ar det battre att hitta langa ord eller halla kombos igaang?',
-        answer: 'Hall kombos igaang, nastan alltid. Matten ar tydlig: ett litet 3-bokstavsord pa kombiniva 5 (3x = 6 poang) slaar ett fint 6-bokstavsord pa niva 1 (5 poang). Anvand korta ord som kombolim medan du skannar efter langre. Multiplikatorn ar allt.',
+        question: 'Är det bättre att hitta långa ord eller halla kombos igång?',
+        answer: 'Håll kombos igång, nästan alltid. Matten är tydlig: ett litet 3-bokstavsord på kombinivå 5 (3x = 6 poäng) slår ett fint 6-bokstavsord på nivå 1 (5 poäng). Använd korta ord som kombolim medan du skannar efter längre. Multiplikatorn är allt.',
       },
       {
-        question: 'Nar ska jag anvanda Blast-drag som Blanda och Ledtrad?',
-        answer: 'Sent och sparsamt. En Ledtrad pa kombiniva 7 ar vard fyra ganger mer an pa niva 1 for att den bevarar din multiplikator. Blanda bara nar bradet ar genuint dott och din kombo redan ar borta. Tank pa dina Blast-drag som investeringar som okar i varde ju langre du vantar.',
+        question: 'När ska jag använda Blast-drag som Blanda och Ledtrad?',
+        answer: 'Sent och sparsamt. En Ledtråd på kombinivå 7 är vard fyra gånger mer än på nivå 1 för att den bevarar din multiplikator. Blanda bara när brädet är genuint dott och din kombo redan är borta. Tänk på dina Blast-drag som investeringar som ökar i värde ju längre du vantar.',
       },
     ],
-    ctaText: 'Testa Blast-lage',
+    ctaText: 'Testa Blast-läge',
     ctaLink: '/singleplayer',
     backToGuides: 'Tillbaka till guider',
   },

@@ -17,15 +17,15 @@ describe('storyConfig', () => {
     expect(getStoryBeat(99, 1)).toBeNull();
   });
 
-  it('has 3 beats per world for worlds 1-5', () => {
-    for (let w = 1; w <= 5; w++) {
+  it('has 3 beats per world for all 10 worlds', () => {
+    for (let w = 1; w <= 10; w++) {
       const beats = STORY_BEATS.filter(b => b.worldId === w);
       expect(beats).toHaveLength(3);
     }
   });
 
-  it('has 15 total beats', () => {
-    expect(STORY_BEATS).toHaveLength(15);
+  it('has 30 total beats (3 per world × 10 worlds)', () => {
+    expect(STORY_BEATS).toHaveLength(30);
   });
 
   it('returns correct beat for world 3 after level 7', () => {

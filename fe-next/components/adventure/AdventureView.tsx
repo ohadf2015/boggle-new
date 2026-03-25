@@ -253,6 +253,12 @@ function AdventureView(): React.JSX.Element {
           <p className="text-neo-white font-bold">
             {isAuthError ? t('adventure.sessionExpired') : t('adventure.loadError')}
           </p>
+          {/* TODO: Remove debug info after diagnosing mobile load failure */}
+          {error && !isAuthError && (
+            <p className="text-neo-white/40 text-xs max-w-xs font-mono break-all">
+              {error.message}
+            </p>
+          )}
           {isAuthError && (
             <p className="text-neo-white/60 text-sm max-w-xs">
               {t('adventure.sessionExpiredHint')}

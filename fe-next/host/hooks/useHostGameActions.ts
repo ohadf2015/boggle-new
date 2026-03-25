@@ -9,7 +9,7 @@
  * - Cancel tournament
  */
 
-import React, { useCallback, useRef, MutableRefObject } from 'react';
+import React, { useCallback, useRef, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -61,8 +61,8 @@ interface UseHostGameActionsOptions {
   setShowSoloConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Refs
-  intentionalExitRef: MutableRefObject<boolean>;
-  tournamentTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
+  intentionalExitRef: RefObject<boolean>;
+  tournamentTimeoutRef: RefObject<NodeJS.Timeout | null>;
 }
 
 export interface UseHostGameActionsReturn {

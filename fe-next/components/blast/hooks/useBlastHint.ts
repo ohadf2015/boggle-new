@@ -31,7 +31,7 @@ export function useBlastHint(
   language: string,
   checkWord: (word: string) => boolean,
   foundWords: Set<string>,
-  minWordLength: number = 3,
+  minWordLength: number = 2,
 ): UseBlastHintReturn {
   const [hintPath, setHintPath] = useState<Array<{ row: number; col: number }> | null>(null);
 

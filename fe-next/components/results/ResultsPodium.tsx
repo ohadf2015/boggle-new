@@ -1,19 +1,17 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { Crown, Trophy, SmilePlus, X } from 'lucide-react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Crown, Trophy } from 'lucide-react';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
 import { REACTIONS } from '@/components/game/QuickReactions';
 
-/** A reaction pinned on a podium player */
-interface PinnedReaction {
+/** Emoji bubble that floats above a targeted podium player */
+interface PodiumBubble {
   id: string;
-  reactionId: string;
   emoji: string;
-  senderUsername: string;
   targetUsername: string;
 }
 
@@ -28,8 +26,6 @@ interface ResultsPodiumProps {
   t: (key: string) => string | undefined;
   /** Callback when an emoji is sent to a player */
   onReaction?: (reactionId: string, targetUsername: string) => void;
-  /** Incoming emoji reactions from other players (via socket) */
-  emojiReactions?: Array<{ id: string; emoji: string; username: string; timestamp: number }>;
 }
 
 const PODIUM_CONFIG = [
@@ -44,11 +40,10 @@ const PODIUM_CONFIG = [
     badgeSize: 'w-6 h-6 text-[10px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-24',
+    barHeight: 'h-20',
     barText: 'text-2xl sm:text-4xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
-    pickerAlign: 'left-0' as const,
   },
   {
     order: 0,
@@ -61,11 +56,10 @@ const PODIUM_CONFIG = [
     badgeSize: '',
     nameSize: 'text-[11px]',
     scoreSize: 'text-[10px]',
-    barHeight: 'h-36',
+    barHeight: 'h-32',
     barText: 'text-3xl sm:text-5xl',
     shadow: 'shadow-hard',
     borderWidth: 'border-2',
-    pickerAlign: 'left-1/2 -translate-x-1/2' as const,
   },
   {
     order: 2,
@@ -78,11 +72,10 @@ const PODIUM_CONFIG = [
     badgeSize: 'w-5 h-5 text-[9px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-16',
+    barHeight: 'h-12',
     barText: 'text-xl sm:text-3xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
-    pickerAlign: 'right-0' as const,
   },
 ] as const;
 
@@ -98,15 +91,37 @@ const REVEAL_DELAYS = [0.1, 0.35, 0.2] as const;
 
 const THROTTLE_MS = 2000;
 
-/** Emoji picker positioned based on podium column */
+/** Emoji speech bubble above a targeted podium player */
+function PodiumEmojiBubbleLocal({ emoji, onDone }: { emoji: string; onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 2500);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
+  return (
+    <motion.div
+      initial={{ scale: 0, y: 6, opacity: 0 }}
+      animate={{ scale: 1, y: -6, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+      className="absolute -top-7 left-1/2 -translate-x-1/2 z-30 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-0.5 text-lg pointer-events-none"
+    >
+      {emoji}
+      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-r-3 border-neo-black rotate-45" />
+    </motion.div>
+  );
+}
+
+/** Small emoji picker that appears near a podium player — clamped to viewport */
 function PodiumEmojiPicker({
   onSelect,
   onClose,
-  align,
+  position,
 }: {
   onSelect: (reactionId: string) => void;
   onClose: () => void;
-  align: string;
+  /** 'left' | 'center' | 'right' — controls horizontal alignment to avoid off-screen */
+  position: 'left' | 'center' | 'right';
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -118,6 +133,12 @@ function PodiumEmojiPicker({
     return () => document.removeEventListener('mousedown', handler);
   }, [onClose]);
 
+  // Position classes: center by default, shift left/right to stay on-screen
+  const positionClass =
+    position === 'left' ? 'left-0' :
+    position === 'right' ? 'right-0' :
+    'left-1/2 -translate-x-1/2';
+
   return (
     <motion.div
       ref={ref}
@@ -125,79 +146,17 @@ function PodiumEmojiPicker({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.7, y: 4 }}
       transition={{ duration: 0.12 }}
-      className={cn(
-        'absolute bottom-full mb-2 z-50 flex gap-0.5 bg-neo-navy/95 border border-neo-white/15 rounded-lg p-1.5 backdrop-blur-sm shadow-lg',
-        align
-      )}
+      className={cn("absolute top-full mt-1 z-50 flex gap-0.5 bg-neo-navy/95 border border-neo-white/15 rounded-lg p-1 backdrop-blur-sm shadow-lg", positionClass)}
     >
       {REACTIONS.map((r) => (
         <button
           key={r.id}
           onClick={() => onSelect(r.id)}
-          className="w-9 h-9 flex items-center justify-center text-lg rounded-lg hover:bg-neo-white/10 active:scale-90 transition-all"
+          className="w-8 h-8 flex items-center justify-center text-base rounded hover:bg-neo-white/10 active:scale-90 transition-all"
         >
           {r.emoji}
         </button>
       ))}
-    </motion.div>
-  );
-}
-
-/** Pinned reaction bubble with sender name (WhatsApp-style) */
-function PinnedReactionBubble({
-  reaction,
-  onRemove,
-  canRemove,
-}: {
-  reaction: PinnedReaction;
-  onRemove: (id: string) => void;
-  canRemove: boolean;
-}) {
-  const [showSender, setShowSender] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ scale: 0, y: 8 }}
-      animate={{ scale: 1, y: 0 }}
-      exit={{ scale: 0, y: 8, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-      className="relative group"
-    >
-      <button
-        onClick={() => {
-          if (canRemove) onRemove(reaction.id);
-          else setShowSender(prev => !prev);
-        }}
-        onMouseEnter={() => setShowSender(true)}
-        onMouseLeave={() => setShowSender(false)}
-        className={cn(
-          'flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border border-neo-white/20 bg-neo-navy/80 backdrop-blur-sm text-sm transition-all',
-          canRemove && 'hover:border-red-400/50 hover:bg-red-500/10',
-          !canRemove && 'hover:border-neo-white/30'
-        )}
-      >
-        <span>{reaction.emoji}</span>
-        {canRemove && (
-          <X className="w-2.5 h-2.5 text-white/40 group-hover:text-red-400 transition-colors" />
-        )}
-      </button>
-
-      {/* Sender tooltip */}
-      <AnimatePresence>
-        {showSender && (
-          <motion.div
-            initial={{ opacity: 0, y: 4, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.9 }}
-            transition={{ duration: 0.1 }}
-            className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 z-50 whitespace-nowrap"
-          >
-            <div className="bg-neo-black/90 text-white text-[9px] font-bold px-2 py-0.5 rounded border border-neo-white/10 shadow-lg">
-              {reaction.senderUsername}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
@@ -208,79 +167,32 @@ export default function ResultsPodium({
   isWordHunt = false,
   t,
   onReaction,
-  emojiReactions = [],
 }: ResultsPodiumProps) {
   const reducedMotion = useReducedMotion();
   const [openPicker, setOpenPicker] = useState<string | null>(null);
   const lastReactionRef = useRef(0);
+  const bubbleIdRef = useRef(0);
+  const [bubbles, setBubbles] = useState<PodiumBubble[]>([]);
 
-  // Pinned reactions state — persists on the podium
-  const [pinnedReactions, setPinnedReactions] = useState<PinnedReaction[]>([]);
-  const pinnedIdCounter = useRef(0);
-
-  // Track which incoming reactions we've already processed
-  const processedIncomingIds = useRef(new Set<string>());
-
-  // Absorb incoming emojiReactions into pinned state
-  useEffect(() => {
-    if (!emojiReactions.length) return;
-    const newReactions: PinnedReaction[] = [];
-    for (const r of emojiReactions) {
-      if (processedIncomingIds.current.has(r.id)) continue;
-      processedIncomingIds.current.add(r.id);
-      // Incoming reactions from useQuickReactions don't have a target —
-      // show them on the podium generically (on the 1st place player)
-      const reaction = REACTIONS.find(rx => rx.emoji === r.emoji);
-      if (!reaction) continue;
-      newReactions.push({
-        id: `incoming-${r.id}`,
-        reactionId: reaction.id,
-        emoji: r.emoji,
-        senderUsername: r.username,
-        targetUsername: players[0]?.username || '',
-      });
-    }
-    if (newReactions.length > 0) {
-      setPinnedReactions(prev => [...prev, ...newReactions]);
-    }
-  }, [emojiReactions, players]);
+  const dismissBubble = useCallback((id: string) => {
+    setBubbles(prev => prev.filter(b => b.id !== id));
+  }, []);
 
   const handleEmojiSelect = useCallback((reactionId: string, targetUsername: string) => {
     const now = Date.now();
     if (now - lastReactionRef.current < THROTTLE_MS) return;
     lastReactionRef.current = now;
 
-    // Pin the reaction locally
+    // Show local bubble on the targeted player's podium
     const reaction = REACTIONS.find(r => r.id === reactionId);
-    if (reaction && currentUsername) {
-      const id = `local-${++pinnedIdCounter.current}`;
-      setPinnedReactions(prev => [...prev, {
-        id,
-        reactionId,
-        emoji: reaction.emoji,
-        senderUsername: currentUsername,
-        targetUsername,
-      }]);
+    if (reaction) {
+      const id = `pb-${++bubbleIdRef.current}`;
+      setBubbles(prev => [...prev, { id, emoji: reaction.emoji, targetUsername }]);
     }
 
     onReaction?.(reactionId, targetUsername);
     setOpenPicker(null);
-  }, [onReaction, currentUsername]);
-
-  const handleRemoveReaction = useCallback((id: string) => {
-    setPinnedReactions(prev => prev.filter(r => r.id !== id));
-  }, []);
-
-  // Group pinned reactions by target username
-  const reactionsByPlayer = useMemo(() => {
-    const map = new Map<string, PinnedReaction[]>();
-    for (const r of pinnedReactions) {
-      const existing = map.get(r.targetUsername) || [];
-      existing.push(r);
-      map.set(r.targetUsername, existing);
-    }
-    return map;
-  }, [pinnedReactions]);
+  }, [onReaction]);
 
   if (!players.length) return null;
 
@@ -309,7 +221,7 @@ export default function ResultsPodium({
       <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
           const config = PODIUM_CONFIG[configIdx];
-          const player = top3[config.place - 1];
+          const player = top3[configIdx];
 
           if (!player) {
             return <div key={`empty-${layoutIdx}`} />;
@@ -323,7 +235,6 @@ export default function ResultsPodium({
             : player.username;
           const isFirst = config.place === 1;
           const showEmojiButton = onReaction && !isCurrentUser;
-          const playerReactions = reactionsByPlayer.get(player.username) || [];
 
           const scoreDisplay = isWordHunt
             ? `${player.wordsFoundCount ?? 0} ${t('results.words') || 'Words'}`
@@ -339,6 +250,22 @@ export default function ResultsPodium({
               animate={{ opacity: 1 }}
               transition={{ delay: baseDelay, duration: 0.2 }}
             >
+              {/* Emoji bubbles on this player */}
+              <div className="relative">
+                <AnimatePresence>
+                  {bubbles
+                    .filter(b => b.targetUsername === player.username)
+                    .slice(-2)
+                    .map(b => (
+                      <PodiumEmojiBubbleLocal
+                        key={b.id}
+                        emoji={b.emoji}
+                        onDone={() => dismissBubble(b.id)}
+                      />
+                    ))}
+                </AnimatePresence>
+              </div>
+
               {/* Avatar — bouncy drop-in */}
               <motion.div
                 className="relative mb-3"
@@ -405,9 +332,9 @@ export default function ResultsPodium({
                 )}
               </motion.div>
 
-              {/* Name & Score */}
+              {/* Name, Score & Emoji button — fade up after avatar */}
               <motion.div
-                className="text-center mb-1 min-w-0 px-1"
+                className="text-center mb-3 min-w-0 px-1 relative"
                 initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20, delay: baseDelay + 0.2 }}
@@ -432,49 +359,33 @@ export default function ResultsPodium({
                 >
                   {scoreDisplay}
                 </motion.p>
-              </motion.div>
 
-              {/* Pinned reactions row + react button */}
-              <div className="relative flex items-center justify-center gap-1 mb-2 min-h-[24px] flex-wrap">
-                {/* Pinned emoji reactions */}
-                <AnimatePresence mode="popLayout">
-                  {playerReactions.slice(0, 4).map((pr) => (
-                    <PinnedReactionBubble
-                      key={pr.id}
-                      reaction={pr}
-                      onRemove={handleRemoveReaction}
-                      canRemove={pr.senderUsername === currentUsername}
-                    />
-                  ))}
-                </AnimatePresence>
-
-                {/* React button — icon-based, clearly a button */}
+                {/* Per-player emoji button — only for other players */}
                 {showEmojiButton && (
-                  <div className="relative">
-                    <motion.button
-                      whileTap={{ scale: 0.85 }}
+                  <div className="relative mt-1">
+                    <button
                       onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
                       className={cn(
-                        'w-7 h-7 flex items-center justify-center rounded-full border-2 transition-all',
-                        'bg-neo-white/10 border-neo-white/20 hover:bg-neo-white/20 hover:border-neo-white/40',
-                        openPicker === player.username && 'bg-neo-cyan/20 border-neo-cyan/50'
+                        'w-6 h-6 flex items-center justify-center text-sm rounded-full',
+                        'bg-neo-white/5 hover:bg-neo-white/15 active:scale-90 transition-all',
+                        openPicker === player.username && 'bg-neo-white/15 ring-1 ring-neo-white/20'
                       )}
-                      aria-label={`Send reaction to ${player.username}`}
+                      aria-label={`Send emoji to ${player.username}`}
                     >
-                      <SmilePlus className="w-3.5 h-3.5 text-white/60" />
-                    </motion.button>
+                      😊
+                    </button>
                     <AnimatePresence>
                       {openPicker === player.username && (
                         <PodiumEmojiPicker
                           onSelect={(id) => handleEmojiSelect(id, player.username)}
                           onClose={() => setOpenPicker(null)}
-                          align={config.pickerAlign}
+                          position={layoutIdx === 0 ? 'left' : layoutIdx === 2 ? 'right' : 'center'}
                         />
                       )}
                     </AnimatePresence>
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Podium bar — elastic grow from bottom with slight overshoot */}
               <motion.div

@@ -8,7 +8,8 @@
  * reducing initial load time by ~50-100ms.
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import { captureApiError } from '@/utils/sentry';
@@ -100,7 +101,17 @@ function transformAttempt(dbRow: Record<string, unknown>): LevelAttempt {
  * GET /api/adventure/state
  * Retrieve complete adventure state (progression + attempts) in one request
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-state', {
+    maxRequests: 60,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rateLimitResult.retryAfter ?? 60) } }
+    );
+  }
   // ── Step 1: Authenticate ──────────────────────────────────────────
   // Uses the cookie-based auth client which also serves as the data client.
   // RLS policies on player_progression/level_completions/level_attempts

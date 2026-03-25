@@ -6203,6 +6203,7 @@ const ja = {
       "alreadyFound": "この単語は既に見つかっています",
       "notInDictionary": "辞書にない単語です",
       "validationFailed": "単語を検証できませんでした",
+      "validationTimeout": "検証がタイムアウトしました — もう一度お試しください",
       "validationCancelled": "検証がキャンセルされました"
     },
 "game": {

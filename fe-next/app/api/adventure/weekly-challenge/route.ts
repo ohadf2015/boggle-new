@@ -98,36 +98,60 @@ export async function POST(request: NextRequest) {
     }
 
     const weekId = getCurrentWeekId();
+    const newScore = score as number;
+    const rowData = {
+      user_id: user.id,
+      week_id: weekId,
+      score: newScore,
+      words_found: (wordsFound as number) || 0,
+      longest_word: (typeof longestWord === 'string' ? longestWord : '').slice(0, 50),
+      player_name: (typeof playerName === 'string' ? playerName : 'Adventurer').slice(0, 30),
+      submitted_at: new Date().toISOString(),
+    };
 
-    // Upsert — only update if new score is higher
-    const { data: existing } = await supabase
+    // Step 1: Try to update only if new score is higher (atomic — no TOCTOU)
+    const { data: updated, error: updateError } = await supabase
       .from('weekly_challenge_scores')
-      .select('score')
+      .update(rowData)
       .eq('user_id', user.id)
       .eq('week_id', weekId)
+      .lt('score', newScore)
+      .select('score')
       .maybeSingle();
 
-    if (existing && existing.score >= (score as number)) {
-      // Existing score is higher — no update needed
-      return NextResponse.json({ success: true, updated: false, currentBest: existing.score });
+    if (updateError) {
+      console.error('[WEEKLY CHALLENGE API] Update error:', updateError);
+      return NextResponse.json({ error: 'Failed to submit score' }, { status: 500 });
     }
 
-    const { error: upsertError } = await supabase
-      .from('weekly_challenge_scores')
-      .upsert({
-        user_id: user.id,
-        week_id: weekId,
-        score: score as number,
-        words_found: (wordsFound as number) || 0,
-        longest_word: (typeof longestWord === 'string' ? longestWord : '').slice(0, 50),
-        player_name: (typeof playerName === 'string' ? playerName : 'Adventurer').slice(0, 30),
-        submitted_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id,week_id',
-      });
+    if (updated) {
+      // Score was higher — row updated
+      return NextResponse.json({ success: true, updated: true });
+    }
 
-    if (upsertError) {
-      console.error('[WEEKLY CHALLENGE API] Upsert error:', upsertError);
+    // Step 2: No row updated — either no row exists (first submission) or existing score is higher.
+    // Try insert; if conflict, existing is already >= newScore so we're done.
+    const { error: insertError } = await supabase
+      .from('weekly_challenge_scores')
+      .insert(rowData);
+
+    if (insertError) {
+      // Conflict = row exists with higher or equal score
+      if (insertError.code === '23505') {
+        // Read current best for response
+        const { data: existing } = await supabase
+          .from('weekly_challenge_scores')
+          .select('score')
+          .eq('user_id', user.id)
+          .eq('week_id', weekId)
+          .single();
+        return NextResponse.json({
+          success: true,
+          updated: false,
+          currentBest: existing?.score ?? newScore,
+        });
+      }
+      console.error('[WEEKLY CHALLENGE API] Insert error:', insertError);
       return NextResponse.json({ error: 'Failed to submit score' }, { status: 500 });
     }
 

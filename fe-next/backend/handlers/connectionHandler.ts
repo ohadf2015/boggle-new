@@ -95,7 +95,7 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
  * Handle host disconnection
  * Attempts to transfer host to another player, only closes room if no eligible players
  */
-function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
+function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, _reason: string): void {
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
 
   // Clear any existing host reconnection timeout to prevent double-fire
@@ -217,7 +217,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 /**
  * Handle player disconnection
  */
-function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
+function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCode: string, username: string, _reason: string): void {
   logger.info('SOCKET', `Player ${username} disconnected from game ${gameCode}`);
 
   // Check if user is a bot (bots don't have reconnection handling)

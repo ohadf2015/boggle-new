@@ -6152,6 +6152,7 @@ const sv = {
       "alreadyFound": "Ordet har redan hittats",
       "notInDictionary": "Ordet finns inte i ordboken",
       "validationFailed": "Kunde inte validera ordet",
+      "validationTimeout": "Valideringen tog för lång tid — försök igen",
       "validationCancelled": "Valideringen avbröts"
     },
 "game": {

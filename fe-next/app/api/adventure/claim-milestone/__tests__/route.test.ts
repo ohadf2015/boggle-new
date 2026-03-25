@@ -80,12 +80,14 @@ function setupDbMocks({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: updateData !== undefined
-                    ? updateData
-                    : (updateError ? null : { gold: gold + 50, xp: xp + 25 }),
-                  error: updateError,
+              contains: jest.fn().mockReturnValue({
+                select: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: updateData !== undefined
+                      ? updateData
+                      : (updateError ? null : { gold: gold + 50, xp: xp + 25 }),
+                    error: updateError,
+                  }),
                 }),
               }),
             }),

@@ -107,7 +107,19 @@ export function useDailyMissions(): UseDailyMissionsReturn {
     isMounted.current = true;
     setLoading(true);
     fetchMissions();
-    return () => { isMounted.current = false; };
+
+    // Re-fetch when user returns to the page (e.g., after completing a game)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && isMounted.current) {
+        fetchMissions();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      isMounted.current = false;
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [fetchMissions]);
 
   const completedCount = missions.filter(m => m.completed).length;

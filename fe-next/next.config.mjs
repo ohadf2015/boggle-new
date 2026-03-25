@@ -381,7 +381,7 @@ const nextConfig = {
   },
 
   // Webpack configuration - alias for swedish-words package
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer: _isServer }) => {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
 

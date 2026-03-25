@@ -78,8 +78,9 @@ export function SeedWordTags({
       <div
         className={cn(
           'flex flex-wrap gap-2 items-center',
-          'border-neo border-neo-white/60 bg-neo-navy-light/50 rounded-neo px-3 py-2.5 min-h-[52px]',
-          'focus-within:ring-2 focus-within:ring-neo-cyan',
+          'border-neo border-neo-white/20 bg-black/30 rounded-neo px-3 py-2.5 min-h-[52px]',
+          'focus-within:border-neo-cyan focus-within:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)]',
+          'transition-colors',
           disabled && 'opacity-50 pointer-events-none'
         )}
         onClick={() => inputRef.current?.focus()}

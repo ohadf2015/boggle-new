@@ -87,7 +87,7 @@ export interface UseAdventureWordSubmitReturn {
 
 export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseAdventureWordSubmitReturn {
   const {
-    isPlaying, isPaused, isValidating,
+    isPlaying, isPaused, isValidating, isCascading,
     currentWord, selectedIndices, tiles, gridSize, minWordLength,
     validateWord, submitWordWithPath, clearSelection, clearCurrentHint,
     recordActivity, resetOnGameAction,
@@ -119,11 +119,12 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
   // Synchronous guard to prevent double-submission from React state batching
   const isSubmittingRef = useRef(false);
 
-  // Cleanup timeouts on unmount
+  // Cleanup timeouts and guards on unmount
   useEffect(() => {
     return () => {
       if (validationErrorTimeoutRef.current) clearTimeout(validationErrorTimeoutRef.current);
       if (wordSubmittedTimeoutRef.current) clearTimeout(wordSubmittedTimeoutRef.current);
+      isSubmittingRef.current = false;
     };
   }, []);
 
@@ -132,7 +133,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       const word = submittedWord || currentWord;
       const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
 
-      if (!isPlaying || isPaused || word.length < minWordLength || isValidating || isSubmittingRef.current) return;
+      if (!isPlaying || isPaused || isCascading || word.length < minWordLength || isValidating || isSubmittingRef.current) return;
       isSubmittingRef.current = true;
 
       tap();
@@ -270,7 +271,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         }, 2000);
       }
     },
-    [isPlaying, isPaused, isValidating, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
+    [isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
   const resetWordSubmitState = useCallback(() => {

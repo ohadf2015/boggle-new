@@ -5,7 +5,7 @@
  * Uses the new flexible upgrade system from upgradeConfig.ts.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   getUpgradeTier,
   getUpgradeEffect as getConfigEffect,
@@ -36,23 +36,36 @@ export function useAdventureCurrency(
 
   const [gold, setGold] = useState(initialGold);
   const [upgrades, setUpgrades] = useState<UpgradeState>(initialUpgrades);
+  // Refs mirror state for use in callbacks that need current values
+  // without stale closures (e.g., rapid double-purchase scenario)
+  const goldRef = useRef(initialGold);
+  const upgradesRef = useRef<UpgradeState>(initialUpgrades);
+
   const addGold = useCallback(
     (amount: number) => {
-      setGold(current => current + amount);
+      setGold(current => {
+        const next = current + amount;
+        goldRef.current = next;
+        return next;
+      });
     },
     []
   );
 
   const purchase = useCallback(
     (upgradeId: string): boolean => {
-      const result = configPurchase(upgrades, upgradeId, gold);
+      // Read from refs to avoid stale closure — two rapid purchases
+      // would otherwise both read the same pre-purchase gold/upgrades
+      const result = configPurchase(upgradesRef.current, upgradeId, goldRef.current);
       if (!result) return false;
 
+      goldRef.current = result.gold;
+      upgradesRef.current = result.state;
       setGold(result.gold);
       setUpgrades(result.state);
       return true;
     },
-    [gold, upgrades]
+    []
   );
 
   const getUpgradeEffect = useCallback(

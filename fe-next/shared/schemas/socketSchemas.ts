@@ -118,7 +118,7 @@ export const CreateGameSchema = z.object({
   hostUsername: UsernameSchema.optional(),
   playerId: z.string().max(64).optional().nullable(),
   avatar: AvatarSchema.optional(),
-  authUserId: z.string().uuid().optional().nullable(),
+  authUserId: z.uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
   isRanked: z.boolean().optional().default(false),
 });
@@ -131,7 +131,7 @@ export const JoinGameSchema = z.object({
   username: UsernameSchema,
   playerId: z.string().max(64).optional().nullable(),
   avatar: AvatarSchema.optional(),
-  authUserId: z.string().uuid().optional().nullable(),
+  authUserId: z.uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
 });
 
@@ -152,7 +152,7 @@ export const StartGameSchema = z.object({
   timerSeconds: z.number().int().min(30).max(600).optional().default(180),
   language: LanguageSchema.optional(),
   difficulty: DifficultySchema.optional().default('MEDIUM'),
-  minWordLength: z.number().int().min(2).max(5).optional().default(3),
+  minWordLength: z.number().int().min(2).max(5).optional().default(2),
 });
 
 /**
@@ -316,7 +316,7 @@ export const CloseRoomSchema = z.object({
 export const ReconnectSchema = z.object({
   gameCode: GameCodeSchema,
   username: UsernameSchema,
-  authUserId: z.string().uuid().optional().nullable(),
+  authUserId: z.uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
 });
 
@@ -469,6 +469,6 @@ export type ReconnectData = z.infer<typeof ReconnectSchema>;
 
 // UGC Word Packs
 export const ApplyWordPackSchema = z.object({
-  packId: z.string().uuid(),
+  packId: z.uuid(),
 });
 export type ApplyWordPackData = z.infer<typeof ApplyWordPackSchema>;

@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ImagePlus, X } from 'lucide-react';
+import { ArrowLeft, ImagePlus, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
@@ -46,6 +47,7 @@ function NeoButton({
 
 function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
+  const router = useRouter();
   const {
     gridSize,
     seedTags, addTag, removeTag, updateTag,
@@ -60,9 +62,23 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
   return (
     <div data-testid="step-configure" className="flex flex-col gap-6">
-      <h1 className="font-neo-display text-2xl font-bold text-neo-white">
-        {t('ugc.createBoard')}
-      </h1>
+      <div className="flex items-center gap-3">
+        <button
+          data-testid="back-to-community"
+          onClick={() => router.back()}
+          className={cn(
+            'border-neo border-black bg-neo-navy text-neo-white shadow-hard-sm',
+            'rounded-neo p-2 transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
+            'hover:bg-neo-white/10'
+          )}
+          aria-label={t('common.back') || 'Back'}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h1 className="font-neo-display text-2xl font-bold text-neo-white">
+          {t('ugc.createBoard')}
+        </h1>
+      </div>
 
       {/* Seed words tag input */}
       <SeedWordTags
@@ -237,9 +253,10 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           placeholder={t('ugc.board.titlePlaceholder')}
           maxLength={40}
           className={cn(
-            'border-neo border-black bg-neo-navy text-neo-white',
+            'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2',
-            'placeholder:text-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+            'placeholder:text-neo-white/40 focus:outline-none focus:border-neo-cyan',
+            'focus:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)] transition-colors'
           )}
         />
       </div>
@@ -257,9 +274,10 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           maxLength={140}
           rows={2}
           className={cn(
-            'border-neo border-black bg-neo-navy text-neo-white',
+            'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2 resize-none',
-            'placeholder:text-neo-white/40 focus:outline-none focus:ring-2 focus:ring-neo-cyan'
+            'placeholder:text-neo-white/40 focus:outline-none focus:border-neo-cyan',
+            'focus:shadow-[0_0_0_1px_theme(colors.neo-cyan/40)] transition-colors'
           )}
         />
       </div>
@@ -439,8 +457,8 @@ export function BoardCreatorWizard() {
   }, [appLanguage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 md:p-8">
-      <div className="max-w-lg mx-auto border-neo border-black bg-neo-navy shadow-hard rounded-neo p-6">
+    <div className="p-4 md:p-8">
+      <div className="max-w-lg mx-auto border-neo border-black bg-black/20 shadow-hard rounded-neo p-6">
         <AnimatePresence mode="wait">
           {creator.step === 'configure' && (
             <motion.div key="configure" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>

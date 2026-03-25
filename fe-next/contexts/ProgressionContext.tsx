@@ -44,8 +44,8 @@ function fetchWithRetry(
     fetch(url, options)
       .then((res) => {
         if (res.ok) return;
-        // Retry on transient errors
-        if (retryCount < maxRetries && (res.status === 429 || res.status >= 500)) {
+        // Retry on transient server errors only (not 429 — retrying rate limits makes it worse)
+        if (retryCount < maxRetries && res.status >= 500) {
           const delay = baseDelay * Math.pow(2, retryCount);
           setTimeout(() => attempt(retryCount + 1), delay);
           return;
@@ -89,7 +89,8 @@ interface ProgressionContextType {
     score: number,
     words: number,
     goldEarned?: number,
-    longWords?: number
+    longWords?: number,
+    wordsFound?: string[]
   ) => Promise<boolean>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
@@ -148,6 +149,10 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     const BASE_DELAY = 1000;
 
     if (!user?.id) {
+      setProgression(null);
+      setAttempts([]);
+      setError(null);
+      setIsAuthError(false);
       setIsLoading(false);
       return;
     }
@@ -173,7 +178,10 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch adventure state: ${response.status}`);
+          // Capture response body for debugging mobile failures
+          let body = '';
+          try { body = await response.text(); } catch { /* ignore */ }
+          throw new Error(`HTTP ${response.status}: ${body.slice(0, 200)}`);
         }
 
         const data = await response.json();
@@ -231,7 +239,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       score: number,
       words: number,
       goldEarned?: number,
-      longWords?: number
+      longWords?: number,
+      wordsFound?: string[]
     ) => {
       if (!user?.id) {
         // Guest users can't save progress
@@ -256,6 +265,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           words,
           ...(goldEarned !== undefined && { goldEarned }),
           ...(longWords !== undefined && { longWords }),
+          ...(wordsFound && wordsFound.length > 0 && { wordsFound }),
         });
 
         let response = await fetch('/api/adventure/complete', {
@@ -588,19 +598,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
         if (!added) return prev;
         const updatedAlbum = Array.from(existing);
-        // Persist with retry on transient failures
-        if (user?.id) {
-          fetchWithRetry('/api/adventure/quest-progress', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ wordAlbum: updatedAlbum }),
-          });
-        }
+        // Word album is persisted only through /api/adventure/complete (validated against grid).
+        // Local-only update here for immediate UI feedback.
         return { ...prev, wordAlbum: updatedAlbum };
       });
     },
-    [user?.id]
+    []
   );
 
   // Purchase upgrade by ID — server validates cost and deducts gold

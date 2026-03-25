@@ -4,7 +4,6 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { TrendingUp } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import MissedWords from '@/components/results/MissedWords';
 import { PerformanceSection } from './PerformanceSection';
 import { YourWordsSection } from './YourWordsSection';
 import { AchievementsSection } from './AchievementsSection';
@@ -29,7 +28,7 @@ interface MobileDetailsTabProps {
   sortedPointGroups: number[];
   invalidWords: InvalidWord[];
   botWordDetails: BotWordDetail[];
-  missedWords: MissedWord[];
+  missedWords?: MissedWord[];
   t: (key: string) => string | undefined;
   /** Total combo bonus earned */
   totalComboBonus?: number;
@@ -48,7 +47,6 @@ export function MobileDetailsTab({
   sortedPointGroups,
   invalidWords,
   botWordDetails,
-  missedWords,
   t,
   totalComboBonus = 0,
   totalFireRoundBonus = 0,
@@ -78,10 +76,6 @@ export function MobileDetailsTab({
         />
       )}
 
-      {/* Missed Words */}
-      {mode === 'solo-bots' && missedWords.length > 0 && (
-        <MissedWords missedWords={missedWords} maxDisplay={5} />
-      )}
 
       {/* Bot Words */}
       {mode === 'solo-bots' && botWordDetails.length > 0 && (

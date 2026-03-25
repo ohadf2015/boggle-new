@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 
+import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
@@ -20,7 +21,6 @@ import {
   getDailyChallengeDate,
   getPuzzleNumber,
   getSecondsUntilNextDaily,
-  formatCountdown,
   hasPlayedWordHuntToday,
   getTodaysWordHuntResult,
   saveWordHuntResult,
@@ -101,7 +101,7 @@ const DailyChallenge: React.FC = () => {
   // Set initial countdown value immediately on mount
   useEffect(() => {
     const seconds = getSecondsUntilNextDaily();
-    setCountdown(formatCountdown(seconds));
+    setCountdown(formatTimeHHMMSS(seconds));
   }, []);
 
 
@@ -208,7 +208,7 @@ const DailyChallenge: React.FC = () => {
   // Countdown timer
   useInterval(() => {
     const seconds = getSecondsUntilNextDaily();
-    setCountdown(formatCountdown(seconds));
+    setCountdown(formatTimeHHMMSS(seconds));
   }, 1000);
 
   // Handle game start with safety checks

@@ -9,9 +9,7 @@
 import express, { Request, Response, Router } from 'express';
  
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
- 
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../redisClient');
- 
 const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
 

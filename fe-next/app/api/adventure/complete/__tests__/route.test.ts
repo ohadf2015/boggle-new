@@ -250,26 +250,28 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(89);
     });
 
-    it('awards gold on repeat completion (not just first)', async () => {
+    it('awards 50% gold on repeat completion', async () => {
       setupDbMocks({
         completionData: { stars: 2, best_score: 300, best_words: 8 },
       });
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // Repeat completion: (10+3)*3 + 50 = 89 (same formula as first)
-      expect(res.data.goldEarned).toBe(89);
+      // Repeat completion: floor((10+3)*3 + 50) * 0.5 = floor(89 * 0.5) = 44
+      expect(res.data.goldEarned).toBe(44);
+      expect(res.data.isReplay).toBe(true);
     });
 
-    it('awards gold on repeat with same stars', async () => {
+    it('awards 50% gold on repeat with same stars', async () => {
       setupDbMocks({
         completionData: { stars: 3, best_score: 600, best_words: 12 },
       });
 
       const res = await POST(makeRequest({ ...validBody, stars: 2 }));
       expect(res.status).toBe(200);
-      // (10+3)*2 = 26 (no perfect bonus for 2 stars)
-      expect(res.data.goldEarned).toBe(26);
+      // (10+3)*2 = 26 * 0.5 = 13
+      expect(res.data.goldEarned).toBe(13);
+      expect(res.data.isReplay).toBe(true);
     });
 
     it('server gold formula: 0 stars = 0 gold', async () => {
@@ -305,8 +307,9 @@ describe('POST /api/adventure/complete', () => {
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // base=89, with 25% bonus = round(89*1.25) = 111
-      expect(res.data.goldEarned).toBe(111);
+      // baseGold=(10+1*3)*3=39, perfectClear=50, goldEarned=89
+      // luckyPickaxe additive: round(89 + 39*0.25) = round(98.75) = 99
+      expect(res.data.goldEarned).toBe(99);
       expect(mockGetUpgradeEffect).toHaveBeenCalledWith({ luckyPickaxe: 2 }, 'luckyPickaxe');
       mockGetUpgradeEffect.mockReturnValue(0); // reset
     });
@@ -331,16 +334,16 @@ describe('POST /api/adventure/complete', () => {
     });
 
     it('caps gold at 500 per level', async () => {
-      mockGetUpgradeEffect.mockReturnValue(10); // 1000% bonus
+      mockGetUpgradeEffect.mockReturnValue(50); // extreme bonus
       setupDbMocks({
-        progressionData: { ...mockProgression, upgrades: { luckyPickaxe: 4 } },
-        completionData: null,
-        completionError: { code: 'PGRST116', message: 'not found' },
+        progressionData: { ...mockProgression, upgrades: { luckyPickaxe: 4 }, current_world: 10, current_level: 7 },
+        completionData: { stars: 1, best_score: 100, best_words: 3 },
       });
 
-      const res = await POST(makeRequest({ ...validBody, stars: 3 }));
+      const res = await POST(makeRequest({ ...validBody, world: 10, level: 7, stars: 3 }));
       expect(res.status).toBe(200);
-      // base=80, with 1000% bonus = 880, but capped at 500
+      // baseGold=(10+10*3)*3=120, perfectClear=50, cargoBay=50, longWords=0
+      // goldEarned=170, luckyPickaxe additive: round(170+120*50)=6170, capped at 500
       expect(res.data.goldEarned).toBe(500);
       mockGetUpgradeEffect.mockReturnValue(0); // reset
     });
@@ -430,7 +433,7 @@ describe('POST /api/adventure/complete', () => {
 
   // ===== EDGE CASES =====
   describe('Edge cases', () => {
-    it('replaying a level with fewer stars awards 0 XP but still awards gold', async () => {
+    it('replaying a level with fewer stars awards 0 XP and 50% gold', async () => {
       setupDbMocks({
         completionData: { stars: 3, best_score: 600, best_words: 12 },
       });
@@ -439,8 +442,9 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
       expect(res.data.xpEarned).toBe(0);
       expect(res.data.starsGained).toBe(0);
-      // Gold is always awarded: (10+3)*1 = 13
-      expect(res.data.goldEarned).toBe(13);
+      // Replay gold: floor((10+3)*1 * 0.5) = 6
+      expect(res.data.goldEarned).toBe(6);
+      expect(res.data.isReplay).toBe(true);
     });
 
     it('improving stars on existing completion awards only new stars XP', async () => {

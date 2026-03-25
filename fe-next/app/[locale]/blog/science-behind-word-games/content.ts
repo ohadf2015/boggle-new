@@ -177,7 +177,7 @@ You don't need to justify playing word games with neuroscience. They're fun. Tha
 
 Your brain is running a symphony every time you play. Whether or not that symphony makes you "smarter" is almost beside the point. It's a remarkable piece of cognitive performance, and you should enjoy it.
 
-Now if you'll excuse me, I have a grid of letters that needs my attention. My coffee is getting cold again.`,
+Anyway, I've got a grid waiting and I've already spent too long writing about word games instead of playing them.`,
       },
       {
         content: `Sources:
@@ -355,7 +355,7 @@ Now if you'll excuse me, I have a grid of letters that needs my attention. My co
 
 המוח שלכם מנגן סימפוניה בכל פעם שאתם משחקים. בין אם הסימפוניה הזו הופכת אתכם ל"חכמים יותר" או לא — זה כמעט לא העניין. זו הופעה קוגניטיבית מרשימה, ואתם צריכים ליהנות ממנה.
 
-ועכשיו אם תסלחו לי, יש לי רשת אותיות שדורשת את תשומת ליבי. הקפה שלי מתקרר שוב.`,
+בקיצור, יש לי רשת שמחכה לי וכבר השקעתי יותר מדי זמן בלכתוב על משחקי מילים במקום לשחק אותם.`,
       },
       {
         content: `מקורות:
@@ -533,7 +533,7 @@ Du behöver inte rättfärdiga ordspel med neurovetenskap. De är roliga. Det r�
 
 Din hjärna kör en symfoni varje gång du spelar. Huruvida den symfonin gör dig "smartare" är nästan bredvid poängen. Det är en anmärkningsvärd kognitiv prestation, och du borde njuta av den.
 
-Och nu, om du ursäktar mig, har jag ett bokstavsrutnät som behöver min uppmärksamhet. Mitt kaffe blir kallt igen.`,
+Hur som helst, jag har ett rutnät som väntar och jag har redan lagt för lång tid på att skriva om ordspel istället för att spela dem.`,
       },
       {
         content: `Källor:
@@ -711,7 +711,7 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
 
 プレイするたびに脳はシンフォニーを奏でています。そのシンフォニーがあなたを「賢く」するかどうかは、ほとんど問題ではありません。これは驚くべき認知的パフォーマンスであり、楽しむべきです。
 
-さて、失礼しますが、私の注意を必要としている文字グリッドがあります。コーヒーがまた冷めてきました。`,
+さて、グリッドが待っている。ワードゲームについて書くのに時間をかけすぎた――プレイする代わりに。`,
       },
       {
         content: `出典：
@@ -889,7 +889,7 @@ No necesitas justificar los juegos de palabras con neurociencia. Son divertidos.
 
 Tu cerebro está dirigiendo una sinfonía cada vez que juegas. Si esa sinfonía te hace "más inteligente" es casi irrelevante. Es una actuación cognitiva notable, y deberías disfrutarla.
 
-Ahora, si me disculpas, tengo una cuadrícula de letras que necesita mi atención. Mi café se está enfriando otra vez.`,
+En fin, tengo una cuadrícula esperándome y ya pasé demasiado tiempo escribiendo sobre juegos de palabras en vez de jugarlos.`,
       },
       {
         content: `Fuentes:

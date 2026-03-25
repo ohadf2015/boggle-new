@@ -142,7 +142,20 @@ function gridCacheKey(grid: string[][]): string {
 // Persists across component re-mounts within same session
 // ==============================================
 
+/** LRU-capped cache — keeps last N grid solutions to prevent unbounded memory growth */
+const MAX_CACHE_ENTRIES = 10;
 const gridSolutionCache = new Map<string, Set<string>>();
+
+function gridCacheSet(key: string, value: Set<string>) {
+  // Delete first so re-insertion moves key to end (Map preserves insertion order)
+  gridSolutionCache.delete(key);
+  gridCacheSet(key, value);
+  // Evict oldest entries if over limit
+  if (gridSolutionCache.size > MAX_CACHE_ENTRIES) {
+    const oldest = gridSolutionCache.keys().next().value;
+    if (oldest !== undefined) gridSolutionCache.delete(oldest);
+  }
+}
 
 /**
  * Clear caches (exported for testing)
@@ -193,29 +206,48 @@ export function useAdventureWordValidation({
     solveInFlightRef.current = true;
 
     const controller = new AbortController();
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    // Capture the gridKey at fetch time so we can verify the result is still relevant
+    const fetchGridKey = gridKey;
 
-    fetch('/api/adventure/solve-grid', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ grid, language, minLength: minWordLength }),
-      signal: controller.signal,
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.words && Array.isArray(data.words)) {
-          const wordSet = new Set<string>(data.words);
-          validWordsRef.current = wordSet;
-          gridSolutionCache.set(`${language}:${gridKey}`, wordSet);
-        }
+    const fetchSolve = (attempt: number) => {
+      fetch('/api/adventure/solve-grid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grid, language, minLength: minWordLength }),
+        signal: controller.signal,
       })
-      .catch(() => {
-        // Solve failed — will fall back to per-word API validation
-      })
-      .finally(() => {
-        solveInFlightRef.current = false;
-      });
+        .then(res => {
+          if (!res.ok) throw new Error(`solve-grid ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          if (data.words && Array.isArray(data.words)) {
+            const wordSet = new Set<string>(data.words);
+            validWordsRef.current = wordSet;
+            gridCacheSet(`${language}:${fetchGridKey}`, wordSet);
+          }
+        })
+        .catch((err) => {
+          // Retry once after 2s if first attempt failed (not aborted)
+          if (attempt === 0 && !(err instanceof Error && err.name === 'AbortError')) {
+            retryTimer = setTimeout(() => fetchSolve(1), 2000);
+            return;
+          }
+        })
+        .finally(() => {
+          solveInFlightRef.current = false;
+        });
+    };
 
-    return () => controller.abort();
+    fetchSolve(0);
+
+    return () => {
+      controller.abort();
+      // Clear pending retry so it doesn't fire with stale grid data
+      if (retryTimer) clearTimeout(retryTimer);
+      solveInFlightRef.current = false;
+    };
   }, [grid, language, minWordLength, gridKey]);
 
   const validateWord = useCallback(
@@ -325,7 +357,7 @@ export function useAdventureWordValidation({
         setIsValidating(false);
 
         if (error instanceof Error && error.name === 'AbortError') {
-          return { isValid: false };
+          return { isValid: false, errorKey: 'adventure.errors.validationTimeout' };
         }
 
         const result: WordValidationResult = {

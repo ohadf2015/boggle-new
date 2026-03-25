@@ -36,7 +36,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
   const avatar = player.avatar || null;
 
   // Memoize expensive word categorization and grouping at component level (not inside JSX)
-  const { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
+  const { duplicateWords, invalidWords, validWords: _validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
     if (!player.allWords || player.allWords.length === 0) {
       return {
         duplicateWords: [] as WordObject[],

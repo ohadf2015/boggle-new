@@ -161,7 +161,7 @@ I don't think there's a single perfect word game. Wordle comes close for its for
 
 But whatever you pick, make sure it's one where you actually feel something when you find a great word. That's the whole point.
 
-Now if you'll excuse me, I have a daily challenge to finish and a boss to defeat. My 47-day streak isn't going to maintain itself.`,
+Now if you'll excuse me, I have a daily challenge to finish and a boss to defeat. My 63-day streak isn't going to maintain itself.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -306,7 +306,7 @@ LexiClash זה מה שקורה כשמישהו מסתכל על באגל ואומ�
 
 אבל מה שלא תבחרו, ודאו שזה משחק שבו אתם באמת מרגישים משהו כשמוצאים מילה מדהימה. זו כל הפואנטה.
 
-עכשיו סליחה, יש לי אתגר יומי לסיים ובוס להביס. הסטריק של 47 ימים לא ישמור על עצמו.`,
+עכשיו סליחה, יש לי אתגר יומי לסיים ובוס להביס. הסטריק של 63 ימים לא ישמור על עצמו.`,
       },
     ],
     backToBlog: 'חזרה לבלוג',
@@ -449,7 +449,7 @@ Det finns inget enskilt perfekt ordspel. Wordle kommer nära för sitt format. L
 
 Men vad du än väljer, se till att det är ett spel där du faktiskt känner något när du hittar ett fantastiskt ord. Det är hela poängen.
 
-Nu måste ni ursäkta mig, jag har en daglig utmaning att avsluta och en boss att besegra. Min 47-dagars streak sköter sig inte själv.`,
+Nu måste ni ursäkta mig, jag har en daglig utmaning att avsluta och en boss att besegra. Min 63-dagars streak sköter sig inte själv.`,
       },
     ],
     backToBlog: 'Tillbaka till bloggen',
@@ -598,7 +598,7 @@ LexiClashは誰かがBoggleを見て「これをもっと膨らませたら？�
 
 でも何を選んでも、素晴らしい単語を見つけた時に本当に何かを感じるゲームを選んでほしい。それが全てのポイントだ。
 
-さて失礼、デイリーチャレンジを終わらせてボスを倒さないと。47日のストリークは勝手には続かないから。`,
+さて失礼、デイリーチャレンジを終わらせてボスを倒さないと。63日のストリークは勝手には続かないから。`,
       },
     ],
     backToBlog: 'ブログに戻る',

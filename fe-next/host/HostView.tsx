@@ -45,6 +45,8 @@ interface GameStartData {
   letterGrid: string[][];
   timerSeconds: number;
   language: Language;
+  minWordLength?: number;
+  messageId?: string;
 }
 
 interface LessonData {

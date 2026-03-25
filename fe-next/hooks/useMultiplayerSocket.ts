@@ -57,7 +57,7 @@ interface UseMultiplayerSocketOptions {
     users?: Array<{ username: string; score?: number }>;
   }) => void;
   onError: (error: { message?: string; code?: string }) => void;
-  onGameStart: (data: { letterGrid: string[][]; timerSeconds: number; language: Language }) => void;
+  onGameStart: (data: { letterGrid: string[][]; timerSeconds: number; language: Language; minWordLength?: number; messageId?: string }) => void;
   onGameReset: () => void;
   onHostLeftRoomClosing: (data: { message?: string }) => void;
   onSessionMigrated: (data: { message?: string }) => void;

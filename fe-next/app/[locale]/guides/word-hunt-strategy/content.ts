@@ -263,123 +263,123 @@ And honestly? Just play a lot. After a few hundred rounds, you start seeing patt
     backToGuides: 'חזרה למדריכים',
   },
   sv: {
-    title: 'Word Hunt Strategi: Hur Jag Gick Fran 5 Forsok till Att Losa Pa 3',
-    subtitle: 'Riktiga taktiker fran hundratals rundor. Val av oppnare, ledtradsknep och fallorna jag hela tiden gick i.',
+    title: 'Word Hunt Strategi: Hur Jag Gick Från 5 Försök till Att Lösa På 3',
+    subtitle: 'Riktiga taktiker från hundratals rundor. Val av öppnare, ledtrådsknep och fallorna jag hela tiden gick i.',
     category: 'Strategi',
-    readTime: '8 min lasning',
-    authorName: 'Ordnorden',
-    authorBio: 'Jag foljer min statistik besatt. 95% losningsgrad, 3.2 i genomsnitt. Ja, jag har ett kalkylark.',
+    readTime: '8 min läsning',
+    authorName: 'Ordnörden',
+    authorBio: 'Jag följer min statistik besatt. 95% lösningsgrad, 3.2 i genomsnitt. Ja, jag har ett kalkylark.',
     quickTips: [
-      'STARE eller CRANE som oppnare. Jag vaxlar mellan dem beroende pa humor. Bada traffar bokstaverna som spelar roll.',
-      'Att ateranvanda en graa bokstav ar det storsta nyborjarmisstaget. Jag ertappar mig fortfarande med det nar jag stressar.',
-      'Gront = ratt bokstav, ratt plats. Gult = ratt bokstav, fel plats. Tatuera det pa hjarnan.',
-      'Fick du en gul? Flytta den inte slumpmassigt. Prova den i varje position du inte testat an.',
-      'Tvaa bra oppnare utan overlappande bokstaver = 10 testade bokstaver. Det ar 40% av alfabetet pa 2 gissningar.',
-      'Lar dig -IGHT, -OUND, -ATCH-klustren. Nar du ser ett ar svaret oftast gomt dar.',
-      'Nere pa 2-3 alternativ? Gaa med det vanligare ordet. Svaret ar nastan aldrig det obskyra.',
+      'STARE eller CRANE som öppnare. Jag växlar mellan dem beroende på humor. Båda träffar bokstaverna som spelar roll.',
+      'Att återanvända en grå bokstav är det största nybörjarmisstaget. Jag ertappar mig fortfarande med det när jag stressar.',
+      'Grönt = rätt bokstav, rätt plats. Gult = rätt bokstav, fel plats. Tatuera det på hjärnan.',
+      'Fick du en gul? Flytta den inte slumpmässigt. Prova den i varje position du inte testat än.',
+      'Två bra öppnare utan överlappande bokstäver = 10 testade bokstäver. Det är 40% av alfabetet på 2 gissningar.',
+      'Lär dig -IGHT, -OUND, -ATCH-klustren. När du ser ett är svaret oftast gömt där.',
+      'Nere på 2-3 alternativ? Gå med det vanligare ordet. Svaret är nästan aldrig det obskyra.',
     ],
     sections: [
       {
-        title: 'Sa Vad Ar Egentligen Word Hunt?',
-        content: `Om du spelat Wordle fattar du redan grejen. Word Hunt ar LexiClashs variant pa formeln: gissa det dolda ordet, fa fargkodad feedback, upprepa tills du najar det eller koor slut pa forsok.
+        title: 'Så Vad Är Egentligen Word Hunt?',
+        content: `Om du spelat Wordle fattar du redan grejen. Word Hunt är LexiClashs variant på formeln: gissa det dolda ordet, få färgkodad feedback, upprepa tills du når det eller kör slut på försök.
 
-Gron platta betyder ratt bokstav, ratt plats. Gul betyder att bokstaven finns i ordet men du har den pa fel stalle. Graa betyder att bokstaven inte finns i ordet alls. Enkelt pa pappret, men det deduktiva pusslet det skapar ar genuint beroendeframkallande.
+Grön platta betyder rätt bokstav, rätt plats. Gul betyder att bokstaven finns i ordet men du har den på fel ställe. Grå betyder att bokstaven inte finns i ordet alls. Enkelt på pappret, men det deduktiva pusslet det skapar är genuint beroendeframkallande.
 
-Det som skiljer det fran Klassiskt eller Blast-lage (dar bokstaverna ligger framfor dig pa bradet) ar att du jobbar i blindo. Det ar ren deduktion och ordforrad. Jag tycker arligt talat att det ar mycket mer tillfredsstaallande nar jag knacker ett pa 2 forsok an nagot annat i spelet.
+Det som skiljer det från Klassiskt eller Blast-läge (där bokstaverna ligger framför dig på brädet) är att du jobbar i blindo. Det är ren deduktion och ordförråd. Jag tycker ärligt talat att det är mycket mer tillfredsställande när jag knacker ett på 2 försök än något annat i spelet.
 
-Det finns ett farskt pussel varje dag i Dagliga Utmaningen, plus obegransade ovningsrundor om du ar som jag och inte kan sluta efter bara ett. Farre gissningar = mer poang och mynt, vilket ar moroten som forvandlade mig fran en casual spelare till nagon som genuint tanker pa bokstavsfrekvens vid frukosten.`,
+Det finns ett farskt pussel varje dag i Dagliga Utmaningen, plus obegransade övningsrundor om du är som jag och inte kan sluta efter bara ett. Färre gissningar = mer poäng och mynt, vilket är moroten som förvandlade mig från en casual spelare till någon som genuint tänker på bokstavsfrekvens vid frukosten.`,
       },
       {
-        title: 'Din Oppnare Spelar Storre Roll An Du Tror',
-        content: `Har ar ett misstag jag gjorde mina forsta 50+ rundor: jag forstokte gissa det riktiga ordet pa forsok ett. Gor inte det. Din forsta gissning handlar inte om att ha ratt. Den handlar om att lara sig sa mycket som mojligt.
+        title: 'Din Öppnare Spelar Större Roll Än Du Tror',
+        content: `Här är ett misstag jag gjorde mina första 50+ rundor: jag försökte gissa det riktiga ordet på försök ett. Gör inte det. Din första gissning handlar inte om att ha rätt. Den handlar om att lära sig så mycket som möjligt.
 
-Jag vaxlar mellan STARE och CRANE. Bada traffar vanliga vokaler (A, E) och hogfrekventa konsonanter (S, T, R, N) utan upprepade bokstaver. SLATE och ROAST funkar ocksa bra. Poangen ar att du testar bokstaverna som dyker upp i flest ord.
+Jag växlar mellan STARE och CRANE. Båda träffar vanliga vokaler (A, E) och hogfrekventa konsonanter (S, T, R, N) utan upprepade bokstäver. SLATE och ROAST funkar också bra. Poängen är att du testar bokstaverna som dyker upp i flest ord.
 
-Tank pa det: E, T, A, O, I, N, S, R forekommer i nagot i stil med 80% av alla vanliga ord. Om din oppnare testar 5 av dem har du omedelbart ett massivt forsprang.
+Tänk på det: E, T, A, O, I, N, S, R forekommer i något i stil med 80% av alla vanliga ord. Om din öppnare testar 5 av dem här du omedelbart ett massivt forsprang.
 
-Vad du INTE ska oppna med: TEETH (testar bara 3 unika bokstaver, totalt slaseri), JAZZY (coolt ord, hemsk oppnare), eller nagot med Q, X eller Z. De bokstaverna dyker nastan aldrig upp i svaret.
+Vad du INTE ska öppna med: TEETH (testar bara 3 unika bokstäver, totalt slaseri), JAZZY (coolt ord, hemsk öppnare), eller något med Q, X eller Z. De bokstaverna dyker nästan aldrig upp i svaret.
 
-Mitt favorittrick: para ihop tvaa kompletterande oppnare. STARE sen COIL ger dig 9 unika bokstaver over tvaa gissningar och tacker alla 5 vokaler. Efter de tvaa vet jag oftast tillrackligt for att borja ringaa in.`,
+Mitt favorittrick: para ihop två kompletterande öppnare. STARE sen COIL ger dig 9 unika bokstäver över två gissningar och täcker alla 5 vokaler. Efter de två vet jag oftast tillräckligt för att börja ringa in.`,
       },
       {
-        title: 'Att Lasa Ledtradarna Utan Att Tappa Forstandet',
-        content: `OK sa du har gjort din forsta gissning och fargerna kommer tillbaka. Har ar dar de flesta (inklusive gamla jag) gar fel.
+        title: 'Att Lasa Ledtradarna Utan Att Tappa Förståndet',
+        content: `OK så du här gjort din första gissning och färgerna kommer tillbaka. Här är där de flesta (inklusive gamla jag) går fel.
 
-Grona bokstaver ar latta. Las dem. Om S lyser gront pa position 1 borjar varje gissning harifran med S. Inga undantag, inget smarthetsforsokt. Bara las den.
+Grona bokstäver är lätta. Läs dem. Om S lyser grönt på position 1 börjar varje gissning harifrån med S. Inga undantag, inget smarthetförsök. Bara läs den.
 
-Gula bokstaver ar dar det blir klurigare, och dar jag slosade flest gissningar i borjan. Ett gult A pa position 2 betyder tvaa saker: A FINNS i ordet, och A ar INTE pa position 2. Fallan ar att flytta det till nagot slumpmassigt stalle. Var istallet metodisk. Prova position 1, sen 3, sen 4. Bocka av nar du gar.
+Gula bokstäver är där det blir klurigare, och där jag slösade flest gissningar i början. Ett gult A på position 2 betyder två saker: A FINNS i ordet, och A är INTE på position 2. Fallan är att flytta det till något slumpmässigt ställe. Var istället metodisk. Prova position 1, sen 3, sen 4. Bocka av när du går.
 
-Graa bokstaver ar borta. Doda for dig. Glom att de existerar. Jag kan inte beskriva hur manga ganger jag ertappat mig med att prova ett R som jag redan visste var graat for att jag inte var uppmarksam. Om du minns en sak fran den har guiden sa ar det det har: ateranvand aldrig graa bokstaver.
+Grå bokstäver är borta. Doda för dig. Glöm att de existerar. Jag kan inte beskriva hur många gånger jag ertappat mig med att prova ett R som jag redan visste var gråt för att jag inte var uppmärksam. Om du minns en sak från den här guiden så är det det här: återanvänd aldrig grå bokstäver.
 
-Den riktiga magin hander nar du kombinerar allt. Sag att du vet att A ar gult fran position 2 och R ar gront pa position 4. Nu letar du efter _ _ _ R _ med ett A naaonstans som inte ar position 2. Den begraaansningen ensam brukar skara ner alternativen till en handfull.`,
+Den riktiga magin händer när du kombinerar allt. Sag att du vet att A är gult från position 2 och R är grönt på position 4. Nu letar du efter _ _ _ R _ med ett A någonstans som inte är position 2. Den begränsningen ensam brukar skara ner alternativen till en handfull.`,
       },
       {
-        title: 'Att Begransaa Alternativen (Den Roliga Delen)',
-        content: `Efter 2 bra gissningar borde du ha testat runt 10 bokstaver. Det ar nastan 40% av alfabetet eliminerat eller bekraftat. Om det inte kanns som att faltet har smalnat dramatiskt hade dina gissningar formodligen for mycket overlapp.
+        title: 'Att Begränsa Alternativen (Den Roliga Delen)',
+        content: `Efter 2 bra gissningar borde du ha testat runt 10 bokstäver. Det är nästan 40% av alfabetet eliminerat eller bekraftat. Om det inte känns som att faltet här smalnat dramatiskt hade dina gissningar förmodligen för mycket överlapp.
 
-Grona bokstaver ar det basta. Tvaa grona efter tvaa gissningar betyder att ungefar 95% av mojligheterna for de positionerna ar borta. Det ar en underbar kansla.
+Grona bokstäver är det bästa. Två grona efter två gissningar betyder att ungefär 95% av möjligheterna för de positionerna är borta. Det är en underbar känsla.
 
-Det ar har jag borjar klottra (mentalt eller bokstavligen). Jag tar monstret jag vet och listar bara ord som passar. Position 1 ar S, position 4 ar R, A gar naaonstans som inte ar position 2? OK: SHARP, SNARE, SUGAR, SOLAR... sen korskontrollerar jag mot mina graa bokstaver och listan krymper snabbt.
+Det är här jag börjar klottra (mentalt eller bokstavligen). Jag tar mönstret jag vet och listar bara ord som passar. Position 1 är S, position 4 är R, A går någonstans som inte är position 2? OK: SHARP, SNARE, SUGAR, SOLAR... sen korskontrollerar jag mot mina grå bokstäver och listan krymper snabbt.
 
-Har ar en princip som andrade mitt spel: varje gissning borde ungefar halvera dina aaterstaende alternativ. Om en gissning bara eliminerar ett eller tvaa ord var det inte en bra gissning. Du vill maximal forodelse med varje forsok.
+Här är en princip som ändrade mitt spel: varje gissning borde ungefär halvera dina återstående alternativ. Om en gissning bara eliminerar ett eller två ord var det inte en bra gissning. Du vill maximal förödelse med varje försök.
 
-Nar jag ar nere pa 2-3 kandidater gar jag pa magkansla och frekvens. SHARE fore SNARE. SNARE fore SCARE. Ju vanligare ordet kanns, desto troligare ar det att vara svaret. Pusseldesignerna forsoker inte stumpa dig med obskyrt ordforrad.`,
+När jag är nere på 2-3 kandidater går jag på magkänsla och frekvens. SHARE fore SNARE. SNARE fore SCARE. Ju vanligare ordet känns, desto troligare är det att våra svaret. Pusseldesignerna försökter inte stumpa dig med obskyrt ordförråd.`,
       },
       {
-        title: 'Att Fa Mer Ut Av Ledtradar och Monster',
-        content: `Det finns ett ledtradssystem i Word Hunt som avsloojar en extra bokstavsposition, och jag har asikter om nar man ska anvanda det.
+        title: 'Att Få Mer Ut Av Ledtradar och Monster',
+        content: `Det finns ett ledtrådssystem i Word Hunt som avslöjar en extra bokstavsposition, och jag här asikter om när man ska använda det.
 
-Anvand inte en ledtrad nar du fortfarande har 5+ mojliga ord. En gissning till ger dig mycket mer information an en enda bokstavsavslojning. Spara ledtradar for nar du stirrar pa 2-3 lika sannolika kandidater och genuint inte kan avgora vilken det ar. Da betalar en ledtrad for sig sjalv.
+Använd inte en ledtråd när du fortfarande här 5+ möjliga ord. En gissning till ger dig mycket mer information än en enda bokstavsavslöjning. Spara ledtrådar för när du stirrar på 2-3 lika sannolika kandidater och genuint inte kan avgöra vilken det är. Da betalar en ledtråd för sig själv.
 
-Aven utan ledtradar ar bokstavsfrekvens ditt hemliga vapen. Efter de stora (E, T, A, O, I, N, S, R) ar nasta niva H, L, D, C, U, M, F, P. Om dina forsta tvaa gissningar inte rort nagon av dem, se till att gissning 3 gor det.
+Även utan ledtrådar är bokstavsfrekvens ditt hemliga vapen. Efter de stora (E, T, A, O, I, N, S, R) är nästa nivå H, L, D, C, U, M, F, P. Om dina första två gissningar inte rort någon av dem, se till att gissning 3 gör det.
 
-Jag har mentala "kluster" av ordanslutningar, och det har formodligen sparat mig fler gissningar an nagot annat. Nar jag ser _IGHT ta form vet jag att jag tittar pa light/right/sight/might/night/fight/tight och kan oftast spika det pa en gissning till. Samma med -OUND (bound/found/hound/mound/pound/round/sound/wound). Bygg de har klustren i huvudet och du borjar kanna igen monster nastan direkt.
+Jag här mentala "kluster" av ordanslutningar, och det här förmodligen sparat mig fler gissningar än något annat. När jag ser _IGHT ta form vet jag att jag tittar på light/right/sight/might/night/fight/tight och kan oftast spika det på en gissning till. Samma med -OUND (bound/found/hound/mound/pound/round/sound/wound). Bygg de här klustren i huvudet och du börjar känna igen mönster nästan direkt.
 
-Och dubbla bokstaver. De far mig varje gang. SLEEP, TEETH, LLAMA. Om alla dina gissningar kommer tillbaka rena utan dubblar ar det faktiskt en signal att svaret kanske HAR dubblar. Prova ord med LL, SS, EE, TT. Jag spenderade en gang 4 gissningar utan att overvaga dubblar och kande mig extremt dum.`,
+Och dubbla bokstäver. De får mig varje gång. SLEEP, TEETH, LLAMA. Om alla dina gissningar kommer tillbaka rena utan dubblar är det faktiskt en signal att svaret kanske HAR dubblar. Prova ord med LL, SS, EE, TT. Jag spenderade en gång 4 gissningar utan att överväga dubblar och kande mig extremt dum.`,
       },
       {
-        title: 'Fallor Jag Fortsatter Gaa I (Och Du Ocksa Kommer)',
-        content: `Jag vill vara arlig: jag gar fortfarande i nagra av de har. Att veta om dem hjalper, men i stundens hetta gor hjarnan bara vad den vill.
+        title: 'Fallor Jag Fortsatter Gå I (Och Du Också Kommer)',
+        content: `Jag vill våra ärlig: jag går fortfarande i några av de här. Att veta om dem hjälper, men i stundens hetta gör hjärnan bara vad den vill.
 
-Tunnelseende. Det har ar det stora. Du overtygar dig om att det ar CRANE, sa du provar CRANE, CRONE, CRAZE... samtidigt ar svaret PLUMB och delar noll bokstaver. Om din gissning kommer tillbaka hel-graa betyder det att svaret har INGENTING gemensamt med det du provade. Tvinga dig att tanka i en helt annan riktning.
+Tunnelseende. Det här är det stora. Du övertygar dig om att det är CRANE, så du provar CRANE, CRONE, CRAZE... samtidigt är svaret PLUMB och delar noll bokstäver. Om din gissning kommer tillbaka hel-grå betyder det att svaret här INGENTING gemensamt med det du provade. Tvinga dig att tänka i en helt annan riktning.
 
-Sallsynt-ord-syndromet. Jag har gjort det. "Kanske ar det KNOLL? FJORD?" Nej. Det ar nastan sakeert ett ord du anvander i vardagligt tal. Om du inte skulle saga det till en van ar det formodligen inte svaret.
+Sällsynt-ord-syndromet. Jag här gjort det. "Kanske är det KNOLL? FJORD?" Nej. Det är nästan säkert ett ord du använder i vardagligt tal. Om du inte skulle saga det till en vän är det förmodligen inte svaret.
 
-Positionsfixering. Du far ett gult T, provar det pa position 3, fortfarande gult, provar position 3 igen for att du glomde. Hall en mental (eller fysisk) checklista over var du testat varje gul bokstav. Jag mumlaar faktiskt positionerna for mig sjalv: "T inte 1, inte 3, prova 4."
+Positionsfixering. Du får ett gult T, provar det på position 3, fortfarande gult, provar position 3 igen för att du glömde. Håll en mental (eller fysisk) checklista över var du testat varje gul bokstav. Jag mumlar faktiskt positionerna för mig själv: "T inte 1, inte 3, prova 4."
 
-Panikgissningen. Tvaa gissningar kvar, hjarnan blankar, du slamrar in vilket ord som helst som dyker upp. Stanna. Ta 10 sekunder. Lasomm varje ledtrad. Lista varje begraaansning. Svaret maste uppfylla ALLA. Det dar lugna ogonblicket har raddat min losningssvit mer an en gang.
+Panikgissningen. Två gissningar kvar, hjärnan blankar, du slamrar in vilket ord som helst som dyker upp. Stanna. Ta 10 sekunder. Läs om varje ledtrad. Lista varje begråansning. Svaret måste uppfylla ALLA. Det där lugna ögonblicket här räddat min lösningssvit mer än en gång.
 
-Dubbelbokstavsblindhet. Om E kom tillbaka gult en gang, kom ihag: ordet kanske har TVA E. Jag forlorade en gang ett uppenbart GEESE for att jag antog att ett E racktte. Pinsamt, men laarorikt.`,
+Dubbelbokstavsblindhet. Om E kom tillbaka gult en gang, kom ihag: ordet kanske här TVÅ E. Jag förlorade en gång ett uppenbart GEESE för att jag antog att ett E räckte. Pinsamt, men lärorikt.`,
       },
       {
         title: 'Tricken Som Fick Mig Till 2-3 I Genomsnitt',
-        content: `Det har ar det som skilde "ganska bra" fran "irriterar mina vanner med min losningsgrad."
+        content: `Det här är det som skilde "ganska bra" från "irriterar mina vänner med min lösningsgrad."
 
-Innan jag skickar en gissning spelar jag igenom varje scenario i huvudet. Om A kommer tillbaka gront provar jag DET HAR. Gult, jag provar DET DAR. Graat, nagot helt annat. Det later langsamt men det snabbar faktiskt upp dig for att du inte sitter och omanalyserar efter varje resultat.
+Innan jag skickar en gissning spelar jag igenom varje scenario i huvudet. Om A kommer tillbaka grönt provar jag DET HAR. Gult, jag provar DET DAR. Gråt, något helt annat. Det låter langsamt men det snabbar faktiskt upp dig för att du inte sitter och omanalyserar efter varje resultat.
 
-Jag spelar svart lage aven nar spelet inte tvingar det. Det betyder att varje gissning anvander alla bekraftade grona och gula bokstaver. Det kanns begransande forst, men det tvingar dig till effektivt spel. Du kan inte slosa en gissning pa ett slangord som ignorerar det du redan vet.
+Jag spelar svårt läge även när spelet inte tvingar det. Det betyder att varje gissning använder alla bekraftade grona och gula bokstäver. Det känns begransande först, men det tvingar dig till effektivt spel. Du kan inte slösa en gissning på ett slangord som ignorerar det du redan vet.
 
-Frekvensviktad gissning. Nar jag har 3 kandidatord valjer jag inte bara slumpmassigt. Jag kollar vilka otestade bokstaver som ar vanligast. Om en kandidat testar ett H och en annan testar ett Z gar jag med H varje gang. Aven om den gissningen ar fel kommer feedbacken vara mer anvandbar.
+Frekvensviktad gissning. När jag här 3 kandidatord valjer jag inte bara slumpmässigt. Jag kollar vilka otestade bokstäver som är vanligast. Om en kandidat testar ett H och en annan testar ett Z går jag med H varje gång. Även om den gissningen är fel kommer feedbacken våra mer anvandbar.
 
-Och arligt talat? Bara spela mycket. Efter nagra hundra rundor borjar du se monster utan att tanka pa dem. -ATCH, -OUND, -IGHT, -TION, -NESS. Hjarnan bygger en uppslagstabell over tid, och det ar den monsterigenkannigen som forvandlar ett 4-gissningssnitt till ett 3-gissningssnitt. Det finns ingen genvag. Men det ar ocksa det som gor att forbattringen kanns fortjanad.`,
+Och ärligt talat? Bara spela mycket. Efter några hundra rundor börjar du se mönster utan att tänka på dem. -ATCH, -OUND, -IGHT, -TION, -NESS. Hjärnan bygger en uppslagstabell över tid, och det är den mönsterigenkänningen som förvandlar ett 4-gissningssnitt till ett 3-gissningssnitt. Det finns ingen genvag. Men det är också det som gör att förbättringen känns fortjanad.`,
       },
     ],
     faq: [
       {
-        question: 'Vad ar det basta startordet for Word Hunt i LexiClash?',
-        answer: 'Jag personligen vaxlar mellan STARE och CRANE. Bada traffar de vanligaste vokalerna och konsonanterna utan att upprepa bokstaver. Hela poangen med din oppnare ar att lara dig saker, inte att ha tur och gissa ratt.',
+        question: 'Vad är det bästa startordet för Word Hunt i LexiClash?',
+        answer: 'Jag personligen växlar mellan STARE och CRANE. Båda träffar de vanligaste vokalerna och konsonanterna utan att upprepa bokstäver. Hela poängen med din öppnare är att lära dig saker, inte att ha tur och gissa rätt.',
       },
       {
-        question: 'Hur manga forsok far jag i Word Hunt?',
-        answer: 'Du far ett begraaansat antal forsok. Ju farre gissningar du behoover, desto mer poang och mynt gar du ifran med. Det dagliga pusslet ar samma ord for alla, vilket gor det kul att jamfora med vanner.',
+        question: 'Hur många försök får jag i Word Hunt?',
+        answer: 'Du får ett begränsat antal försök. Ju färre gissningar du behöver, desto mer poäng och mynt går du ifrån med. Det dagliga pusslet är samma ord för alla, vilket gör det kul att jämföra med vänner.',
       },
       {
-        question: 'Vad betyder fargerna i Word Hunt-ledtradar?',
-        answer: 'Gront = ratt bokstav, ratt position. Gult = bokstaven finns i ordet men du la den pa fel plats. Graat = inte i ordet alls. Gront ar toppen, gult ar anvandbart, graat ar ocksa information (nu vet du vad du ska undvika).',
+        question: 'Vad betyder färgerna i Word Hunt-ledtrådar?',
+        answer: 'Grönt = rätt bokstav, rätt position. Gult = bokstaven finns i ordet men du la den på fel plats. Gråt = inte i ordet alls. Grönt är toppen, gult är anvandbart, gråt är också information (nu vet du vad du ska undvika).',
       },
       {
-        question: 'Hur kan jag forbattra min losningsgrad i Word Hunt?',
-        answer: 'Borja med en stark oppnare som STARE eller CRANE, ateranvand aldrig graa bokstaver (serioost, det ensamt hjalper), var systematisk med att testa gula bokstaver i nya positioner, och borja memorera ordsluts-kluster som -IGHT och -OUND. Det kanns langsamt forst men ditt genomsnitt kommer sjunka snabbt.',
+        question: 'Hur kan jag förbättra min lösningsgrad i Word Hunt?',
+        answer: 'Börja med en stark öppnare som STARE eller CRANE, återanvänd aldrig grå bokstäver (serioost, det ensamt hjälper), var systematisk med att testa gula bokstäver i nya positioner, och börja memorera ordsluts-kluster som -IGHT och -OUND. Det känns langsamt först men ditt genomsnitt kommer sjunka snabbt.',
       },
     ],
     ctaText: 'Spela Word Hunt',

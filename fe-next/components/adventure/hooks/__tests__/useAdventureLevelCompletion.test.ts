@@ -74,10 +74,9 @@ describe('useAdventureLevelCompletion', () => {
     it('should not award rewards when level not complete', () => {
       renderHook(() => useAdventureLevelCompletion(defaultProps));
       expect(mockAwardXp).not.toHaveBeenCalled();
-      expect(mockAddGold).not.toHaveBeenCalled();
     });
 
-    it('should award XP and gold when level completes with stars > 0', () => {
+    it('should award XP (for level-up detection) but NOT call addGold when level completes', () => {
       renderHook(() =>
         useAdventureLevelCompletion({
           ...defaultProps,
@@ -85,12 +84,14 @@ describe('useAdventureLevelCompletion', () => {
         })
       );
 
+      // awardXp is called for level-up detection
       expect(mockAwardXp).toHaveBeenCalled();
-      expect(mockAddGold).toHaveBeenCalled();
+      // addGold is NOT called — gold comes from server via ProgressionContext
+      expect(mockAddGold).not.toHaveBeenCalled();
     });
 
-    it('should award perfect clear gold bonus for 3 stars', () => {
-      renderHook(() =>
+    it('should set earnedGold display value with perfect clear bonus for 3 stars', () => {
+      const { result } = renderHook(() =>
         useAdventureLevelCompletion({
           ...defaultProps,
           gameState: { ...defaultProps.gameState, isComplete: true, stars: 3 },
@@ -98,11 +99,12 @@ describe('useAdventureLevelCompletion', () => {
       );
 
       // 3 stars * (10 + world*3) base + 50 perfect bonus = 3*13 + 50 = 89
-      expect(mockAddGold).toHaveBeenCalledWith(89);
+      expect(result.current.earnedGold).toBe(89);
+      expect(mockAddGold).not.toHaveBeenCalled();
     });
 
-    it('should not award perfect clear bonus for less than 3 stars', () => {
-      renderHook(() =>
+    it('should set earnedGold display value without perfect bonus for less than 3 stars', () => {
+      const { result } = renderHook(() =>
         useAdventureLevelCompletion({
           ...defaultProps,
           gameState: { ...defaultProps.gameState, isComplete: true, stars: 2 },
@@ -110,7 +112,8 @@ describe('useAdventureLevelCompletion', () => {
       );
 
       // 2 stars * (10 + world*3) base = 2*13 = 26
-      expect(mockAddGold).toHaveBeenCalledWith(26);
+      expect(result.current.earnedGold).toBe(26);
+      expect(mockAddGold).not.toHaveBeenCalled();
     });
 
     it('should apply XP bonus multiplier from upgrades', () => {
@@ -338,7 +341,8 @@ describe('useAdventureLevelCompletion', () => {
         100, // score
         2, // wordsFound.length
         26, // earnedGold — must NOT be 0 (the race condition bug)
-        0  // longWords (no words >= 6 chars)
+        0, // longWords (no words >= 6 chars)
+        ['cat', 'dog'] // wordsFound for word album persistence
       );
     });
 
@@ -354,7 +358,8 @@ describe('useAdventureLevelCompletion', () => {
       expect(mockSaveCompletion).toHaveBeenCalledWith(
         1, 3, 3, 100, 2,
         89, // 3*13 + 50 perfect bonus
-        0
+        0,
+        ['cat', 'dog']
       );
     });
   });

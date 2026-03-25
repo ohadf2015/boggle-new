@@ -6,7 +6,8 @@
 import express, { Request, Response, Router } from 'express';
 import { getSupabase } from '../modules/supabaseServer';
 import logger from '../utils/logger';
-import { generatePuzzleCode, isValidPuzzleCode } from '../../utils/customPuzzle';
+// Use require to avoid rootDir constraint (customPuzzle is outside backend/)
+const { generatePuzzleCode, isValidPuzzleCode } = require('../../utils/customPuzzle');
 import { validateUgcText, REPORT_REASONS } from '../modules/ugcModeration';
 import {
   createBoard,
@@ -225,7 +226,7 @@ router.get('/mine', async (req: Request, res: Response): Promise<void> => {
  * GET /featured
  * Return featured boards. Must come before /:boardCode.
  */
-router.get('/featured', async (req: Request, res: Response): Promise<void> => {
+router.get('/featured', async (_req: Request, res: Response): Promise<void> => {
   try {
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
     const boards = await getFeaturedBoards(6);
