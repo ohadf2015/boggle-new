@@ -5,8 +5,9 @@ import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import type { Player } from '@/components/results/types';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import { StatsCardGrid } from '@/components/results/shared';
 import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordCategories } from '@/components/results/useWordCategories';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { filterGameAchievements } from '@/components/results/utils';
@@ -36,6 +37,12 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
   isWordsVisible,
   t,
 }) => {
+  const { language } = useLanguage();
+  const formatWord = (word: string) => {
+    const w = language === 'he' ? applyHebrewFinalLetters(word) : word;
+    return w.toUpperCase();
+  };
+
   // Top achievements earned this game (max 3 shown as highlight)
   const gameAchievements = React.useMemo(() => {
     if (!currentPlayerData?.achievements) return [];
@@ -53,40 +60,6 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
 
   return (
     <>
-      {/* Stats Row — slides up with bounce */}
-      {currentPlayerRank > 0 && isStatsVisible && (
-        <motion.div
-          initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 16, delay: statsDelay }}
-        >
-          <StatsCardGrid
-            cards={[
-              { label: t('results.words'), value: currentPlayerValidWords.length, icon: '\ud83d\udcdd' },
-              {
-                label: t('results.bestCombo'),
-                value: (() => {
-                  const words = currentPlayerData?.allWords ?? [];
-                  const maxCombo = words.reduce((max, w) => Math.max(max, w.comboBonus ?? 0), 0);
-                  return maxCombo > 0 ? `x${maxCombo}` : '-';
-                })(),
-                icon: '\u26a1',
-                accent: 'amber',
-              },
-              {
-                label: t('results.bestWord'),
-                value: currentPlayerValidWords.length > 0
-                  ? currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()
-                  : '-',
-                icon: '\u2b50',
-                accent: 'lime',
-              },
-            ]}
-            variant="grid"
-          />
-        </motion.div>
-      )}
-
       {/* Top Achievements — pop in with slight rotate */}
       {gameAchievements.length > 0 && isStatsVisible && (
         <motion.div
@@ -121,7 +94,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
             badge={currentPlayerValidWords.length}
             summary={[
               currentPlayerValidWords.length > 0
-                ? `${t('results.bestWord')}: ${currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase()}`
+                ? `${t('results.bestWord')}: ${formatWord(currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word)}`
                 : undefined,
               totalComboBonus > 0 ? `\u26a1 +${totalComboBonus}` : undefined,
               totalFireRoundBonus > 0 ? `\ud83d\udd25 +${totalFireRoundBonus}` : undefined,
