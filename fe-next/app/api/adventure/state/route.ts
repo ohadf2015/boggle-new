@@ -115,7 +115,12 @@ export async function GET() {
     const userId = user.id;
 
     // Use service role client for database operations (bypasses RLS)
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      global: {
+        fetch: (url, options = {}) =>
+          fetch(url, { ...options, signal: options.signal ?? AbortSignal.timeout(15000) }),
+      },
+    });
 
     // Fetch progression, completions, and attempts in parallel
     // This is ~50-100ms faster than making separate API calls

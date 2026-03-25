@@ -111,10 +111,10 @@ export const QuickReactions = memo<QuickReactionsProps>(({
           whileTap={{ scale: 0.85 }}
           onClick={() => handleClick(reaction.id)}
           aria-label={t(reaction.labelKey)}
-          className="w-9 h-9 flex items-center justify-center text-lg
-            bg-neo-navy/80 border-2 border-neo-white/20 rounded-neo
-            hover:border-neo-yellow hover:bg-neo-navy
-            active:shadow-hard-pressed transition-colors"
+          className="w-10 h-10 flex items-center justify-center text-xl
+            bg-neo-navy/80 border-2 border-neo-white/15 rounded-xl
+            hover:border-neo-yellow hover:bg-neo-navy hover:scale-110
+            active:scale-90 transition-all duration-150"
         >
           {reaction.emoji}
         </AdaptiveMotion.button>

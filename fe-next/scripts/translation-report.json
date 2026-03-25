@@ -56,7 +56,7 @@
       {
         "pattern": "crowns.${crown.id}",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 85,
+        "line": 86,
         "context": "{t(`crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },

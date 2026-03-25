@@ -124,8 +124,9 @@ describe('ProgressionContext', () => {
       expect(result.current.error).toBeNull();
     });
 
-    it('should set error on fetch failure', async () => {
-      // GIVEN
+    it('should set error on fetch failure after retries', async () => {
+      // GIVEN — all retries fail with 500
+      jest.useFakeTimers();
       mockFetch.mockImplementation(createFetchMock({
         ok: false,
         status: 500,
@@ -135,12 +136,23 @@ describe('ProgressionContext', () => {
       // WHEN
       const { result } = renderHook(() => useProgression(), { wrapper });
 
+      // Advance through all retry delays (1s, 2s, 4s)
+      for (let i = 0; i < 3; i++) {
+        await jest.advanceTimersByTimeAsync(5000);
+      }
+
       // THEN
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
       expect(result.current.error).toBeTruthy();
       expect(result.current.progression).toBeNull();
+      // 1 initial + 3 retries = 4 calls
+      const stateCalls = mockFetch.mock.calls.filter(
+        (c: [string]) => c[0].includes('/api/adventure/state')
+      );
+      expect(stateCalls.length).toBe(4);
+      jest.useRealTimers();
     });
   });
 

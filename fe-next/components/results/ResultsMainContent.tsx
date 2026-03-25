@@ -23,7 +23,7 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
-import MissedWords from '@/components/results/MissedWords';
+
 
 // ==============================================
 // TYPES
@@ -186,7 +186,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   }, [isWordHunt, wordHuntSummary, username]);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Score Reveal Animation (before everything) */}
       {isMultiplayer && !scoreRevealComplete && (
         <ScoreRevealAnimation
@@ -287,10 +287,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
             />
           )}
 
-          {/* Missed Words */}
-          {missedWords && missedWords.length > 0 && (
-            <MissedWords missedWords={missedWords} maxDisplay={5} />
-          )}
+          {/* Missed Words rendered in ResultsDetailsContent below */}
         </>
       )}
     </div>

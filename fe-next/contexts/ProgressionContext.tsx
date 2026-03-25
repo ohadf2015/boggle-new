@@ -141,45 +141,60 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   // Fetch progression and attempts from combined API endpoint
   // Uses /api/adventure/state which returns both in one request (~50-100ms faster)
   const fetchProgression = useCallback(async () => {
+    const MAX_RETRIES = 3;
+    const BASE_DELAY = 1000;
+
     if (!user?.id) {
       setIsLoading(false);
       return;
     }
 
-    try {
-      setError(null);
+    setError(null);
 
-      // Single API call for both progression and attempts
-      const response = await fetch('/api/adventure/state', {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetch('/api/adventure/state', {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
 
-      // Handle auth failures silently - user's session may have expired
-      if (response.status === 401) {
-        setProgression(null);
-        setAttempts([]);
+        // Handle auth failures silently - user's session may have expired
+        if (response.status === 401) {
+          setProgression(null);
+          setAttempts([]);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch adventure state: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProgression(data.progression);
+        setAttempts(data.attempts || []);
+        setIsLoading(false);
+        return; // Success — exit
+      } catch (err) {
+        const isNetworkError = err instanceof TypeError && err.message === 'Failed to fetch';
+        const isRetryable = isNetworkError ||
+          (err instanceof Error && /: (429|5\d{2})$/.test(err.message));
+
+        if (isRetryable && attempt < MAX_RETRIES) {
+          const delay = BASE_DELAY * Math.pow(2, attempt);
+          logger.warn(`[ProgressionContext] Retry ${attempt + 1}/${MAX_RETRIES} in ${delay}ms`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        // Final failure
+        if (!isNetworkError) {
+          logger.warn('[ProgressionContext] Fetch error:', err instanceof Error ? err.message : err);
+        }
+        setError(err instanceof Error ? err : new Error('Failed to fetch progression'));
         setIsLoading(false);
         return;
       }
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch adventure state: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setProgression(data.progression);
-      setAttempts(data.attempts || []);
-    } catch (err) {
-      // Only log non-network errors to avoid Sentry noise
-      // Network errors during navigation are expected on mobile
-      const isNetworkError = err instanceof TypeError && err.message === 'Failed to fetch';
-      if (!isNetworkError) {
-        logger.warn('[ProgressionContext] Fetch error:', err instanceof Error ? err.message : err);
-      }
-      setError(err instanceof Error ? err : new Error('Failed to fetch progression'));
-    } finally {
-      setIsLoading(false);
     }
   }, [user?.id]);
 

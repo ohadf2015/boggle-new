@@ -50,7 +50,7 @@ interface GameTimerState {
 function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
-  const { progression, isLoading, error, completeLevel, updateCurrency } = useProgression();
+  const { progression, isLoading, error, completeLevel, updateCurrency, refreshProgression } = useProgression();
 
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
@@ -245,7 +245,7 @@ function AdventureView(): React.JSX.Element {
           <p className="text-neo-white font-bold">{t('adventure.loadError')}</p>
           <div className="flex gap-3">
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => refreshProgression()}
               className={cn(
                 'px-4 py-2 bg-neo-lime text-neo-black font-bold',
                 'border-3 border-neo-black rounded-neo shadow-hard',

@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play, Crown, Check, ChevronUp, X } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Play, Crown, Check, X } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, type GameModeOption } from '@/components/GameModeSelector';
@@ -65,8 +65,6 @@ export default function StickyReadyBar({
   const [autoReadySecondsLeft, setAutoReadySecondsLeft] = useState(AUTO_READY_SECONDS);
   const autoReadyCompletedRef = useRef(false);
   const showAutoReady = !isHost && !isCurrentPlayerReady && !autoReadyCancelled && totalPlayers > 0;
-
-  const [showModeMenu, setShowModeMenu] = useState(false);
 
   const playerMap = useMemo(() => {
     const map = new Map<string, PlayerInfo>();
@@ -133,7 +131,7 @@ export default function StickyReadyBar({
 
   /** Contextual CTA button content */
   function renderCtaButton() {
-    const btnBase = 'w-full h-16 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
+    const btnBase = 'w-full h-14 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
 
     // Auto-advance (host, all ready)
     if (showAutoAdvance) {
@@ -269,63 +267,29 @@ export default function StickyReadyBar({
   }
 
   return (
-    <div className="flex flex-col gap-3 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
-        {/* Game mode chip (host only) */}
+    <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
+        {/* Host mode selector — always-visible horizontal pills */}
         {isHost && selectedGameMode !== undefined && onSelectGameMode && (
-          <div className="relative">
-            <button
-              onClick={() => setShowModeMenu(!showModeMenu)}
-              aria-expanded={showModeMenu}
-              aria-haspopup="listbox"
-              aria-label={getModeLabel(selectedGameMode, t)}
-              className={cn(
-                'flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase rounded-xl border border-neo-black/50 transition-all',
-                MODE_ACTIVE_COLORS[selectedGameMode],
-                showModeMenu && 'ring-2 ring-neo-yellow/40'
-              )}
-            >
-              {MODE_ICONS[selectedGameMode]}
-              <span>{getModeLabel(selectedGameMode, t)}</span>
-              <ChevronUp className={cn('w-3 h-3 transition-transform', showModeMenu && 'rotate-180')} />
-            </button>
-
-            <AnimatePresence>
-              {showModeMenu && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowModeMenu(false)} />
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.9 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute bottom-full mb-2 start-0 z-50 bg-neo-navy/95 backdrop-blur-xl border border-neo-white/15 rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] p-1 min-w-[140px]"
-                    role="listbox"
-                  >
-                    {ALL_MODES.map((mode) => {
-                      const isActive = selectedGameMode === mode;
-                      return (
-                        <button
-                          key={mode}
-                          role="option"
-                          aria-selected={isActive}
-                          onClick={() => { onSelectGameMode(mode); setShowModeMenu(false); }}
-                          className={cn(
-                            'w-full flex items-center gap-2 px-2.5 py-2 text-xs font-bold uppercase rounded-lg transition-all',
-                            isActive
-                              ? cn(MODE_ACTIVE_COLORS[mode], 'border border-current/20')
-                              : 'text-neo-cream/60 hover:text-neo-cream hover:bg-neo-white/8 border border-transparent'
-                          )}
-                        >
-                          {MODE_ICONS[mode]}
-                          <span className="flex-1 text-start">{getModeLabel(mode, t)}</span>
-                          {isActive && <Check className="w-3 h-3 shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+          <div className="flex items-center gap-1 px-0.5">
+            {ALL_MODES.map((mode) => {
+              const isActive = selectedGameMode === mode;
+              return (
+                <button
+                  key={mode}
+                  onClick={() => onSelectGameMode(mode)}
+                  aria-label={getModeLabel(mode, t)}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
+                    isActive
+                      ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-sm')
+                      : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
+                  )}
+                >
+                  <span className="[&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
+                  <span className="hidden xs:inline">{getModeLabel(mode, t)}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 

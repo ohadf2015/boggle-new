@@ -80,8 +80,8 @@ describe('ResultsPage mobile bottom safe zone', () => {
 
   describe('ResultsPage mobile scroll container', () => {
     test('should have sufficient bottom padding to clear floating pill bar', () => {
-      // pb-24 = 96px clearance for the floating pill (~56px + 12px bottom offset + safe area).
-      expect(resultsPageTSX).toContain('pb-24');
+      // pb-36 = 144px clearance for the floating bar (reactions row + CTA + safe area).
+      expect(resultsPageTSX).toContain('pb-36');
     });
 
     test('floating pill bar should have fixed positioning', () => {

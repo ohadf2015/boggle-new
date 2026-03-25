@@ -4,8 +4,6 @@ import React, { useMemo, useEffect, useState, useCallback, useDeferredValue } fr
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
-import { Smile } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -112,7 +110,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     username: username || '',
   });
 
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  // Emoji picker no longer needed — reactions are always visible in the bottom bar
 
   // Extract all data processing logic into a custom hook
   const {
@@ -542,83 +540,55 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* Scrollable content — everything in one flow */}
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-24 bg-neo-navy"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-2 pb-36 bg-neo-navy"
           style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-w-lg mx-auto space-y-10">
+          <div className="max-w-lg mx-auto space-y-6">
             {renderResultsTab()}
             {/* Other players' details (inline, no tab switch needed) */}
             {renderDetailsTab()}
           </div>
         </div>
 
-        {/* Floating bottom bar — just CTA + emoji */}
+        {/* Floating bottom bar — reactions + CTA */}
         <div className="flex-shrink-0 fixed bottom-3 inset-x-3 z-50 text-neo-cream">
-          {/* Emoji popover */}
-          <AnimatePresence>
-            {showEmojiPicker && sortedScores.length > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className="flex justify-center mb-2"
-              >
-                <div className="bg-neo-navy/95 backdrop-blur-xl rounded-xl border border-neo-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.4)] p-1.5">
-                  <QuickReactions
-                    onReaction={(id) => { sendReaction(id); setShowEmojiPicker(false); }}
-                    layout="bar"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <motion.div
             initial={{ y: 60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.1 }}
-            className="flex items-center gap-1.5 p-1.5 bg-neo-navy/90 backdrop-blur-xl rounded-2xl border border-neo-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+            className="flex flex-col gap-0 bg-neo-navy/90 backdrop-blur-xl rounded-2xl border border-neo-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden"
           >
-            {/* Ready bar */}
-            {gameCode && onReturnToRoom && !isBotsOnlyGame ? (
-              <StickyReadyBar
-                isHost={isHost}
-                isCurrentPlayerReady={isCurrentPlayerReady}
-                currentPlayerRank={currentPlayerRank}
-                winnerUsername={sortedScores[0]?.username}
-                readyCount={readyUsernames.length}
-                totalPlayers={sortedScores.length}
-                readyUsernames={readyUsernames}
-                players={sortedScores}
-                onStartGame={handleStartGame}
-                onMarkReady={handleMarkReady}
-                selectedGameMode={selectedGameMode}
-                onSelectGameMode={isHost ? setSelectedGameMode : undefined}
-              />
-            ) : (
-              <div className="flex-1" />
+            {/* Always-visible emoji reactions row */}
+            {sortedScores.length > 1 && (
+              <div className="flex items-center justify-center gap-1 px-3 py-2 border-b border-neo-white/[0.06]">
+                <QuickReactions
+                  onReaction={sendReaction}
+                  layout="bar"
+                />
+              </div>
             )}
 
-            {/* Emoji trigger */}
-            {sortedScores.length > 1 && (
-              <>
-                <div className="w-px h-7 bg-neo-white/[0.06] shrink-0" />
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  aria-expanded={showEmojiPicker}
-                  aria-label={t('reactions.label')}
-                  className={cn(
-                    'w-9 h-9 flex items-center justify-center rounded-xl transition-all shrink-0',
-                    showEmojiPicker
-                      ? 'bg-neo-yellow/15 text-neo-yellow'
-                      : 'text-neo-white/30 hover:text-neo-white/60 hover:bg-neo-white/5'
-                  )}
-                >
-                  <Smile className="w-4 h-4" />
-                </button>
-              </>
-            )}
+            {/* CTA section */}
+            <div className="p-1.5">
+              {gameCode && onReturnToRoom && !isBotsOnlyGame ? (
+                <StickyReadyBar
+                  isHost={isHost}
+                  isCurrentPlayerReady={isCurrentPlayerReady}
+                  currentPlayerRank={currentPlayerRank}
+                  winnerUsername={sortedScores[0]?.username}
+                  readyCount={readyUsernames.length}
+                  totalPlayers={sortedScores.length}
+                  readyUsernames={readyUsernames}
+                  players={sortedScores}
+                  onStartGame={handleStartGame}
+                  onMarkReady={handleMarkReady}
+                  selectedGameMode={selectedGameMode}
+                  onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+                />
+              ) : (
+                <div className="flex-1" />
+              )}
+            </div>
           </motion.div>
 
           <div className="safe-area-bottom" />
