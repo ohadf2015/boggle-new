@@ -96,10 +96,12 @@ function setupDbMocks({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: updateError ? null : (progressionData ?? mockProgression),
-                  error: updateError,
+              eq: jest.fn().mockReturnValue({
+                select: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: updateError ? null : (progressionData ?? mockProgression),
+                    error: updateError,
+                  }),
                 }),
               }),
             }),
@@ -250,15 +252,16 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.goldEarned).toBe(89);
     });
 
-    it('awards 50% gold on repeat completion', async () => {
+    it('awards full gold on replay when stars improved (no penalty)', async () => {
       setupDbMocks({
         completionData: { stars: 2, best_score: 300, best_words: 8 },
       });
 
       const res = await POST(makeRequest({ ...validBody, stars: 3 }));
       expect(res.status).toBe(200);
-      // Repeat completion: floor((10+3)*3 + 50) * 0.5 = floor(89 * 0.5) = 44
-      expect(res.data.goldEarned).toBe(44);
+      // Replay with star improvement (2→3): no penalty applied
+      // (10+3)*3 + 50 (perfect bonus) = 89
+      expect(res.data.goldEarned).toBe(89);
       expect(res.data.isReplay).toBe(true);
     });
 
@@ -485,9 +488,10 @@ describe('POST /api/adventure/complete', () => {
           const makeUpdateChain = () => {
             const singleFn = jest.fn().mockResolvedValue({ data: null, error: null });
             const selectFn = jest.fn().mockReturnValue({ single: singleFn });
-            const eqInner = jest.fn().mockReturnValue({ select: selectFn });
-            const eqOuter = jest.fn().mockReturnValue({ eq: eqInner, select: selectFn });
-            return { eq: eqOuter };
+            const eqStars = jest.fn().mockReturnValue({ select: selectFn });
+            const eqGold = jest.fn().mockReturnValue({ eq: eqStars, select: selectFn });
+            const eqUser = jest.fn().mockReturnValue({ eq: eqGold, select: selectFn });
+            return { eq: eqUser };
           };
           const makeSelectChain = () => {
             const singleFn = jest.fn().mockResolvedValue({ data: mockProgression, error: null });
@@ -593,10 +597,12 @@ describe('POST /api/adventure/complete', () => {
                   // First call: optimistic lock chain → gold column error
                   return {
                     eq: jest.fn().mockReturnValue({
-                      select: jest.fn().mockReturnValue({
-                        single: jest.fn().mockResolvedValue({
-                          data: null,
-                          error: { code: 'PGRST204', message: 'gold column not found' },
+                      eq: jest.fn().mockReturnValue({
+                        select: jest.fn().mockReturnValue({
+                          single: jest.fn().mockResolvedValue({
+                            data: null,
+                            error: { code: 'PGRST204', message: 'gold column not found' },
+                          }),
                         }),
                       }),
                     }),

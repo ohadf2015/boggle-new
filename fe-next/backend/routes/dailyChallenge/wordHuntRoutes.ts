@@ -108,8 +108,11 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
           const normalized = normalizeWordForComparison(a.word, language as Language);
           return normalized === expectedTargetWord;
         });
-        if (!hasMatchingAttempt) {
-          logger.info('API', `Word Hunt validation failed: solved=true but no attempt matches target "${expectedTargetWord}"`);
+        // Auto-win path: if no attempt matches the target word directly,
+        // the player may have revealed all letter positions through word discoveries.
+        // Allow solved=true in this case (wordsDiscovered serves as proof).
+        if (!hasMatchingAttempt && (!wordsDiscovered || wordsDiscovered.length === 0)) {
+          logger.info('API', `Word Hunt validation failed: solved=true but no attempt matches target "${expectedTargetWord}" and no words discovered`);
           res.status(400).json({ error: 'Invalid solve claim' });
           return;
         }

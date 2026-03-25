@@ -208,7 +208,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     let validTimer = Math.max(30, Math.min(120, parseInt(String(timerSeconds), 10) || 120));
 
-    const resolvedMode: GameMode = (!gameMode || gameMode === 'random')
+    let resolvedMode: GameMode = (!gameMode || gameMode === 'random')
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
       : gameMode as GameMode;
 
@@ -327,6 +327,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       } else {
         logger.error('WORD_HUNT', `No target word found for game ${gameCode} - falling back to classic mode`);
         updateGame(gameCode, { gameMode: 'classic' });
+        resolvedMode = 'classic' as GameMode;
       }
     }
 

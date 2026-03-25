@@ -161,8 +161,10 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       shake(4);
       bossTriggerTaunt('onMechanic');
       addTime(1.5);
+      // Advance twist mechanic phase for multi-phase bosses (World 10 finalWord)
+      bossMechanics.advancePhase();
     }
-  }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime]);
+  }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime, bossMechanics]);
 
   // Low time taunt
   const lowTimeTriggedRef = useRef(false);

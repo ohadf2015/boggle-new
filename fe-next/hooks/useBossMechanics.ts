@@ -344,8 +344,6 @@ function evaluateFinalWord(
 ): BossMechanicResult {
   // FinalWord cycles through all previous mechanics based on current phase
   const currentPhase = (mechanicState.currentPhase as string) ?? 'popQuiz';
-  const phaseOrder =
-    (boss.twistMechanic.params.phaseOrder as string[]) ?? [];
 
   // Create a temporary boss-like config for the current phase mechanic.
   // Find the world whose boss uses this mechanic type to get correct params.
@@ -471,6 +469,11 @@ export function useBossMechanics({
     [boss, bossState.lastTauntTime, bossState.currentTauntIndex]
   );
 
+  // Ref mirrors mechanicState so checkWord always reads the latest value
+  // without waiting for a React re-render (avoids stale closure).
+  const mechanicStateRef = useRef(bossState.mechanicState);
+  mechanicStateRef.current = bossState.mechanicState;
+
   // Check a word against the boss mechanic
   const checkWord = useCallback(
     (word: string): BossMechanicResult => {
@@ -478,25 +481,42 @@ export function useBossMechanics({
         return { meetsRequirement: false, scoreMultiplier: 1.0 };
       }
 
-      const result = evaluateWordForMechanic(word, boss, bossState.mechanicState);
+      // Read from ref to always get latest mechanicState (even if called
+      // multiple times before React re-renders)
+      const currentMechanicState = mechanicStateRef.current;
+      const result = evaluateWordForMechanic(word, boss, currentMechanicState);
 
       // Track found words for anagram detection (scrambledReality mechanic)
       if (boss.twistMechanic.type === 'scrambledReality') {
-        setBossState((prev) => {
-          const existingWords = (prev.mechanicState.foundWords as string[]) ?? [];
-          return {
-            ...prev,
-            mechanicState: {
-              ...prev.mechanicState,
-              foundWords: [...existingWords, word.toUpperCase()],
-            },
-          };
-        });
+        const existingWords = (currentMechanicState.foundWords as string[]) ?? [];
+        const updatedMechanicState = {
+          ...currentMechanicState,
+          foundWords: [...existingWords, word.toUpperCase()],
+        };
+        mechanicStateRef.current = updatedMechanicState;
+        setBossState((prev) => ({
+          ...prev,
+          mechanicState: updatedMechanicState,
+        }));
+      }
+
+      // Cycle to next requirement after each word (popQuiz mechanic)
+      if (boss.twistMechanic.type === 'popQuiz') {
+        const currentIdx = (currentMechanicState.currentRequirementIndex as number) ?? 0;
+        const updatedMechanicState = {
+          ...currentMechanicState,
+          currentRequirementIndex: currentIdx + 1,
+        };
+        mechanicStateRef.current = updatedMechanicState;
+        setBossState((prev) => ({
+          ...prev,
+          mechanicState: updatedMechanicState,
+        }));
       }
 
       return result;
     },
-    [boss, bossState.mechanicState]
+    [boss]
   );
 
   // Advance to next phase (for multi-phase bosses)

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ChapterQuestProgress, ChapterQuest } from '@/types/adventure';
 import { getQuestsForChapter } from '@/lib/adventure/questConfig';
 import { useProgression } from '@/contexts/ProgressionContext';
@@ -30,6 +30,7 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
   const { progression, updateChapterQuestProgress } = useProgression();
 
   // Derive progress from persisted progression data
+  // Claimed state is stored as `claimed:<questId>` in the same map
   const progress = useMemo<ChapterQuestProgress[]>(() => {
     const saved = progression?.chapterQuestProgress ?? {};
     return quests.map(q => {
@@ -38,10 +39,25 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
         questId: q.id,
         current,
         isComplete: current >= q.target,
-        rewardClaimed: false,
+        rewardClaimed: !!(saved[`claimed:${q.id}`]),
       };
     });
   }, [quests, progression?.chapterQuestProgress]);
+
+  // Auto-claim rewards for newly completed quests (break infinite loop with ref)
+  const claimingRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const toClaim: string[] = [];
+    for (const p of progress) {
+      if (p.isComplete && !p.rewardClaimed && !claimingRef.current.has(p.questId)) {
+        toClaim.push(p.questId);
+      }
+    }
+    if (toClaim.length > 0) {
+      for (const id of toClaim) claimingRef.current.add(id);
+      updateChapterQuestProgress('__claim__', 1, toClaim.map(id => `claimed:${id}`));
+    }
+  }, [progress, updateChapterQuestProgress]);
 
   // Increment matching quests by type — delegates persistence to ProgressionContext
   const increment = useCallback((type: string, amount = 1) => {

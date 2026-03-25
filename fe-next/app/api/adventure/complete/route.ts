@@ -270,9 +270,9 @@ export async function POST(request: NextRequest) {
       goldEarned = Math.round(goldEarned + baseGold * luckyPickaxeBonus);
     }
 
-    // Replay penalty: 50% gold on previously completed levels
-    // Prevents unlimited gold farming while still rewarding replays
-    if (isReplay) {
+    // Replay penalty: 50% gold only when no new stars earned
+    // Players improving their star count on a replay deserve full gold
+    if (isReplay && starsGained === 0) {
       goldEarned = Math.floor(goldEarned * 0.5);
     }
 
@@ -331,13 +331,15 @@ export async function POST(request: NextRequest) {
       updatePayload.word_album = wordAlbumUpdate;
     }
 
-    // Optimistic lock: only update if gold hasn't changed since we read it
-    // This prevents concurrent requests from doubling gold rewards
+    // Optimistic lock: only update if gold AND total_stars haven't changed since we read them.
+    // Locking on gold prevents doubling gold rewards; locking on total_stars prevents
+    // concurrent level completions from writing stale star counts (Bug H5).
     let { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update(updatePayload)
       .eq('user_id', userId)
       .eq('gold', currentGold)
+      .eq('total_stars', currentTotalStars)
       .select()
       .single();
 
@@ -357,11 +359,11 @@ export async function POST(request: NextRequest) {
       console.error('[ADVENTURE COMPLETE API] Progression update error:', updateError);
       return NextResponse.json({ error: 'Failed to update progression' }, { status: 500 });
     } else if (!updatedRow) {
-      // Optimistic lock conflict: gold was modified by a concurrent request.
-      // Re-read current gold AND upgrades to recalculate gold with fresh state.
+      // Optimistic lock conflict: gold or total_stars changed by a concurrent request.
+      // Re-read fresh state and recalculate before retrying with a new lock.
       const { data: freshProg } = await supabase
         .from('player_progression')
-        .select('gold, upgrades')
+        .select('gold, total_stars, upgrades')
         .eq('user_id', userId)
         .single();
       if (freshProg) {
@@ -375,11 +377,16 @@ export async function POST(request: NextRequest) {
           freshGoldEarned = Math.round(freshGoldEarned + baseGold * freshPickaxe);
         }
         freshGoldEarned = Math.min(freshGoldEarned, MAX_GOLD_PER_LEVEL);
-        updatePayload.gold = (freshProg.gold as number) + freshGoldEarned;
+        const freshGold = (freshProg.gold as number);
+        const freshTotalStars = (freshProg.total_stars as number);
+        updatePayload.gold = freshGold + freshGoldEarned;
+        updatePayload.total_stars = freshTotalStars + starsGained;
         const { data: retryRow, error: retryError } = await supabase
           .from('player_progression')
           .update(updatePayload)
           .eq('user_id', userId)
+          .eq('gold', freshGold)
+          .eq('total_stars', freshTotalStars)
           .select()
           .single();
         if (retryError || !retryRow) {

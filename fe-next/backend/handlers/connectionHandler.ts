@@ -30,6 +30,7 @@ import { resetRateLimit } from '../utils/rateLimiter.js';
 import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import logger from '../utils/logger.js';
 
 // Configuration
@@ -105,7 +106,10 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   }
 
   // Notify game start coordinator so ack sequence adjusts for the missing player
-  gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+  const hostCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+  if (hostCoordResult && hostCoordResult.startTimer) {
+    startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
+  }
 
   // Mark host as disconnected BEFORE checking if room is empty
   // This ensures isRoomEmpty correctly counts the disconnecting host as inactive
@@ -243,7 +247,10 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
   }
 
   // Notify game start coordinator so ack sequence adjusts for the missing player
-  gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+  const playerCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+  if (playerCoordResult && playerCoordResult.startTimer) {
+    startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
+  }
 
   // Mark user as disconnected but don't remove yet (allow reconnection)
   if (game.users[username]) {
