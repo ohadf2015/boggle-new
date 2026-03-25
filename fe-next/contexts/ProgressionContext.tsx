@@ -555,6 +555,22 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [attempts]
   );
 
+  // Debounced quest-progress persist — batches rapid updates into a single API call
+  const questProgressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingQuestProgressRef = useRef<Record<string, number> | null>(null);
+
+  const flushQuestProgress = useCallback(() => {
+    const pending = pendingQuestProgressRef.current;
+    if (!pending || !user?.id) return;
+    pendingQuestProgressRef.current = null;
+    fetchWithRetry('/api/adventure/quest-progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ chapterQuestProgress: pending }),
+    });
+  }, [user?.id]);
+
   // Update chapter quest progress — optimistic local update + debounced server persist
   const updateChapterQuestProgress = useCallback(
     (_questType: string, amount: number, questIds: string[]) => {
@@ -562,23 +578,17 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         if (!prev) return prev;
         const current = prev.chapterQuestProgress ?? {};
         const updated = { ...current };
-        // Increment matching quest IDs (the hook passes the relevant quest IDs)
         for (const id of questIds) {
           updated[id] = (updated[id] ?? 0) + amount;
         }
-        // Persist to server with retry on transient failures
-        if (user?.id) {
-          fetchWithRetry('/api/adventure/quest-progress', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ chapterQuestProgress: updated }),
-          });
-        }
+        // Stage for debounced persist (2s window batches rapid word-find updates)
+        pendingQuestProgressRef.current = updated;
+        if (questProgressTimerRef.current) clearTimeout(questProgressTimerRef.current);
+        questProgressTimerRef.current = setTimeout(flushQuestProgress, 2000);
         return { ...prev, chapterQuestProgress: updated };
       });
     },
-    [user?.id]
+    [flushQuestProgress]
   );
 
   // Add words to the word album — dedup + persist

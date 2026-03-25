@@ -6,6 +6,7 @@ import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb, Keyboard, MousePoi
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
+import { fireConfetti, NEO_BRUTALIST_COLORS, NEO_BRUTALIST_SHAPES } from '@/utils/confettiUtils';
 
 export interface CompactPlayer {
   username: string;
@@ -216,6 +217,23 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
     return !!history && history.length >= STREAK_THRESHOLD;
   }, [currentUsername]);
 
+  // Fire a small ego-confetti burst when the player clicks on themselves
+  const handleSelfClick = useCallback((e: React.MouseEvent) => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    fireConfetti({
+      particleCount: 25,
+      spread: 60,
+      origin: { x, y },
+      colors: NEO_BRUTALIST_COLORS,
+      shapes: NEO_BRUTALIST_SHAPES,
+      flat: true,
+      scalar: 1.3,
+      startVelocity: 35,
+      ticks: 120,
+    });
+  }, []);
+
   if (totalPlayers === 0 || !currentUser) return null;
 
   // Get top 3 players for race visualization (or fewer if less players)
@@ -281,12 +299,13 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                 key={player.username}
                 role="listitem"
                 tabIndex={0}
+                onClick={isMe ? handleSelfClick : undefined}
                 className={cn(
                   'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
                   'hover:bg-neo-black/10',
                   isMe
-                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan hover:bg-neo-cyan/40'
+                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan hover:bg-neo-cyan/40 cursor-pointer active:scale-[0.98]'
                     : 'bg-neo-black/5 border border-neo-black/20'
                 )}
               >

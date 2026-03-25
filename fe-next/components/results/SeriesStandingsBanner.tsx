@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import Avatar from '../Avatar';
 import SessionStatsCard from './SessionStatsCard';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
@@ -84,11 +85,11 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
               </span>
 
               {/* Avatar */}
-              {player.avatar?.emoji && (
-                <span className="text-base" role="img" aria-hidden>
-                  {player.avatar.emoji}
-                </span>
-              )}
+              <Avatar
+                customAvatar={player.avatar?.customAvatar}
+                userId={player.username}
+                size="sm"
+              />
 
               {/* Name + Round Scores */}
               <div className="flex-1 min-w-0">

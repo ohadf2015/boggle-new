@@ -4586,7 +4586,12 @@ const sv = {
       "moreOptions": "Fler delningsalternativ",
       "lessOptions": "Färre alternativ",
       "challengeFriends": "Utmana vänner →",
-      "screenshotHint": "Skärmdumpa och dela din poäng!"
+      "screenshotHint": "Skärmdumpa och dela din poäng!",
+      "eliminationHistory": "Elimineringshistorik",
+      "matchSummary": "Matchsammanfattning",
+      "survived": "Överlevde",
+      "outOrder": "Ut #{order}",
+      "eliminatedOrder": "#{order}"
     },
     "score": {
       "title": "Din Poäng",

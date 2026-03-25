@@ -80,15 +80,14 @@ export function subscribeToNotifications(
             'Using polling fallback - no action needed.'
           );
         } else {
-          // Use warn to avoid Sentry noise — subscription errors are non-fatal
-          // and handled with polling fallback
-          console.warn('Error subscribing to notifications channel:', errorMessage);
+          // Non-fatal — polling fallback handles it. Use log to avoid Sentry noise.
+          console.log('[Notifications] Channel error (using polling fallback):', errorMessage);
         }
 
         // Notify caller so they can implement fallback (e.g., polling)
         onSubscriptionError?.(errorMessage);
       } else if (status === 'TIMED_OUT') {
-        console.warn('Notifications channel subscription timed out - will retry');
+        console.log('[Notifications] Channel subscription timed out - will retry');
         onSubscriptionError?.('Subscription timed out');
       }
     });

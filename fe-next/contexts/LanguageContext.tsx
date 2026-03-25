@@ -250,7 +250,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 if (fallback) {
                     return fallback;
                 }
-                logger.warn(`Translation missing for key: ${path} in language: ${language}`);
+                logger.debug(`Translation missing for key: ${path} in language: ${language}`);
                 return path;
             }
             current = (current as Record<string, unknown>)[key];

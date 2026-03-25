@@ -6,11 +6,9 @@
  */
 import { useState, useCallback, useMemo } from 'react';
 import type { PlayerResult } from '@/types/components';
+import type { Avatar } from '@/shared/types/game';
 
-interface AvatarLike {
-  emoji?: string;
-  color?: string;
-}
+type AvatarLike = Avatar;
 
 export interface SeriesStanding {
   username: string;

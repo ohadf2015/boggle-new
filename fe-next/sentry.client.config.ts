@@ -145,6 +145,13 @@ Sentry.init({
     /\[useBlastResultSaver\].*Save failed/i,
     // Solve-grid blacklist Supabase 502 — returns unfiltered words as fallback
     /\[SOLVE-GRID\].*Blacklist query error/i,
+    // Supabase auth lock timeout — known React Strict Mode issue, auto-recovers
+    // See: https://github.com/supabase/gotrue-js/issues/806
+    /lock.*was not released within.*forcefully acquiring/i,
+    // Next.js router state header parse — transient internal error, not actionable
+    /router state header was sent but could not be parsed/i,
+    // Progression quest-progress 429 — rate limited, non-critical background save
+    /\[ProgressionContext\].*quest-progress failed.*429/i,
   ],
 
   denyUrls: [

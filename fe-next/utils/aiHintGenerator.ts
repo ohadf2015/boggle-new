@@ -270,22 +270,22 @@ export async function generateProgressiveHints(
         lastError = error;
 
         if (error.name === 'AbortError') {
-          console.warn('[HintGenerator] Request timed out');
+          console.log('[HintGenerator] Request timed out');
           if (attempt < retryCount) {
             continue;
           }
         } else if (isRetryableError(error, lastResponse) && attempt < retryCount) {
-          console.warn(`[HintGenerator] Retryable error: ${error.message}`);
+          console.log(`[HintGenerator] Retryable error: ${error.message}`);
           continue;
         }
       }
 
-      console.warn('[HintGenerator] Error generating hints:', error);
+      console.log('[HintGenerator] Error generating hints:', error);
     }
   }
 
   if (lastError) {
-    console.warn('[HintGenerator] All attempts failed:', lastError.message);
+    console.log('[HintGenerator] All attempts failed:', lastError.message);
   }
   return generateFallbackHints(normalizedWord, language);
 }

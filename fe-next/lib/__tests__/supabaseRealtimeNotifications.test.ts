@@ -128,9 +128,9 @@ describe('supabaseRealtimeNotifications', () => {
       errorSpy.mockRestore();
     });
 
-    it('should handle regular channel errors with console.error', () => {
+    it('should handle regular channel errors with console.log', () => {
       // GIVEN: A subscription with error callback
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
       const onError = jest.fn();
 
       subscribeToNotifications('user-123', jest.fn(), onError);
@@ -139,16 +139,16 @@ describe('supabaseRealtimeNotifications', () => {
       const regularError = new Error('Connection failed');
       subscribeCallback?.('CHANNEL_ERROR', regularError);
 
-      // THEN: Should log warning and call error callback
-      expect(warnSpy).toHaveBeenCalledWith('Error subscribing to notifications channel:', 'Connection failed');
+      // THEN: Should log (not warn — non-fatal, polling fallback handles it) and call error callback
+      expect(logSpy).toHaveBeenCalledWith('[Notifications] Channel error (using polling fallback):', 'Connection failed');
       expect(onError).toHaveBeenCalledWith('Connection failed');
 
-      warnSpy.mockRestore();
+      logSpy.mockRestore();
     });
 
-    it('should handle timeout with warning and error callback', () => {
+    it('should handle timeout with log and error callback', () => {
       // GIVEN: A subscription with error callback
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
       const onError = jest.fn();
 
       subscribeToNotifications('user-123', jest.fn(), onError);
@@ -156,11 +156,11 @@ describe('supabaseRealtimeNotifications', () => {
       // WHEN: Subscription times out
       subscribeCallback?.('TIMED_OUT');
 
-      // THEN: Should warn and call error callback
-      expect(warnSpy).toHaveBeenCalledWith('Notifications channel subscription timed out - will retry');
+      // THEN: Should log (not warn) and call error callback
+      expect(logSpy).toHaveBeenCalledWith('[Notifications] Channel subscription timed out - will retry');
       expect(onError).toHaveBeenCalledWith('Subscription timed out');
 
-      warnSpy.mockRestore();
+      logSpy.mockRestore();
     });
 
     it('should remove channel on cleanup', () => {

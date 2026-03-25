@@ -160,7 +160,7 @@ export function useMultiplayerJoin({
       }
 
       if (authLoadingTooLong) {
-        logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
+        logger.info('[AUTH] Auth loading timed out, proceeding without profile');
       }
 
       // Compute effective username

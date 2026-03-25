@@ -170,10 +170,17 @@ export function useResultsData({
   // SCORE SORTING & RANKING
   // ==============================================
 
-  /** Sort scores by score (descending). In Word Hunt, target finder ranks first. */
+  /** Sort scores by score (descending). In Word Hunt, target finder ranks first.
+   *  Also ensures wordsFoundCount is always populated from allWords if not set by backend. */
   const sortedScores = useMemo(() => {
     if (!finalScores) return [];
-    const sorted = [...finalScores].sort((a, b) => b.score - a.score);
+    // Enrich each player with wordsFoundCount if missing
+    const enriched = finalScores.map(p => {
+      if (p.wordsFoundCount != null) return p;
+      const validWords = p.allWords?.filter(w => w.validated && !w.isDuplicate) ?? [];
+      return { ...p, wordsFoundCount: validWords.length };
+    });
+    const sorted = [...enriched].sort((a, b) => b.score - a.score);
     if (gameMode === 'word-hunt' && wordHuntTargetFoundBy) {
       return sortWithWordHuntWinner(sorted, wordHuntTargetFoundBy, (p) => p.score);
     }

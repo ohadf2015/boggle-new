@@ -4597,7 +4597,12 @@ const he = {
       "moreOptions": "אפשרויות שיתוף נוספות",
       "lessOptions": "פחות אפשרויות",
       "challengeFriends": "אתגר חברים ←",
-      "screenshotHint": "צלמו מסך ושתפו את הציון!"
+      "screenshotHint": "צלמו מסך ושתפו את הציון!",
+      "eliminationHistory": "היסטוריית הדחה",
+      "matchSummary": "סיכום משחק",
+      "survived": "שרד",
+      "outOrder": "הודח #{order}",
+      "eliminatedOrder": "#{order}"
     },
     "score": {
       "title": "הניקוד שלך",

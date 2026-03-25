@@ -4684,7 +4684,12 @@ const en = {
       "moreOptions": "More share options",
       "lessOptions": "Less options",
       "challengeFriends": "Challenge Friends →",
-      "screenshotHint": "Screenshot & share your score!"
+      "screenshotHint": "Screenshot & share your score!",
+      "eliminationHistory": "Elimination History",
+      "matchSummary": "Match Summary",
+      "survived": "Survived",
+      "outOrder": "Out #{order}",
+      "eliminatedOrder": "#{order}"
     },
     "score": {
       "title": "Your Score",

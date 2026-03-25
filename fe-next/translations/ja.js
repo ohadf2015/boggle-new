@@ -4638,7 +4638,12 @@ const ja = {
       "moreOptions": "その他の共有オプション",
       "lessOptions": "オプションを減らす",
       "challengeFriends": "友達に挑戦 →",
-      "screenshotHint": "スクリーンショットでスコアをシェア!"
+      "screenshotHint": "スクリーンショットでスコアをシェア!",
+      "eliminationHistory": "脱落履歴",
+      "matchSummary": "マッチサマリー",
+      "survived": "生存",
+      "outOrder": "#{order}番目に脱落",
+      "eliminatedOrder": "#{order}"
     },
     "score": {
       "title": "あなたのスコア",

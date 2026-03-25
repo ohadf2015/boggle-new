@@ -4591,7 +4591,12 @@ const es = {
       "challengeFriends": "Desafiar amigos →",
       "screenshotHint": "¡Haz captura de pantalla y comparte tu puntuación!",
       "survivors": "Sobrevivientes",
-      "eliminated": "Eliminados"
+      "eliminated": "Eliminados",
+      "eliminationHistory": "Historial de Eliminación",
+      "matchSummary": "Resumen del Partido",
+      "survived": "Sobrevivió",
+      "outOrder": "Fuera #{order}",
+      "eliminatedOrder": "#{order}"
     },
     "score": {
       "title": "Tu Puntuación",
