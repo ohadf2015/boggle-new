@@ -111,6 +111,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   gameDuration: _gameDuration,
   wordHuntSummary,
   onPodiumReaction,
+  emojiReactions,
 }) => {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -208,6 +209,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           isWordHunt={isWordHunt}
           t={t}
           onReaction={onPodiumReaction}
+          emojiReactions={emojiReactions}
         />
       )}
 
