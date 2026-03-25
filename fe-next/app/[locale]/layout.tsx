@@ -133,7 +133,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
                 { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
             ],
             shortcut: [
-                { url: 'https://www.lexiclash.live/icon-48.png', sizes: '48x48', type: 'image/png' },
+                { url: 'https://www.lexiclash.live/favicon.ico', type: 'image/x-icon' },
             ],
             apple: [
                 { url: 'https://www.lexiclash.live/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
@@ -201,7 +201,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             name: 'LexiClash',
             alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש', 'לקסי קלאש', 'משחק מילים מרובה משתתפים', 'קרב מילים אונליין', 'משחק כמו בוגל', 'משחק כמו סקראבל', 'וורדל מרובה משתתפים'],
             applicationCategory: 'GameApplication',
-            applicationSubCategory: 'Multiplayer Word Game',
+            applicationSubCategory: 'Online Multiplayer Word Game',
             typicalAgeRange: '6-99',
             contentRating: 'Everyone',
             isFamilyFriendly: true,
@@ -237,7 +237,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 { '@type': 'Language', name: 'Spanish', alternateName: 'es' },
             ],
             featureList: [
-                'Real-time multiplayer gameplay',
+                'Online multiplayer word game with real-time gameplay',
                 'Fast-paced competitive word battles',
                 'Multiple language support (Hebrew, English, Swedish, Japanese, Spanish)',
                 'Live leaderboard and rankings',
@@ -281,7 +281,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 name: 'LexiClash',
                 url: 'https://www.lexiclash.live',
             },
-            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle, wordle multiplayer, scrabble online, boggle online, ruzzle alternative, משחק מילים מרובה משתתפים, משחק מילים בעברית, קרב מילים אונליין, משחק מילים לחברים, וורדל בעברית, סקראבל אונליין, בוגל אונליין, תפזורת אונליין',
+            keywords: 'online multiplayer word game, multiplayer word game, real-time word battle, competitive word game, party game, word puzzle, wordle multiplayer, scrabble online, boggle online, ruzzle alternative, משחק מילים מרובה משתתפים, משחק מילים בעברית, קרב מילים אונליין, משחק מילים לחברים, וורדל בעברית, סקראבל אונליין, בוגל אונליין, תפזורת אונליין',
         },
         // Organization schema with social proof
         {

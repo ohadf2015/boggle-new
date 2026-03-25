@@ -7,8 +7,8 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
   en: {
-    title: 'Multiplayer Word Games Online Free - Play With Friends, No Download',
-    description: 'Play multiplayer word games online free with friends — no download needed! Host or join real-time word battle rooms and compete live. Like Words With Friends meets Boggle but everyone plays at once. Perfect for parties, game nights, and quick matches.',
+    title: 'Online Multiplayer Word Game Free - Play With Friends, No Download',
+    description: 'Play the best online multiplayer word game free with friends — no download needed! Host or join real-time word battle rooms and compete live. Like Words With Friends meets Boggle but everyone plays at once. Perfect for parties, game nights, and quick matches.',
     features: [
       'Create private rooms or join public games instantly',
       'Real-time competitive word finding with live scoring',
@@ -18,11 +18,11 @@ const seoContent: Record<string, { title: string; description: string; features:
       'Works on any device - phone, tablet, or desktop',
     ],
     faq: [
-      { question: 'Can I play multiplayer word games online free with friends?', answer: 'Yes! LexiClash is completely free to play online with friends. No download needed — just create a room, share the link, and compete in real-time word battles. Works on any device with a browser.' },
+      { question: 'Can I play this online multiplayer word game free with friends?', answer: 'Yes! LexiClash is a completely free online multiplayer word game. No download needed — just create a room, share the link, and compete in real-time word battles. Works on any device with a browser.' },
       { question: 'How do I start a multiplayer game?', answer: 'Click "Create Room" to host a game. Share the room code or link with friends so they can join. Once everyone is in, the host starts the round.' },
       { question: 'How many players can join a room?', answer: 'Each room supports up to 20+ players for the best competitive experience. Spectators can also watch ongoing games.' },
       { question: 'What game modes are available in multiplayer?', answer: 'Choose from Classic (find the most words), Blast (chain words for combos), or Word Hunt (find the hidden target word in 10 attempts).' },
-      { question: 'Is this like Words With Friends or Boggle online?', answer: 'LexiClash combines the best of both! Like Boggle, you find words on a letter grid. Like Words With Friends, you play with friends online. But the twist — everyone competes in real-time simultaneously, making it faster and more exciting!' },
+      { question: 'Is this online multiplayer word game like Words With Friends or Boggle?', answer: 'LexiClash combines the best of both! Like Boggle, you find words on a letter grid. Like Words With Friends, you play with friends online. But the twist — this online multiplayer word game has everyone competing in real-time simultaneously, making it faster and more exciting!' },
     ],
   },
   he: {
@@ -173,7 +173,7 @@ export default async function MultiplayerLayout({ children, params }: Multiplaye
     '@id': `https://www.lexiclash.live${localePath}/multiplayer#webpage`,
     url: `https://www.lexiclash.live${localePath}/multiplayer`,
     name: 'Multiplayer - LexiClash',
-    description: 'Join real-time word battles with friends! Host or join multiplayer rooms and compete live.',
+    description: 'Free online multiplayer word game — join real-time word battles with friends! Host or join rooms and compete live.',
     isPartOf: {
       '@id': 'https://www.lexiclash.live/#website',
     },

@@ -2,10 +2,10 @@ export const layoutTranslations: Record<string, any> = {
   "en": {
     "direction": "ltr",
     "seo": {
-      "title": "LexiClash - Free Multiplayer Word Game Online | No Download Boggle & Word Battle",
+      "title": "LexiClash - Free Online Multiplayer Word Game | No Download Boggle & Word Battle",
       "description": "Play free boggle online — no download required! LexiClash is a word game where you type in words like Boggle, competing in real-time. Race friends, build combos, and climb leaderboards. Best free alternative to Boggle, Wordle, Words With Friends & Scrabble for groups. Play instantly in 5 languages. Great for parties, team building, and family game nights!",
-      "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle, words with friends multiplayer free online, words with friends alternative, online multiplayer word games, play boggle online free no download, daily word wheel, word multiplayer, multiplayer word games online free, boggle alternatives, spelling multiplayer games, word building game online multiplayer, online web based multiplayer words games, clash for words",
-      "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
+      "keywords": "online multiplayer word game, free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle, words with friends multiplayer free online, words with friends alternative, online multiplayer word games, play boggle online free no download, daily word wheel, word multiplayer, multiplayer word games online free, boggle alternatives, spelling multiplayer games, word building game online multiplayer, online web based multiplayer words games, clash for words",
+      "ogTitle": "LexiClash - Free Online Multiplayer Word Game | Better Than Boggle & Wordle",
       "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
       "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
       "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download. Try now! 🔥",
@@ -60,9 +60,9 @@ export const layoutTranslations: Record<string, any> = {
         "ogDescription": "Daily word wheel puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
       },
       "multiplayer": {
-        "title": "Multiplayer Word Game With Friends - Free Online, No Download",
-        "description": "Play multiplayer word games online free with friends! Host or join real-time word battle rooms, compete live against opponents, and climb the leaderboard. Like Words With Friends meets Boggle — no download needed. Perfect for parties, game nights, and online word find with friends.",
-        "ogTitle": "Multiplayer Word Battle - Play Free With Friends",
+        "title": "Online Multiplayer Word Game With Friends - Free, No Download",
+        "description": "Play the best online multiplayer word game free with friends! Host or join real-time word battle rooms, compete live against opponents, and climb the leaderboard. Like Words With Friends meets Boggle — no download needed. Perfect for parties, game nights, and online word find with friends.",
+        "ogTitle": "Online Multiplayer Word Game - Play Free With Friends",
         "ogDescription": "Free online multiplayer word game - host rooms, invite friends, compete in live word battles. No download!"
       },
       "about": {
