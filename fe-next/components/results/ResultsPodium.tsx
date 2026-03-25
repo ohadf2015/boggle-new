@@ -1,10 +1,12 @@
 'use client';
 
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Crown, Trophy } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
+import { REACTIONS } from '@/components/game/QuickReactions';
 
 interface ResultsPodiumProps {
   /** Top 3 players sorted by rank */
@@ -15,6 +17,8 @@ interface ResultsPodiumProps {
   isWordHunt?: boolean;
   /** Translation function */
   t: (key: string) => string | undefined;
+  /** Callback when an emoji is sent to a player */
+  onReaction?: (reactionId: string, targetUsername: string) => void;
 }
 
 const PODIUM_CONFIG = [
@@ -78,13 +82,67 @@ function formatScore(score: number): string {
 // Sequenced reveal delays: 2nd place, 1st place (dramatic), 3rd place
 const REVEAL_DELAYS = [0.1, 0.35, 0.2] as const;
 
+const THROTTLE_MS = 2000;
+
+/** Small emoji picker that appears near a podium player */
+function PodiumEmojiPicker({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (reactionId: string) => void;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.7, y: 4 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.7, y: 4 }}
+      transition={{ duration: 0.12 }}
+      className="absolute top-full mt-1 left-1/2 -translate-x-1/2 z-50 flex gap-0.5 bg-neo-navy/95 border border-neo-white/15 rounded-lg p-1 backdrop-blur-sm shadow-lg"
+    >
+      {REACTIONS.map((r) => (
+        <button
+          key={r.id}
+          onClick={() => onSelect(r.id)}
+          className="w-8 h-8 flex items-center justify-center text-base rounded hover:bg-neo-white/10 active:scale-90 transition-all"
+        >
+          {r.emoji}
+        </button>
+      ))}
+    </motion.div>
+  );
+}
+
 export default function ResultsPodium({
   players,
   currentUsername,
   isWordHunt = false,
   t,
+  onReaction,
 }: ResultsPodiumProps) {
   const reducedMotion = useReducedMotion();
+  const [openPicker, setOpenPicker] = useState<string | null>(null);
+  const lastReactionRef = useRef(0);
+
+  const handleEmojiSelect = useCallback((reactionId: string, targetUsername: string) => {
+    const now = Date.now();
+    if (now - lastReactionRef.current < THROTTLE_MS) return;
+    lastReactionRef.current = now;
+    onReaction?.(reactionId, targetUsername);
+    setOpenPicker(null);
+  }, [onReaction]);
+
   if (!players.length) return null;
 
   const top3 = players.slice(0, 3);
@@ -125,6 +183,7 @@ export default function ResultsPodium({
             ? (t('results.you') || 'YOU')
             : player.username;
           const isFirst = config.place === 1;
+          const showEmojiButton = onReaction && !isCurrentUser;
 
           const scoreDisplay = isWordHunt
             ? `${player.wordsFoundCount ?? 0} ${t('results.words') || 'Words'}`
@@ -206,9 +265,9 @@ export default function ResultsPodium({
                 )}
               </motion.div>
 
-              {/* Name & Score — fade up after avatar */}
+              {/* Name, Score & Emoji button — fade up after avatar */}
               <motion.div
-                className="text-center mb-3 min-w-0 px-1"
+                className="text-center mb-3 min-w-0 px-1 relative"
                 initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20, delay: baseDelay + 0.2 }}
@@ -233,6 +292,31 @@ export default function ResultsPodium({
                 >
                   {scoreDisplay}
                 </motion.p>
+
+                {/* Per-player emoji button — only for other players */}
+                {showEmojiButton && (
+                  <div className="relative mt-1">
+                    <button
+                      onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
+                      className={cn(
+                        'w-6 h-6 flex items-center justify-center text-sm rounded-full',
+                        'bg-neo-white/5 hover:bg-neo-white/15 active:scale-90 transition-all',
+                        openPicker === player.username && 'bg-neo-white/15 ring-1 ring-neo-white/20'
+                      )}
+                      aria-label={`Send emoji to ${player.username}`}
+                    >
+                      😊
+                    </button>
+                    <AnimatePresence>
+                      {openPicker === player.username && (
+                        <PodiumEmojiPicker
+                          onSelect={(id) => handleEmojiSelect(id, player.username)}
+                          onClose={() => setOpenPicker(null)}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
               </motion.div>
 
               {/* Podium bar — elastic grow from bottom with slight overshoot */}

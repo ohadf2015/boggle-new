@@ -65,7 +65,13 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
-    logger.info('SOCKET', `Socket ${socket.id} disconnected (reason: ${reason})${gameCode ? ` from game ${gameCode}` : ''}`);
+    // Ping timeout is the most common cause of mid-game disconnections
+    // (mobile sleep, network switch, poor WiFi). Log at warn for visibility.
+    if (reason === 'ping timeout') {
+      logger.warn('SOCKET', `Socket ${socket.id} ping timeout${gameCode ? ` in game ${gameCode} (user: ${username})` : ''} — client didn't respond within pingTimeout`);
+    } else {
+      logger.info('SOCKET', `Socket ${socket.id} disconnected (reason: ${reason})${gameCode ? ` from game ${gameCode}` : ''}`);
+    }
 
     // Clean up rate limiting
     resetRateLimit(socket.id);

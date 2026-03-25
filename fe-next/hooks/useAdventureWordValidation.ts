@@ -1,15 +1,13 @@
 /**
  * useAdventureWordValidation Hook
  *
- * Validates words for Adventure Mode by checking:
- * 1. Path validity (adjacent tiles, no repeats)
- * 2. Word matches path letters
- * 3. Minimum length requirement
- * 4. Not already found
- * 5. Exists in dictionary (via API)
+ * Validates words for Adventure Mode using client-side validation:
+ * 1. On mount, fetches all valid words for the grid from /api/adventure/solve-grid
+ * 2. Validates words synchronously against the pre-solved word set (instant, like multiplayer)
+ * 3. Falls back to per-word API validation if pre-solve fails
  */
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { Language } from '@/types';
 
@@ -44,7 +42,7 @@ export interface UseAdventureWordValidationProps {
 }
 
 export interface UseAdventureWordValidationReturn {
-  /** Whether validation is in progress */
+  /** Whether validation is in progress (only true during fallback API call) */
   isValidating: boolean;
   /** Last validation result */
   lastValidationResult: WordValidationResult | null;
@@ -71,57 +69,6 @@ const LENGTH_BONUS_MULTIPLIER: Record<number, number> = {
   7: 3,
   8: 4,
 };
-
-/** Maximum cache size to prevent memory leaks */
-const MAX_CACHE_SIZE = 500;
-
-// ==============================================
-// WORD VALIDATION CACHE
-// Module-level cache persists across component re-mounts
-// Provides instant validation for previously checked words
-// ==============================================
-
-/** Cache key format: "language:word" (lowercase) */
-type CacheKey = string;
-
-/** Cached validation result (true = valid, false = invalid) */
-const wordValidationCache = new Map<CacheKey, boolean>();
-
-/**
- * Get cache key for a word+language combination
- */
-function getCacheKey(word: string, language: string): CacheKey {
-  return `${language}:${word.toLowerCase()}`;
-}
-
-/**
- * Get cached validation result if available
- */
-function getCachedValidation(word: string, language: string): boolean | undefined {
-  return wordValidationCache.get(getCacheKey(word, language));
-}
-
-/**
- * Store validation result in cache with LRU eviction
- */
-function setCachedValidation(word: string, language: string, isValid: boolean): void {
-  const key = getCacheKey(word, language);
-
-  // Simple LRU: if cache is full, delete oldest entries (first 100)
-  if (wordValidationCache.size >= MAX_CACHE_SIZE) {
-    const keysToDelete = Array.from(wordValidationCache.keys()).slice(0, 100);
-    keysToDelete.forEach(k => wordValidationCache.delete(k));
-  }
-
-  wordValidationCache.set(key, isValid);
-}
-
-/**
- * Clear the word validation cache (exported for testing)
- */
-export function clearWordValidationCache(): void {
-  wordValidationCache.clear();
-}
 
 // ==============================================
 // HELPER FUNCTIONS
@@ -151,13 +98,11 @@ function isValidPath(path: Array<{ row: number; col: number }>): boolean {
     const pos = path[i];
     const key = `${pos.row},${pos.col}`;
 
-    // Check for repeated tile
     if (visited.has(key)) {
       return false;
     }
     visited.add(key);
 
-    // Check adjacency (skip first tile)
     if (i > 0 && !isAdjacent(path[i - 1], pos)) {
       return false;
     }
@@ -178,14 +123,32 @@ function getWordFromPath(
 
 /**
  * Calculate base score for a valid word (no special tile multipliers).
- * Tile-type multipliers (gold, rainbow, etc.) are applied once in the
- * reducer's processSpecialTileEffects to avoid double-multiplication.
- * @param wordLength - Length of the word
  */
 function calculateScore(wordLength: number): number {
   const baseScore = wordLength * BASE_SCORE_PER_LETTER;
   const lengthMultiplier = LENGTH_BONUS_MULTIPLIER[wordLength] || (wordLength >= 8 ? 4 : 1);
   return Math.round(baseScore * lengthMultiplier);
+}
+
+/**
+ * Generate a stable cache key for a grid
+ */
+function gridCacheKey(grid: string[][]): string {
+  return grid.map(row => row.join('')).join('|');
+}
+
+// ==============================================
+// MODULE-LEVEL GRID SOLUTION CACHE
+// Persists across component re-mounts within same session
+// ==============================================
+
+const gridSolutionCache = new Map<string, Set<string>>();
+
+/**
+ * Clear caches (exported for testing)
+ */
+export function clearWordValidationCache(): void {
+  gridSolutionCache.clear();
 }
 
 // ==============================================
@@ -202,8 +165,11 @@ export function useAdventureWordValidation({
   const [lastValidationResult, setLastValidationResult] =
     useState<WordValidationResult | null>(null);
 
-  // Abort controller for request deduplication
-  // Cancels previous in-flight request when new validation starts
+  // Pre-solved word set for instant client-side validation
+  const validWordsRef = useRef<Set<string> | null>(null);
+  const solveInFlightRef = useRef<boolean>(false);
+
+  // Abort controller for fallback API calls
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Normalize found words for comparison
@@ -211,6 +177,46 @@ export function useAdventureWordValidation({
     () => new Set(foundWords.map((w) => w.toLowerCase())),
     [foundWords]
   );
+
+  // Pre-solve grid on mount / grid change
+  const gridKey = useMemo(() => gridCacheKey(grid), [grid]);
+
+  useEffect(() => {
+    // Check module-level cache first
+    const cached = gridSolutionCache.get(`${language}:${gridKey}`);
+    if (cached) {
+      validWordsRef.current = cached;
+      return;
+    }
+
+    if (solveInFlightRef.current) return;
+    solveInFlightRef.current = true;
+
+    const controller = new AbortController();
+
+    fetch('/api/adventure/solve-grid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grid, language, minLength: minWordLength }),
+      signal: controller.signal,
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.words && Array.isArray(data.words)) {
+          const wordSet = new Set<string>(data.words);
+          validWordsRef.current = wordSet;
+          gridSolutionCache.set(`${language}:${gridKey}`, wordSet);
+        }
+      })
+      .catch(() => {
+        // Solve failed — will fall back to per-word API validation
+      })
+      .finally(() => {
+        solveInFlightRef.current = false;
+      });
+
+    return () => controller.abort();
+  }, [grid, language, minWordLength, gridKey]);
 
   const validateWord = useCallback(
     async (
@@ -227,7 +233,7 @@ export function useAdventureWordValidation({
         return result;
       }
 
-      // 2. Check path validity (adjacent tiles, no repeats)
+      // 2. Check path validity
       if (!isValidPath(path)) {
         const result: WordValidationResult = {
           isValid: false,
@@ -258,10 +264,10 @@ export function useAdventureWordValidation({
         return result;
       }
 
-      // 5. Check client-side cache first (instant validation for repeated words)
-      const cachedResult = getCachedValidation(word, language);
-      if (cachedResult !== undefined) {
-        if (cachedResult) {
+      // 5. Client-side validation against pre-solved word set (INSTANT)
+      if (validWordsRef.current) {
+        const normalizedWord = word.toLowerCase();
+        if (validWordsRef.current.has(normalizedWord)) {
           const result: WordValidationResult = {
             isValid: true,
             score: calculateScore(word.length),
@@ -274,16 +280,19 @@ export function useAdventureWordValidation({
             errorKey: 'adventure.errors.notInDictionary',
           };
           setLastValidationResult(result);
+          recordNotInDictionary(word, language as Language, 'adventure');
           return result;
         }
       }
 
-      // 6. Validate against dictionary (API call)
-      // Cancel any previous in-flight request (request deduplication)
+      // 6. Fallback: per-word API validation (only if pre-solve hasn't loaded yet)
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      abortControllerRef.current = new AbortController();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       setIsValidating(true);
 
@@ -293,39 +302,28 @@ export function useAdventureWordValidation({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ word: normalizedWord, language }),
-          signal: abortControllerRef.current.signal,
+          signal: controller.signal,
         });
 
+        clearTimeout(timeoutId);
         const data = await response.json();
 
-        if (data.isValid) {
-          // Cache the valid result
-          setCachedValidation(word, language, true);
+        const result: WordValidationResult = data.isValid
+          ? { isValid: true, score: calculateScore(word.length) }
+          : { isValid: false, errorKey: 'adventure.errors.notInDictionary' };
 
-          const result: WordValidationResult = {
-            isValid: true,
-            score: calculateScore(word.length),
-          };
-          setLastValidationResult(result);
-          setIsValidating(false);
-          return result;
-        } else {
-          // Cache the invalid result
-          setCachedValidation(word, language, false);
+        setLastValidationResult(result);
+        setIsValidating(false);
 
-          const result: WordValidationResult = {
-            isValid: false,
-            errorKey: 'adventure.errors.notInDictionary',
-          };
-          setLastValidationResult(result);
-          setIsValidating(false);
-          // Track invalid word for admin review
+        if (!data.isValid) {
           recordNotInDictionary(word, language as Language, 'adventure');
-          return result;
         }
+
+        return result;
       } catch (error) {
-        // Silently ignore aborted requests (user started new validation)
-        // Don't show error feedback or reset isValidating — the new request handles that
+        clearTimeout(timeoutId);
+        setIsValidating(false);
+
         if (error instanceof Error && error.name === 'AbortError') {
           return { isValid: false };
         }
@@ -335,7 +333,6 @@ export function useAdventureWordValidation({
           errorKey: 'adventure.errors.validationFailed',
         };
         setLastValidationResult(result);
-        setIsValidating(false);
         return result;
       }
     },

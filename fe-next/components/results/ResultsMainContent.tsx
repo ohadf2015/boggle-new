@@ -73,6 +73,8 @@ export interface ResultsMainContentProps {
   hideInlineCta?: boolean;
   allPlayerWords?: Record<string, WordObject[]>;
   gameDuration?: number;
+  /** Callback for podium emoji reactions */
+  onPodiumReaction?: (reactionId: string, targetUsername: string) => void;
   /** All player words for crown + MVP computation */
   /** Word Hunt summary */
   wordHuntSummary?: {
@@ -107,6 +109,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   allPlayerWords,
   gameDuration: _gameDuration,
   wordHuntSummary,
+  onPodiumReaction,
 }) => {
   const reducedMotion = useReducedMotion();
   const { dir: _dir } = useLanguage();
@@ -202,6 +205,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           currentUsername={username}
           isWordHunt={isWordHunt}
           t={t}
+          onReaction={onPodiumReaction}
         />
       )}
 

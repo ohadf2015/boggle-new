@@ -8,7 +8,7 @@
  * Fetched here (non-realtime, no user auth required):
  *   - topPlayers     — leaderboard table, top N by total_score
  *   - gamesToday     — game_results count for today
- *   - solveRate      — daily_puzzle_attempts solve % for language
+ *   - solveRate      — daily_word_hunt_stats solve % for language
  *
  * Not fetched here (kept client-side):
  *   - useLiveRoomStats  — WebSocket, inherently real-time
@@ -56,10 +56,11 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
         .gte('created_at', `${today}T00:00:00Z`),
 
       supabase
-        .from('daily_puzzle_attempts')
-        .select('id', { count: 'exact', head: true })
+        .from('daily_word_hunt_stats')
+        .select('solve_rate')
         .eq('puzzle_date', today)
-        .eq('language', language),
+        .eq('language', language)
+        .single(),
     ]),
     fetchGameModeStats(30),
   ]);
@@ -78,10 +79,8 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
 
   const gamesToday = gamesTodayResult.count ?? 0;
 
-  // Classic daily puzzle has no "solved" concept — all completions count.
-  // solveRate = 100 if anyone played, null otherwise.
-  const attemptCount = solveRateResult.count ?? 0;
-  const solveRate: number | null = attemptCount > 0 ? 100 : null;
+  // Use the precomputed solve_rate from the daily_word_hunt_stats view
+  const solveRate: number | null = solveRateResult.data?.solve_rate ?? null;
 
   return { topPlayers, gamesToday, solveRate, gameModeStats };
 }

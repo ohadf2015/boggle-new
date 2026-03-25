@@ -114,11 +114,8 @@ function getRankLabel(
   rank: number,
   t: (key: string) => string | undefined,
 ): string {
-  return (
-    formatRankOrdinal(rank, (key) => t(key) ?? key) +
-    ' ' +
-    (t('results.place') ?? 'PLACE')
-  );
+  // Ordinal translations already include "PLACE" / "מקום" / "PLATS" etc.
+  return formatRankOrdinal(rank, (key) => t(key) ?? key);
 }
 
 // ============================================================
@@ -169,7 +166,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
           data-testid="results-hero-section"
         >
           {/* Rank Display — dramatic slam entrance */}
-          <div className="relative z-10 flex flex-col items-center mb-10">
+          <div className="relative z-10 flex flex-col items-center mb-6">
             {isEliminated ? (
               <motion.span
                 initial={reducedMotion ? undefined : { opacity: 0, scale: 2, rotate: -8 }}
@@ -204,7 +201,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.45 }}
                 className={cn(
                   displayAccent.bg,
-                  'text-black px-6 py-2 rounded-full border-3 border-neo-black shadow-hard-sm -mt-10 relative z-20',
+                  'text-black px-6 py-2 rounded-full border-3 border-neo-black shadow-hard-sm -mt-6 relative z-20',
                 )}
               >
                 <p className="text-xs font-black uppercase tracking-[0.2em]">

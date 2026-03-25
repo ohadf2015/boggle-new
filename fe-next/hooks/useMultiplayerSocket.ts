@@ -101,6 +101,7 @@ export function useMultiplayerSocket(
   const hostLeftReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const kickedReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Latest-ref pattern: keeps a stable ref to the latest options so socket
   // callbacks (registered once) always read fresh values without re-registering
@@ -183,12 +184,18 @@ export function useMultiplayerSocket(
             id: 'socket-reconnecting-to-game',
             duration: 2000,
           });
-          // Re-emit join to restore server-side socket mapping and get current game state
-          // The server's handleReconnection will send startGame if game is in progress
-          socketInstance.emit('join', {
+          // Re-emit join with full identity context for proper server-side matching
+          // Missing authUserId caused reconnections to lose authenticated player mapping
+          const joinPayload: Record<string, unknown> = {
             gameCode: savedSession.gameCode,
             username: savedSession.username,
-          });
+          };
+          // Forward auth context from socket handshake if available
+          const socketAuth = socketInstance.auth as Record<string, unknown> | undefined;
+          if (socketAuth?.token) {
+            joinPayload.authToken = socketAuth.token;
+          }
+          socketInstance.emit('join', joinPayload);
         }
       }
       wasConnectedRef.current = true;
@@ -253,7 +260,7 @@ export function useMultiplayerSocket(
           reconnectFallbackTimerRef.current = null;
           logger.log('[SOCKET.IO] Requesting game state (startGame not received after reconnection)');
           socketInstance.emit('requestGameState');
-        }, 3000);
+        }, 5000);
         reconnectFallbackTimerRef.current = fallbackTimer;
         // The fallback is cancelled in the main startGame/resetGame handlers below
         // via reconnectFallbackTimerRef — no once() listeners needed, which avoids
@@ -474,6 +481,32 @@ export function useMultiplayerSocket(
       // Heartbeat response - connection is alive
     });
 
+    // Client-side heartbeat: send presenceHeartbeat every 20s to keep
+    // server health checks from flagging this player as stale.
+    // This is especially important on mobile where Socket.IO pings
+    // may not be sufficient to detect a live but idle connection.
+    heartbeatIntervalRef.current = setInterval(() => {
+      if (socketInstance.connected) {
+        socketInstance.emit('presenceHeartbeat');
+      }
+    }, 20000);
+
+    // Visibility-change handler: when the tab/app regains focus,
+    // check if the socket is still connected and proactively reconnect
+    // if it was silently dropped (common on mobile sleep/wake cycles).
+    const handleVisibilityForReconnect = () => {
+      if (document.visibilityState === 'visible' && socketInstance) {
+        if (!socketInstance.connected) {
+          logger.log('[SOCKET.IO] Tab became visible — socket disconnected, reconnecting');
+          socketInstance.connect();
+        } else {
+          // Socket is connected — send heartbeat immediately to refresh stale timer
+          socketInstance.emit('presenceHeartbeat');
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityForReconnect);
+
     Promise.resolve().then(() => {
       setSocket(socketInstance);
     });
@@ -481,6 +514,11 @@ export function useMultiplayerSocket(
     return () => {
       logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
       clearTimeout(roomsLoadingTimeout);
+      document.removeEventListener('visibilitychange', handleVisibilityForReconnect);
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
       if (hostLeftReloadTimerRef.current) {
         clearTimeout(hostLeftReloadTimerRef.current);
         hostLeftReloadTimerRef.current = null;

@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
 
     // Optimistic lock: only update if gold hasn't changed since we read it
     // This prevents concurrent requests from doubling gold rewards
-    const { data: updatedRow, error: updateError } = await supabase
+    let { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update(updatePayload)
       .eq('user_id', userId)
@@ -338,11 +338,35 @@ export async function POST(request: NextRequest) {
       console.error('[ADVENTURE COMPLETE API] Progression update error:', updateError);
       return NextResponse.json({ error: 'Failed to update progression' }, { status: 500 });
     } else if (!updatedRow) {
-      // Optimistic lock conflict: gold was modified by a concurrent request
-      return NextResponse.json(
-        { error: 'Concurrent modification detected — please retry' },
-        { status: 409 }
-      );
+      // Optimistic lock conflict: gold was modified by a concurrent request.
+      // Re-read current gold and retry with fresh value to avoid losing stars/progression.
+      const { data: freshProg } = await supabase
+        .from('player_progression')
+        .select('gold')
+        .eq('user_id', userId)
+        .single();
+      if (freshProg) {
+        updatePayload.gold = (freshProg.gold as number) + goldEarned;
+        const { data: retryRow, error: retryError } = await supabase
+          .from('player_progression')
+          .update(updatePayload)
+          .eq('user_id', userId)
+          .select()
+          .single();
+        if (retryError || !retryRow) {
+          console.error('[ADVENTURE COMPLETE API] Optimistic lock retry failed:', retryError);
+          return NextResponse.json(
+            { error: 'Concurrent modification detected — please retry' },
+            { status: 409 }
+          );
+        }
+        updatedRow = retryRow;
+      } else {
+        return NextResponse.json(
+          { error: 'Concurrent modification detected — please retry' },
+          { status: 409 }
+        );
+      }
     }
 
     // Check for level up

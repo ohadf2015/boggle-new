@@ -18,7 +18,7 @@ import { useResultsSocketEvents } from '@/components/results/useResultsSocketEve
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
+import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 // Dynamic import for landscape layout
@@ -387,6 +387,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     allPlayerWords,
     gameDuration,
     wordHuntSummary,
+    onPodiumReaction: sendReaction,
   };
 
   // Word Hunt results data (shared between tabs)
@@ -550,27 +551,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
 
-        {/* Floating bottom bar — reactions + CTA */}
-        <div className="flex-shrink-0 fixed bottom-3 inset-x-3 z-50 text-neo-cream">
-          <motion.div
-            initial={{ y: 60, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.1 }}
-            className="flex flex-col gap-0 bg-neo-navy/90 backdrop-blur-xl rounded-2xl border border-neo-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden"
-          >
-            {/* Always-visible emoji reactions row */}
-            {sortedScores.length > 1 && (
-              <div className="flex items-center justify-center gap-1 px-3 py-2 border-b border-neo-white/[0.06]">
-                <QuickReactions
-                  onReaction={sendReaction}
-                  layout="bar"
-                />
-              </div>
-            )}
-
-            {/* CTA section */}
-            <div className="p-1.5">
-              {gameCode && onReturnToRoom && !isBotsOnlyGame ? (
+        {/* Floating bottom bar — always-visible sticky CTA */}
+        {gameCode && onReturnToRoom && !isBotsOnlyGame && (
+          <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 text-neo-cream">
+            <motion.div
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
+              className="bg-neo-navy/95 backdrop-blur-xl border-t border-neo-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
+            >
+              <div className="px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
                 <StickyReadyBar
                   isHost={isHost}
                   isCurrentPlayerReady={isCurrentPlayerReady}
@@ -585,24 +575,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   selectedGameMode={selectedGameMode}
                   onSelectGameMode={isHost ? setSelectedGameMode : undefined}
                 />
-              ) : (
-                <div className="flex-1" />
-              )}
-            </div>
-          </motion.div>
-
-          <div className="safe-area-bottom" />
-        </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
 
       {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
       <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6 pb-32" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Top Bar with Exit Button and Reactions */}
-        <div className="w-full max-w-6xl mx-auto flex items-center justify-between mb-4">
-          {sortedScores.length > 1 && (
-            <QuickReactions onReaction={sendReaction} layout="bar" />
-          )}
-          <div className="flex-1" />
+        <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
           <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
         </div>
 

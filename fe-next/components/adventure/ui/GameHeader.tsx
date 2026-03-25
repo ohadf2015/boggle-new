@@ -77,7 +77,7 @@ export const GameHeader = memo(function GameHeader({
     <header
       className={cn(
         'flex items-center justify-between relative',
-        'px-3 py-1.5',
+        'px-3 py-1.5 gap-2 sm:gap-3 lg:gap-4',
         hudTheme.headerBg, 'backdrop-blur-md',
         'border-b-3', hudTheme.headerBorder,
         'shadow-hard-sm',
@@ -144,7 +144,7 @@ export const GameHeader = memo(function GameHeader({
       )}
 
       {/* Right: Timer & Controls */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
         {/* Timer — most important game state indicator, visually prominent */}
         <AdventureTimer
           timerStore={timerStore}
@@ -153,7 +153,7 @@ export const GameHeader = memo(function GameHeader({
         />
 
         {/* Control Buttons */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Pause/Resume */}
           <AdaptiveMotion.button
             onClick={onPauseToggle}

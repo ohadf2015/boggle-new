@@ -5,7 +5,7 @@
  * Following TDD: Write tests FIRST, then implement
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAdventureWordValidation, clearWordValidationCache } from '../useAdventureWordValidation';
 
 // ==============================================
@@ -55,6 +55,34 @@ jest.mock('@/utils/invalidWordTracker', () => ({
   recordInvalidWord: jest.fn(),
 }));
 
+// Valid words on the mockGrid that the solve-grid endpoint would return
+const MOCK_GRID_VALID_WORDS = ['cat', 'dog', 'bird', 'fish', 'cats', 'dogs', 'sir', 'ode', 'ire', 'ore', 'god', 'rid', 'rod', 'rig'];
+
+/**
+ * Default fetch implementation that handles:
+ * 1. /api/adventure/solve-grid → returns pre-solved valid words
+ * 2. /api/dictionary/check → returns based on word (fallback path)
+ */
+function createDefaultFetchImpl() {
+  return (url: string, opts?: RequestInit) => {
+    const body = opts?.body ? JSON.parse(opts.body as string) : {};
+    if (url === '/api/adventure/solve-grid') {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ words: MOCK_GRID_VALID_WORDS, count: MOCK_GRID_VALID_WORDS.length }),
+      });
+    }
+    if (url === '/api/dictionary/check') {
+      const isValid = MOCK_GRID_VALID_WORDS.includes(body.word?.toLowerCase());
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ isValid, source: isValid ? 'dictionary' : 'not_found' }),
+      });
+    }
+    return Promise.resolve({ ok: true, json: async () => ({}) });
+  };
+}
+
 // ==============================================
 // TESTS
 // ==============================================
@@ -63,13 +91,10 @@ describe('useAdventureWordValidation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFetch.mockReset();
-    // Clear word validation cache to ensure test isolation
+    // Clear grid solution cache to ensure test isolation
     clearWordValidationCache();
-    // Default implementation for any unexpected fetch calls (e.g., from invalidWordTracker)
-    // This prevents "Cannot read properties of undefined (reading 'catch')" errors
-    mockFetch.mockImplementation(() =>
-      Promise.resolve({ ok: true, json: async () => ({}) })
-    );
+    // Default: handle both solve-grid and dictionary/check
+    mockFetch.mockImplementation(createDefaultFetchImpl());
   });
 
   describe('Initialization', () => {
@@ -111,7 +136,11 @@ describe('useAdventureWordValidation', () => {
       // THEN
       expect(validationResult!.isValid).toBe(false);
       expect(validationResult!.errorKey).toBe('adventure.errors.invalidPath');
-      expect(mockFetch).not.toHaveBeenCalled(); // No API call for invalid path
+      // No per-word API call for invalid path
+      const dictCheckCalls = mockFetch.mock.calls.filter(
+        (c: [string]) => c[0] === '/api/dictionary/check'
+      );
+      expect(dictCheckCalls.length).toBe(0);
     });
 
     it('should reject word that does not match path letters', async () => {
@@ -187,7 +216,11 @@ describe('useAdventureWordValidation', () => {
       // THEN
       expect(validationResult!.isValid).toBe(false);
       expect(validationResult!.errorKey).toBe('adventure.errors.alreadyFound');
-      expect(mockFetch).not.toHaveBeenCalled(); // No API call for duplicate
+      // No per-word API call for duplicate (solve-grid may have been called)
+      const dictCheckCalls = mockFetch.mock.calls.filter(
+        (c: [string]) => c[0] === '/api/dictionary/check'
+      );
+      expect(dictCheckCalls.length).toBe(0);
     });
 
     it('should reject duplicate regardless of case', async () => {
@@ -214,13 +247,8 @@ describe('useAdventureWordValidation', () => {
   });
 
   describe('Dictionary Validation', () => {
-    it('should validate word against dictionary API when path is valid', async () => {
-      // GIVEN
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ isValid: true, source: 'dictionary' }),
-      });
-
+    it('should validate word against pre-solved word set (instant, no per-word API call)', async () => {
+      // GIVEN — solve-grid is handled by default mock
       const { result } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
@@ -229,6 +257,9 @@ describe('useAdventureWordValidation', () => {
           foundWords: [],
         })
       );
+
+      // Wait for solve-grid to complete
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -236,23 +267,18 @@ describe('useAdventureWordValidation', () => {
         validationResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN
-      expect(mockFetch).toHaveBeenCalledWith('/api/dictionary/check', expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: 'cat', language: 'en' }),
-        // signal is also passed for request deduplication (AbortController)
-      }));
+      // THEN — should be valid (CAT is in MOCK_GRID_VALID_WORDS)
       expect(validationResult!.isValid).toBe(true);
+      // No per-word API call — only the solve-grid call should have been made
+      expect(mockFetch).toHaveBeenCalledWith('/api/adventure/solve-grid', expect.anything());
+      const dictCheckCalls = mockFetch.mock.calls.filter(
+        (c: [string]) => c[0] === '/api/dictionary/check'
+      );
+      expect(dictCheckCalls.length).toBe(0);
     });
 
-    it('should reject word not in dictionary', async () => {
-      // GIVEN
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ isValid: false, reason: 'Word not in dictionary', source: 'pending' }),
-      });
-
+    it('should reject word not in pre-solved word set', async () => {
+      // GIVEN — solve-grid returns words that do NOT include "DOGE"
       const { result } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
@@ -262,7 +288,8 @@ describe('useAdventureWordValidation', () => {
         })
       );
 
-      // Path for "DOGE" - valid adjacent path but not a real word
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
       const dogePath = [
         { row: 1, col: 0 }, // D
         { row: 1, col: 1 }, // O
@@ -281,9 +308,17 @@ describe('useAdventureWordValidation', () => {
       expect(validationResult!.errorKey).toBe('adventure.errors.notInDictionary');
     });
 
-    it('should handle API errors gracefully', async () => {
-      // GIVEN
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+    it('should fall back to per-word API when solve-grid fails', async () => {
+      // GIVEN — solve-grid fails, per-word API succeeds
+      mockFetch.mockImplementation((url: string) => {
+        if (url === '/api/adventure/solve-grid') {
+          return Promise.reject(new Error('Network error'));
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ isValid: true, source: 'dictionary' }),
+        });
+      });
 
       const { result } = renderHook(() =>
         useAdventureWordValidation({
@@ -293,6 +328,42 @@ describe('useAdventureWordValidation', () => {
           foundWords: [],
         })
       );
+
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
+      // WHEN
+      let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
+      await act(async () => {
+        validationResult = await result.current.validateWord('CAT', validCatPath);
+      });
+
+      // THEN — should fall back to per-word API call
+      expect(validationResult!.isValid).toBe(true);
+      const dictCheckCalls = mockFetch.mock.calls.filter(
+        (c: [string]) => c[0] === '/api/dictionary/check'
+      );
+      expect(dictCheckCalls.length).toBe(1);
+    });
+
+    it('should handle fallback API errors gracefully', async () => {
+      // GIVEN — both solve-grid and per-word API fail
+      mockFetch.mockImplementation((url: string) => {
+        if (url === '/api/adventure/solve-grid') {
+          return Promise.reject(new Error('Network error'));
+        }
+        return Promise.reject(new Error('Network error'));
+      });
+
+      const { result } = renderHook(() =>
+        useAdventureWordValidation({
+          grid: mockGrid,
+          language: 'en',
+          minWordLength: 3,
+          foundWords: [],
+        })
+      );
+
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -307,14 +378,39 @@ describe('useAdventureWordValidation', () => {
   });
 
   describe('Loading State', () => {
-    it('should set isValidating during API call', async () => {
-      // GIVEN
-      let resolvePromise: (value: unknown) => void;
-      const delayedPromise = new Promise((resolve) => {
-        resolvePromise = resolve;
+    it('should NOT set isValidating when pre-solved words are available (instant validation)', async () => {
+      // GIVEN — solve-grid loaded
+      const { result } = renderHook(() =>
+        useAdventureWordValidation({
+          grid: mockGrid,
+          language: 'en',
+          minWordLength: 3,
+          foundWords: [],
+        })
+      );
+
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
+      // WHEN
+      await act(async () => {
+        await result.current.validateWord('CAT', validCatPath);
       });
 
-      mockFetch.mockReturnValueOnce(delayedPromise);
+      // THEN — client-side validation, never sets isValidating
+      expect(result.current.isValidating).toBe(false);
+    });
+
+    it('should set isValidating during fallback API call', async () => {
+      // GIVEN — solve-grid fails
+      let resolveDict: (value: unknown) => void;
+      const dictPromise = new Promise((resolve) => { resolveDict = resolve; });
+
+      mockFetch.mockImplementation((url: string) => {
+        if (url === '/api/adventure/solve-grid') {
+          return Promise.reject(new Error('fail'));
+        }
+        return dictPromise;
+      });
 
       const { result } = renderHook(() =>
         useAdventureWordValidation({
@@ -325,37 +421,30 @@ describe('useAdventureWordValidation', () => {
         })
       );
 
-      // WHEN - start validation
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
+      // WHEN — start validation (falls back to API)
       let validationPromise: Promise<unknown>;
       act(() => {
         validationPromise = result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN - should be validating
+      // THEN — should be validating during API call
       expect(result.current.isValidating).toBe(true);
 
       // Resolve the API call
       await act(async () => {
-        resolvePromise!({
-          ok: true,
-          json: async () => ({ isValid: true }),
-        });
+        resolveDict!({ ok: true, json: async () => ({ isValid: true }) });
         await validationPromise;
       });
 
-      // THEN - should no longer be validating
       expect(result.current.isValidating).toBe(false);
     });
   });
 
   describe('Score Calculation', () => {
     it('should return base score for valid word', async () => {
-      // GIVEN
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ isValid: true, source: 'dictionary' }),
-      });
-
+      // GIVEN — solve-grid loaded via default mock
       const { result } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
@@ -364,6 +453,8 @@ describe('useAdventureWordValidation', () => {
           foundWords: [],
         })
       );
+
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -371,138 +462,37 @@ describe('useAdventureWordValidation', () => {
         validationResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN - 3 letter word = base score
+      // THEN - 3 letter word = base score (30 = 3 * 10 * 1x)
       expect(validationResult!.isValid).toBe(true);
       expect(validationResult!.score).toBeGreaterThan(0);
     });
 
-    it('should return 3x score when word path contains gold tile', async () => {
-      // GIVEN - Grid with tiles and gold tile info passed
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ isValid: true, source: 'dictionary' }),
-      });
-
-      // Mock tiles with gold tile at position (0,0)
-      const mockTiles = [
-        [
-          { letter: 'C', type: 'gold' as const, isCleared: false },
-          { letter: 'A', type: 'standard' as const, isCleared: false },
-          { letter: 'T', type: 'standard' as const, isCleared: false },
-          { letter: 'S', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'D', type: 'standard' as const, isCleared: false },
-          { letter: 'O', type: 'standard' as const, isCleared: false },
-          { letter: 'G', type: 'standard' as const, isCleared: false },
-          { letter: 'E', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'B', type: 'standard' as const, isCleared: false },
-          { letter: 'I', type: 'standard' as const, isCleared: false },
-          { letter: 'R', type: 'standard' as const, isCleared: false },
-          { letter: 'D', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'F', type: 'standard' as const, isCleared: false },
-          { letter: 'I', type: 'standard' as const, isCleared: false },
-          { letter: 'S', type: 'standard' as const, isCleared: false },
-          { letter: 'H', type: 'standard' as const, isCleared: false },
-        ],
-      ];
-
+    it('should return base score only (no tile multiplier — reducer handles it)', async () => {
+      // GIVEN — solve-grid loaded
       const { result } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
           language: 'en',
           minWordLength: 3,
           foundWords: [],
-          tiles: mockTiles,
         })
       );
 
-      // WHEN - Validate CAT starting with gold tile
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
+      // WHEN - Validate CAT
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
       await act(async () => {
         validationResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // THEN - Score should be the BASE score only (no tile multiplier)
-      // Gold multiplier is applied in the reducer (processSpecialTileEffects), not here
-      // Base score = 3 letters * 10 points * 1x length bonus = 30
+      // THEN - Base score = 3 letters * 10 points * 1x length bonus = 30
       expect(validationResult!.isValid).toBe(true);
-      expect(validationResult!.score).toBe(30); // No multiplier - reducer handles it
-    });
-
-    it('should return 1.25x score when word path contains rainbow tile', async () => {
-      // GIVEN - Grid with rainbow tile
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ isValid: true, source: 'dictionary' }),
-      });
-
-      const mockTiles = [
-        [
-          { letter: 'C', type: 'rainbow' as const, isCleared: false },
-          { letter: 'A', type: 'standard' as const, isCleared: false },
-          { letter: 'T', type: 'standard' as const, isCleared: false },
-          { letter: 'S', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'D', type: 'standard' as const, isCleared: false },
-          { letter: 'O', type: 'standard' as const, isCleared: false },
-          { letter: 'G', type: 'standard' as const, isCleared: false },
-          { letter: 'E', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'B', type: 'standard' as const, isCleared: false },
-          { letter: 'I', type: 'standard' as const, isCleared: false },
-          { letter: 'R', type: 'standard' as const, isCleared: false },
-          { letter: 'D', type: 'standard' as const, isCleared: false },
-        ],
-        [
-          { letter: 'F', type: 'standard' as const, isCleared: false },
-          { letter: 'I', type: 'standard' as const, isCleared: false },
-          { letter: 'S', type: 'standard' as const, isCleared: false },
-          { letter: 'H', type: 'standard' as const, isCleared: false },
-        ],
-      ];
-
-      const { result } = renderHook(() =>
-        useAdventureWordValidation({
-          grid: mockGrid,
-          language: 'en',
-          minWordLength: 3,
-          foundWords: [],
-          tiles: mockTiles,
-        })
-      );
-
-      // WHEN - Validate CAT starting with rainbow tile
-      let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
-      await act(async () => {
-        validationResult = await result.current.validateWord('CAT', validCatPath);
-      });
-
-      // THEN - Score should be the BASE score only (no tile multiplier)
-      // Rainbow multiplier is applied in the reducer (processSpecialTileEffects), not here
-      // Base score = 3 letters * 10 points * 1x length bonus = 30
-      expect(validationResult!.isValid).toBe(true);
-      expect(validationResult!.score).toBe(30); // No multiplier - reducer handles it
+      expect(validationResult!.score).toBe(30);
     });
 
     it('should return higher score for longer words', async () => {
-      // GIVEN
-      mockFetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ isValid: true, source: 'dictionary' }),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ isValid: true, source: 'dictionary' }),
-        });
-
+      // GIVEN — solve-grid loaded
       const { result } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
@@ -512,7 +502,8 @@ describe('useAdventureWordValidation', () => {
         })
       );
 
-      // Path for "BIRD" (4 letters)
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+
       const birdPath = [
         { row: 2, col: 0 }, // B
         { row: 2, col: 1 }, // I
@@ -528,7 +519,7 @@ describe('useAdventureWordValidation', () => {
         catResult = await result.current.validateWord('CAT', validCatPath);
       });
 
-      // Update foundWords for next call
+      // Render with foundWords=['CAT'] for second validation
       const { result: result2 } = renderHook(() =>
         useAdventureWordValidation({
           grid: mockGrid,
@@ -537,6 +528,8 @@ describe('useAdventureWordValidation', () => {
           foundWords: ['CAT'],
         })
       );
+
+      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
 
       await act(async () => {
         birdResult = await result2.current.validateWord('BIRD', birdPath);

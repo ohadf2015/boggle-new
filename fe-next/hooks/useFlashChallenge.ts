@@ -22,6 +22,7 @@ interface UseFlashChallengeReturn {
   isChallengeFailed: boolean;
   challengeTimeLeft: number;
   dismiss: () => void;
+  reset: () => void;
 }
 
 /** Check if a word contains consecutive double letters (e.g., "book" has "oo") */
@@ -187,5 +188,21 @@ export function useFlashChallenge({
     setChallengeTimeLeft(0);
   }, []);
 
-  return { activeChallenge, isChallengeComplete, isChallengeFailed, challengeTimeLeft, dismiss };
+  const reset = useCallback(() => {
+    if (failedTimerRef.current) {
+      clearTimeout(failedTimerRef.current);
+      failedTimerRef.current = null;
+    }
+    setActiveChallenge(null);
+    setIsChallengeComplete(false);
+    setIsChallengeFailed(false);
+    setChallengeTimeLeft(0);
+    hasTriggered.current = false;
+    challengeStartWords.current = [];
+    challengeStartTime.current = 0;
+    usedGoldTile.current = false;
+    lastWordTimestamp.current = 0;
+  }, []);
+
+  return { activeChallenge, isChallengeComplete, isChallengeFailed, challengeTimeLeft, dismiss, reset };
 }

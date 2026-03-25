@@ -209,6 +209,16 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
       setReconnectAttempt(attemptNumber);
+
+      // Refresh auth token before each reconnection attempt
+      // Prevents stale JWT from causing silent guest fallback
+      getAuthToken().then(token => {
+        if (token && socketInstance) {
+          socketInstance.auth = { token };
+        }
+      }).catch(() => {
+        // Continue reconnection without fresh token
+      });
     };
 
     const handleReconnectError = (error: Error) => {

@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import type { ConsolationCrown } from '@/utils/consolationCrowns';
+import Avatar from '@/components/Avatar';
 
 interface ConsolationRowsProps {
   /** Players ranked 4th and below */
@@ -14,6 +15,8 @@ interface ConsolationRowsProps {
   currentUsername?: string;
   /** Translation function */
   t: (key: string) => string | undefined;
+  /** Starting rank (e.g. 4 when top 3 are on the podium) */
+  startRank?: number;
 }
 
 function formatScore(score: number): string {
@@ -46,6 +49,7 @@ export default function ConsolationRows({
   crowns,
   currentUsername,
   t,
+  startRank = 4,
 }: ConsolationRowsProps) {
   const reducedMotion = useReducedMotion();
   if (!players.length) return null;
@@ -55,8 +59,7 @@ export default function ConsolationRows({
       {players.map((player, index) => {
         const crown = crowns.get(player.username);
         const isCurrent = player.username === currentUsername;
-        const avatarEmoji = (player.avatar as any)?.emoji;
-        const avatarColor = (player.avatar as any)?.color || '#334155';
+        const rank = startRank + index;
 
         return (
           <motion.div
@@ -68,8 +71,13 @@ export default function ConsolationRows({
             className="flex items-center justify-between py-4"
           >
             <div className="flex items-center gap-3">
+              {/* Placement number */}
+              <span className="text-xs font-black tabular-nums text-white/30 w-6 text-center shrink-0">
+                {rank}
+              </span>
+
+              {/* Crown image */}
               {crown && (
-                 
                 <motion.img
                   src={crown.image}
                   alt=""
@@ -77,7 +85,7 @@ export default function ConsolationRows({
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 350, damping: 14, delay: 0.7 + index * 0.08 }}
                   className={cn(
-                    'w-8 h-8 rounded-lg shrink-0',
+                    'w-10 h-10 rounded-lg shrink-0',
                     crown.id === 'sniper' && 'shadow-[0_0_8px_rgba(0,255,255,0.3)]',
                     crown.id === 'speedDemon' && 'shadow-[0_0_8px_rgba(255,107,53,0.3)]',
                     crown.id === 'scholar' && 'shadow-[0_0_8px_rgba(255,20,147,0.3)]',
@@ -87,12 +95,17 @@ export default function ConsolationRows({
                   )}
                 />
               )}
-              <div
-                className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-sm shrink-0"
-                style={{ backgroundColor: avatarColor }}
-              >
-                {avatarEmoji || player.username.charAt(0).toUpperCase()}
+
+              {/* Player avatar */}
+              <div className="w-10 h-10 shrink-0">
+                <Avatar
+                  userId={player.username}
+                  customAvatar={(player.avatar as any)?.customAvatar}
+                  size="md"
+                  className="w-full h-full rounded-full"
+                />
               </div>
+
               <div className="flex flex-col min-w-0">
                 <p
                   className={cn(

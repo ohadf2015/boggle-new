@@ -85,9 +85,9 @@ describe('ResultsPage mobile bottom safe zone', () => {
     });
 
     test('floating pill bar should have fixed positioning', () => {
-      // The floating bar uses fixed positioning with margin offset
-      expect(resultsPageTSX).toContain('fixed bottom-3');
-      expect(resultsPageTSX).toContain('inset-x-3');
+      // The sticky bar uses fixed positioning edge-to-edge at the bottom
+      expect(resultsPageTSX).toContain('fixed bottom-0');
+      expect(resultsPageTSX).toContain('inset-x-0');
     });
   });
 

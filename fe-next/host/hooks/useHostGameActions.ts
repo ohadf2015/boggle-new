@@ -226,15 +226,18 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
   /** Public startGame — shows solo confirmation if host is alone */
   const startGame = useCallback(() => {
-    // No players at all
-    if (playersCount === 0 && !hostPlaying) {
+    // playersCount includes the host, so subtract 1 when host is playing
+    const otherPlayers = hostPlaying ? playersCount - 1 : playersCount;
+
+    // No players at all (host not playing and nobody joined)
+    if (otherPlayers <= 0 && !hostPlaying) {
       logger.warn('[HOST] Cannot start game: no players');
       neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
       return;
     }
 
     // Solo host with no other players — ask for confirmation
-    if (playersCount === 0 && hostPlaying) {
+    if (otherPlayers <= 0 && hostPlaying) {
       setShowSoloConfirm(true);
       return;
     }

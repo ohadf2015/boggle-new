@@ -9,8 +9,8 @@ interface UseDailySolveRateOptions {
 }
 
 /**
- * Fetches the solve rate for today's daily challenge.
- * Returns percentage of attempts that were solved.
+ * Fetches the solve rate for today's daily Word Hunt challenge.
+ * Returns percentage (0-100) of players who solved the puzzle.
  * Pass `initialSolveRate` from a server component to eliminate the client-side fetch.
  */
 export function useDailySolveRate(language: string, options: UseDailySolveRateOptions = {}) {
@@ -34,20 +34,18 @@ export function useDailySolveRate(language: string, options: UseDailySolveRateOp
     async function fetch() {
       const today = new Date().toISOString().split('T')[0];
 
-      // daily_puzzle_attempts is the classic timed daily challenge — all rows
-      // represent completed attempts, so "solve rate" = total attempts today.
-      // We report it as a count rather than a percentage.
-      const { count, error } = await supabase!
-        .from('daily_puzzle_attempts')
-        .select('id', { count: 'exact', head: true })
+      // Query the precomputed solve_rate from daily_word_hunt_stats view
+      const { data, error } = await supabase!
+        .from('daily_word_hunt_stats')
+        .select('solve_rate')
         .eq('puzzle_date', today)
-        .eq('language', language);
+        .eq('language', language)
+        .single();
 
       if (cancelled) return;
 
-      if (!error && count !== null) {
-        // Return 100 if anyone played today (all completions count as "solved")
-        setSolveRate(count > 0 ? 100 : 0);
+      if (!error && data?.solve_rate != null) {
+        setSolveRate(Math.round(data.solve_rate));
       }
       setLoading(false);
     }

@@ -477,34 +477,29 @@ describe('POST /api/adventure/complete', () => {
 
   // ===== SECURITY: CONCURRENT GOLD FARMING =====
   describe('SECURITY: Optimistic lock on gold', () => {
-    it('returns 409 when gold was modified concurrently (optimistic lock)', async () => {
-      // Simulate optimistic lock failure: update returns 0 rows (gold changed between read and write)
-      let updateCallCount = 0;
+    it('returns 409 when gold was modified concurrently and retry also fails', async () => {
+      // Simulate optimistic lock failure on both initial update AND retry:
+      // update always returns 0 rows (gold changed between read and write)
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_progression') {
+          // Build a chainable mock that supports both the 2-eq pattern (initial)
+          // and 1-eq pattern (retry), plus standalone select for gold re-read
+          const makeUpdateChain = () => {
+            const singleFn = jest.fn().mockResolvedValue({ data: null, error: null });
+            const selectFn = jest.fn().mockReturnValue({ single: singleFn });
+            const eqInner = jest.fn().mockReturnValue({ select: selectFn });
+            const eqOuter = jest.fn().mockReturnValue({ eq: eqInner, select: selectFn });
+            return { eq: eqOuter };
+          };
+          const makeSelectChain = () => {
+            const singleFn = jest.fn().mockResolvedValue({ data: mockProgression, error: null });
+            const eqFn = jest.fn().mockReturnValue({ single: singleFn });
+            return { eq: eqFn };
+          };
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: mockProgression,
-                  error: null,
-                }),
-              }),
-            }),
+            select: jest.fn().mockReturnValue(makeSelectChain()),
             insert: jest.fn().mockResolvedValue({ error: null }),
-            update: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  select: jest.fn().mockReturnValue({
-                    single: jest.fn().mockResolvedValue({
-                      // null data = 0 rows updated (optimistic lock conflict)
-                      data: null,
-                      error: null,
-                    }),
-                  }),
-                }),
-              }),
-            }),
+            update: jest.fn().mockReturnValue(makeUpdateChain()),
           };
         }
         if (table === 'level_completions') {

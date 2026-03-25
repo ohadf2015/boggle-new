@@ -58,6 +58,12 @@ interface UseAdventureGameCallbacksParams {
   t: (key: string) => string;
   // Hints tracking ref value
   hintsUsed: number;
+  // Reset callbacks for retry
+  resetWordSubmitState: () => void;
+  resetFlashChallenge: () => void;
+  // Save failure tracking
+  completionSaveFailedRef: React.RefObject<boolean>;
+  retrySaveCompletion: (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number) => Promise<boolean>;
 }
 
 export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParams) {
@@ -76,6 +82,8 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     storyBeat, showLootOrComplete,
     setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
     t, hintsUsed,
+    resetWordSubmitState, resetFlashChallenge,
+    completionSaveFailedRef, retrySaveCompletion,
   } = params;
 
   const handleCinematicComplete = useCallback(() => {
@@ -134,13 +142,22 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
 
     setShowLevelComplete(false);
     const longWords = wordsFoundList.filter(w => w.length >= 6).length;
-    // handleLevelComplete (onLevelComplete) calls completeLevel which piggybacks
-    // on the in-flight eager save — no separate retry needed here.
+
+    // If the eager save failed, retry before navigating away
+    if (completionSaveFailedRef.current && gameStars > 0) {
+      retrySaveCompletion(
+        worldNumber, levelNumber,
+        gameStars as 0 | 1 | 2 | 3,
+        gameScore, wordsFoundList.length, earnedGold, longWords
+      ).catch(() => { /* onLevelComplete below will also retry via ProgressionContext */ });
+    }
+
     onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
   }, [gameStars, gameScore, wordsFoundList, comboCount, earnedGold, onLevelComplete,
     recordLevelPerfect, recordBossDefeatedNoHint, recordScoreChallenge, recordBossHighHealth,
     recordFullComboLevel, isBossLevel, bossHealthPhase, playerHealthCurrentHP, playerHealthMaxHP,
-    totalStars, handleEarnAchievement, worldNumber, setShowLevelComplete, hintsUsed]);
+    totalStars, handleEarnAchievement, worldNumber, levelNumber, setShowLevelComplete, hintsUsed,
+    completionSaveFailedRef, retrySaveCompletion]);
 
   const handleRetry = useCallback(() => {
     setShowLevelComplete(false);
@@ -153,6 +170,8 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     resetGame({ retainedScore });
     resetBossHealth(); resetPlayerHealth();
     resetCinematics();
+    resetWordSubmitState();
+    resetFlashChallenge();
     // Boss levels: don't start game yet — boss intro dismissal triggers
     // handleBossIntroStart which calls bossStartBattle() + startGame().
     // Non-boss levels: start immediately.
@@ -160,7 +179,8 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
       startGame();
     }
   }, [resetGame, startGame, clearSelection, resetBossHealth, resetPlayerHealth, resetCinematics,
-    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setRetriesUsed, isBossLevel]);
+    resetRewards, upgradeRetryScoreRetention, gameScore, setShowLevelComplete, setRetriesUsed, isBossLevel,
+    resetWordSubmitState, resetFlashChallenge]);
 
   return { handleCinematicComplete, handleContinue, handleRetry };
 }

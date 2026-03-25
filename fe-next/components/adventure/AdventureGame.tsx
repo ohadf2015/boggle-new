@@ -375,7 +375,7 @@ const AdventureGame = memo<AdventureGameProps>(
     }, []);
 
     const hintsUsedRef = useRef(0);
-    const { handleCinematicComplete, handleContinue, handleRetry } = useAdventureGameCallbacks({
+    const { handleCinematicComplete, handleContinue, handleRetry: handleRetryBase } = useAdventureGameCallbacks({
       gameStars: gameState.stars, gameScore: gameState.score,
       wordsFoundList: gameState.wordsFound, comboCount: gameState.comboCount,
       isBossLevel, worldNumber: levelConfig.world, levelNumber: levelConfig.level,
@@ -399,7 +399,18 @@ const AdventureGame = memo<AdventureGameProps>(
       storyBeat, showLootOrComplete,
       setShowLevelComplete, setRetriesUsed, setShowStoryBeat,
       t, hintsUsed: hintsUsedRef.current,
+      resetWordSubmitState: wordSubmit.resetWordSubmitState,
+      resetFlashChallenge: flashChallenge.reset,
+      completionSaveFailedRef: levelCompletion.completionSaveFailedRef,
+      retrySaveCompletion: saveCompletionToDb,
     });
+
+    const handleRetry = useCallback(() => {
+      hintsUsedRef.current = 0;
+      hasAwardedFlashGoldRef.current = false;
+      setLastWordTileTypes([]);
+      handleRetryBase();
+    }, [handleRetryBase]);
 
     const handleHintClick = useCallback(() => {
       if (hasHintsAvailable) { getHint(); dismissAutoHint(); hintsUsedRef.current += 1; }

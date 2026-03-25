@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
@@ -12,7 +12,7 @@ import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
@@ -105,12 +105,6 @@ const DailyChallenge: React.FC = () => {
   }, []);
 
 
-  // Pull-to-refresh
-  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
-    onRefresh: async () => { window.location.reload(); },
-    threshold: 60,
-    enabled: phase !== 'playing',
-  });
 
   // Track previous values for smarter re-initialization
   const prevGameLanguageRef = useRef<Language | null>(null);
@@ -320,17 +314,8 @@ const DailyChallenge: React.FC = () => {
   const isResultsPhase = phase === 'completed' || phase === 'already-played';
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? '' : 'overflow-y-auto'}`}
-      {...pullToRefreshHandlers}
+      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? 'overflow-hidden' : 'overflow-y-auto'}`}
     >
-      {phase !== 'playing' && (
-        <PullToRefreshIndicator
-          pullDistance={pullState.pullDistance}
-          isRefreshing={pullState.isRefreshing}
-          threshold={60}
-        />
-      )}
-
       <AutoHideHeader />
 
       <AnimatePresence mode="wait">

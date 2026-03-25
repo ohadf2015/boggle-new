@@ -82,6 +82,7 @@ export interface UseAdventureWordSubmitReturn {
   wordFeedback: WordFeedback | null;
   lastSubmittedWordRef: React.MutableRefObject<{ word: string; path: Array<{ row: number; col: number }> } | null>;
   prevComboCountRef: React.MutableRefObject<number>;
+  resetWordSubmitState: () => void;
 }
 
 export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseAdventureWordSubmitReturn {
@@ -272,6 +273,23 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     [isPlaying, isPaused, isValidating, currentWord, selectedIndices, tiles, gridSize, validateWord, submitWordWithPath, clearSelection, t, getPopupStartPosition, comboCount, wordsFound, clearCurrentHint, recordActivity, resetOnGameAction, isBossActive, bossConfig, checkBossWord, triggerBossTaunt, dealBossDamage, minWordLength, upgradeBonuses.scoreBonus, skillEffects, handleEarnAchievement, recordAIWord, handleAITransition, addScorePopup, getScoreMultiplier, worldMechanic, tap, hapticSuccess, bossHealPerWord, healPlayerHealth, detonateActive]
   );
 
+  const resetWordSubmitState = useCallback(() => {
+    setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
+    setLastAccepted(null);
+    setWordFeedback(null);
+    lastSubmittedWordRef.current = null;
+    prevComboCountRef.current = 0;
+    isSubmittingRef.current = false;
+    if (validationErrorTimeoutRef.current) {
+      clearTimeout(validationErrorTimeoutRef.current);
+      validationErrorTimeoutRef.current = null;
+    }
+    if (wordSubmittedTimeoutRef.current) {
+      clearTimeout(wordSubmittedTimeoutRef.current);
+      wordSubmittedTimeoutRef.current = null;
+    }
+  }, []);
+
   return {
     handleWordSubmit,
     validationFeedback,
@@ -279,5 +297,6 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
     wordFeedback,
     lastSubmittedWordRef,
     prevComboCountRef,
+    resetWordSubmitState,
   };
 }
