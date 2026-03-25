@@ -214,7 +214,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/:packId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { packId } = req.params;
+    const packId = req.params.packId as string;
 
     if (!UUID_RE.test(packId)) {
       res.status(400).json({ error: 'INVALID_PACK_ID' });
@@ -244,7 +244,7 @@ router.patch('/:packId', async (req: Request, res: Response): Promise<void> => {
     const userId = await requireAuth(req, res);
     if (!userId) return;
 
-    const { packId } = req.params;
+    const packId = req.params.packId as string;
     if (!UUID_RE.test(packId)) {
       res.status(400).json({ error: 'INVALID_PACK_ID' });
       return;
@@ -287,7 +287,7 @@ router.delete('/:packId', async (req: Request, res: Response): Promise<void> => 
     const userId = await requireAuth(req, res);
     if (!userId) return;
 
-    const { packId } = req.params;
+    const packId = req.params.packId as string;
     if (!UUID_RE.test(packId)) {
       res.status(400).json({ error: 'INVALID_PACK_ID' });
       return;
@@ -322,7 +322,7 @@ router.post('/:packId/upvote', async (req: Request, res: Response): Promise<void
     const userId = await requireAuth(req, res);
     if (!userId) return;
 
-    const { packId } = req.params;
+    const packId = req.params.packId as string;
     if (!UUID_RE.test(packId)) {
       res.status(400).json({ error: 'INVALID_PACK_ID' });
       return;
@@ -346,7 +346,7 @@ router.post('/:packId/report', async (req: Request, res: Response): Promise<void
     const userId = await requireAuth(req, res);
     if (!userId) return;
 
-    const { packId } = req.params;
+    const packId = req.params.packId as string;
     if (!UUID_RE.test(packId)) {
       res.status(400).json({ error: 'INVALID_PACK_ID' });
       return;

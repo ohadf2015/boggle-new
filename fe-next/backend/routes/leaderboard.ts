@@ -159,7 +159,7 @@ router.get('/rank/:userId', async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const { userId } = req.params;
+    const userId = req.params.userId as string;
     if (!userId) {
       res.status(400).json({ error: 'User ID required' });
       return;

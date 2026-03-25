@@ -89,7 +89,7 @@ router.get('/moderation/queue', async (req: AdminRequest, res: Response): Promis
  */
 router.get('/moderation/players/:id/investigate', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
-    const result = await fetchPlayerInvestigation(getSupabase(), req.params.id);
+    const result = await fetchPlayerInvestigation(getSupabase(), req.params.id as string);
     if (!result.profile) {
       res.status(404).json(errorResponse('PLAYER_NOT_FOUND', 'Player not found'));
       return;

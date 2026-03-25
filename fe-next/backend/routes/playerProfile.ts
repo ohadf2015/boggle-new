@@ -29,7 +29,7 @@ function isValidUuid(id: string): boolean {
  * Returns public profile data for a player by ID (UUID) or username
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   // Reject empty, too long, or suspicious identifiers
   if (!id || id.length > 100 || /[<>"';]/.test(id)) {

@@ -354,7 +354,7 @@ router.post('/:boardCode/cover-image', express.raw({ type: ALLOWED_MIME_TYPES, l
       return;
     }
 
-    const { boardCode } = req.params;
+    const boardCode = req.params.boardCode as string;
     if (!isValidPuzzleCode(boardCode)) {
       res.status(400).json({ error: 'Invalid board code format' });
       return;
@@ -407,7 +407,7 @@ router.post('/:boardCode/cover-image', express.raw({ type: ALLOWED_MIME_TYPES, l
  */
 router.get('/:boardCode', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { boardCode } = req.params;
+    const boardCode = req.params.boardCode as string;
 
     if (!isValidPuzzleCode(boardCode)) {
       res.status(400).json({ error: 'Invalid board code format' });
@@ -434,7 +434,7 @@ router.get('/:boardCode', async (req: Request, res: Response): Promise<void> => 
  */
 router.post('/:boardCode/play', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { boardCode } = req.params;
+    const boardCode = req.params.boardCode as string;
 
     if (!isValidPuzzleCode(boardCode)) {
       res.status(400).json({ error: 'Invalid board code format' });
@@ -482,7 +482,7 @@ router.post('/:boardCode/rate', async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    const { boardCode } = req.params;
+    const boardCode = req.params.boardCode as string;
     const { rating } = req.body;
 
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -517,7 +517,7 @@ router.post('/:boardCode/report', async (req: Request, res: Response): Promise<v
       return;
     }
 
-    const { boardCode } = req.params;
+    const boardCode = req.params.boardCode as string;
     const { reason } = req.body;
 
     if (!reason || !REPORT_REASONS.includes(reason)) {
