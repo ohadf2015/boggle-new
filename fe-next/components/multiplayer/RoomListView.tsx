@@ -13,6 +13,7 @@ import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
+import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeCard';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
@@ -137,10 +138,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 }) => {
   const { t, dir } = useLanguage();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
 
   useEffect(() => {
     if (shouldShowGuidance('multiplayerTutorialShown')) {
-      setShowHowToPlay(true);
+      setShowWelcomeCard(true);
       markGuidanceShown('multiplayerTutorialShown');
     }
   }, []);
@@ -210,6 +212,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
         {/* Scrollable Content */}
         <div className="flex-1 flex flex-col px-5 lg:px-6 gap-5 overflow-y-auto pb-10 safe-area-bottom pt-5">
+
+          {/* Welcome Card — inline, non-blocking */}
+          <AnimatePresence>
+            {showWelcomeCard && (
+              <MultiplayerWelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
+            )}
+          </AnimatePresence>
 
           {/* Live Match Status Bar */}
           {liveMatchCount > 0 && (

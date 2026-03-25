@@ -48,7 +48,7 @@ describe('RoomListView - Tutorial Persistence', () => {
     jest.clearAllMocks();
   });
 
-  it('shows tutorial modal on first visit when tutorial has not been shown', async () => {
+  it('shows welcome card on first visit when tutorial has not been shown', async () => {
     // GIVEN: User has never seen the multiplayer tutorial
     mockShouldShowGuidance.mockReturnValue(true);
 
@@ -59,9 +59,9 @@ describe('RoomListView - Tutorial Persistence', () => {
       </LanguageProvider>
     );
 
-    // THEN: Tutorial modal should be visible
+    // THEN: Inline welcome card should be visible (not a blocking dialog)
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText(/welcome/i)).toBeInTheDocument();
     });
 
     // AND: Tutorial should be marked as shown
@@ -86,31 +86,30 @@ describe('RoomListView - Tutorial Persistence', () => {
     expect(mockMarkGuidanceShown).not.toHaveBeenCalled();
   });
 
-  it('does NOT show tutorial again after dismissal on same session', async () => {
+  it('does NOT show welcome card again after dismissal on same session', async () => {
     const user = userEvent.setup();
 
     // GIVEN: First-time user
     mockShouldShowGuidance.mockReturnValueOnce(true);
 
-    // WHEN: Component mounts and user dismisses tutorial
+    // WHEN: Component mounts and user dismisses welcome card
     const { rerender } = render(
       <LanguageProvider>
         <RoomListView {...mockProps} />
       </LanguageProvider>
     );
 
-    // Wait for modal to appear
+    // Wait for welcome card to appear
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText(/welcome/i)).toBeInTheDocument();
     });
 
     // Verify tutorial was marked as shown on mount
     expect(mockMarkGuidanceShown).toHaveBeenCalledWith('multiplayerTutorialShown');
 
-    // User closes modal - multiple close buttons exist (Dialog's built-in + HowToPlay's own)
-    // Use getAllByRole and click the first one to dismiss
-    const closeButtons = screen.getAllByRole('button', { name: /close/i });
-    await user.click(closeButtons[0]);
+    // User closes the welcome card
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    await user.click(closeButton);
 
     // Mark as shown (simulating the actual storage update)
     mockShouldShowGuidance.mockReturnValue(false);
@@ -122,9 +121,9 @@ describe('RoomListView - Tutorial Persistence', () => {
       </LanguageProvider>
     );
 
-    // THEN: Tutorial should NOT show again
+    // THEN: Welcome card should NOT show again
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.queryByText(/welcome/i)).not.toBeInTheDocument();
     });
   });
 

@@ -22,6 +22,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Swords, Loader2, MapPin } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateRoomConfig {
   hostUsername: string;
@@ -65,6 +66,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   profileAvatar,
 }) => {
   const { t } = useLanguage();
+  const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
   const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
@@ -107,13 +109,16 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     }
     if (!isAuthenticated) setStoredUsername(username.trim());
     setStoredCustomAvatar(customAvatar!);
+    if (isAuthenticated) {
+      updateAuthProfile({ avatar_config: customAvatar! }).catch(() => {});
+    }
 
     const finalRoomName = roomName.trim()
       ? sanitizeRoomName(roomName.trim())
       : sanitizeRoomName(generateRoomName(username.trim()));
 
     onCreate({ hostUsername: username.trim(), roomName: finalRoomName, language });
-  }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName]);
+  }, [username, customAvatar, roomName, language, isAuthenticated, onCreate, generateRoomName, updateAuthProfile]);
 
   const usernameValidation = validateUsername(username);
   const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;

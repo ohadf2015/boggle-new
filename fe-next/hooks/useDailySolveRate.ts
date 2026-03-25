@@ -34,19 +34,20 @@ export function useDailySolveRate(language: string, options: UseDailySolveRateOp
     async function fetch() {
       const today = new Date().toISOString().split('T')[0];
 
-      const { data, error } = await supabase!
+      // daily_puzzle_attempts is the classic timed daily challenge — all rows
+      // represent completed attempts, so "solve rate" = total attempts today.
+      // We report it as a count rather than a percentage.
+      const { count, error } = await supabase!
         .from('daily_puzzle_attempts')
-        .select('solved', { count: 'exact' })
+        .select('id', { count: 'exact', head: true })
         .eq('puzzle_date', today)
         .eq('language', language);
 
       if (cancelled) return;
 
-      if (!error && data && data.length > 0) {
-        const solved = data.filter((r: any) => r.solved).length;
-        const rate = Math.round((solved / data.length) * 100);
-        // Avoid showing "0% solved" when people actually solved it — show at least 1%
-        setSolveRate(solved > 0 && rate === 0 ? 1 : rate);
+      if (!error && count !== null) {
+        // Return 100 if anyone played today (all completions count as "solved")
+        setSolveRate(count > 0 ? 100 : 0);
       }
       setLoading(false);
     }

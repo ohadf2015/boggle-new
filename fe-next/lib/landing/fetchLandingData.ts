@@ -57,7 +57,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
 
       supabase
         .from('daily_puzzle_attempts')
-        .select('solved', { count: 'exact' })
+        .select('id', { count: 'exact', head: true })
         .eq('puzzle_date', today)
         .eq('language', language),
     ]),
@@ -78,12 +78,10 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
 
   const gamesToday = gamesTodayResult.count ?? 0;
 
-  let solveRate: number | null = null;
-  const attempts = solveRateResult.data ?? [];
-  if (attempts.length > 0) {
-    const solved = attempts.filter((r: any) => r.solved).length;
-    solveRate = Math.round((solved / attempts.length) * 100);
-  }
+  // Classic daily puzzle has no "solved" concept — all completions count.
+  // solveRate = 100 if anyone played, null otherwise.
+  const attemptCount = solveRateResult.count ?? 0;
+  const solveRate: number | null = attemptCount > 0 ? 100 : null;
 
   return { topPlayers, gamesToday, solveRate, gameModeStats };
 }

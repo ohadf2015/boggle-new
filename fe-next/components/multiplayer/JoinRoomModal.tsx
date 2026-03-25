@@ -26,6 +26,7 @@ import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import type { ActiveRoom } from '@/shared/types/game';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface JoinRoomModalProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   profileAvatar,
 }) => {
   const { t } = useLanguage();
+  const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
   const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
@@ -88,9 +90,12 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
       setStoredUsername(username.trim());
     }
     setStoredCustomAvatar(customAvatar);
+    if (isAuthenticated) {
+      updateAuthProfile({ avatar_config: customAvatar }).catch(() => {});
+    }
 
     onJoin(username.trim());
-  }, [username, customAvatar, isAuthenticated, onJoin]);
+  }, [username, customAvatar, isAuthenticated, onJoin, updateAuthProfile]);
 
   if (!room) return null;
 

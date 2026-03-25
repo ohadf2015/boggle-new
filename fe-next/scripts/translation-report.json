@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 4165,
+    "totalKeysInCode": 4167,
     "keyCountByLanguage": {
-      "en": 6853,
-      "he": 6980,
-      "sv": 6998,
-      "ja": 7001,
-      "es": 7014
+      "en": 6866,
+      "he": 6993,
+      "sv": 7011,
+      "ja": 7014,
+      "es": 7027
     },
-    "missingFromEnglish": 10,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 8,
@@ -150,98 +150,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "admin.gameModePopularity",
-      "usages": [
-        {
-          "file": "components/admin/overview/GameModePopularity.tsx",
-          "line": 47
-        }
-      ]
-    },
-    {
-      "key": "admin.landingCardOrder",
-      "usages": [
-        {
-          "file": "components/admin/overview/GameModePopularity.tsx",
-          "line": 108
-        }
-      ]
-    },
-    {
-      "key": "admin.noData",
-      "usages": [
-        {
-          "file": "components/admin/overview/GameModePopularity.tsx",
-          "line": 112
-        }
-      ]
-    },
-    {
-      "key": "admin.totalGames",
-      "usages": [
-        {
-          "file": "components/admin/overview/GameModePopularity.tsx",
-          "line": 107
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.hud",
-      "usages": [
-        {
-          "file": "components/adventure/hud/AdventureHUD.tsx",
-          "line": 84
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.retryOptions",
-      "usages": [
-        {
-          "file": "components/adventure/RetryAssistModal.tsx",
-          "line": 107
-        }
-      ]
-    },
-    {
-      "key": "adventure.game.title",
-      "usages": [
-        {
-          "file": "components/adventure/AdventureGame.tsx",
-          "line": 445
-        }
-      ]
-    },
-    {
-      "key": "adventure.lexi.tapToDismiss",
-      "usages": [
-        {
-          "file": "components/adventure/LexiReaction.tsx",
-          "line": 183
-        }
-      ]
-    },
-    {
-      "key": "adventure.lexi.tapToSpeedUp",
-      "usages": [
-        {
-          "file": "components/adventure/LexiReaction.tsx",
-          "line": 251
-        }
-      ]
-    },
-    {
-      "key": "adventure.upgrades.shopTitle",
-      "usages": [
-        {
-          "file": "components/adventure/AdventureViewModals.tsx",
-          "line": 61
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],

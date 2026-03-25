@@ -233,25 +233,38 @@ export async function GET(request: NextRequest) {
           console.error('[admin/game-logs] Word Hunt query error:', wordHuntError);
         } else {
           wordHuntCount = whCount || 0;
-          wordHuntGames = (wordHuntData || []).map((attempt: any) => ({
-            id: attempt.id,
-            player_id: attempt.player_id,
-            guest_session_id: attempt.guest_fingerprint,
-            game_code: `daily_word_${attempt.puzzle_number}`,
-            score: attempt.efficiency_score || 0,
-            word_count: Array.isArray(attempt.words_discovered) ? attempt.words_discovered.length : 0,
-            longest_word: attempt.target_word || null,
-            placement: null,
-            is_ranked: false,
-            is_guest: !attempt.player_id,
-            mode: 'daily_word',
-            solved: attempt.solved,
-            attempts_used: attempt.attempts_used,
-            language: attempt.language,
-            time_played: 0, // Duration not tracked for this game type
-            created_at: attempt.created_at,
-            profiles: attempt.profiles || null,
-          }));
+          wordHuntGames = (wordHuntData || []).map((attempt: any) => {
+            // Derive duration from word discovery timestamps
+            let timePlayed = 0;
+            if (Array.isArray(attempt.words_discovered) && attempt.words_discovered.length > 1) {
+              const timestamps = attempt.words_discovered
+                .map((w: any) => w.timestamp)
+                .filter((t: any) => typeof t === 'number');
+              if (timestamps.length > 1) {
+                timePlayed = Math.round((Math.max(...timestamps) - Math.min(...timestamps)) / 1000);
+              }
+            }
+
+            return {
+              id: attempt.id,
+              player_id: attempt.player_id,
+              guest_session_id: attempt.guest_fingerprint,
+              game_code: `daily_word_${attempt.puzzle_number}`,
+              score: attempt.efficiency_score || 0,
+              word_count: Array.isArray(attempt.words_discovered) ? attempt.words_discovered.length : 0,
+              longest_word: attempt.target_word || null,
+              placement: null,
+              is_ranked: false,
+              is_guest: !attempt.player_id,
+              mode: 'daily_word',
+              solved: attempt.solved,
+              attempts_used: attempt.attempts_used,
+              language: attempt.language,
+              time_played: timePlayed,
+              created_at: attempt.created_at,
+              profiles: attempt.profiles || null,
+            };
+          });
         }
       }
     } catch (error) {

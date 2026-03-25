@@ -9,9 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchGameModeStats, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 
-// In-memory cache (5 min TTL)
-let cachedStats: GameModeStats[] | null = null;
-let cacheTimestamp = 0;
+// In-memory cache keyed by days (5 min TTL)
+const statsCache = new Map<number, { stats: GameModeStats[]; timestamp: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
@@ -29,13 +28,13 @@ export async function GET(request: NextRequest) {
   );
 
   const now = Date.now();
-  if (cachedStats && now - cacheTimestamp < CACHE_TTL_MS) {
-    return NextResponse.json({ stats: cachedStats });
+  const cached = statsCache.get(days);
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return NextResponse.json({ stats: cached.stats });
   }
 
   const stats = await fetchGameModeStats(days);
-  cachedStats = stats;
-  cacheTimestamp = now;
+  statsCache.set(days, { stats, timestamp: now });
 
   return NextResponse.json({ stats });
 }

@@ -280,12 +280,12 @@ export async function generateProgressiveHints(
         }
       }
 
-      console.error('[HintGenerator] Error generating hints:', error);
+      console.warn('[HintGenerator] Error generating hints:', error);
     }
   }
 
   if (lastError) {
-    console.error('[HintGenerator] All attempts failed:', lastError.message);
+    console.warn('[HintGenerator] All attempts failed:', lastError.message);
   }
   return generateFallbackHints(normalizedWord, language);
 }

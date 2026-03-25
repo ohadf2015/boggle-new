@@ -2,10 +2,11 @@
  * Fetch game mode popularity stats by aggregating play counts across tables.
  *
  * Sources:
- *   - game_results        → multiplayer (classic, blast-mp, word-hunt)
- *   - daily_puzzle_attempts → daily challenge
- *   - adventure_level_attempts → adventure mode
- *   - blast_results        → blast mode (solo)
+ *   - game_results              → multiplayer (classic, blast-mp, word-hunt)
+ *   - daily_word_hunt_attempts  → daily word hunt (Wordle-like)
+ *   - daily_puzzle_attempts     → daily puzzle challenge (filtered by completed_at)
+ *   - level_attempts            → adventure mode (filtered by last_attempt_at)
+ *   - blast_results             → blast mode (solo)
  *   - single_player_leaderboard → singleplayer (aggregate games_played)
  */
 
@@ -31,24 +32,30 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
   const sinceISO = since.toISOString();
 
   try {
-    const [mpResult, dailyResult, adventureResult, blastResult, spResult] = await Promise.all([
+    const [mpResult, dailyWordHuntResult, dailyPuzzleResult, adventureResult, blastResult, spResult] = await Promise.all([
       // Multiplayer games
       supabase
         .from('game_results')
         .select('id', { count: 'exact', head: true })
         .gte('created_at', sinceISO),
 
-      // Daily challenge attempts
+      // Daily Word Hunt attempts (Wordle-like daily)
       supabase
-        .from('daily_puzzle_attempts')
+        .from('daily_word_hunt_attempts')
         .select('id', { count: 'exact', head: true })
         .gte('created_at', sinceISO),
 
+      // Daily puzzle attempts (classic daily challenge)
+      supabase
+        .from('daily_puzzle_attempts')
+        .select('id', { count: 'exact', head: true })
+        .gte('completed_at', sinceISO),
+
       // Adventure level attempts
       supabase
-        .from('adventure_level_attempts')
+        .from('level_attempts')
         .select('id', { count: 'exact', head: true })
-        .gte('created_at', sinceISO),
+        .gte('last_attempt_at', sinceISO),
 
       // Blast solo results
       supabase
@@ -67,10 +74,12 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
       0
     );
 
+    const dailyTotal = (dailyWordHuntResult.count ?? 0) + (dailyPuzzleResult.count ?? 0);
+
     const stats: GameModeStats[] = [
       { mode: 'singleplayer', playCount: spTotal },
       { mode: 'multiplayer', playCount: mpResult.count ?? 0 },
-      { mode: 'daily', playCount: dailyResult.count ?? 0 },
+      { mode: 'daily', playCount: dailyTotal },
       { mode: 'adventure', playCount: adventureResult.count ?? 0 },
       { mode: 'blast', playCount: blastResult.count ?? 0 },
     ];
