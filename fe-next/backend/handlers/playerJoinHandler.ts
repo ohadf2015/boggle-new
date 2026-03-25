@@ -38,6 +38,7 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import logger from '../utils/logger.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
@@ -255,6 +256,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
         game.users[username].disconnected = true;
         game.users[username].disconnectedAt = Date.now();
+
+        // Notify game start coordinator so ack sequence adjusts for the leaving player
+        const leaveCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+        if (leaveCoordResult && leaveCoordResult.startTimer) {
+          startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
+        }
 
         // Clear socket mappings to prevent stale socket ID issues on rejoin
         // User data remains in game.users for score preservation

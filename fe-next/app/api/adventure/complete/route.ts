@@ -39,9 +39,10 @@ function validateRequestBody(body: Record<string, unknown>): {
     lootDrops?: unknown[];
     retainedScore?: number;
     wordsFound?: string[];
+    flashChallengeGold?: number;
   };
 } {
-  const { world, level, stars, score, words, longWords, lootDrops, retainedScore } = body;
+  const { world, level, stars, score, words, longWords, lootDrops, retainedScore, flashChallengeGold } = body;
 
   // Check required fields
   if (
@@ -87,6 +88,7 @@ function validateRequestBody(body: Record<string, unknown>): {
       ...(typeof longWords === 'number' && longWords >= 0 && { longWords }),
       ...(Array.isArray(lootDrops) && { lootDrops }),
       ...(typeof retainedScore === 'number' && { retainedScore }),
+      ...(typeof flashChallengeGold === 'number' && flashChallengeGold >= 0 && { flashChallengeGold: Math.min(flashChallengeGold, 100) }),
       ...(Array.isArray(body.wordsFound) && { wordsFound: body.wordsFound as string[] }),
     },
   };
@@ -256,13 +258,19 @@ export async function POST(request: NextRequest) {
     const isReplay = !!existingCompletion;
     const playerUpgrades = (existingProgression?.upgrades as UpgradeState) ?? {};
     // Gold scales with world to prevent late-game gold drought
-    const baseGold = (10 + world * 3) * stars;
+    // Salvage Claw (failureGold) grants a small consolation on 0-star attempts
+    const failureGoldEffect = getUpgradeEffect(playerUpgrades, 'failureGold') || 0;
+    const baseGold = stars === 0 && failureGoldEffect > 0
+      ? Math.floor((10 + world * 3) * failureGoldEffect)
+      : (10 + world * 3) * stars;
     const perfectClearGoldBonus = stars === 3 ? 50 : 0;
     // Cap longWords to a plausible maximum (max ~25 words in a level, not all can be long)
     const clampedLongWords = Math.min(longWords ?? 0, 20);
     const cargoBayEffect = getUpgradeEffect(playerUpgrades, 'cargoBay') || 0;
     const longWordBonus = clampedLongWords * cargoBayEffect;
-    let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus;
+    // Flash challenge gold (capped at 100 in validation, added before multipliers)
+    const flashGold = validation.data.flashChallengeGold ?? 0;
+    let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus + flashGold;
 
     // Apply luckyPickaxe as ADDITIVE bonus (not multiplicative — prevents economy inflation)
     const luckyPickaxeBonus = getUpgradeEffect(playerUpgrades, 'luckyPickaxe') || 0;
@@ -270,10 +278,14 @@ export async function POST(request: NextRequest) {
       goldEarned = Math.round(goldEarned + baseGold * luckyPickaxeBonus);
     }
 
-    // Replay penalty: 50% gold only when no new stars earned
+    // Replay penalty: 50% on BASE gold only — bonuses added on top unpenalized
     // Players improving their star count on a replay deserve full gold
     if (isReplay && starsGained === 0) {
-      goldEarned = Math.floor(goldEarned * 0.5);
+      const penalizedBase = Math.floor(baseGold * 0.5);
+      goldEarned = penalizedBase + perfectClearGoldBonus + longWordBonus + flashGold;
+      if (luckyPickaxeBonus > 0) {
+        goldEarned = Math.round(goldEarned + baseGold * luckyPickaxeBonus);
+      }
     }
 
     // Cap gold per level to prevent edge-case abuse

@@ -27,6 +27,7 @@ export interface AdventureGameOverlaysProps {
   bossTaunt: any;
   showBossIntro: boolean;
   handleBossIntroStart: () => void;
+  handleBossIntroSkip?: () => void;
   bossHealthState: any;
   bossEffectCallbacks: any;
   isBossLevel: boolean;
@@ -103,7 +104,7 @@ export interface AdventureGameOverlaysProps {
 }
 
 const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
-  bossConfig, bossMaxHP, bossTaunt, showBossIntro, handleBossIntroStart,
+  bossConfig, bossMaxHP, bossTaunt, showBossIntro, handleBossIntroStart, handleBossIntroSkip,
   bossHealthState, bossEffectCallbacks, isBossLevel, isBossActive,
   showBossFireworks, defeatedBossTier, showEdgeVignette, playerHealthState,
   showLevelComplete, gameStars, gameScore, wordsFound, gameState,
@@ -128,6 +129,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
       showTaunt={!!bossTaunt}
       showIntro={showBossIntro}
       onStartBattle={handleBossIntroStart}
+      onSkipIntro={handleBossIntroSkip}
       showVictory={showLevelComplete && bossHealthState.phase === 'victory'}
       showDefeat={showLevelComplete && (bossHealthState.phase === 'defeat' || playerHealthState.isDead)}
       stars={gameStars as 0 | 1 | 2 | 3} score={gameScore}

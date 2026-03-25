@@ -232,7 +232,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused, inactivityThresholdMs: init.adjustedInactivityThresholdMs,
-      maxHintsPerLevel: init.upgradeEffects.hintsPerLevel,
+      maxHintsPerLevel: init.upgradeEffects.hintsPerLevel + init.upgradeEffects.bonusHintsPerLevel,
     });
 
     // Gem Detector upgrade: highlight starting tiles of highest-scoring available words
@@ -300,6 +300,8 @@ const AdventureGame = memo<AdventureGameProps>(
       playerIsDead: bossOrch.playerHealthState.isDead, endBossBattle: bossOrch.endBossBattle,
       triggerBossTaunt: bossOrch.triggerBossTaunt,
       playerHealthPercent: bossOrch.playerHealthState.maxHP > 0 ? Math.round((bossOrch.playerHealthState.currentHP / bossOrch.playerHealthState.maxHP) * 100) : 100,
+      flashChallengeGold: flashChallenge.isChallengeComplete && flashChallenge.activeChallenge
+        ? flashChallenge.activeChallenge.rewardCoins : undefined,
     });
     const lastReportedStateRef = useRef<LastReportedTimerState | null>(null);
     useEffect(() => {
@@ -511,6 +513,7 @@ const AdventureGame = memo<AdventureGameProps>(
               bossConfig={bossOrch.bossConfig} bossMaxHP={bossOrch.bossMaxHP}
               bossTaunt={bossOrch.bossTaunt} showBossIntro={bossOrch.showBossIntro}
               handleBossIntroStart={bossOrch.handleBossIntroStart}
+              handleBossIntroSkip={bossOrch.handleBossIntroSkip}
               bossHealthState={bossOrch.bossHealthState} bossEffectCallbacks={bossOrch.bossEffectCallbacks}
               isBossLevel={isBossLevel} isBossActive={bossOrch.isBossActive}
               showBossFireworks={bossOrch.showBossFireworks} defeatedBossTier={bossOrch.defeatedBossTier}

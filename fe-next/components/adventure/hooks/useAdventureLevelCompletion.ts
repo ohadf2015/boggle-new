@@ -62,8 +62,11 @@ export interface UseAdventureLevelCompletionProps {
     words: number,
     goldEarned?: number,
     longWords?: number,
-    wordsFound?: string[]
+    wordsFound?: string[],
+    flashChallengeGold?: number
   ) => Promise<boolean>;
+  /** Gold earned from completed flash challenge (persisted server-side) */
+  flashChallengeGold?: number;
   /** Update word album with words found this level */
   updateWordAlbum?: (words: string[]) => void;
   endAIDirector: () => void;
@@ -307,7 +310,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
           levelConfig.world, levelConfig.level,
           gameState.stars as 0 | 1 | 2 | 3,
           gameState.score, gameState.wordsFound.length,
-          earnedGoldRef.current, longWords, gameState.wordsFound
+          earnedGoldRef.current, longWords, gameState.wordsFound,
+          props.flashChallengeGold
         ).then((success) => {
           if (!success) completionSaveFailedRef.current = true;
         }).catch(() => {

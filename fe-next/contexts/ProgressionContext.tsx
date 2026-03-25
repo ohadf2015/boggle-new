@@ -90,7 +90,8 @@ interface ProgressionContextType {
     words: number,
     goldEarned?: number,
     longWords?: number,
-    wordsFound?: string[]
+    wordsFound?: string[],
+    flashChallengeGold?: number
   ) => Promise<boolean>;
   /** Record a level attempt (including failures) */
   recordAttempt: (
@@ -240,7 +241,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       words: number,
       goldEarned?: number,
       longWords?: number,
-      wordsFound?: string[]
+      wordsFound?: string[],
+      flashChallengeGold?: number
     ) => {
       if (!user?.id) {
         // Guest users can't save progress
@@ -266,6 +268,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           ...(goldEarned !== undefined && { goldEarned }),
           ...(longWords !== undefined && { longWords }),
           ...(wordsFound && wordsFound.length > 0 && { wordsFound }),
+          ...(flashChallengeGold !== undefined && flashChallengeGold > 0 && { flashChallengeGold }),
         });
 
         let response = await fetch('/api/adventure/complete', {

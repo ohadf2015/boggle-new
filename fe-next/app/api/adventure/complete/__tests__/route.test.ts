@@ -146,6 +146,7 @@ function setupDbMocks({
 describe('POST /api/adventure/complete', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetUpgradeEffect.mockReturnValue(0);
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -265,16 +266,43 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.isReplay).toBe(true);
     });
 
-    it('awards 50% gold on repeat with same stars', async () => {
+    it('awards 50% penalty on BASE gold only, then adds bonuses on replay', async () => {
       setupDbMocks({
         completionData: { stars: 3, best_score: 600, best_words: 12 },
       });
 
       const res = await POST(makeRequest({ ...validBody, stars: 2 }));
       expect(res.status).toBe(200);
-      // (10+3)*2 = 26 * 0.5 = 13
+      // baseGold = (10+3)*2 = 26, penalized = floor(26*0.5) = 13
+      // no perfect bonus (stars≠3), no upgrade bonuses → 13
       expect(res.data.goldEarned).toBe(13);
       expect(res.data.isReplay).toBe(true);
+    });
+
+    it('replay penalty applies to base only — bonuses added after', async () => {
+      // luckyPickaxe gives 25% additive bonus on base
+      mockGetUpgradeEffect.mockImplementation((_upgrades: unknown, key: string) => {
+        if (key === 'luckyPickaxe') return 0.25;
+        return 0;
+      });
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { luckyPickaxe: 2 } },
+        completionData: { stars: 3, best_score: 600, best_words: 12 },
+      });
+
+      // Replay W1L1 with 3 stars (same as existing → starsGained=0 → penalty applies)
+      const res = await POST(makeRequest({ ...validBody, stars: 3 }));
+      expect(res.status).toBe(200);
+      expect(res.data.isReplay).toBe(true);
+      // OLD (wrong): (baseGold + perfectBonus + luckyBonus) * 0.5
+      // NEW (correct): floor(baseGold * 0.5) + perfectBonus + luckyBonus
+      // baseGold = (10+3)*3 = 39, penalizedBase = floor(39*0.5) = 19
+      // perfectClearBonus = 50 (stars===3)
+      // luckyPickaxeBonus = round(39 * 0.25) = 10 (applied on original baseGold)
+      // total = 19 + 50 + 10 = 79
+      expect(res.data.goldEarned).toBe(79);
+
+      mockGetUpgradeEffect.mockReset().mockReturnValue(0); // reset
     });
 
     it('server gold formula: 0 stars = 0 gold', async () => {

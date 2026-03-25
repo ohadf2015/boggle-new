@@ -81,6 +81,15 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
     logger.info('API', `[WordHunt Submit] Received: playerId=${playerId || 'null'}, guestFingerprint=${guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null'}, displayName=${displayName}, solved=${solved}, attempts=${attemptsUsed}`);
 
+    // Validate puzzleDate is today or yesterday (UTC) to prevent clock-drift abuse
+    const serverDate = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if (puzzleDate !== serverDate && puzzleDate !== yesterday) {
+      logger.info('API', `[WordHunt] Date drift: client=${puzzleDate}, server=${serverDate}`);
+      res.status(400).json({ error: 'Invalid puzzle date' });
+      return;
+    }
+
     // Server-side validation
     try {
       let expectedPuzzle: CachedPuzzle | null = await getCachedDailyPuzzle(puzzleDate, language) as CachedPuzzle | null;
@@ -210,29 +219,37 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
           ? Math.round(efficiencyScore)
           : 0;
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('total_score, total_games')
-          .eq('id', playerId)
-          .single();
+        // Atomic increment to prevent multi-tab race conditions
+        const { error: updateError } = await supabase.rpc('increment_profile_stats', {
+          p_user_id: playerId,
+          p_score: scoreToAdd,
+          p_games: 1,
+        });
 
-        if (profile) {
-          const newTotalScore = (profile.total_score || 0) + scoreToAdd;
-          const newTotalGames = (profile.total_games || 0) + 1;
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              total_score: newTotalScore,
-              total_games: newTotalGames,
-              last_game_at: new Date().toISOString(),
-            })
-            .eq('id', playerId);
+        if (updateError) {
+          // Fallback to non-atomic update if RPC doesn't exist yet
+          if (updateError.code === '42883' || updateError.message?.includes('function')) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('total_score, total_games')
+              .eq('id', playerId)
+              .single();
 
-          if (updateError) {
-            logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${updateError.message}`);
+            if (profile) {
+              await supabase
+                .from('profiles')
+                .update({
+                  total_score: (profile.total_score || 0) + scoreToAdd,
+                  total_games: (profile.total_games || 0) + 1,
+                  last_game_at: new Date().toISOString(),
+                })
+                .eq('id', playerId);
+            }
           } else {
-            logger.info('API', `[WordHunt] Updated profile stats for ${playerId}: +${scoreToAdd} points (total: ${newTotalScore}, games: ${newTotalGames})`);
+            logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${updateError.message}`);
           }
+        } else {
+          logger.info('API', `[WordHunt] Updated profile stats atomically for ${playerId}: +${scoreToAdd} points`);
         }
       } catch (scoreError) {
         logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
@@ -516,7 +533,8 @@ router.get('/stats/:date/:language', async (req: Request<WordHuntStatsParams>, r
 router.get('/check-played/:date/:language', async (req: Request<{ date: string; language: string }, unknown, unknown, { playerId?: string; guestFingerprint?: string }>, res: Response): Promise<void> => {
   try {
     if (!isSupabaseConfigured()) {
-      res.json({ hasPlayed: false });
+      // Return error instead of false — prevents replay when DB is down
+      res.status(503).json({ error: 'Service temporarily unavailable', hasPlayed: null });
       return;
     }
 
