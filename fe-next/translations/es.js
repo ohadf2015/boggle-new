@@ -5963,6 +5963,9 @@ const es = {
       "fullComboLevels": "Combo completo"
     },
     "loadError": "Error al cargar el progreso",
+    "sessionExpired": "Tu sesión ha caducado",
+    "sessionExpiredHint": "Inicia sesión de nuevo para continuar tu aventura",
+    "loginAgain": "Iniciar sesión",
     "prestige": {
       "title": "Prestigio",
       "available": "¡Prestigio disponible!",

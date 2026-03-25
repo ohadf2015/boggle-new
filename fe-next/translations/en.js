@@ -6183,6 +6183,9 @@ const en = {
       "fullComboLevels": "Full Combo"
     },
     "loadError": "Failed to load progress",
+    "sessionExpired": "Your session has expired",
+    "sessionExpiredHint": "Log in again to continue your adventure",
+    "loginAgain": "Log In",
     "prestige": {
       "title": "Prestige",
       "available": "Prestige Available!",

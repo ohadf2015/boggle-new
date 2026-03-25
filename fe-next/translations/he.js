@@ -5978,6 +5978,9 @@ const he = {
       "fullComboLevels": "קומבו מלא"
     },
     "loadError": "נכשל לטעון התקדמות",
+    "sessionExpired": "החיבור שלך פג תוקף",
+    "sessionExpiredHint": "התחברו שוב כדי להמשיך בהרפתקה",
+    "loginAgain": "התחברות",
     "prestige": {
       "title": "פרסטיז'",
       "available": "פרסטיז' זמין!",

@@ -77,6 +77,8 @@ interface ProgressionContextType {
   isLoading: boolean;
   /** Error from fetch or update operations */
   error: Error | null;
+  /** True when error was caused by expired/missing auth session */
+  isAuthError: boolean;
   /** Refresh progression data from API */
   refreshProgression: () => Promise<void>;
   /** Complete a level and update progression. Returns true if saved, false if save failed (guest/network/auth). */
@@ -137,6 +139,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   const [attempts, setAttempts] = useState<LevelAttempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isAuthError, setIsAuthError] = useState(false);
 
   // Fetch progression and attempts from combined API endpoint
   // Uses /api/adventure/state which returns both in one request (~50-100ms faster)
@@ -150,6 +153,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     }
 
     setError(null);
+    setIsAuthError(false);
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -158,10 +162,12 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           credentials: 'include',
         });
 
-        // Handle auth failures silently - user's session may have expired
+        // Handle auth failures — flag as auth error so UI can offer re-login
         if (response.status === 401) {
           setProgression(null);
           setAttempts([]);
+          setIsAuthError(true);
+          setError(new Error('Session expired'));
           setIsLoading(false);
           return;
         }
@@ -642,6 +648,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       attempts,
       isLoading,
       error,
+      isAuthError,
       refreshProgression,
       completeLevel,
       recordAttempt,
@@ -659,6 +666,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       attempts,
       isLoading,
       error,
+      isAuthError,
       refreshProgression,
       completeLevel,
       recordAttempt,

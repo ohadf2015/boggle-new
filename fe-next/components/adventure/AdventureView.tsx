@@ -50,7 +50,7 @@ interface GameTimerState {
 function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
-  const { progression, isLoading, error, completeLevel, updateCurrency, refreshProgression } = useProgression();
+  const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, refreshProgression } = useProgression();
 
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
@@ -236,24 +236,52 @@ function AdventureView(): React.JSX.Element {
   }
 
   if (error) {
+    const handleReLogin = () => {
+      // Clear stale auth cookies and redirect to login
+      window.location.href = `/${language || 'en'}?login=true`;
+    };
+
     return (
       <div className="h-screen bg-neo-navy flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center px-4">
-          <div className="w-16 h-16 bg-neo-red/20 rounded-full flex items-center justify-center">
-            <span className="text-3xl">!</span>
+          <div className={cn(
+            'w-16 h-16 rounded-full flex items-center justify-center',
+            isAuthError ? 'bg-neo-yellow/20' : 'bg-neo-red/20'
+          )}>
+            <span className="text-3xl">{isAuthError ? '🔑' : '!'}</span>
           </div>
-          <p className="text-neo-white font-bold">{t('adventure.loadError')}</p>
+          <p className="text-neo-white font-bold">
+            {isAuthError ? t('adventure.sessionExpired') : t('adventure.loadError')}
+          </p>
+          {isAuthError && (
+            <p className="text-neo-white/60 text-sm max-w-xs">
+              {t('adventure.sessionExpiredHint')}
+            </p>
+          )}
           <div className="flex gap-3">
-            <button
-              onClick={() => refreshProgression()}
-              className={cn(
-                'px-4 py-2 bg-neo-lime text-neo-black font-bold',
-                'border-3 border-neo-black rounded-neo shadow-hard',
-                'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
-              )}
-            >
-              {t('common.retry')}
-            </button>
+            {isAuthError ? (
+              <button
+                onClick={handleReLogin}
+                className={cn(
+                  'px-4 py-2 bg-neo-lime text-neo-black font-bold',
+                  'border-3 border-neo-black rounded-neo shadow-hard',
+                  'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
+                )}
+              >
+                {t('adventure.loginAgain')}
+              </button>
+            ) : (
+              <button
+                onClick={() => refreshProgression()}
+                className={cn(
+                  'px-4 py-2 bg-neo-lime text-neo-black font-bold',
+                  'border-3 border-neo-black rounded-neo shadow-hard',
+                  'hover:shadow-hard-pressed active:translate-y-0.5 transition-all'
+                )}
+              >
+                {t('common.retry')}
+              </button>
+            )}
             <Link
               href="/"
               className={cn(

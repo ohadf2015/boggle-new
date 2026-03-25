@@ -5931,6 +5931,9 @@ const sv = {
       "fullComboLevels": "Full combo"
     },
     "loadError": "Kunde inte ladda framsteg",
+    "sessionExpired": "Din session har gått ut",
+    "sessionExpiredHint": "Logga in igen för att fortsätta äventyret",
+    "loginAgain": "Logga in",
     "prestige": {
       "title": "Prestige",
       "available": "Prestige tillgänglig!",

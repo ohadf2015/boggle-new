@@ -5983,6 +5983,9 @@ const ja = {
       "fullComboLevels": "フルコンボ"
     },
     "loadError": "進捗の読み込みに失敗しました",
+    "sessionExpired": "セッションの有効期限が切れました",
+    "sessionExpiredHint": "冒険を続けるには再度ログインしてください",
+    "loginAgain": "ログイン",
     "prestige": {
       "title": "プレステージ",
       "available": "プレステージ可能！",
