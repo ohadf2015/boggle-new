@@ -36,11 +36,11 @@ describe('AdventureGame — useChapterQuests wiring', () => {
   });
 
   it('calls recordWordsFound when words are found', () => {
-    expect(allSources).toMatch(/chapterQuests\.recordWordsFound/);
+    expect(allSources).toMatch(/chapterQuests(?:Ref\.current)?\.recordWordsFound/);
   });
 
   it('calls recordLongWord for long words', () => {
-    expect(allSources).toMatch(/chapterQuests\.recordLongWord/);
+    expect(allSources).toMatch(/chapterQuests(?:Ref\.current)?\.recordLongWord/);
   });
 
   it('calls recordLevelPerfect when 3 stars earned', () => {
@@ -52,15 +52,15 @@ describe('AdventureGame — useChapterQuests wiring', () => {
   });
 
   it('calls recordStreakMaster when combo count increases', () => {
-    expect(allSources).toMatch(/chapterQuests\.recordStreakMaster/);
+    expect(allSources).toMatch(/chapterQuests(?:Ref\.current)?\.recordStreakMaster/);
   });
 
   it('calls recordFlashChallengeMaster when flash challenge completes', () => {
-    expect(allSources).toMatch(/chapterQuests\.recordFlashChallengeMaster/);
+    expect(allSources).toMatch(/chapterQuests(?:Ref\.current)?\.recordFlashChallengeMaster/);
   });
 
   it('calls recordWorldMechanicUse when boss grid effect triggers', () => {
-    expect(allSources).toMatch(/chapterQuests\.recordWorldMechanicUse/);
+    expect(allSources).toMatch(/chapterQuests(?:Ref\.current)?\.recordWorldMechanicUse/);
   });
 
   it('calls recordScoreChallenge with final score on level complete', () => {

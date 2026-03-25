@@ -38,6 +38,12 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     recordQuestProgress, chapterQuests, updateObjective,
   } = params;
 
+  // Ref for chapterQuests to avoid having the object in useEffect deps.
+  // The object changes on every render (new progress derived from state),
+  // which causes infinite re-render loops when effects call methods that update state.
+  const chapterQuestsRef = useRef(chapterQuests);
+  chapterQuestsRef.current = chapterQuests;
+
   // Boss objective: defeatBoss — track boss HP depletion as percentage
   useEffect(() => {
     if (!isBossLevel) return;
@@ -56,12 +62,16 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     updateObjective('surviveBattle', healthPct, 'set');
   }, [isBossLevel, playerCurrentHP, playerMaxHP, updateObjective]);
 
-  // Boss objective: mechanicTrigger — increment when boss grid effect triggers
+  // Grid effect trigger: track for both boss objective AND chapter quest
   const prevGridEffectRef = useRef(gridEffectTrigger);
   useEffect(() => {
-    if (!isBossLevel) return;
     if (gridEffectTrigger !== prevGridEffectRef.current && gridEffectTrigger) {
-      updateObjective('mechanicTrigger', 1, 'increment');
+      // Boss objective: mechanicTrigger
+      if (isBossLevel) {
+        updateObjective('mechanicTrigger', 1, 'increment');
+      }
+      // Chapter quest: world mechanic use
+      chapterQuestsRef.current.recordWorldMechanicUse();
     }
     prevGridEffectRef.current = gridEffectTrigger;
   }, [isBossLevel, gridEffectTrigger, updateObjective]);
@@ -72,40 +82,37 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     const newWords = wordsFound.length - prevQuestWordsRef.current;
     if (newWords > 0) {
       recordQuestProgress('wordCount', newWords);
-      chapterQuests.recordWordsFound(newWords);
+      chapterQuestsRef.current.recordWordsFound(newWords);
       const latestWord = wordsFound[wordsFound.length - 1];
       if (latestWord && latestWord.length >= 6) {
         recordQuestProgress('longWord');
-        chapterQuests.recordLongWord();
+        chapterQuestsRef.current.recordLongWord();
       }
     }
     prevQuestWordsRef.current = wordsFound.length;
-  }, [wordsFound, recordQuestProgress, chapterQuests]);
+  }, [wordsFound, recordQuestProgress]);
 
+  // Combo streak quest: only fire when crossing the 5-combo threshold
+  // (not on every subsequent increment within the same streak)
+  const prevComboRef = useRef(0);
   useEffect(() => {
-    if (comboCount >= 5) recordQuestProgress('comboStreak');
-  }, [comboCount, recordQuestProgress]);
-
-  // Chapter quest: streak master
-  useEffect(() => {
-    if (comboCount > 0) {
-      chapterQuests.recordStreakMaster();
+    const prev = prevComboRef.current;
+    if (comboCount >= 5 && prev < 5) {
+      recordQuestProgress('comboStreak');
     }
-  }, [comboCount, chapterQuests]);
+    // Chapter quest: streak master — fire when a new streak begins
+    // (transition from 0 to positive), not on every word within a streak
+    if (comboCount > 0 && prev === 0) {
+      chapterQuestsRef.current.recordStreakMaster();
+    }
+    prevComboRef.current = comboCount;
+  }, [comboCount, recordQuestProgress]);
 
   // Chapter quest: flash challenge master
   useEffect(() => {
     if (isChallengeComplete) {
-      chapterQuests.recordFlashChallengeMaster();
+      chapterQuestsRef.current.recordFlashChallengeMaster();
     }
-  }, [isChallengeComplete, chapterQuests]);
+  }, [isChallengeComplete]);
 
-  // Chapter quest: world mechanic use
-  const prevMechanicTriggerRef = useRef(gridEffectTrigger);
-  useEffect(() => {
-    if (gridEffectTrigger !== prevMechanicTriggerRef.current && gridEffectTrigger) {
-      chapterQuests.recordWorldMechanicUse();
-    }
-    prevMechanicTriggerRef.current = gridEffectTrigger;
-  }, [gridEffectTrigger, chapterQuests]);
 }

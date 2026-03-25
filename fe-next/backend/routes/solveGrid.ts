@@ -173,10 +173,12 @@ router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promis
     const msg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('SOLVE-GRID', `Error: ${msg}`);
 
-    res.status(500).json({
-      success: false,
-      error: 'Failed to solve grid',
-    } as SolveGridResponse);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to solve grid',
+      } as SolveGridResponse);
+    }
   }
 });
 
