@@ -90,8 +90,19 @@ export async function POST(request: NextRequest) {
     if (typeof score !== 'number' || score < 0 || score > 100000) {
       return NextResponse.json({ error: 'Invalid score' }, { status: 400 });
     }
-    if (typeof wordsFound !== 'number' || wordsFound < 0) {
+    if (typeof wordsFound !== 'number' || wordsFound < 0 || wordsFound > 500) {
       return NextResponse.json({ error: 'Invalid wordsFound' }, { status: 400 });
+    }
+
+    // Plausibility check: score must be roughly proportional to words found
+    // A generous upper bound is ~200 points per word (long word + combo bonus)
+    const maxPlausibleScore = wordsFound * 200;
+    if (wordsFound > 0 && score > maxPlausibleScore) {
+      return NextResponse.json({ error: 'Score implausible for words found' }, { status: 400 });
+    }
+    // Zero words but positive score is also implausible
+    if (wordsFound === 0 && score > 0) {
+      return NextResponse.json({ error: 'Score implausible for zero words' }, { status: 400 });
     }
 
     const weekId = getCurrentWeekId();

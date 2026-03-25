@@ -47,7 +47,7 @@ function NeoButton({
 function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
   const { t } = useLanguage();
   const {
-    gridSize, setGridSize,
+    gridSize,
     seedTags, addTag, removeTag, updateTag,
     generatedBoard,
     isGenerating,
@@ -56,8 +56,6 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
     setStep,
   } = creator;
 
-  const SIZES = [4, 5, 6] as const;
-
   const canProceed = generatedBoard !== null && seedTags.length > 0;
 
   return (
@@ -65,32 +63,6 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
       <h1 className="font-neo-display text-2xl font-bold text-neo-white">
         {t('ugc.createBoard')}
       </h1>
-
-      {/* Grid size picker */}
-      <div className="flex flex-col gap-2">
-        <label className="font-neo-body text-sm text-neo-white/80">
-          {t('ugc.board.gridSize')}
-        </label>
-        <div className="flex gap-2">
-          {SIZES.map(size => (
-            <motion.button
-              key={size}
-              data-testid={`grid-size-${size}`}
-              onClick={() => setGridSize(size)}
-              whileTap={{ scale: 0.92 }}
-              className={cn(
-                'border-neo border-black shadow-hard-sm font-neo-display font-bold',
-                'px-4 py-2 rounded-neo transition-colors',
-                gridSize === size
-                  ? 'bg-neo-lime text-black'
-                  : 'bg-neo-navy text-neo-white hover:bg-neo-navy-light'
-              )}
-            >
-              {size}x{size}
-            </motion.button>
-          ))}
-        </div>
-      </div>
 
       {/* Seed words tag input */}
       <SeedWordTags

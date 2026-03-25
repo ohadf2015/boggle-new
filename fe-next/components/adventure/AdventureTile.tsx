@@ -213,7 +213,7 @@ export const AdventureTile = memo(({
         isHintHighlighted && !isSelected && [
           'bg-neo-lime text-neo-black border-2 border-neo-black/60 z-10',
           'shadow-[0_0_12px_rgba(255,225,53,0.5)]',
-          'animate-pulse',
+          'animate-pulse motion-reduce:animate-none',
         ],
 
         // Standard tile background — use same gradient as GridComponent

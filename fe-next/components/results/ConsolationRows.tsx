@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import type { ConsolationCrown } from '@/utils/consolationCrowns';
@@ -20,12 +20,34 @@ function formatScore(score: number): string {
   return score.toLocaleString();
 }
 
+const rowVariants = {
+  hidden: (i: number) => ({
+    opacity: 0,
+    x: i % 2 === 0 ? -30 : 30,
+    scale: 0.92,
+    rotate: i % 2 === 0 ? -2 : 2,
+  }),
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    rotate: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 250,
+      damping: 18,
+      delay: 0.6 + i * 0.08,
+    },
+  }),
+};
+
 export default function ConsolationRows({
   players,
   crowns,
   currentUsername,
   t,
 }: ConsolationRowsProps) {
+  const reducedMotion = useReducedMotion();
   if (!players.length) return null;
 
   return (
@@ -39,17 +61,21 @@ export default function ConsolationRows({
         return (
           <motion.div
             key={player.username}
-            initial={{ opacity: 0, x: -12, y: 0 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ delay: index * 0.06, duration: 0.3 }}
+            custom={index}
+            variants={reducedMotion ? undefined : rowVariants}
+            initial="hidden"
+            animate="visible"
             className="flex items-center justify-between py-4"
           >
             <div className="flex items-center gap-3">
               {crown && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                 
+                <motion.img
                   src={crown.image}
                   alt=""
+                  initial={reducedMotion ? undefined : { scale: 0, rotate: -20 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 14, delay: 0.7 + index * 0.08 }}
                   className={cn(
                     'w-8 h-8 rounded-lg shrink-0',
                     crown.id === 'sniper' && 'shadow-[0_0_8px_rgba(0,255,255,0.3)]',
@@ -83,7 +109,7 @@ export default function ConsolationRows({
                       crown.color
                     )}
                   >
-                    {t(`crowns.${crown.id}`) || crown.name}
+                    {t(`results.crowns.${crown.id}`) || crown.name}
                   </span>
                 )}
               </div>

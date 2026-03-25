@@ -432,6 +432,25 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     }
   });
 
+  // Handle client requesting results after reconnection
+  // If the client missed 'validatedScores'/'validationComplete' due to a brief disconnect,
+  // this lets them retrieve the cached payload.
+  socket.on('requestResults', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game || game.gameState !== 'finished') return;
+
+    const cached = (game as any).cachedResultsPayload;
+    if (cached) {
+      logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
+      safeEmit(socket, 'validatedScores', cached);
+      safeEmit(socket, 'validationComplete', cached);
+    }
+  });
+
   // Handle player toggling lobby ready state
   socket.on('lobbyReady', (data: { ready: boolean }) => {
     if (!checkRateLimit(socket.id)) return;

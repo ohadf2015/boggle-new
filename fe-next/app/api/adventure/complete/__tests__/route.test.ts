@@ -461,17 +461,17 @@ describe('POST /api/adventure/complete', () => {
       expect(res.data.starsGained).toBe(2);
     });
 
-    it('completing world 10 level 10 caps next world/level', async () => {
+    it('completing world 10 level 7 caps next world/level', async () => {
       setupDbMocks({
-        progressionData: { ...mockProgression, current_world: 10, current_level: 10 },
+        progressionData: { ...mockProgression, current_world: 10, current_level: 7 },
         completionData: null,
         completionError: { code: 'PGRST116', message: 'not found' },
       });
 
-      const res = await POST(makeRequest({ ...validBody, world: 10, level: 10 }));
+      const res = await POST(makeRequest({ ...validBody, world: 10, level: 7 }));
       expect(res.status).toBe(200);
       expect(res.data.progression.currentWorld).toBe(10);
-      expect(res.data.progression.currentLevel).toBe(10);
+      expect(res.data.progression.currentLevel).toBe(7);
     });
   });
 

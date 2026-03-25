@@ -3,19 +3,21 @@ import { neoInfoToast, neoWarningToast } from '@/components/NeoToast';
 
 interface Player {
   username: string;
+  isBot?: boolean;
   [key: string]: unknown;
 }
 
 interface UsePlayerJoinLeaveNotificationsProps {
   players: Player[];
   currentUsername: string;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   enabled?: boolean;
 }
 
 /**
  * Shows toast notifications when players join or leave the multiplayer lobby.
  * Diffs the player list on each update to detect changes.
+ * Batches multiple bot joins into a single consolidated toast.
  */
 export function usePlayerJoinLeaveNotifications({
   players,
@@ -27,6 +29,7 @@ export function usePlayerJoinLeaveNotifications({
 
   useEffect(() => {
     const currentUsernames = new Set(players.map((p) => p.username));
+    const botUsernames = new Set(players.filter((p) => p.isBot).map((p) => p.username));
 
     // Skip first render — don't announce existing players
     if (prevUsernamesRef.current === null) {
@@ -41,14 +44,33 @@ export function usePlayerJoinLeaveNotifications({
 
     const prev = prevUsernamesRef.current;
 
-    // Detect joins
+    // Detect joins — separate bots from humans
+    const newHumans: string[] = [];
+    const newBots: string[] = [];
     for (const name of currentUsernames) {
       if (!prev.has(name) && name !== currentUsername) {
-        neoInfoToast(`${name} ${t('multiplayer.playerJoined')}`, {
-          icon: '👋',
-          duration: 3000,
-        });
+        if (botUsernames.has(name)) {
+          newBots.push(name);
+        } else {
+          newHumans.push(name);
+        }
       }
+    }
+
+    // Show individual toasts for human players
+    for (const name of newHumans) {
+      neoInfoToast(`${name} ${t('multiplayer.playerJoined')}`, {
+        icon: '👋',
+        duration: 3000,
+      });
+    }
+
+    // Show a single consolidated toast for bots
+    if (newBots.length > 0) {
+      neoInfoToast(t('multiplayer.botsJoined', { count: newBots.length }), {
+        icon: '🤖',
+        duration: 3000,
+      });
     }
 
     // Detect leaves

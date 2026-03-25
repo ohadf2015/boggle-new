@@ -75,7 +75,7 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
             <button
               onClick={onClose}
               className="p-1.5 rounded-neo hover:bg-neo-white/10 transition-colors"
-              aria-label="Close"
+              aria-label={t('common.close')}
             >
               <X className="w-5 h-5 text-neo-white/60" />
             </button>

@@ -53,12 +53,12 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
 
   return (
     <>
-      {/* Stats Row */}
+      {/* Stats Row — slides up with bounce */}
       {currentPlayerRank > 0 && isStatsVisible && (
         <motion.div
-          initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 20, delay: statsDelay }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 16, delay: statsDelay }}
         >
           <StatsCardGrid
             cards={[
@@ -87,12 +87,12 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
         </motion.div>
       )}
 
-      {/* Top Achievements */}
+      {/* Top Achievements — pop in with slight rotate */}
       {gameAchievements.length > 0 && isStatsVisible && (
         <motion.div
-          initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20, delay: statsDelay + 0.15 }}
+          initial={reducedMotion ? undefined : { opacity: 0, scale: 0.9, rotate: -1 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 250, damping: 16, delay: statsDelay + 0.18 }}
           className="flex items-center gap-2 flex-wrap justify-center py-2"
         >
           <span className="text-[10px] font-black uppercase tracking-widest text-neo-cream/40 w-full text-center mb-0.5">
@@ -108,12 +108,12 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
         </motion.div>
       )}
 
-      {/* Your Words — grouped by points */}
+      {/* Your Words — grouped by points, slides up */}
       {currentPlayerValidWords.length > 0 && isWordsVisible && (
         <motion.div
-          initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 120, damping: 20, delay: wordsDelay }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 180, damping: 18, delay: wordsDelay }}
         >
           <CollapsibleSection
             title={t('results.yourWords')}
@@ -126,7 +126,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
               totalComboBonus > 0 ? `\u26a1 +${totalComboBonus}` : undefined,
               totalFireRoundBonus > 0 ? `\ud83d\udd25 +${totalFireRoundBonus}` : undefined,
             ].filter(Boolean).join(' \u00b7 ')}
-            defaultExpanded={true}
+            defaultExpanded={false}
             variant="tertiary"
             className="shadow-hard"
           >

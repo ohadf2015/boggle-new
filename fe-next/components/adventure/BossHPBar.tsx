@@ -202,7 +202,7 @@ export const BossHPBar = memo(function BossHPBar({
         <AdaptiveMotion.div
           animate={{ width: `${pct}%` }}
           transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-          className={cn('absolute inset-y-0 left-0 rounded-neo', barColor, isEnraged && 'animate-pulse')}
+          className={cn('absolute inset-y-0 left-0 rounded-neo', barColor, isEnraged && 'animate-pulse motion-reduce:animate-none')}
         />
 
         {/* White flash overlay on hit */}

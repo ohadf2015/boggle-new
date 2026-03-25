@@ -10,6 +10,8 @@ import type { GameState } from '../../modules/gameState/types';
 import { processGameResults, isSupabaseConfigured } from '../../modules/supabaseServer';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
+import { updateQuestProgress } from '../../modules/weeklyQuestManager';
+import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
 import { processGameEndEngagement, processAchievementEngagement } from '../../handlers/engagementHandler';
@@ -66,6 +68,7 @@ export async function recordGameResultsToSupabase(
       language: game.language || 'en',
       isRanked: game.isRanked || false,
       timePlayed: game.timerSeconds || 0,
+      gameMode: game.gameMode || 'classic',
     };
 
     // Sort scores to calculate placements for stats recording
@@ -112,6 +115,9 @@ export async function recordGameResultsToSupabase(
 
     // Process engagement events for each player
     await processEngagementEvents(io, scoresArray, game, gameCode);
+
+    // Update weekly quest progress for each authenticated player
+    await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap);
 
     // Increment word approval counts for dictionary words
     // OPTIMIZATION: Batch all operations with Promise.all instead of sequential awaits
@@ -292,6 +298,42 @@ async function incrementWordApprovals(
   if (wordApprovalOps.length > 0) {
     await Promise.all(wordApprovalOps);
   }
+}
+
+/**
+ * Update weekly quest progress for all authenticated players after a game.
+ */
+async function updateWeeklyQuestProgressForPlayers(
+  scoresArray: PlayerResult[],
+  _game: GameState,
+  userAuthMap: Record<string, UserAuthInfo>,
+): Promise<void> {
+  const isWin = (username: string) => {
+    const sorted = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+    return sorted[0]?.username === username;
+  };
+
+  const ops = scoresArray.map(async (player) => {
+    const authInfo = userAuthMap[player.username];
+    if (!authInfo?.authUserId) return;
+
+    const stats: GameStats = {
+      gamesPlayed: 1,
+      wordsFound: player.wordDetails?.length ?? 0,
+      longWordsFound: player.wordDetails?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
+      maxCombo: 0,
+      maxScore: player.totalScore ?? 0,
+      multiplayerWins: isWin(player.username) ? 1 : 0,
+    };
+
+    try {
+      await updateQuestProgress(authInfo.authUserId, stats);
+    } catch (err) {
+      logger.error('WEEKLY_QUEST', `Failed to update quest for ${player.username}: ${err}`);
+    }
+  });
+
+  await Promise.all(ops);
 }
 
 export { isSupabaseConfigured };

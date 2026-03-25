@@ -112,14 +112,22 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         </AdaptiveMotion.div>
       </button>
 
-      {/* Summary line — visible only when collapsed, tells player what's inside */}
+      {/* Summary teaser — visible only when collapsed, entices player to expand */}
       {summary && !isExpanded && (
-        <div className={cn(
-          'px-3 py-1.5 text-xs text-slate-400 italic border-t border-slate-700/30',
-          styles.content,
-        )}>
-          {summary}
-        </div>
+        <button
+          onClick={handleToggle}
+          className={cn(
+            'w-full px-3 py-2 text-xs text-slate-300 border-t border-white/5 text-start',
+            'bg-gradient-to-r from-neo-cyan/[0.04] via-transparent to-neo-pink/[0.04]',
+            'hover:from-neo-cyan/[0.08] hover:to-neo-pink/[0.08] transition-colors cursor-pointer',
+            styles.content,
+          )}
+        >
+          <span className="opacity-70">{summary}</span>
+          <span className="text-neo-cyan/60 ms-1.5 text-[10px] font-black uppercase tracking-widest">
+            {'\u2022\u2022\u2022'}
+          </span>
+        </button>
       )}
 
       {/* Collapsible Content */}

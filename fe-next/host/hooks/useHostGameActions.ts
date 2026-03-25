@@ -58,6 +58,7 @@ interface UseHostGameActionsOptions {
   setShowExitConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCancelTournamentDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setShowQR: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSoloConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Refs
   intentionalExitRef: MutableRefObject<boolean>;
@@ -66,6 +67,7 @@ interface UseHostGameActionsOptions {
 
 export interface UseHostGameActionsReturn {
   startGame: () => void;
+  confirmSoloStart: () => void;
   stopGame: () => void;
   handleExitRoom: () => void;
   confirmExitRoom: () => void;
@@ -111,13 +113,15 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setShowExitConfirm,
     setShowCancelTournamentDialog,
     setShowQR,
+    setShowSoloConfirm,
     intentionalExitRef,
     tournamentTimeoutRef,
   } = options;
 
   const startGameLockRef = useRef(false);
 
-  const startGame = useCallback(() => {
+  /** Core game-start logic shared by startGame and confirmSoloStart */
+  const executeStartGame = useCallback(() => {
     // Debounce: prevent double-click from emitting startGame twice
     if (startGameLockRef.current) {
       logger.warn('[HOST] Start game already in progress, ignoring duplicate');
@@ -125,13 +129,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     }
     startGameLockRef.current = true;
     setTimeout(() => { startGameLockRef.current = false; }, 3000);
-
-    // Validate players are ready (allow start if host is playing solo)
-    if (playersCount === 0 && !hostPlaying) {
-      logger.warn('[HOST] Cannot start game: no players');
-      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
-      return;
-    }
 
     // Validate socket connection
     if (!socket || !socket.connected) {
@@ -226,6 +223,30 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentTimeoutRef,
     gameMode,
   ]);
+
+  /** Public startGame — shows solo confirmation if host is alone */
+  const startGame = useCallback(() => {
+    // No players at all
+    if (playersCount === 0 && !hostPlaying) {
+      logger.warn('[HOST] Cannot start game: no players');
+      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
+      return;
+    }
+
+    // Solo host with no other players — ask for confirmation
+    if (playersCount === 0 && hostPlaying) {
+      setShowSoloConfirm(true);
+      return;
+    }
+
+    executeStartGame();
+  }, [playersCount, hostPlaying, t, executeStartGame, setShowSoloConfirm]);
+
+  /** Called when user confirms they want to play solo with bots */
+  const confirmSoloStart = useCallback(() => {
+    setShowSoloConfirm(false);
+    executeStartGame();
+  }, [executeStartGame, setShowSoloConfirm]);
 
   const stopGame = useCallback(() => {
     socket?.emit('endGame', { gameCode });
@@ -371,6 +392,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
   return {
     startGame,
+    confirmSoloStart,
     stopGame,
     handleExitRoom,
     confirmExitRoom,

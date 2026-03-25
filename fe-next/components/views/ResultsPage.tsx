@@ -64,7 +64,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
-  const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);
+  const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(true);
 
   // Desktop keyboard shortcuts: R=rematch, Escape=exit (enabled after score reveal)
   useGameKeyboardShortcuts({

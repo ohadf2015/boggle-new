@@ -169,7 +169,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
           {isCurrent && isUnlocked && (
             <Play
               data-testid="play-icon"
-              className="w-5 h-5 text-neo-lime fill-neo-lime animate-bounce"
+              className="w-5 h-5 text-neo-lime fill-neo-lime animate-bounce motion-reduce:animate-none"
             />
           )}
 
@@ -202,7 +202,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       {isPerfect && isUnlocked && (
         <div
           data-testid="crown-badge"
-          className="absolute -top-1 -right-1 rtl:-right-auto rtl:-left-1 w-7 h-7 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-20"
+          className="absolute -top-1 -end-1 w-7 h-7 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-20"
         >
           <Crown className="w-4 h-4 text-neo-black" />
         </div>

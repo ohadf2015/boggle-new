@@ -1003,6 +1003,10 @@ const he = {
     "gameStopped": "המשחק נעצר",
     "confirmExit": "לצאת? החדר נשאר פתוח, מישהו אחר יהיה מארח.",
     "exitWarning": "לצאת? החדר ייסגר לכולם.",
+    "soloStartTitle": "אין עדיין שחקנים אחרים!",
+    "soloStartDescription": "רוצה להזמין חברים קודם? אם לא, בוטים יצטרפו כדי שיהיה מאתגר.",
+    "soloStartCancel": "לחכות לשחקנים",
+    "soloStartConfirm": "לשחק עם בוטים",
     "exitRoom": "יציאה",
     "startNewGame": "משחק חדש",
     "startNextRound": "סיבוב הבא",
@@ -1446,12 +1450,16 @@ const he = {
       "tryAgain": "לנסות שוב?",
       "continue": "המשך",
       "dailyChallenge": "אתגר יומי",
+      "dailyChallengeDesc": "התחרו על הלוח של היום — אותו פאזל לכולם!",
       "practiceMode": "מצב תרגול",
+      "practiceModeDesc": "בלי לחץ — שחקו בקצב שלכם וגלו מילים חדשות.",
       "joinFriendsGame": "הצטרפו למשחק של חבר",
-      "homePage": "דף הבית",
+      "joinFriendsGameDesc": "קפצו למשחק חי עם חברים!",
+      "homePage": "גלו את כל המצבים",
+      "homePageDesc": "הרפתקה, מרובה משתתפים ועוד.",
       "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
       "skip": "דלג",
-      "letsGo": "יאללה!"
+      "letsGo": "יאללה, מתחילים!"
     }
   },
 
@@ -3569,6 +3577,7 @@ const he = {
       "title": "לוחות הקהילה",
       "boardCount": "לוחות",
       "empty": "אין לוחות עדיין. היה הראשון ליצור!",
+      "emptyHint": "צרו לוח מותאם ושתפו עם הקהילה",
       "emptyTitle": "אין לוחות עדיין",
       "emptySubtitle": "היה הראשון ליצור!",
       "createBoard": "צור לוח",
@@ -3677,7 +3686,10 @@ const he = {
       "tabCreators": "יוצרים",
       "searchPlaceholder": "חיפוש לוחות וחבילות...",
       "createNew": "יצירה",
-      "featuredCreator": "יוצר מומלץ"
+      "featuredCreator": "יוצר מומלץ",
+      "statBoards": "לוחות",
+      "statCreators": "יוצרים",
+      "statPlays": "משחקים"
     },
     "strip": {
       "title": "לוחות הקהילה",
@@ -5289,6 +5301,10 @@ const he = {
     "daysAgo": "לפני {n} ימים"
   },
   "admin": {
+    "gameModePopularity": "פופולריות מצבי משחק",
+    "totalGames": "סה״כ",
+    "landingCardOrder": "סדר כרטיסים בדף נחיתה",
+    "noData": "אין נתונים זמינים",
     "dashboard": "לוח בקרה",
     "accessRequired": "נדרשת הרשאת מנהל",
     "accessDenied": "יש צורך בהרשאות מנהל כדי לגשת לעמוד זה.",
@@ -6148,6 +6164,9 @@ const he = {
       "validationCancelled": "האימות בוטל"
     },
 "game": {
+      "title": "מצב הרפתקה",
+      "hud": "תצוגת הרפתקה",
+      "retryOptions": "אפשרויות ניסיון חוזר",
       "objectives": "מטרות",
       "combo": "קומבו",
       "wordsFound": "מילים שנמצאו",
@@ -6260,7 +6279,9 @@ const he = {
         "star1": "השלב הושלם!",
         "star2": "עבודה מצוינת!",
         "star3": "ניקוד מושלם!"
-      }
+      },
+      "tapToDismiss": "הקש לסגירה",
+      "tapToSpeedUp": "הקש להאצה"
     },
     "xp": {
       "label": "נק'",
@@ -6280,6 +6301,7 @@ const he = {
       "cascadeBlocked": "המתן לסיום המפולת"
     },
     "upgrades": {
+      "shopTitle": "חנות שדרוגים",
       "maxLevel": "מקסימום",
       "purchase": "קנה",
       "needMore": "חסרים עוד {amount}",
@@ -6373,8 +6395,8 @@ const he = {
       }
     },
     "shop": {
-      "title": "מפעל המילים",
-      "open": "פתח את מפעל המילים"
+      "title": "חנות",
+      "open": "פתח חנות"
     },
     "bosses": {
       "fightBoss": "הילחם בבוס",
@@ -9232,6 +9254,14 @@ const he = {
     "grandSlamBonus": "בונוס XP 500+",
     "grandSlamAvatar": "חלק אווטאר +1",
     "avatarReward": "חלק אווטאר +1",
+    "avatarPartCategory": {
+      "eyes": "עיניים",
+      "mouth": "פה",
+      "accessory": "אביזר",
+      "hair": "שיער",
+      "eyebrows": "גבות",
+      "facialHair": "שיער פנים"
+    },
     "completedAll": "!הכל הושלם להיום",
     "progress": "{{completed}}/{{total}}",
     "go": "GO",

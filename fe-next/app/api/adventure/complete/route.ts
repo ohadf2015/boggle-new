@@ -11,6 +11,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
+import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
 
 // Lazy-init to avoid crash on missing env vars
 function getSupabaseConfig() {
@@ -65,9 +66,9 @@ function validateRequestBody(body: Record<string, unknown>): {
     return { valid: false, error: 'Invalid world: must be between 1 and 10' };
   }
 
-  // Validate level range (1-10)
-  if (level < 1 || level > 10) {
-    return { valid: false, error: 'Invalid level: must be between 1 and 10' };
+  // Validate level range (1-7, matches LEVELS_PER_WORLD)
+  if (level < 1 || level > 7) {
+    return { valid: false, error: 'Invalid level: must be between 1 and 7' };
   }
 
   // Validate stars range (0-3)
@@ -271,7 +272,9 @@ export async function POST(request: NextRequest) {
     // Gold scales with world to prevent late-game gold drought
     const baseGold = (10 + world * 3) * stars;
     const perfectClearGoldBonus = stars === 3 ? 50 : 0;
-    const longWordBonus = (longWords ?? 0) * getUpgradeEffect(playerUpgrades, 'cargoBay');
+    // Cap longWords to a plausible maximum (max ~25 words in a level, not all can be long)
+    const clampedLongWords = Math.min(longWords ?? 0, 20);
+    const longWordBonus = clampedLongWords * getUpgradeEffect(playerUpgrades, 'cargoBay');
     let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus;
 
     // Apply luckyPickaxe upgrade bonus from DB if player has it
@@ -289,13 +292,13 @@ export async function POST(request: NextRequest) {
     // Calculate next unlocked level
     let nextWorld = world;
     let nextLevel = level + 1;
-    if (nextLevel > 10) {
+    if (nextLevel > 7) {
       nextWorld = world + 1;
       nextLevel = 1;
     }
     if (nextWorld > 10) {
       nextWorld = 10;
-      nextLevel = 10;
+      nextLevel = 7;
     }
 
     // Update progression in database
@@ -346,6 +349,17 @@ export async function POST(request: NextRequest) {
     const previousLevel = existingProgression?.player_level ?? 1;
     const leveledUp = newPlayerLevel > previousLevel;
 
+    // Update weekly quest progress (fire-and-forget, don't block response)
+    const questStats: GameStats = {
+      gamesPlayed: 1,
+      wordsFound: words,
+      longWordsFound: validation.data.longWords ?? 0,
+      maxScore: score,
+    };
+    updateWeeklyQuestProgress(supabase, userId, questStats).catch((err) => {
+      console.error('[ADVENTURE COMPLETE API] Weekly quest update failed:', err);
+    });
+
     return NextResponse.json({
       success: true,
       completion: {
@@ -376,5 +390,79 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[ADVENTURE COMPLETE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * Update weekly quest progress and grant avatar part on completion.
+ * Standalone function using the passed Supabase client (service role).
+ */
+ 
+async function updateWeeklyQuestProgress(
+  supabase: any,
+  userId: string,
+  stats: GameStats,
+): Promise<void> {
+  const weekStart = getWeekStart();
+
+  // Fetch active quest
+  const { data: quest, error: fetchErr } = await supabase
+    .from('weekly_quests')
+    .select('id, quest_type, current_progress, requirements, completed, week_start')
+    .eq('player_id', userId)
+    .eq('week_start', weekStart)
+    .single();
+
+  if (fetchErr || !quest || quest.completed) return;
+
+  const reqs = typeof quest.requirements === 'string'
+    ? JSON.parse(quest.requirements)
+    : quest.requirements;
+  const prog = typeof quest.current_progress === 'string'
+    ? JSON.parse(quest.current_progress)
+    : quest.current_progress;
+
+  const currentVal = prog?.current ?? 0;
+  const target = reqs?.target ?? 0;
+  const delta = getStatDelta(quest.quest_type, stats);
+  if (delta <= 0) return;
+
+  const newCurrent = Math.min(currentVal + delta, target);
+  const completed = newCurrent >= target;
+
+  const updatePayload: Record<string, unknown> = {
+    current_progress: JSON.stringify({ current: newCurrent }),
+    completed,
+  };
+  if (completed) {
+    updatePayload.completed_at = new Date().toISOString();
+  }
+
+  await supabase
+    .from('weekly_quests')
+    .update(updatePayload)
+    .eq('id', quest.id);
+
+  // Grant avatar part on completion
+  if (completed) {
+    const difficulty = getDifficultyFromType(quest.quest_type);
+    const weekNum = getWeekNumber(quest.week_start);
+    const reward = pickAvatarReward(difficulty, weekNum);
+    const partKey = `${reward.category}:${reward.partId}`;
+
+    // Add to premium_avatar_parts if not already unlocked
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('premium_avatar_parts')
+      .eq('id', userId)
+      .single();
+
+    const existing: string[] = (profile?.premium_avatar_parts as string[]) ?? [];
+    if (!existing.includes(partKey)) {
+      await supabase
+        .from('profiles')
+        .update({ premium_avatar_parts: [...existing, partKey] })
+        .eq('id', userId);
+    }
   }
 }

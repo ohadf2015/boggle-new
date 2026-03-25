@@ -13,6 +13,8 @@ import { Target, Medal, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { QuestTemplate, QuestDifficulty } from '@/shared/weeklyQuestTemplates';
+import PartPreview from '@/components/avatar/PartPreview';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 interface QuestSelectorProps {
   quests: QuestTemplate[];
@@ -76,9 +78,20 @@ function QuestOption({
           <Icon className="w-3 h-3" />
           {t(`weeklyQuest.${quest.difficulty}`)}
         </span>
-        <span className={cn('text-xs font-black', config.color)}>
-          {t('weeklyQuest.xpReward', { xp: quest.xpReward })}
-        </span>
+        <div className="flex flex-col items-end gap-0.5">
+          <span className={cn('text-xs font-black', config.color)}>
+            {t('weeklyQuest.xpReward', { xp: quest.xpReward })}
+          </span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neo-pink">
+            <PartPreview
+              partType={quest.avatarPartReward.category as 'eyes' | 'mouth' | 'hair' | 'accessory' | 'eyebrows' | 'facialHair'}
+              partName={quest.avatarPartReward.partId}
+              config={DEFAULT_AVATAR_CONFIG}
+              size={18}
+            />
+            {t(`quests.avatarPartCategory.${quest.avatarPartReward.category}`)}
+          </span>
+        </div>
       </div>
 
       {/* Description */}

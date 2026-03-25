@@ -18,7 +18,7 @@ import { getCardStyle } from '../../utils/rankingStyles';
 import { filterGameAchievements } from './utils';
 import type { WordObject, ResultsPlayerCardProps } from './types';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, archetype }) => {
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, archetype, compact = false }) => {
   const { t } = useLanguage();
 
   // Check if this is the current player
@@ -147,13 +147,15 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: Math.min(index * 0.05, 0.3), type: 'spring', stiffness: 300, damping: 26 }}
-      style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
+      style={compact ? undefined : { transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
     >
       {/* Neo-Brutalist Card */}
       <div
         className={cn(
-          "p-3 sm:p-4 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
-          "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
+          "transition-all duration-200 rounded-neo-lg relative overflow-hidden",
+          compact
+            ? "p-2 border-2 shadow-hard-sm"
+            : "p-3 sm:p-4 border-4 shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
           cardStyleClass,
           isWordsExpanded && "ring-4 ring-neo-cyan"
         )}
@@ -168,18 +170,18 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         {/* Header: Rank, Name, Score - Neo-Brutalist - Organized */}
         <div className="relative z-10">
           {/* Main row: Avatar, Username (no rank/score for secondary cards) */}
-          <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3">
+          <div className={cn("flex items-center justify-between gap-2 sm:gap-3", compact ? "mb-1" : "mb-3")}>
             {/* Left: Avatar + Username with key badges */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Avatar
                 userId={player.username}
                 customAvatar={avatar?.customAvatar}
-                size="2xl"
+                size={compact ? "md" : "2xl"}
                 className="flex-shrink-0"
               />
               <div className="flex flex-col gap-1 min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="text-base sm:text-xl font-black text-neo-black truncate" title={player.username}>
+                  <h3 className={cn("font-black text-neo-black truncate", compact ? "text-sm" : "text-base sm:text-xl")} title={player.username}>
                     {player.username}
                   </h3>
                   {isCurrentPlayer && !showWinnerMessage && (

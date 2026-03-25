@@ -1,7 +1,7 @@
 'use client';
 
 import { Crown, Trophy } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
@@ -71,13 +71,12 @@ const PODIUM_CONFIG = [
 // Layout order: 2nd, 1st, 3rd
 const LAYOUT_ORDER = [1, 0, 2] as const;
 
-function getInitials(name: string): string {
-  return name.charAt(0).toUpperCase();
-}
-
 function formatScore(score: number): string {
   return score.toLocaleString();
 }
+
+// Sequenced reveal delays: 2nd place, 1st place (dramatic), 3rd place
+const REVEAL_DELAYS = [0.1, 0.35, 0.2] as const;
 
 export default function ResultsPodium({
   players,
@@ -85,19 +84,30 @@ export default function ResultsPodium({
   isWordHunt = false,
   t,
 }: ResultsPodiumProps) {
+  const reducedMotion = useReducedMotion();
   if (!players.length) return null;
 
   const top3 = players.slice(0, 3);
 
   return (
-    <div className="w-full">
+    <motion.div
+      className="w-full"
+      initial={reducedMotion ? undefined : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Section header */}
-      <div className="flex items-center justify-center gap-1.5 mb-4">
+      <motion.div
+        className="flex items-center justify-center gap-1.5 mb-4"
+        initial={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, duration: 0.3 }}
+      >
         <Trophy className="w-3.5 h-3.5 text-white/30" />
         <span className="font-black text-[10px] text-white/30 uppercase tracking-wider">
           {t('results.matchResults') || 'Match Results'}
         </span>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
@@ -105,7 +115,6 @@ export default function ResultsPodium({
           const player = top3[configIdx];
 
           if (!player) {
-            // Empty slot for missing players
             return <div key={`empty-${layoutIdx}`} />;
           }
 
@@ -121,23 +130,35 @@ export default function ResultsPodium({
             ? `${player.wordsFoundCount ?? 0} ${t('results.words') || 'Words'}`
             : formatScore(player.score);
 
+          const baseDelay = REVEAL_DELAYS[layoutIdx];
+
           return (
             <motion.div
               key={player.username}
               className={cn('flex flex-col items-center', config.ptOffset)}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 15,
-                delay: layoutIdx * 0.15,
-              }}
+              initial={reducedMotion ? undefined : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: baseDelay, duration: 0.2 }}
             >
-              {/* Avatar */}
-              <div className="relative mb-3">
+              {/* Avatar — bouncy drop-in */}
+              <motion.div
+                className="relative mb-3"
+                initial={reducedMotion ? undefined : { opacity: 0, y: -25, scale: 0.6 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 260,
+                  damping: 12,
+                  delay: baseDelay,
+                }}
+              >
                 {isFirst && (
-                  <div className="absolute inset-0 rounded-full bg-neo-lime/20 blur-md" />
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-neo-lime/20 blur-md"
+                    initial={reducedMotion ? undefined : { scale: 0 }}
+                    animate={{ scale: [0, 1.3, 1] }}
+                    transition={{ delay: baseDelay + 0.3, duration: 0.5 }}
+                  />
                 )}
                 <div
                   className={cn(
@@ -154,18 +175,26 @@ export default function ResultsPodium({
                   />
                 </div>
 
-                {/* Crown for 1st, badge for 2nd/3rd */}
+                {/* Crown for 1st — dramatic spin-in with overshoot */}
                 {isFirst ? (
                   <motion.div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 text-neo-lime drop-shadow-md"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', delay: 0.6, stiffness: 300, damping: 12 }}
+                    initial={reducedMotion ? undefined : { scale: 0, rotate: -360, y: -20 }}
+                    animate={{ scale: [0, 1.4, 1], rotate: 0, y: 0 }}
+                    transition={{
+                      type: 'spring',
+                      delay: baseDelay + 0.4,
+                      stiffness: 250,
+                      damping: 10,
+                    }}
                   >
                     <Crown className="w-5 h-5 fill-neo-lime" />
                   </motion.div>
                 ) : (
-                  <div
+                  <motion.div
+                    initial={reducedMotion ? undefined : { scale: 0, rotate: -45 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', delay: baseDelay + 0.25, stiffness: 400, damping: 15 }}
                     className={cn(
                       'absolute -top-1.5 -right-1.5 text-black rounded-full flex items-center justify-center border-2 border-black shadow-sm font-black',
                       config.badgeSize,
@@ -173,12 +202,17 @@ export default function ResultsPodium({
                     )}
                   >
                     {config.place}
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
 
-              {/* Name & Score */}
-              <div className="text-center mb-3 min-w-0 px-1">
+              {/* Name & Score — fade up after avatar */}
+              <motion.div
+                className="text-center mb-3 min-w-0 px-1"
+                initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20, delay: baseDelay + 0.2 }}
+              >
                 <p
                   className={cn(
                     'font-black text-white uppercase truncate',
@@ -187,7 +221,10 @@ export default function ResultsPodium({
                 >
                   {displayName}
                 </p>
-                <p
+                <motion.p
+                  initial={reducedMotion ? undefined : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: baseDelay + 0.35 }}
                   className={cn(
                     'font-black mt-0.5',
                     config.scoreSize,
@@ -195,10 +232,10 @@ export default function ResultsPodium({
                   )}
                 >
                   {scoreDisplay}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
-              {/* Podium bar */}
+              {/* Podium bar — elastic grow from bottom with slight overshoot */}
               <motion.div
                 className={cn(
                   'w-full flex items-center justify-center font-neo-display font-black text-black',
@@ -209,21 +246,28 @@ export default function ResultsPodium({
                   'border-black rounded-t-neo',
                   config.bgClass
                 )}
-                initial={{ scaleY: 0 }}
+                initial={reducedMotion ? undefined : { scaleY: 0 }}
                 animate={{ scaleY: 1 }}
                 transition={{
-                  delay: layoutIdx * 0.15 + 0.2,
-                  duration: 0.35,
-                  ease: 'easeOut',
+                  type: 'spring',
+                  stiffness: 180,
+                  damping: 10,
+                  delay: baseDelay + 0.15,
                 }}
                 style={{ transformOrigin: 'bottom' }}
               >
-                {config.place}
+                <motion.span
+                  initial={reducedMotion ? undefined : { opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 15, delay: baseDelay + 0.45 }}
+                >
+                  {config.place}
+                </motion.span>
               </motion.div>
             </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

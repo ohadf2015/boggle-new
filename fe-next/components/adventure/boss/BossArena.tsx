@@ -83,7 +83,7 @@ function OceanDeckEffect() {
   return (
     <div
       data-testid="arena-effect-ocean-deck"
-      className="absolute inset-0 animate-[oceanSway_6s_ease-in-out_infinite]"
+      className="absolute inset-0 animate-[oceanSway_6s_ease-in-out_infinite] motion-reduce:animate-none"
       style={{
         background: `
           repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(0,119,190,0.04) 30px, rgba(0,119,190,0.04) 32px),

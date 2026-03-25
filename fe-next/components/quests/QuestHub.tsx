@@ -17,6 +17,9 @@ import { cn } from '@/lib/utils';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { QuestProgressRing } from './QuestProgressRing';
 import { QuestCard } from './QuestCard';
+import PartPreview from '@/components/avatar/PartPreview';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
+import type { AvatarPartReward } from '@/shared/weeklyQuestTemplates';
 
 // --- Stagger animation variants (spring: stiffness 300, damping 24 = snappy bounce) ---
 const containerVariants = {
@@ -108,6 +111,32 @@ const DIFFICULTY_STYLES: Record<string, { color: string; border: string; bg: str
   hard: { color: 'text-red-400', border: 'border-red-400/50', bg: 'bg-red-400/15' },
 };
 
+function AvatarPartBadge({ reward, t, size = 'sm' }: {
+  reward: AvatarPartReward;
+  t: (key: string) => string;
+  size?: 'sm' | 'md';
+}) {
+  if (!reward) return null;
+  const partType = reward.category as 'eyes' | 'mouth' | 'hair' | 'accessory' | 'eyebrows' | 'facialHair';
+  const previewSize = size === 'md' ? 28 : 20;
+  return (
+    <span className="inline-flex items-center gap-1 text-neo-pink">
+      <PartPreview
+        partType={partType}
+        partName={reward.partId}
+        config={DEFAULT_AVATAR_CONFIG}
+        size={previewSize}
+      />
+      <span className={cn(
+        'font-bold',
+        size === 'md' ? 'text-sm' : 'text-[10px]',
+      )}>
+        {t(`quests.avatarPartCategory.${reward.category}`)}
+      </span>
+    </span>
+  );
+}
+
 function GrandSlamBanner({ t }: { t: (key: string) => string }) {
   return (
     <div
@@ -185,10 +214,14 @@ function WeeklyQuestSection() {
               <span className="font-neo-display text-sm font-bold text-neo-cyan">
                 {t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}
               </span>
-              <span className="inline-flex items-center gap-1 text-sm font-bold text-neo-pink">
-                <Puzzle className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('quests.avatarReward')}
-              </span>
+              {activeQuest.avatarPartReward ? (
+                <AvatarPartBadge reward={activeQuest.avatarPartReward} t={t} size="md" />
+              ) : (
+                <span className="inline-flex items-center gap-1 text-sm font-bold text-neo-pink">
+                  <Puzzle className="w-3.5 h-3.5" aria-hidden="true" />
+                  {t('quests.avatarReward')}
+                </span>
+              )}
             </div>
             <p className="font-neo-body text-xs text-neo-white/50">
               {t('weeklyQuest.newQuestMonday')}
@@ -219,10 +252,14 @@ function WeeklyQuestSection() {
               <span className="inline-flex items-center gap-1 font-black text-neo-cyan">
                 {t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}
               </span>
-              <span className="inline-flex items-center gap-1 font-black text-neo-pink">
-                <Puzzle className="w-3 h-3" aria-hidden="true" />
-                {t('quests.avatarReward')}
-              </span>
+              {activeQuest.avatarPartReward ? (
+                <AvatarPartBadge reward={activeQuest.avatarPartReward} t={t} />
+              ) : (
+                <span className="inline-flex items-center gap-1 font-black text-neo-pink">
+                  <Puzzle className="w-3 h-3" aria-hidden="true" />
+                  {t('quests.avatarReward')}
+                </span>
+              )}
             </div>
             {/* Progress bar */}
             <div className="flex flex-col gap-1.5">
@@ -293,10 +330,7 @@ function WeeklyQuestSection() {
                       <span className="font-neo-display text-sm font-black text-neo-cyan">
                         {t('quests.reward.xp', { xp: quest.xpReward })}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neo-pink">
-                        <Puzzle className="w-2.5 h-2.5" aria-hidden="true" />
-                        {t('quests.avatarReward')}
-                      </span>
+                      <AvatarPartBadge reward={quest.avatarPartReward} t={t} />
                     </div>
                   </button>
                 );

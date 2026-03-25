@@ -22,8 +22,8 @@ jest.mock('framer-motion', () => ({
 
 const mockT = (key: string) => {
   const map: Record<string, string> = {
-    'adventure.shop.open': 'Open Word Forge',
-    'adventure.shop.title': 'Word Forge',
+    'adventure.shop.open': 'Open Shop',
+    'adventure.shop.title': 'Shop',
   };
   return map[key] ?? key;
 };
@@ -40,7 +40,7 @@ describe('AdventureShopFAB', () => {
 
   it('renders the shop button with accessible label', () => {
     render(<AdventureShopFAB {...defaultProps} />);
-    expect(screen.getByRole('button', { name: /open word forge/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open shop/i })).toBeInTheDocument();
   });
 
   it('displays the gold balance formatted with commas', () => {
@@ -50,7 +50,7 @@ describe('AdventureShopFAB', () => {
 
   it('displays shop title text', () => {
     render(<AdventureShopFAB {...defaultProps} />);
-    expect(screen.getByText('Word Forge')).toBeInTheDocument();
+    expect(screen.getByText('Shop')).toBeInTheDocument();
   });
 
   it('calls onOpenShop when clicked', () => {

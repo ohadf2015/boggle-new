@@ -34,5 +34,10 @@ Sentry.init({
     /timeout/i,
     /ETIMEDOUT/i,
     /ECONNRESET/i,
+    // Solve-grid blacklist Supabase 502 — returns unfiltered words as fallback
+    /\[SOLVE-GRID\].*Blacklist query error/i,
+    // Supabase updatePlayerStats transient errors — retried by client
+    /\[SUPABASE\].*updatePlayerStats error/i,
+    /\[SUPABASE\].*Failed to update profile stats/i,
   ],
 });

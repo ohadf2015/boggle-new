@@ -24,7 +24,8 @@ export async function recordGameResult(result: GameResultInput): Promise<{ data:
       placement: result.placement,
       is_ranked: result.isRanked || false,
       language: result.language || 'en',
-      time_played: result.timePlayed || 0
+      time_played: result.timePlayed || 0,
+      game_mode: result.gameMode || 'multiplayer'
     };
 
     logger.info('GAME_SAVE', `Saving game to database: gameCode=${result.gameCode}, playerId=${result.playerId}, score=${result.score}, language=${result.language}`);

@@ -2,7 +2,7 @@
  * useEndlessMode Hook
  *
  * Manages endless mode — procedurally generated floors with escalating difficulty.
- * Tracks current floor, generates level configs, and records high floors.
+ * Tracks current floor, generates level configs, and persists high floors to DB.
  */
 
 'use client';
@@ -25,7 +25,7 @@ export interface UseEndlessModeReturn {
   advanceFloor: () => void;
   /** End the run (defeat or quit) */
   endRun: () => void;
-  /** Highest floor reached this session */
+  /** Highest floor reached (persisted) */
   highFloor: number;
 }
 
@@ -34,6 +34,19 @@ interface UseEndlessModeProps {
   initialHighFloor?: number;
   /** Callback when high floor is beaten */
   onNewHighFloor?: (floor: number) => void;
+}
+
+/** Fire-and-forget save to DB */
+async function saveHighFloor(floor: number): Promise<void> {
+  try {
+    await fetch('/api/adventure/endless-highfloor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ floor }),
+    });
+  } catch {
+    // Silently fail — localStorage/state still has the value
+  }
 }
 
 export function useEndlessMode({
@@ -58,6 +71,7 @@ export function useEndlessMode({
       if (next > highFloor) {
         setHighFloor(next);
         onNewHighFloor?.(next);
+        saveHighFloor(next);
       }
       return next;
     });

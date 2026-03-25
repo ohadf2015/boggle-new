@@ -118,8 +118,8 @@ export const UPGRADES: UpgradeDefinition[] = [
     tiers: [
       { level: 1, cost: 80, effectKey: 'adventure.upgrades.armorPlating.t1', value: 0.1 },
       { level: 2, cost: 160, effectKey: 'adventure.upgrades.armorPlating.t2', value: 0.2 },
-      { level: 3, cost: 300, effectKey: 'adventure.upgrades.armorPlating.t3', value: 1 },
-      { level: 4, cost: 500, effectKey: 'adventure.upgrades.armorPlating.t4', value: 5 },
+      { level: 3, cost: 300, effectKey: 'adventure.upgrades.armorPlating.t3', value: 0.35 },
+      { level: 4, cost: 500, effectKey: 'adventure.upgrades.armorPlating.t4', value: 0.5 },
     ],
   },
   {
@@ -148,8 +148,8 @@ export const UPGRADES: UpgradeDefinition[] = [
     tiers: [
       { level: 1, cost: 40, effectKey: 'adventure.upgrades.luckyPickaxe.t1', value: 0.1 },
       { level: 2, cost: 100, effectKey: 'adventure.upgrades.luckyPickaxe.t2', value: 0.25 },
-      { level: 3, cost: 200, effectKey: 'adventure.upgrades.luckyPickaxe.t3', value: 1 },
-      { level: 4, cost: 350, effectKey: 'adventure.upgrades.luckyPickaxe.t4', value: 2 },
+      { level: 3, cost: 200, effectKey: 'adventure.upgrades.luckyPickaxe.t3', value: 0.5 },
+      { level: 4, cost: 350, effectKey: 'adventure.upgrades.luckyPickaxe.t4', value: 0.75 },
     ],
   },
   {

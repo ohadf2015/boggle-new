@@ -481,6 +481,46 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
   </AlertDialog>
 );
 
+// ==================== Solo Start Confirm Dialog ====================
+
+interface SoloStartConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  t: (path: string, params?: Record<string, string | number>) => string;
+}
+
+export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = ({
+  open,
+  onOpenChange,
+  onConfirm,
+  t
+}): React.ReactElement => (
+  <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-neo-cyan/30">
+      <AlertDialogHeader>
+        <AlertDialogTitle className="text-slate-900 dark:text-white">
+          {t('hostView.soloStartTitle')}
+        </AlertDialogTitle>
+        <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+          {t('hostView.soloStartDescription')}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel className="bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50">
+          {t('hostView.soloStartCancel')}
+        </AlertDialogCancel>
+        <AlertDialogAction
+          onClick={onConfirm}
+          className="bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
+        >
+          {t('hostView.soloStartConfirm')}
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+);
+
 // ==================== Cancel Tournament Dialog ====================
 
 interface CancelTournamentDialogProps {

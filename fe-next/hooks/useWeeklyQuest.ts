@@ -8,7 +8,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { getAvailableQuests, getWeekStart, type QuestTemplate, type ActiveQuest } from '@/shared/weeklyQuestTemplates';
+import {
+  getAvailableQuests, getWeekStart, getWeekNumber, pickAvatarReward,
+  getDifficultyFromType,
+  type QuestTemplate, type ActiveQuest,
+} from '@/shared/weeklyQuestTemplates';
 
 interface UseWeeklyQuestReturn {
   activeQuest: ActiveQuest | null;
@@ -27,17 +31,23 @@ function parseRow(row: Record<string, unknown>): ActiveQuest {
     ? JSON.parse(row.current_progress as string)
     : row.current_progress;
 
+  const questType = row.quest_type as string;
+  const weekStart = row.week_start as string;
+  const difficulty = (row.difficulty as ActiveQuest['difficulty']) ?? getDifficultyFromType(questType);
+  const weekNum = getWeekNumber(weekStart);
+
   return {
     id: row.id as string,
-    questType: row.quest_type as string,
+    questType,
     title: row.title as string,
     description: row.description as string,
     target: reqs?.target ?? 0,
     current: prog?.current ?? 0,
     xpReward: row.xp_reward as number,
     completed: row.completed as boolean,
-    difficulty: (row.difficulty as ActiveQuest['difficulty']) ?? 'easy',
-    weekStart: row.week_start as string,
+    difficulty,
+    weekStart,
+    avatarPartReward: pickAvatarReward(difficulty, weekNum),
   };
 }
 

@@ -134,9 +134,14 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
                 className="w-full h-full"
               />
             </div>
-            <div className="relative z-30 bg-neo-pink border-2 border-black w-6 h-6 rotate-45 flex items-center justify-center shadow-hard-sm">
+            <motion.div
+              initial={reducedMotion ? undefined : { scale: 0, rotate: -135 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 12, delay: revengeDelay + 0.2 }}
+              className="relative z-30 bg-neo-pink border-2 border-black w-6 h-6 flex items-center justify-center shadow-hard-sm"
+            >
               <span className="font-neo-display text-[9px] font-black text-white -rotate-45 leading-none">VS</span>
-            </div>
+            </motion.div>
             <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
               <Avatar
                 userId={winner.username}
@@ -164,9 +169,16 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           </div>
 
           {/* Action */}
-          <button className="shrink-0 bg-neo-pink px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-white">
+          <motion.button
+            initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 14, delay: revengeDelay + 0.35 }}
+            whileHover={{ scale: 1.08, rotate: 2 }}
+            whileTap={{ scale: 0.92 }}
+            className="shrink-0 bg-neo-pink px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-white"
+          >
             {t('results.rematch')}
-          </button>
+          </motion.button>
         </div>
       </motion.section>
     );
@@ -200,9 +212,14 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
                 className="w-full h-full"
               />
             </div>
-            <div className="relative z-30 bg-neo-lime border-2 border-black w-6 h-6 rotate-45 flex items-center justify-center shadow-hard-sm">
+            <motion.div
+              initial={reducedMotion ? undefined : { scale: 0, rotate: -135 }}
+              animate={{ scale: 1, rotate: 45 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 12, delay: revengeDelay + 0.2 }}
+              className="relative z-30 bg-neo-lime border-2 border-black w-6 h-6 flex items-center justify-center shadow-hard-sm"
+            >
               <span className="font-neo-display text-[9px] font-black text-neo-black -rotate-45 leading-none">VS</span>
-            </div>
+            </motion.div>
             {runnerUp && (
               <div className="absolute right-0 w-8 h-8 rounded-full border-2 border-black overflow-hidden z-10 shadow-hard-sm">
                 <Avatar
@@ -229,9 +246,16 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           </div>
 
           {/* Action */}
-          <button className="shrink-0 bg-neo-lime px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-neo-black">
+          <motion.button
+            initial={reducedMotion ? undefined : { scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 14, delay: revengeDelay + 0.35 }}
+            whileHover={{ scale: 1.08, rotate: -2 }}
+            whileTap={{ scale: 0.92 }}
+            className="shrink-0 bg-neo-lime px-3 py-2 border-2 border-black rounded-neo shadow-hard-sm text-[10px] font-black uppercase text-neo-black"
+          >
             {t('results.defendTitle')}
-          </button>
+          </motion.button>
         </div>
       </motion.section>
     );

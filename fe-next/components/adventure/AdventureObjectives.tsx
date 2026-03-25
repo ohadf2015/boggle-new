@@ -137,7 +137,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
       <AdaptiveMotion.ul
         role="list"
         className={cn('flex flex-col gap-2', className)}
-        aria-label="Level objectives"
+        aria-label={t('adventure.game.objectives')}
         initial={false}
         data-testid="objectives-list"
         data-animation-complete={animationComplete}

@@ -987,6 +987,10 @@ const ja = {
     "gameStopped": "ゲーム停止",
     "confirmExit": "退出する？別のプレイヤーがホストになるよ。",
     "exitWarning": "退出するとルームが閉じるよ。本当にいい？",
+    "soloStartTitle": "まだ他のプレイヤーがいないよ！",
+    "soloStartDescription": "友達を招待する？しなければボットが参加して対戦するよ。",
+    "soloStartCancel": "プレイヤーを待つ",
+    "soloStartConfirm": "ボットと対戦",
     "exitRoom": "ルームを退出",
     "startNewGame": "新しいゲームを開始",
     "startNextRound": "次のラウンドを開始",
@@ -1429,12 +1433,16 @@ const ja = {
       "tryAgain": "もう一回？",
       "continue": "続ける",
       "dailyChallenge": "デイリーチャレンジ",
+      "dailyChallengeDesc": "今日のボードで勝負 — みんな同じパズル！",
       "practiceMode": "練習モード",
+      "practiceModeDesc": "プレッシャーなし — 自分のペースで新しい単語を発見。",
       "joinFriendsGame": "フレンドのゲームに参加",
-      "homePage": "ホームページ",
+      "joinFriendsGameDesc": "フレンドとライブマッチに飛び込もう！",
+      "homePage": "すべてのモードを見る",
+      "homePageDesc": "アドベンチャー、マルチプレイヤーなど。",
       "moreModesUnlock": "プレイするほど新しいモードが解放！",
       "skip": "スキップ",
-      "letsGo": "レッツゴー！"
+      "letsGo": "はじめよう！"
     }
   },
   "preGameTutorial": {
@@ -3183,6 +3191,7 @@ const ja = {
       "title": "コミュニティボード",
       "boardCount": "ボード",
       "empty": "まだボードがありません。最初に作成しましょう！",
+      "emptyHint": "カスタムボードを作成してコミュニティと共有しよう",
       "emptyTitle": "まだボードがありません",
       "emptySubtitle": "最初に作成しましょう！",
       "createBoard": "ボードを作成",
@@ -3291,7 +3300,10 @@ const ja = {
       "tabCreators": "クリエイター",
       "searchPlaceholder": "ボードやパックを検索...",
       "createNew": "作成",
-      "featuredCreator": "注目のクリエイター"
+      "featuredCreator": "注目のクリエイター",
+      "statBoards": "ボード",
+      "statCreators": "クリエイター",
+      "statPlays": "プレイ数"
     },
     "strip": {
       "title": "コミュニティボード",
@@ -5417,6 +5429,10 @@ const ja = {
     "daysAgo": "{n}日前"
   },
   "admin": {
+    "gameModePopularity": "ゲームモード人気",
+    "totalGames": "合計",
+    "landingCardOrder": "ランディングカード順",
+    "noData": "データなし",
     "dashboard": "管理ダッシュボード",
     "accessRequired": "管理者アクセスが必要です",
     "accessDenied": "このページにアクセスするには管理者権限が必要です。",
@@ -6174,6 +6190,9 @@ const ja = {
       "validationCancelled": "検証がキャンセルされました"
     },
 "game": {
+      "title": "アドベンチャーモード",
+      "hud": "アドベンチャーHUD",
+      "retryOptions": "リトライオプション",
       "objectives": "目標",
       "combo": "コンボ",
       "wordsFound": "見つけた単語",
@@ -6286,7 +6305,9 @@ const ja = {
         "star1": "レベルクリア!",
         "star2": "素晴らしい!",
         "star3": "完璧!"
-      }
+      },
+      "tapToDismiss": "タップして閉じる",
+      "tapToSpeedUp": "タップして早送り"
     },
     "xp": {
       "label": "経験値",
@@ -6306,6 +6327,7 @@ const ja = {
       "cascadeBlocked": "カスケード完了を待つ"
     },
     "upgrades": {
+      "shopTitle": "アップグレードショップ",
       "maxLevel": "最大",
       "purchase": "購入",
       "needMore": "あと{amount}必要",
@@ -6399,8 +6421,8 @@ const ja = {
       }
     },
     "shop": {
-      "title": "ワードフォージ",
-      "open": "ワードフォージを開く"
+      "title": "ショップ",
+      "open": "ショップを開く"
     },
     "bosses": {
       "fightBoss": "ボスと戦う",
@@ -9208,6 +9230,14 @@ const ja = {
     "grandSlamBonus": "+500 XPボーナス",
     "grandSlamAvatar": "+1 アバターパーツ",
     "avatarReward": "+1 アバターパーツ",
+    "avatarPartCategory": {
+      "eyes": "目",
+      "mouth": "口",
+      "accessory": "アクセサリー",
+      "hair": "髪",
+      "eyebrows": "眉毛",
+      "facialHair": "ひげ"
+    },
     "completedAll": "今日は全て完了！",
     "progress": "{{completed}}/{{total}}",
     "go": "GO",

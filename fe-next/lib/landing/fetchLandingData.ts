@@ -18,12 +18,15 @@
 
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
+import { fetchGameModeStats, type GameModeStats } from './fetchGameModeStats';
 
 export interface LandingInitialData {
   topPlayers: TopPlayer[];
   gamesToday: number;
   /** Solve rate 0-100, or null if insufficient data */
   solveRate: number | null;
+  /** Per-mode play counts for popularity-based card ordering */
+  gameModeStats: GameModeStats[];
 }
 
 const TOP_PLAYERS_LIMIT = 5;
@@ -32,31 +35,36 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return { topPlayers: [], gamesToday: 0, solveRate: null };
+    return { topPlayers: [], gamesToday: 0, solveRate: null, gameModeStats: [] };
   }
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [topPlayersResult, gamesTodayResult, solveRateResult] = await Promise.all([
-    supabase
-      .from('leaderboard')
-      .select(
-        'player_id, username, display_name, total_score, avatar_image, avatar_config'
-      )
-      .order('total_score', { ascending: false })
-      .limit(TOP_PLAYERS_LIMIT),
+  const [supabaseResults, gameModeStats] = await Promise.all([
+    Promise.all([
+      supabase
+        .from('leaderboard')
+        .select(
+          'player_id, username, display_name, total_score, avatar_image, avatar_config'
+        )
+        .order('total_score', { ascending: false })
+        .limit(TOP_PLAYERS_LIMIT),
 
-    supabase
-      .from('game_results')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', `${today}T00:00:00Z`),
+      supabase
+        .from('game_results')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${today}T00:00:00Z`),
 
-    supabase
-      .from('daily_puzzle_attempts')
-      .select('solved', { count: 'exact' })
-      .eq('puzzle_date', today)
-      .eq('language', language),
+      supabase
+        .from('daily_puzzle_attempts')
+        .select('solved', { count: 'exact' })
+        .eq('puzzle_date', today)
+        .eq('language', language),
+    ]),
+    fetchGameModeStats(30),
   ]);
+
+  const [topPlayersResult, gamesTodayResult, solveRateResult] = supabaseResults;
 
   // Map leaderboard rows to TopPlayer shape
   const topPlayers: TopPlayer[] = (topPlayersResult.data ?? []).map((row: any) => ({
@@ -77,5 +85,5 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
     solveRate = Math.round((solved / attempts.length) * 100);
   }
 
-  return { topPlayers, gamesToday, solveRate };
+  return { topPlayers, gamesToday, solveRate, gameModeStats };
 }

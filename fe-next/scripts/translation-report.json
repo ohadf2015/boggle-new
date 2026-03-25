@@ -2,18 +2,18 @@
   "summary": {
     "totalKeysInCode": 4165,
     "keyCountByLanguage": {
-      "en": 6835,
-      "he": 6962,
-      "sv": 6980,
-      "ja": 6983,
-      "es": 6996
+      "en": 6853,
+      "he": 6980,
+      "sv": 6998,
+      "ja": 7001,
+      "es": 7014
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 10,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 8,
       "fallbackUsages": 0,
-      "variableKeys": 10
+      "variableKeys": 8
     }
   },
   "runtimeRisks": {
@@ -54,10 +54,10 @@
         "type": "template_literal"
       },
       {
-        "pattern": "crowns.${crown.id}",
+        "pattern": "results.crowns.${crown.id}",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 86,
-        "context": "{t(`crowns.${crown.id}`) || crown.name}",
+        "line": 112,
+        "context": "{t(`results.crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },
       {
@@ -83,22 +83,6 @@
         "file": "components/adventure/BossDialogue.tsx",
         "line": 62,
         "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(messageKey)",
-        "variable": "messageKey",
-        "file": "components/adventure/LexiReaction.tsx",
-        "line": 152,
-        "context": "const message = t(messageKey);",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(defaultKey)",
-        "variable": "defaultKey",
-        "file": "components/adventure/LexiReaction.tsx",
-        "line": 159,
-        "context": "const defaultMessage = t(defaultKey);",
         "type": "variable_key"
       },
       {
@@ -166,7 +150,98 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "admin.gameModePopularity",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "key": "admin.landingCardOrder",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "key": "admin.noData",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "admin.totalGames",
+      "usages": [
+        {
+          "file": "components/admin/overview/GameModePopularity.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.hud",
+      "usages": [
+        {
+          "file": "components/adventure/hud/AdventureHUD.tsx",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.retryOptions",
+      "usages": [
+        {
+          "file": "components/adventure/RetryAssistModal.tsx",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "key": "adventure.game.title",
+      "usages": [
+        {
+          "file": "components/adventure/AdventureGame.tsx",
+          "line": 445
+        }
+      ]
+    },
+    {
+      "key": "adventure.lexi.tapToDismiss",
+      "usages": [
+        {
+          "file": "components/adventure/LexiReaction.tsx",
+          "line": 183
+        }
+      ]
+    },
+    {
+      "key": "adventure.lexi.tapToSpeedUp",
+      "usages": [
+        {
+          "file": "components/adventure/LexiReaction.tsx",
+          "line": 251
+        }
+      ]
+    },
+    {
+      "key": "adventure.upgrades.shopTitle",
+      "usages": [
+        {
+          "file": "components/adventure/AdventureViewModals.tsx",
+          "line": 61
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

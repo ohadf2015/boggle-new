@@ -7,7 +7,7 @@
  * on every screen. Pulses red when streak is at risk.
  */
 
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Flame, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,6 +26,11 @@ export const StreakBar: React.FC = memo(() => {
   const { user } = useAuth();
   const status = useEngagementStatus();
   const reducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Always return null on server & first client render to avoid hydration mismatch
+  if (!mounted) return null;
 
   // Don't render while loading or for unauthenticated users with no data
   if (status.loading) return null;

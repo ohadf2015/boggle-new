@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LifeGainAnimation } from '../LifeGainAnimation';
@@ -38,20 +38,32 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
   const isLow = pct <= 20;
   const isDanger = pct <= 33;
 
-  // Track damage for shake effect
+  // Drip droplets on damage (replaces shake)
   const prevLifeRef = useRef(lifePoints);
-  const [isDamaged, setIsDamaged] = useState(false);
+  const [drips, setDrips] = useState<{ id: number; x: number; size: number; delay: number }[]>([]);
+  const dripIdRef = useRef(0);
+
+  const spawnDrips = useCallback((fillPct: number) => {
+    const count = 3 + Math.floor(Math.random() * 2);
+    const newDrips = Array.from({ length: count }, () => ({
+      id: dripIdRef.current++,
+      x: Math.max(8, fillPct) + (Math.random() * 6 - 3),
+      size: 3 + Math.random() * 3,
+      delay: Math.random() * 0.25,
+    }));
+    setDrips(newDrips);
+  }, []);
 
   useEffect(() => {
     if (lifePoints < prevLifeRef.current && !isGameOver) {
-      setIsDamaged(true);
-      const timer = setTimeout(() => setIsDamaged(false), 500);
+      spawnDrips(pct);
+      const timer = setTimeout(() => setDrips([]), 1200);
       prevLifeRef.current = lifePoints;
       return () => clearTimeout(timer);
     }
     prevLifeRef.current = lifePoints;
     return undefined;
-  }, [lifePoints, isGameOver]);
+  }, [lifePoints, isGameOver, pct, spawnDrips]);
 
   // Segment markers for visual rhythm (every 25%)
   const segments = [25, 50, 75];
@@ -60,7 +72,6 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
     <div
       className={cn(
         "flex items-center gap-2 max-w-3xl mx-auto w-full relative py-1 overflow-x-clip",
-        isDamaged && "animate-neo-shake",
         tier.glow
       )}
       role="progressbar"
@@ -100,10 +111,11 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
         )} />
       </AdaptiveMotion.div>
 
-      {/* Life bar container */}
+      {/* Life bar wrapper — relative for drip overflow */}
+      <div className="flex-1 relative">
       <AdaptiveMotion.div
         className={cn(
-          "flex-1 h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
+          "h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
           "bg-neo-navy/80",
           isLow ? "border-red-500" : "border-neo-black",
           isLifeGaining && "life-gain-flash life-meter-pulse"
@@ -179,6 +191,39 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
           </div>
         )}
       </AdaptiveMotion.div>
+
+        {/* Drip droplets — fall below the bar on damage */}
+        <AdaptiveAnimatePresence>
+          {drips.map((drip) => (
+            <AdaptiveMotion.div
+              key={drip.id}
+              data-testid="life-drip-droplet"
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                left: `${drip.x}%`,
+                top: '100%',
+                width: drip.size,
+                height: drip.size,
+                background: pct > 42
+                  ? 'linear-gradient(to bottom, #fbbf24, #f59e0b)'
+                  : 'linear-gradient(to bottom, #f87171, #ef4444)',
+              }}
+              initial={{ y: -4, opacity: 0.9, scale: 1 }}
+              animate={{
+                y: [0, 8, 18],
+                opacity: [0.9, 0.7, 0],
+                scale: [1, 1.1, 0.5],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.8,
+                delay: drip.delay,
+                ease: 'easeIn',
+              }}
+            />
+          ))}
+        </AdaptiveAnimatePresence>
+      </div>
     </div>
   );
 };

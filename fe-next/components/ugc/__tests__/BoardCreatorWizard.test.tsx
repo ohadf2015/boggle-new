@@ -54,7 +54,7 @@ function makeHookReturn(overrides: Partial<UseBoardCreatorReturn> = {}): UseBoar
   return {
     step: 'configure',
     setStep: jest.fn(),
-    gridSize: 4,
+    gridSize: 6,
     setGridSize: jest.fn(),
     language: 'en',
     setLanguage: jest.fn(),
@@ -94,28 +94,12 @@ describe('BoardCreatorWizard — step 1 (configure)', () => {
     expect(screen.getByTestId('step-configure')).toBeInTheDocument();
   });
 
-  it('renders 3 grid size toggle buttons', () => {
+  it('does not render grid size picker (default 6x6)', () => {
     mockUseBoardCreator.mockReturnValue(makeHookReturn());
     render(<BoardCreatorWizard />);
-    expect(screen.getByTestId('grid-size-4')).toBeInTheDocument();
-    expect(screen.getByTestId('grid-size-5')).toBeInTheDocument();
-    expect(screen.getByTestId('grid-size-6')).toBeInTheDocument();
-  });
-
-  it('clicking grid size 5 calls setGridSize(5)', async () => {
-    const setGridSize = jest.fn();
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ setGridSize }));
-    render(<BoardCreatorWizard />);
-    await userEvent.click(screen.getByTestId('grid-size-5'));
-    expect(setGridSize).toHaveBeenCalledWith(5);
-  });
-
-  it('clicking grid size 6 calls setGridSize(6)', async () => {
-    const setGridSize = jest.fn();
-    mockUseBoardCreator.mockReturnValue(makeHookReturn({ setGridSize }));
-    render(<BoardCreatorWizard />);
-    await userEvent.click(screen.getByTestId('grid-size-6'));
-    expect(setGridSize).toHaveBeenCalledWith(6);
+    expect(screen.queryByTestId('grid-size-4')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('grid-size-5')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('grid-size-6')).not.toBeInTheDocument();
   });
 
   it('shows animated board grid placeholder when no board', () => {

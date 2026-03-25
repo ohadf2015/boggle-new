@@ -212,6 +212,9 @@ export async function calculateAndBroadcastFinalScores(
     wordHuntSummary,
     blastSummary,
   };
+  // Cache results on game state so reconnecting clients can retrieve them
+  (game as any).cachedResultsPayload = resultsPayload;
+
   broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', resultsPayload);
   broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', resultsPayload);
 

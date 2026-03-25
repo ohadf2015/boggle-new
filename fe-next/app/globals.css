@@ -829,6 +829,11 @@ body {
     aspect-ratio: 1 / 1;
     /* Center within parent */
     margin: 0 auto;
+    /* Respect flex container — viewport calc is a starting estimate,
+       but the actual container may be smaller (e.g. WordHunt has extra chrome).
+       This ensures the grid never overflows its allocated flex space. */
+    max-height: min(var(--board-size), 100%);
+    max-width: min(var(--board-size), 100%);
   }
 
   /* On desktop screens, size grid to fill available space between sidebars */
@@ -842,7 +847,7 @@ body {
       --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
-      max-height: var(--board-size);
+      max-height: min(var(--board-size), 100%);
       padding: 14px;
     }
   }
@@ -854,7 +859,7 @@ body {
       --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
-      max-height: var(--board-size);
+      max-height: min(var(--board-size), 100%);
     }
   }
 
@@ -865,7 +870,7 @@ body {
       --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - var(--game-chrome-desktop)), 500px);
       width: var(--board-size);
       height: var(--board-size);
-      max-height: var(--board-size);
+      max-height: min(var(--board-size), 100%);
     }
   }
 
@@ -878,8 +883,8 @@ body {
       --board-size: min(calc(100dvw - 32px), calc(100dvh - var(--game-chrome-height, 280px) - env(safe-area-inset-bottom, 0px)));
       width: var(--board-size);
       height: var(--board-size);
-      max-width: var(--board-size);
-      max-height: var(--board-size);
+      max-width: min(var(--board-size), 100%);
+      max-height: min(var(--board-size), 100%);
       min-height: 180px;
       min-width: 180px;
     }

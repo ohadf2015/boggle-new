@@ -272,7 +272,7 @@ describe('useAdventureBossNew', () => {
       expect(result.current.phase).toBe('angry');
     });
 
-    it('should stay normal at exactly 50% HP', () => {
+    it('should stay normal at 66% HP (threshold boundary)', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -282,13 +282,13 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(50);
+        result.current.dealDamage(34); // 66 HP remaining = exactly 66%
       });
 
       expect(result.current.phase).toBe('normal');
     });
 
-    it('should transition to desperate at below 25% HP', () => {
+    it('should transition to desperate at below 33% HP', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -298,13 +298,13 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(76);
+        result.current.dealDamage(68); // 32 HP remaining = 32% < 33%
       });
 
       expect(result.current.phase).toBe('desperate');
     });
 
-    it('should stay angry at exactly 25% HP', () => {
+    it('should stay angry at exactly 33% HP', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -314,7 +314,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(75);
+        result.current.dealDamage(67); // 33 HP remaining = exactly 33%
       });
 
       expect(result.current.phase).toBe('angry');
@@ -330,7 +330,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(51);
+        result.current.dealDamage(35); // 65 HP = 65% < 66% → angry
       });
 
       // Should have a taunt from phase change

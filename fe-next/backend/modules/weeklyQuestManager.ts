@@ -12,9 +12,11 @@ import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
 import {
   getWeekStart,
+  getWeekNumber,
   getAvailableQuests,
   getDifficultyFromType,
   getStatDelta,
+  pickAvatarReward,
   type QuestDifficulty,
   type QuestTemplate,
   type ActiveQuest,
@@ -24,9 +26,11 @@ import {
 // Re-export shared types and pure functions for existing backend consumers
 export {
   getWeekStart,
+  getWeekNumber,
   getAvailableQuests,
   getDifficultyFromType,
   getStatDelta,
+  pickAvatarReward,
   type QuestDifficulty,
   type QuestTemplate,
   type ActiveQuest,
@@ -112,7 +116,7 @@ export async function updateQuestProgress(
   const newCurrent = Math.min(quest.current + delta, quest.target);
   const completed = newCurrent >= quest.target;
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('weekly_quests')
     .update({
       current_progress: JSON.stringify({ current: newCurrent }),
@@ -125,6 +129,15 @@ export async function updateQuestProgress(
   if (error) {
     logger.error('weeklyQuest', `Failed to update quest progress for ${playerId}: ${error.message}`);
     return null;
+  }
+
+  // Grant avatar part reward on completion
+  if (completed) {
+    try {
+      await grantAvatarPartReward(supabase, playerId, quest.questType, quest.weekStart);
+    } catch (err) {
+      logger.error('weeklyQuest', `Failed to grant avatar part for ${playerId}: ${err}`);
+    }
   }
 
   return { ...quest, current: newCurrent, completed };
@@ -142,6 +155,31 @@ interface QuestRow {
   xp_reward: number;
   completed: boolean;
   week_start: string;
+}
+
+/**
+ * Grant avatar part reward to player's profile on quest completion.
+ */
+async function grantAvatarPartReward(supabase: any, playerId: string, questType: string, weekStart: string): Promise<void> {
+  const difficulty = getDifficultyFromType(questType);
+  const weekNum = getWeekNumber(weekStart);
+  const reward = pickAvatarReward(difficulty, weekNum);
+  const partKey = `${reward.category}:${reward.partId}`;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('premium_avatar_parts')
+    .eq('id', playerId)
+    .single();
+
+  const existing: string[] = (profile?.premium_avatar_parts as string[]) ?? [];
+  if (!existing.includes(partKey)) {
+    await supabase
+      .from('profiles')
+      .update({ premium_avatar_parts: [...existing, partKey] })
+      .eq('id', playerId);
+    logger.info('weeklyQuest', `Granted avatar part ${partKey} to ${playerId}`);
+  }
 }
 
 function parseQuestRow(row: QuestRow): ActiveQuest {

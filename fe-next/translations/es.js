@@ -1005,6 +1005,10 @@ const es = {
     "gameStopped": "Detenido",
     "confirmExit": "¿Salir? Otro jugador será anfitrión.",
     "exitWarning": "Esto cerrará la sala. ¿Continuar?",
+    "soloStartTitle": "¡Aún no hay otros jugadores!",
+    "soloStartDescription": "¿Quieres invitar amigos primero? Si no, bots se unirán para competir.",
+    "soloStartCancel": "Esperar jugadores",
+    "soloStartConfirm": "Jugar con bots",
     "exitRoom": "Salir",
     "startNewGame": "Nuevo Juego",
     "startNextRound": "Siguiente Ronda",
@@ -3317,12 +3321,16 @@ const es = {
       "tryAgain": "¿Intentar de nuevo?",
       "continue": "Continuar",
       "dailyChallenge": "Desafío Diario",
+      "dailyChallengeDesc": "Compite en el tablero de hoy — ¡el mismo puzzle para todos!",
       "practiceMode": "Modo Práctica",
+      "practiceModeDesc": "Sin presión — juega a tu ritmo y aprende palabras nuevas.",
       "joinFriendsGame": "Unirse al juego de un amigo",
-      "homePage": "Página Principal",
+      "joinFriendsGameDesc": "¡Únete a una partida en vivo con amigos!",
+      "homePage": "Explorar Todos los Modos",
+      "homePageDesc": "Aventura, multijugador y más.",
       "moreModesUnlock": "¡Más modos se desbloquean mientras juegas!",
       "skip": "Omitir",
-      "letsGo": "¡Vamos!"
+      "letsGo": "¡Empecemos!"
     }
   },
   "preGameTutorial": {
@@ -3596,6 +3604,7 @@ const es = {
       "title": "Tableros de la comunidad",
       "boardCount": "tableros",
       "empty": "Aún no hay tableros. ¡Sé el primero en crear uno!",
+      "emptyHint": "Crea un tablero personalizado y compártelo con la comunidad",
       "emptyTitle": "Aún no hay tableros",
       "emptySubtitle": "¡Sé el primero en crear uno!",
       "createBoard": "Crear un tablero",
@@ -3704,7 +3713,10 @@ const es = {
       "tabCreators": "Creadores",
       "searchPlaceholder": "Buscar tableros y paquetes...",
       "createNew": "Crear",
-      "featuredCreator": "Creador destacado"
+      "featuredCreator": "Creador destacado",
+      "statBoards": "tableros",
+      "statCreators": "creadores",
+      "statPlays": "partidas"
     },
     "strip": {
       "title": "Tableros de la Comunidad",
@@ -5331,6 +5343,10 @@ const es = {
     "daysAgo": "hace {n}d"
   },
   "admin": {
+    "gameModePopularity": "Popularidad de modos",
+    "totalGames": "Total",
+    "landingCardOrder": "Orden de tarjetas",
+    "noData": "Sin datos disponibles",
     "dashboard": "Panel de Administración",
     "accessRequired": "Acceso de Administrador Requerido",
     "accessDenied": "Necesitas privilegios de administrador para acceder a esta página.",
@@ -6472,6 +6488,9 @@ const es = {
       "validationCancelled": "La validación fue cancelada"
     },
     "game": {
+      "title": "Modo Aventura",
+      "hud": "HUD de Aventura",
+      "retryOptions": "Opciones de reintento",
       "objectives": "Objetivos",
       "combo": "Combo",
       "wordsFound": "Palabras encontradas",
@@ -6584,7 +6603,9 @@ const es = {
         "star1": "¡Nivel completado!",
         "star2": "¡Excelente trabajo!",
         "star3": "¡Puntuación perfecta!"
-      }
+      },
+      "tapToDismiss": "Toca para cerrar",
+      "tapToSpeedUp": "Toca para acelerar"
     },
     "xp": {
       "label": "XP",
@@ -6604,6 +6625,7 @@ const es = {
       "cascadeBlocked": "Espera a que termine la cascada"
     },
     "upgrades": {
+      "shopTitle": "Tienda de mejoras",
       "maxLevel": "MÁX",
       "purchase": "Comprar",
       "needMore": "Necesitas {amount} más",
@@ -6697,8 +6719,8 @@ const es = {
       }
     },
     "shop": {
-      "title": "Forja de Palabras",
-      "open": "Abrir Forja de Palabras"
+      "title": "Tienda",
+      "open": "Abrir tienda"
     },
     "cinematics": {
       "victory": "¡VICTORIA!",
@@ -9288,6 +9310,14 @@ const es = {
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Parte de Avatar",
     "avatarReward": "+1 Parte de Avatar",
+    "avatarPartCategory": {
+      "eyes": "Ojos",
+      "mouth": "Boca",
+      "accessory": "Accesorio",
+      "hair": "Cabello",
+      "eyebrows": "Cejas",
+      "facialHair": "Vello facial"
+    },
     "completedAll": "¡Todo listo por hoy!",
     "progress": "{{completed}}/{{total}}",
     "go": "IR",

@@ -113,7 +113,7 @@ describe('AdventureObjectives - Slide-in Animation', () => {
     );
 
     const list = screen.getByRole('list');
-    expect(list).toHaveAttribute('aria-label', 'Level objectives');
+    expect(list).toHaveAttribute('aria-label', 'adventure.game.objectives');
   });
 });
 

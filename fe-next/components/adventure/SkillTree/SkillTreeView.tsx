@@ -107,7 +107,7 @@ function SkillNodeComponent({
       {!isUnlocked && (
         <span
           className={cn(
-            'absolute -top-2 -right-2',
+            'absolute -top-2 -end-2',
             'px-1.5 py-0.5 rounded-full',
             'text-[10px] font-bold',
             'bg-neo-black border border-neo-white/30',
@@ -122,7 +122,7 @@ function SkillNodeComponent({
       {isUnlocked && (
         <span
           className={cn(
-            'absolute -top-2 -right-2',
+            'absolute -top-2 -end-2',
             'w-5 h-5 rounded-full',
             'flex items-center justify-center',
             'bg-neo-lime border-2 border-neo-black',

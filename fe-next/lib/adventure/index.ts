@@ -127,20 +127,6 @@ export {
   type ModifiableConfig,
 } from './weeklyModifiers';
 
-// Rune system
-export {
-  RUNE_DEFINITIONS,
-  MAX_EQUIPPED_RUNES,
-  canForgeRune,
-  forgeRune,
-  getEquippedRuneEffects,
-  toggleRuneEquip,
-  type RuneDefinition,
-  type RuneEffect,
-  type RuneState,
-  type RuneEffects,
-} from './runeSystem';
-
 // Daily quests
 export {
   getDailyQuests,
@@ -165,10 +151,3 @@ export {
   type BossRushReward,
 } from './bossRush';
 
-// Cross-mode synergy
-export {
-  getAdventureBonusesForMultiplayer,
-  getUnlockedCosmetics,
-  type CrossModeBonus,
-  type CosmeticUnlock,
-} from './crossModeSynergy';

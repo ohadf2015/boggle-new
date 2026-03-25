@@ -56,6 +56,7 @@ function transformProgression(
     skillTree: (dbRow.skill_tree as Record<string, number>) ?? {},
     runeFragments: (dbRow.rune_fragments as number) ?? 0,
     runes: (dbRow.runes as Array<{ runeId: string; equipped: boolean }>) ?? [],
+    endlessHighFloor: (dbRow.endless_high_floor as number) ?? 0,
     createdAt: dbRow.created_at as string,
     updatedAt: dbRow.updated_at as string,
   };

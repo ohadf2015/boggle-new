@@ -62,43 +62,87 @@ describe('QuickReactions', () => {
     jest.useRealTimers();
   });
 
-  it('should render 6 emoji reaction buttons', () => {
+  it('should render a smile trigger button in collapsed state', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
-    const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(6);
+    const trigger = screen.getByLabelText('Quick reactions');
+    expect(trigger).toBeInTheDocument();
+    // Should NOT show reaction buttons yet
+    expect(screen.queryByLabelText('Fire')).not.toBeInTheDocument();
   });
 
-  it('should call onReaction with reaction id when button is clicked', () => {
+  it('should expand to show 6 emoji buttons when trigger is clicked', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[0]); // fire
+    const trigger = screen.getByRole('button', { name: 'Quick reactions' });
+    fireEvent.click(trigger);
+
+    const reactionButtons = REACTIONS.map(r =>
+      screen.getByLabelText(r.labelKey.replace('reactions.', '').charAt(0).toUpperCase() + r.labelKey.replace('reactions.', '').slice(1))
+    );
+    expect(reactionButtons).toHaveLength(6);
+  });
+
+  it('should call onReaction and close tray when a reaction is clicked', () => {
+    render(<QuickReactions onReaction={mockOnReaction} />);
+    // Open
+    fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
+    // Click fire
+    fireEvent.click(screen.getByLabelText('Fire'));
     expect(mockOnReaction).toHaveBeenCalledWith('fire');
+    // Tray should close — reaction buttons gone
+    expect(screen.queryByLabelText('Fire')).not.toBeInTheDocument();
   });
 
   it('should throttle reactions to 1 per 2 seconds', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
-    const buttons = screen.getAllByRole('button');
 
-    fireEvent.click(buttons[0]); // fire
-    fireEvent.click(buttons[1]); // clap (should be throttled)
+    // Open and click fire
+    fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
+    fireEvent.click(screen.getByLabelText('Fire'));
+    expect(mockOnReaction).toHaveBeenCalledTimes(1);
+
+    // Re-open and try clap immediately (should be throttled)
+    fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
+    fireEvent.click(screen.getByLabelText('Clap'));
     expect(mockOnReaction).toHaveBeenCalledTimes(1);
 
     // Advance past throttle window
     act(() => { jest.advanceTimersByTime(2100); });
 
-    fireEvent.click(buttons[1]); // clap (should work now)
+    // Re-open and click clap (should work now)
+    fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
+    fireEvent.click(screen.getByLabelText('Clap'));
     expect(mockOnReaction).toHaveBeenCalledTimes(2);
   });
 
-  it('should have accessibility labels on buttons', () => {
+  it('should have aria-expanded on trigger button', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
-    expect(screen.getByLabelText('Fire')).toBeInTheDocument();
-    expect(screen.getByLabelText('Clap')).toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: 'Quick reactions' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('should render with aria label on container', () => {
+  it('should close tray on outside click', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
-    expect(screen.getByLabelText('Quick reactions')).toBeInTheDocument();
+    // Open
+    fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
+    expect(screen.getByLabelText('Fire')).toBeInTheDocument();
+
+    // Click outside
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByLabelText('Fire')).not.toBeInTheDocument();
+  });
+
+  it('should toggle closed when trigger is clicked again', () => {
+    render(<QuickReactions onReaction={mockOnReaction} />);
+    const trigger = screen.getByRole('button', { name: 'Quick reactions' });
+
+    fireEvent.click(trigger); // open
+    expect(screen.getByLabelText('Fire')).toBeInTheDocument();
+
+    fireEvent.click(trigger); // close
+    expect(screen.queryByLabelText('Fire')).not.toBeInTheDocument();
   });
 });
 

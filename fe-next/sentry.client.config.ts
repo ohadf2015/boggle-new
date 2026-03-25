@@ -137,6 +137,14 @@ Sentry.init({
     /\[Realtime\].*connection failed.*retrying/i,
     // Progression duplicate/retry — handled gracefully with dedup guards
     /\[ProgressionContext\].*Skipping duplicate/i,
+    // Progression 429 after retry — rate limited by Supabase, retried once, then logged
+    /\[ProgressionContext\].*Record attempt failed/i,
+    // Moderation approve/reject timeouts — handled gracefully with AbortController
+    /Moderation (approve|reject) failed/i,
+    // Blast result save transient failures — retried once on 5xx, guest fallback on 401
+    /\[useBlastResultSaver\].*Save failed/i,
+    // Solve-grid blacklist Supabase 502 — returns unfiltered words as fallback
+    /\[SOLVE-GRID\].*Blacklist query error/i,
   ],
 
   denyUrls: [

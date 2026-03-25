@@ -11,18 +11,22 @@
  * Used as the seed for grid generation.
  */
 export function getCurrentWeekId(date: Date = new Date()): string {
-  const year = date.getUTCFullYear();
-  const jan1 = new Date(Date.UTC(year, 0, 1));
-  const dayOfYear = Math.floor((date.getTime() - jan1.getTime()) / 86400000) + 1;
-  const weekNumber = Math.ceil(dayOfYear / 7);
-  return `${year}-W${String(weekNumber).padStart(2, '0')}`;
+  // Use ISO week numbering — weeks start on Monday, consistent with getTimeUntilReset
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  // Set to nearest Thursday (ISO week belongs to the year of its Thursday)
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNumber = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
 }
 
 /**
  * Get milliseconds until the next Monday 00:00 UTC (weekly reset).
  */
 export function getTimeUntilReset(now: Date = new Date()): number {
-  const daysUntilMonday = (8 - now.getUTCDay()) % 7 || 7;
+  // Days until next Monday: Sunday(0)→1, Mon(1)→7, Tue(2)→6, ...
+  const day = now.getUTCDay();
+  const daysUntilMonday = day === 0 ? 1 : (8 - day);
   const nextMonday = new Date(Date.UTC(
     now.getUTCFullYear(),
     now.getUTCMonth(),

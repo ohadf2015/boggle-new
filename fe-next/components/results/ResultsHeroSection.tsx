@@ -160,33 +160,33 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
     const gap =
       rank > 1 && winnerScore !== undefined ? winnerScore - score : 0;
 
-    const motionProps = reducedMotion
-      ? {}
-      : {
-          initial: { opacity: 0, scale: 0.9 },
-          animate: { opacity: 1, scale: 1 },
-          transition: { type: 'spring' as const, stiffness: 120, damping: 20 },
-        };
-
     return (
         <motion.section
-          {...motionProps}
+          initial={reducedMotion ? undefined : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
           className="flex flex-col items-center text-center relative pt-6 pb-4"
           data-testid="results-hero-section"
         >
-          {/* Rank Display */}
+          {/* Rank Display — dramatic slam entrance */}
           <div className="relative z-10 flex flex-col items-center mb-10">
             {isEliminated ? (
-              <span
+              <motion.span
+                initial={reducedMotion ? undefined : { opacity: 0, scale: 2, rotate: -8 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.1 }}
                 className={cn(
                   'font-neo-display font-black text-4xl xs:text-6xl sm:text-9xl leading-none',
                   'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
                 {t('results.eliminated') ?? 'ELIMINATED'}
-              </span>
+              </motion.span>
             ) : (
-              <span
+              <motion.span
+                initial={reducedMotion ? undefined : { opacity: 0, scale: 3, y: -40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
                 className={cn(
                   'text-6xl xs:text-8xl sm:text-[11rem] font-neo-display font-black leading-none',
                   displayAccent.text,
@@ -194,11 +194,14 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 )}
               >
                 {rank}
-              </span>
+              </motion.span>
             )}
 
             {!isEliminated && (
-              <div
+              <motion.div
+                initial={reducedMotion ? undefined : { opacity: 0, scale: 0, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.45 }}
                 className={cn(
                   displayAccent.bg,
                   'text-black px-6 py-2 rounded-full border-3 border-neo-black shadow-hard-sm -mt-10 relative z-20',
@@ -207,12 +210,17 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 <p className="text-xs font-black uppercase tracking-[0.2em]">
                   {getRankLabel(rank, t)}
                 </p>
-              </div>
+              </motion.div>
             )}
           </div>
 
-          {/* Pulsing Avatar */}
-          <div className="relative mb-8">
+          {/* Pulsing Avatar — drops in from above */}
+          <motion.div
+            className="relative mb-8"
+            initial={reducedMotion ? undefined : { opacity: 0, y: -30, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 16, delay: 0.55 }}
+          >
             {!reducedMotion && (
               <div
                 className={cn(
@@ -237,7 +245,10 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 className="w-full h-full rounded-full"
               />
             </div>
-            <div
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.75 }}
               className={cn(
                 'absolute -bottom-2 left-1/2 -translate-x-1/2 max-w-[80vw]',
                 'bg-neo-navy border-2 px-5 py-1.5 rounded-full shadow-hard-sm',
@@ -252,20 +263,30 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               >
                 {username}
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Score & gap */}
-          <div className="space-y-4">
+          {/* Score & gap — score counter starts after avatar lands */}
+          <motion.div
+            className="space-y-4"
+            initial={reducedMotion ? undefined : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.85 }}
+          >
             <div>
               <AnimatedScore
                 target={score}
                 skipAnimation={reducedMotion}
                 className="font-neo-display text-4xl xs:text-5xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
               />
-              <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+              <motion.p
+                initial={reducedMotion ? undefined : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+                className="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+              >
                 {t('results.totalPoints') ?? 'Total Points'}
-              </p>
+              </motion.p>
             </div>
 
             {/* Word Hunt target badges */}
@@ -302,7 +323,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 {(t('results.soClose') ?? 'So close!').replace('{points}', String(gap)) || `So close! Just ${gap} pts behind #1.`}
               </p>
             )}
-          </div>
+          </motion.div>
         </motion.section>
     );
   },

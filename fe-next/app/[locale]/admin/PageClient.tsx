@@ -23,6 +23,7 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { KPICards } from '@/components/admin/overview/KPICards';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
+import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 
 export default function AdminPageClient() {
   const router = useRouter();
@@ -115,9 +116,12 @@ export default function AdminPageClient() {
             </span>
           </div>
 
-          {/* KPI Cards + System Health */}
+          {/* KPI Cards + System Health + Game Mode Popularity */}
           <KPICards stats={stats} />
-          <SystemHealth health={health} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <SystemHealth health={health} />
+            <GameModePopularity />
+          </div>
 
           {/* Dashboard content */}
           {authToken ? (

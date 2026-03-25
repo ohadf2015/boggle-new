@@ -5,6 +5,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock dependencies before importing component
+jest.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveMotion: {
+    div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
+  },
+  AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
@@ -86,13 +93,15 @@ describe('CreatorLeaderboard', () => {
     expect(screen.getByText('Top Creators')).toBeInTheDocument();
   });
 
-  it('shows loading state initially', () => {
+  it('shows loading skeleton initially', () => {
     // Never resolves during this test
     mockFetch.mockReturnValueOnce(new Promise(() => {}));
 
-    render(<CreatorLeaderboard />);
+    const { container } = render(<CreatorLeaderboard />);
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    // Loading state renders skeleton pulse divs instead of text
+    const skeletons = container.querySelectorAll('.animate-pulse');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it('renders creator rows with rank, name, boards, plays, rating', async () => {
@@ -111,10 +120,10 @@ describe('CreatorLeaderboard', () => {
     expect(screen.getByText('PuzzlePro')).toBeInTheDocument();
     expect(screen.getByText('GridGuru')).toBeInTheDocument();
 
-    // Rank indicators
-    expect(screen.getByText('#1')).toBeInTheDocument();
-    expect(screen.getByText('#2')).toBeInTheDocument();
-    expect(screen.getByText('#3')).toBeInTheDocument();
+    // Rank indicators — top 3 use emoji medals (👑 appears in spotlight + row)
+    expect(screen.getAllByText('👑').length).toBeGreaterThan(0);
+    expect(screen.getByText('🥈')).toBeInTheDocument();
+    expect(screen.getByText('🥉')).toBeInTheDocument();
 
     // Stats — values may appear in spotlight + table rows
     expect(screen.getAllByText('3,400').length).toBeGreaterThan(0); // total_plays formatted

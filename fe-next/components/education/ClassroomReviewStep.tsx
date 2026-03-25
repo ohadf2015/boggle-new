@@ -90,7 +90,7 @@ export function ClassroomReviewStep({
                 )}
               >
                 <Icon className="w-6 h-6" />
-                <span className="text-sm">{t(`classroom.gameModes.${key}`)}</span>
+                <span className="text-sm">{t(`teacher.classroom.gameModes.${key}`)}</span>
               </button>
             ))}
           </div>

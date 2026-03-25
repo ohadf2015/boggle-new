@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,7 +16,6 @@ import HighlightsBar from '@/components/results/HighlightsBar';
 import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
 
 // Keep existing components for stats/words detail
-const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
 const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -52,8 +51,8 @@ export interface ResultsMainContentProps {
   isCurrentUserWinner: boolean;
   currentPlayerValidWords: Array<{ word: string; score: number }>;
   currentPlayerRank: number;
-  scoreRevealComplete: boolean;
-  setScoreRevealComplete: (complete: boolean) => void;
+  scoreRevealComplete?: boolean;
+  setScoreRevealComplete?: (complete: boolean) => void;
   normalizeUsername: (name: string | undefined | null) => string;
   username: string | undefined;
   gameCode?: string;
@@ -99,9 +98,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   currentPlayerData,
   currentPlayerValidWords,
   currentPlayerRank,
-  scoreRevealComplete,
-  setScoreRevealComplete,
-  normalizeUsername,
   username,
   gameMode,
   missedWords,
@@ -120,13 +116,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   const gapToWinner = currentPlayerRank > 1 ? winnerScore - (currentPlayerData?.score ?? 0) : 0;
   const isWordHunt = gameMode === 'word-hunt';
   const isMultiplayer = sortedScores.length > 1;
-
-  // Auto-complete score reveal for single-player/bots
-  useEffect(() => {
-    if (!isMultiplayer && !scoreRevealComplete) {
-      setScoreRevealComplete(true);
-    }
-  }, [isMultiplayer, scoreRevealComplete, setScoreRevealComplete]);
 
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
@@ -187,108 +176,88 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Score Reveal Animation (before everything) */}
-      {isMultiplayer && !scoreRevealComplete && (
-        <ScoreRevealAnimation
-          players={sortedScores.map(p => ({
-            username: p.username,
-            finalScore: p.score,
-            avatar: p.avatar,
-            isCurrentPlayer: normalizeUsername(p.username) === normalizeUsername(username),
-          }))}
-          currentUsername={username}
-          duration={2500}
-          onComplete={() => setScoreRevealComplete(true)}
+      {/* Cinematic results in YOU-FIRST order */}
+
+      {/* 1. YOUR RESULT HERO */}
+      {currentPlayerData && (
+        <ResultsHeroSection
+          rank={currentPlayerRank}
+          score={currentPlayerData.score}
+          username={currentPlayerData.username}
+          avatar={currentPlayerData.avatar}
+          winnerScore={winnerScore}
+          totalPlayers={sortedScores.length}
+          isWordHunt={isWordHunt}
+          wordHuntStatus={wordHuntStatus}
+          wordHuntTarget={wordHuntSummary?.targetWord}
+          wordsFound={currentPlayerValidWords.length}
+          t={t}
         />
       )}
 
-      {/* After reveal: cinematic results in YOU-FIRST order */}
-      {scoreRevealComplete && (
-        <>
-          {/* 1. YOUR RESULT HERO */}
-          {currentPlayerData && (
-            <ResultsHeroSection
-              rank={currentPlayerRank}
-              score={currentPlayerData.score}
-              username={currentPlayerData.username}
-              avatar={currentPlayerData.avatar}
-              winnerScore={winnerScore}
-              totalPlayers={sortedScores.length}
-              isWordHunt={isWordHunt}
-              wordHuntStatus={wordHuntStatus}
-              wordHuntTarget={wordHuntSummary?.targetWord}
-              wordsFound={currentPlayerValidWords.length}
-              t={t}
-            />
-          )}
+      {/* 2. TOP 3 PODIUM */}
+      {isMultiplayer && podiumPlayers.length >= 2 && (
+        <ResultsPodium
+          players={podiumPlayers}
+          currentUsername={username}
+          isWordHunt={isWordHunt}
+          t={t}
+        />
+      )}
 
-          {/* 2. TOP 3 PODIUM */}
-          {isMultiplayer && podiumPlayers.length >= 2 && (
-            <ResultsPodium
-              players={podiumPlayers}
-              currentUsername={username}
-              isWordHunt={isWordHunt}
-              t={t}
-            />
-          )}
+      {/* 3. CONSOLATION ROWS (4th+ with archetype titles) */}
+      {consolationPlayers.length > 0 && (
+        <ConsolationRows
+          players={consolationPlayers}
+          crowns={consolationCrowns}
+          currentUsername={username}
+          t={t}
+        />
+      )}
 
-          {/* 3. CONSOLATION ROWS (4th+ with archetype titles) */}
-          {consolationPlayers.length > 0 && (
-            <ConsolationRows
-              players={consolationPlayers}
-              crowns={consolationCrowns}
-              currentUsername={username}
-              t={t}
-            />
-          )}
+      {/* 4. HIGHLIGHTS BAR */}
+      {currentPlayerData && (
+        <HighlightsBar stats={highlightStats} />
+      )}
 
-          {/* 4. HIGHLIGHTS BAR */}
-          {currentPlayerData && (
-            <HighlightsBar stats={highlightStats} />
-          )}
+      {/* 5. REVENGE CARD */}
+      {isMultiplayer && currentPlayerData && sortedScores.length > 1 && (
+        <ResultsRevengeSection
+          sortedScores={sortedScores}
+          currentPlayerData={currentPlayerData}
+          currentPlayerRank={currentPlayerRank}
+          gapToWinner={gapToWinner}
+          gameMode={gameMode}
+          reducedMotion={reducedMotion}
+          revengeDelay={0.3}
+          t={t}
+          missedWords={missedWords}
+        />
+      )}
 
-          {/* 5. REVENGE CARD */}
-          {isMultiplayer && currentPlayerData && sortedScores.length > 1 && (
-            <ResultsRevengeSection
-              sortedScores={sortedScores}
-              currentPlayerData={currentPlayerData}
-              currentPlayerRank={currentPlayerRank}
-              gapToWinner={gapToWinner}
-              gameMode={gameMode}
-              reducedMotion={reducedMotion}
-              revengeDelay={0.3}
-              t={t}
-              missedWords={missedWords}
-            />
-          )}
+      {/* Series Standings */}
+      {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
+        <SeriesStandingsBanner
+          standings={seriesStandings}
+          roundNumber={seriesRoundNumber}
+          currentUsername={username}
+          t={t}
+        />
+      )}
 
-          {/* Series Standings */}
-          {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
-            <SeriesStandingsBanner
-              standings={seriesStandings}
-              roundNumber={seriesRoundNumber}
-              currentUsername={username}
-              t={t}
-            />
-          )}
-
-          {/* Stats + Words Detail */}
-          {currentPlayerData && (
-            <ResultsWordsSection
-              currentPlayerData={currentPlayerData}
-              currentPlayerValidWords={currentPlayerValidWords}
-              currentPlayerRank={currentPlayerRank}
-              reducedMotion={reducedMotion}
-              statsDelay={0.4}
-              wordsDelay={0.5}
-              isStatsVisible
-              isWordsVisible
-              t={t}
-            />
-          )}
-
-          {/* Missed Words rendered in ResultsDetailsContent below */}
-        </>
+      {/* Stats + Words Detail */}
+      {currentPlayerData && (
+        <ResultsWordsSection
+          currentPlayerData={currentPlayerData}
+          currentPlayerValidWords={currentPlayerValidWords}
+          currentPlayerRank={currentPlayerRank}
+          reducedMotion={reducedMotion}
+          statsDelay={0.4}
+          wordsDelay={0.5}
+          isStatsVisible
+          isWordsVisible
+          t={t}
+        />
       )}
     </div>
   );

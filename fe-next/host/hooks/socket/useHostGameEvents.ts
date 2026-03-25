@@ -479,6 +479,15 @@ export function useHostGameEvents({
     socket.on('wordHuntEliminated', handleWordHuntEliminated);
     socket.on('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
 
+    // Recovery: if socket reconnects after missing validationComplete, request from server
+    const handleReconnectRecovery = () => {
+      if (gameStartedRef.current === false && hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+        logger.log('[HOST] Socket reconnected — requesting missed results');
+        socket.emit('requestResults');
+      }
+    };
+    socket.on('connect', handleReconnectRecovery);
+
     return () => {
       // Clear fire round interval explicitly
       if (fireRoundIntervalRef.current) {
@@ -503,6 +512,7 @@ export function useHostGameEvents({
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
       socket.off('wordHuntEliminated', handleWordHuntEliminated);
       socket.off('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
+      socket.off('connect', handleReconnectRecovery);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

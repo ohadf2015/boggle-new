@@ -180,7 +180,7 @@ export const LexiReaction = memo<LexiReactionProps>(
             className
           )}
           onClick={handleTap}
-          aria-label="Lexi says something - tap to dismiss"
+          aria-label={t('adventure.lexi.tapToDismiss')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               handleTap();
@@ -248,7 +248,7 @@ export const LexiReaction = memo<LexiReactionProps>(
             onClick={handleTap}
             role="button"
             tabIndex={0}
-            aria-label="Lexi says something - tap to speed up, double-tap to dismiss"
+            aria-label={t('adventure.lexi.tapToSpeedUp')}
             onKeyDown={(e: React.KeyboardEvent) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 handleTap();

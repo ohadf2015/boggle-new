@@ -7,6 +7,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BoardGallery from '../BoardGallery';
 
+jest.mock('@/components/motion/AdaptiveMotion', () => ({
+  AdaptiveMotion: {
+    div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
+  },
+  AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
@@ -80,9 +87,12 @@ describe('BoardGallery', () => {
     mockFetch.mockReturnValue(buildFetchResponse(mockBoards));
   });
 
-  it('renders hero section with title', async () => {
+  it('renders sort and filter toolbar', async () => {
     render(<BoardGallery />);
-    expect(screen.getByText('ugc.gallery.title')).toBeInTheDocument();
+    // Gallery no longer renders its own hero title (parent page owns it)
+    // It should render the sort tabs and difficulty filters
+    expect(screen.getByText('ugc.gallery.sort.featured')).toBeInTheDocument();
+    expect(screen.getByText('ugc.difficulty.easy')).toBeInTheDocument();
   });
 
   it('renders sort tabs: Featured, Popular, Newest, Top Rated', async () => {

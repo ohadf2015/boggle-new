@@ -21,9 +21,9 @@ describe('useBoardCreator — initial state', () => {
     expect(result.current.step).toBe('configure');
   });
 
-  it('starts with gridSize 4', () => {
+  it('starts with gridSize 6', () => {
     const { result } = renderHook(() => useBoardCreator());
-    expect(result.current.gridSize).toBe(4);
+    expect(result.current.gridSize).toBe(6);
   });
 
   it('starts with language en', () => {
@@ -138,7 +138,7 @@ describe('useBoardCreator — generateBoard', () => {
     expect(mockFetch).toHaveBeenCalledWith('/api/ugc/boards/generate', expect.objectContaining({
       method: 'POST',
       headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
-      body: expect.stringContaining('"gridSize":4'),
+      body: expect.stringContaining('"gridSize":6'),
     }));
   });
 

@@ -7,10 +7,11 @@ jest.mock('@/components/NeoToast', () => ({
   neoWarningToast: jest.fn(),
 }));
 
-const mockT = (key: string) => {
+const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
     'multiplayer.playerJoined': 'joined the game!',
     'multiplayer.playerLeft': 'left the game',
+    'multiplayer.botsJoined': `No humans? ${params?.count ?? 0} bots jumped in!`,
   };
   return translations[key] || key;
 };
@@ -130,6 +131,60 @@ describe('usePlayerJoinLeaveNotifications', () => {
     expect(neoInfoToast).toHaveBeenCalledWith(
       'Charlie joined the game!',
       expect.any(Object)
+    );
+  });
+
+  it('should show a single consolidated toast when multiple bots join', () => {
+    const initialPlayers: Player[] = [{ username: 'Alice' }];
+    const { rerender } = renderHook(
+      ({ players }: { players: Player[] }) =>
+        usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+      { initialProps: { players: initialPlayers } }
+    );
+
+    rerender({
+      players: [
+        { username: 'Alice' },
+        { username: 'Bot-1', isBot: true },
+        { username: 'Bot-2', isBot: true },
+        { username: 'Bot-3', isBot: true },
+      ],
+    });
+
+    // Should show exactly 1 toast for all bots, not 3 individual ones
+    expect(neoInfoToast).toHaveBeenCalledTimes(1);
+    expect(neoInfoToast).toHaveBeenCalledWith(
+      expect.stringContaining('3 bots'),
+      expect.objectContaining({ icon: '🤖' })
+    );
+  });
+
+  it('should show separate toasts for humans and one consolidated toast for bots', () => {
+    const initialPlayers: Player[] = [{ username: 'Alice' }];
+    const { rerender } = renderHook(
+      ({ players }: { players: Player[] }) =>
+        usePlayerJoinLeaveNotifications({ players, currentUsername: 'Alice', t: mockT }),
+      { initialProps: { players: initialPlayers } }
+    );
+
+    rerender({
+      players: [
+        { username: 'Alice' },
+        { username: 'Bob' },
+        { username: 'Bot-1', isBot: true },
+        { username: 'Bot-2', isBot: true },
+      ],
+    });
+
+    // 1 toast for Bob (human) + 1 consolidated toast for 2 bots = 2 total
+    expect(neoInfoToast).toHaveBeenCalledTimes(2);
+    expect(neoInfoToast).toHaveBeenCalledWith(
+      'Bob joined the game!',
+      expect.objectContaining({ icon: '👋' })
+    );
+    expect(neoInfoToast).toHaveBeenCalledWith(
+      expect.stringContaining('2 bots'),
+      expect.objectContaining({ icon: '🤖' })
     );
   });
 });

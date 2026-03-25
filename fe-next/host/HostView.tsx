@@ -24,6 +24,7 @@ import {
   FinalScoresModal,
   ExitConfirmDialog,
   CancelTournamentDialog,
+  SoloStartConfirmDialog,
 } from './components/HostDialogs';
 
 // Custom hooks
@@ -222,6 +223,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     setShowExitConfirm: state.setShowExitConfirm,
     setShowCancelTournamentDialog: state.setShowCancelTournamentDialog,
     setShowQR: state.setShowQR,
+    setShowSoloConfirm: state.setShowSoloConfirm,
     intentionalExitRef: state.refs.intentionalExitRef,
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
   });
@@ -457,6 +459,13 @@ const HostView: React.FC<HostViewProps> = memo(({
         open={ui.showExitConfirm}
         onOpenChange={state.setShowExitConfirm}
         onConfirm={actions.confirmExitRoom}
+        t={t}
+      />
+
+      <SoloStartConfirmDialog
+        open={ui.showSoloConfirm}
+        onOpenChange={state.setShowSoloConfirm}
+        onConfirm={actions.confirmSoloStart}
         t={t}
       />
 

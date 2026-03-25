@@ -987,6 +987,10 @@ const sv = {
     "gameStopped": "Spelet stoppat",
     "confirmExit": "Lämna? Någon annan tar över som värd.",
     "exitWarning": "Lämna? Rummet stängs för alla.",
+    "soloStartTitle": "Inga andra spelare ännu!",
+    "soloStartDescription": "Vill du bjuda in vänner först? Annars hoppar bottar in för att göra det spännande.",
+    "soloStartCancel": "Vänta på spelare",
+    "soloStartConfirm": "Spela med bottar",
     "exitRoom": "Lämna rum",
     "startNewGame": "Starta nytt spel",
     "startNextRound": "Starta nästa runda",
@@ -1429,12 +1433,16 @@ const sv = {
       "tryAgain": "Försöka igen?",
       "continue": "Fortsätt",
       "dailyChallenge": "Daglig Utmaning",
+      "dailyChallengeDesc": "Tävla på dagens bräde — samma pussel för alla!",
       "practiceMode": "Träningsläge",
+      "practiceModeDesc": "Ingen press — spela i din takt och lär dig nya ord.",
       "joinFriendsGame": "Gå med i väns spel",
-      "homePage": "Startsidan",
+      "joinFriendsGameDesc": "Hoppa in i en livematch med vänner!",
+      "homePage": "Utforska Alla Lägen",
+      "homePageDesc": "Äventyr, multiplayer och mer.",
       "moreModesUnlock": "Fler lägen låses upp när du spelar!",
       "skip": "Hoppa över",
-      "letsGo": "Kör igång!"
+      "letsGo": "Nu kör vi!"
     }
   },
   "preGameTutorial": {
@@ -3183,6 +3191,7 @@ const sv = {
       "title": "Community-brädor",
       "boardCount": "brädor",
       "empty": "Inga brädor ännu. Bli först att skapa en!",
+      "emptyHint": "Skapa ett eget bräde och dela det med gemenskapen",
       "emptyTitle": "Inga brädor ännu",
       "emptySubtitle": "Bli först att skapa en!",
       "createBoard": "Skapa en bräda",
@@ -3291,7 +3300,10 @@ const sv = {
       "tabCreators": "Skapare",
       "searchPlaceholder": "Sök bräden och paket...",
       "createNew": "Skapa",
-      "featuredCreator": "Utvald skapare"
+      "featuredCreator": "Utvald skapare",
+      "statBoards": "bräden",
+      "statCreators": "skapare",
+      "statPlays": "spelningar"
     },
     "strip": {
       "title": "Community-bräden",
@@ -5295,6 +5307,10 @@ const sv = {
     "daysAgo": "{n}d sedan"
   },
   "admin": {
+    "gameModePopularity": "Spelläges popularitet",
+    "totalGames": "Totalt",
+    "landingCardOrder": "Ordning på landningskort",
+    "noData": "Ingen data tillgänglig",
     "dashboard": "Adminpanel",
     "accessRequired": "Adminbehörighet krävs",
     "accessDenied": "Du behöver administratörsbehörighet för att komma åt denna sida.",
@@ -6123,6 +6139,9 @@ const sv = {
       "validationCancelled": "Valideringen avbröts"
     },
 "game": {
+      "title": "Äventyrsläge",
+      "hud": "Äventyrs-HUD",
+      "retryOptions": "Försök igen-alternativ",
       "selectWord": "Välj ett ord",
       "hintFullReveal": "Prova att leta efter kortare ord först!",
       "hintLengthAndStart": "Leta efter ord som börjar med specifika bokstäver!",
@@ -6235,7 +6254,9 @@ const sv = {
         "star1": "Nivan avklarad!",
         "star2": "Utmarkt arbete!",
         "star3": "Perfekt poang!"
-      }
+      },
+      "tapToDismiss": "Tryck för att stänga",
+      "tapToSpeedUp": "Tryck för att snabba på"
     },
     "xp": {
       "label": "EP",
@@ -6255,6 +6276,7 @@ const sv = {
       "cascadeBlocked": "Vänta tills kaskaden är klar"
     },
     "upgrades": {
+      "shopTitle": "Uppgraderingsbutik",
       "maxLevel": "MAX",
       "purchase": "Köp",
       "needMore": "Behöver {amount} till",
@@ -6348,8 +6370,8 @@ const sv = {
       }
     },
     "shop": {
-      "title": "Ordsmedjan",
-      "open": "Öppna Ordsmedjan"
+      "title": "Butik",
+      "open": "Öppna butiken"
     },
     "bosses": {
       "fightBoss": "Bekampa bossen",
@@ -9227,6 +9249,14 @@ const sv = {
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Avatardel",
     "avatarReward": "+1 Avatardel",
+    "avatarPartCategory": {
+      "eyes": "Ögon",
+      "mouth": "Mun",
+      "accessory": "Tillbehör",
+      "hair": "Hår",
+      "eyebrows": "Ögonbryn",
+      "facialHair": "Ansiktshår"
+    },
     "completedAll": "Allt klart för idag!",
     "progress": "{{completed}}/{{total}}",
     "go": "KÖR",

@@ -6,17 +6,28 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useProgression } from '@/contexts/ProgressionContext';
+import { useSkillTreeStore } from '@/hooks/useSkillTreeStore';
 import { SkillTreeView, SkillUnlockModal } from '@/components/adventure/SkillTree';
 import type { SkillNode } from '@/types/adventure';
 
 export function SkillTreePageClient() {
   const { t } = useLanguage();
+  const { progression } = useProgression();
+  const hydrateFromDB = useSkillTreeStore((s) => s.hydrateFromDB);
   const [unlockedSkill, setUnlockedSkill] = useState<SkillNode | null>(null);
+
+  // Hydrate skill tree from DB on first load
+  useEffect(() => {
+    if (progression?.skillTree && progression?.skillPoints !== undefined) {
+      hydrateFromDB(progression.skillTree, progression.skillPoints);
+    }
+  }, [progression?.skillTree, progression?.skillPoints, hydrateFromDB]);
 
   const handleSkillUnlock = useCallback((skill: SkillNode) => {
     setUnlockedSkill(skill);

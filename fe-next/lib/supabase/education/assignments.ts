@@ -102,15 +102,11 @@ export async function createAssignment(data: {
 
   try {
     const { data: assignment, error } = await supabase
-      .from('teacher_assignments')
+      .from('lesson_assignments')
       .insert({
         classroom_id: data.classroom_id,
         lesson_id: data.lesson_id,
-        teacher_id: data.teacher_id,
-        assignment_type: data.assignment_type || 'practice',
         due_date: data.due_date || null,
-        title: data.title || null,
-        instructions: data.instructions || null,
       })
       .select()
       .single();
@@ -139,7 +135,7 @@ export async function getClassroomAssignments(
   try {
     // Fetch assignments with joined lesson data
     const { data: assignments, error } = await supabase
-      .from('teacher_assignments')
+      .from('lesson_assignments')
       .select('*, vocabulary_lessons(*)')
       .eq('classroom_id', classroomId)
       .order('created_at', { ascending: false });
@@ -225,7 +221,7 @@ export async function deleteAssignment(
 
   try {
     const { error } = await supabase
-      .from('teacher_assignments')
+      .from('lesson_assignments')
       .delete()
       .eq('id', assignmentId);
 
@@ -257,7 +253,7 @@ export async function updateAssignment(
 
   try {
     const { data: assignment, error } = await supabase
-      .from('teacher_assignments')
+      .from('lesson_assignments')
       .update(updates)
       .eq('id', id)
       .select()

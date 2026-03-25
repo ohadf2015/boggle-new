@@ -143,6 +143,8 @@ export interface GameResultInput {
   isRanked?: boolean;
   language?: string;
   timePlayed?: number;
+  /** Landing-page game mode: singleplayer, multiplayer, daily, adventure, blast */
+  gameMode?: string;
 }
 
 export interface PlayerScore {
@@ -158,6 +160,8 @@ export interface GameInfo {
   language?: string;
   isRanked?: boolean;
   timePlayed?: number;
+  /** Landing-page game mode: singleplayer, multiplayer, daily, adventure, blast */
+  gameMode?: string;
 }
 
 export interface UserAuthInfo {

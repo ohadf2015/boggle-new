@@ -81,7 +81,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
     return (
       <div
         data-testid="adventure-hud"
-        aria-label="Game HUD"
+        aria-label={t('adventure.game.hud')}
         className={cn('fixed inset-x-0 top-0 z-40 pointer-events-none', className)}
       >
         {/* Top Bar */}

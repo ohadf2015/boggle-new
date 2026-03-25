@@ -77,6 +77,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     setShowCancelTournamentDialog: noop,
     setShowQR: noop,
     intentionalExitRef: noopRef,
+    setShowSoloConfirm: noop,
     tournamentTimeoutRef: timeoutRef,
   };
 

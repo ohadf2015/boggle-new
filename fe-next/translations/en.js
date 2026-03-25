@@ -971,6 +971,10 @@ const en = {
     "gameStopped": "Game Stopped",
     "confirmExit": "Exit? Someone else will become host.",
     "exitWarning": "Exit? Room closes for everyone.",
+    "soloStartTitle": "No other players yet!",
+    "soloStartDescription": "Want to invite friends first? If not, bots will join to keep things competitive.",
+    "soloStartCancel": "Wait for players",
+    "soloStartConfirm": "Play with bots",
     "exitRoom": "Exit",
     "addFriend": "Add {name}",
     "requestSent": "Request Sent",
@@ -1532,12 +1536,16 @@ const en = {
       "tryAgain": "Try again?",
       "continue": "Continue",
       "dailyChallenge": "Daily Challenge",
+      "dailyChallengeDesc": "Compete on today's board — same puzzle for everyone!",
       "practiceMode": "Practice Mode",
+      "practiceModeDesc": "No pressure — play at your own pace and learn new words.",
       "joinFriendsGame": "Join Friend's Game",
-      "homePage": "Home Page",
+      "joinFriendsGameDesc": "Jump into a live match with friends!",
+      "homePage": "Explore All Modes",
+      "homePageDesc": "Browse adventure, multiplayer, and more.",
       "moreModesUnlock": "More modes unlock as you play!",
       "skip": "Skip",
-      "letsGo": "Let's go!"
+      "letsGo": "Let's Start!"
     }
   },
   "preGameTutorial": {
@@ -3655,6 +3663,7 @@ const en = {
       "title": "Community Boards",
       "boardCount": "boards",
       "empty": "No boards yet. Be the first to create one!",
+      "emptyHint": "Create a custom board and share it with the community",
       "emptyTitle": "No boards yet",
       "emptySubtitle": "Be the first to create one!",
       "createBoard": "Create a Board",
@@ -3763,7 +3772,10 @@ const en = {
       "tabCreators": "Creators",
       "searchPlaceholder": "Search boards & packs...",
       "createNew": "Create",
-      "featuredCreator": "Featured Creator"
+      "featuredCreator": "Featured Creator",
+      "statBoards": "boards",
+      "statCreators": "creators",
+      "statPlays": "plays"
     },
     "strip": {
       "title": "Community Boards",
@@ -5393,6 +5405,10 @@ const en = {
     "daysAgo": "{n}d ago"
   },
   "admin": {
+    "gameModePopularity": "Game Mode Popularity",
+    "totalGames": "Total",
+    "landingCardOrder": "Landing card order",
+    "noData": "No data available",
     "dashboard": "Admin Dashboard",
     "accessRequired": "Admin Access Required",
     "accessDenied": "You need administrator privileges to access this page.",
@@ -6214,6 +6230,9 @@ const en = {
       "validationCancelled": "Validation was cancelled"
     },
 "game": {
+      "title": "Adventure Mode",
+      "hud": "Adventure HUD",
+      "retryOptions": "Retry options",
       "objectives": "Objectives",
       "combo": "Combo",
       "wordsFound": "Words Found",
@@ -6326,7 +6345,9 @@ const en = {
         "star1": "Level cleared!",
         "star2": "Excellent work!",
         "star3": "Perfect score!"
-      }
+      },
+      "tapToDismiss": "Tap to dismiss",
+      "tapToSpeedUp": "Tap to speed up"
     },
     "xp": {
       "label": "XP",
@@ -6346,6 +6367,7 @@ const en = {
       "cascadeBlocked": "Wait for cascade to complete"
     },
     "upgrades": {
+      "shopTitle": "Upgrade Shop",
       "maxLevel": "MAX",
       "purchase": "Buy",
       "needMore": "Need {amount} more",
@@ -6439,8 +6461,8 @@ const en = {
       }
     },
     "shop": {
-      "title": "Word Forge",
-      "open": "Open Word Forge Shop"
+      "title": "Shop",
+      "open": "Open Shop"
     },
     "bosses": {
       "fightBoss": "Fight Boss",
@@ -8939,6 +8961,14 @@ const en = {
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Avatar Part",
     "avatarReward": "+1 Avatar Part",
+    "avatarPartCategory": {
+      "eyes": "Eyes",
+      "mouth": "Mouth",
+      "accessory": "Accessory",
+      "hair": "Hair",
+      "eyebrows": "Eyebrows",
+      "facialHair": "Facial Hair"
+    },
     "completedAll": "All done for today!",
     "progress": "{{completed}}/{{total}}",
     "go": "GO",

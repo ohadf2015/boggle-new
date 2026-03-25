@@ -109,6 +109,7 @@ export interface HostUIState {
   showQR: boolean;
   showExitConfirm: boolean;
   showCancelTournamentDialog: boolean;
+  showSoloConfirm: boolean;
 }
 
 // Combo state (matching PlayerView pattern)
@@ -181,6 +182,7 @@ export interface UseHostViewStateReturn {
   setShowQR: React.Dispatch<React.SetStateAction<boolean>>;
   setShowExitConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCancelTournamentDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSoloConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Combo
   combo: ComboState;
@@ -283,6 +285,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const [showQR, setShowQR] = useState<boolean>(false);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState<boolean>(false);
+  const [showSoloConfirm, setShowSoloConfirm] = useState<boolean>(false);
 
   // ==========================================
   // Combo State
@@ -365,7 +368,8 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     showQR,
     showExitConfirm,
     showCancelTournamentDialog,
-  }), [showQR, showExitConfirm, showCancelTournamentDialog]);
+    showSoloConfirm,
+  }), [showQR, showExitConfirm, showCancelTournamentDialog, showSoloConfirm]);
 
   const combo = useMemo<ComboState>(() => ({
     level: comboLevel,
@@ -488,6 +492,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     setShowQR,
     setShowExitConfirm,
     setShowCancelTournamentDialog,
+    setShowSoloConfirm,
 
     // Combo
     combo,

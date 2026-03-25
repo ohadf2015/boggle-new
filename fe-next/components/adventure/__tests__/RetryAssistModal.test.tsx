@@ -207,7 +207,7 @@ describe('RetryAssistModal', () => {
 
     it('should have descriptive aria-label', () => {
       render(<RetryAssistModal {...defaultProps} />);
-      expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Retry options');
+      expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'adventure.game.retryOptions');
     });
   });
 

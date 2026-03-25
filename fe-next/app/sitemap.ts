@@ -1,6 +1,15 @@
-export default function sitemap() {
+import type { MetadataRoute } from 'next';
+
+type SitemapOpts = {
+  lastModified: string;
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+  priority: number;
+  images?: string[];
+};
+
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.lexiclash.live';
-  const locales = ['he', 'en', 'sv', 'ja', 'es'];
+  const locales = ['he', 'en', 'sv', 'ja', 'es'] as const;
 
   // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
   // Update these dates when actual content changes are deployed.
@@ -9,11 +18,11 @@ export default function sitemap() {
   const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
   const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
 
-  const routes = [];
+  const routes: MetadataRoute.Sitemap = [];
 
   // Helper: generate hreflang alternates for a given path
-  function langAlternates(path) {
-    const alts = { 'x-default': `${baseUrl}/en${path}` };
+  function langAlternates(path: string): Record<string, string> {
+    const alts: Record<string, string> = { 'x-default': `${baseUrl}/en${path}` };
     locales.forEach((l) => { alts[l] = `${baseUrl}/${l}${path}`; });
     // Region-specific: show both English and Hebrew for Israeli users
     alts['en-IL'] = `${baseUrl}/en${path}`;
@@ -36,7 +45,7 @@ export default function sitemap() {
   }
 
   // Helper: add a route for all locales
-  function addForAllLocales(path, opts) {
+  function addForAllLocales(path: string, opts: SitemapOpts) {
     locales.forEach((locale) => {
       routes.push({
         url: `${baseUrl}/${locale}${path}`,
@@ -125,7 +134,6 @@ export default function sitemap() {
     'why-word-games-are-addictive',
     'best-boggle-alternatives-2026',
     'word-games-for-brain-training',
-    // Previously missing from sitemap:
     'hebrew-word-games-guide',
     'multiplayer-word-games-social',
     'vocabulary-building-strategies',
@@ -160,7 +168,7 @@ export default function sitemap() {
     { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
     { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
-  ];
+  ] as const;
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({
       url: `${baseUrl}/${locale}${path}`,

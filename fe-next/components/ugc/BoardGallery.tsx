@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
-import { Layout } from 'lucide-react';
+import { Layout, Search, Filter } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import BoardCard, { type BoardCardBoard } from './BoardCard';
 
 type SortOption = 'featured' | 'popular' | 'newest' | 'topRated';
@@ -16,17 +18,17 @@ interface GalleryResponse {
   hasMore: boolean;
 }
 
-const SORT_TABS: { key: SortOption; label: string }[] = [
-  { key: 'featured', label: 'ugc.gallery.sort.featured' },
-  { key: 'popular', label: 'ugc.gallery.sort.popular' },
-  { key: 'newest', label: 'ugc.gallery.sort.newest' },
-  { key: 'topRated', label: 'ugc.gallery.sort.topRated' },
+const SORT_TABS: { key: SortOption; label: string; icon: string }[] = [
+  { key: 'featured', label: 'ugc.gallery.sort.featured', icon: '⭐' },
+  { key: 'popular', label: 'ugc.gallery.sort.popular', icon: '🔥' },
+  { key: 'newest', label: 'ugc.gallery.sort.newest', icon: '✨' },
+  { key: 'topRated', label: 'ugc.gallery.sort.topRated', icon: '🏆' },
 ];
 
-const DIFFICULTY_CHIPS: { key: DifficultyFilter; label: string }[] = [
-  { key: 'EASY', label: 'ugc.difficulty.easy' },
-  { key: 'MEDIUM', label: 'ugc.difficulty.medium' },
-  { key: 'HARD', label: 'ugc.difficulty.hard' },
+const DIFFICULTY_CHIPS: { key: DifficultyFilter; label: string; color: string }[] = [
+  { key: 'EASY', label: 'ugc.difficulty.easy', color: 'bg-green-500/15 border-green-500/30 text-green-400 hover:bg-green-500/25' },
+  { key: 'MEDIUM', label: 'ugc.difficulty.medium', color: 'bg-neo-orange/15 border-neo-orange/30 text-neo-orange hover:bg-neo-orange/25' },
+  { key: 'HARD', label: 'ugc.difficulty.hard', color: 'bg-red-500/15 border-red-500/30 text-red-400 hover:bg-red-500/25' },
 ];
 
 const LIMIT = 12;
@@ -71,7 +73,6 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
     []
   );
 
-  // Reset to page 1 on filter change
   useEffect(() => {
     setPage(1);
     fetchBoards(sort, difficulty, 1, false);
@@ -92,63 +93,76 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-neo-navy px-4 py-6 max-w-5xl mx-auto">
-      {/* Hero */}
-      <div className="mb-6 text-center">
-        <h1 className="font-neo-display font-bold text-3xl text-neo-white mb-1">
-          {t('ugc.gallery.title')}
-        </h1>
-        {total > 0 && (
-          <p className="text-neo-white/60 font-neo-body text-sm">
-            {total} {t('ugc.gallery.boardCount')}
-          </p>
-        )}
+    <div className="w-full">
+      {/* ── Toolbar row — sort + difficulty in a single bar ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        {/* Sort tabs */}
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide flex-1">
+          {SORT_TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => handleSortChange(tab.key)}
+              className={cn(
+                'flex items-center gap-1.5 px-3.5 py-2 rounded-neo',
+                'font-neo-body font-bold text-xs whitespace-nowrap',
+                'border-2 border-black transition-all duration-100',
+                sort === tab.key
+                  ? 'bg-neo-yellow text-black shadow-hard-sm'
+                  : 'bg-neo-navy text-neo-white/60 shadow-hard-sm hover:text-neo-white hover:bg-neo-white/5'
+              )}
+            >
+              <span className="text-sm" aria-hidden>{tab.icon}</span>
+              {t(tab.label)}
+            </button>
+          ))}
+        </div>
+
+        {/* Difficulty chips */}
+        <div className="flex items-center gap-1.5">
+          <Filter className="w-3.5 h-3.5 text-neo-white/30 shrink-0" />
+          {DIFFICULTY_CHIPS.map(chip => (
+            <button
+              key={chip.key}
+              onClick={() => handleDifficultyToggle(chip.key)}
+              className={cn(
+                'px-2.5 py-1 rounded-neo font-neo-body font-bold text-[11px]',
+                'border transition-all duration-100',
+                difficulty === chip.key
+                  ? cn(chip.color, 'border-current shadow-hard-sm')
+                  : 'border-neo-white/10 text-neo-white/40 hover:text-neo-white/60'
+              )}
+            >
+              {t(chip.label)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Sort tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-        {SORT_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => handleSortChange(tab.key)}
-            className={`flex-shrink-0 px-4 py-1.5 rounded-neo border-neo border-black font-neo-body font-bold text-sm transition-all duration-100 ${
-              sort === tab.key
-                ? 'bg-neo-yellow text-black shadow-hard-pressed'
-                : 'bg-neo-navy text-neo-white/70 shadow-hard hover:text-neo-white'
-            }`}
-          >
-            {t(tab.label)}
-          </button>
-        ))}
-      </div>
+      {/* ── Board count ── */}
+      {total > 0 && (
+        <p className="text-neo-white/40 font-neo-body text-xs mb-4">
+          {total} {t('ugc.gallery.boardCount')}
+        </p>
+      )}
 
-      {/* Difficulty filter chips */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {DIFFICULTY_CHIPS.map(chip => (
-          <button
-            key={chip.key}
-            onClick={() => handleDifficultyToggle(chip.key)}
-            className={`px-3 py-1 rounded-neo border-neo border-black font-neo-body font-bold text-xs transition-all duration-100 ${
-              difficulty === chip.key
-                ? 'bg-neo-orange text-white shadow-hard-pressed'
-                : 'bg-neo-navy text-neo-white/70 shadow-hard hover:text-neo-white'
-            }`}
-          >
-            {t(chip.label)}
-          </button>
-        ))}
-      </div>
-
-      {/* Board grid */}
+      {/* ── Board grid ── */}
       {!loading && boards.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 py-16 text-center">
-          <Layout size={48} className="text-neo-white/20" />
-          <p className="font-neo-body text-neo-white/60 text-sm">
-            {t('ugc.gallery.empty')}
-          </p>
+        <div className="flex flex-col items-center gap-4 py-20 text-center">
+          <div className="relative">
+            <Layout size={52} className="text-neo-white/10" />
+            <Search size={20} className="text-neo-white/20 absolute -bottom-1 -end-1" />
+          </div>
+          <div>
+            <p className="font-neo-display font-bold text-neo-white/60 text-lg mb-1">
+              {t('ugc.gallery.empty')}
+            </p>
+            <p className="text-neo-white/30 font-neo-body text-sm max-w-xs mx-auto">
+              {t('ugc.gallery.emptyHint')}
+            </p>
+          </div>
           <Link
             href={`/${language}/create/board`}
-            className="px-5 py-2 bg-neo-yellow text-black font-neo-body font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-all"
+            className="px-5 py-2.5 bg-neo-yellow text-black font-neo-display font-bold text-sm rounded-neo border-3 border-black shadow-hard hover:shadow-hard-pressed transition-all"
           >
             {t('ugc.gallery.createBoard')}
           </Link>
@@ -156,21 +170,51 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {boards.map(board => (
-              <BoardCard
+            {boards.map((board, i) => (
+              <AdaptiveMotion.div
                 key={board.board_code}
-                board={board}
-                onPlay={onPlay}
-              />
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.04 * Math.min(i, 12),
+                  type: 'spring',
+                  stiffness: 350,
+                  damping: 24,
+                }}
+              >
+                <BoardCard
+                  board={board}
+                  onPlay={onPlay}
+                />
+              </AdaptiveMotion.div>
             ))}
           </div>
 
-          {hasMore && (
-            <div className="flex justify-center mt-6">
+          {/* Loading skeleton placeholders */}
+          {loading && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-52 rounded-neo border-3 border-black bg-neo-white/[0.03] animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+
+          {hasMore && !loading && (
+            <div className="flex justify-center mt-8">
               <button
                 onClick={handleLoadMore}
                 disabled={loading}
-                className="px-6 py-2 bg-neo-navy text-neo-white font-neo-body font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-lg transition-all disabled:opacity-50"
+                className={cn(
+                  'px-8 py-2.5 font-neo-display font-bold text-sm',
+                  'bg-neo-navy text-neo-white rounded-neo',
+                  'border-3 border-black shadow-hard',
+                  'hover:shadow-hard-lg hover:-translate-y-0.5',
+                  'active:shadow-hard-pressed active:translate-y-0',
+                  'transition-all duration-150 disabled:opacity-50'
+                )}
               >
                 {t('ugc.gallery.loadMore')}
               </button>

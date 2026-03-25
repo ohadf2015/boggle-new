@@ -600,6 +600,18 @@ export function usePlayerGameEvents({
     socket.on('wordHuntEliminated', handleWordHuntEliminated);
     socket.on('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
 
+    // Recovery: if socket reconnects after missing validatedScores, request them from server.
+    // This handles the case where a brief disconnect during game-end causes the client
+    // to miss the fire-and-forget broadcast.
+    const handleReconnectRecovery = () => {
+      // Only request if we were in an active game and haven't processed results yet
+      if (wasInActiveGameRef.current && hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+        logger.log('[PLAYER] Socket reconnected — requesting missed results');
+        socket.emit('requestResults');
+      }
+    };
+    socket.on('connect', handleReconnectRecovery);
+
     return () => {
       // Clear fire round interval explicitly
       if (fireRoundIntervalRef.current) {
@@ -628,6 +640,7 @@ export function usePlayerGameEvents({
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
       socket.off('wordHuntEliminated', handleWordHuntEliminated);
       socket.off('wordHuntDiscoveryClues', handleWordHuntDiscoveryClues);
+      socket.off('connect', handleReconnectRecovery);
     };
     // Setters from context are stable (wrapped in useCallback)
     // NOTE: letterGrid and gameLanguage are accessed via refs (letterGridRef, gameLanguageRef)

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Hammer, Coins } from 'lucide-react';
+import { ShoppingBag, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AdventureShopFABProps {
@@ -28,7 +28,7 @@ export default function AdventureShopFAB({
       )}
     >
       {/* Ember glow — radiates behind the button */}
-      <div className="absolute inset-0 -inset-x-1 -inset-y-1 rounded-neo-lg bg-neo-orange/40 animate-[ember-pulse_3s_ease-in-out_infinite] pointer-events-none" />
+      <div className="absolute inset-0 -inset-x-1 -inset-y-1 rounded-neo-lg bg-neo-orange/40 animate-[ember-pulse_3s_ease-in-out_infinite] motion-reduce:animate-none pointer-events-none" />
 
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
@@ -52,18 +52,18 @@ export default function AdventureShopFAB({
           'before:bg-white/25 before:rounded-t-neo before:pointer-events-none'
         )}
       >
-        {/* Hammer icon with idle strike animation */}
+        {/* Shop icon with idle bounce animation */}
         <motion.span
-          animate={{ rotate: [0, -12, 0] }}
+          animate={{ y: [0, -2, 0] }}
           transition={{
-            duration: 0.4,
+            duration: 0.6,
             repeat: Infinity,
             repeatDelay: 4,
             ease: 'easeInOut',
           }}
-          className="inline-flex origin-bottom-right"
+          className="inline-flex"
         >
-          <Hammer className="w-5 h-5 drop-shadow-[1px_1px_0px_rgba(0,0,0,0.3)]" />
+          <ShoppingBag className="w-5 h-5 drop-shadow-[1px_1px_0px_rgba(0,0,0,0.3)]" />
         </motion.span>
 
         {/* Title */}
@@ -87,8 +87,8 @@ export default function AdventureShopFAB({
         </div>
 
         {/* Spark dots — tiny decorative "sparks" */}
-        <div className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-neo-yellow animate-[spark_2s_ease-in-out_infinite]" />
-        <div className="absolute -top-0.5 right-3 w-1 h-1 rounded-full bg-neo-yellow/60 animate-[spark_2s_ease-in-out_infinite_0.7s]" />
+        <div className="absolute -top-1 -end-1 w-1.5 h-1.5 rounded-full bg-neo-yellow animate-[spark_2s_ease-in-out_infinite] motion-reduce:animate-none" />
+        <div className="absolute -top-0.5 end-3 w-1 h-1 rounded-full bg-neo-yellow/60 animate-[spark_2s_ease-in-out_infinite_0.7s] motion-reduce:animate-none" />
       </motion.button>
     </div>
   );

@@ -69,6 +69,8 @@ export interface ResultsPlayerCardProps {
   levelUpData?: LevelUpData | null;
   duplicateRuleDisabled?: boolean;
   archetype?: PlayerArchetype | null;
+  /** Compact mode — smaller avatar, tighter spacing, no rotation */
+  compact?: boolean;
 }
 
 export interface WordChipProps {

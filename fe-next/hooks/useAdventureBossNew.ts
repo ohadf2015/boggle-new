@@ -105,11 +105,13 @@ const PHASE_DAMAGE: Record<BossPhaseNew, number> = {
 // HELPERS
 // ==============================================
 
-function derivePhase(hp: number, maxHP: number): BossPhaseNew {
+function derivePhase(hp: number, maxHP: number, phaseThresholds?: { angry: number; desperate: number }): BossPhaseNew {
   if (maxHP <= 0) return 'normal';
   const pct = (hp / maxHP) * 100;
-  if (pct < 25) return 'desperate';
-  if (pct < 50) return 'angry';
+  const desperateAt = phaseThresholds?.desperate ?? 33;
+  const angryAt = phaseThresholds?.angry ?? 66;
+  if (pct < desperateAt) return 'desperate';
+  if (pct < angryAt) return 'angry';
   return 'normal';
 }
 

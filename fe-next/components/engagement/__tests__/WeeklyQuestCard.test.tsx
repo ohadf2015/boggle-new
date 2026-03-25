@@ -52,12 +52,17 @@ jest.mock('@/hooks/useReducedMotion', () => ({
   default: jest.fn(() => false),
 }));
 
+jest.mock('@/components/avatar/PartPreview', () => ({
+  __esModule: true,
+  default: () => React.createElement('svg', { 'data-testid': 'part-preview' }),
+}));
+
 import { WeeklyQuestCard } from '../WeeklyQuestCard';
 
 const mockAvailableQuests = [
-  { id: 'easy_1', difficulty: 'easy' as const, type: 'play_games', description: 'Play 3 games', target: 3, xpReward: 200 },
-  { id: 'med_1', difficulty: 'medium' as const, type: 'long_words', description: 'Find 20 long words', target: 20, xpReward: 500 },
-  { id: 'hard_1', difficulty: 'hard' as const, type: 'find_words_session', description: 'Find 100 words', target: 100, xpReward: 1000 },
+  { id: 'easy_1', difficulty: 'easy' as const, type: 'play_games', description: 'Play 3 games', target: 3, xpReward: 200, avatarPartReward: { category: 'eyes', partId: 'monocleEye' } },
+  { id: 'med_1', difficulty: 'medium' as const, type: 'long_words', description: 'Find 20 long words', target: 20, xpReward: 500, avatarPartReward: { category: 'accessory', partId: 'crown' } },
+  { id: 'hard_1', difficulty: 'hard' as const, type: 'find_words_session', description: 'Find 100 words', target: 100, xpReward: 1000, avatarPartReward: { category: 'eyes', partId: 'galaxy' } },
 ];
 
 beforeEach(() => jest.clearAllMocks());

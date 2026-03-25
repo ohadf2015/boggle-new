@@ -103,7 +103,8 @@ async function processPlayerResult(
           playerId: authInfo.authUserId,
           gameCode,
           ...gameStats,
-          language: gameInfo.language
+          language: gameInfo.language,
+          gameMode: gameInfo.gameMode
         }),
         updatePlayerStats(authInfo.authUserId, gameStats)
       ]);

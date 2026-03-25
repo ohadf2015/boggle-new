@@ -7,11 +7,12 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Clock, Lightbulb, LogOut, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 // ==============================================
 // TYPES
@@ -89,6 +90,8 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     onExit,
   }) => {
     const { t } = useLanguage();
+    const dialogRef = useRef<HTMLDivElement>(null);
+    useFocusTrap(dialogRef, isOpen, onExit);
 
     // Determine which assists are unlocked
     const showBonusTime = consecutiveFailures >= BONUS_TIME_THRESHOLD;
@@ -101,7 +104,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
             data-testid="retry-assist-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="Retry options"
+            aria-label={t('adventure.game.retryOptions')}
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -114,6 +117,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
             )}
           >
             <AdaptiveMotion.div
+              ref={dialogRef}
               variants={modalVariants}
               initial="hidden"
               animate="visible"

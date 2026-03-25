@@ -60,7 +60,7 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function useBoardCreator(): UseBoardCreatorReturn {
   const [step, setStep] = useState<CreatorStep>('configure');
-  const [gridSize, setGridSize] = useState<GridSize>(4);
+  const [gridSize, setGridSize] = useState<GridSize>(6);
   const [language, setLanguage] = useState<string>('en');
   const [seedTags, setSeedTags] = useState<string[]>([]);
   const [generatedBoard, setGeneratedBoard] = useState<GeneratedBoard | null>(null);

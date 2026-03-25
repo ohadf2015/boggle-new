@@ -98,13 +98,13 @@ export function computeUpgradeEffects(upgrades: UpgradeState): UpgradeEffects {
 
   // ── Armor Plating ──
   const armor = getUpgradeTier(upgrades, 'armorPlating');
-  if (armor >= 1) effects.bossDamageMultiplier = [1, 0.9, 0.8, 0.8, 0.8][armor];
+  if (armor >= 1) effects.bossDamageMultiplier = [1, 0.9, 0.8, 0.65, 0.5][armor];
   if (armor >= 3) effects.blockFirstAttack = true;
   if (armor >= 4) effects.bossHealPerWord = 5;
 
   // ── Lucky Pickaxe ──
   const lucky = getUpgradeTier(upgrades, 'luckyPickaxe');
-  if (lucky >= 1) effects.goldMultiplier = [1, 1.1, 1.25, 1.25, 1.25][lucky];
+  if (lucky >= 1) effects.goldMultiplier = [1, 1.1, 1.25, 1.5, 1.75][lucky];
   if (lucky >= 3) effects.longWordGoldBonus = 5;
   if (lucky >= 4) effects.doubleFirstCompletionGold = true;
 

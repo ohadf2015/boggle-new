@@ -1,10 +1,9 @@
 /**
  * Skill Tree Zustand Store
  *
- * Manages skill tree state with localStorage persistence.
+ * Manages skill tree state with DB persistence via /api/adventure/skill-tree.
+ * Falls back to localStorage if DB save fails.
  * Uses custom storage to correctly serialize Set<string>.
- *
- * Key pattern: Set must be converted to Array for JSON.stringify
  */
 
 import { create } from 'zustand';
@@ -21,6 +20,8 @@ interface SkillTreeStoreState {
   availablePoints: number;
   /** Total skill points earned (never decreases) */
   totalPointsEarned: number;
+  /** Whether initial state has been hydrated from DB */
+  hydrated: boolean;
 }
 
 interface SkillTreeStoreActions {
@@ -32,18 +33,50 @@ interface SkillTreeStoreActions {
   hasSkill: (skillId: string) => boolean;
   /** Reset all state (for testing/new game) */
   reset: () => void;
+  /** Hydrate from DB progression data */
+  hydrateFromDB: (skillTree: Record<string, number>, skillPoints: number) => void;
 }
 
 type SkillTreeStore = SkillTreeStoreState & SkillTreeStoreActions;
 
 // ==============================================
+// DB SYNC (fire-and-forget)
+// ==============================================
+
+/** Convert Set<string> to Record<string, 1> for DB storage */
+function skillSetToRecord(skills: Set<string>): Record<string, number> {
+  const record: Record<string, number> = {};
+  for (const skill of skills) {
+    record[skill] = 1;
+  }
+  return record;
+}
+
+let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+
+/** Debounced save to DB — coalesces rapid unlocks into one request */
+function syncToDB(skills: Set<string>, points: number): void {
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(async () => {
+    try {
+      await fetch('/api/adventure/skill-tree', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          skillTree: skillSetToRecord(skills),
+          skillPoints: points,
+        }),
+      });
+    } catch {
+      // Silently fail — localStorage still has the data
+    }
+  }, 500);
+}
+
+// ==============================================
 // CUSTOM STORAGE (Set serialization)
 // ==============================================
 
-/**
- * Custom storage that handles Set<string> serialization
- * JSON.stringify converts Set to {} - we need Array format
- */
 const skillTreeStorage: StateStorage = {
   getItem: (name: string): string | null => {
     if (typeof window === 'undefined') return null;
@@ -52,7 +85,6 @@ const skillTreeStorage: StateStorage = {
 
     try {
       const parsed = JSON.parse(str);
-      // Convert Array back to Set
       if (parsed.state && Array.isArray(parsed.state.unlockedSkills)) {
         return JSON.stringify({
           ...parsed,
@@ -71,7 +103,6 @@ const skillTreeStorage: StateStorage = {
     if (typeof window === 'undefined') return;
     try {
       const parsed = JSON.parse(value);
-      // Convert Set to Array for storage
       const serialized = {
         ...parsed,
         state: {
@@ -100,6 +131,7 @@ const initialState: SkillTreeStoreState = {
   unlockedSkills: new Set(),
   availablePoints: 0,
   totalPointsEarned: 0,
+  hydrated: false,
 };
 
 // ==============================================
@@ -113,24 +145,30 @@ export const useSkillTreeStore = create<SkillTreeStore>()(
 
       addSkillPoints: (amount: number) => {
         if (amount <= 0) return;
-        set((state) => ({
-          availablePoints: state.availablePoints + amount,
-          totalPointsEarned: state.totalPointsEarned + amount,
-        }));
+        set((state) => {
+          const newPoints = state.availablePoints + amount;
+          syncToDB(state.unlockedSkills, newPoints);
+          return {
+            availablePoints: newPoints,
+            totalPointsEarned: state.totalPointsEarned + amount,
+          };
+        });
       },
 
       unlockSkill: (skillId: string, cost: number): boolean => {
         const state = get();
-
-        // Validate unlock conditions
         if (state.availablePoints < cost) return false;
         if (state.unlockedSkills.has(skillId)) return false;
 
-        // Unlock skill
-        set((state) => ({
-          unlockedSkills: new Set([...state.unlockedSkills, skillId]),
-          availablePoints: state.availablePoints - cost,
-        }));
+        set((state) => {
+          const newSkills = new Set([...state.unlockedSkills, skillId]);
+          const newPoints = state.availablePoints - cost;
+          syncToDB(newSkills, newPoints);
+          return {
+            unlockedSkills: newSkills,
+            availablePoints: newPoints,
+          };
+        });
 
         return true;
       },
@@ -145,12 +183,29 @@ export const useSkillTreeStore = create<SkillTreeStore>()(
           availablePoints: 0,
           totalPointsEarned: 0,
         });
+        syncToDB(new Set(), 0);
+      },
+
+      hydrateFromDB: (skillTree: Record<string, number>, skillPoints: number) => {
+        const state = get();
+        // Only hydrate once, and only if DB has data that localStorage doesn't
+        if (state.hydrated) return;
+        const dbSkills = new Set(Object.keys(skillTree));
+        const localSkills = state.unlockedSkills;
+        // Merge: use whichever has more skills (DB or localStorage)
+        const useDB = dbSkills.size > localSkills.size;
+        set({
+          hydrated: true,
+          ...(useDB ? {
+            unlockedSkills: dbSkills,
+            availablePoints: skillPoints,
+          } : {}),
+        });
       },
     }),
     {
       name: 'lexiclash-skill-tree',
       storage: createJSONStorage(() => skillTreeStorage),
-      // Custom merge to handle Set restoration
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<SkillTreeStoreState> | undefined;
         if (!persisted) return currentState;
@@ -158,7 +213,6 @@ export const useSkillTreeStore = create<SkillTreeStore>()(
         return {
           ...currentState,
           ...persisted,
-          // Ensure Set is restored correctly
           unlockedSkills: persisted.unlockedSkills instanceof Set
             ? persisted.unlockedSkills
             : new Set(Array.isArray(persisted.unlockedSkills) ? persisted.unlockedSkills : []),

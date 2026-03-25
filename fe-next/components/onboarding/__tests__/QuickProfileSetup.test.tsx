@@ -15,7 +15,11 @@ jest.mock('framer-motion', () => {
     );
   });
   return {
-    motion: { div: MotionDiv, button: MotionDiv },
+    motion: new Proxy({ div: MotionDiv, button: MotionDiv }, {
+      get(target: any, prop: string) {
+        return target[prop] || MotionDiv;
+      },
+    }),
     AnimatePresence: function AnimatePresence({ children }: any) {
       return <>{children}</>;
     },

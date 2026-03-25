@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Star, Crown } from 'lucide-react';
+import { Star, Crown, Trophy, TrendingUp, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -42,99 +43,144 @@ function useTopCreators() {
   return { creators, loading, error };
 }
 
-const RANK_MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
-
-function RankBadge({ rank }: { rank: number }) {
-  const medal = RANK_MEDALS[rank];
-  return (
-    <span className="flex flex-col items-center gap-0">
-      {medal && <span className="text-lg leading-none" aria-hidden>{medal}</span>}
-      <span className="font-bold text-neo-white/60 text-xs">#{rank}</span>
-    </span>
-  );
-}
+const RANK_STYLES: Record<number, { bg: string; text: string; icon: string }> = {
+  1: { bg: 'bg-neo-yellow/15 border-neo-yellow/40', text: 'text-neo-yellow', icon: '👑' },
+  2: { bg: 'bg-gray-300/10 border-gray-400/30', text: 'text-gray-300', icon: '🥈' },
+  3: { bg: 'bg-amber-700/15 border-amber-600/30', text: 'text-amber-500', icon: '🥉' },
+};
 
 function RatingStars({ value }: { value: number | null }) {
-  if (value === null) return <span className="text-neo-white/40 text-xs">—</span>;
+  if (value === null) return <span className="text-neo-white/30 text-xs">—</span>;
   return (
-    <span className="flex items-center gap-0.5 text-sm font-semibold text-neo-yellow">
-      <Star className="w-3 h-3 fill-neo-yellow" aria-hidden />
+    <span className="flex items-center gap-0.5 text-sm font-bold text-neo-yellow">
+      <Star className="w-3.5 h-3.5 fill-neo-yellow" aria-hidden />
       {value}
     </span>
   );
 }
 
-function CreatorSpotlight({ creator }: { creator: CreatorRow }) {
+/* ── Champion spotlight — dramatic #1 showcase ── */
+function ChampionSpotlight({ creator }: { creator: CreatorRow }) {
   const { t } = useLanguage();
   return (
-    <div
+    <AdaptiveMotion.div
       data-testid="creator-spotlight"
+      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        'border-neo border-neo-yellow bg-neo-navy rounded-neo p-4 mb-4',
-        'shadow-hard flex items-center gap-4'
+        'relative overflow-hidden rounded-neo p-5 mb-6',
+        'border-3 border-neo-yellow/40 shadow-hard',
+        'bg-gradient-to-br from-neo-yellow/[0.08] via-neo-navy to-neo-pink/[0.05]'
       )}
     >
-      <Crown className="w-8 h-8 text-neo-yellow flex-shrink-0" aria-hidden />
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <Avatar
-          customAvatar={creator.avatar_config}
+      {/* Decorative corner glow */}
+      <div className="absolute -top-8 -end-8 w-24 h-24 bg-neo-yellow/10 blur-2xl rounded-full pointer-events-none" />
 
-          size="lg"
-        />
-        <div className="min-w-0">
-          <p className="text-neo-yellow font-bold text-xs uppercase tracking-wider mb-0.5">
+      <div className="flex items-center gap-4 relative">
+        {/* Crown + Avatar */}
+        <div className="relative shrink-0">
+          <Avatar
+            customAvatar={creator.avatar_config}
+            size="lg"
+          />
+          <span className="absolute -top-2 -end-2 text-xl" aria-hidden>👑</span>
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-neo-yellow font-bold text-[10px] uppercase tracking-[0.15em] mb-0.5">
             {t('ugc.creator.leaderboard.spotlight')}
           </p>
-          <p className="font-neo-display text-neo-white font-bold text-lg truncate">
+          <p className="font-neo-display text-neo-white font-bold text-xl truncate">
             {creator.display_name}
           </p>
-          <p className="text-neo-white/60 text-xs">
-            {creator.boards_created} {t('ugc.creator.leaderboard.boards')}
-            {' · '}
-            {creator.total_plays.toLocaleString()} {t('ugc.creator.leaderboard.plays')}
-          </p>
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-neo-white/50 font-neo-body">
+            <span className="flex items-center gap-1">
+              <LayoutGrid className="w-3 h-3" />
+              {creator.boards_created} {t('ugc.creator.leaderboard.boards')}
+            </span>
+            <span className="flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" />
+              {creator.total_plays.toLocaleString()} {t('ugc.creator.leaderboard.plays')}
+            </span>
+          </div>
+        </div>
+
+        {/* Rating badge */}
+        <div className="shrink-0 flex flex-col items-center gap-0.5">
+          <RatingStars value={creator.avg_rating} />
+          <span className="text-[9px] text-neo-white/30 uppercase font-bold">
+            {t('ugc.creator.leaderboard.rating')}
+          </span>
         </div>
       </div>
-      <RatingStars value={creator.avg_rating} />
-    </div>
+    </AdaptiveMotion.div>
   );
 }
 
-function CreatorTableRow({ creator, rank }: { creator: CreatorRow; rank: number }) {
+/* ── Creator row — clean card-style row ── */
+function CreatorRow_({ creator, rank }: { creator: CreatorRow; rank: number }) {
   const { t } = useLanguage();
-  return (
-    <Link
-      href={`/community?creator=${creator.creator_id}`}
-      className={cn(
-        'grid grid-cols-12 gap-2 px-3 py-2 items-center transition-colors',
-        'hover:bg-neo-white/5 border-b border-neo-white/10 last:border-b-0',
-        rank % 2 === 0 ? 'bg-neo-navy/80' : 'bg-neo-navy'
-      )}
-      aria-label={`${creator.display_name} — ${t('ugc.creator.leaderboard.rank')} ${rank}`}
-    >
-      <div className="col-span-1 text-center">
-        <RankBadge rank={rank} />
-      </div>
-      <div className="col-span-5 flex items-center gap-2 min-w-0">
-        <Avatar
-          customAvatar={creator.avatar_config}
+  const style = RANK_STYLES[rank];
+  const isTopThree = rank <= 3;
 
-          size="sm"
-        />
-        <span className="font-medium text-neo-white text-sm truncate">
-          {creator.display_name}
-        </span>
-      </div>
-      <div className="col-span-2 text-right text-neo-white/70 text-sm">
-        {creator.boards_created}
-      </div>
-      <div className="col-span-2 text-right text-neo-white/70 text-sm">
-        {creator.total_plays.toLocaleString()}
-      </div>
-      <div className="col-span-2 text-right">
-        <RatingStars value={creator.avg_rating} />
-      </div>
-    </Link>
+  return (
+    <AdaptiveMotion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.05 * rank, type: 'spring', stiffness: 350, damping: 24 }}
+    >
+      <Link
+        href={`/community?creator=${creator.creator_id}`}
+        className={cn(
+          'flex items-center gap-3 px-3 py-2.5 transition-all duration-100',
+          'hover:bg-neo-white/5 rounded-neo group',
+          isTopThree && style
+            ? cn('border', style.bg)
+            : 'border border-transparent'
+        )}
+        aria-label={`${creator.display_name} — ${t('ugc.creator.leaderboard.rank')} ${rank}`}
+      >
+        {/* Rank */}
+        <div className="w-8 flex flex-col items-center shrink-0">
+          {isTopThree ? (
+            <span className="text-lg leading-none" aria-hidden>{RANK_STYLES[rank]?.icon}</span>
+          ) : (
+            <span className="font-bold text-neo-white/40 text-sm">#{rank}</span>
+          )}
+        </div>
+
+        {/* Avatar + name */}
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <Avatar
+            customAvatar={creator.avatar_config}
+            size="sm"
+          />
+          <span className={cn(
+            'font-neo-body font-bold text-sm truncate',
+            isTopThree ? 'text-neo-white' : 'text-neo-white/80'
+          )}>
+            {creator.display_name}
+          </span>
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center gap-4 shrink-0 text-xs text-neo-white/50">
+          <span className="hidden sm:flex items-center gap-1 min-w-[3rem] justify-end">
+            <LayoutGrid className="w-3 h-3" />
+            {creator.boards_created}
+          </span>
+          <span className="flex items-center gap-1 min-w-[3.5rem] justify-end">
+            <TrendingUp className="w-3 h-3" />
+            {creator.total_plays.toLocaleString()}
+          </span>
+          <span className="min-w-[3rem] flex justify-end">
+            <RatingStars value={creator.avg_rating} />
+          </span>
+        </div>
+      </Link>
+    </AdaptiveMotion.div>
   );
 }
 
@@ -143,37 +189,53 @@ export default function CreatorLeaderboard() {
   const { creators, loading } = useTopCreators();
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-neo-display text-neo-white font-bold text-2xl">
-        {t('ugc.creator.leaderboard.title')}
-      </h2>
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-5">
+        <Trophy className="w-5 h-5 text-neo-yellow" />
+        <h2 className="font-neo-display text-neo-white font-bold text-xl">
+          {t('ugc.creator.leaderboard.title')}
+        </h2>
+      </div>
 
+      {/* Loading */}
       {loading && (
-        <p className="text-neo-white/60 text-center py-8">{t('common.loading')}</p>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 rounded-neo bg-neo-white/[0.03] animate-pulse" />
+          ))}
+        </div>
       )}
 
+      {/* Empty */}
       {!loading && creators.length === 0 && (
-        <p className="text-neo-white/60 text-center py-8">
-          {t('ugc.creator.leaderboard.empty')}
-        </p>
+        <div className="text-center py-16">
+          <Crown className="w-12 h-12 text-neo-white/10 mx-auto mb-3" />
+          <p className="text-neo-white/50 font-neo-body text-sm">
+            {t('ugc.creator.leaderboard.empty')}
+          </p>
+        </div>
       )}
 
+      {/* Content */}
       {!loading && creators.length > 0 && (
         <>
-          <CreatorSpotlight creator={creators[0]} />
+          {/* #1 gets the spotlight */}
+          <ChampionSpotlight creator={creators[0]} />
 
-          {/* Table */}
-          <div className={cn('border-neo border-neo-white/20 rounded-neo overflow-hidden')}>
-            {/* Header */}
-            <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-neo-white/5 text-neo-white/50 text-xs font-semibold uppercase tracking-wider">
-              <div className="col-span-1 text-center">{t('ugc.creator.leaderboard.rank')}</div>
-              <div className="col-span-5">{t('ugc.creator.leaderboard.creator')}</div>
-              <div className="col-span-2 text-right">{t('ugc.creator.leaderboard.boards')}</div>
-              <div className="col-span-2 text-right">{t('ugc.creator.leaderboard.plays')}</div>
-              <div className="col-span-2 text-right">{t('ugc.creator.leaderboard.rating')}</div>
-            </div>
+          {/* Table header */}
+          <div className="flex items-center gap-3 px-3 py-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-white/30">
+            <div className="w-8 text-center">#</div>
+            <div className="flex-1">{t('ugc.creator.leaderboard.creator')}</div>
+            <div className="hidden sm:block min-w-[3rem] text-end">{t('ugc.creator.leaderboard.boards')}</div>
+            <div className="min-w-[3.5rem] text-end">{t('ugc.creator.leaderboard.plays')}</div>
+            <div className="min-w-[3rem] text-end">{t('ugc.creator.leaderboard.rating')}</div>
+          </div>
+
+          {/* Rows */}
+          <div className="space-y-1">
             {creators.map((creator, i) => (
-              <CreatorTableRow key={creator.creator_id} creator={creator} rank={i + 1} />
+              <CreatorRow_ key={creator.creator_id} creator={creator} rank={i + 1} />
             ))}
           </div>
         </>

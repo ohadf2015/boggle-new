@@ -52,10 +52,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid quest progress data' }, { status: 400 });
     }
 
-    // Validate all values are non-negative numbers and keys are strings
+    // Validate all values are non-negative numbers with bounded keys and values
     const progress = chapterQuestProgress as Record<string, number>;
-    for (const [key, value] of Object.entries(progress)) {
-      if (typeof key !== 'string' || typeof value !== 'number' || value < 0) {
+    const MAX_QUEST_KEYS = 30; // 10 worlds × 3 chapters max
+    const MAX_QUEST_VALUE = 10000;
+    const entries = Object.entries(progress);
+    if (entries.length > MAX_QUEST_KEYS) {
+      return NextResponse.json({ error: 'Too many quest keys' }, { status: 400 });
+    }
+    for (const [key, value] of entries) {
+      if (typeof key !== 'string' || key.length > 50 || typeof value !== 'number' || value < 0 || value > MAX_QUEST_VALUE) {
         return NextResponse.json({ error: 'Invalid quest progress values' }, { status: 400 });
       }
     }
@@ -85,9 +91,18 @@ export async function POST(request: NextRequest) {
     // Merge word album if provided (union of existing + new words)
     const wordAlbum = body.wordAlbum;
     if (Array.isArray(wordAlbum)) {
+      // Cap words per request to prevent inflation
+      const MAX_WORDS_PER_REQUEST = 50;
+      const MAX_ALBUM_SIZE = 5000;
       const existingAlbum = new Set((existing?.word_album as string[]) ?? []);
+      let added = 0;
       for (const word of wordAlbum) {
-        if (typeof word === 'string') existingAlbum.add(word.toUpperCase());
+        if (added >= MAX_WORDS_PER_REQUEST) break;
+        if (existingAlbum.size >= MAX_ALBUM_SIZE) break;
+        if (typeof word === 'string' && word.length >= 3 && word.length <= 15) {
+          existingAlbum.add(word.toUpperCase());
+          added++;
+        }
       }
       updatePayload.word_album = Array.from(existingAlbum);
     }

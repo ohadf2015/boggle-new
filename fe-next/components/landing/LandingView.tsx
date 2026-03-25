@@ -271,6 +271,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           t={t}
           dailyChallengeStats={dailyChallengeStats}
           solveRate={solveRate}
+          gameModeStats={initialData?.gameModeStats}
         />
 
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}

@@ -214,7 +214,7 @@ export const GameSidebar = memo(function GameSidebar({
             'transition-all duration-500',
             hasHintsAvailable
               ? showAutoHint
-                ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse'
+                ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
                 : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
               : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
           )}
@@ -234,7 +234,7 @@ export const GameSidebar = memo(function GameSidebar({
               'rounded-neo border-2 min-w-10 min-h-10',
               !freezeUsed
                 ? isFrozen
-                  ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse'
+                  ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
@@ -269,7 +269,7 @@ export const GameSidebar = memo(function GameSidebar({
               'flex-shrink-0 flex items-center gap-1 px-2 py-1',
               'rounded-neo border-2 min-w-10 min-h-10',
               detonateActive
-                ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse'
+                ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
                 : 'bg-neo-red/60 text-neo-black border-neo-black shadow-hard-sm'
             )}
             aria-pressed={detonateActive}
@@ -343,7 +343,7 @@ export const GameSidebar = memo(function GameSidebar({
               'border-3 transition-all duration-500',
               hasHintsAvailable
                 ? showAutoHint
-                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_16px_3px_rgba(255,225,53,0.5)] animate-pulse'
+                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_16px_3px_rgba(255,225,53,0.5)] animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg'
                 : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
             )}
@@ -365,7 +365,7 @@ export const GameSidebar = memo(function GameSidebar({
                 'font-bold text-sm border-3 transition-all duration-200 shadow-hard',
                 !freezeUsed
                   ? isFrozen
-                    ? 'bg-neo-cyan text-neo-black border-neo-black animate-pulse'
+                    ? 'bg-neo-cyan text-neo-black border-neo-black animate-pulse motion-reduce:animate-none'
                     : 'bg-neo-cyan/80 text-neo-black border-neo-black hover:shadow-hard-lg'
                   : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
               )}
@@ -405,7 +405,7 @@ export const GameSidebar = memo(function GameSidebar({
                 'px-4 py-2.5 rounded-neo-lg',
                 'font-bold text-sm border-3 transition-all duration-200 shadow-hard',
                 detonateActive
-                  ? 'bg-neo-red text-neo-white border-neo-black animate-pulse'
+                  ? 'bg-neo-red text-neo-white border-neo-black animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-red/60 text-neo-black border-neo-black hover:shadow-hard-lg'
               )}
             >

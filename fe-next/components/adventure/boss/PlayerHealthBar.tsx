@@ -105,7 +105,7 @@ export default function PlayerHealthBar({
           <Heart
             className={cn(
               'w-4 h-4',
-              isLowHealth ? 'text-neo-red animate-pulse' : 'text-neo-cyan'
+              isLowHealth ? 'text-neo-red animate-pulse motion-reduce:animate-none' : 'text-neo-cyan'
             )}
             fill={isLowHealth ? 'currentColor' : 'none'}
           />

@@ -159,7 +159,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         />
       )}
 
-      {/* Other Players — auto-expand in 1v1 for natural word comparison */}
+      {/* Other Players — collapsed by default, compact cards */}
       {otherPlayers.length > 0 && (
         <CollapsibleSection
           title={otherPlayers.length === 1
@@ -168,11 +168,12 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           }
           icon={<Users className="w-4 h-4" />}
           badge={otherPlayers.length === 1 ? undefined : otherPlayers.length}
-          defaultExpanded={otherPlayers.length === 1}
+          summary={otherPlayers.slice(0, 3).map(p => p.username).join(', ') + (otherPlayers.length > 3 ? ` +${otherPlayers.length - 3}` : '')}
+          defaultExpanded={false}
           variant="tertiary"
           className="shadow-hard"
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {otherPlayers.map((player) => {
               const originalIndex = sortedScores.findIndex(p => p.username === player.username);
               return (
@@ -187,6 +188,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
                   levelUpData={null}
                   duplicateRuleDisabled={duplicateRuleDisabled}
                   archetype={playerArchetypes.get(player.username) || null}
+                  compact
                 />
               );
             })}
@@ -204,16 +206,17 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
         const rarest = achievements[achievements.length - 1];
         return (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.4 }}
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 250, damping: 14, delay: 0.4 }}
             className="flex items-center gap-3 px-4 py-3 bg-neo-navy border-3 border-neo-black shadow-hard-lg relative overflow-hidden"
           >
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle,#fff_1px,transparent_1px)] bg-[length:6px_6px]" />
             <motion.span
               className="text-2xl relative z-10"
-              animate={{ rotate: [0, -5, 5, 0] }}
-              transition={{ delay: 1, duration: 0.4 }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: [0, 1.3, 1], rotate: [0, -10, 10, 0] }}
+              transition={{ delay: 0.8, duration: 0.6, ease: 'easeOut' }}
             >
               {rarest.icon || '🏆'}
             </motion.span>

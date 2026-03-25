@@ -120,7 +120,9 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 "sm:hidden",
             )}
             style={{
-                paddingBottom: safeArea.bottom > 0 ? `${safeArea.bottom}px` : undefined,
+                paddingBottom: safeArea.bottom > 0
+                    ? `${safeArea.bottom}px`
+                    : 'env(safe-area-inset-bottom, 0px)',
             }}
             aria-label={t('nav.bottomNavigation')}
         >

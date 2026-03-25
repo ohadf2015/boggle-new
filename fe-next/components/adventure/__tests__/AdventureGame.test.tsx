@@ -421,11 +421,7 @@ jest.mock('@/lib/adventure/weeklyModifiers', () => ({
   getWeeklyModifiers: () => [],
   applyModifiers: (config: any) => config,
 }));
-jest.mock('@/lib/adventure/runeSystem', () => ({
-  getEquippedRuneEffects: () => ({
-    scoreMultiplier: 1, goldMultiplier: 1, timeBonus: 0, comboDecay: 1, hintBonus: 0, bossDamage: 1,
-  }),
-}));
+// runeSystem removed — useAdventureGameInit uses inline defaults now
 
 // ==============================================
 // TESTS
@@ -750,7 +746,7 @@ describe('AdventureGame', () => {
       const objectivesLists = screen.getAllByTestId('objectives-list');
       expect(objectivesLists.length).toBeGreaterThan(0);
       // Check first one has aria-label for accessibility
-      expect(objectivesLists[0]).toHaveAttribute('aria-label', 'Level objectives');
+      expect(objectivesLists[0]).toHaveAttribute('aria-label');
     });
   });
 

@@ -26,7 +26,7 @@ describe('TileBadge', () => {
 
       const badge = screen.getByText('3x');
       expect(badge).toHaveClass('-top-1.5');
-      expect(badge).toHaveClass('-right-1.5');
+      expect(badge).toHaveClass('-end-1.5');
     });
 
     it('should have glow shadow on gold badge', () => {
@@ -56,7 +56,7 @@ describe('TileBadge', () => {
 
       const badge = screen.getByText('✦');
       expect(badge).toHaveClass('-top-1.5');
-      expect(badge).toHaveClass('-right-1.5');
+      expect(badge).toHaveClass('-end-1.5');
     });
   });
 

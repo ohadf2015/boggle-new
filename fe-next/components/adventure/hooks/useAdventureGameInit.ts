@@ -23,7 +23,15 @@ import { showAchievementToast } from '@/components/achievements/AchievementToast
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
 import { getWeeklyModifiers, applyModifiers } from '@/lib/adventure/weeklyModifiers';
-import { getEquippedRuneEffects, type RuneState } from '@/lib/adventure/runeSystem';
+/** Default rune effects — rune system not yet wired to DB */
+const DEFAULT_RUNE_EFFECTS = {
+  scoreMultiplier: 1.0,
+  goldMultiplier: 1.0,
+  timeBonus: 0,
+  comboDecay: 1.0,
+  hintBonus: 0,
+  bossDamage: 1.0,
+} as const;
 
 export interface UseAdventureGameInitProps {
   world: number;
@@ -133,11 +141,8 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   // Word Forge upgrade effects
   const upgradeEffects = useUpgradeEffects(upgrades);
 
-  // Rune effects — aggregated from all equipped runes
-  const runeEffects = useMemo(
-    () => getEquippedRuneEffects((progression?.runes ?? []) as RuneState[]),
-    [progression?.runes]
-  );
+  // Rune effects — system not yet wired, use defaults
+  const runeEffects = DEFAULT_RUNE_EFFECTS;
 
   // Streak multiplier — scales gold/XP based on consecutive play days
   const streakMultiplier = useMemo(
@@ -185,7 +190,7 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     return Math.floor(aiAdjusted / hintMultiplier);
   }, [intensityAdjustments.hintEscalationRate, upgradeEffects.hintRechargeMultiplier, runeEffects.hintBonus]);
 
-  return {
+  return useMemo(() => ({
     // Adaptive difficulty
     tier,
     hintData,
@@ -234,5 +239,15 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
     runeEffects,
     streakMultiplier,
     weeklyModifiers,
-  };
+  }), [
+    tier, hintData, powerUpCooldownMultiplier, recordCompletion, adjustedLevelConfig,
+    intensityAdjustments, flowState, startAIDirector, endAIDirector, recordAIWord,
+    handleAITransition, isAIBossBattle,
+    totalXp, currentLevel, xpProgress, awardXp,
+    gold, upgrades, addGold, purchase, getUpgradeEffect, upgradeBonuses, upgradeEffects,
+    skillEffects, handleEarnAchievement,
+    currentMilestone, checkMilestone,
+    adjustedInactivityThresholdMs,
+    runeEffects, streakMultiplier, weeklyModifiers,
+  ]);
 }
