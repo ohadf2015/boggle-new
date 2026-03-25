@@ -59,9 +59,7 @@ export async function proxy(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+    request,
   });
 
   if (!isBot && supabaseUrl && supabaseAnonKey) {
@@ -71,8 +69,20 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          // 1. Update cookies on the request so downstream route handlers
+          //    see the refreshed tokens via `cookies()`.
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
+          });
+          // 2. Recreate the response with the updated request — this is
+          //    critical because the original response captured the old
+          //    headers before the token refresh.
+          response = NextResponse.next({
+            request,
+          });
+          // 3. Set cookies on the response so the browser persists the
+          //    new tokens for subsequent requests.
+          cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
         },

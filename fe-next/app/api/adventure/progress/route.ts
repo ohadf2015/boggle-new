@@ -88,21 +88,25 @@ export async function GET(request: NextRequest) {
   if (!rateLimitResult.success) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
+  // Auth — own try-catch so thrown errors become 401 (not 500)
+  let userId: string;
   try {
-    // Get authenticated user using proper Supabase SSR auth
     const authSupabase = await createClient();
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    userId = user.id;
+  } catch (authErr) {
+    const msg = authErr instanceof Error ? authErr.message : String(authErr);
+    console.error('[ADVENTURE API] Auth threw:', msg);
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    const userId = user.id;
-
-    // Use service role client for database operations (bypasses RLS)
+  try {
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch progression and completions in parallel for ~50-100ms faster response
     const [progressionResult, completionsResult] = await Promise.all([
       supabase
         .from('player_progression')
@@ -128,12 +132,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (progressionError) {
-      console.error('[ADVENTURE API] Progression fetch error:', progressionError);
+      console.error('[ADVENTURE API] Progression fetch error:', JSON.stringify(progressionError));
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
     }
 
     if (completionsError) {
-      console.error('[ADVENTURE API] Completions fetch error:', completionsError);
+      console.error('[ADVENTURE API] Completions fetch error:', JSON.stringify(completionsError));
       return NextResponse.json({ error: 'Failed to fetch completions' }, { status: 500 });
     }
 

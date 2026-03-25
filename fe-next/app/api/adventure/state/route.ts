@@ -105,27 +105,41 @@ function transformAttempt(dbRow: Record<string, unknown>): LevelAttempt {
  * Retrieve complete adventure state (progression + attempts) in one request
  */
 export async function GET() {
+  // ── Step 1: Authenticate ──────────────────────────────────────────
+  // Wrapped in its own try-catch so auth failures (timeout, network,
+  // cookie parse errors) return 401 instead of 500.
+  let userId: string;
   try {
-    // Get authenticated user using proper Supabase SSR auth
     const authSupabase = await createClient();
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    userId = user.id;
+  } catch (authErr) {
+    // Auth threw — timeout, cookie error, or Supabase unreachable.
+    // Treat as 401 so frontend handles it silently (no error screen).
+    const msg = authErr instanceof Error ? authErr.message : String(authErr);
+    console.error('[ADVENTURE STATE API] Auth threw:', msg);
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    const userId = user.id;
+  // ── Step 2: Validate env ──────────────────────────────────────────
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('[ADVENTURE STATE API] Missing SUPABASE env vars');
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
 
-    // Use service role client for database operations (bypasses RLS)
+  // ── Step 3: Fetch data ────────────────────────────────────────────
+  try {
     const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
       global: {
         fetch: (url, options = {}) =>
-          fetch(url, { ...options, signal: options.signal ?? AbortSignal.timeout(15000) }),
+          fetch(url, { ...options, signal: options.signal ?? AbortSignal.timeout(20000) }),
       },
     });
 
-    // Fetch progression, completions, and attempts in parallel
-    // This is ~50-100ms faster than making separate API calls
     const [progressionResult, completionsResult, attemptsResult] = await Promise.all([
       supabase
         .from('player_progression')
@@ -161,12 +175,12 @@ export async function GET() {
     }
 
     if (progressionError) {
-      console.error('[ADVENTURE STATE API] Progression fetch error:', progressionError);
+      console.error('[ADVENTURE STATE API] Progression fetch error:', JSON.stringify(progressionError));
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
     }
 
     if (completionsError) {
-      console.error('[ADVENTURE STATE API] Completions fetch error:', completionsError);
+      console.error('[ADVENTURE STATE API] Completions fetch error:', JSON.stringify(completionsError));
       return NextResponse.json({ error: 'Failed to fetch completions' }, { status: 500 });
     }
 
@@ -183,7 +197,8 @@ export async function GET() {
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/state', { method: 'GET' });
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[ADVENTURE STATE API] GET error:', errorMessage);
+    const errorName = error instanceof Error ? error.name : 'Unknown';
+    console.error(`[ADVENTURE STATE API] GET error (${errorName}):`, errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
