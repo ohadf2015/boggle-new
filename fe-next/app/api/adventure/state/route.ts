@@ -10,12 +10,8 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 /**
  * Transform database row to PlayerProgression type
@@ -106,40 +102,27 @@ function transformAttempt(dbRow: Record<string, unknown>): LevelAttempt {
  */
 export async function GET() {
   // ── Step 1: Authenticate ──────────────────────────────────────────
-  // Wrapped in its own try-catch so auth failures (timeout, network,
-  // cookie parse errors) return 401 instead of 500.
+  // Uses the cookie-based auth client which also serves as the data client.
+  // RLS policies on player_progression/level_completions/level_attempts
+  // scope queries to auth.uid() automatically — no service role key needed.
   let userId: string;
+  let supabase: Awaited<ReturnType<typeof createClient>>;
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     userId = user.id;
   } catch (authErr) {
-    // Auth threw — timeout, cookie error, or Supabase unreachable.
-    // Treat as 401 so frontend handles it silently (no error screen).
     const msg = authErr instanceof Error ? authErr.message : String(authErr);
     console.error('[ADVENTURE STATE API] Auth threw:', msg);
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // ── Step 2: Validate env ──────────────────────────────────────────
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('[ADVENTURE STATE API] Missing SUPABASE env vars');
-    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
-  }
-
-  // ── Step 3: Fetch data ────────────────────────────────────────────
+  // ── Step 2: Fetch data ────────────────────────────────────────────
   try {
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
-      global: {
-        fetch: (url, options = {}) =>
-          fetch(url, { ...options, signal: options.signal ?? AbortSignal.timeout(20000) }),
-      },
-    });
-
     const [progressionResult, completionsResult, attemptsResult] = await Promise.all([
       supabase
         .from('player_progression')

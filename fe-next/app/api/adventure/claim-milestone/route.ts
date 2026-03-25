@@ -9,7 +9,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { WORD_ALBUM_MILESTONES } from '@/lib/adventure/wordAlbum';
 import { captureApiError } from '@/utils/sentry';
 
@@ -22,15 +21,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
-  }
-
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -53,8 +46,6 @@ export async function POST(request: NextRequest) {
     if (!milestone) {
       return NextResponse.json({ error: 'Unknown milestone' }, { status: 400 });
     }
-
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch current state
     const { data: prog, error: fetchError } = await supabase

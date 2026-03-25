@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { User, LogOut, ChevronDown, Users } from 'lucide-react';
+import { User, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -174,26 +174,6 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     if (inline) {
       return (
         <div className="flex flex-col gap-2 w-full">
-          <button
-            onClick={() => { router.push(`/${language}/profile`); onClose?.(); }}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
-            )}
-          >
-            <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
-            <span className="text-neo-black truncate flex-1">{profile.display_name || profile.username}</span>
-            {profile.total_xp !== undefined && (
-              <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
-            )}
-          </button>
-          <button
-            onClick={() => { router.push(`/${language}/friends`); onClose?.(); }}
-            className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-white hover:bg-neo-cyan/50")}
-          >
-            <Users size={14} className="text-neo-black" aria-hidden="true" />
-            <span className="text-neo-black">{t('friends.title')}</span>
-          </button>
           <button
             onClick={handleSignOut}
             disabled={isSigningOut}

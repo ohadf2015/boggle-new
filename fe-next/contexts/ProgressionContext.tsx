@@ -204,6 +204,13 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     }
   }, [user?.id]);
 
+  // Stable ref for fetchProgression — used inside completeLevel to avoid
+  // putting fetchProgression in its dependency array (which would cause
+  // completeLevel to be recreated on every progression state change and
+  // risk infinite render loops when completeLevel triggers a 403 retry).
+  const fetchProgressionRef = useRef(fetchProgression);
+  fetchProgressionRef.current = fetchProgression;
+
   // Refresh progression (exposed to consumers)
   const refreshProgression = useCallback(async () => {
     setIsLoading(true);
@@ -277,7 +284,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         // Refresh progression (which updates the server's view) and retry once.
         if (response.status === 403) {
           logger.info('[ProgressionContext] 403 on completeLevel — refreshing progression and retrying');
-          await fetchProgression();
+          await fetchProgressionRef.current();
           await new Promise(r => setTimeout(r, 300));
           response = await fetch('/api/adventure/complete', {
             method: 'POST',
@@ -382,7 +389,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       completeLevelPromiseRef.current = promise;
       return promise;
     },
-    [user?.id, fetchProgression]
+    [user?.id]
   );
 
   // Record a level attempt (including failed attempts)
@@ -623,15 +630,15 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             });
           } else {
             // Revert optimistic update on failure
-            fetchProgression();
+            fetchProgressionRef.current();
           }
         } catch (err) {
           logger.warn('[ProgressionContext] Purchase persist error:', err instanceof Error ? err.message : err);
-          fetchProgression();
+          fetchProgressionRef.current();
         }
       }
     },
-    [user?.id, fetchProgression]
+    [user?.id]
   );
 
   // Initial fetch on mount (when auth is ready)

@@ -7,19 +7,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
-
-// Lazy-init to avoid crash on missing env vars
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
 
 /**
  * XP awarded per star earned (new stars only)
@@ -120,15 +111,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const config = getSupabaseConfig();
-  if (!config) {
-    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
-  }
-
   try {
     // Get authenticated user using proper Supabase SSR auth
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -155,9 +141,6 @@ export async function POST(request: NextRequest) {
     // TODO: persist retainedScore once retry scoring schema exists
     void _lootDrops;
     void _retainedScore;
-
-    // Use service role client for database operations (bypasses RLS)
-    const supabase = createServiceClient(config.url, config.key);
 
     // Fetch progression and existing completion in parallel
     const [progressionResult, completionResult] = await Promise.all([
@@ -419,7 +402,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * Update weekly quest progress and grant avatar part on completion.
- * Standalone function using the passed Supabase client (service role).
+ * Standalone function using the passed Supabase client.
  */
  
 async function updateWeeklyQuestProgress(

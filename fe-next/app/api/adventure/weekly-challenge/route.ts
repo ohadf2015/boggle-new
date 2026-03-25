@@ -8,12 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { getCurrentWeekId } from '@/lib/adventure/weeklyChallenge';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function GET(request: NextRequest) {
   const rateLimitResult = checkApiRateLimit(request, 'weekly-challenge-get', {
@@ -26,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const weekId = getCurrentWeekId();
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
+    const supabase = await createClient();
 
     const { data: scores, error } = await supabase
       .from('weekly_challenge_scores')
@@ -66,13 +62,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
-  }
-
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -106,7 +98,6 @@ export async function POST(request: NextRequest) {
     }
 
     const weekId = getCurrentWeekId();
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Upsert — only update if new score is higher
     const { data: existing } = await supabase

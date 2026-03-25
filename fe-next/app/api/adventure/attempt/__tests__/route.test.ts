@@ -19,19 +19,13 @@ jest.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
-// Mock supabase server auth client
+// Mock supabase server client (auth + data queries on the same client)
 const mockGetUser = jest.fn();
+const mockRpc = jest.fn();
+const mockFrom = jest.fn();
 jest.mock('@/utils/supabase/server', () => ({
   createClient: jest.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
-  }),
-}));
-
-// Mock supabase service client
-const mockRpc = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn().mockReturnValue({
     rpc: (...args: unknown[]) => mockRpc(...args),
     from: (...args: unknown[]) => mockFrom(...args),
   }),
@@ -44,13 +38,6 @@ jest.mock('@/utils/sentry', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST, GET } from '../route';
-
-// ---------- Env ----------
-
-beforeAll(() => {
-  process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test.supabase.co';
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
-});
 
 // ---------- Helpers ----------
 

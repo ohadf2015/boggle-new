@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 4170,
+    "totalKeysInCode": 4169,
     "keyCountByLanguage": {
       "en": 6869,
       "he": 6996,
@@ -35,14 +35,14 @@
       {
         "pattern": "adventure.worlds.${currentWorldConfig.name}",
         "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
-        "line": 92,
+        "line": 100,
         "context": "previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),",
         "type": "template_literal"
       },
       {
         "pattern": "adventure.worlds.${nextWorldConfig.name}",
         "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
-        "line": 94,
+        "line": 102,
         "context": "newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),",
         "type": "template_literal"
       },
@@ -56,7 +56,7 @@
       {
         "pattern": "results.crowns.${crown.id}",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 112,
+        "line": 125,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },

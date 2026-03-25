@@ -18,20 +18,14 @@ jest.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
 }));
 
-// Mock supabase server auth client
+// Mock supabase server client (auth + data queries on the same client)
 const mockGetUser = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
-    auth: { getUser: () => mockGetUser() },
-  }),
-}));
-
-// Mock supabase service client
 const mockUpdate = jest.fn();
 const mockSelect = jest.fn();
 const mockFrom = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn().mockReturnValue({
+jest.mock('@/utils/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue({
+    auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));

@@ -153,14 +153,14 @@ export function ProfileHeader({
             onClick={() => setIsAvatarBuilderOpen(true)}
             className={cn(
               'absolute -bottom-1 -end-1 flex items-center justify-center',
-              'rounded-full bg-neo-pink/90 border-2 border-neo-pink/50',
-              'text-white/90 hover:bg-neo-pink hover:text-white transition-colors',
-              compact ? 'w-6 h-6' : 'w-7 h-7'
+              'rounded-full bg-neo-pink border-3 border-neo-black shadow-hard-sm',
+              'text-white hover:bg-neo-pink/80 hover:scale-110 transition-all',
+              compact ? 'w-6 h-6' : 'w-9 h-9'
             )}
             title={t('profile.chooseAvatar')}
             aria-label={t('profile.chooseAvatar')}
           >
-            <Edit size={compact ? 10 : 12} />
+            <Edit size={compact ? 12 : 14} />
           </button>
         </div>
 

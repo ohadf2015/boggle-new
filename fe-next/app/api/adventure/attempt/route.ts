@@ -11,11 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 /**
  * Validate attempt request body
@@ -97,8 +93,8 @@ export async function POST(request: NextRequest) {
   }
   try {
     // Get authenticated user
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -120,9 +116,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { world, level, words, score, timeRemaining, objectiveProgress, isCompletion } = validation.data;
-
-    // Use service role client for database operations
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Call the upsert function
     const { data: attempt, error: attemptError } = await supabase.rpc(
@@ -184,17 +177,14 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     // Get authenticated user
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = user.id;
-
-    // Use service role client for database operations
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch all attempts for user
     const { data: attempts, error: fetchError } = await supabase

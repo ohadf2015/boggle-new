@@ -8,12 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 /**
  * Transform database row to PlayerProgression type
@@ -90,9 +86,10 @@ export async function GET(request: NextRequest) {
   }
   // Auth — own try-catch so thrown errors become 401 (not 500)
   let userId: string;
+  let supabase: Awaited<ReturnType<typeof createClient>>;
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -105,7 +102,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     const [progressionResult, completionsResult] = await Promise.all([
       supabase
@@ -160,17 +156,14 @@ export async function GET(request: NextRequest) {
 export async function POST() {
   try {
     // Get authenticated user using proper Supabase SSR auth
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = user.id;
-
-    // Use service role client for database operations (bypasses RLS)
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Check if progression already exists
     const { data: existing } = await supabase

@@ -9,7 +9,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { purchaseUpgrade, getUpgrade, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
 
@@ -26,15 +25,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
-  }
-
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -53,8 +46,6 @@ export async function POST(request: NextRequest) {
     if (typeof upgradeId !== 'string' || !getUpgrade(upgradeId)) {
       return NextResponse.json({ error: 'Invalid upgrade ID' }, { status: 400 });
     }
-
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch current progression from DB (server is source of truth)
     const { data: progression, error: fetchError } = await supabase
