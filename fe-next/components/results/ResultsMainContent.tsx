@@ -172,7 +172,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         color: 'text-neo-orange',
       },
     ];
-  }, [currentPlayerData, currentPlayerValidWords, t]);
+  }, [currentPlayerData, currentPlayerValidWords, t, language]);
 
   // Word Hunt status for current player
   const wordHuntStatus = useMemo(() => {
@@ -209,7 +209,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           isWordHunt={isWordHunt}
           t={t}
           onReaction={onPodiumReaction}
-          emojiReactions={emojiReactions}
         />
       )}
 
