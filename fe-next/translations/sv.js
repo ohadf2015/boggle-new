@@ -1615,6 +1615,14 @@ const sv = {
       "podium": "På pallen!",
       "keepGoing": "Kämpa på!"
     },
+    "crowns": {
+      "sniper": "Prickskytten",
+      "speedDemon": "Snabbansen",
+      "explorer": "Utforskaren",
+      "scholar": "Den lärde",
+      "clutch": "Avgörande spelaren",
+      "tank": "Stridsvagnen"
+    },
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
     "ready": "Redo!",
@@ -1960,6 +1968,10 @@ const sv = {
   },
   "scorePage": {
     "pts": "poäng"
+  },
+  "multiplayerWelcome": {
+    "title": "Välkommen till Multiplayer",
+    "tip": "Svep över bokstäver för att bilda ord — längre ord ger mer poäng!"
   },
   "howToPlay": {
     "missionBriefing": "Uppdragsbriefing",
@@ -3824,6 +3836,7 @@ const sv = {
     "adventureModeDesc": "100 nivåer i 10 världar",
     "blastMode": "Blast-läge",
     "blastModeDesc": "Rensa brädet!",
+    "dailyChallenge": "Daglig Utmaning",
     "education": "Utbildning",
     "educationDesc": "För lärare och elever",
     "educationBadge": "FÖR LÄRARE",

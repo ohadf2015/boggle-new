@@ -1718,6 +1718,14 @@ const en = {
       "podium": "On The Podium!",
       "keepGoing": "Keep Going!"
     },
+    "crowns": {
+      "sniper": "The Sniper",
+      "speedDemon": "Speed Demon",
+      "explorer": "The Explorer",
+      "scholar": "The Scholar",
+      "clutch": "Clutch Player",
+      "tank": "The Tank"
+    },
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting...",
     "ready": "Ready!",
@@ -2063,6 +2071,10 @@ const en = {
   },
   "scorePage": {
     "pts": "pts"
+  },
+  "multiplayerWelcome": {
+    "title": "Welcome to Multiplayer",
+    "tip": "Swipe letters to form words — longer words score more!"
   },
   "howToPlay": {
     "missionBriefing": "Mission Briefing",
@@ -3929,6 +3941,7 @@ const en = {
     "adventureModeDesc": "100 levels across 10 worlds",
     "blastMode": "Blast Mode",
     "blastModeDesc": "Clear the board!",
+    "dailyChallenge": "Daily Challenge",
     "education": "Education",
     "educationDesc": "For teachers & students",
     "educationBadge": "FOR TEACHERS",

@@ -1637,6 +1637,14 @@ const es = {
       "podium": "¡En el podio!",
       "keepGoing": "¡Sigue así!"
     },
+    "crowns": {
+      "sniper": "El Francotirador",
+      "speedDemon": "Demonio Veloz",
+      "explorer": "El Explorador",
+      "scholar": "El Erudito",
+      "clutch": "Jugador Decisivo",
+      "tank": "El Tanque"
+    },
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
     "ready": "¡Listo!",
@@ -1983,6 +1991,10 @@ const es = {
   },
   "scorePage": {
     "pts": "pts"
+  },
+  "multiplayerWelcome": {
+    "title": "Bienvenido al Multijugador",
+    "tip": "Desliza sobre las letras para formar palabras — ¡las más largas valen más!"
   },
   "howToPlay": {
     "missionBriefing": "Informe de Misión",
@@ -3870,6 +3882,7 @@ const es = {
     "adventureModeDesc": "100 niveles en 10 mundos",
     "blastMode": "Modo Blast",
     "blastModeDesc": "¡Limpia el tablero!",
+    "dailyChallenge": "Desafío Diario",
     "education": "Educación",
     "educationDesc": "Para profesores y estudiantes",
     "educationBadge": "PARA PROFESORES",

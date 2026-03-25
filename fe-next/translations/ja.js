@@ -1616,6 +1616,14 @@ const ja = {
       "podium": "表彰台！",
       "keepGoing": "頑張れ！"
     },
+    "crowns": {
+      "sniper": "スナイパー",
+      "speedDemon": "スピードデーモン",
+      "explorer": "探検家",
+      "scholar": "学者",
+      "clutch": "クラッチプレイヤー",
+      "tank": "タンク"
+    },
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
     "ready": "準備完了！",
@@ -1961,6 +1969,10 @@ const ja = {
   },
   "scorePage": {
     "pts": "pts"
+  },
+  "multiplayerWelcome": {
+    "title": "マルチプレイヤーへようこそ",
+    "tip": "文字をスワイプして単語を作ろう — 長い単語ほど高得点！"
   },
   "howToPlay": {
     "missionBriefing": "ミッションブリーフィング",
@@ -3824,6 +3836,7 @@ const ja = {
     "adventureModeDesc": "10の世界で100レベル",
     "blastMode": "ブラストモード",
     "blastModeDesc": "ボードをクリアしよう！",
+    "dailyChallenge": "デイリーチャレンジ",
     "education": "教育",
     "educationDesc": "教師と生徒向け",
     "educationBadge": "教師向け",

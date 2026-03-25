@@ -1634,6 +1634,14 @@ const he = {
       "podium": "על הפודיום!",
       "keepGoing": "המשך!"
     },
+    "crowns": {
+      "sniper": "הצלף",
+      "speedDemon": "שד המהירות",
+      "explorer": "החוקר",
+      "scholar": "המלומד",
+      "clutch": "שחקן הרגע",
+      "tank": "הטנק"
+    },
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
     "ready": "מוכן!",
@@ -1979,6 +1987,10 @@ const he = {
   },
   "scorePage": {
     "pts": "נק׳"
+  },
+  "multiplayerWelcome": {
+    "title": "ברוכים הבאים למשחק רב-משתתפים",
+    "tip": "החליקו על אותיות ליצירת מילים — מילים ארוכות שוות יותר!"
   },
   "howToPlay": {
     "missionBriefing": "תדריך משימה",
@@ -3843,6 +3855,7 @@ const he = {
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
     "blastMode": "מצב פיצוץ",
     "blastModeDesc": "נקו את הלוח!",
+    "dailyChallenge": "אתגר יומי",
     "education": "חינוך",
     "educationDesc": "למורים ותלמידים",
     "educationBadge": "למורים",
