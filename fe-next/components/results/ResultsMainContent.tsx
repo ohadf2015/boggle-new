@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Type, Zap } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 // New cinematic components
 import ResultsHeroSection from '@/components/results/ResultsHeroSection';
@@ -112,7 +113,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   onPodiumReaction,
 }) => {
   const reducedMotion = useReducedMotion();
-  const { dir: _dir } = useLanguage();
+  const { dir: _dir, language } = useLanguage();
 
   // Derived data
   const winnerScore = sortedScores[0]?.score ?? 0;
@@ -149,10 +150,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
       (best, w) => (w.word.length > best.length ? w.word : best),
       ''
     );
+    const displayWord = language === 'he' ? applyHebrewFinalLetters(longestWord) : longestWord;
     return [
       {
         label: t('results.bestWord') || 'Best Word',
-        value: longestWord.toUpperCase() || '—',
+        value: displayWord.toUpperCase() || '—',
         icon: <Sparkles className="w-3 h-3" />,
         color: 'text-neo-pink',
       },

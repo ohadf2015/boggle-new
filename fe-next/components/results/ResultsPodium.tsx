@@ -33,7 +33,7 @@ const PODIUM_CONFIG = [
     badgeSize: 'w-6 h-6 text-[10px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-20',
+    barHeight: 'h-24',
     barText: 'text-2xl sm:text-4xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
@@ -49,7 +49,7 @@ const PODIUM_CONFIG = [
     badgeSize: '',
     nameSize: 'text-[11px]',
     scoreSize: 'text-[10px]',
-    barHeight: 'h-32',
+    barHeight: 'h-36',
     barText: 'text-3xl sm:text-5xl',
     shadow: 'shadow-hard',
     borderWidth: 'border-2',
@@ -65,7 +65,7 @@ const PODIUM_CONFIG = [
     badgeSize: 'w-5 h-5 text-[9px]',
     nameSize: 'text-[10px]',
     scoreSize: 'text-[9px]',
-    barHeight: 'h-12',
+    barHeight: 'h-16',
     barText: 'text-xl sm:text-3xl',
     shadow: 'shadow-hard-sm',
     borderWidth: 'border-2',
@@ -170,7 +170,7 @@ export default function ResultsPodium({
       <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
           const config = PODIUM_CONFIG[configIdx];
-          const player = top3[configIdx];
+          const player = top3[config.place - 1];
 
           if (!player) {
             return <div key={`empty-${layoutIdx}`} />;
