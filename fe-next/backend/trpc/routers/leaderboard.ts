@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { router, loggedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
+import { getTopPlayersByScore } from '../../db/queries/leaderboardQueries';
 
 const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseServer');
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../../redisClient');
@@ -32,22 +33,39 @@ export const leaderboardRouter = router({
           return { data: recheck, cached: true, coalesced: true };
         }
 
-        const supabase = getSupabase();
-        const { data, error } = await supabase
-          .from('leaderboard')
-          .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
-          .order('total_score', { ascending: false })
-          .limit(input.limit);
+        let entries;
+        try {
+          const drizzleData = await getTopPlayersByScore(input.limit);
+          entries = drizzleData.map(row => ({
+            player_id: row.playerId,
+            username: row.username,
+            avatar_emoji: row.avatarEmoji,
+            avatar_color: row.avatarColor,
+            total_score: row.totalScore,
+            games_played: row.gamesPlayed,
+            games_won: row.gamesWon,
+            ranked_mmr: 0,
+          }));
+        } catch (drizzleErr) {
+          logger.warn('TRPC', `Drizzle leaderboard query failed, falling back to Supabase: ${drizzleErr}`);
+          const supabase = getSupabase();
+          const { data, error } = await supabase
+            .from('leaderboard')
+            .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
+            .order('total_score', { ascending: false })
+            .limit(input.limit);
 
-        if (error) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `Leaderboard fetch error: ${error.message}` });
+          if (error) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `Leaderboard fetch error: ${error.message}` });
+          }
+          entries = data || [];
         }
 
-        if (data) {
-          await cacheLeaderboardTop100(data);
+        if (entries.length > 0) {
+          await cacheLeaderboardTop100(entries);
         }
 
-        return { data: data || [], cached: false };
+        return { data: entries, cached: false };
       });
 
       return result;

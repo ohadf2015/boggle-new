@@ -5,9 +5,8 @@
 
 import type { Application, Request, Response } from 'express';
 import type { Server } from 'socket.io';
-import { createClient } from '@supabase/supabase-js';
-
 import { isRedisAvailable, getRedisMetrics, getRedisClient } from '../backend/redisClient';
+import { checkPoolHealth } from '../backend/db/supabasePool';
 import { getAllGames } from '../backend/modules/gameStateManager';
 import { getMetrics, getRoomMetrics, resetAll } from '../backend/utils/metrics';
 import * as dictionary from '../backend/dictionary';
@@ -54,19 +53,13 @@ export function configureHealthRoutes(app: Application, io: Server): void {
       overall = 'degraded';
     }
 
-    // Check Supabase
+    // Check Supabase (pooled connection)
     try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      if (supabaseUrl && supabaseKey) {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const start = Date.now();
-        const { error } = await supabase.from('profiles').select('id').limit(1);
-        if (error) throw error;
-        checks.supabase = { status: 'ok', latencyMs: Date.now() - start };
-      } else {
-        checks.supabase = { status: 'skipped', error: 'Missing env vars' };
-      }
+      const poolResult = await checkPoolHealth();
+      checks.supabase = poolResult.ok
+        ? { status: 'ok', latencyMs: poolResult.latencyMs }
+        : { status: 'error', latencyMs: poolResult.latencyMs, error: poolResult.error };
+      if (!poolResult.ok) overall = 'degraded';
     } catch (err) {
       checks.supabase = { status: 'error', error: err instanceof Error ? err.message : String(err) };
       overall = 'degraded';

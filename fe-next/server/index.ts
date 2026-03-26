@@ -27,6 +27,7 @@ import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } fro
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
 import { errorHandler, notFoundHandler } from './errorMiddleware';
+import { httpRateLimitMiddleware } from '../backend/middleware/rateLimiterRedis';
 import {
   initializeServer,
   setupEventLoopMonitoring,
@@ -92,6 +93,9 @@ async function start(): Promise<void> {
 
   // Health and metrics routes
   configureHealthRoutes(app, io);
+
+  // Rate limiting for API routes
+  app.use('/api', httpRateLimitMiddleware());
 
   // API routes
   app.use('/api/leaderboard', leaderboardRoutes);
