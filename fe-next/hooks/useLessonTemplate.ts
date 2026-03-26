@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMounted } from '@/hooks/useMounted';
 import logger from '@/utils/logger';
 
 // Types
@@ -168,153 +168,80 @@ export type UseTemplatesReturn = UseTemplatesState & UseTemplatesActions;
  */
 export function useTemplates(lessonId: string | undefined): UseTemplatesReturn {
   const { isAuthenticated } = useAuth();
-  const isMounted = useMounted();
+  const queryClient = useQueryClient();
+  const queryKey = ['education', 'templates', lessonId] as const;
 
-  const [state, setState] = useState<UseTemplatesState>({
-    templates: [],
-    isLoading: true,
-    error: null,
+  const { data: templates = [], isLoading, error: queryError, refetch } = useQuery<LessonTemplate[], Error>({
+    queryKey,
+    queryFn: async () => {
+      const { templates, error } = await fetchTemplatesAPI(lessonId!);
+      if (error) throw new Error(error);
+      return templates;
+    },
+    enabled: !!isAuthenticated && !!lessonId,
+    staleTime: 2 * 60_000,
   });
 
-  // Fetch all templates for the lesson
-  const fetchTemplates = useCallback(async () => {
-    if (!isAuthenticated || !lessonId) {
-      setState(prev => ({
-        ...prev,
-        templates: [],
-        isLoading: false,
-      }));
-      return;
-    }
+  const error = queryError?.message ?? null;
 
-    try {
-      const { templates, error } = await fetchTemplatesAPI(lessonId);
-
-      if (isMounted.current) {
-        setState({
-          templates,
-          isLoading: false,
-          error: error || null,
-        });
-      }
-    } catch (err) {
-      logger.error('Error fetching templates:', err);
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Failed to load templates',
-        }));
-      }
-    }
-  }, [isAuthenticated, lessonId, isMounted]);
-
-  // Refresh template list
   const refresh = useCallback(async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    await fetchTemplates();
-  }, [fetchTemplates]);
+    await refetch();
+  }, [refetch]);
 
-  // Create new template
   const createTemplate = useCallback(async (
     data: CreateTemplateData
   ): Promise<{ success: boolean; data?: LessonTemplate; error?: string }> => {
     try {
       const { template, error } = await createTemplateAPI(data);
-
       if (error || !template) {
         return { success: false, error: error || 'Failed to create template' };
       }
-
-      // Optimistically update state
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          templates: [template, ...prev.templates],
-        }));
-      }
-
+      queryClient.invalidateQueries({ queryKey });
       return { success: true, data: template };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create template';
       logger.error('Exception in createTemplate:', error);
       return { success: false, error };
     }
-  }, [isMounted]);
+  }, [queryClient, queryKey]);
 
-  // Update template
   const updateTemplate = useCallback(async (
     id: string,
     updates: UpdateTemplateData
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const { template, error } = await updateTemplateAPI(id, updates);
-
-      if (error) {
-        return { success: false, error };
-      }
-
-      // Optimistically update state
-      if (isMounted.current && template) {
-        setState(prev => ({
-          ...prev,
-          templates: prev.templates.map(t => (t.id === id ? template : t)),
-        }));
-      }
-
+      if (error) return { success: false, error };
+      queryClient.invalidateQueries({ queryKey });
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to update template';
       logger.error('Exception in updateTemplate:', error);
       return { success: false, error };
     }
-  }, [isMounted]);
+  }, [queryClient, queryKey]);
 
-  // Delete template
   const deleteTemplate = useCallback(async (id: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const { success, error } = await deleteTemplateAPI(id);
-
-      if (!success) {
-        return { success: false, error };
-      }
-
-      // Optimistically update state
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          templates: prev.templates.filter(t => t.id !== id),
-        }));
-      }
-
+      if (!success) return { success: false, error };
+      queryClient.invalidateQueries({ queryKey });
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to delete template';
       logger.error('Exception in deleteTemplate:', error);
       return { success: false, error };
     }
-  }, [isMounted]);
+  }, [queryClient, queryKey]);
 
-  // Get default template
   const getDefaultTemplate = useCallback(() => {
-    return state.templates.find(t => t.is_default);
-  }, [state.templates]);
-
-  // Initial fetch
-  useEffect(() => {
-    if (isAuthenticated && lessonId) {
-      fetchTemplates();
-    } else {
-      setState({
-        templates: [],
-        isLoading: false,
-        error: null,
-      });
-    }
-  }, [isAuthenticated, lessonId, fetchTemplates]);
+    return templates.find(t => t.is_default);
+  }, [templates]);
 
   return {
-    ...state,
+    templates,
+    isLoading,
+    error,
     refresh,
     createTemplate,
     updateTemplate,
@@ -349,121 +276,60 @@ export type UseTemplateReturn = UseTemplateState & UseTemplateActions;
  * - Update/delete operations
  */
 export function useTemplate(templateId: string | undefined): UseTemplateReturn {
-  const isMounted = useMounted();
+  const queryClient = useQueryClient();
+  const queryKey = ['education', 'template', templateId] as const;
 
-  const [state, setState] = useState<UseTemplateState>({
-    template: null,
-    isLoading: true,
-    error: null,
+  const { data: template = null, isLoading, error: queryError, refetch } = useQuery<LessonTemplate | null, Error>({
+    queryKey,
+    queryFn: async () => {
+      const { template, error } = await fetchTemplateAPI(templateId!);
+      if (error) throw new Error(error);
+      return template;
+    },
+    enabled: !!templateId,
+    staleTime: 2 * 60_000,
   });
 
-  // Fetch template details
-  const fetchTemplate = useCallback(async () => {
-    if (!templateId) {
-      setState({
-        template: null,
-        isLoading: false,
-        error: null,
-      });
-      return;
-    }
+  const error = queryError?.message ?? null;
 
-    try {
-      const { template, error } = await fetchTemplateAPI(templateId);
-
-      if (isMounted.current) {
-        setState({
-          template,
-          isLoading: false,
-          error: error || null,
-        });
-      }
-    } catch (err) {
-      logger.error('Error fetching template:', err);
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Failed to load template',
-        }));
-      }
-    }
-  }, [templateId, isMounted]);
-
-  // Refresh template
   const refresh = useCallback(async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    await fetchTemplate();
-  }, [fetchTemplate]);
+    await refetch();
+  }, [refetch]);
 
-  // Update template
   const update = useCallback(async (
     updates: UpdateTemplateData
   ): Promise<{ success: boolean; error?: string }> => {
-    if (!templateId) {
-      return { success: false, error: 'No template ID' };
-    }
-
+    if (!templateId) return { success: false, error: 'No template ID' };
     try {
       const { template, error } = await updateTemplateAPI(templateId, updates);
-
-      if (error) {
-        return { success: false, error };
-      }
-
-      // Optimistically update state
-      if (isMounted.current && template) {
-        setState(prev => ({
-          ...prev,
-          template,
-        }));
-      }
-
+      if (error) return { success: false, error };
+      queryClient.invalidateQueries({ queryKey });
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to update template';
       logger.error('Exception in update:', error);
       return { success: false, error };
     }
-  }, [templateId, isMounted]);
+  }, [templateId, queryClient, queryKey]);
 
-  // Delete template
   const deleteTemplate = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
-    if (!templateId) {
-      return { success: false, error: 'No template ID' };
-    }
-
+    if (!templateId) return { success: false, error: 'No template ID' };
     try {
       const { success, error } = await deleteTemplateAPI(templateId);
-
-      if (!success) {
-        return { success: false, error };
-      }
-
-      // Clear state after deletion
-      if (isMounted.current) {
-        setState({
-          template: null,
-          isLoading: false,
-          error: null,
-        });
-      }
-
+      if (!success) return { success: false, error };
+      queryClient.invalidateQueries({ queryKey });
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to delete template';
       logger.error('Exception in deleteTemplate:', error);
       return { success: false, error };
     }
-  }, [templateId, isMounted]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchTemplate();
-  }, [fetchTemplate]);
+  }, [templateId, queryClient, queryKey]);
 
   return {
-    ...state,
+    template,
+    isLoading,
+    error,
     refresh,
     update,
     deleteTemplate,

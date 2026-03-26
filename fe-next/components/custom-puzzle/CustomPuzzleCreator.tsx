@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Share2, Check, Copy, ArrowRight, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -91,9 +92,9 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     setValidationStatus(result.status);
   }, []);
 
-  // Generate grid with target word embedded (always 7x7 for custom puzzles)
-  const generateGrid = useCallback(async (targetWord: string): Promise<LetterGrid | null> => {
-    try {
+  // Generate grid mutation
+  const generateGridMutation = useMutation({
+    mutationFn: async (targetWord: string): Promise<LetterGrid | null> => {
       const response = await fetch('/api/grid/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,48 +104,60 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
       const data = await response.json();
       if (!data.grid || !Array.isArray(data.grid)) return null;
       return data.grid;
-    } catch {
-      return null;
-    }
-  }, [language]);
+    },
+  });
 
-  const handleCreatePuzzle = useCallback(async () => {
-    if (validationStatus !== 'valid' || !inputWord) return;
-    setSelectedWord(inputWord);
-    setIsCreating(true);
-    const grid = await generateGrid(inputWord);
-    if (grid) {
-      setGeneratedGrid(grid);
-      setPhase('play');
-    }
-    setIsCreating(false);
-  }, [inputWord, validationStatus, generateGrid]);
-
-  const handleCreatorComplete = useCallback(async (result: SurvivalGameResult) => {
-    setCreatorResult(result);
-    if (!selectedWord || !generatedGrid) return;
-
-    try {
-      const wordsDiscoveredCount = Array.isArray(result.wordsDiscovered)
-        ? result.wordsDiscovered.length : 0;
+  // Create puzzle mutation
+  const createPuzzleMutation = useMutation({
+    mutationFn: async (params: {
+      targetWord: string;
+      grid: LetterGrid;
+      result: SurvivalGameResult;
+    }) => {
+      const wordsDiscoveredCount = Array.isArray(params.result.wordsDiscovered)
+        ? params.result.wordsDiscovered.length : 0;
 
       const response = await fetch('/api/custom-puzzle/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           language,
-          targetWord: selectedWord,
-          grid: generatedGrid,
+          targetWord: params.targetWord,
+          grid: params.grid,
           displayName,
           guestFingerprint: user ? null : fingerprint,
-          creatorSolved: result.solved ?? false,
-          creatorAttemptsUsed: result.attemptsUsed ?? 0,
+          creatorSolved: params.result.solved ?? false,
+          creatorAttemptsUsed: params.result.attemptsUsed ?? 0,
           creatorWordsDiscovered: wordsDiscoveredCount,
-          creatorLifeRemaining: result.lifeRemaining ?? 0,
+          creatorLifeRemaining: params.result.lifeRemaining ?? 0,
         }),
       });
+      return response.json();
+    },
+  });
 
-      const data = await response.json();
+  const handleCreatePuzzle = useCallback(async () => {
+    if (validationStatus !== 'valid' || !inputWord) return;
+    setSelectedWord(inputWord);
+    setIsCreating(true);
+    const grid = await generateGridMutation.mutateAsync(inputWord);
+    if (grid) {
+      setGeneratedGrid(grid);
+      setPhase('play');
+    }
+    setIsCreating(false);
+  }, [inputWord, validationStatus, generateGridMutation]);
+
+  const handleCreatorComplete = useCallback(async (result: SurvivalGameResult) => {
+    setCreatorResult(result);
+    if (!selectedWord || !generatedGrid) return;
+
+    try {
+      const data = await createPuzzleMutation.mutateAsync({
+        targetWord: selectedWord,
+        grid: generatedGrid,
+        result,
+      });
       if (data.success) {
         setPuzzleCode(data.puzzleCode);
         setPhase('share');
@@ -152,7 +165,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     } catch (error) {
       console.error('Error creating puzzle:', error);
     }
-  }, [selectedWord, generatedGrid, language, displayName, user, fingerprint]);
+  }, [selectedWord, generatedGrid, createPuzzleMutation]);
 
   const handleQuit = useCallback(() => {
     setPhase('enter-word');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { Star, Crown, Trophy, TrendingUp, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,28 +19,18 @@ interface CreatorRow {
 }
 
 function useTopCreators() {
-  const [creators, setCreators] = useState<CreatorRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: creators = [], isLoading: loading, error } = useQuery<CreatorRow[], Error>({
+    queryKey: ['ugc', 'top-creators'],
+    queryFn: async () => {
+      const res = await fetch('/api/ugc/boards/creators/top');
+      if (!res.ok) throw new Error('fetch failed');
+      const json = await res.json();
+      return json.creators ?? [];
+    },
+    staleTime: 5 * 60_000,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/ugc/boards/creators/top');
-        if (!res.ok) throw new Error('fetch failed');
-        const json = await res.json();
-        if (!cancelled) setCreators(json.creators ?? []);
-      } catch (err) {
-        if (!cancelled) setError((err as Error).message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  return { creators, loading, error };
+  return { creators, loading, error: error?.message ?? null };
 }
 
 const RANK_STYLES: Record<number, { bg: string; text: string; icon: string }> = {

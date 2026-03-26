@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 export interface WordValidation {
   word: string;
@@ -33,21 +34,6 @@ export interface UseWordPackBuilderReturn {
   publishPack: () => Promise<void>;
 }
 
-async function validateWordApi(word: string): Promise<boolean> {
-  try {
-    const res = await fetch('/api/ugc/packs/validate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word }),
-    });
-    if (!res.ok) return false;
-    const data = await res.json();
-    return !!data.valid;
-  } catch {
-    return false;
-  }
-}
-
 export function useWordPackBuilder(): UseWordPackBuilderReturn {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -55,7 +41,6 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
   const [themeEmoji, setThemeEmoji] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [words, setWords] = useState<string[]>([]);
-  const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [publishedPackId, setPublishedPackId] = useState<string | null>(null);
 
@@ -63,6 +48,19 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
     () => name.trim().length > 0 && words.length >= 10,
     [name, words.length]
   );
+
+  const validateMutation = useMutation({
+    mutationFn: async (word: string): Promise<boolean> => {
+      const res = await fetch('/api/ugc/packs/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word }),
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      return !!data.valid;
+    },
+  });
 
   const addWord = useCallback(
     async (rawWord: string): Promise<WordValidation> => {
@@ -73,7 +71,7 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
         return { word, valid: true, duplicate: true };
       }
 
-      const valid = await validateWordApi(word);
+      const valid = await validateMutation.mutateAsync(word);
 
       if (valid) {
         setWords((prev) => [...prev, word]);
@@ -81,7 +79,7 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
 
       return { word, valid, duplicate: false };
     },
-    [words]
+    [words, validateMutation]
   );
 
   const removeWord = useCallback((word: string) => {
@@ -107,13 +105,8 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
     [addWord]
   );
 
-  const publishPack = useCallback(async () => {
-    if (!canPublish) return;
-
-    setIsPublishing(true);
-    setPublishError(null);
-
-    try {
+  const publishMutation = useMutation({
+    mutationFn: async () => {
       const res = await fetch('/api/ugc/packs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,20 +119,19 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
           words,
         }),
       });
-
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message ?? 'Failed to publish pack');
+      return data;
+    },
+    onSuccess: (data) => { setPublishedPackId(data.id); },
+    onError: (err: Error) => { setPublishError(err.message); },
+  });
 
-      if (!res.ok) {
-        setPublishError(data.message ?? 'Failed to publish pack');
-      } else {
-        setPublishedPackId(data.id);
-      }
-    } catch (err) {
-      setPublishError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setIsPublishing(false);
-    }
-  }, [canPublish, name, description, language, themeEmoji, tags, words]);
+  const publishPack = useCallback(async () => {
+    if (!canPublish) return;
+    setPublishError(null);
+    publishMutation.mutate();
+  }, [canPublish, publishMutation]);
 
   return {
     name,
@@ -157,7 +149,7 @@ export function useWordPackBuilder(): UseWordPackBuilderReturn {
     removeWord,
     bulkAddWords,
     canPublish,
-    isPublishing,
+    isPublishing: publishMutation.isPending,
     publishError,
     publishedPackId,
     publishPack,

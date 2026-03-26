@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyChallengeCard } from './DailyChallengeCard';
@@ -46,49 +46,61 @@ interface ChallengePanelProps {
 
 export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps) {
   const { t } = useLanguage();
-  const [dailyChallenges, setDailyChallenges] = useState<DailyChallengeRow[]>([]);
-  const [weeklyQuests, setWeeklyQuests] = useState<WeeklyQuestRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const loadChallenges = async () => {
-    setLoading(true);
-    const [dailyRes, weeklyRes] = await Promise.all([
-      fetch('/api/education/challenges/daily'),
-      fetch('/api/education/challenges/weekly'),
-    ]);
-    const [dailyJson, weeklyJson] = await Promise.all([
-      dailyRes.json(),
-      weeklyRes.json(),
-    ]);
-    if (dailyRes.ok && dailyJson.challenges) {
-      setDailyChallenges(dailyJson.challenges);
-    }
-    if (weeklyRes.ok && weeklyJson.quests) {
-      setWeeklyQuests(weeklyJson.quests);
-    }
-    setLoading(false);
-  };
+  const challengeKeys = ['education', 'challenges', playerId] as const;
 
-  useEffect(() => {
-    loadChallenges();
-  }, [playerId]);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: challengeKeys,
+    queryFn: async () => {
+      const [dailyRes, weeklyRes] = await Promise.all([
+        fetch('/api/education/challenges/daily'),
+        fetch('/api/education/challenges/weekly'),
+      ]);
+      const [dailyJson, weeklyJson] = await Promise.all([
+        dailyRes.json(),
+        weeklyRes.json(),
+      ]);
+      return {
+        dailyChallenges: (dailyRes.ok ? dailyJson.challenges : []) as DailyChallengeRow[],
+        weeklyQuests: (weeklyRes.ok ? weeklyJson.quests : []) as WeeklyQuestRow[],
+      };
+    },
+    staleTime: 2 * 60_000,
+    enabled: !!playerId,
+  });
 
-  async function handleClaimChallenge(challengeId: string) {
-    await fetch('/api/education/challenges/daily', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ challengeId }),
-    });
-    loadChallenges();
+  const dailyChallenges = data?.dailyChallenges ?? [];
+  const weeklyQuests = data?.weeklyQuests ?? [];
+
+  const claimDailyMutation = useMutation({
+    mutationFn: async (challengeId: string) => {
+      await fetch('/api/education/challenges/daily', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId }),
+      });
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: challengeKeys }); },
+  });
+
+  const claimWeeklyMutation = useMutation({
+    mutationFn: async (questId: string) => {
+      await fetch('/api/education/challenges/weekly', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questId }),
+      });
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: challengeKeys }); },
+  });
+
+  function handleClaimChallenge(challengeId: string) {
+    claimDailyMutation.mutate(challengeId);
   }
 
-  async function handleClaimQuest(questId: string) {
-    await fetch('/api/education/challenges/weekly', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ questId }),
-    });
-    loadChallenges();
+  function handleClaimQuest(questId: string) {
+    claimWeeklyMutation.mutate(questId);
   }
 
   if (loading) return <PageLoader text={t('challenges.loading')} size="lg" nested />;

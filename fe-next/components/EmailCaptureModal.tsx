@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Mail, Trophy, Calendar } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { socialEvents } from './SocialMediaPixels';
@@ -28,25 +29,38 @@ export function EmailCaptureModal() {
   const { t } = useLanguage();
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const [isEnabled, setIsEnabled] = useState<boolean | null>(null);
 
   // Check if email subscription is enabled on the server
-  useEffect(() => {
-    const checkEnabled = async () => {
+  const { data: isEnabled = null } = useQuery<boolean | null>({
+    queryKey: ['email-subscription-enabled'],
+    queryFn: async () => {
       try {
         const response = await fetch('/api/subscribe-email');
         const data = await response.json();
-        setIsEnabled(data.enabled);
+        return data.enabled ?? false;
       } catch {
-        // If check fails, assume disabled
-        setIsEnabled(false);
+        return false;
       }
-    };
-    checkEnabled();
-  }, []);
+    },
+    staleTime: 10 * 60_000,
+  });
+
+  const subscribeMutation = useMutation({
+    mutationFn: async (emailAddress: string) => {
+      const response = await fetch('/api/subscribe-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailAddress,
+          source: 'post_game_modal',
+          timestamp: Date.now(),
+        }),
+      });
+      if (!response.ok) throw new Error('Subscription failed');
+    },
+  });
 
   useEffect(() => {
     // Don't show if not enabled or still checking
@@ -100,52 +114,26 @@ export function EmailCaptureModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsSubmitting(true);
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError(t('validation.invalidEmail'));
-      setIsSubmitting(false);
       return;
     }
 
-    try {
-      // Send to your email service endpoint
-      const response = await fetch('/api/subscribe-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          source: 'post_game_modal',
-          timestamp: Date.now(),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Subscription failed');
-      }
-
-      // Mark as subscribed
-      localStorage.setItem('email_subscribed', 'true');
-      localStorage.setItem('subscriber_email', email);
-
-      // Track conversion
-      socialEvents.completeRegistration(email);
-
-      setSubmitted(true);
-
-      // Close modal after 3 seconds
-      setTimeout(() => {
-        setShowModal(false);
-      }, 3000);
-    } catch (err) {
-      setError(t('error.subscriptionFailed'));
-    } finally {
-      setIsSubmitting(false);
-    }
+    subscribeMutation.mutate(email, {
+      onSuccess: () => {
+        localStorage.setItem('email_subscribed', 'true');
+        localStorage.setItem('subscriber_email', email);
+        socialEvents.completeRegistration(email);
+        setSubmitted(true);
+        setTimeout(() => { setShowModal(false); }, 3000);
+      },
+      onError: () => {
+        setError(t('error.subscriptionFailed'));
+      },
+    });
   };
 
   const handleDismiss = () => {
@@ -224,7 +212,7 @@ export function EmailCaptureModal() {
                     aria-describedby={error ? 'capture-email-error' : undefined}
                     className="w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-gray placeholder:opacity-75 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 transition-all"
                     required
-                    disabled={isSubmitting}
+                    disabled={subscribeMutation.isPending}
                   />
                   {error && (
                     <p id="capture-email-error" role="alert" className="mt-2 text-neo-red text-sm font-bold">{error}</p>
@@ -234,10 +222,10 @@ export function EmailCaptureModal() {
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={subscribeMutation.isPending}
                     className="flex-1 px-6 py-3 bg-neo-lime text-neo-black font-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting
+                    {subscribeMutation.isPending
                       ? t('email.submitting')
                       : t('email.submit')}
                   </button>

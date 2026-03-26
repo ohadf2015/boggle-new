@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { getSession } from '@/lib/supabase';
 
 export type CreatorStep = 'configure' | 'preview' | 'published';
@@ -69,7 +70,6 @@ export function useBoardCreator(): UseBoardCreatorReturn {
   const [gridRevision, setGridRevision] = useState(0);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [publishedBoard, setPublishedBoard] = useState<PublishedBoard | null>(null);
   const [coverImage, setCoverImageState] = useState<File | null>(null);
@@ -139,7 +139,7 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     };
   }, [coverImagePreview]);
 
-  // Core generate function
+  // Core generate function — kept as plain async for abort signal support in debounce
   const runGenerate = useCallback(async (
     seeds: string[],
     size: GridSize,
@@ -211,11 +211,9 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     return runGenerate(seedTags, gridSize, language);
   }, [runGenerate, seedTags, gridSize, language]);
 
-  const publishBoard = useCallback(async (): Promise<void> => {
-    if (!generatedBoard) return;
-    setIsPublishing(true);
-    setPublishError(null);
-    try {
+  const publishMutation = useMutation({
+    mutationFn: async () => {
+      if (!generatedBoard) throw new Error('No board to publish');
       const res = await fetch('/api/ugc/boards/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,13 +228,11 @@ export function useBoardCreator(): UseBoardCreatorReturn {
           totalFindableWords: generatedBoard.totalFindableWords,
         }),
       });
-
       const data = await res.json() as { boardCode?: string; title?: string; error?: string };
-      if (!res.ok) {
-        setPublishError(data.error ?? 'Publish failed');
-        return;
-      }
-
+      if (!res.ok) throw new Error(data.error ?? 'Publish failed');
+      return data;
+    },
+    onSuccess: async (data) => {
       if (data.boardCode) {
         // Upload cover image after successful publish
         if (coverImage) {
@@ -244,7 +240,6 @@ export function useBoardCreator(): UseBoardCreatorReturn {
           try {
             const { data: sessionData } = await getSession();
             const accessToken = sessionData?.session?.access_token;
-
             if (accessToken) {
               const uploadRes = await fetch(`/api/ugc/boards/${data.boardCode}/cover-image`, {
                 method: 'POST',
@@ -254,7 +249,6 @@ export function useBoardCreator(): UseBoardCreatorReturn {
                 },
                 body: coverImage,
               });
-
               if (!uploadRes.ok) {
                 const uploadData = await uploadRes.json();
                 setImageUploadError(uploadData.error ?? 'Image upload failed');
@@ -266,16 +260,18 @@ export function useBoardCreator(): UseBoardCreatorReturn {
             setIsUploadingImage(false);
           }
         }
-
         setPublishedBoard({ boardCode: data.boardCode, title: data.title ?? title });
         setStep('published');
       }
-    } catch (err) {
-      setPublishError(err instanceof Error ? err.message : 'Publish failed');
-    } finally {
-      setIsPublishing(false);
-    }
-  }, [generatedBoard, title, description, language, gridSize, coverImage]);
+    },
+    onError: (err: Error) => { setPublishError(err.message); },
+  });
+
+  const publishBoard = useCallback(async (): Promise<void> => {
+    if (!generatedBoard) return;
+    setPublishError(null);
+    publishMutation.mutate();
+  }, [generatedBoard, publishMutation]);
 
   return {
     step,
@@ -300,7 +296,7 @@ export function useBoardCreator(): UseBoardCreatorReturn {
     setTitle,
     description,
     setDescription,
-    isPublishing,
+    isPublishing: publishMutation.isPending,
     publishError,
     publishedBoard,
     publishBoard,

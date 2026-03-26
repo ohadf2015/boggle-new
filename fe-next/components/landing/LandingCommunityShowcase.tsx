@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, PencilRuler, Play, Star, Users, Sparkles } from 'lucide-react';
@@ -62,20 +62,17 @@ interface LandingCommunityShowcaseProps {
 export function LandingCommunityShowcase({ className }: LandingCommunityShowcaseProps) {
   const { t, language, dir } = useLanguage();
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
-  const [boards, setBoards] = useState<BoardCardBoard[]>([]);
 
-  const fetchFeatured = useCallback(async () => {
-    try {
+  const { data: boards = [] } = useQuery<BoardCardBoard[]>({
+    queryKey: ['ugc', 'featured-boards'],
+    queryFn: async () => {
       const res = await fetch('/api/ugc/boards/gallery?sort=featured&limit=3&page=1');
-      if (!res.ok) return;
+      if (!res.ok) return [];
       const data = await res.json();
-      setBoards(data.boards ?? []);
-    } catch {
-      // Silent fail
-    }
-  }, []);
-
-  useEffect(() => { fetchFeatured(); }, [fetchFeatured]);
+      return data.boards ?? [];
+    },
+    staleTime: 5 * 60_000,
+  });
 
   if (boards.length === 0) return null;
 
