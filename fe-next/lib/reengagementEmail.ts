@@ -18,6 +18,8 @@ import {
   isEmailServiceConfigured,
 } from '@/lib/email';
 
+const logger = require('@/backend/utils/logger');
+
 // Re-export template functions for backward compatibility
 export {
   generateReengagementEmailHtml,
@@ -280,7 +282,7 @@ export async function sendReengagementEmail(
     );
 
     if (result.error) {
-      console.error(`[Reengagement] Failed to send to ${recipient.email}:`, result.error);
+      logger.error('EMAIL', `Failed to send to ${recipient.email}:`, result.error);
       return { success: false, error: result.error.message };
     }
 
@@ -289,11 +291,11 @@ export async function sendReengagementEmail(
       .update({ last_reengagement_email_sent_at: new Date().toISOString() })
       .eq('id', recipient.id);
 
-    console.log(`[Reengagement] Sent to ${recipient.email}`);
+    logger.info('EMAIL', `Reengagement sent to ${recipient.email}`);
     return { success: true };
   } catch (err) {
     const error = err as Error;
-    console.error(`[Reengagement] Error sending to ${recipient.email}:`, error);
+    logger.error('EMAIL', `Reengagement error sending to ${recipient.email}:`, error);
     return { success: false, error: error.message };
   }
 }

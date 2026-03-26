@@ -13,6 +13,8 @@ import type { Language } from '@/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type WordBankEntry } from './wordBankData';
 
+const logger = require('@/backend/utils/logger');
+
 // Re-export types and data from wordBankData
 export type { ValidationStatus, WordStatus, WordBankEntry } from './wordBankData';
 export { STATIC_WORD_LISTS, WORD_LENGTH_RANGE } from './wordBankData';
@@ -55,7 +57,7 @@ export async function getWordsFromWordBank(
     });
 
     if (error) {
-      console.error('Error fetching from word bank:', error);
+      logger.error('WORD_BANK', 'Error fetching from word bank:', error);
       return [];
     }
 
@@ -66,7 +68,7 @@ export async function getWordsFromWordBank(
       category: row.category,
     }));
   } catch (error) {
-    console.error('Word bank query failed:', error);
+    logger.error('WORD_BANK', 'Word bank query failed:', error);
     return [];
   }
 }

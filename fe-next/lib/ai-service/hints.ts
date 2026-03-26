@@ -14,6 +14,7 @@ import {
 } from './types';
 import { trackTokenUsage } from './client';
 import { withRetry } from './validation';
+const logger = require('@/backend/utils/logger');
 
 const HINT_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -102,7 +103,7 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
 
     return hintResult;
   } catch (error) {
-    console.error('[Hints] generateHint error:', error);
+    logger.error('AI_SERVICE', ' generateHint error:', error);
 
     // Return graceful fallback
     return {

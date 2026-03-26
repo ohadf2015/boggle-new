@@ -7,6 +7,7 @@ import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { captureAIServiceError } from '@/utils/sentry';
 import { TOKEN_COSTS, type GoogleCredentials, type TokenUsageStats } from './types';
+const logger = require('@/backend/utils/logger');
 
 /**
  * Parse Google Cloud credentials from JSON string environment variable.
@@ -60,10 +61,7 @@ export function createServiceClient(): SupabaseClient | null {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn(
-      '[GameAIService] Supabase service role not configured. ' +
-      'Word caching will be disabled.'
-    );
+    logger.warn('AI_SERVICE', 'Supabase service role not configured. Word caching will be disabled.');
     return null;
   }
 
@@ -105,11 +103,11 @@ export async function initializeVertexAI(
       },
     });
 
-    console.log('[GameAIService] Initialized successfully');
+    logger.info('AI_SERVICE', ' Initialized successfully');
     return { vertexAI, model };
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown initialization error';
-    console.error('[GameAIService] Initialization failed:', msg);
+    logger.error('AI_SERVICE', ' Initialization failed:', msg);
     captureAIServiceError(error instanceof Error ? error : new Error(msg), {
       operation: 'initialize',
     });

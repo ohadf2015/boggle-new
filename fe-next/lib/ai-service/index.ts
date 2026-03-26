@@ -41,6 +41,8 @@ import {
   generateBulkWords,
 } from './generation';
 
+const logger = require('@/backend/utils/logger');
+
 /**
  * Main GameAIService class
  * Provides word validation, hint generation, and themed board creation
@@ -180,7 +182,7 @@ class GameAIService {
       // Save valid words to database (fire and forget)
       if (aiResult.isValid) {
         saveToCommunityWords(this.supabaseAdmin, normalizedWord, language).catch((err) => {
-          console.error('[GameAIService] Background save failed:', err);
+          logger.error('AI_SERVICE', ' Background save failed:', err);
         });
       }
 
@@ -191,7 +193,7 @@ class GameAIService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[GameAIService] validateAndSaveWord error:', errorMessage);
+      logger.error('AI_SERVICE', ' validateAndSaveWord error:', errorMessage);
       captureAIServiceError(error instanceof Error ? error : new Error(errorMessage), {
         operation: 'validateAndSaveWord',
         word: normalizedWord,
@@ -219,7 +221,7 @@ class GameAIService {
       await this.initialize();
       return checkDatabaseOnly(this.supabaseAdmin, word, language, minWordLength);
     } catch (error) {
-      console.error('[GameAIService] checkDatabaseOnly error:', error);
+      logger.error('AI_SERVICE', ' checkDatabaseOnly error:', error);
       return { isValid: false, source: 'unknown' };
     }
   }
@@ -393,7 +395,7 @@ class GameAIService {
 
   clearValidationCache(): void {
     validationCache.clear();
-    console.log('[GameAIService] Validation cache cleared');
+    logger.info('AI_SERVICE', ' Validation cache cleared');
   }
 }
 

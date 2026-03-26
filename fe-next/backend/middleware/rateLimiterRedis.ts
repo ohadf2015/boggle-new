@@ -1,34 +1,59 @@
-import { RateLimiterMemory, RateLimiterAbstract } from 'rate-limiter-flexible';
+import { RateLimiterMemory, RateLimiterRedis, RateLimiterAbstract } from 'rate-limiter-flexible';
+import { getRedisClient, isRedisAvailable } from '../redis/connection';
 import { RATE_LIMITS } from '../config/rateLimits';
 
-/**
- * HTTP API rate limiter — sliding window, 100 requests/min per IP
- */
-export const httpRateLimiter = new RateLimiterMemory({
-  keyPrefix: 'http',
-  points: RATE_LIMITS.http.points,
-  duration: RATE_LIMITS.http.duration,
-});
+const logger = require('../utils/logger');
 
 /**
- * Socket event rate limiters — per-action limits
+ * Create a rate limiter that uses Redis when available, falling back to in-memory.
+ * This ensures rate limits are shared across horizontal replicas.
  */
-export const socketRateLimiters: Record<string, RateLimiterAbstract> = {
-  wordSubmit: new RateLimiterMemory({ keyPrefix: 'ws:word', points: RATE_LIMITS.wordSubmit.points, duration: RATE_LIMITS.wordSubmit.duration }),
-  chatMessage: new RateLimiterMemory({ keyPrefix: 'ws:chat', points: RATE_LIMITS.chatMessage.points, duration: RATE_LIMITS.chatMessage.duration }),
-  emojiReaction: new RateLimiterMemory({ keyPrefix: 'ws:emoji', points: RATE_LIMITS.emojiReaction.points, duration: RATE_LIMITS.emojiReaction.duration }),
-  roomCreate: new RateLimiterMemory({ keyPrefix: 'ws:room', points: RATE_LIMITS.roomCreate.points, duration: RATE_LIMITS.roomCreate.duration }),
-  default: new RateLimiterMemory({ keyPrefix: 'ws:default', points: RATE_LIMITS.default.points, duration: RATE_LIMITS.default.duration }),
-};
+function createRateLimiter(keyPrefix: string, points: number, duration: number): RateLimiterAbstract {
+  const redis = isRedisAvailable() ? getRedisClient() : null;
+  if (redis) {
+    return new RateLimiterRedis({
+      storeClient: redis,
+      keyPrefix: `rl:${keyPrefix}`,
+      points,
+      duration,
+      insuranceLimiter: new RateLimiterMemory({ keyPrefix, points, duration }),
+    });
+  }
+  logger.warn('RATE_LIMIT', `Redis unavailable, using in-memory limiter for ${keyPrefix}`);
+  return new RateLimiterMemory({ keyPrefix, points, duration });
+}
 
-/**
- * Connection rate limiter — max 5 sockets per IP per minute
- */
-export const connectionRateLimiter = new RateLimiterMemory({
-  keyPrefix: 'conn',
-  points: RATE_LIMITS.connection.points,
-  duration: RATE_LIMITS.connection.duration,
-});
+// Lazy init — Redis may not be connected at module load time
+let _httpRateLimiter: RateLimiterAbstract | null = null;
+let _socketRateLimiters: Record<string, RateLimiterAbstract> | null = null;
+let _connectionRateLimiter: RateLimiterAbstract | null = null;
+
+function getHttpRateLimiter(): RateLimiterAbstract {
+  if (!_httpRateLimiter) {
+    _httpRateLimiter = createRateLimiter('http', RATE_LIMITS.http.points, RATE_LIMITS.http.duration);
+  }
+  return _httpRateLimiter;
+}
+
+function getSocketRateLimiters(): Record<string, RateLimiterAbstract> {
+  if (!_socketRateLimiters) {
+    _socketRateLimiters = {
+      wordSubmit: createRateLimiter('ws:word', RATE_LIMITS.wordSubmit.points, RATE_LIMITS.wordSubmit.duration),
+      chatMessage: createRateLimiter('ws:chat', RATE_LIMITS.chatMessage.points, RATE_LIMITS.chatMessage.duration),
+      emojiReaction: createRateLimiter('ws:emoji', RATE_LIMITS.emojiReaction.points, RATE_LIMITS.emojiReaction.duration),
+      roomCreate: createRateLimiter('ws:room', RATE_LIMITS.roomCreate.points, RATE_LIMITS.roomCreate.duration),
+      default: createRateLimiter('ws:default', RATE_LIMITS.default.points, RATE_LIMITS.default.duration),
+    };
+  }
+  return _socketRateLimiters;
+}
+
+function getConnectionRateLimiter(): RateLimiterAbstract {
+  if (!_connectionRateLimiter) {
+    _connectionRateLimiter = createRateLimiter('conn', RATE_LIMITS.connection.points, RATE_LIMITS.connection.duration);
+  }
+  return _connectionRateLimiter;
+}
 
 /**
  * Express middleware for HTTP rate limiting
@@ -37,9 +62,14 @@ export function httpRateLimitMiddleware() {
   return async (req: any, res: any, next: any) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     try {
-      await httpRateLimiter.consume(ip);
+      const result = await getHttpRateLimiter().consume(ip);
+      res.setHeader('RateLimit-Limit', RATE_LIMITS.http.points);
+      res.setHeader('RateLimit-Remaining', result.remainingPoints);
+      res.setHeader('RateLimit-Reset', Math.ceil(result.msBeforeNext / 1000));
       next();
-    } catch {
+    } catch (rejRes: any) {
+      const retryAfter = Math.ceil((rejRes.msBeforeNext || 1000) / 1000);
+      res.setHeader('Retry-After', retryAfter);
       res.status(429).json({ error: 'TOO_MANY_REQUESTS', message: 'Rate limit exceeded. Please slow down.' });
     }
   };
@@ -53,7 +83,8 @@ export async function checkSocketRateLimit(
   socketId: string,
   action: string = 'default'
 ): Promise<{ allowed: boolean; retryAfterMs?: number }> {
-  const limiter = socketRateLimiters[action] || socketRateLimiters.default;
+  const limiters = getSocketRateLimiters();
+  const limiter = limiters[action] || limiters.default;
   try {
     await limiter.consume(socketId);
     return { allowed: true };
@@ -67,7 +98,7 @@ export async function checkSocketRateLimit(
  */
 export async function checkConnectionRateLimit(ip: string): Promise<boolean> {
   try {
-    await connectionRateLimiter.consume(ip);
+    await getConnectionRateLimiter().consume(ip);
     return true;
   } catch {
     return false;

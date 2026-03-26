@@ -13,7 +13,7 @@ interface PlayerProfile {
 
 export function usePlayerProfile(userId: string | null) {
   return useQuery({
-    queryKey: queryKeys.playerProfile.byId(userId!),
+    queryKey: queryKeys.playerProfile.byId(userId ?? ''),
     queryFn: async ({ signal }): Promise<PlayerProfile> => {
       const res = await fetch(`/api/player-profile?userId=${userId}`, { signal });
       if (!res.ok) throw new Error(`Profile fetch failed: ${res.status}`);

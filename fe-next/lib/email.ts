@@ -9,6 +9,8 @@ import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
+const logger = require('@/backend/utils/logger');
+
 // Initialize Resend client
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -111,7 +113,7 @@ interface EmailRecipient {
 export async function getEligibleRecipients(_targetHourUTC: number): Promise<EmailRecipient[]> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
-    console.error('[Email] Supabase admin client not available');
+    logger.error('EMAIL', 'Supabase admin client not available');
     return [];
   }
 
@@ -130,7 +132,7 @@ export async function getEligibleRecipients(_targetHourUTC: number): Promise<Ema
     .eq('daily_email_subscribed', true);
 
   if (error) {
-    console.error('[Email] Error fetching subscribed profiles:', error);
+    logger.error('EMAIL', 'Error fetching subscribed profiles:', error);
     return [];
   }
 
@@ -142,7 +144,7 @@ export async function getEligibleRecipients(_targetHourUTC: number): Promise<Ema
   const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
 
   if (authError) {
-    console.error('[Email] Error fetching auth users:', authError);
+    logger.error('EMAIL', 'Error fetching auth users:', authError);
     return [];
   }
 
@@ -594,7 +596,7 @@ export async function sendDailyChallengeEmail(
     );
 
     if (result.error) {
-      console.error(`[Email] Failed to send to ${recipient.email}:`, result.error);
+      logger.error('EMAIL', `Failed to send to ${recipient.email}:`, result.error);
       return { success: false, error: result.error.message };
     }
 
@@ -604,11 +606,11 @@ export async function sendDailyChallengeEmail(
       .update({ last_daily_email_sent_at: new Date().toISOString() })
       .eq('id', recipient.id);
 
-    console.log(`[Email] Successfully sent daily challenge to ${recipient.email}`);
+    logger.info('EMAIL', `Successfully sent daily challenge to ${recipient.email}`);
     return { success: true };
   } catch (err) {
     const error = err as Error;
-    console.error(`[Email] Error sending to ${recipient.email}:`, error);
+    logger.error('EMAIL', `Error sending to ${recipient.email}:`, error);
     return { success: false, error: error.message };
   }
 }
@@ -630,11 +632,11 @@ export async function unsubscribeByToken(token: string): Promise<{ success: bool
     .single();
 
   if (error || !data) {
-    console.error('[Email] Unsubscribe error:', error);
+    logger.error('EMAIL', 'Unsubscribe error:', error);
     return { success: false, error: 'Invalid or expired unsubscribe link' };
   }
 
-  console.log(`[Email] User ${data.id} unsubscribed successfully`);
+  logger.info('EMAIL', `User ${data.id} unsubscribed successfully`);
   return { success: true };
 }
 
@@ -645,21 +647,20 @@ export async function sendTestEmail(
   toEmail: string,
   recipientName: string = 'Test User'
 ): Promise<{ success: boolean; error?: string }> {
-  // Using console.warn because console.log is stripped in production
-  console.warn('[Email] sendTestEmail called', { toEmail, recipientName });
+  logger.warn('EMAIL', 'sendTestEmail called', { toEmail, recipientName });
 
   if (!resend) {
-    console.warn('[Email] Resend client not initialized');
+    logger.warn('EMAIL', 'Resend client not initialized');
     return { success: false, error: 'Resend not configured - RESEND_API_KEY missing' };
   }
 
   const fromEmail = process.env.RESEND_FROM_EMAIL;
   if (!fromEmail) {
-    console.warn('[Email] RESEND_FROM_EMAIL not set');
+    logger.warn('EMAIL', 'RESEND_FROM_EMAIL not set');
     return { success: false, error: 'RESEND_FROM_EMAIL not configured' };
   }
 
-  console.warn('[Email] Config OK, preparing email', { fromEmail, toEmail });
+  logger.warn('EMAIL', 'Config OK, preparing email', { fromEmail, toEmail });
 
   const puzzleNumber = getPuzzleNumber();
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
@@ -674,7 +675,7 @@ export async function sendTestEmail(
     baseUrl
   );
 
-  console.warn('[Email] Sending via Resend...', { subject });
+  logger.warn('EMAIL', 'Sending via Resend...', { subject });
 
   try {
     // Add 10-second timeout to prevent hanging
@@ -691,15 +692,15 @@ export async function sendTestEmail(
     );
 
     if (result.error) {
-      console.error(`[Email] Resend returned error:`, result.error);
+      logger.error('EMAIL', 'Resend returned error:', result.error);
       return { success: false, error: result.error.message };
     }
 
-    console.warn(`[Email] Test email sent successfully to ${toEmail}`, { id: result.data?.id });
+    logger.warn('EMAIL', `Test email sent successfully to ${toEmail}`, { id: result.data?.id });
     return { success: true };
   } catch (err) {
     const error = err as Error;
-    console.error('[Email] Error sending test email:', error.message);
+    logger.error('EMAIL', 'Error sending test email:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -748,7 +749,7 @@ export async function updateEmailPreferences(
     .eq('id', userId);
 
   if (error) {
-    console.error('[Email] Update preferences error:', error);
+    logger.error('EMAIL', 'Update preferences error:', error);
     return { success: false, error: error.message };
   }
 

@@ -6,6 +6,7 @@
 import type { Application, Request, Response } from 'express';
 import type { Server } from 'socket.io';
 import { isRedisAvailable, getRedisMetrics, getRedisClient } from '../backend/redisClient';
+import { circuitBreaker } from '../backend/redis/circuitBreaker';
 import { checkPoolHealth } from '../backend/db/supabasePool';
 import { getAllGames } from '../backend/modules/gameStateManager';
 import { getMetrics, getRoomMetrics, resetAll } from '../backend/utils/metrics';
@@ -38,13 +39,30 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     const checks: Record<string, { status: string; latencyMs?: number; error?: string }> = {};
     let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 
+    const HEALTH_CHECK_TIMEOUT_MS = 5000;
+
+    /** Race a promise against a timeout */
+    function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+      return Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error(`${label} health check timed out after ${HEALTH_CHECK_TIMEOUT_MS}ms`)), HEALTH_CHECK_TIMEOUT_MS)
+        ),
+      ]);
+    }
+
     // Check Redis (reuse existing client — no per-request connection)
     try {
       const redis = getRedisClient();
       if (redis) {
         const start = Date.now();
-        await redis.ping();
-        checks.redis = { status: 'ok', latencyMs: Date.now() - start };
+        await withTimeout(redis.ping(), 'Redis');
+        const cbState = circuitBreaker.getState();
+        checks.redis = {
+          status: cbState.state === 'OPEN' ? 'degraded' : 'ok',
+          latencyMs: Date.now() - start,
+          ...(cbState.state !== 'CLOSED' && { circuitBreaker: cbState.state, failures: cbState.failureCount }),
+        } as any;
       } else {
         checks.redis = { status: 'skipped', error: 'No Redis client available' };
       }
@@ -55,7 +73,7 @@ export function configureHealthRoutes(app: Application, io: Server): void {
 
     // Check Supabase (pooled connection)
     try {
-      const poolResult = await checkPoolHealth();
+      const poolResult = await withTimeout(checkPoolHealth(), 'Supabase');
       checks.supabase = poolResult.ok
         ? { status: 'ok', latencyMs: poolResult.latencyMs }
         : { status: 'error', latencyMs: poolResult.latencyMs, error: poolResult.error };

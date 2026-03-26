@@ -64,6 +64,7 @@ end
 
 local encoded = cjson.encode(approvalData)
 redis.call('SET', key, encoded)
+redis.call('EXPIRE', key, 604800) -- 7 day TTL to prevent unbounded growth
 return encoded
 `;
 

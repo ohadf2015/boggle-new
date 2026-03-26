@@ -13,6 +13,8 @@ import {
   RATE_LIMIT_KEYS,
 } from '@/backend/redis/rateLimit';
 
+const logger = require('@/backend/utils/logger');
+
 // Store for rate limit data
 interface RateLimitData {
   count: number;
@@ -146,7 +148,7 @@ export function checkApiRateLimit(
     if (data.count > config.maxRequests * 2) {
       const blockDuration = config.blockDurationMs || 300000; // 5 minutes default
       blockedIps.set(ip, { expiry: now + blockDuration });
-      console.warn(`[API Rate Limit] Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
+      logger.warn('RATE_LIMIT', `Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
     }
 
     return {
@@ -276,7 +278,7 @@ export async function checkApiRateLimitAsync(
         const blockDuration = config.blockDurationMs || 300000;
         blockedIps.set(ip, { expiry: now + blockDuration });
         await blockIpRedis(ip, blockDuration);
-        console.warn(`[API Rate Limit] Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
+        logger.warn('RATE_LIMIT', `Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
       }
 
       return {
@@ -310,7 +312,7 @@ export async function checkApiRateLimitAsync(
     };
   } catch (error) {
     // Redis error - fall back to in-memory
-    console.warn('[API Rate Limit] Redis error, using in-memory fallback:', error);
+    logger.warn('RATE_LIMIT', 'Redis error, using in-memory fallback:', error);
     return checkApiRateLimit(request, endpoint, config);
   }
 }

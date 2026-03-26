@@ -16,6 +16,7 @@ import {
   type WordValidationResult,
 } from './types';
 import { validationCache } from './cache';
+const logger = require('@/backend/utils/logger');
 
 /**
  * Check if word exists in community_words table (host/AI approved).
@@ -36,7 +37,7 @@ export async function checkCommunityWords(
     .maybeSingle();
 
   if (error) {
-    console.warn('[Validation] community_words lookup error:', error.message);
+    logger.warn('AI_SERVICE', ' community_words lookup error:', error.message);
     return false;
   }
 
@@ -63,7 +64,7 @@ export async function checkWordScores(
     .maybeSingle();
 
   if (error) {
-    console.warn('[Validation] word_scores lookup error:', error.message);
+    logger.warn('AI_SERVICE', ' word_scores lookup error:', error.message);
     return false;
   }
 
@@ -105,10 +106,10 @@ export async function saveToCommunityWords(
       .eq('language', language);
 
     if (updateError) {
-      console.error('[Validation] Failed to update community_words:', updateError.message);
+      logger.error('AI_SERVICE', ' Failed to update community_words:', updateError.message);
     }
   } else if (insertError) {
-    console.error('[Validation] Failed to insert community_words:', insertError.message);
+    logger.error('AI_SERVICE', ' Failed to insert community_words:', insertError.message);
   }
 }
 
@@ -187,7 +188,7 @@ Respond with ONLY valid JSON (no markdown):
 
     // Handle non-successful finish reasons
     if (finishReason && finishReason !== 'STOP') {
-      console.warn(`[Validation] Non-standard finish reason for "${word}": ${finishReason}`);
+      logger.warn('AI_SERVICE', `Non-standard finish reason for "${word}": ${finishReason}`);
 
       // MAX_TOKENS: Response was cut off - retry
       if (finishReason === 'MAX_TOKENS') {
@@ -275,7 +276,7 @@ Respond with ONLY valid JSON (no markdown):
     return validated;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('[Validation] AI response schema validation failed:', error.issues);
+      logger.error('AI_SERVICE', ' AI response schema validation failed:', error.issues);
       captureAIServiceError(new Error(`Schema validation failed: ${error.issues.map(i => i.message).join(', ')}`), {
         operation: 'validateWithAI_schema',
         word,
@@ -332,7 +333,7 @@ export async function withRetry<T>(
 
       if (!retryable || attempt === RETRY_CONFIG.maxRetries - 1) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`[Validation] ${operationName} failed after ${attempt + 1} attempts:`, msg);
+        logger.error('AI_SERVICE', `${operationName} failed after ${attempt + 1} attempts:`, msg);
         captureAIServiceError(error instanceof Error ? error : new Error(msg), {
           operation: operationName,
           retryAttempt: attempt + 1,
@@ -346,7 +347,7 @@ export async function withRetry<T>(
         RETRY_CONFIG.maxDelayMs
       );
 
-      console.warn(`[Validation] ${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms`);
+      logger.warn('AI_SERVICE', `${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -393,7 +394,7 @@ export async function checkDatabaseOnly(
     // Not in database - needs AI validation
     return { isValid: false, source: 'unknown' };
   } catch (error) {
-    console.error('[Validation] checkDatabaseOnly error:', error);
+    logger.error('AI_SERVICE', ' checkDatabaseOnly error:', error);
     return { isValid: false, source: 'unknown' };
   }
 }

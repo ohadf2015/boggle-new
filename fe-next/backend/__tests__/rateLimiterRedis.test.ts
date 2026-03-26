@@ -1,4 +1,4 @@
-import { checkSocketRateLimit, checkConnectionRateLimit, httpRateLimiter } from '../middleware/rateLimiterRedis';
+import { checkSocketRateLimit, checkConnectionRateLimit, httpRateLimitMiddleware } from '../middleware/rateLimiterRedis';
 
 describe('rateLimiterRedis', () => {
   describe('checkSocketRateLimit', () => {
@@ -31,7 +31,8 @@ describe('rateLimiterRedis', () => {
 
     it('blocks excessive connections from same IP', async () => {
       const ip = '10.0.0.99';
-      for (let i = 0; i < 5; i++) {
+      // connection limit is 20/min per config
+      for (let i = 0; i < 20; i++) {
         await checkConnectionRateLimit(ip);
       }
       const result = await checkConnectionRateLimit(ip);
@@ -39,10 +40,27 @@ describe('rateLimiterRedis', () => {
     });
   });
 
-  describe('httpRateLimiter', () => {
-    it('allows requests within limit', async () => {
-      const res = await httpRateLimiter.consume('test-ip');
-      expect(res.remainingPoints).toBeGreaterThanOrEqual(0);
+  describe('httpRateLimitMiddleware', () => {
+    it('creates a middleware function', () => {
+      const middleware = httpRateLimitMiddleware();
+      expect(typeof middleware).toBe('function');
+    });
+
+    it('allows requests within limit and sets headers', async () => {
+      const middleware = httpRateLimitMiddleware();
+      const req = { ip: 'test-http-ip', headers: {} };
+      const headers: Record<string, unknown> = {};
+      const res = {
+        setHeader: (k: string, v: unknown) => { headers[k] = v; },
+        status: () => res,
+        json: () => {},
+      };
+      const next = jest.fn();
+
+      await middleware(req, res, next);
+      expect(next).toHaveBeenCalled();
+      expect(headers['RateLimit-Limit']).toBe(100);
+      expect(headers['RateLimit-Remaining']).toBeGreaterThanOrEqual(0);
     });
   });
 });

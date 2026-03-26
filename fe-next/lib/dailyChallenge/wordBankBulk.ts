@@ -12,6 +12,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { WORD_LENGTH_RANGE, type ValidationStatus } from './wordBankData';
 import { updateValidationStatus } from './wordBankAdmin';
 
+const logger = require('@/backend/utils/logger');
+
 /**
  * Add a word to the community_words table for game validation
  */
@@ -41,14 +43,14 @@ export async function addToCommunityWords(
       .eq('language', language);
 
     if (updateError) {
-      console.error('Error updating community_words:', updateError.message);
+      logger.error('WORD_BANK', 'Error updating community_words:', updateError.message);
     } else {
-      console.log(`[WordBank] Updated ${normalizedWord} in community_words for ${language}`);
+      logger.info('WORD_BANK', `Updated ${normalizedWord} in community_words for ${language}`);
     }
   } else if (insertError) {
-    console.error('Error inserting into community_words:', insertError.message);
+    logger.error('WORD_BANK', 'Error inserting into community_words:', insertError.message);
   } else {
-    console.log(`[WordBank] Added ${normalizedWord} to community_words for ${language}`);
+    logger.info('WORD_BANK', `Added ${normalizedWord} to community_words for ${language}`);
   }
 }
 
@@ -81,11 +83,11 @@ export async function batchAddToCommunityWords(
     });
 
   if (error) {
-    console.error('Error batch inserting into community_words:', error.message);
+    logger.error('WORD_BANK', 'Error batch inserting into community_words:', error.message);
     return { added: 0, errors: words.length };
   }
 
-  console.log(`[WordBank] Batch added ${words.length} words to community_words`);
+  logger.info('WORD_BANK', `Batch added ${words.length} words to community_words`);
   return { added: words.length, errors: 0 };
 }
 
@@ -109,7 +111,7 @@ export async function bulkUpdateValidationStatus(
       .in('id', wordIds);
 
     if (fetchError) {
-      console.error('Error fetching words for bulk approval:', fetchError);
+      logger.error('WORD_BANK', 'Error fetching words for bulk approval:', fetchError);
     } else if (wordData) {
       wordsToAddToCommunity = wordData.map(w => ({ word: w.word, language: w.language }));
     }
@@ -121,7 +123,7 @@ export async function bulkUpdateValidationStatus(
   });
 
   if (error) {
-    console.warn('Bulk update RPC failed, falling back to individual updates:', error);
+    logger.warn('WORD_BANK', 'Bulk update RPC failed, falling back to individual updates:', error);
     for (const id of wordIds) {
       const result = await updateValidationStatus(supabase, id, validationStatus);
       if (result) {
@@ -133,7 +135,7 @@ export async function bulkUpdateValidationStatus(
   } else {
     affected = data || wordIds.length;
     if (validationStatus === 'approved' && wordsToAddToCommunity.length > 0) {
-      console.log(`[WordBank] Batch adding ${wordsToAddToCommunity.length} bulk-approved words to community_words`);
+      logger.info('WORD_BANK', `Batch adding ${wordsToAddToCommunity.length} bulk-approved words to community_words`);
       await batchAddToCommunityWords(supabase, wordsToAddToCommunity);
     }
   }
@@ -203,7 +205,7 @@ export async function bulkImportWords(
       .upsert(chunk, { onConflict: 'word,language', ignoreDuplicates: false });
 
     if (error) {
-      console.error('Error importing batch:', error);
+      logger.error('WORD_BANK', 'Error importing batch:', error);
       errors += chunk.length;
       for (const w of chunk) {
         errorDetails.push({ word: w.word, error: error.message });

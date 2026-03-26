@@ -13,6 +13,7 @@ import {
 } from './types';
 import { trackTokenUsage } from './client';
 import { withRetry } from './validation';
+const logger = require('@/backend/utils/logger');
 
 /**
  * Generate a themed word board using AI
@@ -41,7 +42,7 @@ export async function generateThemedBoard(
     // Extract JSON array from response
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      console.warn('[Generation] Could not extract JSON array from AI response');
+      logger.warn('AI_SERVICE', ' Could not extract JSON array from AI response');
       return [];
     }
 
@@ -57,10 +58,10 @@ export async function generateThemedBoard(
     return filteredWords;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('[Generation] Themed words schema validation failed:', error.issues);
+      logger.error('AI_SERVICE', ' Themed words schema validation failed:', error.issues);
       return [];
     }
-    console.error('[Generation] generateThemedBoard error:', error);
+    logger.error('AI_SERVICE', ' generateThemedBoard error:', error);
     throw error;
   }
 }
@@ -173,7 +174,7 @@ Output ONLY valid JSON:
       reason: entry.reason || 'AI selected',
     }));
   } catch (error) {
-    console.error('[Generation] generateBulkWords error:', error);
+    logger.error('AI_SERVICE', ' generateBulkWords error:', error);
     throw error;
   }
 }

@@ -12,6 +12,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type ValidationStatus } from './wordBankData';
 import { addToCommunityWords } from './wordBankBulk';
 
+const logger = require('@/backend/utils/logger');
+
 // Re-export bulk operations for consumers importing from wordBankAdmin
 export {
   bulkUpdateValidationStatus,
@@ -48,7 +50,7 @@ export async function seedWordBank(
 
     if (error) {
       if (error.code === '23505') skipped++;
-      else { console.error('Error inserting word:', normalizedWord, error); errors++; }
+      else { logger.error('WORD_BANK', 'Error inserting word:', normalizedWord, error); errors++; }
     } else {
       inserted++;
     }
@@ -88,7 +90,7 @@ export async function importWordsFromDictionary(
 
     if (error) {
       if (error.code === '23505') skipped++;
-      else { console.error('Error importing word:', normalizedWord, error); errors++; }
+      else { logger.error('WORD_BANK', 'Error importing word:', normalizedWord, error); errors++; }
     } else {
       inserted++;
     }
@@ -117,8 +119,9 @@ export async function importWikipediaWordsToBank(
     return n.length >= lengthRange.min && n.length <= lengthRange.max;
   });
 
-  console.log(
-    `[Word Bank] Importing ${validWords.length}/${words.length} Wikipedia words for ${language} (filtered by length ${lengthRange.min}-${lengthRange.max})`
+  logger.info(
+    'WORD_BANK',
+    `Importing ${validWords.length}/${words.length} Wikipedia words for ${language} (filtered by length ${lengthRange.min}-${lengthRange.max})`
   );
 
   return importWordsFromDictionary(supabase, language, validWords, 'wikipedia', options?.validationStatus ?? 'pending');
@@ -157,7 +160,7 @@ export async function importWikipediaWordWithMetadata(
       { onConflict: 'word,language', ignoreDuplicates: false }
     );
 
-  if (error) { console.error('Error importing Wikipedia word:', normalizedWord, error); return false; }
+  if (error) { logger.error('WORD_BANK', 'Error importing Wikipedia word:', normalizedWord, error); return false; }
   return true;
 }
 
@@ -170,7 +173,7 @@ export async function blockWord(
   const { data, error } = await supabase.rpc('block_word_bank_word', {
     p_word: word.toUpperCase(), p_language: language, p_admin_id: adminId, p_reason: reason || null,
   });
-  if (error) { console.error('Error blocking word:', error); return false; }
+  if (error) { logger.error('WORD_BANK', 'Error blocking word:', error); return false; }
   return data === true;
 }
 
@@ -183,7 +186,7 @@ export async function unblockWord(
   const { data, error } = await supabase.rpc('unblock_word_bank_word', {
     p_word: word.toUpperCase(), p_language: language,
   });
-  if (error) { console.error('Error unblocking word:', error); return false; }
+  if (error) { logger.error('WORD_BANK', 'Error unblocking word:', error); return false; }
   return data === true;
 }
 
@@ -196,7 +199,7 @@ export async function markWordAsUsed(
   const { error } = await supabase.rpc('mark_word_bank_used', {
     p_word: word.toUpperCase(), p_language: language,
   });
-  if (error) console.error('Error marking word as used:', error);
+  if (error) logger.error('WORD_BANK', 'Error marking word as used:', error);
 }
 
 /**
@@ -214,7 +217,7 @@ export async function getWordBankStats(
     .eq('language', language);
 
   if (error) {
-    console.error('Error fetching word bank stats:', error);
+    logger.error('WORD_BANK', 'Error fetching word bank stats:', error);
     return { total: 0, active: 0, blocked: 0, bySource: {}, pending: 0, approved: 0, rejected: 0 };
   }
 
@@ -272,7 +275,7 @@ export async function getWordBankWords(
   if (options.offset) query = query.range(options.offset, options.offset + (options.limit || 50) - 1);
 
   const { data, error, count } = await query;
-  if (error) { console.error('Error fetching word bank words:', error); return { words: [], total: 0 }; }
+  if (error) { logger.error('WORD_BANK', 'Error fetching word bank words:', error); return { words: [], total: 0 }; }
   return { words: data || [], total: count || 0 };
 }
 
@@ -287,7 +290,7 @@ export async function deleteWordFromBank(
     .delete()
     .eq('word', word.toUpperCase())
     .eq('language', language);
-  if (error) { console.error('Error deleting word:', error); return false; }
+  if (error) { logger.error('WORD_BANK', 'Error deleting word:', error); return false; }
   return true;
 }
 
@@ -305,7 +308,7 @@ export async function updateValidationStatus(
       .single();
 
     if (fetchError || !wordData) {
-      console.error('Error fetching word for approval:', fetchError);
+      logger.error('WORD_BANK', 'Error fetching word for approval:', fetchError);
       return false;
     }
 
@@ -314,7 +317,7 @@ export async function updateValidationStatus(
       .update({ validation_status: validationStatus })
       .eq('id', wordId);
 
-    if (updateError) { console.error('Error updating validation status:', updateError); return false; }
+    if (updateError) { logger.error('WORD_BANK', 'Error updating validation status:', updateError); return false; }
     await addToCommunityWords(supabase, wordData.word, wordData.language);
     return true;
   }
@@ -324,7 +327,7 @@ export async function updateValidationStatus(
     .update({ validation_status: validationStatus })
     .eq('id', wordId);
 
-  if (error) { console.error('Error updating validation status:', error); return false; }
+  if (error) { logger.error('WORD_BANK', 'Error updating validation status:', error); return false; }
   return true;
 }
 
@@ -346,7 +349,7 @@ export async function getPendingWords(
     .order('interestingness_score', { ascending: false, nullsFirst: false })
     .limit(limit);
 
-  if (error) { console.error('Error fetching pending words:', error); return []; }
+  if (error) { logger.error('WORD_BANK', 'Error fetching pending words:', error); return []; }
   return data || [];
 }
 

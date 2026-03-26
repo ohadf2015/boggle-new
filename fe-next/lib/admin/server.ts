@@ -7,6 +7,8 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
+const logger = require('@/backend/utils/logger');
+
 /**
  * Create Supabase admin client with service role key
  * Used for admin operations that bypass RLS
@@ -18,7 +20,7 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('[Admin] Missing Supabase environment variables');
+    logger.error('ADMIN', 'Missing Supabase environment variables');
     return null;
   }
 

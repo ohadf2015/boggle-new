@@ -14,6 +14,16 @@ import type { GameDataInput, GameStateData } from './types';
 
 const logger = require('../utils/logger');
 
+/** Safely parse JSON with a fallback — prevents a single corrupted field from crashing the entire game state */
+function safeJsonParse<T>(value: string | undefined, fallback: T, fieldName: string, gameCode?: string): T {
+  try {
+    return JSON.parse(value || JSON.stringify(fallback));
+  } catch (err) {
+    logger.warn('REDIS', `Corrupted JSON in field "${fieldName}" for game ${gameCode || 'unknown'}, using fallback`);
+    return fallback;
+  }
+}
+
 export async function saveGameState(gameCode: string, gameData: GameDataInput): Promise<void> {
   if (!isRedisAvailable() || !getRedisClient()) {
     return;
@@ -81,16 +91,16 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
 
     return {
       roomName: data.roomName,
-      users: JSON.parse(data.users || '[]'),
-      playerScores: JSON.parse(data.playerScores || '{}'),
-      playerWords: JSON.parse(data.playerWords || '{}'),
-      playerAchievements: JSON.parse(data.playerAchievements || '{}'),
-      playerWordDetails: JSON.parse(data.playerWordDetails || '{}'),
-      firstWordFound: JSON.parse(data.firstWordFound || '{}'),
+      users: safeJsonParse<string[]>(data.users, [], 'users', gameCode),
+      playerScores: safeJsonParse<Record<string, number>>(data.playerScores, {}, 'playerScores', gameCode),
+      playerWords: safeJsonParse<Record<string, string[]>>(data.playerWords, {}, 'playerWords', gameCode),
+      playerAchievements: safeJsonParse<Record<string, string[]>>(data.playerAchievements, {}, 'playerAchievements', gameCode),
+      playerWordDetails: safeJsonParse<Record<string, unknown[]>>(data.playerWordDetails, {}, 'playerWordDetails', gameCode),
+      firstWordFound: safeJsonParse<Record<string, boolean>>(data.firstWordFound, {}, 'firstWordFound', gameCode),
       gameState: data.gameState,
       startTime: data.startTime,
       endTime: data.endTime,
-      letterGrid: JSON.parse(data.letterGrid || '[]'),
+      letterGrid: safeJsonParse<string[][]>(data.letterGrid, [], 'letterGrid', gameCode),
       timerSeconds: parseInt(data.timerSeconds) || 60,
       language: data.language,
       tournamentId: data.tournamentId || null,
