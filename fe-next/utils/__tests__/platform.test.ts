@@ -7,10 +7,10 @@ import { isNative, isIOS, isAndroid, isWeb, getPlatform } from '../platform';
 import { Capacitor } from '@capacitor/core';
 
 // Mock Capacitor
-jest.mock('@capacitor/core', () => ({
+vi.mock('@capacitor/core', () => ({
   Capacitor: {
-    isNativePlatform: jest.fn(),
-    getPlatform: jest.fn(),
+    isNativePlatform: vi.fn(),
+    getPlatform: vi.fn(),
   },
 }));
 

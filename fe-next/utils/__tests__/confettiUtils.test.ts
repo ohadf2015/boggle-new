@@ -81,18 +81,18 @@ describe('confettiUtils', () => {
   });
 
   describe('fireLayeredCelebration function', () => {
-    it('should be exported and callable', () => {
+    it('should be exported and callable', async () => {
       // GIVEN
-      const { fireLayeredCelebration } = require('../confettiUtils');
+      const { fireLayeredCelebration } = await import('../confettiUtils');
 
       // THEN
       expect(fireLayeredCelebration).toBeDefined();
       expect(typeof fireLayeredCelebration).toBe('function');
     });
 
-    it('should accept totalBudget parameter', () => {
+    it('should accept totalBudget parameter', async () => {
       // GIVEN
-      const { fireLayeredCelebration } = require('../confettiUtils');
+      const { fireLayeredCelebration } = await import('../confettiUtils');
 
       // WHEN/THEN - Should not throw
       expect(() => fireLayeredCelebration(100, { combo: 100 })).not.toThrow();

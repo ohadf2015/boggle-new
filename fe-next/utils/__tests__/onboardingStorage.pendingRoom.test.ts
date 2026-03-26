@@ -5,8 +5,14 @@ import {
 } from '../onboardingStorage';
 
 describe('pending room invite helpers', () => {
+  // Use a real sessionStorage-like implementation for these tests
+  let store: Record<string, string> = {};
   beforeEach(() => {
-    sessionStorage.clear();
+    store = {};
+    (sessionStorage.getItem as ReturnType<typeof vi.fn>).mockImplementation((key: string) => store[key] ?? null);
+    (sessionStorage.setItem as ReturnType<typeof vi.fn>).mockImplementation((key: string, value: string) => { store[key] = value; });
+    (sessionStorage.removeItem as ReturnType<typeof vi.fn>).mockImplementation((key: string) => { delete store[key]; });
+    (sessionStorage.clear as ReturnType<typeof vi.fn>).mockImplementation(() => { store = {}; });
   });
 
   it('returns null when no pending invite exists', () => {

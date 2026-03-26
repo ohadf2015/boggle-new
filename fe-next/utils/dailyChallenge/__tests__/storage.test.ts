@@ -11,21 +11,21 @@ import type { WordHuntResult } from '../types';
 import type { Language } from '@/types';
 
 // Mock the storage helpers
-jest.mock('@/utils/storageHelpers', () => ({
-  getJsonFromLocalStorage: jest.fn(),
-  saveJsonToLocalStorage: jest.fn(),
-  removeFromLocalStorage: jest.fn(),
-  getFromLocalStorage: jest.fn(),
+vi.mock('@/utils/storageHelpers', () => ({
+  getJsonFromLocalStorage: vi.fn(),
+  saveJsonToLocalStorage: vi.fn(),
+  removeFromLocalStorage: vi.fn(),
+  getFromLocalStorage: vi.fn(),
 }));
 
 // Mock date utilities to return a consistent date
-jest.mock('../dateUtils', () => ({
-  getDailyChallengeDate: jest.fn(() => '2025-01-20'),
+vi.mock('../dateUtils', () => ({
+  getDailyChallengeDate: vi.fn(() => '2025-01-20'),
 }));
 
 // Mock streak utilities
-jest.mock('../streaks', () => ({
-  updateDailyStreak: jest.fn(() => ({
+vi.mock('../streaks', () => ({
+  updateDailyStreak: vi.fn(() => ({
     currentStreak: 1,
     longestStreak: 1,
     lastPlayedDate: '2025-01-20',
@@ -33,7 +33,8 @@ jest.mock('../streaks', () => ({
   })),
 }));
 
-const { getJsonFromLocalStorage, saveJsonToLocalStorage } = jest.requireMock('@/utils/storageHelpers');
+import { getJsonFromLocalStorage, saveJsonToLocalStorage } from '@/utils/storageHelpers';
+// vi.mock hoists above, so these are already mocked vi.fn() instances
 
 describe('getWordHuntStatusToday', () => {
   beforeEach(() => {

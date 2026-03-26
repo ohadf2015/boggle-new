@@ -7,37 +7,37 @@
 import { performMobileOAuth, closeMobileOAuthBrowser } from '../mobileOAuth';
 
 // Mock dependencies
-jest.mock('@capacitor/browser', () => ({
+vi.mock('@capacitor/browser', () => ({
   Browser: {
-    open: jest.fn().mockResolvedValue(undefined),
-    close: jest.fn().mockResolvedValue(undefined),
+    open: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
-jest.mock('@capacitor/app', () => ({
+vi.mock('@capacitor/app', () => ({
   App: {
-    addListener: jest.fn().mockResolvedValue({ remove: jest.fn() }),
+    addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
   },
 }));
 
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
-      signInWithOAuth: jest.fn(),
+      signInWithOAuth: vi.fn(),
     },
   },
 }));
 
-jest.mock('@/utils/platform', () => ({
-  isNative: jest.fn(),
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(),
 }));
 
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    log: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 

@@ -41,10 +41,10 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock date utilities
-jest.mock('../dateUtils', () => ({
-  getDailyChallengeDate: jest.fn(() => '2026-01-31'),
-  getYesterdayDate: jest.fn(() => '2026-01-30'),
-  getPreviousDate: jest.fn((date: string) => {
+vi.mock('../dateUtils', () => ({
+  getDailyChallengeDate: vi.fn(() => '2026-01-31'),
+  getYesterdayDate: vi.fn(() => '2026-01-30'),
+  getPreviousDate: vi.fn((date: string) => {
     const d = new Date(date);
     d.setDate(d.getDate() - 1);
     return d.toISOString().split('T')[0];

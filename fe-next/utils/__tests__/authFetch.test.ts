@@ -33,24 +33,24 @@ class MockResponse {
 global.Response = MockResponse as any;
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock the supabase module with factory function
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
-      getSession: jest.fn(),
-      refreshSession: jest.fn(),
+      getSession: vi.fn(),
+      refreshSession: vi.fn(),
     },
   },
 }));
 
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 

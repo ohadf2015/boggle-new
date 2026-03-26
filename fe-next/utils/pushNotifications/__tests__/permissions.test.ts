@@ -11,15 +11,15 @@ import {
 import type { PermissionResult } from '../types';
 
 // Mock the platform utility
-jest.mock('../../platform', () => ({
-  isNative: jest.fn(),
+vi.mock('../../platform', () => ({
+  isNative: vi.fn(),
 }));
 
 // Mock Capacitor LocalNotifications
-jest.mock('@capacitor/local-notifications', () => ({
+vi.mock('@capacitor/local-notifications', () => ({
   LocalNotifications: {
-    checkPermissions: jest.fn(),
-    requestPermissions: jest.fn(),
+    checkPermissions: vi.fn(),
+    requestPermissions: vi.fn(),
   },
 }));
 

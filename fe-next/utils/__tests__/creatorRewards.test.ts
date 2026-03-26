@@ -17,8 +17,8 @@ import {
 import * as coinManager from '../coinManager';
 
 // Mock coinManager
-jest.mock('../coinManager', () => ({
-  addCoins: jest.fn().mockReturnValue(100),
+vi.mock('../coinManager', () => ({
+  addCoins: vi.fn().mockReturnValue(100),
 }));
 
 // Mock localStorage

@@ -11,7 +11,7 @@ describe('invalidWordTracker', () => {
   let recordNotOnBoard: typeof import('../invalidWordTracker').recordNotOnBoard;
   let recordNotInDictionary: typeof import('../invalidWordTracker').recordNotInDictionary;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create fresh mock for each test
     mockFetch = jest.fn(() =>
       Promise.resolve({
@@ -22,8 +22,8 @@ describe('invalidWordTracker', () => {
     global.fetch = mockFetch as unknown as typeof fetch;
 
     // Re-import module to get fresh state (clear deduplication cache)
-    jest.resetModules();
-    const tracker = require('../invalidWordTracker');
+    vi.resetModules();
+    const tracker = await import('../invalidWordTracker');
     recordInvalidWord = tracker.recordInvalidWord;
     recordNotOnBoard = tracker.recordNotOnBoard;
     recordNotInDictionary = tracker.recordNotInDictionary;

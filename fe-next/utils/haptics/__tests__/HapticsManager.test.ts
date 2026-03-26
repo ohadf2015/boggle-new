@@ -9,11 +9,17 @@ import { NativeHaptics } from '../nativeHaptics';
 import { WebHaptics } from '../webHaptics';
 
 // Mock platform utilities
-jest.mock('../../platform');
+vi.mock('../../platform', () => ({
+  isNative: vi.fn(),
+}));
 
 // Mock implementations
-jest.mock('../nativeHaptics');
-jest.mock('../webHaptics');
+vi.mock('../nativeHaptics', () => ({
+  NativeHaptics: vi.fn(),
+}));
+vi.mock('../webHaptics', () => ({
+  WebHaptics: vi.fn(),
+}));
 
 describe('HapticsManager', () => {
   beforeEach(() => {
@@ -44,7 +50,7 @@ describe('HapticsManager', () => {
     it('should delegate to implementation', () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockIsSupported = jest.fn().mockReturnValue(true);
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: mockIsSupported,
       }));
 
@@ -58,7 +64,7 @@ describe('HapticsManager', () => {
     it('should return false when implementation not supported', () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockIsSupported = jest.fn().mockReturnValue(false);
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: mockIsSupported,
       }));
 
@@ -73,7 +79,7 @@ describe('HapticsManager', () => {
     it('should delegate to implementation when supported', async () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -87,7 +93,7 @@ describe('HapticsManager', () => {
     it('should not trigger when unsupported', async () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => false,
         trigger: mockTrigger,
       }));
@@ -103,7 +109,7 @@ describe('HapticsManager', () => {
     it('should delegate to implementation when supported', async () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockTriggerCustom = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         triggerCustom: mockTriggerCustom,
       }));
@@ -118,7 +124,7 @@ describe('HapticsManager', () => {
     it('should not trigger when unsupported', async () => {
       (platform.isNative as jest.Mock).mockReturnValue(false);
       const mockTriggerCustom = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => false,
         triggerCustom: mockTriggerCustom,
       }));
@@ -138,7 +144,7 @@ describe('HapticsManager', () => {
 
     it('tap() should trigger TAP pattern', async () => {
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -151,7 +157,7 @@ describe('HapticsManager', () => {
 
     it('success() should trigger SUCCESS pattern', async () => {
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -164,7 +170,7 @@ describe('HapticsManager', () => {
 
     it('error() should trigger ERROR pattern', async () => {
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -177,7 +183,7 @@ describe('HapticsManager', () => {
 
     it('warning() should trigger WARNING pattern', async () => {
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -190,7 +196,7 @@ describe('HapticsManager', () => {
 
     it('selection() should trigger SELECTION pattern', async () => {
       const mockTrigger = jest.fn();
-      (WebHaptics as jest.Mock).mockImplementation(() => ({
+      (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
       }));
@@ -203,8 +209,8 @@ describe('HapticsManager', () => {
   });
 
   describe('Singleton Instance', () => {
-    it('should export a singleton instance', () => {
-      const { haptics } = require('../HapticsManager');
+    it('should export a singleton instance', async () => {
+      const { haptics } = await import('../HapticsManager');
 
       expect(haptics).toBeDefined();
       expect(haptics).toBeInstanceOf(HapticsManager);

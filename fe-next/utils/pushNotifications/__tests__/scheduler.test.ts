@@ -13,22 +13,22 @@ import {
 import { NOTIFICATION_IDS, NOTIFICATION_MESSAGES } from '../types';
 
 // Mock the platform utility
-jest.mock('../../platform', () => ({
-  isNative: jest.fn(),
+vi.mock('../../platform', () => ({
+  isNative: vi.fn(),
 }));
 
 // Mock Capacitor LocalNotifications
-jest.mock('@capacitor/local-notifications', () => ({
+vi.mock('@capacitor/local-notifications', () => ({
   LocalNotifications: {
-    schedule: jest.fn(),
-    cancel: jest.fn(),
-    getPending: jest.fn(),
+    schedule: vi.fn(),
+    cancel: vi.fn(),
+    getPending: vi.fn(),
   },
 }));
 
 // Mock permissions
-jest.mock('../permissions', () => ({
-  canScheduleNotifications: jest.fn(),
+vi.mock('../permissions', () => ({
+  canScheduleNotifications: vi.fn(),
 }));
 
 import { isNative } from '../../platform';

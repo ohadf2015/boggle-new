@@ -17,40 +17,40 @@ import * as platform from '../platform';
 import { supabase } from '@/lib/supabase';
 
 // Mock platform utils
-jest.mock('../platform', () => ({
-  isNative: jest.fn(),
-  isIOS: jest.fn(),
-  isAndroid: jest.fn()
+vi.mock('../platform', () => ({
+  isNative: vi.fn(),
+  isIOS: vi.fn(),
+  isAndroid: vi.fn()
 }));
 
 // Mock Supabase client
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
-      signInWithIdToken: jest.fn(),
-      updateUser: jest.fn()
+      signInWithIdToken: vi.fn(),
+      updateUser: vi.fn()
     }
   }
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn()
+    log: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn()
   }
 }));
 
-// Mock the Social Login plugin
-const mockSocialLogin = {
-  initialize: jest.fn(),
-  login: jest.fn(),
-  logout: jest.fn()
-};
+// Mock the Social Login plugin - use vi.hoisted to make it available in vi.mock factory
+const mockSocialLogin = vi.hoisted(() => ({
+  initialize: vi.fn(),
+  login: vi.fn(),
+  logout: vi.fn()
+}));
 
-jest.mock('@capgo/capacitor-social-login', () => ({
+vi.mock('@capgo/capacitor-social-login', () => ({
   SocialLogin: mockSocialLogin
 }));
 
