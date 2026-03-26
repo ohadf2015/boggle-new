@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import {
@@ -154,26 +154,24 @@ export function useSpacedRepetition(
     },
   });
 
-  const recordReview = useCallback(
-    (word: string, quality: 0 | 1 | 2 | 3 | 4 | 5) => {
-      setReviewSchedule(prev => {
-        const current = prev[word];
-        if (!current) return prev;
+  // No manual useCallback — React Compiler auto-memoizes this
+  const recordReview = (word: string, quality: 0 | 1 | 2 | 3 | 4 | 5) => {
+    setReviewSchedule(prev => {
+      const current = prev[word];
+      if (!current) return prev;
 
-        const updated = calculateNextReview(current, { quality });
-        const newSchedule = { ...prev, [word]: updated };
+      const updated = calculateNextReview(current, { quality });
+      const newSchedule = { ...prev, [word]: updated };
 
-        saveSchedule(lessonId, newSchedule);
-        setWordsForToday(computeWordsForToday(newSchedule));
+      saveSchedule(lessonId, newSchedule);
+      setWordsForToday(computeWordsForToday(newSchedule));
 
-        // Sync to DB in background
-        syncReviewMutation.mutate({ lessonId, word, quality });
+      // Sync to DB in background
+      syncReviewMutation.mutate({ lessonId, word, quality });
 
-        return newSchedule;
-      });
-    },
-    [lessonId, syncReviewMutation]
-  );
+      return newSchedule;
+    });
+  };
 
   return {
     reviewSchedule,
