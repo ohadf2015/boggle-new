@@ -230,6 +230,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return;
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on user.id, not the full user object
   }, [user?.id]);
 
   // Stable ref for fetchProgression — used inside completeLevel to avoid
