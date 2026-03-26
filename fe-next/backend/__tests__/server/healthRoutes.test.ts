@@ -25,6 +25,9 @@ jest.mock('@supabase/supabase-js', () => ({
 jest.mock('../../redisClient', () => ({
   isRedisAvailable: jest.fn(() => true),
   getRedisMetrics: jest.fn().mockResolvedValue({ connected: true }),
+  getRedisClient: jest.fn(() => ({
+    ping: jest.fn().mockResolvedValue('PONG'),
+  })),
 }));
 
 jest.mock('../../modules/gameStateManager', () => ({
@@ -37,8 +40,9 @@ jest.mock('../../utils/metrics', () => ({
   resetAll: jest.fn(),
 }));
 
-// Mock dictionary module — no isLoaded export
-jest.mock('../../dictionary', () => ({}));
+jest.mock('../../dictionary', () => ({
+  getMemoryStats: jest.fn(() => [{ language: 'en', wordCount: 100, estimatedBytes: 1024 }]),
+}));
 
 function createApp() {
   const app = express();
@@ -104,13 +108,11 @@ describe('Health Routes', () => {
     });
 
     it('returns degraded when Redis fails', async () => {
-      const IoRedis = require('ioredis');
-      IoRedis.mockImplementationOnce(() => ({
+      const { getRedisClient } = require('../../redisClient');
+      (getRedisClient as jest.Mock).mockReturnValueOnce({
         ping: jest.fn().mockRejectedValue(new Error('Connection refused')),
-        quit: jest.fn().mockResolvedValue('OK'),
-      }));
+      });
 
-      app = createApp();
       const res = await request(app).get('/health/ready');
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('degraded');
