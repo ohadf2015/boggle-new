@@ -25,6 +25,7 @@ vi.mock('@/hooks/useWordOfTheDay', () => ({
 }));
 
 import { WotdTeaser } from '../WotdTeaser';
+import * as LanguageContext from '@/contexts/LanguageContext';
 
 describe('WotdTeaser', () => {
   beforeEach(() => {
@@ -106,7 +107,7 @@ describe('WotdTeaser', () => {
 
   it('should show last letter for RTL languages', () => {
     // Override useLanguage to return RTL
-    vi.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
+    vi.spyOn(LanguageContext, 'useLanguage').mockReturnValue({
       t: mockT, language: 'he', dir: 'rtl',
     });
     mockUseWordOfTheDay.mockReturnValue({

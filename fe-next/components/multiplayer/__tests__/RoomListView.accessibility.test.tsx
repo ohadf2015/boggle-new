@@ -50,11 +50,11 @@ vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
 }));
 
 vi.mock('@/components/LandscapeIndicator', () => ({ default: () => null }));
-vi.mock('@/components/HowToPlay', () => {
-  return function HowToPlayMock({ onClose }: { onClose: () => void }) {
+vi.mock('@/components/HowToPlay', () => ({
+  default: function HowToPlayMock({ onClose }: { onClose: () => void }) {
     return <button onClick={onClose}>Close HowToPlay</button>;
-  };
-});
+  },
+}));
 vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <span>Loading...</span>,
 }));

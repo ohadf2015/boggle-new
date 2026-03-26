@@ -15,8 +15,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
 let mockEfficiencyScore = 95;
 
 // Mock DailyWordHuntSurvival component
-vi.mock('@/components/daily/DailyWordHuntSurvival', () => {
-  return { default: function MockDailyWordHuntSurvival({ onComplete }: { onComplete: (result: any) => void }) {
+vi.mock('@/components/daily/DailyWordHuntSurvival', () => ({
+  default: function MockDailyWordHuntSurvival({ onComplete }: { onComplete: (result: any) => void }) {
     return (
       <div data-testid="game-component">
         <button onClick={() => onComplete({
@@ -28,8 +28,8 @@ vi.mock('@/components/daily/DailyWordHuntSurvival', () => {
         })}>Complete Game</button>
       </div>
     );
-  }
-});
+  },
+}));
 
 describe('CustomPuzzleCreator - Grid Size', () => {
   const mockOnClose = vi.fn();

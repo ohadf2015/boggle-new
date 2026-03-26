@@ -9,6 +9,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import fs from 'fs';
 import path from 'path';
+import { WordHuntPlayerLives } from '../WordHuntPlayerLives';
 
 describe('WordHuntPlayerLives rendering in PortraitLayout', () => {
   const portraitSource = fs.readFileSync(
@@ -33,7 +34,7 @@ describe('WordHuntPlayerLives component', () => {
   // Also verify the component itself renders correctly
   it('should render player life bars for other players', () => {
     // Import the component
-    const { WordHuntPlayerLives } = require('../WordHuntPlayerLives');
+    
 
     render(
       <WordHuntPlayerLives
@@ -51,7 +52,7 @@ describe('WordHuntPlayerLives component', () => {
   });
 
   it('should show eliminated players with strikethrough', () => {
-    const { WordHuntPlayerLives } = require('../WordHuntPlayerLives');
+    
 
     render(
       <WordHuntPlayerLives

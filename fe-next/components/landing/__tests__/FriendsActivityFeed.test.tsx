@@ -5,6 +5,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import * as AuthContext from '@/contexts/AuthContext';
 
 // Mock hooks
 const mockUseFriendsActivity = vi.fn();
@@ -117,7 +118,7 @@ describe('FriendsActivityFeed', () => {
   // WHEN component renders
   // THEN returns null
   it('should return null for unauthenticated users', () => {
-    vi.spyOn(require('@/contexts/AuthContext'), 'useAuth').mockReturnValue({
+    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
       isAuthenticated: false,
       user: null,
     });

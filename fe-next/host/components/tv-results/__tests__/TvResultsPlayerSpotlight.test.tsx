@@ -33,8 +33,8 @@ function filterDomProps(props: Record<string, unknown>) {
 vi.mock('../../../../components/Avatar', () => ({
   default: function MockAvatar({ className }: { className?: string }) {
     return <div data-testid="avatar" className={className} />;
-  };
-});
+  },
+}));
 
 // Mock the engine
 vi.mock('../playerSpotlightEngine', () => ({

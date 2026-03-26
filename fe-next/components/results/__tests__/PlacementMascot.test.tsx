@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import PlacementMascot from '../PlacementMascot';
 
 // Mock framer-motion — passthrough all SVG/HTML elements
 vi.mock('framer-motion', () => {
@@ -33,8 +34,6 @@ vi.mock('@/hooks/useReducedMotion', () => ({
 }));
 
 describe('PlacementMascot', () => {
-   
-  const PlacementMascot = require('../PlacementMascot').default;
 
   it('renders the mascot container', () => {
     render(<PlacementMascot rank={1} />);

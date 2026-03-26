@@ -37,7 +37,7 @@ vi.mock('next/image', () => {
   const React = require('react');
   return { default: function MockImage({ src, alt, ...props }: { src: string; alt: string }) {
     return React.createElement('img', { src, alt, ...props });
-  }
+  } };
 });
 
 describe('InteractiveMascot', () => {

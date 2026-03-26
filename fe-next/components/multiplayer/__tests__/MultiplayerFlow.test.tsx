@@ -15,6 +15,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MultiplayerFlow from '../MultiplayerFlow';
 import type { ActiveRoom, Language } from '@/shared/types/game';
+import { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 
 // Mock dependencies
 vi.mock('@/utils/profileStorage', () => ({
@@ -235,8 +236,8 @@ describe('MultiplayerFlow', () => {
     });
 
     it('should open join modal when room is clicked and no profile', async () => {
-      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
 
       render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
@@ -248,8 +249,8 @@ describe('MultiplayerFlow', () => {
     });
 
     it('should close join modal when close button clicked', async () => {
-      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
 
       render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
@@ -369,10 +370,10 @@ describe('MultiplayerFlow', () => {
 
   describe('Prefilled Room Code', () => {
     it('should auto-join with prefilled room code when profile exists', async () => {
-      const { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(true);
-      (getStoredUsername as vi.Mock).mockReturnValue('StoredPlayer');
-      (getStoredAvatarId as vi.Mock).mockReturnValue('stored-avatar');
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(true);
+      (getStoredUsername as Mock).mockReturnValue('StoredPlayer');
+      (getStoredAvatarId as Mock).mockReturnValue('stored-avatar');
 
       render(<MultiplayerFlow {...defaultProps} prefilledRoom="INVITE1" />);
 
@@ -383,8 +384,8 @@ describe('MultiplayerFlow', () => {
     });
 
     it('should show join modal with prefilled room when no profile', async () => {
-      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
 
       render(
         <MultiplayerFlow

@@ -59,6 +59,8 @@ vi.mock('framer-motion', () => {
 
 import WordHuntAnnouncementBanner from '../WordHuntAnnouncementBanner';
 import { clearSessionPreservingUsername } from '@/utils/session';
+import * as useWordHuntPromoModule from '@/hooks/useWordHuntPromo';
+import * as useDevicePerformanceModule from '@/hooks/useDevicePerformance';
 
 describe('WordHuntAnnouncementBanner', () => {
   beforeEach(() => {
@@ -90,7 +92,7 @@ describe('WordHuntAnnouncementBanner', () => {
   });
 
   it('returns null when impression limit reached', () => {
-    vi.spyOn(require('@/hooks/useWordHuntPromo'), 'useWordHuntPromo').mockReturnValue({
+    vi.spyOn(useWordHuntPromoModule, 'useWordHuntPromo').mockReturnValue({
       canShow: false,
       recordImpression: vi.fn(),
     });
@@ -101,7 +103,7 @@ describe('WordHuntAnnouncementBanner', () => {
 
   it('respects reduced motion preferences', () => {
     // Override to prefer reduced motion
-    vi.spyOn(require('@/hooks/useDevicePerformance'), 'useDevicePerformance').mockReturnValue({
+    vi.spyOn(useDevicePerformanceModule, 'useDevicePerformance').mockReturnValue({
       enableComplexAnimations: false,
       prefersReducedMotion: true,
     });

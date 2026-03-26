@@ -22,14 +22,14 @@ vi.mock('next/link', () => {
 vi.mock('@/components/auth/AuthButton', () => ({
   default: function MockAuthButton() {
         return <div data-testid="mock-auth-button">Auth Button</div>;
-    };
-});
+    },
+}));
 
 vi.mock('@/components/MusicControls', () => ({
   default: function MockMusicControls() {
         return <div data-testid="mock-music-controls">Music Controls</div>;
-    };
-});
+    },
+}));
 
 const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;

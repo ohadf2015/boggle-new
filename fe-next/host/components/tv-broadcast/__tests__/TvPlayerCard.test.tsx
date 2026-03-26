@@ -59,8 +59,8 @@ vi.mock('framer-motion', () => {
 vi.mock('../../../../components/Avatar', () => ({
   default: function MockAvatar({ className }: any) {
     return <div data-testid="avatar" className={className} />;
-  };
-});
+  },
+}));
 
 vi.mock('../../../../components/ui/AnimatedCounter', () => ({
   AnimatedCounter: ({ value, className }: any) => (

@@ -25,8 +25,8 @@ vi.mock('@/hooks/useDuelSocket', () => ({
   }),
 }));
 
-vi.mock('../DuelChallengeModal', () => {
-  return { default: function MockDuelChallengeModal({
+vi.mock('../DuelChallengeModal', () => ({
+  default: function MockDuelChallengeModal({
     opponent,
     onClose,
   }: {
@@ -39,8 +39,8 @@ vi.mock('../DuelChallengeModal', () => {
         <button onClick={onClose}>Close</button>
       </div>
     );
-  }
-});
+  },
+}));
 
 // ============================================
 // TESTS

@@ -41,6 +41,7 @@ vi.mock('@/components/avatar/AvatarRenderer', () => {
   const MockAvatarRenderer = ({ config, size }: { config: CustomAvatarConfig; size: number }) => {
     return <div data-testid="avatar-renderer" data-size={size} data-base={config.base} />;
   };
+  return { default: MockAvatarRenderer };
 });
 
 vi.mock('@/lib/utils', () => ({

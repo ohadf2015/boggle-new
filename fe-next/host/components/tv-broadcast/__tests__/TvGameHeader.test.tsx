@@ -49,8 +49,8 @@ vi.mock('framer-motion', () => ({
 vi.mock('../../../../components/CircularTimer', () => ({
   default: function MockCircularTimer() {
     return <div data-testid="circular-timer" />;
-  };
-});
+  },
+}));
 
 const mockT = (key: string) => key;
 

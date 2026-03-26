@@ -1,5 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import PlacementHero from '../PlacementHero';
+import { fireRankConfetti } from '@/utils/confettiUtils';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -55,8 +57,6 @@ vi.mock('../../Avatar', () => ({
 }));
 
 describe('PlacementHero — Clean Compact Layout', () => {
-
-  const PlacementHero = require('../PlacementHero').default;
 
   const defaultProps = {
     rank: 1,
@@ -122,7 +122,7 @@ describe('PlacementHero — Clean Compact Layout', () => {
   });
 
   it('fires confetti for top 3', () => {
-    const { fireRankConfetti } = require('@/utils/confettiUtils');
+    // fireRankConfetti imported at top
     vi.useFakeTimers();
     render(<PlacementHero {...defaultProps} rank={2} />);
     vi.advanceTimersByTime(600);

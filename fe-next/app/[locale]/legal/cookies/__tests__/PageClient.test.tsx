@@ -27,8 +27,8 @@ vi.mock('@/utils/ThemeContext', () => ({
 vi.mock('@/components/Header', () => ({
   default: function MockHeader() {
     return <header data-testid="header">Header</header>;
-  };
-});
+  },
+}));
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,

@@ -126,8 +126,8 @@ vi.mock('@/components/results/NextStepPrompt', () => {
 });
 
 // Mock DailyLeaderboard
-vi.mock('../DailyLeaderboard', () => {
-  return { default: function MockDailyLeaderboard({ onCurrentUserRankChange, onParticipantCountChange }: {
+vi.mock('../DailyLeaderboard', () => ({
+  default: function MockDailyLeaderboard({ onCurrentUserRankChange, onParticipantCountChange }: {
     onCurrentUserRankChange?: (rank: number | null) => void;
     onParticipantCountChange?: (count: number) => void;
   }) {
@@ -136,8 +136,8 @@ vi.mock('../DailyLeaderboard', () => {
       onParticipantCountChange?.(100);
     }, [onCurrentUserRankChange, onParticipantCountChange]);
     return <div data-testid="daily-leaderboard">Leaderboard</div>;
-  }
-});
+  },
+}));
 
 // Mock useAuth - will be overridden per test
 const mockUseAuth = vi.fn();

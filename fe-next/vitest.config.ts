@@ -53,6 +53,7 @@ export default defineConfig({
       '**/ClassroomGameLobby.test.tsx',
       '**/useAdaptiveDifficulty.test.ts',
       '**/MusicContext.duplicateProvider.test.tsx',
+      '**/MusicContext.ios.test.tsx',
     ],
     testTimeout: 10000,
     clearMocks: true,

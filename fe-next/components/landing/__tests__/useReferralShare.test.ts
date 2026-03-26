@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useReferralShare } from '../useReferralShare';
+import { trackShare } from '@/utils/growthTracking';
 
 // Mock auth context
 let mockIsAuthenticated = false;
@@ -162,7 +163,6 @@ describe('useReferralShare', () => {
 
     it('should call trackShare("copy")', async () => {
       // GIVEN
-      const { trackShare } = require('@/utils/growthTracking');
       mockIsAuthenticated = false;
       const { result } = renderHook(() => useReferralShare());
       await act(async () => { await result.current.fetchShareData(); });

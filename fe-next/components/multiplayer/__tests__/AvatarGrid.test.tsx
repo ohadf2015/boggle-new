@@ -129,6 +129,7 @@ vi.mock('@/components/avatar/AvatarRenderer', () => {
   const MockAvatarRenderer = () => {
     return <div data-testid="avatar-renderer" />;
   };
+  return { default: MockAvatarRenderer };
 });
 
 vi.mock('@/components/join/LanguageSelector', () => ({
