@@ -2,16 +2,17 @@
  * Tests for useLeagueRivals hook
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useLeagueRivals } from '../useLeagueRivals';
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('useLeagueRivals', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading state initially', () => {

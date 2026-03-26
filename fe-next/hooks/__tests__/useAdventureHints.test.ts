@@ -5,11 +5,12 @@
  * Following TDD: Write tests FIRST, then implement.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAdventureHints } from '../useAdventureHints';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Test grid (4x4)
@@ -32,8 +33,8 @@ const mockSolveResponse = {
 
 describe('useAdventureHints', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => mockSolveResponse,
@@ -41,7 +42,7 @@ describe('useAdventureHints', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Initialization', () => {
@@ -260,7 +261,7 @@ describe('useAdventureHints', () => {
   describe('Inactivity Detection', () => {
     it('should trigger auto-hint after inactivity period', async () => {
       // GIVEN
-      const onAutoHint = jest.fn();
+      const onAutoHint = vi.fn();
       const { result } = renderHook(() =>
         useAdventureHints({
           grid: testGrid,
@@ -278,7 +279,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Advance time by inactivity threshold
       act(() => {
-        jest.advanceTimersByTime(15000);
+        vi.advanceTimersByTime(15000);
       });
 
       // THEN
@@ -288,7 +289,7 @@ describe('useAdventureHints', () => {
 
     it('should reset inactivity timer when recordActivity is called', async () => {
       // GIVEN
-      const onAutoHint = jest.fn();
+      const onAutoHint = vi.fn();
       const { result } = renderHook(() =>
         useAdventureHints({
           grid: testGrid,
@@ -306,7 +307,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Wait 10 seconds, then record activity
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       act(() => {
@@ -315,7 +316,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Wait another 10 seconds (would be 20 total without reset)
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // THEN - Should NOT trigger auto-hint yet (only 10s since last activity)
@@ -324,7 +325,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Wait 5 more seconds (15s since last activity)
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       // THEN - Now should trigger
@@ -333,7 +334,7 @@ describe('useAdventureHints', () => {
 
     it('should not trigger auto-hint when game is paused', async () => {
       // GIVEN
-      const onAutoHint = jest.fn();
+      const onAutoHint = vi.fn();
       const { result, rerender } = renderHook(
         ({ isPlaying }) =>
           useAdventureHints({
@@ -356,7 +357,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Advance time past threshold
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
 
       // THEN - Should NOT trigger
@@ -365,7 +366,7 @@ describe('useAdventureHints', () => {
 
     it('should dismiss auto-hint when dismissAutoHint is called', async () => {
       // GIVEN
-      const onAutoHint = jest.fn();
+      const onAutoHint = vi.fn();
       const { result } = renderHook(() =>
         useAdventureHints({
           grid: testGrid,
@@ -383,7 +384,7 @@ describe('useAdventureHints', () => {
 
       // WHEN - Trigger auto-hint
       act(() => {
-        jest.advanceTimersByTime(15000);
+        vi.advanceTimersByTime(15000);
       });
 
       expect(result.current.showAutoHint).toBe(true);

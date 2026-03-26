@@ -6,6 +6,7 @@
  * tile locking, scramble, and visual feedback triggers.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBossEffectExecutor } from '../useBossEffectExecutor';
 import type { AbilityEffect } from '../../types/bossAbility';
@@ -13,13 +14,13 @@ import type { AbilityEffect } from '../../types/bossAbility';
 describe('useBossEffectExecutor', () => {
   // Mock callbacks for game state modifications
   const createMockCallbacks = () => ({
-    onPlayerDamage: jest.fn(),
-    onTimerPenalty: jest.fn(),
-    onLockTiles: jest.fn(),
-    onUnlockTiles: jest.fn(),
-    onScramble: jest.fn(),
-    onScreenShake: jest.fn(),
-    onDamageFlash: jest.fn(),
+    onPlayerDamage: vi.fn(),
+    onTimerPenalty: vi.fn(),
+    onLockTiles: vi.fn(),
+    onUnlockTiles: vi.fn(),
+    onScramble: vi.fn(),
+    onScreenShake: vi.fn(),
+    onDamageFlash: vi.fn(),
   });
 
   describe('Initialization', () => {
@@ -250,11 +251,11 @@ describe('useBossEffectExecutor', () => {
     it('should not call callbacks for missing handlers', () => {
       // GIVEN: Hook with partial callbacks (no onScramble)
       const callbacks = {
-        onPlayerDamage: jest.fn(),
-        onTimerPenalty: jest.fn(),
+        onPlayerDamage: vi.fn(),
+        onTimerPenalty: vi.fn(),
         // onScramble is missing
-        onScreenShake: jest.fn(),
-        onDamageFlash: jest.fn(),
+        onScreenShake: vi.fn(),
+        onDamageFlash: vi.fn(),
       };
       const { result } = renderHook(() => useBossEffectExecutor(callbacks));
 
@@ -326,11 +327,11 @@ describe('useBossEffectExecutor', () => {
 
   describe('Effect Expiration', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('should expire timed effects after duration', () => {
@@ -354,7 +355,7 @@ describe('useBossEffectExecutor', () => {
 
       // WHEN: Time passes
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // THEN: Effect expires and tiles are unlocked

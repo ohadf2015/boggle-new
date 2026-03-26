@@ -5,6 +5,7 @@
  * Following TDD: Write tests FIRST, then implement
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureWordValidation, clearWordValidationCache } from '../useAdventureWordValidation';
 
@@ -45,14 +46,14 @@ const invalidPath = [
 // ==============================================
 
 // Mock fetch for API validation
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock invalidWordTracker to prevent actual API calls
-jest.mock('@/utils/invalidWordTracker', () => ({
-  recordNotOnBoard: jest.fn(),
-  recordNotInDictionary: jest.fn(),
-  recordInvalidWord: jest.fn(),
+vi.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: vi.fn(),
+  recordNotInDictionary: vi.fn(),
+  recordInvalidWord: vi.fn(),
 }));
 
 // Valid words on the mockGrid that the solve-grid endpoint would return
@@ -89,7 +90,7 @@ function createDefaultFetchImpl() {
 
 describe('useAdventureWordValidation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReset();
     // Clear grid solution cache to ensure test isolation
     clearWordValidationCache();

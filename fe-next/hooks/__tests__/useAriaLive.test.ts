@@ -7,6 +7,7 @@
  * Following WCAG 2.0 AA / Israeli Standard 5568 requirements.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAriaLive } from '../useAriaLive';
 
@@ -14,11 +15,11 @@ describe('useAriaLive', () => {
   beforeEach(() => {
     // Clear any existing live regions from previous tests
     document.querySelectorAll('[data-aria-live-region]').forEach(el => el.remove());
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -80,7 +81,7 @@ describe('useAriaLive', () => {
       expect(document.querySelector('[data-aria-live-region]')).toHaveTextContent('First message');
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(document.querySelector('[data-aria-live-region]')).toHaveTextContent('');
@@ -96,7 +97,7 @@ describe('useAriaLive', () => {
       expect(document.querySelector('[data-aria-live-region]')).toHaveTextContent('First');
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.announce('Second');
       });
 
@@ -138,7 +139,7 @@ describe('useAriaLive', () => {
       // Should not throw or cause issues when timer fires after unmount
       expect(() => {
         act(() => {
-          jest.advanceTimersByTime(1000);
+          vi.advanceTimersByTime(1000);
         });
       }).not.toThrow();
     });

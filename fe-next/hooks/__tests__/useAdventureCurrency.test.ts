@@ -4,12 +4,13 @@
  * Tests currency state management, purchase validation, and persistence tracking.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock upgradeConfig before importing hook
-jest.mock('@/lib/adventure/upgradeConfig', () => ({
-  getUpgradeTier: jest.fn((state: Record<string, number>, id: string) => state[id] ?? 0),
-  getUpgradeEffect: jest.fn((state: Record<string, number>, id: string) => {
+vi.mock('@/lib/adventure/upgradeConfig', () => ({
+  getUpgradeTier: vi.fn((state: Record<string, number>, id: string) => state[id] ?? 0),
+  getUpgradeEffect: vi.fn((state: Record<string, number>, id: string) => {
     const tier = state[id] ?? 0;
     if (tier === 0) return 0;
     // Simulate config values for known upgrades
@@ -22,7 +23,7 @@ jest.mock('@/lib/adventure/upgradeConfig', () => ({
     if (!tiers || tier > tiers.length) return 0;
     return tiers[tier - 1];
   }),
-  purchaseUpgrade: jest.fn(
+  purchaseUpgrade: vi.fn(
     (state: Record<string, number>, id: string, gold: number) => {
       // Simulate costs for fuelTank: 50, 100, 200, 400
       const costs: Record<string, number[]> = {

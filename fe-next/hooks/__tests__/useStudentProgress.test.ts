@@ -4,40 +4,41 @@
  * Tests enhanced hook that combines assigned and started lessons
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudentProgress } from '../useStudentProgress';
 import * as teacherLib from '@/lib/supabase/education';
 import type { LessonAssignment, StudentLessonProgress } from '@/lib/supabase/education';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     user: { id: 'student-1' }
   })
 }));
 
-jest.mock('@/hooks/useMounted', () => ({
+vi.mock('@/hooks/useMounted', () => ({
   useMounted: () => ({ current: true })
 }));
 
-jest.mock('@/lib/supabase/education');
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/lib/supabase/education');
+vi.mock('@/utils/logger', () => ({
   default: {
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
-  warn: jest.fn(),
-  error: jest.fn(),
-  info: jest.fn(),
-  debug: jest.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  debug: vi.fn(),
 }));
 
 describe('useStudentProgress - Enhanced with Assignments', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Combining assigned and started lessons', () => {
@@ -87,12 +88,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: mockAssignments,
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: mockProgress,
         error: null
       });
@@ -134,12 +135,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: mockAssignments,
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: [],
         error: null
       });
@@ -178,12 +179,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: [],
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: mockProgress,
         error: null
       });
@@ -221,12 +222,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: [],
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: mockProgress,
         error: null
       });
@@ -303,12 +304,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: mockAssignments,
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: mockProgress,
         error: null
       });
@@ -371,12 +372,12 @@ describe('useStudentProgress - Enhanced with Assignments', () => {
         }
       ];
 
-      jest.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentAssignedLessons').mockResolvedValue({
         data: mockAssignments,
         error: null
       });
 
-      jest.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
+      vi.spyOn(teacherLib, 'getStudentProgress').mockResolvedValue({
         data: mockProgress,
         error: null
       });

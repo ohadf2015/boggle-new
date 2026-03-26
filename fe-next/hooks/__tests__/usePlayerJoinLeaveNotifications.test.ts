@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePlayerJoinLeaveNotifications } from '../usePlayerJoinLeaveNotifications';
 import { neoInfoToast, neoWarningToast } from '@/components/NeoToast';
 
-jest.mock('@/components/NeoToast', () => ({
-  neoInfoToast: jest.fn(),
-  neoWarningToast: jest.fn(),
+vi.mock('@/components/NeoToast', () => ({
+  neoInfoToast: vi.fn(),
+  neoWarningToast: vi.fn(),
 }));
 
 const mockT = (key: string, params?: Record<string, string | number>) => {
@@ -20,7 +21,7 @@ type Player = { username: string; score?: number; isBot?: boolean };
 
 describe('usePlayerJoinLeaveNotifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not show notifications on initial render', () => {

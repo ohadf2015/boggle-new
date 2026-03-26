@@ -1,12 +1,15 @@
 /**
  * useCrazyGamesPurchases hook tests
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-const mockGetXsollaUserToken = jest.fn();
-const mockTrackOrder = jest.fn();
-
-jest.mock('@/components/CrazyGamesSDK', () => ({
+const { mockGetXsollaUserToken, mockTrackOrder } = vi.hoisted(() => {
+  const mockGetXsollaUserToken = vi.fn();
+  const mockTrackOrder = vi.fn();
+  return { mockGetXsollaUserToken, mockTrackOrder };
+});
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
     getXsollaUserToken: mockGetXsollaUserToken,
@@ -18,7 +21,7 @@ import { useCrazyGamesPurchases } from '../useCrazyGamesPurchases';
 
 describe('useCrazyGamesPurchases', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('reports SDK as available', () => {

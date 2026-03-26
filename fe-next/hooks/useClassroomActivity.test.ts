@@ -1,25 +1,27 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useClassroomActivity } from './useClassroomActivity';
 import { createClient } from '@/utils/supabase/client';
 
 // Mock Supabase client
-jest.mock('@/utils/supabase/client', () => ({
-  createClient: jest.fn(),
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: vi.fn(),
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
-  error: jest.fn(),
+vi.mock('@/utils/logger', () => ({
+  default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
+  error: vi.fn(),
 }));
 
 describe('useClassroomActivity', () => {
   const mockSupabase = {
-    from: jest.fn(),
+    from: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (createClient as jest.Mock).mockReturnValue(mockSupabase);
+    vi.clearAllMocks();
+    (createClient as any).mockReturnValue(mockSupabase);
   });
 
   it('returns empty activities when classroomId is null', () => {
@@ -33,23 +35,23 @@ describe('useClassroomActivity', () => {
   it('returns loading=true initially, then false after fetch', async () => {
     // Mock empty results
     const mockDuelsQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({ data: [], error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
 
     const mockAchievementsQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({ data: [], error: null }),
-      in: jest.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({ data: [], error: null }),
+      in: vi.fn().mockReturnThis(),
     };
 
     const mockClassroomMembersQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     };
 
     mockSupabase.from.mockImplementation((table: string) => {
@@ -77,8 +79,8 @@ describe('useClassroomActivity', () => {
 
     // Mock classroom members
     const mockClassroomMembersQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({
         data: [{ student_id: 'student-1' }, { student_id: 'student-2' }],
         error: null,
       }),
@@ -87,12 +89,12 @@ describe('useClassroomActivity', () => {
     // Mock duels data (completed 1 hour ago)
     // Query chain: select -> eq -> eq -> order -> range
     const mockDuelsQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn(function(this: any) {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn(function(this: any) {
         return this;
       }),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: [
           {
             id: 'duel-1',
@@ -111,10 +113,10 @@ describe('useClassroomActivity', () => {
     // Mock achievements data (unlocked now and 2 hours ago)
     // Query chain: select -> in -> order -> range
     const mockAchievementsQuery = {
-      select: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: [
           {
             id: 'ach-1',
@@ -166,29 +168,29 @@ describe('useClassroomActivity', () => {
 
   it('handles fetch errors gracefully', async () => {
     const mockClassroomMembersQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({
         data: [],
         error: null,
       }),
     };
 
     const mockDuelsQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'Database error' },
       }),
     };
 
     const mockAchievementsQuery = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockReturnThis(),
-      in: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
+      in: vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'Database error' },
       }),

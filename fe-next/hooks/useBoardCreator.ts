@@ -214,9 +214,13 @@ export function useBoardCreator(): UseBoardCreatorReturn {
   const publishMutation = useMutation({
     mutationFn: async () => {
       if (!generatedBoard) throw new Error('No board to publish');
+      const { data: sessionData } = await getSession();
+      const accessToken = sessionData?.session?.access_token;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
       const res = await fetch('/api/ugc/boards/publish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           title,
           description,

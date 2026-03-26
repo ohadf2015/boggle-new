@@ -5,15 +5,16 @@
  * the 2-second countdown before boss attacks.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAttackTelegraph } from './useAttackTelegraph';
 
 // Use fake timers for controlled testing
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('useAttackTelegraph', () => {
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe('Initial State', () => {
@@ -105,7 +106,7 @@ describe('useAttackTelegraph', () => {
 
       // Advance 1 second (50% of 2s duration)
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.progress).toBeGreaterThan(0.4);
@@ -120,7 +121,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(result.current.progress).toBe(1);
@@ -136,7 +137,7 @@ describe('useAttackTelegraph', () => {
       expect(result.current.state.timeRemaining).toBe(2000);
 
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       expect(result.current.state.timeRemaining).toBeLessThanOrEqual(1550);
@@ -151,7 +152,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(result.current.state.timeRemaining).toBe(0);
@@ -167,14 +168,14 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(result.current.isActive).toBe(false);
     });
 
     it('should call onComplete callback', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() => useAttackTelegraph({ onComplete }));
 
       act(() => {
@@ -182,7 +183,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(onComplete).toHaveBeenCalledTimes(1);
@@ -197,7 +198,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(result.current.state.targetTiles).toEqual([]);
@@ -211,7 +212,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       expect(result.current.state.abilityId).toBeNull();
@@ -227,7 +228,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
         result.current.cancelTelegraph();
       });
 
@@ -236,7 +237,7 @@ describe('useAttackTelegraph', () => {
     });
 
     it('should not call onComplete when cancelled', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() => useAttackTelegraph({ onComplete }));
 
       act(() => {
@@ -244,9 +245,9 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
         result.current.cancelTelegraph();
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(onComplete).not.toHaveBeenCalled();
@@ -260,7 +261,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
         result.current.cancelTelegraph();
       });
 
@@ -272,7 +273,7 @@ describe('useAttackTelegraph', () => {
 
   describe('Custom Duration', () => {
     it('should respect custom duration', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() =>
         useAttackTelegraph({ duration: 1000, onComplete })
       );
@@ -283,13 +284,13 @@ describe('useAttackTelegraph', () => {
 
       // Should not complete at 900ms
       act(() => {
-        jest.advanceTimersByTime(900);
+        vi.advanceTimersByTime(900);
       });
       expect(onComplete).not.toHaveBeenCalled();
 
       // Should complete at 1100ms
       act(() => {
-        jest.advanceTimersByTime(200);
+        vi.advanceTimersByTime(200);
       });
       expect(onComplete).toHaveBeenCalled();
     });
@@ -309,7 +310,7 @@ describe('useAttackTelegraph', () => {
 
   describe('Restart Behavior', () => {
     it('should cancel previous telegraph when starting new one', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() => useAttackTelegraph({ onComplete }));
 
       act(() => {
@@ -317,7 +318,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.startTelegraph('attack-2', [1, 2]);
       });
 
@@ -325,7 +326,7 @@ describe('useAttackTelegraph', () => {
       expect(result.current.state.targetTiles).toEqual([1, 2]);
 
       act(() => {
-        jest.advanceTimersByTime(2100);
+        vi.advanceTimersByTime(2100);
       });
 
       // Only the second attack should complete
@@ -341,7 +342,7 @@ describe('useAttackTelegraph', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       expect(result.current.progress).toBeGreaterThan(0.5);
@@ -367,7 +368,7 @@ describe('useAttackTelegraph', () => {
 
       // Should not throw or cause issues
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
     });
   });

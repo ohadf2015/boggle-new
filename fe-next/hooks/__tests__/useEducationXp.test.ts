@@ -5,6 +5,7 @@
  * Following TDD RED-GREEN-REFACTOR cycle
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useEducationXp } from '../useEducationXp';
 
@@ -23,12 +24,12 @@ type PracticeSessionXp = {
 
 // Mock fetch — the hook now fires a fetch to /api/education/record-xp
 // Use a never-resolving promise so pendingUpdate stays set during tests
-global.fetch = jest.fn().mockImplementation(() => new Promise(() => {}));
+global.fetch = vi.fn().mockImplementation(() => new Promise(() => {}));
 
 // Mock the educationXpManager module
-jest.mock('@/backend/modules/educationXpManager', () => ({
-  calculatePracticeXp: jest.fn(),
-  getMasteryMessage: jest.fn(),
+vi.mock('@/backend/modules/educationXpManager', () => ({
+  calculatePracticeXp: vi.fn(),
+  getMasteryMessage: vi.fn(),
   EDUCATION_XP_CONFIG: {
     FLASHCARD_CORRECT: 10,
     FLASHCARD_ACCURACY_BONUS: { 90: 50, 80: 30, 70: 10 },
@@ -44,18 +45,18 @@ jest.mock('@/backend/modules/educationXpManager', () => ({
 }));
 
 // Mock the xpManager module
-jest.mock('@/backend/modules/xpManager', () => ({
-  getXpProgress: jest.fn(),
-  getLevelFromXp: jest.fn(),
-  checkLevelUp: jest.fn(),
+vi.mock('@/backend/modules/xpManager', () => ({
+  getXpProgress: vi.fn(),
+  getLevelFromXp: vi.fn(),
+  checkLevelUp: vi.fn(),
 }));
 
 // Mock the streaks module
-jest.mock('@/utils/dailyChallenge/streaks', () => ({
-  getDailyStreak: jest.fn(),
-  updateDailyStreak: jest.fn(),
-  getStreakMilestone: jest.fn(),
-  getStreakMilestoneMessage: jest.fn(),
+vi.mock('@/utils/dailyChallenge/streaks', () => ({
+  getDailyStreak: vi.fn(),
+  updateDailyStreak: vi.fn(),
+  getStreakMilestone: vi.fn(),
+  getStreakMilestoneMessage: vi.fn(),
 }));
 
 // Import mocked functions for assertions
@@ -75,15 +76,15 @@ import {
   getStreakMilestoneMessage,
 } from '@/utils/dailyChallenge/streaks';
 
-const mockCalculatePracticeXp = calculatePracticeXp as jest.MockedFunction<typeof calculatePracticeXp>;
-const mockGetMasteryMessage = getMasteryMessage as jest.MockedFunction<typeof getMasteryMessage>;
-const mockGetXpProgress = getXpProgress as jest.MockedFunction<typeof getXpProgress>;
-const mockGetLevelFromXp = getLevelFromXp as jest.MockedFunction<typeof getLevelFromXp>;
-const mockCheckLevelUp = checkLevelUp as jest.MockedFunction<typeof checkLevelUp>;
-const mockGetDailyStreak = getDailyStreak as jest.MockedFunction<typeof getDailyStreak>;
-const mockUpdateDailyStreak = updateDailyStreak as jest.MockedFunction<typeof updateDailyStreak>;
-const mockGetStreakMilestone = getStreakMilestone as jest.MockedFunction<typeof getStreakMilestone>;
-const mockGetStreakMilestoneMessage = getStreakMilestoneMessage as jest.MockedFunction<typeof getStreakMilestoneMessage>;
+const mockCalculatePracticeXp = calculatePracticeXp as any;
+const mockGetMasteryMessage = getMasteryMessage as any;
+const mockGetXpProgress = getXpProgress as any;
+const mockGetLevelFromXp = getLevelFromXp as any;
+const mockCheckLevelUp = checkLevelUp as any;
+const mockGetDailyStreak = getDailyStreak as any;
+const mockUpdateDailyStreak = updateDailyStreak as any;
+const mockGetStreakMilestone = getStreakMilestone as any;
+const mockGetStreakMilestoneMessage = getStreakMilestoneMessage as any;
 
 describe('useEducationXp', () => {
   const defaultStreak = {
@@ -105,7 +106,7 @@ describe('useEducationXp', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default mock implementations
     mockGetDailyStreak.mockReturnValue(defaultStreak);

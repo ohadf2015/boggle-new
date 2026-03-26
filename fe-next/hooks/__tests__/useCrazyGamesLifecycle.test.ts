@@ -1,16 +1,19 @@
 /**
  * @jest-environment jsdom
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCrazyGamesLifecycle } from '../useCrazyGamesLifecycle';
 
 // Mock the CrazyGames SDK
-const mockGameplayStart = jest.fn();
-const mockGameplayStop = jest.fn();
-const mockHappyTime = jest.fn();
-const mockShowMidgameAd = jest.fn();
-
-jest.mock('@/components/CrazyGamesSDK', () => ({
+const { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd } = vi.hoisted(() => {
+  const mockGameplayStart = vi.fn();
+  const mockGameplayStop = vi.fn();
+  const mockHappyTime = vi.fn();
+  const mockShowMidgameAd = vi.fn();
+  return { mockGameplayStart, mockGameplayStop, mockHappyTime, mockShowMidgameAd };
+});
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     gameplayStart: mockGameplayStart,
     gameplayStop: mockGameplayStop,
@@ -23,7 +26,7 @@ jest.mock('@/components/CrazyGamesSDK', () => ({
 
 describe('useCrazyGamesLifecycle', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('gameplay lifecycle', () => {
@@ -255,7 +258,7 @@ describe('useCrazyGamesLifecycle', () => {
 
   describe('callbacks', () => {
     it('should call onGameplayStart callback when game starts', () => {
-      const onGameplayStart = jest.fn();
+      const onGameplayStart = vi.fn();
 
       // GIVEN the hook with onGameplayStart callback
       const { rerender } = renderHook(
@@ -276,7 +279,7 @@ describe('useCrazyGamesLifecycle', () => {
     });
 
     it('should call onGameplayStop callback when game ends', () => {
-      const onGameplayStop = jest.fn();
+      const onGameplayStop = vi.fn();
 
       // GIVEN the hook with onGameplayStop callback
       const { rerender } = renderHook(
@@ -297,7 +300,7 @@ describe('useCrazyGamesLifecycle', () => {
     });
 
     it('should call onHappyTime callback when happyTime triggers', () => {
-      const onHappyTime = jest.fn();
+      const onHappyTime = vi.fn();
 
       // GIVEN the hook with onHappyTime callback
       const { rerender } = renderHook(
@@ -366,8 +369,8 @@ describe('useCrazyGamesLifecycle', () => {
 
   describe('midgame ads', () => {
     it('should call showMidgameAd with callbacks', () => {
-      const onAdStart = jest.fn();
-      const onAdEnd = jest.fn();
+      const onAdStart = vi.fn();
+      const onAdEnd = vi.fn();
 
       // GIVEN the hook is rendered with ad callbacks
       const { result } = renderHook(() =>

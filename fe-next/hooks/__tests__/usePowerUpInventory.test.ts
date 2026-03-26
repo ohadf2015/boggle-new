@@ -5,6 +5,7 @@
  * and level transition reset functionality.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePowerUpInventory } from '../usePowerUpInventory';
 
@@ -30,11 +31,11 @@ Object.defineProperty(window, 'localStorage', {
 describe('usePowerUpInventory', () => {
   beforeEach(() => {
     mockLocalStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Default State', () => {

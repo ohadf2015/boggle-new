@@ -8,11 +8,12 @@
  * Expected: Once dismissed, the modal should NOT auto-show in future sessions.
  */
 
+import { vi } from 'vitest';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(),
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
 describe('Gift Modal Dismissal Persistence Bug', () => {
@@ -25,16 +26,16 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
   };
 
   beforeEach(() => {
-    // Don't call jest.clearAllMocks() - it clears mock implementations too
+    // Don't call vi.clearAllMocks() - it clears mock implementations too
     // Just clear the specific mocks we need
-    (global.fetch as jest.Mock).mockReset();
+    (global.fetch as any).mockReset();
     localStorage.clear();
     sessionStorage.clear();
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       profile: mockProfile,
-      refreshProfile: jest.fn(),
+      refreshProfile: vi.fn(),
     });
   });
 
@@ -45,14 +46,14 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
       gift_modal_dismissed_at: '2026-01-18T10:00:00Z',
     };
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       profile: profileWithDismissedModal,
-      refreshProfile: jest.fn(),
+      refreshProfile: vi.fn(),
     });
 
     // Mock API response with unclaimed gifts
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         gifts: [
@@ -82,7 +83,7 @@ describe('Gift Modal Dismissal Persistence Bug', () => {
   it('should persist dismissal to database when user closes modal', async () => {
     // Mock API endpoint to mark modal as dismissed
     // Use mockImplementationOnce instead of mockResolvedValueOnce for more reliable behavior
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+    (global.fetch as any).mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () =>

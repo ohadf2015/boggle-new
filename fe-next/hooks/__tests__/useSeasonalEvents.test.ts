@@ -4,20 +4,23 @@
  * Tests event fetching, joining, and reward claiming.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // --- Mocks ---
 
 const mockUser = { id: 'test-user-id' };
-const mockUseAuth = jest.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-const mockFrom = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
   },
@@ -61,26 +64,26 @@ function setupFetchEvents(
   mockFrom.mockImplementation((table: string) => {
     if (table === 'events') {
       return {
-        select: jest.fn().mockReturnValue({
-          in: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: eventRows, error: null }),
+        select: vi.fn().mockReturnValue({
+          in: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: eventRows, error: null }),
           }),
         }),
       };
     }
     if (table === 'event_participation') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ data: participationRows, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ data: participationRows, error: null }),
         }),
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        insert: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ error: null }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ error: null }),
           }),
         }),
       };
@@ -93,7 +96,7 @@ function setupFetchEvents(
 
 describe('useSeasonalEvents', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: mockUser });
   });
 
@@ -144,9 +147,9 @@ describe('useSeasonalEvents', () => {
   describe('Given fetch errors', () => {
     it('should return empty events on error', async () => {
       mockFrom.mockImplementation(() => ({
-        select: jest.fn().mockReturnValue({
-          in: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: null, error: { message: 'fail' } }),
+        select: vi.fn().mockReturnValue({
+          in: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: null, error: { message: 'fail' } }),
           }),
         }),
       }));
@@ -172,9 +175,9 @@ describe('useSeasonalEvents', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'event_participation') {
           return {
-            insert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({ data: newParticipation, error: null }),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: newParticipation, error: null }),
               }),
             }),
           };
@@ -237,9 +240,9 @@ describe('useSeasonalEvents', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'event_participation') {
           return {
-            update: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({ error: null }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({ error: null }),
               }),
             }),
           };

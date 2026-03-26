@@ -7,12 +7,13 @@
  * Solution: Use classroom membership directly via useStudentClassroom hook.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useStudentClassroom } from '../useStudentClassroom';
 
 // Mock the auth context
 const mockUser = { id: 'student-123' };
-const mockUseAuth = jest.fn<
+const mockUseAuth = vi.fn<
   {
     user: { id: string } | null;
     isAuthenticated: boolean;
@@ -25,19 +26,22 @@ const mockUseAuth = jest.fn<
   loading: false,
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock the Supabase API
-const mockGetStudentClassroom = jest.fn();
-jest.mock('@/lib/supabase/education', () => ({
+const { mockGetStudentClassroom } = vi.hoisted(() => {
+  const mockGetStudentClassroom = vi.fn();
+  return { mockGetStudentClassroom };
+});
+vi.mock('@/lib/supabase/education', () => ({
   getStudentClassroom: (...args: any[]) => mockGetStudentClassroom(...args),
 }));
 
 describe('useStudentClassroom', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({
       user: mockUser,
       isAuthenticated: true,

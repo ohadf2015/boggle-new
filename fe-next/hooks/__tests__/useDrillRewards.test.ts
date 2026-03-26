@@ -4,13 +4,16 @@
  * Tests for drill XP and gold reward calculation and awarding.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
-const mockAddCoins = jest.fn().mockResolvedValue(100);
-
-jest.mock('@/contexts/CoinContext', () => ({
+const { mockAddCoins } = vi.hoisted(() => {
+  const mockAddCoins = vi.fn().mockResolvedValue(100);
+  return { mockAddCoins };
+});
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
     addCoins: mockAddCoins,
   }),
@@ -56,7 +59,7 @@ describe('calculateDrillGold', () => {
 
 describe('useDrillRewards', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAddCoins.mockResolvedValue(100);
   });
 

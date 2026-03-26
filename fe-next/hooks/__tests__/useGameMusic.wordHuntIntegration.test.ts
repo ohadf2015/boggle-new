@@ -9,6 +9,7 @@
  * 5. Verify which track actually plays
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useGameMusic } from '../useGameMusic';
 
@@ -18,7 +19,7 @@ const createMusicContextMock = () => {
   const pendingTrack: { trackKey: string; fadeOutMs: number; fadeInMs: number } | null = null;
   const playedTracks: string[] = [];
 
-  const mockFadeToTrack = jest.fn((trackKey: string, fadeOutMs?: number, fadeInMs?: number) => {
+  const mockFadeToTrack = vi.fn((trackKey: string, fadeOutMs?: number, fadeInMs?: number) => {
     // Simulate real MusicContext behavior:
     // When audio is NOT unlocked, the last call wins (overwrites previous pending)
     // When audio IS unlocked, immediately "play" the track
@@ -29,9 +30,9 @@ const createMusicContextMock = () => {
     // In real MusicContext, pendingUnlockTrackRef would store only the LAST request
   });
 
-  const mockPlayTrack = jest.fn();
+  const mockPlayTrack = vi.fn();
 
-  const mockUnlockAudio = jest.fn(() => {
+  const mockUnlockAudio = vi.fn(() => {
     audioUnlocked = true;
   });
 
@@ -55,13 +56,13 @@ const createMusicContextMock = () => {
 // Variable to hold mock instance for each test
 let mockMusicContext: ReturnType<typeof createMusicContextMock>;
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => mockMusicContext,
 }));
 
 describe('useGameMusic - Word Hunt Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Create fresh mock for each test
     mockMusicContext = createMusicContextMock();
   });

@@ -4,14 +4,15 @@
  * Tests tier resolution, progress calculation, and override behavior.
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 // --- Mocks ---
 
 const mockProfile = { ranked_mmr: 0 };
-const mockUseAuth = jest.fn(() => ({ profile: mockProfile }));
+const mockUseAuth = vi.fn(() => ({ profile: mockProfile }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
@@ -21,7 +22,7 @@ import { useRankedTier } from '../useRankedTier';
 
 describe('useRankedTier', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ profile: mockProfile });
   });
 

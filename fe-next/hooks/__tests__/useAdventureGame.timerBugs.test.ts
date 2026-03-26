@@ -4,6 +4,7 @@
  * Bug #1: ADD_TIME and time-tile bonus cap at timerSeconds instead of MAX_TIMER_SECONDS (180)
  * Bug #2: Combo timeout fires after game completion (unnecessary state update)
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -40,8 +41,8 @@ const GRID = [
 // ==============================================
 
 describe('useAdventureGame - Timer cap bug fix', () => {
-  beforeEach(() => jest.useFakeTimers());
-  afterEach(() => jest.useRealTimers());
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
   it('should allow addTime to push timer above initial timerSeconds up to MAX_TIMER_SECONDS (180)', () => {
     // GIVEN - Level starts with 60s timer
@@ -126,8 +127,8 @@ describe('useAdventureGame - Timer cap bug fix', () => {
 // ==============================================
 
 describe('useAdventureGame - Combo timeout after game end', () => {
-  beforeEach(() => jest.useFakeTimers());
-  afterEach(() => jest.useRealTimers());
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
   it('should not dispatch COMBO_TIMEOUT after timer runs out', () => {
     // GIVEN - Level with 3s timer
@@ -147,7 +148,7 @@ describe('useAdventureGame - Combo timeout after game end', () => {
     expect(result.current.gameState.comboCount).toBe(1);
 
     // WHEN - Timer runs out (game ends)
-    act(() => jest.advanceTimersByTime(4000));
+    act(() => vi.advanceTimersByTime(4000));
 
     expect(result.current.gameState.isComplete).toBe(true);
 
@@ -175,7 +176,7 @@ describe('useAdventureGame - Combo timeout after game end', () => {
     expect(result.current.gameState.comboCount).toBe(1);
 
     // WHEN - Combo timeout fires (3s later)
-    act(() => jest.advanceTimersByTime(4000));
+    act(() => vi.advanceTimersByTime(4000));
 
     // THEN - Combo should not be reset after game is complete
     expect(result.current.gameState.comboCount).toBe(1);

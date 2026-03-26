@@ -5,6 +5,7 @@
  * Return values are MotionValue<number> instances; use .get() to read current value.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useParallax } from '../useParallax';
 
@@ -16,13 +17,13 @@ const mockDevicePerformance = {
   isLowEnd: false,
 };
 
-jest.mock('../useDevicePerformance', () => ({
+vi.mock('../useDevicePerformance', () => ({
   useDevicePerformance: () => mockDevicePerformance,
 }));
 
 // Mock framer-motion MotionValue minimally
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual('framer-motion');
   return {
     ...actual,
     useMotionValue: actual.useMotionValue,
@@ -32,7 +33,7 @@ jest.mock('framer-motion', () => {
 
 describe('useParallax', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockDevicePerformance.prefersReducedMotion = false;
     mockDevicePerformance.isMobile = false;
     mockDevicePerformance.enableComplexAnimations = true;
@@ -40,7 +41,7 @@ describe('useParallax', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initial state', () => {
@@ -70,7 +71,7 @@ describe('useParallax', () => {
       const { result } = renderHook(() => useParallax());
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(typeof result.current.x.get()).toBe('number');
@@ -83,7 +84,7 @@ describe('useParallax', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.x.get()).toBe(0);
@@ -96,7 +97,7 @@ describe('useParallax', () => {
       const { result } = renderHook(() => useParallax());
 
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(result.current.x.get()).toBe(0);
@@ -113,7 +114,7 @@ describe('useParallax', () => {
 
       for (let i = 0; i < 100; i++) {
         act(() => {
-          jest.advanceTimersByTime(200);
+          vi.advanceTimersByTime(200);
         });
         maxX = Math.max(maxX, Math.abs(result.current.x.get()));
         maxY = Math.max(maxY, Math.abs(result.current.y.get()));
@@ -131,7 +132,7 @@ describe('useParallax', () => {
       const samples: { x: number; y: number }[] = [];
       for (let i = 0; i < 50; i++) {
         act(() => {
-          jest.advanceTimersByTime(100);
+          vi.advanceTimersByTime(100);
         });
         samples.push({ x: result.current.x.get(), y: result.current.y.get() });
       }
@@ -203,7 +204,7 @@ describe('useParallax', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       expect(typeof result.current.x.get()).toBe('number');
@@ -212,7 +213,7 @@ describe('useParallax', () => {
 
   describe('cleanup', () => {
     it('removes event listeners on unmount', () => {
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
       const { unmount } = renderHook(() => useParallax());
 
@@ -224,7 +225,7 @@ describe('useParallax', () => {
     });
 
     it('cancels animation frame on unmount', () => {
-      const cancelAnimationFrameSpy = jest.spyOn(window, 'cancelAnimationFrame');
+      const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
       const { unmount } = renderHook(() => useParallax());
 

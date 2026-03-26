@@ -11,21 +11,22 @@
  * 4. After user confirms exit in dialog, navigation should proceed without native prompt
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useNavigationGuard } from '../useNavigationGuard';
 
 describe('useNavigationGuard - Quit Confirmation Flow', () => {
-  let mockPushState: jest.SpyInstance;
-  let mockAddEventListener: jest.SpyInstance;
-  let mockRemoveEventListener: jest.SpyInstance;
+  let mockPushState: any;
+  let mockAddEventListener: any;
+  let mockRemoveEventListener: any;
 
   beforeEach(() => {
     // Mock window.history
-    mockPushState = jest.spyOn(window.history, 'pushState').mockImplementation();
+    mockPushState = vi.spyOn(window.history, 'pushState').mockImplementation();
 
     // Track event listeners
-    mockAddEventListener = jest.spyOn(window, 'addEventListener');
-    mockRemoveEventListener = jest.spyOn(window, 'removeEventListener');
+    mockAddEventListener = vi.spyOn(window, 'addEventListener');
+    mockRemoveEventListener = vi.spyOn(window, 'removeEventListener');
   });
 
   afterEach(() => {
@@ -79,7 +80,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
 
       // Simulate beforeunload event
       const mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
-      const preventDefaultSpy = jest.spyOn(mockEvent, 'preventDefault');
+      const preventDefaultSpy = vi.spyOn(mockEvent, 'preventDefault');
 
       const result = handler(mockEvent);
 
@@ -137,7 +138,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
     });
 
     it('should call onNavigationAttempt callback on popstate', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       renderHook(() =>
         useNavigationGuard({
@@ -162,7 +163,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
     });
 
     it('should block navigation when onNavigationAttempt returns false', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       renderHook(() =>
         useNavigationGuard({
@@ -194,7 +195,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
     });
 
     it('should allow navigation when onNavigationAttempt returns true', () => {
-      const onNavigationAttempt = jest.fn(() => true);
+      const onNavigationAttempt = vi.fn(() => true);
 
       renderHook(() =>
         useNavigationGuard({
@@ -284,7 +285,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
 
   describe('Typical Game Flow', () => {
     it('should handle complete game lifecycle: start → play → quit', () => {
-      const onNavigationAttempt = jest.fn(() => {
+      const onNavigationAttempt = vi.fn(() => {
         // First call: User clicks back button → show dialog → return false
         // This simulates showing the confirmation dialog
         return false;
@@ -338,11 +339,11 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
   });
 
   describe('Cleanup Behavior', () => {
-    let mockHistoryBack: jest.SpyInstance;
+    let mockHistoryBack: any;
 
     beforeEach(() => {
       // Mock history.back to track if it gets called
-      mockHistoryBack = jest.spyOn(window.history, 'back').mockImplementation();
+      mockHistoryBack = vi.spyOn(window.history, 'back').mockImplementation();
     });
 
     afterEach(() => {

@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useOfflineWordQueue } from '../useOfflineWordQueue';
 
 // Mock socket
 function createMockSocket() {
   return {
-    emit: jest.fn(),
+    emit: vi.fn(),
   } as unknown as import('socket.io-client').Socket;
 }
 
@@ -13,11 +14,11 @@ describe('useOfflineWordQueue', () => {
 
   beforeEach(() => {
     mockSocket = createMockSocket();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // 1. Queues words when not connected
@@ -189,7 +190,7 @@ describe('useOfflineWordQueue', () => {
     it('is true during replay and false after', () => {
       let replayingDuringEmit = false;
 
-      const emitMock = jest.fn(() => {
+      const emitMock = vi.fn(() => {
         // Capture isReplaying state during emit — we check it after
         replayingDuringEmit = true;
       });
@@ -267,7 +268,7 @@ describe('useOfflineWordQueue', () => {
     it('replays words in the order they were queued', () => {
       const emitOrder: string[] = [];
       const socket = {
-        emit: jest.fn((_event: string, payload: { word: string }) => {
+        emit: vi.fn((_event: string, payload: { word: string }) => {
           emitOrder.push(payload.word);
         }),
       } as unknown as import('socket.io-client').Socket;
@@ -308,7 +309,7 @@ describe('useOfflineWordQueue', () => {
   describe('timestamp', () => {
     it('records a timestamp for each queued word', () => {
       const now = Date.now();
-      jest.setSystemTime(now);
+      vi.setSystemTime(now);
 
       const { result } = renderHook(() =>
         useOfflineWordQueue(mockSocket, false)

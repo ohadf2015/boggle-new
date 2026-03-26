@@ -4,21 +4,24 @@
  * Tests difficulty offset fetching and game result reporting via RPC.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // --- Mocks ---
 
 const mockUser = { id: 'test-user-id' };
-const mockUseAuth = jest.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-const mockFrom = jest.fn();
-const mockRpc = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom, mockRpc } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockRpc = vi.fn();
+  return { mockFrom, mockRpc };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -44,10 +47,10 @@ function makeTrackingRow(overrides: Record<string, unknown> = {}) {
 
 function setupFetchSuccess(row: Record<string, unknown>) {
   mockFrom.mockReturnValue({
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: row, error: null }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: row, error: null }),
         }),
       }),
     }),
@@ -56,10 +59,10 @@ function setupFetchSuccess(row: Record<string, unknown>) {
 
 function setupFetchNoData() {
   mockFrom.mockReturnValue({
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: null, error: { message: 'not found' } }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: null, error: { message: 'not found' } }),
         }),
       }),
     }),
@@ -70,7 +73,7 @@ function setupFetchNoData() {
 
 describe('useDynamicDifficulty', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: mockUser });
   });
 

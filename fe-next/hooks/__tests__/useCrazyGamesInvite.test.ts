@@ -1,22 +1,23 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCrazyGamesInvite } from '../useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // Mock the CrazyGames SDK hook
-jest.mock('@/components/CrazyGamesSDK', () => ({
-  useCrazyGames: jest.fn(),
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: vi.fn(),
 }));
 
-const mockUseCrazyGames = useCrazyGames as jest.MockedFunction<typeof useCrazyGames>;
+const mockUseCrazyGames = useCrazyGames as any;
 
 describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
-  const mockSdkShowInvite = jest.fn();
-  const mockSdkHideInvite = jest.fn();
-  const mockGetInviteParam = jest.fn();
-  const mockInviteLink = jest.fn();
+  const mockSdkShowInvite = vi.fn();
+  const mockSdkHideInvite = vi.fn();
+  const mockGetInviteParam = vi.fn();
+  const mockInviteLink = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default SDK mock (available and ready)
     mockUseCrazyGames.mockReturnValue({
@@ -32,38 +33,38 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       inviteLink: mockInviteLink,
       showInviteButton: mockSdkShowInvite,
       hideInviteButton: mockSdkHideInvite,
-      happyTime: jest.fn(),
-      gameplayStart: jest.fn(),
-      gameplayStop: jest.fn(),
-      loadingStart: jest.fn(),
-      loadingStop: jest.fn(),
-      showMidgameAd: jest.fn(),
-      showRewardedAd: jest.fn(),
-      hasAdblock: jest.fn(),
-      requestBanner: jest.fn(),
-      requestResponsiveBanner: jest.fn(),
-      clearBanner: jest.fn(),
-      clearAllBanners: jest.fn(),
-      saveData: jest.fn(),
-      loadData: jest.fn(),
-      removeData: jest.fn(),
-      getUser: jest.fn(),
-      showAuthPrompt: jest.fn(),
-      isUserAccountAvailable: jest.fn(),
-      getSystemInfo: jest.fn(),
-      getInviteParams: jest.fn(),
-      addJoinRoomListener: jest.fn(),
-      removeJoinRoomListener: jest.fn(),
-      getSettings: jest.fn(),
-      addSettingsChangeListener: jest.fn(),
-      removeSettingsChangeListener: jest.fn(),
-      addAuthListener: jest.fn(),
-      removeAuthListener: jest.fn(),
-      getUserToken: jest.fn(),
-      listFriends: jest.fn(),
-      showAccountLinkPrompt: jest.fn(),
-      getXsollaUserToken: jest.fn(),
-      trackOrder: jest.fn(),
+      happyTime: vi.fn(),
+      gameplayStart: vi.fn(),
+      gameplayStop: vi.fn(),
+      loadingStart: vi.fn(),
+      loadingStop: vi.fn(),
+      showMidgameAd: vi.fn(),
+      showRewardedAd: vi.fn(),
+      hasAdblock: vi.fn(),
+      requestBanner: vi.fn(),
+      requestResponsiveBanner: vi.fn(),
+      clearBanner: vi.fn(),
+      clearAllBanners: vi.fn(),
+      saveData: vi.fn(),
+      loadData: vi.fn(),
+      removeData: vi.fn(),
+      getUser: vi.fn(),
+      showAuthPrompt: vi.fn(),
+      isUserAccountAvailable: vi.fn(),
+      getSystemInfo: vi.fn(),
+      getInviteParams: vi.fn(),
+      addJoinRoomListener: vi.fn(),
+      removeJoinRoomListener: vi.fn(),
+      getSettings: vi.fn(),
+      addSettingsChangeListener: vi.fn(),
+      removeSettingsChangeListener: vi.fn(),
+      addAuthListener: vi.fn(),
+      removeAuthListener: vi.fn(),
+      getUserToken: vi.fn(),
+      listFriends: vi.fn(),
+      showAccountLinkPrompt: vi.fn(),
+      getXsollaUserToken: vi.fn(),
+      trackOrder: vi.fn(),
     });
   });
 
@@ -294,7 +295,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       });
 
       expect(result.current.isInviteButtonVisible).toBe(true);
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Game starts - should hide
       rerender({ gameState: 'playing' });
@@ -306,7 +307,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
       const firstHideCallCount = mockSdkHideInvite.mock.calls.length;
       expect(firstHideCallCount).toBeGreaterThanOrEqual(1);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Game ends - should NOT trigger hide again (already hidden)
       rerender({ gameState: 'ended' });
@@ -321,7 +322,7 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
     it('should still detect invite joins', () => {
       mockGetInviteParam.mockReturnValue('INVITE123');
 
-      const onInviteJoin = jest.fn();
+      const onInviteJoin = vi.fn();
       renderHook(() => useCrazyGamesInvite({ onInviteJoin }));
 
       expect(onInviteJoin).toHaveBeenCalledWith('INVITE123');
@@ -344,41 +345,41 @@ describe('useCrazyGamesInvite - Room Lifecycle Auto-Hide', () => {
         inviteLink: mockInviteLink,
         showInviteButton: mockSdkShowInvite,
         hideInviteButton: mockSdkHideInvite,
-        happyTime: jest.fn(),
-        gameplayStart: jest.fn(),
-        gameplayStop: jest.fn(),
-        loadingStart: jest.fn(),
-        loadingStop: jest.fn(),
-        showMidgameAd: jest.fn(),
-        showRewardedAd: jest.fn(),
-        hasAdblock: jest.fn(),
-        requestBanner: jest.fn(),
-        requestResponsiveBanner: jest.fn(),
-        clearBanner: jest.fn(),
-        clearAllBanners: jest.fn(),
-        saveData: jest.fn(),
-        loadData: jest.fn(),
-        removeData: jest.fn(),
-        getUser: jest.fn(),
-        showAuthPrompt: jest.fn(),
-        isUserAccountAvailable: jest.fn(),
-        getSystemInfo: jest.fn(),
-        getInviteParams: jest.fn(),
-        addJoinRoomListener: jest.fn(),
-        removeJoinRoomListener: jest.fn(),
-        getSettings: jest.fn(),
-        addSettingsChangeListener: jest.fn(),
-        removeSettingsChangeListener: jest.fn(),
-        addAuthListener: jest.fn(),
-        removeAuthListener: jest.fn(),
-        getUserToken: jest.fn(),
-        listFriends: jest.fn(),
-        showAccountLinkPrompt: jest.fn(),
-        getXsollaUserToken: jest.fn(),
-        trackOrder: jest.fn(),
+        happyTime: vi.fn(),
+        gameplayStart: vi.fn(),
+        gameplayStop: vi.fn(),
+        loadingStart: vi.fn(),
+        loadingStop: vi.fn(),
+        showMidgameAd: vi.fn(),
+        showRewardedAd: vi.fn(),
+        hasAdblock: vi.fn(),
+        requestBanner: vi.fn(),
+        requestResponsiveBanner: vi.fn(),
+        clearBanner: vi.fn(),
+        clearAllBanners: vi.fn(),
+        saveData: vi.fn(),
+        loadData: vi.fn(),
+        removeData: vi.fn(),
+        getUser: vi.fn(),
+        showAuthPrompt: vi.fn(),
+        isUserAccountAvailable: vi.fn(),
+        getSystemInfo: vi.fn(),
+        getInviteParams: vi.fn(),
+        addJoinRoomListener: vi.fn(),
+        removeJoinRoomListener: vi.fn(),
+        getSettings: vi.fn(),
+        addSettingsChangeListener: vi.fn(),
+        removeSettingsChangeListener: vi.fn(),
+        addAuthListener: vi.fn(),
+        removeAuthListener: vi.fn(),
+        getUserToken: vi.fn(),
+        listFriends: vi.fn(),
+        showAccountLinkPrompt: vi.fn(),
+        getXsollaUserToken: vi.fn(),
+        trackOrder: vi.fn(),
       });
 
-      const onInstantMultiplayer = jest.fn();
+      const onInstantMultiplayer = vi.fn();
       renderHook(() => useCrazyGamesInvite({ onInstantMultiplayer }));
 
       await waitFor(() => {

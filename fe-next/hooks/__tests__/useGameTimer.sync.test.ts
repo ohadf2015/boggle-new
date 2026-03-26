@@ -3,17 +3,18 @@
  * Tests multiplayer timer synchronization scenarios
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useGameTimer } from '../useGameTimer';
 
 describe('useGameTimer - Multiplayer Synchronization', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   it('should continue counting down smoothly after server sync', async () => {
@@ -31,7 +32,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Advance time by 5 seconds - timer should count down
     act(() => {
-      jest.advanceTimersByTime(5100); // Extra 100ms to ensure second ticks
+      vi.advanceTimersByTime(5100); // Extra 100ms to ensure second ticks
     });
 
     expect(result.current.remainingTime).toBe(55);
@@ -47,7 +48,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Advance time by 4 seconds (needs buffer for 1s interval alignment after setTime)
     act(() => {
-      jest.advanceTimersByTime(4100);
+      vi.advanceTimersByTime(4100);
     });
 
     // Timer should continue counting down after server sync
@@ -71,26 +72,26 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // First sync at 95 seconds
     act(() => {
-      jest.advanceTimersByTime(5100);
+      vi.advanceTimersByTime(5100);
       result.current.setTime(95);
     });
 
     // Timer should continue after first sync
     act(() => {
-      jest.advanceTimersByTime(2100);
+      vi.advanceTimersByTime(2100);
     });
 
     expect(result.current.remainingTime).toBe(93);
 
     // Second sync at 85 seconds (10 seconds later)
     act(() => {
-      jest.advanceTimersByTime(8100);
+      vi.advanceTimersByTime(8100);
       result.current.setTime(85);
     });
 
     // Timer should still continue after second sync
     act(() => {
-      jest.advanceTimersByTime(2100);
+      vi.advanceTimersByTime(2100);
     });
 
     expect(result.current.remainingTime).toBe(83);
@@ -98,7 +99,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
   });
 
   it('should handle sync during active gameplay without freezing', async () => {
-    const onTick = jest.fn();
+    const onTick = vi.fn();
 
     const { result } = renderHook(() =>
       useGameTimer({
@@ -111,7 +112,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     // Simulate active gameplay with frequent updates
     for (let i = 1; i <= 5; i++) {
       act(() => {
-        jest.advanceTimersByTime(1100);
+        vi.advanceTimersByTime(1100);
       });
 
       expect(result.current.remainingTime).toBe(30 - i);
@@ -126,7 +127,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Timer should keep ticking after sync
     act(() => {
-      jest.advanceTimersByTime(2100);
+      vi.advanceTimersByTime(2100);
     });
 
     expect(result.current.remainingTime).toBe(23);
@@ -135,7 +136,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     const tickCallsBefore = onTick.mock.calls.length;
 
     act(() => {
-      jest.advanceTimersByTime(1100);
+      vi.advanceTimersByTime(1100);
     });
 
     expect(onTick.mock.calls.length).toBeGreaterThan(tickCallsBefore);
@@ -163,7 +164,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Advance time
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Timer should still be paused, not counting down
@@ -201,7 +202,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Let it count down to 115
     act(() => {
-      jest.advanceTimersByTime(5100);
+      vi.advanceTimersByTime(5100);
     });
     expect(result.current.remainingTime).toBe(115);
 
@@ -221,7 +222,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Step 5: Timer should continue counting down from 110
     act(() => {
-      jest.advanceTimersByTime(3100);
+      vi.advanceTimersByTime(3100);
     });
 
     // EXPECTED: 110 - 3 = 107
@@ -249,7 +250,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
 
     // Run for 10 seconds
     act(() => {
-      jest.advanceTimersByTime(10100);
+      vi.advanceTimersByTime(10100);
     });
     expect(result.current.remainingTime).toBe(170);
 
@@ -261,7 +262,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     rerender({ isPaused: false });
 
     act(() => {
-      jest.advanceTimersByTime(2100);
+      vi.advanceTimersByTime(2100);
     });
     expect(result.current.remainingTime).toBe(166);
 
@@ -273,7 +274,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     rerender({ isPaused: false });
 
     act(() => {
-      jest.advanceTimersByTime(5100);
+      vi.advanceTimersByTime(5100);
     });
     expect(result.current.remainingTime).toBe(155);
 
@@ -287,7 +288,7 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     rerender({ isPaused: false });
 
     act(() => {
-      jest.advanceTimersByTime(3100);
+      vi.advanceTimersByTime(3100);
     });
     expect(result.current.remainingTime).toBe(147);
     expect(result.current.isRunning).toBe(true);

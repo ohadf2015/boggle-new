@@ -1,13 +1,17 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useChapterQuests } from '../useChapterQuests';
 
 // Mock ProgressionContext — quest progress now persisted via context
-const mockUpdateChapterQuestProgress = jest.fn();
+const { mockUpdateChapterQuestProgress } = vi.hoisted(() => {
+  const mockUpdateChapterQuestProgress = vi.fn();
+  return { mockUpdateChapterQuestProgress };
+});
 const mockProgression: Record<string, unknown> = {
   chapterQuestProgress: {},
 };
 
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     progression: mockProgression,
     updateChapterQuestProgress: mockUpdateChapterQuestProgress,
@@ -16,7 +20,7 @@ jest.mock('@/contexts/ProgressionContext', () => ({
 
 describe('useChapterQuests', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockProgression.chapterQuestProgress = {};
   });
 

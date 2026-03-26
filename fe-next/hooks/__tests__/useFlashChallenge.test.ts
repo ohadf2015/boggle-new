@@ -1,9 +1,10 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useFlashChallenge } from '../useFlashChallenge';
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // Mock Math.random to always return 0 (selects first candidate)
-const mockRandom = jest.spyOn(Math, 'random').mockReturnValue(0);
+const mockRandom = vi.spyOn(Math, 'random').mockReturnValue(0);
 
 const baseProps = { worldId: 1, totalTimeSeconds: 100, isPlaying: true };
 
@@ -50,7 +51,7 @@ function triggerChallengeType(type: string) {
 }
 
 describe('useFlashChallenge', () => {
-  afterEach(() => { jest.clearAllTimers(); mockRandom.mockReturnValue(0); });
+  afterEach(() => { vi.clearAllTimers(); mockRandom.mockReturnValue(0); });
 
   it('returns null challenge before 30% time has elapsed', () => {
     const { result } = renderHook(() =>

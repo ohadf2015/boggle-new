@@ -13,6 +13,7 @@
  * Actual behavior: Music doesn't play until user clicks sound controller
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGameMusic } from '../useGameMusic';
 
@@ -27,9 +28,9 @@ let mockAudioUnlocked = false;
 let mockPendingTrack: { trackKey: string; fadeOutMs: number; fadeInMs: number } | null = null;
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    fadeToTrack: jest.fn((trackKey: string, fadeOutMs = 1000, fadeInMs = 1000) => {
+    fadeToTrack: vi.fn((trackKey: string, fadeOutMs = 1000, fadeInMs = 1000) => {
       mockCalls.fadeToTrack.push({ trackKey, fadeOutMs, fadeInMs });
 
       // Simulate real MusicContext behavior
@@ -42,7 +43,7 @@ jest.mock('@/contexts/MusicContext', () => ({
       // When audio is unlocked, "play" the track
       // (In real code, this calls newHowl.play())
     }),
-    playTrack: jest.fn((trackKey: string) => {
+    playTrack: vi.fn((trackKey: string) => {
       mockCalls.playTrack.push({ trackKey });
     }),
     TRACKS: {
@@ -58,7 +59,7 @@ jest.mock('@/contexts/MusicContext', () => ({
 
 describe('useGameMusic - Auto Play on Word Hunt Mount', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCalls.fadeToTrack = [];
     mockCalls.playTrack = [];
     mockAudioUnlocked = false;

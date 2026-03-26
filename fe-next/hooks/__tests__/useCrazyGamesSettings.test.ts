@@ -1,11 +1,14 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock useCrazyGames - must be before import
-const mockGetSettings = jest.fn();
-const mockAddSettingsChangeListener = jest.fn();
-const mockRemoveSettingsChangeListener = jest.fn();
-
-jest.mock('@/components/CrazyGamesSDK', () => ({
+const { mockGetSettings, mockAddSettingsChangeListener, mockRemoveSettingsChangeListener } = vi.hoisted(() => {
+  const mockGetSettings = vi.fn();
+  const mockAddSettingsChangeListener = vi.fn();
+  const mockRemoveSettingsChangeListener = vi.fn();
+  return { mockGetSettings, mockAddSettingsChangeListener, mockRemoveSettingsChangeListener };
+});
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
     isLoading: false,
@@ -15,18 +18,18 @@ jest.mock('@/components/CrazyGamesSDK', () => ({
   }),
 }));
 
-const { useCrazyGamesSettings, triggerHappytime } = require('../useCrazyGamesSettings');
+const { useCrazyGamesSettings, triggerHappytime } = await import('../useCrazyGamesSettings');
 
 // Mock CrazyGames SDK on window for triggerHappytime
 const mockSDK = {
   game: {
-    happyTime: jest.fn(),
+    happyTime: vi.fn(),
   },
 };
 
 describe('useCrazyGamesSettings', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetSettings.mockReturnValue(null);
   });
 
@@ -98,7 +101,7 @@ describe('useCrazyGamesSettings', () => {
 
 describe('triggerHappytime', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     (window as any).CrazyGames = {
       SDK: mockSDK,

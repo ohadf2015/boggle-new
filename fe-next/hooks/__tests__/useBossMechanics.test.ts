@@ -6,6 +6,7 @@
  * TDD: Written BEFORE implementation (RED phase).
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBossMechanics } from '../useBossMechanics';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
@@ -15,7 +16,7 @@ import type { BossConfig, BossTauntEvent } from '@/types/boss';
 // SETUP
 // ==============================================
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 const TAUNT_DISPLAY_MS = 3000;
 const TAUNT_COOLDOWN_MS = 5000;
@@ -28,7 +29,7 @@ function getBoss(worldId: number): BossConfig {
 
 describe('useBossMechanics', () => {
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   // ==============================================
@@ -150,7 +151,7 @@ describe('useBossMechanics', () => {
 
       // WHEN - Advance time past taunt display duration
       act(() => {
-        jest.advanceTimersByTime(TAUNT_DISPLAY_MS + 100);
+        vi.advanceTimersByTime(TAUNT_DISPLAY_MS + 100);
       });
 
       // THEN
@@ -169,7 +170,7 @@ describe('useBossMechanics', () => {
 
       // Wait for first taunt to hide
       act(() => {
-        jest.advanceTimersByTime(TAUNT_DISPLAY_MS + 100);
+        vi.advanceTimersByTime(TAUNT_DISPLAY_MS + 100);
       });
 
       // WHEN - Try to trigger another taunt immediately (within cooldown)
@@ -192,7 +193,7 @@ describe('useBossMechanics', () => {
 
       // Wait for display + cooldown
       act(() => {
-        jest.advanceTimersByTime(TAUNT_DISPLAY_MS + TAUNT_COOLDOWN_MS + 200);
+        vi.advanceTimersByTime(TAUNT_DISPLAY_MS + TAUNT_COOLDOWN_MS + 200);
       });
 
       // WHEN - Trigger another taunt after cooldown
@@ -227,7 +228,7 @@ describe('useBossMechanics', () => {
 
       // Wait for cooldown from previous test
       act(() => {
-        jest.advanceTimersByTime(TAUNT_COOLDOWN_MS + TAUNT_DISPLAY_MS + 200);
+        vi.advanceTimersByTime(TAUNT_COOLDOWN_MS + TAUNT_DISPLAY_MS + 200);
       });
 
       // WHEN
@@ -632,7 +633,7 @@ describe('useBossMechanics', () => {
 
       // THEN - No errors should occur when timers fire after unmount
       act(() => {
-        jest.advanceTimersByTime(TAUNT_DISPLAY_MS + TAUNT_COOLDOWN_MS + 1000);
+        vi.advanceTimersByTime(TAUNT_DISPLAY_MS + TAUNT_COOLDOWN_MS + 1000);
       });
       // If we get here without errors, cleanup was successful
     });

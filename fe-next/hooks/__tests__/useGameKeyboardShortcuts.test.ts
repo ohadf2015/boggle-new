@@ -3,6 +3,7 @@
  * Desktop keyboard shortcuts for game navigation and actions
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGameKeyboardShortcuts } from '../useGameKeyboardShortcuts';
 
@@ -12,7 +13,7 @@ describe('useGameKeyboardShortcuts', () => {
   };
 
   it('should call onEscape when Escape is pressed', () => {
-    const onEscape = jest.fn();
+    const onEscape = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onEscape }));
 
     fireKey('Escape');
@@ -20,7 +21,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should call onRematch when "r" is pressed', () => {
-    const onRematch = jest.fn();
+    const onRematch = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onRematch }));
 
     fireKey('r');
@@ -28,7 +29,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should NOT call onRematch when "r" is pressed with modifier keys', () => {
-    const onRematch = jest.fn();
+    const onRematch = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onRematch }));
 
     fireKey('r', { ctrlKey: true });
@@ -38,7 +39,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should NOT fire shortcuts when typing in an input', () => {
-    const onRematch = jest.fn();
+    const onRematch = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onRematch }));
 
     // Simulate keydown originating from an input
@@ -51,7 +52,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should NOT fire when disabled', () => {
-    const onEscape = jest.fn();
+    const onEscape = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onEscape, enabled: false }));
 
     fireKey('Escape');
@@ -59,7 +60,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should call onPlayAgain when Space is pressed', () => {
-    const onPlayAgain = jest.fn();
+    const onPlayAgain = vi.fn();
     renderHook(() => useGameKeyboardShortcuts({ onPlayAgain }));
 
     fireKey(' ');
@@ -67,7 +68,7 @@ describe('useGameKeyboardShortcuts', () => {
   });
 
   it('should cleanup listeners on unmount', () => {
-    const onEscape = jest.fn();
+    const onEscape = vi.fn();
     const { unmount } = renderHook(() => useGameKeyboardShortcuts({ onEscape }));
 
     unmount();

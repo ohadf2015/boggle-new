@@ -4,6 +4,7 @@
  * Tests network status monitoring via browser online/offline events.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useOnlineStatus } from '../useOnlineStatus';
 
@@ -122,7 +123,7 @@ describe('useOnlineStatus', () => {
   describe('cleanup', () => {
     it('should remove event listeners on unmount', () => {
       // GIVEN
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
       const { unmount } = renderHook(() => useOnlineStatus());
 
       // WHEN

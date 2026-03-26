@@ -4,6 +4,7 @@
  * Tests for skill point awarding on level up.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSkillPoints } from './useSkillPoints';
 import { useSkillTreeStore } from './useSkillTreeStore';
@@ -94,7 +95,7 @@ describe('useSkillPoints', () => {
 
   describe('callback integration', () => {
     it('calls onLevelUp callback when level increases', () => {
-      const onLevelUp = jest.fn();
+      const onLevelUp = vi.fn();
 
       const { rerender } = renderHook(
         ({ level }) => useSkillPoints({ currentLevel: level, onLevelUp }),
@@ -111,7 +112,7 @@ describe('useSkillPoints', () => {
     });
 
     it('callback receives correct multi-level data', () => {
-      const onLevelUp = jest.fn();
+      const onLevelUp = vi.fn();
 
       const { rerender } = renderHook(
         ({ level }) => useSkillPoints({ currentLevel: level, onLevelUp }),
@@ -128,7 +129,7 @@ describe('useSkillPoints', () => {
     });
 
     it('does not call callback when level stays same', () => {
-      const onLevelUp = jest.fn();
+      const onLevelUp = vi.fn();
 
       const { rerender } = renderHook(
         ({ level }) => useSkillPoints({ currentLevel: level, onLevelUp }),

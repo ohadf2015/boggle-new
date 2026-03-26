@@ -2,36 +2,39 @@
  * Tests for useWordPact hook
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useWordPact } from '../useWordPact';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock supabase
-const mockSingle = jest.fn();
-const mockOr = jest.fn().mockReturnValue({ single: mockSingle });
-const mockEq = jest.fn().mockReturnValue({ or: mockOr, single: mockSingle });
-const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
-const mockInsert = jest.fn().mockResolvedValue({ data: null, error: null });
-const mockUpdate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: null, error: null }) });
-const mockFrom = jest.fn().mockReturnValue({
-  select: mockSelect,
-  insert: mockInsert,
-  update: mockUpdate,
+const { mockSingle, mockFrom, mockOr, mockEq, mockSelect, mockInsert, mockUpdate } = vi.hoisted(() => {
+  const mockSingle = vi.fn();
+  const mockInsert = vi.fn().mockResolvedValue({ data: null, error: null });
+  const mockUpdate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: null, error: null }) });
+  const mockOr = vi.fn().mockReturnValue({ single: mockSingle });
+  const mockEq = vi.fn().mockReturnValue({ or: mockOr, single: mockSingle });
+  const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+  const mockFrom = vi.fn().mockReturnValue({
+    select: mockSelect,
+    insert: mockInsert,
+    update: mockUpdate,
+  });
+  return { mockSingle, mockFrom, mockOr, mockEq, mockSelect, mockInsert, mockUpdate };
 });
-
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
-jest.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/AuthContext');
 
 const USER_ID = 'user-123';
 const FRIEND_ID = 'friend-456';
 
 describe('useWordPact', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: USER_ID } });
+    vi.clearAllMocks();
+    (useAuth as any).mockReturnValue({ user: { id: USER_ID } });
   });
 
   it('returns loading=true initially then false after fetch', async () => {
@@ -101,7 +104,7 @@ describe('useWordPact', () => {
   });
 
   it('handles no user gracefully', async () => {
-    (useAuth as jest.Mock).mockReturnValue({ user: null });
+    (useAuth as any).mockReturnValue({ user: null });
 
     const { result } = renderHook(() => useWordPact());
 

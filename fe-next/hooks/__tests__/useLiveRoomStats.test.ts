@@ -1,15 +1,16 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useLiveRoomStats } from '../useLiveRoomStats';
 
 // Mock the socket context
 const mockSocket = {
   connected: true,
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  emit: vi.fn(),
 };
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocketOptional: () => ({
     socket: mockSocket,
     isConnected: true,
@@ -18,12 +19,12 @@ jest.mock('@/utils/SocketContext', () => ({
 
 describe('useLiveRoomStats', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return initial loading state', () => {
@@ -133,14 +134,14 @@ describe('useLiveRoomStats', () => {
 
     // Advance by 30 seconds
     act(() => {
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
     });
 
     expect(mockSocket.emit).toHaveBeenCalledTimes(2);
 
     // Advance another 30 seconds
     act(() => {
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
     });
 
     expect(mockSocket.emit).toHaveBeenCalledTimes(3);

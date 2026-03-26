@@ -5,25 +5,26 @@
  * Verifies GDPR/PPL compliance for users under 14.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useParentalConsent } from '../useParentalConsent';
 
 // Mock Supabase client
 const mockSupabaseClient = {
-  from: jest.fn(),
+  from: vi.fn(),
   auth: {
-    getUser: jest.fn(),
+    getUser: vi.fn(),
   },
 };
 
 // Mock the supabase import
-jest.mock('@/utils/supabase/client', () => ({
+vi.mock('@/utils/supabase/client', () => ({
   createClient: () => mockSupabaseClient,
 }));
 
 // Mock useAuth
 const mockUser = { id: 'user-123', email: 'test@example.com' };
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: mockUser,
     isAuthenticated: true,
@@ -33,21 +34,21 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 describe('useParentalConsent', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock for checking consent
     mockSupabaseClient.from.mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: null, error: null }),
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
         }),
       }),
-      insert: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: { id: 'consent-123' }, error: null }),
+      insert: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { id: 'consent-123' }, error: null }),
         }),
       }),
-      update: jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ data: null, error: null }),
       }),
     });
   });
@@ -71,9 +72,9 @@ describe('useParentalConsent', () => {
   describe('needsConsent', () => {
     it('should return true for users without consent', async () => {
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
       });
@@ -89,9 +90,9 @@ describe('useParentalConsent', () => {
 
     it('should return false for users with active consent', async () => {
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: 'consent-123',
                 parent_email: 'parent@example.com',
@@ -116,9 +117,9 @@ describe('useParentalConsent', () => {
 
     it('should return true for users with revoked consent', async () => {
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: 'consent-123',
                 parent_email: 'parent@example.com',
@@ -144,9 +145,9 @@ describe('useParentalConsent', () => {
 
   describe('submitConsent', () => {
     it('should submit consent successfully', async () => {
-      const mockInsert = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const mockInsert = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: { id: 'consent-123', parent_email: 'parent@test.com' },
             error: null,
           }),
@@ -154,9 +155,9 @@ describe('useParentalConsent', () => {
       });
 
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
         insert: mockInsert,
@@ -180,9 +181,9 @@ describe('useParentalConsent', () => {
     });
 
     it('should return false on submission error', async () => {
-      const mockInsert = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const mockInsert = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: null,
             error: { message: 'Database error' },
           }),
@@ -190,9 +191,9 @@ describe('useParentalConsent', () => {
       });
 
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
         insert: mockInsert,
@@ -219,14 +220,14 @@ describe('useParentalConsent', () => {
 
   describe('revokeConsent', () => {
     it('should revoke consent successfully', async () => {
-      const mockUpdate = jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ data: null, error: null }),
       });
 
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: 'consent-123',
                 parent_email: 'parent@example.com',
@@ -266,9 +267,9 @@ describe('useParentalConsent', () => {
       };
 
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: consentData, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: consentData, error: null }),
           }),
         }),
       });
@@ -284,9 +285,9 @@ describe('useParentalConsent', () => {
 
     it('should return null when no consent exists', async () => {
       mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
       });

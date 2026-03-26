@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useMascotImageAnimation,
@@ -7,15 +8,13 @@ import {
 import { useDevicePerformance } from '../useDevicePerformance';
 
 // Mock device performance hook
-jest.mock('../useDevicePerformance');
-const mockUseDevicePerformance = useDevicePerformance as jest.MockedFunction<
-  typeof useDevicePerformance
->;
+vi.mock('../useDevicePerformance');
+const mockUseDevicePerformance = useDevicePerformance as any;
 
 describe('useMascotImageAnimation', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
-    jest.useFakeTimers();
+    vi.clearAllTimers();
+    vi.useFakeTimers();
     mockUseDevicePerformance.mockReturnValue({
       isLowEnd: false,
       targetFPS: 60,
@@ -31,8 +30,8 @@ describe('useMascotImageAnimation', () => {
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it('should start with initial preset', () => {
@@ -67,7 +66,7 @@ describe('useMascotImageAnimation', () => {
 
     // Fast-forward to trigger animation change
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Should have changed to a different animation
@@ -124,7 +123,7 @@ describe('useMascotImageAnimation', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
     });
 
     expect(result.current.currentPreset).toBe('bounce');
@@ -166,7 +165,7 @@ describe('useMascotImageAnimation', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(result.current.currentPreset).toBe('bounce');

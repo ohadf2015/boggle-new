@@ -1,19 +1,18 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudentProgressMetrics } from '../useStudentProgressMetrics';
 import { getStudentsProgressSummary, type StudentProgressSummary } from '@/lib/supabase/analytics';
 
 // Mock the analytics module
-jest.mock('@/lib/supabase/analytics', () => ({
-  getStudentsProgressSummary: jest.fn(),
+vi.mock('@/lib/supabase/analytics', () => ({
+  getStudentsProgressSummary: vi.fn(),
 }));
 
-const mockGetStudentsProgressSummary = getStudentsProgressSummary as jest.MockedFunction<
-  typeof getStudentsProgressSummary
->;
+const mockGetStudentsProgressSummary = getStudentsProgressSummary as any;
 
 describe('useStudentProgressMetrics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading state initially', () => {

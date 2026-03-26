@@ -4,6 +4,7 @@
  * Tests for lesson draft auto-save to localStorage
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLessonDraft, type LessonDraft } from '../useLessonDraft';
 
@@ -11,14 +12,14 @@ import { useLessonDraft, type LessonDraft } from '../useLessonDraft';
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
   };
@@ -31,12 +32,12 @@ Object.defineProperty(window, 'localStorage', {
 describe('useLessonDraft', () => {
   beforeEach(() => {
     mockLocalStorage.clear();
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -103,7 +104,7 @@ describe('useLessonDraft', () => {
 
     it('should include savedAt timestamp', () => {
       const now = Date.now();
-      jest.setSystemTime(now);
+      vi.setSystemTime(now);
 
       const { result } = renderHook(() => useLessonDraft());
 

@@ -1,6 +1,7 @@
 /**
  * Tests for useAdventureGame addTime functionality
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -41,7 +42,7 @@ describe('useAdventureGame - addTime', () => {
   });
 
   it('should increase timeRemaining when addTime is called', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const { result } = renderHook(() =>
       useAdventureGame({
@@ -57,7 +58,7 @@ describe('useAdventureGame - addTime', () => {
 
     // Let 5 seconds pass (timer ticks down from 60 to 55)
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Verify timer decreased
@@ -71,7 +72,7 @@ describe('useAdventureGame - addTime', () => {
     // Timer can exceed initial timerSeconds, capped at MAX_TIMER_SECONDS (180)
     expect(result.current.timeRemaining).toBe(65);
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should cap addTime at MAX_TIMER_SECONDS (180), not timerSeconds', () => {

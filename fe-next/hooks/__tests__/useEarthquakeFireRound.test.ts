@@ -8,13 +8,14 @@
  * - Score multiplier during fire round
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useEarthquakeFireRound } from '../useEarthquakeFireRound';
 import type { Socket } from 'socket.io-client';
 
 // Mock the utils
-jest.mock('../../utils/utils', () => ({
-  generateRandomTable: jest.fn(() => [
+vi.mock('../../utils/utils', () => ({
+  generateRandomTable: vi.fn(() => [
     ['A', 'B', 'C'],
     ['D', 'E', 'F'],
     ['G', 'H', 'I'],
@@ -22,7 +23,7 @@ jest.mock('../../utils/utils', () => ({
 }));
 
 // Mock the consts
-jest.mock('../../utils/consts', () => ({
+vi.mock('../../utils/consts', () => ({
   DIFFICULTIES: {
     EASY: { rows: 3, cols: 3 },
     MEDIUM: { rows: 4, cols: 4 },
@@ -35,9 +36,9 @@ describe('useEarthquakeFireRound', () => {
   const originalRandom = Math.random;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.clearAllTimers();
+    vi.useFakeTimers();
     // Mock Math.random to return 0.9 consistently
     // This ensures triggerTimeRef.current is ~24s (low), preventing auto-trigger
     // when currentTimeSeconds is 60+ (higher than trigger threshold)
@@ -45,17 +46,17 @@ describe('useEarthquakeFireRound', () => {
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
     // Restore original Math.random
     Math.random = originalRandom;
   });
 
   describe('timer pause/resume behavior', () => {
     it('should pause timer when earthquake warning starts', async () => {
-      const onTimerPause = jest.fn();
-      const onTimerResume = jest.fn();
-      const onEarthquakeStart = jest.fn();
+      const onTimerPause = vi.fn();
+      const onTimerResume = vi.fn();
+      const onEarthquakeStart = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -83,12 +84,12 @@ describe('useEarthquakeFireRound', () => {
     });
 
     it('should resume timer after fire round starts (new letters appear)', async () => {
-      const onTimerPause = jest.fn();
-      const onTimerResume = jest.fn();
-      const onEarthquakeStart = jest.fn();
-      const onEarthquakeShake = jest.fn();
-      const onFireRoundStart = jest.fn();
-      const onGridRegenerate = jest.fn();
+      const onTimerPause = vi.fn();
+      const onTimerResume = vi.fn();
+      const onEarthquakeStart = vi.fn();
+      const onEarthquakeShake = vi.fn();
+      const onFireRoundStart = vi.fn();
+      const onGridRegenerate = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -118,7 +119,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance through warning phase (2000ms)
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(result.current.earthquakeState).toBe('shaking');
@@ -128,7 +129,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance through shake phase (1000ms)
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       // Now fire round starts, grid regenerates, and timer resumes
@@ -141,12 +142,12 @@ describe('useEarthquakeFireRound', () => {
 
     it('should execute earthquake sequence in correct order', async () => {
       const callOrder: string[] = [];
-      const onTimerPause = jest.fn(() => callOrder.push('pause'));
-      const onTimerResume = jest.fn(() => callOrder.push('resume'));
-      const onEarthquakeStart = jest.fn(() => callOrder.push('warning'));
-      const onEarthquakeShake = jest.fn(() => callOrder.push('shake'));
-      const onFireRoundStart = jest.fn(() => callOrder.push('fireRound'));
-      const onGridRegenerate = jest.fn(() => callOrder.push('gridRegenerate'));
+      const onTimerPause = vi.fn(() => callOrder.push('pause'));
+      const onTimerResume = vi.fn(() => callOrder.push('resume'));
+      const onEarthquakeStart = vi.fn(() => callOrder.push('warning'));
+      const onEarthquakeShake = vi.fn(() => callOrder.push('shake'));
+      const onFireRoundStart = vi.fn(() => callOrder.push('fireRound'));
+      const onGridRegenerate = vi.fn(() => callOrder.push('gridRegenerate'));
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -172,7 +173,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance through entire sequence
       act(() => {
-        jest.advanceTimersByTime(3000); // Warning (2s) + Shake (1s)
+        vi.advanceTimersByTime(3000); // Warning (2s) + Shake (1s)
       });
 
       // Verify correct order: warning → pause → shake → gridRegenerate → fireRound → resume
@@ -217,20 +218,20 @@ describe('useEarthquakeFireRound', () => {
       expect(result.current.earthquakeState).toBe('warning');
 
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(result.current.earthquakeState).toBe('shaking');
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.earthquakeState).toBe('fire-round');
     });
 
     it('should return to idle after fire round ends', async () => {
-      const onFireRoundEnd = jest.fn();
+      const onFireRoundEnd = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -250,7 +251,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance through warning + shake + fire round (2s + 1s + 15s)
       act(() => {
-        jest.advanceTimersByTime(18000);
+        vi.advanceTimersByTime(18000);
       });
 
       expect(result.current.earthquakeState).toBe('idle');
@@ -278,14 +279,14 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance to fire round start
       act(() => {
-        jest.advanceTimersByTime(3000); // warning + shake
+        vi.advanceTimersByTime(3000); // warning + shake
       });
 
       expect(result.current.fireRoundRemaining).toBe(15);
 
       // Advance 5 seconds
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(result.current.fireRoundRemaining).toBe(10);
@@ -326,7 +327,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance to fire round
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       expect(result.current.getScoreMultiplier()).toBe(2);
@@ -350,7 +351,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance through entire sequence
       act(() => {
-        jest.advanceTimersByTime(18000);
+        vi.advanceTimersByTime(18000);
       });
 
       expect(result.current.getScoreMultiplier()).toBe(1);
@@ -359,7 +360,7 @@ describe('useEarthquakeFireRound', () => {
 
   describe('grid regeneration', () => {
     it('should call onGridRegenerate with new grid during fire round', async () => {
-      const onGridRegenerate = jest.fn();
+      const onGridRegenerate = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -379,7 +380,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Advance to fire round
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // Grid regeneration should be called at least once during fire round
@@ -399,10 +400,10 @@ describe('useEarthquakeFireRound', () => {
   describe('multiplayer mode', () => {
     it('should emit socket event for multiplayer host instead of executing locally', () => {
       const mockSocket = {
-        emit: jest.fn(),
+        emit: vi.fn(),
       } as unknown as Socket;
 
-      const onTimerPause = jest.fn();
+      const onTimerPause = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -436,7 +437,7 @@ describe('useEarthquakeFireRound', () => {
 
   describe('edge cases', () => {
     it('should not trigger earthquake if already triggered', () => {
-      const onEarthquakeStart = jest.fn();
+      const onEarthquakeStart = vi.fn();
 
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
@@ -502,7 +503,7 @@ describe('useEarthquakeFireRound', () => {
 
       // Should not throw errors
       expect(() => {
-        jest.runAllTimers();
+        vi.runAllTimers();
       }).not.toThrow();
     });
   });

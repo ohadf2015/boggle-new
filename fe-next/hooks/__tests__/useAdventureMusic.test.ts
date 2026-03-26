@@ -4,54 +4,50 @@
  * Tests world-specific music loading, track switching, and pause/resume behavior.
  */
 
+import { vi } from 'vitest';
 import React, { ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureMusic } from '../useAdventureMusic';
 import { MusicProvider } from '@/contexts/MusicContext';
 
-// Mock Howler.js
-const mockPlay = jest.fn();
-const mockStop = jest.fn();
-const mockPause = jest.fn();
-const mockFade = jest.fn();
-const mockVolume = jest.fn();
-const mockSeek = jest.fn();
-const mockUnload = jest.fn();
-const mockLoad = jest.fn();
-const mockState = jest.fn().mockReturnValue('loaded');
-const mockPlaying = jest.fn().mockReturnValue(false);
+// Mock Howler.js — use vi.hoisted so vars exist when vi.mock factory runs (hoisted above imports)
+const { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance } = vi.hoisted(() => {
+  const mockPlay = vi.fn();
+  const mockStop = vi.fn();
+  const mockPause = vi.fn();
+  const mockFade = vi.fn();
+  const mockVolume = vi.fn();
+  const mockSeek = vi.fn();
+  const mockUnload = vi.fn();
+  const mockLoad = vi.fn();
+  const mockState = vi.fn().mockReturnValue('loaded');
+  const mockPlaying = vi.fn().mockReturnValue(false);
+  const mockHowlInstance = {
+    play: mockPlay, stop: mockStop, pause: mockPause, fade: mockFade,
+    volume: mockVolume, seek: mockSeek, unload: mockUnload, load: mockLoad,
+    state: mockState, playing: mockPlaying,
+  };
+  return { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance };
+});
 
-const mockHowlInstance = {
-  play: mockPlay,
-  stop: mockStop,
-  pause: mockPause,
-  fade: mockFade,
-  volume: mockVolume,
-  seek: mockSeek,
-  unload: mockUnload,
-  load: mockLoad,
-  state: mockState,
-  playing: mockPlaying,
-};
-
-jest.mock('howler', () => ({
-  Howl: jest.fn().mockImplementation(() => mockHowlInstance),
+vi.mock('howler', () => ({
+  Howl: vi.fn(function() { return mockHowlInstance; }),
   Howler: {
     ctx: {
       state: 'running',
-      resume: jest.fn().mockResolvedValue(undefined),
+      resume: vi.fn().mockResolvedValue(undefined),
     },
   },
 }));
 
 // Mock logger - needs to match the actual export shape
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
   };
   return {
     __esModule: true,
@@ -77,22 +73,22 @@ describe('useAdventureMusic', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockPlaying.mockReturnValue(false);
     mockState.mockReturnValue('loaded');
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
-    it('initializes tracks for world with music (1-3)', () => {
-      const { Howl } = require('howler');
+    it('initializes tracks for world with music (1-3)', async () => {
+      const { Howl } = await import('howler');
 
       // Clear mocks to ignore MusicProvider's Howl calls
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       renderHook(() => useAdventureMusic(defaultProps), { wrapper: createWrapper() });
 
@@ -118,11 +114,11 @@ describe('useAdventureMusic', () => {
       );
     });
 
-    it('does NOT initialize tracks for worlds without music (4+)', () => {
-      const { Howl } = require('howler');
+    it('does NOT initialize tracks for worlds without music (4+)', async () => {
+      const { Howl } = await import('howler');
 
       // Clear mocks to ignore MusicProvider's Howl calls
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       renderHook(() =>
         useAdventureMusic({
@@ -224,7 +220,7 @@ describe('useAdventureMusic', () => {
       );
 
       // Clear mocks from initialization
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Time drops below 50% threshold
       rerender({ timeRemaining: switchTime - 1 });
@@ -249,14 +245,14 @@ describe('useAdventureMusic', () => {
       );
 
       // Clear mocks from initialization
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // First threshold crossing
       rerender({ timeRemaining: 59 });
       const firstCallCount = mockPlay.mock.calls.length;
 
       // Clear and cross again
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       rerender({ timeRemaining: 58 });
 
       // Should NOT call play again (already on track 2)
@@ -302,15 +298,15 @@ describe('useAdventureMusic', () => {
   });
 
   describe('world changes', () => {
-    it('reinitializes tracks when world number changes', () => {
-      const { Howl } = require('howler');
+    it('reinitializes tracks when world number changes', async () => {
+      const { Howl } = await import('howler');
 
       const { rerender } = renderHook(
         ({ worldNumber }) => useAdventureMusic({ ...defaultProps, worldNumber }),
         { initialProps: { worldNumber: 1 }, wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Change to world 2
       rerender({ worldNumber: 2 });
@@ -346,9 +342,9 @@ describe('useAdventureMusic', () => {
   });
 
   describe('continuous looping', () => {
-    it('loops music when track ends in adventure mode', () => {
+    it('loops music when track ends in adventure mode', async () => {
       // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
       const capturedOnEndCallbacks: (() => void)[] = [];
 
       Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
@@ -386,9 +382,9 @@ describe('useAdventureMusic', () => {
       expect(mockFade).toHaveBeenCalled();
     });
 
-    it('continues looping even when window was briefly unfocused', () => {
+    it('continues looping even when window was briefly unfocused', async () => {
       // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
       const capturedOnEndCallbacks: (() => void)[] = [];
 
       Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
@@ -427,9 +423,9 @@ describe('useAdventureMusic', () => {
       expect(mockPlay).toHaveBeenCalled();
     });
 
-    it('does NOT loop when music is disabled', () => {
+    it('does NOT loop when music is disabled', async () => {
       // GIVEN
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
       let capturedOnEnd: (() => void) | undefined;
 
       Howl.mockImplementation((config: { onend?: () => void }) => {
@@ -466,9 +462,9 @@ describe('useAdventureMusic', () => {
       expect(mockPlay).not.toHaveBeenCalled();
     });
 
-    it('does NOT loop when game is paused', () => {
+    it('does NOT loop when game is paused', async () => {
       // GIVEN
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
       let capturedOnEnd: (() => void) | undefined;
 
       Howl.mockImplementation((config: { onend?: () => void }) => {

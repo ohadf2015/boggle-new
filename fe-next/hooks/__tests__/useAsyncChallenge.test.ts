@@ -4,24 +4,27 @@
  * Tests async board challenge CRUD: fetch, create, accept, submit, decline.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // --- Mocks (must be before imports) ---
 
 const mockUser = { id: 'test-user-id' };
-const mockUseAuth = jest.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-const mockSelect = jest.fn();
-const mockInsert = jest.fn();
-const mockUpdate = jest.fn();
-const mockDelete = jest.fn();
-const mockFrom = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const mockSelect = vi.fn();
+const mockInsert = vi.fn();
+const mockUpdate = vi.fn();
+const mockDelete = vi.fn();
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
   },
@@ -59,18 +62,18 @@ function makeChallengeRow(overrides: Record<string, unknown> = {}) {
 }
 
 function setupFetchSuccess(rows: Record<string, unknown>[]) {
-  const orderFn = jest.fn().mockResolvedValue({ data: rows, error: null });
-  const inFn = jest.fn().mockReturnValue({ order: orderFn });
-  const orFn = jest.fn().mockReturnValue({ in: inFn });
-  const selectFn = jest.fn().mockReturnValue({ or: orFn });
+  const orderFn = vi.fn().mockResolvedValue({ data: rows, error: null });
+  const inFn = vi.fn().mockReturnValue({ order: orderFn });
+  const orFn = vi.fn().mockReturnValue({ in: inFn });
+  const selectFn = vi.fn().mockReturnValue({ or: orFn });
   mockFrom.mockReturnValue({ select: selectFn, insert: mockInsert, update: mockUpdate });
 }
 
 function setupFetchError() {
-  const orderFn = jest.fn().mockResolvedValue({ data: null, error: { message: 'fail' } });
-  const inFn = jest.fn().mockReturnValue({ order: orderFn });
-  const orFn = jest.fn().mockReturnValue({ in: inFn });
-  const selectFn = jest.fn().mockReturnValue({ or: orFn });
+  const orderFn = vi.fn().mockResolvedValue({ data: null, error: { message: 'fail' } });
+  const inFn = vi.fn().mockReturnValue({ order: orderFn });
+  const orFn = vi.fn().mockReturnValue({ in: inFn });
+  const selectFn = vi.fn().mockReturnValue({ or: orFn });
   mockFrom.mockReturnValue({ select: selectFn, insert: mockInsert, update: mockUpdate });
 }
 
@@ -78,7 +81,7 @@ function setupFetchError() {
 
 describe('useAsyncChallenge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: mockUser });
   });
 
@@ -128,12 +131,12 @@ describe('useAsyncChallenge', () => {
 
       // Setup insert mock for createChallenge call
       const createdRow = makeChallengeRow({ id: 'ch-new' });
-      const singleFn = jest.fn().mockResolvedValue({ data: createdRow, error: null });
-      const selectAfterInsert = jest.fn().mockReturnValue({ single: singleFn });
+      const singleFn = vi.fn().mockResolvedValue({ data: createdRow, error: null });
+      const selectAfterInsert = vi.fn().mockReturnValue({ single: singleFn });
       mockFrom.mockReturnValue({
-        insert: jest.fn().mockReturnValue({ select: selectAfterInsert }),
-        select: jest.fn(),
-        update: jest.fn(),
+        insert: vi.fn().mockReturnValue({ select: selectAfterInsert }),
+        select: vi.fn(),
+        update: vi.fn(),
       });
 
       let created: unknown;
@@ -186,12 +189,12 @@ describe('useAsyncChallenge', () => {
       await waitFor(() => expect(result.current.loading).toBe(false));
 
       // Setup update mock
-      const eqChained = jest.fn().mockResolvedValue({ error: null });
-      const eqFirst = jest.fn().mockReturnValue({ eq: eqChained });
+      const eqChained = vi.fn().mockResolvedValue({ error: null });
+      const eqFirst = vi.fn().mockReturnValue({ eq: eqChained });
       mockFrom.mockReturnValue({
-        update: jest.fn().mockReturnValue({ eq: eqFirst }),
-        select: jest.fn(),
-        insert: jest.fn(),
+        update: vi.fn().mockReturnValue({ eq: eqFirst }),
+        select: vi.fn(),
+        insert: vi.fn(),
       });
 
       let success: boolean = false;
@@ -212,12 +215,12 @@ describe('useAsyncChallenge', () => {
       const { result } = renderHook(() => useAsyncChallenge());
       await waitFor(() => expect(result.current.loading).toBe(false));
 
-      const eqChained = jest.fn().mockResolvedValue({ error: null });
-      const eqFirst = jest.fn().mockReturnValue({ eq: eqChained });
+      const eqChained = vi.fn().mockResolvedValue({ error: null });
+      const eqFirst = vi.fn().mockReturnValue({ eq: eqChained });
       mockFrom.mockReturnValue({
-        update: jest.fn().mockReturnValue({ eq: eqFirst }),
-        select: jest.fn(),
-        insert: jest.fn(),
+        update: vi.fn().mockReturnValue({ eq: eqFirst }),
+        select: vi.fn(),
+        insert: vi.fn(),
       });
 
       let success: boolean = false;
@@ -246,12 +249,12 @@ describe('useAsyncChallenge', () => {
       await waitFor(() => expect(result.current.loading).toBe(false));
       expect(result.current.challenges).toHaveLength(1);
 
-      const eqChained = jest.fn().mockResolvedValue({ error: null });
-      const eqFirst = jest.fn().mockReturnValue({ eq: eqChained });
+      const eqChained = vi.fn().mockResolvedValue({ error: null });
+      const eqFirst = vi.fn().mockReturnValue({ eq: eqChained });
       mockFrom.mockReturnValue({
-        update: jest.fn().mockReturnValue({ eq: eqFirst }),
-        select: jest.fn(),
-        insert: jest.fn(),
+        update: vi.fn().mockReturnValue({ eq: eqFirst }),
+        select: vi.fn(),
+        insert: vi.fn(),
       });
 
       let success: boolean = false;

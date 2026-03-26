@@ -1,15 +1,16 @@
+import { vi } from 'vitest';
 import { checkWordIntegration, checkWordIntegrationAsync, useWordIntegration } from '../useWordIntegration';
 import { renderHook } from '@testing-library/react';
 
 // Mock fetch for async dictionary checks
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
-const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+const mockFetch = global.fetch as any;
 
 describe('checkWordIntegration', () => {
   beforeEach(() => {
     // Reset mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default: simulate API response for dictionary validation
     mockFetch.mockImplementation(async (_url, options) => {

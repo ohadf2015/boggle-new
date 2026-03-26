@@ -1,10 +1,14 @@
 'use client';
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock Howler
-const mockHowlerMute = jest.fn();
-jest.mock('howler', () => ({
+const { mockHowlerMute } = vi.hoisted(() => {
+  const mockHowlerMute = vi.fn();
+  return { mockHowlerMute };
+});
+vi.mock('howler', () => ({
   Howler: { mute: (val: boolean) => mockHowlerMute(val) },
 }));
 
@@ -14,7 +18,7 @@ const mockSettings = {
   shouldDisableChat: false,
   isReady: true,
 };
-jest.mock('@/hooks/useCrazyGamesSettings', () => ({
+vi.mock('@/hooks/useCrazyGamesSettings', () => ({
   useCrazyGamesSettings: () => mockSettings,
 }));
 
@@ -22,7 +26,7 @@ import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
 
 describe('CrazyGamesSettingsBridge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSettings.shouldMuteAudio = false;
     mockSettings.shouldDisableChat = false;
     mockSettings.isReady = true;

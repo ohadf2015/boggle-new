@@ -1,12 +1,13 @@
 /**
  * @jest-environment jsdom
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAutoScrollOnGameStart } from '../useAutoScrollOnGameStart';
 import type { RefObject } from 'react';
 
 // Mock window.scrollTo
-const mockScrollTo = jest.fn();
+const mockScrollTo = vi.fn();
 Object.defineProperty(window, 'scrollTo', {
   value: mockScrollTo,
   writable: true,
@@ -31,8 +32,8 @@ describe('useAutoScrollOnGameStart', () => {
   let gridElement: HTMLDivElement;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Reset window properties
     Object.defineProperty(window, 'innerWidth', { value: 400, writable: true });
@@ -41,7 +42,7 @@ describe('useAutoScrollOnGameStart', () => {
 
     // Create target element
     targetElement = document.createElement('div');
-    targetElement.getBoundingClientRect = jest.fn(() =>
+    targetElement.getBoundingClientRect = vi.fn(() =>
       mockGetBoundingClientRect(100, 150)
     );
     document.body.appendChild(targetElement);
@@ -49,7 +50,7 @@ describe('useAutoScrollOnGameStart', () => {
     // Create grid element
     gridElement = document.createElement('div');
     gridElement.className = 'game-board-frame';
-    gridElement.getBoundingClientRect = jest.fn(() =>
+    gridElement.getBoundingClientRect = vi.fn(() =>
       mockGetBoundingClientRect(200, 700)
     );
     document.body.appendChild(gridElement);
@@ -58,7 +59,7 @@ describe('useAutoScrollOnGameStart', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     // Clean up DOM elements properly
     if (targetElement.parentNode) {
       targetElement.parentNode.removeChild(targetElement);
@@ -78,7 +79,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(mockScrollTo).not.toHaveBeenCalled();
@@ -94,7 +95,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(mockScrollTo).not.toHaveBeenCalled();
@@ -110,7 +111,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(mockScrollTo).not.toHaveBeenCalled();
@@ -130,7 +131,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Desktop without touch - should NOT scroll
@@ -158,14 +159,14 @@ describe('useAutoScrollOnGameStart', () => {
     // Game becomes active with animation showing
     rerender({ gameActive: true, showStartAnimation: true });
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
     expect(mockScrollTo).not.toHaveBeenCalled();
 
     // Animation finishes
     rerender({ gameActive: true, showStartAnimation: false });
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Should scroll now
@@ -193,7 +194,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     const firstCallCount = mockScrollTo.mock.calls.length;
@@ -202,7 +203,7 @@ describe('useAutoScrollOnGameStart', () => {
     // Re-render with same state
     rerender({ gameActive: true });
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Should NOT have scrolled again
@@ -226,7 +227,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     const firstCallCount = mockScrollTo.mock.calls.length;
@@ -234,13 +235,13 @@ describe('useAutoScrollOnGameStart', () => {
     // Game ends
     rerender({ gameActive: false });
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Game restarts
     rerender({ gameActive: true });
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Should have scrolled again for new game
@@ -260,7 +261,7 @@ describe('useAutoScrollOnGameStart', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(mockScrollTo).toHaveBeenCalledWith(

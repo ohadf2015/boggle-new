@@ -1,11 +1,14 @@
 /**
  * useCrazyGamesFriends hook tests
  */
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
-const mockListFriends = jest.fn();
-
-jest.mock('@/components/CrazyGamesSDK', () => ({
+const { mockListFriends } = vi.hoisted(() => {
+  const mockListFriends = vi.fn();
+  return { mockListFriends };
+});
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
     listFriends: mockListFriends,
@@ -16,7 +19,7 @@ import { useCrazyGamesFriends } from '../useCrazyGamesFriends';
 
 describe('useCrazyGamesFriends', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('starts with empty friends list', () => {

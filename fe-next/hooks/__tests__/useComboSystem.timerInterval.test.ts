@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useComboSystem } from '../useComboSystem';
 
@@ -11,15 +12,15 @@ function activateCombo(result: { current: ReturnType<typeof useComboSystem> }) {
 
 describe('useComboSystem — timerIntervalMs option', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should use 500ms interval by default', () => {
-    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
     const { result } = renderHook(() => useComboSystem());
 
     activateCombo(result);
@@ -33,7 +34,7 @@ describe('useComboSystem — timerIntervalMs option', () => {
   });
 
   it('should use custom timerIntervalMs when provided', () => {
-    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
     const { result } = renderHook(() =>
       useComboSystem({ timerIntervalMs: 500 })
     );
@@ -69,7 +70,7 @@ describe('useComboSystem — timerIntervalMs option', () => {
 
     // Advance 500ms — should trigger one update
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Time remaining should have decreased

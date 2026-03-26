@@ -3,13 +3,14 @@
  * TDD: RED phase — all tests written before implementation
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBoardCreator } from '../useBoardCreator';
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 beforeEach(() => {
   mockFetch.mockReset();

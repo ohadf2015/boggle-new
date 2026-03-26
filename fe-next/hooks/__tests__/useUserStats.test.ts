@@ -4,21 +4,22 @@
  * Tests hook that fetches user statistics for feature gating
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useUserStats } from '../useUserStats';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/AuthContext');
 
 describe('useUserStats', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return null stats for unauthenticated users', () => {
     // GIVEN - No authenticated user
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: null,
       profile: null,
       loading: false, // AuthContext uses 'loading', not 'isLoading'
@@ -34,7 +35,7 @@ describe('useUserStats', () => {
 
   it('should return stats for authenticated users', () => {
     // GIVEN - Authenticated user with profile
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: { id: 'user-123' },
       profile: {
         id: 'user-123',
@@ -55,7 +56,7 @@ describe('useUserStats', () => {
 
   it('should handle loading state', () => {
     // GIVEN - Auth is still loading
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: null,
       profile: null,
       loading: true, // AuthContext uses 'loading', not 'isLoading'
@@ -71,7 +72,7 @@ describe('useUserStats', () => {
 
   it('should handle profile without total_games field', () => {
     // GIVEN - Profile exists but no total_games
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: { id: 'user-123' },
       profile: {
         id: 'user-123',
@@ -94,7 +95,7 @@ describe('useUserStats', () => {
     // GIVEN - Initial profile with 5 games
     const { result, rerender } = renderHook(() => useUserStats());
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: { id: 'user-123' },
       profile: {
         id: 'user-123',
@@ -106,7 +107,7 @@ describe('useUserStats', () => {
     // WHEN - Profile updates to 6 games
     rerender();
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as any).mockReturnValue({
       user: { id: 'user-123' },
       profile: {
         id: 'user-123',

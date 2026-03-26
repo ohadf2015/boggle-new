@@ -5,6 +5,7 @@
  * TDD RED phase — written before implementation.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useUnfinishedBoard } from '../useUnfinishedBoard';
 import type { LetterGrid } from '@/shared/types/game';
@@ -13,14 +14,14 @@ import type { LetterGrid } from '@/shared/types/game';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
   };
@@ -42,7 +43,7 @@ const mockMissedWords = ['QUARTZ', 'JUMBLE', 'FROZEN', 'APEX', 'BLITZ'];
 describe('useUnfinishedBoard', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('saveUnfinishedBoard', () => {

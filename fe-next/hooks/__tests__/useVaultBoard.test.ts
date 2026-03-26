@@ -3,17 +3,18 @@
  * Tests for the vault board fetching and countdown hook
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useVaultBoard } from '../useVaultBoard';
 
 // Mock supabase client
-const mockSelect = jest.fn();
-const mockEq = jest.fn();
-const mockOrder = jest.fn();
-const mockLimit = jest.fn();
-const mockMaybeSingle = jest.fn();
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockOrder = vi.fn();
+const mockLimit = vi.fn();
+const mockMaybeSingle = vi.fn();
 
-const mockFrom = jest.fn((_table: string) => ({
+const mockFrom = vi.fn((_table: string) => ({
   select: mockSelect,
 }));
 
@@ -38,7 +39,7 @@ mockOrder.mockReturnValue({
 mockLimit.mockResolvedValue({ data: [], error: null });
 mockMaybeSingle.mockResolvedValue({ data: null, error: null });
 
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (table: string) => mockFrom(table),
   },
@@ -46,14 +47,14 @@ jest.mock('@/lib/supabase', () => ({
 
 describe('useVaultBoard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockLimit.mockResolvedValue({ data: [], error: null });
     mockMaybeSingle.mockResolvedValue({ data: null, error: null });
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should start in loading state', () => {
@@ -68,7 +69,7 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     expect(result.current.vault).toBeNull();
@@ -94,7 +95,7 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     expect(result.current.vault).toEqual(vault);
@@ -121,7 +122,7 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     // timeRemaining should be roughly 2 hours in ms
@@ -148,13 +149,13 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     const initial = result.current.timeRemaining;
 
     await act(async () => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(result.current.timeRemaining).toBeLessThan(initial);
@@ -183,7 +184,7 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     expect(result.current.leaderboard).toEqual(scores);
@@ -195,7 +196,7 @@ describe('useVaultBoard', () => {
     const { result } = renderHook(() => useVaultBoard());
 
     await act(async () => {
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
     });
 
     expect(result.current.vault).toBeNull();

@@ -5,20 +5,19 @@
  * for different game events (combos, level ups, word finds).
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useParticleBudget } from '../useParticleBudget';
 import * as useDevicePerformanceModule from '../useDevicePerformance';
 
 // Mock useDevicePerformance
-jest.mock('../useDevicePerformance');
+vi.mock('../useDevicePerformance');
 
-const mockUseDevicePerformance = useDevicePerformanceModule.useDevicePerformance as jest.MockedFunction<
-  typeof useDevicePerformanceModule.useDevicePerformance
->;
+const mockUseDevicePerformance = useDevicePerformanceModule.useDevicePerformance as any;
 
 describe('useParticleBudget', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('high-end devices', () => {

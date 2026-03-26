@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useClassroomLeaderboard } from '../useClassroomLeaderboard';
 import * as educationLib from '@/lib/supabase/education';
 
 // Mock the education library
-jest.mock('@/lib/supabase/education');
+vi.mock('@/lib/supabase/education');
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
@@ -38,7 +39,7 @@ describe('useClassroomLeaderboard', () => {
   const mockCurrentUserId = 'student-456';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==================== BASIC FUNCTIONALITY ====================
@@ -46,7 +47,7 @@ describe('useClassroomLeaderboard', () => {
   describe('Basic Functionality', () => {
     it('returns loading state initially', () => {
       // GIVEN: Mock returns pending promise
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockImplementation(
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockImplementation(
         () => new Promise(() => {}) // Never resolves
       );
 
@@ -76,7 +77,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: 'student-5', displayName: 'Eve', totalXp: 50, currentLevel: 1, rank: 5 }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -112,7 +113,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: 'student-5', displayName: 'Eve', totalXp: 50, rank: 5 }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -144,7 +145,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -176,7 +177,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: 'student-3', displayName: 'Carol', totalXp: 200, rank: 3 }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -205,7 +206,7 @@ describe('useClassroomLeaderboard', () => {
   describe('Edge Cases', () => {
     it('handles empty classroom gracefully', async () => {
       // GIVEN: Empty classroom
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: [],
         error: null,
       });
@@ -236,7 +237,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 1, isCurrentUser: true }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -267,7 +268,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 2, isCurrentUser: true }),
       ];
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: mockFullList,
         error: null,
       });
@@ -301,7 +302,7 @@ describe('useClassroomLeaderboard', () => {
         resolvePromise = resolve;
       });
 
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockReturnValue(promise as any);
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockReturnValue(promise as any);
 
       // WHEN: Hook is rendered
       const { result } = renderHook(() =>
@@ -327,7 +328,7 @@ describe('useClassroomLeaderboard', () => {
     it('handles error state', async () => {
       // GIVEN: API returns error
       const mockError = { message: 'Failed to fetch leaderboard' };
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta').mockResolvedValue({
         data: [],
         error: mockError,
       });
@@ -450,7 +451,7 @@ describe('useClassroomLeaderboard', () => {
 
     it('exposes setTimeScope to change scope', async () => {
       // GIVEN: Hook with default scope
-      jest.spyOn(educationLib, 'getLeaderboardWithRankDelta')
+      vi.spyOn(educationLib, 'getLeaderboardWithRankDelta')
         .mockResolvedValue({ data: [], error: null });
 
       // WHEN: Hook is rendered

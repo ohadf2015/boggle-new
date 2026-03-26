@@ -3,25 +3,22 @@
  * Tests achievement unlock detection and celebration queue management
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAchievementUnlock } from '../useAchievementUnlock';
 import type { StudentProgressData } from '@/backend/modules/educationAchievementManager';
 import * as achievementManager from '@/backend/modules/educationAchievementManager';
 
 // Mock achievement manager
-jest.mock('@/backend/modules/educationAchievementManager');
+vi.mock('@/backend/modules/educationAchievementManager');
 
 describe('useAchievementUnlock', () => {
   const mockStudentId = 'student-123';
-  const mockCalculateNewUnlocks = achievementManager.calculateNewUnlocks as jest.MockedFunction<
-    typeof achievementManager.calculateNewUnlocks
-  >;
-  const mockCheckAchievementProgress = achievementManager.checkAchievementProgress as jest.MockedFunction<
-    typeof achievementManager.checkAchievementProgress
-  >;
+  const mockCalculateNewUnlocks = achievementManager.calculateNewUnlocks as any;
+  const mockCheckAchievementProgress = achievementManager.checkAchievementProgress as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 

@@ -5,26 +5,27 @@
  * TDD: Tests written first, then implementation.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAIDirector } from './useAIDirector';
 import { useAIDirectorStore } from '@/stores/aiDirectorStore';
 import { DEFAULT_INTENSITY } from '@/lib/aiDirector/constants';
 
 // Mock useAdaptiveDifficulty (Phase 29)
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
-  useAdaptiveDifficulty: jest.fn(() => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
+  useAdaptiveDifficulty: vi.fn(() => ({
     tier: 'normal',
     adjustedConfig: {},
     hintData: null,
     powerUpCooldownMultiplier: 1.0,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   })),
 }));
 
 // Mock analytics logger
-jest.mock('@/lib/aiDirector/analyticsLogger', () => ({
-  logDDAEvent: jest.fn().mockResolvedValue(true),
-  createDDAEvent: jest.fn((params) => ({
+vi.mock('@/lib/aiDirector/analyticsLogger', () => ({
+  logDDAEvent: vi.fn().mockResolvedValue(true),
+  createDDAEvent: vi.fn((params) => ({
     ...params,
     timestamp: Date.now(),
   })),
@@ -37,13 +38,13 @@ import { logDDAEvent, createDDAEvent } from '@/lib/aiDirector/analyticsLogger';
 describe('useAIDirector', () => {
   beforeEach(() => {
     useAIDirectorStore.getState().reset();
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     useAIDirectorStore.getState().reset();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -60,12 +61,12 @@ describe('useAIDirector', () => {
 
     it('should integrate with Phase 29 tier', () => {
       // Mock different tier
-      (useAdaptiveDifficulty as jest.Mock).mockReturnValueOnce({
+      (useAdaptiveDifficulty as any).mockReturnValueOnce({
         tier: 'hard',
         adjustedConfig: {},
         hintData: null,
         powerUpCooldownMultiplier: 1.5,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       const { result } = renderHook(() =>
@@ -252,7 +253,7 @@ describe('useAIDirector', () => {
           result.current.recordWord(false, 0);
         }
         // Advance timer past warm-up period (60 seconds)
-        jest.advanceTimersByTime(65000);
+        vi.advanceTimersByTime(65000);
         result.current.handleTransition();
       });
 
@@ -300,7 +301,7 @@ describe('useAIDirector', () => {
       });
 
       // createDDAEvent should not be called for session_end without sessionId
-      const sessionEndCalls = (createDDAEvent as jest.Mock).mock.calls.filter(
+      const sessionEndCalls = (createDDAEvent as any).mock.calls.filter(
         (call) => call[0]?.adjustmentTrigger === 'session_end'
       );
       expect(sessionEndCalls.length).toBe(0);

@@ -4,6 +4,7 @@
  * Validates cascade animation delay calculations for chain tile reactions.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useCascadeAnimation,
@@ -297,7 +298,7 @@ describe('useCascadeAnimation Hook', () => {
   });
 
   test('auto-cleanup after totalDuration', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const { result } = renderHook(() => useCascadeAnimation());
 
@@ -314,12 +315,12 @@ describe('useCascadeAnimation Hook', () => {
 
     // Fast-forward past totalDuration (50ms max delay)
     act(() => {
-      jest.advanceTimersByTime(60);
+      vi.advanceTimersByTime(60);
     });
 
     expect(result.current.isAnimating).toBe(false);
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('wave pattern calculates correctly for 5x5 grid', () => {

@@ -2,17 +2,20 @@
  * Tests for useDailyMissions hook
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock supabase — must use inline factory to avoid hoisting issues
-const mockSingle = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const { mockSingle } = vi.hoisted(() => {
+  const mockSingle = vi.fn();
+  return { mockSingle };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
             single: (...args: unknown[]) => mockSingle(...args),
           }),
         }),
@@ -21,14 +24,14 @@ jest.mock('@/lib/supabase', () => ({
   },
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'user-123' } }),
 }));
 
 import { useDailyMissions } from '../useDailyMissions';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 const EMPTY_DATA = {

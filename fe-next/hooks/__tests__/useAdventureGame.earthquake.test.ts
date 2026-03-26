@@ -2,6 +2,7 @@
  * Tests for useAdventureGame REGENERATE_GRID action
  * Used during earthquake fire-round to replace the grid mid-game.
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -142,7 +143,7 @@ describe('useAdventureGame - REGENERATE_GRID (earthquake)', () => {
   });
 
   it('should preserve comboCount after grid regeneration', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const { result } = renderHook(() =>
       useAdventureGame({
@@ -170,7 +171,7 @@ describe('useAdventureGame - REGENERATE_GRID (earthquake)', () => {
 
     expect(result.current.gameState.comboCount).toBe(2);
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should create standard tiles (no special types) in regenerated grid', () => {

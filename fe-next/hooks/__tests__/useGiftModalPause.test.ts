@@ -5,12 +5,13 @@
  * and returns whether the gift modal is currently open.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useGiftModalPause } from '../useGiftModalPause';
 
 describe('useGiftModalPause', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return false initially', () => {
@@ -101,8 +102,8 @@ describe('useGiftModalPause', () => {
   });
 
   it('should cleanup event listener on unmount', () => {
-    const addSpy = jest.spyOn(window, 'addEventListener');
-    const removeSpy = jest.spyOn(window, 'removeEventListener');
+    const addSpy = vi.spyOn(window, 'addEventListener');
+    const removeSpy = vi.spyOn(window, 'removeEventListener');
 
     const { unmount } = renderHook(() => useGiftModalPause());
 

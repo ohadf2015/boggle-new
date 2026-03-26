@@ -4,6 +4,7 @@
  * Tests reaction trigger detection, cooldown enforcement, and priority handling.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLexiReactions, type GameStateForReactions } from '../useLexiReactions';
 
@@ -19,11 +20,11 @@ describe('useLexiReactions', () => {
   });
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initial state', () => {
@@ -143,7 +144,7 @@ describe('useLexiReactions', () => {
 
       // Wait past cooldown so next reaction can trigger
       act(() => {
-        jest.advanceTimersByTime(3500);
+        vi.advanceTimersByTime(3500);
       });
 
       // Now cross 10x threshold
@@ -176,7 +177,7 @@ describe('useLexiReactions', () => {
       // Try to trigger another immediately (should be blocked by cooldown)
       // Advance time but not past cooldown
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       const state2 = createGameState({ wordsFound: ['AMAZING', 'BRILLIANT'] });
@@ -203,7 +204,7 @@ describe('useLexiReactions', () => {
 
       // Wait for cooldown
       act(() => {
-        jest.advanceTimersByTime(3500);
+        vi.advanceTimersByTime(3500);
       });
 
       // Clear the auto-dismissed reaction

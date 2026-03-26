@@ -1,14 +1,27 @@
-'use client';
-
+import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUnclaimedGifts } from '../useUnclaimedGifts';
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
+
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock useAuth
-const mockIsAuthenticated = jest.fn(() => true);
-jest.mock('@/contexts/AuthContext', () => ({
+const { mockIsAuthenticated } = vi.hoisted(() => {
+  const mockIsAuthenticated = vi.fn(() => true);
+  return { mockIsAuthenticated };
+});
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: mockIsAuthenticated(),
   }),
@@ -16,7 +29,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
     mockIsAuthenticated.mockReturnValue(true);
   });
@@ -37,7 +50,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
 
       // First call: unclaimed-count returns 1
       // Second call: gifts returns the full list
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ success: true, count: 1 }),
@@ -47,7 +60,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
           json: async () => ({ success: true, gifts: [mockGift] }),
         });
 
-      const { result } = renderHook(() => useUnclaimedGifts());
+      const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
 
       // Wait for initial fetch to complete
       await waitFor(() => {
@@ -68,12 +81,12 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
     });
 
     it('should not fetch gifts when unclaimed count is 0', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, count: 0 }),
       });
 
-      const { result } = renderHook(() => useUnclaimedGifts());
+      const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -100,7 +113,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
         created_at: new Date().toISOString(),
       };
 
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ success: true, count: 1 }),
@@ -110,7 +123,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
           json: async () => ({ success: true, gifts: [mockGift] }),
         });
 
-      const { result } = renderHook(() => useUnclaimedGifts());
+      const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
 
       // Wait for loading to complete
       await waitFor(() => {

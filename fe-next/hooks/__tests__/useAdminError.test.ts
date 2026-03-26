@@ -3,21 +3,22 @@
  * Verifies toast-based error handling for admin dashboard
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdminError } from '../useAdminError';
 import * as NeoToast from '@/components/NeoToast';
 
 // Mock NeoToast
-jest.mock('@/components/NeoToast', () => ({
-  neoErrorToast: jest.fn(),
-  neoSuccessToast: jest.fn(),
-  neoWarningToast: jest.fn(),
-  neoInfoToast: jest.fn(),
+vi.mock('@/components/NeoToast', () => ({
+  neoErrorToast: vi.fn(),
+  neoSuccessToast: vi.fn(),
+  neoWarningToast: vi.fn(),
+  neoInfoToast: vi.fn(),
 }));
 
 describe('useAdminError', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('showError', () => {
@@ -118,10 +119,10 @@ describe('useAdminError', () => {
   });
 
   describe('handleError', () => {
-    let consoleSpy: jest.SpyInstance;
+    let consoleSpy: any;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     afterEach(() => {

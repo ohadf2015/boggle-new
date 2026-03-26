@@ -5,63 +5,55 @@
  * This is critical for the MusicControls component to work in adventure mode.
  */
 
+import { vi } from 'vitest';
 import React, { ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureMusic } from '../useAdventureMusic';
 import { MusicProvider, useMusic } from '@/contexts/MusicContext';
 
-// Mock Howler.js with volume tracking
-const mockPlay = jest.fn();
-const mockStop = jest.fn();
-const mockPause = jest.fn();
-const mockFade = jest.fn();
-const mockVolumeSet = jest.fn();
-const mockSeek = jest.fn();
-const mockUnload = jest.fn();
-const mockLoad = jest.fn();
-const mockState = jest.fn().mockReturnValue('loaded');
-const mockPlaying = jest.fn().mockReturnValue(false);
+// Mock Howler.js with volume tracking — use vi.hoisted for mock factory access
+const { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance } = vi.hoisted(() => {
+  const mockPlay = vi.fn();
+  const mockStop = vi.fn();
+  const mockPause = vi.fn();
+  const mockFade = vi.fn();
+  const mockVolumeSet = vi.fn();
+  const mockSeek = vi.fn();
+  const mockUnload = vi.fn();
+  const mockLoad = vi.fn();
+  const mockState = vi.fn().mockReturnValue('loaded');
+  const mockPlaying = vi.fn().mockReturnValue(false);
+  let lastVolumeSet = 0;
+  const mockHowlInstance = {
+    play: mockPlay, stop: mockStop, pause: mockPause, fade: mockFade,
+    volume: (vol?: number) => {
+      if (vol !== undefined) { lastVolumeSet = vol; mockVolumeSet(vol); }
+      return lastVolumeSet;
+    },
+    seek: mockSeek, unload: mockUnload, load: mockLoad,
+    state: mockState, playing: mockPlaying,
+  };
+  return { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance };
+});
 
-// Track the last volume set
-let lastVolumeSet = 0;
-
-const mockHowlInstance = {
-  play: mockPlay,
-  stop: mockStop,
-  pause: mockPause,
-  fade: mockFade,
-  volume: (vol?: number) => {
-    if (vol !== undefined) {
-      lastVolumeSet = vol;
-      mockVolumeSet(vol);
-    }
-    return lastVolumeSet;
-  },
-  seek: mockSeek,
-  unload: mockUnload,
-  load: mockLoad,
-  state: mockState,
-  playing: mockPlaying,
-};
-
-jest.mock('howler', () => ({
-  Howl: jest.fn().mockImplementation(() => mockHowlInstance),
+vi.mock('howler', () => ({
+  Howl: vi.fn(function() { return mockHowlInstance; }),
   Howler: {
     ctx: {
       state: 'running',
-      resume: jest.fn().mockResolvedValue(undefined),
+      resume: vi.fn().mockResolvedValue(undefined),
     },
   },
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
   };
   return {
     __esModule: true,
@@ -106,8 +98,8 @@ describe('useAdventureMusic MusicContext Integration', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockPlaying.mockReturnValue(false);
     mockState.mockReturnValue('loaded');
     lastVolumeSet = 0;
@@ -115,7 +107,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('volume control integration', () => {
@@ -123,7 +115,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
       // GIVEN - MusicContext with volume pre-set to 0.8
       localStorageMock.setItem('boggle_music_settings', JSON.stringify({ volume: 0.8, isMuted: false }));
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - adventure music starts with isPlaying: true
       renderHook(
@@ -158,7 +150,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
         { wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - user changes volume via MusicControls (which uses MusicContext)
       act(() => {
@@ -185,7 +177,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
         { wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - user mutes via MusicControls (which toggles MusicContext mute)
       act(() => {
@@ -212,7 +204,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
         { wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - user unmutes via MusicControls
       act(() => {
@@ -255,7 +247,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
       // GIVEN - MusicContext has custom volume (from localStorage)
       localStorageMock.setItem('boggle_music_settings', JSON.stringify({ volume: 0.25, isMuted: false }));
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - adventure music starts
       renderHook(

@@ -5,6 +5,7 @@
  * World music should play on ALL adventure screens, not just during gameplay.
  */
 
+import { vi } from 'vitest';
 import React, { ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureMusic } from '../useAdventureMusic';
@@ -14,47 +15,42 @@ import { MusicProvider } from '@/contexts/MusicContext';
 // MOCKS
 // ==============================================
 
-const mockPlay = jest.fn();
-const mockStop = jest.fn();
-const mockPause = jest.fn();
-const mockFade = jest.fn();
-const mockVolume = jest.fn();
-const mockSeek = jest.fn();
-const mockUnload = jest.fn();
-const mockLoad = jest.fn();
-const mockState = jest.fn().mockReturnValue('loaded');
-const mockPlaying = jest.fn().mockReturnValue(false);
+const { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance } = vi.hoisted(() => {
+  const mockPlay = vi.fn();
+  const mockStop = vi.fn();
+  const mockPause = vi.fn();
+  const mockFade = vi.fn();
+  const mockVolume = vi.fn();
+  const mockSeek = vi.fn();
+  const mockUnload = vi.fn();
+  const mockLoad = vi.fn();
+  const mockState = vi.fn().mockReturnValue('loaded');
+  const mockPlaying = vi.fn().mockReturnValue(false);
+  const mockHowlInstance = {
+    play: mockPlay, stop: mockStop, pause: mockPause, fade: mockFade,
+    volume: mockVolume, seek: mockSeek, unload: mockUnload, load: mockLoad,
+    state: mockState, playing: mockPlaying,
+  };
+  return { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance };
+});
 
-const mockHowlInstance = {
-  play: mockPlay,
-  stop: mockStop,
-  pause: mockPause,
-  fade: mockFade,
-  volume: mockVolume,
-  seek: mockSeek,
-  unload: mockUnload,
-  load: mockLoad,
-  state: mockState,
-  playing: mockPlaying,
-};
-
-jest.mock('howler', () => ({
-  Howl: jest.fn().mockImplementation(() => mockHowlInstance),
+vi.mock('howler', () => ({
+  Howl: vi.fn(function() { return mockHowlInstance; }),
   Howler: {
     ctx: {
       state: 'running',
-      resume: jest.fn().mockResolvedValue(undefined),
+      resume: vi.fn().mockResolvedValue(undefined),
     },
   },
 }));
 
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
   };
   return {
     __esModule: true,
@@ -75,14 +71,14 @@ const createWrapper = () => {
 
 describe('useAdventureMusic - Ambient Mode', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockPlaying.mockReturnValue(false);
     mockState.mockReturnValue('loaded');
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('ambient mode for WorldMap/LevelGrid', () => {
@@ -126,7 +122,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
         { wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - rerender (simulate time passing in ambient mode)
       rerender();
@@ -137,9 +133,9 @@ describe('useAdventureMusic - Ambient Mode', () => {
       expect(mockPlay).not.toHaveBeenCalled();
     });
 
-    it('loops track 1 continuously in ambient mode', () => {
+    it('loops track 1 continuously in ambient mode', async () => {
       // GIVEN
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
 
       renderHook(() =>
         useAdventureMusic({
@@ -186,9 +182,9 @@ describe('useAdventureMusic - Ambient Mode', () => {
       expect(mockPause).toHaveBeenCalled();
     });
 
-    it('changes world music when worldNumber changes in ambient mode', () => {
+    it('changes world music when worldNumber changes in ambient mode', async () => {
       // GIVEN
-      const { Howl } = require('howler');
+      const { Howl } = await import('howler');
 
       const { rerender } = renderHook(
         ({ worldNumber }) =>
@@ -203,7 +199,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
         { initialProps: { worldNumber: 1 }, wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - change to world 2
       rerender({ worldNumber: 2 });
@@ -235,7 +231,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
 
       // Music should be playing
       expect(mockPlay).toHaveBeenCalled();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - transition to gameplay (timer starts)
       rerender({ timeRemaining: 120, totalTime: 120 });
@@ -263,7 +259,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
 
       // Transition to gameplay
       rerender({ timeRemaining: 120, totalTime: 120 });
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - time passes to 50%
       rerender({ timeRemaining: 60, totalTime: 120 });
@@ -290,7 +286,7 @@ describe('useAdventureMusic - Ambient Mode', () => {
         { initialProps: { timeRemaining: 60, totalTime: 120 }, wrapper: createWrapper() }
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // WHEN - return to ambient mode (timer reset to 0)
       rerender({ timeRemaining: 0, totalTime: 0 });

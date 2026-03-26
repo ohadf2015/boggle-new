@@ -1,9 +1,15 @@
 import { renderHook, act } from '@testing-library/react';
 import { useWordHuntPromo } from '../useWordHuntPromo';
 
+// Wire up localStorage mock with real storage backend
+const storageBackend: Record<string, string> = {};
+
 describe('useWordHuntPromo', () => {
   beforeEach(() => {
-    localStorage.clear();
+    Object.keys(storageBackend).forEach(k => delete storageBackend[k]);
+    (localStorage.getItem as any).mockImplementation((key: string) => storageBackend[key] ?? null);
+    (localStorage.setItem as any).mockImplementation((key: string, value: string) => { storageBackend[key] = value; });
+    (localStorage.clear as any).mockImplementation(() => { Object.keys(storageBackend).forEach(k => delete storageBackend[k]); });
   });
 
   it('allows showing when no impressions recorded', () => {

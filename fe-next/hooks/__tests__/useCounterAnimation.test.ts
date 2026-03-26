@@ -4,11 +4,12 @@
  * Comprehensive test suite for the shared counter animation logic.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCounterAnimation } from '../useCounterAnimation';
 
 // Mock useDevicePerformance
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     isLowEnd: false,
@@ -19,13 +20,13 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 
 describe('useCounterAnimation', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
-    jest.useFakeTimers();
+    vi.clearAllTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   describe('Basic Functionality', () => {
@@ -56,7 +57,7 @@ describe('useCounterAnimation', () => {
 
       // Fast-forward through animation
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -83,7 +84,7 @@ describe('useCounterAnimation', () => {
 
       // Fast-forward animation
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -104,7 +105,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 30 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -122,7 +123,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 50 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -198,14 +199,14 @@ describe('useCounterAnimation', () => {
 
       // Fast-forward past delay
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       expect(result.current.isAnimating).toBe(true);
 
       // Complete animation
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -225,14 +226,14 @@ describe('useCounterAnimation', () => {
 
       // Should not crash
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
     });
   });
 
   describe('Completion Callback', () => {
     it('should call onComplete when animation finishes', async () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result, rerender } = renderHook(
         ({ value }) => useCounterAnimation({ value, duration: 100, onComplete, animateOnMount: false }),
         { initialProps: { value: 0 } }
@@ -243,7 +244,7 @@ describe('useCounterAnimation', () => {
       expect(onComplete).not.toHaveBeenCalled();
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -252,7 +253,7 @@ describe('useCounterAnimation', () => {
     });
 
     it('should not call onComplete if animation is interrupted', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { rerender } = renderHook(
         ({ value }) => useCounterAnimation({ value, duration: 100, onComplete, animateOnMount: false }),
         { initialProps: { value: 0 } }
@@ -262,13 +263,13 @@ describe('useCounterAnimation', () => {
 
       // Interrupt with new value
       act(() => {
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
       });
 
       rerender({ value: 100 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       // Should only be called once (for the final animation)
@@ -289,7 +290,7 @@ describe('useCounterAnimation', () => {
 
       // Should still be animating halfway through
       act(() => {
-        jest.advanceTimersByTime(250);
+        vi.advanceTimersByTime(250);
       });
 
       expect(result.current.isAnimating).toBe(true);
@@ -298,7 +299,7 @@ describe('useCounterAnimation', () => {
 
       // Complete animation
       act(() => {
-        jest.advanceTimersByTime(300);
+        vi.advanceTimersByTime(300);
       });
 
       await waitFor(() => {
@@ -316,7 +317,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 100 });
 
       act(() => {
-        jest.advanceTimersByTime(20);
+        vi.advanceTimersByTime(20);
       });
 
       await waitFor(() => {
@@ -340,7 +341,7 @@ describe('useCounterAnimation', () => {
 
       // Should not crash when trying to update after unmount
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
     });
 
@@ -356,7 +357,7 @@ describe('useCounterAnimation', () => {
 
       // Should not start animation after unmount
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
     });
   });
@@ -371,7 +372,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 0 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -388,7 +389,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 999999 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -405,7 +406,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: -50 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -422,7 +423,7 @@ describe('useCounterAnimation', () => {
       rerender({ value: 3.14159 });
 
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       await waitFor(() => {
@@ -444,17 +445,17 @@ describe('useCounterAnimation', () => {
       const samples: number[] = [];
 
       act(() => {
-        jest.advanceTimersByTime(250);
+        vi.advanceTimersByTime(250);
       });
       samples.push(result.current.displayValue);
 
       act(() => {
-        jest.advanceTimersByTime(250);
+        vi.advanceTimersByTime(250);
       });
       samples.push(result.current.displayValue);
 
       act(() => {
-        jest.advanceTimersByTime(250);
+        vi.advanceTimersByTime(250);
       });
       samples.push(result.current.displayValue);
 

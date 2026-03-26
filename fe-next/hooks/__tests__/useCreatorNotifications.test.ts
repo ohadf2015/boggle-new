@@ -3,31 +3,32 @@
  * TDD: RED phase — tests written before implementation
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import toast from 'react-hot-toast';
 import { useCreatorNotifications } from '../useCreatorNotifications';
 
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: Object.assign(
-    jest.fn(),
+    vi.fn(),
     {
-      success: jest.fn(),
+      success: vi.fn(),
     }
   ),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
-const toastMock = toast as jest.Mocked<typeof toast>;
+const toastMock = toast as any;
 
 describe('useCreatorNotifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('notifyBoardPlayed calls toast.success with coins in message', () => {

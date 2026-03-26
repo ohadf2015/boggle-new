@@ -5,18 +5,25 @@
  * for the landing page social FOMO feed.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock AuthContext
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const { mockUseAuth } = vi.hoisted(() => {
+  const mockUseAuth = vi.fn();
+  return { mockUseAuth };
+});
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
 // Mock supabase
-const mockFrom = jest.fn();
-const mockRpc = jest.fn();
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom, mockRpc } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockRpc = vi.fn();
+  return { mockFrom, mockRpc };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -28,16 +35,16 @@ import { useFriendsActivity } from '../useFriendsActivity';
 // Helper: chainable Supabase query mock
 function createSelectChain(data: unknown[] | null, error: unknown = null) {
   return {
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        order: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue({ data, error }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        order: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue({ data, error }),
         }),
       }),
-      or: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          order: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue({ data, error }),
+      or: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          order: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue({ data, error }),
           }),
         }),
       }),
@@ -75,7 +82,7 @@ const mockSessionRows = [
 
 describe('useFriendsActivity', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, isAuthenticated: true });
   });
 
@@ -99,14 +106,14 @@ describe('useFriendsActivity', () => {
       if (table === 'friends') return createSelectChain(mockFriendRows);
       if (table === 'game_sessions') {
         // Must handle both the friend sessions (.in()) and myBestScores (.eq()) queries
-        const mockSelect = jest.fn().mockReturnValue({
-          in: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({ data: mockSessionRows, error: null }),
+        const mockSelect = vi.fn().mockReturnValue({
+          in: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue({ data: mockSessionRows, error: null }),
             }),
           }),
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: [{ mode: 'daily_challenge', score: 300 }], error: null }),
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: [{ mode: 'daily_challenge', score: 300 }], error: null }),
           }),
         });
         return { select: mockSelect };
@@ -171,17 +178,17 @@ describe('useFriendsActivity', () => {
       if (table === 'friends') return createSelectChain(mockFriendRows);
       if (table === 'game_sessions') {
         return {
-          select: jest.fn().mockReturnValue({
-            in: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            in: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: [mockSessionRows[0]],
                   error: null,
                 }),
               }),
             }),
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({ data: [], error: null }),
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
         };
@@ -207,17 +214,17 @@ describe('useFriendsActivity', () => {
       if (table === 'friends') return createSelectChain(mockFriendRows);
       if (table === 'game_sessions') {
         return {
-          select: jest.fn().mockReturnValue({
-            in: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            in: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: [mockSessionRows[1]],
                   error: null,
                 }),
               }),
             }),
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({ data: [], error: null }),
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
         };

@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useWordPace } from '../useWordPace';
 
 describe('useWordPace', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should start with normal tier', () => {
@@ -22,15 +23,15 @@ describe('useWordPace', () => {
 
     // Record 6 words over 30 seconds = 12 WPM
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     act(() => { result.current.recordWord(); });
 
     const state = result.current.getPaceState();
@@ -43,16 +44,16 @@ describe('useWordPace', () => {
 
     // Slow start: 3 words over 60 seconds
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(20000);
+    vi.advanceTimersByTime(20000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(20000);
+    vi.advanceTimersByTime(20000);
     act(() => { result.current.recordWord(); });
-    jest.advanceTimersByTime(20000);
+    vi.advanceTimersByTime(20000);
 
     // Now burst: 6 words in 10 seconds (36 WPM recent vs ~3 WPM average)
     for (let i = 0; i < 10; i++) {
       act(() => { result.current.recordWord(); });
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     }
 
     const state = result.current.getPaceState();

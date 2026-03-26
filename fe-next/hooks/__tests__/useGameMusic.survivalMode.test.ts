@@ -3,16 +3,17 @@
  * Verifies that bossa-arcade music plays automatically when game starts
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGameMusic } from '../useGameMusic';
 import * as MusicContextModule from '@/contexts/MusicContext';
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext');
+vi.mock('@/contexts/MusicContext');
 
 describe('useGameMusic - Survival Mode (fire-round)', () => {
-  const mockFadeToTrack = jest.fn();
-  const mockPlayTrack = jest.fn();
+  const mockFadeToTrack = vi.fn();
+  const mockPlayTrack = vi.fn();
 
   const mockTracks: {
     LOBBY: 'lobby';
@@ -31,22 +32,22 @@ describe('useGameMusic - Survival Mode (fire-round)', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock MusicContext with unlocked audio
-    jest.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
+    vi.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
       currentTrack: null,
       volume: 0.5,
       isMuted: false,
       isPlaying: false,
       audioUnlocked: true, // Audio already unlocked
       playTrack: mockPlayTrack,
-      stopMusic: jest.fn(),
+      stopMusic: vi.fn(),
       fadeToTrack: mockFadeToTrack,
-      setVolume: jest.fn(),
-      toggleMute: jest.fn(),
-      unlockAudio: jest.fn(),
-      preloadMusicTrack: jest.fn(),
+      setVolume: vi.fn(),
+      toggleMute: vi.fn(),
+      unlockAudio: vi.fn(),
+      preloadMusicTrack: vi.fn(),
       TRACKS: mockTracks,
     });
   });
@@ -139,19 +140,19 @@ describe('useGameMusic - Survival Mode (fire-round)', () => {
 
   it('should still call fadeToTrack when audio not unlocked (queues for later)', () => {
     // Override mock to simulate audio not unlocked
-    jest.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
+    vi.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
       currentTrack: null,
       volume: 0.5,
       isMuted: false,
       isPlaying: false,
       audioUnlocked: false, // Audio NOT unlocked
       playTrack: mockPlayTrack,
-      stopMusic: jest.fn(),
+      stopMusic: vi.fn(),
       fadeToTrack: mockFadeToTrack,
-      setVolume: jest.fn(),
-      toggleMute: jest.fn(),
-      unlockAudio: jest.fn(),
-      preloadMusicTrack: jest.fn(),
+      setVolume: vi.fn(),
+      toggleMute: vi.fn(),
+      unlockAudio: vi.fn(),
+      preloadMusicTrack: vi.fn(),
       TRACKS: mockTracks,
     });
 

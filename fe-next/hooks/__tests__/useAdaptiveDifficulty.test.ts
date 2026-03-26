@@ -5,27 +5,31 @@
  * with ProgressionContext and localStorage persistence.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdaptiveDifficulty } from '../useAdaptiveDifficulty';
 
 // Mock ProgressionContext
-const mockRecordAttempt = jest.fn();
-jest.mock('@/contexts/ProgressionContext', () => ({
-  useProgression: jest.fn(() => ({
+const { mockRecordAttempt } = vi.hoisted(() => {
+  const mockRecordAttempt = vi.fn();
+  return { mockRecordAttempt };
+});
+vi.mock('@/contexts/ProgressionContext', () => ({
+  useProgression: vi.fn(() => ({
     attempts: [],
     recordAttempt: mockRecordAttempt,
   })),
 }));
 
 // Mock tierStorage
-jest.mock('@/lib/adaptiveDifficulty/tierStorage', () => ({
-  getCurrentTier: jest.fn(() => 'normal'),
-  saveTier: jest.fn(),
+vi.mock('@/lib/adaptiveDifficulty/tierStorage', () => ({
+  getCurrentTier: vi.fn(() => 'normal'),
+  saveTier: vi.fn(),
 }));
 
 // Mock levelConfig
-jest.mock('@/lib/adventure/levelConfig', () => ({
-  getLevelConfig: jest.fn((world: number, level: number) => ({
+vi.mock('@/lib/adventure/levelConfig', () => ({
+  getLevelConfig: vi.fn((world: number, level: number) => ({
     world,
     level,
     gridSize: 5 as const,
@@ -43,7 +47,7 @@ jest.mock('@/lib/adventure/levelConfig', () => ({
 
 describe('useAdaptiveDifficulty', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRecordAttempt.mockResolvedValue(null);
   });
 

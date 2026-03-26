@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useFirstTimeEncouragement } from '../useFirstTimeEncouragement';
 
@@ -5,22 +6,22 @@ import { useFirstTimeEncouragement } from '../useFirstTimeEncouragement';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
-    clear: jest.fn(() => { store = {}; }),
-    removeItem: jest.fn((key: string) => { delete store[key]; }),
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
+    clear: vi.fn(() => { store = {}; }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 describe('useFirstTimeEncouragement', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     localStorageMock.clear();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('identifies first-time player when games_played < 3', () => {
@@ -58,7 +59,7 @@ describe('useFirstTimeEncouragement', () => {
     act(() => { result.current.triggerEncouragement('game-start'); });
     expect(result.current.currentTrigger).toBe('game-start');
 
-    act(() => { jest.advanceTimersByTime(4000); });
+    act(() => { vi.advanceTimersByTime(4000); });
     expect(result.current.currentTrigger).toBeNull();
   });
 
@@ -79,7 +80,7 @@ describe('useFirstTimeEncouragement', () => {
     const { result } = renderHook(() => useFirstTimeEncouragement());
 
     act(() => { result.current.triggerEncouragement('game-start'); });
-    act(() => { jest.advanceTimersByTime(15001); });
+    act(() => { vi.advanceTimersByTime(15001); });
 
     act(() => { result.current.triggerEncouragement('first-word'); });
     expect(result.current.currentTrigger).toBe('first-word');

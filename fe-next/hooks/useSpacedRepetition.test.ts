@@ -4,22 +4,34 @@
  * Tests for the spaced repetition schedule management hook.
  */
 
+import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSpacedRepetition } from './useSpacedRepetition';
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
+
 // Mock fetch (spaced rep now syncs with DB)
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({ ok: true, json: () => Promise.resolve({ reviews: [] }) })
-) as jest.Mock;
+) as any;
 
 // Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: jest.fn((key: string) => { delete store[key]; }),
-    clear: jest.fn(() => { store = {}; }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
+    clear: vi.fn(() => { store = {}; }),
   };
 })();
 
@@ -28,14 +40,14 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 describe('useSpacedRepetition', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {
     it('initializes review schedule for new words', async () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple', 'banana', 'cherry'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -48,7 +60,7 @@ describe('useSpacedRepetition', () => {
     it('creates initial review data with correct word', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       const appleData = result.current.reviewSchedule['apple'];
       expect(appleData).toBeDefined();
@@ -60,7 +72,7 @@ describe('useSpacedRepetition', () => {
     it('isLoading starts true then resolves to false after DB sync', async () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
       // Initially true (DB fetch in progress)
       expect(result.current.isLoading).toBe(true);
       // Resolves after DB fetch completes
@@ -74,7 +86,7 @@ describe('useSpacedRepetition', () => {
     it('includes all new words (due today)', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple', 'banana'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       // New words are initialized with nextReviewDate = today
       expect(result.current.wordsForToday).toContain('apple');
@@ -99,7 +111,7 @@ describe('useSpacedRepetition', () => {
 
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-2')
-      );
+      , { wrapper: createWrapper() });
 
       expect(result.current.wordsForToday).not.toContain('apple');
     });
@@ -109,7 +121,7 @@ describe('useSpacedRepetition', () => {
     it('updates the review schedule after recording a review', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       const initialRepetitions = result.current.reviewSchedule['apple'].repetitions;
 
@@ -123,7 +135,7 @@ describe('useSpacedRepetition', () => {
     it('persists updated schedule to localStorage', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       act(() => {
         result.current.recordReview('apple', 4);
@@ -138,7 +150,7 @@ describe('useSpacedRepetition', () => {
     it('removes word from wordsForToday after correct review', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       // apple starts as due today
       expect(result.current.wordsForToday).toContain('apple');
@@ -154,7 +166,7 @@ describe('useSpacedRepetition', () => {
     it('does nothing for unknown word', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')
-      );
+      , { wrapper: createWrapper() });
 
       const scheduleBefore = { ...result.current.reviewSchedule };
 
@@ -182,15 +194,15 @@ describe('useSpacedRepetition', () => {
 
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-3')
-      );
+      , { wrapper: createWrapper() });
 
       expect(result.current.reviewSchedule['apple'].easeFactor).toBe(2.1);
       expect(result.current.reviewSchedule['apple'].repetitions).toBe(2);
     });
 
     it('uses different localStorage key per lessonId', () => {
-      renderHook(() => useSpacedRepetition(['apple'], 'lesson-A'));
-      renderHook(() => useSpacedRepetition(['apple'], 'lesson-B'));
+      renderHook(() => useSpacedRepetition(['apple'], 'lesson-A'), { wrapper: createWrapper() });
+      renderHook(() => useSpacedRepetition(['apple'], 'lesson-B'), { wrapper: createWrapper() });
 
       const calls = localStorageMock.getItem.mock.calls.map(c => c[0]);
       expect(calls).toContain('sr_schedule_lesson-A');
@@ -201,7 +213,7 @@ describe('useSpacedRepetition', () => {
       localStorageMock.setItem('sr_schedule_lesson-bad', 'not-valid-json{{{');
 
       expect(() => {
-        renderHook(() => useSpacedRepetition(['apple'], 'lesson-bad'));
+        renderHook(() => useSpacedRepetition(['apple'], 'lesson-bad'), { wrapper: createWrapper() });
       }).not.toThrow();
     });
 
@@ -220,7 +232,7 @@ describe('useSpacedRepetition', () => {
 
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple', 'newword'], 'lesson-4')
-      );
+      , { wrapper: createWrapper() });
 
       expect(result.current.reviewSchedule['newword']).toBeDefined();
       expect(result.current.reviewSchedule['newword'].repetitions).toBe(0);

@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useDesktopLayout, useIsDesktop, useIsTv } from '../useDesktopLayout';
 
@@ -27,11 +28,11 @@ const triggerResize = () => {
 
 describe('useDesktopLayout', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('layout type detection', () => {
@@ -42,7 +43,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect mobile layout
       expect(result.current.type).toBe('mobile');
@@ -59,7 +60,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect tablet layout
       expect(result.current.type).toBe('tablet');
@@ -76,7 +77,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect desktop layout
       expect(result.current.type).toBe('desktop');
@@ -93,7 +94,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect TV layout
       expect(result.current.type).toBe('tv');
@@ -110,7 +111,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should NOT be desktop (height too low)
       expect(result.current.isDesktop).toBe(false);
@@ -126,7 +127,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should meet CrazyGames minimum
       expect(result.current.meetsCrazyGamesMin).toBe(true);
@@ -139,7 +140,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should NOT meet CrazyGames minimum
       expect(result.current.meetsCrazyGamesMin).toBe(false);
@@ -154,7 +155,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect tall screen
       expect(result.current.isTallScreen).toBe(true);
@@ -167,7 +168,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN it should detect wide screen
       expect(result.current.isWideScreen).toBe(true);
@@ -181,7 +182,7 @@ describe('useDesktopLayout', () => {
       // WHEN the hook is rendered
       const { result } = renderHook(() => useDesktopLayout());
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN the aspect ratio should be approximately 16:9
       expect(result.current.aspectRatio).toBeCloseTo(1.778, 2);
@@ -196,7 +197,7 @@ describe('useDesktopLayout', () => {
 
       // Wait for initial effect to run
       await act(async () => {
-        jest.runAllTimers();
+        vi.runAllTimers();
       });
       expect(result.current.isDesktop).toBe(true);
 
@@ -204,7 +205,7 @@ describe('useDesktopLayout', () => {
       setWindowDimensions(375, 667);
       await act(async () => {
         window.dispatchEvent(new Event('resize'));
-        jest.runAllTimers();
+        vi.runAllTimers();
       });
 
       // Force rerender to pick up state changes
@@ -222,18 +223,18 @@ describe('useDesktopLayout', () => {
 
       // Wait for initial calculation
       await act(async () => {
-        jest.runAllTimers();
+        vi.runAllTimers();
       });
 
       // WHEN multiple rapid resizes happen
       await act(async () => {
         setWindowDimensions(500, 500);
         window.dispatchEvent(new Event('resize'));
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         setWindowDimensions(600, 600);
         window.dispatchEvent(new Event('resize'));
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         setWindowDimensions(375, 667);
         window.dispatchEvent(new Event('resize'));
@@ -244,7 +245,7 @@ describe('useDesktopLayout', () => {
 
       // THEN after debounce, layout should update to final size
       await act(async () => {
-        jest.advanceTimersByTime(200);
+        vi.advanceTimersByTime(200);
       });
       rerender();
 
@@ -263,7 +264,7 @@ describe('useDesktopLayout', () => {
         useDesktopLayout({ desktopMinWidth: 1400 })
       );
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN 1280px should NOT be desktop
       expect(result.current.isDesktop).toBe(false);
@@ -279,7 +280,7 @@ describe('useDesktopLayout', () => {
         useDesktopLayout({ desktopMinHeight: 900 })
       );
       triggerResize();
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // THEN 800px height should NOT be desktop
       expect(result.current.isDesktop).toBe(false);
@@ -289,11 +290,11 @@ describe('useDesktopLayout', () => {
 
 describe('useIsDesktop', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return true for desktop screens', () => {
@@ -303,7 +304,7 @@ describe('useIsDesktop', () => {
     // WHEN the hook is rendered
     const { result } = renderHook(() => useIsDesktop());
     triggerResize();
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     // THEN it should return true
     expect(result.current).toBe(true);
@@ -316,7 +317,7 @@ describe('useIsDesktop', () => {
     // WHEN the hook is rendered
     const { result } = renderHook(() => useIsDesktop());
     triggerResize();
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     // THEN it should return false
     expect(result.current).toBe(false);
@@ -325,11 +326,11 @@ describe('useIsDesktop', () => {
 
 describe('useIsTv', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return true for TV screens', () => {
@@ -339,7 +340,7 @@ describe('useIsTv', () => {
     // WHEN the hook is rendered
     const { result } = renderHook(() => useIsTv());
     triggerResize();
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     // THEN it should return true
     expect(result.current).toBe(true);
@@ -352,7 +353,7 @@ describe('useIsTv', () => {
     // WHEN the hook is rendered
     const { result } = renderHook(() => useIsTv());
     triggerResize();
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     // THEN it should return false
     expect(result.current).toBe(false);

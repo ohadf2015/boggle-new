@@ -1,24 +1,25 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSafeArea, SafeAreaInsets } from '../useSafeArea';
 
 // Mock platform detection
-jest.mock('@/utils/platform', () => ({
-  isNative: jest.fn(),
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(),
 }));
 
 // Mock capacitor-plugin-safe-area
-jest.mock('capacitor-plugin-safe-area', () => ({
+vi.mock('capacitor-plugin-safe-area', () => ({
   SafeArea: {
-    getSafeAreaInsets: jest.fn(),
-    addListener: jest.fn(),
+    getSafeAreaInsets: vi.fn(),
+    addListener: vi.fn(),
   },
 }));
 
 import { isNative } from '@/utils/platform';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
-const mockSafeArea = SafeArea as jest.Mocked<typeof SafeArea>;
+const mockIsNative = isNative as any;
+const mockSafeArea = SafeArea as any;
 
 describe('useSafeArea', () => {
   const mockInsets: SafeAreaInsets = {
@@ -29,7 +30,7 @@ describe('useSafeArea', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset document styles
     document.documentElement.style.removeProperty('--cap-safe-area-top');
     document.documentElement.style.removeProperty('--cap-safe-area-bottom');
@@ -53,7 +54,7 @@ describe('useSafeArea', () => {
   it('should fetch safe area insets on native', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
-    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: vi.fn() });
 
     const { result } = renderHook(() => useSafeArea());
 
@@ -65,7 +66,7 @@ describe('useSafeArea', () => {
   it('should set CSS custom properties on native', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
-    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: vi.fn() });
 
     renderHook(() => useSafeArea());
 
@@ -78,9 +79,9 @@ describe('useSafeArea', () => {
   it('should handle errors gracefully', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockRejectedValue(new Error('Plugin error'));
-    mockSafeArea.addListener.mockResolvedValue({ remove: jest.fn() });
+    mockSafeArea.addListener.mockResolvedValue({ remove: vi.fn() });
 
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
     const { result } = renderHook(() => useSafeArea());
 
@@ -102,7 +103,7 @@ describe('useSafeArea', () => {
   it('should cleanup listener on unmount', async () => {
     mockIsNative.mockReturnValue(true);
     mockSafeArea.getSafeAreaInsets.mockResolvedValue({ insets: mockInsets });
-    const mockRemove = jest.fn();
+    const mockRemove = vi.fn();
     mockSafeArea.addListener.mockResolvedValue({ remove: mockRemove });
 
     const { unmount } = renderHook(() => useSafeArea());
@@ -124,7 +125,7 @@ describe('useSafeArea', () => {
     let listenerCallback: ((data: { insets: SafeAreaInsets }) => void) = () => {};
     mockSafeArea.addListener.mockImplementation((eventName, callback) => {
       listenerCallback = callback as (data: { insets: SafeAreaInsets }) => void;
-      return Promise.resolve({ remove: jest.fn() });
+      return Promise.resolve({ remove: vi.fn() });
     });
 
     const { result } = renderHook(() => useSafeArea());

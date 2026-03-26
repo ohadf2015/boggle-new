@@ -2,23 +2,24 @@
  * @jest-environment jsdom
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSpeechSynthesis } from '../useSpeechSynthesis';
 import * as textToSpeech from '../../lib/speech/textToSpeech';
 
 // Mock the textToSpeech module
-jest.mock('../../lib/speech/textToSpeech', () => ({
-  speakWord: jest.fn(),
-  cancelSpeech: jest.fn(),
-  getAvailableVoices: jest.fn(),
+vi.mock('../../lib/speech/textToSpeech', () => ({
+  speakWord: vi.fn(),
+  cancelSpeech: vi.fn(),
+  getAvailableVoices: vi.fn(),
 }));
 
-const mockSpeakWord = textToSpeech.speakWord as jest.MockedFunction<typeof textToSpeech.speakWord>;
-const mockCancelSpeech = textToSpeech.cancelSpeech as jest.MockedFunction<typeof textToSpeech.cancelSpeech>;
-const mockGetAvailableVoices = textToSpeech.getAvailableVoices as jest.MockedFunction<typeof textToSpeech.getAvailableVoices>;
+const mockSpeakWord = textToSpeech.speakWord as any;
+const mockCancelSpeech = textToSpeech.cancelSpeech as any;
+const mockGetAvailableVoices = textToSpeech.getAvailableVoices as any;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 
   // Default: Web Speech API supported
   mockGetAvailableVoices.mockReturnValue([

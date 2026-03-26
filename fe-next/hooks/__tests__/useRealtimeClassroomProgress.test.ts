@@ -3,27 +3,28 @@
  * Tests real-time classroom progress tracking
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRealtimeClassroomProgress } from '../useRealtimeClassroomProgress';
 import * as supabaseRealtime from '@/lib/supabaseRealtime';
 
 // Mock the realtime module
-jest.mock('@/lib/supabaseRealtime', () => ({
-  subscribeToClassroomProgress: jest.fn(),
+vi.mock('@/lib/supabaseRealtime', () => ({
+  subscribeToClassroomProgress: vi.fn(),
 }));
 
 describe('useRealtimeClassroomProgress', () => {
-  let mockUnsubscribe: jest.Mock;
+  let mockUnsubscribe: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
-    mockUnsubscribe = jest.fn();
-    (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mockReturnValue(mockUnsubscribe);
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    mockUnsubscribe = vi.fn();
+    (supabaseRealtime.subscribeToClassroomProgress as any).mockReturnValue(mockUnsubscribe);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ==================== TEST 1: Should Subscribe When Enabled ====================
@@ -68,7 +69,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the update callback
-    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][1];
+    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][1];
 
     // WHEN: Student activities are received
     act(() => {
@@ -101,7 +102,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the update callback
-    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][1];
+    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][1];
 
     // WHEN: Multiple activities are received
     act(() => {
@@ -130,7 +131,7 @@ describe('useRealtimeClassroomProgress', () => {
 
   it('should call onStudentActivity callback', () => {
     // GIVEN: Hook with onStudentActivity callback
-    const onStudentActivity = jest.fn();
+    const onStudentActivity = vi.fn();
     renderHook(() => useRealtimeClassroomProgress({
       classroomId: 'classroom-123',
       enabled: true,
@@ -138,7 +139,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the update callback
-    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][1];
+    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][1];
 
     // WHEN: Student activity is received
     act(() => {
@@ -179,7 +180,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the status change callback
-    const statusCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][2].onStatusChange;
+    const statusCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][2].onStatusChange;
 
     // Initial status should be connecting
     expect(result.current.connectionStatus).toBe('connecting');
@@ -205,7 +206,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the update callback
-    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][1];
+    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][1];
 
     // WHEN: Student activity is received
     act(() => {
@@ -220,7 +221,7 @@ describe('useRealtimeClassroomProgress', () => {
 
     // WHEN: 5 minutes + 1 minute (for cleanup interval) pass
     act(() => {
-      jest.advanceTimersByTime(6 * 60 * 1000);
+      vi.advanceTimersByTime(6 * 60 * 1000);
     });
 
     // THEN: Student should be removed from active list
@@ -237,7 +238,7 @@ describe('useRealtimeClassroomProgress', () => {
     }));
 
     // Get the update callback
-    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as jest.Mock).mock.calls[0][1];
+    const updateCallback = (supabaseRealtime.subscribeToClassroomProgress as any).mock.calls[0][1];
 
     // WHEN: 15 activities are received
     act(() => {

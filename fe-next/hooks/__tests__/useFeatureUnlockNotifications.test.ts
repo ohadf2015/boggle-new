@@ -4,33 +4,37 @@
  * Tests hook that detects and displays feature unlock notifications
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useFeatureUnlockNotifications } from '../useFeatureUnlockNotifications';
 import { useUserStats } from '../useUserStats';
 import { toast } from 'react-hot-toast';
 
 // Mock dependencies
-jest.mock('../useUserStats');
-jest.mock('react-hot-toast');
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('../useUserStats');
+vi.mock('react-hot-toast');
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     dir: 'ltr',
   }),
 }));
 
 describe('useFeatureUnlockNotifications', () => {
+  const storageBackend: Record<string, string> = {};
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Clear localStorage before each test
-    localStorage.clear();
+    vi.clearAllMocks();
+    Object.keys(storageBackend).forEach(k => delete storageBackend[k]);
+    (localStorage.getItem as any).mockImplementation((key: string) => storageBackend[key] ?? null);
+    (localStorage.setItem as any).mockImplementation((key: string, value: string) => { storageBackend[key] = value; });
+    (localStorage.clear as any).mockImplementation(() => { Object.keys(storageBackend).forEach(k => delete storageBackend[k]); });
   });
 
   it('should not show notification for users with 0 games', () => {
     // GIVEN - New user with 0 games
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 0 },
       isLoading: false,
     });
@@ -44,7 +48,7 @@ describe('useFeatureUnlockNotifications', () => {
 
   it('should not show notification for users with 4 games (below threshold)', () => {
     // GIVEN - User with 4 games (below first threshold)
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 4 },
       isLoading: false,
     });
@@ -58,7 +62,7 @@ describe('useFeatureUnlockNotifications', () => {
 
   it('should show notification when user reaches 5 games (advanced settings unlock)', () => {
     // GIVEN - User just reached 5 games
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 5 },
       isLoading: false,
     });
@@ -76,7 +80,7 @@ describe('useFeatureUnlockNotifications', () => {
   it('should show notification when user reaches 10 games (custom bot count unlock)', () => {
     // GIVEN - User just reached 10 games (had already unlocked advancedSettings)
     localStorage.setItem('feature_unlock_advancedSettings', 'true');
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 10 },
       isLoading: false,
     });
@@ -94,7 +98,7 @@ describe('useFeatureUnlockNotifications', () => {
   it('should NOT show notification twice for same unlock', () => {
     // GIVEN - User already saw advancedSettings unlock
     localStorage.setItem('feature_unlock_advancedSettings', 'true');
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 5 },
       isLoading: false,
     });
@@ -108,7 +112,7 @@ describe('useFeatureUnlockNotifications', () => {
 
   it('should not show notification while loading', () => {
     // GIVEN - Stats are still loading
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 5 },
       isLoading: true,
     });
@@ -122,7 +126,7 @@ describe('useFeatureUnlockNotifications', () => {
 
   it('should not show notification for unauthenticated users', () => {
     // GIVEN - No user logged in
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: null,
       isLoading: false,
     });
@@ -137,7 +141,7 @@ describe('useFeatureUnlockNotifications', () => {
   it('should only show the highest-threshold unlock when multiple are new (e.g., returning user)', () => {
     // GIVEN - User returns after playing many games offline (15 games total)
     // They've never seen any unlock notifications
-    (useUserStats as jest.Mock).mockReturnValue({
+    (useUserStats as any).mockReturnValue({
       userStats: { totalGamesPlayed: 15 },
       isLoading: false,
     });

@@ -4,16 +4,20 @@
  * Covers: loading state, fetching active quest, selecting quest, progress
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // Mock supabase
-const mockFrom = jest.fn();
-const mockSelect = jest.fn();
-const mockEq = jest.fn();
-const mockSingle = jest.fn();
-const mockInsert = jest.fn();
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockSingle = vi.fn();
+const mockInsert = vi.fn();
 
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
   },
@@ -21,12 +25,13 @@ jest.mock('@/lib/supabase', () => ({
 
 // Mock AuthContext
 const mockUser = { id: 'user-123' };
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: mockUser }),
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -37,13 +42,13 @@ import { useWeeklyQuest } from '../useWeeklyQuest';
 
 function setupChain(data: unknown, error: unknown = null) {
   mockSingle.mockResolvedValue({ data, error });
-  mockEq.mockReturnValue({ eq: jest.fn().mockReturnValue({ single: mockSingle }) });
+  mockEq.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: mockSingle }) });
   mockSelect.mockReturnValue({ eq: mockEq });
   mockFrom.mockReturnValue({ select: mockSelect, insert: mockInsert });
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('useWeeklyQuest', () => {
@@ -119,7 +124,7 @@ describe('useWeeklyQuest', () => {
   });
 
   it('does not fetch when user is null', async () => {
-    jest.spyOn(require('@/contexts/AuthContext'), 'useAuth').mockReturnValue({ user: null });
+    mockUseAuth.mockReturnValue({ user: null });
     setupChain(null);
 
     const { result } = renderHook(() => useWeeklyQuest());

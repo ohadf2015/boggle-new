@@ -2,6 +2,7 @@
  * usePublicProfile Hook Tests
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePublicProfile } from '../usePublicProfile';
 import type { PublicProfile } from '@/shared/types/publicProfile';
@@ -27,11 +28,11 @@ const MOCK_PROFILE: PublicProfile = {
 
 describe('usePublicProfile', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('fetches profile successfully', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(MOCK_PROFILE),
     });
@@ -50,7 +51,7 @@ describe('usePublicProfile', () => {
   });
 
   it('handles 404 error', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 404,
     });
@@ -66,7 +67,7 @@ describe('usePublicProfile', () => {
   });
 
   it('handles network error', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => usePublicProfile('WordMaster'));
 
@@ -79,7 +80,7 @@ describe('usePublicProfile', () => {
   });
 
   it('does not fetch when username is undefined', async () => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
 
     const { result } = renderHook(() => usePublicProfile(undefined));
 
@@ -91,7 +92,7 @@ describe('usePublicProfile', () => {
   });
 
   it('encodes username in URL', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(MOCK_PROFILE),
     });

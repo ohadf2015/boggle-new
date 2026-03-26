@@ -2,28 +2,29 @@
  * @jest-environment jsdom
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useHaptics } from '../useHaptics';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import { HapticPattern, HapticIntensity } from '@/utils/haptics/types';
 
 // Mock HapticsManager
-jest.mock('@/utils/haptics/HapticsManager', () => ({
+vi.mock('@/utils/haptics/HapticsManager', () => ({
   haptics: {
-    trigger: jest.fn(),
-    triggerCustom: jest.fn(),
-    tap: jest.fn(),
-    success: jest.fn(),
-    error: jest.fn(),
-    warning: jest.fn(),
-    selection: jest.fn(),
-    isSupported: jest.fn().mockReturnValue(true),
+    trigger: vi.fn(),
+    triggerCustom: vi.fn(),
+    tap: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    selection: vi.fn(),
+    isSupported: vi.fn().mockReturnValue(true),
   },
 }));
 
 describe('useHaptics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Hook Return Value', () => {
@@ -133,7 +134,7 @@ describe('useHaptics', () => {
     });
 
     it('should return false when haptics not supported', () => {
-      (haptics.isSupported as jest.Mock).mockReturnValue(false);
+      (haptics.isSupported as any).mockReturnValue(false);
 
       const { result } = renderHook(() => useHaptics());
 

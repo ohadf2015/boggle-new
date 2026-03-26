@@ -1,18 +1,19 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useVocabularyMastery } from '../useVocabularyMastery';
 import * as analyticsModule from '@/lib/supabase/analytics';
 
 // Mock analytics module
-jest.mock('@/lib/supabase/analytics');
+vi.mock('@/lib/supabase/analytics');
 
 describe('useVocabularyMastery', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading state initially', () => {
     // GIVEN: Mock data loading
-    jest.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockImplementation(
+    vi.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -52,7 +53,7 @@ describe('useVocabularyMastery', () => {
       ],
     };
 
-    jest.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
+    vi.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
       data: mockData,
       error: null,
     });
@@ -74,7 +75,7 @@ describe('useVocabularyMastery', () => {
   it('should return error on failure', async () => {
     // GIVEN: Mock failed fetch
     const mockError = { message: 'Failed to fetch data' };
-    jest.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
+    vi.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
       data: { students: [], words: [], cells: [] },
       error: mockError,
     });
@@ -95,7 +96,7 @@ describe('useVocabularyMastery', () => {
 
   it('should refetch when lessonId changes', async () => {
     // GIVEN: Mock data for different lessons
-    const mockSpy = jest.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
+    const mockSpy = vi.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
       data: { students: [], words: [], cells: [] },
       error: null,
     });
@@ -124,7 +125,7 @@ describe('useVocabularyMastery', () => {
 
   it('should expose refresh function', async () => {
     // GIVEN: Mock data
-    const mockSpy = jest.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
+    const mockSpy = vi.spyOn(analyticsModule, 'getVocabularyHeatmapData').mockResolvedValue({
       data: { students: [], words: [], cells: [] },
       error: null,
     });

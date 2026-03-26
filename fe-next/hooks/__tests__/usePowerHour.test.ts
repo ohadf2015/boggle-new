@@ -5,17 +5,25 @@
  * Manages 1-hour 2x XP window activated on first game of the day.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-// Mock timers
+// Use a real storage backing so the hook can read what it writes
+const storageBackend: Record<string, string> = {};
 beforeEach(() => {
-  jest.useFakeTimers();
-  localStorage.clear();
-  jest.clearAllMocks();
+  vi.useFakeTimers();
+  // Clear storage backend
+  Object.keys(storageBackend).forEach(k => delete storageBackend[k]);
+  vi.clearAllMocks();
+  // Wire up localStorage mock to actually store values
+  (localStorage.getItem as any).mockImplementation((key: string) => storageBackend[key] ?? null);
+  (localStorage.setItem as any).mockImplementation((key: string, value: string) => { storageBackend[key] = value; });
+  (localStorage.removeItem as any).mockImplementation((key: string) => { delete storageBackend[key]; });
+  (localStorage.clear as any).mockImplementation(() => { Object.keys(storageBackend).forEach(k => delete storageBackend[k]); });
 });
 
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 import { usePowerHour, POWER_HOUR_STORAGE_KEY } from '../usePowerHour';
@@ -67,7 +75,7 @@ describe('usePowerHour', () => {
 
     // Advance 90 seconds
     act(() => {
-      jest.advanceTimersByTime(90_000);
+      vi.advanceTimersByTime(90_000);
     });
 
     expect(result.current.active).toBe(true);
@@ -84,7 +92,7 @@ describe('usePowerHour', () => {
 
     // Advance 61 minutes
     act(() => {
-      jest.advanceTimersByTime(61 * 60 * 1000);
+      vi.advanceTimersByTime(61 * 60 * 1000);
     });
 
     expect(result.current.active).toBe(false);
@@ -158,7 +166,7 @@ describe('usePowerHour', () => {
 
     // Should not throw or update after unmount
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
   });
 });

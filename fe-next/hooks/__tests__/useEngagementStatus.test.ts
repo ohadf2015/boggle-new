@@ -5,27 +5,34 @@
  * streak, XP, gold, and level data for the StreakBar.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-// Mock AuthContext — jest.fn stored in var to avoid hoisting issue
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+// Mock AuthContext — vi.fn stored in var to avoid hoisting issue
+const { mockUseAuth } = vi.hoisted(() => {
+  const mockUseAuth = vi.fn();
+  return { mockUseAuth };
+});
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
-// Mock supabase — use a module-level jest.fn for `from`
-const mockFrom = jest.fn();
-jest.mock('@/lib/supabase', () => ({
+// Mock supabase — use a module-level vi.fn for `from`
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
 // Mock adventureXpUtils
-jest.mock('@/shared/utils/adventureXpUtils', () => ({
-  getXpForLevel: jest.fn((level: number) => {
+vi.mock('@/shared/utils/adventureXpUtils', () => ({
+  getXpForLevel: vi.fn((level: number) => {
     const xpTable: Record<number, number> = { 1: 0, 2: 100, 3: 250, 4: 500, 5: 800, 6: 1200 };
     return xpTable[level] ?? level * 100;
   }),
-  getLevelFromXp: jest.fn(),
+  getLevelFromXp: vi.fn(),
 }));
 
 import { useEngagementStatus } from '../useEngagementStatus';
@@ -33,9 +40,9 @@ import { useEngagementStatus } from '../useEngagementStatus';
 // Helper to create a chained Supabase query mock
 function createChain(data: Record<string, unknown> | null, error: unknown = null) {
   return {
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        single: jest.fn().mockResolvedValue({ data, error }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data, error }),
       }),
     }),
   };
@@ -56,7 +63,7 @@ const profileData = {
 
 describe('useEngagementStatus', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
 
     // Default: authenticated user
@@ -91,7 +98,7 @@ describe('useEngagementStatus', () => {
   it('should calculate streakAtRisk when close to midnight', async () => {
     const now = new Date();
     now.setHours(23, 0, 0, 0);
-    jest.spyOn(Date, 'now').mockReturnValue(now.getTime());
+    vi.spyOn(Date, 'now').mockReturnValue(now.getTime());
 
     const { result } = renderHook(() => useEngagementStatus());
 
@@ -100,13 +107,13 @@ describe('useEngagementStatus', () => {
     });
 
     expect(result.current.streakAtRisk).toBe(true);
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should NOT show streakAtRisk when far from midnight', async () => {
     const now = new Date();
     now.setHours(10, 0, 0, 0);
-    jest.spyOn(Date, 'now').mockReturnValue(now.getTime());
+    vi.spyOn(Date, 'now').mockReturnValue(now.getTime());
 
     const { result } = renderHook(() => useEngagementStatus());
 
@@ -115,7 +122,7 @@ describe('useEngagementStatus', () => {
     });
 
     expect(result.current.streakAtRisk).toBe(false);
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should return defaults for unauthenticated users', () => {

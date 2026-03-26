@@ -7,14 +7,17 @@
  * is not 'idle' on mount.
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGameMusic } from '../useGameMusic';
 
 // Mock MusicContext
-const mockFadeToTrack = jest.fn();
-const mockPlayTrack = jest.fn();
-
-jest.mock('@/contexts/MusicContext', () => ({
+const { mockFadeToTrack, mockPlayTrack } = vi.hoisted(() => {
+  const mockFadeToTrack = vi.fn();
+  const mockPlayTrack = vi.fn();
+  return { mockFadeToTrack, mockPlayTrack };
+});
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     fadeToTrack: mockFadeToTrack,
     playTrack: mockPlayTrack,
@@ -31,7 +34,7 @@ jest.mock('@/contexts/MusicContext', () => ({
 
 describe('useGameMusic - Earthquake Music Priority on Mount', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should play BOSSA_ARCADE immediately when earthquakeState is fire-round on mount', () => {

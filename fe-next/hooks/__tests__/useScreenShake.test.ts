@@ -6,38 +6,39 @@
  * the user's prefers-reduced-motion preference.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useScreenShake } from '../useScreenShake';
 
 // Mock useDevicePerformance
-jest.mock('../useDevicePerformance', () => ({
-  useDevicePerformance: jest.fn(() => ({
+vi.mock('../useDevicePerformance', () => ({
+  useDevicePerformance: vi.fn(() => ({
     prefersReducedMotion: false,
     isLowEnd: false,
   })),
 }));
 
 // Mock Web Animations API
-const mockAnimate = jest.fn<
-  { finished: Promise<void>; cancel: jest.Mock },
+const mockAnimate = vi.fn<
+  { finished: Promise<void>; cancel: any },
   [Keyframe[] | PropertyIndexedKeyframes | null, KeyframeAnimationOptions?]
 >(() => ({
   finished: Promise.resolve(),
-  cancel: jest.fn(),
+  cancel: vi.fn(),
 }));
 
 describe('useScreenShake', () => {
   let mockElement: HTMLDivElement;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  beforeEach(async () => {
+    vi.clearAllMocks();
 
     // Create a mock element with animate method
     mockElement = document.createElement('div');
     mockElement.animate = mockAnimate as unknown as typeof mockElement.animate;
 
     // Reset mock implementation
-    const { useDevicePerformance } = require('../useDevicePerformance');
+    const { useDevicePerformance } = await import('../useDevicePerformance');
     useDevicePerformance.mockReturnValue({
       prefersReducedMotion: false,
       isLowEnd: false,
@@ -220,8 +221,8 @@ describe('useScreenShake', () => {
   });
 
   describe('Reduced motion preference', () => {
-    it('should skip shake animation when prefers-reduced-motion is enabled', () => {
-      const { useDevicePerformance } = require('../useDevicePerformance');
+    it('should skip shake animation when prefers-reduced-motion is enabled', async () => {
+      const { useDevicePerformance } = await import('../useDevicePerformance');
       useDevicePerformance.mockReturnValue({
         prefersReducedMotion: true,
         isLowEnd: false,
@@ -249,8 +250,8 @@ describe('useScreenShake', () => {
       expect(shakeAnimations.length).toBe(0);
     });
 
-    it('should provide flash feedback for reduced-motion users', () => {
-      const { useDevicePerformance } = require('../useDevicePerformance');
+    it('should provide flash feedback for reduced-motion users', async () => {
+      const { useDevicePerformance } = await import('../useDevicePerformance');
       useDevicePerformance.mockReturnValue({
         prefersReducedMotion: true,
         isLowEnd: false,

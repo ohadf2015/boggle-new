@@ -6,21 +6,22 @@
  * after playback starts, isStalled becomes true.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useCinematic,
   STALL_DETECTION_MS,
 } from '../useCinematic';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('useCinematic - stall detection', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should export STALL_DETECTION_MS constant', () => {
@@ -40,7 +41,7 @@ describe('useCinematic - stall detection', () => {
 
     // Advance past stall detection threshold without calling handleFrameUpdate
     act(() => {
-      jest.advanceTimersByTime(STALL_DETECTION_MS + 50);
+      vi.advanceTimersByTime(STALL_DETECTION_MS + 50);
     });
 
     expect(result.current.isStalled).toBe(true);
@@ -51,13 +52,13 @@ describe('useCinematic - stall detection', () => {
 
     // Simulate a frame update arriving before the stall timeout
     act(() => {
-      jest.advanceTimersByTime(500); // half the stall time
+      vi.advanceTimersByTime(500); // half the stall time
       result.current.handleFrameUpdate(1);
     });
 
     // Now advance past the original stall detection time
     act(() => {
-      jest.advanceTimersByTime(STALL_DETECTION_MS);
+      vi.advanceTimersByTime(STALL_DETECTION_MS);
     });
 
     expect(result.current.isStalled).toBe(false);
@@ -67,7 +68,7 @@ describe('useCinematic - stall detection', () => {
     const { result } = renderHook(() => useCinematic({ autoPlay: false }));
 
     act(() => {
-      jest.advanceTimersByTime(STALL_DETECTION_MS + 50);
+      vi.advanceTimersByTime(STALL_DETECTION_MS + 50);
     });
 
     expect(result.current.isStalled).toBe(false);
@@ -87,7 +88,7 @@ describe('useCinematic - stall detection', () => {
 
     // Stall timer should not fire after completion
     act(() => {
-      jest.advanceTimersByTime(STALL_DETECTION_MS + 50);
+      vi.advanceTimersByTime(STALL_DETECTION_MS + 50);
     });
 
     expect(result.current.isStalled).toBe(false);
@@ -98,7 +99,7 @@ describe('useCinematic - stall detection', () => {
 
     // Let it stall
     act(() => {
-      jest.advanceTimersByTime(STALL_DETECTION_MS + 50);
+      vi.advanceTimersByTime(STALL_DETECTION_MS + 50);
     });
 
     expect(result.current.isStalled).toBe(true);

@@ -4,20 +4,23 @@
  * Tests word club CRUD: fetch, create, join, leave, select.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // --- Mocks ---
 
 const mockUser = { id: 'test-user-id' };
-const mockUseAuth = jest.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-const mockFrom = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
   },
@@ -75,20 +78,20 @@ function setupFetchClubs(clubRows: Record<string, unknown>[], memberDetailRows: 
       callCount++;
       // First call: get club IDs for user
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ data: memberIds, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ data: memberIds, error: null }),
         }),
       };
     }
     if (table === 'word_clubs') {
       // Second call: get club details
       return {
-        select: jest.fn().mockReturnValue({
-          in: jest.fn().mockResolvedValue({ data: clubRows, error: null }),
+        select: vi.fn().mockReturnValue({
+          in: vi.fn().mockResolvedValue({ data: clubRows, error: null }),
         }),
-        insert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        insert: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           }),
         }),
       };
@@ -96,22 +99,22 @@ function setupFetchClubs(clubRows: Record<string, unknown>[], memberDetailRows: 
     if (table === 'word_club_members') {
       // Third call: fetch members for currentClub
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: memberDetailRows, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: memberDetailRows, error: null }),
           }),
         }),
-        insert: jest.fn().mockResolvedValue({ error: null }),
-        delete: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ error: null }),
+        insert: vi.fn().mockResolvedValue({ error: null }),
+        delete: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ error: null }),
           }),
         }),
       };
     }
     return {
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ data: [], error: null }),
       }),
     };
   });
@@ -119,8 +122,8 @@ function setupFetchClubs(clubRows: Record<string, unknown>[], memberDetailRows: 
 
 function setupFetchEmpty() {
   mockFrom.mockImplementation(() => ({
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     }),
   }));
 }
@@ -129,7 +132,7 @@ function setupFetchEmpty() {
 
 describe('useWordClubs', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: mockUser });
   });
 
@@ -163,8 +166,8 @@ describe('useWordClubs', () => {
 
     it('should handle empty club list', async () => {
       mockFrom.mockImplementation(() => ({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ data: [], error: null }),
         }),
       }));
 
@@ -187,19 +190,19 @@ describe('useWordClubs', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'word_clubs') {
           return {
-            insert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({ data: newClubRow, error: null }),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: newClubRow, error: null }),
               }),
             }),
           };
         }
         // word_club_members insert for owner
         return {
-          insert: jest.fn().mockResolvedValue({ error: null }),
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({ data: [], error: null }),
+          insert: vi.fn().mockResolvedValue({ error: null }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
         };
@@ -243,18 +246,18 @@ describe('useWordClubs', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'word_clubs') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({ data: targetClub, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: targetClub, error: null }),
               }),
             }),
           };
         }
         return {
-          insert: jest.fn().mockResolvedValue({ error: null }),
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({ data: [], error: null }),
+          insert: vi.fn().mockResolvedValue({ error: null }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
         };
@@ -296,9 +299,9 @@ describe('useWordClubs', () => {
 
       // Setup leave mock
       mockFrom.mockImplementation(() => ({
-        delete: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ error: null }),
+        delete: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ error: null }),
           }),
         }),
       }));

@@ -1,11 +1,15 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 // Mock dependencies
-const mockSpendCoins = jest.fn().mockResolvedValue(true);
-const mockRefreshCoins = jest.fn().mockResolvedValue(100);
+const { mockSpendCoins, mockRefreshCoins } = vi.hoisted(() => {
+  const mockSpendCoins = vi.fn().mockResolvedValue(true);
+  const mockRefreshCoins = vi.fn().mockResolvedValue(100);
+  return { mockSpendCoins, mockRefreshCoins };
+});
 const mockCoins = 500;
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinsFromContext: () => ({
     coins: mockCoins,
     spendCoins: mockSpendCoins,
@@ -13,7 +17,7 @@ jest.mock('@/contexts/CoinContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'test-user-123' },
     isAuthenticated: true,
@@ -21,16 +25,16 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 import { useAvatarPremium } from '../useAvatarPremium';
 
 describe('useAvatarPremium', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
     mockRefreshCoins.mockResolvedValue(100);
-    (global.fetch as jest.Mock).mockResolvedValue({
+    (global.fetch as any).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ success: true, gold: 400, premiumAvatarParts: ['eyes:laser'] }),
     });
@@ -80,7 +84,7 @@ describe('useAvatarPremium', () => {
 
       // Flush mount effect
       await waitFor(() => {
-        expect((global.fetch as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+        expect((global.fetch as any).mock.calls.length).toBeGreaterThanOrEqual(1);
       });
 
       const successPromise = result.current.purchaseWithGold('eyes', 'laser');
@@ -100,11 +104,11 @@ describe('useAvatarPremium', () => {
 
       // Flush mount effect
       await waitFor(() => {
-        expect((global.fetch as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+        expect((global.fetch as any).mock.calls.length).toBeGreaterThanOrEqual(1);
       });
 
       // Now override fetch to return failure for the purchase call
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         json: () => Promise.resolve({ error: 'Cannot afford' }),
       });

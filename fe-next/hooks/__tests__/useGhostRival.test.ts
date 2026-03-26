@@ -3,24 +3,25 @@
  * Tests weekly ghost rival data fetching and state management
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useGhostRival } from '../useGhostRival';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/AuthContext');
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('useGhostRival', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading=false and null rival for unauthenticated users', async () => {
     // GIVEN - No authenticated user
-    (useAuth as jest.Mock).mockReturnValue({ user: null });
+    (useAuth as any).mockReturnValue({ user: null });
 
     // WHEN
     const { result } = renderHook(() => useGhostRival());
@@ -35,7 +36,7 @@ describe('useGhostRival', () => {
 
   it('should fetch and return rival data for authenticated users', async () => {
     // GIVEN
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-1' } });
+    (useAuth as any).mockReturnValue({ user: { id: 'user-1' } });
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -65,7 +66,7 @@ describe('useGhostRival', () => {
 
   it('should calculate gap correctly when behind', async () => {
     // GIVEN
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-1' } });
+    (useAuth as any).mockReturnValue({ user: { id: 'user-1' } });
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -88,7 +89,7 @@ describe('useGhostRival', () => {
 
   it('should handle fetch errors gracefully', async () => {
     // GIVEN
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-1' } });
+    (useAuth as any).mockReturnValue({ user: { id: 'user-1' } });
     mockFetch.mockResolvedValue({ ok: false });
 
     // WHEN
@@ -104,7 +105,7 @@ describe('useGhostRival', () => {
 
   it('should call fetch with correct URL', async () => {
     // GIVEN
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-123' } });
+    (useAuth as any).mockReturnValue({ user: { id: 'user-123' } });
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ rival: null, player: { score: 0 } }),

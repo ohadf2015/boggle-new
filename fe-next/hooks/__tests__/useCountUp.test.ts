@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCountUp } from '../useCountUp';
 
@@ -6,18 +7,18 @@ const mockRAF = (cb: FrameRequestCallback) => setTimeout(() => cb(Date.now()), 1
 const mockCAF = (id: number) => clearTimeout(id);
 
 beforeAll(() => {
-  jest.spyOn(window, 'requestAnimationFrame').mockImplementation(mockRAF);
-  jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(mockCAF);
-  jest.spyOn(performance, 'now').mockImplementation(() => Date.now());
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(mockRAF);
+  vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(mockCAF);
+  vi.spyOn(performance, 'now').mockImplementation(() => Date.now());
 });
 
 afterAll(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe('useCountUp', () => {
-  beforeEach(() => { jest.useFakeTimers(); });
-  afterEach(() => { jest.useRealTimers(); });
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
 
   it('starts at 0', () => {
     const { result } = renderHook(() => useCountUp({ target: 750, duration: 1000 }));
@@ -28,7 +29,7 @@ describe('useCountUp', () => {
     const { result } = renderHook(() => useCountUp({ target: 750, duration: 1000 }));
 
     // Advance past the duration
-    act(() => { jest.advanceTimersByTime(1100); });
+    act(() => { vi.advanceTimersByTime(1100); });
     expect(result.current).toBe(750);
   });
 
@@ -41,7 +42,7 @@ describe('useCountUp', () => {
     const { result } = renderHook(() => useCountUp({ target: 500, duration: 1000, startDelay: 500 }));
 
     // Before delay
-    act(() => { jest.advanceTimersByTime(400); });
+    act(() => { vi.advanceTimersByTime(400); });
     expect(result.current).toBe(0);
   });
 
@@ -51,11 +52,11 @@ describe('useCountUp', () => {
       { initialProps: { target: 100 } }
     );
 
-    act(() => { jest.advanceTimersByTime(1100); });
+    act(() => { vi.advanceTimersByTime(1100); });
     expect(result.current).toBe(100);
 
     rerender({ target: 200 });
-    act(() => { jest.advanceTimersByTime(1100); });
+    act(() => { vi.advanceTimersByTime(1100); });
     expect(result.current).toBe(200);
   });
 });

@@ -9,6 +9,7 @@
  * TDD RED phase: Tests written first, before implementation.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Will be created in GREEN phase
@@ -16,11 +17,11 @@ import { useInactivityDetection } from '../useInactivityDetection';
 
 describe('useInactivityDetection', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ============================================================
@@ -29,7 +30,7 @@ describe('useInactivityDetection', () => {
 
   describe('basic timeout behavior', () => {
     it('should call onInactive after timeout expires with no activity', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -43,19 +44,19 @@ describe('useInactivityDetection', () => {
 
       // Advance to just before timeout
       act(() => {
-        jest.advanceTimersByTime(29999);
+        vi.advanceTimersByTime(29999);
       });
       expect(onInactive).not.toHaveBeenCalled();
 
       // Advance past timeout
       act(() => {
-        jest.advanceTimersByTime(1);
+        vi.advanceTimersByTime(1);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should use default 30s timeout when not specified', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -65,19 +66,19 @@ describe('useInactivityDetection', () => {
 
       // Advance to just before default 30s timeout
       act(() => {
-        jest.advanceTimersByTime(29999);
+        vi.advanceTimersByTime(29999);
       });
       expect(onInactive).not.toHaveBeenCalled();
 
       // Advance past 30s
       act(() => {
-        jest.advanceTimersByTime(1);
+        vi.advanceTimersByTime(1);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should support custom timeout values', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -87,18 +88,18 @@ describe('useInactivityDetection', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(9999);
+        vi.advanceTimersByTime(9999);
       });
       expect(onInactive).not.toHaveBeenCalled();
 
       act(() => {
-        jest.advanceTimersByTime(1);
+        vi.advanceTimersByTime(1);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should only call onInactive once until reset', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -109,13 +110,13 @@ describe('useInactivityDetection', () => {
 
       // First timeout
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
 
       // Wait longer - should not call again
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
@@ -127,7 +128,7 @@ describe('useInactivityDetection', () => {
 
   describe('activity reset via DOM events', () => {
     it('should reset timer on mousemove', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -138,7 +139,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Mouse move resets timer
@@ -148,7 +149,7 @@ describe('useInactivityDetection', () => {
 
       // Advance another 25 seconds (would be 50s total without reset)
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Should not have fired - timer was reset at 25s
@@ -156,14 +157,14 @@ describe('useInactivityDetection', () => {
 
       // Advance remaining 5 seconds to complete 30s from reset
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should reset timer on keydown', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -174,7 +175,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Keydown resets timer
@@ -184,21 +185,21 @@ describe('useInactivityDetection', () => {
 
       // Advance another 29 seconds
       act(() => {
-        jest.advanceTimersByTime(29000);
+        vi.advanceTimersByTime(29000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
 
       // 1 more second to complete timeout from reset
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should reset timer on touchstart', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -209,7 +210,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Touch resets timer
@@ -219,14 +220,14 @@ describe('useInactivityDetection', () => {
 
       // Would have fired without reset
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
     });
 
     it('should reset timer on click', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -237,7 +238,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Click resets timer
@@ -247,14 +248,14 @@ describe('useInactivityDetection', () => {
 
       // Would have fired without reset
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
     });
 
     it('should use default events when not specified', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -269,7 +270,7 @@ describe('useInactivityDetection', () => {
 
       for (const eventType of defaultEvents) {
         act(() => {
-          jest.advanceTimersByTime(9000);
+          vi.advanceTimersByTime(9000);
         });
 
         act(() => {
@@ -294,7 +295,7 @@ describe('useInactivityDetection', () => {
 
   describe('custom events', () => {
     it('should listen to custom events array', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -306,7 +307,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 9 seconds
       act(() => {
-        jest.advanceTimersByTime(9000);
+        vi.advanceTimersByTime(9000);
       });
 
       // Scroll resets
@@ -316,7 +317,7 @@ describe('useInactivityDetection', () => {
 
       // Another 9 seconds
       act(() => {
-        jest.advanceTimersByTime(9000);
+        vi.advanceTimersByTime(9000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
@@ -327,14 +328,14 @@ describe('useInactivityDetection', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should ignore events not in custom array', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -346,7 +347,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 9 seconds
       act(() => {
-        jest.advanceTimersByTime(9000);
+        vi.advanceTimersByTime(9000);
       });
 
       // Click should NOT reset (not in custom events)
@@ -355,7 +356,7 @@ describe('useInactivityDetection', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
@@ -368,7 +369,7 @@ describe('useInactivityDetection', () => {
 
   describe('manual reset function', () => {
     it('should provide reset function that resets timer', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { result } = renderHook(() =>
         useInactivityDetection({
@@ -379,7 +380,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Manual reset
@@ -389,7 +390,7 @@ describe('useInactivityDetection', () => {
 
       // Advance another 25 seconds
       act(() => {
-        jest.advanceTimersByTime(25000);
+        vi.advanceTimersByTime(25000);
       });
 
       // Should not have fired - timer was reset
@@ -397,14 +398,14 @@ describe('useInactivityDetection', () => {
 
       // Complete timeout from reset
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should reset timer after onInactive was called', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { result } = renderHook(() =>
         useInactivityDetection({
@@ -415,7 +416,7 @@ describe('useInactivityDetection', () => {
 
       // First timeout fires
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
       expect(onInactive).toHaveBeenCalledTimes(1);
 
@@ -426,7 +427,7 @@ describe('useInactivityDetection', () => {
 
       // Wait another timeout period
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // Should fire again
@@ -434,7 +435,7 @@ describe('useInactivityDetection', () => {
     });
 
     it('should return stable reset function reference', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { result, rerender } = renderHook(() =>
         useInactivityDetection({
@@ -457,9 +458,9 @@ describe('useInactivityDetection', () => {
 
   describe('lastActivity timestamp', () => {
     it('should return lastActivity timestamp', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
       const now = Date.now();
-      jest.setSystemTime(now);
+      vi.setSystemTime(now);
 
       const { result } = renderHook(() =>
         useInactivityDetection({
@@ -472,9 +473,9 @@ describe('useInactivityDetection', () => {
     });
 
     it('should update lastActivity on DOM events', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
       const startTime = Date.now();
-      jest.setSystemTime(startTime);
+      vi.setSystemTime(startTime);
 
       const { result } = renderHook(() =>
         useInactivityDetection({
@@ -486,7 +487,7 @@ describe('useInactivityDetection', () => {
       const initialActivity = result.current.lastActivity;
 
       // Advance time
-      jest.setSystemTime(startTime + 5000);
+      vi.setSystemTime(startTime + 5000);
 
       // Trigger activity
       act(() => {
@@ -497,9 +498,9 @@ describe('useInactivityDetection', () => {
     });
 
     it('should update lastActivity on manual reset', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
       const startTime = Date.now();
-      jest.setSystemTime(startTime);
+      vi.setSystemTime(startTime);
 
       const { result } = renderHook(() =>
         useInactivityDetection({
@@ -511,7 +512,7 @@ describe('useInactivityDetection', () => {
       const initialActivity = result.current.lastActivity;
 
       // Advance time
-      jest.setSystemTime(startTime + 5000);
+      vi.setSystemTime(startTime + 5000);
 
       // Manual reset
       act(() => {
@@ -528,7 +529,7 @@ describe('useInactivityDetection', () => {
 
   describe('enabled/disabled toggle', () => {
     it('should not run timer when enabled=false', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -540,14 +541,14 @@ describe('useInactivityDetection', () => {
 
       // Advance well past timeout
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
     });
 
     it('should default to enabled=true', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -558,14 +559,14 @@ describe('useInactivityDetection', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should clear timer when enabled changes true -> false', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { rerender } = renderHook(
         ({ enabled }) =>
@@ -579,7 +580,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 8 seconds
       act(() => {
-        jest.advanceTimersByTime(8000);
+        vi.advanceTimersByTime(8000);
       });
 
       // Disable
@@ -587,14 +588,14 @@ describe('useInactivityDetection', () => {
 
       // Advance past original timeout
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(onInactive).not.toHaveBeenCalled();
     });
 
     it('should start timer when enabled changes false -> true', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { rerender } = renderHook(
         ({ enabled }) =>
@@ -608,7 +609,7 @@ describe('useInactivityDetection', () => {
 
       // Wait while disabled
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
       expect(onInactive).not.toHaveBeenCalled();
 
@@ -617,15 +618,15 @@ describe('useInactivityDetection', () => {
 
       // Wait for timeout from enable point
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should not listen to events when disabled', () => {
-      const onInactive = jest.fn();
-      const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+      const onInactive = vi.fn();
+      const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
 
       renderHook(() =>
         useInactivityDetection({
@@ -653,8 +654,8 @@ describe('useInactivityDetection', () => {
 
   describe('cleanup', () => {
     it('should cleanup event listeners on unmount', () => {
-      const onInactive = jest.fn();
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const onInactive = vi.fn();
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
       const { unmount } = renderHook(() =>
         useInactivityDetection({
@@ -678,7 +679,7 @@ describe('useInactivityDetection', () => {
     });
 
     it('should clear timer on unmount', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       const { unmount } = renderHook(() =>
         useInactivityDetection({
@@ -689,7 +690,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 8 seconds
       act(() => {
-        jest.advanceTimersByTime(8000);
+        vi.advanceTimersByTime(8000);
       });
 
       // Unmount
@@ -697,7 +698,7 @@ describe('useInactivityDetection', () => {
 
       // Advance past original timeout
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       // Should not have fired - timer was cleaned up
@@ -705,8 +706,8 @@ describe('useInactivityDetection', () => {
     });
 
     it('should cleanup custom event listeners on unmount', () => {
-      const onInactive = jest.fn();
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const onInactive = vi.fn();
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
       const { unmount } = renderHook(() =>
         useInactivityDetection({
@@ -734,7 +735,7 @@ describe('useInactivityDetection', () => {
 
   describe('edge cases', () => {
     it('should handle rapid activity events', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -746,7 +747,7 @@ describe('useInactivityDetection', () => {
       // Rapid events
       for (let i = 0; i < 100; i++) {
         act(() => {
-          jest.advanceTimersByTime(50);
+          vi.advanceTimersByTime(50);
           window.dispatchEvent(new MouseEvent('mousemove'));
         });
       }
@@ -756,14 +757,14 @@ describe('useInactivityDetection', () => {
 
       // Now stop activity and wait
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should handle timeout of 0', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -774,15 +775,15 @@ describe('useInactivityDetection', () => {
 
       // Should fire immediately (or very quickly)
       act(() => {
-        jest.advanceTimersByTime(0);
+        vi.advanceTimersByTime(0);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);
     });
 
     it('should handle onInactive callback changes', () => {
-      const onInactive1 = jest.fn();
-      const onInactive2 = jest.fn();
+      const onInactive1 = vi.fn();
+      const onInactive2 = vi.fn();
 
       const { rerender } = renderHook(
         ({ onInactive }) =>
@@ -795,7 +796,7 @@ describe('useInactivityDetection', () => {
 
       // Advance 8 seconds
       act(() => {
-        jest.advanceTimersByTime(8000);
+        vi.advanceTimersByTime(8000);
       });
 
       // Change callback
@@ -803,7 +804,7 @@ describe('useInactivityDetection', () => {
 
       // Complete timeout
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       // Should call the new callback
@@ -812,7 +813,7 @@ describe('useInactivityDetection', () => {
     });
 
     it('should handle empty events array', () => {
-      const onInactive = jest.fn();
+      const onInactive = vi.fn();
 
       renderHook(() =>
         useInactivityDetection({
@@ -824,9 +825,9 @@ describe('useInactivityDetection', () => {
 
       // Activity should not reset timer since no events are listened to
       act(() => {
-        jest.advanceTimersByTime(9000);
+        vi.advanceTimersByTime(9000);
         window.dispatchEvent(new MouseEvent('mousemove'));
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(onInactive).toHaveBeenCalledTimes(1);

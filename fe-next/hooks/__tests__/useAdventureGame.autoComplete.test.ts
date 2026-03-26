@@ -10,6 +10,7 @@
  * 3. Stars are correctly set in gameState
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -58,11 +59,11 @@ function createMockGrid(size: number = 4): string[][] {
 
 describe('useAdventureGame - Auto-Complete Star Calculation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Bug: Stars should be calculated when game auto-completes on word submission', () => {
@@ -157,7 +158,7 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
 
       // Let 30 seconds pass (still have 90 seconds left)
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       // WHEN - Submit word with 90 seconds remaining (> 60 target)
@@ -192,7 +193,7 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
 
       // Let 50 seconds pass (only 70 seconds left, below 100 target)
       act(() => {
-        jest.advanceTimersByTime(50000);
+        vi.advanceTimersByTime(50000);
       });
 
       // WHEN - Submit word with 70 seconds remaining (< 100 target)

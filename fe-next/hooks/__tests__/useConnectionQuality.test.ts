@@ -5,6 +5,7 @@
  * computing rolling average/jitter, and exposing connection quality level.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { Socket } from 'socket.io-client';
 import { useConnectionQuality } from '../useConnectionQuality';
@@ -12,9 +13,9 @@ import { useConnectionQuality } from '../useConnectionQuality';
 // Helper to create a mock socket
 function createMockSocket(overrides: Partial<Socket> = {}): Socket {
   return {
-    emit: jest.fn(),
-    on: jest.fn(),
-    off: jest.fn(),
+    emit: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     connected: true,
     ...overrides,
   } as unknown as Socket;
@@ -22,7 +23,7 @@ function createMockSocket(overrides: Partial<Socket> = {}): Socket {
 
 describe('useConnectionQuality', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     // Clear any navigator.connection mock
     Object.defineProperty(navigator, 'connection', {
       writable: true,
@@ -32,8 +33,8 @@ describe('useConnectionQuality', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   // ==========================================
@@ -82,7 +83,7 @@ describe('useConnectionQuality', () => {
 
       // Advance past first interval
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       // THEN
@@ -98,7 +99,7 @@ describe('useConnectionQuality', () => {
       const socket = createMockSocket();
       let emitCallback: (...args: unknown[]) => void;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (event: string, _data: unknown, cb: (...args: unknown[]) => void) => {
           if (event === 'latencyCheck') {
             emitCallback = cb;
@@ -110,12 +111,12 @@ describe('useConnectionQuality', () => {
 
       // WHEN - trigger latency check and simulate 50ms RTT
       const now = Date.now();
-      jest.spyOn(Date, 'now')
+      vi.spyOn(Date, 'now')
         .mockReturnValueOnce(now) // timestamp sent in emit
         .mockReturnValueOnce(now + 50); // timestamp when callback fires
 
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       act(() => {
@@ -143,13 +144,13 @@ describe('useConnectionQuality', () => {
       const originalDateNow = Date.now;
       let mockNow = 1000;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (_event: string, _data: unknown, cb: () => void) => {
           emitCallback = cb;
         }
       );
 
-      jest.spyOn(Date, 'now').mockImplementation(() => mockNow);
+      vi.spyOn(Date, 'now').mockImplementation(() => mockNow);
 
       const { result } = renderHook(() => useConnectionQuality(socket, true));
 
@@ -158,7 +159,7 @@ describe('useConnectionQuality', () => {
         mockNow = 1000 + callCount * 10000;
 
         act(() => {
-          jest.advanceTimersByTime(5000);
+          vi.advanceTimersByTime(5000);
         });
 
         mockNow += rtt;
@@ -181,13 +182,13 @@ describe('useConnectionQuality', () => {
       let emitCallback: (() => void) | null = null;
       let mockNow = 1000;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (_event: string, _data: unknown, cb: () => void) => {
           emitCallback = cb;
         }
       );
 
-      jest.spyOn(Date, 'now').mockImplementation(() => mockNow);
+      vi.spyOn(Date, 'now').mockImplementation(() => mockNow);
 
       const { result } = renderHook(() => useConnectionQuality(socket, true));
 
@@ -196,7 +197,7 @@ describe('useConnectionQuality', () => {
         mockNow = 1000 + i * 10000;
 
         act(() => {
-          jest.advanceTimersByTime(5000);
+          vi.advanceTimersByTime(5000);
         });
 
         mockNow += (i + 1) * 10; // RTTs: 10, 20, 30, ..., 120
@@ -226,19 +227,19 @@ describe('useConnectionQuality', () => {
       let emitCallback: (() => void) | null = null;
       let mockNow = 1000;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (_event: string, _data: unknown, cb: () => void) => {
           emitCallback = cb;
         }
       );
 
-      jest.spyOn(Date, 'now').mockImplementation(() => mockNow);
+      vi.spyOn(Date, 'now').mockImplementation(() => mockNow);
 
       const { result } = renderHook(() => useConnectionQuality(socket, true));
 
       // WHEN
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       mockNow = 1100; // 100ms RTT
@@ -257,13 +258,13 @@ describe('useConnectionQuality', () => {
       let emitCallback: (() => void) | null = null;
       let mockNow = 1000;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (_event: string, _data: unknown, cb: () => void) => {
           emitCallback = cb;
         }
       );
 
-      jest.spyOn(Date, 'now').mockImplementation(() => mockNow);
+      vi.spyOn(Date, 'now').mockImplementation(() => mockNow);
 
       const { result } = renderHook(() => useConnectionQuality(socket, true));
 
@@ -273,7 +274,7 @@ describe('useConnectionQuality', () => {
         mockNow = 1000 + i * 10000;
 
         act(() => {
-          jest.advanceTimersByTime(5000);
+          vi.advanceTimersByTime(5000);
         });
 
         mockNow += rtts[i];
@@ -299,19 +300,19 @@ describe('useConnectionQuality', () => {
       let emitCallback: (() => void) | null = null;
       let mockNow = 1000;
 
-      (socket.emit as jest.Mock).mockImplementation(
+      (socket.emit as any).mockImplementation(
         (_event: string, _data: unknown, cb: () => void) => {
           emitCallback = cb;
         }
       );
 
-      jest.spyOn(Date, 'now').mockImplementation(() => mockNow);
+      vi.spyOn(Date, 'now').mockImplementation(() => mockNow);
 
       const hookResult = renderHook(() => useConnectionQuality(socket, true));
 
       // Push one sample
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       mockNow = 1000 + rtt;
@@ -424,7 +425,7 @@ describe('useConnectionQuality', () => {
   describe('cleanup', () => {
     it('should clear interval on unmount', () => {
       // GIVEN
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
       const socket = createMockSocket();
 
       const { unmount } = renderHook(() => useConnectionQuality(socket, true));
@@ -443,10 +444,10 @@ describe('useConnectionQuality', () => {
 
       // WHEN
       unmount();
-      (socket.emit as jest.Mock).mockClear();
+      (socket.emit as any).mockClear();
 
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // THEN
@@ -455,7 +456,7 @@ describe('useConnectionQuality', () => {
 
     it('should clear interval when socket disconnects', () => {
       // GIVEN
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
       const socket = createMockSocket();
 
       const { rerender } = renderHook(

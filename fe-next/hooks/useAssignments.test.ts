@@ -4,20 +4,21 @@
  * Tests for the useAssignments hook which manages teacher assignments
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAssignments } from './useAssignments';
 import * as assignmentsAPI from '@/lib/supabase/education/assignments';
 
 // Mock the assignments API
-jest.mock('@/lib/supabase/education/assignments');
+vi.mock('@/lib/supabase/education/assignments');
 
-const mockGetClassroomAssignments = assignmentsAPI.getClassroomAssignments as jest.MockedFunction<typeof assignmentsAPI.getClassroomAssignments>;
-const mockCreateAssignment = assignmentsAPI.createAssignment as jest.MockedFunction<typeof assignmentsAPI.createAssignment>;
-const mockDeleteAssignment = assignmentsAPI.deleteAssignment as jest.MockedFunction<typeof assignmentsAPI.deleteAssignment>;
+const mockGetClassroomAssignments = assignmentsAPI.getClassroomAssignments as any;
+const mockCreateAssignment = assignmentsAPI.createAssignment as any;
+const mockDeleteAssignment = assignmentsAPI.deleteAssignment as any;
 
 describe('useAssignments', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {

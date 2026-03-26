@@ -4,6 +4,7 @@
  * Tests for cinematic playback state management and skip timing.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useCinematic,
@@ -16,15 +17,15 @@ import {
 } from '../useCinematic';
 
 // Mock timers for skip delay testing
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('useCinematic', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {
@@ -74,14 +75,14 @@ describe('useCinematic', () => {
       expect(result.current.canSkip).toBe(false);
 
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
+        vi.advanceTimersByTime(SKIP_DELAY_MS);
       });
 
       expect(result.current.canSkip).toBe(true);
     });
 
     it('should call onSkipAvailable when skip becomes enabled', () => {
-      const onSkipAvailable = jest.fn();
+      const onSkipAvailable = vi.fn();
       renderHook(() =>
         useCinematic({ onSkipAvailable })
       );
@@ -89,7 +90,7 @@ describe('useCinematic', () => {
       expect(onSkipAvailable).not.toHaveBeenCalled();
 
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
+        vi.advanceTimersByTime(SKIP_DELAY_MS);
       });
 
       expect(onSkipAvailable).toHaveBeenCalledTimes(1);
@@ -99,7 +100,7 @@ describe('useCinematic', () => {
       const { result } = renderHook(() => useCinematic());
 
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS - 100);
+        vi.advanceTimersByTime(SKIP_DELAY_MS - 100);
       });
 
       expect(result.current.canSkip).toBe(false);
@@ -108,7 +109,7 @@ describe('useCinematic', () => {
 
   describe('skip function', () => {
     it('should not skip when canSkip is false', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() =>
         useCinematic({ onComplete })
       );
@@ -122,14 +123,14 @@ describe('useCinematic', () => {
     });
 
     it('should complete when skip is called after delay', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() =>
         useCinematic({ onComplete })
       );
 
       // Enable skip
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
+        vi.advanceTimersByTime(SKIP_DELAY_MS);
       });
 
       // Skip
@@ -143,14 +144,14 @@ describe('useCinematic', () => {
     });
 
     it('should not call onComplete multiple times', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() =>
         useCinematic({ onComplete })
       );
 
       // Enable skip
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
+        vi.advanceTimersByTime(SKIP_DELAY_MS);
       });
 
       // Skip multiple times
@@ -200,7 +201,7 @@ describe('useCinematic', () => {
     });
 
     it('should call onFrameChange when frame updates', () => {
-      const onFrameChange = jest.fn();
+      const onFrameChange = vi.fn();
       const { result } = renderHook(() =>
         useCinematic({ onFrameChange })
       );
@@ -215,7 +216,7 @@ describe('useCinematic', () => {
 
   describe('natural completion', () => {
     it('should complete when reaching last frame', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const durationFrames = 100;
       const { result } = renderHook(() =>
         useCinematic({ durationFrames, onComplete })
@@ -231,7 +232,7 @@ describe('useCinematic', () => {
     });
 
     it('should not complete before last frame', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const durationFrames = 100;
       const { result } = renderHook(() =>
         useCinematic({ durationFrames, onComplete })
@@ -303,7 +304,7 @@ describe('useCinematic', () => {
 
       // Progress the cinematic
       act(() => {
-        jest.advanceTimersByTime(SKIP_DELAY_MS);
+        vi.advanceTimersByTime(SKIP_DELAY_MS);
         result.current.handleFrameUpdate(50);
       });
 
@@ -323,7 +324,7 @@ describe('useCinematic', () => {
     });
 
     it('should allow re-completion after reset', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() =>
         useCinematic({ durationFrames: 100, onComplete })
       );

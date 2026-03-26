@@ -8,20 +8,21 @@
  * Both conditions must be met before triggering.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAutoShowWithInteraction } from '../useAutoShowWithInteraction';
 
 describe('useAutoShowWithInteraction', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should not trigger before delay passes', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -35,14 +36,14 @@ describe('useAutoShowWithInteraction', () => {
 
     // Not enough time has passed
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onTrigger).not.toHaveBeenCalled();
   });
 
   it('should not trigger if delay passes but no interaction', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -51,7 +52,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // No interaction happened
@@ -59,7 +60,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should trigger when delay passes AND user clicks', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -68,7 +69,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Now user interacts
@@ -80,7 +81,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should trigger when user interacts first, then delay passes', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -89,7 +90,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // User interacts early
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       window.dispatchEvent(new MouseEvent('click'));
     });
 
@@ -98,14 +99,14 @@ describe('useAutoShowWithInteraction', () => {
 
     // Now delay passes
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onTrigger).toHaveBeenCalledTimes(1);
   });
 
   it('should trigger on scroll interaction', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -114,7 +115,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // User scrolls
@@ -126,7 +127,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should trigger on keypress interaction', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -135,7 +136,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // User presses key
@@ -147,7 +148,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should trigger on touchstart interaction', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -156,7 +157,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // User touches screen
@@ -168,7 +169,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should only trigger once', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: true,
       delayMs: 5000,
@@ -177,7 +178,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // Multiple interactions
@@ -191,7 +192,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should not trigger when disabled', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     renderHook(() => useAutoShowWithInteraction({
       enabled: false,
       delayMs: 5000,
@@ -200,7 +201,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // User interacts
@@ -212,8 +213,8 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should cleanup event listeners on unmount', () => {
-    const onTrigger = jest.fn();
-    const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+    const onTrigger = vi.fn();
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
     const { unmount } = renderHook(() => useAutoShowWithInteraction({
       enabled: true,
@@ -229,7 +230,7 @@ describe('useAutoShowWithInteraction', () => {
   });
 
   it('should reset when enabled changes from false to true', () => {
-    const onTrigger = jest.fn();
+    const onTrigger = vi.fn();
     const { rerender } = renderHook(
       ({ enabled }) => useAutoShowWithInteraction({
         enabled,
@@ -241,7 +242,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // First disabled, wait and interact - nothing happens
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       window.dispatchEvent(new MouseEvent('click'));
     });
     expect(onTrigger).not.toHaveBeenCalled();
@@ -251,7 +252,7 @@ describe('useAutoShowWithInteraction', () => {
 
     // Wait for delay and interact
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       window.dispatchEvent(new MouseEvent('click'));
     });
 

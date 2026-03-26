@@ -5,34 +5,35 @@
  * verify action methods emit correct events, verify on* methods register/unregister listeners
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { io, Socket } from 'socket.io-client';
 import { useDuelSocket } from '../useDuelSocket';
 
 // Mock socket.io-client
-jest.mock('socket.io-client');
+vi.mock('socket.io-client');
 
 describe('useDuelSocket', () => {
-  let mockSocket: jest.Mocked<Partial<Socket>>;
-  let mockIo: jest.MockedFunction<typeof io>;
+  let mockSocket: any;
+  let mockIo: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     // Create mock socket instance
     mockSocket = {
-      on: jest.fn(),
-      off: jest.fn(),
-      emit: jest.fn(),
-      disconnect: jest.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+      emit: vi.fn(),
+      disconnect: vi.fn(),
       connected: true,
     };
 
     // Mock io() to return our mock socket
-    mockIo = io as jest.MockedFunction<typeof io>;
+    mockIo = io as any;
     mockIo.mockReturnValue(mockSocket as Socket);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==========================================
@@ -77,7 +78,7 @@ describe('useDuelSocket', () => {
 
       // Simulate connect event
       act(() => {
-        const connectHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+        const connectHandler = (mockSocket.on as any).mock.calls.find(
           (call) => call[0] === 'connect'
         )?.[1];
         if (connectHandler) {
@@ -197,7 +198,7 @@ describe('useDuelSocket', () => {
   describe('Event Listeners', () => {
     it('should register onChallengeReceived listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onChallengeReceived(callback);
@@ -211,14 +212,14 @@ describe('useDuelSocket', () => {
 
     it('should call callback when challenge received', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onChallengeReceived(callback);
       });
 
       // Find and call the registered handler
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as any).mock.calls.find(
         (call) => call[0] === 'duel:challenge-received'
       )?.[1];
 
@@ -237,7 +238,7 @@ describe('useDuelSocket', () => {
 
     it('should unregister onChallengeReceived when cleanup function called', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       let cleanup: (() => void) | undefined;
       act(() => {
@@ -256,7 +257,7 @@ describe('useDuelSocket', () => {
 
     it('should register onLobbyUpdate listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onLobbyUpdate(callback);
@@ -270,7 +271,7 @@ describe('useDuelSocket', () => {
 
     it('should register onDuelAccepted listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onDuelAccepted(callback);
@@ -284,7 +285,7 @@ describe('useDuelSocket', () => {
 
     it('should register onDuelDeclined listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onDuelDeclined(callback);
@@ -298,7 +299,7 @@ describe('useDuelSocket', () => {
 
     it('should register onDuelCompleted listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onDuelCompleted(callback);
@@ -312,7 +313,7 @@ describe('useDuelSocket', () => {
 
     it('should register onScoreSubmitted listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onScoreSubmitted(callback);
@@ -326,7 +327,7 @@ describe('useDuelSocket', () => {
 
     it('should register onError listener', () => {
       const { result } = renderHook(() => useDuelSocket());
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       act(() => {
         result.current.onError(callback);
@@ -343,13 +344,13 @@ describe('useDuelSocket', () => {
 
       // Register some listeners
       act(() => {
-        result.current.onChallengeReceived(jest.fn());
-        result.current.onLobbyUpdate(jest.fn());
-        result.current.onError(jest.fn());
+        result.current.onChallengeReceived(vi.fn());
+        result.current.onLobbyUpdate(vi.fn());
+        result.current.onError(vi.fn());
       });
 
       // Clear mock calls from registration
-      (mockSocket.off as jest.Mock).mockClear();
+      (mockSocket.off as any).mockClear();
 
       unmount();
 
@@ -405,7 +406,7 @@ describe('useDuelSocket', () => {
       // Simulate disconnect
       act(() => {
         mockSocket.connected = false;
-        const disconnectHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+        const disconnectHandler = (mockSocket.on as any).mock.calls.find(
           (call) => call[0] === 'disconnect'
         )?.[1];
         disconnectHandler?.();
@@ -418,7 +419,7 @@ describe('useDuelSocket', () => {
       // Simulate reconnect
       act(() => {
         mockSocket.connected = true;
-        const connectHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+        const connectHandler = (mockSocket.on as any).mock.calls.find(
           (call) => call[0] === 'connect'
         )?.[1];
         connectHandler?.();

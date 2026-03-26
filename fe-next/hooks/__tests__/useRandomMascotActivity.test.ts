@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import {
   useRandomMascotActivity,
@@ -11,8 +12,8 @@ const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
 
 describe('useRandomMascotActivity', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
-    jest.useFakeTimers();
+    vi.clearAllTimers();
+    vi.useFakeTimers();
     mockUseDevicePerformance.mockReturnValue({
       isLowEnd: false,
       targetFPS: 60,
@@ -28,8 +29,8 @@ describe('useRandomMascotActivity', () => {
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it('should start with base variant', () => {
@@ -61,7 +62,7 @@ describe('useRandomMascotActivity', () => {
 
     // Fast-forward to trigger first activity (uses initial delay of 2s, not regular 10s)
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     await waitFor(() => {
@@ -71,7 +72,7 @@ describe('useRandomMascotActivity', () => {
 
     // Should return to base after activity duration
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     await waitFor(() => {
@@ -94,7 +95,7 @@ describe('useRandomMascotActivity', () => {
 
     // Fast-forward to trigger first activity (initial delay: 1s)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     await waitFor(() => {
@@ -103,7 +104,7 @@ describe('useRandomMascotActivity', () => {
 
     // Wait for activity to complete (1s duration)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     await waitFor(() => {
@@ -112,14 +113,14 @@ describe('useRandomMascotActivity', () => {
 
     // Second activity should not trigger at 1s (initial delay) but at 5s (regular interval)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(result.current.isDoingActivity).toBe(false);
 
     // Now wait for regular interval (5s total from after first activity)
     act(() => {
-      jest.advanceTimersByTime(4000);
+      vi.advanceTimersByTime(4000);
     });
 
     await waitFor(() => {
@@ -146,7 +147,7 @@ describe('useRandomMascotActivity', () => {
 
     // Reset after duration
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(result.current.currentVariant).toBe('thinking');
@@ -177,7 +178,7 @@ describe('useRandomMascotActivity', () => {
 
     // Should not trigger activities when reduced motion is preferred
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
     });
 
     expect(result.current.currentVariant).toBe('happy');
@@ -265,7 +266,7 @@ describe('useRandomMascotActivity', () => {
 
     // Fast-forward time
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
     });
 
     expect(result.current.currentVariant).toBe('happy');
@@ -313,7 +314,7 @@ describe('useRandomMascotActivity', () => {
 
       // Complete activity - should cycle to a new base
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.isDoingActivity).toBe(false);
@@ -339,7 +340,7 @@ describe('useRandomMascotActivity', () => {
           result.current.triggerActivity();
         });
         act(() => {
-          jest.advanceTimersByTime(1000);
+          vi.advanceTimersByTime(1000);
         });
 
         expect(result.current.currentBaseVariant).toBe('happy');
@@ -379,7 +380,7 @@ describe('useRandomMascotActivity', () => {
         result.current.triggerActivity();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       const currentBase = result.current.currentBaseVariant;

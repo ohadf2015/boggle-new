@@ -5,6 +5,7 @@
  * Each power-up has distinct behavior that modifies game state.
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import {
   applyFreezeTime,
@@ -204,12 +205,12 @@ describe('applyHint', () => {
 
 describe('applyScoreMultiplier', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2025-01-30T12:00:00Z'));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-30T12:00:00Z'));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return 2x multiplier with 30s expiration', () => {
@@ -229,7 +230,7 @@ describe('applyScoreMultiplier', () => {
     const firstActivation = applyScoreMultiplier();
 
     // Advance time by 5 seconds
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
 
     // WHEN
     const secondActivation = applyScoreMultiplier();

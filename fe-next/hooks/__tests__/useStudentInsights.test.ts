@@ -5,6 +5,7 @@
  * Covers education analytics: weak/strong words, practice trends, XP, mode performance
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStudentInsights } from '../useStudentInsights';
 import * as practiceModule from '@/lib/supabase/education/practice';
@@ -15,24 +16,20 @@ let mockAuthReturn: { isAuthenticated: boolean; user: { id: string } | null } = 
   user: { id: 'student-1' },
 };
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockAuthReturn,
 }));
-jest.mock('@/hooks/useMounted', () => ({
+vi.mock('@/hooks/useMounted', () => ({
   useMounted: () => ({ current: true }),
 }));
-jest.mock('@/lib/supabase/education/practice');
-jest.mock('@/lib/supabase/education');
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/lib/supabase/education/practice');
+vi.mock('@/lib/supabase/education');
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
+  default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
-const mockGetPracticeSessions = practiceModule.getPracticeSessions as jest.MockedFunction<
-  typeof practiceModule.getPracticeSessions
->;
-const mockGetStudentProgress = educationModule.getStudentProgress as jest.MockedFunction<
-  typeof educationModule.getStudentProgress
->;
+const mockGetPracticeSessions = practiceModule.getPracticeSessions as any;
+const mockGetStudentProgress = educationModule.getStudentProgress as any;
 
 // Helper: build mock practice sessions
 function buildSession(overrides: Partial<practiceModule.PracticeSessionRow> = {}): practiceModule.PracticeSessionRow {
@@ -57,7 +54,7 @@ function buildSession(overrides: Partial<practiceModule.PracticeSessionRow> = {}
 
 describe('useStudentInsights', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAuthReturn = { isAuthenticated: true, user: { id: 'student-1' } };
   });
 

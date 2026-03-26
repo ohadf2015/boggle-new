@@ -4,25 +4,26 @@
  * Tests for the keyboard support convenience hook for brain drills
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useDrillKeyboardSupport } from '../useDrillKeyboardSupport';
 import type { LetterGrid } from '@/types';
 
 // Mock useKeyboardWordInput
-jest.mock('../useKeyboardWordInput', () => ({
-  useKeyboardWordInput: jest.fn(() => ({
+vi.mock('../useKeyboardWordInput', () => ({
+  useKeyboardWordInput: vi.fn(() => ({
     typedWord: '',
     isTypingMode: false,
     isValidOnGrid: false,
     highlightedCells: [],
-    clearTypedWord: jest.fn(),
-    submitTypedWord: jest.fn(),
+    clearTypedWord: vi.fn(),
+    submitTypedWord: vi.fn(),
   })),
 }));
 
 import { useKeyboardWordInput } from '../useKeyboardWordInput';
 
-const mockUseKeyboardWordInput = useKeyboardWordInput as jest.Mock;
+const mockUseKeyboardWordInput = useKeyboardWordInput as any;
 
 describe('useDrillKeyboardSupport', () => {
   const QUICK_TIP_STORAGE_KEY = 'lexiclash_drill_keyboard_tip_dismissed';
@@ -40,7 +41,7 @@ describe('useDrillKeyboardSupport', () => {
     grid: mockGrid,
     language: 'en' as const,
     enabled: true,
-    onWordSubmit: jest.fn(),
+    onWordSubmit: vi.fn(),
     minWordLength: 2,
   };
 
@@ -49,7 +50,7 @@ describe('useDrillKeyboardSupport', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock desktop userAgent
     Object.defineProperty(window, 'navigator', {
@@ -63,11 +64,11 @@ describe('useDrillKeyboardSupport', () => {
       isTypingMode: false,
       isValidOnGrid: false,
       highlightedCells: [],
-      clearTypedWord: jest.fn(),
-      submitTypedWord: jest.fn(),
+      clearTypedWord: vi.fn(),
+      submitTypedWord: vi.fn(),
     });
 
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
@@ -75,7 +76,7 @@ describe('useDrillKeyboardSupport', () => {
       value: originalNavigator,
       writable: true,
     });
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('desktop detection', () => {
@@ -163,8 +164,8 @@ describe('useDrillKeyboardSupport', () => {
     });
 
     it('returns keyboard input values', () => {
-      const mockClearTypedWord = jest.fn();
-      const mockSubmitTypedWord = jest.fn();
+      const mockClearTypedWord = vi.fn();
+      const mockSubmitTypedWord = vi.fn();
 
       mockUseKeyboardWordInput.mockReturnValue({
         typedWord: 'CAT',
@@ -195,7 +196,7 @@ describe('useDrillKeyboardSupport', () => {
 
       // After 1 second delay
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.showQuickTip).toBe(true);
@@ -207,7 +208,7 @@ describe('useDrillKeyboardSupport', () => {
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.showQuickTip).toBe(false);
@@ -217,7 +218,7 @@ describe('useDrillKeyboardSupport', () => {
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.showQuickTip).toBe(true);
@@ -239,7 +240,7 @@ describe('useDrillKeyboardSupport', () => {
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.showQuickTip).toBe(false);
@@ -251,7 +252,7 @@ describe('useDrillKeyboardSupport', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.showQuickTip).toBe(false);
@@ -265,8 +266,8 @@ describe('useDrillKeyboardSupport', () => {
         isTypingMode: false,
         isValidOnGrid: false,
         highlightedCells: [],
-        clearTypedWord: jest.fn(),
-        submitTypedWord: jest.fn(),
+        clearTypedWord: vi.fn(),
+        submitTypedWord: vi.fn(),
       });
 
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
@@ -282,8 +283,8 @@ describe('useDrillKeyboardSupport', () => {
         isTypingMode: true,
         isValidOnGrid: true,
         highlightedCells: [],
-        clearTypedWord: jest.fn(),
-        submitTypedWord: jest.fn(),
+        clearTypedWord: vi.fn(),
+        submitTypedWord: vi.fn(),
       });
 
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
@@ -297,8 +298,8 @@ describe('useDrillKeyboardSupport', () => {
         isTypingMode: false,
         isValidOnGrid: false,
         highlightedCells: [],
-        clearTypedWord: jest.fn(),
-        submitTypedWord: jest.fn(),
+        clearTypedWord: vi.fn(),
+        submitTypedWord: vi.fn(),
       });
 
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));
@@ -312,8 +313,8 @@ describe('useDrillKeyboardSupport', () => {
         isTypingMode: true,
         isValidOnGrid: true,
         highlightedCells: [],
-        clearTypedWord: jest.fn(),
-        submitTypedWord: jest.fn(),
+        clearTypedWord: vi.fn(),
+        submitTypedWord: vi.fn(),
       });
 
       const { result } = renderHook(() =>
@@ -329,8 +330,8 @@ describe('useDrillKeyboardSupport', () => {
         isTypingMode: true,
         isValidOnGrid: false,
         highlightedCells: [],
-        clearTypedWord: jest.fn(),
-        submitTypedWord: jest.fn(),
+        clearTypedWord: vi.fn(),
+        submitTypedWord: vi.fn(),
       });
 
       const { result } = renderHook(() => useDrillKeyboardSupport(defaultOptions));

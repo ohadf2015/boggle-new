@@ -9,6 +9,7 @@
  * Following TDD: Write failing tests FIRST, then implement
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -56,11 +57,11 @@ function createMockGrid(size: number = 4): string[][] {
 
 describe('Time Tile Effects', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should add +5 seconds when time tile is used in a word', () => {
@@ -79,7 +80,7 @@ describe('Time Tile Effects', () => {
       result.current.startGame();
     });
     act(() => {
-      jest.advanceTimersByTime(10000); // 10 seconds pass
+      vi.advanceTimersByTime(10000); // 10 seconds pass
     });
 
     expect(result.current.timeRemaining).toBe(50);
@@ -116,7 +117,7 @@ describe('Time Tile Effects', () => {
       result.current.startGame();
     });
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
     });
 
     // WHEN - Submit word using both time tiles
@@ -149,7 +150,7 @@ describe('Time Tile Effects', () => {
     });
     // Only 2 seconds have passed, timer at 118
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     // WHEN - Submit word using time tile
@@ -594,11 +595,11 @@ describe('Bomb Tile - Row Clearing', () => {
 
 describe('Combined Special Tile Effects', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should apply all bonuses when multiple special tiles are in path', () => {
@@ -620,7 +621,7 @@ describe('Combined Special Tile Effects', () => {
       result.current.startGame();
     });
     act(() => {
-      jest.advanceTimersByTime(10000); // 10 seconds pass
+      vi.advanceTimersByTime(10000); // 10 seconds pass
     });
 
     const initialTime = result.current.timeRemaining; // 50

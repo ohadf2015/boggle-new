@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useGameStore } from '@/hooks/gameState/store';
 import { useMultiplayerEventNotifications } from '../useMultiplayerEventNotifications';
 import { neoWarningToast, neoErrorToast, neoInfoToast } from '@/components/NeoToast';
 
-jest.mock('@/components/NeoToast', () => ({
-  neoWarningToast: jest.fn(),
-  neoErrorToast: jest.fn(),
-  neoInfoToast: jest.fn(),
-  neoSuccessToast: jest.fn(),
+vi.mock('@/components/NeoToast', () => ({
+  neoWarningToast: vi.fn(),
+  neoErrorToast: vi.fn(),
+  neoInfoToast: vi.fn(),
+  neoSuccessToast: vi.fn(),
 }));
 
 const mockT = (key: string) => {
@@ -22,7 +23,7 @@ const mockT = (key: string) => {
 
 describe('useMultiplayerEventNotifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     useGameStore.setState({
       wordHuntEliminatedPlayers: [],
       wordHuntPlayerLives: {},

@@ -4,20 +4,23 @@
  * Tests weekly and monthly recap fetching, including fallback computation.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 // --- Mocks ---
 
 const mockUser = { id: 'test-user-id' };
-const mockUseAuth = jest.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn(() => ({ user: mockUser }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-const mockFrom = jest.fn();
-
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: (...args: unknown[]) => mockFrom(...args),
   },
@@ -69,7 +72,7 @@ function makeGameResultRow(overrides: Record<string, unknown> = {}) {
 
 describe('usePlayerRecap', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: mockUser });
   });
 
@@ -93,9 +96,9 @@ describe('usePlayerRecap', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_recaps') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                in: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                in: vi.fn().mockResolvedValue({
                   data: [weeklyRow, monthlyRow],
                   error: null,
                 }),
@@ -104,11 +107,11 @@ describe('usePlayerRecap', () => {
           };
         }
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              gte: jest.fn().mockReturnValue({
-                lte: jest.fn().mockReturnValue({
-                  order: jest.fn().mockResolvedValue({ data: [], error: null }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              gte: vi.fn().mockReturnValue({
+                lte: vi.fn().mockReturnValue({
+                  order: vi.fn().mockResolvedValue({ data: [], error: null }),
                 }),
               }),
             }),
@@ -137,20 +140,20 @@ describe('usePlayerRecap', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_recaps') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                in: jest.fn().mockResolvedValue({ data: [], error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                in: vi.fn().mockResolvedValue({ data: [], error: null }),
               }),
             }),
           };
         }
         if (table === 'game_results') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                gte: jest.fn().mockReturnValue({
-                  lte: jest.fn().mockReturnValue({
-                    order: jest.fn().mockResolvedValue({ data: gameRows, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                gte: vi.fn().mockReturnValue({
+                  lte: vi.fn().mockReturnValue({
+                    order: vi.fn().mockResolvedValue({ data: gameRows, error: null }),
                   }),
                 }),
               }),
@@ -178,20 +181,20 @@ describe('usePlayerRecap', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_recaps') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                in: jest.fn().mockResolvedValue({ data: [], error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                in: vi.fn().mockResolvedValue({ data: [], error: null }),
               }),
             }),
           };
         }
         if (table === 'game_results') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                gte: jest.fn().mockReturnValue({
-                  lte: jest.fn().mockReturnValue({
-                    order: jest.fn().mockResolvedValue({ data: [], error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                gte: vi.fn().mockReturnValue({
+                  lte: vi.fn().mockReturnValue({
+                    order: vi.fn().mockResolvedValue({ data: [], error: null }),
                   }),
                 }),
               }),
@@ -212,9 +215,9 @@ describe('usePlayerRecap', () => {
   describe('Given a fetch error', () => {
     it('should return null recaps on error', async () => {
       mockFrom.mockImplementation(() => ({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            in: jest.fn().mockRejectedValue(new Error('Network error')),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            in: vi.fn().mockRejectedValue(new Error('Network error')),
           }),
         }),
       }));

@@ -1,16 +1,17 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useQuickReactions } from '../useQuickReactions';
 import { REACTIONS } from '@/components/game/QuickReactions';
 
 // Mock socket
-const mockEmit = jest.fn();
-const mockOn = jest.fn();
-const mockOff = jest.fn();
+const mockEmit = vi.fn();
+const mockOn = vi.fn();
+const mockOff = vi.fn();
 const mockSocket = { emit: mockEmit, on: mockOn, off: mockOff } as any;
 
 describe('useQuickReactions', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should register quickReaction listener on mount', () => {

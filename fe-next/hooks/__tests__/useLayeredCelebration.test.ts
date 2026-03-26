@@ -4,6 +4,7 @@
  * Tests budget-aware layered celebrations with reduced motion support
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useLayeredCelebration } from '../useLayeredCelebration';
 import * as confettiUtils from '../../utils/confettiUtils';
@@ -11,25 +12,25 @@ import * as useParticleBudgetModule from '../useParticleBudget';
 import * as useDevicePerformanceModule from '../useDevicePerformance';
 
 // Mock dependencies
-jest.mock('../../utils/confettiUtils');
-jest.mock('../useParticleBudget');
-jest.mock('../useDevicePerformance');
+vi.mock('../../utils/confettiUtils');
+vi.mock('../useParticleBudget');
+vi.mock('../useDevicePerformance');
 
 describe('useLayeredCelebration', () => {
-  let mockFireLayeredCelebration: jest.Mock;
-  let mockUseParticleBudget: jest.Mock;
-  let mockUseDevicePerformance: jest.Mock;
+  let mockFireLayeredCelebration: any;
+  let mockUseParticleBudget: any;
+  let mockUseDevicePerformance: any;
 
   beforeEach(() => {
     // Create mocks
-    mockFireLayeredCelebration = jest.fn();
-    mockUseParticleBudget = jest.fn();
-    mockUseDevicePerformance = jest.fn();
+    mockFireLayeredCelebration = vi.fn();
+    mockUseParticleBudget = vi.fn();
+    mockUseDevicePerformance = vi.fn();
 
     // Setup default mock implementations
-    (confettiUtils.fireLayeredCelebration as jest.Mock) = mockFireLayeredCelebration;
-    (useParticleBudgetModule.useParticleBudget as jest.Mock) = mockUseParticleBudget;
-    (useDevicePerformanceModule.useDevicePerformance as jest.Mock) = mockUseDevicePerformance;
+    (confettiUtils.fireLayeredCelebration as any) = mockFireLayeredCelebration;
+    (useParticleBudgetModule.useParticleBudget as any) = mockUseParticleBudget;
+    (useDevicePerformanceModule.useDevicePerformance as any) = mockUseDevicePerformance;
 
     // Default: high-end device, no reduced motion
     mockUseParticleBudget.mockReturnValue({
@@ -48,7 +49,7 @@ describe('useLayeredCelebration', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('basic functionality', () => {

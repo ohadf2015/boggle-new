@@ -2,17 +2,24 @@
  * useWordOfTheDay Hook Tests
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock AuthContext
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const { mockUseAuth } = vi.hoisted(() => {
+  const mockUseAuth = vi.fn();
+  return { mockUseAuth };
+});
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
 // Mock supabase
-const mockFrom = jest.fn();
-jest.mock('@/lib/supabase', () => ({
+const { mockFrom } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  return { mockFrom };
+});
+vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
@@ -20,10 +27,10 @@ import { useWordOfTheDay } from '../useWordOfTheDay';
 
 function createChain(data: Record<string, unknown> | null, error: unknown = null) {
   return {
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data, error }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data, error }),
         }),
       }),
     }),
@@ -34,7 +41,7 @@ function createChain(data: Record<string, unknown> | null, error: unknown = null
 
 describe('useWordOfTheDay', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: null });
   });
 

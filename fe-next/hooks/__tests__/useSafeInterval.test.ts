@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSafeInterval, useSafeTimeout } from '../useSafeTimeout';
 
 describe('useSafeInterval', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should call callback at regular intervals', () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
     const { result } = renderHook(() => useSafeInterval());
 
     act(() => {
@@ -21,20 +22,20 @@ describe('useSafeInterval', () => {
     expect(callback).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(callback).toHaveBeenCalledTimes(1);
 
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     expect(callback).toHaveBeenCalledTimes(3);
   });
 
   it('should stop interval when stop is called', () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
     const { result } = renderHook(() => useSafeInterval());
 
     act(() => {
@@ -42,7 +43,7 @@ describe('useSafeInterval', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(callback).toHaveBeenCalledTimes(1);
@@ -52,7 +53,7 @@ describe('useSafeInterval', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(callback).toHaveBeenCalledTimes(1);
@@ -78,7 +79,7 @@ describe('useSafeInterval', () => {
   });
 
   it('should not restart interval when component rerenders', () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
     const { result, rerender } = renderHook(() => useSafeInterval());
 
     act(() => {
@@ -87,7 +88,7 @@ describe('useSafeInterval', () => {
 
     // Advance 500ms
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Rerender should not affect the interval
@@ -95,14 +96,14 @@ describe('useSafeInterval', () => {
 
     // Advance another 500ms (should trigger callback at 1000ms total)
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     expect(callback).toHaveBeenCalledTimes(1);
 
     // Verify it keeps running
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(callback).toHaveBeenCalledTimes(2);
@@ -111,11 +112,11 @@ describe('useSafeInterval', () => {
 
 describe('useSafeTimeout', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return stable references to prevent infinite effect loops', () => {

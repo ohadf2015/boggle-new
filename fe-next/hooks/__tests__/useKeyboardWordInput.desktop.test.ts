@@ -2,6 +2,7 @@
  * Tests for desktop-specific keyboard notification behavior in useKeyboardWordInput
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import toast from 'react-hot-toast';
 import { useKeyboardWordInput } from '../useKeyboardWordInput';
@@ -9,8 +10,8 @@ import { useIsDesktop } from '../useMediaQuery';
 import type { LetterGrid } from '@/types';
 
 // Mock dependencies
-jest.mock('react-hot-toast');
-jest.mock('../useMediaQuery');
+vi.mock('react-hot-toast');
+vi.mock('../useMediaQuery');
 const mockTranslations: Record<string, string> = {
   keyboardLanguageMismatch: 'Please switch to {language} keyboard to match the board language',
   hebrew: 'Hebrew',
@@ -24,7 +25,7 @@ const mockTranslations: Record<string, string> = {
   'joinView.japanese': 'Japanese',
   'joinView.spanish': 'Spanish',
 };
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string, params?: Record<string, string>) => {
       let result = mockTranslations[key] || key;
@@ -39,8 +40,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const mockToast = toast as jest.Mocked<typeof toast>;
-const mockUseIsDesktop = useIsDesktop as jest.MockedFunction<typeof useIsDesktop>;
+const mockToast = toast as any;
+const mockUseIsDesktop = useIsDesktop as any;
 
 describe('useKeyboardWordInput - Desktop notifications', () => {
   const mockGrid: LetterGrid = [
@@ -50,8 +51,8 @@ describe('useKeyboardWordInput - Desktop notifications', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockToast.error = jest.fn();
+    vi.clearAllMocks();
+    mockToast.error = vi.fn();
   });
 
   describe('Language mismatch notification', () => {

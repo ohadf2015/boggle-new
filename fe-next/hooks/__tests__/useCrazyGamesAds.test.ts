@@ -1,31 +1,32 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCrazyGamesAds } from '../useCrazyGamesAds';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { Howler } from 'howler';
 
 // Mock dependencies
-jest.mock('@/components/CrazyGamesSDK');
-jest.mock('howler', () => ({
+vi.mock('@/components/CrazyGamesSDK');
+vi.mock('howler', () => ({
   Howler: {
-    mute: jest.fn(),
+    mute: vi.fn(),
   },
 }));
 
 describe('useCrazyGamesAds', () => {
-  let mockShowRewardedAd: jest.Mock;
-  let mockShowMidgameAd: jest.Mock;
-  let mockHasAdblock: jest.Mock;
-  let mockGameplayStop: jest.Mock;
-  let mockGameplayStart: jest.Mock;
+  let mockShowRewardedAd: any;
+  let mockShowMidgameAd: any;
+  let mockHasAdblock: any;
+  let mockGameplayStop: any;
+  let mockGameplayStart: any;
 
   beforeEach(() => {
-    mockShowRewardedAd = jest.fn();
-    mockShowMidgameAd = jest.fn();
-    mockHasAdblock = jest.fn();
-    mockGameplayStop = jest.fn();
-    mockGameplayStart = jest.fn();
+    mockShowRewardedAd = vi.fn();
+    mockShowMidgameAd = vi.fn();
+    mockHasAdblock = vi.fn();
+    mockGameplayStop = vi.fn();
+    mockGameplayStart = vi.fn();
 
-    (useCrazyGames as jest.Mock).mockReturnValue({
+    (useCrazyGames as any).mockReturnValue({
       isAvailable: true,
       showRewardedAd: mockShowRewardedAd,
       showMidgameAd: mockShowMidgameAd,
@@ -39,7 +40,7 @@ describe('useCrazyGamesAds', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {
@@ -62,7 +63,7 @@ describe('useCrazyGamesAds', () => {
     });
 
     it('should not check adblock when SDK unavailable', async () => {
-      (useCrazyGames as jest.Mock).mockReturnValue({
+      (useCrazyGames as any).mockReturnValue({
         isAvailable: false,
         showRewardedAd: mockShowRewardedAd,
         showMidgameAd: mockShowMidgameAd,
@@ -81,7 +82,7 @@ describe('useCrazyGamesAds', () => {
 
   describe('requestMidgameAd', () => {
     it('should return false when SDK unavailable', async () => {
-      (useCrazyGames as jest.Mock).mockReturnValue({
+      (useCrazyGames as any).mockReturnValue({
         isAvailable: false,
         showRewardedAd: mockShowRewardedAd,
         showMidgameAd: mockShowMidgameAd,
@@ -283,7 +284,7 @@ describe('useCrazyGamesAds', () => {
 
   describe('requestRewardedAd', () => {
     it('should return false when SDK unavailable', async () => {
-      (useCrazyGames as jest.Mock).mockReturnValue({
+      (useCrazyGames as any).mockReturnValue({
         isAvailable: false,
         showRewardedAd: mockShowRewardedAd,
         showMidgameAd: mockShowMidgameAd,

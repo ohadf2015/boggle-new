@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useUrgencyData } from '../useUrgencyData';
 
@@ -25,39 +26,39 @@ let mockDaily = {
   puzzleDate: '',
   loading: false,
   fromServer: false,
-  refresh: jest.fn(),
+  refresh: vi.fn(),
 };
 
 let mockSolveRate = { solveRate: null as number | null, loading: false };
 let mockIsAuthenticated = false;
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
 }));
 
-jest.mock('@/hooks/useEngagementStatus', () => ({
+vi.mock('@/hooks/useEngagementStatus', () => ({
   useEngagementStatus: () => mockEngagement,
 }));
 
-jest.mock('@/hooks/useDailyChallengeStatus', () => ({
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
   useDailyChallengeStatus: () => mockDaily,
 }));
 
-jest.mock('@/hooks/useDailySolveRate', () => ({
+vi.mock('@/hooks/useDailySolveRate', () => ({
   useDailySolveRate: () => mockSolveRate,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en' }),
 }));
 
-jest.mock('@/hooks/useFriendsActivity', () => ({
+vi.mock('@/hooks/useFriendsActivity', () => ({
   useFriendsActivity: () => ({ events: [], loading: false }),
 }));
 
 describe('useUrgencyData', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEngagement = {
       streak: 0,
       streakAtRisk: false,
@@ -80,7 +81,7 @@ describe('useUrgencyData', () => {
       puzzleDate: '',
       loading: false,
       fromServer: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     };
     mockSolveRate = { solveRate: null, loading: false };
     mockIsAuthenticated = false;

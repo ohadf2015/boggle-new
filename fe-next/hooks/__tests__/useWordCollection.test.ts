@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useWordCollection } from '../useWordCollection';
 import * as spacedRepUtils from '@/lib/utils/spacedRepetition';
@@ -6,10 +7,10 @@ import * as spacedRepUtils from '@/lib/utils/spacedRepetition';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: jest.fn((key: string) => { delete store[key]; }),
-    clear: jest.fn(() => { store = {}; }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
+    clear: vi.fn(() => { store = {}; }),
   };
 })();
 
@@ -17,7 +18,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 describe('useWordCollection', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
   });
 

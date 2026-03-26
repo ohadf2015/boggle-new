@@ -2,6 +2,7 @@
  * Tests for useAdventureTimerStore
  */
 
+import { vi } from 'vitest';
 import { createAdventureTimerStore } from '../useAdventureTimerStore';
 
 describe('createAdventureTimerStore', () => {
@@ -20,7 +21,7 @@ describe('createAdventureTimerStore', () => {
 
   it('notify() calls subscribers when value changes', () => {
     const store = createAdventureTimerStore(60);
-    const listener = jest.fn();
+    const listener = vi.fn();
     store.subscribe(listener);
     store.notify(59);
     expect(listener).toHaveBeenCalledTimes(1);
@@ -29,7 +30,7 @@ describe('createAdventureTimerStore', () => {
 
   it('notify() does NOT call subscribers when value is unchanged', () => {
     const store = createAdventureTimerStore(60);
-    const listener = jest.fn();
+    const listener = vi.fn();
     store.subscribe(listener);
     store.notify(60); // same value
     expect(listener).not.toHaveBeenCalled();
@@ -38,7 +39,7 @@ describe('createAdventureTimerStore', () => {
 
   it('subscribe() returns an unsubscribe function', () => {
     const store = createAdventureTimerStore(60);
-    const listener = jest.fn();
+    const listener = vi.fn();
     const unsub = store.subscribe(listener);
     store.notify(59);
     unsub();
@@ -49,8 +50,8 @@ describe('createAdventureTimerStore', () => {
 
   it('multiple subscribers all get notified', () => {
     const store = createAdventureTimerStore(60);
-    const a = jest.fn();
-    const b = jest.fn();
+    const a = vi.fn();
+    const b = vi.fn();
     store.subscribe(a);
     store.subscribe(b);
     store.notify(55);
@@ -61,7 +62,7 @@ describe('createAdventureTimerStore', () => {
 
   it('destroy() clears all subscribers', () => {
     const store = createAdventureTimerStore(60);
-    const listener = jest.fn();
+    const listener = vi.fn();
     store.subscribe(listener);
     store.destroy();
     store.notify(50);

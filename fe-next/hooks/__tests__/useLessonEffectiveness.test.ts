@@ -1,17 +1,16 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useLessonEffectiveness } from '../useLessonEffectiveness';
 import * as analyticsModule from '@/lib/supabase/analytics';
 
 // Mock analytics module
-jest.mock('@/lib/supabase/analytics');
+vi.mock('@/lib/supabase/analytics');
 
-const mockGetLessonEffectiveness = analyticsModule.getLessonEffectiveness as jest.MockedFunction<
-  typeof analyticsModule.getLessonEffectiveness
->;
+const mockGetLessonEffectiveness = analyticsModule.getLessonEffectiveness as any;
 
 describe('useLessonEffectiveness', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading state initially', () => {

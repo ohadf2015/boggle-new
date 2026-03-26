@@ -5,18 +5,19 @@
  * Covers: HP system, phases, attacks, taunts, battle lifecycle.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureBossNew } from '../useAdventureBossNew';
 import { getBossConfig, getBossTaunt } from '@/lib/adventure/bossConfig';
 
 // Mock bossConfig utilities
-jest.mock('@/lib/adventure/bossConfig', () => ({
-  getBossConfig: jest.fn(),
-  getBossTaunt: jest.fn(),
+vi.mock('@/lib/adventure/bossConfig', () => ({
+  getBossConfig: vi.fn(),
+  getBossTaunt: vi.fn(),
 }));
 
-const mockGetBossConfig = getBossConfig as jest.MockedFunction<typeof getBossConfig>;
-const mockGetBossTaunt = getBossTaunt as jest.MockedFunction<typeof getBossTaunt>;
+const mockGetBossConfig = getBossConfig as any;
+const mockGetBossTaunt = getBossTaunt as any;
 
 const MOCK_BOSS_CONFIG = {
   id: 'msGrammar',
@@ -40,14 +41,14 @@ const MOCK_BOSS_CONFIG = {
 
 describe('useAdventureBossNew', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockGetBossConfig.mockReturnValue(MOCK_BOSS_CONFIG as any);
     mockGetBossTaunt.mockReturnValue('taunt_key');
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ==============================================
@@ -180,7 +181,7 @@ describe('useAdventureBossNew', () => {
     });
 
     it('should trigger victory when HP reaches 0', () => {
-      const onVictory = jest.fn();
+      const onVictory = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onVictory })
       );
@@ -401,7 +402,7 @@ describe('useAdventureBossNew', () => {
 
   describe('endBattle', () => {
     it('should deactivate and trigger defeat taunt on defeat', () => {
-      const onDefeat = jest.fn();
+      const onDefeat = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onDefeat })
       );
@@ -434,7 +435,7 @@ describe('useAdventureBossNew', () => {
       // Advance timers — no attacks should fire
       const hpBefore = result.current.hp;
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       // No state changes expected after ending
@@ -448,20 +449,20 @@ describe('useAdventureBossNew', () => {
 
   describe('boss attacks', () => {
     it('should not attack before battle starts', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
 
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
 
       expect(onAttack).not.toHaveBeenCalled();
     });
 
     it('should execute an attack after 15s in normal phase', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -471,14 +472,14 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(15000);
+        vi.advanceTimersByTime(15000);
       });
 
       expect(onAttack).toHaveBeenCalledTimes(1);
     });
 
     it('should execute attacks every 10s in angry phase', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -495,14 +496,14 @@ describe('useAdventureBossNew', () => {
       onAttack.mockClear();
 
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       expect(onAttack).toHaveBeenCalledTimes(1);
     });
 
     it('should execute attacks every 7s in desperate phase', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -519,14 +520,14 @@ describe('useAdventureBossNew', () => {
       onAttack.mockClear();
 
       act(() => {
-        jest.advanceTimersByTime(7000);
+        vi.advanceTimersByTime(7000);
       });
 
       expect(onAttack).toHaveBeenCalledTimes(1);
     });
 
     it('should call onAttack with attack type: lockTiles, scramble, or timePenalty', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -536,7 +537,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(15000);
+        vi.advanceTimersByTime(15000);
       });
 
       expect(onAttack).toHaveBeenCalledWith(
@@ -549,7 +550,7 @@ describe('useAdventureBossNew', () => {
     it('should include lockedTiles array for lockTiles attack (2-4 tiles)', () => {
       // We need to test that when a lockTiles attack happens,
       // the lockedTiles state is populated with 2-4 indices
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -562,7 +563,7 @@ describe('useAdventureBossNew', () => {
       // We'll check the lockedTiles from state instead
       // After an attack, lockedTiles may be populated
       act(() => {
-        jest.advanceTimersByTime(15000 * 10); // 10 attack cycles
+        vi.advanceTimersByTime(15000 * 10); // 10 attack cycles
       });
 
       // The hook should expose lockedTiles
@@ -570,7 +571,7 @@ describe('useAdventureBossNew', () => {
     });
 
     it('should clear locked tiles after 5 seconds', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -583,20 +584,20 @@ describe('useAdventureBossNew', () => {
       // Instead, test the exposed lockedTiles clearing behavior
       // After lock tiles set, wait 5s and they should clear
       act(() => {
-        jest.advanceTimersByTime(15000 * 10);
+        vi.advanceTimersByTime(15000 * 10);
       });
 
       // Even if tiles were locked, after 5s they should auto-clear
       // The hook handles this internally
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(result.current.lockedTiles).toEqual([]);
     });
 
     it('should include timePenalty seconds for timePenalty attack (3-5)', () => {
-      const onAttack = jest.fn();
+      const onAttack = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1, onAttack })
       );
@@ -607,7 +608,7 @@ describe('useAdventureBossNew', () => {
 
       // Run multiple attacks, check if any timePenalty attack has valid seconds
       act(() => {
-        jest.advanceTimersByTime(15000 * 10);
+        vi.advanceTimersByTime(15000 * 10);
       });
 
       const timePenaltyCall = onAttack.mock.calls.find(
@@ -684,7 +685,7 @@ describe('useAdventureBossNew', () => {
       expect(result.current.currentTaunt).not.toBeNull();
 
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       expect(result.current.currentTaunt).toBeNull();
@@ -734,7 +735,7 @@ describe('useAdventureBossNew', () => {
 
       // Should not throw when advancing timers
       expect(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       }).not.toThrow();
     });
 

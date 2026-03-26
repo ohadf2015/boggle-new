@@ -11,6 +11,7 @@
  * - Works correctly with other special tiles (gold 3x stacks with chain 1.5x)
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -58,11 +59,11 @@ function createMockGrid(size: number = 4): string[][] {
 
 describe('Chain Tile 1.5x Combo Multiplier', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should apply 1.5x multiplier when chain tile used during active combo (comboCount > 0)', () => {

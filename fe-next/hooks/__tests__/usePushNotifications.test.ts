@@ -3,22 +3,23 @@
  * Tests for the push notification management hook
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePushNotifications } from '../usePushNotifications';
 import type { PushNotificationPreferences } from '@/utils/pushNotifications/types';
 
 // Mock platform utility
-jest.mock('@/utils/platform', () => ({
-  isNative: jest.fn(),
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(),
 }));
 
 // Mock push notification utilities
-jest.mock('@/utils/pushNotifications', () => ({
-  checkNotificationPermission: jest.fn(),
-  requestNotificationPermission: jest.fn(),
-  scheduleDailyNotification: jest.fn(),
-  cancelDailyNotification: jest.fn(),
-  hasPendingDailyNotification: jest.fn(),
+vi.mock('@/utils/pushNotifications', () => ({
+  checkNotificationPermission: vi.fn(),
+  requestNotificationPermission: vi.fn(),
+  scheduleDailyNotification: vi.fn(),
+  cancelDailyNotification: vi.fn(),
+  hasPendingDailyNotification: vi.fn(),
   DEFAULT_PUSH_PREFERENCES: {
     enabled: true,
     hour: 9,
@@ -35,24 +36,16 @@ import {
   hasPendingDailyNotification,
 } from '@/utils/pushNotifications';
 
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
-const mockCheckPermission = checkNotificationPermission as jest.MockedFunction<
-  typeof checkNotificationPermission
->;
-const mockRequestPermission = requestNotificationPermission as jest.MockedFunction<
-  typeof requestNotificationPermission
->;
-const mockSchedule = scheduleDailyNotification as jest.MockedFunction<
-  typeof scheduleDailyNotification
->;
-const mockCancel = cancelDailyNotification as jest.MockedFunction<typeof cancelDailyNotification>;
-const mockHasPending = hasPendingDailyNotification as jest.MockedFunction<
-  typeof hasPendingDailyNotification
->;
+const mockIsNative = isNative as any;
+const mockCheckPermission = checkNotificationPermission as any;
+const mockRequestPermission = requestNotificationPermission as any;
+const mockSchedule = scheduleDailyNotification as any;
+const mockCancel = cancelDailyNotification as any;
+const mockHasPending = hasPendingDailyNotification as any;
 
 describe('usePushNotifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default to web platform
     mockIsNative.mockReturnValue(false);
     mockCheckPermission.mockResolvedValue({ status: 'denied', canSchedule: false });

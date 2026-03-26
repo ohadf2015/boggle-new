@@ -1,15 +1,16 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useShareResult } from '../useShareResult';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 
 // Mock clipboard API
 Object.assign(navigator, {
-  clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+  clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
   share: undefined,
 });
 
 // Mock window.open
-const mockOpen = jest.fn();
+const mockOpen = vi.fn();
 window.open = mockOpen;
 
 describe('useShareResult', () => {
@@ -22,7 +23,7 @@ describe('useShareResult', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should generate share text from params', () => {

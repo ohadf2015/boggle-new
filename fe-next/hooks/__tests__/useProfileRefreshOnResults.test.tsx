@@ -10,10 +10,11 @@
  * the backend are not reflected in the UI until page reload.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock refreshProfile function
-const mockRefreshProfile = jest.fn();
+const mockRefreshProfile = vi.fn();
 
 // Track if refreshProfile was called
 let refreshProfileCalledOnResults = false;
@@ -42,7 +43,7 @@ function simulateHandleShowResults(
 
 describe('Profile Refresh on Game Results', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     refreshProfileCalledOnResults = false;
   });
 
@@ -86,7 +87,7 @@ describe('Profile Refresh on Game Results', () => {
     };
 
     let showResults = false;
-    const setResultsData = jest.fn();
+    const setResultsData = vi.fn();
     const setShowResults = (show: boolean) => { showResults = show; };
 
     // WHEN: handleShowResults is called without refreshProfile
@@ -126,9 +127,9 @@ describe('Profile Refresh on Game Results', () => {
       };
     };
 
-    const fixedMockRefreshProfile = jest.fn();
-    const setResultsData = jest.fn();
-    const setShowResults = jest.fn();
+    const fixedMockRefreshProfile = vi.fn();
+    const setResultsData = vi.fn();
+    const setShowResults = vi.fn();
 
     // WHEN: Results are shown with the fixed implementation for authenticated user
     const handleShowResults = fixedHandleShowResults(
@@ -161,9 +162,9 @@ describe('Profile Refresh on Game Results', () => {
       };
     };
 
-    const mockRefreshProfile = jest.fn();
-    const setResultsData = jest.fn();
-    const setShowResults = jest.fn();
+    const mockRefreshProfile = vi.fn();
+    const setResultsData = vi.fn();
+    const setShowResults = vi.fn();
 
     // WHEN: Results are shown for unauthenticated user
     const handleShowResults = handleShowResultsForGuest(

@@ -1,19 +1,20 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useComboMilestone, COMBO_MILESTONES } from '../useComboMilestone';
 import { usePrefersReducedMotion } from '../usePrefersReducedMotion';
 import { useParticleBudget } from '../useParticleBudget';
 import { fireLayeredCelebration } from '@/utils/confettiUtils';
 
-jest.mock('../usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(),
+vi.mock('../usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(),
 }));
 
-jest.mock('../useParticleBudget', () => ({
-  useParticleBudget: jest.fn(),
+vi.mock('../useParticleBudget', () => ({
+  useParticleBudget: vi.fn(),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireLayeredCelebration: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireLayeredCelebration: vi.fn(),
   Z_INDEX: {
     BACKGROUND_PARTICLES: 1000,
     MIDGROUND_PARTICLES: 2000,
@@ -23,10 +24,10 @@ jest.mock('@/utils/confettiUtils', () => ({
 
 describe('useComboMilestone', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
-    (usePrefersReducedMotion as jest.Mock).mockReturnValue(false);
-    (useParticleBudget as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    (usePrefersReducedMotion as any).mockReturnValue(false);
+    (useParticleBudget as any).mockReturnValue({
       combo: 60,
       max: 100,
       tier: 'high',
@@ -36,7 +37,7 @@ describe('useComboMilestone', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('exports COMBO_MILESTONES with 10/15/20/25 thresholds', () => {
@@ -105,7 +106,7 @@ describe('useComboMilestone', () => {
   });
 
   it('does not fire celebration when reduced motion preferred', () => {
-    (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+    (usePrefersReducedMotion as any).mockReturnValue(true);
 
     const { result } = renderHook(() => useComboMilestone());
 
@@ -126,7 +127,7 @@ describe('useComboMilestone', () => {
     expect(result.current.currentMilestone).not.toBeNull();
 
     act(() => {
-      jest.advanceTimersByTime(2000); // Milestone duration
+      vi.advanceTimersByTime(2000); // Milestone duration
     });
 
     expect(result.current.currentMilestone).toBeNull();
@@ -139,7 +140,7 @@ describe('useComboMilestone', () => {
       result.current.checkMilestone(10);
     });
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     act(() => {
       result.current.checkMilestone(10);

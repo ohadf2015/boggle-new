@@ -3,6 +3,7 @@
  * Comprehensive test coverage for app foreground/background lifecycle events
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAppLifecycle } from '../useAppLifecycle';
 import * as platformUtils from '../../utils/platform';
@@ -14,31 +15,31 @@ interface PluginListenerHandle {
 }
 
 // Mock platform detection
-jest.mock('../../utils/platform');
+vi.mock('../../utils/platform');
 
 // Mock Capacitor App plugin
-jest.mock('@capacitor/app', () => ({
+vi.mock('@capacitor/app', () => ({
   App: {
-    addListener: jest.fn(),
+    addListener: vi.fn(),
   },
 }));
 
 describe('useAppLifecycle', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Native Environment', () => {
     beforeEach(() => {
-      (platformUtils.isNative as jest.Mock).mockReturnValue(true);
+      (platformUtils.isNative as any).mockReturnValue(true);
     });
 
     it('should register appStateChange listener on mount', async () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
 
-      (App.addListener as jest.Mock).mockResolvedValue({
-        remove: jest.fn(),
+      (App.addListener as any).mockResolvedValue({
+        remove: vi.fn(),
       } as PluginListenerHandle);
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
@@ -53,13 +54,13 @@ describe('useAppLifecycle', () => {
     });
 
     it('should call onForeground when app becomes active', async () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
@@ -75,13 +76,13 @@ describe('useAppLifecycle', () => {
     });
 
     it('should call onBackground when app becomes inactive', async () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
@@ -97,13 +98,13 @@ describe('useAppLifecycle', () => {
     });
 
     it('should handle multiple state changes', async () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
@@ -121,11 +122,11 @@ describe('useAppLifecycle', () => {
     });
 
     it('should clean up listener on unmount', async () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
-      const removeMock = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
+      const removeMock = vi.fn();
 
-      (App.addListener as jest.Mock).mockResolvedValue({
+      (App.addListener as any).mockResolvedValue({
         remove: removeMock,
       } as PluginListenerHandle);
 
@@ -142,15 +143,15 @@ describe('useAppLifecycle', () => {
     });
 
     it('should not crash if callbacks throw errors', async () => {
-      const onForeground = jest.fn().mockImplementation(() => {
+      const onForeground = vi.fn().mockImplementation(() => {
         throw new Error('Foreground error');
       });
-      const onBackground = jest.fn();
+      const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
@@ -164,12 +165,12 @@ describe('useAppLifecycle', () => {
     });
 
     it('should handle optional callbacks', async () => {
-      const onForeground = jest.fn();
+      const onForeground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
       renderHook(() => useAppLifecycle({ onForeground }));
@@ -185,12 +186,12 @@ describe('useAppLifecycle', () => {
 
   describe('Web Environment', () => {
     beforeEach(() => {
-      (platformUtils.isNative as jest.Mock).mockReturnValue(false);
+      (platformUtils.isNative as any).mockReturnValue(false);
     });
 
     it('should not register listeners on web', () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
 
@@ -198,8 +199,8 @@ describe('useAppLifecycle', () => {
     });
 
     it('should not throw on unmount on web', () => {
-      const onForeground = jest.fn();
-      const onBackground = jest.fn();
+      const onForeground = vi.fn();
+      const onBackground = vi.fn();
 
       const { unmount } = renderHook(() =>
         useAppLifecycle({ onForeground, onBackground })
@@ -211,18 +212,18 @@ describe('useAppLifecycle', () => {
 
   describe('Callback Stability', () => {
     beforeEach(() => {
-      (platformUtils.isNative as jest.Mock).mockReturnValue(true);
+      (platformUtils.isNative as any).mockReturnValue(true);
     });
 
     it('should use latest callback reference', async () => {
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as jest.Mock).mockImplementation(async (event, callback) => {
+      (App.addListener as any).mockImplementation(async (event, callback) => {
         capturedCallback = callback;
-        return { remove: jest.fn() } as PluginListenerHandle;
+        return { remove: vi.fn() } as PluginListenerHandle;
       });
 
-      const firstCallback = jest.fn();
+      const firstCallback = vi.fn();
       const { rerender } = renderHook(
         ({ onForeground }) => useAppLifecycle({ onForeground }),
         {
@@ -233,7 +234,7 @@ describe('useAppLifecycle', () => {
       // Wait for async registration
       await new Promise((resolve) => setTimeout(resolve, 0));
 
-      const secondCallback = jest.fn();
+      const secondCallback = vi.fn();
       rerender({ onForeground: secondCallback });
 
       capturedCallback({ isActive: true });
@@ -245,14 +246,14 @@ describe('useAppLifecycle', () => {
 
   describe('Error Handling', () => {
     beforeEach(() => {
-      (platformUtils.isNative as jest.Mock).mockReturnValue(true);
+      (platformUtils.isNative as any).mockReturnValue(true);
     });
 
     it('should handle App.addListener throwing error', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const onForeground = jest.fn();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
+      const onForeground = vi.fn();
 
-      (App.addListener as jest.Mock).mockRejectedValue(
+      (App.addListener as any).mockRejectedValue(
         new Error('Listener registration failed')
       );
 
@@ -267,11 +268,11 @@ describe('useAppLifecycle', () => {
     });
 
     it('should handle cleanup error gracefully', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const onForeground = jest.fn();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
+      const onForeground = vi.fn();
 
-      (App.addListener as jest.Mock).mockResolvedValue({
-        remove: jest.fn().mockImplementation(() => {
+      (App.addListener as any).mockResolvedValue({
+        remove: vi.fn().mockImplementation(() => {
           throw new Error('Cleanup failed');
         }),
       } as PluginListenerHandle);

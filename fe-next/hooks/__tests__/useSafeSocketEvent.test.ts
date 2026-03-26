@@ -6,6 +6,7 @@
  * JSON.stringify dep gap, and emit helpers.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useSafeSocketEvent,
@@ -17,15 +18,15 @@ import {
 function createMockSocket() {
   const listeners = new Map<string, Set<Function>>();
   return {
-    on: jest.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: Function) => {
       if (!listeners.has(event)) listeners.set(event, new Set());
       listeners.get(event)!.add(handler);
     }),
-    off: jest.fn((event: string, handler: Function) => {
+    off: vi.fn((event: string, handler: Function) => {
       listeners.get(event)?.delete(handler);
     }),
-    emit: jest.fn(),
-    emitWithAck: jest.fn(),
+    emit: vi.fn(),
+    emitWithAck: vi.fn(),
     // Helper to simulate incoming event
     _trigger(event: string, data: unknown) {
       listeners.get(event)?.forEach(fn => fn(data));
@@ -42,14 +43,14 @@ describe('useSafeSocketEvent', () => {
   let socket: MockSocket;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     socket = createMockSocket();
   });
 
   // --- Basic mount/unmount ---
 
   it('registers listener on mount and removes on unmount', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { unmount } = renderHook(() =>
       useSafeSocketEvent({ socket: socket as any, event: 'test', handler })
     );
@@ -66,7 +67,7 @@ describe('useSafeSocketEvent', () => {
   // --- Enabled/disabled ---
 
   it('does not register listener when enabled=false', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     renderHook(() =>
       useSafeSocketEvent({ socket: socket as any, event: 'test', handler, enabled: false })
     );
@@ -75,7 +76,7 @@ describe('useSafeSocketEvent', () => {
   });
 
   it('adds listener when toggled from disabled to enabled', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ enabled }) =>
         useSafeSocketEvent({ socket: socket as any, event: 'test', handler, enabled }),
@@ -91,7 +92,7 @@ describe('useSafeSocketEvent', () => {
   });
 
   it('removes listener when toggled from enabled to disabled', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ enabled }) =>
         useSafeSocketEvent({ socket: socket as any, event: 'test', handler, enabled }),
@@ -108,8 +109,8 @@ describe('useSafeSocketEvent', () => {
   // --- Handler ref stability ---
 
   it('does not re-register when only handler reference changes', () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
     const { rerender } = renderHook(
       ({ handler }) =>
         useSafeSocketEvent({ socket: socket as any, event: 'test', handler }),
@@ -132,7 +133,7 @@ describe('useSafeSocketEvent', () => {
   // --- Event name change ---
 
   it('unsubscribes old event and subscribes new when event name changes', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ event }) =>
         useSafeSocketEvent({ socket: socket as any, event, handler }),
@@ -152,7 +153,7 @@ describe('useSafeSocketEvent', () => {
   // --- Null socket ---
 
   it('does not crash when socket is null', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     expect(() => {
       renderHook(() =>
         useSafeSocketEvent({ socket: null, event: 'test', handler })
@@ -161,7 +162,7 @@ describe('useSafeSocketEvent', () => {
   });
 
   it('registers listener when socket changes from null to valid', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ socket: s }) =>
         useSafeSocketEvent({ socket: s as any, event: 'test', handler }),
@@ -178,7 +179,7 @@ describe('useSafeSocketEvent', () => {
   // --- Multiple rapid enabled toggles ---
 
   it('has exactly one listener after rapid enabled toggles', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ enabled }) =>
         useSafeSocketEvent({ socket: socket as any, event: 'test', handler, enabled }),
@@ -197,9 +198,9 @@ describe('useSafeSocketEvent', () => {
 
   it('calls onError when handler throws', async () => {
     const error = new Error('boom');
-    const handler = jest.fn(() => { throw error; });
-    const onError = jest.fn();
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const handler = vi.fn(() => { throw error; });
+    const onError = vi.fn();
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
 
     renderHook(() =>
       useSafeSocketEvent({ socket: socket as any, event: 'test', handler, onError })
@@ -214,9 +215,9 @@ describe('useSafeSocketEvent', () => {
   });
 
   it('wraps non-Error throws in Error for onError', async () => {
-    const handler = jest.fn(() => { throw 'string error'; });
-    const onError = jest.fn();
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const handler = vi.fn(() => { throw 'string error'; });
+    const onError = vi.fn();
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
 
     renderHook(() =>
       useSafeSocketEvent({ socket: socket as any, event: 'test', handler, onError })
@@ -233,7 +234,7 @@ describe('useSafeSocketEvent', () => {
   // --- deps ---
 
   it('re-subscribes when deps change', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const { rerender } = renderHook(
       ({ roomId }) =>
         useSafeSocketEvent({ socket: socket as any, event: 'test', handler, deps: [roomId] }),
@@ -254,13 +255,13 @@ describe('useSafeSocketEvents', () => {
   let socket: MockSocket;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     socket = createMockSocket();
   });
 
   it('registers multiple event listeners on mount', () => {
-    const h1 = jest.fn();
-    const h2 = jest.fn();
+    const h1 = vi.fn();
+    const h2 = vi.fn();
 
     renderHook(() =>
       useSafeSocketEvents({
@@ -281,8 +282,8 @@ describe('useSafeSocketEvents', () => {
       useSafeSocketEvents({
         socket: socket as any,
         events: [
-          { event: 'e1', handler: jest.fn() },
-          { event: 'e2', handler: jest.fn() },
+          { event: 'e1', handler: vi.fn() },
+          { event: 'e2', handler: vi.fn() },
         ],
       })
     );
@@ -298,8 +299,8 @@ describe('useSafeSocketEvents', () => {
       useSafeSocketEvents({
         socket: socket as any,
         events: [
-          { event: 'e1', handler: jest.fn(), enabled: true },
-          { event: 'e2', handler: jest.fn(), enabled: false },
+          { event: 'e1', handler: vi.fn(), enabled: true },
+          { event: 'e2', handler: vi.fn(), enabled: false },
         ],
       })
     );
@@ -309,8 +310,8 @@ describe('useSafeSocketEvents', () => {
   });
 
   it('handler ref stays fresh — calls latest handler', async () => {
-    const h1 = jest.fn();
-    const h2 = jest.fn();
+    const h1 = vi.fn();
+    const h2 = vi.fn();
 
     const { rerender } = renderHook(
       ({ handler }) =>
@@ -339,7 +340,7 @@ describe('useSafeSocketEvents', () => {
         useSafeSocketEvents({ socket: socket as any, events }),
       {
         initialProps: {
-          events: [{ event: 'e1', handler: jest.fn() }],
+          events: [{ event: 'e1', handler: vi.fn() }],
         },
       }
     );
@@ -348,8 +349,8 @@ describe('useSafeSocketEvents', () => {
 
     rerender({
       events: [
-        { event: 'e1', handler: jest.fn() },
-        { event: 'e2', handler: jest.fn() },
+        { event: 'e1', handler: vi.fn() },
+        { event: 'e2', handler: vi.fn() },
       ],
     });
 
@@ -365,13 +366,13 @@ describe('useSafeSocketEvents', () => {
           socket: socket as any,
           events: [{ event: 'e1', handler: h }],
         }),
-      { initialProps: { h: jest.fn() } }
+      { initialProps: { h: vi.fn() } }
     );
 
     expect(socket.on).toHaveBeenCalledTimes(1);
 
     // Different handler function but same event config shape
-    rerender({ h: jest.fn() });
+    rerender({ h: vi.fn() });
 
     // Should NOT re-subscribe (JSON.stringify of {event,enabled} is unchanged)
     expect(socket.on).toHaveBeenCalledTimes(1);
@@ -382,15 +383,15 @@ describe('useSafeSocketEvents', () => {
       renderHook(() =>
         useSafeSocketEvents({
           socket: null,
-          events: [{ event: 'e1', handler: jest.fn() }],
+          events: [{ event: 'e1', handler: vi.fn() }],
         })
       );
     }).not.toThrow();
   });
 
   it('calls onError with event name when handler throws', async () => {
-    const onError = jest.fn();
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const onError = vi.fn();
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
 
     renderHook(() =>
       useSafeSocketEvents({
@@ -413,7 +414,7 @@ describe('useSocketEmit', () => {
   let socket: MockSocket;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     socket = createMockSocket();
   });
 
@@ -430,7 +431,7 @@ describe('useSocketEmit', () => {
   });
 
   it('warns and does not throw when socket is null', () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
     const { result } = renderHook(() =>
       useSocketEmit({ socket: null })
@@ -462,8 +463,8 @@ describe('useSocketEmit', () => {
 
   it('emitWithAck returns undefined and calls onError on failure', async () => {
     socket.emitWithAck.mockRejectedValue(new Error('timeout'));
-    const onError = jest.fn();
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const onError = vi.fn();
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
 
     const { result } = renderHook(() =>
       useSocketEmit({ socket: socket as any, onError })
@@ -480,7 +481,7 @@ describe('useSocketEmit', () => {
   });
 
   it('emitWithAck returns undefined when socket is null', async () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
     const { result } = renderHook(() =>
       useSocketEmit({ socket: null })

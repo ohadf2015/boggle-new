@@ -9,14 +9,26 @@
  * even if refresh is called after.
  */
 
+import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUnclaimedGifts } from '../useUnclaimedGifts';
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
+
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock useAuth
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
   }),
@@ -24,7 +36,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 
@@ -42,7 +54,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
     };
 
     // Initial fetch returns unclaimed gift
-    (global.fetch as jest.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, count: 1 }),
@@ -52,7 +64,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
         json: async () => ({ success: true, gifts: [mockGift] }),
       });
 
-    const { result } = renderHook(() => useUnclaimedGifts());
+    const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
 
     // Wait for initial fetch
     await waitFor(() => {
@@ -64,7 +76,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
     expect(result.current.unclaimedCount).toBe(1);
 
     // Mock claim API call
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, xpAwarded: 100, coinsAwarded: 50 }),
     });
@@ -80,7 +92,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
 
     // BUG SCENARIO: API hasn't processed claim yet (eventual consistency)
     // refresh() fetches from API which still shows claimed: false
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, gifts: [{ ...mockGift, claimed: false }] }),
     });
@@ -124,7 +136,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
     ];
 
     // Initial fetch
-    (global.fetch as jest.Mock)
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, count: 2 }),
@@ -134,14 +146,14 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
         json: async () => ({ success: true, gifts: mockGifts }),
       });
 
-    const { result } = renderHook(() => useUnclaimedGifts());
+    const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(result.current.gifts.length).toBe(2);
     });
 
     // Mock claim for gift-1
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, xpAwarded: 100, coinsAwarded: 50 }),
     });
@@ -157,7 +169,7 @@ describe('useUnclaimedGifts - Refresh Overwrite Bug', () => {
     expect(result.current.unclaimedCount).toBe(1);
 
     // Refresh returns stale data (neither gift claimed)
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, gifts: mockGifts }), // Both unclaimed
     });

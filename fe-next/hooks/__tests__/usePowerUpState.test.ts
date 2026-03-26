@@ -8,17 +8,18 @@
  * - Effect duration handling (instant vs duration-based)
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePowerUpState } from '../usePowerUpState';
 
 describe('usePowerUpState - TDD Cycle', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   describe('RED Phase - Initial state and interface', () => {
@@ -80,7 +81,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // Force transition to cooldown (instant power-up)
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // WHEN - try to activate again during cooldown
@@ -105,7 +106,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // Advance past activation frame
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN
@@ -127,7 +128,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // WHEN - advance time by effect duration (30s)
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       // THEN - should transition to cooldown
@@ -146,7 +147,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // Force to cooldown
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - should start at 60s cooldown
@@ -155,7 +156,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // WHEN - 10 seconds pass
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // THEN - should be 50s remaining
@@ -172,14 +173,14 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // Force to cooldown
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       expect(result.current.powerUp.state).toBe('cooldown');
 
       // WHEN - advance full cooldown period
       act(() => {
-        jest.advanceTimersByTime(60000);
+        vi.advanceTimersByTime(60000);
       });
 
       // THEN
@@ -202,7 +203,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // Force to cooldown
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - activatedAt should be a timestamp
@@ -256,7 +257,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       const initialRemaining = result.current.powerUp.remainingCooldown;
@@ -264,7 +265,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       // WHEN - simulate many small time advances (could cause drift with setInterval)
       for (let i = 0; i < 100; i++) {
         act(() => {
-          jest.advanceTimersByTime(100);
+          vi.advanceTimersByTime(100);
         });
       }
 
@@ -281,12 +282,12 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // WHEN - advance way past cooldown period
       act(() => {
-        jest.advanceTimersByTime(120000); // 120 seconds
+        vi.advanceTimersByTime(120000); // 120 seconds
       });
 
       // THEN
@@ -306,7 +307,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - 60s cooldown (60 * 1.0)
@@ -328,7 +329,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - 90s cooldown (60 * 1.5)
@@ -350,7 +351,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - 30s cooldown (60 * 0.5)
@@ -371,7 +372,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - starts at 120s
@@ -379,7 +380,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // WHEN - 30 seconds pass
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       // THEN - should be 90s remaining
@@ -399,14 +400,14 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       expect(result.current.powerUp.state).toBe('cooldown');
 
       // WHEN - advance 30 seconds (full cooldown)
       act(() => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
       });
 
       // THEN - should transition to ready
@@ -430,7 +431,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - should immediately be ready (0s cooldown)
@@ -454,7 +455,7 @@ describe('usePowerUpState - TDD Cycle', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
 
       // THEN - totalCooldown should be integer
@@ -544,7 +545,7 @@ describe('usePowerUpState - TDD Cycle', () => {
 
       // WHEN - advance past remaining cooldown
       act(() => {
-        jest.advanceTimersByTime(11000); // 11 seconds
+        vi.advanceTimersByTime(11000); // 11 seconds
       });
 
       // THEN - should transition to ready

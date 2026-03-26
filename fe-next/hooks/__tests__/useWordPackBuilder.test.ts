@@ -3,12 +3,24 @@
  * TDD: RED phase — all tests written before implementation
  */
 
+import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useWordPackBuilder } from '../useWordPackBuilder';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
+  };
+}
 
 beforeEach(() => {
   mockFetch.mockReset();
@@ -16,73 +28,73 @@ beforeEach(() => {
 
 describe('useWordPackBuilder — initial state', () => {
   it('starts with empty name', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.name).toBe('');
   });
 
   it('starts with empty words array', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.words).toEqual([]);
   });
 
   it('starts with empty description', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.description).toBe('');
   });
 
   it('starts with default language en', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.language).toBe('en');
   });
 
   it('canPublish is false initially', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.canPublish).toBe(false);
   });
 
   it('isPublishing is false initially', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.isPublishing).toBe(false);
   });
 
   it('publishedPackId is null initially', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.publishedPackId).toBeNull();
   });
 
   it('publishError is null initially', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(result.current.publishError).toBeNull();
   });
 });
 
 describe('useWordPackBuilder — setters', () => {
   it('setName updates name', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     act(() => { result.current.setName('My Pack'); });
     expect(result.current.name).toBe('My Pack');
   });
 
   it('setDescription updates description', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     act(() => { result.current.setDescription('A cool pack'); });
     expect(result.current.description).toBe('A cool pack');
   });
 
   it('setLanguage updates language', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     act(() => { result.current.setLanguage('es'); });
     expect(result.current.language).toBe('es');
   });
 
   it('setThemeEmoji updates themeEmoji', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     act(() => { result.current.setThemeEmoji('🐶'); });
     expect(result.current.themeEmoji).toBe('🐶');
   });
 
   it('setTags updates tags array', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     act(() => { result.current.setTags(['Animals', 'Food']); });
     expect(result.current.tags).toEqual(['Animals', 'Food']);
   });
@@ -95,7 +107,7 @@ describe('useWordPackBuilder — addWord', () => {
       json: async () => ({ valid: true }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validation: { word: string; valid: boolean; duplicate: boolean } | undefined;
     await act(async () => {
@@ -113,7 +125,7 @@ describe('useWordPackBuilder — addWord', () => {
       json: async () => ({ valid: false }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validation: { word: string; valid: boolean; duplicate: boolean } | undefined;
     await act(async () => {
@@ -130,7 +142,7 @@ describe('useWordPackBuilder — addWord', () => {
       json: async () => ({ valid: true }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     // Add the word once
     await act(async () => {
@@ -153,7 +165,7 @@ describe('useWordPackBuilder — addWord', () => {
       json: async () => ({ valid: true }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
       await result.current.addWord('apple');
@@ -170,7 +182,7 @@ describe('useWordPackBuilder — removeWord', () => {
       json: async () => ({ valid: true }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
       await result.current.addWord('APPLE');
@@ -182,7 +194,7 @@ describe('useWordPackBuilder — removeWord', () => {
   });
 
   it('handles removing a non-existent word gracefully', () => {
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
     expect(() => {
       act(() => { result.current.removeWord('NOTHERE'); });
     }).not.toThrow();
@@ -196,7 +208,7 @@ describe('useWordPackBuilder — bulkAddWords', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: false }) });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     let validations: { word: string; valid: boolean; duplicate: boolean }[] = [];
     await act(async () => {
@@ -210,9 +222,11 @@ describe('useWordPackBuilder — bulkAddWords', () => {
   });
 
   it('skips empty lines', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
+    mockFetch
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     await act(async () => {
       await result.current.bulkAddWords('CAT\n\n\nDOG');
@@ -230,7 +244,7 @@ describe('useWordPackBuilder — canPublish', () => {
       mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
     }
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     for (let i = 0; i < 10; i++) {
       await act(async () => {
@@ -244,7 +258,7 @@ describe('useWordPackBuilder — canPublish', () => {
   it('is false when name is set but fewer than 10 words', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
 
@@ -260,7 +274,7 @@ describe('useWordPackBuilder — canPublish', () => {
       mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ valid: true }) });
     }
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
 
@@ -284,7 +298,7 @@ describe('useWordPackBuilder — publishPack', () => {
       json: async () => ({ id: 'pack-123' }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
 
@@ -312,7 +326,7 @@ describe('useWordPackBuilder — publishPack', () => {
       json: async () => ({ message: 'Server error' }),
     });
 
-    const { result } = renderHook(() => useWordPackBuilder());
+    const { result } = renderHook(() => useWordPackBuilder(), { wrapper: createWrapper() });
 
     act(() => { result.current.setName('My Pack'); });
 

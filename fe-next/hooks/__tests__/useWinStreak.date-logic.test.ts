@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Tests for the date comparison logic in useWinStreak
  *
@@ -33,12 +34,12 @@ const isYesterday = (date: Date): boolean => {
 
 describe('useWinStreak date logic', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     localStorageMock.clear();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('isSameDay', () => {
@@ -69,13 +70,13 @@ describe('useWinStreak date logic', () => {
 
   describe('isYesterday', () => {
     it('should return true for yesterday (same time)', () => {
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       const yesterday = new Date('2024-01-14T10:00:00');
       expect(isYesterday(yesterday)).toBe(true);
     });
 
     it('should return true for yesterday (different times)', () => {
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       const yesterdayLate = new Date('2024-01-14T23:59:59');
       const yesterdayEarly = new Date('2024-01-14T00:00:01');
       expect(isYesterday(yesterdayLate)).toBe(true);
@@ -83,31 +84,31 @@ describe('useWinStreak date logic', () => {
     });
 
     it('should return false for today', () => {
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       const today = new Date('2024-01-15T08:00:00');
       expect(isYesterday(today)).toBe(false);
     });
 
     it('should return false for two days ago', () => {
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       const twoDaysAgo = new Date('2024-01-13T10:00:00');
       expect(isYesterday(twoDaysAgo)).toBe(false);
     });
 
     it('should work across month boundaries', () => {
-      jest.setSystemTime(new Date('2024-02-01T10:00:00'));
+      vi.setSystemTime(new Date('2024-02-01T10:00:00'));
       const lastDayOfJan = new Date('2024-01-31T10:00:00');
       expect(isYesterday(lastDayOfJan)).toBe(true);
     });
 
     it('should work across year boundaries', () => {
-      jest.setSystemTime(new Date('2024-01-01T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-01T10:00:00'));
       const lastDayOfPrevYear = new Date('2023-12-31T10:00:00');
       expect(isYesterday(lastDayOfPrevYear)).toBe(true);
     });
 
     it('should work with ISO date strings (simulating localStorage storage)', () => {
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       // Simulate how dates are stored: as ISO strings from new Date().toISOString()
       const storedDateIso = '2024-01-14T18:30:00.000Z';
       const parsedDate = new Date(storedDateIso);
@@ -118,11 +119,11 @@ describe('useWinStreak date logic', () => {
   describe('streak continuation scenarios', () => {
     it('should continue streak when winning on consecutive days', () => {
       // Day 1: User wins at 8 PM
-      jest.setSystemTime(new Date('2024-01-14T20:00:00'));
+      vi.setSystemTime(new Date('2024-01-14T20:00:00'));
       const day1WinTime = new Date().toISOString();
 
       // Day 2: User opens app at 10 AM
-      jest.setSystemTime(new Date('2024-01-15T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-15T10:00:00'));
       const lastDate = new Date(day1WinTime);
 
       expect(isSameDay(lastDate, new Date())).toBe(false); // Not same day
@@ -131,11 +132,11 @@ describe('useWinStreak date logic', () => {
 
     it('should break streak when skipping a day', () => {
       // Day 1: User wins
-      jest.setSystemTime(new Date('2024-01-14T20:00:00'));
+      vi.setSystemTime(new Date('2024-01-14T20:00:00'));
       const day1WinTime = new Date().toISOString();
 
       // Day 3: User opens app (skipped Day 2)
-      jest.setSystemTime(new Date('2024-01-16T10:00:00'));
+      vi.setSystemTime(new Date('2024-01-16T10:00:00'));
       const lastDate = new Date(day1WinTime);
 
       expect(isSameDay(lastDate, new Date())).toBe(false); // Not same day
@@ -144,11 +145,11 @@ describe('useWinStreak date logic', () => {
 
     it('should handle late night win followed by early morning play', () => {
       // Day 1: User wins at 11:59 PM
-      jest.setSystemTime(new Date('2024-01-14T23:59:00'));
+      vi.setSystemTime(new Date('2024-01-14T23:59:00'));
       const lateNightWin = new Date().toISOString();
 
       // Day 2: User plays at 12:01 AM (2 minutes later)
-      jest.setSystemTime(new Date('2024-01-15T00:01:00'));
+      vi.setSystemTime(new Date('2024-01-15T00:01:00'));
       const lastDate = new Date(lateNightWin);
 
       expect(isSameDay(lastDate, new Date())).toBe(false); // Different calendar days

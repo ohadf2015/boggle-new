@@ -3,24 +3,25 @@
  * Verifies JWT token management for admin authentication
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAdminAuth } from '../useAdminAuth';
 import * as supabaseLib from '@/lib/supabase';
 import * as loggerModule from '@/utils/logger';
 
 // Mock Supabase
-jest.mock('@/lib/supabase', () => ({
-  getSession: jest.fn(),
+vi.mock('@/lib/supabase', () => ({
+  getSession: vi.fn(),
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    log: jest.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    log: vi.fn(),
   };
   return {
     __esModule: true,
@@ -37,19 +38,19 @@ describe('useAdminAuth', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   describe('initial token fetch', () => {
     test('should fetch token on mount', async () => {
       // GIVEN: Supabase returns a valid session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: mockSession },
       });
 
@@ -72,7 +73,7 @@ describe('useAdminAuth', () => {
 
     test('should handle missing session', async () => {
       // GIVEN: Supabase returns null session (will retry 3 times)
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: null },
       });
 
@@ -83,7 +84,7 @@ describe('useAdminAuth', () => {
       // Total: 4 attempts (initial + 3 retries)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
-          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          vi.advanceTimersByTime(1000 * Math.pow(2, i));
           await Promise.resolve(); // Flush promises
         });
       }
@@ -105,7 +106,7 @@ describe('useAdminAuth', () => {
     test('should handle session error via exception', async () => {
       // GIVEN: getSession throws an error (will retry 3 times)
       const sessionError = new Error('Session expired');
-      (supabaseLib.getSession as jest.Mock).mockRejectedValue(sessionError);
+      (supabaseLib.getSession as any).mockRejectedValue(sessionError);
 
       // WHEN: Hook is rendered
       const { result } = renderHook(() => useAdminAuth());
@@ -113,7 +114,7 @@ describe('useAdminAuth', () => {
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
-          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          vi.advanceTimersByTime(1000 * Math.pow(2, i));
           await Promise.resolve(); // Flush promises
         });
       }
@@ -136,7 +137,7 @@ describe('useAdminAuth', () => {
   describe('automatic token refresh', () => {
     test('should set up refresh interval when token is available', async () => {
       // GIVEN: Supabase returns a valid session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: mockSession },
       });
 
@@ -157,7 +158,7 @@ describe('useAdminAuth', () => {
 
     test('should auto-refresh token after 50 minutes', async () => {
       // GIVEN: Supabase returns a valid session initially
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -170,11 +171,11 @@ describe('useAdminAuth', () => {
       });
 
       // Clear previous calls
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // GIVEN: New token for refresh
       const newToken = 'refreshed-token-67890';
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: {
           session: { ...mockSession, access_token: newToken },
         },
@@ -183,7 +184,7 @@ describe('useAdminAuth', () => {
 
       // WHEN: 50 minutes pass
       act(() => {
-        jest.advanceTimersByTime(50 * 60 * 1000);
+        vi.advanceTimersByTime(50 * 60 * 1000);
       });
 
       // THEN: Token should be refreshed
@@ -203,7 +204,7 @@ describe('useAdminAuth', () => {
 
     test('should not set up refresh interval if no token', async () => {
       // GIVEN: Supabase returns null session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: null },
       });
 
@@ -213,7 +214,7 @@ describe('useAdminAuth', () => {
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
-          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          vi.advanceTimersByTime(1000 * Math.pow(2, i));
           await Promise.resolve(); // Flush promises
         });
       }
@@ -236,7 +237,7 @@ describe('useAdminAuth', () => {
   describe('manual token refresh', () => {
     test('should allow manual refresh', async () => {
       // GIVEN: Supabase returns a valid session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: mockSession },
       });
 
@@ -248,11 +249,11 @@ describe('useAdminAuth', () => {
       });
 
       // Clear previous calls
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // GIVEN: New token for manual refresh
       const newToken = 'manually-refreshed-token';
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: {
           session: { ...mockSession, access_token: newToken },
         },
@@ -281,7 +282,7 @@ describe('useAdminAuth', () => {
         resolveSession = resolve;
       });
 
-      (supabaseLib.getSession as jest.Mock).mockReturnValue(sessionPromise);
+      (supabaseLib.getSession as any).mockReturnValue(sessionPromise);
 
       // WHEN: Hook is rendered
       const { result } = renderHook(() => useAdminAuth());
@@ -312,7 +313,7 @@ describe('useAdminAuth', () => {
 
     test('should handle refresh failure', async () => {
       // GIVEN: Initial valid session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValueOnce({
+      (supabaseLib.getSession as any).mockResolvedValueOnce({
         data: { session: mockSession },
       });
 
@@ -325,7 +326,7 @@ describe('useAdminAuth', () => {
 
       // GIVEN: Refresh fails (mock all retry attempts)
       const refreshError = new Error('Refresh failed');
-      (supabaseLib.getSession as jest.Mock)
+      (supabaseLib.getSession as any)
         .mockRejectedValueOnce(refreshError)
         .mockRejectedValueOnce(refreshError)
         .mockRejectedValueOnce(refreshError)
@@ -340,7 +341,7 @@ describe('useAdminAuth', () => {
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
-          jest.advanceTimersByTime(1000 * Math.pow(2, i));
+          vi.advanceTimersByTime(1000 * Math.pow(2, i));
           await Promise.resolve(); // Flush promises
         });
       }
@@ -357,10 +358,10 @@ describe('useAdminAuth', () => {
   describe('cleanup', () => {
     test('should clear interval on unmount', async () => {
       // Spy on clearInterval before rendering
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
 
       // GIVEN: Supabase returns a valid session
-      (supabaseLib.getSession as jest.Mock).mockResolvedValue({
+      (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: mockSession },
       });
 

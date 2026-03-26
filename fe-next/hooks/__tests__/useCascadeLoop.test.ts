@@ -5,6 +5,7 @@
  * These tests define the behavior of the cascade state machine
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import {
   useCascadeLoop,
@@ -265,12 +266,12 @@ describe('checkForMatches', () => {
 
 describe('useCascadeLoop', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   it('should start in idle state', () => {
@@ -320,7 +321,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Wait 250ms for removing phase to complete
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: Should be in falling phase
@@ -330,7 +331,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Wait 250ms for falling phase to complete
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: Should be in spawning phase
@@ -340,12 +341,12 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Wait 250ms for spawning phase to complete
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // WHEN: Advance a bit more for checking phase
     act(() => {
-      jest.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
     });
 
     // THEN: Should eventually reach idle after checking
@@ -373,7 +374,7 @@ describe('useCascadeLoop', () => {
 
     // Advance through all phases (250ms each + small buffer)
     act(() => {
-      jest.advanceTimersByTime(1000); // Give enough time for all transitions
+      vi.advanceTimersByTime(1000); // Give enough time for all transitions
     });
 
     // THEN
@@ -399,7 +400,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Advance to falling
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: Still processing
@@ -410,7 +411,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Advance to spawning
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: Still processing
@@ -421,7 +422,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Complete cascade
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: isProcessing should be false when idle
@@ -448,7 +449,7 @@ describe('useCascadeLoop', () => {
     for (let i = 0; i < 12; i++) {
       act(() => {
         result.current.startCascade([`${i}-0`]);
-        jest.advanceTimersByTime(750); // Complete each cascade
+        vi.advanceTimersByTime(750); // Complete each cascade
       });
     }
 
@@ -484,7 +485,7 @@ describe('useCascadeLoop', () => {
 
   it('should call onPhaseChange callback when phases transition', async () => {
     // GIVEN
-    const onPhaseChange = jest.fn();
+    const onPhaseChange = vi.fn();
     const { result } = renderHook(() => useCascadeLoop({ onPhaseChange }));
 
     // WHEN
@@ -497,7 +498,7 @@ describe('useCascadeLoop', () => {
 
     // WHEN: Advance to next phase
     act(() => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     // THEN: Should call callback with 'falling'
@@ -509,10 +510,10 @@ describe('useCascadeLoop', () => {
   it('should use instant transitions when reduced motion is preferred', async () => {
     // GIVEN
     // Mock matchMedia to return prefers-reduced-motion: reduce
-    const mockMatchMedia = jest.fn().mockReturnValue({
+    const mockMatchMedia = vi.fn().mockReturnValue({
       matches: true,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     });
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -530,7 +531,7 @@ describe('useCascadeLoop', () => {
     expect(result.current.state.phase).toBe('removing');
 
     act(() => {
-      jest.advanceTimersByTime(0); // No delay needed
+      vi.advanceTimersByTime(0); // No delay needed
     });
 
     // Cleanup mock
@@ -540,10 +541,10 @@ describe('useCascadeLoop', () => {
   it('should populate fallingTiles map during falling phase', async () => {
     // GIVEN
     // Mock matchMedia for JSDOM environment
-    const mockMatchMedia = jest.fn().mockReturnValue({
+    const mockMatchMedia = vi.fn().mockReturnValue({
       matches: false,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     });
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -555,7 +556,7 @@ describe('useCascadeLoop', () => {
     // WHEN
     act(() => {
       result.current.startCascade(['0-0']);
-      jest.advanceTimersByTime(250); // Move to falling phase
+      vi.advanceTimersByTime(250); // Move to falling phase
     });
 
     // THEN
@@ -569,10 +570,10 @@ describe('useCascadeLoop', () => {
   it('should populate spawningTiles array during spawning phase', async () => {
     // GIVEN
     // Mock matchMedia for JSDOM environment
-    const mockMatchMedia = jest.fn().mockReturnValue({
+    const mockMatchMedia = vi.fn().mockReturnValue({
       matches: false,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     });
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -584,7 +585,7 @@ describe('useCascadeLoop', () => {
     // WHEN
     act(() => {
       result.current.startCascade(['0-0']);
-      jest.advanceTimersByTime(500); // Move to spawning phase
+      vi.advanceTimersByTime(500); // Move to spawning phase
     });
 
     // THEN

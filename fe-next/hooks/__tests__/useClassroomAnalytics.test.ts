@@ -1,24 +1,25 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useClassroomAnalytics } from '../useClassroomAnalytics';
 import * as analytics from '@/lib/supabase/analytics';
 
 // Mock analytics module
-jest.mock('@/lib/supabase/analytics', () => ({
-  getClassroomMetrics: jest.fn(),
-  getCommonMistakes: jest.fn(),
+vi.mock('@/lib/supabase/analytics', () => ({
+  getClassroomMetrics: vi.fn(),
+  getCommonMistakes: vi.fn(),
 }));
 
 describe('useClassroomAnalytics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return loading state initially', () => {
     // GIVEN: Mock functions return pending promises
-    (analytics.getClassroomMetrics as jest.Mock).mockImplementation(
+    (analytics.getClassroomMetrics as any).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
-    (analytics.getCommonMistakes as jest.Mock).mockImplementation(
+    (analytics.getCommonMistakes as any).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -47,11 +48,11 @@ describe('useClassroomAnalytics', () => {
       { word: 'challenging', errorRate: 0.7, studentCount: 4 },
     ];
 
-    (analytics.getClassroomMetrics as jest.Mock).mockResolvedValue({
+    (analytics.getClassroomMetrics as any).mockResolvedValue({
       data: mockMetrics,
       error: null,
     });
-    (analytics.getCommonMistakes as jest.Mock).mockResolvedValue({
+    (analytics.getCommonMistakes as any).mockResolvedValue({
       data: mockMistakes,
       error: null,
     });
@@ -72,7 +73,7 @@ describe('useClassroomAnalytics', () => {
 
   it('should return error on fetch failure', async () => {
     // GIVEN: Mock fetch error
-    (analytics.getClassroomMetrics as jest.Mock).mockResolvedValue({
+    (analytics.getClassroomMetrics as any).mockResolvedValue({
       data: null,
       error: { message: 'Database error' },
     });
@@ -91,7 +92,7 @@ describe('useClassroomAnalytics', () => {
 
   it('should call getClassroomMetrics and getCommonMistakes', async () => {
     // GIVEN: Mock successful fetch
-    (analytics.getClassroomMetrics as jest.Mock).mockResolvedValue({
+    (analytics.getClassroomMetrics as any).mockResolvedValue({
       data: {
         studentsNeedingHelp: 0,
         classAverageXp: 100,
@@ -101,7 +102,7 @@ describe('useClassroomAnalytics', () => {
       },
       error: null,
     });
-    (analytics.getCommonMistakes as jest.Mock).mockResolvedValue({
+    (analytics.getCommonMistakes as any).mockResolvedValue({
       data: [],
       error: null,
     });
@@ -118,7 +119,7 @@ describe('useClassroomAnalytics', () => {
 
   it('should refresh metrics when refresh() called', async () => {
     // GIVEN: Mock successful fetch
-    (analytics.getClassroomMetrics as jest.Mock).mockResolvedValue({
+    (analytics.getClassroomMetrics as any).mockResolvedValue({
       data: {
         studentsNeedingHelp: 0,
         classAverageXp: 100,
@@ -128,7 +129,7 @@ describe('useClassroomAnalytics', () => {
       },
       error: null,
     });
-    (analytics.getCommonMistakes as jest.Mock).mockResolvedValue({
+    (analytics.getCommonMistakes as any).mockResolvedValue({
       data: [],
       error: null,
     });
@@ -140,7 +141,7 @@ describe('useClassroomAnalytics', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     // Clear the mock call counts
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // WHEN
     await result.current.refresh();

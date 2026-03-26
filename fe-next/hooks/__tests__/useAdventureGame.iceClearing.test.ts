@@ -9,6 +9,7 @@
  *    so they can be selected and used in words
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
@@ -58,11 +59,11 @@ function createMockGrid(size: number = 4): string[][] {
 
 describe('Ice Tile Clearing - Complete Flow', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should NOT clear ice tile when just initializing (ice should be frozen)', () => {

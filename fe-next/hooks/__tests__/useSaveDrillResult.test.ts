@@ -4,16 +4,17 @@
  * Tests for the drill result saving hook that should return brain score data
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSaveDrillResult } from '../useSaveDrillResult';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('useSaveDrillResult', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockReset();
+    vi.clearAllMocks();
+    (global.fetch as any).mockReset();
   });
 
   const mockDrillResult = {
@@ -44,7 +45,7 @@ describe('useSaveDrillResult', () => {
 
   describe('saveDrillResult', () => {
     it('should return success and brainScore data on successful save', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockBrainScoreResponse,
       });
@@ -65,7 +66,7 @@ describe('useSaveDrillResult', () => {
     });
 
     it('should return domain scores in the brainScore response', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockBrainScoreResponse,
       });
@@ -83,7 +84,7 @@ describe('useSaveDrillResult', () => {
     });
 
     it('should return targetDomain for the drill type', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           ...mockBrainScoreResponse,
@@ -111,7 +112,7 @@ describe('useSaveDrillResult', () => {
         resolvePromise = resolve;
       });
 
-      (global.fetch as jest.Mock).mockReturnValueOnce(pendingPromise);
+      (global.fetch as any).mockReturnValueOnce(pendingPromise);
 
       const { result } = renderHook(() => useSaveDrillResult());
 
@@ -140,7 +141,7 @@ describe('useSaveDrillResult', () => {
     });
 
     it('should return error on failed API response', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         json: async () => ({ error: 'Unauthorized' }),
       });
@@ -159,7 +160,7 @@ describe('useSaveDrillResult', () => {
     });
 
     it('should return error on network failure', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
       const { result } = renderHook(() => useSaveDrillResult());
 
@@ -175,7 +176,7 @@ describe('useSaveDrillResult', () => {
     });
 
     it('should send correct request body to API', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockBrainScoreResponse,
       });

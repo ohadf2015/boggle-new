@@ -6,27 +6,24 @@
  * sessions to mastery, engagement score, failing students
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useLessonEffectivenessMetrics } from '../useLessonEffectivenessMetrics';
 import * as progressModule from '@/lib/supabase/education/progress';
 import * as practiceModule from '@/lib/supabase/education/practice';
 
-jest.mock('@/hooks/useMounted', () => ({
+vi.mock('@/hooks/useMounted', () => ({
   useMounted: () => ({ current: true }),
 }));
-jest.mock('@/lib/supabase/education/progress');
-jest.mock('@/lib/supabase/education/practice');
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/lib/supabase/education/progress');
+vi.mock('@/lib/supabase/education/practice');
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
+  default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-const mockGetStudentProgress = progressModule.getStudentProgressForLesson as jest.MockedFunction<
-  typeof progressModule.getStudentProgressForLesson
->;
-const mockGetPracticeSessions = practiceModule.getPracticeSessionsForLesson as jest.MockedFunction<
-  typeof practiceModule.getPracticeSessionsForLesson
->;
+const mockGetStudentProgress = progressModule.getStudentProgressForLesson as any;
+const mockGetPracticeSessions = practiceModule.getPracticeSessionsForLesson as any;
 
 function buildProgress(
   overrides: Partial<{
@@ -59,7 +56,7 @@ function buildProgress(
 
 describe('useLessonEffectivenessMetrics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ============================================

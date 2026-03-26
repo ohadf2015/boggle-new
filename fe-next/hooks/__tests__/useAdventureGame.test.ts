@@ -5,6 +5,7 @@
  * Following TDD: Write tests FIRST, then implement
  */
 
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAdventureGame } from '../useAdventureGame';
 import type { LevelConfig, TileState, LevelObjective } from '@/types/adventure';
@@ -60,11 +61,11 @@ function createMockGrid(size: number = 4): string[][] {
 describe('useAdventureGame', () => {
   // Use fake timers for timer tests
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Initialization', () => {
@@ -514,7 +515,7 @@ describe('useAdventureGame', () => {
 
       // WHEN - Advance timer by 5 seconds
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       // THEN
@@ -534,7 +535,7 @@ describe('useAdventureGame', () => {
         result.current.startGame();
       });
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
       act(() => {
         result.current.pauseGame();
@@ -542,7 +543,7 @@ describe('useAdventureGame', () => {
 
       // WHEN - Advance timer while paused
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // THEN - Timer should still be at 115 (not 105)
@@ -563,7 +564,7 @@ describe('useAdventureGame', () => {
 
       // WHEN - Let timer run out
       act(() => {
-        jest.advanceTimersByTime(6000);
+        vi.advanceTimersByTime(6000);
       });
 
       // THEN
@@ -591,7 +592,7 @@ describe('useAdventureGame', () => {
 
       // Submit word to complete primary objective with 40 seconds remaining
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
         result.current.submitWord('TEST', 100);
       });
 
@@ -767,7 +768,7 @@ describe('useAdventureGame', () => {
 
       // WHEN - Wait for combo timeout (3 seconds)
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       // THEN

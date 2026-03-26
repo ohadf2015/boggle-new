@@ -4,6 +4,7 @@
  * Tests for practice session timing preferences stored in localStorage
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePracticeSettings, DEFAULT_PRACTICE_SETTINGS } from '../usePracticeSettings';
 
@@ -11,14 +12,14 @@ import { usePracticeSettings, DEFAULT_PRACTICE_SETTINGS } from '../usePracticeSe
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
   };
@@ -31,7 +32,7 @@ Object.defineProperty(window, 'localStorage', {
 describe('usePracticeSettings', () => {
   beforeEach(() => {
     mockLocalStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {

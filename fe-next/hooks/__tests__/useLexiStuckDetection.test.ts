@@ -5,24 +5,25 @@
  * Detects when players are stuck in Adventure mode and triggers Lexi hints
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLexiStuckDetection } from '../useLexiStuckDetection';
 
 // Mock the underlying inactivity detection hook
-jest.mock('../useInactivityDetection', () => ({
-  useInactivityDetection: jest.fn(),
+vi.mock('../useInactivityDetection', () => ({
+  useInactivityDetection: vi.fn(),
 }));
 
 import { useInactivityDetection } from '../useInactivityDetection';
 
-const mockUseInactivityDetection = useInactivityDetection as jest.Mock;
+const mockUseInactivityDetection = useInactivityDetection as any;
 
 describe('useLexiStuckDetection', () => {
-  const mockReset = jest.fn();
-  const mockOnStuck = jest.fn();
+  const mockReset = vi.fn();
+  const mockOnStuck = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseInactivityDetection.mockReturnValue({
       reset: mockReset,
       lastActivity: Date.now(),

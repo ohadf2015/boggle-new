@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLeadChangeDetection } from '../useLeadChangeDetection';
 
@@ -8,11 +9,11 @@ interface LeaderboardPlayer {
 
 describe('useLeadChangeDetection', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return null when leaderboard is empty', () => {
@@ -179,7 +180,7 @@ describe('useLeadChangeDetection', () => {
     expect(result.current).toEqual({ type: 'took-lead', newLeader: 'player1', previousLeader: 'player2' });
 
     // Auto-clear the event so we can detect cooldown suppression
-    act(() => { jest.advanceTimersByTime(2500); });
+    act(() => { vi.advanceTimersByTime(2500); });
     expect(result.current).toBeNull();
 
     // Player2 takes lead back (still within 5s cooldown — only 2.5s elapsed)
@@ -194,7 +195,7 @@ describe('useLeadChangeDetection', () => {
     expect(result.current).toBeNull();
 
     // After total 5 seconds from first event, cooldown expires
-    act(() => { jest.advanceTimersByTime(2500); });
+    act(() => { vi.advanceTimersByTime(2500); });
     rerender({
       leaderboard: [
         { username: 'player1', score: 25 },
@@ -225,7 +226,7 @@ describe('useLeadChangeDetection', () => {
     expect(result.current).not.toBeNull();
 
     // After 2.5 seconds, event should auto-clear
-    act(() => { jest.advanceTimersByTime(2500); });
+    act(() => { vi.advanceTimersByTime(2500); });
     expect(result.current).toBeNull();
   });
 });

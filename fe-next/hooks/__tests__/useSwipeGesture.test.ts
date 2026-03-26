@@ -5,12 +5,13 @@
  * Following TDD RED-GREEN-REFACTOR cycle
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSwipeGesture } from '../useSwipeGesture';
 
 // Mock Framer Motion
-jest.mock('framer-motion', () => ({
-  useMotionValue: jest.fn((initialValue) => {
+vi.mock('framer-motion', () => ({
+  useMotionValue: vi.fn((initialValue) => {
     let value = initialValue;
     const listeners = new Set<(v: number) => void>();
     return {
@@ -25,7 +26,7 @@ jest.mock('framer-motion', () => ({
       },
     };
   }),
-  useTransform: jest.fn((motionValue, inputRange, outputRange) => {
+  useTransform: vi.fn((motionValue, inputRange, outputRange) => {
     const listeners = new Set<(v: number) => void>();
     const mockMotionValue = {
       get: () => {
@@ -35,7 +36,7 @@ jest.mock('framer-motion', () => ({
         const output = outputRange[0] + ratio * (outputRange[1] - outputRange[0]);
         return Math.max(outputRange[0], Math.min(outputRange[1], output));
       },
-      set: jest.fn(),
+      set: vi.fn(),
       onChange: (listener: (v: number) => void) => {
         listeners.add(listener);
         return () => listeners.delete(listener);
@@ -51,13 +52,13 @@ jest.mock('framer-motion', () => ({
 
 describe('useSwipeGesture', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Initial State', () => {
     it('should initialize with x position at 0', () => {
       // GIVEN/WHEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // THEN
       expect(result.current.x.get()).toBe(0);
@@ -65,7 +66,7 @@ describe('useSwipeGesture', () => {
 
     it('should initialize with rotation at 0', () => {
       // GIVEN/WHEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // THEN
       expect(result.current.rotate.get()).toBe(0);
@@ -73,7 +74,7 @@ describe('useSwipeGesture', () => {
 
     it('should initialize with opacity at 1', () => {
       // GIVEN/WHEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // THEN
       expect(result.current.opacity.get()).toBe(1);
@@ -81,7 +82,7 @@ describe('useSwipeGesture', () => {
 
     it('should use default threshold of 150px when not provided', () => {
       // GIVEN/WHEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // THEN - drag exactly 150px should trigger swipe
@@ -93,7 +94,7 @@ describe('useSwipeGesture', () => {
 
     it('should use custom threshold when provided', () => {
       // GIVEN/WHEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 200 })
       );
@@ -115,7 +116,7 @@ describe('useSwipeGesture', () => {
   describe('Swipe Right Detection', () => {
     it('should detect swipe right when drag exceeds positive threshold', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - drag 200px to the right
@@ -129,7 +130,7 @@ describe('useSwipeGesture', () => {
 
     it('should call onSwipe exactly once for swipe right', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN
@@ -145,7 +146,7 @@ describe('useSwipeGesture', () => {
   describe('Swipe Left Detection', () => {
     it('should detect swipe left when drag exceeds negative threshold', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - drag 200px to the left
@@ -159,7 +160,7 @@ describe('useSwipeGesture', () => {
 
     it('should call onSwipe exactly once for swipe left', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN
@@ -175,7 +176,7 @@ describe('useSwipeGesture', () => {
   describe('Insufficient Swipe (Snap Back)', () => {
     it('should reset x to 0 when drag is below threshold', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - drag only 100px (threshold is 150)
@@ -190,7 +191,7 @@ describe('useSwipeGesture', () => {
 
     it('should reset x to 0 when drag is negative but below threshold', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - drag only -100px (threshold is 150)
@@ -205,7 +206,7 @@ describe('useSwipeGesture', () => {
 
     it('should not call onSwipe when drag is exactly at threshold minus 1', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - drag exactly 149px (threshold is 150)
@@ -221,7 +222,7 @@ describe('useSwipeGesture', () => {
   describe('Keyboard Shortcuts', () => {
     it('should trigger swipe right on ArrowRight key', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN
@@ -236,7 +237,7 @@ describe('useSwipeGesture', () => {
 
     it('should trigger swipe left on ArrowLeft key', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN
@@ -251,7 +252,7 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger swipe on other keys', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - press various other keys
@@ -268,7 +269,7 @@ describe('useSwipeGesture', () => {
 
     it('should call onSwipe exactly once per keyboard press', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN
@@ -285,7 +286,7 @@ describe('useSwipeGesture', () => {
   describe('Disabled State', () => {
     it('should not trigger swipe when disabled', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe, disabled: true }));
 
       // WHEN - try to swipe right
@@ -299,7 +300,7 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger keyboard shortcuts when disabled', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe, disabled: true }));
 
       // WHEN
@@ -314,7 +315,7 @@ describe('useSwipeGesture', () => {
 
     it('should still reset x position when disabled and drag ends', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe, disabled: true }));
 
       // WHEN - drag while disabled
@@ -329,7 +330,7 @@ describe('useSwipeGesture', () => {
 
     it('should allow swipe when disabled is false', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result, rerender } = renderHook(
         ({ disabled }) => useSwipeGesture({ onSwipe, disabled }),
         { initialProps: { disabled: true } }
@@ -357,7 +358,7 @@ describe('useSwipeGesture', () => {
   describe('Derived Values', () => {
     it('should provide swipeDirection based on x position', () => {
       // GIVEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // WHEN - x is positive
       act(() => {
@@ -370,7 +371,7 @@ describe('useSwipeGesture', () => {
 
     it('should return left direction when x is negative', () => {
       // GIVEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // WHEN - x is negative
       act(() => {
@@ -383,7 +384,7 @@ describe('useSwipeGesture', () => {
 
     it('should return null direction when x is 0', () => {
       // GIVEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // WHEN/THEN - x is 0 (initial state)
       expect(result.current.swipeDirection).toBeNull();
@@ -392,7 +393,7 @@ describe('useSwipeGesture', () => {
     it('should provide swipeProgress as percentage of threshold', () => {
       // GIVEN
       const { result } = renderHook(() =>
-        useSwipeGesture({ onSwipe: jest.fn(), threshold: 150 })
+        useSwipeGesture({ onSwipe: vi.fn(), threshold: 150 })
       );
 
       // WHEN - x is 75 (50% of 150)
@@ -407,7 +408,7 @@ describe('useSwipeGesture', () => {
     it('should cap swipeProgress at 1.0 when exceeding threshold', () => {
       // GIVEN
       const { result } = renderHook(() =>
-        useSwipeGesture({ onSwipe: jest.fn(), threshold: 150 })
+        useSwipeGesture({ onSwipe: vi.fn(), threshold: 150 })
       );
 
       // WHEN - x is 300 (200% of 150)
@@ -422,7 +423,7 @@ describe('useSwipeGesture', () => {
     it('should return 0 progress when x is 0', () => {
       // GIVEN
       const { result } = renderHook(() =>
-        useSwipeGesture({ onSwipe: jest.fn() })
+        useSwipeGesture({ onSwipe: vi.fn() })
       );
 
       // WHEN/THEN - initial state
@@ -433,7 +434,7 @@ describe('useSwipeGesture', () => {
   describe('Motion Value Transforms', () => {
     it('should create rotate transform from x position', () => {
       // GIVEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // WHEN - x changes
       act(() => {
@@ -447,7 +448,7 @@ describe('useSwipeGesture', () => {
 
     it('should create opacity transform from x position', () => {
       // GIVEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // WHEN - x changes
       act(() => {
@@ -469,7 +470,7 @@ describe('useSwipeGesture', () => {
 
     it('should return onTouchStart and onTouchEnd handlers', () => {
       // GIVEN/WHEN
-      const { result } = renderHook(() => useSwipeGesture({ onSwipe: jest.fn() }));
+      const { result } = renderHook(() => useSwipeGesture({ onSwipe: vi.fn() }));
 
       // THEN
       expect(result.current.onTouchStart).toBeDefined();
@@ -480,7 +481,7 @@ describe('useSwipeGesture', () => {
 
     it('should detect swipe right on horizontal touch gesture', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75 })
       );
@@ -488,7 +489,7 @@ describe('useSwipeGesture', () => {
       // Mock Date.now for timing check
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN - start touch at x=100
       act(() => {
@@ -512,14 +513,14 @@ describe('useSwipeGesture', () => {
 
     it('should detect swipe left on horizontal touch gesture', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75 })
       );
 
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN - start touch at x=200
       act(() => {
@@ -541,14 +542,14 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger swipe when horizontal movement is less than threshold', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75 })
       );
 
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN - start touch at x=100
       act(() => {
@@ -570,14 +571,14 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger swipe when vertical movement exceeds horizontal', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75 })
       );
 
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN - start touch
       act(() => {
@@ -599,14 +600,14 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger swipe when gesture is too slow (> 300ms)', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75 })
       );
 
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN - start touch
       act(() => {
@@ -629,14 +630,14 @@ describe('useSwipeGesture', () => {
 
     it('should not trigger swipe when disabled', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 75, disabled: true })
       );
 
       const originalDateNow = Date.now;
       let mockTime = 1000;
-      Date.now = jest.fn(() => mockTime);
+      Date.now = vi.fn(() => mockTime);
 
       // WHEN
       act(() => {
@@ -657,7 +658,7 @@ describe('useSwipeGesture', () => {
 
     it('should handle touch end without touch start gracefully', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - touch end without start
@@ -673,7 +674,7 @@ describe('useSwipeGesture', () => {
   describe('Edge Cases', () => {
     it('should handle exactly threshold value as swipe', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 150 })
       );
@@ -689,7 +690,7 @@ describe('useSwipeGesture', () => {
 
     it('should handle exactly negative threshold value as swipe', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() =>
         useSwipeGesture({ onSwipe, threshold: 150 })
       );
@@ -705,7 +706,7 @@ describe('useSwipeGesture', () => {
 
     it('should handle very large swipe distances', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - very large swipe
@@ -719,7 +720,7 @@ describe('useSwipeGesture', () => {
 
     it('should ignore y offset and only consider x for swipe detection', () => {
       // GIVEN
-      const onSwipe = jest.fn();
+      const onSwipe = vi.fn();
       const { result } = renderHook(() => useSwipeGesture({ onSwipe }));
 
       // WHEN - large y but sufficient x
