@@ -7,7 +7,7 @@
 import { render } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
-import { useAdventureGame: mockHook } from '@/hooks/useAdventureGame';
+import { useAdventureGame as mockHook } from '@/hooks/useAdventureGame';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
