@@ -6,7 +6,7 @@
  * can run under both runners.
  */
 
-/* eslint-disable no-undef */
+ 
 const vi = {
   fn: (...args) => jest.fn(...args),
   mock: (...args) => jest.mock(...args),

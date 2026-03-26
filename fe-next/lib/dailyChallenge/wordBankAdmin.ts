@@ -50,7 +50,7 @@ export async function seedWordBank(
 
     if (error) {
       if (error.code === '23505') skipped++;
-      else { logger.error('WORD_BANK', 'Error inserting word:', normalizedWord, error); errors++; }
+      else { logger.error('WORD_BANK', `Error inserting word: ${normalizedWord}`, { error }); errors++; }
     } else {
       inserted++;
     }
@@ -90,7 +90,7 @@ export async function importWordsFromDictionary(
 
     if (error) {
       if (error.code === '23505') skipped++;
-      else { logger.error('WORD_BANK', 'Error importing word:', normalizedWord, error); errors++; }
+      else { logger.error('WORD_BANK', `Error importing word: ${normalizedWord}`, { error }); errors++; }
     } else {
       inserted++;
     }
@@ -160,7 +160,7 @@ export async function importWikipediaWordWithMetadata(
       { onConflict: 'word,language', ignoreDuplicates: false }
     );
 
-  if (error) { logger.error('WORD_BANK', 'Error importing Wikipedia word:', normalizedWord, error); return false; }
+  if (error) { logger.error('WORD_BANK', `Error importing Wikipedia word: ${normalizedWord}`, { error }); return false; }
   return true;
 }
 
