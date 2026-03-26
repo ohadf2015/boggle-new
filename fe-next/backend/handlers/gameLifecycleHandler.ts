@@ -613,11 +613,16 @@ function initializePlayerData(_game: Game, gameCode: string): void {
     if (!gameForInit.playerScores) gameForInit.playerScores = {};
     if (!gameForInit.playerWords) gameForInit.playerWords = {};
 
+    // Also clear playerWordsSet to prevent stale O(1) lookup data
+    const gameAny = gameForInit as any;
+    if (!gameAny.playerWordsSet) gameAny.playerWordsSet = {};
+
     playerUsernames.forEach((username: string) => {
       gameForInit.playerWordDetails![username] = [];
       gameForInit.playerWords[username] = [];
       gameForInit.playerScores[username] = 0;
       gameForInit.playerAchievements[username] = [];
+      gameAny.playerWordsSet[username] = new Set<string>();
     });
 
     gameForInit.firstWordFound = false;

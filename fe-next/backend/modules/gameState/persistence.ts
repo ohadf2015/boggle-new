@@ -111,6 +111,13 @@ export async function restoreGameFromRedis(
       playersReadyForNextGame: {}
     };
 
+    // Reconstruct O(1) lookup Sets from restored word arrays
+    const restored = games[gameCode] as any;
+    restored.playerWordsSet = {};
+    for (const [u, words] of Object.entries(restored.playerWords)) {
+      restored.playerWordsSet[u] = new Set(words as string[]);
+    }
+
     return games[gameCode];
   } catch (error) {
     logger.error('PERSIST', `Failed to restore game ${gameCode} from Redis`, error);

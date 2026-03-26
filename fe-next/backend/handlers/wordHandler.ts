@@ -273,6 +273,12 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       // Check if already found
       if (playerHasWord(gameCode, username, normalizedWord)) {
+        logger.warn('WORD', `Word already found`, {
+          gameCode, username, word: normalizedWord,
+          gameState: game.gameState,
+          playerWordsCount: game.playerWords?.[username]?.length ?? -1,
+          playerWords: game.playerWords?.[username]?.slice(0, 10),
+        });
         socket.emit('wordAlreadyFound', { word: normalizedWord });
         // Note: Not counted as spam - could be UX issue where user didn't see feedback
         await releaseGraceLockIfNeeded();
