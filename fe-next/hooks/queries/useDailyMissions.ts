@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { trpc } from '@/lib/trpc';
 
 interface DailyMission {
   id: string;
@@ -10,17 +10,20 @@ interface DailyMission {
   reward: number;
 }
 
+/**
+ * Fetches daily challenge data via tRPC.
+ *
+ * NOTE: The Express route `/api/daily-challenge` has no `?type=missions` param.
+ * This hook now uses the tRPC `dailyChallenge.getCurrent` procedure which
+ * queries `daily_puzzles` for today's challenge. If a dedicated missions table
+ * is added later, create a separate tRPC procedure for it.
+ */
 export function useDailyMissions(userId: string | null) {
-  return useQuery({
-    queryKey: ['dailyMissions', userId],
-    queryFn: async (): Promise<DailyMission[]> => {
-      const res = await fetch(`/api/daily-challenge?type=missions&userId=${userId}`);
-      if (!res.ok) throw new Error(`Daily missions fetch failed: ${res.status}`);
-      return res.json();
-    },
+  return trpc.dailyChallenge.getCurrent.useQuery(undefined, {
     enabled: !!userId,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
-    // TODO: Verify /api/daily-challenge?type=missions endpoint exists and returns DailyMission[]
   });
 }
+
+export type { DailyMission };
