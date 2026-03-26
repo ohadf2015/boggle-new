@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import { getRedisClient } from '../redisClient';
+import logger from '../utils/logger';
 
 /**
  * News article from Google News enrichment
@@ -74,7 +75,7 @@ export async function fetchGoogleTrends(
     if (redis) {
       const cached = await redis.get(cacheKey);
       if (cached) {
-        console.log(`[SERP] Using cached trends for ${region} from ${todayDate}${enrichWithNews ? ' (enriched)' : ''}`);
+        logger.info('SERP', `Using cached trends for ${region} from ${todayDate}`, { enriched: enrichWithNews });
         return JSON.parse(cached);
       }
 
@@ -84,14 +85,14 @@ export async function fetchGoogleTrends(
         const enrichedCacheKey = `${REDIS_PREFIX}${region}:${todayDate}:enriched`;
         const enrichedCached = await redis.get(enrichedCacheKey);
         if (enrichedCached) {
-          console.log(`[SERP] Reusing enriched cache for ${region} (enrichment off but enriched data available)`);
+          logger.info('SERP', `Reusing enriched cache for ${region}`);
           return JSON.parse(enrichedCached);
         }
       }
     }
 
     // Fetch from SERP API
-    console.log(`[SERP] Fetching fresh trends for ${region}...`);
+    logger.info('SERP', `Fetching fresh trends for ${region}...`);
     const startTime = Date.now();
 
     const response = await axios.get<SerpApiResponse>('https://serpapi.com/search.json', {
@@ -109,7 +110,7 @@ export async function fetchGoogleTrends(
     let trends = response.data.trending_searches || [];
 
     if (trends.length === 0) {
-      console.warn(`[SERP] No trends returned for ${region}`);
+      logger.warn('SERP', `No trends returned for ${region}`);
     }
 
     // Enrich with news articles if requested
@@ -124,19 +125,19 @@ export async function fetchGoogleTrends(
 
     // Log to database for monitoring (fire and forget)
     logSerpApiRequest(region, trends.length, apiResponseTime, true).catch(err =>
-      console.error('[SERP] Failed to log API request:', err)
+      logger.error('SERP', 'Failed to log API request', err)
     );
 
-    console.log(`[SERP] Fetched ${trends.length} trends for ${region} in ${apiResponseTime}ms${enrichWithNews ? ' (enriched)' : ''}`);
+    logger.info('SERP', `Fetched ${trends.length} trends for ${region} in ${apiResponseTime}ms`, { enriched: enrichWithNews });
     return trends;
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`[SERP] Error fetching trends for ${region}:`, errorMessage);
+    logger.error('SERP', `Error fetching trends for ${region}`, { error: errorMessage });
 
     // Log error to database
     await logSerpApiRequest(region, 0, 0, false, errorMessage).catch(err =>
-      console.error('[SERP] Failed to log error:', err)
+      logger.error('SERP', 'Failed to log error', err)
     );
 
     // Try to return yesterday's cached data as fallback
@@ -144,13 +145,13 @@ export async function fetchGoogleTrends(
     if (redis) {
       const fallback = await redis.get(yesterdayKey);
       if (fallback) {
-        console.log(`[SERP] Using yesterday's cached data for ${region} as fallback`);
+        logger.info('SERP', `Using yesterday's cached data for ${region} as fallback`);
         return JSON.parse(fallback);
       }
     }
 
     // No fallback available - return empty array
-    console.warn(`[SERP] No fallback data available for ${region}`);
+    logger.warn('SERP', `No fallback data available for ${region}`);
     return [];
   }
 }
@@ -186,7 +187,7 @@ export async function getTrendsFromDbCache(
     return data.trends_data as TrendingTopic[];
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[SERP] Error fetching from DB cache:', errorMessage);
+    logger.error('SERP', 'Error fetching from DB cache', { error: errorMessage });
     return null;
   }
 }
@@ -220,10 +221,10 @@ export async function storeTrendsInDbCache(
       onConflict: 'region,fetch_date'
     });
 
-    console.log(`[SERP] Stored ${trends.length} trends in DB cache for ${region}`);
+    logger.info('SERP', `Stored ${trends.length} trends in DB cache for ${region}`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[SERP] Error storing in DB cache:', errorMessage);
+    logger.error('SERP', 'Error storing in DB cache', { error: errorMessage });
   }
 }
 
@@ -255,7 +256,7 @@ async function logSerpApiRequest(
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[SERP] Failed to log request:', errorMessage);
+    logger.error('SERP', 'Failed to log request', { error: errorMessage });
   }
 }
 
@@ -320,7 +321,7 @@ export async function enrichTrendWithNews(
       .slice(0, 3)
       .map((paa: any) => paa.question);
 
-    console.log(`[SERP] Enriched "${query}" with ${newsArticles.length} articles, ${relatedSearches.length} related searches, ${peopleAlsoAsk.length} PAA`);
+    logger.info('SERP', `Enriched "${query}"`, { articles: newsArticles.length, relatedSearches: relatedSearches.length, paa: peopleAlsoAsk.length });
 
     return {
       ...trend,
@@ -332,7 +333,7 @@ export async function enrichTrendWithNews(
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.warn(`[SERP] Failed to enrich trend "${query}":`, errorMessage);
+    logger.warn('SERP', `Failed to enrich trend "${query}"`, { error: errorMessage });
 
     // Return trend without enrichment on error
     return trend;
@@ -354,7 +355,7 @@ export async function enrichTrendsWithNews(
   maxTrendsToEnrich: number = 5
 ): Promise<TrendingTopic[]> {
   if (!process.env.SERPAPI_KEY) {
-    console.warn('[SERP] SERPAPI_KEY not set, skipping trend enrichment');
+    logger.warn('SERP', 'SERPAPI_KEY not set, skipping trend enrichment');
     return trends;
   }
 
@@ -362,7 +363,7 @@ export async function enrichTrendsWithNews(
   const trendsToEnrich = trends.slice(0, maxTrendsToEnrich);
   const trendsToSkip = trends.slice(maxTrendsToEnrich);
 
-  console.log(`[SERP] Enriching ${trendsToEnrich.length}/${trends.length} trends with news & related searches...`);
+  logger.info('SERP', `Enriching ${trendsToEnrich.length}/${trends.length} trends with news & related searches...`);
 
   // Enrich trends sequentially to avoid rate limiting (add 500ms delay between calls)
   const enrichedTrends: TrendingTopic[] = [];
@@ -438,7 +439,7 @@ export async function getMonthlyApiCallCount(): Promise<number> {
     return count;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[SERP] Failed to get monthly API call count:', errorMessage);
+    logger.error('SERP', 'Failed to get monthly API call count', { error: errorMessage });
     return 0;
   }
 }

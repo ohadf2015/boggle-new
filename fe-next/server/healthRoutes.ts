@@ -5,12 +5,12 @@
 
 import type { Application, Request, Response } from 'express';
 import type { Server } from 'socket.io';
-import Redis from 'ioredis';
 import { createClient } from '@supabase/supabase-js';
 
-import { isRedisAvailable, getRedisMetrics } from '../backend/redisClient';
+import { isRedisAvailable, getRedisMetrics, getRedisClient } from '../backend/redisClient';
 import { getAllGames } from '../backend/modules/gameStateManager';
 import { getMetrics, getRoomMetrics, resetAll } from '../backend/utils/metrics';
+import * as dictionary from '../backend/dictionary';
 
 import type { ExtendedSocketServer } from './redisAdapter';
 
@@ -39,14 +39,16 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     const checks: Record<string, { status: string; latencyMs?: number; error?: string }> = {};
     let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 
-    // Check Redis
+    // Check Redis (reuse existing client — no per-request connection)
     try {
-      const redisUrl = process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`;
-      const redis = new Redis(redisUrl, { connectTimeout: 3000, lazyConnect: true });
-      const start = Date.now();
-      await redis.ping();
-      checks.redis = { status: 'ok', latencyMs: Date.now() - start };
-      await redis.quit();
+      const redis = getRedisClient();
+      if (redis) {
+        const start = Date.now();
+        await redis.ping();
+        checks.redis = { status: 'ok', latencyMs: Date.now() - start };
+      } else {
+        checks.redis = { status: 'skipped', error: 'No Redis client available' };
+      }
     } catch (err) {
       checks.redis = { status: 'error', error: err instanceof Error ? err.message : String(err) };
       overall = 'degraded';
@@ -70,11 +72,10 @@ export function configureHealthRoutes(app: Application, io: Server): void {
       overall = 'degraded';
     }
 
-    // Dictionary loaded check
+    // Dictionary loaded check — getMemoryStats returns empty array if no dictionaries loaded
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const dictionary = require('../backend/dictionary');
-      const loaded = typeof dictionary.isLoaded === 'function' ? dictionary.isLoaded() : true;
+      const stats = dictionary.getMemoryStats();
+      const loaded = stats.length > 0;
       checks.dictionary = { status: loaded ? 'ok' : 'not_loaded' };
       if (!loaded) overall = 'degraded';
     } catch {

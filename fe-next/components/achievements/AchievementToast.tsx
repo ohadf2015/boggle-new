@@ -137,7 +137,7 @@ function AchievementToastContent({ payload, isVisible }: AchievementToastContent
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
               className="font-black text-lg truncate"
-              style={{ color: tierColors.text === '#000000' ? '#BFFF00' : tierColors.text }}
+              style={{ color: tierColors.text === '#000000' ? 'var(--neo-lime)' : tierColors.text }}
             >
               {achievementName}
             </motion.span>

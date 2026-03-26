@@ -379,7 +379,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               <div
                                 key={i}
                                 className="w-6 h-6 rounded-full border-2 border-neo-black flex items-center justify-center text-[8px] overflow-hidden"
-                                style={{ backgroundColor: av.color || '#1a1a2e' }}
+                                style={{ backgroundColor: av.color || 'var(--neo-navy)' }}
                               >
                                 {av.emoji || '👤'}
                               </div>

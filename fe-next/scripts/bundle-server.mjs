@@ -58,8 +58,6 @@ const externalPackages = [
   'zod',
   'zod/*',
   'sharp',
-  'million',
-  'million/*',
   'logrocket',
   // React/browser packages (should never be in server bundle)
   'react',

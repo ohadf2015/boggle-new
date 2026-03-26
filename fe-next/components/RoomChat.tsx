@@ -143,9 +143,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
               toast.dismiss();
             }}
           >
-            <Bell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
+            <Bell style={{ color: 'var(--neo-pink-light)', flexShrink: 0, fontSize: '18px' }} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
+              <div style={{ fontWeight: 900, color: 'rgb(var(--neo-black))', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
             </div>
           </div>,

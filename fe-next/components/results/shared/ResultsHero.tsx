@@ -37,7 +37,7 @@ interface ResultsHeroProps {
 }
 
 const gradients: Record<HeroVariant, string> = {
-  win: 'from-[#BFFF00]/10 via-transparent to-transparent',
+  win: 'from-neo-lime/10 via-transparent to-transparent',
   loss: 'from-neo-pink/10 via-transparent to-transparent',
   neutral: 'from-neo-cyan/10 via-transparent to-transparent',
 };

@@ -3,6 +3,7 @@
  */
 
 import type { WordDetail } from '@/shared/types/game';
+import logger from '../utils/logger';
 const { translations } = require('../../translations/index.js');
 
 export interface PlayerTitle {
@@ -66,7 +67,7 @@ export function calculatePlayerTitles(
 
   // If playerTitles translations are missing, return empty (graceful degradation)
   if (!titleTranslations) {
-    console.warn(`[TITLES] playerTitles translations missing for locale: ${supportedLocale}`);
+    logger.warn('TITLES', 'playerTitles translations missing for locale', { locale: supportedLocale });
     return {};
   }
 
@@ -140,7 +141,7 @@ export function calculatePlayerTitles(
   const assignTitle = (username: string, titleKey: string): boolean => {
     // Double-check titleTranslations exists (defensive check for edge cases)
     if (!titleTranslations || typeof titleTranslations !== 'object') {
-      console.warn(`[TITLES] titleTranslations is invalid when assigning ${titleKey}`);
+      logger.warn('TITLES', 'titleTranslations is invalid when assigning', { titleKey });
       return false;
     }
 
@@ -156,7 +157,7 @@ export function calculatePlayerTitles(
 
     // Validate titleData has required properties
     if (typeof titleData !== 'object' || !titleData.name) {
-      console.warn(`[TITLES] Invalid title data for ${titleKey}:`, titleData);
+      logger.warn('TITLES', 'Invalid title data', { titleKey, titleData });
       return false;
     }
 
@@ -243,9 +244,9 @@ export function calculatePlayerTitles(
     assignTitle(consistentPlayer.username, 'consistentPlayer');
   }
 
-  console.log(`[TITLES] Assigned titles for ${Object.keys(assignedTitles).length} players:`,
-    Object.entries(assignedTitles).map(([username, t]) => `${username}: ${t.titleKey}`).join(', ')
-  );
+  logger.info('TITLES', `Assigned titles for ${Object.keys(assignedTitles).length} players`, {
+    titles: Object.entries(assignedTitles).map(([username, t]) => `${username}: ${t.titleKey}`).join(', ')
+  });
 
   return assignedTitles;
 }

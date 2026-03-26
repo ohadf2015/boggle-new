@@ -52,7 +52,7 @@ export async function fetchRandomPlayerName(
     logger.warn('Failed to fetch random name, using fallback:', error);
     return {
       name: 'Player ' + Math.floor(Math.random() * 1000),
-      avatar: { emoji: '😀', color: '#6366f1' },
+      avatar: { emoji: '😀', color: '#8B5CF6' },
     };
   }
 }
@@ -77,7 +77,7 @@ export async function fetchRandomGenericAvatar(): Promise<{
     return data.avatar;
   } catch (error) {
     logger.warn('Failed to fetch random avatar, using fallback:', error);
-    return { emoji: '😊', color: '#6366f1' };
+    return { emoji: '😊', color: '#8B5CF6' };
   }
 }
 

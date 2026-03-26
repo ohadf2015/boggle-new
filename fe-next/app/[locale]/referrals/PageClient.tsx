@@ -211,7 +211,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
             {/* Avatar */}
             <div
               className="w-9 h-9 rounded-neo border-2 border-neo-black flex items-center justify-center text-lg shrink-0"
-              style={{ backgroundColor: r.avatarColor || '#475569' }}
+              style={{ backgroundColor: r.avatarColor || 'var(--neo-gray)' }}
             >
               {r.avatarEmoji || (r.displayName?.[0] ?? r.username?.[0] ?? '?')}
             </div>

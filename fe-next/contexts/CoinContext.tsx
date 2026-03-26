@@ -33,14 +33,14 @@ import * as Sentry from '@sentry/nextjs';
 function coinEarnToast(amount: number, reason?: string) {
   toast(
     `+${amount} gold${reason ? ` \u00b7 ${reason}` : ''}`,
-    { duration: 2500, style: { fontWeight: 700, background: '#1a1a2e', color: '#FFE135', border: '2px solid #FFE135', fontSize: '0.875rem' } }
+    { duration: 2500, style: { fontWeight: 700, background: 'var(--neo-navy)', color: 'var(--neo-yellow)', border: '2px solid var(--neo-yellow)', fontSize: '0.875rem' } }
   );
 }
 
 function coinSpendToast(amount: number, reason?: string) {
   toast(
     `-${amount} gold${reason ? ` \u00b7 ${reason}` : ''}`,
-    { duration: 2500, style: { fontWeight: 700, background: '#1a1a2e', color: '#FF6B35', border: '2px solid #FF6B35', fontSize: '0.875rem' } }
+    { duration: 2500, style: { fontWeight: 700, background: 'var(--neo-navy)', color: 'var(--neo-orange)', border: '2px solid var(--neo-orange)', fontSize: '0.875rem' } }
   );
 }
 

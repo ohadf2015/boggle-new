@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import { configureHealthRoutes } from '../healthRoutes';
+import { configureHealthRoutes } from '@/server/healthRoutes';
 
 // Mock Redis
 jest.mock('ioredis', () => {
@@ -22,23 +22,23 @@ jest.mock('@supabase/supabase-js', () => ({
 }));
 
 // Mock backend dependencies
-jest.mock('../../backend/redisClient', () => ({
+jest.mock('../../redisClient', () => ({
   isRedisAvailable: jest.fn(() => true),
   getRedisMetrics: jest.fn().mockResolvedValue({ connected: true }),
 }));
 
-jest.mock('../../backend/modules/gameStateManager', () => ({
+jest.mock('../../modules/gameStateManager', () => ({
   getAllGames: jest.fn(() => []),
 }));
 
-jest.mock('../../backend/utils/metrics', () => ({
+jest.mock('../../utils/metrics', () => ({
   getMetrics: jest.fn(() => ({})),
   getRoomMetrics: jest.fn(() => ({})),
   resetAll: jest.fn(),
 }));
 
 // Mock dictionary module — no isLoaded export
-jest.mock('../../backend/dictionary', () => ({}));
+jest.mock('../../dictionary', () => ({}));
 
 function createApp() {
   const app = express();
@@ -110,7 +110,6 @@ describe('Health Routes', () => {
         quit: jest.fn().mockResolvedValue('OK'),
       }));
 
-      // Recreate app to pick up new mock
       app = createApp();
       const res = await request(app).get('/health/ready');
       expect(res.status).toBe(200);

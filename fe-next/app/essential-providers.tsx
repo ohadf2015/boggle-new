@@ -20,6 +20,7 @@ import { HapticsProvider } from '@/contexts/HapticsContext';
 import { CoinProvider } from '@/contexts/CoinContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -152,6 +153,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
 
     return (
         <ErrorBoundary>
+            <QueryProvider>
             {/* Stable tier: rarely changes */}
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
@@ -177,8 +179,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             toastOptions={{
                                                 duration: 2000,
                                                 style: {
-                                                    background: '#363636',
-                                                    color: '#fff',
+                                                    background: 'var(--neo-gray)',
+                                                    color: 'rgb(var(--neo-white))',
                                                     pointerEvents: 'auto',
                                                 },
                                             }}
@@ -190,6 +192,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                     </CoinProvider>
                     </AuthProvider>                </LanguageProvider>
             </ThemeProvider>
+            </QueryProvider>
         </ErrorBoundary>
     );
 }

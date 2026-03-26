@@ -4,6 +4,7 @@
  */
 
 import { Server } from 'socket.io';
+import { socketLogger } from './logger';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
@@ -55,7 +56,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
   io.use((_socket, next) => {
     const currentConnections = io.sockets.sockets.size;
     if (currentConnections >= MAX_CONNECTIONS) {
-      console.warn(`[SOCKET.IO] Connection rejected: limit reached (${currentConnections}/${MAX_CONNECTIONS})`);
+      socketLogger.warn({ currentConnections, maxConnections: MAX_CONNECTIONS }, 'Connection rejected: limit reached');
       return next(new Error('Server at capacity, please try again later'));
     }
     next();
@@ -83,7 +84,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     }
 
     if (!supabase) {
-      console.warn('[SOCKET.IO] Auth middleware: Supabase not configured, skipping verification');
+      socketLogger.warn('Auth middleware: Supabase not configured, skipping verification');
       socket.data.verifiedUserId = null;
       return next();
     }
@@ -92,7 +93,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       const { data: { user }, error } = await supabase.auth.getUser(token);
 
       if (error || !user) {
-        console.warn(`[SOCKET.IO] Invalid auth token from ${socket.id}: ${error?.message || 'no user'}`);
+        socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Invalid auth token');
         socket.data.verifiedUserId = null;
         // Don't reject — allow as guest, but log the failed auth attempt
         return next();
@@ -101,7 +102,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       socket.data.verifiedUserId = user.id;
       socket.data.verifiedEmail = user.email;
     } catch (err) {
-      console.error('[SOCKET.IO] Auth verification error:', err);
+      socketLogger.error({ err }, 'Auth verification error');
       socket.data.verifiedUserId = null;
     }
 
@@ -130,7 +131,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     }
 
     if (!supabase) {
-      console.warn('[DUEL] Auth middleware: Supabase not configured');
+      socketLogger.warn('Duel auth middleware: Supabase not configured');
       return next(new Error('Authentication service unavailable'));
     }
 
@@ -138,7 +139,7 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       const { data: { user }, error } = await supabase.auth.getUser(token);
 
       if (error || !user) {
-        console.warn(`[DUEL] Invalid auth token from ${socket.id}: ${error?.message || 'no user'}`);
+        socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Duel invalid auth token');
         return next(new Error('Invalid authentication token'));
       }
 
@@ -149,20 +150,20 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
       socket.data.classroomIds = [];
       next();
     } catch (err) {
-      console.error('[DUEL] Auth verification error:', err);
+      socketLogger.error({ err }, 'Duel auth verification error');
       return next(new Error('Authentication error'));
     }
   });
 
   // Register duel namespace connection handler
   duelNamespace.on('connection', (socket) => {
-    console.log(`[DUEL NAMESPACE] Client connected: ${socket.id}`);
+    socketLogger.info({ socketId: socket.id }, 'Duel client connected');
 
     // Register all duel event handlers for this socket
     registerDuelHandlers(duelNamespace, socket);
 
     socket.on('disconnect', (reason) => {
-      console.log(`[DUEL NAMESPACE] Client disconnected: ${socket.id}, reason: ${reason}`);
+      socketLogger.info({ socketId: socket.id, reason }, 'Duel client disconnected');
     });
   });
 
@@ -176,14 +177,14 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
 export function setupConnectionMonitoring(io: Server): void {
   // Log connection errors
   io.engine.on('connection_error', (err: { req?: { url?: string }; code?: string; message?: string }) => {
-    console.error('[SOCKET.IO] Connection error:', err.req?.url, err.code, err.message);
+    socketLogger.error({ url: err.req?.url, code: err.code, err: err.message }, 'Connection error');
   });
 
   // Log connection stats periodically
   const statsTimer = setInterval(() => {
     const socketCount = io.sockets.sockets.size;
     if (socketCount > 0) {
-      console.log(`[SOCKET.IO] Active connections: ${socketCount}`);
+      socketLogger.info({ socketCount }, 'Active connections');
     }
   }, 60000);
   cleanupTimers.add(statsTimer);
@@ -198,7 +199,7 @@ export function setupCleanupTimers(io: Server): void {
   const staleGamesTimer = setInterval(() => {
     const cleaned = cleanupStaleGames();
     if (cleaned > 0) {
-      console.log(`[CLEANUP] Removed ${cleaned} stale games`);
+      socketLogger.info({ count: cleaned }, 'Removed stale games');
     }
   }, 5 * 60 * 1000);
   cleanupTimers.add(staleGamesTimer);
@@ -207,7 +208,7 @@ export function setupCleanupTimers(io: Server): void {
   const emptyRoomsTimer = setInterval(() => {
     const cleaned = cleanupEmptyRooms();
     if (cleaned > 0) {
-      console.log(`[CLEANUP] Removed ${cleaned} empty room(s)`);
+      socketLogger.info({ count: cleaned }, 'Removed empty rooms');
       broadcastActiveRooms(io, getActiveRooms());
     }
   }, 30 * 1000);
@@ -218,7 +219,7 @@ export function setupCleanupTimers(io: Server): void {
  * Clear all cleanup timers (for graceful shutdown)
  */
 export function clearCleanupTimers(): void {
-  console.log(`[SHUTDOWN] Clearing ${cleanupTimers.size} cleanup timers...`);
+  socketLogger.info({ count: cleanupTimers.size }, 'Clearing cleanup timers');
   for (const timer of cleanupTimers) {
     clearInterval(timer);
   }

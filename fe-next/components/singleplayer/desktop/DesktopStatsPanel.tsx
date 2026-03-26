@@ -82,7 +82,7 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
         >
           <div
             className="px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard"
-            style={{ background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)' }}
+            style={{ background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-lime) 100%)' }}
           >
             <div className="text-center">
               <div className="text-[8px] font-bold uppercase tracking-widest text-neo-black/60 mb-0.5">

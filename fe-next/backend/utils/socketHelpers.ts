@@ -4,6 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
+import logger from './logger';
 
 // ==========================================
 // Safe Emit Functions
@@ -20,7 +21,7 @@ export function safeEmit(socket: Socket, event: string, data: unknown): boolean 
     }
     return false;
   } catch (error) {
-    console.error('[SOCKET] Error emitting to socket:', (error as Error).message);
+    logger.error('SOCKET', 'Error emitting to socket', { error: (error as Error).message });
     return false;
   }
 }
@@ -32,7 +33,7 @@ export function broadcastToRoom(io: Server, room: string, event: string, data: u
   try {
     io.to(room).emit(event, data);
   } catch (error) {
-    console.error('[SOCKET] Error broadcasting to room:', (error as Error).message);
+    logger.error('SOCKET', 'Error broadcasting to room', { error: (error as Error).message });
   }
 }
 
@@ -45,7 +46,7 @@ export function volatileBroadcastToRoom(io: Server, room: string, event: string,
   try {
     io.to(room).volatile.emit(event, data);
   } catch (error) {
-    console.error('[SOCKET] Error volatile broadcasting to room:', (error as Error).message);
+    logger.error('SOCKET', 'Error volatile broadcasting to room', { error: (error as Error).message });
   }
 }
 
@@ -56,7 +57,7 @@ export function broadcastToRoomExceptSender(socket: Socket, room: string, event:
   try {
     socket.to(room).emit(event, data);
   } catch (error) {
-    console.error('[SOCKET] Error broadcasting to room except sender:', (error as Error).message);
+    logger.error('SOCKET', 'Error broadcasting to room except sender', { error: (error as Error).message });
   }
 }
 
@@ -78,7 +79,7 @@ function _executeBroadcast(): void {
     try {
       io.to(LOBBY_ROOM).emit('activeRooms', { rooms });
     } catch (error) {
-      console.error('[SOCKET] Error broadcasting activeRooms to lobby:', (error as Error).message);
+      logger.error('SOCKET', 'Error broadcasting activeRooms to lobby', { error: (error as Error).message });
     }
     _pendingBroadcastArgs = null;
   }
@@ -124,7 +125,7 @@ export async function getSocketsInRoom(io: Server, room: string): Promise<Set<st
   try {
     return await io.in(room).allSockets();
   } catch (error) {
-    console.error('[SOCKET] Error getting sockets in room:', (error as Error).message);
+    logger.error('SOCKET', 'Error getting sockets in room', { error: (error as Error).message });
     return new Set();
   }
 }
@@ -191,7 +192,7 @@ export function broadcastToAll(io: Server, event: string, data: unknown): void {
   try {
     io.emit(event, data);
   } catch (error) {
-    console.error('[SOCKET] Error broadcasting to all:', (error as Error).message);
+    logger.error('SOCKET', 'Error broadcasting to all', { error: (error as Error).message });
   }
 }
 
@@ -215,7 +216,7 @@ export function disconnectSocket(socket: Socket, close: boolean = false): void {
       socket.disconnect(close);
     }
   } catch (error) {
-    console.error('[SOCKET] Error disconnecting socket:', (error as Error).message);
+    logger.error('SOCKET', 'Error disconnecting socket', { error: (error as Error).message });
   }
 }
 

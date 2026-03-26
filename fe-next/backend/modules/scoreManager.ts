@@ -5,6 +5,7 @@
  */
 
 import type { Avatar, WordDetail, LeaderboardEntry, GameUser, FirstFinderEntry } from '@/shared/types/game';
+import logger from '../utils/logger';
 
 // Base game interface for scoreManager - compatible with both Game and GameState
 
@@ -101,7 +102,7 @@ export function addPlayerWord(
 
   // Defensive check: ensure word is a valid string
   if (!word || typeof word !== 'string') {
-    console.warn(`[SCORE] addPlayerWord called with invalid word: ${word} for user ${username}`);
+    logger.warn('SCORE', 'addPlayerWord called with invalid word', { word, username });
     return;
   }
 

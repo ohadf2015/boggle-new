@@ -15,12 +15,11 @@
 import './preload';
 
 import 'dotenv/config';
+import { httpLogger } from './logger';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import * as http from 'http';
 import next from 'next';
-import * as url from 'url';
-
-import type { Server as SocketIOServer } from 'socket.io';
+import { parse as parseUrl } from 'url';
 
 // Server modules
 import { configureMiddleware } from './middleware';
@@ -52,6 +51,8 @@ import adminNotificationRoutes from '../backend/routes/adminNotification';
 import ugcPacksRoutes from '../backend/routes/ugcPacks';
 import ugcBoardsRoutes from '../backend/routes/ugcBoards';
 import playerProfileRoutes from '../backend/routes/playerProfile';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import { appRouter } from '../backend/trpc/root';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -109,10 +110,16 @@ async function start(): Promise<void> {
   app.use('/api/player-profile', playerProfileRoutes);
   app.use('/api', aiHintsRoutes);
 
+  // tRPC API — type-safe endpoints (alongside existing Express routes)
+  app.use('/api/trpc', createExpressMiddleware({
+    router: appRouter,
+    createContext: ({ req, res }) => ({ req, res }),
+  }));
+
   // Next.js request handler (catch-all)
   app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const parsedUrl = url.parse(req.url, true);
+      const parsedUrl = parseUrl(req.url, true);
       const { pathname } = parsedUrl;
 
       // Handle root path locale redirect
@@ -149,14 +156,12 @@ async function start(): Promise<void> {
 
   // Start listening
   httpServer.listen(PORT, HOST, () => {
-    console.log(`> Server ready on http://${HOST}:${PORT}`);
-    console.log(`> Socket.IO server ready`);
-    console.log(`> Environment: ${dev ? 'development' : 'production'}`);
+    httpLogger.info({ host: HOST, port: PORT, env: dev ? 'development' : 'production' }, 'Server ready');
   });
 }
 
 // Start the server
 start().catch((err: Error) => {
-  console.error('Failed to start server:', err);
+  httpLogger.fatal({ err }, 'Failed to start server');
   process.exit(1);
 });

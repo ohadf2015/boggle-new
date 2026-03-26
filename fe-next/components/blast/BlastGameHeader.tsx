@@ -130,7 +130,7 @@ export function BlastGameHeader({
             animate={{ scale: 1 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="border-3 border-neo-black rounded-neo shadow-hard px-3 py-1.5 min-w-[80px]"
-            style={{ background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)' }}
+            style={{ background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-lime) 100%)' }}
           >
             <div className="text-center">
               <div className="font-black text-neo-black text-xl sm:text-2xl leading-tight tabular-nums">

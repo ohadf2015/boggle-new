@@ -3,10 +3,13 @@
  * Security headers, CORS, and common middleware setup
  */
 
+import crypto from 'crypto';
 import compression from 'compression';
 import cors, { type CorsOptions } from 'cors';
 import express, { Application, Request, Response, NextFunction, RequestHandler } from 'express';
+import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
+import { httpLogger } from './logger';
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
@@ -30,7 +33,7 @@ export function createCorsOptions(corsOrigin: string, isDev: boolean): CorsOptio
     origin: (() => {
       if (corsOrigin === '*') {
         if (!isDev) {
-          console.error('FATAL: CORS_ORIGIN=* is not allowed in production. Set explicit origins.');
+          httpLogger.fatal('CORS_ORIGIN=* is not allowed in production. Set explicit origins.');
           return false;
         }
         return true;
@@ -47,17 +50,8 @@ export function createCorsOptions(corsOrigin: string, isDev: boolean): CorsOptio
  * @returns Express middleware
  */
 export function securityHeaders(isDev: boolean): RequestHandler {
-  const cspDev = "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://*.adtrafficquality.google https://*.doubleclick.net; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "img-src 'self' data: https: blob:; " +
-    "font-src 'self' data: https://fonts.gstatic.com; " +
-    "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google ws: wss:; " +
-    "worker-src 'self' blob:; " +
-    "frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; " +
-    "frame-ancestors 'none';";
-
-  const cspProd = "default-src 'self'; " +
+  // CSP is identical for dev and prod — kept as single string
+  const csp = "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://*.adtrafficquality.google https://*.doubleclick.net; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "img-src 'self' data: https: blob:; " +
@@ -85,7 +79,7 @@ export function securityHeaders(isDev: boolean): RequestHandler {
   ].join(', ');
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    res.setHeader('Content-Security-Policy', isDev ? cspDev : cspProd);
+    res.setHeader('Content-Security-Policy', csp);
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -100,21 +94,6 @@ export function securityHeaders(isDev: boolean): RequestHandler {
   };
 }
 
-/**
- * Request logging middleware (conditional based on environment)
- */
-function requestLogger(): RequestHandler {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    if (dev || process.env.ENABLE_REQUEST_LOGGING === 'true') {
-      const start = Date.now();
-      res.on('finish', () => {
-        const duration = Date.now() - start;
-        console.log(`[Request] ${req.method} ${req.url} | ${res.statusCode} | ${duration}ms`);
-      });
-    }
-    next();
-  };
-}
 
 /**
  * Caching headers middleware for static assets
@@ -125,11 +104,7 @@ function cacheHeaders(): RequestHandler {
     
     if (path.startsWith('/_next/static/') || path.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    } else if (path.startsWith('/_next/')) {
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    } else if (EXPRESS_API_ROUTES.some((route) => path.startsWith(route))) {
+    } else if (path.startsWith('/_next/') || EXPRESS_API_ROUTES.some((route) => path.startsWith(route))) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
@@ -261,6 +236,16 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // Disable x-powered-by header
   app.disable('x-powered-by');
 
+  // Request ID middleware
+  app.use((req: Request, res: Response, next: NextFunction): void => {
+    req.id = req.headers['x-request-id'] as string || crypto.randomUUID();
+    res.setHeader('X-Request-Id', req.id as string);
+    next();
+  });
+
+  // Structured HTTP logging (skip health checks)
+  app.use(pinoHttp({ logger: httpLogger, autoLogging: { ignore: (req) => req.url === '/health' || req.url === '/health/live' } }));
+
   // WWW redirect (must be first - before other middleware)
   app.use(wwwRedirect());
 
@@ -281,9 +266,6 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
     level: isDev ? 1 : 6,
     threshold: 1024
   }));
-
-  // Request logging (conditional)
-  app.use(requestLogger());
 
   // CORS
   app.use(cors(createCorsOptions(corsOrigin, isDev)));

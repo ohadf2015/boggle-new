@@ -221,7 +221,8 @@ export default function ResultsPodium({
       <div className="grid grid-cols-3 items-end gap-1 px-1 max-w-xs mx-auto">
         {LAYOUT_ORDER.map((configIdx, layoutIdx) => {
           const config = PODIUM_CONFIG[configIdx];
-          const player = top3[configIdx];
+          // Index by place (1-based) to match rank-sorted players array
+          const player = top3[config.place - 1];
 
           if (!player) {
             return <div key={`empty-${layoutIdx}`} />;

@@ -264,7 +264,7 @@ function resetGameForNewRound(gameCode: string): boolean {
 function cleanupEmptyRooms(): number {
   const emptyRooms = gameQueryManager.getEmptyRooms(games as unknown as Record<string, QueryGameBase>);
   for (const code of emptyRooms) {
-    console.log(`[CLEANUP] Removing empty room: ${code}`);
+    logger.info('CLEANUP', `Removing empty room: ${code}`);
     deleteGame(code);
   }
 
@@ -281,7 +281,7 @@ function cleanupEmptyRooms(): number {
 function cleanupStaleGames(maxAge = 30 * 60 * 1000): number {
   const staleCodes = gameQueryManager.getStaleGameCodes(games as unknown as Record<string, QueryGameBase>, maxAge);
   for (const code of staleCodes) {
-    console.log(`[CLEANUP] Removing stale game: ${code}`);
+    logger.info('CLEANUP', `Removing stale game: ${code}`);
     deleteGame(code);
   }
   return staleCodes.length;

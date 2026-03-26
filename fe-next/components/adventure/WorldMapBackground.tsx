@@ -76,7 +76,7 @@ export function WorldMapBackground({
     <>
       {/* Deep space background gradient */}
       <AdaptiveMotion.div
-        className="fixed inset-0 bg-gradient-to-b from-[#050510] via-[#0a0a2a] to-[#0d1033] pointer-events-none"
+        className="fixed inset-0 bg-gradient-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none"
         style={{ x: bgX, y: bgY }}
       />
 

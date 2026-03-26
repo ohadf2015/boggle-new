@@ -26,6 +26,7 @@ import {
 } from '@/utils/dailyChallenge/wikipediaWordProcessor';
 import { importWikipediaWordsToBank } from '@/lib/dailyChallenge/wordBankService';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import logger from '../utils/logger';
 
 // Re-export admin functions for backward compatibility
 export {
@@ -50,11 +51,10 @@ function logPipelineError(
   context: { word?: string; language?: Language; score?: number; candidateId?: string }
 ): void {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  console.error(`[WikiPopulator] ${operation} failed: ${errorMessage}`, {
+  logger.error('WikiPopulator', `${operation} failed: ${errorMessage}`, {
     operation,
     error: errorMessage,
     ...context,
-    timestamp: new Date().toISOString()
   });
 }
 
@@ -129,7 +129,7 @@ async function loadWordsFromJSON(
     const jsonPath = path.join(process.cwd(), 'data', 'wikipedia-words', `${language}.json`);
 
     if (!fs.existsSync(jsonPath)) {
-      console.log(`[WikiPopulator] No local JSON file found for ${language} at ${jsonPath}`);
+      logger.info('WikiPopulator', `No local JSON file found for ${language}`, { jsonPath });
       return null;
     }
 
@@ -140,11 +140,11 @@ async function loadWordsFromJSON(
       words: WikipediaWordData[];
     };
 
-    console.log(`[WikiPopulator] Loaded ${data.words.length} words from local JSON for ${language} (updated: ${data.lastUpdated})`);
+    logger.info('WikiPopulator', `Loaded ${data.words.length} words from local JSON for ${language}`, { lastUpdated: data.lastUpdated });
     return data.words;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[WikiPopulator] Error loading JSON file for ${language}:`, errorMessage);
+    logger.error('WikiPopulator', `Error loading JSON file for ${language}`, { error: errorMessage });
     return null;
   }
 }
@@ -167,20 +167,20 @@ export async function populateWikipediaWords(
   language: Language
 ): Promise<PopulationResult> {
   const dateStr = date.toISOString().split('T')[0];
-  console.log(`[WikiPopulator] Starting population for ${language} on ${dateStr}`);
+  logger.info('WikiPopulator', `Starting population for ${language} on ${dateStr}`);
 
   const recentlyUsed = await getRecentlyUsedWords(language, 30);
-  console.log(`[WikiPopulator] Found ${recentlyUsed.size} recently used words to avoid`);
+  logger.info('WikiPopulator', `Found ${recentlyUsed.size} recently used words to avoid`);
 
   const isProduction = process.env.NODE_ENV === 'production';
 
   if (isProduction) {
-    console.log(`[WikiPopulator] Production mode: trying local JSON first`);
+    logger.info('WikiPopulator', 'Production mode: trying local JSON first');
     const jsonResult = await tryLocalJSONSource(language, recentlyUsed, dateStr);
     if (jsonResult && jsonResult.candidates.length > 0) {
       return jsonResult;
     }
-    console.log(`[WikiPopulator] Local JSON unavailable, trying Wikipedia API`);
+    logger.info('WikiPopulator', 'Local JSON unavailable, trying Wikipedia API');
   }
 
   const wikipediaResult = await tryWikipediaSource(date, language, recentlyUsed);
@@ -205,14 +205,14 @@ export async function populateWikipediaWords(
   }
 
   if (!isProduction) {
-    console.log(`[WikiPopulator] Development mode: Wikipedia failed, trying local JSON`);
+    logger.info('WikiPopulator', 'Development mode: Wikipedia failed, trying local JSON');
     const jsonResult = await tryLocalJSONSource(language, recentlyUsed, dateStr);
     if (jsonResult && jsonResult.candidates.length > 0) {
       return jsonResult;
     }
   }
 
-  console.log(`[WikiPopulator] All sources failed, using static fallback for ${language}`);
+  logger.info('WikiPopulator', `All sources failed, using static fallback for ${language}`);
   return getFallbackWords(language, recentlyUsed);
 }
 
@@ -225,7 +225,7 @@ async function tryLocalJSONSource(
     const jsonWords = await loadWordsFromJSON(language);
     if (!jsonWords || jsonWords.length === 0) return null;
 
-    console.log(`[WikiPopulator] Processing ${jsonWords.length} words from local JSON`);
+    logger.info('WikiPopulator', `Processing ${jsonWords.length} words from local JSON`);
 
     const candidates = jsonWords
       .filter(w => !recentlyUsed.has(w.word))
@@ -234,7 +234,7 @@ async function tryLocalJSONSource(
       .slice(0, 50);
 
     if (candidates.length === 0) {
-      console.log(`[WikiPopulator] All JSON words were recently used`);
+      logger.info('WikiPopulator', 'All JSON words were recently used');
       return null;
     }
 
@@ -258,7 +258,7 @@ async function tryLocalJSONSource(
     return null;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[WikiPopulator] Error processing local JSON for ${language}:`, errorMessage);
+    logger.error('WikiPopulator', `Error processing local JSON for ${language}`, { error: errorMessage });
     return null;
   }
 }
@@ -273,16 +273,16 @@ async function tryWikipediaSource(
 
     if (featuredContent) {
       const rawCandidates = extractWordsFromFeaturedContent(featuredContent, language);
-      console.log(`[WikiPopulator] Extracted ${rawCandidates.length} raw candidates from featured content`);
+      logger.info('WikiPopulator', `Extracted ${rawCandidates.length} raw candidates from featured content`);
 
       if (rawCandidates.length > 0) {
         const rankedCandidates = rankWordsByInterest(rawCandidates, language);
-        console.log(`[WikiPopulator] Ranked ${rankedCandidates.length} valid candidates`);
+        logger.info('WikiPopulator', `Ranked ${rankedCandidates.length} valid candidates`);
         return { candidates: rankedCandidates };
       }
     }
 
-    console.log(`[WikiPopulator] No featured content, trying random articles for ${language}`);
+    logger.info('WikiPopulator', `No featured content, trying random articles for ${language}`);
     const randomArticles = await fetchRandomArticles(language, 10);
 
     if (randomArticles.length > 0) {
@@ -291,14 +291,14 @@ async function tryWikipediaSource(
         .map(a => ({ word: a.title, source: 'random', url: a.content_urls?.desktop?.page }));
 
       const rankedCandidates = rankWordsByInterest(rawCandidates, language);
-      console.log(`[WikiPopulator] Found ${rankedCandidates.length} candidates from random articles`);
+      logger.info('WikiPopulator', `Found ${rankedCandidates.length} candidates from random articles`);
       return { candidates: rankedCandidates };
     }
 
     return null;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[WikiPopulator] Wikipedia fetch error for ${language}:`, errorMessage);
+    logger.error('WikiPopulator', `Wikipedia fetch error for ${language}`, { error: errorMessage });
     return null;
   }
 }
@@ -309,7 +309,7 @@ async function isWordInDictionary(word: string, language: Language): Promise<boo
     const result = await gameAIService.checkDatabaseOnly(word, language);
     return result.source === 'database' && result.isValid;
   } catch (error) {
-    console.warn(`[WikiPopulator] Dictionary check failed for ${word}:`, error);
+    logger.warn('WikiPopulator', `Dictionary check failed for ${word}`, { error });
     return false;
   }
 }
@@ -337,12 +337,12 @@ async function validateTopCandidates(
             try {
               const { gameAIService } = await import('@/lib/ai-service');
               await gameAIService.validateAndSaveWord(candidate.word, language);
-              console.log(`[WikiPopulator] Auto-promoted ${candidate.word} (score: ${candidate.score}) to dictionary`);
+              logger.info('WikiPopulator', `Auto-promoted ${candidate.word} to dictionary`, { score: candidate.score });
             } catch (promoError) {
               logPipelineError('auto-promotion', promoError, { word: candidate.word, language, score: candidate.score });
             }
           } else {
-            console.log(`[WikiPopulator] Word ${candidate.word} already in dictionary, skipping promotion`);
+            logger.info('WikiPopulator', `Word ${candidate.word} already in dictionary, skipping promotion`);
           }
         }
       } else {
@@ -357,16 +357,16 @@ async function validateTopCandidates(
         const formatResult = validateGameWord(candidate.word, language);
         if (formatResult.valid) {
           validated.push(candidate);
-          console.log(`[WikiPopulator] Added ${candidate.word} despite error (format valid, high score)`);
+          logger.info('WikiPopulator', `Added ${candidate.word} despite error (format valid, high score)`);
         }
       }
     }
   }
 
   if (errors.length > 0) {
-    console.warn(`[WikiPopulator] ${errors.length} candidates had errors:`,
-      errors.map(e => `${e.word}: ${e.error}`).join(', ')
-    );
+    logger.warn('WikiPopulator', `${errors.length} candidates had errors`, {
+      errors: errors.map(e => `${e.word}: ${e.error}`).join(', ')
+    });
   }
 
   if (validated.length > 0) {
@@ -375,9 +375,9 @@ async function validateTopCandidates(
       if (supabase) {
         const validWords = validated.map(c => c.word);
         const importResult = await importWikipediaWordsToBank(supabase, language, validWords);
-        console.log(
-          `[WikiPopulator] Auto-imported ${importResult.inserted} validated words to word bank (${importResult.skipped} skipped, ${importResult.errors} errors)`
-        );
+        logger.info('WikiPopulator', `Auto-imported ${importResult.inserted} validated words to word bank`, {
+          skipped: importResult.skipped, errors: importResult.errors
+        });
       }
     } catch (importError) {
       logPipelineError('word-bank-import', importError, { language });
@@ -395,7 +395,7 @@ function getFallbackWords(
   const availableWords = fallbackList.filter(word => !recentlyUsed.has(word));
 
   if (availableWords.length === 0) {
-    console.warn(`[WikiPopulator] All fallback words for ${language} were recently used`);
+    logger.warn('WikiPopulator', `All fallback words for ${language} were recently used`);
     return {
       wordsFound: fallbackList.length,
       source: 'fallback',

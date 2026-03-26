@@ -93,7 +93,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
           onClick={handleTelegramShare}
           whileTap={{ scale: 0.95 }}
           aria-label={`Share via ${t('share.telegram')}`}
-          className="h-11 px-3 flex items-center justify-center rounded-full border-2 border-neo-black bg-[#0088cc] text-white shadow-hard-sm transition-all"
+          className="h-11 px-3 flex items-center justify-center rounded-full border-2 border-neo-black bg-brand-telegram text-white shadow-hard-sm transition-all"
         >
           <TelegramIcon size={16} />
         </motion.button>

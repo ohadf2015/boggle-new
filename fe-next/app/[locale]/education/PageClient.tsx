@@ -253,7 +253,7 @@ export default function EducationPageClient() {
             animate="visible"
             className={cn(
               'relative rounded-neo-lg border-neo-thick border-neo-black overflow-hidden mb-8',
-              'bg-gradient-to-br from-neo-navy via-neo-navy to-[#2a2a4e]',
+              'bg-gradient-to-br from-neo-navy via-neo-navy to-neo-navy-elevated',
               'shadow-hard-lg p-6 sm:p-8',
             )}
           >

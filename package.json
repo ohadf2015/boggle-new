@@ -21,6 +21,8 @@
     "puppeteer": "^24.31.0"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.95.2",
+    "@tanstack/react-query-devtools": "^5.95.2",
     "@tanstack/react-virtual": "^3.13.13",
     "next": "^16.1.0",
     "react": "^19.2.0"

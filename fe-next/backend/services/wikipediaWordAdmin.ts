@@ -5,6 +5,7 @@
 
 import type { Language } from '@/shared/types/game';
 import { storeWikipediaWordCandidates } from './wikipediaWordFetcher';
+import logger from '../utils/logger';
 
 /**
  * Get word candidates for admin review from UNIFIED WORD BANK
@@ -42,7 +43,7 @@ export async function getWordCandidatesForAdmin(
     const { data, error } = await query;
 
     if (error) {
-      console.error('[WikiPopulator] Error fetching candidates for admin:', error.message);
+      logger.error('WikiPopulator', 'Error fetching candidates for admin', { error: error.message });
       return [];
     }
 
@@ -57,7 +58,7 @@ export async function getWordCandidatesForAdmin(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error fetching candidates for admin:', errorMessage);
+    logger.error('WikiPopulator', 'Error fetching candidates for admin', { error: errorMessage });
     return [];
   }
 }
@@ -92,7 +93,7 @@ export async function adminUpdateWordStatus(
       .eq('id', candidateId);
 
     if (error) {
-      console.error('[WikiPopulator] Error updating word status:', error.message);
+      logger.error('WikiPopulator', 'Error updating word status', { error: error.message });
       return false;
     }
 
@@ -100,7 +101,7 @@ export async function adminUpdateWordStatus(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error updating word status:', errorMessage);
+    logger.error('WikiPopulator', 'Error updating word status', { error: errorMessage });
     return false;
   }
 }
@@ -122,7 +123,7 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
       .eq('id', candidateId);
 
     if (error) {
-      console.error('[WikiPopulator] Error deleting word:', error.message);
+      logger.error('WikiPopulator', 'Error deleting word', { error: error.message });
       return false;
     }
 
@@ -130,7 +131,7 @@ export async function adminDeleteWordCandidate(candidateId: string): Promise<boo
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error deleting word:', errorMessage);
+    logger.error('WikiPopulator', 'Error deleting word', { error: errorMessage });
     return false;
   }
 }
@@ -171,7 +172,7 @@ export async function adminAddWordCandidate(
       .single();
 
     if (error) {
-      console.error('[WikiPopulator] Error adding word:', error.message);
+      logger.error('WikiPopulator', 'Error adding word', { error: error.message });
       return { success: false };
     }
 
@@ -179,7 +180,7 @@ export async function adminAddWordCandidate(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[WikiPopulator] Error adding word:', errorMessage);
+    logger.error('WikiPopulator', 'Error adding word', { error: errorMessage });
     return { success: false };
   }
 }
@@ -196,7 +197,7 @@ export async function syncLocalJSONToDatabase(
   const targetLanguages = language ? [language] : (['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as Language[]);
   const today = new Date();
 
-  console.log(`[WikiPopulator] Starting local JSON sync for: ${targetLanguages.join(', ')} (parallel processing)`);
+  logger.info('WikiPopulator', `Starting local JSON sync for: ${targetLanguages.join(', ')} (parallel processing)`);
   const startTime = Date.now();
 
   const syncPromises = targetLanguages.map(async (lang) => {
@@ -218,12 +219,12 @@ export async function syncLocalJSONToDatabase(
         }))
       );
 
-      console.log(`[WikiPopulator] Synced ${jsonWords.length} words from JSON for ${lang}`);
+      logger.info('WikiPopulator', `Synced ${jsonWords.length} words from JSON for ${lang}`);
       return { lang, synced: jsonWords.length };
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`[WikiPopulator] Error syncing JSON for ${lang}:`, errorMsg);
+      logger.error('WikiPopulator', `Error syncing JSON for ${lang}`, { error: errorMsg });
       return { lang, synced: 0, error: errorMsg };
     }
   });
@@ -236,14 +237,14 @@ export async function syncLocalJSONToDatabase(
       const { lang, synced, error } = result.value;
       results[lang] = { synced, error };
     } else {
-      console.error('[WikiPopulator] Unexpected promise rejection:', result.reason);
+      logger.error('WikiPopulator', 'Unexpected promise rejection', { reason: result.reason });
     }
   }
 
   const duration = Date.now() - startTime;
   const allSuccess = Object.values(results).every(r => !r.error || r.synced > 0);
 
-  console.log(`[WikiPopulator] JSON sync completed in ${duration}ms (success: ${allSuccess})`);
+  logger.info('WikiPopulator', `JSON sync completed in ${duration}ms`, { success: allSuccess });
 
   return { success: allSuccess, results };
 }

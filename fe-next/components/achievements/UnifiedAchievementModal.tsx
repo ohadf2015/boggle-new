@@ -247,7 +247,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn('text-2xl font-black text-center mb-2')}
-            style={{ color: tierColors?.text || '#BFFF00' }}
+            style={{ color: tierColors?.text || 'var(--neo-lime)' }}
           >
             {normalized.name}
           </motion.h3>

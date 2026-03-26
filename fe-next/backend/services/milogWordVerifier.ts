@@ -6,6 +6,7 @@
 
 import axios from 'axios';
 import { getRedisClient } from '../redisClient';
+import logger from '../utils/logger';
 
 // User-Agent for requests (be a good citizen)
 const MILOG_USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
@@ -215,7 +216,7 @@ async function fetchWithRetry(
 
       // Retry on network errors or timeouts
       if (attempt < retries) {
-        console.log(`[Milog] Retry ${attempt + 1}/${retries} after error: ${lastError.message}`);
+        logger.info('Milog', `Retry ${attempt + 1}/${retries} after error: ${lastError.message}`);
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * (attempt + 1)));
       }
     }
@@ -243,17 +244,17 @@ export async function verifyWordOnMilog(word: string): Promise<MilogVerification
       ]);
 
       if (cached) {
-        console.log(`[Milog] Using cached result for "${word}"`);
+        logger.debug('Milog', `Using cached result for "${word}"`);
         return JSON.parse(cached);
       }
     } catch (cacheError) {
-      console.warn(`[Milog] Redis cache check failed:`, cacheError instanceof Error ? cacheError.message : 'Unknown error');
+      logger.warn('Milog', 'Redis cache check failed', { error: cacheError instanceof Error ? cacheError.message : 'Unknown error' });
     }
   }
 
   try {
     const url = `https://milog.co.il/${encodeURIComponent(word)}`;
-    console.log(`[Milog] Verifying word: ${word}`);
+    logger.info('Milog', `Verifying word: ${word}`);
 
     const html = await fetchWithRetry(url, 10000);
     const result = parseVerificationResult(html, word);
@@ -268,14 +269,14 @@ export async function verifyWordOnMilog(word: string): Promise<MilogVerification
           ),
         ]);
       } catch (cacheWriteError) {
-        console.warn(`[Milog] Redis cache write failed:`, cacheWriteError instanceof Error ? cacheWriteError.message : 'Unknown error');
+        logger.warn('Milog', 'Redis cache write failed', { error: cacheWriteError instanceof Error ? cacheWriteError.message : 'Unknown error' });
       }
     }
 
     return result;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[Milog] Error verifying word "${word}":`, errorMessage);
+    logger.error('Milog', `Error verifying word "${word}"`, { error: errorMessage });
 
     // On 404, word definitely doesn't exist
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -361,16 +362,16 @@ export async function processMilogVerificationQueue(
     );
 
     if (fetchError) {
-      console.error('[Milog] Error fetching verification queue:', fetchError.message);
+      logger.error('Milog', 'Error fetching verification queue', { error: fetchError.message });
       throw fetchError;
     }
 
     if (!words || words.length === 0) {
-      console.log('[Milog] No words in verification queue');
+      logger.info('Milog', 'No words in verification queue');
       return result;
     }
 
-    console.log(`[Milog] Processing ${words.length} words from queue`);
+    logger.info('Milog', `Processing ${words.length} words from queue`);
 
     // Process each word
     for (const wordRecord of words) {
@@ -388,33 +389,33 @@ export async function processMilogVerificationQueue(
         });
 
         if (updateError) {
-          console.error(`[Milog] Error updating verification for "${wordRecord.word}":`, updateError.message);
+          logger.error('Milog', `Error updating verification for "${wordRecord.word}"`, { error: updateError.message });
           result.errors++;
         } else {
           result.processed++;
           if (verificationResult.verified) {
             result.verified++;
-            console.log(`[Milog] ✓ Verified: ${wordRecord.word} (${verificationResult.wordType || 'unknown'})`);
+            logger.info('Milog', `Verified: ${wordRecord.word}`, { wordType: verificationResult.wordType || 'unknown' });
           } else if (verificationResult.status === 'rejected_type') {
             result.rejectedType++;
-            console.log(`[Milog] ⊘ Rejected type: ${wordRecord.word} (${verificationResult.wordType})`);
+            logger.info('Milog', `Rejected type: ${wordRecord.word}`, { wordType: verificationResult.wordType });
           } else if (verificationResult.status === 'not_found') {
             result.notFound++;
-            console.log(`[Milog] ✗ Not found: ${wordRecord.word}`);
+            logger.info('Milog', `Not found: ${wordRecord.word}`);
           } else {
             result.errors++;
           }
         }
       } catch (wordError) {
-        console.error(`[Milog] Error processing word "${wordRecord.word}":`, wordError);
+        logger.error('Milog', `Error processing word "${wordRecord.word}"`, { error: wordError });
         result.errors++;
       }
     }
 
-    console.log(`[Milog] Queue processing complete: ${result.verified} verified, ${result.rejectedType} rejected_type, ${result.notFound} not found, ${result.errors} errors`);
+    logger.info('Milog', 'Queue processing complete', { verified: result.verified, rejectedType: result.rejectedType, notFound: result.notFound, errors: result.errors });
     return result;
   } catch (error) {
-    console.error('[Milog] Error processing verification queue:', error);
+    logger.error('Milog', 'Error processing verification queue', { error });
     throw error;
   }
 }
@@ -437,7 +438,7 @@ export async function getVerifiedWordsForPromotion(
     });
 
     if (error) {
-      console.error('[Milog] Error fetching verified words:', error.message);
+      logger.error('Milog', 'Error fetching verified words', { error: error.message });
       return [];
     }
 
@@ -447,7 +448,7 @@ export async function getVerifiedWordsForPromotion(
       url: d.milog_url,
     }));
   } catch (error) {
-    console.error('[Milog] Error fetching verified words:', error);
+    logger.error('Milog', 'Error fetching verified words', { error });
     return [];
   }
 }
@@ -463,7 +464,7 @@ export async function invalidateMilogCache(word: string): Promise<void> {
   try {
     await redis.del(`${REDIS_PREFIX}${word}`);
   } catch (error) {
-    console.warn(`[Milog] Failed to invalidate cache for "${word}":`, error instanceof Error ? error.message : 'Unknown error');
+    logger.warn('Milog', `Failed to invalidate cache for "${word}"`, { error: error instanceof Error ? error.message : 'Unknown error' });
   }
 }
 
@@ -483,13 +484,13 @@ export async function markWordPromoted(wordId: string): Promise<boolean> {
     });
 
     if (error) {
-      console.error('[Milog] Error marking word as promoted:', error.message);
+      logger.error('Milog', 'Error marking word as promoted', { error: error.message });
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('[Milog] Error marking word as promoted:', error);
+    logger.error('Milog', 'Error marking word as promoted', { error });
     return false;
   }
 }

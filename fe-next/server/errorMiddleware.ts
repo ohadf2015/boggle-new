@@ -6,6 +6,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as Sentry from '@sentry/nextjs';
 import { AppError } from '../backend/utils/errorHandler';
+import { httpLogger } from './logger';
 
 /**
  * Express error handler middleware
@@ -17,13 +18,7 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  // Log error details
-  console.error('[Express Error]:', {
-    message: error.message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method,
-  });
+  httpLogger.error({ err: error, url: req.url, method: req.method }, 'Express error');
 
   // Capture to Sentry (only in production)
   if (process.env.NODE_ENV === 'production') {

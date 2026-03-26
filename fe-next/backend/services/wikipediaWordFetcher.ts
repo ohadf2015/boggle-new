@@ -7,6 +7,7 @@
 import axios from 'axios';
 import { getRedisClient } from '../redisClient';
 import type { Language } from '@/shared/types/game';
+import logger from '../utils/logger';
 
 // Wikipedia API User-Agent (required by Wikimedia guidelines)
 const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
@@ -168,7 +169,7 @@ async function fetchWithRetry<T>(
 
       // Retry on network errors or timeouts
       if (attempt < retries) {
-        console.log(`[Wikipedia] Retry ${attempt + 1}/${retries} after error: ${lastError.message}`);
+        logger.info('Wikipedia', `Retry ${attempt + 1}/${retries} after error: ${lastError.message}`);
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * (attempt + 1)));
       }
     }
@@ -203,16 +204,16 @@ export async function fetchFeaturedContent(
           )
         ]);
         if (cached) {
-          console.log(`[Wikipedia] Using cached featured content for ${language} from ${dateStr}`);
+          logger.debug('Wikipedia', `Using cached featured content for ${language} from ${dateStr}`);
           return JSON.parse(cached);
         }
       } catch (cacheError) {
         // Log but continue without cache - don't let Redis issues block Wikipedia fetch
-        console.warn(`[Wikipedia] Redis cache check failed for ${language}:`, cacheError instanceof Error ? cacheError.message : 'Unknown error');
+        logger.warn('Wikipedia', `Redis cache check failed for ${language}`, { error: cacheError instanceof Error ? cacheError.message : 'Unknown error' });
       }
     }
 
-    console.log(`[Wikipedia] Fetching featured content for ${language} on ${dateStr}...`);
+    logger.info('Wikipedia', `Fetching featured content for ${language} on ${dateStr}...`);
     const startTime = Date.now();
 
     // Wikimedia REST API endpoint for featured content
@@ -225,7 +226,7 @@ export async function fetchFeaturedContent(
     const data = await fetchWithRetry<WikipediaFeaturedContent>(url, 30000);
 
     const apiResponseTime = Date.now() - startTime;
-    console.log(`[Wikipedia] Fetched featured content for ${language} in ${apiResponseTime}ms`);
+    logger.info('Wikipedia', `Fetched featured content for ${language} in ${apiResponseTime}ms`);
 
     // Cache in Redis for 24 hours (with timeout to prevent hanging)
     if (redis && data) {
@@ -238,7 +239,7 @@ export async function fetchFeaturedContent(
         ]);
       } catch (cacheWriteError) {
         // Log but don't fail - data was fetched successfully
-        console.warn(`[Wikipedia] Redis cache write failed for ${language}:`, cacheWriteError instanceof Error ? cacheWriteError.message : 'Unknown error');
+        logger.warn('Wikipedia', `Redis cache write failed for ${language}`, { error: cacheWriteError instanceof Error ? cacheWriteError.message : 'Unknown error' });
       }
     }
 
@@ -249,9 +250,9 @@ export async function fetchFeaturedContent(
 
     // 404 is common for non-English wikis on certain dates
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      console.log(`[Wikipedia] No featured content for ${language} on ${dateStr}`);
+      logger.info('Wikipedia', `No featured content for ${language} on ${dateStr}`);
     } else {
-      console.error(`[Wikipedia] Error fetching featured content for ${language}:`, errorMessage);
+      logger.error('Wikipedia', `Error fetching featured content for ${language}`, { error: errorMessage });
     }
 
     return null;
@@ -285,7 +286,7 @@ export async function fetchRandomArticles(
       return response.data;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`[Wikipedia] Error fetching random article for ${language}:`, errorMessage);
+      logger.error('Wikipedia', `Error fetching random article for ${language}`, { error: errorMessage });
       return null;
     }
   });
@@ -600,7 +601,7 @@ export async function storeWikipediaWordCandidates(
   candidates: Array<{ word: string; source: string; url?: string; score?: number }>
 ): Promise<void> {
   if (candidates.length === 0) {
-    console.log(`[Wikipedia] No candidates to store for ${language}`);
+    logger.info('Wikipedia', `No candidates to store for ${language}`);
     return;
   }
 
@@ -631,7 +632,7 @@ export async function storeWikipediaWordCandidates(
     let successCount = 0;
     let errorCount = 0;
 
-    console.log(`[Wikipedia] Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es) to unified word bank`);
+    logger.info('Wikipedia', `Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es) to unified word bank`);
 
     for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
       const batch = insertData.slice(i, i + BATCH_SIZE);
@@ -649,7 +650,7 @@ export async function storeWikipediaWordCandidates(
 
         if (error) {
           // Log but don't throw - continue with other batches
-          console.error(`[Wikipedia] Batch ${batchNum}/${totalBatches} upsert error for ${language}:`, error.message);
+          logger.error('Wikipedia', `Batch ${batchNum}/${totalBatches} upsert error for ${language}`, { error: error.message });
           errorCount += batch.length;
         } else {
           successCount += batch.length;
@@ -657,21 +658,21 @@ export async function storeWikipediaWordCandidates(
       } catch (batchError) {
         // Catch any unexpected errors and continue processing
         const errorMsg = batchError instanceof Error ? batchError.message : 'Unknown error';
-        console.error(`[Wikipedia] Batch ${batchNum}/${totalBatches} processing error for ${language}:`, errorMsg);
+        logger.error('Wikipedia', `Batch ${batchNum}/${totalBatches} processing error for ${language}`, { error: errorMsg });
         errorCount += batch.length;
         // Continue with next batch
       }
     }
 
     if (errorCount > 0) {
-      console.warn(`[Wikipedia] Stored ${successCount}/${candidates.length} candidates for ${language} (${errorCount} failed)`);
+      logger.warn('Wikipedia', `Stored ${successCount}/${candidates.length} candidates for ${language}`, { errorCount });
     } else {
-      console.log(`[Wikipedia] Stored ${candidates.length} word candidates for ${language} in unified word bank`);
+      logger.info('Wikipedia', `Stored ${candidates.length} word candidates for ${language} in unified word bank`);
     }
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Wikipedia] Error storing word candidates:', errorMessage);
+    logger.error('Wikipedia', 'Error storing word candidates', { error: errorMessage });
   }
 }
 
@@ -705,7 +706,7 @@ export async function getValidatedWikipediaWords(
       .limit(limit);
 
     if (error) {
-      console.error('[Wikipedia] Error fetching validated words:', error.message);
+      logger.error('Wikipedia', 'Error fetching validated words', { error: error.message });
       return [];
     }
 
@@ -717,7 +718,7 @@ export async function getValidatedWikipediaWords(
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Wikipedia] Error fetching validated words:', errorMessage);
+    logger.error('Wikipedia', 'Error fetching validated words', { error: errorMessage });
     return [];
   }
 }

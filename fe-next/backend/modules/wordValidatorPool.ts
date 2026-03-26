@@ -11,6 +11,7 @@ import fs from 'fs';
 import os from 'os';
 import { createWorker, WorkerLike, isBun } from './workerRuntime';
 import * as validator from './wordValidator';
+import logger from '../utils/logger';
 
 // Interfaces
 export interface WorkerMessage {
@@ -81,7 +82,7 @@ export class WordValidatorPool {
       .catch((error) => {
         // Reset so next call can retry instead of returning the rejected promise forever
         this.initPromise = null;
-        console.error('[WORKER POOL] Initialization failed, will retry on next call:', error);
+        logger.error('WORKER_POOL', 'Initialization failed, will retry on next call', error);
         // Fall back to sync mode for this attempt
         this.syncOnly = true;
       });
@@ -94,13 +95,13 @@ export class WordValidatorPool {
 
     // Skip worker creation if the worker file doesn't exist (uses sync fallback)
     if (!fs.existsSync(workerPath)) {
-      console.log('[WORKER POOL] Worker file not found, using direct synchronous validation');
+      logger.info('WORKER_POOL', 'Worker file not found, using direct synchronous validation');
       this.syncOnly = true;
       return;
     }
 
     const runtime = isBun ? 'Bun' : 'Node.js';
-    console.log(`[WORKER POOL] Initializing with ${runtime} runtime...`);
+    logger.info('WORKER_POOL', `Initializing with ${runtime} runtime...`);
 
     for (let i = 0; i < POOL_SIZE; i++) {
       try {
@@ -114,14 +115,14 @@ export class WordValidatorPool {
         this.availableWorkers.push(worker);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.warn(`[WORKER POOL] Failed to create worker ${i}:`, errorMessage);
+        logger.warn('WORKER_POOL', `Failed to create worker ${i}`, { error: errorMessage });
       }
     }
 
     if (this.workers.length > 0) {
-      console.log(`[WORKER POOL] Initialized with ${this.workers.length} workers (${runtime})`);
+      logger.info('WORKER_POOL', `Initialized with ${this.workers.length} workers`, { runtime });
     } else {
-      console.warn('[WORKER POOL] No workers available, falling back to sync mode');
+      logger.warn('WORKER_POOL', 'No workers available, falling back to sync mode');
       this.syncOnly = true;
     }
   }
@@ -153,7 +154,7 @@ export class WordValidatorPool {
    * Handle worker error
    */
   private _handleWorkerError(worker: WorkerLike, error: Error): void {
-    console.error('[WORKER POOL] Worker error:', error.message);
+    logger.error('WORKER_POOL', 'Worker error', { error: error.message });
     this._removeWorker(worker);
   }
 
@@ -162,7 +163,7 @@ export class WordValidatorPool {
    */
   private _handleWorkerExit(worker: WorkerLike, code: number): void {
     if (code !== 0) {
-      console.warn(`[WORKER POOL] Worker exited with code ${code}`);
+      logger.warn('WORKER_POOL', `Worker exited with code ${code}`);
     }
     this._removeWorker(worker);
   }
@@ -291,7 +292,7 @@ export class WordValidatorPool {
       }) as boolean;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
+      logger.warn('WORKER_POOL', 'Falling back to sync', { error: errorMessage });
       return validator.isWordOnBoard(word, board, safePositions);
     }
   }
@@ -320,7 +321,7 @@ export class WordValidatorPool {
       }) as GridPosition[] | null;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
+      logger.warn('WORKER_POOL', 'Falling back to sync', { error: errorMessage });
       return validator.getWordPath(word, board, safePositions);
     }
   }
@@ -340,7 +341,7 @@ export class WordValidatorPool {
       return new Map(entries);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
+      logger.warn('WORKER_POOL', 'Falling back to sync', { error: errorMessage });
       return validator.makePositionsMap(board);
     }
   }
@@ -361,7 +362,7 @@ export class WordValidatorPool {
    * Shutdown the worker pool
    */
   async shutdown(): Promise<void> {
-    console.log('[WORKER POOL] Shutting down...');
+    logger.info('WORKER_POOL', 'Shutting down...');
 
     // Clear pending tasks
     for (const [id, task] of this.pendingTasks) {
@@ -385,7 +386,7 @@ export class WordValidatorPool {
     this.isInitialized = false;
     this.initPromise = null;
 
-    console.log('[WORKER POOL] Shutdown complete');
+    logger.info('WORKER_POOL', 'Shutdown complete');
   }
 }
 

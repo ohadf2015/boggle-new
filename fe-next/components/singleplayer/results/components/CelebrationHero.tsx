@@ -92,7 +92,7 @@ export const CelebrationHero = memo(function CelebrationHero({
           'relative overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]',
           // Full-width transparent gradient zone - no border, no shadow
           isWinner
-            ? 'bg-gradient-to-b from-[#BFFF00]/10 via-transparent to-transparent'
+            ? 'bg-gradient-to-b from-neo-lime/10 via-transparent to-transparent'
             : styleKey === 'zero'
               ? 'bg-gradient-to-b from-white/5 via-transparent to-transparent'
               : 'bg-gradient-to-b from-neo-pink/10 via-transparent to-transparent',

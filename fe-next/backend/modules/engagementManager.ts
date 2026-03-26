@@ -4,6 +4,7 @@
  */
 
 import { getSupabase } from './supabaseServer';
+import logger from '../utils/logger';
 import type {
   StreakBonus, StreakBonusWithDays, CalendarReward, LoginResult,
   CalendarStatus, EngagementStatus, MysteryRewardResult,
@@ -56,7 +57,7 @@ export async function recordLogin(playerId: string): Promise<LoginResult> {
       .select().single();
 
     if (error) {
-      console.error('[Engagement] Error creating record:', error.message || 'Unknown error');
+      logger.error('Engagement', 'Error creating record', { error: error.message || 'Unknown error' });
       return { streak: 1, isNewStreak: true, bonuses: [] };
     }
     return { streak: 1, isNewStreak: true, bonuses: [] };

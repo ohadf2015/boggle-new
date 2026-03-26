@@ -59,8 +59,7 @@ export async function initializeServer(io: Server): Promise<void> {
     await wordValidatorPool.initialize();
     lifecycleLogger.info('Worker pool warmed up');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    lifecycleLogger.warn({ err: errorMessage }, 'Failed to warm up worker pool');
+    lifecycleLogger.warn({ err: error }, 'Failed to warm up worker pool');
   }
 
   // Start all cron schedulers (Wikipedia, Daily Words, Bot Difficulty)
@@ -68,8 +67,7 @@ export async function initializeServer(io: Server): Promise<void> {
     cronTasks = startAllCronJobs();
     lifecycleLogger.info({ count: cronTasks.length }, 'Started cron schedulers');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    lifecycleLogger.error({ err: errorMessage }, 'Failed to start cron schedulers');
+    lifecycleLogger.error({ err: error }, 'Failed to start cron schedulers');
   }
 }
 
@@ -95,23 +93,21 @@ export function setupEventLoopMonitoring(): void {
 async function persistAllActiveGames(): Promise<void> {
   try {
     const gameCodes = gameStateManager.getAllGameCodes();
-    console.log(`[SHUTDOWN] Persisting ${gameCodes.length} active game(s) to Redis...`);
+    lifecycleLogger.info({ count: gameCodes.length }, 'Persisting active games to Redis');
     
     const persistPromises = gameCodes.map(async (gameCode) => {
       try {
         await gameStateManager.persistGameStateNow(gameCode);
-        console.log(`[SHUTDOWN] Persisted game ${gameCode}`);
+        lifecycleLogger.info({ gameCode }, 'Persisted game');
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`[SHUTDOWN] Failed to persist game ${gameCode}:`, errorMessage);
+        lifecycleLogger.error({ gameCode, err: error }, 'Failed to persist game');
       }
     });
 
     await Promise.all(persistPromises);
-    console.log(`[SHUTDOWN] Successfully persisted ${gameCodes.length} game(s) to Redis`);
+    lifecycleLogger.info({ count: gameCodes.length }, 'Successfully persisted all games to Redis');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[SHUTDOWN] Error persisting games:', errorMessage);
+    lifecycleLogger.error({ err: error }, 'Error persisting games');
   }
 }
 
@@ -129,7 +125,7 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     if (isShuttingDown) return;
     isShuttingDown = true;
 
-    console.log('[SHUTDOWN] Starting graceful shutdown...');
+    lifecycleLogger.info('Starting graceful shutdown');
 
     // Clear all cleanup timers and health checks
     clearCleanupTimers();
@@ -140,7 +136,7 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     await persistAllActiveGames();
 
     // Stop accepting new connections
-    httpServer.close(() => console.log('[SHUTDOWN] HTTP server closed'));
+    httpServer.close(() => lifecycleLogger.info('HTTP server closed'));
 
     // Notify clients about shutdown
     io.emit('serverShutdown', { reconnectIn: 5000, message: 'Server is restarting' });
@@ -149,36 +145,34 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     // Shutdown worker pool
     try {
       await wordValidatorPool.shutdown();
-      console.log('[SHUTDOWN] Worker pool closed');
+      lifecycleLogger.info('Worker pool closed');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[SHUTDOWN] Error closing worker pool:', errorMessage);
+      lifecycleLogger.error({ err }, 'Error closing worker pool');
     }
 
     // Stop all cron schedulers
     try {
       if (cronTasks.length > 0) {
         stopAllCronJobs(cronTasks);
-        console.log(`[SHUTDOWN] Stopped ${cronTasks.length} cron schedulers`);
+        lifecycleLogger.info({ count: cronTasks.length }, 'Stopped cron schedulers');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[SHUTDOWN] Error stopping cron schedulers:', errorMessage);
+      lifecycleLogger.error({ err }, 'Error stopping cron schedulers');
     }
 
     // Close socket connections
-    io.close(() => console.log('[SHUTDOWN] Socket.IO server closed'));
+    io.close(() => lifecycleLogger.info('Socket.IO server closed'));
 
     // Clean up Redis adapter clients
     await cleanupRedisAdapter(extendedIo);
 
     // Force exit after timeout
     setTimeout(() => {
-      console.log('[SHUTDOWN] Forcing exit after timeout');
+      lifecycleLogger.warn('Forcing exit after timeout');
       process.exit(0);
     }, 10000);
 
-    console.log('[SHUTDOWN] Server shutdown complete');
+    lifecycleLogger.info('Server shutdown complete');
     process.exit(0);
   };
 }
@@ -199,7 +193,7 @@ export function registerShutdownHandlers(shutdownHandler: ShutdownHandler): void
 export function registerProcessErrorHandlers(): void {
   // Capture unhandled promise rejections
   process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
-    console.error('[PROCESS] Unhandled Promise Rejection:', reason);
+    lifecycleLogger.error({ err: reason }, 'Unhandled Promise Rejection');
 
     // Capture to Sentry in production
     if (process.env.NODE_ENV === 'production') {
@@ -222,7 +216,7 @@ export function registerProcessErrorHandlers(): void {
 
   // Capture uncaught exceptions
   process.on('uncaughtException', (error: Error) => {
-    console.error('[PROCESS] Uncaught Exception:', error);
+    lifecycleLogger.fatal({ err: error }, 'Uncaught Exception');
 
     // Capture to Sentry in production
     if (process.env.NODE_ENV === 'production') {
@@ -241,7 +235,7 @@ export function registerProcessErrorHandlers(): void {
 
   // Capture warnings (non-fatal)
   process.on('warning', (warning: Error) => {
-    console.warn('[PROCESS] Warning:', warning.name, warning.message);
+    lifecycleLogger.warn({ warningName: warning.name }, warning.message);
 
     // Only capture high-severity warnings to Sentry in production
     if (

@@ -503,7 +503,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {overlayModals}
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"
-        style={{ background: 'radial-gradient(circle at center, #1e1e3f 0%, #1a1a2e 70%)' }}
+        style={{ background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)' }}
       >
         {/* Subtle dot pattern */}
         <div

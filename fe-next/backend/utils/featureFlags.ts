@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import logger from './logger';
 
 // Lazy initialization to avoid build-time errors when env vars are missing
 let supabase: SupabaseClient | null = null;
@@ -30,7 +31,7 @@ export interface FeatureFlag {
 export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | null> {
   const client = getSupabase();
   if (!client) {
-    console.warn('Supabase not configured - feature flags unavailable');
+    logger.warn('FLAGS', 'Supabase not configured - feature flags unavailable');
     return null;
   }
 
@@ -43,14 +44,14 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | nu
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error(`Error fetching feature flag ${flagName}:`, errorMessage);
+      logger.error('FLAGS', `Error fetching feature flag ${flagName}`, { error: errorMessage });
       return null;
     }
 
     return data;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error fetching feature flag ${flagName}:`, errorMessage);
+    logger.error('FLAGS', `Error fetching feature flag ${flagName}`, { error: errorMessage });
     return null;
   }
 }
@@ -111,7 +112,7 @@ export async function canAccessFeature(
     return (userHash % 100) < flag.rollout_percentage;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error checking feature access for ${flagName}:`, errorMessage);
+    logger.error('FLAGS', `Error checking feature access for ${flagName}`, { error: errorMessage });
     return false;
   }
 }
@@ -134,14 +135,14 @@ async function checkIsAdmin(userId: string): Promise<boolean> {
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error(`Error checking admin status for user ${userId}:`, errorMessage);
+      logger.error('FLAGS', `Error checking admin status for user ${userId}`, { error: errorMessage });
       return false;
     }
 
     return data?.is_admin === true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error checking admin status:`, errorMessage);
+    logger.error('FLAGS', 'Error checking admin status', { error: errorMessage });
     return false;
   }
 }
@@ -169,7 +170,7 @@ export async function setFeatureFlag(
 ): Promise<boolean> {
   const client = getSupabase();
   if (!client) {
-    console.error('Supabase not configured - cannot set feature flags');
+    logger.error('FLAGS', 'Supabase not configured - cannot set feature flags');
     return false;
   }
 
@@ -185,14 +186,14 @@ export async function setFeatureFlag(
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error(`Error setting feature flag ${flagName}:`, errorMessage);
+      logger.error('FLAGS', `Error setting feature flag ${flagName}`, { error: errorMessage });
       return false;
     }
 
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error setting feature flag:`, errorMessage);
+    logger.error('FLAGS', 'Error setting feature flag', { error: errorMessage });
     return false;
   }
 }
@@ -205,7 +206,7 @@ export async function setFeatureFlag(
 export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
   const client = getSupabase();
   if (!client) {
-    console.error('Supabase not configured - cannot delete feature flags');
+    logger.error('FLAGS', 'Supabase not configured - cannot delete feature flags');
     return false;
   }
 
@@ -217,14 +218,14 @@ export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error(`Error deleting feature flag ${flagName}:`, errorMessage);
+      logger.error('FLAGS', `Error deleting feature flag ${flagName}`, { error: errorMessage });
       return false;
     }
 
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error deleting feature flag:`, errorMessage);
+    logger.error('FLAGS', 'Error deleting feature flag', { error: errorMessage });
     return false;
   }
 }
@@ -236,7 +237,7 @@ export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
 export async function listFeatureFlags(): Promise<FeatureFlag[]> {
   const client = getSupabase();
   if (!client) {
-    console.warn('Supabase not configured - feature flags unavailable');
+    logger.warn('FLAGS', 'Supabase not configured - feature flags unavailable');
     return [];
   }
 
@@ -248,14 +249,14 @@ export async function listFeatureFlags(): Promise<FeatureFlag[]> {
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
-      console.error('Error listing feature flags:', errorMessage);
+      logger.error('FLAGS', 'Error listing feature flags', { error: errorMessage });
       return [];
     }
 
     return data || [];
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error listing feature flags:', errorMessage);
+    logger.error('FLAGS', 'Error listing feature flags', { error: errorMessage });
     return [];
   }
 }

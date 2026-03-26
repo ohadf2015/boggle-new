@@ -4,6 +4,7 @@
  */
 
 import { getSupabase } from './supabaseServer';
+import logger from '../utils/logger';
 
 // Challenge type definitions
 export const CHALLENGE_TYPES = {
@@ -216,7 +217,7 @@ export async function generateDailyChallenges(playerId: string): Promise<DailyCh
 
   if (error) {
     const errorMessage = error.message || 'Unknown error';
-    console.error('[DailyChallenges] Error generating challenges:', errorMessage);
+    logger.error('DailyChallenges', 'Error generating challenges', { error: errorMessage });
     return [];
   }
 

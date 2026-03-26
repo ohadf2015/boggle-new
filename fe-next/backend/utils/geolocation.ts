@@ -11,6 +11,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../redisClient';
+import logger from './logger';
 
 // ==========================================
 // Type Definitions
@@ -152,7 +153,7 @@ async function getCachedGeodata(ip: string): Promise<GeoData | null> {
         return JSON.parse(cached) as GeoData;
       }
     } catch (error) {
-      console.warn('[GEOLOCATION] Redis cache read error:', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Redis cache read error', { error: (error as Error).message });
     }
   }
 
@@ -175,7 +176,7 @@ async function cacheGeodata(ip: string, data: GeoData): Promise<void> {
     try {
       await redis.setex(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
     } catch (error) {
-      console.warn('[GEOLOCATION] Redis cache write error:', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Redis cache write error', { error: (error as Error).message });
     }
   }
 
@@ -221,7 +222,7 @@ export async function lookupIP(ip: string): Promise<GeoData> {
 
     // Check if fetch is available (Node.js 18+ has global fetch)
     if (typeof fetch === 'undefined') {
-      console.warn('[GEOLOCATION] fetch is not available - returning null');
+      logger.warn('GEOLOCATION', 'fetch is not available - returning null');
       return {
         status: 'error',
         message: 'fetch not available',
@@ -244,7 +245,7 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     }
 
     if (!response.ok) {
-      console.warn('[GEOLOCATION] API returned HTTP', response.status);
+      logger.warn('GEOLOCATION', 'API returned HTTP error', { status: response.status });
       return {
         status: 'error',
         message: `HTTP ${response.status}`,
@@ -255,7 +256,7 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     const data = await response.json() as GeoData;
 
     if (data.status === 'fail') {
-      console.warn('[GEOLOCATION] API returned failure:', data.message);
+      logger.warn('GEOLOCATION', 'API returned failure', { message: data.message });
       return {
         status: 'fail',
         message: data.message,
@@ -275,16 +276,16 @@ export async function lookupIP(ip: string): Promise<GeoData> {
 
     // Cache the result (in background, don't await)
     cacheGeodata(ip, result).catch(err => {
-      console.warn('[GEOLOCATION] Cache write failed:', err.message);
+      logger.warn('GEOLOCATION', 'Cache write failed', { error: err.message });
     });
 
     return result;
   } catch (error) {
     // Handle AbortError specially for clearer logging
     if ((error as Error).name === 'AbortError') {
-      console.warn('[GEOLOCATION] Request timed out for', ip);
+      logger.warn('GEOLOCATION', 'Request timed out', { ip });
     } else {
-      console.warn('[GEOLOCATION] Lookup failed for', ip, ':', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Lookup failed', { ip, error: (error as Error).message });
     }
     return {
       status: 'error',
@@ -345,7 +346,7 @@ export async function getCountryFromRequest(req: Request): Promise<CountryResult
     };
   } catch (error) {
     // Log the error but return a safe fallback - never throw
-    console.warn('[GEOLOCATION] getCountryFromRequest error:', (error as Error).message);
+    logger.warn('GEOLOCATION', 'getCountryFromRequest error', { error: (error as Error).message });
     return { countryCode: null, source: 'error', error: (error as Error).message };
   }
 }
@@ -399,7 +400,7 @@ export function geolocationMiddleware(options: GeolocationMiddlewareOptions = {}
       next();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[GEOLOCATION] Middleware error:', errorMessage);
+      logger.error('GEOLOCATION', 'Middleware error', { error: errorMessage });
       next(); // Continue even if geolocation fails
     }
   };

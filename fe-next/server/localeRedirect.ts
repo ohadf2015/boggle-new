@@ -5,6 +5,7 @@
 
 import type { Request, Response } from 'express';
 import type { UrlWithParsedQuery } from 'url';
+import { httpLogger } from './logger';
 
 /**
  * Extended Request with geo data
@@ -124,14 +125,14 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   if (isBot(userAgent)) {
     // SEO bots always get x-default locale (en) to match sitemap canonical
     const botLocale = isSeoCrawler(userAgent) ? 'en' : locale;
-    console.log(`[Crawler] Bot detected -> rewriting to /${botLocale}${queryString}`);
+    httpLogger.debug({ botLocale, queryString }, 'Bot detected, rewriting');
     parsedUrl.pathname = `/${botLocale}`;
     req.url = `/${botLocale}${queryString}`;
     return false; // Continue to Next.js handler
   }
 
   // For regular users: 301 permanent redirect (locale structure is permanent)
-  console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
+  httpLogger.debug({ from: req.url, to: `/${locale}${queryString}` }, 'Root path redirect');
   res.writeHead(301, { Location: `/${locale}${queryString}` });
   res.end();
   return true; // Request handled

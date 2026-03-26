@@ -31,7 +31,7 @@ type ComboRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 const RARITY_COLORS = {
   // Level 1-2: Common - Neon Green/Lime (electric green)
   common: {
-    gradient: 'bg-gradient-to-r from-[#39FF14] via-[#BFFF00] to-[#00FF7F]',
+    gradient: 'bg-gradient-to-r from-neo-lime via-neo-lime to-emerald-400',
     sparkles: ['#39FF14', '#BFFF00', '#00FF7F', '#7FFF00'], // neon green variants
     glow: 'linear-gradient(90deg, #39FF14, #BFFF00, #00FF7F)',
     shadow: 'rgba(57, 255, 20, 0.8)', // neon green glow
@@ -39,7 +39,7 @@ const RARITY_COLORS = {
   },
   // Level 3: Rare - Neon Cyan/Electric Blue
   rare: {
-    gradient: 'bg-gradient-to-r from-[#00FFFF] via-[#00F5FF] to-[#00BFFF]',
+    gradient: 'bg-gradient-to-r from-neo-cyan via-neo-cyan-light to-sky-400',
     sparkles: ['#00FFFF', '#00F5FF', '#00BFFF', '#7DF9FF'], // neon cyan variants
     glow: 'linear-gradient(90deg, #00FFFF, #00F5FF, #00BFFF)',
     shadow: 'rgba(0, 255, 255, 0.8)', // neon cyan glow
@@ -47,7 +47,7 @@ const RARITY_COLORS = {
   },
   // Level 4: Epic - Neon Magenta/Hot Pink
   epic: {
-    gradient: 'bg-gradient-to-r from-[#FF00FF] via-[#FF1493] to-[#FF00BF]',
+    gradient: 'bg-gradient-to-r from-fuchsia-500 via-neo-pink to-pink-500',
     sparkles: ['#FF00FF', '#FF1493', '#FF00BF', '#FF69B4'], // neon magenta variants
     glow: 'linear-gradient(90deg, #FF00FF, #FF1493, #FF00BF)',
     shadow: 'rgba(255, 0, 255, 0.8)', // neon magenta glow
@@ -55,7 +55,7 @@ const RARITY_COLORS = {
   },
   // Level 5-6: Legendary - Neon Yellow/Gold (electric gold)
   legendary: {
-    gradient: 'bg-gradient-to-r from-[#FFE135] via-[#FFFF00] to-[#FFD700]',
+    gradient: 'bg-gradient-to-r from-neo-yellow via-yellow-300 to-amber-400',
     sparkles: ['#FFE135', '#FFFF00', '#FFD700', '#FFC300'], // neon yellow/gold variants
     glow: 'linear-gradient(90deg, #FFE135, #FFFF00, #FFD700)',
     shadow: 'rgba(255, 225, 53, 0.9)', // neon yellow glow

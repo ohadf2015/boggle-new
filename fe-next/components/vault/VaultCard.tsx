@@ -170,7 +170,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
                     <div className="flex items-center gap-2">
                       <Trophy
                         size={14}
-                        style={{ color: MEDAL_COLORS[i] ?? '#FFFFFF' }}
+                        style={{ color: MEDAL_COLORS[i] ?? 'rgb(var(--neo-white))' }}
                       />
                       <span className="text-sm text-white font-medium truncate max-w-[120px]">
                         {entry.display_name ?? `Player ${i + 1}`}

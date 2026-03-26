@@ -41,7 +41,7 @@ export default function AdventureShopFAB({
         className={cn(
           'relative flex items-center gap-2.5',
           'pl-3.5 pr-2 py-2.5',
-          'bg-gradient-to-b from-neo-orange to-[#cc4e1a]',
+          'bg-gradient-to-b from-neo-orange to-neo-orange-hover',
           'text-neo-black font-neo-display font-black text-sm uppercase tracking-wider',
           'border-3 border-neo-black rounded-neo-lg',
           'shadow-hard-lg',

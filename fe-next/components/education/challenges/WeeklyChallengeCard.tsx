@@ -24,7 +24,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
   return (
     <div
       className="bg-neo-navy bg-opacity-80 border-neo-cyan border-3 rounded-neo shadow-hard p-4"
-      style={{ backgroundColor: 'rgba(26, 26, 46, 0.9)', borderColor: '#00FFFF' }}
+      style={{ backgroundColor: 'rgba(26, 26, 46, 0.9)', borderColor: 'var(--neo-cyan)' }}
       data-testid="weekly-challenge-card"
     >
       <div className="flex items-center justify-between mb-2">
