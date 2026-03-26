@@ -7,6 +7,8 @@ import { dictionaryRouter } from './routers/dictionary';
 import { analyticsRouter } from './routers/analytics';
 import { solveGridRouter } from './routers/solveGrid';
 import { ugcRouter } from './routers/ugc';
+import { adminRouter } from './routers/admin';
+import { singlePlayerLeaderboardRouter } from './routers/singlePlayerLeaderboard';
 
 export const appRouter = router({
   leaderboard: leaderboardRouter,
@@ -17,6 +19,8 @@ export const appRouter = router({
   analytics: analyticsRouter,
   solveGrid: solveGridRouter,
   ugc: ugcRouter,
+  admin: adminRouter,
+  singlePlayerLeaderboard: singlePlayerLeaderboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

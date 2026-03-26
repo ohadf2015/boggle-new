@@ -2,8 +2,7 @@ import { z } from 'zod';
 import { router, loggedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
-import { pushNotificationService } from '../../services/pushNotificationService';
-import type { GiftNotificationData, NotificationPayload } from '../../services/pushNotificationService';
+import { pushNotificationService, type GiftNotificationData, type NotificationPayload } from '../../services/pushNotificationService';
 
 const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseServer');
 
