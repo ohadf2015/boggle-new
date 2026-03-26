@@ -347,7 +347,7 @@ describe('useAdventureMusic', () => {
       const { Howl } = await import('howler');
       const capturedOnEndCallbacks: (() => void)[] = [];
 
-      Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
+      Howl.mockImplementation(function(config: { onend?: () => void; src?: string[] }) {
         // Only capture onend from adventure music tracks, not MusicProvider
         if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
           capturedOnEndCallbacks.push(config.onend);
@@ -387,7 +387,7 @@ describe('useAdventureMusic', () => {
       const { Howl } = await import('howler');
       const capturedOnEndCallbacks: (() => void)[] = [];
 
-      Howl.mockImplementation((config: { onend?: () => void; src?: string[] }) => {
+      Howl.mockImplementation(function(config: { onend?: () => void; src?: string[] }) {
         // Only capture onend from adventure music tracks, not MusicProvider
         if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
           capturedOnEndCallbacks.push(config.onend);
@@ -428,7 +428,7 @@ describe('useAdventureMusic', () => {
       const { Howl } = await import('howler');
       let capturedOnEnd: (() => void) | undefined;
 
-      Howl.mockImplementation((config: { onend?: () => void }) => {
+      Howl.mockImplementation(function(config: { onend?: () => void }) {
         if (config.onend) {
           capturedOnEnd = config.onend;
         }
@@ -467,7 +467,7 @@ describe('useAdventureMusic', () => {
       const { Howl } = await import('howler');
       let capturedOnEnd: (() => void) | undefined;
 
-      Howl.mockImplementation((config: { onend?: () => void }) => {
+      Howl.mockImplementation(function(config: { onend?: () => void }) {
         if (config.onend) {
           capturedOnEnd = config.onend;
         }

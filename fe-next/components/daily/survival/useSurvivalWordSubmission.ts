@@ -15,7 +15,7 @@ import {
   getLifeBonusForWord,
 } from './constants';
 import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
-import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import { MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { useSafeTimeout } from '@/hooks/useSafeTimeout';
@@ -147,6 +147,7 @@ export function useSurvivalWordSubmission({
   // Handle discovery feedback (for different-length words)
   const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
     if (word.length < MIN_DISCOVERY_WORD_LENGTH) return;
+    if (word.length > MAX_DISCOVERY_WORD_LENGTH) return;
 
     const feedback = getLetterFeedback(word, target, language);
 
@@ -177,6 +178,11 @@ export function useSurvivalWordSubmission({
   const handleWordDiscovery = useCallback(async (word: string) => {
     if (word.length < MIN_DISCOVERY_WORD_LENGTH) {
       showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`);
+      return;
+    }
+
+    if (word.length > MAX_DISCOVERY_WORD_LENGTH) {
+      showToast('too-long', t('wordHunt.feedback.tooLong') || `Maximum ${MAX_DISCOVERY_WORD_LENGTH} letters`);
       return;
     }
 

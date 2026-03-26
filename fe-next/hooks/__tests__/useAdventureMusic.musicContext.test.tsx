@@ -12,7 +12,7 @@ import { useAdventureMusic } from '../useAdventureMusic';
 import { MusicProvider, useMusic } from '@/contexts/MusicContext';
 
 // Mock Howler.js with volume tracking — use vi.hoisted for mock factory access
-const { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance } = vi.hoisted(() => {
+const { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance, resetLastVolume } = vi.hoisted(() => {
   const mockPlay = vi.fn();
   const mockStop = vi.fn();
   const mockPause = vi.fn();
@@ -23,17 +23,18 @@ const { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUn
   const mockLoad = vi.fn();
   const mockState = vi.fn().mockReturnValue('loaded');
   const mockPlaying = vi.fn().mockReturnValue(false);
-  let lastVolumeSet = 0;
+  const volumeState = { value: 0 };
   const mockHowlInstance = {
     play: mockPlay, stop: mockStop, pause: mockPause, fade: mockFade,
     volume: (vol?: number) => {
-      if (vol !== undefined) { lastVolumeSet = vol; mockVolumeSet(vol); }
-      return lastVolumeSet;
+      if (vol !== undefined) { volumeState.value = vol; mockVolumeSet(vol); }
+      return volumeState.value;
     },
     seek: mockSeek, unload: mockUnload, load: mockLoad,
     state: mockState, playing: mockPlaying,
   };
-  return { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance };
+  const resetLastVolume = () => { volumeState.value = 0; };
+  return { mockPlay, mockStop, mockPause, mockFade, mockVolumeSet, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance, resetLastVolume };
 });
 
 vi.mock('howler', () => ({
@@ -102,7 +103,7 @@ describe('useAdventureMusic MusicContext Integration', () => {
     vi.useFakeTimers();
     mockPlaying.mockReturnValue(false);
     mockState.mockReturnValue('loaded');
-    lastVolumeSet = 0;
+    resetLastVolume();
     localStorageMock.clear();
   });
 

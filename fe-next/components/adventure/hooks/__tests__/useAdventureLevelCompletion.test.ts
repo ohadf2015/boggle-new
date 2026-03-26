@@ -7,27 +7,28 @@
  * - Achievement recording and progress tracking
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureLevelCompletion } from '../useAdventureLevelCompletion';
 import { calculateAdventureXp } from '@/shared/utils/adventureXpUtils';
 
-jest.mock('@/shared/utils/adventureXpUtils');
-const mockCalculateAdventureXp = calculateAdventureXp as jest.MockedFunction<typeof calculateAdventureXp>;
+vi.mock('@/shared/utils/adventureXpUtils');
+const mockCalculateAdventureXp = calculateAdventureXp as any;
 
 describe('useAdventureLevelCompletion', () => {
-  const mockAwardXp = jest.fn().mockReturnValue({ leveledUp: false });
-  const mockAddGold = jest.fn();
-  const mockRecordAttempt = jest.fn();
-  const mockRecordCompletion = jest.fn();
-  const mockEndAIDirector = jest.fn();
-  const mockHandleEarnAchievement = jest.fn();
-  const mockPauseGame = jest.fn();
-  const mockShowVictory = jest.fn();
-  const mockShowDefeat = jest.fn();
-  const mockCompleteLevel = jest.fn();
-  const mockSaveCompletion = jest.fn().mockResolvedValue(true);
-  const mockEndBossBattle = jest.fn();
-  const mockTriggerBossTaunt = jest.fn();
+  const mockAwardXp = vi.fn().mockReturnValue({ leveledUp: false });
+  const mockAddGold = vi.fn();
+  const mockRecordAttempt = vi.fn();
+  const mockRecordCompletion = vi.fn();
+  const mockEndAIDirector = vi.fn();
+  const mockHandleEarnAchievement = vi.fn();
+  const mockPauseGame = vi.fn();
+  const mockShowVictory = vi.fn();
+  const mockShowDefeat = vi.fn();
+  const mockCompleteLevel = vi.fn();
+  const mockSaveCompletion = vi.fn().mockResolvedValue(true);
+  const mockEndBossBattle = vi.fn();
+  const mockTriggerBossTaunt = vi.fn();
 
   const defaultProps = {
     gameState: {
@@ -66,7 +67,7 @@ describe('useAdventureLevelCompletion', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCalculateAdventureXp.mockReturnValue(50);
   });
 

@@ -6,19 +6,20 @@
  * not on every comboCount increment.
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAdventureQuestTracking } from '../useAdventureQuestTracking';
 
 describe('useAdventureQuestTracking', () => {
-  const mockRecordQuestProgress = jest.fn();
+  const mockRecordQuestProgress = vi.fn();
   const mockChapterQuests = {
-    recordWordsFound: jest.fn(),
-    recordLongWord: jest.fn(),
-    recordStreakMaster: jest.fn(),
-    recordFlashChallengeMaster: jest.fn(),
-    recordWorldMechanicUse: jest.fn(),
+    recordWordsFound: vi.fn(),
+    recordLongWord: vi.fn(),
+    recordStreakMaster: vi.fn(),
+    recordFlashChallengeMaster: vi.fn(),
+    recordWorldMechanicUse: vi.fn(),
   };
-  const mockUpdateObjective = jest.fn();
+  const mockUpdateObjective = vi.fn();
 
   const defaultProps = {
     wordsFound: [],
@@ -36,7 +37,7 @@ describe('useAdventureQuestTracking', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('comboStreak quest (M3 fix)', () => {

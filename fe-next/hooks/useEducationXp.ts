@@ -17,6 +17,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import logger from '@/utils/logger';
 import {
   calculatePracticeXp,
   EDUCATION_XP_CONFIG,
@@ -169,7 +170,10 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
       });
     },
     onSuccess: () => setPendingUpdate(null),
-    // On error, pendingUpdate stays set for retry
+    onError: (err) => {
+      logger.error('useEducationXp: failed to record XP', err);
+      // pendingUpdate stays set for retry
+    },
   });
 
   // ==================== Derived State ====================

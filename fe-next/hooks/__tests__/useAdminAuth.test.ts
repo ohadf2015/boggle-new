@@ -4,7 +4,9 @@
  */
 
 import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAdminAuth } from '../useAdminAuth';
 import * as supabaseLib from '@/lib/supabase';
 import * as loggerModule from '@/utils/logger';
@@ -29,6 +31,9 @@ vi.mock('@/utils/logger', () => {
   };
 });
 
+let queryClient: QueryClient;
+let wrapper: ({ children }: { children: React.ReactNode }) => React.ReactElement;
+
 describe('useAdminAuth', () => {
   const mockToken = 'mock-jwt-token-12345';
   const mockSession = {
@@ -40,10 +45,14 @@ describe('useAdminAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: queryClient }, children);
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
+    queryClient.clear();
+    try { vi.runOnlyPendingTimers(); } catch { /* real timers active */ }
     vi.useRealTimers();
   });
 
@@ -55,7 +64,7 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       // THEN: Token should be initially null (loading)
       expect(result.current.authToken).toBeNull();
@@ -72,20 +81,19 @@ describe('useAdminAuth', () => {
     });
 
     test('should handle missing session', async () => {
-      // GIVEN: Supabase returns null session (will retry 3 times)
+      // GIVEN: Supabase returns null session (TanStack Query retries 3 times)
       (supabaseLib.getSession as any).mockResolvedValue({
         data: { session: null },
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
-      // Advance through retry delays (1s, 2s, 4s exponential backoff)
-      // Total: 4 attempts (initial + 3 retries)
+      // Advance through TanStack Query retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
           vi.advanceTimersByTime(1000 * Math.pow(2, i));
-          await Promise.resolve(); // Flush promises
+          await Promise.resolve();
         });
       }
 
@@ -99,7 +107,7 @@ describe('useAdminAuth', () => {
       expect(result.current.error).toBe('Session not available - please log in again');
       expect(loggerModule.default.warn).toHaveBeenCalledWith(
         'ADMIN_AUTH',
-        'No access token after max retries'
+        'No access token in session'
       );
     });
 
@@ -109,7 +117,7 @@ describe('useAdminAuth', () => {
       (supabaseLib.getSession as any).mockRejectedValue(sessionError);
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
@@ -124,13 +132,9 @@ describe('useAdminAuth', () => {
         expect(result.current.error).not.toBeNull();
       });
 
-      // THEN: Error should be set after max retries
+      // THEN: Error should be set after TanStack Query exhausts retries
       expect(result.current.authToken).toBeNull();
       expect(result.current.error).toBe('Session expired');
-      expect(loggerModule.default.error).toHaveBeenCalledWith(
-        'ADMIN_AUTH',
-        `Token fetch failed after max retries: Session expired`
-      );
     });
   });
 
@@ -142,18 +146,16 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       // Wait for initial token fetch
       await waitFor(() => {
         expect(result.current.authToken).toBe(mockToken);
       });
 
-      // THEN: Refresh interval should be set up
-      expect(loggerModule.default.debug).toHaveBeenCalledWith(
-        'ADMIN_AUTH',
-        'Setting up token refresh every 50 minutes'
-      );
+      // THEN: Token is available (TanStack Query handles refetchInterval internally)
+      expect(result.current.authToken).toBe(mockToken);
+      expect(result.current.error).toBeNull();
     });
 
     test('should auto-refresh token after 50 minutes', async () => {
@@ -164,7 +166,7 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.authToken).toBe(mockToken);
@@ -182,24 +184,15 @@ describe('useAdminAuth', () => {
         error: null,
       });
 
-      // WHEN: 50 minutes pass
+      // WHEN: 50 minutes pass (TanStack Query refetchInterval triggers)
       act(() => {
         vi.advanceTimersByTime(50 * 60 * 1000);
       });
 
-      // THEN: Token should be refreshed
+      // THEN: Token should be refreshed via TanStack Query's refetchInterval
       await waitFor(() => {
         expect(result.current.authToken).toBe(newToken);
       });
-
-      expect(loggerModule.default.debug).toHaveBeenCalledWith(
-        'ADMIN_AUTH',
-        'Auto-refreshing token'
-      );
-      expect(loggerModule.default.debug).toHaveBeenCalledWith(
-        'ADMIN_AUTH',
-        'Token refreshed successfully'
-      );
     });
 
     test('should not set up refresh interval if no token', async () => {
@@ -209,7 +202,7 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
@@ -242,7 +235,7 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.authToken).toBe(mockToken);
@@ -268,35 +261,42 @@ describe('useAdminAuth', () => {
 
       // THEN: Token should be refreshed
       expect(refreshedToken).toBe(newToken);
-      expect(result.current.authToken).toBe(newToken);
-      expect(loggerModule.default.debug).toHaveBeenCalledWith(
-        'ADMIN_AUTH',
-        'Refreshing admin token'
-      );
+      await waitFor(() => {
+        expect(result.current.authToken).toBe(newToken);
+      });
     });
 
     test('should set isRefreshing flag during manual refresh', async () => {
-      // GIVEN: Supabase returns a valid session
+      // GIVEN: Initial fetch succeeds
+      (supabaseLib.getSession as any).mockResolvedValue({
+        data: { session: mockSession },
+      });
+
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.authToken).toBe(mockToken);
+      });
+
+      // GIVEN: Next fetch hangs (manual refresh)
       let resolveSession: (value: unknown) => void;
       const sessionPromise = new Promise((resolve) => {
         resolveSession = resolve;
       });
-
       (supabaseLib.getSession as any).mockReturnValue(sessionPromise);
-
-      // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
 
       // WHEN: Manual refresh is triggered (but not resolved yet)
       act(() => {
         result.current.refreshToken();
       });
 
-      // THEN: isRefreshing should be true
-      expect(result.current.isRefreshing).toBe(true);
+      // THEN: isRefreshing should be true (isFetching && !isLoading)
+      await waitFor(() => {
+        expect(result.current.isRefreshing).toBe(true);
+      });
 
       // WHEN: Promise resolves
-      act(() => {
+      await act(async () => {
         resolveSession!({
           data: { session: mockSession },
           error: null,
@@ -306,9 +306,6 @@ describe('useAdminAuth', () => {
       await waitFor(() => {
         expect(result.current.isRefreshing).toBe(false);
       });
-
-      // THEN: isRefreshing should be false
-      expect(result.current.isRefreshing).toBe(false);
     });
 
     test('should handle refresh failure', async () => {
@@ -318,7 +315,7 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result } = renderHook(() => useAdminAuth());
+      const { result } = renderHook(() => useAdminAuth(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.authToken).toBe(mockToken);
@@ -332,33 +329,34 @@ describe('useAdminAuth', () => {
         .mockRejectedValueOnce(refreshError)
         .mockRejectedValueOnce(refreshError);
 
-      // WHEN: Manual refresh is triggered
-      let refreshPromise: Promise<string | null>;
-      act(() => {
-        refreshPromise = result.current.refreshToken();
+      // WHEN: Manual refresh is triggered — fetchTokenWithRetry throws after retries
+      let caughtError: Error | null = null;
+      const refreshPromise = result.current.refreshToken().catch((e: Error) => {
+        caughtError = e;
+        return null;
       });
 
       // Advance through retry delays (1s, 2s, 4s exponential backoff)
       for (let i = 0; i < 4; i++) {
         await act(async () => {
           vi.advanceTimersByTime(1000 * Math.pow(2, i));
-          await Promise.resolve(); // Flush promises
         });
       }
 
-      // Wait for refresh to complete
-      const refreshedToken = await refreshPromise!;
+      await act(async () => {
+        await refreshPromise;
+      });
 
-      // THEN: Refresh should fail gracefully after retries
-      expect(refreshedToken).toBeNull();
-      expect(result.current.error).toBe('Refresh failed');
+      // THEN: Refresh should fail — queryClient.fetchQuery propagates error
+      expect(caughtError).not.toBeNull();
+      expect(caughtError!.message).toBe('Refresh failed');
     });
   });
 
   describe('cleanup', () => {
-    test('should clear interval on unmount', async () => {
-      // Spy on clearInterval before rendering
-      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+    test('should clean up on unmount without errors', async () => {
+      // Use real timers for this test to avoid interaction with previous test's fake timer state
+      vi.useRealTimers();
 
       // GIVEN: Supabase returns a valid session
       (supabaseLib.getSession as any).mockResolvedValue({
@@ -366,23 +364,15 @@ describe('useAdminAuth', () => {
       });
 
       // WHEN: Hook is rendered
-      const { result, unmount } = renderHook(() => useAdminAuth());
+      const { result, unmount } = renderHook(() => useAdminAuth(), { wrapper });
 
-      // Wait for initial fetch and interval setup
       await waitFor(() => {
         expect(result.current.authToken).toBe(mockToken);
       });
 
-      // Clear previous spy calls (from interval setup)
-      clearIntervalSpy.mockClear();
-
-      // WHEN: Component unmounts
-      unmount();
-
-      // THEN: Interval should be cleared
-      expect(clearIntervalSpy).toHaveBeenCalled();
-
-      clearIntervalSpy.mockRestore();
+      // WHEN: Component unmounts — should not throw
+      // TanStack Query handles refetchInterval cleanup internally
+      expect(() => unmount()).not.toThrow();
     });
   });
 });

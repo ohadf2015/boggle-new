@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { queryKeys } from '@/lib/queryKeys';
+import logger from '@/utils/logger';
 
 interface BadgeInfo {
   id: string;
@@ -67,7 +69,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
 
   // Query: unclaimed count
   const countQuery = useQuery({
-    queryKey: ['gifts', 'unclaimed-count'],
+    queryKey: queryKeys.gifts.unclaimedCount(),
     queryFn: async () => {
       const response = await fetch('/api/player/gifts/unclaimed-count');
       if (response.status === 401) return { count: 0 };
@@ -100,7 +102,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
 
   // Query: full gift list (only when count > 0)
   const giftsQuery = useQuery({
-    queryKey: ['gifts', 'list'],
+    queryKey: queryKeys.gifts.list(),
     queryFn: async () => {
       const response = await fetch('/api/player/gifts');
       if (response.status === 401) return { gifts: [] };
@@ -148,6 +150,9 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
         return next;
       });
     },
+    onError: (err) => {
+      logger.error('useUnclaimedGifts: claim failed', err);
+    },
   });
 
   const claimGift = useCallback(async (giftId: string) => {
@@ -157,7 +162,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
 
   const refresh = useCallback(async () => {
     if (typeof window !== 'undefined') localStorage.removeItem(CACHE_KEY);
-    await queryClient.invalidateQueries({ queryKey: ['gifts'] });
+    await queryClient.invalidateQueries({ queryKey: queryKeys.gifts._def });
   }, [queryClient]);
 
   // Reset when not authenticated

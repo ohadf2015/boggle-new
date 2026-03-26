@@ -1,18 +1,18 @@
 /**
- * Tests for Word Hunt minimum word length enforcement
+ * Tests for Word Hunt minimum/maximum word length enforcement
  *
  * Two distinct minimums:
  * 1. Target word: 4+ letters (except Japanese 2+) - enforced during puzzle generation
- * 2. Discovery words: 2+ letters for ALL languages - players can find short words
+ * 2. Discovery words: 3-8 letters - filters trivial 2-letter entries and absurdly long paths
  *
  * Expected Behavior:
- * - For all languages: Accept 2+ letter discovered words
+ * - For all languages: Accept 3-8 letter discovered words
  * - Target word generation enforces 4+ (except Japanese) separately
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
-import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 // Mock contexts and hooks
 jest.mock('@/contexts/AuthContext', () => ({
@@ -99,8 +99,12 @@ describe('Word Hunt Minimum Word Length', () => {
       expect(MIN_ANSWER_LENGTH.ja).toBe(2);
     });
 
-    it('should have discovery word minimum of 2', () => {
-      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(2);
+    it('should have discovery word minimum of 3', () => {
+      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(3);
+    });
+
+    it('should have discovery word maximum of 8', () => {
+      expect(MAX_DISCOVERY_WORD_LENGTH).toBe(8);
     });
   });
 
@@ -121,20 +125,17 @@ describe('Word Hunt Minimum Word Length', () => {
       expect(result.current[0].discoveredWords).toHaveLength(0);
     });
 
-    it('should NOT reject 2-letter English words as too-short', async () => {
+    it('should reject 2-letter English words as too-short', async () => {
       const { result } = renderHook(() =>
         useSurvivalGameLogic(createProps('en'))
       );
 
       act(() => {
-        // Submit a 2-letter word - should NOT be rejected as too-short
-        // (may be rejected for other reasons like not-on-board or not-in-dictionary)
         result.current[1].handleWordSubmit('AB');
       });
 
       await waitFor(() => {
-        // Should NOT show too-short toast for 2-letter words
-        expect(result.current[0].feedbackType).not.toBe('too-short');
+        expect(result.current[0].feedbackType).toBe('too-short');
       });
     });
 
@@ -167,7 +168,7 @@ describe('Word Hunt Minimum Word Length', () => {
       });
     });
 
-    it('should accept 2-letter Japanese words', async () => {
+    it('should accept 3-letter Japanese words', async () => {
       const japaneseGrid = [
         ['ゆ', 'れ', 'あ', 'い'],
         ['う', 'え', 'お', 'か'],
@@ -184,7 +185,7 @@ describe('Word Hunt Minimum Word Length', () => {
       const { result } = renderHook(() => useSurvivalGameLogic(props));
 
       act(() => {
-        result.current[1].handleWordSubmit('ゆれ');
+        result.current[1].handleWordSubmit('ゆれあ');
       });
 
       await waitFor(() => {

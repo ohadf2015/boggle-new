@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 import {
   createWordReviewData,
   calculateNextReview,
@@ -111,7 +112,7 @@ export function useSpacedRepetition(
 
   // Fetch DB schedule via useQuery
   const dbQuery = useQuery({
-    queryKey: ['spaced-repetition', lessonId, wordsKey],
+    queryKey: queryKeys.spacedRepetition.byLesson(lessonId, wordsKey),
     queryFn: () => fetchDbSchedule(lessonId),
     staleTime: 5 * 60 * 1000,
   });

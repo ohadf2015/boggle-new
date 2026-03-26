@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { queryKeys } from '@/lib/queryKeys';
 
 export interface ReferralMilestoneData {
   id: string;
@@ -68,7 +69,7 @@ export function useReferralDashboard(): UseReferralDashboardReturn {
   }, []);
 
   const { data = null, isLoading, error: queryError } = useQuery<ReferralDashboardData>({
-    queryKey: ['referral', 'stats'],
+    queryKey: queryKeys.referral.stats(),
     queryFn: fetchReferralStats,
     staleTime: 5 * 60_000,
     enabled: !!isAuthenticated,
@@ -91,7 +92,7 @@ export function useReferralDashboard(): UseReferralDashboardReturn {
   }, [shareUrl]);
 
   const refresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: ['referral', 'stats'] });
+    await queryClient.invalidateQueries({ queryKey: queryKeys.referral.stats() });
   }, [queryClient]);
 
   return { data, isLoading, error, copied, handleCopy, refresh };

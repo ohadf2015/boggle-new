@@ -5,13 +5,14 @@
  * sequential boss fights with shared player health.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBossRush } from '../useBossRush';
 import type { LevelCompletion } from '@/types/adventure';
 
 // Mock dependencies
-jest.mock('@/lib/adventure/bossConfig', () => ({
-  getBossConfig: jest.fn((worldId: number) => ({
+vi.mock('@/lib/adventure/bossConfig', () => ({
+  getBossConfig: vi.fn((worldId: number) => ({
     id: `boss-${worldId}`,
     worldId,
     displayName: `adventure.bosses.boss${worldId}.name`,
@@ -24,8 +25,8 @@ jest.mock('@/lib/adventure/bossConfig', () => ({
   })),
 }));
 
-jest.mock('@/lib/adventure', () => ({
-  getLevelConfig: jest.fn((worldId: number, level: number) => ({
+vi.mock('@/lib/adventure', () => ({
+  getLevelConfig: vi.fn((worldId: number, level: number) => ({
     world: worldId,
     level,
     gridSize: 5,
@@ -39,9 +40,9 @@ jest.mock('@/lib/adventure', () => ({
     bossTwist: 'popQuiz',
     showBossIntro: true,
   })),
-  generateAdventureGrid: jest.fn(() => [['A', 'B'], ['C', 'D']]),
-  getLevelSeed: jest.fn((w: number, l: number) => w * 100 + l),
-  getGridSize: jest.fn((w: number) => Math.min(4 + Math.floor(w / 3), 7)),
+  generateAdventureGrid: vi.fn(() => [['A', 'B'], ['C', 'D']]),
+  getLevelSeed: vi.fn((w: number, l: number) => w * 100 + l),
+  getGridSize: vi.fn((w: number) => Math.min(4 + Math.floor(w / 3), 7)),
 }));
 
 // ==============================================
@@ -71,7 +72,7 @@ function bossCompletions(...worlds: number[]): LevelCompletion[] {
 
 describe('useBossRush', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ------------------------------------------

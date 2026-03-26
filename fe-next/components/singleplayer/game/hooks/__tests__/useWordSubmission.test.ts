@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useWordSubmission } from '../useWordSubmission';
 import type { Language, LetterGrid } from '@/shared/types/game';
@@ -5,25 +6,31 @@ import type { ComboSystemReturn } from '@/hooks/useComboSystem';
 import type { UseSpamDetectionReturn } from '../useSpamDetection';
 
 // Mock external dependencies
-jest.mock('@/utils/clientWordValidator', () => ({
-  validateWordLocally: jest.fn(),
-  isWordOnBoard: jest.fn(),
+vi.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: vi.fn(),
+  isWordOnBoard: vi.fn(),
 }));
 
-jest.mock('@/utils/haptics', () => ({
-  hapticForWordScore: jest.fn(),
-  hapticError: jest.fn(),
+vi.mock('@/utils/haptics', () => ({
+  hapticForWordScore: vi.fn(),
+  hapticError: vi.fn(),
 }));
 
 // Mock invalidWordTracker to prevent fetch calls during tests
-jest.mock('@/utils/invalidWordTracker', () => ({
-  recordNotOnBoard: jest.fn(),
-  recordNotInDictionary: jest.fn(),
-  recordInvalidWord: jest.fn(),
+vi.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: vi.fn(),
+  recordNotInDictionary: vi.fn(),
+  recordInvalidWord: vi.fn(),
 }));
 
 // Mock useDictionaryCache to prevent dictionary loading in tests
-const mockCheckWord = jest.fn().mockReturnValue(false);
+const { mockCheckWord, mockPrefetch, mockGetCached, mockClearCache } = vi.hoisted(() => {
+  const mockCheckWord = vi.fn().mockReturnValue(false);
+  const mockPrefetch = vi.fn();
+  const mockGetCached = vi.fn().mockReturnValue(undefined);
+  const mockClearCache = vi.fn();
+  return { mockCheckWord, mockPrefetch, mockGetCached, mockClearCache };
+});
 const mockDictionaryCacheState = {
   isLoaded: false,
   isLoading: false,
@@ -31,7 +38,7 @@ const mockDictionaryCacheState = {
   error: null,
 };
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
+vi.mock('@/hooks/useDictionaryCache', () => ({
   useDictionaryCache: () => ({
     checkWord: mockCheckWord,
     ...mockDictionaryCacheState,
@@ -39,11 +46,7 @@ jest.mock('@/hooks/useDictionaryCache', () => ({
 }));
 
 // Mock usePrevalidation for pre-typing validation
-const mockPrefetch = jest.fn();
-const mockGetCached = jest.fn().mockReturnValue(undefined);
-const mockClearCache = jest.fn();
-
-jest.mock('@/hooks/usePrevalidation', () => ({
+vi.mock('@/hooks/usePrevalidation', () => ({
   usePrevalidation: () => ({
     prefetch: mockPrefetch,
     getCached: mockGetCached,
@@ -54,8 +57,8 @@ jest.mock('@/hooks/usePrevalidation', () => ({
 // Import mocked modules
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 
-const mockValidateWordLocally = validateWordLocally as jest.Mock;
-const mockIsWordOnBoard = isWordOnBoard as jest.Mock;
+const mockValidateWordLocally = validateWordLocally as any;
+const mockIsWordOnBoard = isWordOnBoard as any;
 
 describe('useWordSubmission', () => {
   // Create mock grid
@@ -76,17 +79,17 @@ describe('useWordSubmission', () => {
     validWordCount: 0,
     comboTimeRemaining: null,
     isDangerState: false,
-    incrementCombo: jest.fn().mockReturnValue(1),
-    resetCombo: jest.fn(),
-    forceResetCombo: jest.fn(),
-    incrementValidWordCount: jest.fn(),
-    resetAll: jest.fn(),
+    incrementCombo: vi.fn().mockReturnValue(1),
+    resetCombo: vi.fn(),
+    forceResetCombo: vi.fn(),
+    incrementValidWordCount: vi.fn(),
+    resetAll: vi.fn(),
   });
 
   // Mock spam detection
   const createMockSpamDetection = (): UseSpamDetectionReturn => ({
-    checkSubmission: jest.fn().mockReturnValue({ allowed: true }),
-    resetSpamDetection: jest.fn(),
+    checkSubmission: vi.fn().mockReturnValue({ allowed: true }),
+    resetSpamDetection: vi.fn(),
   });
 
   // Default options factory
@@ -101,20 +104,20 @@ describe('useWordSubmission', () => {
       combo: createMockCombo(),
       spamDetection: createMockSpamDetection(),
       t: (key: string) => key,
-      playWordAcceptedSound: jest.fn(),
-      playComboSound: jest.fn(),
-      announceWordResult: jest.fn(),
-      announceCombo: jest.fn(),
+      playWordAcceptedSound: vi.fn(),
+      playComboSound: vi.fn(),
+      announceWordResult: vi.fn(),
+      announceCombo: vi.fn(),
       ...overrides,
     };
   }
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset fetch mock with default implementation
     // This prevents "Cannot read properties of undefined (reading 'catch')" errors
     // when invalidWordTracker calls fetch() for tracking purposes
-    global.fetch = jest.fn().mockImplementation(() =>
+    global.fetch = vi.fn().mockImplementation(() =>
       Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
     );
   });
@@ -137,7 +140,7 @@ describe('useWordSubmission', () => {
   describe('spam detection', () => {
     it('should block submission when spam detected', () => {
       const mockSpamDetection = createMockSpamDetection();
-      mockSpamDetection.checkSubmission = jest.fn().mockReturnValue({
+      mockSpamDetection.checkSubmission = vi.fn().mockReturnValue({
         allowed: false,
         isCooldown: true,
         remainingCooldown: 3,
@@ -200,7 +203,7 @@ describe('useWordSubmission', () => {
     it('should reject duplicate words', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
@@ -220,7 +223,7 @@ describe('useWordSubmission', () => {
       });
 
       // Reset combo mock to check second submission
-      (mockCombo.resetCombo as jest.Mock).mockClear();
+      (mockCombo.resetCombo as any).mockClear();
 
       // Submit same word again
       act(() => {
@@ -237,7 +240,7 @@ describe('useWordSubmission', () => {
     it('should show accepted feedback when API confirms word is valid', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
@@ -259,7 +262,7 @@ describe('useWordSubmission', () => {
     it('should show rejected feedback when word not in dictionary', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: false }),
       });
@@ -287,7 +290,7 @@ describe('useWordSubmission', () => {
       mockDictionaryCacheState.isLoaded = true;
       mockCheckWord.mockImplementation((word: string) => word === 'hello');
 
-      const playWordAcceptedSound = jest.fn();
+      const playWordAcceptedSound = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ playWordAcceptedSound }))
       );
@@ -320,7 +323,7 @@ describe('useWordSubmission', () => {
       mockDictionaryCacheState.isLoaded = true;
       mockCheckWord.mockReturnValue(false);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
@@ -357,7 +360,7 @@ describe('useWordSubmission', () => {
         word === 'hello' ? true : undefined
       );
 
-      const playWordAcceptedSound = jest.fn();
+      const playWordAcceptedSound = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ playWordAcceptedSound }))
       );
@@ -436,14 +439,14 @@ describe('useWordSubmission', () => {
     it('should add valid word and update score', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
 
       const mockCombo = createMockCombo();
-      const playWordAcceptedSound = jest.fn();
-      const onWordFound = jest.fn();
+      const playWordAcceptedSound = vi.fn();
+      const onWordFound = vi.fn();
 
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({
@@ -471,7 +474,7 @@ describe('useWordSubmission', () => {
     it('should apply fire round multiplier', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
@@ -502,7 +505,7 @@ describe('useWordSubmission', () => {
     it('should reject word when API returns invalid', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: false }),
       });
@@ -526,7 +529,7 @@ describe('useWordSubmission', () => {
     it('should reject word when API call fails', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
       const mockCombo = createMockCombo();
       const { result } = renderHook(() =>
@@ -549,7 +552,7 @@ describe('useWordSubmission', () => {
     it('should reset all state', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
@@ -582,12 +585,12 @@ describe('useWordSubmission', () => {
     it('should call onWordAccepted with word data when word is validated', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
 
-      const onWordAccepted = jest.fn();
+      const onWordAccepted = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ onWordAccepted }))
       );
@@ -612,7 +615,7 @@ describe('useWordSubmission', () => {
       mockDictionaryCacheState.isLoaded = true;
       mockCheckWord.mockImplementation((word: string) => word === 'hello');
 
-      const onWordAccepted = jest.fn();
+      const onWordAccepted = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ onWordAccepted }))
       );
@@ -632,12 +635,12 @@ describe('useWordSubmission', () => {
     it('should NOT call onWordAccepted when word is rejected', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: false }),
       });
 
-      const onWordAccepted = jest.fn();
+      const onWordAccepted = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ onWordAccepted }))
       );
@@ -658,12 +661,12 @@ describe('useWordSubmission', () => {
     it('should call onTrainingTrackValidWord for valid words', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ isValid: true }),
       });
 
-      const onTrainingTrackValidWord = jest.fn();
+      const onTrainingTrackValidWord = vi.fn();
       const { result } = renderHook(() =>
         useWordSubmission(createDefaultOptions({ onTrainingTrackValidWord }))
       );

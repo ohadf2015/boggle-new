@@ -12,6 +12,16 @@ import * as achievementManager from '@/backend/modules/educationAchievementManag
 // Mock achievement manager
 vi.mock('@/backend/modules/educationAchievementManager');
 
+// Provide a real localStorage backend so getItem returns what setItem stored
+const localStore: Record<string, string> = {};
+beforeEach(() => {
+  for (const k of Object.keys(localStore)) delete localStore[k];
+  (localStorage.getItem as any).mockImplementation((key: string) => localStore[key] ?? null);
+  (localStorage.setItem as any).mockImplementation((key: string, val: string) => { localStore[key] = val; });
+  (localStorage.removeItem as any).mockImplementation((key: string) => { delete localStore[key]; });
+  (localStorage.clear as any).mockImplementation(() => { for (const k of Object.keys(localStore)) delete localStore[k]; });
+});
+
 describe('useAchievementUnlock', () => {
   const mockStudentId = 'student-123';
   const mockCalculateNewUnlocks = achievementManager.calculateNewUnlocks as any;

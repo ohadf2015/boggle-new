@@ -3,6 +3,7 @@
  * Converts Zustand multiplayer state into BlastGame-compatible props.
  */
 
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useBlastMultiplayerBridge } from '../useBlastMultiplayerBridge';
 import type { BlastTileOverlay } from '@/shared/types/game';
@@ -18,7 +19,7 @@ const mockLetterGrid = [
   ['M', 'N', 'O', 'P'],
 ];
 
-jest.mock('@/hooks/gameState/store', () => ({
+vi.mock('@/hooks/gameState/store', () => ({
   useBlastTileOverlay: () => mockBlastTileOverlay,
   useBlastSeed: () => mockBlastSeed,
   useGameLanguage: () => mockGameLanguage,

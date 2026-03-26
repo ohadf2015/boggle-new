@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 // ==============================================
 // TYPES
@@ -244,7 +245,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     isLoading,
     error: queryError,
   } = useQuery<{ easy: string[]; medium: string[]; hard: string[] }>({
-    queryKey: ['adventure-hints-solve-grid', language, gridKey],
+    queryKey: queryKeys.adventure.hintsSolveGrid(language, gridKey),
     queryFn: async ({ signal }) => {
       const response = await fetch('/api/solve-grid', {
         method: 'POST',

@@ -6,7 +6,9 @@
  */
 
 import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEducationXp } from '../useEducationXp';
 
 // Type import (separate from mock)
@@ -86,6 +88,9 @@ const mockUpdateDailyStreak = updateDailyStreak as any;
 const mockGetStreakMilestone = getStreakMilestone as any;
 const mockGetStreakMilestoneMessage = getStreakMilestoneMessage as any;
 
+let queryClient: QueryClient;
+let wrapper: ({ children }: { children: React.ReactNode }) => React.ReactElement;
+
 describe('useEducationXp', () => {
   const defaultStreak = {
     currentStreak: 0,
@@ -106,6 +111,9 @@ describe('useEducationXp', () => {
   };
 
   beforeEach(() => {
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: queryClient }, children);
     vi.clearAllMocks();
 
     // Default mock implementations
@@ -134,7 +142,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       expect(result.current.totalXp).toBe(0);
       expect(result.current.currentLevel).toBe(1);
@@ -165,7 +173,7 @@ describe('useEducationXp', () => {
           initialLevel: 5,
           initialStreak: 7,
         })
-      );
+      , { wrapper });
 
       expect(result.current.totalXp).toBe(500);
       expect(result.current.currentLevel).toBe(5);
@@ -186,7 +194,7 @@ describe('useEducationXp', () => {
           lessonId: 'lesson-1',
           initialXp: 350,
         })
-      );
+      , { wrapper });
 
       expect(result.current.xpProgress.progressPercent).toBe(75);
       expect(mockGetXpProgress).toHaveBeenCalledWith(350);
@@ -207,7 +215,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -252,7 +260,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'lesson_completion',
@@ -295,7 +303,7 @@ describe('useEducationXp', () => {
           lessonId: 'lesson-1',
           initialStreak: 7,
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -333,7 +341,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -375,7 +383,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -411,7 +419,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       // Initial call
       expect(mockGetXpProgress).toHaveBeenCalledWith(0);
@@ -443,7 +451,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       // Testing invalid input by casting to any to bypass TypeScript
       const invalidSession = {
@@ -470,7 +478,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       // Initially not loading
       expect(result.current.isLoading).toBe(false);
@@ -502,7 +510,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -536,7 +544,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'flashcard',
@@ -575,7 +583,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'solo_board',
@@ -612,7 +620,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'lesson_completion',
@@ -653,7 +661,7 @@ describe('useEducationXp', () => {
           studentId: 'student-1',
           lessonId: 'lesson-1',
         })
-      );
+      , { wrapper });
 
       const session: PracticeSessionXp = {
         type: 'lesson_completion',

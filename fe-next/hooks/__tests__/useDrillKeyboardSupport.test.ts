@@ -48,6 +48,16 @@ describe('useDrillKeyboardSupport', () => {
   // Store original navigator
   const originalNavigator = window.navigator;
 
+  // Provide real localStorage backend
+  const localStore: Record<string, string> = {};
+  beforeEach(() => {
+    for (const k of Object.keys(localStore)) delete localStore[k];
+    (localStorage.getItem as any).mockImplementation((key: string) => localStore[key] ?? null);
+    (localStorage.setItem as any).mockImplementation((key: string, val: string) => { localStore[key] = val; });
+    (localStorage.removeItem as any).mockImplementation((key: string) => { delete localStore[key]; });
+    (localStorage.clear as any).mockImplementation(() => { for (const k of Object.keys(localStore)) delete localStore[k]; });
+  });
+
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();

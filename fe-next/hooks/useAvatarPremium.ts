@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { queryKeys } from '@/lib/queryKeys';
 import { isPremiumPart } from '@/shared/types/customAvatar';
 import toast from 'react-hot-toast';
 
@@ -43,7 +44,7 @@ export function useAvatarPremium() {
 
   // Load permanent unlocks from profile via TanStack Query
   const { data: premiumData } = useQuery<{ premiumAvatarParts: string[] }>({
-    queryKey: ['avatar', 'premium-parts'],
+    queryKey: queryKeys.avatar.premiumParts(),
     queryFn: async () => {
       const res = await fetch('/api/avatar/premium-parts');
       if (!res.ok) throw new Error('Failed to fetch premium parts');
@@ -72,9 +73,9 @@ export function useAvatarPremium() {
     },
     onSuccess: async (data) => {
       if (data.premiumAvatarParts) {
-        queryClient.setQueryData(['avatar', 'premium-parts'], { premiumAvatarParts: data.premiumAvatarParts });
+        queryClient.setQueryData(queryKeys.avatar.premiumParts(), { premiumAvatarParts: data.premiumAvatarParts });
       } else {
-        queryClient.invalidateQueries({ queryKey: ['avatar', 'premium-parts'] });
+        queryClient.invalidateQueries({ queryKey: queryKeys.avatar.premiumParts() });
       }
       await refreshCoins();
       toast('🎉 Unlocked!', { duration: 1500 });

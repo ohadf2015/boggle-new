@@ -9,6 +9,7 @@
 
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { Language } from '@/types';
 
@@ -195,7 +196,7 @@ export function useAdventureWordValidation({
   const gridKey = useMemo(() => gridCacheKey(grid), [grid]);
 
   const { data: solvedWords } = useQuery<Set<string>>({
-    queryKey: ['adventure-solve-grid', language, gridKey],
+    queryKey: queryKeys.adventure.solveGrid(language, gridKey),
     queryFn: async ({ signal }): Promise<Set<string>> => {
       // Check module-level cache first
       const cached = gridSolutionCache.get(`${language}:${gridKey}`);

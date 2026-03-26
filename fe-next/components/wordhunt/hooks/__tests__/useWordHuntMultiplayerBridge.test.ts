@@ -5,6 +5,7 @@
  * for reusing SurvivalClueBoxes, SurvivalLifeBar, etc.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock Zustand selectors
@@ -20,7 +21,7 @@ const mockWordHuntState = {
   knownLetters: [] as string[],
 };
 
-jest.mock('@/hooks/gameState/store', () => ({
+vi.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetLength: () => mockWordHuntState.targetLength,
   useWordHuntMyLife: () => mockWordHuntState.myLife,
   useWordHuntTargetAttempts: () => mockWordHuntState.targetAttempts,
@@ -44,11 +45,11 @@ describe('useWordHuntMultiplayerBridge', () => {
     mockWordHuntState.eliminatedPlayers = [];
     mockWordHuntState.discoveryClues = [];
     mockWordHuntState.knownLetters = [];
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('basic state mapping', () => {
@@ -215,7 +216,7 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.showFeedbackOverlay).toBe(true);
 
       act(() => {
-        jest.advanceTimersByTime(1200);
+        vi.advanceTimersByTime(1200);
       });
 
       expect(result.current.showFeedbackOverlay).toBe(false);
@@ -275,7 +276,7 @@ describe('useWordHuntMultiplayerBridge', () => {
       expect(result.current.wrongGuessShake).toBe(true);
 
       act(() => {
-        jest.advanceTimersByTime(400);
+        vi.advanceTimersByTime(400);
       });
 
       expect(result.current.wrongGuessShake).toBe(false);

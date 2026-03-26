@@ -1,12 +1,13 @@
+import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useDrillWordSubmit, UseDrillWordSubmitProps } from '../useDrillWordSubmit';
 import { isWordOnBoard } from '@/utils/utils';
 
-jest.mock('@/utils/utils', () => ({
-  isWordOnBoard: jest.fn(),
+vi.mock('@/utils/utils', () => ({
+  isWordOnBoard: vi.fn(),
 }));
 
-const mockIsWordOnBoard = isWordOnBoard as jest.MockedFunction<typeof isWordOnBoard>;
+const mockIsWordOnBoard = isWordOnBoard as any;
 
 function makeProps(overrides: Partial<UseDrillWordSubmitProps> = {}): UseDrillWordSubmitProps {
   return {
@@ -19,7 +20,7 @@ function makeProps(overrides: Partial<UseDrillWordSubmitProps> = {}): UseDrillWo
     wordsFound: [],
     phase: 'playing',
     playingPhase: 'playing',
-    playErrorSound: jest.fn(),
+    playErrorSound: vi.fn(),
     t: (key: string) => key,
     ...overrides,
   };
@@ -27,7 +28,7 @@ function makeProps(overrides: Partial<UseDrillWordSubmitProps> = {}): UseDrillWo
 
 describe('useDrillWordSubmit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsWordOnBoard.mockReturnValue(true);
   });
 
@@ -65,7 +66,7 @@ describe('useDrillWordSubmit', () => {
 
     it('rejects word not on board and plays error sound', () => {
       mockIsWordOnBoard.mockReturnValue(false);
-      const playErrorSound = jest.fn();
+      const playErrorSound = vi.fn();
       const { result } = renderHook(() =>
         useDrillWordSubmit(makeProps({ playErrorSound }))
       );
@@ -76,7 +77,7 @@ describe('useDrillWordSubmit', () => {
     });
 
     it('rejects duplicate word and plays error sound', () => {
-      const playErrorSound = jest.fn();
+      const playErrorSound = vi.fn();
       const { result } = renderHook(() =>
         useDrillWordSubmit(makeProps({ wordsFound: ['CAT'], playErrorSound }))
       );
@@ -87,7 +88,7 @@ describe('useDrillWordSubmit', () => {
     });
 
     it('rejects word not in available set and plays error sound', () => {
-      const playErrorSound = jest.fn();
+      const playErrorSound = vi.fn();
       const { result } = renderHook(() =>
         useDrillWordSubmit(makeProps({ playErrorSound }))
       );

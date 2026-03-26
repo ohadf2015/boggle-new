@@ -30,7 +30,6 @@ const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCar
 // Engagement widgets — only high-value conditional ones on landing
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
-const UnfinishedBoardCardConnected = dynamic(() => import('./UnfinishedBoardCardConnected').then(m => m.UnfinishedBoardCardConnected), { ssr: false });
 const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
@@ -245,13 +244,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           languages={langCount}
         />
 
-        {/* Action prompts — ONLY render when there's something to act on */}
-        {hydrated && isAuthenticated && (
-          <div className="flex flex-col gap-3 max-w-4xl mx-auto w-full">
-            {/* "Resume your game" — only when unfinished board exists */}
-            <UnfinishedBoardCardConnected />
-          </div>
-        )}
 
         {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
         <LandingChallengeCards

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Tests for activeComboFlash state + clearComboFlash in useBlastGame.
  * TDD: written before implementation.
@@ -67,7 +68,7 @@ describe('activeComboFlash state contract', () => {
 
 describe('onSynergyDetected callback', () => {
   it('is called with the first combo type when combos are detected', () => {
-    const onSynergyDetected = jest.fn();
+    const onSynergyDetected = vi.fn();
     const detectedCombos = [{ type: 'bomb_lightning' }];
     if (detectedCombos.length > 0) {
       onSynergyDetected(detectedCombos[0].type);
@@ -76,7 +77,7 @@ describe('onSynergyDetected callback', () => {
   });
 
   it('is NOT called when no combos are detected', () => {
-    const onSynergyDetected = jest.fn();
+    const onSynergyDetected = vi.fn();
     const detectedCombos: Array<{ type: string }> = [];
     if (detectedCombos.length > 0) {
       onSynergyDetected(detectedCombos[0].type);
@@ -85,7 +86,7 @@ describe('onSynergyDetected callback', () => {
   });
 
   it('is called once per word submission (not per combo in the list)', () => {
-    const onSynergyDetected = jest.fn();
+    const onSynergyDetected = vi.fn();
     const detectedCombos = [
       { type: 'prism_prism' },
       { type: 'bomb_lightning' },

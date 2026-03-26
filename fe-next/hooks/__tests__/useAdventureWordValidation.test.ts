@@ -6,8 +6,13 @@
  */
 
 import { vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import React from 'react';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAdventureWordValidation, clearWordValidationCache } from '../useAdventureWordValidation';
+
+let queryClient: QueryClient;
+let wrapper: ({ children }: { children: React.ReactNode }) => React.ReactElement;
 
 // ==============================================
 // TEST FIXTURES
@@ -90,6 +95,9 @@ function createDefaultFetchImpl() {
 
 describe('useAdventureWordValidation', () => {
   beforeEach(() => {
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: queryClient }, children);
     vi.clearAllMocks();
     mockFetch.mockReset();
     // Clear grid solution cache to ensure test isolation
@@ -108,7 +116,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       // THEN
       expect(result.current.isValidating).toBe(false);
@@ -126,7 +134,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       // WHEN - "CRD" with non-adjacent path
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -139,7 +147,7 @@ describe('useAdventureWordValidation', () => {
       expect(validationResult!.errorKey).toBe('adventure.errors.invalidPath');
       // No per-word API call for invalid path
       const dictCheckCalls = mockFetch.mock.calls.filter(
-        (c: [string]) => c[0] === '/api/dictionary/check'
+        (c: unknown[]) => c[0] === '/api/dictionary/check'
       );
       expect(dictCheckCalls.length).toBe(0);
     });
@@ -153,7 +161,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       // WHEN - word "DOG" but path spells "CAT"
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -177,7 +185,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       const shortPath = [
         { row: 0, col: 0 }, // C
@@ -206,7 +214,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: ['CAT', 'DOG'],
         })
-      );
+      , { wrapper });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -219,7 +227,7 @@ describe('useAdventureWordValidation', () => {
       expect(validationResult!.errorKey).toBe('adventure.errors.alreadyFound');
       // No per-word API call for duplicate (solve-grid may have been called)
       const dictCheckCalls = mockFetch.mock.calls.filter(
-        (c: [string]) => c[0] === '/api/dictionary/check'
+        (c: unknown[]) => c[0] === '/api/dictionary/check'
       );
       expect(dictCheckCalls.length).toBe(0);
     });
@@ -233,7 +241,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: ['cat'], // lowercase
         })
-      );
+      , { wrapper });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -257,10 +265,12 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      // Wait for solve-grid to complete
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      // Wait for solve-grid query to resolve and populate hook state
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
+      // Extra flush to allow TanStack Query to process the response and trigger re-render
+      await act(async () => { await Promise.resolve(); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -273,7 +283,7 @@ describe('useAdventureWordValidation', () => {
       // No per-word API call — only the solve-grid call should have been made
       expect(mockFetch).toHaveBeenCalledWith('/api/adventure/solve-grid', expect.anything());
       const dictCheckCalls = mockFetch.mock.calls.filter(
-        (c: [string]) => c[0] === '/api/dictionary/check'
+        (c: unknown[]) => c[0] === '/api/dictionary/check'
       );
       expect(dictCheckCalls.length).toBe(0);
     });
@@ -287,9 +297,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       const dogePath = [
         { row: 1, col: 0 }, // D
@@ -328,9 +338,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -341,7 +351,7 @@ describe('useAdventureWordValidation', () => {
       // THEN — should fall back to per-word API call
       expect(validationResult!.isValid).toBe(true);
       const dictCheckCalls = mockFetch.mock.calls.filter(
-        (c: [string]) => c[0] === '/api/dictionary/check'
+        (c: unknown[]) => c[0] === '/api/dictionary/check'
       );
       expect(dictCheckCalls.length).toBe(1);
     });
@@ -362,9 +372,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -388,9 +398,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN
       await act(async () => {
@@ -420,9 +430,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN — start validation (falls back to API)
       let validationPromise: Promise<unknown>;
@@ -453,9 +463,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -477,9 +487,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       // WHEN - Validate CAT
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -501,9 +511,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       const birdPath = [
         { row: 2, col: 0 }, // B
@@ -528,9 +538,9 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: ['CAT'],
         })
-      );
+      , { wrapper });
 
-      await act(async () => { await new Promise(r => setTimeout(r, 10)); });
+      await waitFor(() => { expect(mockFetch).toHaveBeenCalled(); });
 
       await act(async () => {
         birdResult = await result2.current.validateWord('BIRD', birdPath);
@@ -551,7 +561,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       // WHEN
       let validationResult: Awaited<ReturnType<typeof result.current.validateWord>>;
@@ -573,7 +583,7 @@ describe('useAdventureWordValidation', () => {
           minWordLength: 3,
           foundWords: [],
         })
-      );
+      , { wrapper });
 
       // Path with same tile twice
       const repeatedPath = [

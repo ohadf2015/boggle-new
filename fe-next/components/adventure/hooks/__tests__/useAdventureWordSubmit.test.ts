@@ -5,25 +5,26 @@
  * validation, scoring, boss damage, achievements, and feedback.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureWordSubmit } from '../useAdventureWordSubmit';
 
 describe('useAdventureWordSubmit', () => {
-  const mockValidateWord = jest.fn();
-  const mockSubmitWordWithPath = jest.fn();
-  const mockClearSelection = jest.fn();
-  const mockClearCurrentHint = jest.fn();
-  const mockRecordActivity = jest.fn();
-  const mockResetOnGameAction = jest.fn();
-  const mockCheckBossWord = jest.fn();
-  const mockDealBossDamage = jest.fn();
-  const mockTriggerBossTaunt = jest.fn();
-  const mockHandleEarnAchievement = jest.fn();
-  const mockRecordAIWord = jest.fn();
-  const mockHandleAITransition = jest.fn();
-  const mockAddScorePopup = jest.fn();
-  const mockGetScoreMultiplier = jest.fn().mockReturnValue(1);
-  const mockT = jest.fn().mockImplementation((key: string) => key);
+  const mockValidateWord = vi.fn();
+  const mockSubmitWordWithPath = vi.fn();
+  const mockClearSelection = vi.fn();
+  const mockClearCurrentHint = vi.fn();
+  const mockRecordActivity = vi.fn();
+  const mockResetOnGameAction = vi.fn();
+  const mockCheckBossWord = vi.fn();
+  const mockDealBossDamage = vi.fn();
+  const mockTriggerBossTaunt = vi.fn();
+  const mockHandleEarnAchievement = vi.fn();
+  const mockRecordAIWord = vi.fn();
+  const mockHandleAITransition = vi.fn();
+  const mockAddScorePopup = vi.fn();
+  const mockGetScoreMultiplier = vi.fn().mockReturnValue(1);
+  const mockT = vi.fn().mockImplementation((key: string) => key);
 
   // Generate a 5x5 tile grid with proper row/col
   const mockTiles = Array.from({ length: 25 }, (_, i) => ({
@@ -67,19 +68,19 @@ describe('useAdventureWordSubmit', () => {
     skillEffects: {
       bossDamageMultiplier: 1,
       comboMultiplierBonus: 0,
-      getLongWordDamageMultiplier: jest.fn().mockReturnValue(1),
+      getLongWordDamageMultiplier: vi.fn().mockReturnValue(1),
     },
     t: mockT,
-    getPopupStartPosition: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+    getPopupStartPosition: vi.fn().mockReturnValue({ x: 100, y: 100 }),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should return handleWordSubmit callback and feedback state', () => {
@@ -261,7 +262,7 @@ describe('useAdventureWordSubmit', () => {
     expect(result.current.validationFeedback.isValid).toBe(true);
 
     act(() => {
-      jest.advanceTimersByTime(1200);
+      vi.advanceTimersByTime(1200);
     });
 
     expect(result.current.validationFeedback.isValid).toBe(false);
@@ -280,7 +281,7 @@ describe('useAdventureWordSubmit', () => {
     expect(result.current.validationFeedback.error).toBe('error.notAWord');
 
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     expect(result.current.validationFeedback.error).toBeNull();

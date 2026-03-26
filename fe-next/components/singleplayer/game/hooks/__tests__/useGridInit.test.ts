@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useGridInit } from '../useGridInit';
 import type { DifficultyLevel, Language } from '@/shared/types/game';
 
 // Mock external dependencies
-jest.mock('@/utils/utils', () => ({
-  generateRandomTable: jest.fn(),
+vi.mock('@/utils/utils', () => ({
+  generateRandomTable: vi.fn(),
 }));
 
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   DIFFICULTIES: {
     easy: { rows: 4, cols: 4, wordCount: 5 },
     medium: { rows: 5, cols: 5, wordCount: 7 },
@@ -17,7 +18,7 @@ jest.mock('@/utils/consts', () => ({
 
 import { generateRandomTable } from '@/utils/utils';
 
-const mockGenerateRandomTable = generateRandomTable as jest.Mock;
+const mockGenerateRandomTable = generateRandomTable as any;
 
 describe('useGridInit', () => {
   const mockGrid = [
@@ -34,14 +35,14 @@ describe('useGridInit', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGenerateRandomTable.mockReturnValue(mockGrid);
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   describe('grid initialization', () => {
     it('should initialize grid on mount', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: ['test', 'word'] }),
@@ -67,7 +68,7 @@ describe('useGridInit', () => {
     });
 
     it('should skip themed words for Japanese language', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as any).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ success: true, words: mockAvailableWords }),
       });
@@ -93,7 +94,7 @@ describe('useGridInit', () => {
     });
 
     it('should use more words in practice mode', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: ['test'] }),
@@ -124,7 +125,7 @@ describe('useGridInit', () => {
 
   describe('grid solving', () => {
     it('should fetch available words after grid is set', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -148,7 +149,7 @@ describe('useGridInit', () => {
     });
 
     it('should set empty words on API error', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -172,7 +173,7 @@ describe('useGridInit', () => {
     });
 
     it('should set empty words on network error', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -201,7 +202,7 @@ describe('useGridInit', () => {
         hard: ['testing'], // 7 letters
       };
 
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -241,9 +242,9 @@ describe('useGridInit', () => {
 
   describe('onGridChange callback', () => {
     it('should call onGridChange when grid changes', async () => {
-      const onGridChange = jest.fn();
+      const onGridChange = vi.fn();
 
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -270,7 +271,7 @@ describe('useGridInit', () => {
 
   describe('setGrid', () => {
     it('should allow external grid updates', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -309,7 +310,7 @@ describe('useGridInit', () => {
 
   describe('refs', () => {
     it('should keep gridRef in sync', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),
@@ -333,7 +334,7 @@ describe('useGridInit', () => {
     });
 
     it('should keep availableWordsRef in sync', async () => {
-      (global.fetch as jest.Mock)
+      (global.fetch as any)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve({ words: [] }),

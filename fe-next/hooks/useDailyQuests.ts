@@ -11,6 +11,7 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { getDailyQuests, type DailyQuest } from '@/lib/adventure/dailyQuests';
 import { useAuth } from '@/contexts/AuthContext';
+import logger from '@/utils/logger';
 
 const LS_KEY = 'lexiclash_daily_quest_progress';
 
@@ -84,6 +85,9 @@ export function useDailyQuests({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterQuestProgress: progress }),
       });
+    },
+    onError: (err) => {
+      logger.error('useDailyQuests: failed to sync progress', err);
     },
   });
 

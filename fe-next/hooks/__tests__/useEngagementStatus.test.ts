@@ -61,7 +61,18 @@ const profileData = {
   total_coins: 1500,
 };
 
+// Provide real localStorage backend
+const localStore: Record<string, string> = {};
+
 describe('useEngagementStatus', () => {
+  beforeEach(() => {
+    for (const k of Object.keys(localStore)) delete localStore[k];
+    (localStorage.getItem as any).mockImplementation((key: string) => localStore[key] ?? null);
+    (localStorage.setItem as any).mockImplementation((key: string, val: string) => { localStore[key] = val; });
+    (localStorage.removeItem as any).mockImplementation((key: string) => { delete localStore[key]; });
+    (localStorage.clear as any).mockImplementation(() => { for (const k of Object.keys(localStore)) delete localStore[k]; });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();

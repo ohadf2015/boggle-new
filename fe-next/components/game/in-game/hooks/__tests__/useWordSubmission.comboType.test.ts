@@ -4,23 +4,26 @@
  *
  * Written BEFORE implementation (RED phase).
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
-const mockValidateWordLocally = jest.fn();
-const mockCouldBeOnBoard = jest.fn();
-const mockHapticForWordScore = jest.fn();
-const mockHapticError = jest.fn();
-
-jest.mock('@/utils/clientWordValidator', () => ({
+const { mockValidateWordLocally, mockCouldBeOnBoard, mockHapticForWordScore, mockHapticError } = vi.hoisted(() => {
+  const mockValidateWordLocally = vi.fn();
+  const mockCouldBeOnBoard = vi.fn();
+  const mockHapticForWordScore = vi.fn();
+  const mockHapticError = vi.fn();
+  return { mockValidateWordLocally, mockCouldBeOnBoard, mockHapticForWordScore, mockHapticError };
+});
+vi.mock('@/utils/clientWordValidator', () => ({
   validateWordLocally: (...args: any[]) => mockValidateWordLocally(...args),
   couldBeOnBoard: (...args: any[]) => mockCouldBeOnBoard(...args),
 }));
 
-jest.mock('@/utils/haptics', () => ({
+vi.mock('@/utils/haptics', () => ({
   hapticForWordScore: (...args: any[]) => mockHapticForWordScore(...args),
   hapticError: (...args: any[]) => mockHapticError(...args),
 }));
@@ -36,7 +39,7 @@ import { useWordSubmission } from '../useWordSubmission';
 // ---------------------------------------------------------------------------
 
 function buildOptions(overrides: Partial<Parameters<typeof useWordSubmission>[0]> = {}) {
-  const mockSocket = { emit: jest.fn() } as any;
+  const mockSocket = { emit: vi.fn() } as any;
   const comboLevelRef: MutableRefObject<number> = { current: 0 };
 
   return {
@@ -49,12 +52,12 @@ function buildOptions(overrides: Partial<Parameters<typeof useWordSubmission>[0]
     socket: mockSocket,
     comboLevelRef,
     t: (k: string) => k,
-    playWordAcceptedSound: jest.fn(),
-    announceWordResult: jest.fn(),
-    onWordSubmit: jest.fn(),
-    onResetCombo: jest.fn(),
-    setCurrentFeedback: jest.fn(),
-    setLastWordFoundTime: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    announceWordResult: vi.fn(),
+    onWordSubmit: vi.fn(),
+    onResetCombo: vi.fn(),
+    setCurrentFeedback: vi.fn(),
+    setLastWordFoundTime: vi.fn(),
     ...overrides,
   };
 }
@@ -65,7 +68,7 @@ function buildOptions(overrides: Partial<Parameters<typeof useWordSubmission>[0]
 
 describe('useWordSubmission — comboType in submitWord emit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default: word is valid and on board
     mockValidateWordLocally.mockReturnValue({ isValid: true });
     mockCouldBeOnBoard.mockReturnValue(true);

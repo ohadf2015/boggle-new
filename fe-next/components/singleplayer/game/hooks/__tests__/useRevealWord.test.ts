@@ -1,17 +1,18 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRevealWord } from '../useRevealWord';
 import type { LetterGrid, Language } from '@/shared/types/game';
 
 // Mock external dependencies
-jest.mock('@/utils/wordPathFinder', () => ({
-  selectRandomRevealWord: jest.fn(),
-  getRevealableWordCount: jest.fn(),
+vi.mock('@/utils/wordPathFinder', () => ({
+  selectRandomRevealWord: vi.fn(),
+  getRevealableWordCount: vi.fn(),
 }));
 
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 
-const mockSelectRandomRevealWord = selectRandomRevealWord as jest.Mock;
-const mockGetRevealableWordCount = getRevealableWordCount as jest.Mock;
+const mockSelectRandomRevealWord = selectRandomRevealWord as any;
+const mockGetRevealableWordCount = getRevealableWordCount as any;
 
 describe('useRevealWord', () => {
   const mockGrid: LetterGrid = [
@@ -29,13 +30,13 @@ describe('useRevealWord', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockGetRevealableWordCount.mockReturnValue(5);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initial state', () => {
@@ -253,7 +254,7 @@ describe('useRevealWord', () => {
 
       // Advance time by 4 seconds
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       expect(result.current.highlightedPath).toEqual([]);

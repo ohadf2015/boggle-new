@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import logger from '@/utils/logger';
 
 const STORAGE_KEY = 'lexiclash_churn_signals';
 const REPORT_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -92,6 +93,9 @@ export function useChurnSignals(): UseChurnSignalsReturn {
         lastReportedAt: Date.now(),
       };
       saveSignals(signalsRef.current);
+    },
+    onError: (err) => {
+      logger.error('useChurnSignals: failed to report signals', err);
     },
   });
 

@@ -2,6 +2,7 @@
  * useBlastHotTiles - Tests for hot tile time-pressure mechanic.
  * TDD: written before implementation (RED phase).
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { BlastTileState, BlastTileType } from '../../types';
 
@@ -46,11 +47,11 @@ describe('useBlastHotTiles', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should have no hot tiles before activation threshold', () => {
@@ -147,7 +148,7 @@ describe('useBlastHotTiles', () => {
 
     // Advance past refresh interval
     act(() => {
-      jest.advanceTimersByTime(8100);
+      vi.advanceTimersByTime(8100);
     });
 
     // After refresh, tiles should have been regenerated

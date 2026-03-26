@@ -2,33 +2,36 @@
  * useBlastComboDiscovery - Tests for combo discovery state management hook.
  * TDD: written before implementation (RED phase).
  */
+import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useBlastComboDiscovery } from '../useBlastComboDiscovery';
 import type { SpecialCombo } from '../../utils/blastCombos';
 import type { BlastTileType } from '../../types';
 
 // ---- localStorage mocks ----
+// vitest.setup.ts replaces global.localStorage with a plain object of vi.fn() stubs,
+// so Storage.prototype spying doesn't work. Instead, give the stubs real backing storage.
 
 let mockStorage: Record<string, string> = {};
 
 beforeEach(() => {
   mockStorage = {};
-  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(
+  (localStorage.getItem as any).mockImplementation(
     (key: string) => mockStorage[key] ?? null,
   );
-  jest.spyOn(Storage.prototype, 'setItem').mockImplementation(
+  (localStorage.setItem as any).mockImplementation(
     (key: string, value: string) => { mockStorage[key] = value; },
   );
-  jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(
+  (localStorage.removeItem as any).mockImplementation(
     (key: string) => { delete mockStorage[key]; },
   );
 
   // Reset fetch mock each test
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 // ---- Helpers ----
@@ -43,14 +46,14 @@ function makeCombo(type: SpecialCombo['type']): SpecialCombo {
 }
 
 function mockFetchSuccess(responseData: Record<string, unknown>) {
-  global.fetch = jest.fn().mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: () => Promise.resolve(responseData),
   });
 }
 
 function mockFetchFailure() {
-  global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+  global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 }
 
 // ==================== useBlastComboDiscovery (existing tests) ====================
@@ -120,7 +123,7 @@ describe('useBlastComboDiscovery', () => {
   });
 
   it('is SSR-safe: does not crash when localStorage throws', () => {
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('localStorage unavailable');
     });
     expect(() => renderHook(() => useBlastComboDiscovery())).not.toThrow();
@@ -169,7 +172,7 @@ describe('useBlastComboDiscovery — Supabase sync', () => {
     });
 
     it('does NOT call fetch when userId is undefined (unauthenticated)', async () => {
-      global.fetch = jest.fn();
+      global.fetch = vi.fn();
 
       const { result } = renderHook(() => useBlastComboDiscovery());
 
@@ -198,7 +201,7 @@ describe('useBlastComboDiscovery — Supabase sync', () => {
       });
 
       // Reset call count after init GET
-      (global.fetch as jest.Mock).mockClear();
+      (global.fetch as any).mockClear();
 
       await act(async () => {
         result.current.onComboDetected([makeCombo('bomb_bomb')]);
@@ -243,7 +246,7 @@ describe('useBlastComboDiscovery — Supabase sync', () => {
     });
 
     it('does NOT call GET on mount when unauthenticated', async () => {
-      global.fetch = jest.fn();
+      global.fetch = vi.fn();
 
       renderHook(() => useBlastComboDiscovery());
 

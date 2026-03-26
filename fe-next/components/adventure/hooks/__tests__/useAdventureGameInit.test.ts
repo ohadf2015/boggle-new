@@ -5,6 +5,7 @@
  * adaptive difficulty, AI director, XP, currency, skills, achievements, combo
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGameInit } from '../useAdventureGameInit';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
@@ -18,13 +19,13 @@ import { useComboMilestone } from '@/hooks/useComboMilestone';
 import { registerAllAbilities } from '@/lib/adventure/abilities';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'test-user-id' } }),
 }));
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({ progression: { xp: 0, gold: 0, upgrades: {} } }),
 }));
-jest.mock('@/hooks/useUpgradeEffects', () => ({
+vi.mock('@/hooks/useUpgradeEffects', () => ({
   useUpgradeEffects: () => ({
     bonusTimeSeconds: 0,
     comboScoreMultiplier: 1,
@@ -38,30 +39,30 @@ jest.mock('@/hooks/useUpgradeEffects', () => ({
     longWordGoldBonus: 0,
   }),
 }));
-jest.mock('@/hooks/useAdaptiveDifficulty');
-jest.mock('@/hooks/useAIDirector');
-jest.mock('@/hooks/useAdventureXp');
-jest.mock('@/hooks/useAdventureCurrency');
-jest.mock('@/hooks/useSkillPoints');
-jest.mock('@/hooks/useSkillEffects');
-jest.mock('@/hooks/useAdventureAchievements');
-jest.mock('@/hooks/useComboMilestone');
-jest.mock('@/lib/adventure/abilities');
-jest.mock('@/components/achievements/AchievementToast');
-jest.mock('@/lib/adventure/weeklyModifiers', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty');
+vi.mock('@/hooks/useAIDirector');
+vi.mock('@/hooks/useAdventureXp');
+vi.mock('@/hooks/useAdventureCurrency');
+vi.mock('@/hooks/useSkillPoints');
+vi.mock('@/hooks/useSkillEffects');
+vi.mock('@/hooks/useAdventureAchievements');
+vi.mock('@/hooks/useComboMilestone');
+vi.mock('@/lib/adventure/abilities');
+vi.mock('@/components/achievements/AchievementToast');
+vi.mock('@/lib/adventure/weeklyModifiers', () => ({
   getWeeklyModifiers: () => [],
   applyModifiers: (config: any) => config,
 }));
 // runeSystem removed — useAdventureGameInit uses inline defaults now
 
-const mockUseAdaptiveDifficulty = useAdaptiveDifficulty as jest.MockedFunction<typeof useAdaptiveDifficulty>;
-const mockUseAIDirector = useAIDirector as jest.MockedFunction<typeof useAIDirector>;
-const mockUseAdventureXp = useAdventureXp as jest.MockedFunction<typeof useAdventureXp>;
-const mockUseAdventureCurrency = useAdventureCurrency as jest.MockedFunction<typeof useAdventureCurrency>;
-const mockUseSkillPoints = useSkillPoints as jest.MockedFunction<typeof useSkillPoints>;
-const mockUseSkillEffects = useSkillEffects as jest.MockedFunction<typeof useSkillEffects>;
-const mockUseAdventureAchievements = useAdventureAchievements as jest.MockedFunction<typeof useAdventureAchievements>;
-const mockUseComboMilestone = useComboMilestone as jest.MockedFunction<typeof useComboMilestone>;
+const mockUseAdaptiveDifficulty = useAdaptiveDifficulty as any;
+const mockUseAIDirector = useAIDirector as any;
+const mockUseAdventureXp = useAdventureXp as any;
+const mockUseAdventureCurrency = useAdventureCurrency as any;
+const mockUseSkillPoints = useSkillPoints as any;
+const mockUseSkillEffects = useSkillEffects as any;
+const mockUseAdventureAchievements = useAdventureAchievements as any;
+const mockUseComboMilestone = useComboMilestone as any;
 
 describe('useAdventureGameInit', () => {
   const defaultProps = {
@@ -75,16 +76,16 @@ describe('useAdventureGameInit', () => {
     adjustedConfig: { timerSeconds: 120, gridSize: 5, objectives: [{ type: 'score', target: 100 }], world: 1, level: 3, minWordLength: 3 },
     hintData: { level: 'none' as const, highlightTiles: [] },
     powerUpCooldownMultiplier: 1,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   };
 
   const mockAIDirector = {
     intensityAdjustments: { hintEscalationRate: 1, difficultyModifier: 0 },
     flowState: 'normal' as const,
-    startSession: jest.fn(),
-    endSession: jest.fn(),
-    recordWord: jest.fn(),
-    handleTransition: jest.fn(),
+    startSession: vi.fn(),
+    endSession: vi.fn(),
+    recordWord: vi.fn(),
+    handleTransition: vi.fn(),
     isBossBattle: false,
   };
 
@@ -92,39 +93,39 @@ describe('useAdventureGameInit', () => {
     totalXp: 0,
     currentLevel: 1,
     xpProgress: 0,
-    awardXp: jest.fn().mockReturnValue({ leveledUp: false }),
+    awardXp: vi.fn().mockReturnValue({ leveledUp: false }),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   };
 
   const mockCurrency = {
     gold: 0,
     upgrades: {},
-    addGold: jest.fn(),
-    purchase: jest.fn(),
-    getUpgradeEffect: jest.fn().mockReturnValue({ multiplier: 1 }),
+    addGold: vi.fn(),
+    purchase: vi.fn(),
+    getUpgradeEffect: vi.fn().mockReturnValue({ multiplier: 1 }),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   };
 
   const mockSkillEffectsVal = {
     bossDamageMultiplier: 1,
     comboMultiplierBonus: 0,
-    getLongWordDamageMultiplier: jest.fn().mockReturnValue(1),
+    getLongWordDamageMultiplier: vi.fn().mockReturnValue(1),
   };
 
   const mockAchievements = {
-    earnAchievement: jest.fn().mockReturnValue(true),
-    getCount: jest.fn().mockReturnValue(0),
+    earnAchievement: vi.fn().mockReturnValue(true),
+    getCount: vi.fn().mockReturnValue(0),
   };
 
   const mockComboMilestone = {
     currentMilestone: null,
-    checkMilestone: jest.fn(),
+    checkMilestone: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAdaptiveDifficulty.mockReturnValue(mockAdaptiveDifficulty as any);
     mockUseAIDirector.mockReturnValue(mockAIDirector as any);
     mockUseAdventureXp.mockReturnValue(mockXp as any);

@@ -11,6 +11,7 @@ export type FeedbackType =
   | 'not-on-board'      // Orange - valid but not on this board
   | 'not-in-dictionary' // Red - on board but not in dictionary
   | 'too-short'         // Orange - below minimum length
+  | 'too-long'          // Orange - above maximum length
   | 'duplicate'         // Yellow - already found
   | 'target-attempt'    // Blue - attempted target word
   | 'target-found';     // Rainbow - found the target!
@@ -58,6 +59,13 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     animation: 'animate-neo-shake',
   },
   'too-short': {
+    bg: 'bg-orange-500',
+    text: 'text-white',
+    border: 'border-orange-700',
+    icon: <AlertTriangle className="w-4 h-4" />,
+    animation: 'animate-bounce',
+  },
+  'too-long': {
     bg: 'bg-orange-500',
     text: 'text-white',
     border: 'border-orange-700',

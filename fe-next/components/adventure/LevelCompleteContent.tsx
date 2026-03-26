@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
-import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
@@ -290,7 +289,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </AdaptiveMotion.div>
       )}
 
-      {/* Double Coins Rewarded Ad */}
+      {/* Double Coins Rewarded Ad (single ad offer per level completion) */}
       {stars > 0 && !goldDoubled && (
         <div className="mb-4">
           <RewardedAdButton name="adventure-double-coins" onReward={() => setGoldDoubled(true)} className="w-full">
@@ -298,11 +297,6 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
           </RewardedAdButton>
         </div>
       )}
-
-      {/* Bonus Gold Ad */}
-      <div className="flex justify-center mb-4">
-        <RewardedAdGoldButton goldAmount={30} />
-      </div>
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3">

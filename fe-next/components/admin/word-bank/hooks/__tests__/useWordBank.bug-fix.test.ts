@@ -7,17 +7,18 @@
  * 3. useEffect includes `refresh` in dependencies, causing recreation loop
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useWordBank } from '../useWordBank';
 import type { Language } from '@/types';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('useWordBank - Bug Fix: Infinite Loop and Rate Limit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (global.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({
         success: true,
@@ -44,12 +45,12 @@ describe('useWordBank - Bug Fix: Infinite Loop and Rate Limit', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
 
-    const initialCallCount = (global.fetch as jest.Mock).mock.calls.length;
+    const initialCallCount = (global.fetch as any).mock.calls.length;
 
     // Wait 500ms to see if additional calls happen (they shouldn't)
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    const finalCallCount = (global.fetch as jest.Mock).mock.calls.length;
+    const finalCallCount = (global.fetch as any).mock.calls.length;
 
     // Should only have made initial calls (words + stats = 2 calls)
     expect(finalCallCount).toBe(initialCallCount);
@@ -85,7 +86,7 @@ describe('useWordBank - Bug Fix: Infinite Loop and Rate Limit', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
 
-    const callsAfterMount = (global.fetch as jest.Mock).mock.calls.length;
+    const callsAfterMount = (global.fetch as any).mock.calls.length;
 
     // Rerender with SAME filters
     rerender({ filters: { language: 'en' as Language } });
@@ -93,13 +94,13 @@ describe('useWordBank - Bug Fix: Infinite Loop and Rate Limit', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Should NOT trigger new fetch calls
-    expect((global.fetch as jest.Mock).mock.calls.length).toBe(callsAfterMount);
+    expect((global.fetch as any).mock.calls.length).toBe(callsAfterMount);
 
     // Now change language
     rerender({ filters: { language: 'he' as Language } });
 
     await waitFor(() => {
-      expect((global.fetch as jest.Mock).mock.calls.length).toBeGreaterThan(callsAfterMount);
+      expect((global.fetch as any).mock.calls.length).toBeGreaterThan(callsAfterMount);
     });
   });
 });

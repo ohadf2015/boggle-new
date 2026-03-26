@@ -6,8 +6,13 @@
  */
 
 import { vi } from 'vitest';
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAdventureHints } from '../useAdventureHints';
+
+let queryClient: QueryClient;
+let wrapper: ({ children }: { children: React.ReactNode }) => React.ReactElement;
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -33,6 +38,9 @@ const mockSolveResponse = {
 
 describe('useAdventureHints', () => {
   beforeEach(() => {
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: queryClient }, children);
     vi.clearAllMocks();
     vi.useFakeTimers();
     mockFetch.mockResolvedValue({
@@ -55,7 +63,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -79,7 +87,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       expect(result.current.isLoading).toBe(true);
@@ -94,7 +102,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -113,7 +121,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -136,7 +144,7 @@ describe('useAdventureHints', () => {
           foundWords: allFoundWords,
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -156,7 +164,7 @@ describe('useAdventureHints', () => {
           foundWords,
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -179,7 +187,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -213,7 +221,7 @@ describe('useAdventureHints', () => {
           foundWords: allFoundWords,
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -240,7 +248,7 @@ describe('useAdventureHints', () => {
           foundWords,
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -271,7 +279,7 @@ describe('useAdventureHints', () => {
           inactivityThresholdMs: 15000, // 15 seconds
           onAutoHint,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -299,7 +307,7 @@ describe('useAdventureHints', () => {
           inactivityThresholdMs: 15000,
           onAutoHint,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -345,7 +353,7 @@ describe('useAdventureHints', () => {
             inactivityThresholdMs: 15000,
             onAutoHint,
           }),
-        { initialProps: { isPlaying: true } }
+        { initialProps: { isPlaying: true }, wrapper }
       );
 
       await waitFor(() => {
@@ -376,7 +384,7 @@ describe('useAdventureHints', () => {
           inactivityThresholdMs: 15000,
           onAutoHint,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -409,7 +417,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -436,7 +444,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -462,7 +470,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -486,7 +494,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       // THEN
       await waitFor(() => {
@@ -506,7 +514,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -535,7 +543,7 @@ describe('useAdventureHints', () => {
           foundWords: [],
           isPlaying: true,
         })
-      );
+      , { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);

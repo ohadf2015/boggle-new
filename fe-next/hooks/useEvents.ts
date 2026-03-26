@@ -5,8 +5,10 @@
 
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
+import logger from '@/utils/logger';
 
 export interface ClientGameEvent {
   id: string;
@@ -36,12 +38,11 @@ export interface UseEventsReturn {
 
 export function useEvents(): UseEventsReturn {
   const queryClient = useQueryClient();
-  const [optimisticMyEvents, setOptimisticMyEvents] = useState<ClientGameEvent[]>([]);
 
   const { data, isLoading } = useQuery<EventsData>({
-    queryKey: ['events'],
-    queryFn: async () => {
-      const res = await fetch('/api/events');
+    queryKey: queryKeys.events.all(),
+    queryFn: async ({ signal }) => {
+      const res = await fetch('/api/events', { signal });
       if (!res.ok) throw new Error('Failed to fetch events');
       const json = await res.json();
       return {
@@ -65,30 +66,42 @@ export function useEvents(): UseEventsReturn {
         throw new Error(errData.error || 'Failed to join event');
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+    // Proper TanStack optimistic update with rollback
+    onMutate: async (eventId: string) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.events.all() });
+      const previous = queryClient.getQueryData<EventsData>(queryKeys.events.all());
+
+      queryClient.setQueryData<EventsData>(queryKeys.events.all(), (old) => {
+        if (!old) return old;
+        const joined = old.active.find(e => e.id === eventId);
+        if (!joined) return old;
+        return {
+          ...old,
+          myEvents: [...old.myEvents, joined],
+        };
+      });
+
+      return { previous };
+    },
+    onError: (_err, _eventId, context) => {
+      // Rollback on failure
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.events.all(), context.previous);
+      }
+      logger.error('useEvents: join failed', _err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all() });
     },
   });
 
   const activeEvents = useMemo(() => data?.active ?? [], [data?.active]);
   const upcomingEvents = data?.upcoming ?? [];
-  const serverMyEvents = data?.myEvents ?? [];
-
-  // Merge server myEvents with optimistic additions
-  const myEventIds = new Set(serverMyEvents.map(e => e.id));
-  const mergedMyEvents = [
-    ...serverMyEvents,
-    ...optimisticMyEvents.filter(e => !myEventIds.has(e.id)),
-  ];
+  const myEvents = data?.myEvents ?? [];
 
   const joinEvent = useCallback(async (eventId: string) => {
-    // Optimistically add to myEvents
-    const joined = activeEvents.find((e) => e.id === eventId);
-    if (joined) {
-      setOptimisticMyEvents((prev) => [...prev, joined]);
-    }
     await joinMutation.mutateAsync(eventId);
-  }, [activeEvents, joinMutation]);
+  }, [joinMutation]);
 
-  return { activeEvents, upcomingEvents, myEvents: mergedMyEvents, joinEvent, isLoading };
+  return { activeEvents, upcomingEvents, myEvents, joinEvent, isLoading };
 }

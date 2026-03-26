@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useHintPrompt } from '../useHintPrompt';
 
 describe('useHintPrompt', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initial state', () => {
@@ -34,7 +35,7 @@ describe('useHintPrompt', () => {
 
       // After first interval check, the ref should be initialized
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(result.current.lastWordFoundTimeRef.current).toBeGreaterThan(0);
@@ -55,7 +56,7 @@ describe('useHintPrompt', () => {
 
       // Advance time past the 5 second threshold
       act(() => {
-        jest.advanceTimersByTime(6000);
+        vi.advanceTimersByTime(6000);
       });
 
       expect(result.current.showHintPrompt).toBe(true);
@@ -71,7 +72,7 @@ describe('useHintPrompt', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
 
       expect(result.current.showHintPrompt).toBe(false);
@@ -87,7 +88,7 @@ describe('useHintPrompt', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
 
       expect(result.current.showHintPrompt).toBe(false);
@@ -103,7 +104,7 @@ describe('useHintPrompt', () => {
       );
 
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
 
       expect(result.current.showHintPrompt).toBe(false);
@@ -122,7 +123,7 @@ describe('useHintPrompt', () => {
 
       // Show the prompt
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
       expect(result.current.showHintPrompt).toBe(true);
 
@@ -147,7 +148,7 @@ describe('useHintPrompt', () => {
 
       // Show the prompt
       act(() => {
-        jest.advanceTimersByTime(20000);
+        vi.advanceTimersByTime(20000);
       });
       expect(result.current.showHintPrompt).toBe(true);
 
@@ -170,7 +171,7 @@ describe('useHintPrompt', () => {
 
       // Wait some time
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // Reset (player found a word)
@@ -180,14 +181,14 @@ describe('useHintPrompt', () => {
 
       // Wait less than 5 seconds
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       expect(result.current.showHintPrompt).toBe(false);
 
       // Wait past the 5 second threshold
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       expect(result.current.showHintPrompt).toBe(true);

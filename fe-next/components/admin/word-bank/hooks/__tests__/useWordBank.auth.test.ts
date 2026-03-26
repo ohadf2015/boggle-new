@@ -8,15 +8,16 @@
  * and inject Authorization header into requests.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useWordBank } from '../useWordBank';
 import type { Language } from '@/types';
 
 // Mock Supabase client
-jest.mock('@/utils/supabase/client', () => ({
-  createClient: jest.fn(() => ({
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: vi.fn(() => ({
     auth: {
-      getSession: jest.fn().mockResolvedValue({
+      getSession: vi.fn().mockResolvedValue({
         data: {
           session: {
             access_token: 'test-admin-token-12345',
@@ -30,12 +31,12 @@ jest.mock('@/utils/supabase/client', () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('useWordBank - Bug Fix: Missing Authorization Header', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (global.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({
         success: true,
@@ -59,7 +60,7 @@ describe('useWordBank - Bug Fix: Missing Authorization Header', () => {
     });
 
     // Check that fetch was called with Authorization header
-    const fetchCalls = (global.fetch as jest.Mock).mock.calls;
+    const fetchCalls = (global.fetch as any).mock.calls;
 
     // At least one call should exist
     expect(fetchCalls.length).toBeGreaterThan(0);
@@ -94,13 +95,13 @@ describe('useWordBank - Bug Fix: Missing Authorization Header', () => {
     });
 
     // Clear previous fetch calls
-    (global.fetch as jest.Mock).mockClear();
+    (global.fetch as any).mockClear();
 
     // Call deleteWord
     await result.current.deleteWord('test-word');
 
     // Check that POST fetch was called with Authorization header
-    const fetchCalls = (global.fetch as jest.Mock).mock.calls;
+    const fetchCalls = (global.fetch as any).mock.calls;
     const postCall = fetchCalls.find(call => {
       const options = call[1] as RequestInit;
       return options?.method === 'POST';
@@ -126,13 +127,13 @@ describe('useWordBank - Bug Fix: Missing Authorization Header', () => {
     });
 
     // Clear previous fetch calls
-    (global.fetch as jest.Mock).mockClear();
+    (global.fetch as any).mockClear();
 
     // Call bulkApprove
     await result.current.bulkApprove(['word-id-1', 'word-id-2']);
 
     // Check that POST fetch was called with Authorization header
-    const fetchCalls = (global.fetch as jest.Mock).mock.calls;
+    const fetchCalls = (global.fetch as any).mock.calls;
     expect(fetchCalls.length).toBeGreaterThan(0);
 
     const postCall = fetchCalls.find(call => {

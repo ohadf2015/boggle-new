@@ -4,40 +4,41 @@
  * Tests for the simplified boss orchestration hook that wraps useAdventureBossNew.
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureBossOrchestration } from '../useAdventureBossOrchestration';
 import { useAdventureBossNew } from '@/hooks/useAdventureBossNew';
 import { usePlayerHealth } from '@/hooks/usePlayerHealth';
 
-jest.mock('@/hooks/useAdventureBossNew');
-jest.mock('@/hooks/usePlayerHealth');
-jest.mock('@/hooks/useBossMechanics', () => ({
-  useBossMechanics: jest.fn().mockReturnValue({
+vi.mock('@/hooks/useAdventureBossNew');
+vi.mock('@/hooks/usePlayerHealth');
+vi.mock('@/hooks/useBossMechanics', () => ({
+  useBossMechanics: vi.fn().mockReturnValue({
     checkWord: (word: string) => ({
       meetsRequirement: word.length >= 5,
       scoreMultiplier: word.length >= 5 ? 1.5 : 1.0,
     }),
-    triggerTaunt: jest.fn(),
+    triggerTaunt: vi.fn(),
   }),
 }));
-jest.mock('@/lib/adventure/bossConfig', () => ({
-  getBossConfig: jest.fn().mockReturnValue({ id: 'test-boss' }),
-  getBossTaunt: jest.fn().mockReturnValue('taunt_key'),
+vi.mock('@/lib/adventure/bossConfig', () => ({
+  getBossConfig: vi.fn().mockReturnValue({ id: 'test-boss' }),
+  getBossTaunt: vi.fn().mockReturnValue('taunt_key'),
 }));
 
-const mockUseAdventureBossNew = useAdventureBossNew as jest.MockedFunction<typeof useAdventureBossNew>;
-const mockUsePlayerHealth = usePlayerHealth as jest.MockedFunction<typeof usePlayerHealth>;
+const mockUseAdventureBossNew = useAdventureBossNew as any;
+const mockUsePlayerHealth = usePlayerHealth as any;
 
 describe('useAdventureBossOrchestration', () => {
-  const mockTakeDamage = jest.fn();
-  const mockResetPlayerHealth = jest.fn();
-  const mockShake = jest.fn();
-  const mockAddTime = jest.fn();
-  const mockDealDamage = jest.fn().mockReturnValue(10);
-  const mockStartBattle = jest.fn();
-  const mockEndBattle = jest.fn();
-  const mockTriggerTaunt = jest.fn();
-  const mockReset = jest.fn();
+  const mockTakeDamage = vi.fn();
+  const mockResetPlayerHealth = vi.fn();
+  const mockShake = vi.fn();
+  const mockAddTime = vi.fn();
+  const mockDealDamage = vi.fn().mockReturnValue(10);
+  const mockStartBattle = vi.fn();
+  const mockEndBattle = vi.fn();
+  const mockTriggerTaunt = vi.fn();
+  const mockReset = vi.fn();
 
   const mockBossReturn = {
     isActive: true,
@@ -59,7 +60,7 @@ describe('useAdventureBossOrchestration', () => {
     healthState: { currentHP: 100, maxHP: 100, isDead: false, isActive: true },
     takeDamage: mockTakeDamage,
     resetHealth: mockResetPlayerHealth,
-    heal: jest.fn(),
+    heal: vi.fn(),
   };
 
   const defaultProps = {
@@ -69,14 +70,14 @@ describe('useAdventureBossOrchestration', () => {
     showBossIntroConfig: true,
     timeRemaining: 60,
     isPlaying: false,
-    startGame: jest.fn(),
-    startAIDirector: jest.fn(),
+    startGame: vi.fn(),
+    startAIDirector: vi.fn(),
     addTime: mockAddTime,
     shake: mockShake,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAdventureBossNew.mockReturnValue(mockBossReturn as any);
     mockUsePlayerHealth.mockReturnValue(mockPlayerHealthReturn as any);
   });
@@ -141,8 +142,8 @@ describe('useAdventureBossOrchestration', () => {
 
   describe('handleBossIntroStart', () => {
     it('should hide intro, start battle, start game, and start AI director', () => {
-      const startGame = jest.fn();
-      const startAIDirector = jest.fn();
+      const startGame = vi.fn();
+      const startAIDirector = vi.fn();
       const { result } = renderHook(() =>
         useAdventureBossOrchestration({ ...defaultProps, startGame, startAIDirector })
       );

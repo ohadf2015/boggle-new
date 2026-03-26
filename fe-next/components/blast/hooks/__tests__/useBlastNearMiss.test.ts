@@ -1,6 +1,7 @@
 /**
  * useBlastNearMiss - Tests for near-miss shimmer state hook.
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBlastNearMiss } from '../useBlastNearMiss';
 import type { BlastTileState, BlastTileType } from '../../types';
@@ -41,12 +42,12 @@ function makeGrid(gridSize: number): string[][] {
 
 describe('useBlastNearMiss', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   it('should initialize with empty shimmerCells', () => {
@@ -97,7 +98,7 @@ describe('useBlastNearMiss', () => {
     expect(result.current.shimmerCells.length).toBeGreaterThan(0);
 
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     expect(result.current.shimmerCells).toEqual([]);
@@ -152,7 +153,7 @@ describe('useBlastNearMiss', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // At 500ms (within 900ms window), should still be showing
@@ -176,7 +177,7 @@ describe('useBlastNearMiss', () => {
 
     // Advance 500ms (not yet cleared within 900ms window)
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Call check again — resets timer
@@ -186,7 +187,7 @@ describe('useBlastNearMiss', () => {
 
     // Advance another 500ms (only 500ms since last check, not 900ms total)
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Should still be active
@@ -194,7 +195,7 @@ describe('useBlastNearMiss', () => {
   });
 
   it('should clean up timer on unmount', () => {
-    const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
     const gridSize = 6;
     const tileStates = makeTileStates(gridSize, [
       { row: 1, col: 2, type: 'bomb' },

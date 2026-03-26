@@ -8,6 +8,7 @@
  * was read before localStorage was loaded, causing static "1 day streak" display.
  */
 
+import { vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock useWinStreak hook directly to control isLoaded state
@@ -48,17 +49,19 @@ function computeRecordWinResult() {
 }
 
 // Track what recordWin should return based on current mock state
-const mockRecordWin = jest.fn().mockImplementation(computeRecordWinResult);
-
-jest.mock('@/hooks/useWinStreak', () => ({
+const { mockRecordWin } = vi.hoisted(() => {
+  const mockRecordWin = vi.fn().mockImplementation(computeRecordWinResult);
+  return { mockRecordWin };
+});
+vi.mock('@/hooks/useWinStreak', () => ({
   useWinStreak: () => ({
     ...mockStreakData,
     recordWin: mockRecordWin,
-    applyStreakFreeze: jest.fn(),
-    recoverStreak: jest.fn(),
-    purchaseFreeze: jest.fn(),
-    getStreakEmoji: jest.fn(),
-    getStreakTier: jest.fn(),
+    applyStreakFreeze: vi.fn(),
+    recoverStreak: vi.fn(),
+    purchaseFreeze: vi.fn(),
+    getStreakEmoji: vi.fn(),
+    getStreakTier: vi.fn(),
     isStreakAtRisk: false,
   }),
 }));
@@ -86,7 +89,7 @@ function simulateLoadedStreak(streak: number, bestStreak?: number, lastWinDate?:
 
 describe('useWinStreakTracking', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset mock data to unloaded state
     mockStreakData = {
       currentStreak: 0,

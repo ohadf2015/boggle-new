@@ -2,19 +2,20 @@
  * useBlastSugarCrush - Tests for the Sugar Crush orchestration hook.
  * Verifies timed sequence execution, cleanup, and completion callback.
  */
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBlastSugarCrush } from '../useBlastSugarCrush';
 import type { BlastTileState } from '../../types';
 
 // ==================== Mocks ====================
 
-jest.mock('../../utils/blastSugarCrush', () => ({
-  planSugarCrush: jest.fn(),
+vi.mock('../../utils/blastSugarCrush', () => ({
+  planSugarCrush: vi.fn(),
   SUGAR_CRUSH_STAGGER_MS: 300,
 }));
 
 import { planSugarCrush } from '../../utils/blastSugarCrush';
-const mockPlanSugarCrush = planSugarCrush as jest.Mock;
+const mockPlanSugarCrush = planSugarCrush as any;
 
 // ==================== Helpers ====================
 
@@ -40,12 +41,12 @@ function makeStandardGrid(size: number): BlastTileState[][] {
 
 describe('useBlastSugarCrush', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockPlanSugarCrush.mockReset();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initial state', () => {
@@ -70,10 +71,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -91,10 +92,10 @@ describe('useBlastSugarCrush', () => {
       mockPlanSugarCrush.mockReturnValue([]);
 
       const grid = makeStandardGrid(5);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -112,10 +113,10 @@ describe('useBlastSugarCrush', () => {
       mockPlanSugarCrush.mockReturnValue([]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -137,10 +138,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -152,7 +153,7 @@ describe('useBlastSugarCrush', () => {
 
       // WHEN: advance past the last step's delay
       act(() => {
-        jest.advanceTimersByTime(400);
+        vi.advanceTimersByTime(400);
       });
 
       // THEN
@@ -168,10 +169,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(6);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -184,7 +185,7 @@ describe('useBlastSugarCrush', () => {
 
       // WHEN: advance to step delay
       act(() => {
-        jest.advanceTimersByTime(300);
+        vi.advanceTimersByTime(300);
       });
 
       // THEN: setTileStates called with updater function
@@ -203,10 +204,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -215,11 +216,11 @@ describe('useBlastSugarCrush', () => {
       });
 
       // First step fires
-      act(() => jest.advanceTimersByTime(300));
+      act(() => vi.advanceTimersByTime(300));
       expect(addExplosion).toHaveBeenCalledTimes(1);
 
       // Second step fires
-      act(() => jest.advanceTimersByTime(200));
+      act(() => vi.advanceTimersByTime(200));
       expect(addExplosion).toHaveBeenCalledTimes(2);
     });
 
@@ -230,10 +231,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -241,7 +242,7 @@ describe('useBlastSugarCrush', () => {
         result.current.start(grid, 4, setTileStates, addExplosion, addScore, onComplete);
       });
 
-      act(() => jest.advanceTimersByTime(300));
+      act(() => vi.advanceTimersByTime(300));
 
       expect(addScore).toHaveBeenCalledTimes(1);
       const scoreArg = addScore.mock.calls[0][0];
@@ -256,10 +257,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -268,7 +269,7 @@ describe('useBlastSugarCrush', () => {
       });
 
       // Execute both steps
-      act(() => jest.advanceTimersByTime(600));
+      act(() => vi.advanceTimersByTime(600));
 
       // THEN: onComplete called once with accumulated bonus
       expect(onComplete).toHaveBeenCalledTimes(1);
@@ -285,10 +286,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -297,12 +298,12 @@ describe('useBlastSugarCrush', () => {
       });
 
       // After 300ms: only first step fired
-      act(() => jest.advanceTimersByTime(300));
+      act(() => vi.advanceTimersByTime(300));
       expect(setTileStates).toHaveBeenCalledTimes(1);
       expect(onComplete).not.toHaveBeenCalled();
 
       // After 550ms: both steps fired, completion triggered
-      act(() => jest.advanceTimersByTime(250));
+      act(() => vi.advanceTimersByTime(250));
       expect(setTileStates).toHaveBeenCalledTimes(2);
       expect(onComplete).toHaveBeenCalledTimes(1);
     });
@@ -317,10 +318,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -334,7 +335,7 @@ describe('useBlastSugarCrush', () => {
       });
 
       // Advance timers
-      act(() => jest.advanceTimersByTime(1000));
+      act(() => vi.advanceTimersByTime(1000));
 
       // THEN: no steps executed, no completion
       expect(setTileStates).not.toHaveBeenCalled();
@@ -349,10 +350,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -381,10 +382,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result, unmount } = renderHook(() => useBlastSugarCrush());
 
@@ -396,7 +397,7 @@ describe('useBlastSugarCrush', () => {
       unmount();
 
       // Advance timers — no callbacks should fire
-      act(() => jest.advanceTimersByTime(3000));
+      act(() => vi.advanceTimersByTime(3000));
 
       // THEN: no state updates or callbacks after unmount
       expect(onComplete).not.toHaveBeenCalled();
@@ -411,10 +412,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(6);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -422,7 +423,7 @@ describe('useBlastSugarCrush', () => {
         result.current.start(grid, 6, setTileStates, addExplosion, addScore, onComplete);
       });
 
-      act(() => jest.advanceTimersByTime(300));
+      act(() => vi.advanceTimersByTime(300));
 
       // Verify conversion: get updater and apply it
       const updater = setTileStates.mock.calls[0][0];
@@ -440,10 +441,10 @@ describe('useBlastSugarCrush', () => {
       ]);
 
       const grid = makeStandardGrid(4);
-      const setTileStates = jest.fn();
-      const addExplosion = jest.fn();
-      const addScore = jest.fn();
-      const onComplete = jest.fn();
+      const setTileStates = vi.fn();
+      const addExplosion = vi.fn();
+      const addScore = vi.fn();
+      const onComplete = vi.fn();
 
       const { result } = renderHook(() => useBlastSugarCrush());
 
@@ -451,7 +452,7 @@ describe('useBlastSugarCrush', () => {
         result.current.start(grid, 4, setTileStates, addExplosion, addScore, onComplete);
       });
 
-      act(() => jest.advanceTimersByTime(300));
+      act(() => vi.advanceTimersByTime(300));
 
       // Apply updater to original grid
       const updater = setTileStates.mock.calls[0][0];

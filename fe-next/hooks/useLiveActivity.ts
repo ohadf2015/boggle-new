@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 import type { ActivityEvent } from '@/app/api/activity/recent/route';
 
 /**
@@ -9,7 +10,7 @@ import type { ActivityEvent } from '@/app/api/activity/recent/route';
  */
 export function useLiveActivity(): { events: ActivityEvent[]; loading: boolean } {
   const { data, isLoading } = useQuery<{ events: ActivityEvent[] }>({
-    queryKey: ['activity', 'recent'],
+    queryKey: queryKeys.activity.recent(),
     queryFn: async () => {
       const res = await fetch('/api/activity/recent');
       if (!res.ok) throw new Error('Failed to fetch activity');
