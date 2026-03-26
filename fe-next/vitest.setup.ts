@@ -306,65 +306,6 @@ afterEach(() => {
 });
 
 // ==========================================
-// Mock Framer Motion (prevents "No motion export" errors)
-// ==========================================
-
-const createMotionComponent = (tag: string) => {
-  const Component = vi.fn(({ children, ...props }: any) => {
-    const element = document.createElement(tag);
-    Object.entries(props).forEach(([key, value]) => {
-      if (key === 'children' || key.startsWith('animate') || key.startsWith('initial') || key.startsWith('exit') || key.startsWith('transition') || key.startsWith('whileHover') || key.startsWith('whileTap') || key === 'variants' || key === 'layout') return;
-      if (key === 'className') element.className = value as string;
-      if (key === 'style' && typeof value === 'object') Object.assign(element.style, value);
-      if (key.startsWith('data-')) element.setAttribute(key, String(value));
-    });
-    return children;
-  });
-  Component.displayName = `motion.${tag}`;
-  return Component;
-};
-
-vi.mock('framer-motion', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('framer-motion');
-  return {
-    ...actual,
-    motion: new Proxy({} as Record<string, any>, {
-      get: (_target, prop: string) => createMotionComponent(prop),
-    }),
-    AnimatePresence: ({ children }: any) => children,
-    useAnimation: () => ({ start: vi.fn(), stop: vi.fn(), set: vi.fn() }),
-    useMotionValue: (val: number) => ({ get: () => val, set: vi.fn(), onChange: vi.fn() }),
-    useTransform: (val: any) => val,
-    useSpring: (val: any) => val,
-    useInView: () => [vi.fn(), true],
-    useScroll: () => ({ scrollYProgress: { get: () => 0, onChange: vi.fn() } }),
-    useReducedMotion: () => false,
-  };
-});
-
-// ==========================================
-// Mock Capacitor (prevents "PushNotifications" errors)
-// ==========================================
-
-vi.mock('@capacitor/app', () => ({
-  App: {
-    addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
-    removeAllListeners: vi.fn(),
-    getInfo: vi.fn().mockResolvedValue({ build: '1', version: '1.0.0' }),
-  },
-}));
-
-vi.mock('@capacitor/push-notifications', () => ({
-  PushNotifications: {
-    addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
-    removeAllListeners: vi.fn(),
-    requestPermissions: vi.fn().mockResolvedValue({ receive: 'granted' }),
-    register: vi.fn().mockResolvedValue(undefined),
-    getDeliveredNotifications: vi.fn().mockResolvedValue({ notifications: [] }),
-  },
-}));
-
-// ==========================================
 // Test Utilities
 // ==========================================
 
