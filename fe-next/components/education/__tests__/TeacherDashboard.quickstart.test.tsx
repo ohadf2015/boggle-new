@@ -63,11 +63,11 @@ vi.mock('@/components/teacher/ClassroomManager', () => ({
   },
 }));
 
-vi.mock('@/components/teacher/LessonBuilder', () =>
-  function LessonBuilder() {
+vi.mock('@/components/teacher/LessonBuilder', () => ({
+  default: function LessonBuilder() {
     return <div data-testid="lesson-builder" />;
-  }
-);
+  },
+}));
 
 vi.mock('@/components/teacher/assignments', () => ({
   AssignmentTrackingPanel: () => <div data-testid="assignment-tracking-panel" />,

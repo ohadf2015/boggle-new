@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-const remotion = require('remotion');
+import * as remotion from 'remotion';
 
 vi.mock('../../../../lib/remotion/fonts', () => ({
   fredokaFamily: 'Fredoka, sans-serif',

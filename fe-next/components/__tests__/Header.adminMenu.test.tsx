@@ -113,6 +113,7 @@ describe('Header Admin Menu', () => {
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
+    mockAuthContext.isAdmin = true;
   });
 
   describe('Mobile Menu (works correctly)', () => {
@@ -164,8 +165,7 @@ describe('Header Admin Menu', () => {
 
     it('should not show admin link for non-admin users', async () => {
       // Override AuthContext to non-admin
-      const nonAdminContext = { ...mockAuthContext, isAdmin: false };
-      vi.spyOn(require('../../contexts/AuthContext'), 'useAuth').mockReturnValue(nonAdminContext);
+      mockAuthContext.isAdmin = false;
 
       const user = userEvent.setup();
       render(<HeaderMenuDropdown />);

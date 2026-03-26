@@ -136,17 +136,17 @@ vi.mock('../results', () => ({
 }));
 
 // ── Inline sub-components ────────────────────────────────────────────────────
-vi.mock('@/components/auth/DailyChallengeInlineSignup', () =>
-  function MockInlineSignup() {
+vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({
+  default: function MockInlineSignup() {
     return <div data-testid="inline-signup" />;
-  }
-);
+  },
+}));
 
-vi.mock('../StreakMilestoneCelebration', () =>
-  function MockStreakMilestone() {
+vi.mock('../StreakMilestoneCelebration', () => ({
+  default: function MockStreakMilestone() {
     return <div data-testid="streak-milestone" />;
-  }
-);
+  },
+}));
 
 vi.mock('../TabbedDailyLeaderboard', () =>
   function MockLeaderboard() {

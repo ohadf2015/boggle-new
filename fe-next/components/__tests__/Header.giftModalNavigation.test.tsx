@@ -95,13 +95,15 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock components that are not relevant to this test
-vi.mock('@/components/auth/AuthButton', () => function MockAuthButton() {
-  return <button>Auth</button>;
-});
+vi.mock('@/components/auth/AuthButton', () => ({
+  default: function MockAuthButton() {
+    return <button>Auth</button>;
+  },
+}));
 
-vi.mock('@/components/MusicControls', () => function MockMusicControls() {
+vi.mock('@/components/MusicControls', () => ({ default: function MockMusicControls() {
   return <button>Music</button>;
-});
+} }));
 
 vi.mock('@/components/CoinBalance', () => ({
   CoinBalance: function MockCoinBalance() {

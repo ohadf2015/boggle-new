@@ -72,18 +72,24 @@ vi.mock('framer-motion', () => {
 });
 
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
-vi.mock('next/dynamic', () => {
-  const React = require('react');
-  return { default: (_importFn: unknown, _opts?: unknown) => {
+vi.mock('next/dynamic', () => ({
+  default: (importFn: () => Promise<any>, _opts?: unknown) => {
     const Dynamic = (props: Record<string, unknown>) => {
-      const AdventureGame = require('../AdventureGame');
-      const Comp = AdventureGame.default || AdventureGame;
+      const [Comp, setComp] = React.useState<React.ComponentType | null>(null);
+      React.useEffect(() => {
+        let mounted = true;
+        importFn().then((mod: any) => {
+          if (mounted) setComp(() => mod.default || mod);
+        });
+        return () => { mounted = false; };
+      }, []);
+      if (!Comp) return null;
       return React.createElement(Comp, props);
     };
     Dynamic.displayName = 'NextDynamic';
     return Dynamic;
-  } };
-});
+  },
+}));
 
 vi.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: any) => {

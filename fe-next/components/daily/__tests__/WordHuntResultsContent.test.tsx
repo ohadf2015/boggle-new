@@ -30,9 +30,9 @@ vi.mock('../results', () => ({
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
 }));
-vi.mock('../TabbedDailyLeaderboard', () => function MockLeaderboard() { return <div data-testid="leaderboard" />; });
-vi.mock('@/components/auth/DailyChallengeInlineSignup', () => function MockInlineSignup() { return <div data-testid="inline-signup" />; });
-vi.mock('../WatchAdButton', () => function MockWatchAdButton() { return <div data-testid="watch-ad" />; });
+vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard() { return <div data-testid="leaderboard" />; } }));
+vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: function MockInlineSignup() { return <div data-testid="inline-signup" />; } }));
+vi.mock('../WatchAdButton', () => ({ default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; } }));
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 

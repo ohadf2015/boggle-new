@@ -38,8 +38,8 @@ vi.mock('../../../host/components/pre-game/desktop', () => ({
   ),
   InviteCard: () => <div data-testid="invite-card" />,
 }));
-vi.mock('../../../components/RoomChat', () => () => <div data-testid="room-chat" />);
-vi.mock('../../../components/Avatar', () => ({ size }: { size: string }) => <div data-testid="avatar" data-size={size} />);
+vi.mock('../../../components/RoomChat', () => ({ default: () => <div data-testid="room-chat" /> }));
+vi.mock('../../../components/Avatar', () => ({ default: ({ size }: { size: string }) => <div data-testid="avatar" data-size={size} /> }));
 vi.mock('../../../components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => open ? <div data-testid="alert-dialog">{children}</div> : null,
   AlertDialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,

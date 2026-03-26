@@ -64,16 +64,16 @@ vi.mock('@/components/singleplayer/SinglePlayerGame', () => ({
 }));
 
 // --- Mock ChallengeResults ---
-vi.mock('../ChallengeResults', () =>
-  function MockChallengeResults({ onPlayAgain, onBackToHome }: { onPlayAgain: () => void; onBackToHome: () => void }) {
+vi.mock('../ChallengeResults', () => ({
+  default: function MockChallengeResults({ onPlayAgain, onBackToHome }: { onPlayAgain: () => void; onBackToHome: () => void }) {
     return (
       <div data-testid="challenge-results">
         <button onClick={onPlayAgain}>Play Again</button>
         <button onClick={onBackToHome}>Back to Home</button>
       </div>
     );
-  }
-);
+  },
+}));
 
 // --- Mock PageLoader ---
 vi.mock('@/components/ui/PageLoader', () => ({

@@ -27,13 +27,13 @@ vi.mock('next/link', () => {
 vi.mock('../../components/auth/AuthButton', () => {
   const MockAuthButton = () => <div>Auth Button</div>;
   MockAuthButton.displayName = 'MockAuthButton';
-  return MockAuthButton;
+  return { default: MockAuthButton };
 });
 
 vi.mock('../../components/MusicControls', () => {
   const MockMusicControls = () => <div>Music Controls</div>;
   MockMusicControls.displayName = 'MockMusicControls';
-  return MockMusicControls;
+  return { default: MockMusicControls };
 });
 
 describe('HeaderMenuDropdown - Contrast Issues', () => {

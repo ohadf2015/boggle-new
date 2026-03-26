@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-const remotion = require('remotion');
+import * as remotion from 'remotion';
 
 // Mock @remotion/transitions (transitive dep via WordHuntPromoVideo)
 vi.mock('@remotion/transitions', () => ({

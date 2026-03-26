@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
  
-const remotion = require('remotion');
+import * as remotion from 'remotion';
 
 beforeEach(() => {
   remotion.useCurrentFrame.mockReturnValue(75);

@@ -82,21 +82,24 @@ vi.mock('next/link', () => {
 
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 // We intercept this and return the jest-mocked AdventureGame synchronously
-vi.mock('next/dynamic', () => {
-
-  const React = require('react');
-  return { default: (_importFn: unknown, _opts?: unknown) => {
-    // Return a component that renders the mocked AdventureGame
+vi.mock('next/dynamic', () => ({
+  default: (importFn: () => Promise<any>, _opts?: unknown) => {
     const Dynamic = (props: Record<string, unknown>) => {
-
-      const AdventureGame = require('../AdventureGame');
-      const Comp = AdventureGame.default || AdventureGame;
+      const [Comp, setComp] = React.useState<React.ComponentType | null>(null);
+      React.useEffect(() => {
+        let mounted = true;
+        importFn().then((mod: any) => {
+          if (mounted) setComp(() => mod.default || mod);
+        });
+        return () => { mounted = false; };
+      }, []);
+      if (!Comp) return null;
       return React.createElement(Comp, props);
     };
     Dynamic.displayName = 'NextDynamic';
     return Dynamic;
-  } };
-});
+  },
+}));
 
 // Mock Next.js Image
 vi.mock('next/image', () => {
@@ -377,8 +380,8 @@ vi.mock('@/lib/adventure/weeklyChallenge', () => ({
   getCurrentWeekId: () => '2026-W11',
 }));
 
-vi.mock('../WordAlbumPanel', () => { const M = () => null; M.displayName = 'M'; return M; });
-vi.mock('../WeeklyChallengePanel', () => { const M = () => null; M.displayName = 'M'; return M; });
+vi.mock('../WordAlbumPanel', () => ({ default: () => null }));
+vi.mock('../WeeklyChallengePanel', () => ({ default: () => null }));
 
 vi.mock('../WorldMap', () => {
   const MockWorldMap = ({
