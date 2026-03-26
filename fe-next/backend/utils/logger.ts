@@ -95,7 +95,17 @@ class Logger {
     Sentry.withScope((scope) => {
       scope.setLevel(level);
       scope.setTag('log.category', category);
+      // Attach structured context so Sentry links to the right code
+      scope.setContext('logger', {
+        category,
+        message,
+        ...(data != null && !(data instanceof Error) ? { data: typeof data === 'object' ? JSON.stringify(data).slice(0, 2048) : String(data) } : {}),
+      });
       if (data instanceof Error) {
+        // Preserve the category/message as fingerprint context so errors
+        // with the same category+message group together in Sentry
+        scope.setFingerprint([category, data.message || message]);
+        scope.setTransactionName(`${category}: ${message}`);
         Sentry.captureException(data);
       } else {
         Sentry.captureMessage(`[${category}] ${message}`, level);
