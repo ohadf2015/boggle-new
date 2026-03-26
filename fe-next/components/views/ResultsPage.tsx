@@ -259,17 +259,37 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results page');
 
+    // Timeout guard: if resetGame callback never fires (socket issue), recover
+    let callbackFired = false;
+    const timeout = setTimeout(() => {
+      if (!callbackFired) {
+        logger.error('[RESULTS] resetGame callback timed out — attempting startGame anyway');
+        socket.emit('startGame', {
+          letterGrid: preGeneratedGrid,
+          timerSeconds: 120,
+          language: roomLanguage,
+          hostPlaying: true,
+          minWordLength: 2,
+          difficulty: 'MEDIUM',
+          boardTheme: null,
+          gameMode: selectedGameMode,
+        });
+      }
+    }, 3000);
+
     // Reset game state first, then start new game in callback
     socket.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+      callbackFired = true;
+      clearTimeout(timeout);
       if (response?.success) {
         logger.log('[RESULTS] Game reset confirmed, starting new game');
 
         socket.emit('startGame', {
           letterGrid: preGeneratedGrid,
-          timerSeconds: 180,
+          timerSeconds: 120,
           language: roomLanguage,
           hostPlaying: true,
-          minWordLength: 3,
+          minWordLength: 2,
           difficulty: 'MEDIUM',
           boardTheme: null,
           gameMode: selectedGameMode,

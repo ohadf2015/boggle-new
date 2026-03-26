@@ -64,9 +64,9 @@ const PODIUM_CONFIG = [
   {
     order: 2,
     place: 3,
-    bgClass: 'bg-neo-orange',
-    borderClass: 'border-neo-orange',
-    textClass: 'text-neo-orange',
+    bgClass: 'bg-neo-purple',
+    borderClass: 'border-neo-purple',
+    textClass: 'text-neo-purple',
     ptOffset: 'pt-14',
     avatarSize: 'w-10 h-10 sm:w-12 sm:h-12',
     badgeSize: 'w-5 h-5 text-[9px]',
@@ -307,12 +307,12 @@ export default function ResultsPodium({
                   <motion.div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 text-neo-lime drop-shadow-md"
                     initial={reducedMotion ? undefined : { scale: 0, rotate: -360, y: -20 }}
-                    animate={{ scale: [0, 1.4, 1], rotate: 0, y: 0 }}
+                    animate={{ scale: 1, rotate: 0, y: 0 }}
                     transition={{
                       type: 'spring',
                       delay: baseDelay + 0.4,
-                      stiffness: 250,
-                      damping: 10,
+                      stiffness: 200,
+                      damping: 8,
                     }}
                   >
                     <Crown className="w-5 h-5 fill-neo-lime" />

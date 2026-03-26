@@ -45,9 +45,9 @@ vi.mock('../tooltip', async () => {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
   }) => {
-    // Store in external object to avoid lint error
-    const handlers = (globalThis as any).__mobileTooltipMockHandlers;
-    handlers.openChange = onOpenChange || null;
+    React.useEffect(() => {
+      (globalThis as any).__mobileTooltipMockHandlers.openChange = onOpenChange || null;
+    }, [onOpenChange]);
     return (
       <div data-testid="tooltip" data-open={open}>
         {children}
@@ -89,9 +89,9 @@ vi.mock('../tooltip', async () => {
     className?: string;
     onPointerDownOutside?: () => void;
   }) => {
-    // Store in external object to avoid lint error
-    const handlers = (globalThis as any).__mobileTooltipMockHandlers;
-    handlers.pointerDownOutside = onPointerDownOutside || null;
+    React.useEffect(() => {
+      (globalThis as any).__mobileTooltipMockHandlers.pointerDownOutside = onPointerDownOutside || null;
+    }, [onPointerDownOutside]);
     return (
       <div
         data-testid="tooltip-content"

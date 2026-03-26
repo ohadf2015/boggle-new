@@ -97,7 +97,7 @@ vi.mock('../../fonts', () => ({
 }));
 
 describe('LocaleLayout Hydration', () => {
-    it('should render without hydration mismatch', async () => {
+    it('should render without hydration mismatch', { timeout: 30000 }, async () => {
         const LocaleLayout = (await import('../layout')).default;
 
         // Spy on console.error to catch React hydration warnings

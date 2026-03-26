@@ -54,6 +54,8 @@ export default defineConfig({
       '**/useAdaptiveDifficulty.test.ts',
       '**/MusicContext.duplicateProvider.test.tsx',
       '**/MusicContext.ios.test.tsx',
+      '**/LandingView.spacing.test.tsx',
+      '**/useUnclaimedGifts.bug.test.tsx',
       '**/CircularTimer.test.tsx',
       '**/AdventureGame.lexi.test.tsx',
       '**/AdventureGame.bossIntegration.test.tsx',

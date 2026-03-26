@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect } from 'react';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { cn } from '@/lib/utils';
@@ -52,6 +52,11 @@ const Avatar = memo<AvatarProps>(({
 }) => {
   const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
 
+  // Hydration guard: always render skeleton on first paint to match SSR,
+  // then show the real avatar after mount (client stores aren't available on server).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
   const fallbackSeed = avatarImage || userId || 'default-avatar';
   const fallbackConfig = useMemo(
@@ -62,7 +67,7 @@ const Avatar = memo<AvatarProps>(({
   // Infer loading state: if isLoading is not explicitly set and there's no
   // avatar data or seed, the consumer likely hasn't loaded data yet — show skeleton.
   const hasIdentity = !!(customAvatar || userId || avatarImage);
-  const shouldLoad = isLoading === true || (isLoading === undefined && !hasIdentity);
+  const shouldLoad = !mounted || isLoading === true || (isLoading === undefined && !hasIdentity);
 
   // 0. Loading state
   if (shouldLoad) {

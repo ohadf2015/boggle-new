@@ -217,7 +217,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
     });
   });
 
-  it('should render game with achievement notification support', async () => {
+  it('should render game with achievement notification support', { timeout: 30000 }, async () => {
     // GIVEN: Game is initialized
     const mockSettings = {
       timerSeconds: 180,

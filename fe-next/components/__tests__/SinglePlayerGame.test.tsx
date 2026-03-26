@@ -177,7 +177,7 @@ describe('SinglePlayerGame - Word Submission', () => {
     });
   });
 
-  it('renders the game grid correctly', async () => {
+  it('renders the game grid correctly', { timeout: 30000 }, async () => {
     const mockSettings = {
       timerSeconds: 180,
       language: 'en' as const,

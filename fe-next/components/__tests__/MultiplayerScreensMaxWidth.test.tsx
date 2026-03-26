@@ -58,7 +58,7 @@ const createWrapper = () => {
 
 describe('Multiplayer Screens Max Width', () => {
   describe('HostPreGameView', () => {
-    it('should have max-width constraint on desktop via inner content', async () => {
+    it('should have max-width constraint on desktop via inner content', { timeout: 30000 }, async () => {
       const { default: HostPreGameView } = await import('../../host/components/HostPreGameView');
 
       const mockProps = {

@@ -10,5 +10,5 @@ export const RATE_LIMITS = {
   roomCreate: { points: 1, duration: 10, description: 'Room creation per 10 seconds' },
   default: { points: 50, duration: 10, description: 'Default socket events per 10 seconds' },
   http: { points: 100, duration: 60, description: 'HTTP API requests per minute' },
-  connection: { points: 5, duration: 60, description: 'Socket connections per IP per minute' },
+  connection: { points: 20, duration: 60, description: 'Socket connections per IP per minute' },
 } as const;

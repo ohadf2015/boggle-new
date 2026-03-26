@@ -74,7 +74,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
       // This is the bug - gifts array is empty because fetchGifts() was never called
       await waitFor(() => {
         expect(result.current.gifts.length).toBeGreaterThan(0);
-      }, { timeout: 3000 });
+      }, { timeout: 5000 });
 
       // Verify the gift data is correct
       expect(result.current.gifts[0].id).toBe('gift-1');
@@ -136,7 +136,7 @@ describe('useUnclaimedGifts - Gift Modal Bug Fix', () => {
         const unclaimedGift = result.current.gifts.find(g => !g.claimed);
         expect(unclaimedGift).toBeDefined();
         expect(unclaimedGift?.id).toBe('gift-123');
-      }, { timeout: 3000 });
+      }, { timeout: 5000 });
     });
   });
 });

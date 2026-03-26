@@ -404,6 +404,10 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         currentGame.playerWords[username] = [];
         currentGame.playerWordDetails[username] = [];
         currentGame.playerAchievements[username] = [];
+        // Also initialize playerWordsSet for O(1) duplicate checking
+        const gameAny = currentGame as any;
+        if (!gameAny.playerWordsSet) gameAny.playerWordsSet = {};
+        gameAny.playerWordsSet[username] = new Set<string>();
       }
       handleLateJoin(socket, game as unknown as Game, gameCode, username);
     }

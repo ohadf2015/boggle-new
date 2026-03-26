@@ -101,7 +101,15 @@ export function useMultiplayerGameFlow(
 
   const handleShowResults = useCallback(
     (data: unknown) => {
-      setResultsData(data as ResultsData);
+      const rd = data as ResultsData;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MP_RESULTS] handleShowResults called', {
+          hasScores: !!rd?.scores,
+          scoresLength: rd?.scores?.length,
+          hasLetterGrid: !!rd?.letterGrid,
+        });
+      }
+      setResultsData(rd);
       setShowResults(true);
       recordGameCompleted();
 

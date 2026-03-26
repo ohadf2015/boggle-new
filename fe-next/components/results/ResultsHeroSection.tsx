@@ -53,11 +53,11 @@ const RANK_ACCENTS: Record<number, RankAccent> = {
     ring: 'bg-neo-cyan/30',
   },
   3: {
-    text: 'text-neo-orange',
-    bg: 'bg-neo-orange',
-    border: 'border-neo-orange',
-    glow: 'drop-shadow-[0_0_35px_rgba(255,107,53,0.5)]',
-    ring: 'bg-neo-orange/30',
+    text: 'text-neo-purple',
+    bg: 'bg-neo-purple',
+    border: 'border-neo-purple',
+    glow: 'drop-shadow-[0_0_35px_rgba(139,92,246,0.5)]',
+    ring: 'bg-neo-purple/30',
   },
 };
 
@@ -173,7 +173,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.1 }}
                 className={cn(
-                  'font-neo-display font-black text-4xl xs:text-6xl sm:text-9xl leading-none',
+                  'font-neo-display font-black text-3xl xs:text-4xl sm:text-6xl md:text-9xl leading-none',
                   'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
@@ -185,7 +185,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
                 className={cn(
-                  'text-6xl xs:text-8xl sm:text-[11rem] font-neo-display font-black leading-none',
+                  'text-5xl xs:text-6xl sm:text-8xl md:text-[11rem] font-neo-display font-black leading-none',
                   displayAccent.text,
                   displayAccent.glow,
                 )}

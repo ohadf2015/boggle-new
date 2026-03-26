@@ -72,6 +72,14 @@ export function useWordSubmission(
     const validation = validateWordLocally(formedWord, currentLang, minWordLength, normalizedFoundWords);
 
     if (!validation.isValid) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[WORD_SUBMIT] Client rejected word:', {
+          word: formedWord,
+          errorKey: validation.errorKey,
+          foundWordsCount: normalizedFoundWords.length,
+          foundWordsList: normalizedFoundWords.slice(0, 10).map(w => typeof w === 'string' ? w : w.word),
+        });
+      }
       let msg: string;
       const isDuplicate = validation.errorKey === 'playerView.wordAlreadyFound';
 

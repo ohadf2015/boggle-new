@@ -234,9 +234,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onGameStart: (data) => {
       setPendingGameStart(data);
       setGameStartTime(Date.now());
-      if (showResults) { setShowResults(false); setResultsData(null); }
+      setShowResults(false);
+      setResultsData(null);
     },
-    onGameReset: () => { setShowResults(false); setResultsData(null); },
+    onGameReset: () => { setResultsData(null); },
     onHostLeftRoomClosing: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false); setIsHost(false); setGameCode('');
