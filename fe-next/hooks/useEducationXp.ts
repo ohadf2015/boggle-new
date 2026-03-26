@@ -223,6 +223,21 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         };
         setPendingUpdate(update);
 
+        // Persist XP to Supabase via API (fire-and-forget)
+        fetch('/api/education/record-xp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            xpAmount: xpResult.totalXp,
+            lessonId,
+            activityType: session.type,
+          }),
+        }).then(() => {
+          setPendingUpdate(null);
+        }).catch(() => {
+          // pendingUpdate stays set for retry
+        });
+
         // Build result
         const result: AwardPracticeXpResult = {
           ...xpResult,

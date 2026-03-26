@@ -20,6 +20,7 @@ import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -94,6 +95,7 @@ const SinglePlayerView: React.FC = () => {
   } = useSinglePlayerConfig({ searchParams });
 
   const setIsInGame = useHideNavigation();
+  const { user, isAuthenticated } = useAuth();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
 
   // Show feature unlock notifications when user reaches milestones
@@ -189,6 +191,22 @@ const SinglePlayerView: React.FC = () => {
     results.previousHighScore = highScoreResult.previousBest;
     results.isNewAllTimeBest = highScoreResult.isNewAllTimeBest;
 
+    // Sync stats + XP to Supabase for authenticated users
+    if (isAuthenticated && user?.id) {
+      fetch('/api/stats/record-game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: results.playerScore,
+          wordCount: (results.playerWords || []).length,
+          longestWord,
+          timePlayed: results.gameDuration,
+          achievementCount: results.achievements?.length || 0,
+          mode: gameState.mode,
+        }),
+      }).catch(() => { /* non-critical — localStorage is the fallback */ });
+    }
+
     if (boardCode) {
       awardCreatorCoins('BOARD_PLAYED', { boardCode });
       fetch(`/api/ugc/boards/${boardCode}/play`, {
@@ -200,7 +218,7 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase]);
+  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id]);
 
   return (
     <div

@@ -21,6 +21,10 @@ type PracticeSessionXp = {
   streakDays?: number;
 };
 
+// Mock fetch — the hook now fires a fetch to /api/education/record-xp
+// Use a never-resolving promise so pendingUpdate stays set during tests
+global.fetch = jest.fn().mockImplementation(() => new Promise(() => {}));
+
 // Mock the educationXpManager module
 jest.mock('@/backend/modules/educationXpManager', () => ({
   calculatePracticeXp: jest.fn(),

@@ -21,10 +21,12 @@ jest.mock('@/lib/apiRateLimit', () => ({
 // Mock supabase server client (auth + data queries on the same client)
 const mockGetUser = jest.fn();
 const mockFrom = jest.fn();
+const mockRpc = jest.fn().mockResolvedValue({ data: null, error: null });
 jest.mock('@/utils/supabase/server', () => ({
   createClient: jest.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
+    rpc: (...args: unknown[]) => mockRpc(...args),
   }),
 }));
 
@@ -61,6 +63,20 @@ function makeInvalidJsonRequest(): NextRequest {
 }
 
 const validBody = { world: 1, level: 1, stars: 3, score: 500, words: 10 };
+
+/** Reusable profiles table mock for inline mockFrom implementations */
+function mockProfilesTable() {
+  return {
+    select: jest.fn().mockReturnValue({
+      eq: jest.fn().mockReturnValue({
+        single: jest.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
+      }),
+    }),
+    update: jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error: null }),
+    }),
+  };
+}
 
 const mockProgression = {
   user_id: 'user-1',
@@ -134,6 +150,18 @@ function setupDbMocks({
               error: upsertError,
             }),
           }),
+        }),
+      };
+    }
+    if (table === 'profiles') {
+      return {
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
+          }),
+        }),
+        update: jest.fn().mockReturnValue({
+          eq: jest.fn().mockResolvedValue({ error: null }),
         }),
       };
     }
@@ -560,12 +588,44 @@ describe('POST /api/adventure/complete', () => {
             }),
           };
         }
-        return {};
+        return mockProfilesTable();
       });
 
       const res = await POST(makeRequest(validBody));
       expect(res.status).toBe(409);
       expect(res.data.error).toContain('Concurrent');
+    });
+  });
+
+  // ===== XP SYNC TO MAIN PROFILES =====
+  describe('XP sync to main profiles table', () => {
+    it('calls increment_player_xp when XP is earned', async () => {
+      setupDbMocks({
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      await POST(makeRequest(validBody));
+      // Wait for fire-and-forget async IIFE
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', {
+        p_player_id: 'user-1',
+        p_xp_amount: 50 + 3 * 25, // BASE_COMPLETION_XP + stars * XP_PER_STAR
+      });
+    });
+
+    it('does not call increment_player_xp when no XP earned (replay, same stars)', async () => {
+      setupDbMocks({
+        completionData: { stars: 3, best_score: 600, best_words: 12 },
+      });
+
+      mockRpc.mockClear();
+      await POST(makeRequest({ ...validBody, stars: 2 }));
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // xpEarned=0 since stars didn't improve (max(2,3)=3, starsGained=0) and not first completion
+      expect(mockRpc).not.toHaveBeenCalled();
     });
   });
 
@@ -670,6 +730,7 @@ describe('POST /api/adventure/complete', () => {
             }),
           };
         }
+        if (table === 'profiles') return mockProfilesTable();
         return {};
       });
 

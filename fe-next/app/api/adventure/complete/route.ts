@@ -422,6 +422,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update last_game_at on the main profiles table (fire-and-forget)
+    void supabase
+      .from('profiles')
+      .update({ last_game_at: new Date().toISOString() })
+      .eq('id', userId);
+
+    // Sync XP to main profiles table so adventure play contributes to overall level.
+    // Without this, adventure XP stays siloed in player_progression and the main
+    // profile level never advances for adventure-only players.
+    if (xpEarned > 0) {
+      // Fire-and-forget: sync adventure XP to main profile without blocking response
+      (async () => {
+        const { error: xpSyncError } = await supabase.rpc('increment_player_xp', {
+          p_player_id: userId,
+          p_xp_amount: xpEarned,
+        });
+        if (xpSyncError) {
+          console.error('[ADVENTURE COMPLETE API] Failed to sync XP to profiles:', xpSyncError);
+        }
+      })().catch((err) => {
+        console.error('[ADVENTURE COMPLETE API] XP sync error:', err);
+      });
+    }
+
     // Check for level up
     const previousLevel = existingProgression?.player_level ?? 1;
     const leveledUp = newPlayerLevel > previousLevel;
