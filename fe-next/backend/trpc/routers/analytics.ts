@@ -16,7 +16,7 @@ export const analyticsRouter = router({
       utm_medium: z.string().optional(),
       utm_campaign: z.string().optional(),
       referrer: z.string().optional(),
-      metadata: z.record(z.unknown()).optional(),
+      metadata: z.record(z.string(), z.unknown()).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       if (!isSupabaseConfigured()) {
