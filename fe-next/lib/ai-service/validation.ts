@@ -16,7 +16,7 @@ import {
   type WordValidationResult,
 } from './types';
 import { validationCache } from './cache';
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 /**
  * Check if word exists in community_words table (host/AI approved).

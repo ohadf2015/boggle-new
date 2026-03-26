@@ -18,7 +18,7 @@ import {
   isEmailServiceConfigured,
 } from '@/lib/email';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 // Re-export template functions for backward compatibility
 export {

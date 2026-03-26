@@ -7,7 +7,7 @@ import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { captureAIServiceError } from '@/utils/sentry';
 import { TOKEN_COSTS, type GoogleCredentials, type TokenUsageStats } from './types';
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 /**
  * Parse Google Cloud credentials from JSON string environment variable.

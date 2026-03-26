@@ -9,7 +9,7 @@ import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 // Initialize Resend client
 const resend = process.env.RESEND_API_KEY

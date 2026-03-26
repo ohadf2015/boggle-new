@@ -12,7 +12,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { WORD_LENGTH_RANGE, STATIC_WORD_LISTS, type ValidationStatus } from './wordBankData';
 import { addToCommunityWords } from './wordBankBulk';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 // Re-export bulk operations for consumers importing from wordBankAdmin
 export {

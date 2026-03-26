@@ -7,7 +7,7 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 /**
  * Create Supabase admin client with service role key

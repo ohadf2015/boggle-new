@@ -13,7 +13,7 @@ import {
   RATE_LIMIT_KEYS,
 } from '@/backend/redis/rateLimit';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 // Store for rate limit data
 interface RateLimitData {

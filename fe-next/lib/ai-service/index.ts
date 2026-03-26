@@ -41,7 +41,7 @@ import {
   generateBulkWords,
 } from './generation';
 
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 /**
  * Main GameAIService class

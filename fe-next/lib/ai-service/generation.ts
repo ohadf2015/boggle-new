@@ -13,7 +13,7 @@ import {
 } from './types';
 import { trackTokenUsage } from './client';
 import { withRetry } from './validation';
-const logger = require('@/backend/utils/logger');
+import logger from '@/backend/utils/logger';
 
 /**
  * Generate a themed word board using AI
