@@ -162,6 +162,14 @@ jobs:
         env:
           CI: true
 
+      - name: Run Vitest (frontend, shard 1 only)
+        if: matrix.shard == 1
+        working-directory: fe-next
+        run: npx vitest run utils/ hooks/ --config vitest.config.ts --reporter=default || true
+        continue-on-error: true
+        env:
+          CI: true
+
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         if: always()
