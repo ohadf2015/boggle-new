@@ -5838,7 +5838,8 @@ const sv = {
       "wordAlbum": "Ordalbum",
       "bossRush": "Bossrush",
       "bossRushLocked": "Besegra alla bossar för att låsa upp Bossrush",
-      "allQuestsComplete": "Alla dagliga uppdrag klara! Bonus!"
+      "allQuestsComplete": "Alla dagliga uppdrag klara! Bonus!",
+      "dailyQuestBonusComplete": "Alla uppdrag klara! +50 bonusguld"
     },
     "album": {
       "title": "Ordalbum",
@@ -6203,6 +6204,12 @@ const sv = {
       "shieldBlocked": "Sköld blockerade {percent}% skada!",
       "allObjectivesComplete": "Alla mål uppnådda!",
       "gridAriaLabel": "Äventyrsspelbräde"
+    },
+    "nearMiss": {
+      "almostThere": "Nästan där!",
+      "scoreAway": "Bara {{remaining}} poäng kvar!",
+      "wordsAway": "Bara {{remaining}} ord till!",
+      "countAway": "Bara {{remaining}} kvar!"
     },
     "hints": {
       "minLetters2": "2+ bokstäver",
@@ -8507,6 +8514,25 @@ const sv = {
       "unlocked": "Upplåst!",
       "unpin": "Ta bort",
       "upgraded": "Märke uppgraderat!"
+    },
+    "mastery": {
+      "flashcardPerfect": "Perfekt! Du behärskar alla {{count}} ord!",
+      "flashcardProgress": "Du lärde dig {{count}} ord!",
+      "newWordsDiscovered": "Du upptäckte {{count}} nya ord!",
+      "keepPracticing": "Bra övning! Fortsätt hitta ord!",
+      "matchingPerfect": "Perfekt matchning!",
+      "matchingProgress": "Du matchade {{count}} par!",
+      "spellingPerfect": "Perfekt stavning!",
+      "spellingProgress": "Du stavade {{count}} ord korrekt!",
+      "blitzResult": "Du hittade {{count}} ord på 60 sekunder!",
+      "dailyChallengeComplete": "Daglig utmaning klar!",
+      "lessonMastered": "Lektion bemästrad! Du kan dessa ord!",
+      "lessonProgress": "Bra jobbat! Fortsätt öva.",
+      "duel": {
+        "win": "Seger! Bra spelat!",
+        "loss": "Bra försök! Nästa gång!",
+        "draw": "Oavgjort! Jämnstarka!"
+      }
     },
     "analytics": {
       "accuracy": "Precision",

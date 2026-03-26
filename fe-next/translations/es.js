@@ -5870,7 +5870,8 @@ const es = {
       "wordAlbum": "Álbum de palabras",
       "bossRush": "Carrera de Jefes",
       "bossRushLocked": "Derrota a todos los jefes para desbloquear Carrera de Jefes",
-      "allQuestsComplete": "¡Todas las misiones diarias completas! ¡Bonus!"
+      "allQuestsComplete": "¡Todas las misiones diarias completas! ¡Bonus!",
+      "dailyQuestBonusComplete": "¡Todas las misiones completas! +50 oro de bonificación"
     },
     "album": {
       "title": "Álbum de palabras",
@@ -6552,6 +6553,12 @@ const es = {
       "shieldBlocked": "¡Escudo bloqueó {percent}% de daño!",
       "allObjectivesComplete": "¡Todos los objetivos completados!",
       "gridAriaLabel": "Tablero de juego de aventura"
+    },
+    "nearMiss": {
+      "almostThere": "¡Ya casi!",
+      "scoreAway": "¡Solo faltan {{remaining}} puntos!",
+      "wordsAway": "¡Solo falta {{remaining}} palabra más!",
+      "countAway": "¡Solo faltan {{remaining}} más!"
     },
     "hints": {
       "minLetters2": "2+ letras",
@@ -8551,6 +8558,25 @@ const es = {
       "unlocked": "¡Desbloqueado!",
       "unpin": "Desfijar",
       "upgraded": "¡Insignia mejorada!"
+    },
+    "mastery": {
+      "flashcardPerfect": "¡Perfecto! ¡Dominaste las {{count}} palabras!",
+      "flashcardProgress": "¡Aprendiste {{count}} palabras!",
+      "newWordsDiscovered": "¡Descubriste {{count}} palabras nuevas!",
+      "keepPracticing": "¡Buena práctica! ¡Sigue encontrando palabras!",
+      "matchingPerfect": "¡Emparejamiento perfecto!",
+      "matchingProgress": "¡Emparejaste {{count}} pares!",
+      "spellingPerfect": "¡Ortografía perfecta!",
+      "spellingProgress": "¡Deletreaste {{count}} palabras correctamente!",
+      "blitzResult": "¡Encontraste {{count}} palabras en 60 segundos!",
+      "dailyChallengeComplete": "¡Desafío diario completado!",
+      "lessonMastered": "¡Lección dominada! ¡Conoces estas palabras!",
+      "lessonProgress": "¡Buen trabajo! Sigue practicando.",
+      "duel": {
+        "win": "¡Victoria! ¡Bien jugado!",
+        "loss": "¡Buen esfuerzo! ¡La próxima será!",
+        "draw": "¡Empate! ¡Rivales parejos!"
+      }
     },
     "analytics": {
       "accuracy": "Precisión",

@@ -5890,7 +5890,8 @@ const ja = {
       "wordAlbum": "ワードアルバム",
       "bossRush": "ボスラッシュ",
       "bossRushLocked": "全ボスを倒してボスラッシュを解放",
-      "allQuestsComplete": "デイリークエスト全達成！ボーナス獲得！"
+      "allQuestsComplete": "デイリークエスト全達成！ボーナス獲得！",
+      "dailyQuestBonusComplete": "全クエスト達成！+50ボーナスゴールド"
     },
     "album": {
       "title": "ワードアルバム",
@@ -6254,6 +6255,12 @@ const ja = {
       "shieldBlocked": "シールドが{percent}%のダメージをブロック！",
       "allObjectivesComplete": "すべての目標を達成！",
       "gridAriaLabel": "アドベンチャーゲームボード"
+    },
+    "nearMiss": {
+      "almostThere": "あと少し！",
+      "scoreAway": "あと{{remaining}}ポイント！",
+      "wordsAway": "あと{{remaining}}単語！",
+      "countAway": "あと{{remaining}}つ！"
     },
     "hints": {
       "minLetters2": "2文字以上",
@@ -8541,6 +8548,25 @@ const ja = {
       "unlocked": "アンロック！",
       "unpin": "ピン解除",
       "upgraded": "バッジがランクアップ！"
+    },
+    "mastery": {
+      "flashcardPerfect": "完璧！{{count}}個の単語をマスター！",
+      "flashcardProgress": "{{count}}個の単語を学びました！",
+      "newWordsDiscovered": "{{count}}個の新しい単語を発見！",
+      "keepPracticing": "いい練習！単語を見つけ続けよう！",
+      "matchingPerfect": "完璧なマッチング！",
+      "matchingProgress": "{{count}}ペアをマッチ！",
+      "spellingPerfect": "完璧なスペリング！",
+      "spellingProgress": "{{count}}個の単語を正しくスペル！",
+      "blitzResult": "60秒で{{count}}個の単語を発見！",
+      "dailyChallengeComplete": "デイリーチャレンジ完了！",
+      "lessonMastered": "レッスンマスター！単語を覚えました！",
+      "lessonProgress": "よくできました！練習を続けよう。",
+      "duel": {
+        "win": "勝利！よくやった！",
+        "loss": "惜しい！次は勝てる！",
+        "draw": "引き分け！いい勝負！"
+      }
     },
     "analytics": {
       "accuracy": "正解率",

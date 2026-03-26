@@ -5885,7 +5885,8 @@ const he = {
       "wordAlbum": "אלבום מילים",
       "bossRush": "מרוץ בוסים",
       "bossRushLocked": "נצחו את כל הבוסים כדי לפתוח מרוץ בוסים",
-      "allQuestsComplete": "כל המשימות היומיות הושלמו! בונוס!"
+      "allQuestsComplete": "כל המשימות היומיות הושלמו! בונוס!",
+      "dailyQuestBonusComplete": "כל המשימות הושלמו! +50 זהב בונוס"
     },
     "album": {
       "title": "אלבום מילים",
@@ -6228,6 +6229,12 @@ const he = {
       "shieldBlocked": "המגן חסם {percent}% נזק!",
       "allObjectivesComplete": "כל המשימות הושלמו!",
       "gridAriaLabel": "לוח משחק הרפתקה"
+    },
+    "nearMiss": {
+      "almostThere": "כמעט שם!",
+      "scoreAway": "חסרות רק {{remaining}} נקודות!",
+      "wordsAway": "חסרה עוד {{remaining}} מילה בלבד!",
+      "countAway": "נשאר רק עוד {{remaining}}!"
     },
     "hints": {
       "minLetters2": "2+ אותיות",
@@ -8568,6 +8575,25 @@ const he = {
       "unlocked": "נפתח!",
       "unpin": "בטל הצמדה",
       "upgraded": "התג שודרג! ⬆️"
+    },
+    "mastery": {
+      "flashcardPerfect": "מושלם! שלטת ב-{{count}} מילים!",
+      "flashcardProgress": "למדת {{count}} מילים!",
+      "newWordsDiscovered": "גילית {{count}} מילים חדשות!",
+      "keepPracticing": "תרגול מעולה! המשיכו למצוא מילים!",
+      "matchingPerfect": "התאמה מושלמת!",
+      "matchingProgress": "התאמת {{count}} זוגות!",
+      "spellingPerfect": "איות מושלם!",
+      "spellingProgress": "איייתת {{count}} מילים נכון!",
+      "blitzResult": "מצאת {{count}} מילים ב-60 שניות!",
+      "dailyChallengeComplete": "אתגר יומי הושלם!",
+      "lessonMastered": "שיעור נשלט! את/ה מכיר/ה את המילים!",
+      "lessonProgress": "כל הכבוד! המשיכו לתרגל.",
+      "duel": {
+        "win": "ניצחון! שיחקת מעולה!",
+        "loss": "מאמץ טוב! בפעם הבאה!",
+        "draw": "תיקו! שחקנים מאוזנים!"
+      }
     },
     "analytics": {
       "accuracy": "דיוק",
