@@ -17,41 +17,36 @@ vi.mock('../../platform', () => ({
   isNative: vi.fn(),
 }));
 
-// Mock Capacitor LocalNotifications
-vi.mock('@capacitor/local-notifications', () => ({
-  LocalNotifications: {
-    schedule: vi.fn(),
-    cancel: vi.fn(),
-    getPending: vi.fn(),
-  },
-}));
-
 // Mock permissions
 vi.mock('../permissions', () => ({
   canScheduleNotifications: vi.fn(),
 }));
 
 import { isNative } from '../../platform';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { canScheduleNotifications } from '../permissions';
 
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
-const mockSchedule = LocalNotifications.schedule as jest.MockedFunction<
-  typeof LocalNotifications.schedule
->;
-const mockCancel = LocalNotifications.cancel as jest.MockedFunction<
-  typeof LocalNotifications.cancel
->;
-const mockGetPending = LocalNotifications.getPending as jest.MockedFunction<
-  typeof LocalNotifications.getPending
->;
-const mockCanSchedule = canScheduleNotifications as jest.MockedFunction<
-  typeof canScheduleNotifications
->;
+const mockIsNative = isNative as any;
+const mockCanSchedule = canScheduleNotifications as any;
+
+// Mock functions for LocalNotifications
+const mockSchedule = vi.fn();
+const mockCancel = vi.fn();
+const mockGetPending = vi.fn();
 
 describe('Notification Scheduler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set up globalThis.Capacitor with LocalNotifications plugin
+    (globalThis as any).Capacitor = {
+      isNativePlatform: () => true,
+      Plugins: {
+        LocalNotifications: {
+          schedule: mockSchedule,
+          cancel: mockCancel,
+          getPending: mockGetPending,
+        },
+      },
+    };
     // Reset localStorage mock
     const localStorageMock = {
       getItem: vi.fn(),
@@ -63,6 +58,10 @@ describe('Notification Scheduler', () => {
       value: localStorageMock,
       writable: true,
     });
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).Capacitor;
   });
 
   describe('scheduleDailyNotification', () => {
@@ -187,7 +186,7 @@ describe('Notification Scheduler', () => {
   describe('getNextMessageIndex', () => {
     it('should return 0 when no previous index stored', () => {
       // GIVEN - No previous index
-      (localStorage.getItem as jest.Mock).mockReturnValue(null);
+      (localStorage.getItem as any).mockReturnValue(null);
 
       // WHEN - Getting next index
       const index = getNextMessageIndex();
@@ -198,7 +197,7 @@ describe('Notification Scheduler', () => {
 
     it('should return next index in sequence', () => {
       // GIVEN - Previous index was 2
-      (localStorage.getItem as jest.Mock).mockReturnValue('2');
+      (localStorage.getItem as any).mockReturnValue('2');
 
       // WHEN - Getting next index
       const index = getNextMessageIndex();
@@ -210,7 +209,7 @@ describe('Notification Scheduler', () => {
     it('should wrap around to 0 at end of messages array', () => {
       // GIVEN - Previous index was last in array
       const lastIndex = NOTIFICATION_MESSAGES.length - 1;
-      (localStorage.getItem as jest.Mock).mockReturnValue(String(lastIndex));
+      (localStorage.getItem as any).mockReturnValue(String(lastIndex));
 
       // WHEN - Getting next index
       const index = getNextMessageIndex();

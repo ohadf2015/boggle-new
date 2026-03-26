@@ -1,6 +1,5 @@
 import { isNative } from '../platform';
 import { WebHaptics } from './webHaptics';
-import { NativeHaptics } from './nativeHaptics';
 import {
   HapticPattern,
   CustomHapticPattern,
@@ -10,41 +9,46 @@ import {
 /**
  * Unified haptics manager (Facade pattern).
  * Automatically selects best implementation for current platform.
+ * NativeHaptics is lazily loaded to avoid pulling @capacitor/haptics into the web bundle.
  */
 export class HapticsManager {
-  private implementation: IHapticsImplementation;
+  private implementation: IHapticsImplementation | null = null;
+  private initPromise: Promise<IHapticsImplementation> | null = null;
 
-  constructor() {
-    // Select implementation based on platform
-    this.implementation = isNative() ? new NativeHaptics() : new WebHaptics();
+  private getImpl(): Promise<IHapticsImplementation> {
+    if (this.implementation) return Promise.resolve(this.implementation);
+    if (this.initPromise) return this.initPromise;
+
+    this.initPromise = (async () => {
+      if (isNative()) {
+        const { NativeHaptics } = await import('./nativeHaptics');
+        this.implementation = new NativeHaptics();
+      } else {
+        this.implementation = new WebHaptics();
+      }
+      return this.implementation;
+    })();
+
+    return this.initPromise;
   }
 
-  /**
-   * Check if haptics supported on current platform.
-   */
   isSupported(): boolean {
-    return this.implementation.isSupported();
+    // Synchronous check — if not initialized yet, return false
+    return this.implementation?.isSupported() ?? false;
   }
 
-  /**
-   * Trigger predefined haptic pattern.
-   */
   async trigger(pattern: HapticPattern): Promise<void> {
-    if (!this.isSupported()) return;
-    await this.implementation.trigger(pattern);
+    const impl = await this.getImpl();
+    if (!impl.isSupported()) return;
+    await impl.trigger(pattern);
   }
 
-  /**
-   * Trigger custom haptic pattern.
-   */
   async triggerCustom(pattern: CustomHapticPattern): Promise<void> {
-    if (!this.isSupported()) return;
-    await this.implementation.triggerCustom(pattern);
+    const impl = await this.getImpl();
+    if (!impl.isSupported()) return;
+    await impl.triggerCustom(pattern);
   }
 
-  /**
-   * Convenience methods for common patterns.
-   */
   async tap(): Promise<void> {
     await this.trigger(HapticPattern.TAP);
   }

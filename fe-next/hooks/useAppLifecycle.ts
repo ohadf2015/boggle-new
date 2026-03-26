@@ -1,7 +1,7 @@
 /**
  * App Lifecycle Hook
  * Provides callbacks for app foreground/background transitions on native.
- * Capacitor is dynamically imported to avoid Turbopack SWC helper errors.
+ * Uses globalThis.Capacitor to avoid any @capacitor/* imports that break Turbopack.
  */
 
 import { useEffect, useRef } from 'react';
@@ -27,38 +27,38 @@ export function useAppLifecycle({
   useEffect(() => {
     if (!isNative()) return;
 
-    let removed = false;
-    let removeListener: (() => void) | null = null;
+    // Access Capacitor plugins via globalThis to avoid static imports
+     
+    const plugins = (globalThis as any).Capacitor?.Plugins;
+    const AppPlugin = plugins?.App;
+    if (!AppPlugin) return;
 
-    const registerListener = async () => {
+    let listenerHandle: { remove: () => void } | null = null;
+    let removed = false;
+
+    AppPlugin.addListener('appStateChange', (state: { isActive: boolean }) => {
       try {
-        const { App } = await import('@capacitor/app');
-        const listener = await App.addListener('appStateChange', (state) => {
-          try {
-            if (state.isActive) {
-              onForegroundRef.current?.();
-            } else {
-              onBackgroundRef.current?.();
-            }
-          } catch (error) {
-            console.error('App lifecycle callback error:', error);
-          }
-        });
-        if (removed) {
-          listener.remove();
+        if (state.isActive) {
+          onForegroundRef.current?.();
         } else {
-          removeListener = () => listener.remove();
+          onBackgroundRef.current?.();
         }
       } catch (error) {
-        console.error('Failed to register app lifecycle listener:', error);
+        console.error('App lifecycle callback error:', error);
       }
-    };
-
-    registerListener();
+    }).then((handle: { remove: () => void }) => {
+      if (removed) {
+        handle.remove();
+      } else {
+        listenerHandle = handle;
+      }
+    }).catch((error: unknown) => {
+      console.error('Failed to register app lifecycle listener:', error);
+    });
 
     return () => {
       removed = true;
-      try { removeListener?.(); } catch {}
+      try { listenerHandle?.remove(); } catch {}
     };
   }, []);
 }

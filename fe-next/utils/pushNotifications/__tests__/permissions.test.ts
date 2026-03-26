@@ -15,28 +15,31 @@ vi.mock('../../platform', () => ({
   isNative: vi.fn(),
 }));
 
-// Mock Capacitor LocalNotifications
-vi.mock('@capacitor/local-notifications', () => ({
-  LocalNotifications: {
-    checkPermissions: vi.fn(),
-    requestPermissions: vi.fn(),
-  },
-}));
-
 import { isNative } from '../../platform';
-import { LocalNotifications } from '@capacitor/local-notifications';
 
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
-const mockCheckPermissions = LocalNotifications.checkPermissions as jest.MockedFunction<
-  typeof LocalNotifications.checkPermissions
->;
-const mockRequestPermissions = LocalNotifications.requestPermissions as jest.MockedFunction<
-  typeof LocalNotifications.requestPermissions
->;
+const mockIsNative = isNative as any;
+
+// Mock functions for LocalNotifications
+const mockCheckPermissions = vi.fn();
+const mockRequestPermissions = vi.fn();
 
 describe('Push Notification Permissions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set up globalThis.Capacitor with LocalNotifications plugin
+    (globalThis as any).Capacitor = {
+      isNativePlatform: () => true,
+      Plugins: {
+        LocalNotifications: {
+          checkPermissions: mockCheckPermissions,
+          requestPermissions: mockRequestPermissions,
+        },
+      },
+    };
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).Capacitor;
   });
 
   describe('checkNotificationPermission', () => {

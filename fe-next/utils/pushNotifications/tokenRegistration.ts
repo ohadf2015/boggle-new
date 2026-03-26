@@ -44,8 +44,9 @@ async function getPlatform(): Promise<'ios' | 'android' | 'web'> {
   if (typeof window === 'undefined') return 'web';
 
   try {
-    const { Capacitor } = await import('@capacitor/core');
-    const platform = Capacitor.getPlatform();
+     
+    const cap = (globalThis as any).Capacitor;
+    const platform = cap?.getPlatform?.();
     if (platform === 'ios') return 'ios';
     if (platform === 'android') return 'android';
     return 'web';
@@ -97,7 +98,7 @@ export async function registerPushToken(): Promise<boolean> {
 
   try {
     // Dynamic import for Capacitor plugin
-    const { PushNotifications } = await import('@capacitor/push-notifications');
+    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
 
     // Check current permission status
     const permStatus = await PushNotifications.checkPermissions();
@@ -144,7 +145,7 @@ export async function registerPushToken(): Promise<boolean> {
       });
 
       // Trigger registration
-      PushNotifications.register().catch((err) => {
+      PushNotifications.register().catch((err: Error) => {
         if (resolved) return;
         resolved = true;
 
@@ -196,12 +197,12 @@ export async function setupPushListeners(
   }
 
   try {
-    const { PushNotifications } = await import('@capacitor/push-notifications');
+    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
 
     // Handle notification received while app is in foreground
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',
-      (notification) => {
+      (notification: { data?: Record<string, string> }) => {
         console.log('Push notification received:', notification);
         if (onNotificationReceived && notification.data) {
           onNotificationReceived(notification.data as Record<string, string>);
@@ -240,7 +241,7 @@ export async function isPushEnabled(): Promise<boolean> {
   }
 
   try {
-    const { PushNotifications } = await import('@capacitor/push-notifications');
+    const { PushNotifications } = { PushNotifications: (globalThis as any).Capacitor?.Plugins?.PushNotifications } as any;
     const permStatus = await PushNotifications.checkPermissions();
     return permStatus.receive === 'granted';
   } catch {

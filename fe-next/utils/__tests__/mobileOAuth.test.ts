@@ -6,20 +6,6 @@
 
 import { performMobileOAuth, closeMobileOAuthBrowser } from '../mobileOAuth';
 
-// Mock dependencies
-vi.mock('@capacitor/browser', () => ({
-  Browser: {
-    open: vi.fn().mockResolvedValue(undefined),
-    close: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock('@capacitor/app', () => ({
-  App: {
-    addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
-  },
-}));
-
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
@@ -41,21 +27,50 @@ vi.mock('@/utils/logger', () => ({
   },
 }));
 
-import { Browser } from '@capacitor/browser';
+vi.mock('@/lib/i18n', () => ({
+  defaultLocale: 'en',
+  locales: ['en', 'he', 'sv', 'ja'],
+}));
+
 import { supabase } from '@/lib/supabase';
 import { isNative } from '@/utils/platform';
+
+// Browser mock functions accessible from tests
+const mockBrowserOpen = vi.fn().mockResolvedValue(undefined);
+const mockBrowserClose = vi.fn().mockResolvedValue(undefined);
 
 describe('Mobile OAuth Utility', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default to native platform
-    (isNative as jest.Mock).mockReturnValue(true);
+    (isNative as any).mockReturnValue(true);
+    // Reset browser mocks
+    mockBrowserOpen.mockResolvedValue(undefined);
+    mockBrowserClose.mockResolvedValue(undefined);
+    // Set up globalThis.Capacitor
+    (globalThis as any).Capacitor = {
+      isNativePlatform: () => true,
+      getPlatform: () => 'ios',
+      Plugins: {
+        Browser: {
+          open: mockBrowserOpen,
+          close: mockBrowserClose,
+        },
+        App: {
+          addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
+        },
+      },
+    };
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).Capacitor;
   });
 
   describe('performMobileOAuth', () => {
     it('should return error when not in native environment', async () => {
       // GIVEN: Not running in native environment
-      (isNative as jest.Mock).mockReturnValue(false);
+      (isNative as any).mockReturnValue(false);
 
       // WHEN: Attempting mobile OAuth
       const result = await performMobileOAuth('google');
@@ -63,16 +78,13 @@ describe('Mobile OAuth Utility', () => {
       // THEN: Should return error
       expect(result.success).toBe(false);
       expect(result.error).toBe('Not running in native environment');
-      expect(Browser.open).not.toHaveBeenCalled();
+      expect(mockBrowserOpen).not.toHaveBeenCalled();
     });
-
-    // Note: Testing supabase === null case is complex due to module loading
-    // The null check is covered by other integration tests
 
     it('should get OAuth URL with skipBrowserRedirect and open in-app browser', async () => {
       // GIVEN: Native platform with Supabase configured
       const mockOAuthUrl = 'https://accounts.google.com/oauth/authorize?...';
-      (supabase!.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (supabase!.auth.signInWithOAuth as any).mockResolvedValue({
         data: { url: mockOAuthUrl },
         error: null,
       });
@@ -90,7 +102,7 @@ describe('Mobile OAuth Utility', () => {
       });
 
       // AND: Should open in-app browser with OAuth URL
-      expect(Browser.open).toHaveBeenCalledWith({
+      expect(mockBrowserOpen).toHaveBeenCalledWith({
         url: mockOAuthUrl,
         presentationStyle: 'popover',
         windowName: '_self',
@@ -102,7 +114,7 @@ describe('Mobile OAuth Utility', () => {
 
     it('should return error when OAuth URL fetch fails', async () => {
       // GIVEN: Supabase returns an error
-      (supabase!.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (supabase!.auth.signInWithOAuth as any).mockResolvedValue({
         data: null,
         error: { message: 'OAuth provider error' },
       });
@@ -113,12 +125,12 @@ describe('Mobile OAuth Utility', () => {
       // THEN: Should return error
       expect(result.success).toBe(false);
       expect(result.error).toBe('OAuth provider error');
-      expect(Browser.open).not.toHaveBeenCalled();
+      expect(mockBrowserOpen).not.toHaveBeenCalled();
     });
 
     it('should return error when no OAuth URL is returned', async () => {
       // GIVEN: Supabase returns no URL
-      (supabase!.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (supabase!.auth.signInWithOAuth as any).mockResolvedValue({
         data: { url: null },
         error: null,
       });
@@ -129,17 +141,17 @@ describe('Mobile OAuth Utility', () => {
       // THEN: Should return error
       expect(result.success).toBe(false);
       expect(result.error).toBe('No OAuth URL returned');
-      expect(Browser.open).not.toHaveBeenCalled();
+      expect(mockBrowserOpen).not.toHaveBeenCalled();
     });
 
     it('should handle browser open error gracefully', async () => {
       // GIVEN: Browser.open throws an error
       const mockOAuthUrl = 'https://accounts.google.com/oauth/authorize?...';
-      (supabase!.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (supabase!.auth.signInWithOAuth as any).mockResolvedValue({
         data: { url: mockOAuthUrl },
         error: null,
       });
-      (Browser.open as jest.Mock).mockRejectedValue(new Error('Browser unavailable'));
+      mockBrowserOpen.mockRejectedValue(new Error('Browser unavailable'));
 
       // WHEN: Performing OAuth
       const result = await performMobileOAuth('google');
@@ -152,12 +164,7 @@ describe('Mobile OAuth Utility', () => {
     it('should work with Discord provider', async () => {
       // GIVEN: Discord OAuth setup
       const mockOAuthUrl = 'https://discord.com/oauth2/authorize?...';
-      // Reset mocks to ensure clean state (clearAllMocks clears calls but not implementations)
-      vi.clearAllMocks();
-      (isNative as jest.Mock).mockReturnValue(true);
-      // Reset Browser.open to resolve successfully (previous test made it reject)
-      (Browser.open as jest.Mock).mockResolvedValue(undefined);
-      (supabase!.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+      (supabase!.auth.signInWithOAuth as any).mockResolvedValue({
         data: { url: mockOAuthUrl },
         error: null,
       });
@@ -178,30 +185,30 @@ describe('Mobile OAuth Utility', () => {
   describe('closeMobileOAuthBrowser', () => {
     it('should close the browser on native platform', async () => {
       // GIVEN: Native platform
-      (isNative as jest.Mock).mockReturnValue(true);
+      (isNative as any).mockReturnValue(true);
 
       // WHEN: Closing browser
       await closeMobileOAuthBrowser();
 
       // THEN: Should call Browser.close
-      expect(Browser.close).toHaveBeenCalled();
+      expect(mockBrowserClose).toHaveBeenCalled();
     });
 
     it('should not attempt to close browser on web', async () => {
       // GIVEN: Web platform
-      (isNative as jest.Mock).mockReturnValue(false);
+      (isNative as any).mockReturnValue(false);
 
       // WHEN: Closing browser
       await closeMobileOAuthBrowser();
 
       // THEN: Should not call Browser.close
-      expect(Browser.close).not.toHaveBeenCalled();
+      expect(mockBrowserClose).not.toHaveBeenCalled();
     });
 
     it('should handle browser close error gracefully', async () => {
       // GIVEN: Browser.close throws (already closed)
-      (isNative as jest.Mock).mockReturnValue(true);
-      (Browser.close as jest.Mock).mockRejectedValue(new Error('Already closed'));
+      (isNative as any).mockReturnValue(true);
+      mockBrowserClose.mockRejectedValue(new Error('Already closed'));
 
       // WHEN: Closing browser
       // THEN: Should not throw

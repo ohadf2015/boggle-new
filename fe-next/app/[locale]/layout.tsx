@@ -16,7 +16,6 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import VersionChecker from '@/components/VersionChecker';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
-import DeepLinkHandler from '@/components/DeepLinkHandler';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { fredoka, rubik } from '../fonts';
@@ -529,8 +528,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}
                 <AnimationsLoader />
-                {/* Handle deep links for OAuth callbacks on mobile (Capacitor) */}
-                <DeepLinkHandler />
+                {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
                 {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
                 <NativeOAuthInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find

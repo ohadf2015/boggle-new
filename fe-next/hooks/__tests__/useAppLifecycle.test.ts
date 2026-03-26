@@ -7,7 +7,6 @@ import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAppLifecycle } from '../useAppLifecycle';
 import * as platformUtils from '../../utils/platform';
-import { App } from '@capacitor/app';
 
 // Define PluginListenerHandle type locally
 interface PluginListenerHandle {
@@ -17,16 +16,25 @@ interface PluginListenerHandle {
 // Mock platform detection
 vi.mock('../../utils/platform');
 
-// Mock Capacitor App plugin
-vi.mock('@capacitor/app', () => ({
-  App: {
-    addListener: vi.fn(),
-  },
-}));
+// Mock addListener for the App plugin
+const mockAddListener = vi.fn();
 
 describe('useAppLifecycle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set up globalThis.Capacitor with App plugin
+    (globalThis as any).Capacitor = {
+      isNativePlatform: () => true,
+      Plugins: {
+        App: {
+          addListener: mockAddListener,
+        },
+      },
+    };
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).Capacitor;
   });
 
   describe('Native Environment', () => {
@@ -38,7 +46,7 @@ describe('useAppLifecycle', () => {
       const onForeground = vi.fn();
       const onBackground = vi.fn();
 
-      (App.addListener as any).mockResolvedValue({
+      mockAddListener.mockResolvedValue({
         remove: vi.fn(),
       } as PluginListenerHandle);
 
@@ -47,7 +55,7 @@ describe('useAppLifecycle', () => {
       // Wait for async registration
       await new Promise((resolve) => setTimeout(resolve, 0));
 
-      expect(App.addListener).toHaveBeenCalledWith(
+      expect(mockAddListener).toHaveBeenCalledWith(
         'appStateChange',
         expect.any(Function)
       );
@@ -58,7 +66,7 @@ describe('useAppLifecycle', () => {
       const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -80,7 +88,7 @@ describe('useAppLifecycle', () => {
       const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -102,7 +110,7 @@ describe('useAppLifecycle', () => {
       const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -126,7 +134,7 @@ describe('useAppLifecycle', () => {
       const onBackground = vi.fn();
       const removeMock = vi.fn();
 
-      (App.addListener as any).mockResolvedValue({
+      mockAddListener.mockResolvedValue({
         remove: removeMock,
       } as PluginListenerHandle);
 
@@ -149,7 +157,7 @@ describe('useAppLifecycle', () => {
       const onBackground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -168,7 +176,7 @@ describe('useAppLifecycle', () => {
       const onForeground = vi.fn();
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -195,7 +203,7 @@ describe('useAppLifecycle', () => {
 
       renderHook(() => useAppLifecycle({ onForeground, onBackground }));
 
-      expect(App.addListener).not.toHaveBeenCalled();
+      expect(mockAddListener).not.toHaveBeenCalled();
     });
 
     it('should not throw on unmount on web', () => {
@@ -218,7 +226,7 @@ describe('useAppLifecycle', () => {
     it('should use latest callback reference', async () => {
       let capturedCallback: (state: { isActive: boolean }) => void = () => {};
 
-      (App.addListener as any).mockImplementation(async (event, callback) => {
+      mockAddListener.mockImplementation(async (event: string, callback: any) => {
         capturedCallback = callback;
         return { remove: vi.fn() } as PluginListenerHandle;
       });
@@ -253,7 +261,7 @@ describe('useAppLifecycle', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const onForeground = vi.fn();
 
-      (App.addListener as any).mockRejectedValue(
+      mockAddListener.mockRejectedValue(
         new Error('Listener registration failed')
       );
 
@@ -271,7 +279,7 @@ describe('useAppLifecycle', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const onForeground = vi.fn();
 
-      (App.addListener as any).mockResolvedValue({
+      mockAddListener.mockResolvedValue({
         remove: vi.fn().mockImplementation(() => {
           throw new Error('Cleanup failed');
         }),

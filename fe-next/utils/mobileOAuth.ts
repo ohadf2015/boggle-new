@@ -1,8 +1,10 @@
 /**
  * Mobile OAuth Utility
  * Handles OAuth authentication flow for Capacitor native apps using in-app browser.
- * All Capacitor packages are dynamically imported to avoid Turbopack SWC helper errors.
+ * Uses globalThis.Capacitor to avoid any @capacitor/* imports that break Turbopack.
  */
+
+ 
 
 import { supabase } from '@/lib/supabase';
 import { isNative } from '@/utils/platform';
@@ -24,9 +26,13 @@ function getCurrentLocale(): string {
   return defaultLocale;
 }
 
-async function getOAuthRedirectUrl(locale: string): Promise<string> {
-  const { Capacitor } = await import('@capacitor/core');
-  const platform = Capacitor.getPlatform();
+function getCapacitor(): any {
+  return (globalThis as any).Capacitor ?? null;
+}
+
+function getOAuthRedirectUrl(locale: string): string {
+  const cap = getCapacitor();
+  const platform = cap?.getPlatform?.() ?? 'web';
 
   if (platform === 'android') {
     return `https://www.lexiclash.live/${locale}/auth/callback?from_app=true`;
@@ -47,7 +53,7 @@ export async function performMobileOAuth(
   }
 
   const currentLocale = getCurrentLocale();
-  const redirectTo = await getOAuthRedirectUrl(currentLocale);
+  const redirectTo = getOAuthRedirectUrl(currentLocale);
 
   try {
     logger.log(`[MobileOAuth] Starting ${provider} OAuth with redirect: ${redirectTo}`);
@@ -72,12 +78,14 @@ export async function performMobileOAuth(
 
     logger.log('[MobileOAuth] Opening in-app browser for OAuth');
 
-    const { Browser } = await import('@capacitor/browser');
-    await Browser.open({
-      url: data.url,
-      presentationStyle: 'popover',
-      windowName: '_self',
-    });
+    const BrowserPlugin = getCapacitor()?.Plugins?.Browser;
+    if (BrowserPlugin) {
+      await BrowserPlugin.open({
+        url: data.url,
+        presentationStyle: 'popover',
+        windowName: '_self',
+      });
+    }
 
     return { success: true };
   } catch (err) {
@@ -91,8 +99,8 @@ export async function closeMobileOAuthBrowser(): Promise<void> {
   if (!isNative()) return;
 
   try {
-    const { Browser } = await import('@capacitor/browser');
-    await Browser.close();
+    const BrowserPlugin = getCapacitor()?.Plugins?.Browser;
+    if (BrowserPlugin) await BrowserPlugin.close();
   } catch (err) {
     logger.log('[MobileOAuth] Browser close (may already be closed):', err);
   }
@@ -105,8 +113,10 @@ export async function listenForOAuthCallback(
     return () => {};
   }
 
-  const { App } = await import('@capacitor/app');
-  const listener = await App.addListener('appUrlOpen', (event) => {
+  const AppPlugin = getCapacitor()?.Plugins?.App;
+  if (!AppPlugin) return () => {};
+
+  const listener = await AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {
     if (event.url.includes('auth/callback')) {
       logger.log('[MobileOAuth] Received OAuth callback:', event.url);
       onCallback(event.url);

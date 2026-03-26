@@ -1,6 +1,7 @@
 export { HapticsManager, haptics } from './HapticsManager';
 export { WebHaptics } from './webHaptics';
-export { NativeHaptics } from './nativeHaptics';
+// NativeHaptics intentionally NOT re-exported — it's lazily loaded by HapticsManager
+// to avoid pulling @capacitor/haptics into the web bundle
 export {
   HapticPattern,
   HapticIntensity,

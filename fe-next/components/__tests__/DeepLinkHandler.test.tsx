@@ -12,23 +12,14 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
-// Mock @capacitor/app
+// Mock addListener for the App plugin
 let appUrlOpenHandler: ((event: { url: string }) => void) | null = null;
 const mockAddListener = vi.fn().mockImplementation((_event: string, handler: (event: { url: string }) => void) => {
   appUrlOpenHandler = handler;
   return Promise.resolve({ remove: vi.fn() });
 });
 
-vi.mock('@capacitor/app', () => ({
-  App: {
-    addListener: (...args: unknown[]) => mockAddListener(...args),
-  },
-}));
-
-// Mock @capacitor/browser
-vi.mock('@capacitor/browser', () => ({
-  Browser: { close: vi.fn().mockResolvedValue(undefined) },
-}));
+const mockBrowserClose = vi.fn().mockResolvedValue(undefined);
 
 // Mock platform
 vi.mock('@/utils/platform', () => ({
@@ -37,8 +28,11 @@ vi.mock('@/utils/platform', () => ({
 
 // Mock logger
 vi.mock('@/utils/logger', () => ({
-  log: vi.fn(),
-  error: vi.fn(),
+  __esModule: true,
+  default: {
+    log: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 // Mock i18n
@@ -47,10 +41,31 @@ vi.mock('@/lib/i18n', () => ({
   locales: ['en', 'he', 'sv', 'ja'],
 }));
 
+// Mock pushNotifications/tokenRegistration
+vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
+  setupPushListeners: vi.fn().mockResolvedValue(() => {}),
+}));
+
 describe('DeepLinkHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     appUrlOpenHandler = null;
+    // Set up globalThis.Capacitor with App and Browser plugins
+    (globalThis as any).Capacitor = {
+      isNativePlatform: () => true,
+      Plugins: {
+        App: {
+          addListener: mockAddListener,
+        },
+        Browser: {
+          close: mockBrowserClose,
+        },
+      },
+    };
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).Capacitor;
   });
 
   it('should register appUrlOpen listener on mount', () => {

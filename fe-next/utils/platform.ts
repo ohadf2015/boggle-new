@@ -7,7 +7,7 @@
  * resolution failures in dev mode.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 function getCapacitor(): any {
   if (typeof globalThis !== 'undefined' && (globalThis as any).Capacitor) {

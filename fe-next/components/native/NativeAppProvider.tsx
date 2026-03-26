@@ -10,10 +10,13 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import logger from '@/utils/logger';
+
+const DeepLinkHandler = dynamic(() => import('@/components/DeepLinkHandler'), { ssr: false });
 
 interface NativeAppProviderProps {
   children: React.ReactNode;
@@ -43,5 +46,10 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
     },
   });
 
-  return <>{children}</>;
+  return (
+    <>
+      <DeepLinkHandler />
+      {children}
+    </>
+  );
 }
