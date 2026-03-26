@@ -12,21 +12,21 @@ import type { OpponentInfo } from '@/hooks/useDuelSocket';
 // MOCKS
 // ============================================
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/hooks/useDuelSocket', () => ({
+vi.mock('@/hooks/useDuelSocket', () => ({
   useDuelSocket: () => ({
-    createChallenge: jest.fn(),
+    createChallenge: vi.fn(),
   }),
 }));
 
-jest.mock('../DuelChallengeModal', () => {
-  return function MockDuelChallengeModal({
+vi.mock('../DuelChallengeModal', () => {
+  return { default: function MockDuelChallengeModal({
     opponent,
     onClose,
   }: {
@@ -39,7 +39,7 @@ jest.mock('../DuelChallengeModal', () => {
         <button onClick={onClose}>Close</button>
       </div>
     );
-  };
+  }
 });
 
 // ============================================
@@ -59,7 +59,7 @@ describe('ChallengeButton', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ============================================

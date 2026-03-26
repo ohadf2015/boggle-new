@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: TV Tutorial shows on initial mount when TV mode is enabled
  *
@@ -11,19 +12,19 @@ import HostPreGameView from '../components/HostPreGameView';
 import { resetTvTutorial } from '../components/tv-broadcast/TvTutorialOverlay';
 
 // Mock all dependencies
-jest.mock('../../utils/SocketContext', () => ({
+vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
-jest.mock('../../hooks/useCrazyGamesInvite', () => ({
+vi.mock('../../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
     isInviteButtonVisible: false,
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
@@ -33,7 +34,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Clock: () => null,
   Users: () => null,
   Crown: () => null,
@@ -68,11 +69,11 @@ jest.mock('lucide-react', () => ({
   Wand2: () => null,
 }));
 
-jest.mock('../../components/ui/button', () => ({
+vi.mock('../../components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
-jest.mock('../../components/ui/checkbox', () => ({
+vi.mock('../../components/ui/checkbox', () => ({
   Checkbox: ({ checked, onCheckedChange, ...props }: any) => (
     <input
       type="checkbox"
@@ -83,49 +84,49 @@ jest.mock('../../components/ui/checkbox', () => ({
   ),
 }));
 
-jest.mock('../../components/Avatar', () => ({
+vi.mock('../../components/Avatar', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../../components/RoomChat', () => ({
+vi.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../../components/PresenceIndicator', () => ({
+vi.mock('../../components/PresenceIndicator', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../../components/BotControls', () => ({
+vi.mock('../../components/BotControls', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/hooks/gameState', () => ({
+vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
   useGameActions: () => ({
-    setGameMode: jest.fn(),
+    setGameMode: vi.fn(),
   }),
 }));
 
-jest.mock('../../hooks/useNativeShare', () => ({
+vi.mock('../../hooks/useNativeShare', () => ({
   useNativeShare: () => ({
     canShare: false,
-    share: jest.fn(),
+    share: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/ui/DJMascot', () => ({
+vi.mock('@/components/ui/DJMascot', () => ({
   DJMascotWithEntrance: () => null,
 }));
 
-jest.mock('@/components/GameModeSelector', () => ({
+vi.mock('@/components/GameModeSelector', () => ({
   GameModeSelector: () => null,
 }));
 
-jest.mock('../components/pre-game/PresetSelector', () => ({
+vi.mock('../components/pre-game/PresetSelector', () => ({
   PresetSelector: () => null,
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
@@ -134,31 +135,31 @@ jest.mock('../components/pre-game/PresetSelector', () => ({
   },
 }));
 
-jest.mock('../components/pre-game/PlayerRoster', () => ({
+vi.mock('../components/pre-game/PlayerRoster', () => ({
   PlayerRoster: () => null,
 }));
 
-jest.mock('../components/pre-game/BattleModeCard', () => ({
+vi.mock('../components/pre-game/BattleModeCard', () => ({
   BattleModeCard: () => null,
 }));
 
-jest.mock('../components/pre-game/StartButton', () => ({
+vi.mock('../components/pre-game/StartButton', () => ({
   StartButton: () => null,
 }));
 
-jest.mock('../components/pre-game/MobileBottomNav', () => ({
+vi.mock('../components/pre-game/MobileBottomNav', () => ({
   MobileBottomNav: () => null,
 }));
 
-jest.mock('../components/pre-game/MobileShareSection', () => ({
+vi.mock('../components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => null,
 }));
 
-jest.mock('../components/pre-game/PresetInfoDrawer', () => ({
+vi.mock('../components/pre-game/PresetInfoDrawer', () => ({
   PresetInfoDrawer: () => null,
 }));
 
-jest.mock('../components/pre-game/desktop', () => ({
+vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: () => null,
   SettingsPanel: () => null,
   InviteCard: () => null,
@@ -195,34 +196,34 @@ describe('HostPreGameView - TV Tutorial on Initial Mount (Bug Fix)', () => {
     username: 'TestHost',
     t: mockT,
     timerValue: 3,
-    setTimerValue: jest.fn(),
+    setTimerValue: vi.fn(),
     timerDirection: 0,
-    setTimerDirection: jest.fn(),
+    setTimerDirection: vi.fn(),
     difficulty: 'EASY' as const,
-    setDifficulty: jest.fn(),
+    setDifficulty: vi.fn(),
     minWordLength: 2,
-    setMinWordLength: jest.fn(),
+    setMinWordLength: vi.fn(),
     gameType: 'regular' as const,
-    setGameType: jest.fn(),
+    setGameType: vi.fn(),
     tournamentRounds: 3,
-    setTournamentRounds: jest.fn(),
+    setTournamentRounds: vi.fn(),
     tournamentData: null,
     hostPlaying: true,
-    setHostPlaying: jest.fn(),
+    setHostPlaying: vi.fn(),
     playersReady: [],
     playerWordCounts: {},
     shufflingGrid: null,
     highlightedCells: [],
     tableData: [['A', 'B'], ['C', 'D']],
-    onStartGame: jest.fn(),
-    onExitRoom: jest.fn(),
-    onCancelTournament: jest.fn(),
-    onRegenerateBoard: jest.fn(),
+    onStartGame: vi.fn(),
+    onExitRoom: vi.fn(),
+    onCancelTournament: vi.fn(),
+    onRegenerateBoard: vi.fn(),
     tournamentCreating: false,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.clear();
     resetTvTutorial();
   });

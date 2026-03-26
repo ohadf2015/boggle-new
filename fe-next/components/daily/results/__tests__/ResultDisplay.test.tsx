@@ -11,7 +11,7 @@ import { ResultDisplay } from '../ResultDisplay';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 
 // Mock framer-motion to render immediately
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
@@ -24,20 +24,20 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('@/hooks/useCountUp', () => ({
+vi.mock('@/hooks/useCountUp', () => ({
   useCountUp: ({ target }: { target: number }) => target,
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
-jest.mock('@/shared/utils/wordNormalization', () => ({
+vi.mock('@/shared/utils/wordNormalization', () => ({
   applyHebrewFinalLetters: (w: string) => w,
 }));
 
 // Mock ScoreGaugeRing to avoid SVG rendering complexity
-jest.mock('../ScoreGaugeRing', () => ({
+vi.mock('../ScoreGaugeRing', () => ({
   ScoreGaugeRing: (props: any) => (
     <div data-testid="score-gauge-ring" data-score={props.score} data-max={props.maxScore}>
       {props.showScore !== false && <span data-testid="gauge-score">{props.score}</span>}

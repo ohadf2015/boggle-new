@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * RBAC tests for /api/education/templates
  * Verifies teacher/admin role is required for write operations (POST/PATCH/DELETE).
@@ -5,7 +6,7 @@
  */
 
 // Mock next/server BEFORE any imports - following the pattern from practice/route.test.ts
-jest.mock('next/server', () => {
+vi.mock('next/server', () => {
   class MockNextRequest {
     private _body: Record<string, unknown> | null;
     url: string;
@@ -25,7 +26,7 @@ jest.mock('next/server', () => {
   return {
     NextRequest: MockNextRequest,
     NextResponse: {
-      json: jest.fn((data: Record<string, unknown>, init?: { status?: number }) => ({
+      json: vi.fn((data: Record<string, unknown>, init?: { status?: number }) => ({
         json: async () => data,
         status: init?.status || 200,
       })),
@@ -33,15 +34,15 @@ jest.mock('next/server', () => {
   };
 });
 
-jest.mock('@/utils/supabase/server');
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/supabase/server');
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
+    log: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -49,19 +50,19 @@ import { NextRequest } from 'next/server';
 import { POST, PATCH, DELETE } from '../route';
 
 interface MockSupabase {
-  auth: { getUser: jest.Mock };
-  from: jest.Mock;
+  auth: { getUser: Mock };
+  from: Mock;
 }
 
 let mockSupabase: MockSupabase;
-let mockFrom: jest.Mock;
-let mockAuth: { getUser: jest.Mock };
+let mockFrom: Mock;
+let mockAuth: { getUser: Mock };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 
-  mockFrom = jest.fn();
-  mockAuth = { getUser: jest.fn() };
+  mockFrom = vi.fn();
+  mockAuth = { getUser: vi.fn() };
   mockSupabase = { auth: mockAuth, from: mockFrom };
 
   const { createClient } = require('@/utils/supabase/server');
@@ -73,14 +74,14 @@ beforeEach(() => {
 /** Build a Supabase query chain resolving to given data/error */
 type ChainData = Record<string, unknown> | null;
 const chain = (data: ChainData, error: { message: string } | null = null) => ({
-  select: jest.fn().mockReturnThis(),
-  insert: jest.fn().mockReturnThis(),
-  update: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  neq: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  single: jest.fn().mockResolvedValue({ data, error }),
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockResolvedValue({ data, error }),
 });
 
 const makeReq = (method: string, body?: Record<string, unknown>, queryParams?: string): NextRequest => {
@@ -209,10 +210,10 @@ describe('DELETE /api/education/templates - teacher role required', () => {
     mockFrom.mockReturnValueOnce(chain({ id: templateId, teacher_id: 'teacher-id' }));
     // Delete call - .delete().eq() resolves without .single()
     mockFrom.mockReturnValueOnce({
-      select: jest.fn().mockReturnThis(),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: null, error: null }),
-      single: jest.fn().mockResolvedValue({ data: null, error: null }),
+      select: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
     });
 
     const res = await DELETE(makeReq('DELETE', undefined, `id=${templateId}`));

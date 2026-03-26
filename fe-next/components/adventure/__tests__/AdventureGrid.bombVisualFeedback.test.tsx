@@ -17,7 +17,7 @@ import type { GridTileState } from '@/types/adventure';
 // ==============================================
 
 // Mock the hooks
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -25,7 +25,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock AdventureThemeContext
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   AdventureThemeContext: React.createContext({ worldId: 1 }),
   useHUDTheme: () => ({
     headerBg: 'bg-neo-navy/90',
@@ -65,7 +65,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -75,21 +75,21 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock animations
-jest.mock('@/components/animations', () => ({
+vi.mock('@/components/animations', () => ({
   WordPathTrail: () => null,
   SelectionSparkle: () => null,
 }));
 
 // Mock BoardFrame
-jest.mock('@/components/adventure/themed/BoardFrame', () => ({
+vi.mock('@/components/adventure/themed/BoardFrame', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="board-frame">{children}</div>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     t: (key: string) => key,
     dir: 'ltr',
   }),

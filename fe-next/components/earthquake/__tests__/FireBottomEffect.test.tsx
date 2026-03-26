@@ -2,19 +2,19 @@ import { render, screen, act } from '@testing-library/react';
 
 // Mock useReducedMotion
 let mockReducedMotion = false;
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   useReducedMotion: () => mockReducedMotion,
 }));
 
 // Mock canvas 2D context
-const mockPutImageData = jest.fn();
-const mockCreateImageData = jest.fn((w: number, h: number) => ({
+const mockPutImageData = vi.fn();
+const mockCreateImageData = vi.fn((w: number, h: number) => ({
   data: new Uint8ClampedArray(w * h * 4),
 }));
 
 beforeAll(() => {
    
-  (HTMLCanvasElement.prototype as any).getContext = jest.fn(() => ({
+  (HTMLCanvasElement.prototype as any).getContext = vi.fn(() => ({
     createImageData: mockCreateImageData,
     putImageData: mockPutImageData,
   }));

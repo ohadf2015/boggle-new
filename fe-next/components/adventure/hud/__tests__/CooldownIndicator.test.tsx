@@ -8,17 +8,17 @@ import { render, screen } from '@testing-library/react';
 import { CooldownIndicator } from '../CooldownIndicator';
 
 // Mock usePrefersReducedMotion hook
-jest.mock('../../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(() => false),
+vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(() => false),
 }));
 
-const { usePrefersReducedMotion } = jest.requireMock(
+const { usePrefersReducedMotion } = vi.importMock(
   '../../../../hooks/usePrefersReducedMotion'
 );
 
 describe('CooldownIndicator', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (usePrefersReducedMotion as jest.Mock).mockReturnValue(false);
   });
 
@@ -203,7 +203,7 @@ describe('CooldownIndicator', () => {
     });
 
     it('should call onComplete when reaching 0', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       const { rerender } = render(
         <CooldownIndicator
@@ -230,7 +230,7 @@ describe('CooldownIndicator', () => {
     });
 
     it('should only call onComplete once when remainingTime stays at 0', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       const { rerender } = render(
         <CooldownIndicator

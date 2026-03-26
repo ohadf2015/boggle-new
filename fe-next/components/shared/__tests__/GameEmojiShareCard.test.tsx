@@ -56,7 +56,7 @@ describe('GameEmojiShareCard — classic mode', () => {
 
   it('shows Copied! feedback after copy click', async () => {
     Object.assign(navigator, {
-      clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
     render(<GameEmojiShareCard data={classicData} t={t} />);
     fireEvent.click(screen.getByText('Copy'));

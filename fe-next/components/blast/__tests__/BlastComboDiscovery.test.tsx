@@ -8,7 +8,7 @@ import type { BlastComboType } from '../utils/blastCombos';
 
 // ---- Mocks ----
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
@@ -16,15 +16,15 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useShouldReduceMotion: () => false,
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
   AdaptiveMotion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
@@ -39,31 +39,31 @@ import { BlastComboDiscovery } from '../BlastComboDiscovery';
 
 describe('BlastComboDiscovery', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders nothing when pendingDiscovery is null', () => {
     const { container } = render(
-      <BlastComboDiscovery pendingDiscovery={null} onComplete={jest.fn()} />,
+      <BlastComboDiscovery pendingDiscovery={null} onComplete={vi.fn()} />,
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('renders banner with data-testid when pendingDiscovery is set', () => {
     render(
-      <BlastComboDiscovery pendingDiscovery="bomb_bomb" onComplete={jest.fn()} />,
+      <BlastComboDiscovery pendingDiscovery="bomb_bomb" onComplete={vi.fn()} />,
     );
     expect(screen.getByTestId('combo-discovery-banner')).toBeInTheDocument();
   });
 
   it('renders comboDiscovered header key via t()', () => {
     render(
-      <BlastComboDiscovery pendingDiscovery="bomb_bomb" onComplete={jest.fn()} />,
+      <BlastComboDiscovery pendingDiscovery="bomb_bomb" onComplete={vi.fn()} />,
     );
     // t() returns key in mock, so we check for the key
     expect(screen.getByText('blast.comboDiscovered')).toBeInTheDocument();
@@ -72,32 +72,32 @@ describe('BlastComboDiscovery', () => {
   it('renders combo name key via t() with combo type', () => {
     const comboType: BlastComboType = 'lightning_lightning';
     render(
-      <BlastComboDiscovery pendingDiscovery={comboType} onComplete={jest.fn()} />,
+      <BlastComboDiscovery pendingDiscovery={comboType} onComplete={vi.fn()} />,
     );
     expect(screen.getByText(`blast.combo.${comboType}`)).toBeInTheDocument();
   });
 
   it('calls onComplete after ~1800ms timeout', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(
       <BlastComboDiscovery pendingDiscovery="prism_prism" onComplete={onComplete} />,
     );
     expect(onComplete).not.toHaveBeenCalled();
     act(() => {
-      jest.advanceTimersByTime(1800);
+      vi.advanceTimersByTime(1800);
     });
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('clears timeout when pendingDiscovery changes to null', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const { rerender } = render(
       <BlastComboDiscovery pendingDiscovery="bomb_bomb" onComplete={onComplete} />,
     );
     // Change to null before timer fires
     rerender(<BlastComboDiscovery pendingDiscovery={null} onComplete={onComplete} />);
     act(() => {
-      jest.advanceTimersByTime(1800);
+      vi.advanceTimersByTime(1800);
     });
     // Should not call onComplete since we switched to null
     expect(onComplete).not.toHaveBeenCalled();
@@ -108,19 +108,19 @@ describe('BlastComboDiscovery', () => {
 
 describe('BlastComboDiscovery (reduced motion)', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     // Override AccessibilityContext mock for this suite
-    jest.resetModules();
+    vi.resetModules();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('calls onComplete quickly (300ms) when reduced motion flag is true via prop', () => {
     // Test via the reducedMotion prop path
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
 
     // We test this by observing the timeout behavior: component should call
     // onComplete after 300ms in reduced-motion mode vs 1800ms normally.
@@ -130,7 +130,7 @@ describe('BlastComboDiscovery (reduced motion)', () => {
     );
 
     act(() => {
-      jest.advanceTimersByTime(299);
+      vi.advanceTimersByTime(299);
     });
     // Not called yet at 299ms (component uses 1800ms by default)
     // This confirms the component is using a timer-based approach

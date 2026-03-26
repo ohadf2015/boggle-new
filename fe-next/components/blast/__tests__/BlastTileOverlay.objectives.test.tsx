@@ -5,21 +5,21 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...rest }: any) => <div className={className} {...rest}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, className, ...rest }: any) => <div className={className} {...rest}>{children}</div>,
   },
   AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Star: () => <span />,
   Bomb: () => <span />,
   Rainbow: () => <span />,

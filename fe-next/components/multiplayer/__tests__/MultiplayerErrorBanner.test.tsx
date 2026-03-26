@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MultiplayerErrorBanner } from '../MultiplayerErrorBanner';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -15,7 +15,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_target, prop) => {
       const Component = React.forwardRef(function MotionMock(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
@@ -35,22 +35,22 @@ jest.mock('framer-motion', () => {
 describe('MultiplayerErrorBanner', () => {
   it('should not render when error is null', () => {
     const { container } = render(
-      <MultiplayerErrorBanner error={null} onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error={null} onDismiss={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('should render room-full error with correct i18n key', () => {
     render(
-      <MultiplayerErrorBanner error="room-full" onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error="room-full" onDismiss={vi.fn()} />
     );
     expect(screen.getByText('multiplayerFlow.errors.roomFull')).toBeInTheDocument();
   });
 
   it('should render connection-lost error with retry button', () => {
-    const onRetry = jest.fn();
+    const onRetry = vi.fn();
     render(
-      <MultiplayerErrorBanner error="connection-lost" onDismiss={jest.fn()} onRetry={onRetry} />
+      <MultiplayerErrorBanner error="connection-lost" onDismiss={vi.fn()} onRetry={onRetry} />
     );
     expect(screen.getByText('multiplayerFlow.errors.connectionLost')).toBeInTheDocument();
     const retryBtn = screen.getByRole('button', { name: /common.retry/i });
@@ -61,27 +61,27 @@ describe('MultiplayerErrorBanner', () => {
 
   it('should render host-left error', () => {
     render(
-      <MultiplayerErrorBanner error="host-left" onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error="host-left" onDismiss={vi.fn()} />
     );
     expect(screen.getByText('multiplayerFlow.errors.hostLeft')).toBeInTheDocument();
   });
 
   it('should render invalid-code error', () => {
     render(
-      <MultiplayerErrorBanner error="invalid-code" onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error="invalid-code" onDismiss={vi.fn()} />
     );
     expect(screen.getByText('multiplayerFlow.errors.invalidCode')).toBeInTheDocument();
   });
 
   it('should render room-closed error', () => {
     render(
-      <MultiplayerErrorBanner error="room-closed" onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error="room-closed" onDismiss={vi.fn()} />
     );
     expect(screen.getByText('multiplayerFlow.errors.roomClosed')).toBeInTheDocument();
   });
 
   it('should call onDismiss when dismiss button is clicked', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(
       <MultiplayerErrorBanner error="room-full" onDismiss={onDismiss} />
     );
@@ -92,7 +92,7 @@ describe('MultiplayerErrorBanner', () => {
 
   it('should have role="alert" for screen reader announcement', () => {
     render(
-      <MultiplayerErrorBanner error="room-full" onDismiss={jest.fn()} />
+      <MultiplayerErrorBanner error="room-full" onDismiss={vi.fn()} />
     );
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });

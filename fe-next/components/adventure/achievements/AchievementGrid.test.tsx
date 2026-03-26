@@ -12,7 +12,7 @@ import { AchievementCard } from './AchievementCard';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 
 // Mock hooks
-jest.mock('@/hooks/useAdventureAchievements', () => ({
+vi.mock('@/hooks/useAdventureAchievements', () => ({
   useAdventureAchievements: () => ({
     achievementCounts: { FIRST_WORD: 1, BOSS_SLAYER: 3 },
     isEarned: (id: string) => id === 'FIRST_WORD' || id === 'BOSS_SLAYER',
@@ -33,7 +33,7 @@ jest.mock('@/hooks/useAdventureAchievements', () => ({
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -59,7 +59,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => (
       <div {...props}>{children}</div>
@@ -110,7 +110,7 @@ describe('AchievementCard', () => {
   });
 
   it('calls onClick when earned achievement clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(
       <AchievementCard
         achievement={mockAchievement}
@@ -125,7 +125,7 @@ describe('AchievementCard', () => {
   });
 
   it('does not call onClick when unearned achievement clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(
       <AchievementCard
         achievement={mockAchievement}
@@ -191,7 +191,7 @@ describe('AchievementGrid', () => {
   });
 
   it('calls onSelectAchievement when achievement clicked', () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     render(<AchievementGrid onSelectAchievement={onSelect} />);
 
     // Click on an earned achievement

@@ -15,7 +15,7 @@ import { SurvivalLandscapeLayout } from '../SurvivalLandscapeLayout';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 
 // Mock framer-motion to make tests synchronous
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileHover, whileTap, ...domProps } = props;
@@ -26,23 +26,23 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock dialog component
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
 // Mock GridComponent
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-grid" />,
 }));
 
 // Mock WordFeedbackToast
-jest.mock('../../WordFeedbackToast', () => ({
+vi.mock('../../WordFeedbackToast', () => ({
   WordFeedbackToast: () => null,
 }));
 
 // Mock SwipeTipTooltip
-jest.mock('@/components/game/SwipeTipTooltip', () => ({
+vi.mock('@/components/game/SwipeTipTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -52,8 +52,8 @@ describe('LandscapeClueBoxes - Feedback Box Count', () => {
     grid: [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']] as [string[], string[], string[]],
     isGameOver: false,
     eliminatedLetters: new Set<string>(),
-    onWordSubmit: jest.fn(),
-    onWordChange: jest.fn(),
+    onWordSubmit: vi.fn(),
+    onWordChange: vi.fn(),
     highlightedPath: [],
     lifePoints: 100,
     isLifeGaining: false,
@@ -80,16 +80,16 @@ describe('LandscapeClueBoxes - Feedback Box Count', () => {
     knownLetters: new Set<string>(),
     skipAnimations: true,
     showQuitConfirm: false,
-    onQuitClick: jest.fn(),
-    onQuitConfirm: jest.fn(),
-    onQuitCancel: jest.fn(),
+    onQuitClick: vi.fn(),
+    onQuitConfirm: vi.fn(),
+    onQuitCancel: vi.fn(),
     feedbackType: null,
     feedbackMessage: '',
-    onCloseToast: jest.fn(),
+    onCloseToast: vi.fn(),
     showSwipeTip: false,
-    onDismissSwipeTip: jest.fn(),
+    onDismissSwipeTip: vi.fn(),
     activeNotifications: [],
-    onDismissNotification: jest.fn(),
+    onDismissNotification: vi.fn(),
     t: (key: string) => key,
   });
 

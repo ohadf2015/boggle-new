@@ -2,23 +2,23 @@ import { render, act, waitFor } from '@testing-library/react';
 import SoloPracticeBoard from '../SoloPracticeBoard';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
-// Use jest.fn() to capture GridComponent props without module-level reassignment
+// Use vi.fn() to capture GridComponent props without module-level reassignment
 const mockGridComponent = jest.fn<React.JSX.Element, [Record<string, unknown>]>(() => <div data-testid="grid-component" />);
 
-jest.mock('@/components/GridComponent', () => {
+vi.mock('@/components/GridComponent', () => {
   const Wrapped = (props: Record<string, unknown>) => mockGridComponent(props);
   Wrapped.displayName = 'MockGridComponent';
-  return Wrapped;
+  return { default: Wrapped };
 });
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: ({ feedback }: { feedback: { type: string } | null }) => (
     <div data-testid="word-forming-area" data-feedback-type={feedback?.type ?? ''} />
   ),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} {...props}>{children}</div>
@@ -30,7 +30,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -38,7 +38,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/utils', () => ({
+vi.mock('@/utils/utils', () => ({
   generateRandomTable: () => [
     ['T', 'E', 'S', 'T'],
     ['W', 'O', 'R', 'D'],
@@ -48,10 +48,10 @@ jest.mock('@/utils/utils', () => ({
 }));
 
 // Mock clientWordValidator - allow all words through local validation
-jest.mock('@/utils/clientWordValidator', () => ({
-  validateWordLocally: jest.fn().mockReturnValue({ isValid: true }),
-  isWordOnBoard: jest.fn().mockReturnValue(true),
-  buildPositionsMap: jest.fn().mockReturnValue(new Map()),
+vi.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: vi.fn().mockReturnValue({ isValid: true }),
+  isWordOnBoard: vi.fn().mockReturnValue(true),
+  buildPositionsMap: vi.fn().mockReturnValue(new Map()),
 }));
 
 /** Helper to get the most recent GridComponent props */
@@ -69,19 +69,19 @@ const defaultProps = {
   lessonName: 'Test Lesson',
   words: mockWords,
   language: 'en' as const,
-  onComplete: jest.fn(),
-  onBack: jest.fn(),
-  onWordFound: jest.fn(),
+  onComplete: vi.fn(),
+  onBack: vi.fn(),
+  onWordFound: vi.fn(),
 };
 
 describe('SoloPracticeBoard - Word Feedback & Validation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    global.fetch = jest.fn();
+    vi.clearAllMocks();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should render WordFormingArea for feedback display', () => {

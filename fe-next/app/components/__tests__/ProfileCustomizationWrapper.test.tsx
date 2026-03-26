@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * ProfileCustomizationWrapper Component Tests
  *
@@ -9,18 +10,18 @@
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Mock the dependencies
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(),
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('@/utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
+vi.mock('@/utils/logger', () => ({
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
 }));
 
-jest.mock('next/dynamic', () => () => {
+vi.mock('next/dynamic', () => () => {
   const MockComponent = () => null;
   MockComponent.displayName = 'DynamicComponent';
   return MockComponent;
@@ -28,13 +29,13 @@ jest.mock('next/dynamic', () => () => {
 
 import { useAuth } from '@/contexts/AuthContext';
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 // Helper to create mock auth state (types are simplified for tests)
 const createMockAuthState = (overrides: Record<string, unknown>) => ({
   profile: null,
   needsProfileCustomization: false,
-  updateProfile: jest.fn(),
+  updateProfile: vi.fn(),
   user: null,
   rankedProgress: null,
   loading: false,
@@ -45,14 +46,14 @@ const createMockAuthState = (overrides: Record<string, unknown>) => ({
   isTeacher: false,
   canPlayRanked: false,
   gamesUntilRanked: 10,
-  setupProfile: jest.fn(),
-  refreshProfile: jest.fn(),
+  setupProfile: vi.fn(),
+  refreshProfile: vi.fn(),
   ...overrides,
 });
 
 describe('ProfileCustomizationWrapper', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Auth State Conditions', () => {
@@ -105,7 +106,7 @@ describe('ProfileCustomizationWrapper', () => {
 
   describe('Save Handler Logic', () => {
     it('should save avatar_config (CustomAvatarConfig) when saving', async () => {
-      const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+      const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
       const testAvatar: CustomAvatarConfig = {
         base: 'round',
@@ -141,7 +142,7 @@ describe('ProfileCustomizationWrapper', () => {
     });
 
     it('should not include old avatar_image/avatar_emoji/avatar_color fields', async () => {
-      const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+      const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
       const testAvatar = getRandomAvatarConfig();
 
@@ -167,7 +168,7 @@ describe('ProfileCustomizationWrapper', () => {
 
 describe('Integration: Profile Customization Flow', () => {
   it('complete signup to customization flow saves CustomAvatarConfig', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
     const selectedAvatar: CustomAvatarConfig = {
       base: 'heart',

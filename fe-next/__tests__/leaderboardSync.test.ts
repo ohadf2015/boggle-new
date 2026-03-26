@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Tests for Single-Player Leaderboard Sync
  */
@@ -5,7 +6,7 @@
 describe('Single-Player Leaderboard Sync', () => {
   beforeEach(() => {
     // Reset fetch mock
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   describe('API endpoint', () => {

@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import { ComboMilestoneAnnouncement } from '../ComboMilestoneAnnouncement';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, ...rest } = props;
@@ -15,11 +15,11 @@ jest.mock('framer-motion', () => ({
 
 describe('ComboMilestoneAnnouncement', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders nothing at combo level 0', () => {
@@ -62,7 +62,7 @@ describe('ComboMilestoneAnnouncement', () => {
     expect(screen.getByText('NICE!')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(1200);
+      vi.advanceTimersByTime(1200);
     });
 
     expect(screen.queryByText('NICE!')).not.toBeInTheDocument();

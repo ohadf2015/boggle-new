@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mocks
-const mockShowAd = jest.fn();
-const mockT = jest.fn((key: string) => {
+const mockShowAd = vi.fn();
+const mockT = vi.fn((key: string) => {
   const translations: Record<string, string> = {
     'ads.rewarded.watchForGold': 'Watch ad for +{amount} gold',
     'ads.rewarded.earning': 'Watching...',
@@ -13,8 +13,8 @@ const mockT = jest.fn((key: string) => {
   return translations[key] || key;
 });
 
-jest.mock('@/hooks/useRewardedAd', () => ({
-  useRewardedAd: jest.fn(() => ({
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: vi.fn(() => ({
     status: 'idle',
     isAdAvailable: true,
     isPlaceholderCooldown: false,
@@ -24,11 +24,11 @@ jest.mock('@/hooks/useRewardedAd', () => ({
   })),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en', direction: 'ltr' }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
@@ -37,7 +37,7 @@ import { useRewardedAd } from '@/hooks/useRewardedAd';
 
 describe('RewardedAdGoldButton', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
     (useRewardedAd as jest.Mock).mockReturnValue({
       status: 'idle',

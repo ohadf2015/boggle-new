@@ -10,91 +10,93 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 
 // Mock all required contexts and hooks
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/contexts/MusicContext');
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/MusicContext');
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
-    stopSound: jest.fn(),
+    playSound: vi.fn(),
+    stopSound: vi.fn(),
     isSoundEnabled: true,
-    toggleSound: jest.fn(),
+    toggleSound: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoin: () => ({
     coins: 0,
-    updateCoins: jest.fn(),
+    updateCoins: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/HapticsContext', () => ({
+vi.mock('@/contexts/HapticsContext', () => ({
   useHapticsConfig: () => ({
     isEnabled: true,
-    toggle: jest.fn(),
+    toggle: vi.fn(),
   }),
 }));
-jest.mock('@/hooks/useLiveRoomStats', () => ({
+vi.mock('@/hooks/useLiveRoomStats', () => ({
   useLiveRoomStats: () => ({
     openRooms: 0,
     totalPlayers: 0,
-    refresh: jest.fn(),
+    refresh: vi.fn(),
   }),
 }));
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => true, // Mobile landscape mode
 }));
-jest.mock('@/hooks/useMobilePortrait', () => ({
+vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),
 }));
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/onboardingStorage', () => ({
+vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,
-  markOnboardingSkipped: jest.fn(),
+  markOnboardingSkipped: vi.fn(),
 }));
 
 // Mock components that are lazy loaded
-jest.mock('@/components/daily/DailyChallengeBanner', () => {
-  return function MockDailyChallengeBanner() {
+vi.mock('@/components/daily/DailyChallengeBanner', () => {
+  const MockDailyChallengeBanner = () => {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
+  return { default: MockDailyChallengeBanner };
 });
 
-jest.mock('@/components/OnboardingModal', () => {
-  return function MockOnboardingModal() {
+vi.mock('@/components/OnboardingModal', () => {
+  const MockOnboardingModal = () => {
     return <div>Onboarding Modal</div>;
   };
+  return { default: MockOnboardingModal };
 });
 
 describe('LandingView - Daily Challenge Banner Container', () => {
   beforeEach(() => {
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as vi.Mock).mockReturnValue({
       isAuthenticated: false,
       loading: false,
     });
 
-    (useLanguage as jest.Mock).mockReturnValue({
+    (useLanguage as vi.Mock).mockReturnValue({
       t: (key: string) => key,
       language: 'en',
       dir: 'ltr',
     });
 
-    (useMusic as jest.Mock).mockReturnValue({
-      playTrack: jest.fn(),
+    (useMusic as vi.Mock).mockReturnValue({
+      playTrack: vi.fn(),
       TRACKS: { LOBBY: 'lobby' },
     });
 
@@ -102,15 +104,15 @@ describe('LandingView - Daily Challenge Banner Container', () => {
 
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: query.includes('orientation: landscape'),
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
   });

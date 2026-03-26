@@ -4,7 +4,7 @@ import { WeeklyChallengeCard } from './WeeklyChallengeCard';
 import type { WeeklyQuestRow } from '@/lib/supabase/education/types';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div {...props}>{children}</div>
@@ -13,7 +13,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -33,7 +33,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('WeeklyChallengeCard', () => {
-  const mockOnClaim = jest.fn();
+  const mockOnClaim = vi.fn();
 
   const baseQuest: WeeklyQuestRow = {
     id: 'quest-1',

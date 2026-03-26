@@ -24,7 +24,7 @@ const mockHasDirectionChange = hasDirectionChange as jest.Mock;
 
 describe('findMixedDirectionWord', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockGrid = [

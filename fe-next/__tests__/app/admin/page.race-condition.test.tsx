@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Admin Page - Race Condition Test
  *
@@ -19,89 +20,89 @@ import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/supabase';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  usePathname: jest.fn(() => '/en/admin'),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(() => '/en/admin'),
 }));
-jest.mock('@/lib/supabase', () => ({
-  getSession: jest.fn(),
+vi.mock('@/lib/supabase', () => ({
+  getSession: vi.fn(),
 }));
 
-const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
-jest.mock('@/components/Header', () => {
-  return function MockHeader() {
+const mockGetSession = getSession as MockedFunction<typeof getSession>;
+vi.mock('@/components/Header', () => ({
+  default: function MockHeader() {
     return <div data-testid="mock-header">Header</div>;
-  };
-});
-jest.mock('@/components/admin/LiveMonitor', () => {
+  },
+}));
+vi.mock('@/components/admin/LiveMonitor', () => {
   return {
     LiveMonitor: function MockLiveMonitor() {
       return <div data-testid="mock-live-monitor">LiveMonitor</div>;
     },
   };
 });
-jest.mock('@/components/admin/TodayGamesHistory', () => {
+vi.mock('@/components/admin/TodayGamesHistory', () => {
   return {
     TodayGamesHistory: function MockTodayGamesHistory() {
       return <div data-testid="mock-today-games">TodayGamesHistory</div>;
     },
   };
 });
-jest.mock('@/components/admin/GamesDiagnostic', () => {
+vi.mock('@/components/admin/GamesDiagnostic', () => {
   return {
     GamesDiagnostic: function MockGamesDiagnostic() {
       return <div data-testid="mock-games-diagnostic">GamesDiagnostic</div>;
     },
   };
 });
-jest.mock('@/components/admin/EmailTestPanel', () => {
+vi.mock('@/components/admin/EmailTestPanel', () => {
   return {
     EmailTestPanel: function MockEmailTestPanel() {
       return <div data-testid="mock-email-test">EmailTestPanel</div>;
     },
   };
 });
-jest.mock('@/utils/mobileAccessibility', () => ({
-  isMobileDevice: jest.fn(() => false),
+vi.mock('@/utils/mobileAccessibility', () => ({
+  isMobileDevice: vi.fn(() => false),
 }));
-jest.mock('@/components/admin/overview/KPICards', () => ({
+vi.mock('@/components/admin/overview/KPICards', () => ({
   KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
 }));
-jest.mock('@/components/admin/overview/SystemHealth', () => ({
+vi.mock('@/components/admin/overview/SystemHealth', () => ({
   SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
 }));
-jest.mock('@/components/admin/sidebar/AdminSidebar', () => ({
+vi.mock('@/components/admin/sidebar/AdminSidebar', () => ({
   AdminSidebar: () => <div data-testid="admin-sidebar">AdminSidebar</div>,
 }));
-jest.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
+vi.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
   AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
 }));
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: ({ text }: { text?: string }) => <div>{text}</div>,
 }));
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
 }));
-jest.mock('@/hooks/useAdminAuth', () => ({
-  useAdminAuth: jest.fn(() => ({
+vi.mock('@/hooks/useAdminAuth', () => ({
+  useAdminAuth: vi.fn(() => ({
     authToken: null,
-    refreshToken: jest.fn(),
+    refreshToken: vi.fn(),
     isLoading: false,
     isRefreshing: false,
     error: null,
   })),
 }));
-jest.mock('@/hooks/useAdminDashboard', () => ({
-  useAdminDashboard: jest.fn(() => ({
+vi.mock('@/hooks/useAdminDashboard', () => ({
+  useAdminDashboard: vi.fn(() => ({
     stats: null,
     health: null,
     loading: false,
     error: null,
   })),
 }));
-jest.mock('@/components/ui/PullToRefreshWrapper', () => {
+vi.mock('@/components/ui/PullToRefreshWrapper', () => {
   return {
     PullToRefreshWrapper: function MockPullToRefreshWrapper({ children }: any) {
       return <div data-testid="mock-pull-to-refresh">{children}</div>;
@@ -109,18 +110,18 @@ jest.mock('@/components/ui/PullToRefreshWrapper', () => {
   };
 });
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
 describe('AdminPage - Race Condition Tests', () => {
   const mockRouter = {
-    push: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   };
 
   const mockLanguageContext = {
@@ -139,14 +140,14 @@ describe('AdminPage - Race Condition Tests', () => {
       return translations[key] || key;
     },
     language: 'en' as const,
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     dir: 'ltr' as const,
     currentFlag: '🇺🇸',
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockUseRouter.mockReturnValue(mockRouter as any);
     mockUseLanguage.mockReturnValue(mockLanguageContext);
     // Default mock for getSession (returns valid token immediately)
@@ -157,8 +158,8 @@ describe('AdminPage - Race Condition Tests', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   describe('Race Condition: Auth loads before Profile', () => {
@@ -177,9 +178,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // WHEN: Admin page renders
@@ -205,9 +206,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // WHEN: Admin page renders
@@ -233,9 +234,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       const { rerender } = render(<AdminPage />);
@@ -265,9 +266,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       rerender(<AdminPage />);
@@ -308,9 +309,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // WHEN: Admin page renders
@@ -347,9 +348,9 @@ describe('AdminPage - Race Condition Tests', () => {
         needsProfileCustomization: false,
         rankedProgress: null,
         isSupabaseEnabled: true,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // WHEN: Admin page renders (shows loading while authToken fetches)

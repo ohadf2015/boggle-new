@@ -9,7 +9,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
     return rest;
@@ -25,7 +25,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useDevicePerformance hook to allow PageLoader to render properly
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
     enableComplexAnimations: false,
@@ -67,7 +67,7 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -75,7 +75,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Import after mocks
@@ -85,12 +85,12 @@ describe('TodayGamesHistory', () => {
   const mockAuthToken = 'test-auth-token';
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   const mockGamesResponse = {
@@ -392,7 +392,7 @@ describe('TodayGamesHistory', () => {
     const initialCallCount = mockFetch.mock.calls.length;
 
     // Advance timers by 30 seconds
-    jest.advanceTimersByTime(30000);
+    vi.advanceTimersByTime(30000);
 
     await waitFor(() => {
       expect(mockFetch.mock.calls.length).toBeGreaterThan(initialCallCount);

@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Tests for Student Profile Page
  * Enhanced with duel stats and recent activity
@@ -15,17 +16,17 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/hooks/useStudentProgress');
-jest.mock('@/lib/supabase/education/duels');
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/hooks/useStudentProgress');
+vi.mock('@/lib/supabase/education/duels');
+vi.mock('@/lib/supabase', () => ({
   supabase: null,
 }));
-jest.mock('@/components/education/EducationHeader', () => ({
+vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header">EducationHeader</div>,
 }));
-jest.mock('@/components/education', () => ({
+vi.mock('@/components/education', () => ({
   EducationBadgeGrid: ({ achievements }: any) => (
     <div data-testid="badge-grid">
       {achievements.map((a: any) => (
@@ -35,11 +36,11 @@ jest.mock('@/components/education', () => ({
   ),
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseStudentProgress = useStudentProgress as jest.MockedFunction<typeof useStudentProgress>;
-const mockGetDuelStats = getDuelStats as jest.MockedFunction<typeof getDuelStats>;
-const mockGetDuelHistory = getDuelHistory as jest.MockedFunction<typeof getDuelHistory>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseStudentProgress = useStudentProgress as MockedFunction<typeof useStudentProgress>;
+const mockGetDuelStats = getDuelStats as MockedFunction<typeof getDuelStats>;
+const mockGetDuelHistory = getDuelHistory as MockedFunction<typeof getDuelHistory>;
 
 describe('StudentProfilePageClient - Duel Features', () => {
   const mockUser = {
@@ -74,22 +75,22 @@ describe('StudentProfilePageClient - Duel Features', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockUseAuth.mockReturnValue({
       user: mockUser,
       isAuthenticated: true,
       profile: mockProfile,
       loading: false,
-      login: jest.fn(),
-      logout: jest.fn(),
-      updateProfile: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
+      updateProfile: vi.fn(),
     } as any);
 
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       dir: 'ltr',
       currentFlag: '🇺🇸',
     } as any);
@@ -98,15 +99,15 @@ describe('StudentProfilePageClient - Duel Features', () => {
       lessons: mockLessons as any,
       isLoading: false,
       error: null,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     } as any);
 
     // Mock Supabase achievements query
     const mockSupabase = require('@/lib/supabase');
     mockSupabase.supabase = {
-      from: jest.fn(() => ({
-        select: jest.fn(() => ({
-          eq: jest.fn(() => Promise.resolve({
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => Promise.resolve({
             data: [
               {
                 id: 'ach-1',

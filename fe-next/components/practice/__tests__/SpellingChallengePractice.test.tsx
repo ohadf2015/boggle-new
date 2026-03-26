@@ -4,7 +4,7 @@ import { SpellingChallengePractice } from '../SpellingChallengePractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockMotionDiv = React.forwardRef(
     ({ children, initial, animate, exit, transition, ...props }: any, ref: any) => (
@@ -30,7 +30,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('../PracticeResultsCard', () => ({
+vi.mock('../PracticeResultsCard', () => ({
   __esModule: true,
   default: ({
     correct,
@@ -58,17 +58,17 @@ describe('SpellingChallengePractice', () => {
     { word: 'apple', definition: 'A round fruit', canIntegrate: true },
   ];
 
-  const mockOnComplete = jest.fn();
-  const mockOnBack = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnBack = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('rendering', () => {
@@ -216,7 +216,7 @@ describe('SpellingChallengePractice', () => {
       fireEvent.submit(input.closest('form')!);
 
       // After 1s delay for correct answer
-      act(() => { jest.advanceTimersByTime(1100); });
+      act(() => { vi.advanceTimersByTime(1100); });
 
       await waitFor(() => {
         const newDefinition = screen.getByTestId('definition-card').textContent;

@@ -2,12 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { GameSidebar } from '../GameSidebar';
 import type { LevelObjective } from '@/types/adventure';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
 // Mock AdventureObjectives so it doesn't duplicate testids from desktop layout
-jest.mock('../../AdventureObjectives', () => ({
+vi.mock('../../AdventureObjectives', () => ({
   __esModule: true,
   default: () => <div data-testid="adventure-objectives-mock" />,
 }));
@@ -23,7 +23,7 @@ describe('GameSidebar mobile layout', () => {
       <GameSidebar
         objectives={objectives}
         hasHintsAvailable={true}
-        onHintClick={jest.fn()}
+        onHintClick={vi.fn()}
         showAutoHint={false}
         currentHint={null}
         hintLevel="none"
@@ -38,7 +38,7 @@ describe('GameSidebar mobile layout', () => {
       <GameSidebar
         objectives={objectives}
         hasHintsAvailable={false}
-        onHintClick={jest.fn()}
+        onHintClick={vi.fn()}
         showAutoHint={false}
         currentHint={null}
         hintLevel="none"

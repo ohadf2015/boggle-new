@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * TV Mode Host Filtering Tests
  *
@@ -14,7 +15,7 @@ import { render, screen, within } from '@testing-library/react';
 import { EnhancedPlayerList } from '../desktop/EnhancedPlayerList';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }) => (
       <div {...props}>{children}</div>
@@ -24,7 +25,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Avatar component
-jest.mock('../../../../components/Avatar', () => ({
+vi.mock('../../../../components/Avatar', () => ({
   __esModule: true,
   default: ({ size, className }: { avatarImage?: string; size?: string; className?: string }) => (
     <div data-testid="avatar" className={className}>{size}</div>
@@ -32,7 +33,7 @@ jest.mock('../../../../components/Avatar', () => ({
 }));
 
 // Mock PresenceIndicator
-jest.mock('../../../../components/PresenceIndicator', () => ({
+vi.mock('../../../../components/PresenceIndicator', () => ({
   __esModule: true,
   default: ({ status }: { status: string; size?: string }) => (
     <div data-testid="presence-indicator">{status}</div>

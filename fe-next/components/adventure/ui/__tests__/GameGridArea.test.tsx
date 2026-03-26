@@ -10,14 +10,14 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const R = require('react');
   return {
     useHUDTheme: () => ({
@@ -35,7 +35,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...rest }: Record<string, unknown>) => (
       <div className={className as string} data-testid={rest['data-testid'] as string}>{children as React.ReactNode}</div>
@@ -44,7 +44,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('../../AdventureGrid', () => {
+vi.mock('../../AdventureGrid', () => {
   const R = require('react');
   return {
     __esModule: true,
@@ -54,9 +54,9 @@ jest.mock('../../AdventureGrid', () => {
   };
 });
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
-  default: jest.fn(({ word, feedback, compact }: { word: string; letterCount?: number; feedback?: unknown; compact?: boolean }) => (
+  default: vi.fn(({ word, feedback, compact }: { word: string; letterCount?: number; feedback?: unknown; compact?: boolean }) => (
     <div data-testid="word-forming-area" data-word={word} data-has-feedback={!!feedback} data-compact={compact} />
   )),
 }));
@@ -77,16 +77,16 @@ const defaultProps = {
   tiles: baseTiles,
   gridSize: 3,
   selectedIndices: [] as number[],
-  onTileSelect: jest.fn(),
-  onWordSubmit: jest.fn(),
-  onDragStart: jest.fn(),
-  onDragEnter: jest.fn(),
+  onTileSelect: vi.fn(),
+  onWordSubmit: vi.fn(),
+  onDragStart: vi.fn(),
+  onDragEnter: vi.fn(),
   gridRef: { current: null },
   isInteractive: true,
   isDisabled: false,
   entryPhase: 'playing',
   showCascade: false,
-  onCascadeComplete: jest.fn(),
+  onCascadeComplete: vi.fn(),
   hintHighlightIndices: [] as number[],
   pathPoints: [] as Array<{ x: number; y: number; timestamp: number }>,
   validationError: null as string | null,

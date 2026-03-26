@@ -151,7 +151,7 @@ describe('ThemedTile', () => {
 
   it('should call onClick when clicked', async () => {
     // GIVEN
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const tile = createTile();
     const user = userEvent.setup();
 

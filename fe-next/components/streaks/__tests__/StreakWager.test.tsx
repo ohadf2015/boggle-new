@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { StreakWager } from '../StreakWager';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -17,7 +17,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
     <div {...props}>{children}</div>
   ),
@@ -26,7 +26,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 
 // Mock useLanguage
 const mockT = (key: string) => key;
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, locale: 'en' }),
 }));
 
@@ -34,8 +34,8 @@ describe('StreakWager', () => {
   const defaultProps = {
     currentCoins: 200,
     currentStreak: 3,
-    onWager: jest.fn(),
-    onSkip: jest.fn(),
+    onWager: vi.fn(),
+    onSkip: vi.fn(),
   };
 
   beforeEach(() => {

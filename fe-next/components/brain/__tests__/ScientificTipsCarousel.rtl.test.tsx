@@ -5,12 +5,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock dependencies BEFORE imports
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => {
       // Filter out framer-motion specific props
@@ -26,12 +26,12 @@ jest.mock('framer-motion', () => ({
 }));
 
 const mockDir = { current: 'ltr' };
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: mockDir.current,
     language: mockDir.current === 'rtl' ? 'he' : 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     currentFlag: '🇺🇸',
   }),
 }));

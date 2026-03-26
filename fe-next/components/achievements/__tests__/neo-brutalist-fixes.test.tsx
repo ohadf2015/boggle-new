@@ -16,8 +16,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     m: new Proxy({}, {
@@ -33,45 +33,45 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock react-dom createPortal to render in place
-jest.mock('react-dom', () => ({
-  ...jest.requireActual('react-dom'),
+vi.mock('react-dom', () => ({
+  ...vi.importActual('react-dom'),
   createPortal: (node: React.ReactNode) => node,
 }));
 
 // Mock contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'ltr', language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({ playAchievementSound: jest.fn() }),
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playAchievementSound: vi.fn() }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({ fireConfetti: jest.fn() }));
-jest.mock('@/utils/ogShare', () => ({
-  getAchievementShareUrl: jest.fn(),
-  shareWithOgImage: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
+vi.mock('@/utils/ogShare', () => ({
+  getAchievementShareUrl: vi.fn(),
+  shareWithOgImage: vi.fn(),
 }));
-jest.mock('@/components/GoogleAnalytics', () => ({
-  gameEvents: { achievementUnlock: jest.fn(), share: jest.fn() },
+vi.mock('@/components/GoogleAnalytics', () => ({
+  gameEvents: { achievementUnlock: vi.fn(), share: vi.fn() },
 }));
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => <div data-testid="mascot" />,
 }));
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
   shouldHideExternalLogin: () => false,
 }));
-jest.mock('@/lib/supabase', () => ({
-  signInWithGoogle: jest.fn(),
-  signInWithDiscord: jest.fn(),
+vi.mock('@/lib/supabase', () => ({
+  signInWithGoogle: vi.fn(),
+  signInWithDiscord: vi.fn(),
 }));
-jest.mock('@/constants/achievementIcons', () => ({
+vi.mock('@/constants/achievementIcons', () => ({
   getAchievementIcon: () => '🏆',
 }));
-jest.mock('../AchievementIcon', () => ({
+vi.mock('../AchievementIcon', () => ({
   AchievementIcon: ({ achievementKey }: { achievementKey: string }) => <span data-testid="achievement-icon">{achievementKey}</span>,
 }));
-jest.mock('@/utils/achievementTiers', () => ({
+vi.mock('@/utils/achievementTiers', () => ({
   calculateTier: () => 'BRONZE',
   TIER_COLORS: {
     BRONZE: { bg: '#CD7F32', border: '#8B5A2B', text: '#000000', glow: '' },
@@ -83,7 +83,7 @@ jest.mock('@/utils/achievementTiers', () => ({
 }));
 
 // Mock tooltip
-jest.mock('@/components/ui/tooltip', () => ({
+vi.mock('@/components/ui/tooltip', () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,

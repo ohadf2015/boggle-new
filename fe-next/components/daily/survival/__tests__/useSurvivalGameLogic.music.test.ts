@@ -9,26 +9,26 @@ import * as MusicContextModule from '@/contexts/MusicContext';
 import * as GameMusicModule from '@/hooks/useGameMusic';
 
 // Mock contexts and hooks
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
     isAuthenticated: false,
   }),
 }));
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/MusicContext');
-jest.mock('@/hooks/useGameMusic');
+vi.mock('@/contexts/MusicContext');
+vi.mock('@/hooks/useGameMusic');
 
 describe('useSurvivalGameLogic - Music', () => {
-  const mockFadeToTrack = jest.fn();
-  const mockUseGameMusic = jest.fn(() => ({
-    resetUrgentMusic: jest.fn(),
+  const mockFadeToTrack = vi.fn();
+  const mockUseGameMusic = vi.fn(() => ({
+    resetUrgentMusic: vi.fn(),
   }));
 
   const defaultProps = {
@@ -36,27 +36,27 @@ describe('useSurvivalGameLogic - Music', () => {
     puzzleNumber: 1,
     language: 'en' as const,
     targetWord: 'TEST',
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
     t: (key: string) => key,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock MusicContext
-    jest.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
+    vi.spyOn(MusicContextModule, 'useMusic').mockReturnValue({
       currentTrack: null,
       volume: 0.5,
       isMuted: false,
       isPlaying: false,
       audioUnlocked: false,
-      playTrack: jest.fn(),
-      stopMusic: jest.fn(),
+      playTrack: vi.fn(),
+      stopMusic: vi.fn(),
       fadeToTrack: mockFadeToTrack,
-      setVolume: jest.fn(),
-      toggleMute: jest.fn(),
-      unlockAudio: jest.fn(),
-      preloadMusicTrack: jest.fn(),
+      setVolume: vi.fn(),
+      toggleMute: vi.fn(),
+      unlockAudio: vi.fn(),
+      preloadMusicTrack: vi.fn(),
       TRACKS: {
         LOBBY: 'lobby',
         BEFORE_GAME: 'beforeGame',
@@ -68,7 +68,7 @@ describe('useSurvivalGameLogic - Music', () => {
     });
 
     // Mock useGameMusic
-    jest.spyOn(GameMusicModule, 'useGameMusic').mockImplementation(mockUseGameMusic);
+    vi.spyOn(GameMusicModule, 'useGameMusic').mockImplementation(mockUseGameMusic);
   });
 
   it('should use useGameMusic hook to play music automatically', () => {

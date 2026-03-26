@@ -206,7 +206,7 @@ describe('MetricCard - Actionable Button', () => {
       icon: <TrendingUp data-testid="icon" />,
       actionable: {
         label: 'View Details',
-        onClick: jest.fn(),
+        onClick: vi.fn(),
       },
     });
 
@@ -226,7 +226,7 @@ describe('MetricCard - Actionable Button', () => {
   });
 
   it('calls onClick when actionable button clicked', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
 
     renderMetricCard({
       title: 'Metric',

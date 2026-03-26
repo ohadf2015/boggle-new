@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { SettingsPanel } from '../../host/components/pre-game/desktop/SettingsPanel';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>
@@ -21,8 +21,8 @@ jest.mock('framer-motion', () => ({
 
 describe('SettingsPanel', () => {
   const mockT = (key: string) => key;
-  const mockOnGameModeClick = jest.fn();
-  const mockOnTvModeToggle = jest.fn();
+  const mockOnGameModeClick = vi.fn();
+  const mockOnTvModeToggle = vi.fn();
 
   const defaultProps = {
     selectedGameMode: 'random' as const,
@@ -33,7 +33,7 @@ describe('SettingsPanel', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the settings panel', () => {

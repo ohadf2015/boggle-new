@@ -4469,6 +4469,7 @@ const sv = {
     "quitConfirmMessage": "Du förlorar dina framsteg!",
     "feedback": {
       "tooShort": "📏 Minst 3 bokstäver",
+      "tooLong": "📏 Max 8 bokstäver",
       "duplicate": "🔁 Redan hittat!",
       "notOnBoardPenalty": "⚠️ Inte på brädet -5 ❤️",
       "notFormablePenalty": "⚠️ Inte på brädet -5 ❤️",

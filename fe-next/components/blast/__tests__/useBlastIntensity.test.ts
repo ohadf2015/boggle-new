@@ -11,10 +11,10 @@ const defaultOptions = {
 
 describe('useBlastIntensity', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('returns 0 with no active effects', () => {
@@ -93,13 +93,13 @@ describe('useBlastIntensity', () => {
     rerender({ ...defaultOptions, comboLevel: 0 });
     // Should still be 3 immediately (decay hasn't started yet fully)
     // After 2s, drops by 1
-    act(() => { jest.advanceTimersByTime(2000); });
+    act(() => { vi.advanceTimersByTime(2000); });
     expect(result.current).toBe(2);
 
-    act(() => { jest.advanceTimersByTime(2000); });
+    act(() => { vi.advanceTimersByTime(2000); });
     expect(result.current).toBe(1);
 
-    act(() => { jest.advanceTimersByTime(2000); });
+    act(() => { vi.advanceTimersByTime(2000); });
     expect(result.current).toBe(0);
   });
 });

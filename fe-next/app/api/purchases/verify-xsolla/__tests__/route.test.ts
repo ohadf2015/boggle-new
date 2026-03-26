@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 // @ts-nocheck
 /**
  * Xsolla Webhook Verification Tests
@@ -6,14 +7,14 @@
  */
 import crypto from 'crypto';
 
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Set webhook secret before importing route
@@ -41,7 +42,7 @@ function makeRequest(body: string, signature?: string) {
 
 describe('POST /api/purchases/verify-xsolla', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 200 for valid payment webhook', async () => {

@@ -15,33 +15,33 @@ import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
 import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 
 // Mock contexts and hooks
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
     isAuthenticated: false,
   }),
 }));
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     currentTrack: null,
     volume: 0.5,
     isMuted: false,
     isPlaying: false,
     audioUnlocked: false,
-    playTrack: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
-    setVolume: jest.fn(),
-    toggleMute: jest.fn(),
-    unlockAudio: jest.fn(),
-    preloadMusicTrack: jest.fn(),
+    playTrack: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
+    setVolume: vi.fn(),
+    toggleMute: vi.fn(),
+    unlockAudio: vi.fn(),
+    preloadMusicTrack: vi.fn(),
     TRACKS: {
       LOBBY: 'lobby',
       BEFORE_GAME: 'beforeGame',
@@ -52,14 +52,14 @@ jest.mock('@/contexts/MusicContext', () => ({
     },
   }),
 }));
-jest.mock('@/hooks/useGameMusic', () => ({
+vi.mock('@/hooks/useGameMusic', () => ({
   useGameMusic: () => ({
-    resetUrgentMusic: jest.fn(),
+    resetUrgentMusic: vi.fn(),
   }),
 }));
 
 // Mock fetch for dictionary validation
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({
     json: () => Promise.resolve({ isValid: true }),
   })
@@ -79,12 +79,12 @@ describe('Word Hunt Minimum Word Length', () => {
     puzzleNumber: 1,
     language,
     targetWord: 'TEST',
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
     t: (key: string) => key,
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Constants', () => {

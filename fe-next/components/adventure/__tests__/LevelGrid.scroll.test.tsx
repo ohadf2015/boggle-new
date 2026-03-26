@@ -13,7 +13,7 @@ import type { WorldConfig } from '@/lib/adventure';
 // MOCKS
 // ==============================================
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -28,24 +28,24 @@ jest.mock('framer-motion', () => {
   // Mock useMotionValue with get/set methods
   const useMotionValue = (initial: any) => ({
     get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: initial,
   });
 
   // Mock useTransform
   const useTransform = (...args: any[]) => ({
     get: () => 0,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: 0,
   });
 
   // Mock useSpring
   const useSpring = (initial: any) => ({
     get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: initial,
   });
 
@@ -63,7 +63,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const MockImage = ({ src, alt, ...props }: any) => {
     return React.createElement('img', { src, alt, ...props });
   };
@@ -73,7 +73,7 @@ jest.mock('next/image', () => {
 
 // Mock useParallax hook
 const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
-jest.mock('@/hooks/useParallax', () => ({
+vi.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
     x: mockMotionValue(10),
     y: mockMotionValue(10),
@@ -82,7 +82,7 @@ jest.mock('@/hooks/useParallax', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -124,7 +124,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -144,7 +144,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -164,7 +164,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -189,7 +189,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -213,7 +213,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -241,7 +241,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -258,7 +258,7 @@ describe('LevelGrid Scroll Behavior', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={6}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 

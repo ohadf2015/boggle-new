@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for challenges module (daily challenges + weekly quests)
  * TDD: RED phase - these tests MUST fail before implementation
@@ -17,9 +18,9 @@ import {
 } from './challenges';
 
 // Mock supabase
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
@@ -29,7 +30,7 @@ describe('challenges module', () => {
   const mockWeekStart = '2026-02-10'; // Monday
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==========================================
@@ -56,11 +57,11 @@ describe('challenges module', () => {
         },
       ];
 
-      const mockEq2 = jest.fn().mockResolvedValue({ data: mockChallenges, error: null });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockEq2 = vi.fn().mockResolvedValue({ data: mockChallenges, error: null });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq1 });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       const result = await getDailyChallenges(mockPlayerId, mockDate);
 
@@ -98,11 +99,11 @@ describe('challenges module', () => {
         },
       ];
 
-      const mockEq2 = jest.fn().mockResolvedValue({ data: mockQuests, error: null });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockEq2 = vi.fn().mockResolvedValue({ data: mockQuests, error: null });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq1 });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       const result = await getWeeklyQuests(mockPlayerId, mockWeekStart);
 
@@ -124,23 +125,23 @@ describe('challenges module', () => {
       ];
 
       // Mock check for existing challenges (none found)
-      const mockCheckEq2 = jest.fn().mockResolvedValue({ data: [], error: null });
-      const mockCheckEq1 = jest.fn().mockReturnValue({ eq: mockCheckEq2 });
-      const mockCheckSelect = jest.fn().mockReturnValue({ eq: mockCheckEq1 });
+      const mockCheckEq2 = vi.fn().mockResolvedValue({ data: [], error: null });
+      const mockCheckEq1 = vi.fn().mockReturnValue({ eq: mockCheckEq2 });
+      const mockCheckSelect = vi.fn().mockReturnValue({ eq: mockCheckEq1 });
 
       // Mock getStudentLevel query
-      const mockLevelMaybeSingle = jest.fn().mockResolvedValue({ data: { current_level: 1 }, error: null });
-      const mockLevelLimit = jest.fn().mockReturnValue({ maybeSingle: mockLevelMaybeSingle });
-      const mockLevelOrder = jest.fn().mockReturnValue({ limit: mockLevelLimit });
-      const mockLevelEq2 = jest.fn().mockReturnValue({ order: mockLevelOrder });
-      const mockLevelEq1 = jest.fn().mockReturnValue({ eq: mockLevelEq2 });
-      const mockLevelSelect = jest.fn().mockReturnValue({ eq: mockLevelEq1 });
+      const mockLevelMaybeSingle = vi.fn().mockResolvedValue({ data: { current_level: 1 }, error: null });
+      const mockLevelLimit = vi.fn().mockReturnValue({ maybeSingle: mockLevelMaybeSingle });
+      const mockLevelOrder = vi.fn().mockReturnValue({ limit: mockLevelLimit });
+      const mockLevelEq2 = vi.fn().mockReturnValue({ order: mockLevelOrder });
+      const mockLevelEq1 = vi.fn().mockReturnValue({ eq: mockLevelEq2 });
+      const mockLevelSelect = vi.fn().mockReturnValue({ eq: mockLevelEq1 });
 
       // Mock insert chain
-      const mockInsertSelect = jest.fn().mockResolvedValue({ data: mockCreatedChallenges, error: null });
-      const mockInsert = jest.fn().mockReturnValue({ select: mockInsertSelect });
+      const mockInsertSelect = vi.fn().mockResolvedValue({ data: mockCreatedChallenges, error: null });
+      const mockInsert = vi.fn().mockReturnValue({ select: mockInsertSelect });
 
-      (supabase.from as jest.Mock)
+      (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockCheckSelect }) // First call: check existing
         .mockReturnValueOnce({ select: mockLevelSelect }) // Second call: getStudentLevel
         .mockReturnValueOnce({ insert: mockInsert }); // Third call: insert
@@ -160,11 +161,11 @@ describe('challenges module', () => {
         { id: 'existing-3', challenge_tier: 'hard' },
       ];
 
-      const mockEq2 = jest.fn().mockResolvedValue({ data: mockExisting, error: null });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockEq2 = vi.fn().mockResolvedValue({ data: mockExisting, error: null });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq1 });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       const result = await assignDailyChallenges(mockPlayerId);
 
@@ -189,23 +190,23 @@ describe('challenges module', () => {
 
       // Mock fetch challenge
       const mockSelectQuery = {
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockChallenge, error: null }),
       };
 
       // Mock update
       const mockUpdateQuery = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
           data: { ...mockChallenge, claimed: true, claimed_at: '2026-02-14T12:00:00Z' },
           error: null
         }),
       };
 
-      (supabase.from as jest.Mock)
-        .mockReturnValueOnce({ select: jest.fn().mockReturnValue(mockSelectQuery) })
-        .mockReturnValueOnce({ update: jest.fn().mockReturnValue(mockUpdateQuery) });
+      (supabase.from as Mock)
+        .mockReturnValueOnce({ select: vi.fn().mockReturnValue(mockSelectQuery) })
+        .mockReturnValueOnce({ update: vi.fn().mockReturnValue(mockUpdateQuery) });
 
       const result = await claimChallengeReward('challenge-1', mockPlayerId);
 
@@ -222,12 +223,12 @@ describe('challenges module', () => {
       };
 
       const mockSelectQuery = {
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockChallenge, error: null }),
       };
 
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue(mockSelectQuery)
+      (supabase.from as Mock).mockReturnValue({
+        select: vi.fn().mockReturnValue(mockSelectQuery)
       });
 
       const result = await claimChallengeReward('challenge-1', mockPlayerId);
@@ -245,12 +246,12 @@ describe('challenges module', () => {
       };
 
       const mockSelectQuery = {
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockChallenge, error: null }),
       };
 
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue(mockSelectQuery)
+      (supabase.from as Mock).mockReturnValue({
+        select: vi.fn().mockReturnValue(mockSelectQuery)
       });
 
       const result = await claimChallengeReward('challenge-1', mockPlayerId);
@@ -268,12 +269,12 @@ describe('challenges module', () => {
       };
 
       const mockSelectQuery = {
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockChallenge, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockChallenge, error: null }),
       };
 
-      (supabase.from as jest.Mock).mockReturnValue({
-        select: jest.fn().mockReturnValue(mockSelectQuery)
+      (supabase.from as Mock).mockReturnValue({
+        select: vi.fn().mockReturnValue(mockSelectQuery)
       });
 
       const result = await claimChallengeReward('challenge-1', mockPlayerId);
@@ -298,22 +299,22 @@ describe('challenges module', () => {
       };
 
       const mockSelectQuery = {
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockQuest, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockQuest, error: null }),
       };
 
       const mockUpdateQuery = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
           data: { ...mockQuest, claimed: true },
           error: null
         }),
       };
 
-      (supabase.from as jest.Mock)
-        .mockReturnValueOnce({ select: jest.fn().mockReturnValue(mockSelectQuery) })
-        .mockReturnValueOnce({ update: jest.fn().mockReturnValue(mockUpdateQuery) });
+      (supabase.from as Mock)
+        .mockReturnValueOnce({ select: vi.fn().mockReturnValue(mockSelectQuery) })
+        .mockReturnValueOnce({ update: vi.fn().mockReturnValue(mockUpdateQuery) });
 
       const result = await claimQuestReward('quest-1', mockPlayerId);
 
@@ -344,16 +345,16 @@ describe('challenges module', () => {
       ];
 
       // Mock select (fetch today's incomplete challenges)
-      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
-      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
-      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+      const mockEqDate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
       // Mock update for increment
-      const mockUpdateEqId = jest.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 2 }, error: null });
-      const mockUpdateEq = jest.fn().mockReturnValue({ eq: mockUpdateEqId });
-      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+      const mockUpdateEqId = vi.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 2 }, error: null });
+      const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
-      (supabase.from as jest.Mock)
+      (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
         .mockReturnValueOnce({ update: mockUpdate });
 
@@ -380,15 +381,15 @@ describe('challenges module', () => {
         },
       ];
 
-      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
-      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
-      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+      const mockEqDate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
-      const mockUpdateEqId = jest.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 5, completed: true }, error: null });
-      const mockUpdateEq = jest.fn().mockReturnValue({ eq: mockUpdateEqId });
-      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+      const mockUpdateEqId = vi.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 5, completed: true }, error: null });
+      const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
-      (supabase.from as jest.Mock)
+      (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
         .mockReturnValueOnce({ update: mockUpdate });
 
@@ -422,11 +423,11 @@ describe('challenges module', () => {
         },
       ];
 
-      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
-      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
-      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+      const mockEqDate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: mockChallenges, error: null }) });
+      const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelectChain });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelectChain });
 
       // WHEN: fire duel_played event
       const result = await updateEducationChallengeProgress(mockPlayerId, 'duel_played', 1);
@@ -437,11 +438,11 @@ describe('challenges module', () => {
 
     it('returns 0 when player has no challenges today', async () => {
       // GIVEN: empty challenges
-      const mockEqDate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: [], error: null }) });
-      const mockEqPlayer = jest.fn().mockReturnValue({ eq: mockEqDate });
-      const mockSelectChain = jest.fn().mockReturnValue({ eq: mockEqPlayer });
+      const mockEqDate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: [], error: null }) });
+      const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
+      const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelectChain });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelectChain });
 
       // WHEN
       const result = await updateEducationChallengeProgress(mockPlayerId, 'xp_earned', 50);
@@ -457,15 +458,15 @@ describe('challenges module', () => {
   describe('getCurrentWeekStart', () => {
     it('should return Monday of current week', () => {
       // Mock Date to Feb 14, 2026 (Saturday)
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2026-02-14T12:00:00Z'));
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-02-14T12:00:00Z'));
 
       const result = getCurrentWeekStart();
 
       // Should return Monday Feb 9, 2026
       expect(result).toBe('2026-02-09');
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 });

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * TitleReveal Responsive Scaling Tests
  *
@@ -8,11 +9,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-jest.mock('remotion', () => ({
+vi.mock('remotion', () => ({
   __esModule: true,
-  useCurrentFrame: jest.fn(() => 0),
-  useVideoConfig: jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
-  interpolate: jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+  useCurrentFrame: vi.fn(() => 0),
+  useVideoConfig: vi.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
+  interpolate: vi.fn((frame: number, inputRange: number[], outputRange: number[]) => {
     if (frame <= inputRange[0]) return outputRange[0];
     if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
     const [inMin, inMax] = inputRange;
@@ -20,7 +21,7 @@ jest.mock('remotion', () => ({
     const pct = Math.min(1, Math.max(0, (frame - inMin) / (inMax - inMin)));
     return outMin + pct * (outMax - outMin);
   }),
-  spring: jest.fn(() => 0),
+  spring: vi.fn(() => 0),
   Easing: { bezier: () => (t: number) => t },
   AbsoluteFill: ({ children, style, ...rest }: any) => (
     <div data-testid={rest['data-testid'] || 'absolute-fill'} style={style}>
@@ -33,7 +34,7 @@ jest.mock('remotion', () => ({
 const remotion = require('remotion');
 
 // Mock fonts
-jest.mock('../../fonts', () => ({
+vi.mock('../../fonts', () => ({
   fredokaFamily: 'Fredoka, sans-serif',
   rubikFamily: 'Rubik, sans-serif',
 }));

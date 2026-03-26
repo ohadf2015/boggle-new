@@ -51,13 +51,13 @@ const mockCanSchedule = canScheduleNotifications as jest.MockedFunction<
 
 describe('Notification Scheduler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset localStorage mock
     const localStorageMock = {
-      getItem: jest.fn(),
-      setItem: jest.fn(),
-      removeItem: jest.fn(),
-      clear: jest.fn(),
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
     };
     Object.defineProperty(global, 'localStorage', {
       value: localStorageMock,

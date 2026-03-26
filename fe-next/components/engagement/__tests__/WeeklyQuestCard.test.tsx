@@ -8,13 +8,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useWeeklyQuest
-const mockUseWeeklyQuest = jest.fn();
-jest.mock('@/hooks/useWeeklyQuest', () => ({
+const mockUseWeeklyQuest = vi.fn();
+vi.mock('@/hooks/useWeeklyQuest', () => ({
   useWeeklyQuest: () => mockUseWeeklyQuest(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const map: Record<string, string> = {
@@ -34,7 +34,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const Div = React.forwardRef(
     ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) =>
       React.createElement('div', { ...props, ref }, children)
@@ -47,12 +47,12 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useReducedMotion
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
-  default: jest.fn(() => false),
+  default: vi.fn(() => false),
 }));
 
-jest.mock('@/components/avatar/PartPreview', () => ({
+vi.mock('@/components/avatar/PartPreview', () => ({
   __esModule: true,
   default: () => React.createElement('svg', { 'data-testid': 'part-preview' }),
 }));
@@ -65,7 +65,7 @@ const mockAvailableQuests = [
   { id: 'hard_1', difficulty: 'hard' as const, type: 'find_words_session', description: 'Find 100 words', target: 100, xpReward: 1000, avatarPartReward: { category: 'eyes', partId: 'galaxy' } },
 ];
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('WeeklyQuestCard', () => {
   it('renders loading state as null', () => {
@@ -75,7 +75,7 @@ describe('WeeklyQuestCard', () => {
       progress: 0,
       isComplete: false,
       loading: true,
-      selectQuest: jest.fn(),
+      selectQuest: vi.fn(),
     });
 
     const { container } = render(<WeeklyQuestCard />);
@@ -89,7 +89,7 @@ describe('WeeklyQuestCard', () => {
       progress: 0,
       isComplete: false,
       loading: false,
-      selectQuest: jest.fn(),
+      selectQuest: vi.fn(),
     });
 
     render(<WeeklyQuestCard />);
@@ -113,7 +113,7 @@ describe('WeeklyQuestCard', () => {
       progress: 1,
       isComplete: false,
       loading: false,
-      selectQuest: jest.fn(),
+      selectQuest: vi.fn(),
     });
 
     render(<WeeklyQuestCard />);
@@ -139,7 +139,7 @@ describe('WeeklyQuestCard', () => {
       progress: 3,
       isComplete: true,
       loading: false,
-      selectQuest: jest.fn(),
+      selectQuest: vi.fn(),
     });
 
     render(<WeeklyQuestCard />);
@@ -153,7 +153,7 @@ describe('WeeklyQuestCard', () => {
       progress: 0,
       isComplete: false,
       loading: false,
-      selectQuest: jest.fn(),
+      selectQuest: vi.fn(),
     });
 
     render(<WeeklyQuestCard />);

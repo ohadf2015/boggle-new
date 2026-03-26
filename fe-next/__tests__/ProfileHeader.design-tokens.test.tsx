@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * @jest-environment jsdom
  */
@@ -7,13 +8,13 @@ import '@testing-library/jest-dom';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: (props: any) => <img {...props} alt={props.alt} />,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} data-testid="profile-header-root" {...props}>{children}</div>
@@ -26,29 +27,29 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar" />,
 }));
 
-jest.mock('@/components/settings/CountrySelector', () => ({
+vi.mock('@/components/settings/CountrySelector', () => ({
   CountrySelector: () => null,
 }));
 
-jest.mock('@/shared/utils/countryUtils', () => ({
+vi.mock('@/shared/utils/countryUtils', () => ({
   getCountryFlag: () => '🏳',
 }));
 
-jest.mock('@/shared/types/customAvatar', () => ({
+vi.mock('@/shared/types/customAvatar', () => ({
   getRandomAvatarConfig: () => ({}),
 }));
 

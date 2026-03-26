@@ -21,7 +21,7 @@ const mockTranslations: Record<string, string> = {
 };
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -30,7 +30,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const createMockMotion = (element: string) => {
     const MockComponent = React.forwardRef(

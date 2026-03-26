@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { PracticeHeader } from '../PracticeHeader';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -21,7 +21,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock XpProgressBar
-jest.mock('@/components/education/XpProgressBar', () => ({
+vi.mock('@/components/education/XpProgressBar', () => ({
   __esModule: true,
   default: ({ totalXp }: { totalXp: number }) => (
     <div data-testid="xp-progress-bar">XP: {totalXp}</div>
@@ -29,7 +29,7 @@ jest.mock('@/components/education/XpProgressBar', () => ({
 }));
 
 // Mock StreakBonusIndicator
-jest.mock('@/components/education/StreakBonusIndicator', () => ({
+vi.mock('@/components/education/StreakBonusIndicator', () => ({
   __esModule: true,
   default: ({ currentStreak }: { currentStreak: number }) => (
     <div data-testid="streak-indicator">Streak: {currentStreak}</div>
@@ -37,7 +37,7 @@ jest.mock('@/components/education/StreakBonusIndicator', () => ({
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   __esModule: true,
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid="mascot">Mascot: {variant}</div>
@@ -54,11 +54,11 @@ describe('PracticeHeader', () => {
     totalXp: 500,
     currentStreak: 5,
     progress: 50,
-    onBack: jest.fn(),
+    onBack: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders lesson name and mode', () => {

@@ -9,19 +9,19 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useEngagementStatus
-const mockEngagementStatus = jest.fn();
-jest.mock('@/hooks/useEngagementStatus', () => ({
+const mockEngagementStatus = vi.fn();
+vi.mock('@/hooks/useEngagementStatus', () => ({
   useEngagementStatus: () => mockEngagementStatus(),
 }));
 
 // Mock useAuth
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -37,13 +37,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useReducedMotion
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
-  default: jest.fn(() => false),
+  default: vi.fn(() => false),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) =>
     React.createElement('div', { ...props, ref, 'data-testid': props['data-testid'] }, children)
   );
@@ -72,7 +72,7 @@ const defaultStatus = {
 
 describe('StreakBar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: { id: 'test' }, isAuthenticated: true });
     mockEngagementStatus.mockReturnValue(defaultStatus);
   });

@@ -9,12 +9,12 @@ import type {
 } from '@/hooks/useDuelSocket.types';
 
 // Mock useDuelSocket hook
-const mockSubmitWord = jest.fn();
-const mockForfeitDuel = jest.fn();
-const mockSyncState = jest.fn();
+const mockSubmitWord = vi.fn();
+const mockForfeitDuel = vi.fn();
+const mockSyncState = vi.fn();
 let mockListeners: Record<string, Function> = {};
 
-jest.mock('@/hooks/useDuelSocket', () => ({
+vi.mock('@/hooks/useDuelSocket', () => ({
   useDuelSocket: () => ({
     isConnected: true,
     submitWord: mockSubmitWord,
@@ -56,14 +56,14 @@ jest.mock('@/hooks/useDuelSocket', () => ({
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
@@ -73,7 +73,7 @@ jest.mock('framer-motion', () => ({
 describe('RealTimeDuelGame', () => {
   beforeEach(() => {
     mockListeners = {};
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render waiting phase initially', () => {

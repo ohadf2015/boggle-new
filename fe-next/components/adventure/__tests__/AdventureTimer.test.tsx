@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
 import AdventureTimer from '../AdventureTimer';
 
 // Mock theme context — returns default theme (matches old hardcoded values)
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useTimerTheme: () => ({
     normal: { bg: 'bg-neo-navy/80', text: 'text-neo-white', shadow: '' },
     warning: { bg: 'bg-neo-orange/20', text: 'text-neo-orange', shadow: '' },

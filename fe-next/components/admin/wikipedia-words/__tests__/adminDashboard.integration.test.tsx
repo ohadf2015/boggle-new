@@ -7,17 +7,17 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { Language } from '@/types';
 
 // Mock Supabase client - factory function for jest.mock
-const mockAuthGetSession = jest.fn(() => Promise.resolve({
+const mockAuthGetSession = vi.fn(() => Promise.resolve({
   data: { session: { access_token: 'test-token' } },
   error: null
 }));
 
-const mockFrom = jest.fn(() => ({
-  select: jest.fn(() => ({
-    eq: jest.fn(() => ({
-      gte: jest.fn(() => ({
-        lte: jest.fn(() => ({
-          order: jest.fn(() => Promise.resolve({ data: [], error: null }))
+const mockFrom = vi.fn(() => ({
+  select: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      gte: vi.fn(() => ({
+        lte: vi.fn(() => ({
+          order: vi.fn(() => Promise.resolve({ data: [], error: null }))
         }))
       }))
     }))
@@ -25,8 +25,8 @@ const mockFrom = jest.fn(() => ({
 }));
 
 // Mock Supabase client
-jest.mock('@/utils/supabase/client', () => ({
-  createClient: jest.fn(() => ({
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: vi.fn(() => ({
     from: mockFrom,
     auth: {
       getSession: mockAuthGetSession
@@ -38,12 +38,12 @@ jest.mock('@/utils/supabase/client', () => ({
 import { useWikipediaCandidates } from '../hooks/useWikipediaCandidates';
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Admin Dashboard - Wikipedia Population Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockReset();
+    vi.clearAllMocks();
+    (global.fetch as vi.Mock).mockReset();
 
     // Reset Supabase mock to ensure clean state
     mockAuthGetSession.mockResolvedValue({
@@ -53,11 +53,11 @@ describe('Admin Dashboard - Wikipedia Population Integration', () => {
 
     // Reset from mock chain
     mockFrom.mockReturnValue({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          gte: jest.fn(() => ({
-            lte: jest.fn(() => ({
-              order: jest.fn(() => Promise.resolve({ data: [], error: null }))
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          gte: vi.fn(() => ({
+            lte: vi.fn(() => ({
+              order: vi.fn(() => Promise.resolve({ data: [], error: null }))
             }))
           }))
         }))
@@ -105,7 +105,7 @@ describe('Admin Dashboard - Wikipedia Population Integration', () => {
     );
 
     // Mock successful population response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as vi.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,

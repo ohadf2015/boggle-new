@@ -6,7 +6,7 @@ import type { BlastTileState, BlastResultsData } from '../types';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
     span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
@@ -24,63 +24,63 @@ jest.mock('framer-motion', () => ({
   animate: () => ({ stop: () => {} }),
 }));
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => false,
 }));
 
 // Mock AutoPlayCountdown — immediately call onCancel so tests see normal buttons
-jest.mock('@/components/results/AutoPlayCountdown', () => {
+vi.mock('@/components/results/AutoPlayCountdown', () => {
   const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
     const ReactMod = require('react');
     ReactMod.useEffect(() => { onCancel(); }, [onCancel]);
     return null;
   };
   MockAutoPlay.displayName = 'MockAutoPlayCountdown';
-  return MockAutoPlay;
+  return { default: MockAutoPlay };
 });
 
-jest.mock('@/components/shared/GameEmojiShareCard', () => ({
+vi.mock('@/components/shared/GameEmojiShareCard', () => ({
   GameEmojiShareCard: () => null,
 }));
 
-jest.mock('@/components/results/NextStepPrompt', () => ({
+vi.mock('@/components/results/NextStepPrompt', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => null,
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: () => null,
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
+  fireConfetti: vi.fn(),
 }));
 
-jest.mock('../hooks/useBlastResultSaver', () => ({
+vi.mock('../hooks/useBlastResultSaver', () => ({
   useBlastResultSaver: () => ({ saved: false, personalBests: null, isNewBestScore: false, isNewBestCombo: false, error: null }),
 }));
 
-jest.mock('canvas-confetti', () => ({
+vi.mock('canvas-confetti', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/components/ui/alert-dialog', () => ({
+vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: any) => open ? <div data-testid="dialog">{children}</div> : null,
   AlertDialogContent: ({ children }: any) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: any) => <div>{children}</div>,
@@ -90,7 +90,7 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Gem: () => <span data-testid="gem-icon" />,
   Bomb: () => <span data-testid="bomb-icon" />,
   Rainbow: () => <span data-testid="rainbow-icon" />,
@@ -109,11 +109,11 @@ jest.mock('lucide-react', () => ({
   Grid3X3: () => <span />,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(' '),
 }));
 
@@ -194,8 +194,8 @@ describe('BlastResults', () => {
     waveResults: [],
   };
 
-  const onPlayAgain = jest.fn();
-  const onBackToHome = jest.fn();
+  const onPlayAgain = vi.fn();
+  const onBackToHome = vi.fn();
 
   it('renders the final score (via animated count-up display)', () => {
     // Score animates from 0 → finalScore; use requestAnimationFrame mock to advance to final
@@ -212,7 +212,7 @@ describe('BlastResults', () => {
 
     // Simulate animation completing: advance time past duration and flush RAF
     const now = Date.now();
-    jest.spyOn(Date, 'now').mockReturnValue(now + 2000); // past 1500ms duration
+    vi.spyOn(Date, 'now').mockReturnValue(now + 2000); // past 1500ms duration
     act(() => {
       rafCalls.forEach(cb => cb(now + 2000));
     });
@@ -220,7 +220,7 @@ describe('BlastResults', () => {
     expect(screen.getByTestId('blast-score-display')).toHaveTextContent('150');
 
     global.requestAnimationFrame = originalRAF;
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     unmount();
   });
 
@@ -428,7 +428,7 @@ describe('BlastTileOverlay', () => {
 });
 
 describe('BlastHelpModal', () => {
-  const onOpenChange = jest.fn();
+  const onOpenChange = vi.fn();
 
   it('renders nothing when closed', () => {
     render(<BlastHelpModal open={false} onOpenChange={onOpenChange} t={t} />);

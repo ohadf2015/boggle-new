@@ -31,7 +31,7 @@ const mockTimerTheme = {
   },
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useTimerTheme: () => mockTimerTheme,
   useHUDTheme: () => ({
     headerBg: 'bg-neo-navy/90',

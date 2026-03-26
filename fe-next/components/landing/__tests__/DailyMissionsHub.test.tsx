@@ -7,17 +7,17 @@ import { render, screen } from '@testing-library/react';
 import { DailyMissionsHub } from '../DailyMissionsHub';
 
 // Mock hooks
-const mockUseDailyMissions = jest.fn();
-jest.mock('@/hooks/useDailyMissions', () => ({
+const mockUseDailyMissions = vi.fn();
+vi.mock('@/hooks/useDailyMissions', () => ({
   useDailyMissions: () => mockUseDailyMissions(),
 }));
 
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) {
@@ -34,7 +34,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
@@ -46,7 +46,7 @@ const baseMissions = [
 ];
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockUseAuth.mockReturnValue({ isAuthenticated: true });
   mockUseDailyMissions.mockReturnValue({
     missions: baseMissions,
@@ -54,7 +54,7 @@ beforeEach(() => {
     isGrandSlam: false,
     grandSlamClaimed: false,
     loading: false,
-    refresh: jest.fn(),
+    refresh: vi.fn(),
   });
 });
 
@@ -74,7 +74,7 @@ describe('DailyMissionsHub', () => {
       isGrandSlam: false,
       grandSlamClaimed: false,
       loading: true,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     render(<DailyMissionsHub />);
@@ -117,7 +117,7 @@ describe('DailyMissionsHub', () => {
       isGrandSlam: true,
       grandSlamClaimed: false,
       loading: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     render(<DailyMissionsHub />);
@@ -133,7 +133,7 @@ describe('DailyMissionsHub', () => {
       isGrandSlam: true,
       grandSlamClaimed: true,
       loading: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     render(<DailyMissionsHub />);

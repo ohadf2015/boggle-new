@@ -11,17 +11,17 @@ import RoomChat from '../RoomChat';
 
 // Mock socket
 const mockSocket = {
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn()
+  on: vi.fn(),
+  off: vi.fn(),
+  emit: vi.fn()
 };
 
 // Mock dependencies
-jest.mock('../../utils/SocketContext', () => ({
+vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket })
 }));
 
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -36,25 +36,25 @@ jest.mock('../../contexts/LanguageContext', () => ({
   })
 }));
 
-jest.mock('../../contexts/SoundEffectsContext', () => ({
+vi.mock('../../contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playMessageSound: jest.fn()
+    playMessageSound: vi.fn()
   })
 }));
 
-jest.mock('../GameAnnouncer', () => ({
+vi.mock('../GameAnnouncer', () => ({
   useAnnouncer: () => ({
-    announce: jest.fn()
+    announce: vi.fn()
   })
 }));
 
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
-  default: jest.fn()
+  default: vi.fn()
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>
   },
@@ -62,12 +62,12 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock @tanstack/react-virtual
-jest.mock('@tanstack/react-virtual', () => ({
+vi.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: () => ({
     getVirtualItems: () => [],
     getTotalSize: () => 0,
-    scrollToIndex: jest.fn(),
-    measureElement: jest.fn()
+    scrollToIndex: vi.fn(),
+    measureElement: vi.fn()
   })
 }));
 
@@ -79,7 +79,7 @@ describe('RoomChat', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {

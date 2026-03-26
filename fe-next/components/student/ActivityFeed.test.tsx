@@ -5,12 +5,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock dependencies
-jest.mock('@/hooks/useClassroomActivity');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/contexts/AuthContext');
+vi.mock('@/hooks/useClassroomActivity');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/AuthContext');
 
 // Mock Framer Motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
@@ -30,7 +30,7 @@ describe('ActivityFeed', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useLanguage as jest.Mock).mockReturnValue(mockUseLanguage);
     (useAuth as jest.Mock).mockReturnValue(mockUseAuth);
   });

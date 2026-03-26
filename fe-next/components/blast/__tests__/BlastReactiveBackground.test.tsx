@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { BlastReactiveBackground } from '../BlastReactiveBackground';
 
 // Mock useReducedMotion
-const mockUseReducedMotion = jest.fn(() => false);
-jest.mock('framer-motion', () => ({
+const mockUseReducedMotion = vi.fn(() => false);
+vi.mock('framer-motion', () => ({
   useReducedMotion: () => mockUseReducedMotion(),
 }));
 

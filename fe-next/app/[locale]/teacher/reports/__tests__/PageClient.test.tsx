@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Teacher Reports PageClient Tests
  *
@@ -10,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import ReportsPageClient from '../PageClient';
 
 // Mock the report components
-jest.mock('@/components/teacher/reports/StudentProgressReport', () => ({
+vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   StudentProgressReport: ({ studentId, classroomId }: { studentId: string; classroomId: string }) => (
     <div data-testid="student-progress-report" data-student-id={studentId} data-classroom-id={classroomId}>
       Student Progress Report Mock
@@ -18,7 +19,7 @@ jest.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   ),
 }));
 
-jest.mock('@/components/teacher/reports/ClassProgressReport', () => ({
+vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
   ClassProgressReport: ({ classroomId, onStudentClick }: { classroomId: string; onStudentClick?: (id: string) => void }) => (
     <div data-testid="class-progress-report" data-classroom-id={classroomId}>
       Class Progress Report Mock
@@ -28,7 +29,7 @@ jest.mock('@/components/teacher/reports/ClassProgressReport', () => ({
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -46,7 +47,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useAuth
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'user-123', email: 'teacher@example.com' },
     isAuthenticated: true,
@@ -60,7 +61,7 @@ const mockClassrooms = [
   { id: 'classroom-2', name: 'English 102', created_at: '2024-01-02' },
 ];
 
-jest.mock('@/hooks/useClassroom', () => ({
+vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({
     classrooms: mockClassrooms,
     isLoading: false,
@@ -70,17 +71,17 @@ jest.mock('@/hooks/useClassroom', () => ({
 
 // Mock useSearchParams
 const mockSearchParams = new URLSearchParams();
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
   }),
 }));
 
 describe('ReportsPageClient', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSearchParams.delete('studentId');
     mockSearchParams.delete('classroomId');
   });

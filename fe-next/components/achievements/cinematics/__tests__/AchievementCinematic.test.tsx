@@ -4,12 +4,12 @@ import { render, screen } from '@testing-library/react';
 const remotion = require('remotion');
 
 // Mock @remotion/transitions (transitive dep via WordHuntPromoVideo)
-jest.mock('@remotion/transitions', () => ({
+vi.mock('@remotion/transitions', () => ({
   TransitionSeries: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   linearTiming: () => ({}),
 }));
 
-jest.mock('../../../../lib/remotion/fonts', () => ({
+vi.mock('../../../../lib/remotion/fonts', () => ({
   fredokaFamily: 'Fredoka, sans-serif',
   rubikFamily: 'Rubik, sans-serif',
 }));

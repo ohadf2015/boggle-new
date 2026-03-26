@@ -11,9 +11,9 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { isNative } from '@/utils/platform';
 
 // Mock dependencies
-jest.mock('@/hooks/useOnlineStatus');
-jest.mock('@/utils/platform');
-jest.mock('../OfflineFallback', () => ({
+vi.mock('@/hooks/useOnlineStatus');
+vi.mock('@/utils/platform');
+vi.mock('../OfflineFallback', () => ({
   OfflineFallback: ({ onRetry, isRetrying }: { onRetry: () => void; isRetrying: boolean }) => (
     <div data-testid="offline-fallback">
       <button onClick={onRetry} disabled={isRetrying}>
@@ -28,10 +28,10 @@ const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
 
 describe('NetworkStatusHandler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset window.location.reload mock
     delete (window as any).location;
-    window.location = { reload: jest.fn() } as any;
+    window.location = { reload: vi.fn() } as any;
   });
 
   describe('online scenarios', () => {

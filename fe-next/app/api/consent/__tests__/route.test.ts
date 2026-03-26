@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Consent API Route Tests
  *
@@ -6,20 +7,20 @@
  */
 
 // Mock next/server BEFORE any imports
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn(),
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status || 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status || 200 })),
   },
 }));
 
 // Mock logger - need to mock the default export properly
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   };
   return {
     __esModule: true,
@@ -54,25 +55,25 @@ describe('Consent API Routes', () => {
     insertError: { code?: string; message?: string } | null = null,
     updateError: { message?: string } | null = null
   ) => ({
-    from: jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: selectData,
             error: selectError,
           }),
         }),
       }),
-      insert: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      insert: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: insertData,
             error: insertError,
           }),
         }),
       }),
-      update: jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({
           data: null,
           error: updateError,
         }),

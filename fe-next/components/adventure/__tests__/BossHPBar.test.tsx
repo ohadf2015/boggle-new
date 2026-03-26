@@ -16,7 +16,7 @@ import type { BossHealthState, BossPhase } from '../../../types/boss';
 // MOCKS
 // ==============================================
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...p }: any) => <div {...p}>{children}</div>,
     span: ({ children, ...p }: any) => <span {...p}>{children}</span>,
@@ -25,7 +25,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Provide both legacy translation (Ms. Grammar) and pass-through for new interface
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (k: string) => {
       const map: Record<string, string> = {

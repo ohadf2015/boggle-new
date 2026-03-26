@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import XpProgressBar from './XpProgressBar';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     dir: 'ltr',
@@ -28,7 +28,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, initial, animate, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       // For the progress bar fill, compute transform from animate prop (uses scaleX)
@@ -45,8 +45,8 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock xpManager
-jest.mock('@/backend/modules/xpManager', () => ({
-  getXpProgress: jest.fn((totalXp: number) => {
+vi.mock('@/backend/modules/xpManager', () => ({
+  getXpProgress: vi.fn((totalXp: number) => {
     // Simple level calculation for tests
     const level = Math.floor(totalXp / 100) + 1;
     const xpInCurrentLevel = totalXp % 100;
@@ -176,15 +176,15 @@ describe('XpProgressBar', () => {
       // Mock matchMedia for reduced motion
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation(query => ({
+        value: vi.fn().mockImplementation(query => ({
           matches: query === '(prefers-reduced-motion: reduce)',
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       });
     });

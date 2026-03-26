@@ -11,7 +11,7 @@ import UnfinishedBoardCard from '../UnfinishedBoardCard';
 import type { LetterGrid } from '@/shared/types/game';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} {...props}>{children}</div>
@@ -23,7 +23,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
@@ -58,7 +58,7 @@ describe('UnfinishedBoardCard', () => {
     score: 120,
     wordsFound: 15,
     totalWords: 45,
-    onResume: jest.fn(),
+    onResume: vi.fn(),
   };
 
   it('should render the title', () => {
@@ -93,7 +93,7 @@ describe('UnfinishedBoardCard', () => {
   });
 
   it('should call onResume when CTA clicked', () => {
-    const onResume = jest.fn();
+    const onResume = vi.fn();
     render(<UnfinishedBoardCard {...defaultProps} onResume={onResume} />);
 
     fireEvent.click(screen.getByText('Resume Board'));

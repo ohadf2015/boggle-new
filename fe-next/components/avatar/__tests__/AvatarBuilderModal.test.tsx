@@ -4,11 +4,11 @@ import '@testing-library/jest-dom';
 import AvatarBuilderModal from '../AvatarBuilderModal';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
     const safe = { ...props };
     for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
@@ -21,13 +21,13 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
   return { AdaptiveMotion: proxy, AdaptiveAnimatePresence: AnimatePresence };
 });
 
-jest.mock('../AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
-jest.mock('../PartPreview', () => ({ __esModule: true, default: () => <div data-testid="part-preview" /> }));
+vi.mock('../AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
+vi.mock('../PartPreview', () => ({ __esModule: true, default: () => <div data-testid="part-preview" /> }));
 
 describe('AvatarBuilderModal', () => {
-  const defaultProps = { isOpen: true, onClose: jest.fn(), onSave: jest.fn() };
+  const defaultProps = { isOpen: true, onClose: vi.fn(), onSave: vi.fn() };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders when isOpen=true', () => {
     render(<AvatarBuilderModal {...defaultProps} />);

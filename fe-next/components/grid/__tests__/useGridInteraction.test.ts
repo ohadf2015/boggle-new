@@ -9,7 +9,7 @@ import { useGridInteraction } from '../useGridInteraction';
 import type { LetterGrid } from '@/types';
 
 // Mock performance utils
-jest.mock('../performanceUtils', () => ({
+vi.mock('../performanceUtils', () => ({
   getPerformanceConfig: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -17,17 +17,17 @@ jest.mock('../performanceUtils', () => ({
 }));
 
 // Mock word path finder
-jest.mock('@/utils/wordPathFinder', () => ({
-  findWordPath: jest.fn(),
+vi.mock('@/utils/wordPathFinder', () => ({
+  findWordPath: vi.fn(),
 }));
 
 // Mock client word validator
-jest.mock('@/utils/clientWordValidator', () => ({
+vi.mock('@/utils/clientWordValidator', () => ({
   normalizeWord: (word: string) => word.toUpperCase(),
 }));
 
 // Mock consts
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   getDeadzoneThreshold: () => 5,
 }));
 
@@ -57,8 +57,8 @@ describe('useGridInteraction', () => {
      */
     it('calls onPathSubmit BEFORE onWordSubmit when submitting via submitWord', () => {
       const callOrder: string[] = [];
-      const onWordSubmit = jest.fn(() => callOrder.push('word'));
-      const onPathSubmit = jest.fn(() => callOrder.push('path'));
+      const onWordSubmit = vi.fn(() => callOrder.push('word'));
+      const onPathSubmit = vi.fn(() => callOrder.push('path'));
       const gridRef = createMockRef();
 
       const { result } = renderHook(() =>
@@ -95,8 +95,8 @@ describe('useGridInteraction', () => {
 
     it('calls onPathSubmit BEFORE onWordSubmit on touch end', () => {
       const callOrder: string[] = [];
-      const onWordSubmit = jest.fn(() => callOrder.push('word'));
-      const onPathSubmit = jest.fn(() => callOrder.push('path'));
+      const onWordSubmit = vi.fn(() => callOrder.push('word'));
+      const onPathSubmit = vi.fn(() => callOrder.push('path'));
       const gridRef = createMockRef();
 
       // Mock getBoundingClientRect for cell position calculation
@@ -155,7 +155,7 @@ describe('useGridInteraction', () => {
         const mockMoveEvent = {
           touches: [{ clientX: 150, clientY: 50 }],
           cancelable: true,
-          preventDefault: jest.fn(),
+          preventDefault: vi.fn(),
         } as unknown as TouchEvent;
         result.current.handleTouchMove(mockMoveEvent);
       });
@@ -193,8 +193,8 @@ describe('useGridInteraction', () => {
           grid: mockGrid,
           interactive: true,
           comboLevel: 0,
-          onWordSubmit: jest.fn(),
-          onPathSubmit: jest.fn(),
+          onWordSubmit: vi.fn(),
+          onPathSubmit: vi.fn(),
           gridRef,
           language: 'en',
         })
@@ -206,7 +206,7 @@ describe('useGridInteraction', () => {
     });
 
     it('provides undoLastCell function for error correction', () => {
-      const onWordSubmit = jest.fn();
+      const onWordSubmit = vi.fn();
       const gridRef = createMockRef();
 
       const { result } = renderHook(() =>
@@ -239,8 +239,8 @@ describe('useGridInteraction', () => {
     });
 
     it('provides submitWord function for manual submission', () => {
-      const onWordSubmit = jest.fn();
-      const onPathSubmit = jest.fn();
+      const onWordSubmit = vi.fn();
+      const onPathSubmit = vi.fn();
       const gridRef = createMockRef();
 
       const { result } = renderHook(() =>

@@ -10,24 +10,24 @@ import { useResultsSocketEvents } from '../useResultsSocketEvents';
 import type { Socket } from 'socket.io-client';
 
 // Mock logger to prevent console output during tests
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    log: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
 // Mock LanguageContext
-const mockT = jest.fn((key: string) => key);
-jest.mock('@/contexts/LanguageContext', () => ({
+const mockT = vi.fn((key: string) => key);
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT }),
 }));
 
 // Mock EnhancedToast showToast
-const mockShowToast = jest.fn();
-jest.mock('@/components/ui/EnhancedToast', () => ({
+const mockShowToast = vi.fn();
+vi.mock('@/components/ui/EnhancedToast', () => ({
   showToast: (...args: unknown[]) => mockShowToast(...args),
 }));
 
@@ -38,9 +38,9 @@ jest.mock('@/components/ui/EnhancedToast', () => ({
 interface MockSocket {
   listeners: Record<string, Array<(...args: unknown[]) => void>>;
   connected: boolean;
-  emit: jest.Mock;
-  on: jest.Mock;
-  off: jest.Mock;
+  emit: vi.Mock;
+  on: vi.Mock;
+  off: vi.Mock;
 }
 
 function createMockSocket(): MockSocket {
@@ -49,15 +49,15 @@ function createMockSocket(): MockSocket {
   return {
     listeners,
     connected: true,
-    emit: jest.fn(),
-    on: jest.fn((event: string, callback: (...args: unknown[]) => void) => {
+    emit: vi.fn(),
+    on: vi.fn((event: string, callback: (...args: unknown[]) => void) => {
       if (!listeners[event]) {
         listeners[event] = [];
       }
       listeners[event].push(callback);
       return {} as unknown;
     }),
-    off: jest.fn((event: string, callback: (...args: unknown[]) => void) => {
+    off: vi.fn((event: string, callback: (...args: unknown[]) => void) => {
       if (listeners[event]) {
         listeners[event] = listeners[event].filter((cb) => cb !== callback);
       }
@@ -84,7 +84,7 @@ describe('useResultsSocketEvents', () => {
 
   beforeEach(() => {
     mockSocket = createMockSocket();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockShowToast.mockClear();
   });
 

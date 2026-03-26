@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastReadyScreen } from '../BlastReadyScreen';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...p }: any) => <div {...p}>{children}</div>,
     button: ({ children, ...p }: any) => <button {...p}>{children}</button>,
@@ -10,12 +10,12 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k }),
 }));
 
 describe('BlastReadyScreen', () => {
-  const onStart = jest.fn();
+  const onStart = vi.fn();
 
   beforeEach(() => onStart.mockClear());
 
@@ -56,7 +56,7 @@ describe('BlastReadyScreen', () => {
   });
 
   it('renders resume wave button when saved progress exists', () => {
-    const onStartFromWave = jest.fn();
+    const onStartFromWave = vi.fn();
     render(<BlastReadyScreen onStart={onStart} onStartFromWave={onStartFromWave} savedWave={3} />);
     const resumeBtn = screen.getByTestId('resume-wave-button');
     fireEvent.click(resumeBtn);

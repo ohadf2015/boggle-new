@@ -16,11 +16,11 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Mock hooks before importing the component
-const mockUnlockAudio = jest.fn();
-const mockFadeToTrack = jest.fn();
+const mockUnlockAudio = vi.fn();
+const mockFadeToTrack = vi.fn();
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial: _i, animate: _a, exit: _e, whileHover: _wh, whileTap: _wt, transition: _t, variants: _v, ...domProps } = props as Record<string, unknown>;
@@ -35,17 +35,17 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     unlockAudio: mockUnlockAudio,
     fadeToTrack: mockFadeToTrack,
     audioUnlocked: false,
     isMuted: false,
     volume: 1,
-    toggleMute: jest.fn(),
-    setVolume: jest.fn(),
-    playTrack: jest.fn(),
-    stopMusic: jest.fn(),
+    toggleMute: vi.fn(),
+    setVolume: vi.fn(),
+    playTrack: vi.fn(),
+    stopMusic: vi.fn(),
     TRACKS: {
       LOBBY: 'lobby',
       IN_GAME: 'inGame',
@@ -57,29 +57,29 @@ jest.mock('@/contexts/MusicContext', () => ({
 }));
 
 // Mock SoundEffectsContext
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playErrorSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playSound: vi.fn(),
     isMuted: false,
-    toggleMute: jest.fn(),
+    toggleMute: vi.fn(),
   }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
 }));
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     profile: null,
@@ -88,38 +88,38 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 // Mock NavigationContext
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
 
 // Mock AutoHideHeader
-jest.mock('@/components/AutoHideHeader', () => ({
+vi.mock('@/components/AutoHideHeader', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock MusicControls
-jest.mock('@/components/MusicControls', () => ({
+vi.mock('@/components/MusicControls', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock PullToRefreshIndicator
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
 // Mock PageLoader
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="loading">Loading...</div>,
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -128,20 +128,20 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    back: jest.fn(),
+    push: vi.fn(),
+    back: vi.fn(),
   }),
   useSearchParams: () => ({
-    get: jest.fn(),
+    get: vi.fn(),
     toString: () => '',
   }),
 }));
 
 // Mock utils
-jest.mock('@/utils/dailyChallenge', () => ({
-  generateDailyPuzzle: jest.fn(() => ({
+vi.mock('@/utils/dailyChallenge', () => ({
+  generateDailyPuzzle: vi.fn(() => ({
     grid: [
       ['A', 'B', 'C', 'D', 'E'],
       ['F', 'G', 'H', 'I', 'J'],
@@ -154,35 +154,35 @@ jest.mock('@/utils/dailyChallenge', () => ({
     validWords: ['TEST', 'BEST', 'REST'],
     allValidWords: ['TEST', 'BEST', 'REST'],
   })),
-  getDailyChallengeDate: jest.fn(() => '2024-01-01'),
-  getPuzzleNumber: jest.fn(() => 1),
-  getSecondsUntilNextDaily: jest.fn(() => 3600),
-  formatCountdown: jest.fn(() => '1:00:00'),
-  hasPlayedWordHuntToday: jest.fn(() => false),
-  getTodaysWordHuntResult: jest.fn(() => null),
-  saveWordHuntResult: jest.fn(),
-  getDailyStreak: jest.fn(() => 0),
-  parseChallengeParam: jest.fn(() => null),
-  clearWordHuntResultForRetry: jest.fn(),
-  getGuestFingerprint: jest.fn(() => Promise.resolve('test-fingerprint')),
-  mapServerResultToStoredResult: jest.fn(),
+  getDailyChallengeDate: vi.fn(() => '2024-01-01'),
+  getPuzzleNumber: vi.fn(() => 1),
+  getSecondsUntilNextDaily: vi.fn(() => 3600),
+  formatCountdown: vi.fn(() => '1:00:00'),
+  hasPlayedWordHuntToday: vi.fn(() => false),
+  getTodaysWordHuntResult: vi.fn(() => null),
+  saveWordHuntResult: vi.fn(),
+  getDailyStreak: vi.fn(() => 0),
+  parseChallengeParam: vi.fn(() => null),
+  clearWordHuntResultForRetry: vi.fn(),
+  getGuestFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
+  mapServerResultToStoredResult: vi.fn(),
   GAME_LANGUAGE_KEY: 'daily_game_language',
-  getWordHuntTutorialKey: jest.fn(() => 'word_hunt_tutorial_en'),
-  getWordHuntResultKey: jest.fn(() => 'word_hunt_result_en'),
+  getWordHuntTutorialKey: vi.fn(() => 'word_hunt_tutorial_en'),
+  getWordHuntResultKey: vi.fn(() => 'word_hunt_result_en'),
 }));
 
-jest.mock('@/utils/playerProgressStorage', () => ({
-  hasPlayedAnyGame: jest.fn(() => true),
+vi.mock('@/utils/playerProgressStorage', () => ({
+  hasPlayedAnyGame: vi.fn(() => true),
 }));
 
-jest.mock('@/utils/trainingProgressStorage', () => ({
-  shouldShowTrainingGateway: jest.fn(() => false),
-  markGatewaySkipped: jest.fn(),
-  markGatewaySeen: jest.fn(),
+vi.mock('@/utils/trainingProgressStorage', () => ({
+  shouldShowTrainingGateway: vi.fn(() => false),
+  markGatewaySkipped: vi.fn(),
+  markGatewaySeen: vi.fn(),
 }));
 
 // Mock components
-jest.mock('../DailyWordHuntSurvival', () => ({
+vi.mock('../DailyWordHuntSurvival', () => ({
   __esModule: true,
   default: ({ onComplete }: { onComplete: (result: unknown) => void }) => (
     <div data-testid="survival-game">
@@ -193,12 +193,12 @@ jest.mock('../DailyWordHuntSurvival', () => ({
   ),
 }));
 
-jest.mock('../DailyWordHuntResults', () => ({
+vi.mock('../DailyWordHuntResults', () => ({
   __esModule: true,
   default: () => <div data-testid="results-screen">Results</div>,
 }));
 
-jest.mock('../DailyReadyScreen', () => ({
+vi.mock('../DailyReadyScreen', () => ({
   __esModule: true,
   default: ({ onStart }: { onStart: () => void }) => (
     <div data-testid="ready-screen">
@@ -209,15 +209,15 @@ jest.mock('../DailyReadyScreen', () => ({
   ),
 }));
 
-jest.mock('../DailyChallengeTutorial', () => ({
+vi.mock('../DailyChallengeTutorial', () => ({
   DailyChallengeTutorial: () => <div data-testid="tutorial">Tutorial</div>,
 }));
 
-jest.mock('@/components/training', () => ({
+vi.mock('@/components/training', () => ({
   TrainingGatewayModal: () => null,
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { progress: 0, isRefreshing: false },
@@ -225,7 +225,7 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 }));
 
 // Mock fetch for server-side checks
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ hasPlayed: false }),
@@ -236,10 +236,10 @@ import DailyChallenge from '../DailyChallenge';
 
 describe('DailyChallenge - Audio Unlock on Game Start', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset localStorage mock
-    Storage.prototype.getItem = jest.fn(() => null);
-    Storage.prototype.setItem = jest.fn();
+    Storage.prototype.getItem = vi.fn(() => null);
+    Storage.prototype.setItem = vi.fn();
   });
 
   it('should call unlockAudio synchronously when Play button is clicked', async () => {
@@ -274,7 +274,7 @@ describe('DailyChallenge - Audio Unlock on Game Start', () => {
 
     // Re-render with ready screen again for second click
     // (in real app, the user might navigate back and click again)
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     fireEvent.click(playButton);
     expect(mockUnlockAudio).toHaveBeenCalledTimes(1);
   });

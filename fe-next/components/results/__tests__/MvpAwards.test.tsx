@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import MvpAwards, { computeMvpAwards } from '../MvpAwards';
 import type { Player, WordObject } from '../types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -10,12 +10,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => true,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} data-testid={rest['data-testid'] as string}>{children}</div>
@@ -26,7 +26,7 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: ({ alt }: { alt: string }) => <img alt={alt} />,

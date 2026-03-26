@@ -3,13 +3,13 @@ import { render, screen } from '@testing-library/react';
 import { AdPlaceholder } from '../AdPlaceholder';
 
 // Mock AdUnit to verify it gets rendered in production mode
-jest.mock('../AdUnit', () => ({
+vi.mock('../AdUnit', () => ({
   AdUnit: (props: Record<string, unknown>) => (
     <div data-testid="ad-unit" data-slot={props.adSlot} data-width={props.width} data-height={props.height} />
   ),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 

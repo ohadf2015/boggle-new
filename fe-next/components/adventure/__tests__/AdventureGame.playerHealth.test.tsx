@@ -135,11 +135,11 @@ describe('AdventureGame - Player Health Integration', () => {
     it('should create effect callbacks compatible with BossOverlay', () => {
       // GIVEN: Mock callbacks for effect executor
       const mockCallbacks: EffectCallbacks = {
-        onPlayerDamage: jest.fn(),
-        onTimerPenalty: jest.fn(),
-        onScreenShake: jest.fn(),
-        onDamageFlash: jest.fn(),
-        onScramble: jest.fn(),
+        onPlayerDamage: vi.fn(),
+        onTimerPenalty: vi.fn(),
+        onScreenShake: vi.fn(),
+        onDamageFlash: vi.fn(),
+        onScramble: vi.fn(),
       };
 
       // WHEN: Using effect executor
@@ -153,11 +153,11 @@ describe('AdventureGame - Player Health Integration', () => {
 
     it('should call onPlayerDamage when player_damage effect is applied', () => {
       // GIVEN: Effect executor with mock callbacks
-      const mockOnPlayerDamage = jest.fn();
+      const mockOnPlayerDamage = vi.fn();
       const mockCallbacks: EffectCallbacks = {
         onPlayerDamage: mockOnPlayerDamage,
-        onScreenShake: jest.fn(),
-        onDamageFlash: jest.fn(),
+        onScreenShake: vi.fn(),
+        onDamageFlash: vi.fn(),
       };
       const { result } = renderHook(() => useBossEffectExecutor(mockCallbacks));
 
@@ -174,10 +174,10 @@ describe('AdventureGame - Player Health Integration', () => {
 
     it('should trigger visual feedback when damage effect is applied', () => {
       // GIVEN: Effect executor with mock callbacks
-      const mockOnScreenShake = jest.fn();
-      const mockOnDamageFlash = jest.fn();
+      const mockOnScreenShake = vi.fn();
+      const mockOnDamageFlash = vi.fn();
       const mockCallbacks: EffectCallbacks = {
-        onPlayerDamage: jest.fn(),
+        onPlayerDamage: vi.fn(),
         onScreenShake: mockOnScreenShake,
         onDamageFlash: mockOnDamageFlash,
       };
@@ -210,8 +210,8 @@ describe('AdventureGame - Player Health Integration', () => {
         onPlayerDamage: (amount: number) => {
           playerHealthResult.current.takeDamage(amount);
         },
-        onScreenShake: jest.fn(),
-        onDamageFlash: jest.fn(),
+        onScreenShake: vi.fn(),
+        onDamageFlash: vi.fn(),
       };
 
       // Effect executor using those callbacks
@@ -238,8 +238,8 @@ describe('AdventureGame - Player Health Integration', () => {
         onPlayerDamage: (amount: number) => {
           playerHealthResult.current.takeDamage(amount);
         },
-        onScreenShake: jest.fn(),
-        onDamageFlash: jest.fn(),
+        onScreenShake: vi.fn(),
+        onDamageFlash: vi.fn(),
       };
 
       const { result: effectResult } = renderHook(() =>

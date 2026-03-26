@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -14,7 +14,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(
       (
@@ -48,79 +48,85 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/components/GridComponent', () => {
-  return function MockGrid() {
+vi.mock('@/components/GridComponent', () => {
+  const MockGrid = () => {
     return <div data-testid="grid-component">Grid</div>;
   };
+  return { default: MockGrid };
 });
-jest.mock('@/components/CircularTimer', () => {
-  return function MockTimer() {
+vi.mock('@/components/CircularTimer', () => {
+  const MockTimer = () => {
     return <div>Timer</div>;
   };
+  return { default: MockTimer };
 });
-jest.mock('@/components/game/WordFormingArea', () => {
+vi.mock('@/components/game/WordFormingArea', () => {
   const WordFormingArea = () => <div>WordFormingArea</div>;
   return { __esModule: true, default: WordFormingArea };
 });
-jest.mock('@/components/game/ComboDisplay', () => {
-  return function MockCombo() {
+vi.mock('@/components/game/ComboDisplay', () => {
+  const MockCombo = () => {
     return <div>ComboDisplay</div>;
   };
+  return { default: MockCombo };
 });
-jest.mock('@/components/game/CompactLeaderboard', () => {
-  return function MockLeaderboard() {
+vi.mock('@/components/game/CompactLeaderboard', () => {
+  const MockLeaderboard = () => {
     return <div>CompactLeaderboard</div>;
   };
+  return { default: MockLeaderboard };
 });
-jest.mock('@/components/game/FloatingScoreAnimation', () => {
-  return function MockFloating() {
+vi.mock('@/components/game/FloatingScoreAnimation', () => {
+  const MockFloating = () => {
     return null;
   };
+  return { default: MockFloating };
 });
-jest.mock('@/components/game/in-game/components/GameOverlays', () => ({
+vi.mock('@/components/game/in-game/components/GameOverlays', () => ({
   GameOverlays: () => <div>GameOverlays</div>,
 }));
-jest.mock('@/components/game/in-game/components/GameHeader', () => ({
+vi.mock('@/components/game/in-game/components/GameHeader', () => ({
   GameHeader: () => <div>GameHeader</div>,
 }));
-jest.mock('@/components/game/in-game/components/ScoreDisplay', () => ({
+vi.mock('@/components/game/in-game/components/ScoreDisplay', () => ({
   ScoreDisplay: () => <div>ScoreDisplay</div>,
 }));
-jest.mock('@/components/game/LeadChangeBanner', () => ({
+vi.mock('@/components/game/LeadChangeBanner', () => ({
   LeadChangeBanner: () => null,
 }));
-jest.mock('@/components/game/BlastMultiplayerOverlay', () => ({
+vi.mock('@/components/game/BlastMultiplayerOverlay', () => ({
   BlastMultiplayerOverlay: () => null,
 }));
-jest.mock('@/components/game/WordHuntTargetArea', () => ({
+vi.mock('@/components/game/WordHuntTargetArea', () => ({
   WordHuntTargetArea: () => null,
 }));
-jest.mock('@/components/game/WordHuntLifeBar', () => ({
+vi.mock('@/components/game/WordHuntLifeBar', () => ({
   WordHuntLifeBar: () => null,
 }));
-jest.mock('@/components/game/WordHuntPlayerLives', () => ({
+vi.mock('@/components/game/WordHuntPlayerLives', () => ({
   WordHuntPlayerLives: () => null,
 }));
-jest.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
+vi.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
   DynamicEnergyBackground: () => null,
 }));
-jest.mock('@/components/game/ComboMilestoneAnnouncement', () => ({
+vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({
   ComboMilestoneAnnouncement: () => null,
 }));
-jest.mock('@/components/game/ScreenFlashOverlay', () => ({
+vi.mock('@/components/game/ScreenFlashOverlay', () => ({
   ScreenFlashOverlay: () => null,
 }));
-jest.mock('@/components/game/keyboardTrailsUtils', () => ({
+vi.mock('@/components/game/keyboardTrailsUtils', () => ({
   shouldShowKeyboardTrails: () => false,
 }));
-jest.mock('@/components/HintButton', () => {
-  return function MockHintButton() {
+vi.mock('@/components/HintButton', () => {
+  const MockHintButton = () => {
     return null;
   };
+  return { default: MockHintButton };
 });
 
-const mockVibrateWordSubmit = jest.fn();
-jest.mock('@/components/grid/hapticFeedback', () => ({
+const mockVibrateWordSubmit = vi.fn();
+vi.mock('@/components/grid/hapticFeedback', () => ({
   vibrateWordSubmit: (...args: unknown[]) => mockVibrateWordSubmit(...args),
 }));
 
@@ -159,23 +165,23 @@ const baseProps = {
   typedWord: '',
   highlightedCells: [],
   lastWordFoundTime: 0,
-  onWordSubmit: jest.fn(),
-  onWordChange: jest.fn(),
-  onSingleTapDetected: jest.fn(),
+  onWordSubmit: vi.fn(),
+  onWordChange: vi.fn(),
+  onSingleTapDetected: vi.fn(),
   fireRoundRemaining: 0,
   showDragTutorial: false,
-  onDismissDragTutorial: jest.fn(),
+  onDismissDragTutorial: vi.fn(),
   isDesktop: false,
   showQuickTip: false,
-  onDismissQuickTip: jest.fn(),
+  onDismissQuickTip: vi.fn(),
   isHelpOpen: false,
-  onCloseHelp: jest.fn(),
+  onCloseHelp: vi.fn(),
   minWordLength: 3,
 };
 
 describe('LandscapeLayout Combo Glow', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should have no glow when comboLevel is 0', () => {
@@ -211,7 +217,7 @@ describe('LandscapeLayout Combo Glow', () => {
 
 describe('LandscapeLayout Haptic Feedback', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should trigger haptic on word accept', () => {

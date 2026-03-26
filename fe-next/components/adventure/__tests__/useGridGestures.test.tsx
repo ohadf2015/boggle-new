@@ -16,18 +16,18 @@ import { renderHook, act } from '@testing-library/react';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock adaptive deadzone to return a stable value for tests
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   getDeadzoneThreshold: () => 10,
 }));
 
 // Mock haptic feedback to avoid side effects in tests
-jest.mock('@/components/grid/hapticFeedback', () => ({
-  vibrateCellTap: jest.fn(),
-  vibrateCellDrag: jest.fn(),
+vi.mock('@/components/grid/hapticFeedback', () => ({
+  vibrateCellTap: vi.fn(),
+  vibrateCellDrag: vi.fn(),
 }));
 
 // Mock performance config
-jest.mock('@/components/grid/performanceUtils', () => ({
+vi.mock('@/components/grid/performanceUtils', () => ({
   getPerformanceConfig: () => ({ isLowEnd: false }),
 }));
 
@@ -52,14 +52,14 @@ describe('useGridGestures', () => {
     tiles: mockTiles,
     interactive: true,
     disabled: false,
-    onTileSelect: jest.fn(),
-    onDragStart: jest.fn(),
-    onDragEnter: jest.fn(),
-    onDragEnd: jest.fn(),
+    onTileSelect: vi.fn(),
+    onDragStart: vi.fn(),
+    onDragEnter: vi.fn(),
+    onDragEnd: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Hook Initialization', () => {
@@ -92,7 +92,7 @@ describe('useGridGestures', () => {
 
   describe('handleTileClick', () => {
     it('should call onTileSelect when interactive and tile not cleared', () => {
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect }));
       
       act(() => {
@@ -103,7 +103,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onTileSelect when disabled', () => {
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect, disabled: true }));
       
       act(() => {
@@ -114,7 +114,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onTileSelect when tile is cleared', () => {
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
       const clearedTile = { ...mockTiles[0], isCleared: true };
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect }));
       
@@ -126,7 +126,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onTileSelect when not interactive', () => {
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onTileSelect, interactive: false }));
       
       act(() => {
@@ -154,7 +154,7 @@ describe('useGridGestures', () => {
     });
 
     it('should call onDragStart callback', () => {
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
       
       const mockEvent = {
@@ -170,7 +170,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT start drag when disabled', () => {
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart, disabled: true }));
       
       const mockEvent = {
@@ -186,7 +186,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT start drag when tile is cleared', () => {
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
       const clearedTile = { ...mockTiles[0], isCleared: true };
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
       
@@ -203,7 +203,7 @@ describe('useGridGestures', () => {
     });
 
     it('should handle touch events', () => {
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragStart }));
       
       const mockTouchEvent = {
@@ -235,7 +235,7 @@ describe('useGridGestures', () => {
 
   describe('handleDragEnter', () => {
     it('should call onDragEnter when dragging', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
       
       // Start drag first
@@ -257,7 +257,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onDragEnter when not dragging', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
       
       act(() => {
@@ -268,7 +268,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onDragEnter when disabled', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter, disabled: true }));
       
       act(() => {
@@ -279,7 +279,7 @@ describe('useGridGestures', () => {
     });
 
     it('should NOT call onDragEnter when tile is cleared', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const clearedTile = { ...mockTiles[1], isCleared: true };
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
       
@@ -317,7 +317,7 @@ describe('useGridGestures', () => {
     });
 
     it('should call onDragEnd callback', () => {
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
       
       // Start drag
@@ -354,7 +354,7 @@ describe('useGridGestures', () => {
 
   describe('handleMouseUp', () => {
     it('should call handleDragEnd', () => {
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
       
       // Start drag
@@ -381,7 +381,7 @@ describe('useGridGestures', () => {
       for (let i = 0; i < 4; i++) {
         const cell = document.createElement('div');
         cell.setAttribute('role', 'gridcell');
-        cell.getBoundingClientRect = jest.fn(() => ({
+        cell.getBoundingClientRect = vi.fn(() => ({
           left: (i % 2) * 100,
           top: Math.floor(i / 2) * 100,
           width: 100,
@@ -401,7 +401,7 @@ describe('useGridGestures', () => {
       const { result } = renderHook(() => useGridGestures(testProps));
 
       // Mock getBoundingClientRect for grid
-      const mockGetBoundingClientRect = jest.fn(() => ({
+      const mockGetBoundingClientRect = vi.fn(() => ({
         left: 0,
         top: 0,
         width: 400,
@@ -436,7 +436,7 @@ describe('useGridGestures', () => {
 
   describe('Deadzone Detection', () => {
     it('should NOT select new tiles before exceeding deadzone', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
       
       // Start drag at (100, 100)
@@ -462,7 +462,7 @@ describe('useGridGestures', () => {
     });
 
     it('should select new tiles after exceeding deadzone', () => {
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnter }));
       
       // Mock grid measurements and cell detection
@@ -484,7 +484,7 @@ describe('useGridGestures', () => {
 
   describe('Global mouseup/touchend listeners (Fix 1)', () => {
     it('should end drag when mouseup fires on window', () => {
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
 
       // Start drag
@@ -502,7 +502,7 @@ describe('useGridGestures', () => {
     });
 
     it('should end drag when touchend fires on window', () => {
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
       const { result } = renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
 
       // Start drag
@@ -522,7 +522,7 @@ describe('useGridGestures', () => {
     });
 
     it('should clean up global listeners on unmount', () => {
-      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
       const { unmount } = renderHook(() => useGridGestures(defaultProps));
 
       unmount();
@@ -535,7 +535,7 @@ describe('useGridGestures', () => {
     });
 
     it('should not call onDragEnd on window mouseup if not dragging', () => {
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
       renderHook(() => useGridGestures({ ...defaultProps, onDragEnd }));
 
       // Fire mouseup without starting a drag
@@ -551,7 +551,7 @@ describe('useGridGestures', () => {
     it('should use requestAnimationFrame on low-end devices', () => {
       // The hook should import getPerformanceConfig and use RAF batching
       // when isLowEnd is true, matching classic mode behavior
-      const rafSpy = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
         cb(0);
         return 0;
       });
@@ -565,7 +565,7 @@ describe('useGridGestures', () => {
     });
 
     it('should cancel RAF on unmount', () => {
-      const cancelSpy = jest.spyOn(window, 'cancelAnimationFrame');
+      const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
 
       const gridElement = document.createElement('div');
       const testGridRef = { current: gridElement };
@@ -581,7 +581,7 @@ describe('useGridGestures', () => {
   describe('Native touchmove listener (Fix 2)', () => {
     it('should register native touchmove listener on grid element', () => {
       const gridElement = document.createElement('div');
-      const addEventListenerSpy = jest.spyOn(gridElement, 'addEventListener');
+      const addEventListenerSpy = vi.spyOn(gridElement, 'addEventListener');
       const testGridRef = { current: gridElement };
 
       renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
@@ -597,7 +597,7 @@ describe('useGridGestures', () => {
 
     it('should remove native touchmove listener on unmount', () => {
       const gridElement = document.createElement('div');
-      const removeEventListenerSpy = jest.spyOn(gridElement, 'removeEventListener');
+      const removeEventListenerSpy = vi.spyOn(gridElement, 'removeEventListener');
       const testGridRef = { current: gridElement };
 
       const { unmount } = renderHook(() => useGridGestures({ ...defaultProps, gridRef: testGridRef }));
@@ -613,8 +613,8 @@ describe('useGridGestures', () => {
 
   describe('Props Changes', () => {
     it('should update handlers when callbacks change', () => {
-      const onTileSelect1 = jest.fn();
-      const onTileSelect2 = jest.fn();
+      const onTileSelect1 = vi.fn();
+      const onTileSelect2 = vi.fn();
       
       const { result, rerender } = renderHook(
         ({ onTileSelect }) => useGridGestures({ ...defaultProps, onTileSelect }),

@@ -1,35 +1,36 @@
+import { vi } from 'vitest';
 /**
  * Supabase OTP Auth Functions Tests
  * Tests for email OTP sign-in (mobile-friendly magic link alternative)
  */
 
 // Must mock before importing the module
-const mockSignInWithOtp = jest.fn();
-const mockVerifyOtp = jest.fn();
+const mockSignInWithOtp = vi.fn();
+const mockVerifyOtp = vi.fn();
 
-jest.mock('@supabase/ssr', () => ({
-  createBrowserClient: jest.fn(() => ({
+vi.mock('@supabase/ssr', () => ({
+  createBrowserClient: vi.fn(() => ({
     auth: {
       signInWithOtp: (...args: unknown[]) => mockSignInWithOtp(...args),
       verifyOtp: (...args: unknown[]) => mockVerifyOtp(...args),
-      signInWithOAuth: jest.fn(),
-      signUp: jest.fn(),
-      signInWithPassword: jest.fn(),
-      signOut: jest.fn(),
-      getUser: jest.fn(),
-      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+      signInWithOAuth: vi.fn(),
+      signUp: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signOut: vi.fn(),
+      getUser: vi.fn(),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     },
   })),
 }));
 
-jest.mock('@/utils/logger', () => ({ warn: jest.fn(), log: jest.fn(), error: jest.fn() }));
-jest.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: jest.fn() }));
-jest.mock('@/utils/platform', () => ({ isNative: jest.fn(() => true) }));
+vi.mock('@/utils/logger', () => ({ warn: vi.fn(), log: vi.fn(), error: vi.fn() }));
+vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: vi.fn() }));
+vi.mock('@/utils/platform', () => ({ isNative: vi.fn(() => true) }));
 
 import { sendOtpCode, verifyOtpCode } from '../supabase';
 
 describe('OTP auth functions', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   describe('sendOtpCode', () => {
     it('should call signInWithOtp without emailRedirectTo', async () => {

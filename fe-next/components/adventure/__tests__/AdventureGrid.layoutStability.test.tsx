@@ -11,8 +11,8 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock geometry module
-jest.mock('../adventureGridGeometry', () => ({
-  measureAdventureGrid: jest.fn().mockReturnValue({
+vi.mock('../adventureGridGeometry', () => ({
+  measureAdventureGrid: vi.fn().mockReturnValue({
     gridRect: { left: 0, top: 0, width: 256, height: 256, right: 256, bottom: 256, x: 0, y: 0, toJSON: () => ({}) },
     cellWidth: 60,
     cellHeight: 60,
@@ -24,11 +24,11 @@ jest.mock('../adventureGridGeometry', () => ({
     cellWithGapHeight: 64,
     timestamp: Date.now(),
   }),
-  getCellAtPosition: jest.fn().mockReturnValue(null),
+  getCellAtPosition: vi.fn().mockReturnValue(null),
   getTileIndex: (row: number, col: number, gridSize: number) => row * gridSize + col,
-  isWithinSelectionThreshold: jest.fn().mockReturnValue(true),
-  isDiagonalMove: jest.fn().mockReturnValue(false),
-  hasExceededDeadzone: jest.fn().mockReturnValue(true),
+  isWithinSelectionThreshold: vi.fn().mockReturnValue(true),
+  isDiagonalMove: vi.fn().mockReturnValue(false),
+  hasExceededDeadzone: vi.fn().mockReturnValue(true),
   DEADZONE_THRESHOLD: 8,
   CELL_SELECTION_THRESHOLD: 0.85,
   DIAGONAL_SELECTION_THRESHOLD: 0.95,

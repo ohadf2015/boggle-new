@@ -8,10 +8,10 @@ import { DuelGameView } from '../DuelGameView';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket } from '@/hooks/useDuelSocket';
 
-jest.mock('@/lib/supabase/education/duels');
-jest.mock('@/hooks/useDuelSocket');
+vi.mock('@/lib/supabase/education/duels');
+vi.mock('@/hooks/useDuelSocket');
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -26,14 +26,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock PageLoader so we can detect it reliably
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text}</div>
   ),
 }));
 
 // Also mock the old Loader component in case it's still imported
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <div data-testid="legacy-loader" />,
 }));
 
@@ -42,35 +42,35 @@ const mockUseDuelSocket = useDuelSocket as jest.MockedFunction<typeof useDuelSoc
 
 describe('DuelGameView — loading state', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockUseDuelSocket.mockReturnValue({
       socket: {} as any,
       isConnected: true,
-      joinLobby: jest.fn(),
-      leaveLobby: jest.fn(),
-      createChallenge: jest.fn(),
-      acceptChallenge: jest.fn(),
-      declineChallenge: jest.fn(),
-      cancelChallenge: jest.fn(),
-      submitScore: jest.fn(),
-      submitWord: jest.fn(),
-      forfeitDuel: jest.fn(),
-      syncState: jest.fn(),
-      onChallengeReceived: jest.fn(),
-      onLobbyUpdate: jest.fn(),
-      onDuelAccepted: jest.fn(),
-      onDuelDeclined: jest.fn(),
-      onDuelCompleted: jest.fn(() => jest.fn()),
-      onScoreSubmitted: jest.fn(() => jest.fn()),
-      onError: jest.fn(() => jest.fn()),
-      onDuelStarted: jest.fn(),
-      onWordAccepted: jest.fn(),
-      onWordRejected: jest.fn(),
-      onOpponentProgress: jest.fn(),
-      onOpponentDisconnected: jest.fn(),
-      onOpponentReconnected: jest.fn(),
-      onStateSynced: jest.fn(),
+      joinLobby: vi.fn(),
+      leaveLobby: vi.fn(),
+      createChallenge: vi.fn(),
+      acceptChallenge: vi.fn(),
+      declineChallenge: vi.fn(),
+      cancelChallenge: vi.fn(),
+      submitScore: vi.fn(),
+      submitWord: vi.fn(),
+      forfeitDuel: vi.fn(),
+      syncState: vi.fn(),
+      onChallengeReceived: vi.fn(),
+      onLobbyUpdate: vi.fn(),
+      onDuelAccepted: vi.fn(),
+      onDuelDeclined: vi.fn(),
+      onDuelCompleted: vi.fn(() => vi.fn()),
+      onScoreSubmitted: vi.fn(() => vi.fn()),
+      onError: vi.fn(() => vi.fn()),
+      onDuelStarted: vi.fn(),
+      onWordAccepted: vi.fn(),
+      onWordRejected: vi.fn(),
+      onOpponentProgress: vi.fn(),
+      onOpponentDisconnected: vi.fn(),
+      onOpponentReconnected: vi.fn(),
+      onStateSynced: vi.fn(),
     });
 
     // Never resolve so component stays in loading phase

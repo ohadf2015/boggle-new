@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test for bulk word generator timeout issue
  *
@@ -8,16 +9,16 @@
 import { gameAIService } from '@/lib/ai-service';
 
 // Mock the AI service
-jest.mock('@/lib/ai-service', () => ({
+vi.mock('@/lib/ai-service', () => ({
   gameAIService: {
-    isConfigured: jest.fn(),
-    generateBulkWords: jest.fn(),
+    isConfigured: vi.fn(),
+    generateBulkWords: vi.fn(),
   },
 }));
 
 describe('Bulk Word Generator - Timeout Fix', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should use AI service with retry logic', async () => {
@@ -26,8 +27,8 @@ describe('Bulk Word Generator - Timeout Fix', () => {
       { word: 'LYNX', reason: 'Good variety' },
     ];
 
-    (gameAIService.generateBulkWords as jest.Mock).mockResolvedValue(mockWords);
-    (gameAIService.isConfigured as jest.Mock).mockResolvedValue(true);
+    (gameAIService.generateBulkWords as Mock).mockResolvedValue(mockWords);
+    (gameAIService.isConfigured as Mock).mockResolvedValue(true);
 
     // Import the generateWordsWithAI function (we'll need to export it for testing)
     // For now, just verify the service method is called correctly
@@ -51,7 +52,7 @@ describe('Bulk Word Generator - Timeout Fix', () => {
 
   it('should handle AI service errors gracefully', async () => {
     const error = new Error('AI service timeout');
-    (gameAIService.generateBulkWords as jest.Mock).mockRejectedValue(error);
+    (gameAIService.generateBulkWords as Mock).mockRejectedValue(error);
 
     await expect(
       gameAIService.generateBulkWords(
@@ -68,7 +69,7 @@ describe('Bulk Word Generator - Timeout Fix', () => {
 
   it('should retry on transient failures', async () => {
     // First call fails, second succeeds
-    (gameAIService.generateBulkWords as jest.Mock)
+    (gameAIService.generateBulkWords as Mock)
       .mockRejectedValueOnce(new Error('Transient failure'))
       .mockResolvedValueOnce([
         { word: 'QUICK', reason: 'Success after retry' },

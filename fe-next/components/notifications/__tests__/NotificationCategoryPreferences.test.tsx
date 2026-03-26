@@ -8,7 +8,7 @@ import { NotificationCategoryPreferences } from '../NotificationCategoryPreferen
 import type { ReactNode } from 'react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children: ReactNode } & Record<string, unknown>) => (
       <div {...props}>{children}</div>
@@ -17,7 +17,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -33,17 +33,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock categoryPreferences utils
-const mockLoad = jest.fn();
-const mockSave = jest.fn();
+const mockLoad = vi.fn();
+const mockSave = vi.fn();
 
-jest.mock('@/utils/pushNotifications', () => ({
+vi.mock('@/utils/pushNotifications', () => ({
   loadCategoryPreferences: (...args: unknown[]) => mockLoad(...args),
   saveCategoryPreferences: (...args: unknown[]) => mockSave(...args),
 }));
 
 describe('NotificationCategoryPreferences', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLoad.mockReturnValue({
       dailyChallenge: true,
       streakWarning: true,

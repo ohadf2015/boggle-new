@@ -5,13 +5,13 @@ import { useRandomMascotActivity } from '@/hooks/useRandomMascotActivity';
 import type { ActivityVariant } from '../InteractiveMascot';
 
 // Mock the hook
-jest.mock('@/hooks/useRandomMascotActivity');
+vi.mock('@/hooks/useRandomMascotActivity');
 const mockUseRandomMascotActivity = useRandomMascotActivity as jest.MockedFunction<
   typeof useRandomMascotActivity
 >;
 
 // Mock InteractiveMascot since we only want to test IdleMascot logic
-jest.mock('../InteractiveMascot', () => ({
+vi.mock('../InteractiveMascot', () => ({
   __esModule: true,
   default: ({ variant, onClick }: any) => (
     <div data-testid="interactive-mascot" data-variant={variant} onClick={onClick}>
@@ -21,7 +21,7 @@ jest.mock('../InteractiveMascot', () => ({
 }));
 
 // Mock device performance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -29,11 +29,11 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 describe('IdleMascot', () => {
-  const mockTriggerActivity = jest.fn();
-  const mockResetToBase = jest.fn();
+  const mockTriggerActivity = vi.fn();
+  const mockResetToBase = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseRandomMascotActivity.mockReturnValue({
       currentVariant: 'happy',
       currentBaseVariant: 'happy',
@@ -125,7 +125,7 @@ describe('IdleMascot', () => {
 
   it('should call custom onClick handler along with trigger', async () => {
     const user = userEvent.setup();
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
 
     render(<IdleMascot baseVariant="happy" enableClick onClick={mockOnClick} />);
 

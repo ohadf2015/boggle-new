@@ -11,33 +11,33 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('next/navigation', () => ({ useRouter: () => ({ push: jest.fn() }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
-  useMusic: () => ({ unlockAudio: jest.fn() }),
+vi.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({ unlockAudio: vi.fn() }),
 }));
 
-jest.mock('@/components/ui/PlayfulBackground', () => ({
+vi.mock('@/components/ui/PlayfulBackground', () => ({
   PlayfulBackground: () => null,
 }));
 
-jest.mock('../BlastResults', () => ({
+vi.mock('../BlastResults', () => ({
   BlastResults: () => <div data-testid="blast-results" />,
 }));
 
-jest.mock('../BlastWaveTransition', () => ({
+vi.mock('../BlastWaveTransition', () => ({
   BlastWaveTransition: () => <div data-testid="blast-wave-transition" />,
 }));
 
-jest.mock('../utils/blastWaveConfig', () => ({
+vi.mock('../utils/blastWaveConfig', () => ({
   getWaveConfig: () => ({
     movesAllowed: 20,
     specialTileChance: 0.3,
@@ -48,7 +48,7 @@ jest.mock('../utils/blastWaveConfig', () => ({
   getWaveObjectives: () => [{ type: 'score_target', target: 20 }],
 }));
 
-jest.mock('../BlastWaveIntro', () => ({
+vi.mock('../BlastWaveIntro', () => ({
   BlastWaveIntro: ({ onReady }: { onReady: () => void }) => (
     <div data-testid="wave-intro">
       <button onClick={() => onReady()}>go</button>
@@ -56,7 +56,7 @@ jest.mock('../BlastWaveIntro', () => ({
   ),
 }));
 
-jest.mock('../types', () => ({
+vi.mock('../types', () => ({
   resolveBlastConfig: () => ({
     gridSize: 4,
     language: 'en',
@@ -66,13 +66,13 @@ jest.mock('../types', () => ({
 }));
 
 // Mock useBlastComboDiscovery returning all 4 values
-const mockOnComboDetected = jest.fn();
-const mockAcknowledgeDiscovery = jest.fn();
-const mockUseBlastComboDiscovery = jest.fn();
+const mockOnComboDetected = vi.fn();
+const mockAcknowledgeDiscovery = vi.fn();
+const mockUseBlastComboDiscovery = vi.fn();
 
 // Captures the options argument passed to useBlastComboDiscovery
 let capturedDiscoveryOptions: any = undefined;
-jest.mock('../hooks/useBlastComboDiscovery', () => ({
+vi.mock('../hooks/useBlastComboDiscovery', () => ({
   useBlastComboDiscovery: (opts?: any) => {
     capturedDiscoveryOptions = opts;
     return mockUseBlastComboDiscovery();
@@ -81,13 +81,13 @@ jest.mock('../hooks/useBlastComboDiscovery', () => ({
 
 // Mutable variable to control auth state in tests
 let mockAuthUser: { id: string } | null = null;
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: mockAuthUser }),
 }));
 
 // Capture props passed to BlastGame
 let capturedBlastGameProps: any = null;
-jest.mock('../BlastGame', () => ({
+vi.mock('../BlastGame', () => ({
   BlastGame: (props: any) => {
     capturedBlastGameProps = props;
     return <div data-testid="blast-game" />;
@@ -96,7 +96,7 @@ jest.mock('../BlastGame', () => ({
 
 // Capture props passed to BlastReadyScreen
 let capturedReadyScreenProps: any = null;
-jest.mock('../BlastReadyScreen', () => ({
+vi.mock('../BlastReadyScreen', () => ({
   BlastReadyScreen: (props: any) => {
     capturedReadyScreenProps = props;
     return (
@@ -118,7 +118,7 @@ import BlastView from '../BlastView';
 
 describe('BlastView discovery prop wiring', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     capturedBlastGameProps = null;
     capturedReadyScreenProps = null;
     capturedDiscoveryOptions = undefined;

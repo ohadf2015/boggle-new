@@ -10,12 +10,12 @@ import { AttackTelegraph } from './AttackTelegraph';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
 
 // Mock hooks
-jest.mock('../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(() => false),
+vi.mock('../../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(() => false),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>

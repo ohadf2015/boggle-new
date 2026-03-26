@@ -47,7 +47,7 @@ import { isNative } from '@/utils/platform';
 
 describe('Mobile OAuth Utility', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default to native platform
     (isNative as jest.Mock).mockReturnValue(true);
   });
@@ -153,7 +153,7 @@ describe('Mobile OAuth Utility', () => {
       // GIVEN: Discord OAuth setup
       const mockOAuthUrl = 'https://discord.com/oauth2/authorize?...';
       // Reset mocks to ensure clean state (clearAllMocks clears calls but not implementations)
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       (isNative as jest.Mock).mockReturnValue(true);
       // Reset Browser.open to resolve successfully (previous test made it reject)
       (Browser.open as jest.Mock).mockResolvedValue(undefined);

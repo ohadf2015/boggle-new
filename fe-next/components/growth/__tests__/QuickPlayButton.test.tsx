@@ -1,17 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuickPlayButton } from '../QuickPlayButton';
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
     push: mockPush,
-    replace: jest.fn(),
+    replace: vi.fn(),
   })),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
       return key;
@@ -22,7 +22,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('QuickPlayButton', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders button with correct text', () => {

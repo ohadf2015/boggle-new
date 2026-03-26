@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div {...rest}>{children}</div>
@@ -22,7 +22,7 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 

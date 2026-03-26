@@ -11,11 +11,11 @@ import type { Language } from '@/lib/supabase/education/types';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
 
 // Mock useWordIntegration hook
-jest.mock('@/hooks/useWordIntegration');
+vi.mock('@/hooks/useWordIntegration');
 
 // Mock translations
-jest.mock('@/contexts/LanguageContext', () => ({
-  ...jest.requireActual('@/contexts/LanguageContext'),
+vi.mock('@/contexts/LanguageContext', () => ({
+  ...vi.importActual('@/contexts/LanguageContext'),
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -32,19 +32,19 @@ jest.mock('@/contexts/LanguageContext', () => ({
       return translations[key] || key;
     },
     language: 'en' as Language,
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     isRTL: false,
   }),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 describe('BulkImportEnhanced', () => {
-  const mockOnClose = jest.fn();
-  const mockOnImport = jest.fn();
-  const mockCheckWordIntegration = jest.fn();
+  const mockOnClose = vi.fn();
+  const mockOnImport = vi.fn();
+  const mockCheckWordIntegration = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default mock implementation: words are integrable
     mockCheckWordIntegration.mockImplementation((word: string) => ({

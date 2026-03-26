@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { LeaderboardTeaser } from '../LeaderboardTeaser';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -14,7 +14,7 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe('LeaderboardTeaser', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders leaderboard container', () => {
@@ -118,7 +118,7 @@ describe('LeaderboardTeaser', () => {
       json: () => Promise.resolve({ data: [] }),
     });
 
-    const onViewFull = jest.fn();
+    const onViewFull = vi.fn();
     renderWithProviders(
       <LeaderboardTeaser currentLanguage="en" onViewFull={onViewFull} />
     );

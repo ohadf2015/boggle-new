@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Test: Admin page should not show infinite loading when authToken fetching fails
  *
@@ -21,67 +22,67 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 import AdminPage from '@/app/[locale]/admin/page';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('next/navigation', () => ({
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    refresh: jest.fn(),
+    push: vi.fn(),
+    refresh: vi.fn(),
   }),
-  usePathname: jest.fn(() => '/en/admin'),
+  usePathname: vi.fn(() => '/en/admin'),
 }));
 
 // Mock child components
-jest.mock('@/components/Header', () => ({
+vi.mock('@/components/Header', () => ({
   __esModule: true,
   default: () => <div data-testid="header">Header</div>,
 }));
-jest.mock('@/components/admin/LiveMonitor', () => ({
+vi.mock('@/components/admin/LiveMonitor', () => ({
   LiveMonitor: () => <div data-testid="live-monitor">LiveMonitor</div>,
 }));
-jest.mock('@/components/admin/TodayGamesHistory', () => ({
+vi.mock('@/components/admin/TodayGamesHistory', () => ({
   TodayGamesHistory: () => <div data-testid="games-history">TodayGamesHistory</div>,
 }));
-jest.mock('@/components/admin/GamesDiagnostic', () => ({
+vi.mock('@/components/admin/GamesDiagnostic', () => ({
   GamesDiagnostic: () => <div data-testid="games-diagnostic">GamesDiagnostic</div>,
 }));
-jest.mock('@/components/admin/EmailTestPanel', () => ({
+vi.mock('@/components/admin/EmailTestPanel', () => ({
   EmailTestPanel: () => <div data-testid="email-panel">EmailTestPanel</div>,
 }));
-jest.mock('@/components/ui/PullToRefreshWrapper', () => ({
+vi.mock('@/components/ui/PullToRefreshWrapper', () => ({
   PullToRefreshWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
-jest.mock('@/utils/mobileAccessibility', () => ({
+vi.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: () => false,
 }));
-jest.mock('@/components/admin/overview/KPICards', () => ({
+vi.mock('@/components/admin/overview/KPICards', () => ({
   KPICards: () => <div data-testid="kpi-cards">KPICards</div>,
 }));
-jest.mock('@/components/admin/overview/SystemHealth', () => ({
+vi.mock('@/components/admin/overview/SystemHealth', () => ({
   SystemHealth: () => <div data-testid="system-health">SystemHealth</div>,
 }));
-jest.mock('@/components/admin/sidebar/AdminSidebar', () => ({
+vi.mock('@/components/admin/sidebar/AdminSidebar', () => ({
   AdminSidebar: () => <div data-testid="admin-sidebar">AdminSidebar</div>,
 }));
-jest.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
+vi.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
   AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
 }));
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: ({ text }: { text?: string }) => <div>{text}</div>,
 }));
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => <div>{text}</div>,
 }));
-jest.mock('@/hooks/useAdminAuth', () => ({
-  useAdminAuth: jest.fn(() => ({
+vi.mock('@/hooks/useAdminAuth', () => ({
+  useAdminAuth: vi.fn(() => ({
     authToken: null,
-    refreshToken: jest.fn(),
+    refreshToken: vi.fn(),
     isLoading: false,
     error: null,
   })),
 }));
-jest.mock('@/hooks/useAdminDashboard', () => ({
-  useAdminDashboard: jest.fn(() => ({
+vi.mock('@/hooks/useAdminDashboard', () => ({
+  useAdminDashboard: vi.fn(() => ({
     stats: null,
     health: null,
     loading: false,
@@ -90,25 +91,25 @@ jest.mock('@/hooks/useAdminDashboard', () => ({
 }));
 
 describe('Admin Page - authToken loading issue', () => {
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-  const mockUseAdminAuth = useAdminAuth as jest.MockedFunction<typeof useAdminAuth>;
+  const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+  const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+  const mockUseAdminAuth = useAdminAuth as MockedFunction<typeof useAdminAuth>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Default language context
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
     } as any);
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   test('should NOT show infinite loading when authToken fetch is slow', async () => {
@@ -123,7 +124,7 @@ describe('Admin Page - authToken loading issue', () => {
     // Simulate SLOW authToken fetch — initially loading
     mockUseAdminAuth.mockReturnValue({
       authToken: null,
-      refreshToken: jest.fn(),
+      refreshToken: vi.fn(),
       isLoading: true,
       isRefreshing: false,
       error: null,
@@ -137,7 +138,7 @@ describe('Admin Page - authToken loading issue', () => {
     // Token fetch completes
     mockUseAdminAuth.mockReturnValue({
       authToken: 'mock-token-123',
-      refreshToken: jest.fn(),
+      refreshToken: vi.fn(),
       isLoading: false,
       isRefreshing: false,
       error: null,
@@ -166,7 +167,7 @@ describe('Admin Page - authToken loading issue', () => {
     // authToken is null but not loading (token not yet available)
     mockUseAdminAuth.mockReturnValue({
       authToken: null,
-      refreshToken: jest.fn(),
+      refreshToken: vi.fn(),
       isLoading: false,
       isRefreshing: false,
       error: null,
@@ -191,7 +192,7 @@ describe('Admin Page - authToken loading issue', () => {
     // Token already available
     mockUseAdminAuth.mockReturnValue({
       authToken: 'mock-token-123',
-      refreshToken: jest.fn(),
+      refreshToken: vi.fn(),
       isLoading: false,
       isRefreshing: false,
       error: null,

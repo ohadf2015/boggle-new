@@ -19,7 +19,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.bosses.msGrammar.taunts.goodWord1': 'Acceptable. But no extra credit.',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -27,7 +27,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => ({
     dialogueBg: 'bg-neo-navy/95',
     dialogueBorder: 'border-neo-white/20',
@@ -48,7 +48,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
   }),
 }));
 
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const MockImage = ({ src, alt, ...props }: { src: string; alt: string }) => {
     return React.createElement('img', { src, alt, ...props });
   };
@@ -56,7 +56,7 @@ jest.mock('next/image', () => {
   return { __esModule: true, default: MockImage };
 });
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef<HTMLDivElement, React.PropsWithChildren<Record<string, unknown>>>(
     ({ children, initial: _i, animate: _a, exit: _e, transition: _t, ...props }, ref) => (
       <div ref={ref} {...props}>{children as React.ReactNode}</div>

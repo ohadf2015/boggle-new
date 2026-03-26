@@ -1,31 +1,32 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * useHostGameActions - Game Mode Tests
  * Tests that handleStartNewGame (Play Again) emits gameMode to server.
  */
 
 // Mock dependencies used by the hook
-jest.mock('socket.io-client');
-jest.mock('@/components/NeoToast', () => ({
-  neoSuccessToast: jest.fn(),
-  neoErrorToast: jest.fn(),
-  neoInfoToast: jest.fn(),
+vi.mock('socket.io-client');
+vi.mock('@/components/NeoToast', () => ({
+  neoSuccessToast: vi.fn(),
+  neoErrorToast: vi.fn(),
+  neoInfoToast: vi.fn(),
 }));
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
-jest.mock('@/utils/utils', () => ({
-  generateRandomTable: jest.fn().mockReturnValue([['A', 'B'], ['C', 'D']]),
+vi.mock('@/utils/utils', () => ({
+  generateRandomTable: vi.fn().mockReturnValue([['A', 'B'], ['C', 'D']]),
 }));
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   DIFFICULTIES: {
     EASY: { rows: 4, cols: 4 },
     MEDIUM: { rows: 5, cols: 5 },
     HARD: { rows: 6, cols: 6 },
   },
 }));
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), error: jest.fn(), warn: jest.fn(), log: jest.fn() },
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), log: vi.fn() },
 }));
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: vi.fn().mockReturnValue('blast'),
@@ -37,13 +38,13 @@ import { useGameMode } from '@/hooks/gameState';
 import { generateRandomTable } from '@/utils/utils';
 
 describe('useHostGameActions - gameMode in handleStartNewGame', () => {
-  const mockEmit = jest.fn();
+  const mockEmit = vi.fn();
   const mockSocket = {
     connected: true,
     emit: mockEmit,
   } as any;
 
-  const noop = jest.fn();
+  const noop = vi.fn();
   const noopRef = { current: false } as any;
   const timeoutRef = { current: null } as any;
 
@@ -84,7 +85,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Make resetGame callback invoke immediately with success
     mockEmit.mockImplementation((event: string, _data: any, callback?: any) => {
       if (event === 'resetGame' && typeof callback === 'function') {

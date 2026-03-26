@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { ModeCardSkeleton } from '../ModeCardSkeleton';
 
 // Mock hooks used by ModeCardSkeleton
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     dir: 'ltr',
   }),

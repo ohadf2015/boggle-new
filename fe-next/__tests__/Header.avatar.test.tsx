@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Header from '@/components/Header';
@@ -9,33 +10,33 @@ import type { ProfileData } from '@/contexts/auth';
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  usePathname: jest.fn(() => '/en'),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(() => '/en'),
 }));
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
     return rest;
@@ -50,11 +51,11 @@ jest.mock('framer-motion', () => {
     AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   };
 });
-jest.mock('@/components/MusicControls', () => ({
+vi.mock('@/components/MusicControls', () => ({
   __esModule: true,
   default: () => <div data-testid="music-controls">Music</div>,
 }));
-jest.mock('@/components/auth/AuthButton', () => ({
+vi.mock('@/components/auth/AuthButton', () => ({
   __esModule: true,
   default: ({ inline }: { inline?: boolean }) => (
     <div data-testid={inline ? 'auth-button-inline' : 'auth-button'}>
@@ -62,7 +63,7 @@ jest.mock('@/components/auth/AuthButton', () => ({
     </div>
   ),
 }));
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: ({ avatarImage }: { avatarImage?: string }) => (
     <div
@@ -74,20 +75,20 @@ jest.mock('@/components/Avatar', () => ({
   ),
 }));
 
-const mockPush = jest.fn();
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
+const mockPush = vi.fn();
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 
 describe('Header - Avatar Display', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    (useRouter as Mock).mockReturnValue({
       push: mockPush,
-      back: jest.fn(),
-      forward: jest.fn(),
-      refresh: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
     });
 
     mockUseLanguage.mockReturnValue({
@@ -95,7 +96,7 @@ describe('Header - Avatar Display', () => {
       language: 'en',
       dir: 'ltr',
       currentFlag: '🇺🇸',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
     } as ReturnType<typeof useLanguage>);
   });
 

@@ -11,7 +11,7 @@
  * This test ensures CSP allows this mechanism.
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 describe('Howler.js CSP Compatibility', () => {
   it('should allow data URI audio as required by Howler.js iOS unlock', () => {

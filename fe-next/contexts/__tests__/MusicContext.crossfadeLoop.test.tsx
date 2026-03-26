@@ -1,3 +1,4 @@
+import { vi, type Mock, type MockedClass, } from 'vitest';
 /**
  * Test for music looping behavior
  *
@@ -20,8 +21,8 @@ import { Howl, Howler } from 'howler';
 const howlCallLog: Array<{ instance: string; method: string; args: any[] }> = [];
 
 // Mock Howler
-jest.mock('howler', () => {
-  const mockHowl = jest.fn().mockImplementation((options) => {
+vi.mock('howler', () => {
+  const mockHowl = vi.fn().mockImplementation((options) => {
     const instanceId = options.src[0] || 'unknown';
 
     const howlInstance = {
@@ -35,11 +36,11 @@ jest.mock('howler', () => {
       _seekPosition: 0,
       _fadeActive: false,
 
-      state: jest.fn(function(this: any) {
+      state: vi.fn(function(this: any) {
         return this._state;
       }),
 
-      load: jest.fn(function(this: any) {
+      load: vi.fn(function(this: any) {
         howlCallLog.push({ instance: this._instanceId, method: 'load', args: [] });
         this._state = 'loading';
         setTimeout(() => {
@@ -51,30 +52,30 @@ jest.mock('howler', () => {
         return this;
       }),
 
-      play: jest.fn(function(this: any) {
+      play: vi.fn(function(this: any) {
         howlCallLog.push({ instance: this._instanceId, method: 'play', args: [] });
         this._playing = true;
         return 1;
       }),
 
-      playing: jest.fn(function(this: any) {
+      playing: vi.fn(function(this: any) {
         return this._playing;
       }),
 
-      pause: jest.fn(function(this: any) {
+      pause: vi.fn(function(this: any) {
         howlCallLog.push({ instance: this._instanceId, method: 'pause', args: [] });
         this._playing = false;
         return this;
       }),
 
-      stop: jest.fn(function(this: any) {
+      stop: vi.fn(function(this: any) {
         howlCallLog.push({ instance: this._instanceId, method: 'stop', args: [] });
         this._playing = false;
         this._seekPosition = 0;
         return this;
       }),
 
-      volume: jest.fn(function(this: any, vol?: number) {
+      volume: vi.fn(function(this: any, vol?: number) {
         if (vol !== undefined) {
           howlCallLog.push({ instance: this._instanceId, method: 'volume', args: [vol] });
           this._volume = vol;
@@ -83,7 +84,7 @@ jest.mock('howler', () => {
         return this._volume;
       }),
 
-      fade: jest.fn(function(this: any, from: number, to: number, duration: number) {
+      fade: vi.fn(function(this: any, from: number, to: number, duration: number) {
         howlCallLog.push({ instance: this._instanceId, method: 'fade', args: [from, to, duration] });
         this._fadeActive = true;
         // Simulate fade completing
@@ -94,7 +95,7 @@ jest.mock('howler', () => {
         return this;
       }),
 
-      seek: jest.fn(function(this: any, position?: number) {
+      seek: vi.fn(function(this: any, position?: number) {
         if (position !== undefined) {
           howlCallLog.push({ instance: this._instanceId, method: 'seek', args: [position] });
           this._seekPosition = position;
@@ -103,12 +104,12 @@ jest.mock('howler', () => {
         return this._seekPosition;
       }),
 
-      unload: jest.fn(function(this: any) {
+      unload: vi.fn(function(this: any) {
         this._state = 'unloaded';
         return this;
       }),
 
-      once: jest.fn(function(this: any, event: string, callback: () => void) {
+      once: vi.fn(function(this: any, event: string, callback: () => void) {
         if (event === 'end') {
           this._onEndCallback = callback;
         } else if (event === 'load') {
@@ -133,26 +134,26 @@ jest.mock('howler', () => {
     Howler: {
       ctx: {
         state: 'running',
-        resume: jest.fn().mockResolvedValue(undefined),
-        suspend: jest.fn()
+        resume: vi.fn().mockResolvedValue(undefined),
+        suspend: vi.fn()
       }
     }
   };
 });
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
 // Mock audio loader
-jest.mock('@/lib/audio/audioLoader', () => ({
-  createLazyHowl: jest.fn((src: string | string[], options?: any) => {
+vi.mock('@/lib/audio/audioLoader', () => ({
+  createLazyHowl: vi.fn((src: string | string[], options?: any) => {
     const { Howl } = require('howler');
     return new Howl({
       src: Array.isArray(src) ? src : [src],
@@ -161,7 +162,7 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       ...options
     });
   }),
-  preloadAudioOnDemand: jest.fn((howl: any) => {
+  preloadAudioOnDemand: vi.fn((howl: any) => {
     return new Promise<void>((resolve) => {
       if (howl.state() === 'unloaded') {
         howl.load();
@@ -169,18 +170,18 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       setTimeout(() => resolve(), 20);
     });
   }),
-  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
+  ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
 }));
 
 describe('MusicContext - Crossfade Looping', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     howlCallLog.length = 0; // Clear call log
 
     // Mock window focus and visibility
     Object.defineProperty(document, 'hasFocus', {
       writable: true,
-      value: jest.fn(() => true)
+      value: vi.fn(() => true)
     });
 
     Object.defineProperty(document, 'visibilityState', {
@@ -213,7 +214,7 @@ describe('MusicContext - Crossfade Looping', () => {
     });
 
     // Get the Howl instance for inGame track
-    const HowlConstructor = Howl as jest.MockedClass<typeof Howl>;
+    const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const inGameHowl = HowlConstructor.mock.results.find(r =>
       r.value._options.src[0] === '/music/in_game.mp3'
     )?.value;
@@ -261,7 +262,7 @@ describe('MusicContext - Crossfade Looping', () => {
       await new Promise(resolve => setTimeout(resolve, 150));
     });
 
-    const HowlConstructor = Howl as jest.MockedClass<typeof Howl>;
+    const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const inGameHowl = HowlConstructor.mock.results.find(r =>
       r.value._options.src[0] === '/music/in_game.mp3'
     )?.value;
@@ -307,7 +308,7 @@ describe('MusicContext - Crossfade Looping', () => {
 
     renderHook(() => useMusic(), { wrapper });
 
-    const HowlConstructor = Howl as jest.MockedClass<typeof Howl>;
+    const HowlConstructor = Howl as MockedClass<typeof Howl>;
 
     // Check that all tracks are configured with loop: true
     const allTracks = HowlConstructor.mock.calls.map(call => ({

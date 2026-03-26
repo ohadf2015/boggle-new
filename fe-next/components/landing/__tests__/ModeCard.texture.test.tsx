@@ -4,26 +4,26 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Users } from 'lucide-react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: true,
     prefersReducedMotion: false,

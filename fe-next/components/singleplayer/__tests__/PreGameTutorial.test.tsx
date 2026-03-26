@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   return {
     motion: new Proxy({}, {
@@ -28,7 +28,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -37,7 +37,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock Mascot components
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
@@ -47,23 +47,24 @@ jest.mock('@/components/ui/Mascot', () => ({
 }));
 
 // Mock MiniGrid
-const mockOnDemoComplete = jest.fn();
-jest.mock('@/components/onboarding/MiniGrid', () => {
-  return function MockMiniGrid({ onDemoComplete }: { onDemoComplete: () => void }) {
+const mockOnDemoComplete = vi.fn();
+vi.mock('@/components/onboarding/MiniGrid', () => {
+  return { default: function MockMiniGrid({ onDemoComplete }: { onDemoComplete: () => void }) {
     mockOnDemoComplete.mockImplementation(onDemoComplete);
     return <div data-testid="mini-grid" onClick={onDemoComplete} />;
-  };
+  } };
 });
 
 // Mock AvatarBuilderModal
-jest.mock('@/components/avatar/AvatarBuilderModal', () => {
-  return function MockAvatarBuilderModal({ isOpen }: { isOpen: boolean }) {
+vi.mock('@/components/avatar/AvatarBuilderModal', () => {
+  const MockAvatarBuilderModal = ({ isOpen }: { isOpen: boolean }) => {
     return isOpen ? <div data-testid="avatar-builder-modal" /> : null;
   };
+  return { default: MockAvatarBuilderModal };
 });
 
 // Mock useDevicePerformance (used by Mascot)
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -74,10 +75,10 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 import PreGameTutorial from '../PreGameTutorial';
 
 describe('PreGameTutorial', () => {
-  const mockOnComplete = jest.fn();
+  const mockOnComplete = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // GIVEN: PreGameTutorial renders

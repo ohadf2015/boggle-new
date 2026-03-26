@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Tests for /api/cron/select-daily-words
@@ -9,27 +10,27 @@
  */
 
 // Mock next/server before imports
-const mockJson = jest.fn((data: any, init?: any) => ({
+const mockJson = vi.fn((data: any, init?: any) => ({
   json: async () => data,
   status: init?.status ?? 200,
 }));
 
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn(),
   NextResponse: { json: (...args: any[]) => mockJson(...args) },
 }));
 
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
-const mockVerifyAdminAuth = jest.fn();
-jest.mock('@/lib/auth/adminAuth', () => ({
+const mockVerifyAdminAuth = vi.fn();
+vi.mock('@/lib/auth/adminAuth', () => ({
   verifyAdminAuth: (...args: any[]) => mockVerifyAdminAuth(...args),
 }));
 
 // Mock global fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 import { GET, POST } from '../route';
@@ -50,7 +51,7 @@ describe('/api/cron/select-daily-words', () => {
   const SERVICE_KEY = 'test-service-role-key';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     process.env.CRON_SECRET = CRON_SECRET;
     process.env.NEXT_PUBLIC_SUPABASE_URL = SUPABASE_URL;
     process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE_KEY;

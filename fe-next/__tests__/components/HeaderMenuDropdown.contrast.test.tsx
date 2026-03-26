@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  */
@@ -7,15 +8,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import HeaderMenuDropdown from '../../components/HeaderMenuDropdown';
 
 // Mock dependencies
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('../../contexts/AuthContext', () => ({
+vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: true }),
 }));
 
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: any) => {
     return <a href={href} {...props}>{children}</a>;
   };
@@ -23,13 +24,13 @@ jest.mock('next/link', () => {
   return MockLink;
 });
 
-jest.mock('../../components/auth/AuthButton', () => {
+vi.mock('../../components/auth/AuthButton', () => {
   const MockAuthButton = () => <div>Auth Button</div>;
   MockAuthButton.displayName = 'MockAuthButton';
   return MockAuthButton;
 });
 
-jest.mock('../../components/MusicControls', () => {
+vi.mock('../../components/MusicControls', () => {
   const MockMusicControls = () => <div>Music Controls</div>;
   MockMusicControls.displayName = 'MockMusicControls';
   return MockMusicControls;

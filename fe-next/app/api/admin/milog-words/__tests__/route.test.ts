@@ -1,15 +1,16 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for Milog Words Admin API Route
  * Endpoint: GET /api/admin/milog-words
  */
 
 // Mock Next.js server runtime BEFORE any imports
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn().mockImplementation((url: string) => ({
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url: string) => ({
     url,
   })),
   NextResponse: {
-    json: jest.fn((data, init) => ({
+    json: vi.fn((data, init) => ({
       json: () => Promise.resolve(data),
       status: init?.status || 200,
     })),
@@ -17,18 +18,18 @@ jest.mock('next/server', () => ({
 }));
 
 // Mock auth
-jest.mock('@/lib/auth/adminAuth', () => ({
-  verifyAdminAuth: jest.fn(),
+vi.mock('@/lib/auth/adminAuth', () => ({
+  verifyAdminAuth: vi.fn(),
 }));
 
 // Mock Supabase admin
-jest.mock('@/lib/admin/server', () => ({
-  getSupabaseAdmin: jest.fn(),
+vi.mock('@/lib/admin/server', () => ({
+  getSupabaseAdmin: vi.fn(),
 }));
 
 // Mock Sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 import { GET } from '../route';
@@ -36,12 +37,12 @@ import { NextRequest } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 
-const mockVerifyAdminAuth = verifyAdminAuth as jest.Mock;
-const mockGetSupabaseAdmin = getSupabaseAdmin as jest.Mock;
+const mockVerifyAdminAuth = verifyAdminAuth as Mock;
+const mockGetSupabaseAdmin = getSupabaseAdmin as Mock;
 
 describe('GET /api/admin/milog-words', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return 401 when not authenticated', async () => {
@@ -104,12 +105,12 @@ describe('GET /api/admin/milog-words', () => {
     ];
 
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValueOnce({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValueOnce({
         data: mockWords,
         count: 2,
         error: null,
@@ -135,13 +136,13 @@ describe('GET /api/admin/milog-words', () => {
     mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
 
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      not: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      not: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -161,13 +162,13 @@ describe('GET /api/admin/milog-words', () => {
     mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
 
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      ilike: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      ilike: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -187,12 +188,12 @@ describe('GET /api/admin/milog-words', () => {
     mockVerifyAdminAuth.mockResolvedValueOnce({ success: true });
 
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      range: vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'Database error' },
       }),

@@ -10,9 +10,9 @@ import { useGhostRival } from '@/hooks/useGhostRival';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock dependencies
-jest.mock('@/hooks/useGhostRival');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/hooks/useGhostRival');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
@@ -31,7 +31,7 @@ const mockT = (key: string, params?: Record<string, string>) => {
 
 describe('GhostRivalWidget', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
   });
 
@@ -45,7 +45,7 @@ describe('GhostRivalWidget', () => {
       loading: true,
       error: null,
       weekEnd: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -65,7 +65,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -85,7 +85,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: '2026-03-29',
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -108,7 +108,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: '2026-03-29',
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -129,7 +129,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: '2026-03-29',
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -151,7 +151,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: '2026-03-29',
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -171,7 +171,7 @@ describe('GhostRivalWidget', () => {
       loading: false,
       error: null,
       weekEnd: '2026-03-29',
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN

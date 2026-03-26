@@ -1,18 +1,18 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
-jest.mock('@/utils/contextualGuidanceStorage', () => ({
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
 import '@testing-library/jest-dom';
 
-jest.mock('@/utils/contextualGuidanceStorage', () => ({
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
 import LandingView from '../LandingView';
 
 // Mock all the contexts and hooks
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
 
   useLanguage: () => ({
     t: (key: string) => key,
@@ -21,42 +21,42 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
 
   useMusic: () => ({
-    playTrack: jest.fn(),
+    playTrack: vi.fn(),
     TRACKS: { LOBBY: 'lobby' },
   }),
 }));
 
 // Auth mock is defined inside describe block to allow dynamic values
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
 
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useMobilePortrait', () => ({
+vi.mock('@/hooks/useMobilePortrait', () => ({
 
   useMobilePortrait: () => false,
 }));
 
-jest.mock('@/hooks/useLiveRoomStats', () => ({
+vi.mock('@/hooks/useLiveRoomStats', () => ({
 
   useLiveRoomStats: () => ({
     openRooms: 0,
     totalPlayers: 0,
-    refresh: jest.fn(),
+    refresh: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
 
   useMouseParallax: () => ({ x: 0, y: 0 }),
   useTiltEffect: () => ({ ref: { current: null }, style: {}, handlers: {} }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
 
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
@@ -64,39 +64,40 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/utils/onboardingStorage', () => ({
+vi.mock('@/utils/onboardingStorage', () => ({
 
   hasCompletedOnboarding: () => true,
-  markOnboardingSkipped: jest.fn(),
+  markOnboardingSkipped: vi.fn(),
 }));
 
 // Mock Next.js components
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
 
   const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
 
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
   }),
   useParams: () => ({ locale: 'en' }),
 }));
 
-jest.mock('next/dynamic', () => () => {
-
-  const DynamicComponent = () => <div>Mocked Dynamic Component</div>;
-  return DynamicComponent;
-});
+vi.mock('next/dynamic', () => ({
+  default: () => {
+    const DynamicComponent = () => <div>Mocked Dynamic Component</div>;
+    return DynamicComponent;
+  },
+}));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
 
   const motionObj = {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -122,38 +123,37 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock components
-jest.mock('@/components/Header', () => {
-
-  return function MockHeader() {
+vi.mock('@/components/Header', () => {
+  const MockHeader = () => {
     return <header data-testid="header">Header</header>;
   };
+  return { default: MockHeader };
 });
 
-jest.mock('@/components/ui/PlayfulBackground', () => ({
+vi.mock('@/components/ui/PlayfulBackground', () => ({
 
   PlayfulBackground: () => <div data-testid="playful-background">Background</div>,
 }));
 
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
 
   InteractiveMascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
 }));
 
-jest.mock('@/components/ui/IdleMascot', () => ({
+vi.mock('@/components/ui/IdleMascot', () => ({
 
   IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Idle Mascot</div>,
 }));
 
-jest.mock('@/components/daily/DailyChallengeBanner', () => {
-
-  return function MockDailyChallengeBanner() {
+vi.mock('@/components/daily/DailyChallengeBanner', () => {
+  const MockDailyChallengeBanner = () => {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
+  return { default: MockDailyChallengeBanner };
 });
 
-jest.mock('../ModeCard', () => {
-
-  return function MockModeCard({ title, locked, loading, lockedMessage }: { title: string; locked?: boolean; loading?: boolean; lockedMessage?: string }) {
+vi.mock('../ModeCard', () => {
+  const MockModeCard = ({ title, locked, loading, lockedMessage }: { title: string; locked?: boolean; loading?: boolean; lockedMessage?: string }) => {
     return (
       <div data-testid={`mode-card-${title}`}>
         {title}
@@ -162,48 +162,49 @@ jest.mock('../ModeCard', () => {
       </div>
     );
   };
+  return { default: MockModeCard };
 });
 
-jest.mock('../ModeCard', () => {
-
-  return function MockModeCard({ title }: { title: string }) {
+vi.mock('../ModeCard', () => {
+  const MockModeCard = ({ title }: { title: string }) => {
     return <div data-testid={`mode-card-${title}`}>{title}</div>;
   };
+  return { default: MockModeCard };
 });
 
-jest.mock('@/hooks/usePlayerStats', () => ({
+vi.mock('@/hooks/usePlayerStats', () => ({
 
   usePlayerStats: () => ({ allTimeBest: null }),
 }));
 
-jest.mock('@/hooks/useDailyChallengeStatus', () => ({
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
 
   useDailyChallengeStatus: () => ({ hasCompleted: false, isLoading: false }),
 }));
 
-jest.mock('@/utils/perfVariant', () => ({
+vi.mock('@/utils/perfVariant', () => ({
 
   getPerfVariant: () => 'control',
 }));
 
-jest.mock('../LandingShareBanner', () => ({
+vi.mock('../LandingShareBanner', () => ({
 
   LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
     <button data-testid="landing-share-banner" onClick={onShareClick}>Share</button>
   ),
 }));
 
-jest.mock('../LandingSEOSection', () => ({
+vi.mock('../LandingSEOSection', () => ({
 
   LandingSEOSection: () => <div data-testid="seo-section">SEO Content</div>,
   ScrollIndicator: () => <div data-testid="scroll-indicator">Scroll</div>,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => {
-
-  return function MockAuthModal() {
+vi.mock('@/components/auth/AuthModal', () => {
+  const MockAuthModal = () => {
     return <div data-testid="auth-modal">Auth Modal</div>;
   };
+  return { default: MockAuthModal };
 });
 
 // Store mock values to be changed between tests
@@ -217,14 +218,14 @@ let mockAuthState: {
 };
 
 // Reset mock to use dynamic values
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
 
   useAuth: () => mockAuthState,
 }));
 
 describe('LandingView Loading State', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset to default unauthenticated state
     mockAuthState = {
       isAuthenticated: false,

@@ -13,25 +13,25 @@ import Header from '../Header';
 import HeaderMenuDropdown from '../HeaderMenuDropdown';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
     pathname: '/',
   }),
   usePathname: () => '/',
 }));
 
 // Mock next/link
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
 // Mock LanguageContext
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -48,38 +48,38 @@ const mockAuthContext = {
     total_coins: 1000,
     total_xp: 500,
   },
-  refreshProfile: jest.fn(),
+  refreshProfile: vi.fn(),
 };
 
-jest.mock('../../contexts/AuthContext', () => ({
+vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => mockAuthContext,
 }));
 
 // Mock useUnclaimedGifts
-jest.mock('../../hooks/useUnclaimedGifts', () => ({
+vi.mock('../../hooks/useUnclaimedGifts', () => ({
   useUnclaimedGifts: () => ({
     unclaimedCount: 0,
     gifts: [],
-    refresh: jest.fn(),
-    claimGift: jest.fn(),
+    refresh: vi.fn(),
+    claimGift: vi.fn(),
   }),
 }));
 
 // Mock useSafeArea
-jest.mock('../../hooks/useSafeArea', () => ({
+vi.mock('../../hooks/useSafeArea', () => ({
   useSafeArea: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
 // Mock ThemeContext
-jest.mock('../../utils/ThemeContext', () => ({
+vi.mock('../../utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    toggleTheme: jest.fn(),
+    toggleTheme: vi.fn(),
   }),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: React.HTMLAttributes<HTMLButtonElement>) => <button {...props}>{children}</button>,
@@ -88,23 +88,23 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock MusicControls
-jest.mock('../MusicControls', () => ({
+vi.mock('../MusicControls', () => ({
   __esModule: true,
   default: () => <div data-testid="music-controls">Music Controls</div>,
 }));
 
 // Mock CoinBalance
-jest.mock('../CoinBalance', () => ({
+vi.mock('../CoinBalance', () => ({
   CoinBalance: ({ coins }: { coins: number }) => <div data-testid="coin-balance">{coins}</div>,
 }));
 
 // Mock QuickLanguageSwitcher
-jest.mock('../QuickLanguageSwitcher', () => ({
+vi.mock('../QuickLanguageSwitcher', () => ({
   QuickLanguageSwitcher: () => <div data-testid="language-switcher">Language</div>,
 }));
 
 // Mock AuthButton
-jest.mock('../auth/AuthButton', () => ({
+vi.mock('../auth/AuthButton', () => ({
   __esModule: true,
   default: () => <div data-testid="auth-button">Auth</div>,
 }));
@@ -112,7 +112,7 @@ jest.mock('../auth/AuthButton', () => ({
 describe('Header Admin Menu', () => {
   beforeEach(() => {
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Mobile Menu (works correctly)', () => {
@@ -165,7 +165,7 @@ describe('Header Admin Menu', () => {
     it('should not show admin link for non-admin users', async () => {
       // Override AuthContext to non-admin
       const nonAdminContext = { ...mockAuthContext, isAdmin: false };
-      jest.spyOn(require('../../contexts/AuthContext'), 'useAuth').mockReturnValue(nonAdminContext);
+      vi.spyOn(require('../../contexts/AuthContext'), 'useAuth').mockReturnValue(nonAdminContext);
 
       const user = userEvent.setup();
       render(<HeaderMenuDropdown />);

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * AI Director Store Tests
  *
@@ -5,7 +6,7 @@
  * DDA-05: Boss battles excluded from adaptive difficulty adjustments.
  */
 
-import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from 'vitest';
 import { act } from '@testing-library/react';
 import { useAIDirectorStore } from './aiDirectorStore';
 import { DEFAULT_INTENSITY } from '@/lib/aiDirector/constants';
@@ -14,12 +15,12 @@ describe('useAIDirectorStore', () => {
   beforeEach(() => {
     // Reset store before each test
     useAIDirectorStore.getState().reset();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     useAIDirectorStore.getState().reset();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {

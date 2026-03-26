@@ -6,22 +6,22 @@
  */
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/en',
   useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href, onClick, ...props }: any) => (
     <a href={href} onClick={onClick} {...props}>{children}</a>
@@ -29,9 +29,9 @@ jest.mock('next/link', () => ({
 }));
 
 // Mock next/dynamic - handles all dynamic imports
-jest.mock('next/dynamic', () => {
+vi.mock('next/dynamic', () => {
   const React = require('react');
-  return jest.fn((loader: any, options?: any) => {
+  return vi.fn((loader: any, options?: any) => {
     // Create a mock component that will be used for all dynamic imports
     const DynamicComponent = (props: any) => {
       return React.createElement('div', { 'data-testid': 'dynamic-component', ...props });
@@ -42,79 +42,79 @@ jest.mock('next/dynamic', () => {
 });
 
 // Mock onboardingStorage
-jest.mock('@/utils/onboardingStorage', () => ({
-  hasCompletedOnboarding: jest.fn(() => true),
-  markOnboardingSkipped: jest.fn(),
+vi.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: vi.fn(() => true),
+  markOnboardingSkipped: vi.fn(),
 }));
 
 // Mock Sentry
-jest.mock('@sentry/nextjs', () => ({
-  init: jest.fn(),
-  setUser: jest.fn(),
-  setContext: jest.fn(),
-  captureException: jest.fn(),
-  captureMessage: jest.fn(),
-  withScope: jest.fn((callback) => callback({ setLevel: jest.fn() })),
+vi.mock('@sentry/nextjs', () => ({
+  init: vi.fn(),
+  setUser: vi.fn(),
+  setContext: vi.fn(),
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
+  withScope: vi.fn((callback) => callback({ setLevel: vi.fn() })),
   Severity: { Error: 'error', Warning: 'warning', Info: 'info' },
 }));
 
-jest.mock('@/utils/sentry', () => ({
-  setSentryUserContext: jest.fn(),
-  captureException: jest.fn(),
-  captureMessage: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  setSentryUserContext: vi.fn(),
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
 }));
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
     isLoading: false,
-    signIn: jest.fn(),
-    signOut: jest.fn(),
-    signUp: jest.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    signUp: vi.fn(),
   }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock OnboardingModal
-jest.mock('@/components/OnboardingModal', () => ({
+vi.mock('@/components/OnboardingModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock ProfileCustomizationModal
-jest.mock('@/components/ProfileCustomizationModal', () => ({
+vi.mock('@/components/ProfileCustomizationModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock DailyChallengeBanner
-jest.mock('@/components/daily/DailyChallengeBanner', () => ({
+vi.mock('@/components/daily/DailyChallengeBanner', () => ({
   __esModule: true,
   default: () => <div data-testid="daily-challenge-banner">Daily Challenge</div>,
 }));
 
 // Mock ThemeContext
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'light',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: {
-    success: jest.fn(),
-    error: jest.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   User: () => <span data-testid="icon-user">User</span>,
   Users: () => <span data-testid="icon-users">Users</span>,
   Bot: () => <span data-testid="icon-bot">Bot</span>,
@@ -132,7 +132,7 @@ jest.mock('lucide-react', () => ({
 }));
 
 // Mock SocketContext
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocket: () => ({
     socket: null,
     isConnected: false,
@@ -142,7 +142,7 @@ jest.mock('@/utils/SocketContext', () => ({
 }));
 
 // Mock useLiveRoomStats hook
-jest.mock('@/hooks/useLiveRoomStats', () => ({
+vi.mock('@/hooks/useLiveRoomStats', () => ({
   useLiveRoomStats: () => ({
     stats: null,
     isLoading: false,
@@ -150,12 +150,12 @@ jest.mock('@/hooks/useLiveRoomStats', () => ({
 }));
 
 // Mock MusicContext with unlockAudio
-const mockUnlockAudio = jest.fn();
-const mockPlayTrack = jest.fn();
-jest.mock('@/contexts/MusicContext', () => ({
-  useMusic: jest.fn(() => ({
+const mockUnlockAudio = vi.fn();
+const mockPlayTrack = vi.fn();
+vi.mock('@/contexts/MusicContext', () => ({
+  useMusic: vi.fn(() => ({
     playTrack: mockPlayTrack,
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
     unlockAudio: mockUnlockAudio,
     TRACKS: { LOBBY: 'lobby' },
     currentTrack: null,
@@ -163,17 +163,17 @@ jest.mock('@/contexts/MusicContext', () => ({
   })),
 }));
 
-jest.mock('@/components/Header', () => ({
+vi.mock('@/components/Header', () => ({
   __esModule: true,
   default: () => <header data-testid="header">Header</header>,
 }));
 
-jest.mock('@/components/SocialProof', () => ({
+vi.mock('@/components/SocialProof', () => ({
   __esModule: true,
   default: () => <div data-testid="social-proof">Social Proof</div>,
 }));
 
-jest.mock('../ModeCard', () => ({
+vi.mock('../ModeCard', () => ({
   __esModule: true,
   default: ({ title, href }: { title: string; href: string }) => (
     <a href={href} data-testid={`mode-card-${title.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -182,7 +182,7 @@ jest.mock('../ModeCard', () => ({
   ),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onClick, ...props }: any) => (
       <div onClick={onClick} {...props}>{children}</div>
@@ -194,15 +194,15 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useMobilePortrait', () => ({
+vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({
     transform: 'translateX(0px) translateY(0px)',
   }),
@@ -211,31 +211,31 @@ jest.mock('@/hooks/useTiltEffect', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     canHandleAnimations: true,
     isLowEnd: false,
   }),
 }));
 
-jest.mock('@/components/ui/IdleMascot', () => ({
+vi.mock('@/components/ui/IdleMascot', () => ({
   IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Mascot</div>,
 }));
 
-jest.mock('@/utils/perfVariant', () => ({
+vi.mock('@/utils/perfVariant', () => ({
   getPerfVariant: () => 'standard',
 }));
 
-jest.mock('@/components/ui/PlayfulBackground', () => ({
+vi.mock('@/components/ui/PlayfulBackground', () => ({
   PlayfulBackground: () => <div data-testid="playful-background">Background</div>,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <div data-testid="loader">Loading...</div>,
 }));
 
@@ -252,7 +252,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 describe('LandingView - Direct Bot Game Launch', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Single Player Button Behavior', () => {

@@ -8,13 +8,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useVaultBoard
-const mockUseVaultBoard = jest.fn();
-jest.mock('@/hooks/useVaultBoard', () => ({
+const mockUseVaultBoard = vi.fn();
+vi.mock('@/hooks/useVaultBoard', () => ({
   useVaultBoard: () => mockUseVaultBoard(),
 }));
 
 // Mock VaultCard
-jest.mock('../VaultCard', () => ({
+vi.mock('../VaultCard', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => (
     <div data-testid="vault-card" data-vault-id={props.vault ? (props.vault as { id: string }).id : undefined}>
@@ -24,13 +24,13 @@ jest.mock('../VaultCard', () => ({
 }));
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en' }),
 }));
 
@@ -38,7 +38,7 @@ import { VaultCardConnected } from '../VaultCardConnected';
 
 describe('VaultCardConnected', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns null when loading', () => {
@@ -48,7 +48,7 @@ describe('VaultCardConnected', () => {
       timeRemaining: 0,
       isActive: false,
       loading: true,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     const { container } = render(<VaultCardConnected />);
@@ -62,7 +62,7 @@ describe('VaultCardConnected', () => {
       timeRemaining: 0,
       isActive: false,
       loading: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     const { container } = render(<VaultCardConnected />);
@@ -76,7 +76,7 @@ describe('VaultCardConnected', () => {
       timeRemaining: 5000,
       isActive: true,
       loading: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     render(<VaultCardConnected />);
@@ -91,7 +91,7 @@ describe('VaultCardConnected', () => {
       timeRemaining: 5000,
       isActive: true,
       loading: false,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     render(<VaultCardConnected />);

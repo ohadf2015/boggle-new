@@ -17,7 +17,7 @@ import type { WorldConfig } from '@/lib/adventure';
 // MOCKS
 // ==============================================
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -32,24 +32,24 @@ jest.mock('framer-motion', () => {
   // Mock useMotionValue with get/set methods
   const useMotionValue = (initial: any) => ({
     get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: initial,
   });
 
   // Mock useTransform
   const useTransform = (...args: any[]) => ({
     get: () => 0,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: 0,
   });
 
   // Mock useSpring
   const useSpring = (initial: any) => ({
     get: () => initial,
-    set: jest.fn(),
-    onChange: jest.fn(),
+    set: vi.fn(),
+    onChange: vi.fn(),
     current: initial,
   });
 
@@ -67,7 +67,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const MockImage = ({ src, alt, className, ...props }: any) => {
     return React.createElement('img', {
       src,
@@ -84,12 +84,12 @@ jest.mock('next/image', () => {
 // Mock useParallax hook with controllable values
 const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
 const mockParallaxValues = { x: mockMotionValue(10), y: mockMotionValue(5), isGyroActive: false };
-jest.mock('@/hooks/useParallax', () => ({
+vi.mock('@/hooks/useParallax', () => ({
   useParallax: () => mockParallaxValues,
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -130,7 +130,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -149,7 +149,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -174,7 +174,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -207,7 +207,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -226,7 +226,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={[]}
           totalStars={0}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -245,7 +245,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={[]}
           totalStars={0}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -264,7 +264,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={[]}
           totalStars={0}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -288,7 +288,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -312,7 +312,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -332,7 +332,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -354,7 +354,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -374,7 +374,7 @@ describe('LevelGrid Parallax System', () => {
           world={meadowsWorld}
           completions={[]}
           totalStars={0}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -383,7 +383,7 @@ describe('LevelGrid Parallax System', () => {
           world={nebulaWorld}
           completions={[]}
           totalStars={0}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 
@@ -408,7 +408,7 @@ describe('LevelGrid Parallax System', () => {
           world={mockWorld}
           completions={mockCompletions}
           totalStars={3}
-          onLevelSelect={jest.fn()}
+          onLevelSelect={vi.fn()}
         />
       );
 

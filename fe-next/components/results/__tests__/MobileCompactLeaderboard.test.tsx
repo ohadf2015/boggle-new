@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import MobileCompactLeaderboard from '../MobileCompactLeaderboard';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -10,7 +10,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const makeMotion = (_target: Record<string, unknown>, prop: string) => {
     // eslint-disable-next-line react/display-name
@@ -21,7 +21,7 @@ jest.mock('framer-motion', () => {
     return Comp;
   };
   return {
-    ...jest.requireActual('framer-motion'),
+    ...vi.importActual('framer-motion'),
     useReducedMotion: () => true,
     motion: new Proxy({}, { get: makeMotion }),
     AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),

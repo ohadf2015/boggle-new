@@ -15,18 +15,18 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock the geometry module
-const mockMeasureAdventureGrid = jest.fn();
-const mockGetCellAtPosition = jest.fn();
-const mockIsWithinSelectionThreshold = jest.fn();
-const mockHasExceededDeadzone = jest.fn();
+const mockMeasureAdventureGrid = vi.fn();
+const mockGetCellAtPosition = vi.fn();
+const mockIsWithinSelectionThreshold = vi.fn();
+const mockHasExceededDeadzone = vi.fn();
 
-jest.mock('../adventureGridGeometry', () => ({
+vi.mock('../adventureGridGeometry', () => ({
   measureAdventureGrid: (...args: unknown[]) => mockMeasureAdventureGrid(...args),
   getCellAtPosition: (...args: unknown[]) => mockGetCellAtPosition(...args),
   getTileIndex: (row: number, col: number, gridSize: number) => row * gridSize + col,
   isWithinSelectionThreshold: (...args: unknown[]) => mockIsWithinSelectionThreshold(...args),
-  isDiagonalMove: jest.fn().mockReturnValue(false),
-  isAdjacentCell: jest.fn().mockReturnValue(true),
+  isDiagonalMove: vi.fn().mockReturnValue(false),
+  isAdjacentCell: vi.fn().mockReturnValue(true),
   hasExceededDeadzone: (...args: unknown[]) => mockHasExceededDeadzone(...args),
   DEADZONE_THRESHOLD: 8,
   CELL_SELECTION_THRESHOLD: 0.85,
@@ -106,7 +106,7 @@ describe('AdventureGrid Selection', () => {
     originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
 
     // Reset all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -118,8 +118,8 @@ describe('AdventureGrid Selection', () => {
     it('should select cell when touch is near cell center', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
-      const onDragStart = jest.fn();
+      const onDragEnter = vi.fn();
+      const onDragStart = vi.fn();
 
       // Mock geometry functions for "near center" scenario
       mockMeasureAdventureGrid.mockReturnValue(mockMeasurements);
@@ -165,8 +165,8 @@ describe('AdventureGrid Selection', () => {
     it('should NOT select cell when touch is at cell edge (far from center)', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
-      const onDragStart = jest.fn();
+      const onDragEnter = vi.fn();
+      const onDragStart = vi.fn();
 
       // Mock geometry functions for "far from center" scenario
       mockMeasureAdventureGrid.mockReturnValue(mockMeasurements);
@@ -214,7 +214,7 @@ describe('AdventureGrid Selection', () => {
     it('should not select tiles when movement is within deadzone', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
 
       // Mock - NOT exceeded deadzone
       mockHasExceededDeadzone.mockReturnValue(false);
@@ -250,7 +250,7 @@ describe('AdventureGrid Selection', () => {
     it('should start selecting after movement exceeds deadzone', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
 
       // Mock - exceeded deadzone and within threshold
       mockMeasureAdventureGrid.mockReturnValue(mockMeasurements);
@@ -320,7 +320,7 @@ describe('AdventureGrid Selection', () => {
     it('should show sparkle effect when cell is first selected', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
 
       // WHEN
       const { container } = render(
@@ -393,7 +393,7 @@ describe('AdventureGrid Selection', () => {
     it('should allow backtracking by moving back to previous cell', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
 
       // WHEN
       render(
@@ -413,7 +413,7 @@ describe('AdventureGrid Selection', () => {
       fireEvent.mouseDown(cells[2]);
 
       // Move back to cell 1
-      document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
+      document.elementFromPoint = vi.fn().mockReturnValue(cells[1]);
       fireEvent.mouseEnter(cells[1]);
 
       // THEN - backtrack should be triggered

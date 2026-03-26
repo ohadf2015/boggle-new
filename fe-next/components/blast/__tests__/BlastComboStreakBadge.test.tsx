@@ -10,7 +10,7 @@ import type { ComboStreakState } from '../hooks/useBlastComboStreak';
 
 // ---- Mocks ----
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
@@ -21,7 +21,7 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
@@ -197,7 +197,7 @@ describe('BlastComboStreakBadge — color tiers', () => {
 describe('BlastComboStreakBadge — reduced motion', () => {
   it('still renders badge when reduced motion is active', () => {
     // Override the framer-motion mock for this test
-    jest.mock('framer-motion', () => ({
+    vi.mock('framer-motion', () => ({
       motion: {
         div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
       },

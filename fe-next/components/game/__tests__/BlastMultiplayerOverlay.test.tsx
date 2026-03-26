@@ -8,7 +8,7 @@ import { BlastMultiplayerOverlay } from '../BlastMultiplayerOverlay';
 import type { BlastTileOverlay } from '@/shared/types/game';
 
 // Mock translation hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),

@@ -1,11 +1,12 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvPlayerCard from '../TvPlayerCard';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -55,13 +56,13 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('../../../../components/Avatar', () => {
-  return function MockAvatar({ className }: any) {
+vi.mock('../../../../components/Avatar', () => ({
+  default: function MockAvatar({ className }: any) {
     return <div data-testid="avatar" className={className} />;
   };
 });
 
-jest.mock('../../../../components/ui/AnimatedCounter', () => ({
+vi.mock('../../../../components/ui/AnimatedCounter', () => ({
   AnimatedCounter: ({ value, className }: any) => (
     <span data-testid="animated-counter" className={className}>
       {value}
@@ -75,7 +76,7 @@ jest.mock('../../../../components/ui/AnimatedCounter', () => ({
   ),
 }));
 
-jest.mock('../../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -98,11 +99,11 @@ const defaultProps = {
 
 describe('TvPlayerCard score bar', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders score bar with correct width percentage', () => {
@@ -169,7 +170,7 @@ describe('TvPlayerCard score bar', () => {
     expect(screen.getByTestId('score-delta')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(2600);
+      vi.advanceTimersByTime(2600);
     });
 
     expect(screen.queryByTestId('score-delta')).toBeNull();

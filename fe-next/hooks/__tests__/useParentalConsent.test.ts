@@ -304,7 +304,7 @@ describe('useParentalConsent', () => {
 
   describe('unauthenticated users', () => {
     beforeEach(() => {
-      jest.resetModules();
+      vi.resetModules();
     });
 
     it('should not check consent for unauthenticated users', async () => {

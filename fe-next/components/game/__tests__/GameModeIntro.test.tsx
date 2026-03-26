@@ -4,7 +4,7 @@ import { GameModeIntro } from '../GameModeIntro';
 import type { GameMode } from '@/shared/types/game';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>
   ));
@@ -41,85 +41,85 @@ const mockT = (key: string) => {
 
 describe('GameModeIntro', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render classic mode intro', () => {
-    render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} />);
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={vi.fn()} />);
     expect(screen.getByText('Classic')).toBeInTheDocument();
     expect(screen.getByText('Find as many words as you can!')).toBeInTheDocument();
   });
 
   it('should render blast mode intro', () => {
-    render(<GameModeIntro mode="blast" t={mockT} onComplete={jest.fn()} />);
+    render(<GameModeIntro mode="blast" t={mockT} onComplete={vi.fn()} />);
     expect(screen.getByText('Blast')).toBeInTheDocument();
     expect(screen.getByText('Clear tiles with combos and special powers!')).toBeInTheDocument();
   });
 
   it('should render word-hunt mode intro', () => {
-    render(<GameModeIntro mode="word-hunt" t={mockT} onComplete={jest.fn()} />);
+    render(<GameModeIntro mode="word-hunt" t={mockT} onComplete={vi.fn()} />);
     expect(screen.getByText('Word Hunt')).toBeInTheDocument();
     expect(screen.getByText('Race to find the target word!')).toBeInTheDocument();
   });
 
   it('should call onComplete after duration', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(<GameModeIntro mode="classic" t={mockT} onComplete={onComplete} duration={3000} />);
 
     expect(onComplete).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('should use default 3-second duration', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(<GameModeIntro mode="classic" t={mockT} onComplete={onComplete} />);
 
     act(() => {
-      jest.advanceTimersByTime(2999);
+      vi.advanceTimersByTime(2999);
     });
     expect(onComplete).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(1);
+      vi.advanceTimersByTime(1);
     });
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('should render mode icon', () => {
-    const { container } = render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} />);
+    const { container } = render(<GameModeIntro mode="classic" t={mockT} onComplete={vi.fn()} />);
     expect(container.querySelector('[data-testid="game-mode-intro"]')).toBeInTheDocument();
   });
 
   it('should have correct data-mode attribute', () => {
-    const { container } = render(<GameModeIntro mode="blast" t={mockT} onComplete={jest.fn()} />);
+    const { container } = render(<GameModeIntro mode="blast" t={mockT} onComplete={vi.fn()} />);
     const element = container.querySelector('[data-testid="game-mode-intro"]');
     expect(element).toHaveAttribute('data-mode', 'blast');
   });
 
   it('should render in TV mode with larger text', () => {
-    render(<GameModeIntro mode="classic" t={mockT} onComplete={jest.fn()} isTv />);
+    render(<GameModeIntro mode="classic" t={mockT} onComplete={vi.fn()} isTv />);
     const element = screen.getByTestId('game-mode-intro');
     expect(element).toHaveAttribute('data-tv', 'true');
   });
 
   it('should clean up timer on unmount', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const { unmount } = render(
       <GameModeIntro mode="classic" t={mockT} onComplete={onComplete} />
     );
     unmount();
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(onComplete).not.toHaveBeenCalled();

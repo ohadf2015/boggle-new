@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Combo Codex API Route Tests
  *
@@ -8,18 +9,18 @@
  */
 
 // Mock next/server and Supabase server client BEFORE any imports
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn(),
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn(),
 }));
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(),
 }));
 
 import {
@@ -31,7 +32,7 @@ import {
 // ---- Types ----
 
 interface MockSupabase {
-  from: jest.Mock;
+  from: Mock;
 }
 
 // ---- Helpers ----
@@ -46,16 +47,16 @@ function createMockSupabase({
   upsertError?: { message: string } | null;
 } = {}): MockSupabase {
   return {
-    from: jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: selectData,
             error: selectError,
           }),
         }),
       }),
-      upsert: jest.fn().mockResolvedValue({
+      upsert: vi.fn().mockResolvedValue({
         error: upsertError,
       }),
     }),
@@ -127,10 +128,10 @@ describe('handleGetComboCodex', () => {
   });
 
   it('returns 500 on unexpected database error', async () => {
-    const from = jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockRejectedValue(new Error('db crash')),
+    const from = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockRejectedValue(new Error('db crash')),
         }),
       }),
     });

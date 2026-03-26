@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for supabaseRealtimeNotifications
  * Tests the notification subscription with error handling and fallback behavior
@@ -7,33 +8,33 @@ import { subscribeToNotifications, fetchNotifications } from '../supabaseRealtim
 import { createClient } from '@/utils/supabase/client';
 
 // Mock Supabase client
-jest.mock('@/utils/supabase/client', () => ({
-  createClient: jest.fn(),
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: vi.fn(),
 }));
 
 // Mock fetch for API calls
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('supabaseRealtimeNotifications', () => {
   let mockChannel: {
-    on: jest.Mock;
-    subscribe: jest.Mock;
+    on: Mock;
+    subscribe: Mock;
   };
   let mockSupabase: {
-    channel: jest.Mock;
-    removeChannel: jest.Mock;
+    channel: Mock;
+    removeChannel: Mock;
   };
   let subscribeCallback: ((status: string, err?: Error) => void) | null = null;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     subscribeCallback = null;
 
     // Setup mock channel
     mockChannel = {
-      on: jest.fn().mockReturnThis(),
-      subscribe: jest.fn((callback) => {
+      on: vi.fn().mockReturnThis(),
+      subscribe: vi.fn((callback) => {
         subscribeCallback = callback;
         return mockChannel;
       }),
@@ -41,20 +42,20 @@ describe('supabaseRealtimeNotifications', () => {
 
     // Setup mock Supabase client
     mockSupabase = {
-      channel: jest.fn().mockReturnValue(mockChannel),
-      removeChannel: jest.fn(),
+      channel: vi.fn().mockReturnValue(mockChannel),
+      removeChannel: vi.fn(),
     };
 
-    (createClient as jest.Mock).mockReturnValue(mockSupabase);
+    (createClient as Mock).mockReturnValue(mockSupabase);
   });
 
   describe('subscribeToNotifications', () => {
     it('should return early if no userId provided', () => {
       // GIVEN: No user ID
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation();
 
       // WHEN: Subscribing with empty userId
-      const cleanup = subscribeToNotifications('', jest.fn());
+      const cleanup = subscribeToNotifications('', vi.fn());
 
       // THEN: Should warn and return noop cleanup
       expect(warnSpy).toHaveBeenCalledWith('Cannot subscribe to notifications: no userId provided');
@@ -68,7 +69,7 @@ describe('supabaseRealtimeNotifications', () => {
       const userId = 'user-123';
 
       // WHEN: Subscribing to notifications
-      subscribeToNotifications(userId, jest.fn());
+      subscribeToNotifications(userId, vi.fn());
 
       // THEN: Should create channel with user-specific name
       expect(mockSupabase.channel).toHaveBeenCalledWith(`notifications:${userId}`);
@@ -79,7 +80,7 @@ describe('supabaseRealtimeNotifications', () => {
       const userId = 'user-456';
 
       // WHEN: Subscribing to notifications
-      subscribeToNotifications(userId, jest.fn());
+      subscribeToNotifications(userId, vi.fn());
 
       // THEN: Should configure postgres_changes listener
       expect(mockChannel.on).toHaveBeenCalledWith(
@@ -96,8 +97,8 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should log success on SUBSCRIBED status', () => {
       // GIVEN: A subscription
-      const logSpy = jest.spyOn(console, 'log').mockImplementation();
-      subscribeToNotifications('user-123', jest.fn());
+      const logSpy = vi.spyOn(console, 'log').mockImplementation();
+      subscribeToNotifications('user-123', vi.fn());
 
       // WHEN: Subscription succeeds
       subscribeCallback?.('SUBSCRIBED');
@@ -109,11 +110,11 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should handle mismatch error with log instead of error', () => {
       // GIVEN: A subscription with error callback
-      const logSpy = jest.spyOn(console, 'log').mockImplementation();
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const onError = jest.fn();
+      const logSpy = vi.spyOn(console, 'log').mockImplementation();
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation();
+      const onError = vi.fn();
 
-      subscribeToNotifications('user-123', jest.fn(), onError);
+      subscribeToNotifications('user-123', vi.fn(), onError);
 
       // WHEN: Channel error with mismatch message occurs
       const mismatchError = new Error('mismatch between server and client bindings');
@@ -130,10 +131,10 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should handle regular channel errors with console.log', () => {
       // GIVEN: A subscription with error callback
-      const logSpy = jest.spyOn(console, 'log').mockImplementation();
-      const onError = jest.fn();
+      const logSpy = vi.spyOn(console, 'log').mockImplementation();
+      const onError = vi.fn();
 
-      subscribeToNotifications('user-123', jest.fn(), onError);
+      subscribeToNotifications('user-123', vi.fn(), onError);
 
       // WHEN: Regular channel error occurs
       const regularError = new Error('Connection failed');
@@ -148,10 +149,10 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should handle timeout with log and error callback', () => {
       // GIVEN: A subscription with error callback
-      const logSpy = jest.spyOn(console, 'log').mockImplementation();
-      const onError = jest.fn();
+      const logSpy = vi.spyOn(console, 'log').mockImplementation();
+      const onError = vi.fn();
 
-      subscribeToNotifications('user-123', jest.fn(), onError);
+      subscribeToNotifications('user-123', vi.fn(), onError);
 
       // WHEN: Subscription times out
       subscribeCallback?.('TIMED_OUT');
@@ -165,8 +166,8 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should remove channel on cleanup', () => {
       // GIVEN: A subscription
-      const logSpy = jest.spyOn(console, 'log').mockImplementation();
-      const cleanup = subscribeToNotifications('user-123', jest.fn());
+      const logSpy = vi.spyOn(console, 'log').mockImplementation();
+      const cleanup = subscribeToNotifications('user-123', vi.fn());
 
       // WHEN: Cleanup is called
       cleanup();
@@ -202,7 +203,7 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should return empty result on fetch error', async () => {
       // GIVEN: API fails
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation();
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       // WHEN: Fetching notifications
@@ -218,7 +219,7 @@ describe('supabaseRealtimeNotifications', () => {
 
     it('should handle non-ok response', async () => {
       // GIVEN: API returns error status
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation();
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,

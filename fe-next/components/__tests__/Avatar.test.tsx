@@ -11,7 +11,7 @@ import Avatar from '../Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, onError, ...props }: {
     src: string;
@@ -25,7 +25,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock AvatarRenderer
-jest.mock('@/components/avatar/AvatarRenderer', () => ({
+vi.mock('@/components/avatar/AvatarRenderer', () => ({
   __esModule: true,
   default: ({ config, size }: { config: CustomAvatarConfig; size: number }) => (
     <svg data-testid="custom-avatar" data-size={size} data-base={config.base} />
@@ -33,7 +33,7 @@ jest.mock('@/components/avatar/AvatarRenderer', () => ({
 }));
 
 // Mock NeoSkeletonAvatar
-jest.mock('@/components/ui/skeleton', () => ({
+vi.mock('@/components/ui/skeleton', () => ({
   NeoSkeletonAvatar: ({ size, className }: { size: number; className?: string }) => (
     <div data-testid="avatar-skeleton" data-size={size} className={className} role="status" aria-busy="true" />
   ),

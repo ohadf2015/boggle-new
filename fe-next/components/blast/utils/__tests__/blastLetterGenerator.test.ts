@@ -2,11 +2,11 @@ import { rollSpecialType } from '../blastLetterGenerator';
 
 describe('rollSpecialType — DDA spawnModifier support', () => {
   beforeEach(() => {
-    jest.spyOn(global.Math, 'random');
+    vi.spyOn(global.Math, 'random');
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('without spawnModifier (backward compat)', () => {

@@ -17,7 +17,7 @@ import { GRAY_LETTER_FADE_DELAY } from '../constants';
 import type { AccumulatedClue } from '../types';
 
 // Mock framer-motion to make tests synchronous
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileHover, whileTap, ...domProps } = props;
@@ -144,7 +144,7 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
   });
 
   it('should fade gray letters to "?" after delay while keeping green/yellow visible', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const targetWord = 'WORLD';
     const feedback: LetterFeedback[] = [
       { letter: 'W', position: 0, feedback: 'green' },
@@ -161,7 +161,7 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
     expect(screen.getByText('X')).toBeInTheDocument();
 
     // After fade delay, gray letters become '?'
-    act(() => { jest.advanceTimersByTime(GRAY_LETTER_FADE_DELAY); });
+    act(() => { vi.advanceTimersByTime(GRAY_LETTER_FADE_DELAY); });
 
     // Gray letters should now be '?'
     expect(screen.queryByText('A')).not.toBeInTheDocument();
@@ -171,6 +171,6 @@ describe('SurvivalClueBoxes - Feedback Box Count', () => {
     expect(screen.getByText('W')).toBeInTheDocument();
     expect(screen.getByText('R')).toBeInTheDocument();
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

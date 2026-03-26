@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Test suite for getStudentClassroom functionality
  *
@@ -12,19 +13,19 @@ import { getStudentClassroom } from '../education';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
-const mockFrom = (supabase?.from || jest.fn()) as jest.MockedFunction<any>;
+const mockFrom = (supabase?.from || vi.fn()) as MockedFunction<any>;
 
 describe('getStudentClassroom', () => {
   const mockStudentId = 'student-123';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('when student is a member of a classroom', () => {
@@ -43,11 +44,11 @@ describe('getStudentClassroom', () => {
         },
       };
 
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockOrder = jest.fn().mockReturnThis();
-      const mockLimit = jest.fn().mockReturnThis();
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockSelect = vi.fn().mockReturnThis();
+      const mockEq = vi.fn().mockReturnThis();
+      const mockOrder = vi.fn().mockReturnThis();
+      const mockLimit = vi.fn().mockReturnThis();
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: mockMembership,
         error: null,
       });
@@ -80,11 +81,11 @@ describe('getStudentClassroom', () => {
   describe('when student is not a member of any classroom', () => {
     it('should return null data when student has no membership', async () => {
       // GIVEN: Student has no classroom membership
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockOrder = jest.fn().mockReturnThis();
-      const mockLimit = jest.fn().mockReturnThis();
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockSelect = vi.fn().mockReturnThis();
+      const mockEq = vi.fn().mockReturnThis();
+      const mockOrder = vi.fn().mockReturnThis();
+      const mockLimit = vi.fn().mockReturnThis();
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: null,
         error: null,
       });
@@ -109,11 +110,11 @@ describe('getStudentClassroom', () => {
   describe('error handling', () => {
     it('should return error when database query fails', async () => {
       // GIVEN: Database error occurs
-      const mockSelect = jest.fn().mockReturnThis();
-      const mockEq = jest.fn().mockReturnThis();
-      const mockOrder = jest.fn().mockReturnThis();
-      const mockLimit = jest.fn().mockReturnThis();
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockSelect = vi.fn().mockReturnThis();
+      const mockEq = vi.fn().mockReturnThis();
+      const mockOrder = vi.fn().mockReturnThis();
+      const mockLimit = vi.fn().mockReturnThis();
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'Database connection failed' },
       });
@@ -138,8 +139,8 @@ describe('getStudentClassroom', () => {
     it('should return error when supabase is not configured', async () => {
       // GIVEN: Supabase is not configured
       // We need to temporarily mock supabase as null
-      jest.resetModules();
-      jest.doMock('@/lib/supabase', () => ({
+      vi.resetModules();
+      vi.doMock('@/lib/supabase', () => ({
         supabase: null,
       }));
 

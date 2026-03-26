@@ -7,37 +7,37 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock all child components to isolate layout testing
-jest.mock('../WordHuntMPHeader', () => ({
+vi.mock('../WordHuntMPHeader', () => ({
   WordHuntMPHeader: (props: Record<string, unknown>) => <div data-testid="mp-header" data-score={props.score} />,
 }));
 
-jest.mock('../WordHuntMPLeaderboard', () => ({
+vi.mock('../WordHuntMPLeaderboard', () => ({
   WordHuntMPLeaderboard: () => <div data-testid="mp-leaderboard" />,
 }));
 
-jest.mock('@/components/daily/survival/SurvivalClueBoxes', () => ({
+vi.mock('@/components/daily/survival/SurvivalClueBoxes', () => ({
   SurvivalClueBoxes: React.forwardRef(function MockSurvivalClueBoxes(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
     return <div ref={ref} data-testid="survival-clue-boxes" data-overlay={String(props.showFeedbackOverlay)} />;
   }),
 }));
 
-jest.mock('@/components/daily/survival/SurvivalLifeBar', () => ({
+vi.mock('@/components/daily/survival/SurvivalLifeBar', () => ({
   SurvivalLifeBar: (props: Record<string, unknown>) => <div data-testid="survival-life-bar" data-life={props.lifePoints} />,
 }));
 
-jest.mock('@/components/daily/survival/SurvivalGridSection', () => ({
+vi.mock('@/components/daily/survival/SurvivalGridSection', () => ({
   SurvivalGridSection: (props: Record<string, unknown>) => (
     <div data-testid="survival-grid-section" data-game-over={String(props.isGameOver)} />
   ),
 }));
 
-jest.mock('../WordHuntGameOverOverlay', () => ({
+vi.mock('../WordHuntGameOverOverlay', () => ({
   WordHuntGameOverOverlay: (props: Record<string, unknown>) => (
     <div data-testid="game-over-overlay" data-reason={props.reason || 'none'} />
   ),
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => {
+vi.mock('@/components/game/WordFormingArea', () => {
   const MockWordFormingArea = (props: Record<string, unknown>) => (
     <div data-testid="word-forming-area" data-word={props.word} />
   );
@@ -57,7 +57,7 @@ describe('WordHuntGameLayout', () => {
   const defaultProps = {
     // Header (no timer props)
     score: 450,
-    onQuit: jest.fn(),
+    onQuit: vi.fn(),
 
     // Clue boxes
     targetLength: 5,
@@ -77,8 +77,8 @@ describe('WordHuntGameLayout', () => {
 
     // Grid
     grid: defaultGrid,
-    onWordSubmit: jest.fn(),
-    onWordChange: jest.fn(),
+    onWordSubmit: vi.fn(),
+    onWordChange: vi.fn(),
 
     // Word forming
     formedWord: '',

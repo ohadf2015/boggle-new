@@ -5,63 +5,63 @@ import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Language } from '@/shared/types/game';
 
 // Mock SoundEffectsContext
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
-    setVolume: jest.fn(),
+    playSound: vi.fn(),
+    setVolume: vi.fn(),
     volume: 0.7
   })
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     t: (key: string) => key
   })
 }));
 
 // Mock modules
-jest.mock('@/host/hooks/useTvPlayerCombos', () => ({
+vi.mock('@/host/hooks/useTvPlayerCombos', () => ({
   useTvPlayerCombos: () => ({ playerCombos: {} })
 }));
 
-jest.mock('@/host/hooks/useTvNotifications', () => ({
+vi.mock('@/host/hooks/useTvNotifications', () => ({
   useTvNotifications: () => ({
     notifications: [],
-    dismissNotification: jest.fn()
+    dismissNotification: vi.fn()
   })
 }));
 
-jest.mock('@/host/hooks/useTvSounds', () => ({
-  useTvSounds: () => ({ playSound: jest.fn() })
+vi.mock('@/host/hooks/useTvSounds', () => ({
+  useTvSounds: () => ({ playSound: vi.fn() })
 }));
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false })
 }));
 
 // Mock fullscreen hook - this is what we're testing
-const mockUseTvFullscreen = jest.fn();
-jest.mock('@/host/hooks/useTvFullscreen', () => ({
+const mockUseTvFullscreen = vi.fn();
+vi.mock('@/host/hooks/useTvFullscreen', () => ({
   useTvFullscreen: (config: any) => mockUseTvFullscreen(config)
 }));
 
 // Mock TvGrid to avoid rendering complexity
-jest.mock('@/host/components/tv-broadcast/TvGrid', () => ({
+vi.mock('@/host/components/tv-broadcast/TvGrid', () => ({
   __esModule: true,
   default: () => <div data-testid="tv-grid-mock">Grid</div>
 }));
 
 // Mock TvLeaderboard
-jest.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
+vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
   __esModule: true,
   default: () => <div data-testid="tv-leaderboard-mock">Leaderboard</div>
 }));
 
 // Mock TvTutorialOverlay
-jest.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
+vi.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
   __esModule: true,
   default: () => null,
   isTvTutorialComplete: () => true,
@@ -69,13 +69,13 @@ jest.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
 }));
 
 // Mock TvNotificationQueue
-jest.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
+vi.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
   __esModule: true,
   default: () => null
 }));
 
 // Mock TvGameHeader
-jest.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
+vi.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
   __esModule: true,
   default: () => <div data-testid="tv-game-header">Header</div>
 }));
@@ -107,14 +107,14 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should display join bar when NOT in fullscreen mode', () => {
     // GIVEN: Not in fullscreen mode
     mockUseTvFullscreen.mockReturnValue({
       isFullscreen: false,
-      toggleFullscreen: jest.fn(),
+      toggleFullscreen: vi.fn(),
       isSupported: true
     });
 
@@ -132,7 +132,7 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
     // GIVEN: In fullscreen mode
     mockUseTvFullscreen.mockReturnValue({
       isFullscreen: true,
-      toggleFullscreen: jest.fn(),
+      toggleFullscreen: vi.fn(),
       isSupported: true
     });
 

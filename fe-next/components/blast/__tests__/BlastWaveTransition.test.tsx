@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
     return React.createElement('div', { ref, ...rest }, children);
@@ -12,12 +12,12 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
 // Mock AdaptiveMotion to render plain divs (avoids AccessibilityContext + grid perf deps)
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockAdaptiveDiv({ children, ...rest }: any, ref: any) {
     // Strip motion-only props that aren't valid HTML attributes
@@ -37,17 +37,17 @@ const defaultProps = {
   previousWaveScore: 45,
   previousWaveWords: 8,
   previousClearPercentage: 67,
-  onAdvance: jest.fn(),
+  onAdvance: vi.fn(),
 };
 
 describe('BlastWaveTransition', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    defaultProps.onAdvance = jest.fn();
+    vi.useFakeTimers();
+    defaultProps.onAdvance = vi.fn();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the next wave number', () => {
@@ -71,20 +71,20 @@ describe('BlastWaveTransition', () => {
   });
 
   it('auto-advances after 3000ms', () => {
-    const onAdvance = jest.fn();
+    const onAdvance = vi.fn();
     render(<BlastWaveTransition {...defaultProps} onAdvance={onAdvance} />);
 
     expect(onAdvance).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onAdvance).toHaveBeenCalledTimes(1);
   });
 
   it('does not advance twice if auto-advance fires after click', () => {
-    const onAdvance = jest.fn();
+    const onAdvance = vi.fn();
     render(<BlastWaveTransition {...defaultProps} onAdvance={onAdvance} />);
 
     const overlay = screen.getByTestId('wave-transition-overlay');
@@ -92,14 +92,14 @@ describe('BlastWaveTransition', () => {
     expect(onAdvance).toHaveBeenCalledTimes(1);
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onAdvance).toHaveBeenCalledTimes(1);
   });
 
   it('calls onAdvance when overlay is clicked', () => {
-    const onAdvance = jest.fn();
+    const onAdvance = vi.fn();
     render(<BlastWaveTransition {...defaultProps} onAdvance={onAdvance} />);
 
     const overlay = screen.getByTestId('wave-transition-overlay');
@@ -119,7 +119,7 @@ describe('BlastWaveTransition', () => {
   });
 
   it('calls onAdvance when continue button is clicked', () => {
-    const onAdvance = jest.fn();
+    const onAdvance = vi.fn();
     render(<BlastWaveTransition {...defaultProps} onAdvance={onAdvance} />);
 
     const continueBtn = screen.getByTestId('wave-continue-btn');

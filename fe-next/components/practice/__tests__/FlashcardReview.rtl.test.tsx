@@ -2,15 +2,15 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FlashcardReview from '../FlashcardReview';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'rtl', language: 'he' }),
 }));
 
-jest.mock('@/components/practice/PronunciationButton', () => ({
+vi.mock('@/components/practice/PronunciationButton', () => ({
   PronunciationButton: () => null,
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
@@ -19,15 +19,15 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('../FlashcardSwipeStack', () => ({
+vi.mock('../FlashcardSwipeStack', () => ({
   FlashcardSwipeStack: () => <div data-testid="swipe-stack" />,
 }));
 
-jest.mock('@/hooks/useSpeechSynthesis', () => ({
-  useSpeechSynthesis: () => ({ speak: jest.fn(), cancel: jest.fn(), speaking: false }),
+vi.mock('@/hooks/useSpeechSynthesis', () => ({
+  useSpeechSynthesis: () => ({ speak: vi.fn(), cancel: vi.fn(), speaking: false }),
 }));
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocketOptional: () => null,
 }));
 
@@ -38,7 +38,7 @@ const mockWords = [
 describe('FlashcardReview RTL', () => {
   it('applies dir=rtl on main container when language is Hebrew', () => {
     const { container } = render(
-      <FlashcardReview words={mockWords} onComplete={jest.fn()} onBack={jest.fn()} />
+      <FlashcardReview words={mockWords} onComplete={vi.fn()} onBack={vi.fn()} />
     );
     expect(container.firstChild).toHaveAttribute('dir', 'rtl');
   });

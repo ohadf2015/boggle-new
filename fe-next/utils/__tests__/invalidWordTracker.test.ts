@@ -13,7 +13,7 @@ describe('invalidWordTracker', () => {
 
   beforeEach(async () => {
     // Create fresh mock for each test
-    mockFetch = jest.fn(() =>
+    mockFetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ success: true }),
@@ -30,7 +30,7 @@ describe('invalidWordTracker', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('recordInvalidWord', () => {

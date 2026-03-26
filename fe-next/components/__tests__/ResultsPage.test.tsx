@@ -9,26 +9,26 @@ import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     user: null,
   }),
 }));
 
-jest.mock('@/hooks/useWinStreak', () => ({
+vi.mock('@/hooks/useWinStreak', () => ({
   useWinStreak: () => ({
     currentStreak: 0,
     bestStreak: 0,
-    recordWin: jest.fn(),
+    recordWin: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -37,22 +37,22 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-jest.mock('canvas-confetti', () => ({
+vi.mock('canvas-confetti', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }));
 
-jest.mock('next/dynamic', () => ({
+vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => (Component: React.ComponentType<any>) => Component,
 }));
 
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: () => <div data-testid="grid">Grid</div>,
 }));
 
-jest.mock('@/components/results/ResultsPlayerCard', () => ({
+vi.mock('@/components/results/ResultsPlayerCard', () => ({
   __esModule: true,
   default: ({ player }: { player: { username: string; score: number } }) => (
     <div data-testid={`player-card-${player.username}`}>
@@ -61,17 +61,17 @@ jest.mock('@/components/results/ResultsPlayerCard', () => ({
   ),
 }));
 
-jest.mock('@/components/results/ResultsWinnerBanner', () => ({
+vi.mock('@/components/results/ResultsWinnerBanner', () => ({
   __esModule: true,
   default: () => <div data-testid="winner-banner">Winner</div>,
 }));
 
-jest.mock('@/components/ExitRoomButton', () => ({
+vi.mock('@/components/ExitRoomButton', () => ({
   __esModule: true,
   default: () => <button data-testid="exit-button">Exit</button>,
 }));
 
-jest.mock('@/components/ui/alert-dialog', () => ({
+vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AlertDialogAction: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
   AlertDialogCancel: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
@@ -82,22 +82,22 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogTitle: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/auth/FirstWinSignupModal', () => ({
+vi.mock('@/components/auth/FirstWinSignupModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/results/ShareWinPrompt', () => ({
+vi.mock('@/components/results/ShareWinPrompt', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/results/WinStreakDisplay', () => ({
+vi.mock('@/components/results/WinStreakDisplay', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -106,7 +106,7 @@ jest.mock('@/components/results/WinStreakDisplay', () => ({
 let wordFeedbackModalRenderCount = 0;
 const resetWordFeedbackModalRenderCount = () => { wordFeedbackModalRenderCount = 0; };
 
-jest.mock('@/components/voting/WordFeedbackModal', () => ({
+vi.mock('@/components/voting/WordFeedbackModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => {
     wordFeedbackModalRenderCount++;
@@ -114,30 +114,30 @@ jest.mock('@/components/voting/WordFeedbackModal', () => ({
   },
 }));
 
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  shouldShowUpgradePrompt: jest.fn(() => false),
-  getGuestStatsSummary: jest.fn(() => ({})),
-  updateGuestStatsAfterGame: jest.fn(),
-  isFirstWin: jest.fn(() => false),
+vi.mock('@/utils/guestManager', () => ({
+  shouldShowUpgradePrompt: vi.fn(() => false),
+  getGuestStatsSummary: vi.fn(() => ({})),
+  updateGuestStatsAfterGame: vi.fn(),
+  isFirstWin: vi.fn(() => false),
 }));
 
-jest.mock('@/utils/growthTracking', () => ({
-  trackGameCompletion: jest.fn(),
-  trackStreakMilestone: jest.fn(),
+vi.mock('@/utils/growthTracking', () => ({
+  trackGameCompletion: vi.fn(),
+  trackStreakMilestone: vi.fn(),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'light',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocket: () => ({
     socket: null,
     isConnected: false,

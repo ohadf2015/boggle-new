@@ -4,7 +4,7 @@ import { LeadChangeBanner } from '../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
 // Mock framer-motion — factory must be self-contained (jest.mock is hoisted)
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return React.createElement('div', { ref, 'data-testid': props['data-testid'], ...props }, children);
@@ -17,7 +17,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock translations
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string>) => {
       const translations: Record<string, string> = {

@@ -3,19 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastCodexModal } from '../BlastCodexModal';
 import type { BlastComboType } from '../utils/blastCombos';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...p }: any) => <div {...p}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, _params?: any) => k }),
 }));
 
 // CODEX_COMBOS mock: 31 entries
-jest.mock('../utils/blastComboScaling', () => ({
+vi.mock('../utils/blastComboScaling', () => ({
   CODEX_COMBOS: [
     'bomb_bomb', 'bomb_lightning', 'bomb_prism', 'bomb_rainbow', 'bomb_mirror',
     'bomb_magnet', 'bomb_gem', 'bomb_frozen',
@@ -31,7 +31,7 @@ jest.mock('../utils/blastComboScaling', () => ({
 }));
 
 describe('BlastCodexModal', () => {
-  const onClose = jest.fn();
+  const onClose = vi.fn();
   const emptySet = new Set<BlastComboType>();
 
   beforeEach(() => onClose.mockClear());

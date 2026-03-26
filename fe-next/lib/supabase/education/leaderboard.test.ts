@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for classroom leaderboard backend functions
  * Tests getFullClassroomLeaderboard, getLeaderboardWithRankDelta, saveLeaderboardSnapshot, getLeaderboardTier
@@ -15,19 +16,19 @@ import {
 import type { LeaderboardEntryWithDelta } from './types';
 
 // Mock Supabase
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => {
+vi.mock('@/utils/logger', () => {
   const mockLogger = {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   };
   return {
     __esModule: true,
@@ -40,7 +41,7 @@ describe('leaderboard backend', () => {
   const mockCurrentUserId = 'student-456';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getFullClassroomLeaderboard', () => {
@@ -63,29 +64,29 @@ describe('leaderboard backend', () => {
         { student_id: 'student-3', total_xp: 1200, current_level: 6, current_streak: 5, last_practice_date: '2026-02-13' },
       ];
 
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      (supabase.from as Mock).mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
             }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
             }),
           };
         }
         if (table === 'student_lesson_progress') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
             }),
           };
         }
-        return { select: jest.fn() };
+        return { select: vi.fn() };
       });
 
       const result = await getFullClassroomLeaderboard(mockClassroomId, mockCurrentUserId, 'all-time');
@@ -114,30 +115,30 @@ describe('leaderboard backend', () => {
       ];
 
       let queryBuilder: any;
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      (supabase.from as Mock).mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
             }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
             }),
           };
         }
         if (table === 'student_lesson_progress') {
           queryBuilder = {
-            select: jest.fn().mockReturnThis(),
-            in: jest.fn().mockReturnThis(),
-            gte: jest.fn().mockResolvedValue({ data: mockProgressWeekly, error: null }),
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            gte: vi.fn().mockResolvedValue({ data: mockProgressWeekly, error: null }),
           };
           return queryBuilder;
         }
-        return { select: jest.fn() };
+        return { select: vi.fn() };
       });
 
       const result = await getFullClassroomLeaderboard(mockClassroomId, mockCurrentUserId, 'weekly');
@@ -155,30 +156,30 @@ describe('leaderboard backend', () => {
       ];
 
       let queryBuilder: any;
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      (supabase.from as Mock).mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
             }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
             }),
           };
         }
         if (table === 'student_lesson_progress') {
           queryBuilder = {
-            select: jest.fn().mockReturnThis(),
-            in: jest.fn().mockReturnThis(),
-            gte: jest.fn().mockResolvedValue({ data: mockProgressMonthly, error: null }),
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            gte: vi.fn().mockResolvedValue({ data: mockProgressMonthly, error: null }),
           };
           return queryBuilder;
         }
-        return { select: jest.fn() };
+        return { select: vi.fn() };
       });
 
       const result = await getFullClassroomLeaderboard(mockClassroomId, mockCurrentUserId, 'monthly');
@@ -196,18 +197,18 @@ describe('leaderboard backend', () => {
       ];
 
       // Mock getFullClassroomLeaderboard with gte chain
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      (supabase.from as Mock).mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockResolvedValue({ data: [{ student_id: 'student-1' }, { student_id: 'student-2' }], error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: [{ student_id: 'student-1' }, { student_id: 'student-2' }], error: null }),
             }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({
                 data: [
                   { id: 'student-1', display_name: 'Alice', avatar_emoji: '😀', avatar_color: '#FF0000' },
                   { id: 'student-2', display_name: 'Bob', avatar_emoji: '😎', avatar_color: '#00FF00' },
@@ -219,9 +220,9 @@ describe('leaderboard backend', () => {
         }
         if (table === 'student_lesson_progress') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockReturnThis(),
+              gte: vi.fn().mockResolvedValue({
                 data: [
                   { student_id: 'student-1', total_xp: 1000, current_level: 5, current_streak: 3, last_practice_date: '2026-02-13' },
                   { student_id: 'student-2', total_xp: 800, current_level: 4, current_streak: 0, last_practice_date: '2026-02-13' },
@@ -233,14 +234,14 @@ describe('leaderboard backend', () => {
         }
         if (table === 'leaderboard_snapshots') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              limit: jest.fn().mockResolvedValue({ data: mockSnapshots, error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnThis(),
+              order: vi.fn().mockReturnThis(),
+              limit: vi.fn().mockResolvedValue({ data: mockSnapshots, error: null }),
             }),
           };
         }
-        return { select: jest.fn() };
+        return { select: vi.fn() };
       });
 
       const result = await getLeaderboardWithRankDelta(mockClassroomId, mockCurrentUserId, 'weekly');
@@ -262,18 +263,18 @@ describe('leaderboard backend', () => {
     });
 
     it('should mark entries as new when no previous snapshot exists', async () => {
-      (supabase.from as jest.Mock).mockImplementation((table: string) => {
+      (supabase.from as Mock).mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockResolvedValue({ data: [{ student_id: 'student-1' }], error: null }),
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: [{ student_id: 'student-1' }], error: null }),
             }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockResolvedValue({
                 data: [{ id: 'student-1', display_name: 'Alice', avatar_emoji: '😀', avatar_color: '#FF0000' }],
                 error: null,
               }),
@@ -282,9 +283,9 @@ describe('leaderboard backend', () => {
         }
         if (table === 'student_lesson_progress') {
           return {
-            select: jest.fn().mockReturnValue({
-              in: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              in: vi.fn().mockReturnThis(),
+              gte: vi.fn().mockResolvedValue({
                 data: [{ student_id: 'student-1', total_xp: 500, current_level: 3, current_streak: 2, last_practice_date: '2026-02-13' }],
                 error: null,
               }),
@@ -293,14 +294,14 @@ describe('leaderboard backend', () => {
         }
         if (table === 'leaderboard_snapshots') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              limit: jest.fn().mockResolvedValue({ data: [], error: null }), // No previous snapshot
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnThis(),
+              order: vi.fn().mockReturnThis(),
+              limit: vi.fn().mockResolvedValue({ data: [], error: null }), // No previous snapshot
             }),
           };
         }
-        return { select: jest.fn() };
+        return { select: vi.fn() };
       });
 
       const result = await getLeaderboardWithRankDelta(mockClassroomId, mockCurrentUserId, 'weekly');
@@ -332,9 +333,9 @@ describe('leaderboard backend', () => {
         },
       ];
 
-      const mockUpsert = jest.fn().mockResolvedValue({ data: null, error: null });
+      const mockUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 
-      (supabase.from as jest.Mock).mockReturnValue({
+      (supabase.from as Mock).mockReturnValue({
         upsert: mockUpsert,
       });
 

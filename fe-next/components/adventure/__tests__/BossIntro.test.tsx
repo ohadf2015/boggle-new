@@ -24,7 +24,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.bosses.twistMechanic': 'Boss Twist',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -32,7 +32,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => ({
     dialogueBg: 'bg-neo-navy/95',
     dialogueBorder: 'border-neo-white/20',
@@ -54,7 +54,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
 }));
 
 // Mock framer-motion to render static elements for testing
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const MockMotionDiv = React.forwardRef(
@@ -127,8 +127,8 @@ const mockBoss: BossConfig = {
 const defaultProps = {
   boss: mockBoss,
   worldNumber: 1,
-  onStart: jest.fn(),
-  onSkip: jest.fn(),
+  onStart: vi.fn(),
+  onSkip: vi.fn(),
 };
 
 // ==============================================
@@ -137,7 +137,7 @@ const defaultProps = {
 
 describe('BossIntro', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {
@@ -203,7 +203,7 @@ describe('BossIntro', () => {
 
     it('should call onStart when fight button is clicked', () => {
       // GIVEN
-      const onStart = jest.fn();
+      const onStart = vi.fn();
       render(<BossIntro {...defaultProps} onStart={onStart} />);
 
       // WHEN
@@ -215,7 +215,7 @@ describe('BossIntro', () => {
 
     it('should call onSkip when skip button is clicked', () => {
       // GIVEN
-      const onSkip = jest.fn();
+      const onSkip = vi.fn();
       render(<BossIntro {...defaultProps} onSkip={onSkip} />);
 
       // WHEN

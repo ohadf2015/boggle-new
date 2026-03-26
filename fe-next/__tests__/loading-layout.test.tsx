@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test for loading state layout consistency
  * Ensures loading.tsx uses proper skeleton layout matching the landing page
@@ -6,7 +7,7 @@ import { render } from '@testing-library/react';
 import Loading from '@/app/[locale]/loading';
 
 // Mock framer-motion for simpler testing
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
@@ -21,7 +22,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,

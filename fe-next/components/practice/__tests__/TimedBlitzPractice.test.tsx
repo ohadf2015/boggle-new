@@ -5,7 +5,7 @@ import { TimedBlitzPractice } from '../TimedBlitzPractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -13,7 +13,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockMotionDiv = React.forwardRef(
     (
@@ -46,14 +46,14 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('../../CircularTimer', () => ({
+vi.mock('../../CircularTimer', () => ({
   __esModule: true,
   default: ({ remainingTime }: { remainingTime: number }) => (
     <div data-testid="circular-timer">{remainingTime}s</div>
   ),
 }));
 
-jest.mock('../PracticeResultsCard', () => ({
+vi.mock('../PracticeResultsCard', () => ({
   __esModule: true,
   default: ({
     correct,
@@ -85,26 +85,26 @@ const mockWords: VocabularyWord[] = [
 ];
 
 describe('TimedBlitzPractice', () => {
-  const mockOnComplete = jest.fn();
-  const mockOnBack = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnBack = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Countdown uses chained setTimeouts (3→2→1→playing).
   // Each step needs its own act() to flush React state updates
   // before the next setTimeout can be scheduled.
   function advanceThroughCountdown() {
-    act(() => { jest.advanceTimersByTime(1100); }); // 3 → 2
-    act(() => { jest.advanceTimersByTime(1100); }); // 2 → 1
-    act(() => { jest.advanceTimersByTime(1100); }); // 1 → playing
+    act(() => { vi.advanceTimersByTime(1100); }); // 3 → 2
+    act(() => { vi.advanceTimersByTime(1100); }); // 2 → 1
+    act(() => { vi.advanceTimersByTime(1100); }); // 1 → playing
   }
 
   describe('countdown phase', () => {
@@ -123,7 +123,7 @@ describe('TimedBlitzPractice', () => {
 
       // After 1 second, show 2
       act(() => {
-        jest.advanceTimersByTime(1100);
+        vi.advanceTimersByTime(1100);
       });
 
       await waitFor(() => {
@@ -132,7 +132,7 @@ describe('TimedBlitzPractice', () => {
 
       // After 2 seconds, show 1
       act(() => {
-        jest.advanceTimersByTime(1100);
+        vi.advanceTimersByTime(1100);
       });
 
       await waitFor(() => {
@@ -141,7 +141,7 @@ describe('TimedBlitzPractice', () => {
 
       // After 3 seconds, game starts
       act(() => {
-        jest.advanceTimersByTime(1100);
+        vi.advanceTimersByTime(1100);
       });
 
       await waitFor(() => {
@@ -380,7 +380,7 @@ describe('TimedBlitzPractice', () => {
 
       // Advance to 41 seconds (19 remaining)
       act(() => {
-        jest.advanceTimersByTime(41500);
+        vi.advanceTimersByTime(41500);
       });
 
       // Should have urgency styling
@@ -408,7 +408,7 @@ describe('TimedBlitzPractice', () => {
 
       // Advance to 51 seconds (9 remaining)
       act(() => {
-        jest.advanceTimersByTime(51500);
+        vi.advanceTimersByTime(51500);
       });
 
       // Should have red tint styling
@@ -438,7 +438,7 @@ describe('TimedBlitzPractice', () => {
 
       // Advance time to end of game (61 seconds + buffer)
       act(() => {
-        jest.advanceTimersByTime(61500);
+        vi.advanceTimersByTime(61500);
       });
 
       // Should show TIME'S UP
@@ -448,7 +448,7 @@ describe('TimedBlitzPractice', () => {
 
       // After brief animation, show results
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       await waitFor(() => {
@@ -474,7 +474,7 @@ describe('TimedBlitzPractice', () => {
 
       // Advance time to end of game (61 seconds + buffer)
       act(() => {
-        jest.advanceTimersByTime(61500);
+        vi.advanceTimersByTime(61500);
       });
 
       await waitFor(() => {
@@ -515,12 +515,12 @@ describe('TimedBlitzPractice', () => {
 
       // End game
       act(() => {
-        jest.advanceTimersByTime(61000);
+        vi.advanceTimersByTime(61000);
       });
 
       // Skip TIME'S UP animation
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       // Should show results with 2 correct
@@ -558,12 +558,12 @@ describe('TimedBlitzPractice', () => {
 
       // End game
       act(() => {
-        jest.advanceTimersByTime(61000);
+        vi.advanceTimersByTime(61000);
       });
 
       // Skip TIME'S UP
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       // onComplete should be called with results
@@ -594,10 +594,10 @@ describe('TimedBlitzPractice', () => {
       // Complete countdown and game
       advanceThroughCountdown();
       act(() => {
-        jest.advanceTimersByTime(61000);
+        vi.advanceTimersByTime(61000);
       });
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       await waitFor(() => {
@@ -628,10 +628,10 @@ describe('TimedBlitzPractice', () => {
       // Complete countdown and game
       advanceThroughCountdown();
       act(() => {
-        jest.advanceTimersByTime(61000);
+        vi.advanceTimersByTime(61000);
       });
       act(() => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       await waitFor(() => {

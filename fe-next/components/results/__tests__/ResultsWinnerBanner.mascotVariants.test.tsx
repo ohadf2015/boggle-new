@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import ResultsWinnerBanner from '../ResultsWinnerBanner';
 
 // Mock useLanguage hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
@@ -34,19 +34,19 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock confetti
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
 }));
 
 // Mock Mascot — capture the variant prop via data-variant attribute
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant, className }: { variant?: string; className?: string }) => (
     <div data-testid="mascot-with-entrance" data-variant={variant} className={className}>Mascot</div>
   ),
   MascotVariant: {},
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: ({ className }: { className?: string }) => (
     <div data-testid="celebration-mascot" className={className}>CelebrationMascot</div>
   ),

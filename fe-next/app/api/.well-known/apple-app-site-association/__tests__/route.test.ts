@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Apple App Site Association Route Tests
  * Tests AASA response for iOS Universal Links
  */
 
 // Mock NextResponse before importing route
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
     json: (body: unknown, init?: { headers?: Record<string, string> }) => ({
       json: () => Promise.resolve(body),

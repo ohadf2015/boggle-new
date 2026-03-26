@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Adventure Attempt API Route Tests
@@ -7,24 +8,24 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow by default
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockRpc = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockRpc = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     rpc: (...args: unknown[]) => mockRpc(...args),
     from: (...args: unknown[]) => mockFrom(...args),
@@ -32,8 +33,8 @@ jest.mock('@/utils/supabase/server', () => ({
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 import { NextRequest } from 'next/server';
@@ -41,7 +42,7 @@ import { POST, GET } from '../route';
 
 // ---------- Helpers ----------
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -82,7 +83,7 @@ const mockAttemptResponse = {
 
 describe('POST /api/adventure/attempt', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
@@ -253,7 +254,7 @@ describe('POST /api/adventure/attempt', () => {
 
 describe('GET /api/adventure/attempt', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -300,10 +301,10 @@ describe('GET /api/adventure/attempt', () => {
       ];
 
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
                 data: dbAttempts,
                 error: null,
               }),
@@ -344,10 +345,10 @@ describe('GET /api/adventure/attempt', () => {
 
     it('returns empty array when no attempts exist', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
                 data: [],
                 error: null,
               }),
@@ -366,10 +367,10 @@ describe('GET /api/adventure/attempt', () => {
   describe('Database errors', () => {
     it('returns 500 when fetch fails', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
                 data: null,
                 error: { code: 'INTERNAL', message: 'DB down' },
               }),

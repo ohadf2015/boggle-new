@@ -8,38 +8,38 @@
 import { renderHook, act } from '@testing-library/react';
 
 // Mock dependencies before importing the hook
-jest.mock('@/utils/clientWordValidator', () => ({
-  validateWordLocally: jest.fn(() => ({ isValid: true })),
-  isWordOnBoard: jest.fn(() => true),
+vi.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: vi.fn(() => ({ isValid: true })),
+  isWordOnBoard: vi.fn(() => true),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
+vi.mock('@/hooks/useDictionaryCache', () => ({
   useDictionaryCache: () => ({
-    checkWord: jest.fn(() => true),
+    checkWord: vi.fn(() => true),
     isLoaded: true,
   }),
 }));
 
-jest.mock('@/hooks/usePrevalidation', () => ({
+vi.mock('@/hooks/usePrevalidation', () => ({
   usePrevalidation: () => ({
-    prefetch: jest.fn(),
-    getCached: jest.fn(() => null),
-    clearCache: jest.fn(),
+    prefetch: vi.fn(),
+    getCached: vi.fn(() => null),
+    clearCache: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/haptics', () => ({
-  hapticForWordScore: jest.fn(),
-  hapticError: jest.fn(),
+vi.mock('@/utils/haptics', () => ({
+  hapticForWordScore: vi.fn(),
+  hapticError: vi.fn(),
 }));
 
-jest.mock('@/utils/invalidWordTracker', () => ({
-  recordNotOnBoard: jest.fn(),
-  recordNotInDictionary: jest.fn(),
+vi.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: vi.fn(),
+  recordNotInDictionary: vi.fn(),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
-  getComboBonus: jest.fn(() => 0),
+vi.mock('@/shared/utils/scoring', () => ({
+  getComboBonus: vi.fn(() => 0),
 }));
 
 import { useBlastGame } from '../hooks/useBlastGame';
@@ -59,9 +59,9 @@ const defaultConfig: BlastGameConfig = {
 
 describe('useBlastGame', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock fetch for grid init (themed words + solve grid)
-    global.fetch = jest.fn()
+    global.fetch = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ words: ['test', 'word', 'game'] }),
@@ -76,7 +76,7 @@ describe('useBlastGame', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('initialization', () => {
@@ -478,7 +478,7 @@ describe('useBlastGame', () => {
 
   describe('cascade tilesCleared persistence', () => {
     it('should NOT reset tilesCleared to 0 after cascade completes', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const { result } = renderHook(() => useBlastGame(defaultConfig));
 
       // Clear 3 tiles
@@ -495,13 +495,13 @@ describe('useBlastGame', () => {
 
       // Advance past cascade delay (200ms) + clearing (300ms) + falling (400ms) + appearing (300ms)
       act(() => {
-        jest.advanceTimersByTime(1200);
+        vi.advanceTimersByTime(1200);
       });
 
       // After cascade completes, tilesCleared should still be 3 (cumulative metric)
       expect(result.current.gameState.tilesCleared).toBe(3);
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('should count only newly-cleared tiles per word, not all cleared tiles', () => {

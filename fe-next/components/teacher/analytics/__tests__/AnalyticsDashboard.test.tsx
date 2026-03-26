@@ -16,7 +16,7 @@ import * as useClassroomAnalyticsModule from '@/hooks/useClassroomAnalytics';
 // MOCKS
 // ============================================
 
-const mockRefresh = jest.fn();
+const mockRefresh = vi.fn();
 
 const mockMetrics = {
   studentsNeedingHelp: 5,
@@ -30,7 +30,7 @@ const mockMetrics = {
   ],
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -66,16 +66,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('@/hooks/useClassroomAnalytics');
-jest.mock('@/hooks/useStudentProgressMetrics', () => ({
+vi.mock('@/hooks/useClassroomAnalytics');
+vi.mock('@/hooks/useStudentProgressMetrics', () => ({
   useStudentProgressMetrics: () => ({
     students: [],
     isLoading: false,
     error: null,
-    refresh: jest.fn(),
+    refresh: vi.fn(),
   }),
 }));
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
     open ? <div>{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -83,10 +83,10 @@ jest.mock('@/components/ui/dialog', () => ({
   DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
   DialogClose: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
 }));
-jest.mock('@/components/teacher/reports/StudentProgressReport', () => ({
+vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   StudentProgressReport: () => null,
 }));
-jest.mock('../LessonEffectivenessChart', () => ({
+vi.mock('../LessonEffectivenessChart', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -109,7 +109,7 @@ const renderDashboard = (props: React.ComponentProps<typeof AnalyticsDashboard>)
 
 describe('AnalyticsDashboard - Loading State', () => {
   beforeEach(() => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: null,
       isLoading: true,
       error: null,
@@ -130,7 +130,7 @@ describe('AnalyticsDashboard - Loading State', () => {
 
 describe('AnalyticsDashboard - Error State', () => {
   beforeEach(() => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: null,
       isLoading: false,
       error: new Error('Failed to fetch analytics'),
@@ -170,7 +170,7 @@ describe('AnalyticsDashboard - Error State', () => {
 
 describe('AnalyticsDashboard - Success State', () => {
   beforeEach(() => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -229,7 +229,7 @@ describe('AnalyticsDashboard - Success State', () => {
 
 describe('AnalyticsDashboard - Actionable Callbacks', () => {
   beforeEach(() => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -238,7 +238,7 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
   });
 
   it('calls onViewStudents when View Students button clicked', async () => {
-    const handleViewStudents = jest.fn();
+    const handleViewStudents = vi.fn();
 
     renderDashboard({
       classroomId: 'class-123',
@@ -255,7 +255,7 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
   });
 
   it('calls onCreateReviewLesson with words array when Create Review clicked', async () => {
-    const handleCreateReview = jest.fn();
+    const handleCreateReview = vi.fn();
 
     renderDashboard({
       classroomId: 'class-123',
@@ -286,7 +286,7 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
 
 describe('AnalyticsDashboard - Edge Cases', () => {
   it('handles zero students needing help', () => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: { ...mockMetrics, studentsNeedingHelp: 0 },
       isLoading: false,
       error: null,
@@ -299,7 +299,7 @@ describe('AnalyticsDashboard - Edge Cases', () => {
   });
 
   it('handles empty common mistakes array', () => {
-    jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
       metrics: { ...mockMetrics, commonMistakes: [] },
       isLoading: false,
       error: null,

@@ -16,9 +16,9 @@ import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 // Mock confetti utilities
-jest.mock('@/utils/confettiUtils', () => ({
-  fireVictoryConfetti: jest.fn(),
-  fireLayeredCelebration: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireVictoryConfetti: vi.fn(),
+  fireLayeredCelebration: vi.fn(),
   Z_INDEX: {
     BACKGROUND_PARTICLES: 1000,
     MIDGROUND_PARTICLES: 2000,
@@ -27,23 +27,23 @@ jest.mock('@/utils/confettiUtils', () => ({
 }));
 
 // Mock particle budget
-jest.mock('@/hooks/useParticleBudget', () => ({
-  useParticleBudget: jest.fn(),
+vi.mock('@/hooks/useParticleBudget', () => ({
+  useParticleBudget: vi.fn(),
 }));
 
 // Mock reduced motion
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(),
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(),
 }));
 
 // Mock BossDefeatFireworks
-jest.mock('@/components/celebration/BossDefeatFireworks', () => ({
+vi.mock('@/components/celebration/BossDefeatFireworks', () => ({
   BossDefeatFireworks: ({ active, bossTier }: { active: boolean; bossTier: string }) =>
     active ? <div data-testid="boss-fireworks" data-tier={bossTier}>Fireworks</div> : null,
 }));
 
 // Mock CinematicPlayer
-jest.mock('@/components/adventure/boss/cinematics/CinematicPlayer', () => ({
+vi.mock('@/components/adventure/boss/cinematics/CinematicPlayer', () => ({
   CinematicPlayer: ({
     composition,
     onComplete,
@@ -58,7 +58,7 @@ jest.mock('@/components/adventure/boss/cinematics/CinematicPlayer', () => ({
 }));
 
 // Mock VictoryCinematic and DefeatCinematic
-jest.mock('@/components/adventure/cinematics', () => ({
+vi.mock('@/components/adventure/cinematics', () => ({
   VictoryCinematic: Object.assign(() => <div>Victory</div>, { displayName: 'VictoryCinematic' }),
   DefeatCinematic: Object.assign(() => <div>Defeat</div>, { displayName: 'DefeatCinematic' }),
   VICTORY_DURATION_FRAMES: 180,
@@ -67,7 +67,7 @@ jest.mock('@/components/adventure/cinematics', () => ({
 
 describe('AdventureGame Visual Polish Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useParticleBudget as jest.Mock).mockReturnValue({
       combo: 60,
       max: 100,
@@ -110,7 +110,7 @@ describe('AdventureGame Visual Polish Integration', () => {
     it('CinematicPlayer can render VictoryCinematic', () => {
       const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
       const { VictoryCinematic } = require('@/components/adventure/cinematics');
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <CinematicPlayer
@@ -128,7 +128,7 @@ describe('AdventureGame Visual Polish Integration', () => {
     it('CinematicPlayer can render DefeatCinematic', () => {
       const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
       const { DefeatCinematic } = require('@/components/adventure/cinematics');
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <CinematicPlayer
@@ -146,7 +146,7 @@ describe('AdventureGame Visual Polish Integration', () => {
     it('cinematics can be skipped via onComplete callback', () => {
       const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
       const { VictoryCinematic } = require('@/components/adventure/cinematics');
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <CinematicPlayer

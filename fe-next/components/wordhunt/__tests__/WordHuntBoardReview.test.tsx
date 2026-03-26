@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, initial, animate, transition, exit, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <button {...props}>{children}</button>,
@@ -14,7 +14,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Grid3X3: (props: any) => <svg data-testid="grid-icon" {...props} />,
   ChevronDown: (props: any) => <svg data-testid="chevron-icon" {...props} />,
   ChevronUp: (props: any) => <svg data-testid="chevron-up-icon" {...props} />,

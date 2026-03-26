@@ -5,7 +5,7 @@ import { LessonEffectivenessChart } from '../LessonEffectivenessChartInner';
 import * as useLessonEffectivenessModule from '@/hooks/useLessonEffectiveness';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -13,14 +13,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useLessonEffectiveness hook
-jest.mock('@/hooks/useLessonEffectiveness');
+vi.mock('@/hooks/useLessonEffectiveness');
 
 const mockUseLessonEffectiveness = useLessonEffectivenessModule.useLessonEffectiveness as jest.MockedFunction<
   typeof useLessonEffectivenessModule.useLessonEffectiveness
 >;
 
 // Mock Recharts to avoid rendering issues in tests
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
   BarChart: ({ children }: any) => <div data-testid="bar-chart">{children}</div>,
   Bar: () => <div data-testid="bar" />,
@@ -33,7 +33,7 @@ jest.mock('recharts', () => ({
 
 describe('LessonEffectivenessChart', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render loading state', () => {
@@ -42,7 +42,7 @@ describe('LessonEffectivenessChart', () => {
       effectiveness: [],
       isLoading: true,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -79,7 +79,7 @@ describe('LessonEffectivenessChart', () => {
       effectiveness: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -96,7 +96,7 @@ describe('LessonEffectivenessChart', () => {
       effectiveness: [],
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -125,7 +125,7 @@ describe('LessonEffectivenessChart', () => {
       effectiveness: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -155,7 +155,7 @@ describe('LessonEffectivenessChart', () => {
       effectiveness: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN

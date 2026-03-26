@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Blast Result API Route Tests
@@ -9,30 +10,30 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server auth client
-const mockGetUser = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
   }),
 }));
 
 // Mock supabase service client
-const mockFrom = jest.fn();
-const mockRpc = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn().mockReturnValue({
+const mockFrom = vi.fn();
+const mockRpc = vi.fn();
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn().mockReturnValue({
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
   }),
@@ -46,14 +47,14 @@ import { POST, GET } from '../route';
 function makeRequest(body: unknown): NextRequest {
   return {
     json: () => Promise.resolve(body),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
 function makeInvalidJsonRequest(): NextRequest {
   return {
     json: () => Promise.reject(new Error('Invalid JSON')),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
@@ -93,12 +94,12 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'blast_results') {
       return {
-        insert: jest.fn().mockResolvedValue({ error: insertError }),
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+        insert: vi.fn().mockResolvedValue({ error: insertError }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({ data: [], error: null }),
                 then: (cb: (v: unknown) => unknown) => cb({ data: [], error: null }),
               }),
             }),
@@ -108,10 +109,10 @@ function setupDbMocks({
     }
     if (table === 'blast_personal_bests') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: existingBests,
                 error: bestsError,
               }),
@@ -120,21 +121,21 @@ function setupDbMocks({
             then: (cb: (v: unknown) => unknown) => cb({ data: [], error: null }),
           }),
         }),
-        upsert: jest.fn().mockResolvedValue({ error: upsertError }),
+        upsert: vi.fn().mockResolvedValue({ error: upsertError }),
       };
     }
     if (table === 'profiles') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: profile,
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: profileUpdateError }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: profileUpdateError }),
         }),
       };
     }
@@ -146,7 +147,7 @@ function setupDbMocks({
 
 describe('POST /api/blast/result', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -437,7 +438,7 @@ describe('POST /api/blast/result', () => {
 
 describe('GET /api/blast/result', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -455,10 +456,10 @@ describe('GET /api/blast/result', () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'blast_results') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: [{
                     score: 500, tiles_cleared: 20, total_tiles: 25,
                     clear_percentage: 80, words_found: 2, best_word: 'hello',
@@ -474,8 +475,8 @@ describe('GET /api/blast/result', () => {
       }
       if (table === 'blast_personal_bests') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({
               data: [{
                 difficulty: 'medium',
                 best_score: 500, best_clear_percentage: 80,
@@ -500,22 +501,22 @@ describe('GET /api/blast/result', () => {
   });
 
   it('passes difficulty filter to query', async () => {
-    const eqMock = jest.fn().mockReturnValue({
-      order: jest.fn().mockReturnValue({
-        limit: jest.fn().mockResolvedValue({ data: [], error: null }),
+    const eqMock = vi.fn().mockReturnValue({
+      order: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue({ data: [], error: null }),
       }),
     });
 
     mockFrom.mockImplementation((table: string) => {
       if (table === 'blast_results') {
         return {
-          select: jest.fn().mockReturnValue({ eq: eqMock }),
+          select: vi.fn().mockReturnValue({ eq: eqMock }),
         };
       }
       if (table === 'blast_personal_bests') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ data: [], error: null }),
           }),
         };
       }
@@ -531,10 +532,10 @@ describe('GET /api/blast/result', () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'blast_results') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({ data: null, error: { message: 'fail' } }),
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({ data: null, error: { message: 'fail' } }),
               }),
             }),
           }),

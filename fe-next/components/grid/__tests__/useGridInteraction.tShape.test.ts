@@ -21,7 +21,7 @@ import { useGridInteraction } from '../useGridInteraction';
 import type { LetterGrid } from '@/types';
 
 // Mock performance utils
-jest.mock('../performanceUtils', () => ({
+vi.mock('../performanceUtils', () => ({
   getPerformanceConfig: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -29,17 +29,17 @@ jest.mock('../performanceUtils', () => ({
 }));
 
 // Mock word path finder
-jest.mock('@/utils/wordPathFinder', () => ({
-  findWordPath: jest.fn(),
+vi.mock('@/utils/wordPathFinder', () => ({
+  findWordPath: vi.fn(),
 }));
 
 // Mock client word validator
-jest.mock('@/utils/clientWordValidator', () => ({
+vi.mock('@/utils/clientWordValidator', () => ({
   normalizeWord: (word: string) => word.toUpperCase(),
 }));
 
 // Mock consts
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   getDeadzoneThreshold: () => 5,
 }));
 
@@ -135,8 +135,8 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
    */
   it('should allow T-shape selection: vertical then horizontal (down-down-right)', () => {
     const gridRef = createMockGridRef();
-    const onWordSubmit = jest.fn();
-    const onPathSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
+    const onPathSubmit = vi.fn();
 
     const { result } = renderHook(() =>
       useGridInteraction({
@@ -168,7 +168,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -182,7 +182,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -199,7 +199,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -216,8 +216,8 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
    */
   it('should allow T-shape selection: vertical then horizontal (down-down-left)', () => {
     const gridRef = createMockGridRef();
-    const onWordSubmit = jest.fn();
-    const onPathSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
+    const onPathSubmit = vi.fn();
 
     const { result } = renderHook(() =>
       useGridInteraction({
@@ -246,7 +246,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -257,7 +257,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -271,7 +271,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -286,8 +286,8 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
    */
   it('should allow T-shape selection: horizontal then vertical (right-right-down)', () => {
     const gridRef = createMockGridRef();
-    const onWordSubmit = jest.fn();
-    const onPathSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
+    const onPathSubmit = vi.fn();
 
     const { result } = renderHook(() =>
       useGridInteraction({
@@ -316,7 +316,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -327,7 +327,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -341,7 +341,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -356,8 +356,8 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
    */
   it('should still allow diagonal selection (regression test)', () => {
     const gridRef = createMockGridRef();
-    const onWordSubmit = jest.fn();
-    const onPathSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
+    const onPathSubmit = vi.fn();
 
     const { result } = renderHook(() =>
       useGridInteraction({
@@ -388,7 +388,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -403,8 +403,8 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
    */
   it('should still allow straight line selection (regression test)', () => {
     const gridRef = createMockGridRef();
-    const onWordSubmit = jest.fn();
-    const onPathSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
+    const onPathSubmit = vi.fn();
 
     const { result } = renderHook(() =>
       useGridInteraction({
@@ -433,7 +433,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });
@@ -444,7 +444,7 @@ describe('useGridInteraction - T-Shape Selection Bug', () => {
       const mockMoveEvent = {
         touches: [{ clientX: coords.x, clientY: coords.y }],
         cancelable: true,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
       } as unknown as TouchEvent;
       result.current.handleTouchMove(mockMoveEvent);
     });

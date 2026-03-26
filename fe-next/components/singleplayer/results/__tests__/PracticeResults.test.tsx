@@ -5,12 +5,12 @@ import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
 // ─── Mocks ───
 
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
@@ -37,23 +37,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     isAuthenticated: false,
     profile: null,
-    updateProfile: jest.fn(),
+    updateProfile: vi.fn(),
     loading: false,
   }),
 }));
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => true, // Disable animations in tests
 }));
 
 // Mock framer-motion to render plain elements
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockDiv = React.forwardRef<HTMLDivElement, React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>>(
     function MockDiv({ children, className, style, onClick }, ref) {
       return <div ref={ref} className={className} style={style} onClick={onClick}>{children}</div>;
@@ -77,54 +77,55 @@ jest.mock('framer-motion', () => {
   },
   useMotionValue: () => ({ on: () => () => {} }),
   useTransform: () => ({ on: () => () => {} }),
-  animate: jest.fn(),
+  animate: vi.fn(),
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 };});
 
-const mockFireConfetti = jest.fn();
-const mockFireVictoryConfetti = jest.fn();
-jest.mock('@/utils/confettiUtils', () => ({
+const mockFireConfetti = vi.fn();
+const mockFireVictoryConfetti = vi.fn();
+vi.mock('@/utils/confettiUtils', () => ({
   fireConfetti: (...args: unknown[]) => mockFireConfetti(...args),
   fireVictoryConfetti: (...args: unknown[]) => mockFireVictoryConfetti(...args),
 }));
 
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock all data persistence hooks
-jest.mock('../../results', () => ({
+vi.mock('../../results', () => ({
   useGuestStatsSync: () => ({ hasUpdatedStats: true }),
-  useLeaderboardSync: jest.fn(),
-  useGameHistory: jest.fn(),
-  useGameSessionLogging: jest.fn(),
-  useCoinRewards: jest.fn(),
-  useCognitiveScoring: jest.fn(),
-  useSignupPrompt: jest.fn(),
-  useAchievementsSave: jest.fn(),
+  useLeaderboardSync: vi.fn(),
+  useGameHistory: vi.fn(),
+  useGameSessionLogging: vi.fn(),
+  useCoinRewards: vi.fn(),
+  useCognitiveScoring: vi.fn(),
+  useSignupPrompt: vi.fn(),
+  useAchievementsSave: vi.fn(),
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant, size }: { variant: string; size: string }) => (
     <div data-testid="mascot" data-variant={variant} data-size={size}>Mascot</div>
   ),
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: ({ variant, size }: { variant: string; size: string }) => (
     <div data-testid="celebration-mascot" data-variant={variant} data-size={size}>CelebrationMascot</div>
   ),
 }));
 
-jest.mock('@/components/results/MissedWords', () => {
-  return function MockMissedWords() {
+vi.mock('@/components/results/MissedWords', () => {
+  const MockMissedWords = () => {
     return <div data-testid="missed-words">Missed Words</div>;
   };
+  return { default: MockMissedWords };
 });
 
 // Mock daily challenge storage
-const mockHasPlayedWordHuntToday = jest.fn();
-jest.mock('@/utils/dailyChallenge/storage', () => ({
+const mockHasPlayedWordHuntToday = vi.fn();
+vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordHuntToday: (...args: unknown[]) => mockHasPlayedWordHuntToday(...args),
 }));
 
@@ -153,12 +154,12 @@ function makeResults(overrides: Partial<SinglePlayerResultsData> = {}): SinglePl
 describe('PracticeResults — Celebratory Redesign', () => {
   const defaultProps = {
     results: makeResults(),
-    onPlayAgain: jest.fn(),
-    onBackToLobby: jest.fn(),
+    onPlayAgain: vi.fn(),
+    onBackToLobby: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockHasPlayedWordHuntToday.mockReturnValue(false);
   });
 

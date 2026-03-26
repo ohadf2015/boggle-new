@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
   // Update these dates when actual content changes are deployed.
-  const LAST_DEPLOYED = '2026-03-21T00:00:00.000Z';
+  const LAST_DEPLOYED = '2026-03-26T00:00:00.000Z';
   const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
   const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
   const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
@@ -167,6 +167,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { locale: 'ja', path: '/japanese-word-game', img: 'ja' },
     { locale: 'en', path: '/multiplayer-word-game-online', img: 'en' },
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },
+    { locale: 'en', path: '/word-games-online-free', img: 'en' },
+    { locale: 'en', path: '/daily-word-wheel', img: 'en' },
+    { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },
     { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
   ] as const;
   seoLandings.forEach(({ locale, path, img }) => {

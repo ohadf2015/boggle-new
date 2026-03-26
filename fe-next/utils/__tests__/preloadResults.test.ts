@@ -5,19 +5,19 @@
  */
 
 // Mock all dynamic imports used by preloadResults
-jest.mock('@/components/results/ResultsMainContent', () => ({}), { virtual: true });
-jest.mock('@/components/results/ResultsLandscapeLayout', () => ({}), { virtual: true });
-jest.mock('@/components/results/ResultsModals', () => ({}), { virtual: true });
-jest.mock('@/components/results/ResultsWinnerBanner', () => ({}), { virtual: true });
-jest.mock('@/components/results/ScoreRevealAnimation', () => ({}), { virtual: true });
-jest.mock('@/components/results/Top3Leaderboard', () => ({}), { virtual: true });
-jest.mock('@/components/results/CompactResultsStats', () => ({}), { virtual: true });
-jest.mock('@/components/results/RewardsSummary', () => ({}), { virtual: true });
+vi.mock('@/components/results/ResultsMainContent', () => ({}), { virtual: true });
+vi.mock('@/components/results/ResultsLandscapeLayout', () => ({}), { virtual: true });
+vi.mock('@/components/results/ResultsModals', () => ({}), { virtual: true });
+vi.mock('@/components/results/ResultsWinnerBanner', () => ({}), { virtual: true });
+vi.mock('@/components/results/ScoreRevealAnimation', () => ({}), { virtual: true });
+vi.mock('@/components/results/Top3Leaderboard', () => ({}), { virtual: true });
+vi.mock('@/components/results/CompactResultsStats', () => ({}), { virtual: true });
+vi.mock('@/components/results/RewardsSummary', () => ({}), { virtual: true });
 
 describe('preloadResultsChunks', () => {
   beforeEach(() => {
     // Reset module registry so the `preloaded` flag resets between tests
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it('should only call imports once (idempotent)', async () => {

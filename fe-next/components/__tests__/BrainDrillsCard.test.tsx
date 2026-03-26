@@ -6,7 +6,7 @@
  */
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
@@ -14,7 +14,7 @@ jest.mock('next/link', () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Target: () => <span data-testid="icon-target">Target</span>,
   Lock: () => <span data-testid="icon-lock">Lock</span>,
   ArrowRight: () => <span data-testid="icon-arrow-right">ArrowRight</span>,
@@ -22,7 +22,7 @@ jest.mock('lucide-react', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -31,7 +31,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -47,19 +47,19 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: true,
     prefersReducedMotion: false,
@@ -92,7 +92,7 @@ describe('Brain Drills Card Bug', () => {
   });
 
   it('should show locked state for unauthenticated users', () => {
-    const onLockedClick = jest.fn();
+    const onLockedClick = vi.fn();
 
     render(
       <ModeCard

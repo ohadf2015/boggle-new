@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { WordCollectionCard } from '../WordCollectionCard';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, fallback?: string | Record<string, unknown>, params?: Record<string, unknown>) => {
       const p = typeof fallback === 'object' ? fallback : params;
@@ -22,14 +22,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useWordCollection
-const mockUseWordCollection = jest.fn();
-jest.mock('@/hooks/useWordCollection', () => ({
+const mockUseWordCollection = vi.fn();
+vi.mock('@/hooks/useWordCollection', () => ({
   useWordCollection: () => mockUseWordCollection(),
 }));
 
 describe('WordCollectionCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render empty state when no words collected', () => {
@@ -145,7 +145,7 @@ describe('WordCollectionCard', () => {
 
   it('should call onReviewClick when Review Now is clicked', () => {
     // GIVEN
-    const onReviewClick = jest.fn();
+    const onReviewClick = vi.fn();
     mockUseWordCollection.mockReturnValue({
       words: [],
       dueForReview: ['word1'],

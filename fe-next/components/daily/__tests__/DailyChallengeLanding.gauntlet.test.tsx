@@ -11,16 +11,16 @@ import { render, screen } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 
 // --- next/navigation mocks (overridden per test) ---
-const mockUseSearchParams = jest.fn();
+const mockUseSearchParams = vi.fn();
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   usePathname: () => '/en/daily',
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
   useSearchParams: () => mockUseSearchParams(),
 }));
 
 // --- Mock ScoreGauntletBanner to keep tests lightweight ---
-jest.mock('../ScoreGauntletBanner', () => ({
+vi.mock('../ScoreGauntletBanner', () => ({
   ScoreGauntletBanner: ({
     challengerName,
     challengerScore,
@@ -36,55 +36,55 @@ jest.mock('../ScoreGauntletBanner', () => ({
 }));
 
 // --- Context mocks ---
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null }),
 }));
 
 // --- Utility mocks ---
-jest.mock('@/utils/dailyChallenge/storage', () => ({
-  getWordHuntStatusToday: jest.fn(() => null),
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  getWordHuntStatusToday: vi.fn(() => null),
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: jest.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
 }));
 
 // --- Sub-component mocks to avoid deep render trees ---
-jest.mock('../landing/DailyMissionsHeader', () => ({
+vi.mock('../landing/DailyMissionsHeader', () => ({
   DailyMissionsHeader: () => <div data-testid="missions-header" />,
 }));
 
-jest.mock('../landing/QuestCard', () => ({
+vi.mock('../landing/QuestCard', () => ({
   QuestCard: ({ challengeId }: { challengeId: string }) => (
     <div data-testid={`quest-card-${challengeId}`} />
   ),
 }));
 
-jest.mock('../landing/StreakCounter', () => ({
+vi.mock('../landing/StreakCounter', () => ({
   StreakCounter: () => <div data-testid="streak-counter" />,
 }));
 
-jest.mock('../landing/LeaderboardTeaser', () => ({
+vi.mock('../landing/LeaderboardTeaser', () => ({
   LeaderboardTeaser: () => <div data-testid="leaderboard-teaser" />,
 }));
 
-jest.mock('../landing/ConfettiBackground', () => ({
+vi.mock('../landing/ConfettiBackground', () => ({
   ConfettiBackground: () => null,
 }));
 
-jest.mock('../landing/FloatingDecorations', () => ({
+vi.mock('../landing/FloatingDecorations', () => ({
   FloatingDecorations: () => null,
 }));
 
 // --- framer-motion mock ---
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
@@ -98,15 +98,15 @@ jest.mock('framer-motion', () => ({
 
 // --- fetch mock ---
 beforeEach(() => {
-  jest.clearAllMocks();
-  global.fetch = jest.fn().mockResolvedValue({
+  vi.clearAllMocks();
+  global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: async () => ({ available: true, data: {}, streak: 0 }),
   });
 });
 
 const defaultProps = {
-  onSelectWordHunt: jest.fn(),
+  onSelectWordHunt: vi.fn(),
   currentLanguage: 'en' as const,
 };
 

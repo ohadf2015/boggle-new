@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // ── framer-motion ────────────────────────────────────────────────────────────
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
@@ -18,7 +18,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // ── UI deps ──────────────────────────────────────────────────────────────────
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({
     children,
     onClick,
@@ -34,11 +34,11 @@ jest.mock('@/components/ui/button', () => ({
   ),
 }));
 
-jest.mock('@/components/ui/CoinBalanceBadge', () => ({
+vi.mock('@/components/ui/CoinBalanceBadge', () => ({
   CoinBalanceBadge: () => <div data-testid="coin-balance-badge" />,
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: string[]) => args.filter(Boolean).join(' '),
 }));
 
@@ -49,23 +49,23 @@ const t = (key: string) => key;
 
 describe('ShareSection – Challenge CTA', () => {
   it('calls onChallengeShare when winner share button is clicked and onChallengeShare provided', () => {
-    const onChallengeShare = jest.fn();
-    const onShare = jest.fn();
+    const onChallengeShare = vi.fn();
+    const onShare = vi.fn();
 
     render(
       <ShareSection
         solved={true}
         onShare={onShare}
         onChallengeShare={onChallengeShare}
-        onRetry={jest.fn()}
+        onRetry={vi.fn()}
         canAffordRetry={false}
         retryCost={50}
         currentCoins={0}
-        onWhatsApp={jest.fn()}
-        onTwitter={jest.fn()}
-        onTelegram={jest.fn()}
-        onCopy={jest.fn()}
-        onDownloadImage={jest.fn()}
+        onWhatsApp={vi.fn()}
+        onTwitter={vi.fn()}
+        onTelegram={vi.fn()}
+        onCopy={vi.fn()}
+        onDownloadImage={vi.fn()}
         copied={false}
         isGeneratingImage={false}
         t={t}
@@ -82,21 +82,21 @@ describe('ShareSection – Challenge CTA', () => {
   });
 
   it('falls back to onShare when onChallengeShare is not provided (solved=true)', () => {
-    const onShare = jest.fn();
+    const onShare = vi.fn();
 
     render(
       <ShareSection
         solved={true}
         onShare={onShare}
-        onRetry={jest.fn()}
+        onRetry={vi.fn()}
         canAffordRetry={false}
         retryCost={50}
         currentCoins={0}
-        onWhatsApp={jest.fn()}
-        onTwitter={jest.fn()}
-        onTelegram={jest.fn()}
-        onCopy={jest.fn()}
-        onDownloadImage={jest.fn()}
+        onWhatsApp={vi.fn()}
+        onTwitter={vi.fn()}
+        onTelegram={vi.fn()}
+        onCopy={vi.fn()}
+        onDownloadImage={vi.fn()}
         copied={false}
         isGeneratingImage={false}
         t={t}
@@ -110,23 +110,23 @@ describe('ShareSection – Challenge CTA', () => {
   });
 
   it('calls onShare (not onChallengeShare) for failed players via share button', () => {
-    const onChallengeShare = jest.fn();
-    const onShare = jest.fn();
+    const onChallengeShare = vi.fn();
+    const onShare = vi.fn();
 
     render(
       <ShareSection
         solved={false}
         onShare={onShare}
         onChallengeShare={onChallengeShare}
-        onRetry={jest.fn()}
+        onRetry={vi.fn()}
         canAffordRetry={true}
         retryCost={50}
         currentCoins={100}
-        onWhatsApp={jest.fn()}
-        onTwitter={jest.fn()}
-        onTelegram={jest.fn()}
-        onCopy={jest.fn()}
-        onDownloadImage={jest.fn()}
+        onWhatsApp={vi.fn()}
+        onTwitter={vi.fn()}
+        onTelegram={vi.fn()}
+        onCopy={vi.fn()}
+        onDownloadImage={vi.fn()}
         copied={false}
         isGeneratingImage={false}
         t={t}

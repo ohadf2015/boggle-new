@@ -11,7 +11,7 @@ import { render } from '@testing-library/react';
 import { FROST_HITS_REQUIRED, type BlastTileState } from '../types';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   return {
     motion: {
@@ -23,7 +23,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
@@ -31,7 +31,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => {
+vi.mock('lucide-react', () => {
   const React = require('react');
   const Icon = (name: string) => {
     const IconComponent = React.forwardRef(

@@ -5,7 +5,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock AdaptiveMotion so tests run without device/animation context
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: React.forwardRef(function MockDiv(
       { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,
@@ -21,7 +21,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockDiv(
       { children, ...rest }: React.PropsWithChildren<Record<string, unknown>>,

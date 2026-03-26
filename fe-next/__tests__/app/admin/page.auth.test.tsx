@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @file Test for admin dashboard authentication
  * @description
@@ -10,87 +11,87 @@ import { render, screen, waitFor } from '@testing-library/react';
 import AdminPage from '@/app/[locale]/admin/page';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(),
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
-  usePathname: jest.fn(() => '/en/admin'),
+  usePathname: vi.fn(() => '/en/admin'),
 }));
 
-jest.mock('@/lib/supabase', () => ({
-  getSession: jest.fn(),
+vi.mock('@/lib/supabase', () => ({
+  getSession: vi.fn(),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     currentTrack: null,
     isPlaying: false,
     volume: 0.5,
-    play: jest.fn(),
-    pause: jest.fn(),
-    setVolume: jest.fn(),
+    play: vi.fn(),
+    pause: vi.fn(),
+    setVolume: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
-    stopSound: jest.fn(),
-    stopAllSounds: jest.fn(),
+    playSound: vi.fn(),
+    stopSound: vi.fn(),
+    stopAllSounds: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/HapticsContext', () => ({
+vi.mock('@/contexts/HapticsContext', () => ({
   useHapticsConfig: () => ({
     enabled: true,
-    setEnabled: jest.fn(),
+    setEnabled: vi.fn(),
   }),
 }));
 
 // Mock all components to avoid deep rendering issues
-jest.mock('@/components/Header', () => ({
+vi.mock('@/components/Header', () => ({
   __esModule: true,
   default: () => <div data-testid="header">Header</div>,
 }));
 
-jest.mock('@/components/admin/LiveMonitor', () => ({
+vi.mock('@/components/admin/LiveMonitor', () => ({
   LiveMonitor: () => <div data-testid="live-monitor">LiveMonitor</div>,
 }));
 
-jest.mock('@/components/admin/TodayGamesHistory', () => ({
+vi.mock('@/components/admin/TodayGamesHistory', () => ({
   TodayGamesHistory: () => <div data-testid="games-history">GamesHistory</div>,
 }));
 
-jest.mock('@/components/admin/GamesDiagnostic', () => ({
+vi.mock('@/components/admin/GamesDiagnostic', () => ({
   GamesDiagnostic: () => <div data-testid="games-diagnostic">GamesDiagnostic</div>,
 }));
 
-jest.mock('@/components/admin/EmailTestPanel', () => ({
+vi.mock('@/components/admin/EmailTestPanel', () => ({
   EmailTestPanel: () => <div data-testid="email-panel">EmailPanel</div>,
 }));
 
-jest.mock('@/components/ui/PullToRefreshWrapper', () => ({
+vi.mock('@/components/ui/PullToRefreshWrapper', () => ({
   PullToRefreshWrapper: ({ children }: any) => <div>{children}</div>,
 }));
 
-jest.mock('@/utils/mobileAccessibility', () => ({
+vi.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: () => false,
 }));
 
 describe('Admin Dashboard Authentication', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show "Access Required" for non-admin users', async () => {

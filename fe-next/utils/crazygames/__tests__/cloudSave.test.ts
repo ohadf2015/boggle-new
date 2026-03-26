@@ -27,9 +27,9 @@ describe('cloudSave', () => {
   };
 
   beforeEach(() => {
-    mockSaveData = jest.fn();
-    mockLoadData = jest.fn();
-    mockRemoveData = jest.fn();
+    mockSaveData = vi.fn();
+    mockLoadData = vi.fn();
+    mockRemoveData = vi.fn();
 
     // Default: successful operations
     mockSaveData.mockResolvedValue(undefined);
@@ -46,7 +46,7 @@ describe('cloudSave', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('saveToCloud', () => {
@@ -83,7 +83,7 @@ describe('cloudSave', () => {
     });
 
     it('should not log sensitive data in errors', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       mockSaveData.mockRejectedValue(new Error('Network error'));
 
       await saveToCloud(mockSaveDataValue);
@@ -233,7 +233,7 @@ describe('cloudSave', () => {
     });
 
     it('should log error for malformed data', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       mockLoadData.mockResolvedValue('{ invalid }');
 
       await loadFromCloud();
@@ -278,7 +278,7 @@ describe('cloudSave', () => {
     });
 
     it('should log error on clear failure', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       mockRemoveData.mockRejectedValue(new Error('Permission denied'));
 
       await clearCloudSave();

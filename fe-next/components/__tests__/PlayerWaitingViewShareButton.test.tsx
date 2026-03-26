@@ -16,7 +16,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const motionObj = {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -36,7 +36,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock RoomChat component
-jest.mock('../../components/RoomChat', () => ({
+vi.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
@@ -44,14 +44,14 @@ jest.mock('../../components/RoomChat', () => ({
 }));
 
 // Mock MobileShareSection
-jest.mock('../../host/components/pre-game/MobileShareSection', () => ({
+vi.mock('../../host/components/pre-game/MobileShareSection', () => ({
   MobileShareSection: ({ gameCode }: { gameCode: string }) => (
     <div data-testid="mobile-share-section">Share: {gameCode}</div>
   ),
 }));
 
 // Mock DesktopLobbyLayout
-jest.mock('../../host/components/pre-game/desktop', () => ({
+vi.mock('../../host/components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
     <div data-testid="desktop-lobby-layout">
       <div data-testid="desktop-left-column">{leftContent}</div>
@@ -64,24 +64,24 @@ jest.mock('../../host/components/pre-game/desktop', () => ({
 }));
 
 // Mock toast
-jest.mock('react-hot-toast', () => ({
-  success: jest.fn(),
-  error: jest.fn(),
+vi.mock('react-hot-toast', () => ({
+  success: vi.fn(),
+  error: vi.fn(),
 }));
 
 // Mock share utils
-jest.mock('../../utils/share', () => ({
+vi.mock('../../utils/share', () => ({
   getJoinUrl: (code: string) => `https://example.com?room=${code}`,
 }));
 
 // Mock AuthContext
-jest.mock('../../contexts/AuthContext', () => ({
+vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: false }),
 }));
 
 // Mock SocketContext
-jest.mock('../../utils/SocketContext', () => ({
-  useSocket: () => ({ socket: { emit: jest.fn(), on: jest.fn(), off: jest.fn() } }),
+vi.mock('../../utils/SocketContext', () => ({
+  useSocket: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }),
 }));
 
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
@@ -99,18 +99,18 @@ describe('PlayerWaitingView - Command Center Style', () => {
       { username: 'TestPlayer', isHost: false },
     ],
     showQR: false,
-    setShowQR: jest.fn(),
+    setShowQR: vi.fn(),
     showExitConfirm: false,
-    setShowExitConfirm: jest.fn(),
-    onExitRoom: jest.fn(),
-    onConfirmExit: jest.fn(),
+    setShowExitConfirm: vi.fn(),
+    onExitRoom: vi.fn(),
+    onConfirmExit: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock navigator.clipboard
     Object.assign(navigator, {
-      clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
   });
 

@@ -10,14 +10,14 @@ import QuickStartButton from '../QuickStartButton';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
 
 // Mock hooks
-const mockNavigate = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockNavigate = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockNavigate,
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) =>
       ({
@@ -97,7 +97,7 @@ describe('QuickStartButton', () => {
 
   describe('interaction', () => {
     it('should call onClick when clicked', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<QuickStartButton config={createConfig()} onClick={onClick} />);
 
       fireEvent.click(screen.getByRole('button'));
@@ -106,7 +106,7 @@ describe('QuickStartButton', () => {
     });
 
     it('should pass the config to onClick handler', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const config = createConfig({ classroomId: 'test-classroom' });
       render(<QuickStartButton config={config} onClick={onClick} />);
 

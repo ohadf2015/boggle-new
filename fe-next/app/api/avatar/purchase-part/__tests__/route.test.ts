@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Avatar Premium Part Purchase API Route Tests
@@ -8,50 +9,50 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server auth client
-const mockGetUser = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
   }),
 }));
 
 // Mock supabase service client
-const mockFrom = jest.fn();
-const mockRpc = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn().mockReturnValue({
+const mockFrom = vi.fn();
+const mockRpc = vi.fn();
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn().mockReturnValue({
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
   }),
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Mock customAvatar premium helpers
-jest.mock('@/shared/types/customAvatar', () => ({
-  isPremiumPart: jest.fn((category: string, partId: string) => {
+vi.mock('@/shared/types/customAvatar', () => ({
+  isPremiumPart: vi.fn((category: string, partId: string) => {
     const premiums: Record<string, string[]> = {
       eyes: ['laser', 'cyber'],
       accessory: ['crown', 'halo'],
     };
     return premiums[category]?.includes(partId) ?? false;
   }),
-  getPartPrice: jest.fn((_category: string, _partId: string) => 75),
+  getPartPrice: vi.fn((_category: string, _partId: string) => 75),
 }));
 
 import { NextRequest } from 'next/server';
@@ -63,14 +64,14 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 function makeRequest(body: unknown): NextRequest {
   return {
     json: () => Promise.resolve(body),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
 function makeInvalidJsonRequest(): NextRequest {
   return {
     json: () => Promise.reject(new Error('Invalid JSON')),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
@@ -86,16 +87,16 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'profiles') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: fetchError ? null : { total_coins: gold, premium_avatar_parts: premiumParts },
               error: fetchError,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({
             error: partsUpdateError,
           }),
         }),
@@ -129,7 +130,7 @@ function setupDbMocks({
 
 describe('POST /api/avatar/purchase-part', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
     mockGetUser.mockResolvedValue({
@@ -140,7 +141,7 @@ describe('POST /api/avatar/purchase-part', () => {
 
   // ===== RATE LIMIT =====
   it('returns 429 on rate limit', async () => {
-    (checkApiRateLimit as jest.Mock).mockReturnValueOnce({ success: false });
+    (checkApiRateLimit as Mock).mockReturnValueOnce({ success: false });
     const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
     expect(res.status).toBe(429);
   });

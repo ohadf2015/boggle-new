@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: PlayerInGameView passes initialTileStates and blastSeed to BlastGame
  *
@@ -12,11 +13,11 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: { total_games: 5 } }),
 }));
 
-jest.mock('@/hooks/gameState/store', () => ({
+vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'blast',
   useBlastTileOverlay: () => [],
   useBlastMovesUsed: () => 0,
@@ -29,21 +30,21 @@ jest.mock('@/hooks/gameState/store', () => ({
   useGameStore: (selector: (s: any) => any) => selector({ gameDuration: 120 }),
 }));
 
-jest.mock('@/components/game/InGameScreen', () => ({
+vi.mock('@/components/game/InGameScreen', () => ({
   __esModule: true,
   default: () => <div data-testid="in-game-screen" />,
 }));
 
 // Capture the props passed to BlastGame
 let capturedBlastGameProps: any = null;
-jest.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/BlastGame', () => ({
   BlastGame: (props: any) => {
     capturedBlastGameProps = props;
     return <div data-testid="blast-game" />;
   },
 }));
 
-jest.mock('@/components/game/BlastMoveCounter', () => ({
+vi.mock('@/components/game/BlastMoveCounter', () => ({
   BlastMoveCounter: () => <div data-testid="blast-move-counter" />,
 }));
 
@@ -63,21 +64,21 @@ const mockBridgeReturn = {
   blastSeed: 12345,
 };
 
-jest.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => mockBridgeReturn,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
   DialogContent: ({ children }: any) => <div>{children}</div>,
   DialogHeader: ({ children }: any) => <div>{children}</div>,
   DialogTitle: ({ children }: any) => <div>{children}</div>,
   DialogFooter: ({ children }: any) => <div>{children}</div>,
 }));
-jest.mock('@/components/ui/alert-dialog', () => ({
+vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
   AlertDialogContent: ({ children }: any) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: any) => <div>{children}</div>,
@@ -87,7 +88,7 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
   AlertDialogCancel: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
-jest.mock('@/components/TournamentStandings', () => ({
+vi.mock('@/components/TournamentStandings', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -122,12 +123,12 @@ const baseProps = {
   tournamentData: null,
   tournamentStandings: [],
   showTournamentStandings: false,
-  setShowTournamentStandings: jest.fn(),
+  setShowTournamentStandings: vi.fn(),
   showExitConfirm: false,
-  setShowExitConfirm: jest.fn(),
-  onExitRoom: jest.fn(),
-  onConfirmExit: jest.fn(),
-  onWordSubmit: jest.fn(),
+  setShowExitConfirm: vi.fn(),
+  onExitRoom: vi.fn(),
+  onConfirmExit: vi.fn(),
+  onWordSubmit: vi.fn(),
 };
 
 // ---------------------------------------------------------------------------

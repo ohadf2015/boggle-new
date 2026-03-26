@@ -11,7 +11,7 @@ import SegmentedHPBar from './SegmentedHPBar';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock the theme context — defaults match DEFAULT_BOSS_FIGHT_THEME
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => ({
     hpSegmentColors: ['bg-neo-red', 'bg-neo-orange', 'bg-neo-lime'],
     dialogueBg: 'bg-neo-navy/95',

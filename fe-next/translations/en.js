@@ -4567,6 +4567,7 @@ const en = {
     "quitConfirmMessage": "Your progress will be lost!",
     "feedback": {
       "tooShort": "📏 Minimum 3 letters",
+      "tooLong": "📏 Maximum 8 letters",
       "duplicate": "🔁 Already found!",
       "notOnBoardPenalty": "⚠️ Not on board -5 ❤️",
       "notFormablePenalty": "⚠️ Not on board -5 ❤️",

@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BoardCard from '../BoardCard';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -14,16 +14,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
+vi.mock('@/components/Avatar', () => {
   const MockAvatar = () => (
     <div data-testid="avatar" />
   );
   MockAvatar.displayName = 'Avatar';
-  return MockAvatar;
+  return { default: MockAvatar };
 });
 
-jest.mock('@/utils/share', () => ({
-  shareBoard: jest.fn(),
+vi.mock('@/utils/share', () => ({
+  shareBoard: vi.fn(),
 }));
 
 const defaultBoard = {
@@ -111,7 +111,7 @@ describe('BoardCard (default variant)', () => {
   });
 
   it('calls onPlay callback when play button is clicked', () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     render(<BoardCard board={defaultBoard} onPlay={onPlay} />);
     fireEvent.click(screen.getByText('ugc.gallery.play'));
     expect(onPlay).toHaveBeenCalledWith('ABC123');
@@ -142,7 +142,7 @@ describe('BoardCard (compact variant)', () => {
   });
 
   it('calls onPlay when compact card is clicked', () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     render(<BoardCard board={defaultBoard} variant="compact" onPlay={onPlay} />);
     fireEvent.click(screen.getByRole('button'));
     expect(onPlay).toHaveBeenCalledWith('ABC123');

@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for POST /api/admin/dictionary-revoke
  * Admin endpoint to remove words from the dictionary
  */
 
 // Mock Next.js server runtime BEFORE any imports
-jest.mock('next/server', () => {
+vi.mock('next/server', () => {
   const actualJson = (data: unknown, init?: { status?: number }) => {
     const status = init?.status || 200;
     return {
@@ -13,7 +14,7 @@ jest.mock('next/server', () => {
     };
   };
   return {
-    NextRequest: jest.fn().mockImplementation((url: string, init: Record<string, unknown>) => ({
+    NextRequest: vi.fn().mockImplementation((url: string, init: Record<string, unknown>) => ({
       url,
       method: init?.method || 'GET',
       json: async () => JSON.parse(init?.body as string),
@@ -23,19 +24,19 @@ jest.mock('next/server', () => {
 });
 
 // Mock admin auth
-const mockVerifyAdminAuth = jest.fn();
-jest.mock('@/lib/auth/adminAuth', () => ({
+const mockVerifyAdminAuth = vi.fn();
+vi.mock('@/lib/auth/adminAuth', () => ({
   verifyAdminAuth: (...args: unknown[]) => mockVerifyAdminAuth(...args),
 }));
 
 // Mock Supabase admin
-const mockUpdate = jest.fn();
-const mockUpsert = jest.fn();
-const mockInsert = jest.fn();
-const mockEq = jest.fn();
-const mockFrom = jest.fn();
+const mockUpdate = vi.fn();
+const mockUpsert = vi.fn();
+const mockInsert = vi.fn();
+const mockEq = vi.fn();
+const mockFrom = vi.fn();
 
-jest.mock('@/lib/admin/server', () => ({
+vi.mock('@/lib/admin/server', () => ({
   getSupabaseAdmin: () => ({
     from: (table: string) => {
       mockFrom(table);
@@ -68,26 +69,26 @@ jest.mock('@/lib/admin/server', () => ({
 }));
 
 // Mock dictionary
-const mockRemoveApprovedWord = jest.fn();
-jest.mock('@/backend/dictionary', () => ({
+const mockRemoveApprovedWord = vi.fn();
+vi.mock('@/backend/dictionary', () => ({
   removeApprovedWord: (...args: unknown[]) => mockRemoveApprovedWord(...args),
 }));
 
 // Mock community word manager
-const mockRemoveFromCommunityCache = jest.fn();
-jest.mock('@/backend/modules/communityWordManager', () => ({
+const mockRemoveFromCommunityCache = vi.fn();
+vi.mock('@/backend/modules/communityWordManager', () => ({
   removeFromCommunityCache: (...args: unknown[]) => mockRemoveFromCommunityCache(...args),
 }));
 
 // Mock milog cache invalidation
-const mockInvalidateMilogCache = jest.fn();
-jest.mock('@/backend/services/milogWordVerifier', () => ({
+const mockInvalidateMilogCache = vi.fn();
+vi.mock('@/backend/services/milogWordVerifier', () => ({
   invalidateMilogCache: (...args: unknown[]) => mockInvalidateMilogCache(...args),
 }));
 
 // Mock Sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 describe('POST /api/admin/dictionary-revoke', () => {
@@ -99,7 +100,7 @@ describe('POST /api/admin/dictionary-revoke', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default: admin auth succeeds
     mockVerifyAdminAuth.mockResolvedValue({

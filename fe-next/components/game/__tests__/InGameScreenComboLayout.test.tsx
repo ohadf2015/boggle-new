@@ -10,7 +10,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -25,7 +25,7 @@ jest.mock('../../../contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion - comprehensive mock for all motion components
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<Element>) => {
       // Filter out framer-motion specific props
@@ -56,7 +56,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useDevicePerformance
-jest.mock('../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -65,7 +65,7 @@ jest.mock('../../../hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useReducedMotion
-jest.mock('../../../utils/accessibility', () => ({
+vi.mock('../../../utils/accessibility', () => ({
   useReducedMotion: () => false,
 }));
 

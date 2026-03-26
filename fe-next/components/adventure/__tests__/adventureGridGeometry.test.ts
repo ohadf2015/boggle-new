@@ -15,8 +15,8 @@ import {
 } from '../adventureGridGeometry';
 
 // Mock getDeadzoneThreshold from utils/consts
-jest.mock('@/utils/consts', () => ({
-  getDeadzoneThreshold: jest.fn(() => 8),
+vi.mock('@/utils/consts', () => ({
+  getDeadzoneThreshold: vi.fn(() => 8),
 }));
 
 import { getDeadzoneThreshold } from '@/utils/consts';

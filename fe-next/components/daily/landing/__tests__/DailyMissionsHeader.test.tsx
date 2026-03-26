@@ -3,12 +3,12 @@ import { render, screen, act } from '@testing-library/react';
 import { DailyMissionsHeader } from '../DailyMissionsHeader';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
-jest.mock('@/utils/dailyChallenge/dateUtils', () => ({
-  getSecondsUntilNextDaily: jest.fn(() => 3661),
+vi.mock('@/utils/dailyChallenge/dateUtils', () => ({
+  getSecondsUntilNextDaily: vi.fn(() => 3661),
 }));
 
-jest.mock('@/shared/utils', () => ({
-  formatTimeHHMMSS: jest.fn((s: number) => {
+vi.mock('@/shared/utils', () => ({
+  formatTimeHHMMSS: vi.fn((s: number) => {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
@@ -24,11 +24,11 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe('DailyMissionsHeader', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('renders progress bar with 0 completed', () => {
@@ -85,7 +85,7 @@ describe('DailyMissionsHeader', () => {
     // Advance time by 1 second
     getSecondsUntilNextDaily.mockReturnValue(3660);
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     // Timer should have been called at least once more after the interval tick

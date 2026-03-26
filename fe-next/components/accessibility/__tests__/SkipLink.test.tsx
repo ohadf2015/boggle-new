@@ -37,7 +37,7 @@ describe('SkipLink', () => {
     if (mainContent) {
       document.body.removeChild(mainContent);
     }
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('visibility', () => {
@@ -152,7 +152,7 @@ describe('SkipLink', () => {
     });
 
     it('prevents default anchor behavior', async () => {
-      const preventDefaultMock = jest.fn();
+      const preventDefaultMock = vi.fn();
 
       render(
         <SkipLink targetId="main-content" t={mockT}>

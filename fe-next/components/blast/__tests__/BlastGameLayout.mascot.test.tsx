@@ -6,15 +6,15 @@ import { render, screen } from '@testing-library/react';
 // ---------------------------------------------------------------------------
 
 // Capture props passed to Mascot for assertion
-const MockMascot = jest.fn(({ variant }: { variant: string }) => (
+const MockMascot = vi.fn(({ variant }: { variant: string }) => (
   <div data-testid={`mascot-${variant}`} />
 ));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: (props: any) => MockMascot(props),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
@@ -22,49 +22,49 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(' '),
 }));
 
-jest.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
+vi.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
   DynamicEnergyBackground: () => <div data-testid="energy-bg" />,
 }));
 
-jest.mock('../BlastGrid', () => ({
+vi.mock('../BlastGrid', () => ({
   BlastGrid: () => <div data-testid="blast-grid" />,
 }));
 
-jest.mock('../BlastProgressBar', () => ({
+vi.mock('../BlastProgressBar', () => ({
   BlastProgressBar: () => <div data-testid="blast-progress-bar" />,
 }));
 
-jest.mock('../BlastFoundWords', () => ({
+vi.mock('../BlastFoundWords', () => ({
   BlastFoundWords: () => <div data-testid="blast-found-words" />,
 }));
 
-jest.mock('../BlastHelpModal', () => ({
+vi.mock('../BlastHelpModal', () => ({
   BlastHelpModal: () => <div data-testid="blast-help-modal" />,
 }));
 
-jest.mock('../BlastCascadeWordBanner', () => ({
+vi.mock('../BlastCascadeWordBanner', () => ({
   BlastCascadeWordBanner: () => <div data-testid="blast-cascade-banner" />,
 }));
 
-jest.mock('@/components/game/ComboDisplay', () => ({
+vi.mock('@/components/game/ComboDisplay', () => ({
   __esModule: true,
   default: () => <div data-testid="combo-display" />,
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: () => <div data-testid="word-forming-area" />,
 }));
 
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, disabled, className, ...rest }: any) => (
     <button onClick={onClick} disabled={disabled} className={className} {...rest}>
       {children}
@@ -72,15 +72,15 @@ jest.mock('@/components/ui/button', () => ({
   ),
 }));
 
-jest.mock('@/components/grid/hapticFeedback', () => ({
-  vibrateBlastBomb: jest.fn(),
-  vibrateBlastLightning: jest.fn(),
-  vibrateBlastPrism: jest.fn(),
-  vibrateBlastCascade: jest.fn(),
+vi.mock('@/components/grid/hapticFeedback', () => ({
+  vibrateBlastBomb: vi.fn(),
+  vibrateBlastLightning: vi.fn(),
+  vibrateBlastPrism: vi.fn(),
+  vibrateBlastCascade: vi.fn(),
 }));
 
-jest.mock('../utils/blastStarCalculator', () => ({
-  calculateEarnedStars: jest.fn().mockReturnValue(2),
+vi.mock('../utils/blastStarCalculator', () => ({
+  calculateEarnedStars: vi.fn().mockReturnValue(2),
 }));
 
 // ---------------------------------------------------------------------------
@@ -150,23 +150,23 @@ const baseProps = {
   comboDanger: false,
   formedWord: '',
   currentFeedback: null,
-  onWordSubmit: jest.fn(),
-  onPathSubmit: jest.fn(),
-  onWordChange: jest.fn(),
-  onExplosionComplete: jest.fn(),
-  onScorePopupComplete: jest.fn(),
-  onShuffle: jest.fn(),
-  onQuitRequest: jest.fn(),
-  onConfirmQuit: jest.fn(),
-  onEndGame: jest.fn(),
+  onWordSubmit: vi.fn(),
+  onPathSubmit: vi.fn(),
+  onWordChange: vi.fn(),
+  onExplosionComplete: vi.fn(),
+  onScorePopupComplete: vi.fn(),
+  onShuffle: vi.fn(),
+  onQuitRequest: vi.fn(),
+  onConfirmQuit: vi.fn(),
+  onEndGame: vi.fn(),
   showQuitConfirm: false,
-  setShowQuitConfirm: jest.fn(),
+  setShowQuitConfirm: vi.fn(),
   showEndGameConfirm: false,
-  setShowEndGameConfirm: jest.fn(),
+  setShowEndGameConfirm: vi.fn(),
   hintPath: null,
   hasHintAvailable: false,
-  onRequestHint: jest.fn(),
-  onClearHint: jest.fn(),
+  onRequestHint: vi.fn(),
+  onClearHint: vi.fn(),
   t,
 };
 

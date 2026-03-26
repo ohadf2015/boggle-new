@@ -10,7 +10,7 @@ import { render } from '@testing-library/react';
 import DailyReadyScreen from '../DailyReadyScreen';
 
 // Mock the MusicContext
-const mockPreloadMusicTrack = jest.fn();
+const mockPreloadMusicTrack = vi.fn();
 const mockTracks = {
   LOBBY: 'lobby',
   BEFORE_GAME: 'beforeGame',
@@ -20,7 +20,7 @@ const mockTracks = {
   BOSSA: 'bossa',
 };
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     preloadMusicTrack: mockPreloadMusicTrack,
     TRACKS: mockTracks,
@@ -29,24 +29,24 @@ jest.mock('@/contexts/MusicContext', () => ({
     isMuted: false,
     isPlaying: false,
     audioUnlocked: false,
-    playTrack: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
-    setVolume: jest.fn(),
-    toggleMute: jest.fn(),
-    unlockAudio: jest.fn(),
+    playTrack: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
+    setVolume: vi.fn(),
+    toggleMute: vi.fn(),
+    unlockAudio: vi.fn(),
   }),
 }));
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: () => null,
   }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -54,23 +54,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock ThemeContext
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    toggleTheme: jest.fn(),
+    toggleTheme: vi.fn(),
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
     isAuthenticated: false,
     loading: false,
-    signIn: jest.fn(),
-    signOut: jest.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
   }),
 }));
 
@@ -86,15 +86,15 @@ describe('DailyReadyScreen - Music Preloading', () => {
     currentPlayerId: null,
     guestFingerprint: null,
     tutorialCompleted: true,
-    onLanguageChange: jest.fn(),
-    onStart: jest.fn(),
-    onBack: jest.fn(),
-    onShowTutorial: jest.fn(),
+    onLanguageChange: vi.fn(),
+    onStart: vi.fn(),
+    onBack: vi.fn(),
+    onShowTutorial: vi.fn(),
     t: (key: string) => key,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should preload BOSSA_ARCADE music track on mount', () => {

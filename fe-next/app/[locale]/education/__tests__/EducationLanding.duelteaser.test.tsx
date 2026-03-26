@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * DuelTeaserCard — Education Landing integration tests
  * TDD: RED phase first, then implement to pass.
@@ -6,41 +7,41 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import EducationPageClient from '../PageClient';
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     loading: false,
   }),
 }));
 
-jest.mock('@/components/education/EducationHeader', () => ({
+vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
 
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: () => <div data-testid="interactive-mascot" />,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="auth-modal" /> : null,
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(
     ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) =>
@@ -55,13 +56,13 @@ jest.mock('framer-motion', () => {
   return {
     motion: { div: MotionDiv, button: MotionButton },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    useReducedMotion: jest.fn().mockReturnValue(false),
+    useReducedMotion: vi.fn().mockReturnValue(false),
   };
 });
 
 describe('DuelTeaserCard on Education Landing', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the duel teaser headline', () => {

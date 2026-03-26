@@ -11,7 +11,7 @@ import BossRushResults from '../BossRushResults';
 import type { BossRushState } from '../hooks/useBossRush';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
@@ -22,7 +22,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
       <div className={className} {...props}>{children}</div>
@@ -33,8 +33,8 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
   },
 }));
 
-jest.mock('@/lib/adventure/bossConfig', () => ({
-  getBossConfig: jest.fn((worldId: number) => ({
+vi.mock('@/lib/adventure/bossConfig', () => ({
+  getBossConfig: vi.fn((worldId: number) => ({
     id: `boss-${worldId}`,
     worldId,
     displayName: `adventure.bosses.boss${worldId}.name`,
@@ -63,8 +63,8 @@ function makeState(overrides: Partial<BossRushState> = {}): BossRushState {
 
 const defaultProps = {
   state: makeState(),
-  onRetry: jest.fn(),
-  onExit: jest.fn(),
+  onRetry: vi.fn(),
+  onExit: vi.fn(),
 };
 
 // ==============================================
@@ -73,7 +73,7 @@ const defaultProps = {
 
 describe('BossRushResults', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders complete title when rush is complete', () => {
@@ -98,7 +98,7 @@ describe('BossRushResults', () => {
   });
 
   it('calls onRetry when retry button clicked', () => {
-    const onRetry = jest.fn();
+    const onRetry = vi.fn();
     render(<BossRushResults {...defaultProps} onRetry={onRetry} />);
 
     const retryBtn = screen.getByText('adventure.bossRush.tryAgain');
@@ -107,7 +107,7 @@ describe('BossRushResults', () => {
   });
 
   it('calls onExit when exit button clicked', () => {
-    const onExit = jest.fn();
+    const onExit = vi.fn();
     render(<BossRushResults {...defaultProps} onExit={onExit} />);
 
     const exitBtn = screen.getByText('adventure.bossRush.backToHub');

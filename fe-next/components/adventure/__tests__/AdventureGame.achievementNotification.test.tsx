@@ -41,8 +41,8 @@ const mockGrid = [
 const defaultProps = {
   levelConfig: mockLevelConfig,
   initialGrid: mockGrid,
-  onLevelComplete: jest.fn(),
-  onExit: jest.fn(),
+  onLevelComplete: vi.fn(),
+  onExit: vi.fn(),
 };
 
 // ==============================================
@@ -67,39 +67,39 @@ const mockTranslations: Record<string, string> = {
   'adventure.achievements.longWord6.desc': 'Find a 6+ letter word',
 };
 
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const value = {
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return { useLanguage: () => value, useLanguageSafe: () => value };
 });
 
 // Mock SoundEffectsContext for AchievementToast
-const mockPlayAchievementSound = jest.fn();
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+const mockPlayAchievementSound = vi.fn();
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
     playAchievementSound: mockPlayAchievementSound,
-    playSound: jest.fn(),
-    playWordSound: jest.fn(),
-    playGameStartSound: jest.fn(),
-    playGameEndSound: jest.fn(),
-    playSoloGameSound: jest.fn(),
-    playBuzzWord: jest.fn(),
+    playSound: vi.fn(),
+    playWordSound: vi.fn(),
+    playGameStartSound: vi.fn(),
+    playGameEndSound: vi.fn(),
+    playSoloGameSound: vi.fn(),
+    playBuzzWord: vi.fn(),
   }),
 }));
 
 // Mock AdventureThemeContext to avoid provider requirement
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const R = require('react');
   return {
     useAdventureTheme: () => ({
@@ -113,8 +113,8 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
       },
       worldId: 1,
       level: 1,
-      setWorld: jest.fn(),
-      setLevel: jest.fn(),
+      setWorld: vi.fn(),
+      setLevel: vi.fn(),
       isTransitioning: false,
     }),
     AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -158,15 +158,15 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 // Mock confetti util
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // Mock react-hot-toast to capture toast calls
 // Must be declared before jest.mock to avoid hoisting issues
-jest.mock('react-hot-toast', () => {
-  const mockCustom = jest.fn().mockReturnValue('mock-toast-id');
-  const mockDismiss = jest.fn();
+vi.mock('react-hot-toast', () => {
+  const mockCustom = vi.fn().mockReturnValue('mock-toast-id');
+  const mockDismiss = vi.fn();
   return {
     __esModule: true,
     default: {
@@ -180,17 +180,17 @@ jest.mock('react-hot-toast', () => {
 });
 
 // Get the mock functions after the module is mocked
-const toastModule = jest.requireMock('react-hot-toast') as { mockCustom: jest.Mock; mockDismiss: jest.Mock };
+const toastModule = vi.importMock('react-hot-toast') as { mockCustom: jest.Mock; mockDismiss: jest.Mock };
 const mockToastCustom = toastModule.mockCustom;
 const mockToastDismiss = toastModule.mockDismiss;
 
 // Mock word validation - always returns valid
-const mockValidateWord = jest.fn().mockResolvedValue({
+const mockValidateWord = vi.fn().mockResolvedValue({
   isValid: true,
   score: 30,
 });
 
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
     validateWord: mockValidateWord,
     isValidating: false,
@@ -201,15 +201,15 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
 // Selection state that simulates a selected word
 let mockSelectedIndices = [0, 1, 2]; // C-A-T
 let mockCurrentWord = 'CAT';
-const mockSelectTile = jest.fn();
-const mockClearSelection = jest.fn();
-const mockGetPath = jest.fn(() => [
+const mockSelectTile = vi.fn();
+const mockClearSelection = vi.fn();
+const mockGetPath = vi.fn(() => [
   { row: 0, col: 0 },
   { row: 0, col: 1 },
   { row: 0, col: 2 },
 ]);
 
-jest.mock('@/hooks/useAdventureSelection', () => ({
+vi.mock('@/hooks/useAdventureSelection', () => ({
   useAdventureSelection: () => ({
     selectedIndices: mockSelectedIndices,
     currentWord: mockCurrentWord,
@@ -222,38 +222,38 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
 }));
 
 // Mock ProgressionContext
-const mockRecordAttempt = jest.fn();
-jest.mock('@/contexts/ProgressionContext', () => ({
+const mockRecordAttempt = vi.fn();
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     recordAttempt: mockRecordAttempt,
-    getLevelAttempt: jest.fn(() => null),
-    getLevelCompletion: jest.fn(() => undefined),
+    getLevelAttempt: vi.fn(() => null),
+    getLevelCompletion: vi.fn(() => undefined),
     progression: null,
     isLoading: false,
     error: null,
-    refreshProgression: jest.fn(),
-    completeLevel: jest.fn(),
-    isWorldUnlocked: jest.fn(() => true),
-    isLevelUnlocked: jest.fn(() => true),
-    getWorldStars: jest.fn(() => 0),
+    refreshProgression: vi.fn(),
+    completeLevel: vi.fn(),
+    isWorldUnlocked: vi.fn(() => true),
+    isLevelUnlocked: vi.fn(() => true),
+    getWorldStars: vi.fn(() => 0),
     attempts: [],
   }),
 }));
 
 // Mock useAdaptiveDifficulty
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: () => ({
     tier: 'normal',
     adjustedConfig: mockLevelConfig,
     hintData: { level: 'none', highlightTiles: [] },
     powerUpCooldownMultiplier: 1,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   }),
 }));
 
 // Track achievement state - key mock for testing
 let mockAchievementCounts: Record<string, number> = {};
-const mockEarnAchievement = jest.fn().mockImplementation((id: string) => {
+const mockEarnAchievement = vi.fn().mockImplementation((id: string) => {
   const count = mockAchievementCounts[id] || 0;
   // Return true if this is the first earn (count was 0)
   const isNewOrUpgraded = count === 0;
@@ -261,17 +261,17 @@ const mockEarnAchievement = jest.fn().mockImplementation((id: string) => {
   return isNewOrUpgraded;
 });
 
-const mockGetCount = jest.fn().mockImplementation((id: string) => {
+const mockGetCount = vi.fn().mockImplementation((id: string) => {
   return mockAchievementCounts[id] || 0;
 });
 
-jest.mock('@/hooks/useAdventureAchievements', () => ({
+vi.mock('@/hooks/useAdventureAchievements', () => ({
   useAdventureAchievements: () => ({
     achievementCounts: mockAchievementCounts,
     earnAchievement: mockEarnAchievement,
     isEarned: (id: string) => (mockAchievementCounts[id] || 0) > 0,
     getCount: mockGetCount,
-    getTierInfo: jest.fn(() => ({
+    getTierInfo: vi.fn(() => ({
       count: 0,
       tier: null,
       progress: { current: 0, next: 1, percentToNext: 0 },
@@ -284,7 +284,7 @@ jest.mock('@/hooks/useAdventureAchievements', () => ({
 let mockWordsFound: string[] = [];
 let mockIsPlaying = true;
 
-jest.mock('@/hooks/useAdventureGame', () => ({
+vi.mock('@/hooks/useAdventureGame', () => ({
   useAdventureGame: () => ({
     gameState: {
       wordsFound: mockWordsFound,
@@ -304,50 +304,50 @@ jest.mock('@/hooks/useAdventureGame', () => ({
     canComplete: false,
     isPlaying: mockIsPlaying,
     cascadeComplete: true,
-    submitWordWithPath: jest.fn(),
-    startGame: jest.fn(),
-    pauseGame: jest.fn(),
-    completeLevel: jest.fn(),
-    resetGame: jest.fn(),
-    markCascadeComplete: jest.fn(),
+    submitWordWithPath: vi.fn(),
+    startGame: vi.fn(),
+    pauseGame: vi.fn(),
+    completeLevel: vi.fn(),
+    resetGame: vi.fn(),
+    markCascadeComplete: vi.fn(),
     isCascading: false,
     cascadePhase: 'idle',
-    addTime: jest.fn(),
+    addTime: vi.fn(),
   }),
 }));
 
 // Mock other hooks
-jest.mock('@/hooks/useAdventureXp', () => ({
+vi.mock('@/hooks/useAdventureXp', () => ({
   useAdventureXp: () => ({
     totalXp: 0,
     currentLevel: 1,
     xpProgress: { current: 0, next: 100, percentToNext: 0 },
-    awardXp: jest.fn(() => ({ leveledUp: false })),
+    awardXp: vi.fn(() => ({ leveledUp: false })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureCurrency', () => ({
+vi.mock('@/hooks/useAdventureCurrency', () => ({
   useAdventureCurrency: () => ({
     gold: 0,
     upgrades: {},
-    addGold: jest.fn(),
-    purchase: jest.fn(() => true),
-    getUpgradeEffect: jest.fn(() => ({ multiplier: 1 })),
+    addGold: vi.fn(),
+    purchase: vi.fn(() => true),
+    getUpgradeEffect: vi.fn(() => ({ multiplier: 1 })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useSkillPoints', () => ({
+vi.mock('@/hooks/useSkillPoints', () => ({
   useSkillPoints: () => ({
     skillPoints: 0,
-    addSkillPoints: jest.fn(),
+    addSkillPoints: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useSkillEffects', () => ({
+vi.mock('@/hooks/useSkillEffects', () => ({
   useSkillEffects: () => ({
     bossDamageMultiplier: 1,
     getLongWordDamageMultiplier: () => 1,
@@ -355,90 +355,90 @@ jest.mock('@/hooks/useSkillEffects', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useComboMilestone', () => ({
+vi.mock('@/hooks/useComboMilestone', () => ({
   useComboMilestone: () => ({
     currentMilestone: null,
-    checkMilestone: jest.fn(),
+    checkMilestone: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAIDirector', () => ({
+vi.mock('@/hooks/useAIDirector', () => ({
   useAIDirector: () => ({
     intensityAdjustments: { hintEscalationRate: 1 },
     flowState: 'neutral',
-    startSession: jest.fn(),
-    endSession: jest.fn(),
-    recordWord: jest.fn(),
-    handleTransition: jest.fn(),
+    startSession: vi.fn(),
+    endSession: vi.fn(),
+    recordWord: vi.fn(),
+    handleTransition: vi.fn(),
     isBossBattle: false,
   }),
 }));
 
-jest.mock('@/hooks/useLexiStuckDetection', () => ({
+vi.mock('@/hooks/useLexiStuckDetection', () => ({
   useLexiStuckDetection: () => ({
-    resetOnGameAction: jest.fn(),
+    resetOnGameAction: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: false,
-    getHint: jest.fn(),
+    getHint: vi.fn(),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
   }),
 }));
 
-jest.mock('../hooks/useAdventureCinematics', () => ({
+vi.mock('../hooks/useAdventureCinematics', () => ({
   useAdventureCinematics: () => ({
     showVictoryCinematic: false,
     showDefeatCinematic: false,
     cinematicComplete: true,
-    showVictory: jest.fn(),
-    showDefeat: jest.fn(),
-    handleCinematicComplete: jest.fn(),
+    showVictory: vi.fn(),
+    showDefeat: vi.fn(),
+    handleCinematicComplete: vi.fn(),
   }),
 }));
 
-jest.mock('../hooks/useAdventureEntryPhase', () => ({
+vi.mock('../hooks/useAdventureEntryPhase', () => ({
   useAdventureEntryPhase: () => ({
     entryPhase: 'playing',
-    advanceToObjectives: jest.fn(),
-    advanceToTitle: jest.fn(),
-    advanceToPlaying: jest.fn(),
+    advanceToObjectives: vi.fn(),
+    advanceToTitle: vi.fn(),
+    advanceToPlaying: vi.fn(),
   }),
 }));
 
-jest.mock('../effects/hooks/useAdventureEffects', () => ({
+vi.mock('../effects/hooks/useAdventureEffects', () => ({
   useAdventureEffects: () => ({
     shakeRef: { current: null },
     scoreDisplayRef: { current: null },
     currentPopup: null,
-    handlePopupComplete: jest.fn(),
-    addScorePopup: jest.fn(),
+    handlePopupComplete: vi.fn(),
+    addScorePopup: vi.fn(),
     chainBurstConfig: null,
-    setChainBurstConfig: jest.fn(),
+    setChainBurstConfig: vi.fn(),
     particleConfig: null,
-    setParticleConfig: jest.fn(),
+    setParticleConfig: vi.fn(),
     pendingExplosions: [],
-    addExplosion: jest.fn(),
-    removeExplosion: jest.fn(),
-    shake: jest.fn(),
+    addExplosion: vi.fn(),
+    removeExplosion: vi.fn(),
+    shake: vi.fn(),
     reaction: null,
-    dismissReaction: jest.fn(),
+    dismissReaction: vi.fn(),
   }),
 }));
 
 // Mock remaining components
-jest.mock('@/lib/adventure/abilities', () => ({
-  registerAllAbilities: jest.fn(),
+vi.mock('@/lib/adventure/abilities', () => ({
+  registerAllAbilities: vi.fn(),
 }));
 
 // Mock AdventureGrid with ability to trigger word submission - inline to avoid hoisting issues
-jest.mock('../AdventureGrid', () => {
+vi.mock('../AdventureGrid', () => {
   const React = require('react');
   const MockAdventureGrid = React.forwardRef(
     function MockAdventureGrid(
@@ -464,7 +464,7 @@ jest.mock('../AdventureGrid', () => {
 });
 
 // Mock AdventureObjectives - inline to avoid hoisting issues
-jest.mock('../AdventureObjectives', () => {
+vi.mock('../AdventureObjectives', () => {
   const React = require('react');
   function MockAdventureObjectives({ onSlideInComplete }: { onSlideInComplete?: () => void }) {
     React.useEffect(() => {
@@ -478,62 +478,62 @@ jest.mock('../AdventureObjectives', () => {
   };
 });
 
-jest.mock('../AdventureTimer', () => ({
+vi.mock('../AdventureTimer', () => ({
   __esModule: true,
   default: () => <div data-testid="adventure-timer">Mock Timer</div>,
 }));
 
-jest.mock('../LevelCompleteModal', () => ({
+vi.mock('../LevelCompleteModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../LevelEntryOverlay', () => ({
+vi.mock('../LevelEntryOverlay', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../LexiReaction', () => ({
+vi.mock('../LexiReaction', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../boss', () => ({
+vi.mock('../boss', () => ({
   BossOverlay: () => null,
   PlayerHealthBar: () => null,
 }));
 
-jest.mock('../ComboMilestoneOverlay', () => ({
+vi.mock('../ComboMilestoneOverlay', () => ({
   ComboMilestoneOverlay: () => null,
 }));
 
-jest.mock('../cinematics', () => ({
+vi.mock('../cinematics', () => ({
   VictoryCinematic: () => null,
   VICTORY_DURATION_FRAMES: 90,
   DefeatCinematic: () => null,
   DEFEAT_DURATION_FRAMES: 90,
 }));
 
-jest.mock('../boss/cinematics/CinematicPlayer', () => ({
+vi.mock('../boss/cinematics/CinematicPlayer', () => ({
   CinematicPlayer: () => null,
 }));
 
-jest.mock('../themed/GameplayBackground', () => ({
+vi.mock('../themed/GameplayBackground', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('../HintMessage', () => ({
+vi.mock('../HintMessage', () => ({
   HintMessage: () => null,
 }));
 
-jest.mock('../effects/AdventureEffectsLayer', () => ({
+vi.mock('../effects/AdventureEffectsLayer', () => ({
   __esModule: true,
   default: () => null,
   AdventureEffectsLayer: () => null,
 }));
 
-jest.mock('@/components/animations/ComboTierBadge', () => ({
+vi.mock('@/components/animations/ComboTierBadge', () => ({
   ComboTierBadge: () => null,
 }));
 
@@ -543,8 +543,8 @@ jest.mock('@/components/animations/ComboTierBadge', () => ({
 
 describe('AdventureGame Achievement Notifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockAchievementCounts = {};
     mockWordsFound = [];
     mockIsPlaying = true;
@@ -553,7 +553,7 @@ describe('AdventureGame Achievement Notifications', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Achievement Toast Display', () => {

@@ -13,11 +13,11 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock useDevicePerformance
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: false,
@@ -25,7 +25,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
     p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <p {...props}>{children}</p>,
@@ -48,85 +48,86 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock ResultsWinnerBanner dependencies
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => false,
 }));
 
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => null,
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: () => null,
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
+  fireRankConfetti: vi.fn(),
 }));
 
 
 // Mock RewardedAdButton (uses ThemeProvider internally)
-jest.mock('@/components/ads/RewardedAdButton', () => ({
+vi.mock('@/components/ads/RewardedAdButton', () => ({
   RewardedAdButton: ({ children }: any) => children || null,
 }));
 
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+vi.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: vi.fn() }),
   ThemeProvider: ({ children }: any) => children,
 }));
 
 // Mock share image utilities
-jest.mock('@/utils/shareImageGenerator', () => ({
-  shareImageWithNativeShare: jest.fn().mockResolvedValue(true),
+vi.mock('@/utils/shareImageGenerator', () => ({
+  shareImageWithNativeShare: vi.fn().mockResolvedValue(true),
 }));
 
-jest.mock('@/utils/dailyShareImage', () => ({
-  generateDailyShareImage: jest.fn().mockResolvedValue({ dataUrl: 'data:image/png;base64,test' }),
-  downloadDailyShareImage: jest.fn(),
+vi.mock('@/utils/dailyShareImage', () => ({
+  generateDailyShareImage: vi.fn().mockResolvedValue({ dataUrl: 'data:image/png;base64,test' }),
+  downloadDailyShareImage: vi.fn(),
 }));
 
 // Mock dailyChallenge utilities
-const mockGetGuestFingerprint = jest.fn().mockResolvedValue('test-guest-fingerprint');
-const mockGetGuestDailyPlayer = jest.fn().mockResolvedValue({
+const mockGetGuestFingerprint = vi.fn().mockResolvedValue('test-guest-fingerprint');
+const mockGetGuestDailyPlayer = vi.fn().mockResolvedValue({
   displayName: 'Test Guest',
   avatarEmoji: '🎯',
   avatarColor: '#6366f1',
 });
 
-jest.mock('@/utils/dailyChallenge', () => ({
-  generateShareableResult: jest.fn().mockReturnValue('Test share text'),
+vi.mock('@/utils/dailyChallenge', () => ({
+  generateShareableResult: vi.fn().mockReturnValue('Test share text'),
   getGuestFingerprint: (...args: unknown[]) => mockGetGuestFingerprint(...args),
   getGuestDailyPlayer: (...args: unknown[]) => mockGetGuestDailyPlayer(...args),
 }));
 
 // Mock storage
-jest.mock('@/utils/dailyChallenge/storage', () => ({
-  hasPlayedToday: jest.fn().mockReturnValue(false),
-  getWordHuntStatusToday: jest.fn().mockReturnValue(null), // null = not played yet
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedToday: vi.fn().mockReturnValue(false),
+  getWordHuntStatusToday: vi.fn().mockReturnValue(null), // null = not played yet
 }));
 
 // Mock NextStepPrompt
-jest.mock('@/components/results/NextStepPrompt', () => {
-  return function MockNextStepPrompt() {
+vi.mock('@/components/results/NextStepPrompt', () => {
+  const MockNextStepPrompt = () => {
     return <div data-testid="next-step-prompt">Next Step</div>;
   };
+  return { default: MockNextStepPrompt };
 });
 
 // Mock DailyLeaderboard
-jest.mock('../DailyLeaderboard', () => {
-  return function MockDailyLeaderboard({ onCurrentUserRankChange, onParticipantCountChange }: {
+vi.mock('../DailyLeaderboard', () => {
+  return { default: function MockDailyLeaderboard({ onCurrentUserRankChange, onParticipantCountChange }: {
     onCurrentUserRankChange?: (rank: number | null) => void;
     onParticipantCountChange?: (count: number) => void;
   }) {
@@ -135,12 +136,12 @@ jest.mock('../DailyLeaderboard', () => {
       onParticipantCountChange?.(100);
     }, [onCurrentUserRankChange, onParticipantCountChange]);
     return <div data-testid="daily-leaderboard">Leaderboard</div>;
-  };
+  }
 });
 
 // Mock useAuth - will be overridden per test
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
@@ -169,7 +170,7 @@ describe('DailyChallengeResults score submission', () => {
   const mockT = (key: string): string => key;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReset();
 
     // Default: successful API responses
@@ -224,7 +225,7 @@ describe('DailyChallengeResults score submission', () => {
           longestWord="TEST"
           countdown="23:59:59"
           isNewCompletion={true}
-          onBack={jest.fn()}
+          onBack={vi.fn()}
           t={mockT}
         />
       );
@@ -270,7 +271,7 @@ describe('DailyChallengeResults score submission', () => {
           longestWord="TEST"
           countdown="23:59:59"
           isNewCompletion={true}
-          onBack={jest.fn()}
+          onBack={vi.fn()}
           t={mockT}
         />
       );
@@ -320,7 +321,7 @@ describe('DailyChallengeResults score submission', () => {
           longestWord="TEST"
           countdown="23:59:59"
           isNewCompletion={true}
-          onBack={jest.fn()}
+          onBack={vi.fn()}
           t={mockT}
         />
       );
@@ -362,7 +363,7 @@ describe('DailyChallengeResults score submission', () => {
           longestWord="TEST"
           countdown="23:59:59"
           isNewCompletion={false}
-          onBack={jest.fn()}
+          onBack={vi.fn()}
           t={mockT}
         />
       );

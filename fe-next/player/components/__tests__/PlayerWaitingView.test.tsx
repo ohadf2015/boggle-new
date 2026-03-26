@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /* eslint-disable react/display-name */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -5,7 +6,7 @@ import '@testing-library/jest-dom';
 import PlayerWaitingView from '../PlayerWaitingView';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
       <div ref={ref} {...filterDomProps(props)}>{children}</div>
@@ -28,18 +29,18 @@ function filterDomProps(props: Record<string, unknown>): Record<string, unknown>
 }
 
 // Mock child components
-jest.mock('../../../host/components/pre-game/MobileShareSection', () => ({
+vi.mock('../../../host/components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => <div data-testid="mobile-share-section" />,
 }));
-jest.mock('../../../host/components/pre-game/desktop', () => ({
+vi.mock('../../../host/components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
     <div data-testid="desktop-layout">{leftContent}{rightContent}</div>
   ),
   InviteCard: () => <div data-testid="invite-card" />,
 }));
-jest.mock('../../../components/RoomChat', () => () => <div data-testid="room-chat" />);
-jest.mock('../../../components/Avatar', () => ({ size }: { size: string }) => <div data-testid="avatar" data-size={size} />);
-jest.mock('../../../components/ui/alert-dialog', () => ({
+vi.mock('../../../components/RoomChat', () => () => <div data-testid="room-chat" />);
+vi.mock('../../../components/Avatar', () => ({ size }: { size: string }) => <div data-testid="avatar" data-size={size} />);
+vi.mock('../../../components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => open ? <div data-testid="alert-dialog">{children}</div> : null,
   AlertDialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -52,17 +53,17 @@ jest.mock('../../../components/ui/alert-dialog', () => ({
 
 // Mock SocketContext
 const mockSocket = {
-  emit: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
+  emit: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
 };
-jest.mock('../../../utils/SocketContext', () => ({
+vi.mock('../../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),
 }));
 
 // Mock AuthContext
 let mockIsAuthenticated = false;
-jest.mock('../../../contexts/AuthContext', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
 }));
 
@@ -77,16 +78,16 @@ const defaultProps = {
     { username: 'HostUser', isHost: true },
   ],
   showQR: false,
-  setShowQR: jest.fn(),
+  setShowQR: vi.fn(),
   showExitConfirm: false,
-  setShowExitConfirm: jest.fn(),
-  onExitRoom: jest.fn(),
-  onConfirmExit: jest.fn(),
+  setShowExitConfirm: vi.fn(),
+  onExitRoom: vi.fn(),
+  onConfirmExit: vi.fn(),
 };
 
 describe('PlayerWaitingView', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsAuthenticated = false;
   });
 
@@ -122,7 +123,7 @@ describe('PlayerWaitingView', () => {
 
     it('should call onNameChange when name is submitted', () => {
       mockIsAuthenticated = false;
-      const onNameChange = jest.fn();
+      const onNameChange = vi.fn();
       render(<PlayerWaitingView {...defaultProps} onNameChange={onNameChange} />);
       const editButtons = screen.getAllByTestId('edit-name-button');
       fireEvent.click(editButtons[0]);

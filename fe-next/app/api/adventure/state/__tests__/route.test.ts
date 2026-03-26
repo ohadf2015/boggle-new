@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Adventure State API Route Tests
@@ -6,30 +7,30 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 import { NextRequest } from 'next/server';
@@ -37,7 +38,7 @@ import { GET } from '../route';
 
 // ---------- Helpers ----------
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeGetRequest() {
   return { headers: mockHeaders } as unknown as NextRequest;
@@ -108,9 +109,9 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'player_progression') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: progressionData,
               error: progressionError,
             }),
@@ -120,10 +121,10 @@ function setupDbMocks({
     }
     if (table === 'level_completions') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
                 data: completionsData,
                 error: completionsError,
               }),
@@ -134,10 +135,10 @@ function setupDbMocks({
     }
     if (table === 'level_attempts') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              order: vi.fn().mockResolvedValue({
                 data: attemptsData,
                 error: attemptsError,
               }),
@@ -154,7 +155,7 @@ function setupDbMocks({
 
 describe('GET /api/adventure/state', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,

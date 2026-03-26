@@ -8,9 +8,9 @@ import '@testing-library/jest-dom';
 import StreakCalendar from './StreakCalendar';
 
 // Mock dependencies
-const mockT = jest.fn((key) => key);
+const mockT = vi.fn((key) => key);
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -19,14 +19,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('StreakCalendar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock current date for consistent testing
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     jest.setSystemTime(new Date('2024-02-14T12:00:00Z')); // Wednesday
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders 7 day indicators', () => {

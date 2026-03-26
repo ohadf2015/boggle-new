@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  */
@@ -8,7 +9,7 @@ import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Mock Next.js Image component
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: (props: any) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -17,7 +18,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock AvatarRenderer
-jest.mock('@/components/avatar/AvatarRenderer', () => ({
+vi.mock('@/components/avatar/AvatarRenderer', () => ({
   __esModule: true,
   default: ({ config, size }: { config: CustomAvatarConfig; size: number }) => (
     <svg data-testid="custom-avatar" data-size={size} data-base={config.base} />

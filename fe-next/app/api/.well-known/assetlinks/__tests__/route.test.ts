@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Android Asset Links Route Tests
  * Tests Digital Asset Links response for Android App Links
  */
 
 // Mock NextResponse before importing route
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
     json: (body: unknown, init?: { headers?: Record<string, string> }) => ({
       json: () => Promise.resolve(body),

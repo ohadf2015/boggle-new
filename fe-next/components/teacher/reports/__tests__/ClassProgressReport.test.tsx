@@ -12,14 +12,14 @@ import { ClassProgressReport } from '../ClassProgressReport';
 import { getClassReportData, ClassReportData } from '@/lib/supabase/analytics';
 
 // Mock data fetching
-jest.mock('@/lib/supabase/analytics', () => ({
-  getClassReportData: jest.fn(),
+vi.mock('@/lib/supabase/analytics', () => ({
+  getClassReportData: vi.fn(),
 }));
 
 // Mock react-pdf/renderer
-jest.mock('@react-pdf/renderer', () => ({
-  pdf: jest.fn(() => ({
-    toBlob: jest.fn().mockResolvedValue(new Blob(['test'], { type: 'application/pdf' })),
+vi.mock('@react-pdf/renderer', () => ({
+  pdf: vi.fn(() => ({
+    toBlob: vi.fn().mockResolvedValue(new Blob(['test'], { type: 'application/pdf' })),
   })),
   Document: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pdf-document">{children}</div>
@@ -39,7 +39,7 @@ jest.mock('@react-pdf/renderer', () => ({
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -67,8 +67,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock URL.createObjectURL
-const mockCreateObjectURL = jest.fn(() => 'blob:mock-url');
-const mockRevokeObjectURL = jest.fn();
+const mockCreateObjectURL = vi.fn(() => 'blob:mock-url');
+const mockRevokeObjectURL = vi.fn();
 global.URL.createObjectURL = mockCreateObjectURL;
 global.URL.revokeObjectURL = mockRevokeObjectURL;
 
@@ -107,7 +107,7 @@ describe('ClassProgressReport', () => {
   >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetClassReportData.mockResolvedValue({
       data: mockClassData,
       error: null,
@@ -253,7 +253,7 @@ describe('ClassProgressReport', () => {
       const originalAppendChild = document.body.appendChild.bind(document.body);
       const originalRemoveChild = document.body.removeChild.bind(document.body);
 
-      const mockClick = jest.fn();
+      const mockClick = vi.fn();
       const mockAnchor = {
         href: '',
         download: '',
@@ -262,21 +262,21 @@ describe('ClassProgressReport', () => {
         tagName: 'A',
       };
 
-      const createElementSpy = jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
         if (tagName === 'a') {
           return mockAnchor as unknown as HTMLElement;
         }
         return originalCreateElement(tagName);
       });
 
-      const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation((node) => {
+      const appendChildSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => {
         if (node === (mockAnchor as unknown as Node)) {
           return mockAnchor as unknown as HTMLElement;
         }
         return originalAppendChild(node);
       });
 
-      const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation((node) => {
+      const removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => {
         if (node === (mockAnchor as unknown as Node)) {
           return mockAnchor as unknown as HTMLElement;
         }
@@ -334,7 +334,7 @@ describe('ClassProgressReport', () => {
 
     it('calls onStudentClick when student name is clicked', async () => {
       const user = userEvent.setup();
-      const onStudentClick = jest.fn();
+      const onStudentClick = vi.fn();
 
       render(
         <ClassProgressReport

@@ -19,7 +19,7 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -27,7 +27,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
       <div data-testid="adaptive-motion" {...props}>{children}</div>

@@ -2,14 +2,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { DuelDisconnectOverlay } from '../DuelDisconnectOverlay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -23,12 +23,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('DuelDisconnectOverlay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render overlay with opponent name', () => {
@@ -49,10 +49,10 @@ describe('DuelDisconnectOverlay', () => {
 
     expect(screen.getByText('30')).toBeInTheDocument();
 
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     await waitFor(() => expect(screen.getByText('29')).toBeInTheDocument());
 
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     await waitFor(() => expect(screen.getByText('28')).toBeInTheDocument());
   });
 
@@ -63,7 +63,7 @@ describe('DuelDisconnectOverlay', () => {
   });
 
   it('should call onDismiss when provided', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(
       <DuelDisconnectOverlay
         opponentName="Bob"

@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { AvatarSelector } from '../AvatarSelector';
 import { type CustomAvatarConfig, DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -20,8 +20,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/avatar/AvatarBuilderModal', () => {
-  return function MockAvatarBuilderModal({ isOpen, onClose, onSave, initialConfig }: {
+vi.mock('@/components/avatar/AvatarBuilderModal', () => {
+  return { default: function MockAvatarBuilderModal({ isOpen, onClose, onSave, initialConfig }: {
     isOpen: boolean;
     onClose: () => void;
     onSave: (config: CustomAvatarConfig) => void;
@@ -34,21 +34,21 @@ jest.mock('@/components/avatar/AvatarBuilderModal', () => {
         <button onClick={onClose}>Close Builder</button>
       </div>
     );
-  };
+  } };
 });
 
-jest.mock('@/components/avatar/AvatarRenderer', () => {
-  return function MockAvatarRenderer({ config, size }: { config: CustomAvatarConfig; size: number }) {
+vi.mock('@/components/avatar/AvatarRenderer', () => {
+  const MockAvatarRenderer = ({ config, size }: { config: CustomAvatarConfig; size: number }) => {
     return <div data-testid="avatar-renderer" data-size={size} data-base={config.base} />;
   };
 });
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
 }));
 
 describe('AvatarSelector', () => {
-  const mockOnAvatarChange = jest.fn();
+  const mockOnAvatarChange = vi.fn();
 
   const defaultProps = {
     selectedAvatar: DEFAULT_AVATAR_CONFIG,
@@ -56,7 +56,7 @@ describe('AvatarSelector', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render with avatar preview', () => {

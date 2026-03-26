@@ -4480,6 +4480,7 @@ const he = {
     "quitConfirmMessage": "ההתקדמות שלך תאבד!",
     "feedback": {
       "tooShort": "📏 לפחות 3 אותיות",
+      "tooLong": "📏 מקסימום 8 אותיות",
       "duplicate": "🔁 כבר נמצאה!",
       "notOnBoardPenalty": "⚠️ לא על הלוח -5 ❤️",
       "notFormablePenalty": "⚠️ לא על הלוח -5 ❤️",

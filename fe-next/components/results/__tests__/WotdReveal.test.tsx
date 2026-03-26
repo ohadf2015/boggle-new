@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MotionDiv(
       { children, ...props }: React.PropsWithChildren<Record<string, unknown>>,
@@ -19,7 +19,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useLanguage
-const mockT = jest.fn((key: string) => {
+const mockT = vi.fn((key: string) => {
   const translations: Record<string, string> = {
     'wotd.found': 'You found it!',
     'wotd.foundPercent': 'Only {{percent}}% of players found this!',
@@ -30,13 +30,13 @@ const mockT = jest.fn((key: string) => {
   return translations[key] || key;
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en', dir: 'ltr' }),
 }));
 
 // Mock useWordOfTheDay
-const mockUseWordOfTheDay = jest.fn();
-jest.mock('@/hooks/useWordOfTheDay', () => ({
+const mockUseWordOfTheDay = vi.fn();
+vi.mock('@/hooks/useWordOfTheDay', () => ({
   useWordOfTheDay: (...args: unknown[]) => mockUseWordOfTheDay(...args),
 }));
 
@@ -44,7 +44,7 @@ import { WotdReveal } from '../WotdReveal';
 
 describe('WotdReveal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render loading state', () => {

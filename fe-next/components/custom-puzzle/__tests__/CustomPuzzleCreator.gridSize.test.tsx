@@ -5,18 +5,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/utils/dailyChallenge', () => ({
-  getGuestFingerprint: jest.fn().mockResolvedValue('test-fingerprint'),
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/utils/dailyChallenge', () => ({
+  getGuestFingerprint: vi.fn().mockResolvedValue('test-fingerprint'),
 }));
 
 // Mock efficiency score that can be changed per test
 let mockEfficiencyScore = 95;
 
 // Mock DailyWordHuntSurvival component
-jest.mock('@/components/daily/DailyWordHuntSurvival', () => {
-  return function MockDailyWordHuntSurvival({ onComplete }: { onComplete: (result: any) => void }) {
+vi.mock('@/components/daily/DailyWordHuntSurvival', () => {
+  return { default: function MockDailyWordHuntSurvival({ onComplete }: { onComplete: (result: any) => void }) {
     return (
       <div data-testid="game-component">
         <button onClick={() => onComplete({
@@ -28,15 +28,15 @@ jest.mock('@/components/daily/DailyWordHuntSurvival', () => {
         })}>Complete Game</button>
       </div>
     );
-  };
+  }
 });
 
 describe('CustomPuzzleCreator - Grid Size', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
   const mockT = (key: string) => key;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockEfficiencyScore = 95; // Reset to default
 
     (useLanguage as jest.Mock).mockReturnValue({
@@ -50,7 +50,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     });
 
     // Mock fetch for grid generation
-    global.fetch = jest.fn((url) => {
+    global.fetch = vi.fn((url) => {
       if (url === '/api/grid/generate') {
         return Promise.resolve({
           ok: true,
@@ -75,7 +75,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should always request 7x7 grid when creating custom puzzle', async () => {
@@ -84,15 +84,15 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     // Mock matchMedia for framer-motion
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation(query => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
 

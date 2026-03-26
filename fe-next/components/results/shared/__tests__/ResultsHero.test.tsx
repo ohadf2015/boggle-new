@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, whileHover, whileTap, ...rest } = props;
@@ -19,11 +19,11 @@ jest.mock('framer-motion', () => ({
     },
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
-  useReducedMotion: jest.fn(() => false),
+  useReducedMotion: vi.fn(() => false),
 }));
 
 // Mock ScoreCountUp to render final value immediately
-jest.mock('../ScoreCountUp', () => ({
+vi.mock('../ScoreCountUp', () => ({
   ScoreCountUp: ({ to, className }: any) => (
     <span className={className} aria-label={`Score: ${to}`} aria-live="polite">
       {to.toLocaleString()}
@@ -126,7 +126,7 @@ describe('ResultsHero', () => {
   });
 
   it('calls onScoreClick when score is clicked', async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <ResultsHero
         outcomeLabel="COMPLETED"

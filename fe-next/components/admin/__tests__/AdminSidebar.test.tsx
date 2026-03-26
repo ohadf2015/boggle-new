@@ -6,14 +6,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
   usePathname: () => '/en/admin',
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -24,7 +24,7 @@ import { AdminSidebar } from '../sidebar/AdminSidebar';
 
 describe('AdminSidebar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render all navigation sections', () => {

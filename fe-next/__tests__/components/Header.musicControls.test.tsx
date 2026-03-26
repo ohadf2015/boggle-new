@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -19,25 +20,25 @@ import { ThemeProvider } from '@/utils/ThemeContext';
  */
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
     useRouter: () => ({
-        push: jest.fn(),
-        back: jest.fn(),
+        push: vi.fn(),
+        back: vi.fn(),
     }),
     usePathname: () => '/en',
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useUnclaimedGifts', () => ({
+vi.mock('@/hooks/useUnclaimedGifts', () => ({
     useUnclaimedGifts: () => ({
         unclaimedCount: 0,
         gifts: [],
-        refresh: jest.fn(),
-        claimGift: jest.fn(),
+        refresh: vi.fn(),
+        claimGift: vi.fn(),
     }),
 }));
 
-jest.mock('@/hooks/useSafeArea', () => ({
+vi.mock('@/hooks/useSafeArea', () => ({
     useSafeArea: () => ({
         top: 0,
         bottom: 0,
@@ -65,7 +66,7 @@ const AllProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 describe('Header - Music Controls Placement', () => {
     beforeEach(() => {
         // Clear any mocks
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('Desktop View (sm+ screens)', () => {

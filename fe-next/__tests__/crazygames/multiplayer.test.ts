@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * CrazyGames Multiplayer Invite Tests
  *
@@ -14,15 +15,15 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 
 // Mock CrazyGames SDK BEFORE importing the hook
 let mockIsInstantMultiplayer = false;
-let mockGetInviteParam: jest.Mock<string | null, [string]> = jest.fn<string | null, [string]>(() => null);
-const mockInviteLink = jest.fn((params) => `https://crazygames.com/game/lexiclash?roomId=${params.roomId}`);
-const mockShowInviteButton = jest.fn();
-const mockHideInviteButton = jest.fn();
+let mockGetInviteParam: Mock<string | null, [string]> = vi.fn<string | null, [string]>(() => null);
+const mockInviteLink = vi.fn((params) => `https://crazygames.com/game/lexiclash?roomId=${params.roomId}`);
+const mockShowInviteButton = vi.fn();
+const mockHideInviteButton = vi.fn();
 
-const mockAddJoinRoomListener = jest.fn();
-const mockRemoveJoinRoomListener = jest.fn();
+const mockAddJoinRoomListener = vi.fn();
+const mockRemoveJoinRoomListener = vi.fn();
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
     isLoading: false,
@@ -43,21 +44,21 @@ import useCrazyGamesInvite from '@/hooks/useCrazyGamesInvite';
 
 describe('CrazyGames Multiplayer Invites', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsInstantMultiplayer = false;
-    mockGetInviteParam = jest.fn<string | null, [string]>(() => null);
+    mockGetInviteParam = vi.fn<string | null, [string]>(() => null);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Invite Join Detection', () => {
     it('should detect when player joins via invite link', async () => {
-      const onInviteJoin = jest.fn();
+      const onInviteJoin = vi.fn();
 
       // Mock SDK to return roomId from URL
-      mockGetInviteParam = jest.fn<string | null, [string]>((param) => (param === 'roomId' ? 'ABC123' : null));
+      mockGetInviteParam = vi.fn<string | null, [string]>((param) => (param === 'roomId' ? 'ABC123' : null));
 
       const { result } = renderHook(() =>
         useCrazyGamesInvite({ onInviteJoin })
@@ -77,7 +78,7 @@ describe('CrazyGames Multiplayer Invites', () => {
     });
 
     it('should not trigger invite join when no invite params', async () => {
-      const onInviteJoin = jest.fn();
+      const onInviteJoin = vi.fn();
 
       renderHook(() =>
         useCrazyGamesInvite({ onInviteJoin })
@@ -91,7 +92,7 @@ describe('CrazyGames Multiplayer Invites', () => {
     });
 
     it('should handle instant multiplayer mode', async () => {
-      const onInstantMultiplayer = jest.fn();
+      const onInstantMultiplayer = vi.fn();
 
       // Mock SDK in instant multiplayer mode
       mockIsInstantMultiplayer = true;
@@ -348,10 +349,10 @@ describe('CrazyGames Multiplayer Invites', () => {
 
   describe('Edge Cases', () => {
     it('should handle multiple getInviteParam calls', () => {
-      const onInviteJoin = jest.fn();
+      const onInviteJoin = vi.fn();
 
       // Mock getInviteParam to be called multiple times
-      mockGetInviteParam = jest.fn<string | null, [string]>((param) => {
+      mockGetInviteParam = vi.fn<string | null, [string]>((param) => {
         if (param === 'roomId') return 'ABC123';
         if (param === 'otherParam') return 'value';
         return null;
@@ -384,9 +385,9 @@ describe('CrazyGames Multiplayer Invites', () => {
     });
 
     it('should only trigger onInviteJoin once on mount', async () => {
-      const onInviteJoin = jest.fn();
+      const onInviteJoin = vi.fn();
 
-      mockGetInviteParam = jest.fn<string | null, [string]>(() => 'ABC123');
+      mockGetInviteParam = vi.fn<string | null, [string]>(() => 'ABC123');
 
       const { rerender } = renderHook(() =>
         useCrazyGamesInvite({ onInviteJoin })

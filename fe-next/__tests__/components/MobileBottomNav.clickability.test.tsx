@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * @file Test for mobile bottom nav clickability z-index fix
  * @description
@@ -11,7 +12,7 @@ import { MobileBottomNav } from '@/host/components/pre-game/MobileBottomNav';
 
 describe('MobileBottomNav Clickability', () => {
   const mockT = (key: string) => key;
-  const mockOnTabChange = jest.fn();
+  const mockOnTabChange = vi.fn();
 
   const defaultProps = {
     activeTab: 'lobby' as const,
@@ -22,7 +23,7 @@ describe('MobileBottomNav Clickability', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should have z-index higher than MobileDrawer (z-[60]) to remain clickable', () => {

@@ -26,7 +26,7 @@ describe('CustomPuzzleCreator', () => {
     it('component accepts required props', () => {
       const props = {
         isOpen: true,
-        onClose: jest.fn(),
+        onClose: vi.fn(),
         language: 'en' as const,
       };
 

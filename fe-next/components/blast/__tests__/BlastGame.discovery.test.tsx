@@ -13,76 +13,76 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('canvas-confetti', () => jest.fn());
+vi.mock('canvas-confetti', () => vi.fn());
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,
     comboTimeRemaining: null,
     isDangerState: false,
     maxCombo: 0,
-    incrementCombo: jest.fn(),
+    incrementCombo: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
   useWordSubmission: () => ({
     currentFeedback: null,
-    handleWordSubmit: jest.fn(),
+    handleWordSubmit: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
   useSpamDetection: () => ({}),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
-  useDictionaryCache: () => ({ checkWord: jest.fn() }),
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({ checkWord: vi.fn() }),
 }));
 
-jest.mock('../hooks/useBlastHint', () => ({
+vi.mock('../hooks/useBlastHint', () => ({
   useBlastHint: () => ({
     hintPath: null,
     hasHintAvailable: false,
-    requestHint: jest.fn(),
-    clearHint: jest.fn(),
+    requestHint: vi.fn(),
+    clearHint: vi.fn(),
   }),
 }));
 
-jest.mock('../hooks/useBlastObjectives', () => ({
+vi.mock('../hooks/useBlastObjectives', () => ({
   useBlastObjectives: () => ({
     objectiveProgress: [],
     allObjectivesComplete: true,
   }),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
+vi.mock('@/shared/utils/scoring', () => ({
   getComboMultiplier: () => 1,
 }));
 
-const mockUseBlastGame = jest.fn();
-jest.mock('../hooks/useBlastGame', () => ({
+const mockUseBlastGame = vi.fn();
+vi.mock('../hooks/useBlastGame', () => ({
   useBlastGame: (...args: any[]) => mockUseBlastGame(...args),
 }));
 
 // Track props passed to BlastComboDiscovery
 let capturedComboDiscoveryProps: any = null;
-jest.mock('../BlastComboDiscovery', () => ({
+vi.mock('../BlastComboDiscovery', () => ({
   BlastComboDiscovery: (props: any) => {
     capturedComboDiscoveryProps = props;
     return (
@@ -96,14 +96,14 @@ jest.mock('../BlastComboDiscovery', () => ({
 
 // Track props passed to BlastGameLayout
 let capturedLayoutProps: any = null;
-jest.mock('../BlastGameLayout', () => ({
+vi.mock('../BlastGameLayout', () => ({
   BlastGameLayout: (props: any) => {
     capturedLayoutProps = props;
     return <div data-testid="blast-game-layout" />;
   },
 }));
 
-jest.mock('../BlastComboFlash', () => ({
+vi.mock('../BlastComboFlash', () => ({
   BlastComboFlash: () => <div data-testid="blast-combo-flash" />,
 }));
 
@@ -144,14 +144,14 @@ function makeDefaultBlastReturn(overrides: any = {}) {
     cascadeHighlightData: null,
     cascadeHighlightPhase: 'idle',
     activeComboFlash: null,
-    clearComboFlash: jest.fn(),
-    clearTilesForWord: jest.fn(),
-    dismissExplosion: jest.fn(),
-    dismissScorePopup: jest.fn(),
-    shuffleRemainingTiles: jest.fn(),
-    endGame: jest.fn(),
+    clearComboFlash: vi.fn(),
+    clearTilesForWord: vi.fn(),
+    dismissExplosion: vi.fn(),
+    dismissScorePopup: vi.fn(),
+    shuffleRemainingTiles: vi.fn(),
+    endGame: vi.fn(),
     noWordsRemaining: false,
-    getResultsData: jest.fn(() => ({})),
+    getResultsData: vi.fn(() => ({})),
     ...overrides,
   };
 }
@@ -169,7 +169,7 @@ const baseConfig = {
 
 describe('BlastGame discovery integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     capturedComboDiscoveryProps = null;
     capturedLayoutProps = null;
     mockUseBlastGame.mockReturnValue(makeDefaultBlastReturn());
@@ -179,10 +179,10 @@ describe('BlastGame discovery integration', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={null}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 
@@ -194,10 +194,10 @@ describe('BlastGame discovery integration', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={'bomb_lightning'}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 
@@ -206,12 +206,12 @@ describe('BlastGame discovery integration', () => {
   });
 
   it('passes acknowledgeDiscovery as onComplete to BlastComboDiscovery', () => {
-    const ack = jest.fn();
+    const ack = vi.fn();
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={'bomb_lightning'}
         acknowledgeDiscovery={ack}
       />,
@@ -224,10 +224,10 @@ describe('BlastGame discovery integration', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={'prism_rainbow'}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 
@@ -238,10 +238,10 @@ describe('BlastGame discovery integration', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={null}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 
@@ -252,8 +252,8 @@ describe('BlastGame discovery integration', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
@@ -268,10 +268,10 @@ describe('BlastGameLayout interactive prop with isDiscoveryActive', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={'bomb_lightning'}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 
@@ -283,10 +283,10 @@ describe('BlastGameLayout interactive prop with isDiscoveryActive', () => {
     render(
       <BlastGameImport
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         pendingDiscovery={null}
-        acknowledgeDiscovery={jest.fn()}
+        acknowledgeDiscovery={vi.fn()}
       />,
     );
 

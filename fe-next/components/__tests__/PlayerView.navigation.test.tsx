@@ -22,12 +22,12 @@ describe('Header Logo Navigation - Room Exit Integration', () => {
 
   afterEach(() => {
     sessionStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should dispatch requestRoomExit event when logo is clicked with active session', () => {
     // Setup event listener spy
-    const eventHandler = jest.fn();
+    const eventHandler = vi.fn();
     window.addEventListener('requestRoomExit', eventHandler);
 
     // Simulate the Header's handleLogoClick logic
@@ -60,7 +60,7 @@ describe('Header Logo Navigation - Room Exit Integration', () => {
     // Clear session to simulate no active game
     sessionStorage.clear();
 
-    const eventHandler = jest.fn();
+    const eventHandler = vi.fn();
     window.addEventListener('requestRoomExit', eventHandler);
 
     // Simulate the Header's handleLogoClick logic

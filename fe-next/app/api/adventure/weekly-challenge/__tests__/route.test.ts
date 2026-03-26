@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Weekly Challenge API Route Tests
@@ -7,35 +8,35 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Mock weekly challenge config
-jest.mock('@/lib/adventure/weeklyChallenge', () => ({
-  getCurrentWeekId: jest.fn().mockReturnValue('2026-W13'),
+vi.mock('@/lib/adventure/weeklyChallenge', () => ({
+  getCurrentWeekId: vi.fn().mockReturnValue('2026-W13'),
 }));
 
 import { NextRequest } from 'next/server';
@@ -43,7 +44,7 @@ import { GET, POST } from '../route';
 
 // ---------- Helpers ----------
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeGetRequest() {
   return { headers: mockHeaders } as unknown as NextRequest;
@@ -86,17 +87,17 @@ const mockLeaderboardRows = [
 
 describe('GET /api/adventure/weekly-challenge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns weekly challenge leaderboard with weekId', async () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'weekly_challenge_scores') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: mockLeaderboardRows,
                   error: null,
                 }),
@@ -129,10 +130,10 @@ describe('GET /api/adventure/weekly-challenge', () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'weekly_challenge_scores') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: [],
                   error: null,
                 }),
@@ -154,10 +155,10 @@ describe('GET /api/adventure/weekly-challenge', () => {
     mockFrom.mockImplementation((table: string) => {
       if (table === 'weekly_challenge_scores') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                limit: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'INTERNAL', message: 'DB down' },
                 }),
@@ -179,7 +180,7 @@ describe('GET /api/adventure/weekly-challenge', () => {
 
 describe('POST /api/adventure/weekly-challenge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -203,12 +204,12 @@ describe('POST /api/adventure/weekly-challenge', () => {
         const updateSucceeds = existingScore !== null && existingScore.score < 1200;
         return {
           // For the conditional UPDATE path
-          update: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                lt: jest.fn().mockReturnValue({
-                  select: jest.fn().mockReturnValue({
-                    maybeSingle: jest.fn().mockResolvedValue({
+          update: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                lt: vi.fn().mockReturnValue({
+                  select: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({
                       data: (updateSucceeds && !updateError) ? { score: 1200 } : null,
                       error: updateError,
                     }),
@@ -218,14 +219,14 @@ describe('POST /api/adventure/weekly-challenge', () => {
             }),
           }),
           // For the INSERT fallback path
-          insert: jest.fn().mockResolvedValue({
+          insert: vi.fn().mockResolvedValue({
             error: insertError ?? (existingScore ? { code: '23505', message: 'duplicate' } : null),
           }),
           // For re-reading current best after conflict
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: existingScore ?? { score: 1200 },
                   error: null,
                 }),

@@ -4,13 +4,13 @@ import MiniGrid, { GridPosition } from '../MiniGrid';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Check: () => <div>Check</div>,
   Sparkles: () => <div>Sparkles</div>,
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const createMotionComponent = (tag: string) => {
     const Comp = React.forwardRef(({ children, className, animate, transition, initial, exit, whileHover, whileTap, layout, style, ...rest }: any, ref: any) =>
@@ -51,7 +51,7 @@ describe('MiniGrid - Letter Color Fix', () => {
           letters={mockLetters}
           demoWord="CAT"
           demoPath={mockDemoPath}
-          onDemoComplete={jest.fn()}
+          onDemoComplete={vi.fn()}
           showHints={true}
         />
       </LanguageProvider>

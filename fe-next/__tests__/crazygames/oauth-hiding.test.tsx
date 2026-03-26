@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OAuthButtonGroup } from '@/components/auth/shared/OAuthButtonGroup';
@@ -6,39 +7,39 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock dependencies
-jest.mock('@/components/CrazyGamesSDK');
-jest.mock('@/utils/ThemeContext');
-jest.mock('@/contexts/LanguageContext');
+vi.mock('@/components/CrazyGamesSDK');
+vi.mock('@/utils/ThemeContext');
+vi.mock('@/contexts/LanguageContext');
 
-const mockUseCrazyGames = useCrazyGames as jest.MockedFunction<typeof useCrazyGames>;
-const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
+const mockUseCrazyGames = useCrazyGames as MockedFunction<typeof useCrazyGames>;
+const mockUseTheme = useTheme as MockedFunction<typeof useTheme>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 
 describe('OAuth Hiding on CrazyGames Platform', () => {
-  const mockOnSignIn = jest.fn();
-  const mockShowAuthPrompt = jest.fn();
-  const mockT = jest.fn((key: string, params?: any) => {
+  const mockOnSignIn = vi.fn();
+  const mockShowAuthPrompt = vi.fn();
+  const mockT = vi.fn((key: string, params?: any) => {
     if (key === 'auth.loginCrazyGames') return 'Login';
     if (key === 'auth.signInWith') return `Sign in with ${params?.provider}`;
     return key;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default theme mock
     mockUseTheme.mockReturnValue({
       theme: 'dark',
-      toggleTheme: jest.fn(),
+      toggleTheme: vi.fn(),
     });
 
     // Default language mock
     mockUseLanguage.mockReturnValue({
       t: mockT,
       language: 'en',
-      setLanguage: jest.fn(),
-      formatNumber: jest.fn(),
-      formatDate: jest.fn(),
+      setLanguage: vi.fn(),
+      formatNumber: vi.fn(),
+      formatDate: vi.fn(),
     } as any);
   });
 
@@ -53,42 +54,42 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         deviceType: 'desktop',
         isLandscape: true,
         viewportSize: { width: 1024, height: 768 },
-        gameplayStart: jest.fn(),
-        gameplayStop: jest.fn(),
-        loadingStart: jest.fn(),
-        loadingStop: jest.fn(),
-        happyTime: jest.fn(),
-        showMidgameAd: jest.fn(),
-        showRewardedAd: jest.fn(),
-        hasAdblock: jest.fn(),
-        requestBanner: jest.fn(),
-        requestResponsiveBanner: jest.fn(),
-        clearBanner: jest.fn(),
-        clearAllBanners: jest.fn(),
-        saveData: jest.fn(),
-        loadData: jest.fn(),
-        removeData: jest.fn(),
-        getUser: jest.fn(),
-        isUserAccountAvailable: jest.fn(),
-        getSystemInfo: jest.fn(),
-        inviteLink: jest.fn(),
-        showInviteButton: jest.fn(),
-        hideInviteButton: jest.fn(),
-        getInviteParam: jest.fn(),
-        getInviteParams: jest.fn(),
+        gameplayStart: vi.fn(),
+        gameplayStop: vi.fn(),
+        loadingStart: vi.fn(),
+        loadingStop: vi.fn(),
+        happyTime: vi.fn(),
+        showMidgameAd: vi.fn(),
+        showRewardedAd: vi.fn(),
+        hasAdblock: vi.fn(),
+        requestBanner: vi.fn(),
+        requestResponsiveBanner: vi.fn(),
+        clearBanner: vi.fn(),
+        clearAllBanners: vi.fn(),
+        saveData: vi.fn(),
+        loadData: vi.fn(),
+        removeData: vi.fn(),
+        getUser: vi.fn(),
+        isUserAccountAvailable: vi.fn(),
+        getSystemInfo: vi.fn(),
+        inviteLink: vi.fn(),
+        showInviteButton: vi.fn(),
+        hideInviteButton: vi.fn(),
+        getInviteParam: vi.fn(),
+        getInviteParams: vi.fn(),
         isInstantMultiplayer: false,
-        addJoinRoomListener: jest.fn(),
-        removeJoinRoomListener: jest.fn(),
-        getSettings: jest.fn(),
-        addSettingsChangeListener: jest.fn(),
-        removeSettingsChangeListener: jest.fn(),
-        addAuthListener: jest.fn(),
-        removeAuthListener: jest.fn(),
-        getUserToken: jest.fn(),
-        listFriends: jest.fn(),
-        showAccountLinkPrompt: jest.fn(),
-        getXsollaUserToken: jest.fn(),
-        trackOrder: jest.fn(),
+        addJoinRoomListener: vi.fn(),
+        removeJoinRoomListener: vi.fn(),
+        getSettings: vi.fn(),
+        addSettingsChangeListener: vi.fn(),
+        removeSettingsChangeListener: vi.fn(),
+        addAuthListener: vi.fn(),
+        removeAuthListener: vi.fn(),
+        getUserToken: vi.fn(),
+        listFriends: vi.fn(),
+        showAccountLinkPrompt: vi.fn(),
+        getXsollaUserToken: vi.fn(),
+        trackOrder: vi.fn(),
       });
     });
 
@@ -153,42 +154,42 @@ describe('OAuth Hiding on CrazyGames Platform', () => {
         deviceType: 'desktop',
         isLandscape: true,
         viewportSize: { width: 1024, height: 768 },
-        gameplayStart: jest.fn(),
-        gameplayStop: jest.fn(),
-        loadingStart: jest.fn(),
-        loadingStop: jest.fn(),
-        happyTime: jest.fn(),
-        showMidgameAd: jest.fn(),
-        showRewardedAd: jest.fn(),
-        hasAdblock: jest.fn(),
-        requestBanner: jest.fn(),
-        requestResponsiveBanner: jest.fn(),
-        clearBanner: jest.fn(),
-        clearAllBanners: jest.fn(),
-        saveData: jest.fn(),
-        loadData: jest.fn(),
-        removeData: jest.fn(),
-        getUser: jest.fn(),
-        isUserAccountAvailable: jest.fn(),
-        getSystemInfo: jest.fn(),
-        inviteLink: jest.fn(),
-        showInviteButton: jest.fn(),
-        hideInviteButton: jest.fn(),
-        getInviteParam: jest.fn(),
-        getInviteParams: jest.fn(),
+        gameplayStart: vi.fn(),
+        gameplayStop: vi.fn(),
+        loadingStart: vi.fn(),
+        loadingStop: vi.fn(),
+        happyTime: vi.fn(),
+        showMidgameAd: vi.fn(),
+        showRewardedAd: vi.fn(),
+        hasAdblock: vi.fn(),
+        requestBanner: vi.fn(),
+        requestResponsiveBanner: vi.fn(),
+        clearBanner: vi.fn(),
+        clearAllBanners: vi.fn(),
+        saveData: vi.fn(),
+        loadData: vi.fn(),
+        removeData: vi.fn(),
+        getUser: vi.fn(),
+        isUserAccountAvailable: vi.fn(),
+        getSystemInfo: vi.fn(),
+        inviteLink: vi.fn(),
+        showInviteButton: vi.fn(),
+        hideInviteButton: vi.fn(),
+        getInviteParam: vi.fn(),
+        getInviteParams: vi.fn(),
         isInstantMultiplayer: false,
-        addJoinRoomListener: jest.fn(),
-        removeJoinRoomListener: jest.fn(),
-        getSettings: jest.fn(),
-        addSettingsChangeListener: jest.fn(),
-        removeSettingsChangeListener: jest.fn(),
-        addAuthListener: jest.fn(),
-        removeAuthListener: jest.fn(),
-        getUserToken: jest.fn(),
-        listFriends: jest.fn(),
-        showAccountLinkPrompt: jest.fn(),
-        getXsollaUserToken: jest.fn(),
-        trackOrder: jest.fn(),
+        addJoinRoomListener: vi.fn(),
+        removeJoinRoomListener: vi.fn(),
+        getSettings: vi.fn(),
+        addSettingsChangeListener: vi.fn(),
+        removeSettingsChangeListener: vi.fn(),
+        addAuthListener: vi.fn(),
+        removeAuthListener: vi.fn(),
+        getUserToken: vi.fn(),
+        listFriends: vi.fn(),
+        showAccountLinkPrompt: vi.fn(),
+        getXsollaUserToken: vi.fn(),
+        trackOrder: vi.fn(),
       });
     });
 

@@ -13,7 +13,7 @@ const stripMotionProps = (props: Record<string, unknown>) => {
   return rest;
 };
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     circle: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const rest = stripMotionProps(props);
@@ -35,7 +35,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useCountUp to return target immediately
-jest.mock('@/hooks/useCountUp', () => ({
+vi.mock('@/hooks/useCountUp', () => ({
   useCountUp: ({ target }: { target: number }) => target,
 }));
 

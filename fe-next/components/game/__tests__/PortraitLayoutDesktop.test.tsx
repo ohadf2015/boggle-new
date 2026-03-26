@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -25,7 +25,7 @@ jest.mock('../../../contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(
       (

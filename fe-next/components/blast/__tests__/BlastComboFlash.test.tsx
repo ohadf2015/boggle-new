@@ -9,7 +9,7 @@ import type { BlastComboType } from '../utils/blastCombos';
 
 // ---- Mocks ----
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onAnimationComplete, style, className, 'data-testid': testId, ...rest }: any) => {
       // Simulate animation completing immediately for tests
@@ -33,7 +33,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock AccessibilityContext
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useShouldReduceMotion: () => false,
 }));
 
@@ -111,7 +111,7 @@ describe('getComboFlashColor', () => {
 // ==================== BlastComboFlash component ====================
 
 describe('BlastComboFlash', () => {
-  const onComplete = jest.fn();
+  const onComplete = vi.fn();
 
   beforeEach(() => {
     onComplete.mockClear();

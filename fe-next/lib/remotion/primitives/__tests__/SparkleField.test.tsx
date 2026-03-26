@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * SparkleField Responsive Scaling Tests
  *
@@ -8,10 +9,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('remotion', () => ({
+vi.mock('remotion', () => ({
   __esModule: true,
-  useVideoConfig: jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
-  interpolate: jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+  useVideoConfig: vi.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 })),
+  interpolate: vi.fn((frame: number, inputRange: number[], outputRange: number[]) => {
     if (frame <= inputRange[0]) return outputRange[0];
     if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
     const [inMin, inMax] = inputRange;
@@ -30,7 +31,7 @@ jest.mock('remotion', () => ({
 const remotion = require('remotion');
 
 // Mock seededRandom util
-jest.mock('../../utils/seededRandom', () => ({
+vi.mock('../../utils/seededRandom', () => ({
   createSeededRandom: (seed: number) => {
     let s = seed;
     return () => {

@@ -5,13 +5,13 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ThemeProvider } from '@/utils/ThemeContext';
 
 // Mock next/link
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 
 // Mock useMobileLandscape
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
@@ -26,21 +26,21 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => (
 
 describe('MultiplayerLobby - Room List Max Width', () => {
   const mockProps = {
-    handleJoin: jest.fn(),
+    handleJoin: vi.fn(),
     gameCode: 'TEST123',
     username: 'testuser',
     roomName: 'Test Room',
     hostUsername: 'testhost',
-    setGameCode: jest.fn(),
-    setUsername: jest.fn(),
-    setRoomName: jest.fn(),
-    setHostUsername: jest.fn(),
+    setGameCode: vi.fn(),
+    setUsername: vi.fn(),
+    setRoomName: vi.fn(),
+    setHostUsername: vi.fn(),
     error: '',
     activeRooms: [
       { gameCode: 'ROOM1', roomName: 'Room 1', playerCount: 2, language: 'en' as const, hostUsername: 'host1', gameState: 'waiting' as const, isRanked: false, createdAt: Date.now() },
       { gameCode: 'ROOM2', roomName: 'Room 2', playerCount: 3, language: 'en' as const, hostUsername: 'host2', gameState: 'waiting' as const, isRanked: false, createdAt: Date.now() },
     ],
-    refreshRooms: jest.fn(),
+    refreshRooms: vi.fn(),
     roomsLoading: false,
     isAuthenticated: false,
     displayName: '',

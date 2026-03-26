@@ -7,14 +7,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(
       (

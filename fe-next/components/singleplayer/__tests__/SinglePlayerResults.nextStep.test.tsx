@@ -4,28 +4,30 @@ import userEvent from '@testing-library/user-event';
 import SinglePlayerResults from '../SinglePlayerResults';
 
 // Track navigation
-const mockRouterPush = jest.fn();
+const mockRouterPush = vi.fn();
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
   }),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock dynamic imports
-jest.mock('next/dynamic', () => () => {
-  const MockComponent = () => null;
-  return MockComponent;
-});
+vi.mock('next/dynamic', () => ({
+  default: () => {
+    const MockComponent = () => null;
+    return MockComponent;
+  },
+}));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -49,63 +51,63 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     isAuthenticated: false,
     profile: null,
-    updateProfile: jest.fn(),
+    updateProfile: vi.fn(),
     loading: false,
   }),
 }));
 
 // Mock CoinContext
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
-    awardGameCompletion: jest.fn().mockResolvedValue(null),
+    awardGameCompletion: vi.fn().mockResolvedValue(null),
   }),
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useWinStreak', () => ({
+vi.mock('@/hooks/useWinStreak', () => ({
   useWinStreak: () => ({
     currentStreak: 0,
     bestStreak: 0,
     lastWinDate: null,
-    recordWin: jest.fn(),
+    recordWin: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useAutoShowWithInteraction', () => ({
-  useAutoShowWithInteraction: jest.fn(),
+vi.mock('@/hooks/useAutoShowWithInteraction', () => ({
+  useAutoShowWithInteraction: vi.fn(),
 }));
 
-jest.mock('@/hooks/useWordHuntPromo', () => ({
+vi.mock('@/hooks/useWordHuntPromo', () => ({
   useWordHuntPromo: () => ({
     canShow: false,
-    recordImpression: jest.fn(),
+    recordImpression: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
   }),
 }));
 
-jest.mock('@/hooks/useSaveCognitiveScore', () => ({
+vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({
-    saveCognitiveScore: jest.fn().mockResolvedValue(null),
+    saveCognitiveScore: vi.fn().mockResolvedValue(null),
   }),
 }));
 
 // Mock AutoPlayCountdown — immediately call onCancel so NextStepPrompt renders
-jest.mock('@/components/results/AutoPlayCountdown', () => {
+vi.mock('@/components/results/AutoPlayCountdown', () => {
   const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
     // Simulate cancelled state so tests see NextStepPrompt
     const React = require('react');
@@ -113,11 +115,11 @@ jest.mock('@/components/results/AutoPlayCountdown', () => {
     return null;
   };
   MockAutoPlay.displayName = 'MockAutoPlayCountdown';
-  return MockAutoPlay;
+  return { default: MockAutoPlay };
 });
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
@@ -134,82 +136,82 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock RewardedAdGoldButton (uses ThemeProvider)
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+vi.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: vi.fn() }),
   ThemeProvider: ({ children }: any) => children,
 }));
 
 // Mock utilities
-jest.mock('@/utils/guestManager', () => ({
-  updateGuestStatsAfterGame: jest.fn(),
+vi.mock('@/utils/guestManager', () => ({
+  updateGuestStatsAfterGame: vi.fn(),
   getGuestStats: () => ({ games: 0 }),
   getGuestName: () => 'Guest',
   getGuestSessionId: () => null,
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
-jest.mock('@/utils/gameLogger', () => ({
-  logGameStart: jest.fn().mockResolvedValue(null),
-  logGameEnd: jest.fn().mockResolvedValue(null),
-  formatWordsForLogging: jest.fn().mockReturnValue([]),
+vi.mock('@/utils/gameLogger', () => ({
+  logGameStart: vi.fn().mockResolvedValue(null),
+  logGameEnd: vi.fn().mockResolvedValue(null),
+  formatWordsForLogging: vi.fn().mockReturnValue([]),
 }));
 
-jest.mock('@/utils/gameHistoryManager', () => ({
-  addGameToHistory: jest.fn(),
+vi.mock('@/utils/gameHistoryManager', () => ({
+  addGameToHistory: vi.fn(),
 }));
 
 // Mock result components to simplify test rendering
-jest.mock('@/components/results/ResultsWinnerBanner', () => {
+vi.mock('@/components/results/ResultsWinnerBanner', () => {
   const MockResultsWinnerBanner = () => <div data-testid="results-banner">Results Banner</div>;
   MockResultsWinnerBanner.displayName = 'MockResultsWinnerBanner';
-  return MockResultsWinnerBanner;
+  return { default: MockResultsWinnerBanner };
 });
-jest.mock('@/components/results/Top3Leaderboard', () => {
+vi.mock('@/components/results/Top3Leaderboard', () => {
   const MockTop3Leaderboard = () => <div data-testid="leaderboard">Leaderboard</div>;
   MockTop3Leaderboard.displayName = 'MockTop3Leaderboard';
-  return MockTop3Leaderboard;
+  return { default: MockTop3Leaderboard };
 });
-jest.mock('@/components/results/PlayerArchetypeBadge', () => () => null);
-jest.mock('@/components/results/PlayerInsights', () => () => null);
-jest.mock('@/components/results/CompactResultsStats', () => () => null);
-jest.mock('@/components/results/BonusBadgesRow', () => () => null);
-jest.mock('@/components/results/CoinRewardDisplay', () => () => null);
-jest.mock('@/components/results/BrainPointsDisplay', () => () => null);
-jest.mock('@/components/results/RewardsSummary', () => () => null);
-jest.mock('@/components/results/MissedWords', () => () => null);
-jest.mock('@/components/results/WordPointsGroup', () => ({
+vi.mock('@/components/results/PlayerArchetypeBadge', () => ({ default: () => null }));
+vi.mock('@/components/results/PlayerInsights', () => ({ default: () => null }));
+vi.mock('@/components/results/CompactResultsStats', () => ({ default: () => null }));
+vi.mock('@/components/results/BonusBadgesRow', () => ({ default: () => null }));
+vi.mock('@/components/results/CoinRewardDisplay', () => ({ default: () => null }));
+vi.mock('@/components/results/BrainPointsDisplay', () => ({ default: () => null }));
+vi.mock('@/components/results/RewardsSummary', () => ({ default: () => null }));
+vi.mock('@/components/results/MissedWords', () => ({ default: () => null }));
+vi.mock('@/components/results/WordPointsGroup', () => ({
   WordPointsGroup: () => null,
   InvalidWordsSection: () => null,
 }));
-jest.mock('@/components/AchievementBadge', () => ({
+vi.mock('@/components/AchievementBadge', () => ({
   AchievementBadge: () => null,
 }));
-jest.mock('@/components/layout/MobileTabBar', () => ({
+vi.mock('@/components/layout/MobileTabBar', () => ({
   MobileTabBar: () => null,
 }));
-jest.mock('@/components/voting/WordFeedbackModal', () => () => null);
-jest.mock('@/components/training', () => ({
+vi.mock('@/components/voting/WordFeedbackModal', () => ({ default: () => null }));
+vi.mock('@/components/training', () => ({
   TrainingAnalysisModal: () => null,
 }));
 
 // Mock new components
-jest.mock('../results/components/CelebrationHero', () => ({
+vi.mock('../results/components/CelebrationHero', () => ({
   CelebrationHero: () => <div data-testid="celebration-hero">Hero</div>,
 }));
-jest.mock('../results/components/ResultsInfoCards', () => ({
+vi.mock('../results/components/ResultsInfoCards', () => ({
   ResultsInfoCards: () => <div data-testid="results-info-cards">Cards</div>,
 }));
 
 // Mock useResultsData and extracted hooks
-jest.mock('../results', () => ({
+vi.mock('../results', () => ({
   useResultsData: () => ({
     allParticipants: [
       { name: 'Player', score: 100, isPlayer: true },
@@ -234,13 +236,13 @@ jest.mock('../results', () => ({
   useCoinRewards: () => ({ coinReward: null }),
   useWinStreakTracking: () => ({ winStreakData: null }),
   useCognitiveScoring: () => ({ brainPointsReward: null }),
-  useSignupPrompt: () => ({ showSignupModal: false, setShowSignupModal: jest.fn() }),
+  useSignupPrompt: () => ({ showSignupModal: false, setShowSignupModal: vi.fn() }),
   useAchievementsSave: () => {},
   useWordValidation: () => ({
     wordValidationQueue: [],
     showWordValidation: false,
-    setShowWordValidation: jest.fn(),
-    handleWordVote: jest.fn(),
+    setShowWordValidation: vi.fn(),
+    handleWordVote: vi.fn(),
   }),
   useBannerConfig: () => ({
     variant: 'ranking',
@@ -263,9 +265,9 @@ jest.mock('../results', () => ({
 }));
 
 describe('SinglePlayerResults NextStep navigation bug', () => {
-  const mockOnPlayAgain = jest.fn();
-  const mockOnQuickRematch = jest.fn();
-  const mockOnBackToLobby = jest.fn();
+  const mockOnPlayAgain = vi.fn();
+  const mockOnQuickRematch = vi.fn();
+  const mockOnBackToLobby = vi.fn();
 
   const baseResults = {
     playerScore: 100,
@@ -281,7 +283,7 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRouterPush.mockClear();
   });
 

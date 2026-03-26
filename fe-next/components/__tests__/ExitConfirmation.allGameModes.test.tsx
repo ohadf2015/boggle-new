@@ -17,19 +17,19 @@ import { renderHook } from '@testing-library/react';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 
 // Mock window methods
-const mockPushState = jest.fn();
+const mockPushState = vi.fn();
 const originalHistory = window.history;
 
 describe('Exit Confirmation - All Game Modes', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock history.pushState
     Object.defineProperty(window, 'history', {
       value: {
         ...originalHistory,
         pushState: mockPushState,
         state: null,
-        back: jest.fn(),
+        back: vi.fn(),
       },
       writable: true,
     });
@@ -44,7 +44,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Multiplayer Player Mode', () => {
     it('should enable navigation guard when game is active', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating PlayerView.tsx line 181-189
       renderHook(() =>
@@ -60,7 +60,7 @@ describe('Exit Confirmation - All Game Modes', () => {
     });
 
     it('should NOT enable navigation guard when in waiting state', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating PlayerView.tsx when gameActive = false
       renderHook(() =>
@@ -78,7 +78,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Host Playing Mode', () => {
     it('should enable navigation guard when host is playing and game started', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating HostView.tsx when gameStarted=true and hostPlaying=true
       renderHook(() =>
@@ -95,7 +95,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Host Broadcast/Spectator Mode', () => {
     it('should enable navigation guard when host is spectating and game started', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Host in broadcast/spectator mode (hostPlaying=false) should still get
       // navigation guard when the game is running
@@ -119,7 +119,7 @@ describe('Exit Confirmation - All Game Modes', () => {
     });
 
     it('should enable navigation guard when host is playing and game started', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       const gameStarted = true;
       const hostPlaying = true; // Host is playing
@@ -136,7 +136,7 @@ describe('Exit Confirmation - All Game Modes', () => {
     });
 
     it('should NOT enable navigation guard in pre-game lobby even as spectator', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       const gameStarted = false; // Pre-game lobby
       const hostPlaying = false;
@@ -156,7 +156,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Single Player Mode', () => {
     it('should enable navigation guard when grid exists, not game over, and score > 0', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating SinglePlayerGame.tsx line 152-159
       const grid = [['A', 'B'], ['C', 'D']]; // truthy
@@ -175,7 +175,7 @@ describe('Exit Confirmation - All Game Modes', () => {
     });
 
     it('should NOT enable navigation guard when score is 0', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       const grid = [['A', 'B'], ['C', 'D']];
       const isGameOver = false;
@@ -196,7 +196,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Daily Challenge Mode', () => {
     it('should enable navigation guard when game is not over', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating DailyChallengeGame.tsx line 92-99
       const isGameOver = false;
@@ -215,7 +215,7 @@ describe('Exit Confirmation - All Game Modes', () => {
 
   describe('Word Hunt Survival Mode', () => {
     it('should enable navigation guard when game is not over', () => {
-      const onNavigationAttempt = jest.fn(() => false);
+      const onNavigationAttempt = vi.fn(() => false);
 
       // Simulating DailyWordHuntSurvival.tsx line 82-89
       const isGameOver = false;

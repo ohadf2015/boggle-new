@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -17,7 +17,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     profile: { id: 'user-1' },
@@ -31,7 +31,7 @@ const mockRivalsData = {
   loading: false,
 };
 
-jest.mock('@/hooks/useLeagueRivals', () => ({
+vi.mock('@/hooks/useLeagueRivals', () => ({
   useLeagueRivals: () => mockRivalsData,
 }));
 

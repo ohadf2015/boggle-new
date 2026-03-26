@@ -7,21 +7,21 @@ import { render, screen } from '@testing-library/react';
 import { MilestoneTracker } from './MilestoneTracker';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
-jest.mock('@/backend/modules/xpManager', () => ({
-  getXpForLevel: jest.fn((level: number) => {
+vi.mock('@/backend/modules/xpManager', () => ({
+  getXpForLevel: vi.fn((level: number) => {
     // Simple XP curve for testing
     return Math.round(100 * Math.pow(level, 1.5));
   }),
 }));
 
-jest.mock('@/lib/supabase/education/milestones', () => ({
-  getMilestoneProgress: jest.fn((totalXp: number) => {
+vi.mock('@/lib/supabase/education/milestones', () => ({
+  getMilestoneProgress: vi.fn((totalXp: number) => {
     // Level 1 with 150 XP, next milestone is 3 at ~400 XP
     if (totalXp === 150) {
       return {
@@ -56,7 +56,7 @@ jest.mock('@/lib/supabase/education/milestones', () => ({
       xpToNextMilestone: 400,
     };
   }),
-  getMilestones: jest.fn(() => [
+  getMilestones: vi.fn(() => [
     { level: 3, isMajor: false, title: null },
     { level: 5, isMajor: true, title: 'WORD_SEEKER' },
     { level: 7, isMajor: false, title: null },

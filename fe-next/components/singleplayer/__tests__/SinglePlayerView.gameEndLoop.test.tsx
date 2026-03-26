@@ -17,7 +17,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock search params - will be set per test
 let mockSearchParams = new Map<string, string>();
-const mockRouterPush = jest.fn();
+const mockRouterPush = vi.fn();
 
 // Use global for callback storage to avoid module-level reassignment issues
 declare global {
@@ -27,11 +27,11 @@ declare global {
 global.__testCallbackStore__ = { onGameEnd: null };
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   useSearchParams: () => ({
     get: (key: string) => mockSearchParams.get(key) || null,
@@ -39,7 +39,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -48,40 +48,40 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock NavigationContext
-const mockSetIsInGame = jest.fn();
-jest.mock('@/contexts/NavigationContext', () => ({
+const mockSetIsInGame = vi.fn();
+vi.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => mockSetIsInGame,
 }));
 
 // Mock CoinContext (needed by PracticeResults)
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoin: () => ({
     coins: 0,
-    updateCoins: jest.fn(),
+    updateCoins: vi.fn(),
   }),
   useCoinContext: () => ({
     coins: 0,
-    updateCoins: jest.fn(),
-    addCoins: jest.fn(),
+    updateCoins: vi.fn(),
+    addCoins: vi.fn(),
   }),
 }));
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    unlockAudio: jest.fn(),
-    playBackgroundMusic: jest.fn(),
-    stopBackgroundMusic: jest.fn(),
+    unlockAudio: vi.fn(),
+    playBackgroundMusic: vi.fn(),
+    stopBackgroundMusic: vi.fn(),
     isPlaying: false,
   }),
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useGameMusic', () => ({
-  useGameMusic: jest.fn(),
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: vi.fn(),
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
@@ -89,7 +89,7 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 }));
 
 // Mock SinglePlayerGame to capture onGameEnd callback
-jest.mock('../SinglePlayerGame', () => {
+vi.mock('../SinglePlayerGame', () => {
   const React = require('react');
   const MockSinglePlayerGame = (props: { onGameEnd: (results: unknown) => void }) => {
     // Use useEffect to capture the callback (avoids render-time side effect lint error)
@@ -99,47 +99,47 @@ jest.mock('../SinglePlayerGame', () => {
     return React.createElement('div', { 'data-testid': 'game' }, 'Game');
   };
   MockSinglePlayerGame.displayName = 'MockSinglePlayerGame';
-  return MockSinglePlayerGame;
+  return { default: MockSinglePlayerGame };
 });
 
-jest.mock('../SinglePlayerResults', () => {
+vi.mock('../SinglePlayerResults', () => {
   const MockSinglePlayerResults = () => <div data-testid="results">Results</div>;
   MockSinglePlayerResults.displayName = 'MockSinglePlayerResults';
-  return MockSinglePlayerResults;
+  return { default: MockSinglePlayerResults };
 });
 
-jest.mock('../results/PracticeResults', () => {
+vi.mock('../results/PracticeResults', () => {
   const MockPracticeResults = () => <div data-testid="results">Practice Results</div>;
   MockPracticeResults.displayName = 'MockPracticeResults';
   return { __esModule: true, default: MockPracticeResults };
 });
 
-jest.mock('@/components/AutoHideHeader', () => {
+vi.mock('@/components/AutoHideHeader', () => {
   const MockAutoHideHeader = () => null;
   MockAutoHideHeader.displayName = 'MockAutoHideHeader';
-  return MockAutoHideHeader;
+  return { default: MockAutoHideHeader };
 });
 
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
 // Mock high score manager
-jest.mock('../highScoreManager', () => ({
-  getHighScore: jest.fn().mockReturnValue(null),
-  recordGameResult: jest.fn().mockReturnValue({ isNewHighScore: false }),
-  getAllTimeBest: jest.fn().mockReturnValue(null),
+vi.mock('../highScoreManager', () => ({
+  getHighScore: vi.fn().mockReturnValue(null),
+  recordGameResult: vi.fn().mockReturnValue({ isNewHighScore: false }),
+  getAllTimeBest: vi.fn().mockReturnValue(null),
 }));
 
 // Mock player progress storage
-jest.mock('@/utils/playerProgressStorage', () => ({
-  incrementTrainingGames: jest.fn(),
+vi.mock('@/utils/playerProgressStorage', () => ({
+  incrementTrainingGames: vi.fn(),
 }));
 
 // Mock preset config
-jest.mock('../presetConfig', () => ({
-  getMinWordLength: jest.fn().mockReturnValue(3),
-  getDefaultPreset: jest.fn().mockImplementation((mode: string) => {
+vi.mock('../presetConfig', () => ({
+  getMinWordLength: vi.fn().mockReturnValue(3),
+  getDefaultPreset: vi.fn().mockImplementation((mode: string) => {
     if (mode === 'solo-bots') {
       return {
         id: 'standard',
@@ -164,15 +164,16 @@ jest.mock('../presetConfig', () => ({
     }
     return null;
   }),
-  getPresetById: jest.fn().mockReturnValue(null),
+  getPresetById: vi.fn().mockReturnValue(null),
 }));
 
 // Import after mocks
 import SinglePlayerView from '../SinglePlayerView';
+import { getDefaultPreset } from '../presetConfig';
 
 describe('SinglePlayerView - Game End Loop Bug', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSearchParams = new Map();
     global.__testCallbackStore__.onGameEnd = null;
   });
@@ -292,7 +293,7 @@ describe('SinglePlayerView - Game End Loop Bug', () => {
     it('should not trigger auto-start when phase transitions to results', async () => {
       // GIVEN: autoStart=bots, game started and completed
       mockSearchParams.set('autoStart', 'bots');
-      const getDefaultPreset = jest.requireMock('../presetConfig').getDefaultPreset;
+      // getDefaultPreset is already imported and mocked above
 
       await act(async () => {
         render(<SinglePlayerView />);

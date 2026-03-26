@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * MobileShareSection Component Tests
  *
@@ -11,13 +12,13 @@ import MobileShareSection from '../MobileShareSection';
 import toast from 'react-hot-toast';
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
-  success: jest.fn(),
-  error: jest.fn(),
+vi.mock('react-hot-toast', () => ({
+  success: vi.fn(),
+  error: vi.fn(),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     button: ({ children, whileTap, animate, transition, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown; animate?: unknown; transition?: unknown }) => (
       <button {...props}>{children}</button>
@@ -26,17 +27,17 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock social icons
-jest.mock('../../../../components/icons/SocialIcons', () => ({
+vi.mock('../../../../components/icons/SocialIcons', () => ({
   WhatsAppIcon: ({ size }: { size?: number }) => <svg data-testid="whatsapp-icon" width={size} height={size} />,
   TelegramIcon: ({ size }: { size?: number }) => <svg data-testid="telegram-icon" width={size} height={size} />,
 }));
 
 // Mock share utils
-jest.mock('../../../../utils/share', () => ({
-  getJoinUrl: jest.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
-  copyJoinUrl: jest.fn().mockResolvedValue(true),
-  shareViaWhatsApp: jest.fn(),
-  shareViaTelegram: jest.fn(),
+vi.mock('../../../../utils/share', () => ({
+  getJoinUrl: vi.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
+  copyJoinUrl: vi.fn().mockResolvedValue(true),
+  shareViaWhatsApp: vi.fn(),
+  shareViaTelegram: vi.fn(),
 }));
 
 // Translation mock
@@ -59,18 +60,18 @@ describe('MobileShareSection', () => {
   const originalClipboard = navigator.clipboard;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     Object.defineProperty(navigator, 'clipboard', {
       value: {
-        writeText: jest.fn().mockResolvedValue(undefined),
+        writeText: vi.fn().mockResolvedValue(undefined),
       },
       configurable: true,
     });
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     Object.defineProperty(navigator, 'clipboard', {
       value: originalClipboard,
       configurable: true,
@@ -135,7 +136,7 @@ describe('MobileShareSection', () => {
       });
 
       await act(async () => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(screen.getByText('Copy Link')).toBeInTheDocument();

@@ -29,7 +29,7 @@ const mockT = (key: string, params?: Record<string, string>) => {
   return result;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -38,7 +38,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
       <div data-testid="adaptive-motion" {...props}>{children}</div>
@@ -66,11 +66,11 @@ const mockLeaderboard = [
 
 describe('VaultCard', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('when vault is active', () => {

@@ -3,15 +3,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DailyChallengeRouter from '../DailyChallengeRouter';
 
 // Mock getWordHuntStatusToday
-const mockGetWordHuntStatusToday = jest.fn();
-jest.mock('@/utils/dailyChallenge/storage', () => ({
+const mockGetWordHuntStatusToday = vi.fn();
+vi.mock('@/utils/dailyChallenge/storage', () => ({
   getWordHuntStatusToday: (...args: unknown[]) => mockGetWordHuntStatusToday(...args),
 }));
 
 // Mock useRouter
-const mockPush = jest.fn();
-const mockReplace = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
     replace: mockReplace,
@@ -19,14 +19,14 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     t: (key: string) => key,
   }),
 }));
 
-jest.mock('../DailyChallengeLanding', () => ({
+vi.mock('../DailyChallengeLanding', () => ({
   DailyChallengeLanding: ({
     onSelectWordHunt,
   }: {
@@ -38,12 +38,12 @@ jest.mock('../DailyChallengeLanding', () => ({
   ),
 }));
 
-jest.mock('../../Header', () => ({
+vi.mock('../../Header', () => ({
   __esModule: true,
   default: () => <header data-testid="header">Header</header>,
 }));
 
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   __esModule: true,
   default: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text}</div>
@@ -53,7 +53,7 @@ jest.mock('@/components/ui/PageLoader', () => ({
   ),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => <div {...props}>{children}</div>,
@@ -62,7 +62,7 @@ jest.mock('framer-motion', () => ({
 
 describe('DailyChallengeRouter - Smart Routing', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('redirect when not played today', () => {

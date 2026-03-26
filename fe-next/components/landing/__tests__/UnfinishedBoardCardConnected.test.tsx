@@ -9,17 +9,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useUnfinishedBoard
-const mockGetUnfinishedBoard = jest.fn();
-jest.mock('@/hooks/useUnfinishedBoard', () => ({
+const mockGetUnfinishedBoard = vi.fn();
+vi.mock('@/hooks/useUnfinishedBoard', () => ({
   useUnfinishedBoard: () => ({
     getUnfinishedBoard: mockGetUnfinishedBoard,
-    saveUnfinishedBoard: jest.fn(),
-    clearUnfinishedBoard: jest.fn(),
+    saveUnfinishedBoard: vi.fn(),
+    clearUnfinishedBoard: vi.fn(),
   }),
 }));
 
 // Mock UnfinishedBoardCard
-jest.mock('../UnfinishedBoardCard', () => ({
+vi.mock('../UnfinishedBoardCard', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => (
     <div data-testid="unfinished-board-card" data-score={props.score as number}>
@@ -29,13 +29,13 @@ jest.mock('../UnfinishedBoardCard', () => ({
 }));
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en' }),
 }));
 
@@ -43,7 +43,7 @@ import { UnfinishedBoardCardConnected } from '../UnfinishedBoardCardConnected';
 
 describe('UnfinishedBoardCardConnected', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns null when no unfinished board exists', () => {

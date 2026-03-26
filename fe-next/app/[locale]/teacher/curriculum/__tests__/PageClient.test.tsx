@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Teacher Curriculum PageClient Tests
  *
@@ -9,7 +10,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import CurriculumPageClient from '../PageClient';
 
 // Mock the CurriculumWordListBrowser component
-jest.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
+vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
   CurriculumWordListBrowser: ({
     teacherId,
     classroomId,
@@ -30,7 +31,7 @@ jest.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -45,7 +46,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useAuth
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'teacher-123', email: 'teacher@example.com' },
     isAuthenticated: true,
@@ -55,18 +56,18 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 // Mock useSearchParams
 const mockSearchParams = new URLSearchParams();
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     push: mockPush,
-    replace: jest.fn(),
+    replace: vi.fn(),
   }),
 }));
 
 describe('CurriculumPageClient', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSearchParams.delete('classroomId');
   });
 

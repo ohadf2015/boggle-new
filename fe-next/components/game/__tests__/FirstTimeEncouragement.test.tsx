@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import FirstTimeEncouragement from '../FirstTimeEncouragement';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, className, role, onClick, ...rest }: Record<string, unknown>) => (
@@ -16,12 +16,12 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: { variant: string }) => <div data-testid={`mascot-${variant}`} />,
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -54,7 +54,7 @@ describe('FirstTimeEncouragement', () => {
   });
 
   it('calls onDismiss when clicked', async () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(<FirstTimeEncouragement trigger="game-start" onDismiss={onDismiss} />);
     await userEvent.click(screen.getByRole('status'));
     expect(onDismiss).toHaveBeenCalled();

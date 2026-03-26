@@ -12,7 +12,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -27,7 +27,7 @@ jest.mock('../../../contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(
       (
@@ -75,7 +75,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useDevicePerformance
-jest.mock('../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -84,7 +84,7 @@ jest.mock('../../../hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useReducedMotion
-jest.mock('../../../utils/accessibility', () => ({
+vi.mock('../../../utils/accessibility', () => ({
   useReducedMotion: () => false,
 }));
 

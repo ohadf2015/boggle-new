@@ -66,7 +66,7 @@ import { supabase } from '@/lib/supabase';
 
 describe('fetchWithAuth', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (global.fetch as jest.Mock).mockClear();
   });
 

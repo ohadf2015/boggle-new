@@ -9,7 +9,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { InteractiveMascot, InteractiveMascotWithEntrance } from '../InteractiveMascot';
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -17,7 +17,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion to simplify testing
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockMotionDiv = React.forwardRef(
     ({ children, animate, initial, exit, whileHover, whileTap, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) =>
@@ -33,11 +33,11 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock next/image
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const React = require('react');
-  return function MockImage({ src, alt, ...props }: { src: string; alt: string }) {
+  return { default: function MockImage({ src, alt, ...props }: { src: string; alt: string }) {
     return React.createElement('img', { src, alt, ...props });
-  };
+  }
 });
 
 describe('InteractiveMascot', () => {
@@ -154,7 +154,7 @@ describe('InteractiveMascot', () => {
     });
 
     it('calls onHover callback', () => {
-      const onHover = jest.fn();
+      const onHover = vi.fn();
       render(
         <InteractiveMascot
           variant="happy"
@@ -192,7 +192,7 @@ describe('InteractiveMascot', () => {
     });
 
     it('calls onClick callback', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(
         <InteractiveMascot
           variant="happy"
@@ -208,7 +208,7 @@ describe('InteractiveMascot', () => {
     });
 
     it('reverts to base variant after clickDuration', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       render(
         <InteractiveMascot
@@ -227,12 +227,12 @@ describe('InteractiveMascot', () => {
 
       // After duration, should revert to base
       await act(async () => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/main-nobg.gif');
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 
@@ -255,7 +255,7 @@ describe('InteractiveMascot', () => {
     });
 
     it('responds to keyboard events', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(
         <InteractiveMascot
           variant="happy"
@@ -271,7 +271,7 @@ describe('InteractiveMascot', () => {
     });
 
     it('responds to space key', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(
         <InteractiveMascot
           variant="happy"

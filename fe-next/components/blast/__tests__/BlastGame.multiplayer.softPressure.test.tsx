@@ -13,52 +13,52 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,
     maxCombo: 0,
     comboTimeRemaining: null,
     isDangerState: false,
-    incrementCombo: jest.fn(),
+    incrementCombo: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false }),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
-  useDictionaryCache: () => ({ checkWord: jest.fn().mockReturnValue(true) }),
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({ checkWord: vi.fn().mockReturnValue(true) }),
 }));
 
-jest.mock('@/hooks/gameState', () => ({
+vi.mock('@/hooks/gameState', () => ({
   useBlastComboSync: () => null,
 }));
 
 // Mock useWordSubmission
-jest.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
   useWordSubmission: () => ({
-    handleWordSubmit: jest.fn(),
+    handleWordSubmit: vi.fn(),
     currentFeedback: null,
   }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
   useSpamDetection: () => ({}),
 }));
 
-jest.mock('canvas-confetti', () => jest.fn());
+vi.mock('canvas-confetti', () => vi.fn());
 
 // Capture useBlastGame options
 let capturedUseBlastGameOptions: any = null;
@@ -83,13 +83,13 @@ const mockBlastGameReturn = {
   scorePopups: [],
   availableWords: null,
   noWordsRemaining: false,
-  clearTilesForWord: jest.fn(),
-  endGame: jest.fn(),
-  unlockMoves: jest.fn(),
-  shuffleRemainingTiles: jest.fn(),
-  getResultsData: jest.fn(),
-  dismissExplosion: jest.fn(),
-  dismissScorePopup: jest.fn(),
+  clearTilesForWord: vi.fn(),
+  endGame: vi.fn(),
+  unlockMoves: vi.fn(),
+  shuffleRemainingTiles: vi.fn(),
+  getResultsData: vi.fn(),
+  dismissExplosion: vi.fn(),
+  dismissScorePopup: vi.fn(),
   cascadePhase: 'idle',
   isCascading: false,
   cascadeAnimationData: null,
@@ -97,69 +97,69 @@ const mockBlastGameReturn = {
   cascadeHighlightPhase: 'idle',
   cascadeHighlightData: null,
   activeComboFlash: null,
-  clearComboFlash: jest.fn(),
-  triggerComboFlash: jest.fn(),
-  trackWordFail: jest.fn(),
-  setTileStates: jest.fn(),
-  addExplosion: jest.fn(),
-  addBonusScore: jest.fn(),
+  clearComboFlash: vi.fn(),
+  triggerComboFlash: vi.fn(),
+  trackWordFail: vi.fn(),
+  setTileStates: vi.fn(),
+  addExplosion: vi.fn(),
+  addBonusScore: vi.fn(),
 };
 
-jest.mock('../hooks/useBlastGame', () => ({
+vi.mock('../hooks/useBlastGame', () => ({
   useBlastGame: (_config: any, options: any) => {
     capturedUseBlastGameOptions = options;
     return mockBlastGameReturn;
   },
 }));
 
-jest.mock('../hooks/useBlastSugarCrush', () => ({
+vi.mock('../hooks/useBlastSugarCrush', () => ({
   useBlastSugarCrush: () => ({
     isActive: false,
-    start: jest.fn(),
+    start: vi.fn(),
   }),
 }));
 
-jest.mock('../hooks/useBlastHint', () => ({
+vi.mock('../hooks/useBlastHint', () => ({
   useBlastHint: () => ({
     hintPath: null,
     hasHintAvailable: false,
-    requestHint: jest.fn(),
-    clearHint: jest.fn(),
+    requestHint: vi.fn(),
+    clearHint: vi.fn(),
   }),
 }));
 
-jest.mock('../hooks/useBlastObjectives', () => ({
+vi.mock('../hooks/useBlastObjectives', () => ({
   useBlastObjectives: () => ({
     objectiveProgress: [{ type: 'score', current: 50, target: 100, complete: false }],
     allObjectivesComplete: false,
   }),
 }));
 
-jest.mock('../hooks/useBlastNearMiss', () => ({
+vi.mock('../hooks/useBlastNearMiss', () => ({
   useBlastNearMiss: () => ({
     shimmerCells: [],
-    check: jest.fn(),
+    check: vi.fn(),
   }),
 }));
 
 // Mock BlastGameLayout to capture props
 let capturedLayoutProps: any = null;
-jest.mock('../BlastGameLayout', () => ({
+vi.mock('../BlastGameLayout', () => ({
   BlastGameLayout: (props: any) => {
     capturedLayoutProps = props;
     return <div data-testid="blast-game-layout" />;
   },
 }));
 
-jest.mock('../BlastComboFlash', () => ({
+vi.mock('../BlastComboFlash', () => ({
   BlastComboFlash: () => null,
 }));
 
-jest.mock('../BlastComboDiscovery', () => ({
+vi.mock('../BlastComboDiscovery', () => ({
   BlastComboDiscovery: () => null,
 }));
 
-jest.mock('../utils/blastWaveConfig', () => ({
+vi.mock('../utils/blastWaveConfig', () => ({
   getWaveObjectives: () => [
     { type: 'score', target: 100 },
     { type: 'collect_type', tileType: 'gold', target: 3 },
@@ -167,11 +167,11 @@ jest.mock('../utils/blastWaveConfig', () => ({
   getWaveConfig: () => ({ movesAllowed: 15, minWordLength: 2 }),
 }));
 
-jest.mock('../utils/blastCombos', () => ({
-  detectSpecialCombos: jest.fn().mockReturnValue([]),
+vi.mock('../utils/blastCombos', () => ({
+  detectSpecialCombos: vi.fn().mockReturnValue([]),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
+vi.mock('@/shared/utils/scoring', () => ({
   getComboMultiplier: () => 1,
 }));
 
@@ -207,8 +207,8 @@ describe('BlastGame multiplayer soft pressure', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -224,8 +224,8 @@ describe('BlastGame multiplayer soft pressure', () => {
         config={baseConfig}
         mode="multiplayer"
         waveConfig={{ movesAllowed: 15, minWordLength: 2 } as any}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -239,8 +239,8 @@ describe('BlastGame multiplayer soft pressure', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -254,8 +254,8 @@ describe('BlastGame multiplayer soft pressure', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -274,8 +274,8 @@ describe('BlastGame multiplayer soft pressure', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
         initialTileStates={mockTileStates as any}
         blastSeed={42}
       />
@@ -288,14 +288,14 @@ describe('BlastGame multiplayer soft pressure', () => {
 
   it('should NOT call endGame when allObjectivesComplete in multiplayer (server timer is authoritative)', () => {
     // Even with objectives complete, multiplayer should not trigger local game end
-    const mockOnGameEnd = jest.fn();
+    const mockOnGameEnd = vi.fn();
 
     render(
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
         onGameEnd={mockOnGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />
     );
 

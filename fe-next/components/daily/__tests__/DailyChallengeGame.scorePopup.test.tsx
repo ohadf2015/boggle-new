@@ -2,13 +2,13 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 // Mock ScorePopupFly to render a visible element when popup is not null
-jest.mock('@/components/animations/ScorePopupFly', () => ({
+vi.mock('@/components/animations/ScorePopupFly', () => ({
   ScorePopupFly: ({ popup }: { popup: { value: number; word?: string } | null }) =>
     popup ? <div data-testid="score-popup">{popup.value}</div> : null,
 }));
 
 // Mock all heavy dependencies of DailyChallengeGame
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     t: (key: string) => key,
@@ -16,52 +16,52 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
-    awardComboMilestone: jest.fn().mockResolvedValue(0),
+    awardComboMilestone: vi.fn().mockResolvedValue(0),
   }),
 }));
 
-jest.mock('@/hooks/useGameMusic', () => ({
-  useGameMusic: jest.fn(),
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: vi.fn(),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,
     comboTimeRemaining: 0,
     isDangerState: false,
     maxCombo: 0,
-    incrementCombo: jest.fn(),
-    resetCombo: jest.fn(),
+    incrementCombo: vi.fn(),
+    resetCombo: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useGameTimer', () => ({
+vi.mock('@/hooks/useGameTimer', () => ({
   useGameTimer: () => ({
     remainingTime: 60,
     remainingTimeRef: { current: 60 },
   }),
 }));
 
-const mockSubmitWord = jest.fn();
+const mockSubmitWord = vi.fn();
 let capturedOnWordAccepted: ((word: string, wordScore: number) => void) | null = null;
 
-jest.mock('@/hooks/useWordSubmission', () => ({
+vi.mock('@/hooks/useWordSubmission', () => ({
   useWordSubmission: (opts: { onWordAccepted?: (word: string, wordScore: number) => void }) => {
     capturedOnWordAccepted = opts.onWordAccepted ?? null;
     return {
@@ -73,112 +73,112 @@ jest.mock('@/hooks/useWordSubmission', () => ({
   },
 }));
 
-jest.mock('@/hooks/useCrazyGamesLifecycle', () => ({
-  useCrazyGamesLifecycle: jest.fn(),
+vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
+  useCrazyGamesLifecycle: vi.fn(),
 }));
 
-jest.mock('@/hooks/useDirectionPatternGuidance', () => ({
+vi.mock('@/hooks/useDirectionPatternGuidance', () => ({
   useDirectionPatternGuidance: () => ({
     showDirectionGuidance: false,
-    dismissDirectionGuidance: jest.fn(),
-    trackWordPath: jest.fn(),
+    dismissDirectionGuidance: vi.fn(),
+    trackWordPath: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useFirstPlayTutorial', () => ({
+vi.mock('@/hooks/useFirstPlayTutorial', () => ({
   useFirstPlayTutorial: () => ({
     tutorialPath: null,
     tutorialWord: null,
-    trackUserPath: jest.fn(),
+    trackUserPath: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useContextualGuidance', () => ({
+vi.mock('@/hooks/useContextualGuidance', () => ({
   useContextualGuidance: () => ({
     showSwipeTip: false,
-    dismissSwipeTip: jest.fn(),
-    triggerSwipeTipGuidance: jest.fn(),
+    dismissSwipeTip: vi.fn(),
+    triggerSwipeTipGuidance: vi.fn(),
   }),
-  useSwipeTipGuidanceTrigger: jest.fn(),
+  useSwipeTipGuidanceTrigger: vi.fn(),
 }));
 
-jest.mock('@/hooks/useNavigationGuard', () => ({
-  useNavigationGuard: jest.fn(),
+vi.mock('@/hooks/useNavigationGuard', () => ({
+  useNavigationGuard: vi.fn(),
 }));
 
-jest.mock('@/hooks/useKeyboardWordInput', () => ({
+vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({
     highlightedCells: [],
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: () => <div data-testid="grid-component" />,
 }));
 
-jest.mock('@/components/CircularTimer', () => ({
+vi.mock('@/components/CircularTimer', () => ({
   __esModule: true,
   default: () => <div data-testid="circular-timer" />,
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: () => <div data-testid="word-forming-area" />,
 }));
 
-jest.mock('@/components/game/ComboDisplay', () => ({
+vi.mock('@/components/game/ComboDisplay', () => ({
   __esModule: true,
   default: () => <div data-testid="combo-display" />,
 }));
 
-jest.mock('@/components/game/DirectionGuidanceTooltip', () => ({
+vi.mock('@/components/game/DirectionGuidanceTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/game/SwipeTipTooltip', () => ({
+vi.mock('@/components/game/SwipeTipTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/game/KeyboardHintTooltip', () => ({
+vi.mock('@/components/game/KeyboardHintTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/tutorial/TutorialCallout', () => ({
+vi.mock('@/components/tutorial/TutorialCallout', () => ({
   TutorialCallout: () => null,
 }));
 
-jest.mock('@/components/achievements/AchievementProgressTracker', () => ({
+vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => null,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
 }));
 
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/utils/mascotConfig', () => ({
+vi.mock('@/utils/mascotConfig', () => ({
   PANIC_TIMER_THRESHOLD: 30,
   ONFIRE_COMBO_THRESHOLD: 5,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, role, 'aria-label': ariaLabel, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} style={style} role={role} aria-label={ariaLabel}>{children}</div>
@@ -188,7 +188,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock fetch for grid solver
-global.fetch = jest.fn().mockResolvedValue({
+global.fetch = vi.fn().mockResolvedValue({
   ok: false,
 });
 
@@ -206,13 +206,13 @@ const defaultProps = {
   puzzleNumber: 1,
   language: 'en' as const,
   duration: 120,
-  onComplete: jest.fn(),
-  onQuit: jest.fn(),
+  onComplete: vi.fn(),
+  onQuit: vi.fn(),
 };
 
 describe('DailyChallengeGame score popup', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     capturedOnWordAccepted = null;
   });
 

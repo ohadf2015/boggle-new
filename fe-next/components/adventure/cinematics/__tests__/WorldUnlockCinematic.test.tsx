@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 const remotion = require('remotion');
 
-jest.mock('../../../../lib/remotion/fonts', () => ({
+vi.mock('../../../../lib/remotion/fonts', () => ({
   fredokaFamily: 'Fredoka, sans-serif',
   rubikFamily: 'Rubik, sans-serif',
 }));

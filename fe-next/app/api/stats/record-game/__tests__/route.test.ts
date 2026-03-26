@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 // @ts-nocheck
 /**
  * Singleplayer Stats Record Game API Tests
@@ -6,31 +7,31 @@
  * and XP is awarded via the increment_player_xp RPC.
  */
 
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
-const mockGetUser = jest.fn();
-const mockUpdate = jest.fn();
-const mockRpc = jest.fn();
-const mockSelect = jest.fn();
-const mockEq = jest.fn();
-const mockSingle = jest.fn();
+const mockGetUser = vi.fn();
+const mockUpdate = vi.fn();
+const mockRpc = vi.fn();
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockSingle = vi.fn();
 
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
-    from: jest.fn().mockReturnValue({
+    from: vi.fn().mockReturnValue({
       select: (...args) => {
         mockSelect(...args);
         return {
@@ -59,7 +60,7 @@ import { POST } from '../route';
 function makeRequest(body: unknown): NextRequest {
   return {
     json: () => Promise.resolve(body),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
@@ -87,7 +88,7 @@ const mockProfile = {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockGetUser.mockResolvedValue({
     data: { user: { id: 'user-123' } },
     error: null,

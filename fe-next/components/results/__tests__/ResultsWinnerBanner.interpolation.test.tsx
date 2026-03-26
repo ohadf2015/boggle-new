@@ -12,7 +12,7 @@ import { render, screen } from '@testing-library/react';
 const tCalls: Array<{ key: string; params?: Record<string, unknown> }> = [];
 
 // Mock contexts with parameter tracking
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       tCalls.push({ key, params });
@@ -30,7 +30,7 @@ jest.mock('../../../contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} style={style as React.CSSProperties} onClick={onClick as React.MouseEventHandler} {...rest}>
@@ -54,7 +54,7 @@ jest.mock('framer-motion', () => ({
   animate: () => ({ stop: () => {} }),
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => {
     // eslint-disable-next-line @next/next/no-img-element
@@ -63,18 +63,18 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock confetti utility
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
 }));
 
 // Mock Avatar component
-jest.mock('../../Avatar', () => ({
+vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Crown: () => <span data-testid="crown-icon">Crown</span>,
   Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
   Medal: () => <span data-testid="medal-icon">Medal</span>,
@@ -82,12 +82,12 @@ jest.mock('lucide-react', () => ({
 }));
 
 // Mock Mascot component
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
   MascotVariant: {},
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: () => <div data-testid="mascot">CelebrationMascot</div>,
 }));
 

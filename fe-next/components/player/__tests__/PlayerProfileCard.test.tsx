@@ -10,7 +10,7 @@ import PlayerProfileCard from '../PlayerProfileCard';
 import type { PublicProfile } from '@/shared/types/publicProfile';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
@@ -29,13 +29,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
-  return function MockAvatar({ size, className }: { size?: string; className?: string }) {
+vi.mock('@/components/Avatar', () => {
+  const MockAvatar = ({ size, className }: { size?: string; className?: string }) => {
     return <div data-testid="avatar" data-size={size} className={className} />;
   };
+  return { default: MockAvatar };
 });
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>
@@ -48,9 +49,9 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
@@ -100,7 +101,7 @@ describe('PlayerProfileCard', () => {
   });
 
   it('shows challenge button when onChallenge provided', () => {
-    const onChallenge = jest.fn();
+    const onChallenge = vi.fn();
     render(<PlayerProfileCard profile={MOCK_PROFILE} onChallenge={onChallenge} />);
 
     const challengeBtn = screen.getByRole('button', { name: /challenge/i });
@@ -131,7 +132,7 @@ describe('PlayerProfileCard', () => {
   });
 
   it('calls onClick when card is clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(<PlayerProfileCard profile={MOCK_PROFILE} onClick={onClick} />);
 
     const card = screen.getByRole('button', { name: /view.*profile/i });

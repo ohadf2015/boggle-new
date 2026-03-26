@@ -12,16 +12,16 @@ import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
 // Mock dependencies
-jest.mock('@/hooks/useSafeArea');
-jest.mock('@/hooks/useAppLifecycle');
-jest.mock('@/utils/SocketContext');
-jest.mock('@/utils/logger', () => ({
-  log: jest.fn(),
+vi.mock('@/hooks/useSafeArea');
+vi.mock('@/hooks/useAppLifecycle');
+vi.mock('@/utils/SocketContext');
+vi.mock('@/utils/logger', () => ({
+  log: vi.fn(),
   __esModule: true,
   default: {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    log: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -33,7 +33,7 @@ const mockGetSharedSocketIfExists = getSharedSocketIfExists as jest.MockedFuncti
 
 describe('NativeAppProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {
@@ -90,7 +90,7 @@ describe('NativeAppProvider', () => {
       // GIVEN
       const mockSocket = {
         connected: false,
-        connect: jest.fn(),
+        connect: vi.fn(),
       };
       mockGetSharedSocketIfExists.mockReturnValue(mockSocket as any);
 
@@ -116,7 +116,7 @@ describe('NativeAppProvider', () => {
       // GIVEN
       const mockSocket = {
         connected: true,
-        connect: jest.fn(),
+        connect: vi.fn(),
       };
       mockGetSharedSocketIfExists.mockReturnValue(mockSocket as any);
 
@@ -178,7 +178,7 @@ describe('NativeAppProvider', () => {
       // GIVEN
       const mockSocket = {
         connected: true,
-        disconnect: jest.fn(),
+        disconnect: vi.fn(),
       };
       mockGetSharedSocketIfExists.mockReturnValue(mockSocket as any);
 

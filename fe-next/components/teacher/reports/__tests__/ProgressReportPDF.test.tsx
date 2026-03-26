@@ -9,7 +9,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 
 // Mock react-pdf/renderer since it doesn't work in JSDOM
-jest.mock('@react-pdf/renderer', () => ({
+vi.mock('@react-pdf/renderer', () => ({
   Document: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pdf-document">{children}</div>
   ),
@@ -26,12 +26,12 @@ jest.mock('@react-pdf/renderer', () => ({
     create: (styles: Record<string, unknown>) => styles,
   },
   Font: {
-    register: jest.fn(),
+    register: vi.fn(),
   },
 }));
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {

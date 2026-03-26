@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { KeyboardDesktopBadge } from '../KeyboardDesktopBadge';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -32,7 +32,7 @@ describe('KeyboardDesktopBadge', () => {
 
   beforeEach(() => {
     // Reset userAgent mock before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {

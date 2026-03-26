@@ -4492,6 +4492,7 @@ const es = {
     "quitConfirmMessage": "¡Perderás tu progreso!",
     "feedback": {
       "tooShort": "📏 Mínimo 3 letras",
+      "tooLong": "📏 Máximo 8 letras",
       "duplicate": "🔁 ¡Ya encontrada!",
       "notOnBoardPenalty": "⚠️ No en el tablero -5 ❤️",
       "notFormablePenalty": "⚠️ No en el tablero -5 ❤️",

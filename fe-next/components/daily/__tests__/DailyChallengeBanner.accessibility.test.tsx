@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -25,26 +25,26 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: false,
   }),
 }));
 
-jest.mock('@/utils/dailyChallenge', () => ({
+vi.mock('@/utils/dailyChallenge', () => ({
   getDailyChallengeDate: () => '2026-01-29',
   getPuzzleNumber: () => 123,
   getSecondsUntilNextDaily: () => 3600,
@@ -53,14 +53,14 @@ jest.mock('@/utils/dailyChallenge', () => ({
   getDailyStreak: () => ({ currentStreak: 0 }),
 }));
 
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   ),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,

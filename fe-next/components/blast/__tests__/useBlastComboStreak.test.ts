@@ -3,7 +3,7 @@
  * TDD: written before implementation (RED phase).
  *
  * Given-When-Then pattern throughout.
- * Timer strategy: jest.useFakeTimers() with advanceTimersByTime().
+ * Timer strategy: vi.useFakeTimers() with advanceTimersByTime().
  * RAF is mocked globally as setTimeout(cb, 0) in jest.setup.js.
  */
 import { renderHook, act } from '@testing-library/react';
@@ -18,16 +18,16 @@ const COMBO_MULTIPLIER_PER_LEVEL = 0.20;
 
 /** Advance both real timers and RAF callbacks by ms */
 function advance(ms: number) {
-  jest.advanceTimersByTime(ms);
+  vi.advanceTimersByTime(ms);
 }
 
 // ==================== Tests ====================
 
 describe('useBlastComboStreak — initial state', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('starts with an inactive streak at level 0', () => {
@@ -42,10 +42,10 @@ describe('useBlastComboStreak — initial state', () => {
 });
 
 describe('useBlastComboStreak — first word submitted', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('starts streak at level 1 when first word is submitted', () => {
@@ -77,10 +77,10 @@ describe('useBlastComboStreak — first word submitted', () => {
 });
 
 describe('useBlastComboStreak — streak increments', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('increments level to 2 when second word submitted within window', () => {
@@ -128,10 +128,10 @@ describe('useBlastComboStreak — streak increments', () => {
 });
 
 describe('useBlastComboStreak — window expiry decays by 1', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('decays level by 1 (not reset to 0) when window expires at level 2', () => {
@@ -196,10 +196,10 @@ describe('useBlastComboStreak — window expiry decays by 1', () => {
 });
 
 describe('useBlastComboStreak — max combo level cap', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('caps combo level at MAX_COMBO_LEVEL (10)', () => {
@@ -232,10 +232,10 @@ describe('useBlastComboStreak — max combo level cap', () => {
 });
 
 describe('useBlastComboStreak — reset()', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('reset() clears level to 0', () => {
@@ -301,10 +301,10 @@ describe('useBlastComboStreak — reset()', () => {
 });
 
 describe('useBlastComboStreak — cleanup on unmount', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('cleans up RAF/timers on unmount without throwing', () => {

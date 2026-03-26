@@ -11,33 +11,33 @@ import React from 'react';
 import { render, screen, renderHook } from '@testing-library/react';
 
 // ─── Shared mocks ────────────────────────────────────────────────
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
     coins: 100,
-    spendCoins: jest.fn(),
-    refreshCoins: jest.fn(),
-    awardGameCompletion: jest.fn().mockResolvedValue(null),
+    spendCoins: vi.fn(),
+    refreshCoins: vi.fn(),
+    awardGameCompletion: vi.fn().mockResolvedValue(null),
   }),
 }));
 
-jest.mock('@/components/ads/RewardedAdButton', () => ({
+vi.mock('@/components/ads/RewardedAdButton', () => ({
   RewardedAdButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
@@ -47,7 +47,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
     get: (_target: unknown, prop: string) => {
       return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<unknown>) {
@@ -60,25 +60,25 @@ jest.mock('framer-motion', () => ({
 }));
 
 // ─── Fix 1: LevelCompleteModal shows canRetryFree ────────────────
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => true,
 }));
-jest.mock('@/hooks/useParticleBudget', () => ({
+vi.mock('@/hooks/useParticleBudget', () => ({
   useParticleBudget: () => ({ combo: 0 }),
 }));
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: () => null,
 }));
-jest.mock('@/lib/adventure/constants', () => ({
+vi.mock('@/lib/adventure/constants', () => ({
   OBJECTIVE_TRANSLATION_KEYS: {},
 }));
-jest.mock('@/utils/confettiUtils', () => ({
-  fireVictoryConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireVictoryConfetti: vi.fn(),
 }));
-jest.mock('../ui/RollingNumber', () => ({
+vi.mock('../ui/RollingNumber', () => ({
   RollingNumber: ({ value }: { value: number }) => <span>{value}</span>,
 }));
-jest.mock('lucide-react', () => new Proxy({}, {
+vi.mock('lucide-react', () => new Proxy({}, {
   get: (_t: unknown, name: string) => {
     if (name === '__esModule') return true;
     return (props: Record<string, unknown>) => React.createElement('svg', { 'data-icon': name, ...props });
@@ -97,9 +97,9 @@ describe('Fix 1: LevelCompleteModal canRetryFree prop', () => {
         objectives={[]}
         levelNumber={1}
         worldNumber={1}
-        onContinue={jest.fn()}
-        onRetry={jest.fn()}
-        onExit={jest.fn()}
+        onContinue={vi.fn()}
+        onRetry={vi.fn()}
+        onExit={vi.fn()}
         canRetryFree={true}
       />
     );
@@ -115,9 +115,9 @@ describe('Fix 1: LevelCompleteModal canRetryFree prop', () => {
         objectives={[]}
         levelNumber={1}
         worldNumber={1}
-        onContinue={jest.fn()}
-        onRetry={jest.fn()}
-        onExit={jest.fn()}
+        onContinue={vi.fn()}
+        onRetry={vi.fn()}
+        onExit={vi.fn()}
         canRetryFree={false}
       />
     );
@@ -129,16 +129,16 @@ describe('Fix 1: LevelCompleteModal canRetryFree prop', () => {
 // ─── Fix 2 & 3: useAdventureLevelCompletion sends loot + retainedScore ──
 import { useAdventureLevelCompletion } from '../hooks/useAdventureLevelCompletion';
 
-jest.mock('@/shared/utils/adventureXpUtils', () => ({
+vi.mock('@/shared/utils/adventureXpUtils', () => ({
   calculateAdventureXp: () => 100,
 }));
-jest.mock('@/lib/adventure/lootGenerator', () => ({
+vi.mock('@/lib/adventure/lootGenerator', () => ({
   generateLevelLoot: () => [{ type: 'gold_shard', rarity: 'common' }],
 }));
 
 describe('Fix 2 & 3: completion payload includes lootDrops and retainedScore', () => {
   it('includes lootDrops and retainedScore in recordCompletion call', () => {
-    const recordCompletion = jest.fn();
+    const recordCompletion = vi.fn();
     const props = {
       gameState: { isComplete: true, stars: 2, score: 500, wordsFound: ['cat', 'hat'], comboCount: 3 },
       timeRemaining: 30,
@@ -149,16 +149,16 @@ describe('Fix 2 & 3: completion payload includes lootDrops and retainedScore', (
       upgradeBonuses: { xpBonus: 1, timeBonus: 0, scoreBonus: 1 },
       upgradeEffects: { goldMultiplier: 1, doubleFirstCompletionGold: false, failureGold: 0, longWordGoldBonus: 0 },
       bonusGoldMultiplier: 1,
-      awardXp: jest.fn(() => ({ leveledUp: false })),
-      addGold: jest.fn(),
-      recordAttempt: jest.fn(),
+      awardXp: vi.fn(() => ({ leveledUp: false })),
+      addGold: vi.fn(),
+      recordAttempt: vi.fn(),
       recordCompletion,
-      saveCompletion: jest.fn().mockResolvedValue(true),
-      endAIDirector: jest.fn(),
-      handleEarnAchievement: jest.fn(() => false),
-      pauseGame: jest.fn(),
-      showVictory: jest.fn(),
-      showDefeat: jest.fn(),
+      saveCompletion: vi.fn().mockResolvedValue(true),
+      endAIDirector: vi.fn(),
+      handleEarnAchievement: vi.fn(() => false),
+      pauseGame: vi.fn(),
+      showVictory: vi.fn(),
+      showDefeat: vi.fn(),
       showLevelComplete: false,
       showVictoryCinematic: false,
       showDefeatCinematic: false,
@@ -166,9 +166,9 @@ describe('Fix 2 & 3: completion payload includes lootDrops and retainedScore', (
       isBossActive: false,
       bossHealthPhase: 'idle',
       playerIsDead: false,
-      endBossBattle: jest.fn(),
-      triggerBossTaunt: jest.fn(),
-      completeLevel: jest.fn(),
+      endBossBattle: vi.fn(),
+      triggerBossTaunt: vi.fn(),
+      completeLevel: vi.fn(),
       isFirstCompletion: true,
       retainedScore: 50,
     };

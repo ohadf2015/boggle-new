@@ -11,7 +11,7 @@ import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
 import * as confettiUtils from '@/utils/confettiUtils';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, vars?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
@@ -38,12 +38,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireLevelUpConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireLevelUpConfetti: vi.fn(),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onClick, ...props }: any) => (
       <div onClick={onClick} {...props}>
@@ -61,13 +61,13 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('AchievementUnlockModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
   const mockFireConfetti = confettiUtils.fireLevelUpConfetti as jest.MockedFunction<
     typeof confettiUtils.fireLevelUpConfetti
   >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {
@@ -264,7 +264,7 @@ describe('AchievementUnlockModal', () => {
     });
 
     it('should auto-dismiss toast after 3 seconds (bronze tier)', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       const bronzeUnlock: UnlockPayload = {
         achievementKey: 'first_lesson',
@@ -277,13 +277,13 @@ describe('AchievementUnlockModal', () => {
       render(<AchievementUnlockModal unlock={bronzeUnlock} onClose={mockOnClose} />);
 
       // Fast-forward 3 seconds
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
 
       await waitFor(() => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
       });
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 

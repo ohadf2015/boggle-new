@@ -3,10 +3,10 @@ import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { WinCinematic } from '../WinCinematic';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // Mock framer-motion to render plain divs
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, onClick, ...props }: any) => {
       const { initial, animate, transition, exit, whileTap, variants, whileHover, ...rest } = props;
@@ -21,20 +21,20 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock confetti utility so it doesn't blow up in jsdom
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
-  fireVictoryConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
+  fireVictoryConfetti: vi.fn(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
 describe('WinCinematic', () => {
   afterEach(() => {
     jest.clearAllTimers();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders puzzle number', () => {
@@ -42,14 +42,14 @@ describe('WinCinematic', () => {
       <WinCinematic
         puzzleNumber={421}
         finalScore={847}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
       />
     );
     expect(screen.getByText(/421/)).toBeInTheDocument();
   });
 
   it('calls onComplete after timeout', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(
       <WinCinematic
         puzzleNumber={421}
@@ -57,12 +57,12 @@ describe('WinCinematic', () => {
         onComplete={onComplete}
       />
     );
-    act(() => { jest.advanceTimersByTime(2600); });
+    act(() => { vi.advanceTimersByTime(2600); });
     expect(onComplete).toHaveBeenCalled();
   });
 
   it('calls onComplete on click exactly once', async () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     render(
       <WinCinematic
@@ -73,12 +73,12 @@ describe('WinCinematic', () => {
     );
     await user.click(screen.getByTestId('win-cinematic'));
     // Advance past the original 2.5s timer — should NOT fire again
-    act(() => { jest.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(3000); });
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('does not call onComplete after unmount', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const { unmount } = render(
       <WinCinematic
         puzzleNumber={421}
@@ -87,7 +87,7 @@ describe('WinCinematic', () => {
       />
     );
     unmount();
-    act(() => { jest.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(3000); });
     expect(onComplete).not.toHaveBeenCalled();
   });
 });

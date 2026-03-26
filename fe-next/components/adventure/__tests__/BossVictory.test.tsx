@@ -29,7 +29,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.game.wordsFound': 'Words Found',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -37,7 +37,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const MockMotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) =>
@@ -133,8 +133,8 @@ const defaultProps = {
   score: 1250,
   wordsFound: ['HELLO', 'WORLD', 'TEST'],
   gameState: mockGameState,
-  onContinue: jest.fn(),
-  onRetry: jest.fn(),
+  onContinue: vi.fn(),
+  onRetry: vi.fn(),
 };
 
 // ==============================================
@@ -143,7 +143,7 @@ const defaultProps = {
 
 describe('BossVictory', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Victory State', () => {
@@ -229,7 +229,7 @@ describe('BossVictory', () => {
   describe('Action Buttons', () => {
     it('should call onContinue when continue button clicked (victory only)', () => {
       // GIVEN
-      const onContinue = jest.fn();
+      const onContinue = vi.fn();
       render(<BossVictory {...defaultProps} isVictory={true} onContinue={onContinue} />);
 
       // WHEN
@@ -241,7 +241,7 @@ describe('BossVictory', () => {
 
     it('should call onRetry when retry button clicked', () => {
       // GIVEN
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       render(<BossVictory {...defaultProps} onRetry={onRetry} />);
 
       // WHEN

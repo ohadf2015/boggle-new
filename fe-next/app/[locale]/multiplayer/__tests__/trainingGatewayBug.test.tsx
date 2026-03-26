@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: Multiplayer Training Gateway shows repeatedly bug
  *
@@ -27,14 +28,14 @@ import {
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
     _getStore: () => ({ ...store }),
@@ -47,13 +48,13 @@ Object.defineProperty(window, 'localStorage', {
 
 describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   /**
@@ -175,7 +176,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Advance timer to trigger gateway
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should now be shown
@@ -195,7 +196,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Advance any pending timers
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show while in game
@@ -206,7 +207,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Advance timers again (in case effect re-runs)
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show after leaving game
@@ -223,7 +224,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Trigger initial gateway
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
       expect(screen.getByTestId('training-gateway-modal')).toBeInTheDocument();
 
@@ -241,7 +242,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Advance timers
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show
@@ -253,7 +254,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Initial gateway
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
       expect(screen.getByTestId('training-gateway-modal')).toBeInTheDocument();
       fireEvent.click(screen.getByTestId('close-gateway'));
@@ -263,13 +264,13 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
         // Join game
         fireEvent.click(screen.getByTestId('join-game'));
         act(() => {
-          jest.advanceTimersByTime(600);
+          vi.advanceTimersByTime(600);
         });
 
         // Leave game
         fireEvent.click(screen.getByTestId('leave-game'));
         act(() => {
-          jest.advanceTimersByTime(600);
+          vi.advanceTimersByTime(600);
         });
 
         // Gateway should NOT show
@@ -283,7 +284,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
       render(<TestMultiplayerComponent />);
 
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
       expect(screen.getByTestId('training-gateway-modal')).toBeInTheDocument();
 
@@ -294,7 +295,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
       fireEvent.click(screen.getByTestId('join-game'));
       fireEvent.click(screen.getByTestId('leave-game'));
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show
@@ -313,7 +314,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Trigger initial gateway
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
       expect(screen.getByTestId('training-gateway-modal')).toBeInTheDocument();
 
@@ -328,7 +329,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Advance timers
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show
@@ -353,14 +354,14 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Clear any pending state
       localStorageMock.clear(); // Reset storage to simulate fresh state
-      jest.clearAllTimers();
+      vi.clearAllTimers();
 
       // Second mount (this is what Strict Mode does)
       render(<TestMultiplayerComponent />);
 
       // Now advance timers
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should show (first time)
@@ -380,7 +381,7 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
 
       // Initial gateway trigger
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
       expect(screen.getByTestId('training-gateway-modal')).toBeInTheDocument();
 
@@ -390,14 +391,14 @@ describe('Training Gateway Bug - Shows repeatedly after dismiss', () => {
       // Rapid state changes (like what might happen in real usage)
       for (let i = 0; i < 10; i++) {
         fireEvent.click(screen.getByTestId('join-game'));
-        act(() => jest.advanceTimersByTime(100));
+        act(() => vi.advanceTimersByTime(100));
         fireEvent.click(screen.getByTestId('leave-game'));
-        act(() => jest.advanceTimersByTime(100));
+        act(() => vi.advanceTimersByTime(100));
       }
 
       // Final timer advance
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       // Gateway should NOT show

@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Practice API Route Tests
  * Tests for PATCH handler XP wiring and idempotency
  */
 
 // Mock next/server BEFORE any imports
-jest.mock('next/server', () => {
+vi.mock('next/server', () => {
   class MockNextRequest {
     private _body: any;
     url: string;
@@ -24,7 +25,7 @@ jest.mock('next/server', () => {
   return {
     NextRequest: MockNextRequest,
     NextResponse: {
-      json: jest.fn((data: any, init?: { status?: number }) => ({
+      json: vi.fn((data: any, init?: { status?: number }) => ({
         json: async () => data,
         status: init?.status || 200,
       })),
@@ -32,21 +33,21 @@ jest.mock('next/server', () => {
   };
 });
 
-jest.mock('@/utils/supabase/server');
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/supabase/server');
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    time: jest.fn(),
-    timeEnd: jest.fn(),
+    log: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    time: vi.fn(),
+    timeEnd: vi.fn(),
   },
 }));
-jest.mock('@/backend/modules/educationXpManager', () => ({
-  calculatePracticeXp: jest.fn(() => ({ totalXp: 120, breakdown: { dailyPractice: 20, flashcardCorrect: 100 }, masteryMessage: 'Great!' })),
+vi.mock('@/backend/modules/educationXpManager', () => ({
+  calculatePracticeXp: vi.fn(() => ({ totalXp: 120, breakdown: { dailyPractice: 20, flashcardCorrect: 100 }, masteryMessage: 'Great!' })),
 }));
 
 import { NextRequest } from 'next/server';
@@ -59,22 +60,22 @@ describe('PATCH /api/education/practice', () => {
   let mockRpc: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup mock RPC function
-    mockRpc = jest.fn().mockResolvedValue({ data: null, error: null });
+    mockRpc = vi.fn().mockResolvedValue({ data: null, error: null });
 
     // Setup mock from() builder
-    mockFrom = jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      single: jest.fn(),
+    mockFrom = vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      single: vi.fn(),
     }));
 
     // Setup mock auth
     mockAuth = {
-      getUser: jest.fn().mockResolvedValue({
+      getUser: vi.fn().mockResolvedValue({
         data: { user: { id: '550e8400-e29b-41d4-a716-446655440002' } },
         error: null,
       }),
@@ -95,7 +96,7 @@ describe('PATCH /api/education/practice', () => {
   describe('XP Award on Completion', () => {
     it('should award XP via RPC when practice session is completed', async () => {
       // GIVEN: Session exists and is not yet completed
-      const ownershipCheckMock = jest.fn().mockResolvedValue({
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -104,7 +105,7 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      const sessionUpdateMock = jest.fn().mockResolvedValue({
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -119,15 +120,15 @@ describe('PATCH /api/education/practice', () => {
       });
 
       // Additional from() call for XP update after server calculation
-      const xpUpdateMock = jest.fn().mockResolvedValue({ data: null, error: null });
+      const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
 
       mockFrom.mockImplementation(() => {
         const callCount = mockFrom.mock.calls.length;
-        const builder: Record<string, jest.Mock> = {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          update: jest.fn(() => {
-            if (callCount >= 3) return { eq: jest.fn().mockResolvedValue(xpUpdateMock()) };
+        const builder: Record<string, Mock> = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          update: vi.fn(() => {
+            if (callCount >= 3) return { eq: vi.fn().mockResolvedValue(xpUpdateMock()) };
             return builder;
           }),
           single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
@@ -163,7 +164,7 @@ describe('PATCH /api/education/practice', () => {
 
     it('should NOT award XP when session is not completed', async () => {
       // GIVEN: Session update without completion
-      const ownershipCheckMock = jest.fn().mockResolvedValue({
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -172,7 +173,7 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      const sessionUpdateMock = jest.fn().mockResolvedValue({
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -187,9 +188,9 @@ describe('PATCH /api/education/practice', () => {
       mockFrom.mockImplementation(() => {
         const callCount = mockFrom.mock.calls.length;
         const builder = {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          update: jest.fn().mockReturnThis(),
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
           single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
         };
         return builder;
@@ -219,7 +220,7 @@ describe('PATCH /api/education/practice', () => {
   describe('Idempotency Guard', () => {
     it('should return existing session when already completed (prevent double-awarding)', async () => {
       // GIVEN: Session already completed
-      const ownershipCheckMock = jest.fn().mockResolvedValue({
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -229,8 +230,8 @@ describe('PATCH /api/education/practice', () => {
       });
 
       mockFrom.mockImplementation(() => ({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
         single: ownershipCheckMock,
       }));
 
@@ -267,7 +268,7 @@ describe('PATCH /api/education/practice', () => {
         error: { message: 'RPC function not found' },
       });
 
-      const ownershipCheckMock = jest.fn().mockResolvedValue({
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -276,7 +277,7 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      const sessionUpdateMock = jest.fn().mockResolvedValue({
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
@@ -290,15 +291,15 @@ describe('PATCH /api/education/practice', () => {
         error: null,
       });
 
-      const xpUpdateMock = jest.fn().mockResolvedValue({ data: null, error: null });
+      const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
 
       mockFrom.mockImplementation(() => {
         const callCount = mockFrom.mock.calls.length;
-        const builder: Record<string, jest.Mock> = {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          update: jest.fn(() => {
-            if (callCount >= 3) return { eq: jest.fn().mockResolvedValue(xpUpdateMock()) };
+        const builder: Record<string, Mock> = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          update: vi.fn(() => {
+            if (callCount >= 3) return { eq: vi.fn().mockResolvedValue(xpUpdateMock()) };
             return builder;
           }),
           single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,

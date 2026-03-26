@@ -12,43 +12,43 @@ import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { getWordHuntStatusToday } from '@/utils/dailyChallenge/storage';
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(() => '/en/daily'),
-  useSearchParams: jest.fn(() => ({ get: jest.fn(() => null) })),
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(() => '/en/daily'),
+  useSearchParams: vi.fn(() => ({ get: vi.fn(() => null) })),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
   }),
 }));
 
-jest.mock('@/utils/dailyChallenge/storage');
-jest.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: jest.fn().mockResolvedValue('test-fingerprint'),
+vi.mock('@/utils/dailyChallenge/storage');
+vi.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: vi.fn().mockResolvedValue('test-fingerprint'),
 }));
 
 const mockGetWordHuntStatusToday = getWordHuntStatusToday as jest.MockedFunction<typeof getWordHuntStatusToday>;
 
 describe('DailyChallengeLanding - Navigation Refresh', () => {
-  const mockOnSelectWordHunt = jest.fn();
+  const mockOnSelectWordHunt = vi.fn();
   beforeEach(() => {
-    jest.clearAllMocks();
-    global.fetch = jest.fn().mockResolvedValue({
+    vi.clearAllMocks();
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ available: true, data: {} }),
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('GIVEN user completes Word Hunt and navigates back', () => {

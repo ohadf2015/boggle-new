@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion — passthrough all SVG/HTML elements
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
    
   const handler: ProxyHandler<any> = {
     get(_target, tag: string) {
@@ -27,7 +27,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => false,
 }));

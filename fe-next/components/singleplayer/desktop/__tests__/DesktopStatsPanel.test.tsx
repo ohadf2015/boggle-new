@@ -6,14 +6,14 @@ import { render, screen } from '@testing-library/react';
 import { DesktopStatsPanel } from '../DesktopStatsPanel';
 
 // Mock the framer-motion module
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<object>) => <div {...props}>{children}</div>,
   },
 }));
 
 // Mock CircularTimer component
-jest.mock('@/components/CircularTimer', () => ({
+vi.mock('@/components/CircularTimer', () => ({
   __esModule: true,
   default: ({ remainingTime, totalTime }: { remainingTime: number; totalTime: number }) => (
     <div data-testid="circular-timer" data-remaining={remainingTime} data-total={totalTime}>
@@ -23,7 +23,7 @@ jest.mock('@/components/CircularTimer', () => ({
 }));
 
 // Mock ComboDisplay component
-jest.mock('@/components/game/ComboDisplay', () => ({
+vi.mock('@/components/game/ComboDisplay', () => ({
   __esModule: true,
   default: ({ comboLevel }: { comboLevel: number }) => (
     <div data-testid="combo-display" data-level={comboLevel}>
@@ -52,7 +52,7 @@ describe('DesktopStatsPanel', () => {
     targetHighScore: null,
     isPracticeMode: false,
     comboCoinReward: null,
-    onCoinAnimationComplete: jest.fn(),
+    onCoinAnimationComplete: vi.fn(),
     t: mockT,
   };
 

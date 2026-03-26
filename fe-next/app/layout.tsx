@@ -10,18 +10,18 @@ const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.lexiclash.live'),
     title: {
-        default: 'LexiClash - Free Online Multiplayer Word Game | Play Boggle Online No Download',
+        default: 'LexiClash – Free Online Word Game | Play With Friends',
         template: '%s | LexiClash',
     },
-    description: 'Play free online multiplayer word games — no download required! LexiClash is a fast-paced word battle game like Boggle & Words With Friends. Compete with friends in real-time.',
+    description: 'Play free online word games with friends — no download needed. LexiClash is a real-time multiplayer word battle: find words fast, build combos, climb leaderboards. Like Boggle & Wordle but competitive. 5 languages, daily challenges, adventure mode.',
     // Open Graph meta tags for social sharing (WhatsApp, Facebook, Discord, etc.)
     // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://www.lexiclash.live',
-        title: 'LexiClash - Free Online Multiplayer Word Game | Play Boggle Online No Download',
-        description: 'Play free online multiplayer word games — no download required! LexiClash is a fast-paced word battle game like Boggle & Words With Friends. Compete with friends in real-time.',
+        title: 'LexiClash – Free Online Word Game | Play With Friends',
+        description: 'Play free online word games with friends — no download needed. LexiClash is a real-time multiplayer word battle: find words fast, build combos, climb leaderboards. Like Boggle & Wordle but competitive. 5 languages, daily challenges, adventure mode.',
         siteName: 'LexiClash',
         images: [
             {
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
     // Twitter Card meta tags
     twitter: {
         card: 'summary_large_image',
-        title: 'LexiClash - Free Online Multiplayer Word Game | No Download',
-        description: 'Play free online multiplayer word games — no download! Like Boggle & Words With Friends but real-time. Compete with friends now.',
+        title: 'LexiClash – Free Online Word Game | Play With Friends',
+        description: 'Real-time multiplayer word battles — no download. Find words fast, build combos, climb leaderboards. Free to play in 5 languages.',
         images: ['https://www.lexiclash.live/og-image-en.jpg'],
     },
     // Block indexing for preview/staging environments

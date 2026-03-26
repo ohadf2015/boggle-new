@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { ObjectiveProgress } from '../ObjectiveProgress';
 
 // Mock Framer Motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
@@ -16,7 +16,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock usePrefersReducedMotion hook
-jest.mock('../../../../hooks/usePrefersReducedMotion', () => ({
+vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 

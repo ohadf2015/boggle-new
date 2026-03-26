@@ -93,7 +93,7 @@ describe('useSpellingGame', () => {
 
       // Wait for auto-advance (1000ms for correct)
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
       expect(result.current.wordIndex).toBe(1);
 
@@ -132,7 +132,7 @@ describe('useSpellingGame', () => {
 
       // Wait for auto-advance (1000ms for correct)
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
       expect(result.current.wordIndex).toBe(1);
 
@@ -190,7 +190,7 @@ describe('useSpellingGame', () => {
 
       // Wait for next word
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       // Use hint on second word - should reset streak
@@ -234,21 +234,21 @@ describe('useSpellingGame', () => {
         result.current.submitAnswer('cat');
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       act(() => {
         result.current.submitAnswer('dog');
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       act(() => {
         result.current.submitAnswer('elephant');
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       // Should be complete
@@ -263,21 +263,21 @@ describe('useSpellingGame', () => {
         result.current.submitAnswer('cat'); // Correct
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       act(() => {
         result.current.submitAnswer('dag'); // Incorrect (should be 'dog')
       });
       act(() => {
-        jest.advanceTimersByTime(2000); // 2s for incorrect
+        vi.advanceTimersByTime(2000); // 2s for incorrect
       });
 
       act(() => {
         result.current.submitAnswer('elephant'); // Correct
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       // Should be complete
@@ -299,7 +299,7 @@ describe('useSpellingGame', () => {
         result.current.submitAnswer('cat');
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       // Reset
@@ -339,10 +339,10 @@ describe('useSpellingGame', () => {
 
 // Setup/teardown for timers
 beforeEach(() => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
 });
 
 afterEach(() => {
   jest.runOnlyPendingTimers();
-  jest.useRealTimers();
+  vi.useRealTimers();
 });

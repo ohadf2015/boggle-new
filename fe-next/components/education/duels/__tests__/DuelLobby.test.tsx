@@ -5,12 +5,12 @@ import DuelLobby from '../DuelLobby';
 import { useDuelSocket, type OpponentInfo, type ChallengeReceivedData } from '@/hooks/useDuelSocket';
 
 // Mock dependencies
-jest.mock('@/hooks/useDuelSocket');
-jest.mock('@/lib/supabase/education/duels', () => ({
-  getPendingDuelsForStudent: jest.fn(),
+vi.mock('@/hooks/useDuelSocket');
+vi.mock('@/lib/supabase/education/duels', () => ({
+  getPendingDuelsForStudent: vi.fn(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     dir: 'ltr',
@@ -38,12 +38,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('DuelLobby', () => {
-  const mockJoinLobby = jest.fn();
-  const mockLeaveLobby = jest.fn();
-  const mockAcceptChallenge = jest.fn();
-  const mockDeclineChallenge = jest.fn();
-  const mockOnLobbyUpdate = jest.fn((cb) => () => {});
-  const mockOnChallengeReceived = jest.fn((cb) => () => {});
+  const mockJoinLobby = vi.fn();
+  const mockLeaveLobby = vi.fn();
+  const mockAcceptChallenge = vi.fn();
+  const mockDeclineChallenge = vi.fn();
+  const mockOnLobbyUpdate = vi.fn((cb) => () => {});
+  const mockOnChallengeReceived = vi.fn((cb) => () => {});
 
   const defaultProps = {
     classroomId: 'classroom-1',
@@ -55,7 +55,7 @@ describe('DuelLobby', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useDuelSocket as jest.Mock).mockReturnValue({
       socket: {},
       isConnected: true,

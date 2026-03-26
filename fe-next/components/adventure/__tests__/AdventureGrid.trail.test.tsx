@@ -12,7 +12,7 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock WordPathTrail component
-jest.mock('@/components/animations/WordPathTrail', () => {
+vi.mock('@/components/animations/WordPathTrail', () => {
   const WordPathTrail = ({ points, isValid, wasSubmitted }: any) => (
     <div
       data-testid="word-path-trail-mock"

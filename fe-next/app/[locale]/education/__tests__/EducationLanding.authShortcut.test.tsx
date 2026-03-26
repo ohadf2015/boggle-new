@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Education Landing — authenticated dashboard shortcut tests
  * Covers: role-aware shortcut banner shown when user is authenticated
@@ -6,34 +7,34 @@
 import { render, screen } from '@testing-library/react';
 import EducationPageClient from '../PageClient';
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/components/education/EducationHeader', () => ({
+vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
 
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: () => <div data-testid="interactive-mascot" />,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="auth-modal" /> : null,
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(
     ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) =>
@@ -48,18 +49,18 @@ jest.mock('framer-motion', () => {
   return {
     motion: { div: MotionDiv, button: MotionButton },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    useReducedMotion: jest.fn().mockReturnValue(false),
+    useReducedMotion: vi.fn().mockReturnValue(false),
   };
 });
 
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 describe('Education Landing — authenticated dashboard shortcut', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('does NOT show shortcut when user is not authenticated', () => {

@@ -3,28 +3,28 @@ import { useReferralShare } from '../useReferralShare';
 
 // Mock auth context
 let mockIsAuthenticated = false;
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
 }));
 
 // Mock language context — t() returns the key for simplicity
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
 // Mock growthTracking
-jest.mock('@/utils/growthTracking', () => ({
-  trackShare: jest.fn(),
+vi.mock('@/utils/growthTracking', () => ({
+  trackShare: vi.fn(),
 }));
 
 // Mock navigator.clipboard
 Object.defineProperty(navigator, 'clipboard', {
-  value: { writeText: jest.fn().mockResolvedValue(undefined) },
+  value: { writeText: vi.fn().mockResolvedValue(undefined) },
   writable: true,
 });
 
 // Mock window.open
-global.open = jest.fn();
+global.open = vi.fn();
 
 // Mock window.location.origin
 Object.defineProperty(window, 'location', {
@@ -34,7 +34,7 @@ Object.defineProperty(window, 'location', {
 
 describe('useReferralShare', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsAuthenticated = false;
   });
 
@@ -56,7 +56,7 @@ describe('useReferralShare', () => {
 
     it('should not call /api/referral for guests', async () => {
       // GIVEN
-      global.fetch = jest.fn();
+      global.fetch = vi.fn();
       mockIsAuthenticated = false;
 
       // WHEN
@@ -73,7 +73,7 @@ describe('useReferralShare', () => {
   describe('authenticated user', () => {
     beforeEach(() => {
       mockIsAuthenticated = true;
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
           data: {
@@ -103,7 +103,7 @@ describe('useReferralShare', () => {
     it('should set isLoading true during fetch and false after', async () => {
       // GIVEN
       let resolvePromise: (value: unknown) => void;
-      global.fetch = jest.fn().mockReturnValue(
+      global.fetch = vi.fn().mockReturnValue(
         new Promise((resolve) => { resolvePromise = resolve; })
       );
 
@@ -125,7 +125,7 @@ describe('useReferralShare', () => {
 
     it('should fallback to window.origin if API fails', async () => {
       // GIVEN
-      global.fetch = jest.fn().mockResolvedValue({ ok: false });
+      global.fetch = vi.fn().mockResolvedValue({ ok: false });
 
       // WHEN
       const { result } = renderHook(() => useReferralShare());
@@ -141,7 +141,7 @@ describe('useReferralShare', () => {
   describe('handleCopy', () => {
     it('should copy shareUrl and set copied=true then reset after 2s', async () => {
       // GIVEN
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       mockIsAuthenticated = false;
       const { result } = renderHook(() => useReferralShare());
       await act(async () => { await result.current.fetchShareData(); });
@@ -154,10 +154,10 @@ describe('useReferralShare', () => {
       expect(result.current.copied).toBe(true);
 
       // AFTER 2s
-      act(() => { jest.advanceTimersByTime(2000); });
+      act(() => { vi.advanceTimersByTime(2000); });
       expect(result.current.copied).toBe(false);
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('should call trackShare("copy")', async () => {
@@ -213,7 +213,7 @@ describe('useReferralShare', () => {
     it('should use navigator.share for native platform when available', async () => {
       // GIVEN
       mockIsAuthenticated = false;
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'share', { value: mockShare, configurable: true });
       const { result } = renderHook(() => useReferralShare());
       await act(async () => { await result.current.fetchShareData(); });

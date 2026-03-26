@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Tests for POST /api/validate-word
@@ -22,17 +23,17 @@ if (typeof globalThis.Response === 'undefined' || !globalThis.Response.json) {
 }
 
 // Mock rate limiter
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
-  rateLimitResponse: jest.fn().mockReturnValue({
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
+  rateLimitResponse: vi.fn().mockReturnValue({
     json: async () => ({ error: 'Rate limited' }),
     status: 429,
   }),
 }));
 
 // Mock Supabase
-const mockMaybeSingle = jest.fn().mockResolvedValue({ data: null, error: null });
-jest.mock('@supabase/supabase-js', () => ({
+const mockMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: () => ({
       select: () => ({
@@ -51,24 +52,24 @@ jest.mock('@supabase/supabase-js', () => ({
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Mock english words — include a known word
-jest.mock('an-array-of-english-words', () => ['hello', 'world', 'cat', 'dog', 'test']);
+vi.mock('an-array-of-english-words', () => ['hello', 'world', 'cat', 'dog', 'test']);
 
 // Mock spanish words
-jest.mock('an-array-of-spanish-words', () => ['hola', 'mundo', 'gato']);
+vi.mock('an-array-of-spanish-words', () => ['hola', 'mundo', 'gato']);
 
 // Mock fs for lazy-loaded dictionaries
-jest.mock('fs', () => ({
-  existsSync: jest.fn().mockReturnValue(false),
-  readFileSync: jest.fn().mockReturnValue(''),
+vi.mock('fs', () => ({
+  existsSync: vi.fn().mockReturnValue(false),
+  readFileSync: vi.fn().mockReturnValue(''),
 }));
 
 // Mock word normalization
-jest.mock('@/shared/utils/wordNormalization', () => ({
+vi.mock('@/shared/utils/wordNormalization', () => ({
   normalizeHebrewWord: (w: string) => w,
   normalizeSpanishWord: (w: string) => w.toLowerCase(),
 }));
@@ -102,11 +103,11 @@ describe('POST /api/validate-word', () => {
   const origError = console.error;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (checkApiRateLimit as jest.Mock).mockReturnValue({ success: true });
+    vi.clearAllMocks();
+    (checkApiRateLimit as Mock).mockReturnValue({ success: true });
     mockMaybeSingle.mockResolvedValue({ data: null, error: null });
-    console.warn = jest.fn();
-    console.error = jest.fn();
+    console.warn = vi.fn();
+    console.error = vi.fn();
   });
 
   afterEach(() => {
@@ -231,7 +232,7 @@ describe('POST /api/validate-word', () => {
   // --- Rate limiting ---
 
   it('returns 429 when rate limited', async () => {
-    (checkApiRateLimit as jest.Mock).mockReturnValue({ success: false });
+    (checkApiRateLimit as Mock).mockReturnValue({ success: false });
     const res = await POST(makeRequest({ word: 'hello', language: 'en' }));
     expect(res.status).toBe(429);
   });

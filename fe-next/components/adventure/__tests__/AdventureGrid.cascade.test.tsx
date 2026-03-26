@@ -11,7 +11,7 @@ import type { GridTileState } from '@/types/adventure';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -43,11 +43,11 @@ function createMockTiles(gridSize: number): GridTileState[] {
 
 describe('AdventureGrid - Tile Cascade Animation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('tiles render with cascade animation when showCascade is true', () => {
@@ -67,7 +67,7 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
   });
 
   test('onCascadeComplete is called after animation duration', () => {
-    const onCascadeComplete = jest.fn();
+    const onCascadeComplete = vi.fn();
     const tiles = createMockTiles(4);
 
     render(
@@ -86,14 +86,14 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
     // DEBT-01: For 4x4: max diagonal = 6, so 6*25 + 300 = 450ms (was 580ms)
     const cascadeDuration4x4 = OPTIMIZED_TIMING.getCascadeDuration(4);
     act(() => {
-      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
+      vi.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete).toHaveBeenCalledTimes(1);
   });
 
   test('cascade skipped when showCascade is false', () => {
-    const onCascadeComplete = jest.fn();
+    const onCascadeComplete = vi.fn();
     const tiles = createMockTiles(4);
 
     render(
@@ -117,7 +117,7 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
     // Current test setup uses a global mock that can't be easily overridden per-test
     // Behavior is verified through the useEffect logic in the component
 
-    const onCascadeComplete = jest.fn();
+    const onCascadeComplete = vi.fn();
     const tiles = createMockTiles(4);
 
     render(
@@ -134,7 +134,7 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
     // DEBT-01: Uses optimized timing
     const cascadeDuration4x4 = OPTIMIZED_TIMING.getCascadeDuration(4);
     act(() => {
-      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
+      vi.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete).toHaveBeenCalledTimes(1);
@@ -181,7 +181,7 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
   });
 
   test('cascade duration scales with grid size', () => {
-    const onCascadeComplete5x5 = jest.fn();
+    const onCascadeComplete5x5 = vi.fn();
     const tiles5x5 = createMockTiles(5);
 
     render(
@@ -200,14 +200,14 @@ describe('AdventureGrid - Tile Cascade Animation', () => {
 
     // Advance to just past 4x4 duration - 5x5 should NOT be complete yet
     act(() => {
-      jest.advanceTimersByTime(cascadeDuration4x4 + 10);
+      vi.advanceTimersByTime(cascadeDuration4x4 + 10);
     });
 
     expect(onCascadeComplete5x5).not.toHaveBeenCalled();
 
     // Advance to complete 5x5 duration
     act(() => {
-      jest.advanceTimersByTime(cascadeDuration5x5 - cascadeDuration4x4);
+      vi.advanceTimersByTime(cascadeDuration5x5 - cascadeDuration4x4);
     });
 
     expect(onCascadeComplete5x5).toHaveBeenCalledTimes(1);

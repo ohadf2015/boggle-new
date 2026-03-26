@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AchievementGrid } from './AchievementGrid';
 
 // Mock motion components to avoid AnimatePresence keeping exiting elements
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   AdaptiveMotion: {
     div: Object.assign(React.forwardRef(function MotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) { return <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap'].includes(k)))}>{children}</div>; }), { displayName: 'motion.div' }),
@@ -15,14 +15,14 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 }));
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
-jest.mock('@/utils/achievementTiers', () => ({
-  getTierProgress: jest.fn((count: number) => {
+vi.mock('@/utils/achievementTiers', () => ({
+  getTierProgress: vi.fn((count: number) => {
     if (count === 0) {
       return {
         currentTier: null,
@@ -62,7 +62,7 @@ jest.mock('@/utils/achievementTiers', () => ({
       isMaxTier: false,
     };
   }),
-  getTierDisplay: jest.fn((tier: string | null) => {
+  getTierDisplay: vi.fn((tier: string | null) => {
     if (!tier) return null;
     const colors = {
       BRONZE: { bg: '#CD7F32', border: '#8B4513', text: '#000000', glow: 'rgba(205, 127, 50, 0.5)' },

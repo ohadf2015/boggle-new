@@ -1,9 +1,10 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvMomentumTicker from '../TvMomentumTicker';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
@@ -41,11 +42,11 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
 
 describe('TvMomentumTicker', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders with initial message', () => {
@@ -94,7 +95,7 @@ describe('TvMomentumTicker', () => {
     const firstMessage = ticker.textContent;
 
     act(() => {
-      jest.advanceTimersByTime(8500);
+      vi.advanceTimersByTime(8500);
     });
 
     // Message should have changed (or cycled)
@@ -120,7 +121,7 @@ describe('TvMomentumTicker', () => {
         break;
       }
       act(() => {
-        jest.advanceTimersByTime(8500);
+        vi.advanceTimersByTime(8500);
       });
     }
     expect(foundCloseRace).toBe(true);
@@ -142,7 +143,7 @@ describe('TvMomentumTicker', () => {
         break;
       }
       act(() => {
-        jest.advanceTimersByTime(8500);
+        vi.advanceTimersByTime(8500);
       });
     }
     expect(foundWordMsg).toBe(true);

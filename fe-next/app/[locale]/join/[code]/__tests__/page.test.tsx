@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Tests for Join Classroom via Shareable Link
  *
@@ -12,34 +13,34 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import JoinWithCodePage from '../page';
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  useParams: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  useParams: vi.fn(),
 }));
 
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/components/student/JoinClassroomForm', () => {
-  return function MockJoinClassroomForm({ initialCode }: { initialCode: string }) {
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/components/student/JoinClassroomForm', () => ({
+  default: function MockJoinClassroomForm({ initialCode }: { initialCode: string }) {
     return <div data-testid="join-form">Join Form: {initialCode}</div>;
-  };
-});
+  },
+}));
 
 describe('JoinWithCodePage - Bug Reproduction', () => {
-  const mockPush = jest.fn();
-  const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-  const mockUseParams = useParams as jest.MockedFunction<typeof useParams>;
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
+  const mockPush = vi.fn();
+  const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
+  const mockUseParams = useParams as MockedFunction<typeof useParams>;
+  const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+  const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
     mockUseParams.mockReturnValue({ code: '4HCDMS' });
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       languages: ['en', 'he', 'sv', 'ja'],
     } as any);
 

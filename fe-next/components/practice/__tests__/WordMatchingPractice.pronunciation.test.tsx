@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { WordMatchingPractice } from '../WordMatchingPractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -11,7 +11,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/practice/PronunciationButton', () => ({
+vi.mock('@/components/practice/PronunciationButton', () => ({
   PronunciationButton: ({ word }: { word: string }) => (
     <button data-testid="pronunciation-btn" data-word={word}>
       🔊
@@ -19,42 +19,42 @@ jest.mock('@/components/practice/PronunciationButton', () => ({
   ),
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => <div data-testid="mascot">Mascot</div>,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@dnd-kit/core', () => ({
+vi.mock('@dnd-kit/core', () => ({
   DndContext: ({ children }: any) => <div data-testid="dnd-context">{children}</div>,
-  useSensors: jest.fn(() => []),
-  useSensor: jest.fn(),
-  PointerSensor: jest.fn(),
-  KeyboardSensor: jest.fn(),
-  closestCenter: jest.fn(),
-  useDraggable: jest.fn(() => ({
+  useSensors: vi.fn(() => []),
+  useSensor: vi.fn(),
+  PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
+  closestCenter: vi.fn(),
+  useDraggable: vi.fn(() => ({
     attributes: {},
     listeners: {},
-    setNodeRef: jest.fn(),
+    setNodeRef: vi.fn(),
     transform: null,
     isDragging: false,
   })),
-  useDroppable: jest.fn(() => ({
-    setNodeRef: jest.fn(),
+  useDroppable: vi.fn(() => ({
+    setNodeRef: vi.fn(),
     isOver: false,
   })),
 }));
 
-jest.mock('@dnd-kit/sortable', () => ({
-  sortableKeyboardCoordinates: jest.fn(),
+vi.mock('@dnd-kit/sortable', () => ({
+  sortableKeyboardCoordinates: vi.fn(),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const MockDiv = ({ children, ...props }: any) => <div {...props}>{children}</div>;
   return {
     AdaptiveMotion: {
@@ -76,8 +76,8 @@ describe('WordMatchingPractice - PronunciationButton', () => {
     render(
       <WordMatchingPractice
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 
@@ -89,8 +89,8 @@ describe('WordMatchingPractice - PronunciationButton', () => {
     render(
       <WordMatchingPractice
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 

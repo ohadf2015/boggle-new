@@ -21,11 +21,11 @@ const mockHUDTheme = {
   hintActiveText: 'text-emerald-950',
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useHUDTheme: () => mockHUDTheme,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     locale: 'en',
@@ -33,14 +33,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('../../AdventureTimer', () => ({
+vi.mock('../../AdventureTimer', () => ({
   __esModule: true,
   default: ({ timeRemaining }: any) => (
     <div data-testid="mock-timer">Time: {timeRemaining}s</div>
   ),
 }));
 
-jest.mock('../RollingNumber', () => ({
+vi.mock('../RollingNumber', () => ({
   RollingNumber: ({ value }: any) => <span data-testid="mock-rolling">{value.toLocaleString('en-US')}</span>,
 }));
 
@@ -51,8 +51,8 @@ describe('GameHeader — HUD Theme Integration', () => {
     score: 500,
     timeRemaining: 60,
     isPaused: false,
-    onPauseToggle: jest.fn(),
-    onExit: jest.fn(),
+    onPauseToggle: vi.fn(),
+    onExit: vi.fn(),
   };
 
   it('should apply headerBg from theme to header element', () => {

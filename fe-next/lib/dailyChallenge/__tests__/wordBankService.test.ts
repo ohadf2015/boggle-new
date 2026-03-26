@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Word Bank Service Tests
  *
@@ -15,8 +16,8 @@ import { importWikipediaWordsToBank, WORD_LENGTH_RANGE } from '../wordBankServic
 import type { Language } from '@/types';
 
 // Mock Supabase
-const mockUpsert = jest.fn();
-const mockFrom = jest.fn();
+const mockUpsert = vi.fn();
+const mockFrom = vi.fn();
 
 const mockSupabaseClient = {
   from: mockFrom,
@@ -24,7 +25,7 @@ const mockSupabaseClient = {
 
 describe('importWikipediaWordsToBank', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup default mock behavior for Supabase
     mockFrom.mockReturnValue({
@@ -233,7 +234,7 @@ describe('importWikipediaWordsToBank', () => {
       await importWikipediaWordsToBank(mockSupabaseClient, 'en', ['cat', 'test']);
       expect(mockUpsert).toHaveBeenCalledTimes(1); // Only 'test'
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Japanese: min 2, so single char should be filtered
       await importWikipediaWordsToBank(mockSupabaseClient, 'ja', ['猫', '人間']);

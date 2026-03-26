@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Supabase Auth Functions Tests
  *
@@ -6,39 +7,39 @@
 
 import { mockAuth } from './__mocks__/supabaseAuthMocks';
 
-jest.mock('@supabase/ssr', () => {
+vi.mock('@supabase/ssr', () => {
    
   const { mockAuth: auth } = require('./__mocks__/supabaseAuthMocks');
   return {
     createBrowserClient: () => ({
       auth,
-      from: jest.fn(() => ({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn(),
-        maybeSingle: jest.fn(),
-        insert: jest.fn().mockReturnThis(),
-        update: jest.fn().mockReturnThis(),
-        is: jest.fn().mockReturnThis(),
-        order: jest.fn().mockReturnThis(),
-        range: jest.fn().mockReturnThis(),
+      from: vi.fn(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
+        maybeSingle: vi.fn(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        range: vi.fn().mockReturnThis(),
       })),
       storage: {
-        from: jest.fn(() => ({
-          upload: jest.fn(),
-          remove: jest.fn(),
-          getPublicUrl: jest.fn(),
+        from: vi.fn(() => ({
+          upload: vi.fn(),
+          remove: vi.fn(),
+          getPublicUrl: vi.fn(),
         })),
       },
     }),
   };
 });
 
-jest.mock('@/utils/logger', () => ({
-  default: { warn: jest.fn(), error: jest.fn(), info: jest.fn() },
+vi.mock('@/utils/logger', () => ({
+  default: { warn: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
-jest.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: jest.fn() }));
-jest.mock('@/utils/platform', () => ({ isNative: () => false }));
+vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: vi.fn() }));
+vi.mock('@/utils/platform', () => ({ isNative: () => false }));
 
 const mockLocation = { pathname: '/en/multiplayer', origin: 'https://lexiclash.com' };
 Object.defineProperty(window, 'location', { value: mockLocation, writable: true });
@@ -46,7 +47,7 @@ Object.defineProperty(window, 'location', { value: mockLocation, writable: true 
 import { signInWithMagicLink, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithDiscord } from '../supabase';
 
 describe('signInWithMagicLink', () => {
-  beforeEach(() => { jest.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
+  beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
 
   it('calls signInWithOtp with email and locale-aware redirect', async () => {
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
@@ -84,7 +85,7 @@ describe('signInWithMagicLink', () => {
 });
 
 describe('signInWithEmail', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('calls signInWithPassword with credentials', async () => {
     mockAuth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
@@ -101,7 +102,7 @@ describe('signInWithEmail', () => {
 });
 
 describe('signUpWithEmail', () => {
-  beforeEach(() => { jest.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
+  beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
 
   it('calls signUp with locale-aware redirect', async () => {
     mockAuth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
@@ -114,7 +115,7 @@ describe('signUpWithEmail', () => {
 });
 
 describe('signInWithGoogle', () => {
-  beforeEach(() => { jest.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
+  beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; });
 
   it('calls signInWithOAuth with google provider', async () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
@@ -126,7 +127,7 @@ describe('signInWithGoogle', () => {
 });
 
 describe('signInWithDiscord', () => {
-  beforeEach(() => { jest.clearAllMocks(); mockLocation.pathname = '/sv/game'; });
+  beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/sv/game'; });
 
   it('calls signInWithOAuth with discord and locale', async () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });

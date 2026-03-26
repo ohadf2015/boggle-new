@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * AdventureThemeContext Tests
  *
@@ -200,7 +201,7 @@ describe('AdventureThemeProvider', () => {
 
   it('should not change world when setting same world', () => {
     // GIVEN
-    const onRender = jest.fn();
+    const onRender = vi.fn();
     function RenderTracker() {
       const { worldId } = useAdventureTheme();
       onRender(worldId);

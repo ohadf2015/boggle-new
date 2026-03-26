@@ -5,9 +5,9 @@ import CompletionTracker from './CompletionTracker';
 import { getAssignmentCompletions } from '@/lib/supabase/education/assignments';
 
 // Mock supabase functions
-jest.mock('@/lib/supabase/education/assignments');
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/lib/supabase/education/assignments');
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string) => key,
     language: 'en',
   })),
@@ -17,7 +17,7 @@ const mockGetAssignmentCompletions = getAssignmentCompletions as jest.MockedFunc
 
 describe('CompletionTracker', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders progress bar with correct percentage', async () => {

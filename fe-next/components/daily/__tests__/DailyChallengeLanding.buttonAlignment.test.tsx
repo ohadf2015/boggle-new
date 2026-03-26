@@ -11,40 +11,40 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Mock dependencies
-jest.mock('@/utils/dailyChallenge/storage', () => ({
-  getWordHuntStatusToday: jest.fn(() => null),
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  getWordHuntStatusToday: vi.fn(() => null),
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: jest.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
 }));
 
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(() => '/en/daily'),
-  useSearchParams: jest.fn(() => ({ get: jest.fn(() => null) })),
-  useRouter: jest.fn(() => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    refresh: jest.fn(),
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(() => '/en/daily'),
+  useSearchParams: vi.fn(() => ({ get: vi.fn(() => null) })),
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    refresh: vi.fn(),
   })),
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
-      onTouchStart: jest.fn(),
-      onTouchMove: jest.fn(),
-      onTouchEnd: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
@@ -52,7 +52,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
@@ -67,7 +67,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock fetch for API calls
-global.fetch = jest.fn((url: string) => {
+global.fetch = vi.fn((url: string) => {
   if (typeof url === 'string' && url.includes('daily-streak')) {
     return Promise.resolve({
       ok: true,
@@ -88,7 +88,7 @@ global.fetch = jest.fn((url: string) => {
 
 describe('DailyChallengeLanding - Button Layout', () => {
   const mockProps = {
-    onSelectWordHunt: jest.fn(),
+    onSelectWordHunt: vi.fn(),
     currentLanguage: 'en' as const,
   };
 
@@ -103,7 +103,7 @@ describe('DailyChallengeLanding - Button Layout', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render quest card with CTA button', () => {

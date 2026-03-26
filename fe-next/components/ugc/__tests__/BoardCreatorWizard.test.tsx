@@ -8,11 +8,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BoardCreatorWizard } from '../BoardCreatorWizard';
 
-jest.mock('@/hooks/useBoardCreator');
+vi.mock('@/hooks/useBoardCreator');
 import { useBoardCreator, type UseBoardCreatorReturn, type GeneratedBoard } from '@/hooks/useBoardCreator';
-const mockUseBoardCreator = useBoardCreator as jest.MockedFunction<typeof useBoardCreator>;
+const mockUseBoardCreator = useBoardCreator as vi.MockedFunction<typeof useBoardCreator>;
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -21,7 +21,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const motionCache: Record<string, React.FC> = {};
   function getMotionComponent(el: string) {
@@ -53,34 +53,34 @@ const mockBoard: GeneratedBoard = {
 function makeHookReturn(overrides: Partial<UseBoardCreatorReturn> = {}): UseBoardCreatorReturn {
   return {
     step: 'configure',
-    setStep: jest.fn(),
+    setStep: vi.fn(),
     gridSize: 6,
-    setGridSize: jest.fn(),
+    setGridSize: vi.fn(),
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     seedWords: '',
-    setSeedWords: jest.fn(),
+    setSeedWords: vi.fn(),
     seedTags: [],
-    addTag: jest.fn(),
-    removeTag: jest.fn(),
-    updateTag: jest.fn(),
+    addTag: vi.fn(),
+    removeTag: vi.fn(),
+    updateTag: vi.fn(),
     generatedBoard: null,
     isGenerating: false,
     generateError: null,
-    generateBoard: jest.fn().mockResolvedValue(undefined),
-    shuffleBoard: jest.fn().mockResolvedValue(undefined),
+    generateBoard: vi.fn().mockResolvedValue(undefined),
+    shuffleBoard: vi.fn().mockResolvedValue(undefined),
     gridRevision: 0,
     title: '',
-    setTitle: jest.fn(),
+    setTitle: vi.fn(),
     description: '',
-    setDescription: jest.fn(),
+    setDescription: vi.fn(),
     isPublishing: false,
     publishError: null,
     publishedBoard: null,
-    publishBoard: jest.fn().mockResolvedValue(undefined),
+    publishBoard: vi.fn().mockResolvedValue(undefined),
     coverImage: null,
     coverImagePreview: null,
-    setCoverImage: jest.fn(),
+    setCoverImage: vi.fn(),
     isUploadingImage: false,
     imageUploadError: null,
     ...overrides,
@@ -127,7 +127,7 @@ describe('BoardCreatorWizard — step 1 (configure)', () => {
   });
 
   it('clicking proceed calls setStep preview', async () => {
-    const setStep = jest.fn();
+    const setStep = vi.fn();
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ generatedBoard: mockBoard, seedTags: ['cat'], setStep }));
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('proceed-btn'));
@@ -179,7 +179,7 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
   });
 
   it('typing in title calls setTitle', async () => {
-    const setTitle = jest.fn();
+    const setTitle = vi.fn();
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard, setTitle }));
     render(<BoardCreatorWizard />);
     const input = screen.getByTestId('title-input');
@@ -188,7 +188,7 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
   });
 
   it('publish button calls publishBoard', async () => {
-    const publishBoard = jest.fn().mockResolvedValue(undefined);
+    const publishBoard = vi.fn().mockResolvedValue(undefined);
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard, publishBoard }));
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('publish-btn'));
@@ -196,7 +196,7 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
   });
 
   it('back button calls setStep configure', async () => {
-    const setStep = jest.fn();
+    const setStep = vi.fn();
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard, setStep }));
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('back-btn'));
@@ -204,7 +204,7 @@ describe('BoardCreatorWizard — step 2 (preview)', () => {
   });
 
   it('shuffle button calls shuffleBoard', async () => {
-    const shuffleBoard = jest.fn().mockResolvedValue(undefined);
+    const shuffleBoard = vi.fn().mockResolvedValue(undefined);
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'preview', generatedBoard: mockBoard, shuffleBoard }));
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('shuffle-btn'));
@@ -244,7 +244,7 @@ describe('BoardCreatorWizard — step 3 (published)', () => {
   });
 
   it('make another button resets to configure step', async () => {
-    const setStep = jest.fn();
+    const setStep = vi.fn();
     mockUseBoardCreator.mockReturnValue(makeHookReturn({ step: 'published', publishedBoard, setStep }));
     render(<BoardCreatorWizard />);
     await userEvent.click(screen.getByTestId('make-another-btn'));

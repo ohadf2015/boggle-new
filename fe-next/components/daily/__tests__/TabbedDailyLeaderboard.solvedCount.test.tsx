@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...props }: {
     src: string;
@@ -22,7 +22,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
@@ -31,7 +31,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock avatar config utilities
-jest.mock('@/utils/avatarConfig', () => ({
+vi.mock('@/utils/avatarConfig', () => ({
   AVATARS: [{ id: 'test-avatar', name: 'Test Avatar', filename: 'test-avatar.png' }],
   getAvatarPath: (avatar: { id: string; filename: string } | string) =>
     typeof avatar === 'string' ? `/avatars/${avatar}.png` : `/avatars/${avatar.filename}`,
@@ -39,18 +39,18 @@ jest.mock('@/utils/avatarConfig', () => ({
 }));
 
 // Mock shared utils
-jest.mock('@/shared/utils', () => ({
+vi.mock('@/shared/utils', () => ({
   formatDistanceToNow: () => '5 minutes ago',
   getCountryFlag: (code: string | null | undefined) => code ? '🇺🇸' : null,
 }));
 
 // Mock ranking styles
-jest.mock('@/utils/rankingStyles', () => ({
+vi.mock('@/utils/rankingStyles', () => ({
   getRankDisplay: (rank: number) => `#${rank}`,
 }));
 
 // Mock daily challenge utils
-jest.mock('@/utils/dailyChallenge', () => ({
+vi.mock('@/utils/dailyChallenge', () => ({
   getPuzzleNumber: () => 42,
 }));
 
@@ -75,7 +75,7 @@ const createMockSolvedParticipant = (id: number): DailyParticipant => ({
   efficiency_score: 90 - id * 5,
 });
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('TabbedDailyLeaderboard - Solved Count Display', () => {
   const mockT = (key: string) => {
@@ -101,7 +101,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should display correct solved count when totalSolved is provided by API', async () => {

@@ -20,7 +20,7 @@ import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, onClick, onMouseDown, onMouseEnter, onTouchStart, ...props }: any) =>
       React.createElement(
@@ -41,22 +41,22 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
   }),
 }));
 
-jest.mock('@/hooks/useCascadeAnimation', () => ({
+vi.mock('@/hooks/useCascadeAnimation', () => ({
   useCascadeAnimation: () => ({
     delays: new Map(),
-    startCascade: jest.fn(),
+    startCascade: vi.fn(),
   }),
 }));
 
 // Mock TileBadge component
-jest.mock('../TileBadge', () => ({
+vi.mock('../TileBadge', () => ({
   TileBadge: ({ type }: { type: string }) => (
     <div data-testid={`tile-badge-${type}`}>Badge: {type}</div>
   ),
@@ -89,9 +89,9 @@ describe('AdventureTile', () => {
     getCascadeDelay: () => 0,
     prefersReducedMotion: false,
     enableComplexAnimations: true,
-    onTileClick: jest.fn(),
-    onTileDragStart: jest.fn(),
-    onTileDragEnter: jest.fn(),
+    onTileClick: vi.fn(),
+    onTileDragStart: vi.fn(),
+    onTileDragEnter: vi.fn(),
     getTileAriaLabel: (tile: GridTileState) => `Letter ${tile.letter}`,
   };
 
@@ -458,7 +458,7 @@ describe('AdventureTile', () => {
 
   describe('Event Handlers', () => {
     it('should call onTileClick when tile is clicked', () => {
-      const onTileClick = jest.fn();
+      const onTileClick = vi.fn();
       const { container } = render(<AdventureTile {...defaultProps} onTileClick={onTileClick} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.click(tile!);
@@ -466,7 +466,7 @@ describe('AdventureTile', () => {
     });
 
     it('should call onTileDragStart when mouse pressed', () => {
-      const onTileDragStart = jest.fn();
+      const onTileDragStart = vi.fn();
       const { container } = render(<AdventureTile {...defaultProps} onTileDragStart={onTileDragStart} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.mouseDown(tile!);
@@ -474,7 +474,7 @@ describe('AdventureTile', () => {
     });
 
     it('should call onTileDragEnter when mouse enters', () => {
-      const onTileDragEnter = jest.fn();
+      const onTileDragEnter = vi.fn();
       const { container } = render(<AdventureTile {...defaultProps} onTileDragEnter={onTileDragEnter} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.mouseEnter(tile!);
@@ -482,7 +482,7 @@ describe('AdventureTile', () => {
     });
 
     it('should call onTileDragStart when touch starts', () => {
-      const onTileDragStart = jest.fn();
+      const onTileDragStart = vi.fn();
       const { container } = render(<AdventureTile {...defaultProps} onTileDragStart={onTileDragStart} />);
       const tile = container.querySelector('[role="gridcell"]');
       fireEvent.touchStart(tile!);
@@ -492,7 +492,7 @@ describe('AdventureTile', () => {
 
   describe('Cascade Animation', () => {
     it('should use cascade delay when showCascade=true', () => {
-      const getCascadeDelay = jest.fn(() => 50);
+      const getCascadeDelay = vi.fn(() => 50);
       render(
         <AdventureTile
           {...defaultProps}

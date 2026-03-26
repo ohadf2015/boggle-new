@@ -11,7 +11,7 @@ import { render } from '@testing-library/react';
 import ComboDisplay from '../ComboDisplay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<Element>) => {
       const {
@@ -36,7 +36,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useDevicePerformance
-jest.mock('../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -45,7 +45,7 @@ jest.mock('../../../hooks/useDevicePerformance', () => ({
 }));
 
 // Mock InteractiveMascot
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: ({ variant }: { variant: string }) => (
     <div data-testid="combo-mascot" data-variant={variant}>
       Mascot

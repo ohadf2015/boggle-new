@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
       return <div ref={ref} {...rest}>{children}</div>;
@@ -18,7 +18,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock the theme context
-const mockUseBossFightTheme = jest.fn().mockReturnValue({
+const mockUseBossFightTheme = vi.fn().mockReturnValue({
   dialogueBg: 'bg-neo-navy/95',
   dialogueBorder: 'border-neo-white/20',
   bossNameColor: 'text-neo-red',
@@ -36,7 +36,7 @@ const mockUseBossFightTheme = jest.fn().mockReturnValue({
   victoryGlow: 'rgba(163, 230, 53, 0.6)',
   arenaEffect: 'none',
 });
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => mockUseBossFightTheme(),
 }));
 
@@ -70,7 +70,7 @@ function renderWidget(overrides: Partial<typeof defaultProps> = {}) {
 
 describe('BossMechanicWidget', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {

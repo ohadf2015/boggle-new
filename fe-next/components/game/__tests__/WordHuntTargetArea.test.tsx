@@ -9,7 +9,7 @@ import { WordHuntTargetArea } from '../WordHuntTargetArea';
 import type { LetterFeedback } from '@/shared/types/game';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -28,12 +28,12 @@ describe('WordHuntTargetArea', () => {
   const defaultProps = {
     targetLength: 5,
     attempts: [] as Array<{ guess: string; feedback: LetterFeedback[] }>,
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
     found: false,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render blank boxes for target word length', () => {
@@ -55,7 +55,7 @@ describe('WordHuntTargetArea', () => {
   });
 
   it('should call onSubmit with guess when submitted', () => {
-    const onSubmit = jest.fn();
+    const onSubmit = vi.fn();
     render(<WordHuntTargetArea {...defaultProps} onSubmit={onSubmit} />);
 
     const input = screen.getByTestId('target-guess-input');
@@ -112,7 +112,7 @@ describe('WordHuntTargetArea', () => {
   });
 
   it('should not submit empty guess', () => {
-    const onSubmit = jest.fn();
+    const onSubmit = vi.fn();
     render(<WordHuntTargetArea {...defaultProps} onSubmit={onSubmit} />);
 
     const button = screen.getByTestId('target-submit-button');
@@ -122,7 +122,7 @@ describe('WordHuntTargetArea', () => {
   });
 
   it('should not submit guess with wrong length', () => {
-    const onSubmit = jest.fn();
+    const onSubmit = vi.fn();
     render(<WordHuntTargetArea {...defaultProps} onSubmit={onSubmit} />);
 
     const input = screen.getByTestId('target-guess-input');

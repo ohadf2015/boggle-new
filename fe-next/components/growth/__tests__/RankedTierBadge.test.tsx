@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { RankedTierBadge } from '../RankedTierBadge';
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
       return key;
@@ -11,14 +11,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
   })),
 }));
 
-const mockUseRankedTier = jest.fn();
-jest.mock('@/hooks/useRankedTier', () => ({
+const mockUseRankedTier = vi.fn();
+vi.mock('@/hooks/useRankedTier', () => ({
   useRankedTier: (...args: unknown[]) => mockUseRankedTier(...args),
 }));
 
 describe('RankedTierBadge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when elo is 0', () => {

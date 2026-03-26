@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/components/icons/SocialIcons', () => ({
+vi.mock('@/components/icons/SocialIcons', () => ({
   InstagramIcon: () => <span>Instagram</span>,
 }));
 

@@ -3,11 +3,11 @@ import { render, screen } from '@testing-library/react';
 import BrainScoreHero from '../BrainScoreHero';
 
 // Mock dependencies
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -25,7 +25,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
       <div className={className} {...props}>{children}</div>
@@ -46,7 +46,7 @@ describe('BrainScoreHero UI Fixes', () => {
     tierProgress: 47,
     gamesAnalyzed: 10,
     drillsCompleted: 5,
-    onShare: jest.fn(),
+    onShare: vi.fn(),
   };
 
   describe('Activities counter responsive design', () => {

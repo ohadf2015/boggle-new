@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, ...rest } = props;
@@ -10,18 +10,18 @@ jest.mock('framer-motion', () => ({
     },
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
-  useReducedMotion: jest.fn(() => false),
+  useReducedMotion: vi.fn(() => false),
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: jest.fn(() => false),
+vi.mock('@/hooks/useMobileLandscape', () => ({
+  useMobileLandscape: vi.fn(() => false),
 }));
 
 import { ResultsLayout } from '../ResultsLayout';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
-const mockUseLandscape = useMobileLandscape as jest.Mock;
+const mockUseLandscape = useMobileLandscape as vi.Mock;
 
 describe('ResultsLayout', () => {
   beforeEach(() => {

@@ -4,18 +4,18 @@ import WelcomeDemoStep from '../WelcomeDemoStep';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Pointer: () => <div>Pointer</div>,
   Sparkles: () => <div>Sparkles</div>,
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => <div data-testid="mascot" />,
 }));
 
 // Mock MiniGrid
-jest.mock('../MiniGrid', () => {
+vi.mock('../MiniGrid', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -33,7 +33,7 @@ jest.mock('../MiniGrid', () => {
 });
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return <div ref={ref} {...props}>{children}</div>;
@@ -48,7 +48,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock demoConfigs
-jest.mock('../demoConfigs', () => ({
+vi.mock('../demoConfigs', () => ({
   demoConfigs: {
     en: {
       letters: [['C', 'A', 'T'], ['O', 'R', 'S'], ['W', 'D', 'E']],
@@ -59,15 +59,15 @@ jest.mock('../demoConfigs', () => ({
 }));
 
 describe('WelcomeDemoStep - Fast Onboarding Flow', () => {
-  const mockOnDemoComplete = jest.fn();
+  const mockOnDemoComplete = vi.fn();
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockOnDemoComplete.mockClear();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('should start with auto-trace phase (Phase 1)', () => {

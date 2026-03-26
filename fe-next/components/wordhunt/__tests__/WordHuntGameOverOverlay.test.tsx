@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: Object.assign(React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { initial?: unknown; animate?: unknown; exit?: unknown; transition?: unknown }>(
       function MotionDiv({ children, initial, animate, exit, transition, ...props }, ref) {
@@ -31,11 +31,11 @@ const mockT = (key: string) => {
 
 describe('WordHuntGameOverOverlay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders nothing when reason is null', () => {
@@ -67,7 +67,7 @@ describe('WordHuntGameOverOverlay', () => {
 
     // After spectator delay (2800ms), should show spectator view
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     // Spectator phase shows the watch text in the eye icon row

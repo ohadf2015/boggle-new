@@ -11,22 +11,22 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@testing-library/jest-dom';
 
 // Mock next/navigation for tests
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/he/education',
 }));
 
 // Mock confettiUtils
-jest.mock('@/utils/confettiUtils', () => ({
-  fireLevelUpConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireLevelUpConfetti: vi.fn(),
 }));
 
 // Mock framer-motion to allow class inspection
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, role, ...props }: React.PropsWithChildren<{ className?: string; role?: string }>) => (
       <div className={className} role={role} data-testid="motion-div" {...props}>
@@ -66,7 +66,7 @@ describe('AchievementUnlockModal - RTL Positioning (Toast Mode)', () => {
   ) => {
     return render(
       <LanguageProvider initialLanguage={language}>
-        <AchievementUnlockModal unlock={unlock} onClose={jest.fn()} />
+        <AchievementUnlockModal unlock={unlock} onClose={vi.fn()} />
       </LanguageProvider>
     );
   };

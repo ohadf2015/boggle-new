@@ -300,6 +300,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             sameAs: [
                 'https://www.lexiclash.live',
                 'https://www.instagram.com/lexi.clash',
+                // TODO: Add TikTok and X/Twitter URLs here once accounts are created
             ],
             contactPoint: {
                 '@type': 'ContactPoint',
@@ -373,6 +374,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 { '@type': 'SiteNavigationElement', name: 'Leaderboard', url: `https://www.lexiclash.live${localePath}/leaderboard` },
                 { '@type': 'SiteNavigationElement', name: 'About', url: `https://www.lexiclash.live${localePath}/about` },
                 { '@type': 'SiteNavigationElement', name: 'Contact', url: `https://www.lexiclash.live${localePath}/contact` },
+                { '@type': 'SiteNavigationElement', name: 'Word Solver', url: `https://www.lexiclash.live${localePath}/tools/word-solver` },
+                { '@type': 'SiteNavigationElement', name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day` },
+                { '@type': 'SiteNavigationElement', name: 'Brain Training', url: `https://www.lexiclash.live${localePath}/brain` },
+                { '@type': 'SiteNavigationElement', name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure` },
             ],
         },
         // BreadcrumbList schema for better SERP navigation
@@ -552,7 +557,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             tabIndex={-1}
                         >
                             <StreakBar />
-                            <div className="flex-1 flex flex-col">
+                            <div className="flex-1 flex flex-col min-h-0">
                                 {children}
                             </div>
                         </main>

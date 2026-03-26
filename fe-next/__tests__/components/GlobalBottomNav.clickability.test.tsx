@@ -12,7 +12,7 @@
  * to avoid complex context mocking. We verify the ACTUAL classes used.
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 

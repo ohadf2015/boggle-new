@@ -4,15 +4,15 @@ import '@testing-library/jest-dom';
 import { LandingShareBanner } from '../LandingShareBanner';
 
 let mockIsAuthenticated = false;
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
@@ -22,10 +22,10 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('LandingShareBanner', () => {
-  const onShareClick = jest.fn();
+  const onShareClick = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsAuthenticated = false;
   });
 

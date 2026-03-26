@@ -3,22 +3,22 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestCard, QuestCardProps } from '../QuestCard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
-      onTouchStart: jest.fn(),
-      onTouchMove: jest.fn(),
-      onTouchEnd: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
@@ -26,7 +26,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: React.ComponentProps<'span'>) => <span {...props}>{children}</span>,
@@ -47,7 +47,7 @@ const defaultProps: QuestCardProps = {
   tagline: 'Find words before time runs out!',
   color: 'orange',
   status: 'new',
-  onPlay: jest.fn(),
+  onPlay: vi.fn(),
   buttonText: 'START QUEST',
   timeMode: 'timed',
   timeModeLabel: 'Timed Quest',
@@ -74,7 +74,7 @@ describe('QuestCard', () => {
   });
 
   test('calls onPlay when clicked', () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     renderWithProviders(<QuestCard {...defaultProps} onPlay={onPlay} />);
 
     const button = screen.getByRole('button');
@@ -106,7 +106,7 @@ describe('QuestCard', () => {
   });
 
   test('handles unavailable status with request button', () => {
-    const onRequest = jest.fn();
+    const onRequest = vi.fn();
     renderWithProviders(
       <QuestCard
         {...defaultProps}

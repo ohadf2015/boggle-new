@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'variants'].includes(k)))}>{children}</div>
   ));
@@ -15,19 +15,19 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock child components
-jest.mock('../SurvivalLiveRanks', () => ({
+vi.mock('../SurvivalLiveRanks', () => ({
   SurvivalLiveRanks: () => <div data-testid="live-ranks">Live Ranks</div>,
 }));
 
-jest.mock('../SurvivalLootPanel', () => ({
+vi.mock('../SurvivalLootPanel', () => ({
   SurvivalLootPanel: () => <div data-testid="loot-panel">Loot Panel</div>,
 }));
 
-jest.mock('../SurvivalHeader', () => ({
+vi.mock('../SurvivalHeader', () => ({
   SurvivalHeader: () => <div data-testid="survival-header">Header</div>,
 }));
 
-jest.mock('../SurvivalClueBoxes', () => {
+vi.mock('../SurvivalClueBoxes', () => {
   const MockClueBoxes = React.forwardRef((_: unknown, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} data-testid="clue-boxes">Clue Boxes</div>
   ));
@@ -35,22 +35,23 @@ jest.mock('../SurvivalClueBoxes', () => {
   return { SurvivalClueBoxes: MockClueBoxes };
 });
 
-jest.mock('../SurvivalLifeBar', () => ({
+vi.mock('../SurvivalLifeBar', () => ({
   SurvivalLifeBar: () => <div data-testid="life-bar">Life Bar</div>,
 }));
 
-jest.mock('../SurvivalGridSection', () => ({
+vi.mock('../SurvivalGridSection', () => ({
   SurvivalGridSection: () => <div data-testid="grid-section">Grid</div>,
 }));
 
-jest.mock('../AccumulatedScoreDisplay', () => ({
+vi.mock('../AccumulatedScoreDisplay', () => ({
   AccumulatedScoreDisplay: () => <div data-testid="score-display">Score</div>,
 }));
 
-jest.mock('@/components/Avatar', () => {
-  return function MockAvatar() {
+vi.mock('@/components/Avatar', () => {
+  const MockAvatar = () => {
     return <div data-testid="avatar" />;
   };
+  return { default: MockAvatar };
 });
 
 import { SurvivalDesktopLayout, type SurvivalDesktopLayoutProps } from '../SurvivalDesktopLayout';
@@ -71,15 +72,15 @@ const baseProps: SurvivalDesktopLayoutProps = {
   grid: mockGrid,
   isGameOver: false,
   eliminatedLetters: new Set(),
-  onWordSubmit: jest.fn(),
-  onWordChange: jest.fn(),
+  onWordSubmit: vi.fn(),
+  onWordChange: vi.fn(),
   highlightedPath: [],
   // Life
   lifePoints: 80,
   isLifeGaining: false,
   lifeGainAmount: null,
   skipAnimations: false,
-  onLifeGainComplete: jest.fn(),
+  onLifeGainComplete: vi.fn(),
   // Score
   liveScore: 100,
   lastScoreIncrement: null,
@@ -105,7 +106,7 @@ const baseProps: SurvivalDesktopLayoutProps = {
   currentPlayerId: null,
   currentGuestFingerprint: null,
   // Quit
-  onQuitClick: jest.fn(),
+  onQuitClick: vi.fn(),
   t: mockT,
 };
 

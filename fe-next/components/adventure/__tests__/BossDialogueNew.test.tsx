@@ -9,14 +9,14 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { BossDialogue } from '../BossDialogue';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const MockImage = ({ src, alt, ...props }: { src: string; alt: string }) =>
     React.createElement('img', { src, alt, ...props });
   MockImage.displayName = 'MockImage';
@@ -25,11 +25,11 @@ jest.mock('next/image', () => {
 
 describe('BossDialogue (new interface)', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders null when no dialogue', () => {
@@ -52,7 +52,7 @@ describe('BossDialogue (new interface)', () => {
       <BossDialogue dialogue="Hi!" bossAvatarUrl="/boss.png" bossName="Dragon" />
     );
     // Advance one typewriter tick (45ms)
-    act(() => { jest.advanceTimersByTime(45); });
+    act(() => { vi.advanceTimersByTime(45); });
     expect(screen.getByTestId('dialogue-text').textContent).toHaveLength(1);
   });
 
@@ -61,9 +61,9 @@ describe('BossDialogue (new interface)', () => {
       <BossDialogue dialogue="Hi!" bossAvatarUrl="/boss.png" bossName="Dragon" />
     );
     // 3 chars × 45ms each = 135ms; advance past that
-    act(() => { jest.advanceTimersByTime(45); }); // H
-    act(() => { jest.advanceTimersByTime(45); }); // i
-    act(() => { jest.advanceTimersByTime(45); }); // !
+    act(() => { vi.advanceTimersByTime(45); }); // H
+    act(() => { vi.advanceTimersByTime(45); }); // i
+    act(() => { vi.advanceTimersByTime(45); }); // !
     expect(screen.getByTestId('dialogue-text').textContent).toBe('Hi!');
   });
 });

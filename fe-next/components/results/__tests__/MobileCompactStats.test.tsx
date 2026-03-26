@@ -5,7 +5,7 @@ import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type { GameAchievement } from '../types';
 
 // Mock useLanguage hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -14,14 +14,15 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock PlayerArchetypeBadge to avoid complex rendering
-jest.mock('@/components/results/PlayerArchetypeBadge', () => {
-  return function MockPlayerArchetypeBadge({ archetype, size }: { archetype: PlayerArchetype; size: string }) {
+vi.mock('@/components/results/PlayerArchetypeBadge', () => {
+  const MockPlayerArchetypeBadge = ({ archetype, size }: { archetype: PlayerArchetype; size: string }) => {
     return <div data-testid="archetype-badge" data-size={size}>{archetype.name}</div>;
   };
+  return { default: MockPlayerArchetypeBadge };
 });
 
 // Mock AchievementBadge to avoid tooltip/portal complexity
-jest.mock('@/components/AchievementBadge', () => ({
+vi.mock('@/components/AchievementBadge', () => ({
   AchievementBadge: function MockAchievementBadge({ achievement }: { achievement: GameAchievement }) {
     return <div data-testid="achievement-badge">{achievement.icon} {achievement.name || achievement.key}</div>;
   },

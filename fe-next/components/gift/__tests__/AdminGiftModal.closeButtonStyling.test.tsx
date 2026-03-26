@@ -13,26 +13,26 @@ import { AdminGiftModal } from '../AdminGiftModal';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock dependencies
-jest.mock('gsap', () => ({
+vi.mock('gsap', () => ({
   __esModule: true,
   default: {
-    context: jest.fn(() => ({ revert: jest.fn() })),
-    timeline: jest.fn(() => ({
-      to: jest.fn().mockReturnThis(),
-      from: jest.fn().mockReturnThis(),
-      kill: jest.fn(),
+    context: vi.fn(() => ({ revert: vi.fn() })),
+    timeline: vi.fn(() => ({
+      to: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      kill: vi.fn(),
     })),
   },
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: true, // Skip animations to reach 'ready' phase immediately
@@ -40,8 +40,8 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 describe('AdminGiftModal - Close Button Styling', () => {
@@ -60,8 +60,8 @@ describe('AdminGiftModal - Close Button Styling', () => {
   const defaultProps = {
     gift: mockGift,
     show: true,
-    onClaim: jest.fn(),
-    onDismiss: jest.fn(),
+    onClaim: vi.fn(),
+    onDismiss: vi.fn(),
     currentXp: 0,
     currentCoins: 0,
   };

@@ -10,8 +10,8 @@ import SeriesStandingsBanner from '../SeriesStandingsBanner';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
 // Mock framer-motion — components must be defined inside the factory to avoid
-// Jest hoisting the jest.mock() call above the const declarations (TDZ error).
-jest.mock('framer-motion', () => {
+// Jest hoisting the vi.mock() call above the const declarations (TDZ error).
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>

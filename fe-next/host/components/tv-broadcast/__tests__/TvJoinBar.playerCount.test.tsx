@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvJoinBar from '../TvJoinBar';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, role, ...rest }: any,
@@ -29,12 +30,12 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock QRCodeSVG
-jest.mock('qrcode.react', () => ({
+vi.mock('qrcode.react', () => ({
   QRCodeSVG: () => <div data-testid="qr-code" />,
 }));
 
 // Mock AnimatedCounter
-jest.mock('../../../../components/ui/AnimatedCounter', () => ({
+vi.mock('../../../../components/ui/AnimatedCounter', () => ({
   AnimatedCounter: ({ value, className }: any) => (
     <span data-testid="player-count-counter" className={className}>
       {value}
@@ -49,7 +50,7 @@ jest.mock('../../../../components/ui/AnimatedCounter', () => ({
 }));
 
 // Mock useDevicePerformance
-jest.mock('../../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,

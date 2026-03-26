@@ -7,7 +7,7 @@ import TvTutorialOverlay, {
 } from '@/host/components/tv-broadcast/TvTutorialOverlay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
@@ -30,7 +30,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   ChevronRight: () => <span data-testid="chevron-right">→</span>,
   ChevronLeft: () => <span data-testid="chevron-left">←</span>,
   X: () => <span data-testid="x-icon">✕</span>,
@@ -46,14 +46,14 @@ jest.mock('lucide-react', () => ({
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
   };
@@ -87,14 +87,14 @@ describe('TvTutorialOverlay', () => {
   };
 
   const defaultProps = {
-    onComplete: jest.fn(),
-    onSkip: jest.fn(),
+    onComplete: vi.fn(),
+    onSkip: vi.fn(),
     t: mockT,
     forceShow: true, // Force show to bypass localStorage check in tests
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.clear();
   });
 
@@ -318,13 +318,13 @@ describe('TvHelpButton', () => {
   const mockT = (key: string) => (key === 'tvTutorial.help' ? 'Show Tutorial' : key);
 
   it('should render help icon', () => {
-    render(<TvHelpButton onClick={jest.fn()} t={mockT} />);
+    render(<TvHelpButton onClick={vi.fn()} t={mockT} />);
 
     expect(screen.getByTestId('help-icon')).toBeInTheDocument();
   });
 
   it('should call onClick when clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(<TvHelpButton onClick={onClick} t={mockT} />);
 
     fireEvent.click(screen.getByRole('button'));
@@ -333,7 +333,7 @@ describe('TvHelpButton', () => {
   });
 
   it('should have proper aria-label', () => {
-    render(<TvHelpButton onClick={jest.fn()} t={mockT} />);
+    render(<TvHelpButton onClick={vi.fn()} t={mockT} />);
 
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Show Tutorial');
   });

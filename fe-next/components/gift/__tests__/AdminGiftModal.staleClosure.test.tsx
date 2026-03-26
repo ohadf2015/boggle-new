@@ -14,7 +14,7 @@ import '@testing-library/jest-dom';
 import { AdminGiftModal } from '../AdminGiftModal';
 
 // Mock hooks
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: true, // Skip animations to go straight to ready
@@ -22,7 +22,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -30,17 +30,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // Mock GSAP
-jest.mock('gsap', () => ({
-  context: () => ({ revert: jest.fn() }),
+vi.mock('gsap', () => ({
+  context: () => ({ revert: vi.fn() }),
   timeline: () => ({
     to: () => ({ to: () => ({ from: () => ({ from: () => ({ from: () => {} }) }) }) }),
     from: () => ({ from: () => {} }),
-    kill: jest.fn(),
+    kill: vi.fn(),
   }),
 }));
 
@@ -55,20 +55,20 @@ describe('AdminGiftModal - Stale Closure Fix', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should use the latest onDismiss callback, not a stale closure', async () => {
     // Track which version of onDismiss was called
     const callLog: string[] = [];
 
-    const onDismissV1 = jest.fn(() => callLog.push('v1'));
-    const onDismissV2 = jest.fn(() => callLog.push('v2'));
-    const onClaim = jest.fn().mockResolvedValue(undefined);
+    const onDismissV1 = vi.fn(() => callLog.push('v1'));
+    const onDismissV2 = vi.fn(() => callLog.push('v2'));
+    const onClaim = vi.fn().mockResolvedValue(undefined);
 
     // Render with initial onDismiss
     const { rerender } = render(
@@ -113,7 +113,7 @@ describe('AdminGiftModal - Stale Closure Fix', () => {
 
     // Advance timer past the 1.5s auto-dismiss
     act(() => {
-      jest.advanceTimersByTime(1600);
+      vi.advanceTimersByTime(1600);
     });
 
     // BUG (before fix): v1 would be called because setTimeout captured stale reference

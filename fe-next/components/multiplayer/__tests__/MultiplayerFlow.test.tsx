@@ -17,30 +17,30 @@ import MultiplayerFlow from '../MultiplayerFlow';
 import type { ActiveRoom, Language } from '@/shared/types/game';
 
 // Mock dependencies
-jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestPlayer'),
-  getStoredAvatarId: jest.fn().mockReturnValue('avatar-1'),
-  hasCompleteStoredProfile: jest.fn().mockReturnValue(true),
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
+  getStoredAvatarId: vi.fn().mockReturnValue('avatar-1'),
+  hasCompleteStoredProfile: vi.fn().mockReturnValue(true),
 }));
 
-jest.mock('@/hooks/useCrazyGamesInvite', () => ({
+vi.mock('@/hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
     isReady: true,
     inviteRoomId: null,
     isInstantMultiplayer: false,
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
-    createInviteLink: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
+    createInviteLink: vi.fn(),
     isInviteButtonVisible: false,
     isInviteJoin: false,
   }),
 }));
 
-jest.mock('@/utils/avatarConfig', () => ({
-  getAvatarEmojiAndColor: jest.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
+vi.mock('@/utils/avatarConfig', () => ({
+  getAvatarEmojiAndColor: vi.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
 }));
 
-jest.mock('@/shared/types/customAvatar', () => ({
+vi.mock('@/shared/types/customAvatar', () => ({
   getRandomAvatarConfig: () => ({
     gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
     eyes: 'round', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#1a1a2e',
@@ -48,7 +48,7 @@ jest.mock('@/shared/types/customAvatar', () => ({
 }));
 
 // Mock child components
-jest.mock('../RoomListView', () => ({
+vi.mock('../RoomListView', () => ({
   __esModule: true,
   default: ({
     activeRooms,
@@ -81,7 +81,7 @@ jest.mock('../RoomListView', () => ({
   ),
 }));
 
-jest.mock('../JoinRoomModal', () => ({
+vi.mock('../JoinRoomModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -106,7 +106,7 @@ jest.mock('../JoinRoomModal', () => ({
     ) : null,
 }));
 
-jest.mock('../CreateRoomModal', () => ({
+vi.mock('../CreateRoomModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -165,22 +165,22 @@ describe('MultiplayerFlow', () => {
   ];
 
   const defaultProps = {
-    handleJoin: jest.fn(),
-    refreshRooms: jest.fn(),
+    handleJoin: vi.fn(),
+    refreshRooms: vi.fn(),
     activeRooms: mockActiveRooms,
     roomsLoading: false,
     isJoining: false,
     isAuthenticated: false,
     displayName: 'TestPlayer',
     defaultLanguage: 'en' as Language,
-    setGameCode: jest.fn(),
-    setUsername: jest.fn(),
-    setRoomName: jest.fn(),
-    setHostUsername: jest.fn(),
+    setGameCode: vi.fn(),
+    setUsername: vi.fn(),
+    setRoomName: vi.fn(),
+    setHostUsername: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Initial Render', () => {
@@ -236,7 +236,7 @@ describe('MultiplayerFlow', () => {
 
     it('should open join modal when room is clicked and no profile', async () => {
       const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
+      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
 
       render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
@@ -249,7 +249,7 @@ describe('MultiplayerFlow', () => {
 
     it('should close join modal when close button clicked', async () => {
       const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
+      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
 
       render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
@@ -370,9 +370,9 @@ describe('MultiplayerFlow', () => {
   describe('Prefilled Room Code', () => {
     it('should auto-join with prefilled room code when profile exists', async () => {
       const { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(true);
-      (getStoredUsername as jest.Mock).mockReturnValue('StoredPlayer');
-      (getStoredAvatarId as jest.Mock).mockReturnValue('stored-avatar');
+      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(true);
+      (getStoredUsername as vi.Mock).mockReturnValue('StoredPlayer');
+      (getStoredAvatarId as vi.Mock).mockReturnValue('stored-avatar');
 
       render(<MultiplayerFlow {...defaultProps} prefilledRoom="INVITE1" />);
 
@@ -384,7 +384,7 @@ describe('MultiplayerFlow', () => {
 
     it('should show join modal with prefilled room when no profile', async () => {
       const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
+      (hasCompleteStoredProfile as vi.Mock).mockReturnValue(false);
 
       render(
         <MultiplayerFlow
@@ -412,8 +412,8 @@ describe('MultiplayerFlow', () => {
 
 describe('MultiplayerFlow - Game Code Generation', () => {
   it('should generate different codes for multiple rooms', async () => {
-    const handleJoin = jest.fn();
-    const setGameCode = jest.fn();
+    const handleJoin = vi.fn();
+    const setGameCode = vi.fn();
     const generatedCodes: string[] = [];
 
     // Capture generated codes
@@ -423,7 +423,7 @@ describe('MultiplayerFlow - Game Code Generation', () => {
 
     const props = {
       handleJoin,
-      refreshRooms: jest.fn(),
+      refreshRooms: vi.fn(),
       activeRooms: [],
       roomsLoading: false,
       isJoining: false,
@@ -431,9 +431,9 @@ describe('MultiplayerFlow - Game Code Generation', () => {
       displayName: 'TestPlayer',
       defaultLanguage: 'en' as Language,
       setGameCode,
-      setUsername: jest.fn(),
-      setRoomName: jest.fn(),
-      setHostUsername: jest.fn(),
+      setUsername: vi.fn(),
+      setRoomName: vi.fn(),
+      setHostUsername: vi.fn(),
     };
 
     const { rerender } = render(<MultiplayerFlow {...props} />);

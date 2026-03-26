@@ -16,7 +16,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock Socket context
-jest.mock('../../utils/SocketContext', () => ({
+vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({
     socket: null,
     isConnected: true,
@@ -24,7 +24,7 @@ jest.mock('../../utils/SocketContext', () => ({
 }));
 
 // Mock framer-motion with all motion element types used by components
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const motionObj = {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -44,21 +44,21 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock useCrazyGamesInvite
-jest.mock('../../hooks/useCrazyGamesInvite', () => ({
+vi.mock('../../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
     isInviteButtonVisible: false,
   }),
 }));
 
 // Mock qrcode.react
-jest.mock('qrcode.react', () => ({
+vi.mock('qrcode.react', () => ({
   QRCodeSVG: () => <div data-testid="qr-code">QR Code</div>,
 }));
 
 // Mock RoomChat component since it requires LanguageProvider
-jest.mock('../../components/RoomChat', () => ({
+vi.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
@@ -66,13 +66,13 @@ jest.mock('../../components/RoomChat', () => ({
 }));
 
 // Mock BotControls component since it requires LanguageProvider
-jest.mock('../../components/BotControls', () => ({
+vi.mock('../../components/BotControls', () => ({
   __esModule: true,
   default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
 // Mock TvTutorialOverlay component
-jest.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
+vi.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
   __esModule: true,
   default: () => null,
   isTvTutorialComplete: () => true,
@@ -92,29 +92,29 @@ describe('Multiplayer Desktop Functionality Access', () => {
       username: 'TestHost',
       t: mockT,
       timerValue: 2,
-      setTimerValue: jest.fn(),
+      setTimerValue: vi.fn(),
       timerDirection: 0,
-      setTimerDirection: jest.fn(),
+      setTimerDirection: vi.fn(),
       difficulty: 'MEDIUM' as const,
-      setDifficulty: jest.fn(),
+      setDifficulty: vi.fn(),
       minWordLength: 2,
-      setMinWordLength: jest.fn(),
+      setMinWordLength: vi.fn(),
       gameType: 'regular' as const,
-      setGameType: jest.fn(),
+      setGameType: vi.fn(),
       tournamentRounds: 3,
-      setTournamentRounds: jest.fn(),
+      setTournamentRounds: vi.fn(),
       tournamentData: null,
       hostPlaying: true,
-      setHostPlaying: jest.fn(),
+      setHostPlaying: vi.fn(),
       playersReady: [{ username: 'TestHost', isHost: true }],
       playerWordCounts: {},
       shufflingGrid: null,
       highlightedCells: [],
       tableData: [['A', 'B'], ['C', 'D']],
-      onStartGame: jest.fn(),
-      onExitRoom: jest.fn(),
-      onCancelTournament: jest.fn(),
-      onRegenerateBoard: jest.fn(),
+      onStartGame: vi.fn(),
+      onExitRoom: vi.fn(),
+      onCancelTournament: vi.fn(),
+      onRegenerateBoard: vi.fn(),
       tournamentCreating: false,
     };
 
@@ -164,11 +164,11 @@ describe('Multiplayer Desktop Functionality Access', () => {
         { username: 'TestPlayer', isHost: false },
       ],
       showQR: false,
-      setShowQR: jest.fn(),
+      setShowQR: vi.fn(),
       showExitConfirm: false,
-      setShowExitConfirm: jest.fn(),
-      onExitRoom: jest.fn(),
-      onConfirmExit: jest.fn(),
+      setShowExitConfirm: vi.fn(),
+      onExitRoom: vi.fn(),
+      onConfirmExit: vi.fn(),
     };
 
     it('should show chat content on desktop (not hidden behind tabs)', () => {

@@ -64,7 +64,7 @@ describe('Native OAuth Utility', () => {
   const mockUpdateUser = (supabase?.auth.updateUser as jest.Mock);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Reset environment
     process.env = {

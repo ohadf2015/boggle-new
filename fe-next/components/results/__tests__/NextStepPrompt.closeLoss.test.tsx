@@ -3,17 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import NextStepPrompt from '../NextStepPrompt';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => {
     const translations: Record<string, string> = {
       'nextStep.challengeBots': 'Challenge the Bots!',
@@ -35,7 +35,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
@@ -47,11 +47,11 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt - Close Loss Mode', () => {
-  const mockOnBackToLobby = jest.fn();
-  const mockOnRematch = jest.fn();
+  const mockOnBackToLobby = vi.fn();
+  const mockOnRematch = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show rematch prompt when isCloseLoss is true', () => {

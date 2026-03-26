@@ -45,20 +45,20 @@ const mockGrid = [
 const defaultProps = {
   levelConfig: mockLevelConfig,
   initialGrid: mockGrid,
-  onLevelComplete: jest.fn(),
-  onExit: jest.fn(),
+  onLevelComplete: vi.fn(),
+  onExit: vi.fn(),
 };
 
 // ==============================================
 // MOCKS
 // ==============================================
 
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const langValue = {
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return {
     useLanguage: () => langValue,
@@ -67,8 +67,8 @@ jest.mock('@/contexts/LanguageContext', () => {
 });
 
 // Mock useAdventureGame to return "playing" state
-const mockSubmitWordWithPath = jest.fn();
-jest.mock('@/hooks/useAdventureGame', () => ({
+const mockSubmitWordWithPath = vi.fn();
+vi.mock('@/hooks/useAdventureGame', () => ({
   useAdventureGame: () => ({
     gameState: { score: 0, wordsFound: [], comboCount: 0, stars: 0, maxCombo: 0 },
     tiles: [
@@ -106,35 +106,35 @@ jest.mock('@/hooks/useAdventureGame', () => ({
     isPlaying: true,
     cascadeComplete: true,
     submitWordWithPath: mockSubmitWordWithPath,
-    startGame: jest.fn(),
-    pauseGame: jest.fn(),
-    completeLevel: jest.fn(),
-    resetGame: jest.fn(),
-    markCascadeComplete: jest.fn(),
+    startGame: vi.fn(),
+    pauseGame: vi.fn(),
+    completeLevel: vi.fn(),
+    resetGame: vi.fn(),
+    markCascadeComplete: vi.fn(),
     isCascading: false,
     cascadePhase: null,
-    addTime: jest.fn(),
-    regenerateGrid: jest.fn(),
+    addTime: vi.fn(),
+    regenerateGrid: vi.fn(),
   }),
 }));
 
 // Mock entry phase to be in "playing" state
-jest.mock('../hooks/useAdventureEntryPhase', () => ({
+vi.mock('../hooks/useAdventureEntryPhase', () => ({
   useAdventureEntryPhase: () => ({
     entryPhase: 'playing',
-    handleCascadeComplete: jest.fn(),
-    handleObjectivesComplete: jest.fn(),
-    handleTitleComplete: jest.fn(),
+    handleCascadeComplete: vi.fn(),
+    handleObjectivesComplete: vi.fn(),
+    handleTitleComplete: vi.fn(),
   }),
 }));
 
 // Track validateWord calls to verify submission reaches validation
-const mockValidateWord = jest.fn().mockResolvedValue({
+const mockValidateWord = vi.fn().mockResolvedValue({
   isValid: true,
   score: 30,
 });
 
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
     validateWord: mockValidateWord,
     isValidating: false,
@@ -143,11 +143,11 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
 }));
 
 // React selection hook returns EMPTY state (simulating external submission)
-const mockSelectTile = jest.fn();
-const mockClearSelection = jest.fn();
-const mockGetPath = jest.fn().mockReturnValue([]);
+const mockSelectTile = vi.fn();
+const mockClearSelection = vi.fn();
+const mockGetPath = vi.fn().mockReturnValue([]);
 
-jest.mock('@/hooks/useAdventureSelection', () => ({
+vi.mock('@/hooks/useAdventureSelection', () => ({
   useAdventureSelection: () => ({
     selectedIndices: [],
     currentWord: '',
@@ -159,24 +159,24 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
   }),
 }));
 
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
-    recordAttempt: jest.fn(),
-    getLevelAttempt: jest.fn(() => null),
-    getLevelCompletion: jest.fn(() => undefined),
+    recordAttempt: vi.fn(),
+    getLevelAttempt: vi.fn(() => null),
+    getLevelCompletion: vi.fn(() => undefined),
     progression: null,
     isLoading: false,
     error: null,
-    refreshProgression: jest.fn(),
-    completeLevel: jest.fn(),
-    isWorldUnlocked: jest.fn(() => true),
-    isLevelUnlocked: jest.fn(() => true),
-    getWorldStars: jest.fn(() => 0),
+    refreshProgression: vi.fn(),
+    completeLevel: vi.fn(),
+    isWorldUnlocked: vi.fn(() => true),
+    isLevelUnlocked: vi.fn(() => true),
+    getWorldStars: vi.fn(() => 0),
     attempts: [],
   }),
 }));
 
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: () => ({
     tier: 'normal',
     adjustedConfig: {
@@ -196,38 +196,38 @@ jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
     },
     hintData: { level: 'none' },
     powerUpCooldownMultiplier: 1.0,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: true,
-    getHint: jest.fn(() => null),
+    getHint: vi.fn(() => null),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
     isLoading: false,
     error: null,
     remainingHintWords: [],
-    findPathForWord: jest.fn(() => null),
+    findPathForWord: vi.fn(() => null),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playMusic: jest.fn(),
-    pauseMusic: jest.fn(),
-    resumeMusic: jest.fn(),
+    stopMusic: vi.fn(),
+    playMusic: vi.fn(),
+    pauseMusic: vi.fn(),
+    resumeMusic: vi.fn(),
     isPlaying: false,
     currentTrack: null,
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const createMockMotion = (element: string) => {
     const MockComponent = React.forwardRef(
@@ -268,7 +268,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
   const MockAdventureThemeContext = React.createContext({
     worldId: 1,
@@ -305,8 +305,8 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
       },
       worldId: 1,
       level: 1,
-      setWorld: jest.fn(),
-      setLevel: jest.fn(),
+      setWorld: vi.fn(),
+      setLevel: vi.fn(),
       isTransitioning: false,
       chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
     }),
@@ -349,21 +349,21 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playAchievementSound: jest.fn(),
-    playSound: jest.fn(),
-    playWordSound: jest.fn(),
-    playGameStartSound: jest.fn(),
-    playGameEndSound: jest.fn(),
-    playSoloGameSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playAchievementSound: vi.fn(),
+    playSound: vi.fn(),
+    playWordSound: vi.fn(),
+    playGameStartSound: vi.fn(),
+    playGameEndSound: vi.fn(),
+    playSoloGameSound: vi.fn(),
   }),
 }));
 
@@ -371,7 +371,7 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
 let capturedOnWordSubmit: ((word: string, indices: number[]) => void) | null = null;
 let capturedGridProps: any = null;
 
-jest.mock('../ui', () => {
+vi.mock('../ui', () => {
   const React = require('react');
   return {
     PremiumCard: () => null,
@@ -413,13 +413,13 @@ jest.mock('../ui', () => {
 
 describe('AdventureGame Word Feedback', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     capturedOnWordSubmit = null;
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   /**

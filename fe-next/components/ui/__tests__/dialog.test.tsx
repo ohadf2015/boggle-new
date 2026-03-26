@@ -20,7 +20,7 @@ import {
 } from '../dialog';
 
 // Mock Radix UI Dialog primitives
-jest.mock('@radix-ui/react-dialog', () => {
+vi.mock('@radix-ui/react-dialog', () => {
   const React = require('react');
 
   const MockOverlay = React.forwardRef(

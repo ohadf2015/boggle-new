@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for progress module — spaced repetition extension
  * TDD: RED phase - tests BEFORE implementation
@@ -10,16 +11,16 @@ const supabase = _supabase!;
 import { updateWordSpacedRepetition, getStudentProgressForLesson } from '../progress';
 
 // Mock Supabase
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
+  default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
 describe('progress module — spaced repetition', () => {
@@ -27,7 +28,7 @@ describe('progress module — spaced repetition', () => {
   const mockLessonId = 'lesson-1';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ============================================
@@ -54,21 +55,21 @@ describe('progress module — spaced repetition', () => {
       };
 
       // Mock: fetch existing progress
-      const mockSingle = jest.fn().mockResolvedValue({ data: existingProgress, error: null });
-      const mockEq2 = jest.fn().mockReturnValue({ maybeSingle: mockSingle });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelectFetch = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockSingle = vi.fn().mockResolvedValue({ data: existingProgress, error: null });
+      const mockEq2 = vi.fn().mockReturnValue({ maybeSingle: mockSingle });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelectFetch = vi.fn().mockReturnValue({ eq: mockEq1 });
 
       // Mock: update progress
-      const mockUpdateSingle = jest.fn().mockResolvedValue({
+      const mockUpdateSingle = vi.fn().mockResolvedValue({
         data: { ...existingProgress, words_attempted: { cat: { ...existingProgress.words_attempted.cat, ...srData } } },
         error: null,
       });
-      const mockUpdateSelect = jest.fn().mockReturnValue({ single: mockUpdateSingle });
-      const mockUpdateEq = jest.fn().mockReturnValue({ select: mockUpdateSelect });
-      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+      const mockUpdateSelect = vi.fn().mockReturnValue({ single: mockUpdateSingle });
+      const mockUpdateEq = vi.fn().mockReturnValue({ select: mockUpdateSelect });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
-      (supabase.from as jest.Mock)
+      (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectFetch })
         .mockReturnValueOnce({ update: mockUpdate });
 
@@ -97,12 +98,12 @@ describe('progress module — spaced repetition', () => {
 
     it('returns error when student progress not found', async () => {
       // GIVEN: no existing progress
-      const mockSingle = jest.fn().mockResolvedValue({ data: null, error: null });
-      const mockEq2 = jest.fn().mockReturnValue({ maybeSingle: mockSingle });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+      const mockEq2 = vi.fn().mockReturnValue({ maybeSingle: mockSingle });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq1 });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       // WHEN
       const result = await updateWordSpacedRepetition(mockStudentId, mockLessonId, 'cat', {
@@ -129,17 +130,17 @@ describe('progress module — spaced repetition', () => {
         words_mastered: [],
       };
 
-      const mockSingle = jest.fn().mockResolvedValue({ data: existingProgress, error: null });
-      const mockEq2 = jest.fn().mockReturnValue({ maybeSingle: mockSingle });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelectFetch = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockSingle = vi.fn().mockResolvedValue({ data: existingProgress, error: null });
+      const mockEq2 = vi.fn().mockReturnValue({ maybeSingle: mockSingle });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelectFetch = vi.fn().mockReturnValue({ eq: mockEq1 });
 
-      const mockUpdateSingle = jest.fn().mockResolvedValue({ data: null, error: { message: 'Update failed' } });
-      const mockUpdateSelect = jest.fn().mockReturnValue({ single: mockUpdateSingle });
-      const mockUpdateEq = jest.fn().mockReturnValue({ select: mockUpdateSelect });
-      const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq });
+      const mockUpdateSingle = vi.fn().mockResolvedValue({ data: null, error: { message: 'Update failed' } });
+      const mockUpdateSelect = vi.fn().mockReturnValue({ single: mockUpdateSingle });
+      const mockUpdateEq = vi.fn().mockReturnValue({ select: mockUpdateSelect });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
 
-      (supabase.from as jest.Mock)
+      (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectFetch })
         .mockReturnValueOnce({ update: mockUpdate });
 
@@ -168,11 +169,11 @@ describe('progress module — spaced repetition', () => {
         { id: 'p2', student_id: 's2', lesson_id: mockLessonId, words_attempted: {}, words_mastered: [] },
       ];
 
-      const mockOrder = jest.fn().mockResolvedValue({ data: mockData, error: null });
-      const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockOrder = vi.fn().mockResolvedValue({ data: mockData, error: null });
+      const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       // WHEN
       const result = await getStudentProgressForLesson(mockLessonId);
@@ -185,11 +186,11 @@ describe('progress module — spaced repetition', () => {
 
     it('returns empty array on supabase error', async () => {
       // GIVEN
-      const mockOrder = jest.fn().mockResolvedValue({ data: null, error: { message: 'Query failed' } });
-      const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockOrder = vi.fn().mockResolvedValue({ data: null, error: { message: 'Query failed' } });
+      const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
 
-      (supabase.from as jest.Mock).mockReturnValue({ select: mockSelect });
+      (supabase.from as Mock).mockReturnValue({ select: mockSelect });
 
       // WHEN
       const result = await getStudentProgressForLesson(mockLessonId);

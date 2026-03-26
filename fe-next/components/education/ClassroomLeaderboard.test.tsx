@@ -5,7 +5,7 @@ import * as useClassroomLeaderboardHook from '@/hooks/useClassroomLeaderboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock LanguageContext with translations
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
@@ -38,10 +38,10 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock the hook
-jest.mock('@/hooks/useClassroomLeaderboard');
+vi.mock('@/hooks/useClassroomLeaderboard');
 
 // Mock AdaptiveMotion (used by the component instead of framer-motion directly)
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const createMotionProxy = () =>
     new Proxy({}, {
@@ -62,7 +62,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
 });
 
 // Mock getLeaderboardTier used directly by TierBadge
-jest.mock('@/lib/supabase/education/leaderboard', () => ({
+vi.mock('@/lib/supabase/education/leaderboard', () => ({
   getLeaderboardTier: (rank: number, total: number) => {
     const pct = rank / total;
     if (pct <= 0.1) return 'top10';
@@ -101,9 +101,9 @@ const defaultMock = (overrides: Record<string, any> = {}) => ({
   totalStudents: 0,
   isLoading: false,
   error: null,
-  refresh: jest.fn(),
+  refresh: vi.fn(),
   timeScope: 'weekly' as const,
-  setTimeScope: jest.fn(),
+  setTimeScope: vi.fn(),
   ...overrides,
 } as any);
 
@@ -121,7 +121,7 @@ describe('ClassroomLeaderboard', () => {
   const mockCurrentUserId = 'student-456';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==================== RENDERING ====================

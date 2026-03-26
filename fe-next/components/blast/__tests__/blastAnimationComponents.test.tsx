@@ -6,27 +6,27 @@ import type { LetterGrid } from '@/shared/types/game';
 
 // ---- Mocks ----
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('animejs', () => ({
+vi.mock('animejs', () => ({
   __esModule: true,
-  default: Object.assign(jest.fn(), { stagger: jest.fn(() => 0) }),
+  default: Object.assign(vi.fn(), { stagger: vi.fn(() => 0) }),
 }));
 
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: (props: any) => <div data-testid="grid-component" data-interactive={props.interactive}>{JSON.stringify(props.grid)}</div>,
 }));
 
-jest.mock('@/components/adventure/juice/ExplosionEffect', () => ({
+vi.mock('@/components/adventure/juice/ExplosionEffect', () => ({
   ExplosionEffect: ({ position }: any) => <div data-testid="explosion" data-x={position.x} data-y={position.y} />,
 }));
-jest.mock('@/components/adventure/juice/ScorePopup', () => ({
+vi.mock('@/components/adventure/juice/ScorePopup', () => ({
   ScorePopup: ({ score }: any) => <div data-testid="score-popup">{score}</div>,
 }));
 
@@ -102,8 +102,8 @@ describe('BlastExplosionLayer', () => {
   const defaultProps = {
     explosions: [] as BlastExplosion[],
     scorePopups: [] as BlastScorePopup[],
-    onExplosionComplete: jest.fn(),
-    onScorePopupComplete: jest.fn(),
+    onExplosionComplete: vi.fn(),
+    onScorePopupComplete: vi.fn(),
     cellSize: 60,
     containerOffset: { x: 0, y: 0 },
   };
@@ -219,7 +219,7 @@ describe('BlastCascadeOverlay', () => {
 // ==================== BlastGrid ====================
 
 describe('BlastGrid', () => {
-  const noop = jest.fn();
+  const noop = vi.fn();
 
   const defaultGridProps = {
     grid: make4x4Grid(),

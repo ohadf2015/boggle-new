@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, initial, animate, transition, whileHover, whileTap, exit, ...props }: any) => <span {...props}>{children}</span>,
@@ -17,7 +17,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Skull: (props: any) => <svg data-testid="skull-icon" {...props} />,
   Target: (props: any) => <svg data-testid="target-icon" {...props} />,
   Trophy: (props: any) => <svg data-testid="trophy-icon" {...props} />,

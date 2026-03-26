@@ -2,11 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { FlashChallengeToast } from '../FlashChallengeToast';
 import type { FlashChallenge } from '@/types/adventure';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   m: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   AnimatePresence: ({ children }: any) => <>{children}</>,
@@ -25,14 +25,14 @@ const challenge: FlashChallenge = {
 describe('FlashChallengeToast', () => {
   it('renders null when no challenge', () => {
     const { container } = render(
-      <FlashChallengeToast challenge={null} isComplete={false} onDismiss={jest.fn()} timeLeft={30} />
+      <FlashChallengeToast challenge={null} isComplete={false} onDismiss={vi.fn()} timeLeft={30} />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('shows challenge description key and reward when active', () => {
     render(
-      <FlashChallengeToast challenge={challenge} isComplete={false} onDismiss={jest.fn()} timeLeft={25} />
+      <FlashChallengeToast challenge={challenge} isComplete={false} onDismiss={vi.fn()} timeLeft={25} />
     );
     expect(screen.getByText('adventure.quests.flash.longWord')).toBeInTheDocument();
     expect(screen.getByText(/50/)).toBeInTheDocument();
@@ -40,13 +40,13 @@ describe('FlashChallengeToast', () => {
 
   it('shows completion state when isComplete', () => {
     render(
-      <FlashChallengeToast challenge={challenge} isComplete={true} onDismiss={jest.fn()} timeLeft={10} />
+      <FlashChallengeToast challenge={challenge} isComplete={true} onDismiss={vi.fn()} timeLeft={10} />
     );
     expect(screen.getByTestId('challenge-complete-badge')).toBeInTheDocument();
   });
 
   it('calls onDismiss when X button clicked', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(
       <FlashChallengeToast challenge={challenge} isComplete={false} onDismiss={onDismiss} timeLeft={20} />
     );

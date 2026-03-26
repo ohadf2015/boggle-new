@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Tests for Student Join Classroom Page
  *
@@ -12,31 +13,31 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import StudentJoinPageClient from '../PageClient';
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/components/student/JoinClassroomForm', () => {
-  return function MockJoinClassroomForm() {
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/components/student/JoinClassroomForm', () => ({
+  default: function MockJoinClassroomForm() {
     return <div data-testid="join-form">Join Classroom Form</div>;
-  };
-});
+  },
+}));
 
 describe('StudentJoinPageClient - Auth Loading Bug', () => {
-  const mockPush = jest.fn();
-  const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
+  const mockPush = vi.fn();
+  const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
+  const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+  const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       languages: ['en', 'he', 'sv', 'ja'],
     } as any);
   });

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { render } from '@testing-library/react';
 import TvResultsControls from '../TvResultsControls';
@@ -21,10 +22,10 @@ describe('TvResultsControls - Z-Index Visibility', () => {
     isLastRound: true,
     playersReadyCount: 2,
     totalPlayers: 5,
-    onSkip: jest.fn(),
-    onStartNewGame: jest.fn(),
-    onNextRound: jest.fn(),
-    onShowQR: jest.fn(),
+    onSkip: vi.fn(),
+    onStartNewGame: vi.fn(),
+    onNextRound: vi.fn(),
+    onShowQR: vi.fn(),
     t: mockT,
   };
 

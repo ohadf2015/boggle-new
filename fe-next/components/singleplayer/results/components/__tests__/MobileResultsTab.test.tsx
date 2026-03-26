@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MobileResultsTab } from '../MobileResultsTab';
 
 // Mock hooks and contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -24,56 +24,62 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock confetti
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
 }));
 
 // Mock Mascot components
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => null,
   MascotVariant: {},
 }));
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: () => null,
 }));
 
 // Mock child components
-jest.mock('@/components/results/ResultsWinnerBanner', () => {
-  return function MockResultsWinnerBanner({ compact }: { compact?: boolean }) {
+vi.mock('@/components/results/ResultsWinnerBanner', () => {
+  const MockResultsWinnerBanner = ({ compact }: { compact?: boolean }) => {
     return <div data-testid="winner-banner" data-compact={compact ? 'true' : 'false'}>WinnerBanner</div>;
   };
+  return { default: MockResultsWinnerBanner };
 });
 
-jest.mock('@/components/results/MobileCompactStats', () => {
-  return function MockMobileCompactStats({ wordCount, accuracy }: { wordCount: number; accuracy: number }) {
+vi.mock('@/components/results/MobileCompactStats', () => {
+  const MockMobileCompactStats = ({ wordCount, accuracy }: { wordCount: number; accuracy: number }) => {
     return <div data-testid="mobile-compact-stats">{wordCount} words, {accuracy}% accuracy</div>;
   };
+  return { default: MockMobileCompactStats };
 });
 
-jest.mock('@/components/results/MobileCompactRewards', () => {
-  return function MockMobileCompactRewards({ winStreak, coins }: { winStreak?: number; coins?: number }) {
+vi.mock('@/components/results/MobileCompactRewards', () => {
+  const MockMobileCompactRewards = ({ winStreak, coins }: { winStreak?: number; coins?: number }) => {
     if (!winStreak && !coins) return null;
     return <div data-testid="mobile-compact-rewards">Streak: {winStreak}, Coins: {coins}</div>;
   };
+  return { default: MockMobileCompactRewards };
 });
 
-jest.mock('@/components/results/MobileCompactLeaderboard', () => {
-  return function MockMobileCompactLeaderboard() {
+vi.mock('@/components/results/MobileCompactLeaderboard', () => {
+  const MockMobileCompactLeaderboard = () => {
     return <div data-testid="mobile-compact-leaderboard">Leaderboard</div>;
   };
+  return { default: MockMobileCompactLeaderboard };
 });
 
-jest.mock('@/components/results/NextStepPrompt', () => {
-  return function MockNextStepPrompt() {
+vi.mock('@/components/results/NextStepPrompt', () => {
+  const MockNextStepPrompt = () => {
     return <div data-testid="next-step-prompt">NextStepPrompt</div>;
   };
+  return { default: MockNextStepPrompt };
 });
 
-jest.mock('../ChallengeButton', () => {
-  return function MockChallengeButton() {
+vi.mock('../ChallengeButton', () => {
+  const MockChallengeButton = () => {
     return <div data-testid="challenge-button">ChallengeButton</div>;
   };
+  return { default: MockChallengeButton };
 });
 
 describe('MobileResultsTab simplified layout', () => {
@@ -107,7 +113,7 @@ describe('MobileResultsTab simplified layout', () => {
       announcement: undefined,
     },
     shouldShowConfetti: true,
-    onBackToLobby: jest.fn(),
+    onBackToLobby: vi.fn(),
     t: (key: string) => key,
   };
 

@@ -12,7 +12,7 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock useDevicePerformance
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -21,11 +21,11 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useCascadeAnimation
-jest.mock('@/hooks/useCascadeAnimation', () => ({
+vi.mock('@/hooks/useCascadeAnimation', () => ({
   useCascadeAnimation: () => ({
     delays: new Map(),
-    startCascade: jest.fn(),
-    reset: jest.fn(),
+    startCascade: vi.fn(),
+    reset: vi.fn(),
   }),
 }));
 

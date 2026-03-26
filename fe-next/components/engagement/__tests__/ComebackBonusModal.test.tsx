@@ -5,15 +5,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ComebackBonusModal } from '../ComebackBonusModal';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/hooks/useFocusTrap', () => ({
-  useFocusTrap: jest.fn(),
+vi.mock('@/hooks/useFocusTrap', () => ({
+  useFocusTrap: vi.fn(),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div {...props}>{children}</div>
@@ -22,8 +22,8 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/utils/authFetch', () => ({
-  postWithAuth: jest.fn(),
+vi.mock('@/utils/authFetch', () => ({
+  postWithAuth: vi.fn(),
 }));
 
 import { postWithAuth } from '@/utils/authFetch';
@@ -39,19 +39,19 @@ const tier = {
 
 describe('ComebackBonusModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when closed', () => {
     const { container } = render(
-      <ComebackBonusModal isOpen={false} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={false} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('renders comeback modal with multiplier when open', () => {
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(screen.getByText('comebackBonus.title')).toBeInTheDocument();
     expect(screen.getByText('comebackBonus.claimButton')).toBeInTheDocument();
@@ -59,27 +59,27 @@ describe('ComebackBonusModal', () => {
 
   it('shows XP multiplier value', () => {
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(screen.getByText('2x')).toBeInTheDocument();
   });
 
   it('shows hints reward row', () => {
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(screen.getByText('comebackBonus.hints')).toBeInTheDocument();
   });
 
   it('calls postWithAuth and onClaimed when claim button clicked', async () => {
-    const onClaimed = jest.fn();
+    const onClaimed = vi.fn();
     mockPostWithAuth.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, bonus: tier, expiresAt: '2026-03-28T00:00:00Z' }),
     } as Response);
 
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={onClaimed} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={onClaimed} />
     );
 
     fireEvent.click(screen.getByText('comebackBonus.claimButton'));
@@ -91,9 +91,9 @@ describe('ComebackBonusModal', () => {
   });
 
   it('calls onClose when close button clicked', () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={onClose} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={onClose} onClaimed={vi.fn()} />
     );
     fireEvent.click(screen.getByLabelText('comebackBonus.close'));
     expect(onClose).toHaveBeenCalled();
@@ -102,14 +102,14 @@ describe('ComebackBonusModal', () => {
   it('shows special title badge when tier has title', () => {
     const tierWithTitle = { ...tier, title: 'THE_RETURNED' } as typeof tier & { title: string };
     render(
-      <ComebackBonusModal isOpen={true} daysAway={30} tier={tierWithTitle} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={30} tier={tierWithTitle} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(screen.getByText('comebackBonus.titleUnlocked')).toBeInTheDocument();
   });
 
   it('shows streak freezes row when > 0', () => {
     render(
-      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={jest.fn()} onClaimed={jest.fn()} />
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
     );
     expect(screen.getByText('comebackBonus.streakFreezes')).toBeInTheDocument();
   });

@@ -8,7 +8,7 @@ const mockT = (key: string, params?: Record<string, unknown>) => {
   return key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en' }),
 }));
 

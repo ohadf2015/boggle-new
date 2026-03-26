@@ -11,83 +11,83 @@ import { render, act } from '@testing-library/react';
 // Mocks (same pattern as BlastGame.discovery.test.tsx)
 // ---------------------------------------------------------------------------
 
-jest.mock('canvas-confetti', () => jest.fn());
+vi.mock('canvas-confetti', () => vi.fn());
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,
     comboTimeRemaining: null,
     isDangerState: false,
     maxCombo: 0,
-    incrementCombo: jest.fn(),
+    incrementCombo: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
   useWordSubmission: () => ({
     currentFeedback: null,
-    handleWordSubmit: jest.fn(),
+    handleWordSubmit: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
   useSpamDetection: () => ({}),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
-  useDictionaryCache: () => ({ checkWord: jest.fn() }),
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({ checkWord: vi.fn() }),
 }));
 
-jest.mock('../hooks/useBlastHint', () => ({
+vi.mock('../hooks/useBlastHint', () => ({
   useBlastHint: () => ({
     hintPath: null,
     hasHintAvailable: false,
-    requestHint: jest.fn(),
-    clearHint: jest.fn(),
+    requestHint: vi.fn(),
+    clearHint: vi.fn(),
   }),
 }));
 
 const mockAllObjectivesComplete = { value: true };
-jest.mock('../hooks/useBlastObjectives', () => ({
+vi.mock('../hooks/useBlastObjectives', () => ({
   useBlastObjectives: () => ({
     objectiveProgress: [],
     allObjectivesComplete: mockAllObjectivesComplete.value,
   }),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
+vi.mock('@/shared/utils/scoring', () => ({
   getComboMultiplier: () => 1,
 }));
 
 const mockBlastReturn: { value: any } = { value: null };
-jest.mock('../hooks/useBlastGame', () => ({
+vi.mock('../hooks/useBlastGame', () => ({
   useBlastGame: () => mockBlastReturn.value,
 }));
 
-jest.mock('../BlastComboDiscovery', () => ({
+vi.mock('../BlastComboDiscovery', () => ({
   BlastComboDiscovery: () => <div data-testid="blast-combo-discovery" />,
 }));
 
-jest.mock('../BlastComboFlash', () => ({
+vi.mock('../BlastComboFlash', () => ({
   BlastComboFlash: () => <div data-testid="blast-combo-flash" />,
 }));
 
-jest.mock('../BlastGameLayout', () => ({
+vi.mock('../BlastGameLayout', () => ({
   BlastGameLayout: () => <div data-testid="blast-game-layout" />,
 }));
 
@@ -130,19 +130,19 @@ function makeDefaultBlastReturn(overrides: any = {}) {
     cascadeHighlightData: null,
     cascadeHighlightPhase: 'idle',
     activeComboFlash: null,
-    clearComboFlash: jest.fn(),
-    clearTilesForWord: jest.fn(),
-    dismissExplosion: jest.fn(),
-    dismissScorePopup: jest.fn(),
-    shuffleRemainingTiles: jest.fn(),
-    endGame: jest.fn(),
+    clearComboFlash: vi.fn(),
+    clearTilesForWord: vi.fn(),
+    dismissExplosion: vi.fn(),
+    dismissScorePopup: vi.fn(),
+    shuffleRemainingTiles: vi.fn(),
+    endGame: vi.fn(),
     noWordsRemaining: false,
-    getResultsData: jest.fn(() => ({ score: 50, wordsFound: ['CAT'] })),
-    trackWordFail: jest.fn(),
-    triggerComboFlash: jest.fn(),
-    setTileStates: jest.fn(),
-    addExplosion: jest.fn(),
-    addBonusScore: jest.fn(),
+    getResultsData: vi.fn(() => ({ score: 50, wordsFound: ['CAT'] })),
+    trackWordFail: vi.fn(),
+    triggerComboFlash: vi.fn(),
+    setTileStates: vi.fn(),
+    addExplosion: vi.fn(),
+    addBonusScore: vi.fn(),
     ...rest,
   };
 }
@@ -160,18 +160,18 @@ const baseConfig = {
 
 describe('BlastGame completion logic', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
     mockAllObjectivesComplete.value = true;
     mockBlastReturn.value = makeDefaultBlastReturn();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('calls onGameEnd when isComplete=true but allObjectivesComplete=false (stuck game fix)', () => {
-    const onGameEnd = jest.fn();
+    const onGameEnd = vi.fn();
     mockAllObjectivesComplete.value = false;
     mockBlastReturn.value = makeDefaultBlastReturn({
       gameState: { isComplete: true, tilesCleared: 4, totalTiles: 4, score: 50 },
@@ -181,19 +181,19 @@ describe('BlastGame completion logic', () => {
       <BlastGameImport
         config={baseConfig}
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
     // The effect uses a setTimeout before calling onGameEnd
-    act(() => { jest.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(3000); });
 
     expect(onGameEnd).toHaveBeenCalledTimes(1);
   });
 
   it('calls onWaveComplete when isComplete=true AND allObjectivesComplete=true', () => {
-    const onWaveComplete = jest.fn();
-    const onGameEnd = jest.fn();
+    const onWaveComplete = vi.fn();
+    const onGameEnd = vi.fn();
     mockAllObjectivesComplete.value = true;
     mockBlastReturn.value = makeDefaultBlastReturn({
       gameState: { isComplete: true, tilesCleared: 4, totalTiles: 4, score: 100 },
@@ -204,18 +204,18 @@ describe('BlastGame completion logic', () => {
         config={baseConfig}
         onWaveComplete={onWaveComplete}
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
-    act(() => { jest.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(3000); });
 
     expect(onWaveComplete).toHaveBeenCalledTimes(1);
     expect(onGameEnd).not.toHaveBeenCalled();
   });
 
   it('calls onGameEnd when isDeadEnd=true and objectives not met', () => {
-    const onGameEnd = jest.fn();
+    const onGameEnd = vi.fn();
     mockAllObjectivesComplete.value = false;
     mockBlastReturn.value = makeDefaultBlastReturn({
       gameState: { isDeadEnd: true },
@@ -225,18 +225,18 @@ describe('BlastGame completion logic', () => {
       <BlastGameImport
         config={baseConfig}
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
-    act(() => { jest.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
 
     expect(onGameEnd).toHaveBeenCalledTimes(1);
   });
 
   it('calls onWaveComplete when allObjectivesComplete=true even without board clear', () => {
-    const onWaveComplete = jest.fn();
-    const onGameEnd = jest.fn();
+    const onWaveComplete = vi.fn();
+    const onGameEnd = vi.fn();
     mockAllObjectivesComplete.value = true;
     // Board NOT cleared (isComplete=false), but objectives ARE met
     mockBlastReturn.value = makeDefaultBlastReturn({
@@ -248,18 +248,18 @@ describe('BlastGame completion logic', () => {
         config={baseConfig}
         onWaveComplete={onWaveComplete}
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
-    act(() => { jest.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(3000); });
 
     expect(onWaveComplete).toHaveBeenCalledTimes(1);
     expect(onGameEnd).not.toHaveBeenCalled();
   });
 
   it('does NOT call onGameEnd when game is still in progress (no objectives met, no board clear)', () => {
-    const onGameEnd = jest.fn();
+    const onGameEnd = vi.fn();
     mockAllObjectivesComplete.value = false;
     mockBlastReturn.value = makeDefaultBlastReturn({
       gameState: { isComplete: false, isDeadEnd: false },
@@ -269,11 +269,11 @@ describe('BlastGame completion logic', () => {
       <BlastGameImport
         config={baseConfig}
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />,
     );
 
-    act(() => { jest.advanceTimersByTime(5000); });
+    act(() => { vi.advanceTimersByTime(5000); });
 
     expect(onGameEnd).not.toHaveBeenCalled();
   });

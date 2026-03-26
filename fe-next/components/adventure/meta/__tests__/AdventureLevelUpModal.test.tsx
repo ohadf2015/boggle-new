@@ -17,7 +17,7 @@ import AdventureLevelUpModal from '../AdventureLevelUpModal';
 import * as confettiUtils from '@/utils/confettiUtils';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -26,36 +26,36 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock confetti utils
-jest.mock('@/utils/confettiUtils', () => ({
-  fireLevelUpConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireLevelUpConfetti: vi.fn(),
 }));
 
 // Mock matchMedia globally
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false, // Default to no reduced motion
     media: query,
     onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });
 
 describe('AdventureLevelUpModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Modal Open/Close', () => {
@@ -208,7 +208,7 @@ describe('AdventureLevelUpModal', () => {
 
       // Fast-forward time by 3 seconds
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       await waitFor(() => {
@@ -227,7 +227,7 @@ describe('AdventureLevelUpModal', () => {
 
       // Fast-forward time by 2 seconds
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(mockOnClose).not.toHaveBeenCalled();
@@ -239,15 +239,15 @@ describe('AdventureLevelUpModal', () => {
       // Mock matchMedia for reduced motion
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation((query) => ({
+        value: vi.fn().mockImplementation((query) => ({
           matches: query === '(prefers-reduced-motion: reduce)',
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       });
     });
@@ -269,15 +269,15 @@ describe('AdventureLevelUpModal', () => {
       // Reset matchMedia to default (no reduced motion)
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation((query) => ({
+        value: vi.fn().mockImplementation((query) => ({
           matches: false,
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       });
     });

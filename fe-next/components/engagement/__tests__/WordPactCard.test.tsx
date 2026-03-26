@@ -8,12 +8,12 @@ import { WordPactCard } from '../WordPactCard';
 import { useWordPact } from '@/hooks/useWordPact';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-jest.mock('@/hooks/useWordPact');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/hooks/useWordPact');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
-jest.mock('../PactFriendSelector', () => ({
+vi.mock('../PactFriendSelector', () => ({
   PactFriendSelector: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="pact-friend-selector">
       <button onClick={onClose}>close</button>
@@ -48,13 +48,13 @@ const basePactReturn = {
   multiplier: 1.0,
   streak: 0,
   loading: false,
-  createPact: jest.fn(),
-  dissolvePact: jest.fn(),
+  createPact: vi.fn(),
+  dissolvePact: vi.fn(),
 };
 
 describe('WordPactCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
   });
 
@@ -138,7 +138,7 @@ describe('WordPactCard', () => {
   });
 
   it('calls dissolvePact when dissolve button clicked', () => {
-    const mockDissolve = jest.fn();
+    const mockDissolve = vi.fn();
     (useWordPact as jest.Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },

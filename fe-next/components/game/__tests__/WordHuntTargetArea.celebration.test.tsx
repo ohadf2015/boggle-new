@@ -9,14 +9,14 @@ import { render, screen } from '@testing-library/react';
 import { WordHuntTargetArea } from '../WordHuntTargetArea';
 import type { LetterFeedback } from '@/shared/types/game';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
     const Component = React.forwardRef(
       (
@@ -52,7 +52,7 @@ describe('WordHuntTargetArea Celebration', () => {
   const defaultProps = {
     targetLength: 5,
     attempts: [] as Array<{ guess: string; feedback: LetterFeedback[] }>,
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
     found: false,
   };
 

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: Profile Tab Deep Linking
  *
@@ -13,19 +14,19 @@ import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
 // Mock Next.js navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
     push: mockPush,
-    replace: jest.fn(),
+    replace: vi.fn(),
   })),
-  useSearchParams: jest.fn(() => ({
-    get: jest.fn(),
+  useSearchParams: vi.fn(() => ({
+    get: vi.fn(),
   })),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       const { initial, animate, exit, transition, drag, dragConstraints, dragElastic, onDragEnd, whileHover, whileTap, ...domProps } = props;
@@ -40,7 +41,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -48,7 +49,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'test-user-id' },
     profile: {
@@ -61,41 +62,41 @@ jest.mock('@/contexts/AuthContext', () => ({
     loading: false,
     canPlayRanked: true,
     gamesUntilRanked: 0,
-    updateProfile: jest.fn(),
-    refreshProfile: jest.fn(),
+    updateProfile: vi.fn(),
+    refreshProfile: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
   }),
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
   }),
 }));
 
-jest.mock('@/hooks/usePlayerCollectibles', () => ({
+vi.mock('@/hooks/usePlayerCollectibles', () => ({
   usePlayerCollectibles: () => ({
     collectibles: [],
     isLoading: false,
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/utils/session', () => ({
+vi.mock('@/utils/session', () => ({
   getSession: () => null,
 }));
 
 // Mock profile components to simplify tests
-jest.mock('@/components/profile', () => ({
+vi.mock('@/components/profile', () => ({
   ProfileHeader: () => <div data-testid="profile-header">ProfileHeader</div>,
   ProfileXpSection: () => <div data-testid="profile-xp-section">ProfileXpSection</div>,
   ProfileStatsGrid: () => <div data-testid="profile-stats-grid">ProfileStatsGrid</div>,
@@ -106,34 +107,34 @@ jest.mock('@/components/profile', () => ({
   ProfileBackButtons: () => <div data-testid="profile-back-buttons">ProfileBackButtons</div>,
 }));
 
-jest.mock('@/components/profile/ReferralCard', () => ({
+vi.mock('@/components/profile/ReferralCard', () => ({
   ReferralCard: () => <div data-testid="referral-card">ReferralCard</div>,
 }));
 
-jest.mock('@/components/settings/EmailPreferences', () => ({
+vi.mock('@/components/settings/EmailPreferences', () => ({
   EmailPreferences: () => <div data-testid="email-preferences">EmailPreferences</div>,
 }));
 
-jest.mock('@/components/AutoHideHeader', () => ({
+vi.mock('@/components/AutoHideHeader', () => ({
   __esModule: true,
   default: () => <div data-testid="auto-hide-header">Header</div>,
 }));
 
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
-jest.mock('@/components/EmojiAvatarPicker', () => ({
+vi.mock('@/components/EmojiAvatarPicker', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
@@ -142,17 +143,17 @@ import ProfilePageClient from '@/app/[locale]/profile/PageClient';
 
 describe('Profile Tab Deep Linking', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default: no tab parameter
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn().mockReturnValue(null),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn().mockReturnValue(null),
     });
   });
 
   it('should show overview tab by default when no tab parameter is provided', async () => {
     // GIVEN user navigates to /profile without tab parameter
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn().mockReturnValue(null),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn().mockReturnValue(null),
     });
 
     // WHEN profile page renders
@@ -167,8 +168,8 @@ describe('Profile Tab Deep Linking', () => {
 
   it('should open collection tab when ?tab=collection is in URL', async () => {
     // GIVEN user navigates to /profile?tab=collection
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn((param: string) => (param === 'tab' ? 'collection' : null)),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn((param: string) => (param === 'tab' ? 'collection' : null)),
     });
 
     // WHEN profile page renders
@@ -186,8 +187,8 @@ describe('Profile Tab Deep Linking', () => {
 
   it('should open stats tab when ?tab=stats is in URL', async () => {
     // GIVEN user navigates to /profile?tab=stats
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn((param: string) => (param === 'tab' ? 'stats' : null)),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn((param: string) => (param === 'tab' ? 'stats' : null)),
     });
 
     // WHEN profile page renders
@@ -202,8 +203,8 @@ describe('Profile Tab Deep Linking', () => {
 
   it('should open achievements tab when ?tab=achievements is in URL', async () => {
     // GIVEN user navigates to /profile?tab=achievements
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn((param: string) => (param === 'tab' ? 'achievements' : null)),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn((param: string) => (param === 'tab' ? 'achievements' : null)),
     });
 
     // WHEN profile page renders
@@ -218,8 +219,8 @@ describe('Profile Tab Deep Linking', () => {
 
   it('should fallback to overview for invalid tab parameter', async () => {
     // GIVEN user navigates to /profile?tab=invalid
-    (useSearchParams as jest.Mock).mockReturnValue({
-      get: jest.fn((param: string) => (param === 'tab' ? 'invalid' : null)),
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn((param: string) => (param === 'tab' ? 'invalid' : null)),
     });
 
     // WHEN profile page renders

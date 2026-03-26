@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv(
     { children, ...props }: any,
@@ -27,14 +27,14 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Shuffle: () => <div data-testid="shuffle-icon" />,
   Pencil: () => <div data-testid="pencil-icon" />,
   X: () => <div data-testid="x-icon" />,
 }));
 
 // Mock AvatarBuilderModal
-jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
   __esModule: true,
   default: ({ isOpen, onSave, onClose }: any) =>
     isOpen ? (
@@ -64,7 +64,7 @@ jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -81,13 +81,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock Avatar
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar-preview" />,
 }));
 
 // Mock customAvatar
-jest.mock('@/shared/types/customAvatar', () => ({
+vi.mock('@/shared/types/customAvatar', () => ({
   getRandomAvatarConfig: () => ({
     gender: 'male',
     base: 'round',
@@ -104,12 +104,12 @@ import QuickProfileSetup from '../QuickProfileSetup';
 
 describe('QuickProfileSetup', () => {
   const defaultProps = {
-    onComplete: jest.fn(),
-    onSkip: jest.fn(),
+    onComplete: vi.fn(),
+    onSkip: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the slide-up profile card', () => {

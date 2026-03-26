@@ -15,7 +15,7 @@ import DailyWordHuntSurvival from '../DailyWordHuntSurvival';
 import type { LetterGrid } from '@/types';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
@@ -26,40 +26,40 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock contexts and hooks
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
   useLanguageSafe: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playErrorSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    playMusic: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
+    playMusic: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
     isMuted: false,
-    toggleMute: jest.fn(),
+    toggleMute: vi.fn(),
     TRACKS: {
       BOSSA_ARCADE: 'bossa_arcade',
       MENU: 'menu',
@@ -68,11 +68,11 @@ jest.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -81,9 +81,9 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useMediaQuery to simulate desktop
-jest.mock('@/hooks/useMediaQuery', () => ({
-  useMediaQuery: jest.fn(() => true), // Desktop mode
-  useIsDesktop: jest.fn(() => true),
+vi.mock('@/hooks/useMediaQuery', () => ({
+  useMediaQuery: vi.fn(() => true), // Desktop mode
+  useIsDesktop: vi.fn(() => true),
 }));
 
 const mockGrid: LetterGrid = [
@@ -93,22 +93,22 @@ const mockGrid: LetterGrid = [
 ];
 
 describe('DailyWordHuntSurvival - Keyboard Highlighting on Desktop', () => {
-  const mockOnComplete = jest.fn();
-  const mockOnQuit = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnQuit = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: query === '(min-width: 768px)',
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
   });

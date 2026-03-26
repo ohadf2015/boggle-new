@@ -4,7 +4,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import type { Language } from '@/types';
 
 // Mock framer-motion to prevent animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const ReactModule = require('react');
 
   const MockMotionDiv = ReactModule.forwardRef(
@@ -34,10 +34,11 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock MiniGrid to avoid complex interactions
-jest.mock('../onboarding/MiniGrid', () => {
-  return function MockMiniGrid() {
+vi.mock('../onboarding/MiniGrid', () => {
+  const MockMiniGrid = () => {
     return <div data-testid="mini-grid">Mini Grid</div>;
   };
+  return { default: MockMiniGrid };
 });
 
 // Import after mocks
@@ -50,10 +51,10 @@ const renderWithLanguage = (ui: React.ReactElement, locale: Language = 'en') => 
 };
 
 describe('HowToPlay Neo-Brutalist Design', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Progress Section', () => {

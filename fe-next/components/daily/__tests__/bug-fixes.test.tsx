@@ -17,13 +17,13 @@ import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 import * as dailyChallengeUtils from '@/utils/dailyChallenge';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock dailyChallenge utilities
-jest.mock('@/utils/dailyChallenge', () => ({
-  getTodaysWordHuntResult: jest.fn().mockReturnValue(null),
-  markWordHuntResultSubmitted: jest.fn(),
+vi.mock('@/utils/dailyChallenge', () => ({
+  getTodaysWordHuntResult: vi.fn().mockReturnValue(null),
+  markWordHuntResultSubmitted: vi.fn(),
 }));
 
 describe('Bug Fixes - Phase 10', () => {
@@ -66,10 +66,10 @@ describe('Bug Fixes - Phase 10', () => {
     avatar_image: null,
   };
 
-  const mockOnSubmitSuccess = jest.fn();
+  const mockOnSubmitSuccess = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReset();
 
     // Default: successful API responses

@@ -3,7 +3,7 @@
  * Validates WCAG AA compliance for Phase 3 color system
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // Color values from globals.css
 const COLORS = {

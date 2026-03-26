@@ -15,7 +15,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -34,7 +34,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: any) => (
       <div className={className} style={style} {...props}>{children}</div>
@@ -51,7 +51,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock GameModeSelector exports
-jest.mock('@/components/GameModeSelector', () => ({
+vi.mock('@/components/GameModeSelector', () => ({
   GameModeSelector: () => <div data-testid="game-mode-selector" />,
   MODE_ICONS: { random: '🔀', classic: '📄', blast: '💣', 'word-hunt': '🎯' },
   MODE_ACTIVE_COLORS: { random: '', classic: '', blast: '', 'word-hunt': '' },
@@ -59,7 +59,7 @@ jest.mock('@/components/GameModeSelector', () => ({
 }));
 
 // Mock Avatar
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: ({ userId }: { userId?: string }) => <div data-testid={`avatar-${userId}`} />,
 }));
@@ -76,17 +76,17 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     winnerUsername: 'winner',
     readyCount: 0,
     totalPlayers: 3,
-    onStartGame: jest.fn(),
-    onMarkReady: jest.fn(),
+    onStartGame: vi.fn(),
+    onMarkReady: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // --- Non-host auto-ready ---
@@ -117,16 +117,16 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   });
 
   it('auto-marks player as ready when countdown reaches 0', () => {
-    const onMarkReady = jest.fn();
+    const onMarkReady = vi.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
-    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
+    act(() => { vi.advanceTimersByTime(AUTO_SECONDS * 1000); });
 
     expect(onMarkReady).toHaveBeenCalledTimes(1);
   });
 
   it('clicking the CTA button readies immediately (skips countdown)', () => {
-    const onMarkReady = jest.fn();
+    const onMarkReady = vi.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
     const btn = screen.getByTestId('auto-countdown-cta');
@@ -168,7 +168,7 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   });
 
   it('host auto-starts game when countdown hits 0', () => {
-    const onStartGame = jest.fn();
+    const onStartGame = vi.fn();
     render(
       <StickyReadyBar
         {...baseProps}
@@ -177,7 +177,7 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
       />
     );
 
-    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
+    act(() => { vi.advanceTimersByTime(AUTO_SECONDS * 1000); });
     expect(onStartGame).toHaveBeenCalledTimes(1);
   });
 
@@ -188,22 +188,22 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
 
     expect(screen.getByText(String(AUTO_SECONDS))).toBeInTheDocument();
 
-    act(() => { jest.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
     expect(screen.getByText(String(AUTO_SECONDS - 1))).toBeInTheDocument();
 
-    act(() => { jest.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
     expect(screen.getByText(String(AUTO_SECONDS - 2))).toBeInTheDocument();
   });
 
   // --- Edge cases ---
 
   it('does not auto-ready if countdown cancelled then timer fires', () => {
-    const onMarkReady = jest.fn();
+    const onMarkReady = vi.fn();
     render(<StickyReadyBar {...baseProps} onMarkReady={onMarkReady} />);
 
     fireEvent.click(screen.getByTestId('auto-countdown-cancel'));
 
-    act(() => { jest.advanceTimersByTime(AUTO_SECONDS * 1000); });
+    act(() => { vi.advanceTimersByTime(AUTO_SECONDS * 1000); });
 
     expect(onMarkReady).not.toHaveBeenCalled();
   });

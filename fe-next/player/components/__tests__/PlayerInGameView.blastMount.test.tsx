@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: PlayerInGameView renders BlastGame when gameMode === 'blast'
  *
@@ -11,7 +12,7 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: { total_games: 5 } }),
 }));
 
@@ -25,7 +26,7 @@ const mockWordHuntTargetFound = { value: false };
 
 const mockBlastMovesUsed = { value: 7 };
 
-jest.mock('@/hooks/gameState/store', () => ({
+vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => mockGameMode.value,
   useBlastTileOverlay: () => mockBlastTileOverlay.value,
   useBlastMovesUsed: () => mockBlastMovesUsed.value,
@@ -39,18 +40,18 @@ jest.mock('@/hooks/gameState/store', () => ({
 }));
 
 // Mock cn utility
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(' '),
 }));
 
 // Mock InGameScreen — renders a testid so we can check if it's mounted
-jest.mock('@/components/game/InGameScreen', () => ({
+vi.mock('@/components/game/InGameScreen', () => ({
   __esModule: true,
   default: () => <div data-testid="in-game-screen" />,
 }));
 
 // Mock BlastGame — renders a testid so we can check if it's mounted
-jest.mock('@/components/blast/BlastGame', () => ({
+vi.mock('@/components/blast/BlastGame', () => ({
   BlastGame: (props: any) => (
     <div
       data-testid="blast-game"
@@ -61,12 +62,12 @@ jest.mock('@/components/blast/BlastGame', () => ({
 }));
 
 // Mock BlastMoveCounter
-jest.mock('@/components/game/BlastMoveCounter', () => ({
+vi.mock('@/components/game/BlastMoveCounter', () => ({
   BlastMoveCounter: (props: any) => <div data-testid="blast-move-counter">{props.movesUsed}</div>,
 }));
 
 // Mock useBlastMultiplayerBridge
-jest.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
+vi.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({
     config: { gridSize: 4, specialTileChance: 0.15, language: 'en', difficulty: 'medium' },
     initialTileStates: null,
@@ -75,17 +76,17 @@ jest.mock('@/components/blast/hooks/useBlastMultiplayerBridge', () => ({
 }));
 
 // Mock UI components
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
   DialogContent: ({ children }: any) => <div>{children}</div>,
   DialogHeader: ({ children }: any) => <div>{children}</div>,
   DialogTitle: ({ children }: any) => <div>{children}</div>,
   DialogFooter: ({ children }: any) => <div>{children}</div>,
 }));
-jest.mock('@/components/ui/alert-dialog', () => ({
+vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: any) => open ? <div>{children}</div> : null,
   AlertDialogContent: ({ children }: any) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: any) => <div>{children}</div>,
@@ -95,7 +96,7 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
   AlertDialogCancel: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
-jest.mock('@/components/TournamentStandings', () => ({
+vi.mock('@/components/TournamentStandings', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -130,12 +131,12 @@ const baseProps = {
   tournamentData: null,
   tournamentStandings: [],
   showTournamentStandings: false,
-  setShowTournamentStandings: jest.fn(),
+  setShowTournamentStandings: vi.fn(),
   showExitConfirm: false,
-  setShowExitConfirm: jest.fn(),
-  onExitRoom: jest.fn(),
-  onConfirmExit: jest.fn(),
-  onWordSubmit: jest.fn(),
+  setShowExitConfirm: vi.fn(),
+  onExitRoom: vi.fn(),
+  onConfirmExit: vi.fn(),
+  onWordSubmit: vi.fn(),
 };
 
 // ---------------------------------------------------------------------------

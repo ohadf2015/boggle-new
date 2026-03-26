@@ -13,7 +13,7 @@ import type { DifficultyTier } from '@/types/difficulty';
 import type { HintData } from '@/lib/adaptiveDifficulty';
 
 // Mock all dependencies
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const value = {
     t: (key: string, params?: Record<string, string | number>) => {
       if (key.startsWith('difficulty.hint.')) {
@@ -23,13 +23,13 @@ jest.mock('@/contexts/LanguageContext', () => {
     },
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return { useLanguage: () => value, useLanguageSafe: () => value };
 });
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -89,7 +89,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
   const MockAdventureThemeContext = React.createContext({
     worldId: 1,
@@ -166,46 +166,46 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     attempts: [],
-    recordAttempt: jest.fn(),
-    getLevelAttempt: jest.fn(() => null),
+    recordAttempt: vi.fn(),
+    getLevelAttempt: vi.fn(() => null),
   }),
 }));
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playMusic: jest.fn(),
-    pauseMusic: jest.fn(),
-    resumeMusic: jest.fn(),
+    stopMusic: vi.fn(),
+    playMusic: vi.fn(),
+    pauseMusic: vi.fn(),
+    resumeMusic: vi.fn(),
     isPlaying: false,
     currentTrack: null,
   }),
 }));
 
 // Mock SoundEffectsContext
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playAchievementSound: jest.fn(),
-    playSound: jest.fn(),
-    playWordSound: jest.fn(),
-    playGameStartSound: jest.fn(),
-    playGameEndSound: jest.fn(),
-    playSoloGameSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playAchievementSound: vi.fn(),
+    playSound: vi.fn(),
+    playWordSound: vi.fn(),
+    playGameStartSound: vi.fn(),
+    playGameEndSound: vi.fn(),
+    playSoloGameSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureGame', () => ({
+vi.mock('@/hooks/useAdventureGame', () => ({
   useAdventureGame: () => ({
     gameState: {
       score: 0,
@@ -229,92 +229,92 @@ jest.mock('@/hooks/useAdventureGame', () => ({
     canComplete: false,
     isPlaying: true,
     cascadeComplete: true,
-    submitWordWithPath: jest.fn(),
-    startGame: jest.fn(),
-    pauseGame: jest.fn(),
-    completeLevel: jest.fn(),
-    resetGame: jest.fn(),
-    updateObjective: jest.fn(),
-    markCascadeComplete: jest.fn(),
+    submitWordWithPath: vi.fn(),
+    startGame: vi.fn(),
+    pauseGame: vi.fn(),
+    completeLevel: vi.fn(),
+    resetGame: vi.fn(),
+    updateObjective: vi.fn(),
+    markCascadeComplete: vi.fn(),
     isCascading: false,
     cascadePhase: 'idle' as const,
-    addTime: jest.fn(),
+    addTime: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
-    validateWord: jest.fn(),
+    validateWord: vi.fn(),
     isValidating: false,
   }),
 }));
 
-jest.mock('@/hooks/useAdventureSelection', () => ({
+vi.mock('@/hooks/useAdventureSelection', () => ({
   useAdventureSelection: () => ({
     selectedIndices: [],
     currentWord: '',
-    selectTile: jest.fn(),
-    clearSelection: jest.fn(),
-    getPath: jest.fn(() => []),
+    selectTile: vi.fn(),
+    clearSelection: vi.fn(),
+    getPath: vi.fn(() => []),
     pathPoints: [],
   }),
 }));
 
-jest.mock('@/hooks/useLexiReactions', () => ({
+vi.mock('@/hooks/useLexiReactions', () => ({
   useLexiReactions: () => ({
     reaction: null,
-    dismissReaction: jest.fn(),
+    dismissReaction: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: false,
-    getHint: jest.fn(),
+    getHint: vi.fn(),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useBossMechanics', () => ({
+vi.mock('@/hooks/useBossMechanics', () => ({
   useBossMechanics: () => ({
     isActive: false,
     boss: null,
     currentTaunt: null,
     showTaunt: false,
-    checkWord: jest.fn(() => ({ scoreMultiplier: 1, meetsRequirement: false })),
-    triggerTaunt: jest.fn(),
+    checkWord: vi.fn(() => ({ scoreMultiplier: 1, meetsRequirement: false })),
+    triggerTaunt: vi.fn(),
     bossState: { phase: 'intro' },
   }),
 }));
 
-jest.mock('@/hooks/useAdventureXp', () => ({
+vi.mock('@/hooks/useAdventureXp', () => ({
   useAdventureXp: () => ({
     totalXp: 0,
     currentLevel: 1,
     xpProgress: 0,
-    awardXp: jest.fn(() => ({ leveledUp: false })),
+    awardXp: vi.fn(() => ({ leveledUp: false })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureCurrency', () => ({
+vi.mock('@/hooks/useAdventureCurrency', () => ({
   useAdventureCurrency: () => ({
     gold: 100,
     upgrades: {},
-    addGold: jest.fn(),
-    purchase: jest.fn(),
-    getUpgradeEffect: jest.fn((type) => ({ multiplier: 1.0, stacks: 0 })),
+    addGold: vi.fn(),
+    purchase: vi.fn(),
+    getUpgradeEffect: vi.fn((type) => ({ multiplier: 1.0, stacks: 0 })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/usePowerUpInventory', () => ({
+vi.mock('@/hooks/usePowerUpInventory', () => ({
   usePowerUpInventory: () => ({
     inventory: {
       cooldownStartedAt: {
@@ -323,25 +323,25 @@ jest.mock('@/hooks/usePowerUpInventory', () => ({
         scoreMultiplier: undefined,
       },
     },
-    resetCooldowns: jest.fn(),
-    startCooldown: jest.fn(),
+    resetCooldowns: vi.fn(),
+    startCooldown: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useScreenShake', () => ({
+vi.mock('@/hooks/useScreenShake', () => ({
   useScreenShake: () => ({
     shakeRef: { current: null },
-    shake: jest.fn(),
+    shake: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useParticleBudget', () => ({
+vi.mock('@/hooks/useParticleBudget', () => ({
   useParticleBudget: () => 100,
 }));
 
 // Mock useAdaptiveDifficulty with controlled return values
-const mockUseAdaptiveDifficulty = jest.fn();
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+const mockUseAdaptiveDifficulty = vi.fn();
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: (...args: unknown[]) => mockUseAdaptiveDifficulty(...args),
 }));
 
@@ -367,12 +367,12 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
   const defaultProps = {
     levelConfig: baseConfig,
     initialGrid,
-    onLevelComplete: jest.fn(),
-    onExit: jest.fn(),
+    onLevelComplete: vi.fn(),
+    onExit: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Tier affects timer', () => {
@@ -387,7 +387,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -410,7 +410,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.5,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -427,7 +427,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -453,7 +453,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: bossConfig, // Same as input for boss levels
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} levelConfig={bossConfig} />);
@@ -472,7 +472,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.5,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -490,7 +490,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -508,7 +508,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -529,7 +529,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -554,7 +554,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -581,7 +581,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig: baseConfig,
         hintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -605,7 +605,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         adjustedConfig,
         hintData: { level: 'none' } as HintData,
         powerUpCooldownMultiplier: 1.0,
-        recordCompletion: jest.fn(),
+        recordCompletion: vi.fn(),
       });
 
       render(<AdventureGame {...defaultProps} />);
@@ -619,7 +619,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
 
   describe('Completion recording', () => {
     it('should provide recordCompletion function from hook', () => {
-      const mockRecordCompletion = jest.fn();
+      const mockRecordCompletion = vi.fn();
 
       mockUseAdaptiveDifficulty.mockReturnValue({
         tier: 'normal' as DifficultyTier,

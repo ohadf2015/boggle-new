@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { PersonalRecords } from '../PersonalRecords';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -14,7 +14,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
     <div {...props}>{children}</div>
   ),
@@ -23,12 +23,12 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 
 // Mock useLanguage
 const mockT = (key: string) => key;
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, locale: 'en' }),
 }));
 
 // Mock usePersonalRecords
-jest.mock('@/hooks/usePersonalRecords', () => ({
+vi.mock('@/hooks/usePersonalRecords', () => ({
   usePersonalRecords: () => ({
     longestWord: 'EXTRAORDINARY',
     highestCombo: 12,
@@ -48,7 +48,7 @@ jest.mock('@/hooks/usePersonalRecords', () => ({
 }));
 
 // Mock clipboard
-const mockWriteText = jest.fn().mockResolvedValue(undefined);
+const mockWriteText = vi.fn().mockResolvedValue(undefined);
 Object.defineProperty(navigator, 'clipboard', {
   value: { writeText: mockWriteText },
   writable: true,

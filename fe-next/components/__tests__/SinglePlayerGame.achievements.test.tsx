@@ -13,7 +13,7 @@ Object.defineProperty(globalThis, 'crypto', {
   },
 });
 
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   DIFFICULTIES: {
     easy: { rows: 4, cols: 4 },
     medium: { rows: 5, cols: 5 },
@@ -21,20 +21,20 @@ jest.mock('@/utils/consts', () => ({
   },
 }));
 
-jest.mock('@/utils/utils', () => ({
-  generateRandomTable: jest.fn(() => [
+vi.mock('@/utils/utils', () => ({
+  generateRandomTable: vi.fn(() => [
     ['C', 'A', 'T'],
     ['D', 'O', 'G'],
     ['B', 'A', 'T'],
   ]),
-  applyHebrewFinalLetters: jest.fn((grid) => grid),
+  applyHebrewFinalLetters: vi.fn((grid) => grid),
 }));
 
 // Mock checkLiveAchievements
-const mockCheckLiveAchievements = jest.fn();
-jest.mock('@/utils/singlePlayerAchievements', () => ({
+const mockCheckLiveAchievements = vi.fn();
+vi.mock('@/utils/singlePlayerAchievements', () => ({
   checkLiveAchievements: mockCheckLiveAchievements,
-  createAchievementState: jest.fn(() => ({
+  createAchievementState: vi.fn(() => ({
     achievements: [],
     firstWordFound: false,
     maxCombo: 0,
@@ -48,7 +48,7 @@ jest.mock('@/utils/singlePlayerAchievements', () => ({
 }));
 
 // Mock AchievementDock component
-const MockAchievementDock = jest.fn(({ achievements, className }) => (
+const MockAchievementDock = vi.fn(({ achievements, className }) => (
   <div data-testid="achievement-dock" className={className}>
     {achievements.map((ach: { key: string; icon: string }, idx: number) => (
       <div key={idx} data-testid={`achievement-${ach.key}`}>
@@ -59,14 +59,14 @@ const MockAchievementDock = jest.fn(({ achievements, className }) => (
 ));
 (MockAchievementDock as any).displayName = 'MockAchievementDock';
 
-jest.mock('@/components/achievements/AchievementDock', () => ({
+vi.mock('@/components/achievements/AchievementDock', () => ({
   __esModule: true,
   default: MockAchievementDock,
 }));
 
 // Mock useAchievementQueue to avoid needing AchievementQueueProvider
-const mockQueueAchievement = jest.fn();
-jest.mock('@/components/achievements', () => ({
+const mockQueueAchievement = vi.fn();
+vi.mock('@/components/achievements', () => ({
   useAchievementQueue: () => ({
     queueAchievement: mockQueueAchievement,
   }),
@@ -76,45 +76,45 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playEarthquakeRumble: jest.fn(),
-    playEarthquakeShake: jest.fn(),
-    playFireRoundStart: jest.fn(),
-    startFireCrackleLoop: jest.fn(),
-    stopFireCrackleLoop: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playEarthquakeRumble: vi.fn(),
+    playEarthquakeShake: vi.fn(),
+    playFireRoundStart: vi.fn(),
+    startFireCrackleLoop: vi.fn(),
+    stopFireCrackleLoop: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/GameAnnouncer', () => ({
+vi.mock('@/components/GameAnnouncer', () => ({
   useAnnouncer: () => ({
-    announceWordResult: jest.fn(),
-    announceCombo: jest.fn(),
-    announceTimer: jest.fn(),
+    announceWordResult: vi.fn(),
+    announceCombo: vi.fn(),
+    announceTimer: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useGameMusic', () => ({
+vi.mock('@/hooks/useGameMusic', () => ({
   useGameMusic: () => ({
-    playGameMusic: jest.fn(),
-    stopGameMusic: jest.fn(),
+    playGameMusic: vi.fn(),
+    stopGameMusic: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useEarthquakeFireRound', () => ({
+vi.mock('@/hooks/useEarthquakeFireRound', () => ({
   useEarthquakeFireRound: () => ({
     earthquakeState: 'idle',
     fireRoundActive: false,
@@ -123,7 +123,7 @@ jest.mock('@/hooks/useEarthquakeFireRound', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -141,20 +141,20 @@ jest.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
   useAnimation: () => ({
-    start: jest.fn(),
-    stop: jest.fn(),
-    set: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    set: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/accessibility', () => ({
+vi.mock('@/utils/accessibility', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useAccessibility: () => ({
     isScreenReaderEnabled: false,
-    announceToScreenReader: jest.fn(),
+    announceToScreenReader: vi.fn(),
     highContrast: false,
     largeText: false,
   }),
@@ -164,34 +164,34 @@ jest.mock('@/contexts/AccessibilityContext', () => ({
   useLargeLetters: () => false,
 }));
 
-jest.mock('@/hooks/useAutoScrollOnGameStart', () => ({
-  useAutoScrollOnGameStart: jest.fn(),
+vi.mock('@/hooks/useAutoScrollOnGameStart', () => ({
+  useAutoScrollOnGameStart: vi.fn(),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 5,
     comboMultiplier: 1.5,
     maxCombo: 5,
-    addWord: jest.fn(),
-    reset: jest.fn(),
+    addWord: vi.fn(),
+    reset: vi.fn(),
     getComboBonus: () => 10,
   }),
 }));
 
-jest.mock('@/hooks/useGameTimer', () => ({
+vi.mock('@/hooks/useGameTimer', () => ({
   useGameTimer: () => ({
     remainingTime: 180,
     formattedTime: '3:00',
     isRunning: true,
-    pause: jest.fn(),
-    resume: jest.fn(),
-    reset: jest.fn(),
+    pause: vi.fn(),
+    resume: vi.fn(),
+    reset: vi.fn(),
     getElapsedTime: () => 5,
   }),
 }));
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch as unknown as typeof fetch;
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -200,7 +200,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </LanguageProvider>
 );
 
-jest.mock('@/components/animations/ScorePopupFly', () => ({
+vi.mock('@/components/animations/ScorePopupFly', () => ({
   ScorePopupFly: () => null,
   __esModule: true,
   default: () => null,
@@ -208,7 +208,7 @@ jest.mock('@/components/animations/ScorePopupFly', () => ({
 
 describe('SinglePlayerGame - Achievement Display', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     MockAchievementDock.mockClear();
     mockQueueAchievement.mockClear();
     mockCheckLiveAchievements.mockReturnValue([]);
@@ -235,8 +235,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );
@@ -269,8 +269,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );
@@ -309,8 +309,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );
@@ -341,8 +341,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );
@@ -378,8 +378,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );
@@ -411,8 +411,8 @@ describe('SinglePlayerGame - Achievement Display', () => {
       <SinglePlayerGame
         settings={mockSettings}
         targetHighScore={null}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />,
       { wrapper: TestWrapper }
     );

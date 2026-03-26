@@ -48,11 +48,11 @@ const mockGrid = [
 
 describe('AdventureGame - Auto-Completion Bug', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Bug #1: Level should auto-complete when primary objectives are met', () => {
@@ -163,7 +163,7 @@ describe('AdventureGame - Auto-Completion Bug', () => {
 
       // Let 10 seconds pass
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       expect(result.current.timeRemaining).toBe(110);

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { PageStateHandler } from '../PageStateHandler';
 
 // Mock PageLoader to capture passed props
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ size, text }: { size?: string; text?: string }) => (
     <div
       data-testid="page-loader"
@@ -14,11 +14,11 @@ jest.mock('@/components/ui/PageLoader', () => ({
 }));
 
 // Mock dependencies
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),

@@ -6,8 +6,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -19,7 +19,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock Avatar
-jest.mock('../../Avatar', () => ({
+vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar" />,
 }));

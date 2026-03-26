@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import { ResultsActionButtons } from '../ResultsActionButtons';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -31,13 +31,13 @@ describe('ResultsActionButtons', () => {
     isHost: false,
     isMultiplayer: true,
     isCurrentPlayerReady: false,
-    onStartGame: jest.fn(),
-    onMarkReady: jest.fn(),
-    onExit: jest.fn(),
+    onStartGame: vi.fn(),
+    onMarkReady: vi.fn(),
+    onExit: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Host Mode', () => {
@@ -50,7 +50,7 @@ describe('ResultsActionButtons', () => {
 
     it('should call onStartGame when Start Game button clicked', async () => {
       const user = userEvent.setup();
-      const onStartGame = jest.fn();
+      const onStartGame = vi.fn();
       render(<ResultsActionButtons {...defaultProps} isHost={true} onStartGame={onStartGame} />);
 
       await user.click(screen.getByText('Start Game'));
@@ -66,7 +66,7 @@ describe('ResultsActionButtons', () => {
 
     it('should call onExit when Leave Room button clicked', async () => {
       const user = userEvent.setup();
-      const onExit = jest.fn();
+      const onExit = vi.fn();
       render(<ResultsActionButtons {...defaultProps} isHost={true} onExit={onExit} />);
 
       await user.click(screen.getByText('Leave Room'));
@@ -92,7 +92,7 @@ describe('ResultsActionButtons', () => {
 
     it('should not call onMarkReady when Ready button clicked', async () => {
       const user = userEvent.setup();
-      const onMarkReady = jest.fn();
+      const onMarkReady = vi.fn();
       render(
         <ResultsActionButtons
           {...defaultProps}
@@ -125,7 +125,7 @@ describe('ResultsActionButtons', () => {
 
     it('should call onMarkReady when I\'m Ready button clicked', async () => {
       const user = userEvent.setup();
-      const onMarkReady = jest.fn();
+      const onMarkReady = vi.fn();
       render(<ResultsActionButtons {...defaultProps} onMarkReady={onMarkReady} />);
 
       await user.click(screen.getByText("I'm Ready"));
@@ -158,7 +158,7 @@ describe('ResultsActionButtons', () => {
 
     it('should call onExit when Exit button clicked in single player', async () => {
       const user = userEvent.setup();
-      const onExit = jest.fn();
+      const onExit = vi.fn();
       render(<ResultsActionButtons {...defaultProps} isMultiplayer={false} onExit={onExit} />);
 
       await user.click(screen.getByText('Exit'));

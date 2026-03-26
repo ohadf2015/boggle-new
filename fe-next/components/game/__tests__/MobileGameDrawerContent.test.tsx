@@ -3,7 +3,7 @@ import { MobileGameDrawerContent } from '../MobileGameDrawerContent';
 import type { FoundWord } from '@/shared/types/view';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(

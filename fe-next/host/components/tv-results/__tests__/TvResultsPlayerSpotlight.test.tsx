@@ -1,8 +1,9 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} data-testid={props['data-testid'] as string} {...filterDomProps(props)}>{children}</div>
   ));
@@ -29,15 +30,15 @@ function filterDomProps(props: Record<string, unknown>) {
 }
 
 // Mock Avatar component
-jest.mock('../../../../components/Avatar', () => {
-  return function MockAvatar({ className }: { className?: string }) {
+vi.mock('../../../../components/Avatar', () => ({
+  default: function MockAvatar({ className }: { className?: string }) {
     return <div data-testid="avatar" className={className} />;
   };
 });
 
 // Mock the engine
-jest.mock('../playerSpotlightEngine', () => ({
-  assignArchetypes: jest.fn(),
+vi.mock('../playerSpotlightEngine', () => ({
+  assignArchetypes: vi.fn(),
   ARCHETYPES: Array.from({ length: 17 }, (_, i) => ({
     id: `archetype-${i}`,
     titleKey: `tvResults.spotlight.archetypes.archetype-${i}.title`,
@@ -50,7 +51,7 @@ jest.mock('../playerSpotlightEngine', () => ({
 import TvResultsPlayerSpotlight from '../TvResultsPlayerSpotlight';
 import { assignArchetypes } from '../playerSpotlightEngine';
 
-const mockAssignArchetypes = assignArchetypes as jest.MockedFunction<typeof assignArchetypes>;
+const mockAssignArchetypes = assignArchetypes as MockedFunction<typeof assignArchetypes>;
 
 const mockT = (key: string) => `[${key}]`;
 
@@ -76,7 +77,7 @@ function makeAssignment(username: string, archetypeId: string, quip: string, sta
 
 describe('TvResultsPlayerSpotlight', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not render when visible is false', () => {

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: Profile Mobile Tab Navigation
  *
@@ -12,7 +13,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -29,11 +30,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
   })
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' })
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'test-user' },
     profile: { display_name: 'Test User' },
@@ -41,71 +42,71 @@ jest.mock('@/contexts/AuthContext', () => ({
     loading: false,
     canPlayRanked: false,
     gamesUntilRanked: 5,
-    updateProfile: jest.fn(),
-    refreshProfile: jest.fn()
+    updateProfile: vi.fn(),
+    refreshProfile: vi.fn()
   })
 }));
 
-jest.mock('@/hooks/usePlayerCollectibles', () => ({
+vi.mock('@/hooks/usePlayerCollectibles', () => ({
   usePlayerCollectibles: () => ({
     collectibles: [],
     isLoading: false
   })
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false }
   })
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn()
+    push: vi.fn()
   }),
   useSearchParams: () => ({
-    get: jest.fn(() => null)
+    get: vi.fn(() => null)
   })
 }));
 
 // Mock NavigationContext - AutoHideHeader uses useNavigation
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   useNavigation: () => ({
     isInGame: false,
-    setIsInGame: jest.fn(),
+    setIsInGame: vi.fn(),
     activeTab: 'profile',
-    setActiveTab: jest.fn(),
+    setActiveTab: vi.fn(),
   }),
-  useHideNavigation: () => jest.fn(),
+  useHideNavigation: () => vi.fn(),
   NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     isPlaying: false,
-    toggleMusic: jest.fn()
+    toggleMusic: vi.fn()
   })
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn()
+    playSound: vi.fn()
   })
 }));
 
-jest.mock('@/contexts/HapticsContext', () => ({
+vi.mock('@/contexts/HapticsContext', () => ({
   useHapticsConfig: () => ({
     isHapticsEnabled: true,
-    toggleHaptics: jest.fn()
+    toggleHaptics: vi.fn()
   })
 }));
 
-jest.mock('@/utils/session', () => ({
+vi.mock('@/utils/session', () => ({
   getSession: () => null
 }));
 
@@ -203,7 +204,7 @@ describe('Profile Mobile Tab Navigation', () => {
 describe('Profile RTL Swipe Direction', () => {
   beforeEach(() => {
     // Reset mock to RTL
-    jest.doMock('@/contexts/LanguageContext', () => ({
+    vi.doMock('@/contexts/LanguageContext', () => ({
       useLanguage: () => ({
         t: (key: string) => {
           const translations: Record<string, string> = {

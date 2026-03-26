@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for Re-engagement Email module
  *
@@ -6,13 +7,13 @@
  */
 
 // Mock email.ts shared utilities
-jest.mock('@/lib/email', () => ({
-  getSupabaseAdmin: jest.fn(),
-  withTimeout: jest.fn((p: Promise<unknown>) => p),
-  getTodayDate: jest.fn(() => '2026-03-04'),
-  getLocalHour: jest.fn(() => 8),
-  generateUnsubscribeToken: jest.fn(() => 'mock-token-123'),
-  isEmailServiceConfigured: jest.fn(() => true),
+vi.mock('@/lib/email', () => ({
+  getSupabaseAdmin: vi.fn(),
+  withTimeout: vi.fn((p: Promise<unknown>) => p),
+  getTodayDate: vi.fn(() => '2026-03-04'),
+  getLocalHour: vi.fn(() => 8),
+  generateUnsubscribeToken: vi.fn(() => 'mock-token-123'),
+  isEmailServiceConfigured: vi.fn(() => true),
   EMAIL_COLORS: {
     navy: '#1a1a2e', navyLight: '#16213e', navyCard: '#252545',
     lime: '#BFFF00', limeLight: '#D9FF66', limeMuted: '#A6D900',
@@ -24,10 +25,10 @@ jest.mock('@/lib/email', () => ({
 }));
 
 // Mock resend
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
+vi.mock('resend', () => ({
+  Resend: vi.fn().mockImplementation(() => ({
     emails: {
-      send: jest.fn().mockResolvedValue({ data: { id: 'mock-email-id' }, error: null }),
+      send: vi.fn().mockResolvedValue({ data: { id: 'mock-email-id' }, error: null }),
     },
   })),
 }));
@@ -41,31 +42,31 @@ import {
   COUNTRY_TO_LANGUAGE,
 } from '../reengagementEmail';
 
-const mockGetSupabaseAdmin = getSupabaseAdmin as jest.Mock;
+const mockGetSupabaseAdmin = getSupabaseAdmin as Mock;
 
 // Helper to create a chainable Supabase mock
 function createMockSupabase() {
-  const chain: Record<string, jest.Mock | unknown> = {};
+  const chain: Record<string, Mock | unknown> = {};
 
-  chain.from = jest.fn().mockReturnValue(chain);
-  chain.select = jest.fn().mockReturnValue(chain);
-  chain.eq = jest.fn().mockReturnValue(chain);
-  chain.neq = jest.fn().mockReturnValue(chain);
-  chain.lt = jest.fn().mockReturnValue(chain);
-  chain.lte = jest.fn().mockReturnValue(chain);
-  chain.gt = jest.fn().mockReturnValue(chain);
-  chain.gte = jest.fn().mockReturnValue(chain);
-  chain.is = jest.fn().mockReturnValue(chain);
-  chain.or = jest.fn().mockReturnValue(chain);
-  chain.order = jest.fn().mockReturnValue(chain);
-  chain.limit = jest.fn().mockReturnValue(chain);
-  chain.single = jest.fn().mockResolvedValue({ data: null, error: null });
-  chain.update = jest.fn().mockReturnValue(chain);
-  chain.not = jest.fn().mockReturnValue(chain);
+  chain.from = vi.fn().mockReturnValue(chain);
+  chain.select = vi.fn().mockReturnValue(chain);
+  chain.eq = vi.fn().mockReturnValue(chain);
+  chain.neq = vi.fn().mockReturnValue(chain);
+  chain.lt = vi.fn().mockReturnValue(chain);
+  chain.lte = vi.fn().mockReturnValue(chain);
+  chain.gt = vi.fn().mockReturnValue(chain);
+  chain.gte = vi.fn().mockReturnValue(chain);
+  chain.is = vi.fn().mockReturnValue(chain);
+  chain.or = vi.fn().mockReturnValue(chain);
+  chain.order = vi.fn().mockReturnValue(chain);
+  chain.limit = vi.fn().mockReturnValue(chain);
+  chain.single = vi.fn().mockResolvedValue({ data: null, error: null });
+  chain.update = vi.fn().mockReturnValue(chain);
+  chain.not = vi.fn().mockReturnValue(chain);
 
   chain.auth = {
     admin: {
-      listUsers: jest.fn().mockResolvedValue({
+      listUsers: vi.fn().mockResolvedValue({
         data: { users: [] },
         error: null,
       }),
@@ -76,7 +77,7 @@ function createMockSupabase() {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 // ==========================================
@@ -86,7 +87,7 @@ describe('resolveUserLanguage', () => {
   test('should prioritize game language from daily_puzzle_attempts', async () => {
     // GIVEN - user has played in Hebrew
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: { language: 'he' },
       error: null,
     });
@@ -103,7 +104,7 @@ describe('resolveUserLanguage', () => {
   test('should fall back to country code mapping when no game history', async () => {
     // GIVEN - no game history, country is Israel
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: null,
       error: { code: 'PGRST116' },
     });
@@ -118,7 +119,7 @@ describe('resolveUserLanguage', () => {
 
   test('should map SE to Swedish', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: null,
       error: { code: 'PGRST116' },
     });
@@ -130,7 +131,7 @@ describe('resolveUserLanguage', () => {
 
   test('should map JP to Japanese', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: null,
       error: { code: 'PGRST116' },
     });
@@ -142,7 +143,7 @@ describe('resolveUserLanguage', () => {
 
   test('should map Spanish-speaking countries to es', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: null,
       error: { code: 'PGRST116' },
     });
@@ -156,7 +157,7 @@ describe('resolveUserLanguage', () => {
 
   test('should default to en when no country code and no game history', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: null,
       error: { code: 'PGRST116' },
     });
@@ -181,7 +182,7 @@ describe('getFirstLetterForLanguage', () => {
   test('should return first letter from daily_target_words', async () => {
     // GIVEN
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: { target_word: 'hello', override_word: null },
       error: null,
     });
@@ -196,7 +197,7 @@ describe('getFirstLetterForLanguage', () => {
 
   test('should prefer override_word over target_word', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: { target_word: 'hello', override_word: 'world' },
       error: null,
     });
@@ -215,7 +216,7 @@ describe('getFirstLetterForLanguage', () => {
 
   test('should handle Hebrew first letter correctly', async () => {
     const mockSupabase = createMockSupabase();
-    mockSupabase.single = jest.fn().mockResolvedValue({
+    mockSupabase.single = vi.fn().mockResolvedValue({
       data: { target_word: 'שלום', override_word: null },
       error: null,
     });

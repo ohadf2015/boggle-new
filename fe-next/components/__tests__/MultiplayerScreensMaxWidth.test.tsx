@@ -6,29 +6,29 @@ import React from 'react';
 import { render } from '@testing-library/react';
 
 // Mock hooks that require providers
-jest.mock('../../utils/SocketContext', () => ({
+vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
 }));
 
-jest.mock('../../hooks/useCrazyGamesInvite', () => ({
+vi.mock('../../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
     isInviteButtonVisible: false,
   }),
 }));
 
 // Mock usePullToRefresh to avoid DOM issues
-jest.mock('../../hooks/usePullToRefresh', () => ({
+vi.mock('../../hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
@@ -36,7 +36,7 @@ jest.mock('../../hooks/usePullToRefresh', () => ({
 }));
 
 // Mock RoomChat component since it requires LanguageProvider
-jest.mock('../../components/RoomChat', () => ({
+vi.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
@@ -58,28 +58,28 @@ describe('Multiplayer Screens Max Width', () => {
         username: 'TestHost',
         t: (key: string) => key,
         timerValue: 2,
-        setTimerValue: jest.fn(),
+        setTimerValue: vi.fn(),
         timerDirection: 0,
-        setTimerDirection: jest.fn(),
+        setTimerDirection: vi.fn(),
         difficulty: 'MEDIUM' as const,
-        setDifficulty: jest.fn(),
+        setDifficulty: vi.fn(),
         minWordLength: 2,
-        setMinWordLength: jest.fn(),
+        setMinWordLength: vi.fn(),
         gameType: 'regular' as const,
-        setGameType: jest.fn(),
+        setGameType: vi.fn(),
         tournamentRounds: 3,
-        setTournamentRounds: jest.fn(),
+        setTournamentRounds: vi.fn(),
         tournamentData: null,
         hostPlaying: true,
-        setHostPlaying: jest.fn(),
+        setHostPlaying: vi.fn(),
         playersReady: [],
         playerWordCounts: {},
         shufflingGrid: null,
         highlightedCells: [],
         tableData: [] as never,
-        onStartGame: jest.fn(),
-        onExitRoom: jest.fn(),
-        onCancelTournament: jest.fn(),
+        onStartGame: vi.fn(),
+        onExitRoom: vi.fn(),
+        onCancelTournament: vi.fn(),
         tournamentCreating: false,
       };
 
@@ -111,11 +111,11 @@ describe('Multiplayer Screens Max Width', () => {
         t: (key: string) => key,
         playersReady: [],
         showQR: false,
-        setShowQR: jest.fn(),
+        setShowQR: vi.fn(),
         showExitConfirm: false,
-        setShowExitConfirm: jest.fn(),
-        onExitRoom: jest.fn(),
-        onConfirmExit: jest.fn(),
+        setShowExitConfirm: vi.fn(),
+        onExitRoom: vi.fn(),
+        onConfirmExit: vi.fn(),
       };
 
       const { container } = render(<PlayerWaitingView {...mockProps} />);
@@ -141,9 +141,9 @@ describe('Multiplayer Screens Max Width', () => {
       const mockProps = {
         activeRooms: [],
         roomsLoading: false,
-        onRefreshRooms: jest.fn(),
-        onRoomClick: jest.fn(),
-        onCreateRoom: jest.fn(),
+        onRefreshRooms: vi.fn(),
+        onRoomClick: vi.fn(),
+        onCreateRoom: vi.fn(),
       };
 
       const { container } = render(<RoomListView {...mockProps} />);

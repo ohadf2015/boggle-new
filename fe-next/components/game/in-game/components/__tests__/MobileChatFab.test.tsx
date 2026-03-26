@@ -8,12 +8,12 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { SocketContext } from '@/utils/SocketContext';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/components/RoomChat', () => ({
+vi.mock('@/components/RoomChat', () => ({
   __esModule: true,
   default: ({ username }: { username: string }) => (
     <div data-testid="room-chat">Chat for {username}</div>
@@ -26,16 +26,16 @@ import { MobileChatFab } from '../MobileChatFab';
 const socketHandlers: Record<string, Function[]> = {};
 function createMockSocket() {
   return {
-    on: jest.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: Function) => {
       if (!socketHandlers[event]) socketHandlers[event] = [];
       socketHandlers[event].push(handler);
     }),
-    off: jest.fn((event: string, handler: Function) => {
+    off: vi.fn((event: string, handler: Function) => {
       if (socketHandlers[event]) {
         socketHandlers[event] = socketHandlers[event].filter(h => h !== handler);
       }
     }),
-    emit: jest.fn(),
+    emit: vi.fn(),
     connected: true,
     id: 'test-socket',
   };
@@ -53,7 +53,7 @@ function renderWithSocket(ui: React.ReactElement, socket = createMockSocket()) {
     isReconnecting: false,
     reconnectAttempt: 0,
     maxReconnectAttempts: 20,
-    manualReconnect: jest.fn(),
+    manualReconnect: vi.fn(),
   };
   return render(
     <SocketContext.Provider value={contextValue}>
@@ -71,11 +71,11 @@ describe('MobileChatFab', () => {
 
   beforeEach(() => {
     Object.keys(socketHandlers).forEach(k => delete socketHandlers[k]);
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should be completely invisible by default — no buttons during gameplay', () => {
@@ -107,7 +107,7 @@ describe('MobileChatFab', () => {
     const badge = screen.getByRole('button', { name: /chat/i });
     expect(badge).toBeInTheDocument();
 
-    act(() => { jest.advanceTimersByTime(5000); });
+    act(() => { vi.advanceTimersByTime(5000); });
 
     // AnimatePresence exit: opacity → 0
     expect(badge).toHaveStyle({ opacity: '0' });

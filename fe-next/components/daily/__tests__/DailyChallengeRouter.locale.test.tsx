@@ -10,19 +10,19 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import type { Language } from '@/types';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  usePathname: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(),
 }));
 
 // Mock Header component
-jest.mock('../../Header', () => ({
+vi.mock('../../Header', () => ({
   __esModule: true,
   default: () => <div data-testid="header">Header</div>,
 }));
 
 // Mock DailyChallengeLanding
-jest.mock('../DailyChallengeLanding', () => ({
+vi.mock('../DailyChallengeLanding', () => ({
   __esModule: true,
   DailyChallengeLanding: ({ onSelectWordHunt }: {
     onSelectWordHunt: () => void;
@@ -34,31 +34,31 @@ jest.mock('../DailyChallengeLanding', () => ({
 }));
 
 // Mock storage — simulate user already played so landing page shows
-jest.mock('@/utils/dailyChallenge/storage', () => ({
+vi.mock('@/utils/dailyChallenge/storage', () => ({
   getWordHuntStatusToday: () => ({ solved: true }),
 }));
 
 // Mock PageLoader
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   __esModule: true,
   default: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
   PageLoader: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
 }));
 
 describe('DailyChallengeRouter - Language Routing', () => {
-  const mockPush = jest.fn();
+  const mockPush = vi.fn();
   const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
   const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseRouter.mockReturnValue({
       push: mockPush,
-      back: jest.fn(),
-      forward: jest.fn(),
-      refresh: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
     });
   });
 

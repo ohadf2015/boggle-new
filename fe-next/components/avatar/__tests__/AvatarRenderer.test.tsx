@@ -5,20 +5,20 @@ import AvatarRenderer from '../AvatarRenderer';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 // Mock SVG part modules
-jest.mock('../parts/BaseParts', () => ({
+vi.mock('../parts/BaseParts', () => ({
   BASE_PARTS: { round: ({ fill }: any) => <circle data-testid="base" fill={fill} /> },
 }));
-jest.mock('../parts/EyeParts', () => ({
+vi.mock('../parts/EyeParts', () => ({
   EYE_PARTS: { round: () => <g data-testid="eyes" /> },
 }));
-jest.mock('../parts/MouthParts', () => ({
+vi.mock('../parts/MouthParts', () => ({
   MOUTH_PARTS: { smile: () => <g data-testid="mouth" /> },
 }));
-jest.mock('../parts/HairParts', () => ({
+vi.mock('../parts/HairParts', () => ({
   HAIR_PARTS: { none: ({ fill }: any) => <g data-testid="hair" fill={fill} />, spiky: ({ fill }: any) => <g data-testid="hair" fill={fill} /> },
   HAIR_FRONT_PARTS: {},
 }));
-jest.mock('../parts/AccessoryParts', () => ({
+vi.mock('../parts/AccessoryParts', () => ({
   ACCESSORY_PARTS: { none: ({ fill }: any) => <g data-testid="accessory" fill={fill} /> },
 }));
 

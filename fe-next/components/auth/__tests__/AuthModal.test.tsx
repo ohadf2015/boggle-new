@@ -19,13 +19,13 @@ import AuthModal from '../AuthModal';
 
 // --- Mocks ---
 
-const mockSignInWithGoogle = jest.fn();
-const mockSignInWithDiscord = jest.fn();
-const mockSignUpWithEmail = jest.fn();
-const mockSignInWithEmail = jest.fn();
-const mockSignInWithMagicLink = jest.fn();
+const mockSignInWithGoogle = vi.fn();
+const mockSignInWithDiscord = vi.fn();
+const mockSignUpWithEmail = vi.fn();
+const mockSignInWithEmail = vi.fn();
+const mockSignInWithMagicLink = vi.fn();
 
-jest.mock('../../../lib/supabase', () => ({
+vi.mock('../../../lib/supabase', () => ({
   signInWithGoogle: (...args: any[]) => mockSignInWithGoogle(...args),
   signInWithDiscord: (...args: any[]) => mockSignInWithDiscord(...args),
   signUpWithEmail: (...args: any[]) => mockSignUpWithEmail(...args),
@@ -33,7 +33,7 @@ jest.mock('../../../lib/supabase', () => ({
   signInWithMagicLink: (...args: any[]) => mockSignInWithMagicLink(...args),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string>) => {
       const translations: Record<string, string> = {
@@ -81,23 +81,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const mockShowAuthPrompt = jest.fn();
+const mockShowAuthPrompt = vi.fn();
 let mockIsOnCrazyGamesPlatform = false;
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isOnCrazyGamesPlatform: mockIsOnCrazyGamesPlatform,
     showAuthPrompt: mockShowAuthPrompt,
   }),
 }));
 
-jest.mock('../../../utils/guestManager', () => ({
+vi.mock('../../../utils/guestManager', () => ({
   getGuestStatsSummary: () => ({ gamesPlayed: 5, totalScore: 1200 }),
 }));
 
 // Mock framer-motion to render immediately
-jest.mock('framer-motion', () => {
-  const { forwardRef } = jest.requireActual('react');
+vi.mock('framer-motion', () => {
+  const { forwardRef } = vi.importActual('react');
   const MotionDiv = forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return <div ref={ref} {...props}>{children}</div>;
   });
@@ -106,15 +106,15 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock next/link
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   function MockLink({ children, href, ...props }: any) {
     return <a href={href} {...props}>{children}</a>;
   }
-  return MockLink;
+  return { default: MockLink };
 });
 
 // Mock Loader
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <span data-testid="loader">Loading...</span>,
 }));
 
@@ -122,7 +122,7 @@ jest.mock('@/components/ui/Loader', () => ({
 
 const defaultProps = {
   isOpen: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
 };
 
 const renderModal = (props = {}) => render(<AuthModal {...defaultProps} {...props} />);
@@ -131,7 +131,7 @@ const renderModal = (props = {}) => render(<AuthModal {...defaultProps} {...prop
 
 describe('AuthModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockIsOnCrazyGamesPlatform = false;
     mockSignInWithGoogle.mockResolvedValue({ error: null });
     mockSignInWithDiscord.mockResolvedValue({ error: null });
@@ -142,7 +142,7 @@ describe('AuthModal', () => {
 
   describe('open/close rendering', () => {
     it('renders nothing when isOpen is false', () => {
-      const { container } = render(<AuthModal isOpen={false} onClose={jest.fn()} />);
+      const { container } = render(<AuthModal isOpen={false} onClose={vi.fn()} />);
       expect(container.innerHTML).toBe('');
     });
 
@@ -216,21 +216,21 @@ describe('AuthModal', () => {
     });
 
     it('calls onClose when close button clicked', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       renderModal({ onClose });
       fireEvent.click(screen.getByLabelText('Close'));
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('calls onClose when continue as guest clicked', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       renderModal({ onClose });
       fireEvent.click(screen.getByText('Continue as guest'));
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('calls onClose when backdrop clicked', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       renderModal({ onClose });
       // The backdrop is the outer div with onClick={onClose}
       // The dialog has stopPropagation, so clicking outside should trigger onClose
@@ -240,7 +240,7 @@ describe('AuthModal', () => {
     });
 
     it('calls onClose on Escape key', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       renderModal({ onClose });
       fireEvent.keyDown(document, { key: 'Escape' });
       expect(onClose).toHaveBeenCalledTimes(1);

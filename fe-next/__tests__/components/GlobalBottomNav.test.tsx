@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -9,37 +10,37 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSafeArea } from '../../hooks/useSafeArea';
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
-    useRouter: jest.fn(),
-    usePathname: jest.fn(),
+vi.mock('next/navigation', () => ({
+    useRouter: vi.fn(),
+    usePathname: vi.fn(),
 }));
 
-jest.mock('../../contexts/LanguageContext', () => ({
-    useLanguage: jest.fn(),
+vi.mock('../../contexts/LanguageContext', () => ({
+    useLanguage: vi.fn(),
 }));
 
-jest.mock('../../contexts/NavigationContext', () => ({
-    useNavigation: jest.fn(),
+vi.mock('../../contexts/NavigationContext', () => ({
+    useNavigation: vi.fn(),
 }));
 
-jest.mock('../../contexts/AuthContext', () => ({
-    useAuth: jest.fn(),
+vi.mock('../../contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
 }));
 
-jest.mock('../../hooks/useSafeArea', () => ({
-    useSafeArea: jest.fn(),
+vi.mock('../../hooks/useSafeArea', () => ({
+    useSafeArea: vi.fn(),
 }));
 
-const mockUseDailyMissions = jest.fn();
-jest.mock('../../hooks/useDailyMissions', () => ({
+const mockUseDailyMissions = vi.fn();
+vi.mock('../../hooks/useDailyMissions', () => ({
     useDailyMissions: () => mockUseDailyMissions(),
 }));
 
-jest.mock('../../utils/ThemeContext', () => ({
-    useTheme: jest.fn(() => ({ theme: 'dark' })),
+vi.mock('../../utils/ThemeContext', () => ({
+    useTheme: vi.fn(() => ({ theme: 'dark' })),
 }));
 
-jest.mock('../../components/auth/AuthModal', () => ({
+vi.mock('../../components/auth/AuthModal', () => ({
     __esModule: true,
     default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
         isOpen ? <div data-testid="auth-modal" onClick={onClose}>AuthModal</div> : null
@@ -47,8 +48,8 @@ jest.mock('../../components/auth/AuthModal', () => ({
 }));
 
 describe('GlobalBottomNav', () => {
-    const mockPush = jest.fn();
-    const mockT = jest.fn((key: string, params?: Record<string, unknown>) => {
+    const mockPush = vi.fn();
+    const mockT = vi.fn((key: string, params?: Record<string, unknown>) => {
         const translations: Record<string, string> = {
             'nav.bottomNavigation': 'Bottom navigation',
             'nav.home': 'Home',
@@ -62,22 +63,22 @@ describe('GlobalBottomNav', () => {
     });
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         // Default mocks
-        (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-        (usePathname as jest.Mock).mockReturnValue('/en');
-        (useLanguage as jest.Mock).mockReturnValue({
+        (useRouter as Mock).mockReturnValue({ push: mockPush });
+        (usePathname as Mock).mockReturnValue('/en');
+        (useLanguage as Mock).mockReturnValue({
             t: mockT,
             language: 'en',
         });
-        (useNavigation as jest.Mock).mockReturnValue({
+        (useNavigation as Mock).mockReturnValue({
             isInGame: false,
         });
-        (useAuth as jest.Mock).mockReturnValue({
+        (useAuth as Mock).mockReturnValue({
             isAuthenticated: true,
         });
-        (useSafeArea as jest.Mock).mockReturnValue({
+        (useSafeArea as Mock).mockReturnValue({
             top: 0,
             bottom: 0,
             left: 0,
@@ -94,7 +95,7 @@ describe('GlobalBottomNav', () => {
             isGrandSlam: false,
             grandSlamClaimed: false,
             loading: false,
-            refresh: jest.fn(),
+            refresh: vi.fn(),
         });
     });
 
@@ -115,7 +116,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should highlight active tab based on current path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
             const profileButton = screen.getByRole('button', { name: /profile/i });
@@ -123,7 +124,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should apply safe area padding when present', () => {
-            (useSafeArea as jest.Mock).mockReturnValue({
+            (useSafeArea as Mock).mockReturnValue({
                 top: 0,
                 bottom: 34,
                 left: 0,
@@ -156,7 +157,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should not navigate when profile is clicked but user is not authenticated (disabled)', () => {
-            (useAuth as jest.Mock).mockReturnValue({
+            (useAuth as Mock).mockReturnValue({
                 isAuthenticated: false,
             });
 
@@ -172,7 +173,7 @@ describe('GlobalBottomNav', () => {
 
     describe('Active Tab Detection', () => {
         it('should mark home as active on root path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en');
+            (usePathname as Mock).mockReturnValue('/en');
             render(<GlobalBottomNav />);
 
             const homeButton = screen.getByRole('button', { name: /home/i });
@@ -180,7 +181,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should mark profile as active on profile path', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
             const profileButton = screen.getByRole('button', { name: /profile/i });
@@ -188,7 +189,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should default to home when path does not match any tab', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/some-other-page');
+            (usePathname as Mock).mockReturnValue('/en/some-other-page');
             render(<GlobalBottomNav />);
 
             const homeButton = screen.getByRole('button', { name: /home/i });
@@ -198,7 +199,7 @@ describe('GlobalBottomNav', () => {
 
     describe('Visibility Control', () => {
         it('should hide when user is in active game', () => {
-            (useNavigation as jest.Mock).mockReturnValue({
+            (useNavigation as Mock).mockReturnValue({
                 isInGame: true,
             });
 
@@ -207,35 +208,35 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should hide on multiplayer path (has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/multiplayer');
+            (usePathname as Mock).mockReturnValue('/en/multiplayer');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on singleplayer path (has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/singleplayer');
+            (usePathname as Mock).mockReturnValue('/en/singleplayer');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on daily path (has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/daily');
+            (usePathname as Mock).mockReturnValue('/en/daily');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on adventure path (has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/adventure');
+            (usePathname as Mock).mockReturnValue('/en/adventure');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should remain visible on profile path (consistent navigation)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/profile');
 
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -243,7 +244,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should remain visible on profile sub-paths (consistent navigation)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile/settings');
+            (usePathname as Mock).mockReturnValue('/en/profile/settings');
 
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -251,42 +252,42 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should show on regular pages (settings, rules, etc.)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/settings');
+            (usePathname as Mock).mockReturnValue('/en/settings');
 
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
         it('should hide on education path (education section has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/education');
+            (usePathname as Mock).mockReturnValue('/en/education');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on student path (education section has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/student');
+            (usePathname as Mock).mockReturnValue('/en/student');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on teacher path (education section has own nav)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/teacher');
+            (usePathname as Mock).mockReturnValue('/en/teacher');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on student sub-paths (e.g. /student/lessons)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/student/lessons');
+            (usePathname as Mock).mockReturnValue('/en/student/lessons');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
         });
 
         it('should hide on teacher sub-paths (e.g. /teacher/classroom)', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/teacher/classroom');
+            (usePathname as Mock).mockReturnValue('/en/teacher/classroom');
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
@@ -295,7 +296,7 @@ describe('GlobalBottomNav', () => {
 
     describe('Authentication State', () => {
         it('should show AuthModal when profile button clicked while not authenticated', async () => {
-            (useAuth as jest.Mock).mockReturnValue({
+            (useAuth as Mock).mockReturnValue({
                 isAuthenticated: false,
             });
 
@@ -324,7 +325,7 @@ describe('GlobalBottomNav', () => {
 
     describe('Internationalization', () => {
         it('should use Hebrew translations when language is Hebrew', () => {
-            const hebrewT = jest.fn((key: string) => {
+            const hebrewT = vi.fn((key: string) => {
                 const translations: Record<string, string> = {
                     'nav.home': 'בית',
                     'nav.play': 'שחק',
@@ -334,11 +335,11 @@ describe('GlobalBottomNav', () => {
                 return translations[key] || key;
             });
 
-            (useLanguage as jest.Mock).mockReturnValue({
+            (useLanguage as Mock).mockReturnValue({
                 t: hebrewT,
                 language: 'he',
             });
-            (usePathname as jest.Mock).mockReturnValue('/he');
+            (usePathname as Mock).mockReturnValue('/he');
 
             render(<GlobalBottomNav />);
 
@@ -348,11 +349,11 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should navigate with correct language prefix', () => {
-            (useLanguage as jest.Mock).mockReturnValue({
+            (useLanguage as Mock).mockReturnValue({
                 t: mockT,
                 language: 'sv',
             });
-            (usePathname as jest.Mock).mockReturnValue('/sv');
+            (usePathname as Mock).mockReturnValue('/sv');
 
             render(<GlobalBottomNav />);
 
@@ -375,7 +376,7 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should indicate active state for screen readers', () => {
-            (usePathname as jest.Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/profile');
             render(<GlobalBottomNav />);
 
             const profileButton = screen.getByRole('button', { name: /profile/i });
@@ -412,7 +413,7 @@ describe('GlobalBottomNav', () => {
                 isGrandSlam: false,
                 grandSlamClaimed: false,
                 loading: false,
-                refresh: jest.fn(),
+                refresh: vi.fn(),
             });
 
             render(<GlobalBottomNav />);
@@ -433,7 +434,7 @@ describe('GlobalBottomNav', () => {
                 isGrandSlam: false,
                 grandSlamClaimed: false,
                 loading: false,
-                refresh: jest.fn(),
+                refresh: vi.fn(),
             });
 
             render(<GlobalBottomNav />);
@@ -454,7 +455,7 @@ describe('GlobalBottomNav', () => {
                 isGrandSlam: false,
                 grandSlamClaimed: false,
                 loading: false,
-                refresh: jest.fn(),
+                refresh: vi.fn(),
             });
 
             render(<GlobalBottomNav />);

@@ -10,7 +10,7 @@ import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const value = {
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -26,12 +26,12 @@ jest.mock('@/contexts/LanguageContext', () => {
     },
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return { useLanguage: () => value, useLanguageSafe: () => value };
 });
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     isMobile: false,
@@ -42,7 +42,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock ComboTierBadge to avoid framer-motion useSpring dependency
-jest.mock('@/components/animations/ComboTierBadge', () => ({
+vi.mock('@/components/animations/ComboTierBadge', () => ({
   ComboTierBadge: ({ comboCount }: { comboCount: number }) => {
     if (comboCount < 2) return null;
     return React.createElement('div', { 'data-testid': 'combo-tier-badge' }, `Combo ${comboCount}`);
@@ -50,12 +50,12 @@ jest.mock('@/components/animations/ComboTierBadge', () => ({
 }));
 
 // Mock ChainParticleBurst to avoid framer-motion useSpring dependency
-jest.mock('@/components/animations/ChainParticleBurst', () => ({
+vi.mock('@/components/animations/ChainParticleBurst', () => ({
   ChainParticleBurst: () => null,
 }));
 
 // Mock word validation to always return valid
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
     validateWord: async (word: string) => ({
       isValid: true,
@@ -66,32 +66,32 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
 }));
 
 // Mock useAdventureSelection hook
-jest.mock('@/hooks/useAdventureSelection', () => ({
+vi.mock('@/hooks/useAdventureSelection', () => ({
   useAdventureSelection: () => ({
     selectedIndices: [],
     currentWord: '',
     isSelecting: false,
-    selectTile: jest.fn(),
-    clearSelection: jest.fn(),
-    getPath: jest.fn().mockReturnValue([]),
+    selectTile: vi.fn(),
+    clearSelection: vi.fn(),
+    getPath: vi.fn().mockReturnValue([]),
     pathPoints: [],
   }),
 }));
 
 // Mock MusicContext - adventure mode stops global music when it starts
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playMusic: jest.fn(),
-    pauseMusic: jest.fn(),
-    resumeMusic: jest.fn(),
+    stopMusic: vi.fn(),
+    playMusic: vi.fn(),
+    pauseMusic: vi.fn(),
+    resumeMusic: vi.fn(),
     isPlaying: false,
     currentTrack: null,
   }),
 }));
 
 // Mock ProgressionContext - required by AdventureGame
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     progression: {
       userId: 'test-user',
@@ -106,26 +106,26 @@ jest.mock('@/contexts/ProgressionContext', () => ({
     },
     isLoading: false,
     error: null,
-    completeLevel: jest.fn(),
-    recordAttempt: jest.fn(),
-    isWorldUnlocked: jest.fn(() => true),
-    isLevelUnlocked: jest.fn(() => true),
-    getWorldStars: jest.fn(() => 0),
-    getLevelCompletion: jest.fn(() => undefined),
-    getLevelAttempt: jest.fn(() => undefined),
-    refreshProgression: jest.fn(),
+    completeLevel: vi.fn(),
+    recordAttempt: vi.fn(),
+    isWorldUnlocked: vi.fn(() => true),
+    isLevelUnlocked: vi.fn(() => true),
+    getWorldStars: vi.fn(() => 0),
+    getLevelCompletion: vi.fn(() => undefined),
+    getLevelAttempt: vi.fn(() => undefined),
+    refreshProgression: vi.fn(),
     attempts: [],
   }),
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock components that aren't relevant to Lexi tests
-jest.mock('../themed/WorldBackground', () => ({
+vi.mock('../themed/WorldBackground', () => ({
   __esModule: true,
   default: () => <div data-testid="world-background" />,
 }));
 
-jest.mock('../LevelEntryOverlay', () => {
+vi.mock('../LevelEntryOverlay', () => {
   const LevelEntryOverlayMock = ({ onComplete }: { onComplete: () => void }) => {
     // Auto-complete entry sequence
     React.useEffect(() => {
@@ -140,13 +140,13 @@ jest.mock('../LevelEntryOverlay', () => {
   };
 });
 
-jest.mock('../LevelCompleteModal', () => ({
+vi.mock('../LevelCompleteModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock AdventureThemeContext
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
   const MockAdventureThemeContext = React.createContext({
     worldId: 1,
@@ -183,8 +183,8 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
       },
       worldId: 1,
       level: 1,
-      setWorld: jest.fn(),
-      setLevel: jest.fn(),
+      setWorld: vi.fn(),
+      setLevel: vi.fn(),
       isTransitioning: false,
       chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
     }),
@@ -228,7 +228,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 // Mock useAdaptiveDifficulty hook
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: () => ({
     tier: 'normal',
     adjustedConfig: {
@@ -245,12 +245,12 @@ jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
     },
     hintData: { level: 'none' },
     powerUpCooldownMultiplier: 1.0,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   }),
 }));
 
 // Mock framer-motion for simpler testing
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -344,18 +344,18 @@ describe('AdventureGame Lexi Integration', () => {
     ['R', 'T', 'I', 'N'],
   ];
 
-  const mockOnLevelComplete = jest.fn();
-  const mockOnExit = jest.fn();
+  const mockOnLevelComplete = vi.fn();
+  const mockOnExit = vi.fn();
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockOnLevelComplete.mockClear();
     mockOnExit.mockClear();
     document.documentElement.dir = 'ltr';
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders AdventureGame without Lexi initially', async () => {
@@ -375,7 +375,7 @@ describe('AdventureGame Lexi Integration', () => {
 
     // Advance timers to complete entry sequence
     act(() => {
-      jest.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
     });
 
     // Lexi should not be visible initially (no reaction triggered yet)

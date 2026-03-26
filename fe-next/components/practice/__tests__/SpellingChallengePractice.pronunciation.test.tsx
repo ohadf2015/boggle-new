@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { SpellingChallengePractice } from '../SpellingChallengePractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -11,7 +11,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/practice/PronunciationButton', () => ({
+vi.mock('@/components/practice/PronunciationButton', () => ({
   PronunciationButton: ({ word }: { word: string }) => (
     <button data-testid="pronunciation-btn" data-word={word}>
       🔊
@@ -19,7 +19,7 @@ jest.mock('@/components/practice/PronunciationButton', () => ({
   ),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockMotionDiv = React.forwardRef(
     ({ children, ...props }: any, ref: any) => (
@@ -37,7 +37,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('../PracticeResultsCard', () => ({
+vi.mock('../PracticeResultsCard', () => ({
   __esModule: true,
   default: ({ onRestart, onBack }: { onRestart: () => void; onBack: () => void }) => (
     <div data-testid="practice-results-card">
@@ -57,8 +57,8 @@ describe('SpellingChallengePractice - PronunciationButton', () => {
     render(
       <SpellingChallengePractice
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 
@@ -69,8 +69,8 @@ describe('SpellingChallengePractice - PronunciationButton', () => {
     render(
       <SpellingChallengePractice
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 

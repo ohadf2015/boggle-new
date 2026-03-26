@@ -5,9 +5,9 @@ import DuelChallengeModal from '../DuelChallengeModal';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 
 // Mock dependencies
-jest.mock('@/hooks/useDuelSocket');
+vi.mock('@/hooks/useDuelSocket');
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     dir: 'ltr',
@@ -31,8 +31,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('DuelChallengeModal', () => {
-  const mockCreateChallenge = jest.fn();
-  const mockOnClose = jest.fn();
+  const mockCreateChallenge = vi.fn();
+  const mockOnClose = vi.fn();
 
   const opponent: OpponentInfo = {
     userId: 'opponent-1',
@@ -53,7 +53,7 @@ describe('DuelChallengeModal', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useDuelSocket as jest.Mock).mockReturnValue({
       socket: {},
       isConnected: true,
@@ -150,7 +150,7 @@ describe('DuelChallengeModal', () => {
     });
 
     it('auto-closes after successful creation', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       render(<DuelChallengeModal {...defaultProps} />);
 
       const dropdown = screen.getByRole('combobox');
@@ -160,13 +160,13 @@ describe('DuelChallengeModal', () => {
       fireEvent.click(sendButton);
 
       // Fast-forward timers to trigger the close
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       await waitFor(() => {
         expect(mockOnClose).toHaveBeenCalled();
       });
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 

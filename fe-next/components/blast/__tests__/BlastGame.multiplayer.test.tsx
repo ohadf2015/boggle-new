@@ -9,103 +9,103 @@ import { render, screen } from '@testing-library/react';
 // Mocks (same pattern as BlastGame.completion.test.tsx)
 // ---------------------------------------------------------------------------
 
-jest.mock('canvas-confetti', () => jest.fn());
+vi.mock('canvas-confetti', () => vi.fn());
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: 0,
     comboTimeRemaining: null,
     isDangerState: false,
     maxCombo: 0,
-    incrementCombo: jest.fn(),
+    incrementCombo: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useWordSubmission', () => ({
   useWordSubmission: () => ({
     currentFeedback: null,
-    handleWordSubmit: jest.fn(),
+    handleWordSubmit: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
+vi.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
   useSpamDetection: () => ({}),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
-  useDictionaryCache: () => ({ checkWord: jest.fn() }),
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  useDictionaryCache: () => ({ checkWord: vi.fn() }),
 }));
 
-jest.mock('../hooks/useBlastHint', () => ({
+vi.mock('../hooks/useBlastHint', () => ({
   useBlastHint: () => ({
     hintPath: null,
     hasHintAvailable: false,
-    requestHint: jest.fn(),
-    clearHint: jest.fn(),
+    requestHint: vi.fn(),
+    clearHint: vi.fn(),
   }),
 }));
 
-const mockUseBlastObjectives = jest.fn((_params?: any) => ({
+const mockUseBlastObjectives = vi.fn((_params?: any) => ({
   objectiveProgress: [],
   allObjectivesComplete: false,
 }));
-jest.mock('../hooks/useBlastObjectives', () => ({
+vi.mock('../hooks/useBlastObjectives', () => ({
   useBlastObjectives: (params: any) => mockUseBlastObjectives(params),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
+vi.mock('@/shared/utils/scoring', () => ({
   getComboMultiplier: () => 1,
 }));
 
 const mockBlastReturn: { value: any } = { value: null };
-jest.mock('../hooks/useBlastGame', () => ({
+vi.mock('../hooks/useBlastGame', () => ({
   useBlastGame: () => mockBlastReturn.value,
 }));
 
-const mockUseSugarCrush = jest.fn(() => ({
+const mockUseSugarCrush = vi.fn(() => ({
   isActive: false,
-  start: jest.fn(),
+  start: vi.fn(),
 }));
-jest.mock('../hooks/useBlastSugarCrush', () => ({
+vi.mock('../hooks/useBlastSugarCrush', () => ({
   useBlastSugarCrush: () => mockUseSugarCrush(),
 }));
 
-jest.mock('../BlastComboDiscovery', () => ({
+vi.mock('../BlastComboDiscovery', () => ({
   BlastComboDiscovery: () => <div data-testid="blast-combo-discovery" />,
 }));
 
-jest.mock('../BlastComboFlash', () => ({
+vi.mock('../BlastComboFlash', () => ({
   BlastComboFlash: () => <div data-testid="blast-combo-flash" />,
 }));
 
 const capturedLayoutProps: { value: any } = { value: null };
-jest.mock('../BlastGameLayout', () => ({
+vi.mock('../BlastGameLayout', () => ({
   BlastGameLayout: (props: any) => {
     capturedLayoutProps.value = props;
     return <div data-testid="blast-game-layout" />;
   },
 }));
 
-jest.mock('../hooks/useBlastNearMiss', () => ({
-  useBlastNearMiss: () => ({ shimmerCells: [], check: jest.fn() }),
+vi.mock('../hooks/useBlastNearMiss', () => ({
+  useBlastNearMiss: () => ({ shimmerCells: [], check: vi.fn() }),
 }));
 
-jest.mock('@/hooks/gameState', () => ({
+vi.mock('@/hooks/gameState', () => ({
   useBlastComboSync: () => null,
 }));
 
@@ -139,19 +139,19 @@ function makeDefaultBlastReturn(overrides: any = {}) {
     cascadeHighlightData: null,
     cascadeHighlightPhase: 'idle',
     activeComboFlash: null,
-    clearComboFlash: jest.fn(),
-    clearTilesForWord: jest.fn(),
-    dismissExplosion: jest.fn(),
-    dismissScorePopup: jest.fn(),
-    shuffleRemainingTiles: jest.fn(),
-    endGame: jest.fn(),
+    clearComboFlash: vi.fn(),
+    clearTilesForWord: vi.fn(),
+    dismissExplosion: vi.fn(),
+    dismissScorePopup: vi.fn(),
+    shuffleRemainingTiles: vi.fn(),
+    endGame: vi.fn(),
     noWordsRemaining: false,
-    getResultsData: jest.fn(() => ({ score: 50, wordsFound: ['CAT'] })),
-    trackWordFail: jest.fn(),
-    triggerComboFlash: jest.fn(),
-    setTileStates: jest.fn(),
-    addExplosion: jest.fn(),
-    addBonusScore: jest.fn(),
+    getResultsData: vi.fn(() => ({ score: 50, wordsFound: ['CAT'] })),
+    trackWordFail: vi.fn(),
+    triggerComboFlash: vi.fn(),
+    setTileStates: vi.fn(),
+    addExplosion: vi.fn(),
+    addBonusScore: vi.fn(),
     ...rest,
   };
 }
@@ -186,8 +186,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -199,8 +199,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -210,7 +210,7 @@ describe('BlastGame mode=multiplayer', () => {
 
   it('should not trigger onGameEnd from objective completion in multiplayer', () => {
     // In MP, isComplete/isDeadEnd still trigger end, but allObjectivesComplete does not
-    const onGameEnd = jest.fn();
+    const onGameEnd = vi.fn();
     mockBlastReturn.value = makeDefaultBlastReturn({
       gameState: { isComplete: false, isDeadEnd: false },
     });
@@ -220,7 +220,7 @@ describe('BlastGame mode=multiplayer', () => {
         config={baseConfig}
         mode="multiplayer"
         onGameEnd={onGameEnd}
-        onQuit={jest.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -233,8 +233,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -246,8 +246,8 @@ describe('BlastGame mode=multiplayer', () => {
     render(
       <BlastGame
         config={baseConfig}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -265,8 +265,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -278,8 +278,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="singleplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -293,8 +293,8 @@ describe('BlastGame mode=multiplayer', () => {
         mode="multiplayer"
         remainingTime={45}
         totalTime={120}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -314,8 +314,8 @@ describe('BlastGame mode=multiplayer', () => {
         mode="multiplayer"
         leaderboard={leaderboard}
         username="alice"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -328,8 +328,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="multiplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -347,8 +347,8 @@ describe('BlastGame mode=multiplayer', () => {
         config={baseConfig}
         mode="multiplayer"
         waveNumber={3}
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 
@@ -361,8 +361,8 @@ describe('BlastGame mode=multiplayer', () => {
       <BlastGame
         config={baseConfig}
         mode="singleplayer"
-        onGameEnd={jest.fn()}
-        onQuit={jest.fn()}
+        onGameEnd={vi.fn()}
+        onQuit={vi.fn()}
       />
     );
 

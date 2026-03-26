@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import PlayersReadyIndicator from '../PlayersReadyIndicator';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -22,13 +22,13 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Avatar
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
 // Mock MascotWithEntrance
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant, size }: { variant?: string; size?: string }) => (
     <div data-testid="mascot-celebration" data-variant={variant} data-size={size}>Mascot</div>
   ),

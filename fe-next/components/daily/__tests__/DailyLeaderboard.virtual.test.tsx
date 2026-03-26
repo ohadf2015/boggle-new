@@ -10,7 +10,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...props }: { src: string; alt: string; [k: string]: unknown }) => (
     // eslint-disable-next-line @next/next/no-img-element
@@ -19,7 +19,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
@@ -28,40 +28,40 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Avatar
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar-emoji">avatar</div>,
 }));
 
 // Mock PlayerProfileTooltip
-jest.mock('@/components/ui/PlayerProfileTooltip', () => ({
+vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
   __esModule: true,
   default: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
 // Mock utils
-jest.mock('@/utils/rankingStyles', () => ({
+vi.mock('@/utils/rankingStyles', () => ({
   getRankDisplay: (rank: number) => `#${rank}`,
   getRankRowClasses: () => '',
   getRankBadgeClasses: () => '',
 }));
 
-jest.mock('@/utils/dailyChallenge', () => ({
+vi.mock('@/utils/dailyChallenge', () => ({
   getPuzzleNumber: () => 42,
 }));
 
-jest.mock('@/shared/utils', () => ({
+vi.mock('@/shared/utils', () => ({
   formatDistanceToNow: () => '2m ago',
   getCountryFlag: () => '🇺🇸',
 }));
 
-jest.mock('@/utils/avatarConfig', () => ({
+vi.mock('@/utils/avatarConfig', () => ({
   getAvatarById: () => null,
 }));
 
 // Mock @tanstack/react-virtual to track virtualization
 let lastVirtualizerConfig: { count: number; overscan?: number } | null = null;
-jest.mock('@tanstack/react-virtual', () => ({
+vi.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: (config: { count: number; estimateSize: () => number; overscan?: number }) => {
     lastVirtualizerConfig = { count: config.count, overscan: config.overscan };
     const estimateSize = config.estimateSize();
@@ -104,13 +104,13 @@ const mockT = (key: string) => key;
 
 describe('DailyLeaderboard virtualization', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders only a subset of rows when list is expanded with many participants', async () => {
     const participants = makeParticipants(50);
 
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         data: participants,
@@ -162,7 +162,7 @@ describe('DailyLeaderboard virtualization', () => {
   it('renders all rows when list is small (no virtualization needed)', async () => {
     const participants = makeParticipants(5);
 
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         data: participants,

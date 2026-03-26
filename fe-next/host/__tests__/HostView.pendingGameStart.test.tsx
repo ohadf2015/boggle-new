@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * HostView pendingGameStart Tests
  *
@@ -16,9 +17,9 @@ import { useState, useEffect } from 'react';
 interface MockSocket {
   listeners: Record<string, Array<(...args: unknown[]) => void>>;
   connected: boolean;
-  emit: jest.Mock;
-  on: jest.Mock;
-  off: jest.Mock;
+  emit: Mock;
+  on: Mock;
+  off: Mock;
 }
 
 function createMockSocket(): MockSocket {
@@ -27,15 +28,15 @@ function createMockSocket(): MockSocket {
   return {
     listeners,
     connected: true,
-    emit: jest.fn(),
-    on: jest.fn((event: string, callback: (...args: unknown[]) => void) => {
+    emit: vi.fn(),
+    on: vi.fn((event: string, callback: (...args: unknown[]) => void) => {
       if (!listeners[event]) {
         listeners[event] = [];
       }
       listeners[event].push(callback);
       return {} as unknown;
     }),
-    off: jest.fn((event: string, callback: (...args: unknown[]) => void) => {
+    off: vi.fn((event: string, callback: (...args: unknown[]) => void) => {
       if (listeners[event]) {
         listeners[event] = listeners[event].filter((cb) => cb !== callback);
       }
@@ -134,7 +135,7 @@ describe('HostView pendingGameStart handling', () => {
 
       // WHEN
       const { result } = renderHook(() =>
-        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: jest.fn() })
+        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: vi.fn() })
       );
 
       // THEN
@@ -151,7 +152,7 @@ describe('HostView pendingGameStart handling', () => {
 
       // WHEN
       const { result } = renderHook(() =>
-        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: jest.fn() })
+        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: vi.fn() })
       );
 
       // THEN
@@ -168,7 +169,7 @@ describe('HostView pendingGameStart handling', () => {
 
       // WHEN
       const { result } = renderHook(() =>
-        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: jest.fn() })
+        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: vi.fn() })
       );
 
       // THEN
@@ -177,7 +178,7 @@ describe('HostView pendingGameStart handling', () => {
 
     it('should call onGameStartConsumed callback', () => {
       // GIVEN
-      const onGameStartConsumed = jest.fn();
+      const onGameStartConsumed = vi.fn();
       const pendingGameStart: GameStartData = {
         letterGrid: [['A']],
         timerSeconds: 180,
@@ -203,7 +204,7 @@ describe('HostView pendingGameStart handling', () => {
 
       // WHEN
       const { result } = renderHook(() =>
-        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: jest.fn() })
+        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: vi.fn() })
       );
 
       // THEN
@@ -214,7 +215,7 @@ describe('HostView pendingGameStart handling', () => {
   describe('when pendingGameStart is null', () => {
     it('should not initialize any state', () => {
       // GIVEN
-      const onGameStartConsumed = jest.fn();
+      const onGameStartConsumed = vi.fn();
 
       // WHEN
       const { result } = renderHook(() =>
@@ -241,7 +242,7 @@ describe('HostView pendingGameStart handling', () => {
       // This test verifies the state that would lead to game starting
       // The actual animation completion is handled by HostView's useEffect
       const { result } = renderHook(() =>
-        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: jest.fn() })
+        useHostPendingGameStart({ pendingGameStart, onGameStartConsumed: vi.fn() })
       );
 
       // THEN - After pendingGameStart is processed:

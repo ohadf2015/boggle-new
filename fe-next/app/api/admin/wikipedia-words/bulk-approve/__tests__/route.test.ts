@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for Bulk Approve Wikipedia Word Candidates Endpoint
  * POST /api/admin/wikipedia-words/bulk-approve
@@ -7,18 +8,18 @@
  */
 
 // Mock all Next.js and external dependencies BEFORE any imports
-jest.mock('@/lib/auth/adminAuth', () => ({
-  verifyAdminAuth: jest.fn(),
+vi.mock('@/lib/auth/adminAuth', () => ({
+  verifyAdminAuth: vi.fn(),
 }));
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(),
 }));
 
-jest.mock('@/lib/ai-service', () => ({
+vi.mock('@/lib/ai-service', () => ({
   gameAIService: {
-    checkDatabaseOnly: jest.fn(),
-    validateAndSaveWord: jest.fn(),
+    checkDatabaseOnly: vi.fn(),
+    validateAndSaveWord: vi.fn(),
   },
 }));
 
@@ -31,7 +32,7 @@ describe('Bulk Approve Business Logic', () => {
   let mockSupabase: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock successful auth by default
     mockVerifyAdminAuth.mockResolvedValue({
@@ -41,11 +42,11 @@ describe('Bulk Approve Business Logic', () => {
 
     // Mock Supabase client
     mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
     };
     mockCreateClient.mockReturnValue(mockSupabase);
   });
@@ -59,11 +60,11 @@ describe('Bulk Approve Business Logic', () => {
       ];
 
       mockSupabase.in.mockResolvedValueOnce({ data: mockCandidates, error: null });
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockResolvedValue({
+      (gameAIService.checkDatabaseOnly as Mock).mockResolvedValue({
         source: 'none',
         isValid: false,
       });
-      (gameAIService.validateAndSaveWord as jest.Mock).mockResolvedValue({
+      (gameAIService.validateAndSaveWord as Mock).mockResolvedValue({
         isValid: true,
         reason: null,
       });
@@ -84,7 +85,7 @@ describe('Bulk Approve Business Logic', () => {
 
     it('should skip words already in dictionary', async () => {
       // GIVEN: One word already in dictionary
-      (gameAIService.checkDatabaseOnly as jest.Mock)
+      (gameAIService.checkDatabaseOnly as Mock)
         .mockResolvedValueOnce({ source: 'none', isValid: false })
         .mockResolvedValueOnce({ source: 'database', isValid: true });
 
@@ -100,11 +101,11 @@ describe('Bulk Approve Business Logic', () => {
 
     it('should handle AI validation failures', async () => {
       // GIVEN: AI validation fails for a word
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockResolvedValue({
+      (gameAIService.checkDatabaseOnly as Mock).mockResolvedValue({
         source: 'none',
         isValid: false,
       });
-      (gameAIService.validateAndSaveWord as jest.Mock).mockResolvedValue({
+      (gameAIService.validateAndSaveWord as Mock).mockResolvedValue({
         isValid: false,
         reason: 'Not a valid English word',
       });

@@ -4,7 +4,7 @@ import { ShareButton } from '../ShareButton';
 import type { ShareParams } from '@/shared/utils/shareResultGenerator';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MotionButton = React.forwardRef(function MotionButton({ children, ...props }: any, ref: any) {
     return <button ref={ref} {...props}>{children}</button>;
   });
@@ -13,7 +13,7 @@ jest.mock('framer-motion', () => {
 
 // Mock clipboard
 Object.assign(navigator, {
-  clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+  clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
 });
 
 describe('ShareButton', () => {

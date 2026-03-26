@@ -12,8 +12,8 @@ import type { GridTileState } from '@/types/adventure';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // Mock dependencies
-jest.mock('@/hooks/useDevicePerformance');
-jest.mock('@/components/animations', () => ({
+vi.mock('@/hooks/useDevicePerformance');
+vi.mock('@/components/animations', () => ({
   WordPathTrail: () => <div data-testid="word-path-trail" />,
   SelectionSparkle: ({ position, triggerKey }: { position: { x: number; y: number } | null; triggerKey: number }) => (
     <div data-testid="selection-sparkle" data-position={position ? JSON.stringify(position) : null} data-key={triggerKey} />
@@ -59,7 +59,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Spring animation on selection', () => {
@@ -137,7 +137,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
 
   describe('Sparkle triggers on selection', () => {
     it('should trigger sparkle on mousedown', () => {
-      const mockOnDragStart = jest.fn();
+      const mockOnDragStart = vi.fn();
 
       render(
         <AdventureGrid
@@ -170,7 +170,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
     });
 
     it('should trigger sparkle on touchstart', () => {
-      const mockOnDragStart = jest.fn();
+      const mockOnDragStart = vi.fn();
 
       render(
         <AdventureGrid
@@ -213,7 +213,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
         isMobile: true,
       });
 
-      const mockOnDragStart = jest.fn();
+      const mockOnDragStart = vi.fn();
 
       render(
         <AdventureGrid
@@ -312,7 +312,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
       const key1 = sparkle1.getAttribute('data-key');
 
       // Small delay to ensure different timestamp
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
 
       // Second selection
       fireEvent.mouseDown(tiles[1], { clientX: 200, clientY: 100 });

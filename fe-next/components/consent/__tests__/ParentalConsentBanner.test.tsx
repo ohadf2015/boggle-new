@@ -10,7 +10,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ParentalConsentBanner } from '../ParentalConsentBanner';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -27,12 +27,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('ParentalConsentBanner', () => {
   const defaultProps = {
-    onRequestConsent: jest.fn(),
-    onDismiss: jest.fn(),
+    onRequestConsent: vi.fn(),
+    onDismiss: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {
@@ -64,7 +64,7 @@ describe('ParentalConsentBanner', () => {
 
   describe('interactions', () => {
     it('calls onRequestConsent when action button is clicked', () => {
-      const onRequestConsent = jest.fn();
+      const onRequestConsent = vi.fn();
       render(
         <ParentalConsentBanner
           {...defaultProps}
@@ -79,7 +79,7 @@ describe('ParentalConsentBanner', () => {
     });
 
     it('calls onDismiss when dismiss button is clicked', () => {
-      const onDismiss = jest.fn();
+      const onDismiss = vi.fn();
       render(
         <ParentalConsentBanner
           {...defaultProps}

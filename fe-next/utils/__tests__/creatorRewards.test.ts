@@ -42,7 +42,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 beforeEach(() => {
   localStorageMock.clear();
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('CREATOR_REWARDS constants', () => {

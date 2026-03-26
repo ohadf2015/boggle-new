@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import AchievementProgressCard from './AchievementProgressCard';
 
 // Mock LanguageContext
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, vars?: Record<string, any>) => {
       const translations: Record<string, string> = {
@@ -63,7 +63,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -90,7 +90,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -116,7 +116,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -142,7 +142,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -169,7 +169,7 @@ describe('AchievementProgressCard', () => {
               percentComplete: tier === 'platinum' ? 100 : 50, // 100/200 = 50%
             }}
             isPinned={false}
-            onTogglePin={jest.fn()}
+            onTogglePin={vi.fn()}
             canPin={true}
           />
         );
@@ -199,7 +199,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -226,7 +226,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -252,7 +252,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -279,7 +279,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -306,7 +306,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -319,7 +319,7 @@ describe('AchievementProgressCard', () => {
 
   describe('Pin Functionality', () => {
     it('pin button toggles on click', () => {
-      const onTogglePin = jest.fn();
+      const onTogglePin = vi.fn();
       const achievement = {
         key: 'word_master',
         category: 'progress' as const,
@@ -364,7 +364,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={true}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -390,7 +390,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={false}
         />
       );
@@ -416,7 +416,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={false}
         />
       );
@@ -444,7 +444,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );
@@ -470,7 +470,7 @@ describe('AchievementProgressCard', () => {
         <AchievementProgressCard
           achievement={achievement}
           isPinned={false}
-          onTogglePin={jest.fn()}
+          onTogglePin={vi.fn()}
           canPin={true}
         />
       );

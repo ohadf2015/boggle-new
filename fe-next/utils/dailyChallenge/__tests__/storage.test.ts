@@ -38,7 +38,7 @@ import { getJsonFromLocalStorage, saveJsonToLocalStorage } from '@/utils/storage
 
 describe('getWordHuntStatusToday', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('when user has not played today', () => {
@@ -203,7 +203,7 @@ describe('getWordHuntStatusToday', () => {
 
 describe('getTodaysWordHuntResult', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return full stored result when valid', () => {

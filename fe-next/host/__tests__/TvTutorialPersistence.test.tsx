@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: TV Tutorial should only show ONCE per user
  *
@@ -18,7 +19,7 @@ import TvTutorialOverlay, {
 } from '../components/tv-broadcast/TvTutorialOverlay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
@@ -41,7 +42,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   ChevronRight: () => <span data-testid="chevron-right">→</span>,
   ChevronLeft: () => <span data-testid="chevron-left">←</span>,
   X: () => <span data-testid="x-icon">✕</span>,
@@ -57,14 +58,14 @@ jest.mock('lucide-react', () => ({
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
     // Helper to see what's stored
@@ -100,7 +101,7 @@ describe('TvTutorial Persistence - Bug Fix', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.clear();
     cleanup();
   });
@@ -115,8 +116,8 @@ describe('TvTutorial Persistence - Bug Fix', () => {
      * 5. Tutorial should NOT show again (THIS IS THE BUG)
      */
     it('should NOT show tutorial after being dismissed and component remounts', () => {
-      const onComplete = jest.fn();
-      const onSkip = jest.fn();
+      const onComplete = vi.fn();
+      const onSkip = vi.fn();
 
       // Step 1: First render - tutorial should show (forceShow=true, parent controls visibility)
       const { rerender, unmount } = render(
@@ -150,8 +151,8 @@ describe('TvTutorial Persistence - Bug Fix', () => {
       // Step 4: Remount with forceShow=false (parent checks localStorage and doesn't force show)
       const { container } = render(
         <TvTutorialOverlay
-          onComplete={jest.fn()}
-          onSkip={jest.fn()}
+          onComplete={vi.fn()}
+          onSkip={vi.fn()}
           t={mockT}
           forceShow={false}
         />
@@ -165,8 +166,8 @@ describe('TvTutorial Persistence - Bug Fix', () => {
      * Test the specific scenario where forceShow is controlled by parent state
      */
     it('should NOT show tutorial when forceShow changes from true to false after dismiss', () => {
-      const onComplete = jest.fn();
-      const onSkip = jest.fn();
+      const onComplete = vi.fn();
+      const onSkip = vi.fn();
 
       // Simulate parent component that controls forceShow state
       const ParentComponent = () => {
@@ -232,8 +233,8 @@ describe('TvTutorial Persistence - Bug Fix', () => {
 
       render(
         <TvTutorialOverlay
-          onComplete={jest.fn()}
-          onSkip={jest.fn()}
+          onComplete={vi.fn()}
+          onSkip={vi.fn()}
           t={mockT}
           forceShow={true} // Parent controls visibility
         />

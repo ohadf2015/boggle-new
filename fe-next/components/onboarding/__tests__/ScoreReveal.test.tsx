@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv(
     { children, ...props }: any,
@@ -23,14 +23,14 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   TrendingUp: () => <div data-testid="trending-up" />,
   RotateCcw: () => <div data-testid="rotate-ccw" />,
   ArrowRight: () => <div data-testid="arrow-right" />,
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: any) => {
       const translations: Record<string, string> = {
@@ -58,12 +58,12 @@ describe('ScoreReveal', () => {
   const defaultProps = {
     score: 47,
     averageScore: 62,
-    onTryAgain: jest.fn(),
-    onContinue: jest.fn(),
+    onTryAgain: vi.fn(),
+    onContinue: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the score reveal component', () => {

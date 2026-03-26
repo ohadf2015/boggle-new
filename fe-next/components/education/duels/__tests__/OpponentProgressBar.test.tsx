@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { OpponentProgressBar } from '../OpponentProgressBar';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },

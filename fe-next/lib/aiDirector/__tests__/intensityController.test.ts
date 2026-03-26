@@ -6,7 +6,7 @@
  * TDD: Write tests first, then implement to make them pass.
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   IntensityController,
   createIntensityController,

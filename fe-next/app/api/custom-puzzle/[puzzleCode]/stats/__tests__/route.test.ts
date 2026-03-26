@@ -1,22 +1,23 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 
 // --- Mock next/server ---
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200, headers: init?.headers })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200, headers: init?.headers })),
   },
 }));
 
 // --- Mock customPuzzle utils ---
-jest.mock('@/utils/customPuzzle', () => ({
-  isValidPuzzleCode: jest.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
+vi.mock('@/utils/customPuzzle', () => ({
+  isValidPuzzleCode: vi.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
 }));
 
 // --- Supabase mock ---
-const mockFrom = jest.fn();
+const mockFrom = vi.fn();
 
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
@@ -58,7 +59,7 @@ const mockStats = {
 
 describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Input validation', () => {
@@ -80,16 +81,16 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: { message: 'no rows' } }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'no rows' } }),
           };
         }
         if (table === 'custom_puzzles') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           };
         }
         return {};
@@ -113,16 +114,16 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: { message: 'no rows' } }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'no rows' } }),
           };
         }
         if (table === 'custom_puzzles') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockPuzzleRow, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockPuzzleRow, error: null }),
           };
         }
         return {};
@@ -144,9 +145,9 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockStats, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockStats, error: null }),
           };
         }
         return {};
@@ -202,23 +203,23 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockStats, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockStats, error: null }),
           };
         }
         if (table === 'custom_puzzle_attempts') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockAttempt, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockAttempt, error: null }),
           };
         }
         if (table === 'custom_puzzle_leaderboard') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockRank, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockRank, error: null }),
           };
         }
         return {};
@@ -244,23 +245,23 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockStats, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockStats, error: null }),
           };
         }
         if (table === 'custom_puzzle_attempts') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockAttempt, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockAttempt, error: null }),
           };
         }
         if (table === 'custom_puzzle_leaderboard') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           };
         }
         return {};
@@ -276,9 +277,9 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockStats, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockStats, error: null }),
           };
         }
         return {};
@@ -297,32 +298,32 @@ describe('GET /api/custom-puzzle/[puzzleCode]/stats', () => {
         completed_at: '2026-01-02T00:00:00Z',
       };
 
-      const eqMock = jest.fn().mockReturnThis();
+      const eqMock = vi.fn().mockReturnThis();
       eqMock.mockImplementation(() => ({
         eq: eqMock,
-        single: jest.fn().mockResolvedValue({ data: mockAttempt, error: null }),
+        single: vi.fn().mockResolvedValue({ data: mockAttempt, error: null }),
       }));
 
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzle_stats') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockStats, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockStats, error: null }),
           };
         }
         if (table === 'custom_puzzle_attempts') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockAttempt, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockAttempt, error: null }),
           };
         }
         if (table === 'custom_puzzle_leaderboard') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           };
         }
         return {};

@@ -6,21 +6,21 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock all heavy dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, locale: 'en' }),
 }));
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null, profile: null, isAuthenticated: false }),
 }));
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
   m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => <div data-testid="mascot" />,
 }));
-jest.mock('../results', () => ({
+vi.mock('../results', () => ({
   ResultDisplay: () => <div data-testid="result-display" />,
   PerformanceSection: () => <div data-testid="performance-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
@@ -30,9 +30,9 @@ jest.mock('../results', () => ({
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
 }));
-jest.mock('../TabbedDailyLeaderboard', () => function MockLeaderboard() { return <div data-testid="leaderboard" />; });
-jest.mock('@/components/auth/DailyChallengeInlineSignup', () => function MockInlineSignup() { return <div data-testid="inline-signup" />; });
-jest.mock('../WatchAdButton', () => function MockWatchAdButton() { return <div data-testid="watch-ad" />; });
+vi.mock('../TabbedDailyLeaderboard', () => function MockLeaderboard() { return <div data-testid="leaderboard" />; });
+vi.mock('@/components/auth/DailyChallengeInlineSignup', () => function MockInlineSignup() { return <div data-testid="inline-signup" />; });
+vi.mock('../WatchAdButton', () => function MockWatchAdButton() { return <div data-testid="watch-ad" />; });
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 
@@ -63,42 +63,42 @@ const baseProps: WordHuntResultsContentProps = {
   emojiWords: [{ word: 'HELLO', found: true }],
   stats: null,
   shareHandlers: {
-    handleNativeShare: jest.fn(),
-    handleChallengeShare: jest.fn(),
-    handleWhatsApp: jest.fn(),
-    handleTwitter: jest.fn(),
-    handleTelegram: jest.fn(),
-    handleCopy: jest.fn(),
-    handleDownloadShareImage: jest.fn(),
-    handleLinkedIn: jest.fn(),
-    handleFacebook: jest.fn(),
-    handleEmail: jest.fn(),
-    handleSMS: jest.fn(),
+    handleNativeShare: vi.fn(),
+    handleChallengeShare: vi.fn(),
+    handleWhatsApp: vi.fn(),
+    handleTwitter: vi.fn(),
+    handleTelegram: vi.fn(),
+    handleCopy: vi.fn(),
+    handleDownloadShareImage: vi.fn(),
+    handleLinkedIn: vi.fn(),
+    handleFacebook: vi.fn(),
+    handleEmail: vi.fn(),
+    handleSMS: vi.fn(),
     copied: false,
     isGeneratingImage: false,
     showSharePanel: false,
-    setShowSharePanel: jest.fn(),
+    setShowSharePanel: vi.fn(),
     ogImageUrl: null,
   },
   coinActions: {
     coinReward: { awarded: 15, breakdown: { base: 10, streak: 5, efficiency: 0 } },
-    handleRetryChallenge: jest.fn(),
+    handleRetryChallenge: vi.fn(),
     canAffordRetry: true,
     retryCost: 50,
     currentCoins: 100,
     targetWordRevealed: false,
     revealCost: 25,
-    handleRevealTargetWord: jest.fn(),
+    handleRevealTargetWord: vi.fn(),
   },
   isAuthenticated: false,
   inlineSignupDismissed: false,
-  onInlineSignupDismiss: jest.fn(),
+  onInlineSignupDismiss: vi.fn(),
   leaderboardKey: 0,
   profile: null,
   guestFingerprint: null,
-  onGameLanguageChange: jest.fn(),
-  onShowCreatePuzzle: jest.fn(),
-  onSpendStart: jest.fn(),
+  onGameLanguageChange: vi.fn(),
+  onShowCreatePuzzle: vi.fn(),
+  onSpendStart: vi.fn(),
   t: ((k: string) => k) as WordHuntResultsContentProps['t'],
 };
 

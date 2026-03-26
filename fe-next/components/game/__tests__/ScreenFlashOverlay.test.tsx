@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import { ScreenFlashOverlay } from '../ScreenFlashOverlay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, ...rest } = props;
@@ -15,11 +15,11 @@ jest.mock('framer-motion', () => ({
 
 describe('ScreenFlashOverlay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders nothing when trigger is 0', () => {
@@ -39,7 +39,7 @@ describe('ScreenFlashOverlay', () => {
     expect(screen.getByTestId('screen-flash')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(screen.queryByTestId('screen-flash')).not.toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('ScreenFlashOverlay', () => {
     rerender(<ScreenFlashOverlay trigger={1} />);
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     expect(screen.queryByTestId('screen-flash')).not.toBeInTheDocument();

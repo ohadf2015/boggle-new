@@ -18,7 +18,7 @@ describe('WordHuntLoginModal', () => {
   it('component accepts required props', () => {
     const props = {
       isOpen: true,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
     };
 
     // Check that props match expected interface

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 import type { GameModeStats } from '@/lib/landing/fetchGameModeStats';
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
     const safe = { ...props };
     for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
@@ -17,15 +17,15 @@ jest.mock('framer-motion', () => {
   return { motion: motionObj, AnimatePresence };
 });
 
-jest.mock('../ModeCard', () => {
+vi.mock('../ModeCard', () => {
   const ModeCard = ({ title }: any) => <div data-testid="mode-card">{title}</div>;
   ModeCard.displayName = 'ModeCard';
   return { __esModule: true, default: ModeCard };
 });
-jest.mock('@/utils/contextualGuidanceStorage', () => ({
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
-jest.mock('@/components/daily/DailyChallengeBanner', () => {
+vi.mock('@/components/daily/DailyChallengeBanner', () => {
   const DailyChallengeBanner = () => <div data-testid="daily-banner">daily</div>;
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
   return { __esModule: true, default: DailyChallengeBanner };

@@ -20,19 +20,19 @@ const mockHUDTheme = {
   hintActiveText: 'text-emerald-950',
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useHUDTheme: () => mockHUDTheme,
 }));
 
 // Mock Framer Motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('../../../../hooks/usePrefersReducedMotion', () => ({
+vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 

@@ -11,20 +11,20 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useCinematic — control isStalled from tests
-const mockUseCinematic = jest.fn();
-jest.mock('../../../../../hooks/useCinematic', () => ({
-  ...jest.requireActual('../../../../../hooks/useCinematic'),
+const mockUseCinematic = vi.fn();
+vi.mock('../../../../../hooks/useCinematic', () => ({
+  ...vi.importActual('../../../../../hooks/useCinematic'),
   useCinematic: (...args: unknown[]) => mockUseCinematic(...args),
 }));
 
 // Mock useDevicePerformance — control isMobile from tests
-const mockUseDevicePerformance = jest.fn();
-jest.mock('../../../../../hooks/useDevicePerformance', () => ({
+const mockUseDevicePerformance = vi.fn();
+vi.mock('../../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => mockUseDevicePerformance(),
 }));
 
 // Mock CinematicFallback so we can detect when it renders
-jest.mock('../CinematicFallback', () => ({
+vi.mock('../CinematicFallback', () => ({
   CinematicFallback: (props: Record<string, unknown>) => (
     <div data-testid="cinematic-fallback" data-type={props.cinematicType}>
       Fallback Active
@@ -33,17 +33,17 @@ jest.mock('../CinematicFallback', () => ({
 }));
 
 // Mock Remotion Player
-jest.mock('@remotion/player', () => ({
-  Player: jest.fn(() => <div data-testid="mock-remotion-player">Mock Player</div>),
+vi.mock('@remotion/player', () => ({
+  Player: vi.fn(() => <div data-testid="mock-remotion-player">Mock Player</div>),
 }));
 
 // Mock usePrefersReducedMotion
-jest.mock('../../../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(() => false),
+vi.mock('../../../../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(() => false),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const safeProps: Record<string, unknown> = {};
@@ -59,7 +59,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('../../../../../contexts/LanguageContext', () => ({
+vi.mock('../../../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -74,7 +74,7 @@ jest.mock('../../../../../contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 import { CinematicPlayer } from '../CinematicPlayer';
 
@@ -90,11 +90,11 @@ function createCinematicReturn(overrides: Record<string, unknown> = {}) {
     durationFrames: 240,
     isComplete: false,
     isStalled: false,
-    skip: jest.fn(),
-    play: jest.fn(),
-    pause: jest.fn(),
-    reset: jest.fn(),
-    handleFrameUpdate: jest.fn(),
+    skip: vi.fn(),
+    play: vi.fn(),
+    pause: vi.fn(),
+    reset: vi.fn(),
+    handleFrameUpdate: vi.fn(),
     ...overrides,
   };
 }
@@ -120,12 +120,12 @@ describe('CinematicPlayer - stall fallback', () => {
   const defaultProps = {
     composition: MockComposition,
     durationSeconds: 8,
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
     fallbackType: 'victory' as const,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn());
     mockUseDevicePerformance.mockReturnValue(createDevicePerf());
@@ -162,12 +162,12 @@ describe('CinematicPlayer - mobile bypass', () => {
   const defaultProps = {
     composition: MockComposition,
     durationSeconds: 8,
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
     fallbackType: 'victory' as const,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn());
   });
@@ -203,12 +203,12 @@ describe('CinematicPlayer - mobile error text', () => {
   const defaultProps = {
     composition: MockComposition,
     durationSeconds: 8,
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
     fallbackType: 'victory' as const,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn({ canSkip: true }));
   });

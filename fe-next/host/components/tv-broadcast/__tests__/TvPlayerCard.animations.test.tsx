@@ -1,11 +1,12 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvPlayerCard from '../TvPlayerCard';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -58,14 +59,14 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock Avatar
-jest.mock('../../../../components/Avatar', () => {
-  return function MockAvatar({ className }: any) {
+vi.mock('../../../../components/Avatar', () => ({
+  default: function MockAvatar({ className }: any) {
     return <div data-testid="avatar" className={className} />;
   };
 });
 
 // Mock AnimatedCounter
-jest.mock('../../../../components/ui/AnimatedCounter', () => ({
+vi.mock('../../../../components/ui/AnimatedCounter', () => ({
   AnimatedCounter: ({ value, className }: any) => (
     <span data-testid="animated-counter" className={className}>
       {value}
@@ -80,7 +81,7 @@ jest.mock('../../../../components/ui/AnimatedCounter', () => ({
 }));
 
 // Mock useDevicePerformance
-jest.mock('../../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -102,11 +103,11 @@ const defaultProps = {
 
 describe('TvPlayerCard animations', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Animated score counter', () => {
@@ -154,7 +155,7 @@ describe('TvPlayerCard animations', () => {
 
       // Advance timer past 600ms
       act(() => {
-        jest.advanceTimersByTime(700);
+        vi.advanceTimersByTime(700);
       });
 
       expect(container.querySelector('.ring-neo-yellow')).toBeNull();
@@ -201,7 +202,7 @@ describe('TvPlayerCard animations', () => {
       expect(screen.getByLabelText('tvBroadcast.rankUp')).toBeInTheDocument();
 
       act(() => {
-        jest.advanceTimersByTime(3100);
+        vi.advanceTimersByTime(3100);
       });
 
       expect(screen.queryByLabelText('tvBroadcast.rankUp')).toBeNull();

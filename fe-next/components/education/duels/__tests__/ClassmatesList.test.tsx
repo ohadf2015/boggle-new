@@ -14,14 +14,14 @@ import type { ClassroomStudent } from '@/lib/supabase/education';
 // ============================================
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock ChallengeButton
-jest.mock('../ChallengeButton', () => ({
+vi.mock('../ChallengeButton', () => ({
   ChallengeButton: ({ opponentId, variant }: any) => (
     <div data-testid={`challenge-button-${variant}`} data-opponent-id={opponentId}>
       Challenge Button

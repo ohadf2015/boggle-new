@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import StreakBonusIndicator from './StreakBonusIndicator';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     dir: 'ltr',
@@ -25,7 +25,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       return <div className={className} style={style} {...props}>{children}</div>;

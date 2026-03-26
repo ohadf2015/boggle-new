@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 
 // ---- Mocks ----
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
     span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
@@ -20,7 +20,7 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useShouldReduceMotion: () => false,
 }));
 

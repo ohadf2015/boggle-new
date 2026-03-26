@@ -10,11 +10,11 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
       return <div ref={ref} {...props}>{children}</div>;
@@ -28,7 +28,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -44,7 +44,7 @@ const baseProps = {
   isBoss: false,
   worldAccentColor: '#22c55e',
   glowColor: '#22c55e',
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 describe('RPGLevelCard', () => {

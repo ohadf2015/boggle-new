@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import BlastBoardIntensity from '../BlastBoardIntensity';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  useReducedMotion: jest.fn(() => false),
+vi.mock('framer-motion', () => ({
+  useReducedMotion: vi.fn(() => false),
 }));
 
 describe('BlastBoardIntensity', () => {

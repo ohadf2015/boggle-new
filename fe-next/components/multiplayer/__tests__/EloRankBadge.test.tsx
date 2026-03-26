@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import { EloRankBadge } from '../EloRankBadge';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} style={style as React.CSSProperties}>{children}</div>

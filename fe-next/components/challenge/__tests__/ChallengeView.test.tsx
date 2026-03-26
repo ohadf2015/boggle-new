@@ -4,13 +4,13 @@ import userEvent from '@testing-library/user-event';
 import ChallengeView from '../ChallengeView';
 
 // --- Mock next/navigation ---
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 // --- Mock LanguageContext ---
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     t: (key: string) => key,
@@ -18,7 +18,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // --- Mock AuthContext ---
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'user-1' },
     profile: { username: 'TestUser', avatar_emoji: '🎯', avatar_color: '#333' },
@@ -27,28 +27,28 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 // --- Mock ThemeContext ---
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
 // --- Mock guestManager ---
-jest.mock('@/utils/guestManager', () => ({
-  getGuestSessionId: jest.fn().mockReturnValue('guest-session-id'),
+vi.mock('@/utils/guestManager', () => ({
+  getGuestSessionId: vi.fn().mockReturnValue('guest-session-id'),
 }));
 
 // --- Mock challenges utils ---
-const mockGetChallenge = jest.fn();
-const mockParseGridSeed = jest.fn();
-const mockRecordChallengeAttempt = jest.fn();
+const mockGetChallenge = vi.fn();
+const mockParseGridSeed = vi.fn();
+const mockRecordChallengeAttempt = vi.fn();
 
-jest.mock('@/utils/challenges', () => ({
+vi.mock('@/utils/challenges', () => ({
   getChallenge: (...args: unknown[]) => mockGetChallenge(...args),
   parseGridSeed: (...args: unknown[]) => mockParseGridSeed(...args),
   recordChallengeAttempt: (...args: unknown[]) => mockRecordChallengeAttempt(...args),
 }));
 
 // --- Mock SinglePlayerGame ---
-jest.mock('@/components/singleplayer/SinglePlayerGame', () =>
+vi.mock('@/components/singleplayer/SinglePlayerGame', () =>
   function MockSinglePlayerGame({ onGameEnd, onQuit }: { onGameEnd: (r: any) => void; onQuit: () => void }) {
     return (
       <div data-testid="single-player-game">
@@ -64,7 +64,7 @@ jest.mock('@/components/singleplayer/SinglePlayerGame', () =>
 );
 
 // --- Mock ChallengeResults ---
-jest.mock('../ChallengeResults', () =>
+vi.mock('../ChallengeResults', () =>
   function MockChallengeResults({ onPlayAgain, onBackToHome }: { onPlayAgain: () => void; onBackToHome: () => void }) {
     return (
       <div data-testid="challenge-results">
@@ -76,13 +76,13 @@ jest.mock('../ChallengeResults', () =>
 );
 
 // --- Mock PageLoader ---
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   __esModule: true,
   PageLoader: ({ text }: { text: string }) => <div data-testid="page-loader">{text}</div>,
 }));
 
 // --- Mock framer-motion ---
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { animate, initial, transition, ...restProps } = props;
@@ -125,7 +125,7 @@ const mockGrid = [
 
 describe('ChallengeView', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockParseGridSeed.mockReturnValue(mockGrid);
     mockRecordChallengeAttempt.mockResolvedValue({
       beatCreator: true,

@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -23,13 +23,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useReducedMotion
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
-  default: jest.fn(() => false),
+  default: vi.fn(() => false),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef(
     (
       { children, ...props }: React.PropsWithChildren<Record<string, unknown>>,
@@ -53,16 +53,16 @@ import { PowerHourActivation } from '../PowerHourActivation';
 
 describe('PowerHourActivation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render activation message when visible', () => {
-    render(<PowerHourActivation visible onDismiss={jest.fn()} />);
+    render(<PowerHourActivation visible onDismiss={vi.fn()} />);
 
     expect(screen.getByText('Power Hour Activated!')).toBeInTheDocument();
     expect(
@@ -72,31 +72,31 @@ describe('PowerHourActivation', () => {
 
   it('should not render when not visible', () => {
     const { container } = render(
-      <PowerHourActivation visible={false} onDismiss={jest.fn()} />
+      <PowerHourActivation visible={false} onDismiss={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
 
   it('should auto-dismiss after 3 seconds', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(<PowerHourActivation visible onDismiss={onDismiss} />);
 
     expect(onDismiss).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it('should show lightning bolt icon', () => {
-    render(<PowerHourActivation visible onDismiss={jest.fn()} />);
+    render(<PowerHourActivation visible onDismiss={vi.fn()} />);
     expect(screen.getByTestId('power-hour-bolt')).toBeInTheDocument();
   });
 
   it('should have neo-cyan glow styling', () => {
-    render(<PowerHourActivation visible onDismiss={jest.fn()} />);
+    render(<PowerHourActivation visible onDismiss={vi.fn()} />);
     const container = screen.getByTestId('power-hour-activation');
     expect(container.className).toContain('neo-cyan');
   });

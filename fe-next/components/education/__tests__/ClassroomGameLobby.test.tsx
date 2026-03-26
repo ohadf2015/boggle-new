@@ -10,34 +10,34 @@ import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'teacher-123', email: 'teacher@test.com' },
     profile: { display_name: 'Test Teacher' },
   }),
 }));
 
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
 }));
 
-jest.mock('socket.io-client');
-jest.mock('@/lib/supabase/education');
+vi.mock('socket.io-client');
+vi.mock('@/lib/supabase/education');
 
 const mockSocket = {
-  emit: jest.fn(),
-  on: jest.fn(),
-  disconnect: jest.fn(),
+  emit: vi.fn(),
+  on: vi.fn(),
+  disconnect: vi.fn(),
 };
 
 (io as jest.Mock).mockReturnValue(mockSocket);
@@ -68,7 +68,7 @@ const mockClassrooms = [
 
 describe('ClassroomGameLobby (Wizard)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
       data: mockLessons,
     });
@@ -86,13 +86,13 @@ describe('ClassroomGameLobby (Wizard)', () => {
         new Promise(() => {}) // Never resolves
       );
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       expect(screen.getByRole('progressbar')).toBeInTheDocument();
     });
 
     it('should fetch lessons and classrooms on mount', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(supabaseTeacher.getLessons).toHaveBeenCalled();
@@ -103,7 +103,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
 
   describe('Step 1: Selection', () => {
     it('should show step 1 of 2', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(screen.getByText(/Step 1 of 2/i)).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should display classroom selector', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(screen.getByText('Class A')).toBeInTheDocument();
@@ -120,7 +120,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should pre-select first classroom by default', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const classAOption = screen.getByRole('radio', { name: /Class A/i });
@@ -129,7 +129,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should display lesson selector with buttons', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(screen.getByText(/Unit 1: Colors/i)).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
 
     it('should pre-select initial lesson if provided', async () => {
       render(
-        <ClassroomGameLobby initialLessonId="lesson-1" onBack={jest.fn()} />
+        <ClassroomGameLobby initialLessonId="lesson-1" onBack={vi.fn()} />
       );
 
       await waitFor(() => {
@@ -149,7 +149,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should allow selecting multiple lessons', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -164,7 +164,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should disable Next button when no lessons selected', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const nextButton = screen.getByText('common.next');
@@ -173,7 +173,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should enable Next button when lessons selected', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -185,7 +185,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should show word count for selected lessons', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -202,7 +202,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
 
   describe('Step 2: Review & Start', () => {
     it('should show step 2 of 2 after clicking Next', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -218,7 +218,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should display generated game code', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -237,7 +237,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should show Copy Code button', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -253,7 +253,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should show smart defaults for settings', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -271,7 +271,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should collapse advanced settings by default', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -289,7 +289,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should show Back button to return to step 1', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         const lesson1Button = screen.getByText(/Unit 1: Colors/i).closest('button');
@@ -306,7 +306,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should return to step 1 when Back is clicked', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Go to step 2
       await waitFor(() => {
@@ -336,7 +336,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
 
   describe('Game Creation', () => {
     it('should emit createClassroomGame event when Start Game clicked', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Select lesson
       await waitFor(() => {
@@ -367,7 +367,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should stay in education section until game starts', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Select lesson
       await waitFor(() => {
@@ -386,7 +386,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should navigate to multiplayer after game created', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Wait for socket to be set up
       await waitFor(() => {
@@ -409,7 +409,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should navigate with room= param (not code=) for multiplayer compatibility', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(mockSocket.on).toHaveBeenCalled();
@@ -429,9 +429,9 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should store lessonGameData in sessionStorage before emitting socket event', async () => {
-      const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+      const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Select lesson
       await waitFor(() => {
@@ -489,7 +489,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         data: [],
       });
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(
@@ -503,7 +503,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         data: [],
       });
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(
@@ -517,7 +517,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         data: [],
       });
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         fireEvent.click(screen.getByText('education.classroomGame.createClassroom'));
@@ -531,7 +531,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         data: [],
       });
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         expect(
@@ -545,7 +545,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
         data: [],
       });
 
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       await waitFor(() => {
         fireEvent.click(screen.getByText('education.classroomGame.createLesson'));
@@ -555,7 +555,7 @@ describe('ClassroomGameLobby (Wizard)', () => {
     });
 
     it('should show error toast on socket error', async () => {
-      render(<ClassroomGameLobby initialLessonId="" onBack={jest.fn()} />);
+      render(<ClassroomGameLobby initialLessonId="" onBack={vi.fn()} />);
 
       // Wait for socket to be set up
       await waitFor(() => {

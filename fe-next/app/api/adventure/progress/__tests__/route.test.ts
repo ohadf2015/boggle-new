@@ -1,30 +1,31 @@
+import { vi } from 'vitest';
 // @ts-nocheck
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
-jest.mock('@/utils/sentry', () => ({ captureApiError: jest.fn() }));
+vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeGetRequest(): NextRequest {
   return {
@@ -65,7 +66,7 @@ const mockCompletionRows = [
 
 describe('GET /api/adventure/progress', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
@@ -90,9 +91,9 @@ describe('GET /api/adventure/progress', () => {
         if (callCount === 1) {
           // player_progression
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: mockProgressionRow,
                   error: null,
                 }),
@@ -102,10 +103,10 @@ describe('GET /api/adventure/progress', () => {
         }
         // level_completions
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                order: vi.fn().mockResolvedValue({
                   data: mockCompletionRows,
                   error: null,
                 }),
@@ -132,9 +133,9 @@ describe('GET /api/adventure/progress', () => {
         callCount++;
         if (callCount === 1) {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'PGRST116', message: 'No rows' },
                 }),
@@ -143,10 +144,10 @@ describe('GET /api/adventure/progress', () => {
           };
         }
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                order: vi.fn().mockResolvedValue({
                   data: [],
                   error: null,
                 }),
@@ -172,9 +173,9 @@ describe('GET /api/adventure/progress', () => {
         callCount++;
         if (callCount === 1) {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'INTERNAL', message: 'DB down' },
                 }),
@@ -183,10 +184,10 @@ describe('GET /api/adventure/progress', () => {
           };
         }
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                order: vi.fn().mockResolvedValue({
                   data: [],
                   error: null,
                 }),
@@ -207,9 +208,9 @@ describe('GET /api/adventure/progress', () => {
         callCount++;
         if (callCount === 1) {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: mockProgressionRow,
                   error: null,
                 }),
@@ -218,10 +219,10 @@ describe('GET /api/adventure/progress', () => {
           };
         }
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                order: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'INTERNAL', message: 'DB down' },
                 }),
@@ -242,7 +243,7 @@ describe('GET /api/adventure/progress', () => {
 
 describe('POST /api/adventure/progress', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -265,9 +266,9 @@ describe('POST /api/adventure/progress', () => {
         if (callCount === 1) {
           // Check existing
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'PGRST116' },
                 }),
@@ -277,9 +278,9 @@ describe('POST /api/adventure/progress', () => {
         }
         // Insert
         return {
-          insert: jest.fn().mockReturnValue({
-            select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+          insert: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: {
                   user_id: 'user-1',
                   player_level: 1,
@@ -313,9 +314,9 @@ describe('POST /api/adventure/progress', () => {
   describe('Conflict', () => {
     it('returns 409 when progression already exists', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { user_id: 'user-1' },
               error: null,
             }),
@@ -336,9 +337,9 @@ describe('POST /api/adventure/progress', () => {
         callCount++;
         if (callCount === 1) {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'PGRST116' },
                 }),
@@ -347,9 +348,9 @@ describe('POST /api/adventure/progress', () => {
           };
         }
         return {
-          insert: jest.fn().mockReturnValue({
-            select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+          insert: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: null,
                 error: { message: 'Insert failed' },
               }),

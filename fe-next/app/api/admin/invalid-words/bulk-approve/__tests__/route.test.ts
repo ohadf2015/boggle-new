@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Bulk Approve Invalid Words API Tests
  *
@@ -5,20 +6,20 @@
  */
 
 // Mock Next.js server runtime BEFORE any imports
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn(),
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status || 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status || 200 })),
   },
 }));
 
 // Mock Supabase - use functions that can be overridden per-test
-const mockSupabaseFrom = jest.fn();
-const mockSupabaseSelect = jest.fn();
-const mockSupabaseIn = jest.fn();
-const mockSupabaseUpsert = jest.fn();
-const mockSupabaseUpdate = jest.fn();
-const mockSupabaseEq = jest.fn();
+const mockSupabaseFrom = vi.fn();
+const mockSupabaseSelect = vi.fn();
+const mockSupabaseIn = vi.fn();
+const mockSupabaseUpsert = vi.fn();
+const mockSupabaseUpdate = vi.fn();
+const mockSupabaseEq = vi.fn();
 
 // Test data
 let mockSelectData: unknown[] = [];
@@ -26,7 +27,7 @@ let mockSelectData: unknown[] = [];
 let mockUpsertResults: Array<{ error: { message: string } | null }> = [];
 let upsertCallIndex = 0;
 
-jest.mock('@supabase/supabase-js', () => ({
+vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: (table: string) => {
       mockSupabaseFrom(table);
@@ -70,8 +71,8 @@ jest.mock('@supabase/supabase-js', () => ({
 }));
 
 // Mock admin auth
-jest.mock('@/lib/auth/adminAuth', () => ({
-  verifyAdminAuth: jest.fn(),
+vi.mock('@/lib/auth/adminAuth', () => ({
+  verifyAdminAuth: vi.fn(),
   AdminUser: {},
 }));
 
@@ -84,7 +85,7 @@ const mockAdminUser = {
 
 describe('Bulk Approve Invalid Words API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSelectData = [];
     mockUpsertResults = [];
     upsertCallIndex = 0;

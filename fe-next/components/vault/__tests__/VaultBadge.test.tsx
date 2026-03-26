@@ -22,7 +22,7 @@ const mockT = (key: string, params?: Record<string, string>) => {
   return result;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',

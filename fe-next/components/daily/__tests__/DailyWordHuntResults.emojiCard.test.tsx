@@ -11,7 +11,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // ── Mascot mock ──────────────────────────────────────────────────────────────
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
@@ -21,12 +21,12 @@ jest.mock('@/components/ui/Mascot', () => ({
 }));
 
 // ── Language context ─────────────────────────────────────────────────────────
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k }),
 }));
 
 // ── Auth context ─────────────────────────────────────────────────────────────
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
@@ -35,14 +35,14 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 // ── Auth utils ───────────────────────────────────────────────────────────────
-jest.mock('@/contexts/auth/authUtils', () => ({
-  fetchGeolocation: jest.fn().mockResolvedValue({ countryCode: 'US' }),
+vi.mock('@/contexts/auth/authUtils', () => ({
+  fetchGeolocation: vi.fn().mockResolvedValue({ countryCode: 'US' }),
 }));
 
 // ── Daily challenge utilities ────────────────────────────────────────────────
-jest.mock('@/utils/dailyChallenge', () => ({
-  getGuestFingerprint: jest.fn().mockResolvedValue('test-fp'),
-  getGuestDailyPlayer: jest.fn().mockResolvedValue({
+vi.mock('@/utils/dailyChallenge', () => ({
+  getGuestFingerprint: vi.fn().mockResolvedValue('test-fp'),
+  getGuestDailyPlayer: vi.fn().mockResolvedValue({
     displayName: 'TestGuest',
     avatarEmoji: '🎯',
     avatarColor: '#6366f1',
@@ -53,12 +53,12 @@ jest.mock('@/utils/dailyChallenge', () => ({
 }));
 
 // ── Word normalization ───────────────────────────────────────────────────────
-jest.mock('@/shared/utils/wordNormalization', () => ({
+vi.mock('@/shared/utils/wordNormalization', () => ({
   applyHebrewFinalLetters: (w: string) => w,
 }));
 
 // ── framer-motion ────────────────────────────────────────────────────────────
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
@@ -73,7 +73,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // ── next/image ───────────────────────────────────────────────────────────────
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt }: { src: string; alt: string }) => (
     // eslint-disable-next-line @next/next/no-img-element
@@ -82,7 +82,7 @@ jest.mock('next/image', () => ({
 }));
 
 // ── useDevicePerformance ─────────────────────────────────────────────────────
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
     enableComplexAnimations: false,
@@ -90,35 +90,35 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // ── react-dom createPortal ────────────────────────────────────────────────────
-jest.mock('react-dom', () => ({
-  ...jest.requireActual('react-dom'),
+vi.mock('react-dom', () => ({
+  ...vi.importActual('react-dom'),
   createPortal: (node: React.ReactNode) => node,
 }));
 
 // ── mockChallengeShare for verifying it gets passed through ──────────────────
-const mockHandleChallengeShare = jest.fn();
+const mockHandleChallengeShare = vi.fn();
 
 // ── Results sub-components ───────────────────────────────────────────────────
-jest.mock('../results', () => ({
+vi.mock('../results', () => ({
   useShareHandlers: () => ({
-    handleNativeShare: jest.fn(),
-    handleWhatsApp: jest.fn(),
-    handleTwitter: jest.fn(),
-    handleTelegram: jest.fn(),
-    handleLinkedIn: jest.fn(),
-    handleFacebook: jest.fn(),
-    handleEmail: jest.fn(),
-    handleSMS: jest.fn(),
-    handleCopy: jest.fn(),
-    handleDownloadShareImage: jest.fn(),
+    handleNativeShare: vi.fn(),
+    handleWhatsApp: vi.fn(),
+    handleTwitter: vi.fn(),
+    handleTelegram: vi.fn(),
+    handleLinkedIn: vi.fn(),
+    handleFacebook: vi.fn(),
+    handleEmail: vi.fn(),
+    handleSMS: vi.fn(),
+    handleCopy: vi.fn(),
+    handleDownloadShareImage: vi.fn(),
     handleChallengeShare: mockHandleChallengeShare,
     copied: false,
     isGeneratingImage: false,
     ogImageUrl: null,
     showSharePanel: false,
-    setShowSharePanel: jest.fn(),
+    setShowSharePanel: vi.fn(),
   }),
-  useResultSubmission: jest.fn(),
+  useResultSubmission: vi.fn(),
   useCoinActions: () => ({
     coinReward: { awarded: 10, breakdown: { base: 5, efficiency: 3, streak: 2 } },
     canAffordRetry: false,
@@ -126,10 +126,10 @@ jest.mock('../results', () => ({
     currentCoins: 0,
     revealCost: 20,
     targetWordRevealed: false,
-    handleRetryChallenge: jest.fn(),
-    handleRevealTargetWord: jest.fn(),
+    handleRetryChallenge: vi.fn(),
+    handleRevealTargetWord: vi.fn(),
   }),
-  useConfettiEffects: () => ({ handleBadgeClickConfetti: jest.fn() }),
+  useConfettiEffects: () => ({ handleBadgeClickConfetti: vi.fn() }),
   ScoreBadge: () => <div data-testid="score-badge" />,
   ResultDisplay: () => <div data-testid="result-display" />,
   PerformanceSection: () => <div data-testid="performance-section" />,
@@ -153,68 +153,68 @@ jest.mock('../results', () => ({
 }));
 
 // ── Inline sub-components ────────────────────────────────────────────────────
-jest.mock('@/components/auth/DailyChallengeInlineSignup', () =>
+vi.mock('@/components/auth/DailyChallengeInlineSignup', () =>
   function MockInlineSignup() {
     return <div data-testid="inline-signup" />;
   }
 );
 
-jest.mock('../StreakMilestoneCelebration', () =>
+vi.mock('../StreakMilestoneCelebration', () =>
   function MockStreakMilestone() {
     return <div data-testid="streak-milestone" />;
   }
 );
 
-jest.mock('../TabbedDailyLeaderboard', () =>
+vi.mock('../TabbedDailyLeaderboard', () =>
   function MockLeaderboard() {
     return <div data-testid="tabbed-leaderboard" />;
   }
 );
 
-jest.mock('../WatchAdButton', () =>
+vi.mock('../WatchAdButton', () =>
   function MockWatchAd() {
     return <div data-testid="watch-ad" />;
   }
 );
 
-jest.mock('@/components/custom-puzzle/CustomPuzzleCreator', () =>
+vi.mock('@/components/custom-puzzle/CustomPuzzleCreator', () =>
   function MockCustomPuzzle() {
     return <div data-testid="custom-puzzle" />;
   }
 );
 
-jest.mock('@/components/animations/CoinSpendAnimation', () => ({
+vi.mock('@/components/animations/CoinSpendAnimation', () => ({
   CoinSpendAnimation: () => <div data-testid="coin-spend" />,
 }));
 
-jest.mock('@/components/layout/MobileTabBar', () => ({
+vi.mock('@/components/layout/MobileTabBar', () => ({
   MobileTabBar: () => <div data-testid="mobile-tab-bar" />,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: string[]) => args.filter(Boolean).join(' '),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
-jest.mock('@/utils/mascotConfig', () => ({
+vi.mock('@/utils/mascotConfig', () => ({
   FLEXING_SCORE_THRESHOLD: 0.6,
   ENCOURAGING_SCORE_THRESHOLD: 0.4,
 }));
 
-jest.mock('../WinCinematic', () => ({
+vi.mock('../WinCinematic', () => ({
   WinCinematic: () => null,
 }));
 
-jest.mock('@/components/results/WordHuntPromoPopup', () => {
+vi.mock('@/components/results/WordHuntPromoPopup', () => {
   const React = require('react');
   return React.forwardRef(function MockWordHuntPromoPopup(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
     return React.createElement('div', { ...props, ref, 'data-testid': 'word-hunt-promo-popup' });
@@ -256,14 +256,14 @@ const baseProps: DailyWordHuntResultsProps = {
   language: 'en',
   countdown: '12:00:00',
   isNewCompletion: false,
-  onBack: jest.fn(),
-  onRetry: jest.fn(),
+  onBack: vi.fn(),
+  onRetry: vi.fn(),
 };
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe('DailyWordHuntResults - EmojiShareCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders EmojiShareCard when solved=true and words exist', () => {

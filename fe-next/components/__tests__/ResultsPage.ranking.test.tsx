@@ -28,26 +28,26 @@ globalThis.__TEST_BANNER_PROPS__ = null;
 globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
 
 // Mock all heavy dependencies
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     user: null,
   }),
 }));
 
-jest.mock('@/hooks/useWinStreak', () => ({
+vi.mock('@/hooks/useWinStreak', () => ({
   useWinStreak: () => ({
     currentStreak: 0,
     bestStreak: 0,
-    recordWin: jest.fn(),
+    recordWin: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -63,13 +63,13 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('canvas-confetti', () => ({
+vi.mock('canvas-confetti', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }));
 
 // Mock next/dynamic - return null components for all dynamic imports
-jest.mock('next/dynamic', () => ({
+vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => {
     const React = require('react');
@@ -80,7 +80,7 @@ jest.mock('next/dynamic', () => ({
 }));
 
 // Mock ResultsMainContent to capture currentPlayerRank
-jest.mock('@/components/results/ResultsMainContent', () => ({
+vi.mock('@/components/results/ResultsMainContent', () => ({
   __esModule: true,
   ResultsMainContent: (props: any) => {
     globalThis.__TEST_MAIN_CONTENT_PROPS__ = {
@@ -95,41 +95,41 @@ jest.mock('@/components/results/ResultsMainContent', () => ({
   },
 }));
 
-jest.mock('@/components/results/ResultsPlayerCard', () => ({
+vi.mock('@/components/results/ResultsPlayerCard', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ExitRoomButton', () => ({
+vi.mock('@/components/ExitRoomButton', () => ({
   __esModule: true,
   default: () => <button data-testid="exit-button">Exit</button>,
 }));
 
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/auth/FirstWinSignupModal', () => ({
+vi.mock('@/components/auth/FirstWinSignupModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/results/ShareWinPrompt', () => ({
+vi.mock('@/components/results/ShareWinPrompt', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/voting/WordFeedbackModal', () => ({
+vi.mock('@/components/voting/WordFeedbackModal', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/results/useResultsSocketEvents', () => ({
+vi.mock('@/components/results/useResultsSocketEvents', () => ({
   useResultsSocketEvents: () => ({
     showWordFeedback: false,
     wordToVote: null,
@@ -137,100 +137,100 @@ jest.mock('@/components/results/useResultsSocketEvents', () => ({
     xpGainedData: null,
     levelUpData: null,
     showLevelUpCelebration: false,
-    setShowLevelUpCelebration: jest.fn(),
+    setShowLevelUpCelebration: vi.fn(),
     nearMisses: [],
     referralMilestone: null,
     showReferralMilestone: false,
     readyUsernames: [],
     isCurrentPlayerReady: false,
-    handleVote: jest.fn(),
-    handleFeedbackSkip: jest.fn(),
-    handleReferralMilestoneClose: jest.fn(),
-    handleMarkReady: jest.fn(),
+    handleVote: vi.fn(),
+    handleFeedbackSkip: vi.fn(),
+    handleReferralMilestoneClose: vi.fn(),
+    handleMarkReady: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  shouldShowUpgradePrompt: jest.fn(() => false),
-  getGuestStatsSummary: jest.fn(() => ({ gamesPlayed: 5 })),
-  updateGuestStatsAfterGame: jest.fn(),
-  isFirstWin: jest.fn(() => false),
+vi.mock('@/utils/guestManager', () => ({
+  shouldShowUpgradePrompt: vi.fn(() => false),
+  getGuestStatsSummary: vi.fn(() => ({ gamesPlayed: 5 })),
+  updateGuestStatsAfterGame: vi.fn(),
+  isFirstWin: vi.fn(() => false),
 }));
 
-jest.mock('@/utils/growthTracking', () => ({
-  trackGameCompletion: jest.fn(),
-  trackStreakMilestone: jest.fn(),
+vi.mock('@/utils/growthTracking', () => ({
+  trackGameCompletion: vi.fn(),
+  trackStreakMilestone: vi.fn(),
 }));
 
-jest.mock('@/utils/gameHistoryManager', () => ({
-  addGameToHistory: jest.fn(),
+vi.mock('@/utils/gameHistoryManager', () => ({
+  addGameToHistory: vi.fn(),
 }));
 
-jest.mock('@/utils/coinManager', () => ({
-  awardGameCoins: jest.fn(() => null),
+vi.mock('@/utils/coinManager', () => ({
+  awardGameCoins: vi.fn(() => null),
 }));
 
-jest.mock('@/hooks/useSaveCognitiveScore', () => ({
+vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({
-    saveCognitiveScore: jest.fn().mockResolvedValue(null),
+    saveCognitiveScore: vi.fn().mockResolvedValue(null),
     isSaving: false,
   }),
 }));
 
-jest.mock('@/hooks/useFirstWinCelebration', () => ({
-  useFirstWinCelebration: jest.fn(),
+vi.mock('@/hooks/useFirstWinCelebration', () => ({
+  useFirstWinCelebration: vi.fn(),
 }));
 
-jest.mock('@/hooks/useCrazyGamesLifecycle', () => ({
-  useCrazyGamesLifecycle: jest.fn(),
+vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
+  useCrazyGamesLifecycle: vi.fn(),
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
-    refreshCoins: jest.fn(),
+    refreshCoins: vi.fn(),
   }),
 }));
 
-jest.mock('@/lib/supabase', () => ({
-  syncCoinsToDatabase: jest.fn().mockResolvedValue({}),
+vi.mock('@/lib/supabase', () => ({
+  syncCoinsToDatabase: vi.fn().mockResolvedValue({}),
 }));
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocket: () => ({
-    socket: { emit: jest.fn(), on: jest.fn(), off: jest.fn() },
+    socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
     isConnected: true,
   }),
 }));
 
-jest.mock('@/components/RoomChat', () => ({
+vi.mock('@/components/RoomChat', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/CrazyGamesBanner', () => ({
+vi.mock('@/components/CrazyGamesBanner', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
-  shouldHideExternalLogin: jest.fn(() => false),
-  useCrazyGames: jest.fn(() => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  shouldHideExternalLogin: vi.fn(() => false),
+  useCrazyGames: vi.fn(() => ({
     isAvailable: false,
     isOnCrazyGamesPlatform: false,
-    showMidgameAd: jest.fn(),
-    showRewardedAd: jest.fn(),
-    hasAdblock: jest.fn(async () => false),
-    gameplayStart: jest.fn(),
-    gameplayStop: jest.fn(),
+    showMidgameAd: vi.fn(),
+    showRewardedAd: vi.fn(),
+    hasAdblock: vi.fn(async () => false),
+    gameplayStart: vi.fn(),
+    gameplayStop: vi.fn(),
   })),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
 }));
 
 // Import after all mocks are set up
@@ -246,8 +246,8 @@ const renderResultsPage = (props: {
 }) => {
   const defaultProps = {
     gameCode: 'TEST123',
-    onReturnToRoom: jest.fn(),
-    socket: { emit: jest.fn(), on: jest.fn(), off: jest.fn() } as any,
+    onReturnToRoom: vi.fn(),
+    socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } as any,
     duplicateRuleDisabled: false,
     playerCount: 2,
     isHost: false,
@@ -267,7 +267,7 @@ describe('ResultsPage Ranking', () => {
   beforeEach(() => {
     globalThis.__TEST_BANNER_PROPS__ = null;
     globalThis.__TEST_MAIN_CONTENT_PROPS__ = null;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Player rank calculation', () => {

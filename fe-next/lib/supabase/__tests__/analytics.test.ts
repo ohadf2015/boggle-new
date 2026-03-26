@@ -1,16 +1,17 @@
+import { vi, type Mock, } from 'vitest';
 import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness, getVocabularyHeatmapData } from '../analytics';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
 describe('analytics - getClassroomMetrics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return correct studentsNeedingHelp count', async () => {
@@ -78,15 +79,15 @@ describe('analytics - getClassroomMetrics', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        gte: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -111,16 +112,16 @@ describe('analytics - getClassroomMetrics', () => {
       { student_id: 'student-3', total_xp: 300, words_attempted: {}, last_practice_date: null },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        gte: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -133,9 +134,9 @@ describe('analytics - getClassroomMetrics', () => {
 
   it('should return 0 for empty classroom', async () => {
     // GIVEN: Empty classroom
-    (supabase!.from as jest.Mock).mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    (supabase!.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     });
 
     // WHEN
@@ -163,16 +164,16 @@ describe('analytics - getClassroomMetrics', () => {
       { student_id: 'student-3', total_xp: 300, words_attempted: {}, last_practice_date: today },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        gte: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -185,7 +186,7 @@ describe('analytics - getClassroomMetrics', () => {
 
 describe('analytics - getCommonMistakes', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return top 5 words by error rate', async () => {
@@ -214,14 +215,14 @@ describe('analytics - getCommonMistakes', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -248,15 +249,15 @@ describe('analytics - getCommonMistakes', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -281,15 +282,15 @@ describe('analytics - getCommonMistakes', () => {
       { student_id: 'student-3', words_attempted: { difficult: { attempts: 10, correct: 4 } } },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -304,7 +305,7 @@ describe('analytics - getCommonMistakes', () => {
 
 describe('analytics - getStudentProgressMetrics', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return vocabulary mastery percentage', async () => {
@@ -331,16 +332,16 @@ describe('analytics - getStudentProgressMetrics', () => {
       words_attempted: {},
     };
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        maybeSingle: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockLesson, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockLesson, error: null }),
       });
 
     // WHEN
@@ -353,14 +354,14 @@ describe('analytics - getStudentProgressMetrics', () => {
 
 describe('analytics - getLessonEffectiveness', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return empty array when no lessons assigned', async () => {
     // GIVEN: No lessons assigned to classroom
-    (supabase!.from as jest.Mock).mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    (supabase!.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     });
 
     // WHEN
@@ -386,23 +387,23 @@ describe('analytics - getLessonEffectiveness', () => {
       { student_id: 'student-3' },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockAssignments, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: [mockLesson], error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -428,23 +429,23 @@ describe('analytics - getLessonEffectiveness', () => {
       { student_id: 'student-3' },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockAssignments, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: [mockLesson], error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -463,23 +464,23 @@ describe('analytics - getLessonEffectiveness', () => {
     ];
     const mockMemberships = [{ student_id: 'student-1' }];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockAssignments, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockAssignments, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: [mockLesson], error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: [mockLesson], error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -492,14 +493,14 @@ describe('analytics - getLessonEffectiveness', () => {
 
 describe('analytics - getVocabularyHeatmapData', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return empty data for classroom with no students', async () => {
     // GIVEN: Empty classroom
-    (supabase!.from as jest.Mock).mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    (supabase!.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     });
 
     // WHEN
@@ -527,18 +528,18 @@ describe('analytics - getVocabularyHeatmapData', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -571,18 +572,18 @@ describe('analytics - getVocabularyHeatmapData', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -608,18 +609,18 @@ describe('analytics - getVocabularyHeatmapData', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -656,18 +657,18 @@ describe('analytics - getVocabularyHeatmapData', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -715,18 +716,18 @@ describe('analytics - getVocabularyHeatmapData', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -753,21 +754,21 @@ describe('analytics - getVocabularyHeatmapData', () => {
     ];
 
     const mockProgressQuery = {
-      select: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      in: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
     };
     // Last eq returns the data
     mockProgressQuery.eq.mockResolvedValue({ data: mockProgressLesson1, error: null });
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce(mockProgressQuery);
 
@@ -783,14 +784,14 @@ describe('analytics - getVocabularyHeatmapData', () => {
 
 describe('analytics - getStudentsProgressSummary', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return empty array for classroom with no students', async () => {
     // GIVEN: Empty classroom
-    (supabase!.from as jest.Mock).mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    (supabase!.from as Mock).mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     });
 
     // WHEN
@@ -847,22 +848,22 @@ describe('analytics - getStudentsProgressSummary', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockLessons, error: null }),
       });
 
     // WHEN
@@ -903,22 +904,22 @@ describe('analytics - getStudentsProgressSummary', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockLessons, error: null }),
       });
 
     // WHEN
@@ -949,22 +950,22 @@ describe('analytics - getStudentsProgressSummary', () => {
       },
     ];
 
-    (supabase!.from as jest.Mock)
+    (supabase!.from as Mock)
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValue({ data: mockMemberships, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ data: mockMemberships, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProfiles, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       })
       .mockReturnValueOnce({
-        select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue({ data: mockLessons, error: null }),
+        select: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockLessons, error: null }),
       });
 
     // WHEN

@@ -11,17 +11,17 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@testing-library/jest-dom';
 
 // Mock next/navigation for tests
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/he/singleplayer',
 }));
 
 // Mock framer-motion to allow class inspection
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
       <div className={className} data-testid="motion-div" {...props}>

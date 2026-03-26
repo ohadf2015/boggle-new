@@ -8,7 +8,7 @@ import { PushNotificationPreferences } from '../PushNotificationPreferences';
 import type { ReactNode } from 'react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children: ReactNode } & Record<string, unknown>) => (
       <div {...props}>{children}</div>
@@ -17,7 +17,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -36,12 +36,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock usePushNotifications hook
-const mockSetEnabled = jest.fn();
-const mockSetTime = jest.fn();
-const mockRequestPermission = jest.fn();
+const mockSetEnabled = vi.fn();
+const mockSetTime = vi.fn();
+const mockRequestPermission = vi.fn();
 
-jest.mock('@/hooks/usePushNotifications', () => ({
-  usePushNotifications: jest.fn(() => ({
+vi.mock('@/hooks/usePushNotifications', () => ({
+  usePushNotifications: vi.fn(() => ({
     isAvailable: true,
     permissionStatus: 'granted',
     isLoading: false,
@@ -58,13 +58,13 @@ jest.mock('@/hooks/usePushNotifications', () => ({
 
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
-const mockUsePushNotifications = usePushNotifications as jest.MockedFunction<
+const mockUsePushNotifications = usePushNotifications as vi.MockedFunction<
   typeof usePushNotifications
 >;
 
 describe('PushNotificationPreferences', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSetEnabled.mockResolvedValue(undefined);
     mockSetTime.mockResolvedValue(undefined);
     mockRequestPermission.mockResolvedValue(true);
@@ -92,8 +92,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -113,8 +113,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -136,8 +136,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Toggle is clicked
@@ -160,8 +160,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -181,8 +181,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -204,8 +204,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -225,8 +225,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -246,8 +246,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Time is changed
@@ -273,8 +273,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered
@@ -296,8 +296,8 @@ describe('PushNotificationPreferences', () => {
         setEnabled: mockSetEnabled,
         setTime: mockSetTime,
         requestPermission: mockRequestPermission,
-        markChallengeCompleted: jest.fn(),
-        hasPendingNotification: jest.fn(),
+        markChallengeCompleted: vi.fn(),
+        hasPendingNotification: vi.fn(),
       });
 
       // WHEN - Component is rendered with dark mode

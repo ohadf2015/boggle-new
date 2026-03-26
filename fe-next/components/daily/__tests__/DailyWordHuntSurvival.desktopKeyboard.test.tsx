@@ -5,7 +5,7 @@ import DailyWordHuntSurvival from '../DailyWordHuntSurvival';
 import type { LetterGrid } from '@/types';
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
@@ -16,40 +16,40 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock hooks and components
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
   useLanguageSafe: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playErrorSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    playMusic: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
+    playMusic: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
     isMuted: false,
-    toggleMute: jest.fn(),
+    toggleMute: vi.fn(),
     TRACKS: {
       BOSSA_ARCADE: 'bossa_arcade',
       MENU: 'menu',
@@ -58,11 +58,11 @@ jest.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -71,12 +71,12 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useMediaQuery to simulate desktop view
-jest.mock('@/hooks/useMediaQuery', () => ({
-  useMediaQuery: jest.fn((query: string) => {
+vi.mock('@/hooks/useMediaQuery', () => ({
+  useMediaQuery: vi.fn((query: string) => {
     // Simulate desktop: min-width: 768px returns true
     return query === '(min-width: 768px)';
   }),
-  useIsDesktop: jest.fn(() => true),
+  useIsDesktop: vi.fn(() => true),
 }));
 
 const mockGrid: LetterGrid = [
@@ -86,23 +86,23 @@ const mockGrid: LetterGrid = [
 ];
 
 describe('DailyWordHuntSurvival - Desktop Keyboard Input Bug', () => {
-  const mockOnComplete = jest.fn();
-  const mockOnQuit = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnQuit = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Set up a proper DOM environment for desktop
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: query === '(min-width: 768px)',
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
   });
@@ -176,7 +176,7 @@ describe('DailyWordHuntSurvival - Desktop Keyboard Input Bug', () => {
   });
 
   it('should submit word with Enter key on desktop', async () => {
-    const mockSubmit = jest.fn();
+    const mockSubmit = vi.fn();
 
     render(
       <DailyWordHuntSurvival

@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdventureShopFAB from '../AdventureShopFAB';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { whileHover, whileTap, initial, animate, transition, ...rest } = props;
@@ -31,12 +31,12 @@ const mockT = (key: string) => {
 const defaultProps = {
   isRTL: false,
   gold: 1250,
-  onOpenShop: jest.fn(),
+  onOpenShop: vi.fn(),
   t: mockT,
 };
 
 describe('AdventureShopFAB', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders the shop button with accessible label', () => {
     render(<AdventureShopFAB {...defaultProps} />);

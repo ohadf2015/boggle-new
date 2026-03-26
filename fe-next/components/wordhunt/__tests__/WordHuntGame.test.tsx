@@ -23,43 +23,43 @@ const mockBridgeReturn = {
   isGameOver: false,
 };
 
-jest.mock('../hooks/useWordHuntMultiplayerBridge', () => ({
+vi.mock('../hooks/useWordHuntMultiplayerBridge', () => ({
   useWordHuntMultiplayerBridge: () => mockBridgeReturn,
 }));
 
 // Capture layout props
 const capturedLayoutProps: { value: Record<string, unknown> | null } = { value: null };
 
-jest.mock('../WordHuntGameLayout', () => ({
+vi.mock('../WordHuntGameLayout', () => ({
   WordHuntGameLayout: (props: Record<string, unknown>) => {
     capturedLayoutProps.value = props;
     return <div data-testid="wordhunt-game-layout" />;
   },
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/hooks/useKeyboardWordInput', () => ({
+vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({
     typedWord: '',
     isValidOnGrid: false,
     highlightedCells: [],
-    clearTypedWord: jest.fn(),
-    submitTypedWord: jest.fn(),
+    clearTypedWord: vi.fn(),
+    submitTypedWord: vi.fn(),
     isTypingMode: false,
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ skipAnimations: false }),
 }));
 
 // Mock client word validator
-jest.mock('@/utils/clientWordValidator', () => ({
-  validateWordLocally: jest.fn().mockReturnValue({ isValid: true, shouldSubmitToServer: true }),
-  couldBeOnBoard: jest.fn().mockReturnValue(true),
+vi.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: vi.fn().mockReturnValue({ isValid: true, shouldSubmitToServer: true }),
+  couldBeOnBoard: vi.fn().mockReturnValue(true),
 }));
 
 import { WordHuntGame } from '../WordHuntGame';
@@ -74,7 +74,7 @@ describe('WordHuntGame', () => {
   ];
 
   const mockSocket = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   } as unknown as import('socket.io-client').Socket;
 
   const defaultProps = {
@@ -86,9 +86,9 @@ describe('WordHuntGame', () => {
     ],
     username: 'alice',
     score: 300,
-    onQuit: jest.fn(),
-    onWordSubmit: jest.fn(),
-    onWordHuntGuess: jest.fn(),
+    onQuit: vi.fn(),
+    onWordSubmit: vi.fn(),
+    onWordHuntGuess: vi.fn(),
     gameActive: true,
     minWordLength: 3,
     socket: mockSocket,
@@ -96,7 +96,7 @@ describe('WordHuntGame', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     capturedLayoutProps.value = null;
     mockBridgeReturn.targetLength = 5;
     mockBridgeReturn.targetFound = false;

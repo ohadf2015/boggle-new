@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  */
@@ -8,28 +9,28 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 // Mock dependencies
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: (props: any) => <img {...props} alt={props.alt} />,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('@/components/avatar/AvatarBuilderModal', () => ({
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
   __esModule: true,
   default: ({ isOpen }: any) => isOpen ? <div data-testid="avatar-builder-modal" /> : null,
 }));
 
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: (props: any) => <div data-testid="avatar" {...props} />,
 }));
@@ -52,8 +53,8 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
     profile: mockProfile,
     isDarkMode: false,
     compact: true,
-    updateProfile: jest.fn(),
-    refreshProfile: jest.fn(),
+    updateProfile: vi.fn(),
+    refreshProfile: vi.fn(),
   };
 
   describe('Touch Target Size', () => {

@@ -9,7 +9,7 @@ import { CurrencyDisplay } from '../CurrencyDisplay';
 import '@testing-library/jest-dom';
 
 // Mock Framer Motion to avoid animation complexity in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,

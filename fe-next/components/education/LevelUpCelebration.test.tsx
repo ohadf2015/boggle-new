@@ -11,13 +11,13 @@ import userEvent from '@testing-library/user-event';
 import { LevelUpCelebration, type LevelUpPayload } from './LevelUpCelebration';
 
 // Mock fireConfetti
-const mockFireConfetti = jest.fn();
-jest.mock('@/utils/confettiUtils', () => ({
+const mockFireConfetti = vi.fn();
+vi.mock('@/utils/confettiUtils', () => ({
   fireLevelUpConfetti: () => mockFireConfetti(),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   // Create a factory function that generates mock components
   const createMockComponent = (Element: string) => {
      
@@ -53,7 +53,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock LanguageContext
-const mockT = jest.fn((key: string) => {
+const mockT = vi.fn((key: string) => {
   const translations: Record<string, string> = {
     'education.xp.levelUp': 'Level Up!',
     'education.xp.newLevel': 'You reached level',
@@ -64,7 +64,7 @@ const mockT = jest.fn((key: string) => {
   return translations[key] || key;
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -73,7 +73,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('LevelUpCelebration', () => {
-  const defaultOnClose = jest.fn();
+  const defaultOnClose = vi.fn();
 
   const defaultLevelUpData: LevelUpPayload = {
     oldLevel: 4,
@@ -82,7 +82,7 @@ describe('LevelUpCelebration', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==============================================

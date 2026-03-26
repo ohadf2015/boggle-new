@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for MusicContext automatic music triggering
  * Reproduces the bug where music doesn't play when daily challenge starts
@@ -8,23 +9,23 @@ import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 
 // Create mock storage for mutable mock state
 const mockState = {
-  play: jest.fn(),
-  pause: jest.fn(),
-  stop: jest.fn(),
-  fade: jest.fn(),
-  volume: jest.fn().mockReturnValue(0.5),
-  state: jest.fn().mockReturnValue('loaded'),
-  playing: jest.fn().mockReturnValue(false),
-  unload: jest.fn(),
-  seek: jest.fn(),
+  play: vi.fn(),
+  pause: vi.fn(),
+  stop: vi.fn(),
+  fade: vi.fn(),
+  volume: vi.fn().mockReturnValue(0.5),
+  state: vi.fn().mockReturnValue('loaded'),
+  playing: vi.fn().mockReturnValue(false),
+  unload: vi.fn(),
+  seek: vi.fn(),
   ctxState: 'running' as string,
-  resume: jest.fn().mockResolvedValue(undefined),
-  suspend: jest.fn(),
+  resume: vi.fn().mockResolvedValue(undefined),
+  suspend: vi.fn(),
 };
 
 // Mock modules using factory functions that reference mockState
-jest.mock('howler', () => ({
-  Howl: jest.fn(() => ({
+vi.mock('howler', () => ({
+  Howl: vi.fn(() => ({
     play: () => mockState.play(),
     pause: () => mockState.pause(),
     stop: () => mockState.stop(),
@@ -46,8 +47,8 @@ jest.mock('howler', () => ({
   },
 }));
 
-jest.mock('@/lib/audio/audioLoader', () => ({
-  createLazyHowl: jest.fn((_src, options) => {
+vi.mock('@/lib/audio/audioLoader', () => ({
+  createLazyHowl: vi.fn((_src, options) => {
     // Store callbacks from options but don't spread over methods
     const callbacks = {
       onloaderror: options?.onloaderror,
@@ -71,8 +72,8 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       ...callbacks,
     };
   }),
-  preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
-  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
+  preloadAudioOnDemand: vi.fn().mockResolvedValue(undefined),
+  ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
 }));
 
 import { MusicProvider, useMusic } from '../MusicContext';
@@ -141,8 +142,8 @@ function TestDailyChallengeFlow() {
 
 describe('MusicContext - Auto Trigger on Game Start', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Reset mock state
     mockState.play.mockClear();
@@ -156,7 +157,7 @@ describe('MusicContext - Auto Trigger on Game Start', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('BUG REPRO: unlockAudio then immediate fadeToTrack should play', async () => {
@@ -192,7 +193,7 @@ describe('MusicContext - Auto Trigger on Game Start', () => {
 
     // Advance timers for any internal delays
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // CRITICAL: Music should play
@@ -241,7 +242,7 @@ describe('MusicContext - Auto Trigger on Game Start', () => {
 
     // Advance timers for async operations
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Howl.play should have been called
@@ -277,7 +278,7 @@ describe('MusicContext - Auto Trigger on Game Start', () => {
 
     // Advance timers to allow pending track to play
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Howl.play should eventually be called
@@ -342,7 +343,7 @@ describe('MusicContext - Auto Trigger on Game Start', () => {
 
     // Advance timers for the 100ms delay in processing pending tracks
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // NOW the queued track should play

@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
@@ -18,23 +18,23 @@ const mockItems = [
 
 describe('ModerationQueue', () => {
   it('should render queue items', () => {
-    render(<ModerationQueue items={mockItems} total={2} onAction={jest.fn()} />);
+    render(<ModerationQueue items={mockItems} total={2} onAction={vi.fn()} />);
     expect(screen.getByText('flurb')).toBeInTheDocument();
     expect(screen.getByText('zxqwk')).toBeInTheDocument();
   });
 
   it('should show total count', () => {
-    render(<ModerationQueue items={mockItems} total={42} onAction={jest.fn()} />);
+    render(<ModerationQueue items={mockItems} total={42} onAction={vi.fn()} />);
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
   it('should show empty state when no items', () => {
-    render(<ModerationQueue items={[]} total={0} onAction={jest.fn()} />);
+    render(<ModerationQueue items={[]} total={0} onAction={vi.fn()} />);
     expect(screen.getByText('admin.moderation.empty')).toBeInTheDocument();
   });
 
   it('should show loading when items is null', () => {
-    render(<ModerationQueue items={null} total={0} onAction={jest.fn()} />);
+    render(<ModerationQueue items={null} total={0} onAction={vi.fn()} />);
     expect(screen.getByTestId('queue-loading')).toBeInTheDocument();
   });
 });

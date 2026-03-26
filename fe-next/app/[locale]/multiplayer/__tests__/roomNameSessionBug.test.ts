@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test for empty roomName bug in session saving
  *
@@ -13,18 +14,18 @@ import { saveSession, getSession, clearSession } from '@/utils/session';
 import type { Session } from '@/types';
 
 // Mock js-cookie
-jest.mock('js-cookie', () => ({
-  set: jest.fn(),
-  get: jest.fn(),
-  remove: jest.fn(),
+vi.mock('js-cookie', () => ({
+  set: vi.fn(),
+  get: vi.fn(),
+  remove: vi.fn(),
 }));
 
 import Cookies from 'js-cookie';
 
 describe('Session roomName handling', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (Cookies.get as jest.Mock).mockReturnValue(null);
+    vi.clearAllMocks();
+    (Cookies.get as Mock).mockReturnValue(null);
   });
 
   describe('Bug reproduction: empty roomName in session', () => {

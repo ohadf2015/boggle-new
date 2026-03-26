@@ -10,7 +10,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 // Mock Remotion Player — stores event listeners so we can simulate frameupdate
 const playerEventListeners: Record<string, ((...args: unknown[]) => void)[]> = {};
 
-jest.mock('@remotion/player', () => {
+vi.mock('@remotion/player', () => {
   const React = require('react');
   const instance = {
     addEventListener: (event: string, handler: (...args: unknown[]) => void) => {
@@ -39,12 +39,12 @@ jest.mock('@remotion/player', () => {
 });
 
 // Mock usePrefersReducedMotion
-jest.mock('../../../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: jest.fn(() => false),
+vi.mock('../../../../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(() => false),
 }));
 
 // Mock useDevicePerformance
-jest.mock('../../../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     targetFPS: 60,
@@ -60,7 +60,7 @@ jest.mock('../../../../../hooks/useDevicePerformance', () => ({
 }));
 
 // Mock CinematicFallback (needed when stall detection fires)
-jest.mock('../CinematicFallback', () => ({
+vi.mock('../CinematicFallback', () => ({
   CinematicFallback: (props: Record<string, unknown>) => (
     <div data-testid="cinematic-fallback" data-type={props.cinematicType}>
       Fallback Active
@@ -69,7 +69,7 @@ jest.mock('../CinematicFallback', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -89,13 +89,13 @@ const mockT = (key: string, params?: Record<string, unknown>) => {
   };
   return translations[key] || key;
 };
-jest.mock('../../../../../contexts/LanguageContext', () => ({
+vi.mock('../../../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT }),
   useLanguageSafe: () => ({ t: mockT }),
 }));
 
 // Mock timers
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // Import after mocks
 import { CinematicPlayer } from '../CinematicPlayer';
@@ -109,11 +109,11 @@ describe('CinematicPlayer', () => {
   const defaultProps = {
     composition: MockComposition,
     durationSeconds: 8,
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.clearAllTimers();
     // Clear player event listeners
     Object.keys(playerEventListeners).forEach(key => {
@@ -126,7 +126,7 @@ describe('CinematicPlayer', () => {
   // to prevent stall detection from firing
   const waitForReady = () => {
     act(() => {
-      jest.advanceTimersByTime(200); // Wait for loading delay (100ms + buffer)
+      vi.advanceTimersByTime(200); // Wait for loading delay (100ms + buffer)
     });
     // Simulate a frameupdate event so stall detection doesn't fire
     act(() => {
@@ -139,7 +139,7 @@ describe('CinematicPlayer', () => {
   // Helper to wait for skip to be enabled
   const waitForSkipEnabled = () => {
     act(() => {
-      jest.advanceTimersByTime(SKIP_DELAY_MS);
+      vi.advanceTimersByTime(SKIP_DELAY_MS);
     });
   };
 
@@ -228,7 +228,7 @@ describe('CinematicPlayer', () => {
     });
 
     it('should call onComplete when skip button is clicked', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
       waitForReady();
       waitForSkipEnabled();
@@ -240,7 +240,7 @@ describe('CinematicPlayer', () => {
     });
 
     it('should not call onComplete when skip button is clicked before delay', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
       waitForReady();
 
@@ -253,7 +253,7 @@ describe('CinematicPlayer', () => {
 
   describe('keyboard controls', () => {
     it('should skip on ESC key after delay', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
       waitForReady();
       waitForSkipEnabled();
@@ -265,7 +265,7 @@ describe('CinematicPlayer', () => {
     });
 
     it('should not skip on ESC key before delay', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
       waitForReady();
 
@@ -276,7 +276,7 @@ describe('CinematicPlayer', () => {
     });
 
     it('should not skip on other keys', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
       waitForReady();
       waitForSkipEnabled();
@@ -308,14 +308,14 @@ describe('CinematicPlayer', () => {
     });
 
     it('should auto-complete after delay when reduced motion is preferred', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
 
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
 
       // Should complete after brief delay
       act(() => {
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
       });
 
       expect(onComplete).toHaveBeenCalledTimes(1);

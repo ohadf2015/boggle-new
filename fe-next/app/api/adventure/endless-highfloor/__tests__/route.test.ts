@@ -1,30 +1,31 @@
+import { vi } from 'vitest';
 // @ts-nocheck
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
-jest.mock('@/utils/sentry', () => ({ captureApiError: jest.fn() }));
+vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -42,18 +43,18 @@ function makeBadJsonRequest(): NextRequest {
 
 describe('POST /api/adventure/endless-highfloor', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
     });
     mockFrom.mockReturnValue({
-      update: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          lt: jest.fn().mockReturnValue({
-            select: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          lt: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: { endless_high_floor: 50 },
                 error: null,
               }),
@@ -104,9 +105,9 @@ describe('POST /api/adventure/endless-highfloor', () => {
   describe('SECURITY: Sequential floor validation', () => {
     it('rejects floor that skips ahead (current=10, requested=50)', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: 10 },
               error: null,
             }),
@@ -121,19 +122,19 @@ describe('POST /api/adventure/endless-highfloor', () => {
 
     it('allows incrementing by 1 (current=10, requested=11)', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: 10 },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            lt: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            lt: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: { endless_high_floor: 11 },
                   error: null,
                 }),
@@ -150,19 +151,19 @@ describe('POST /api/adventure/endless-highfloor', () => {
 
     it('allows floor 1 when no existing record', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: null },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            lt: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            lt: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: { endless_high_floor: 1 },
                   error: null,
                 }),
@@ -178,19 +179,19 @@ describe('POST /api/adventure/endless-highfloor', () => {
 
     it('allows replaying a lower floor', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: 20 },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            lt: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            lt: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'PGRST116', message: 'No rows' },
                 }),
@@ -211,19 +212,19 @@ describe('POST /api/adventure/endless-highfloor', () => {
   describe('Happy path', () => {
     it('saves new record and returns updated: true', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: 49 },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            lt: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            lt: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: { endless_high_floor: 50 },
                   error: null,
                 }),
@@ -245,19 +246,19 @@ describe('POST /api/adventure/endless-highfloor', () => {
   describe('Database errors', () => {
     it('returns 500 on DB error', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { endless_high_floor: 9 },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            lt: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            lt: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: { code: 'INTERNAL', message: 'DB down' },
                 }),

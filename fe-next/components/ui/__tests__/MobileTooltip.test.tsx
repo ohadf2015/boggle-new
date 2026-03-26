@@ -20,7 +20,7 @@ const mockHandlers = {
 };
 
 // Mock Radix UI Tooltip primitives
-jest.mock('../tooltip', () => {
+vi.mock('../tooltip', () => {
   const React = require('react');
 
   const MockTooltipProvider = ({
@@ -287,8 +287,8 @@ describe('MobileTooltip Component', () => {
 
       // Create a mock event to check preventDefault and stopPropagation
       const clickEvent = new MouseEvent('click', { bubbles: true });
-      const preventDefaultSpy = jest.spyOn(clickEvent, 'preventDefault');
-      const stopPropagationSpy = jest.spyOn(clickEvent, 'stopPropagation');
+      const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+      const stopPropagationSpy = vi.spyOn(clickEvent, 'stopPropagation');
 
       trigger.dispatchEvent(clickEvent);
 

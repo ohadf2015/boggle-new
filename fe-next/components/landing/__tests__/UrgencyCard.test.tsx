@@ -3,25 +3,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UrgencyCard } from '../UrgencyCard';
 
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 let mockUrgency: any = null;
-jest.mock('@/hooks/useUrgencyData', () => ({
+vi.mock('@/hooks/useUrgencyData', () => ({
   useUrgencyData: () => mockUrgency,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: true }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>
   ));
@@ -48,7 +48,7 @@ jest.mock('framer-motion', () => {
 
 describe('UrgencyCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUrgency = null;
   });
 

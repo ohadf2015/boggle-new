@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { LandingCardsSkeleton } from '../LandingCardsSkeleton';
 
 // Mock hooks
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     dir: 'ltr',
   }),

@@ -3,7 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import ChallengeResults from '../ChallengeResults';
 
 // --- Mock LanguageContext ---
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     t: (key: string) => key,
@@ -11,25 +11,26 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // --- Mock challenges utils ---
-jest.mock('@/utils/challenges', () => ({
-  getChallengeUrl: jest.fn(() => 'https://app.com/challenge/TESTCODE'),
-  generateChallengeShareMessage: jest.fn(() => 'Beat my score!'),
+vi.mock('@/utils/challenges', () => ({
+  getChallengeUrl: vi.fn(() => 'https://app.com/challenge/TESTCODE'),
+  generateChallengeShareMessage: vi.fn(() => 'Beat my score!'),
 }));
 
 // --- Mock confetti ---
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // --- Mock ResultsWinnerBanner ---
-jest.mock('@/components/results/ResultsWinnerBanner', () => {
-  return function MockResultsWinnerBanner({ customMessage }: { customMessage?: string }) {
+vi.mock('@/components/results/ResultsWinnerBanner', () => {
+  const MockResultsWinnerBanner = ({ customMessage }: { customMessage?: string }) => {
     return <div data-testid="winner-banner">{customMessage}</div>;
   };
+  return { default: MockResultsWinnerBanner };
 });
 
 // --- Mock framer-motion ---
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
       <div className={className as string} {...props}>{children}</div>,
@@ -39,7 +40,7 @@ jest.mock('framer-motion', () => ({
 
 // --- Clipboard API ---
 Object.assign(navigator, {
-  clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+  clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
   share: undefined, // disable native share by default
 });
 
@@ -78,11 +79,11 @@ const mockResults = {
 } as any;
 
 describe('ChallengeResults', () => {
-  const onPlayAgain = jest.fn();
-  const onBackToHome = jest.fn();
+  const onPlayAgain = vi.fn();
+  const onBackToHome = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Score display', () => {
@@ -290,7 +291,7 @@ describe('ChallengeResults', () => {
     });
 
     it('uses native share when available', async () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       Object.defineProperty(navigator, 'share', { value: mockShare, configurable: true });
 
       render(

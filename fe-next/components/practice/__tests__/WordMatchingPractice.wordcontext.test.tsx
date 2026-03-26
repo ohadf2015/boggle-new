@@ -10,39 +10,39 @@ import '@testing-library/jest-dom';
 import { WordMatchingPractice } from '../WordMatchingPractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@dnd-kit/core', () => ({
+vi.mock('@dnd-kit/core', () => ({
   DndContext: ({ children }: any) => <div data-testid="dnd-context">{children}</div>,
-  useSensors: jest.fn(() => []),
-  useSensor: jest.fn(),
-  PointerSensor: jest.fn(),
-  KeyboardSensor: jest.fn(),
-  closestCenter: jest.fn(),
-  useDraggable: jest.fn(() => ({
+  useSensors: vi.fn(() => []),
+  useSensor: vi.fn(),
+  PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
+  closestCenter: vi.fn(),
+  useDraggable: vi.fn(() => ({
     attributes: {},
     listeners: {},
-    setNodeRef: jest.fn(),
+    setNodeRef: vi.fn(),
     transform: null,
     isDragging: false,
   })),
-  useDroppable: jest.fn(() => ({ setNodeRef: jest.fn(), isOver: false })),
+  useDroppable: vi.fn(() => ({ setNodeRef: vi.fn(), isOver: false })),
 }));
 
-jest.mock('@dnd-kit/sortable', () => ({
-  sortableKeyboardCoordinates: jest.fn(),
+vi.mock('@dnd-kit/sortable', () => ({
+  sortableKeyboardCoordinates: vi.fn(),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
@@ -59,8 +59,8 @@ describe('WordMatchingPractice — WordContextRow integration', () => {
     render(
       <WordMatchingPractice
         words={baseWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
     // Words still rendered
@@ -82,8 +82,8 @@ describe('WordMatchingPractice — WordContextRow integration', () => {
     render(
       <WordMatchingPractice
         words={enrichedWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 

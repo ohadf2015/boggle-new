@@ -25,7 +25,7 @@ import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import type { LevelConfig } from '@/types/adventure';
 
 // Mock framer-motion for simpler testing
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -47,8 +47,8 @@ jest.mock('framer-motion', () => {
 
   const mockMotionValue = {
     get: () => 0,
-    set: jest.fn(),
-    on: jest.fn(() => jest.fn()), // Return unsubscribe function
+    set: vi.fn(),
+    on: vi.fn(() => vi.fn()), // Return unsubscribe function
   };
 
   return {
@@ -71,13 +71,13 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock hooks
-jest.mock('@/hooks/useAdventureGame');
-jest.mock('@/hooks/useAdventureWordValidation');
-jest.mock('@/hooks/useAdventureSelection');
-jest.mock('@/hooks/useLexiReactions');
-jest.mock('@/hooks/useAdventureHints');
-jest.mock('@/hooks/useBossMechanics');
-jest.mock('@/hooks/useAdventureBossNew');
+vi.mock('@/hooks/useAdventureGame');
+vi.mock('@/hooks/useAdventureWordValidation');
+vi.mock('@/hooks/useAdventureSelection');
+vi.mock('@/hooks/useLexiReactions');
+vi.mock('@/hooks/useAdventureHints');
+vi.mock('@/hooks/useBossMechanics');
+vi.mock('@/hooks/useAdventureBossNew');
 
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
@@ -181,11 +181,11 @@ describe('AdventureGame - Boss Battle Integration', () => {
 
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    mockDealDamage = jest.fn().mockReturnValue(10);
-    mockStartBattle = jest.fn();
-    mockEndBattle = jest.fn();
+    mockDealDamage = vi.fn().mockReturnValue(10);
+    mockStartBattle = vi.fn();
+    mockEndBattle = vi.fn();
 
     // Default game hook mock
     mockUseAdventureGame.mockReturnValue({
@@ -214,19 +214,19 @@ describe('AdventureGame - Boss Battle Integration', () => {
       canComplete: false,
       isPlaying: true,
       cascadeComplete: true,
-      submitWordWithPath: jest.fn(),
-      startGame: jest.fn(),
-      pauseGame: jest.fn(),
-      completeLevel: jest.fn(),
-      resetGame: jest.fn(),
-      markCascadeComplete: jest.fn(),
-      clearCombo: jest.fn(),
-      updateObjective: jest.fn(),
+      submitWordWithPath: vi.fn(),
+      startGame: vi.fn(),
+      pauseGame: vi.fn(),
+      completeLevel: vi.fn(),
+      resetGame: vi.fn(),
+      markCascadeComplete: vi.fn(),
+      clearCombo: vi.fn(),
+      updateObjective: vi.fn(),
     });
 
     // Validation hook mock
     mockUseAdventureWordValidation.mockReturnValue({
-      validateWord: jest.fn().mockResolvedValue({ isValid: true, score: 50 }),
+      validateWord: vi.fn().mockResolvedValue({ isValid: true, score: 50 }),
       isValidating: false,
       lastValidationResult: null,
     });
@@ -236,17 +236,17 @@ describe('AdventureGame - Boss Battle Integration', () => {
       selectedIndices: [],
       currentWord: '',
       isSelecting: false,
-      selectTile: jest.fn(),
-      clearSelection: jest.fn(),
-      getPath: jest.fn().mockReturnValue([]),
+      selectTile: vi.fn(),
+      clearSelection: vi.fn(),
+      getPath: vi.fn().mockReturnValue([]),
       pathPoints: [],
     });
 
     // Lexi reactions mock
     mockUseLexiReactions.mockReturnValue({
       reaction: null,
-      dismissReaction: jest.fn(),
-      triggerReaction: jest.fn(),
+      dismissReaction: vi.fn(),
+      triggerReaction: vi.fn(),
     });
 
     // Hints mock
@@ -255,13 +255,13 @@ describe('AdventureGame - Boss Battle Integration', () => {
       error: null,
       hasHintsAvailable: false,
       remainingHintWords: [],
-      getHint: jest.fn(),
-      findPathForWord: jest.fn().mockReturnValue(null),
-      recordActivity: jest.fn(),
+      getHint: vi.fn(),
+      findPathForWord: vi.fn().mockReturnValue(null),
+      recordActivity: vi.fn(),
       showAutoHint: false,
-      dismissAutoHint: jest.fn(),
+      dismissAutoHint: vi.fn(),
       currentHint: null,
-      clearCurrentHint: jest.fn(),
+      clearCurrentHint: vi.fn(),
     });
 
     // Boss mechanics mock (inactive by default)
@@ -270,12 +270,12 @@ describe('AdventureGame - Boss Battle Integration', () => {
       boss: null,
       currentTaunt: null,
       showTaunt: false,
-      checkWord: jest.fn().mockReturnValue({
+      checkWord: vi.fn().mockReturnValue({
         meetsRequirement: false,
         scoreMultiplier: 1.0,
       }),
-      triggerTaunt: jest.fn(),
-      advancePhase: jest.fn(),
+      triggerTaunt: vi.fn(),
+      advancePhase: vi.fn(),
       bossState: {
         currentTauntIndex: 0,
         lastTauntTime: 0,
@@ -298,8 +298,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
       startBattle: mockStartBattle,
       endBattle: mockEndBattle,
       dealDamage: mockDealDamage,
-      triggerTaunt: jest.fn(),
-      reset: jest.fn(),
+      triggerTaunt: vi.fn(),
+      reset: vi.fn(),
     } as any);
   });
 
@@ -315,8 +315,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         <AdventureGame
           levelConfig={levelConfig}
           initialGrid={mockGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
+          onLevelComplete={vi.fn()}
+          onExit={vi.fn()}
         />
       );
 
@@ -333,8 +333,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         <AdventureGame
           levelConfig={levelConfig}
           initialGrid={mockGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
+          onLevelComplete={vi.fn()}
+          onExit={vi.fn()}
         />
       );
 
@@ -370,12 +370,12 @@ describe('AdventureGame - Boss Battle Integration', () => {
         boss: mockBossConfig,
         currentTaunt: null,
         showTaunt: false,
-        checkWord: jest.fn().mockReturnValue({
+        checkWord: vi.fn().mockReturnValue({
           meetsRequirement: false,
           scoreMultiplier: 1.0,
         }),
-        triggerTaunt: jest.fn(),
-        advancePhase: jest.fn(),
+        triggerTaunt: vi.fn(),
+        advancePhase: vi.fn(),
         bossState: {
           currentTauntIndex: 0,
           lastTauntTime: 0,
@@ -389,8 +389,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         <AdventureGame
           levelConfig={levelConfig}
           initialGrid={mockGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
+          onLevelComplete={vi.fn()}
+          onExit={vi.fn()}
         />
       );
 
@@ -422,12 +422,12 @@ describe('AdventureGame - Boss Battle Integration', () => {
         boss: null,
         currentTaunt: null,
         showTaunt: false,
-        checkWord: jest.fn().mockReturnValue({
+        checkWord: vi.fn().mockReturnValue({
           meetsRequirement: false,
           scoreMultiplier: 1.0,
         }),
-        triggerTaunt: jest.fn(),
-        advancePhase: jest.fn(),
+        triggerTaunt: vi.fn(),
+        advancePhase: vi.fn(),
         bossState: {
           currentTauntIndex: 0,
           lastTauntTime: 0,
@@ -441,8 +441,8 @@ describe('AdventureGame - Boss Battle Integration', () => {
         <AdventureGame
           levelConfig={levelConfig}
           initialGrid={mockGrid}
-          onLevelComplete={jest.fn()}
-          onExit={jest.fn()}
+          onLevelComplete={vi.fn()}
+          onExit={vi.fn()}
         />
       );
 
@@ -484,7 +484,7 @@ describe('AdventureGame - Boss Battle Integration', () => {
  */
 
 // Import real hooks for integration testing using requireActual to bypass mocks
-const { useBossMechanics: realUseBossMechanics } = jest.requireActual('@/hooks/useBossMechanics');
+const { useBossMechanics: realUseBossMechanics } = vi.importActual('@/hooks/useBossMechanics');
 import { getBossConfig } from '@/lib/adventure/bossConfig';
 
 // Boss test data for all 10 worlds
@@ -504,11 +504,11 @@ const BOSS_WORLDS = [
 describe('Boss Mechanic Hook Integration', () => {
   // Use fake timers for taunt tests
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ==============================================

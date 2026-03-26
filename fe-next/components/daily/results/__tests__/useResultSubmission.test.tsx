@@ -15,13 +15,13 @@ import { useResultSubmission } from '../useResultSubmission';
 import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock dailyChallenge utilities
-jest.mock('@/utils/dailyChallenge', () => ({
-  getTodaysWordHuntResult: jest.fn().mockReturnValue(null),
-  markWordHuntResultSubmitted: jest.fn(),
+vi.mock('@/utils/dailyChallenge', () => ({
+  getTodaysWordHuntResult: vi.fn().mockReturnValue(null),
+  markWordHuntResultSubmitted: vi.fn(),
 }));
 
 describe('useResultSubmission', () => {
@@ -92,10 +92,10 @@ describe('useResultSubmission', () => {
     avatarColor: '#6366f1',
   };
 
-  const mockOnSubmitSuccess = jest.fn();
+  const mockOnSubmitSuccess = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReset();
 
     // Default: successful API responses

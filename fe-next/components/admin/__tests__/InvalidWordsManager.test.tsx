@@ -9,7 +9,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const {
       whileHover, whileTap, animate, initial, exit, transition,
@@ -29,7 +29,7 @@ jest.mock('framer-motion', () => {
 
 // Mock AlertDialog component for BulkApproveButton
 // This mock simulates Radix AlertDialog behavior: always render trigger, conditionally render content
-jest.mock('@/components/ui/alert-dialog', () => ({
+vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialog: ({ children, open }: React.PropsWithChildren<{ open?: boolean; onOpenChange?: (open: boolean) => void }>) => {
     // Filter children to find trigger and content
     const childArray = React.Children.toArray(children);
@@ -91,7 +91,7 @@ jest.mock('@/components/ui/alert-dialog', () => ({
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
     enableComplexAnimations: false,
@@ -101,11 +101,11 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: {
-    success: jest.fn(),
-    error: jest.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -131,7 +131,7 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -139,7 +139,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Import after mocks
@@ -156,13 +156,13 @@ describe('InvalidWordsManager', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReset();
   });
 
   afterEach(() => {
     // Clean up any pending promises and timers
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   const mockInvalidWordsResponse = {

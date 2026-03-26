@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
@@ -13,45 +13,45 @@ jest.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(' '),
 }));
 
-jest.mock('../BlastGrid', () => ({
+vi.mock('../BlastGrid', () => ({
   BlastGrid: () => <div data-testid="blast-grid" />,
 }));
 
-jest.mock('../BlastProgressBar', () => ({
+vi.mock('../BlastProgressBar', () => ({
   BlastProgressBar: () => <div data-testid="blast-progress-bar" />,
 }));
 
-jest.mock('../BlastFoundWords', () => ({
+vi.mock('../BlastFoundWords', () => ({
   BlastFoundWords: () => <div data-testid="blast-found-words" />,
 }));
 
-jest.mock('../BlastHelpModal', () => ({
+vi.mock('../BlastHelpModal', () => ({
   BlastHelpModal: () => <div data-testid="blast-help-modal" />,
 }));
 
-jest.mock('../BlastCascadeWordBanner', () => ({
+vi.mock('../BlastCascadeWordBanner', () => ({
   BlastCascadeWordBanner: () => <div data-testid="blast-cascade-banner" />,
 }));
 
-jest.mock('@/components/game/ComboDisplay', () => ({
+vi.mock('@/components/game/ComboDisplay', () => ({
   __esModule: true,
   default: () => <div data-testid="combo-display" />,
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: () => <div data-testid="word-forming-area" />,
 }));
 
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, disabled, className, ...rest }: any) => (
     <button onClick={onClick} disabled={disabled} className={className} {...rest}>
       {children}
@@ -59,44 +59,44 @@ jest.mock('@/components/ui/button', () => ({
   ),
 }));
 
-jest.mock('@/components/grid/hapticFeedback', () => ({
-  vibrateBlastBomb: jest.fn(),
-  vibrateBlastLightning: jest.fn(),
-  vibrateBlastPrism: jest.fn(),
-  vibrateBlastCascade: jest.fn(),
+vi.mock('@/components/grid/hapticFeedback', () => ({
+  vibrateBlastBomb: vi.fn(),
+  vibrateBlastLightning: vi.fn(),
+  vibrateBlastPrism: vi.fn(),
+  vibrateBlastCascade: vi.fn(),
 }));
 
-jest.mock('../utils/blastStarCalculator', () => ({
-  calculateEarnedStars: jest.fn().mockReturnValue(2),
+vi.mock('../utils/blastStarCalculator', () => ({
+  calculateEarnedStars: vi.fn().mockReturnValue(2),
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => <div data-testid="mascot" />,
 }));
 
 // Mock the new orphaned components to verify they render
  
-const MockBlastComboStreakBadge = jest.fn((_props: any) => <div data-testid="combo-streak-badge" />);
-jest.mock('../BlastComboStreakBadge', () => ({
+const MockBlastComboStreakBadge = vi.fn((_props: any) => <div data-testid="combo-streak-badge" />);
+vi.mock('../BlastComboStreakBadge', () => ({
   BlastComboStreakBadge: (props: any) => MockBlastComboStreakBadge(props),
 }));
 
  
-const MockBlastHotTileOverlay = jest.fn((_props: any) => <div data-testid="blast-hot-tile-container" />);
-jest.mock('../BlastHotTileOverlay', () => ({
+const MockBlastHotTileOverlay = vi.fn((_props: any) => <div data-testid="blast-hot-tile-container" />);
+vi.mock('../BlastHotTileOverlay', () => ({
   BlastHotTileOverlay: (props: any) => MockBlastHotTileOverlay(props),
 }));
 
  
-const MockBlastReactiveBackground = jest.fn((_props: any) => <div data-testid="blast-reactive-bg" />);
-jest.mock('../BlastReactiveBackground', () => ({
+const MockBlastReactiveBackground = vi.fn((_props: any) => <div data-testid="blast-reactive-bg" />);
+vi.mock('../BlastReactiveBackground', () => ({
   __esModule: true,
   default: (props: any) => MockBlastReactiveBackground(props),
 }));
 
  
-const MockBlastBoardIntensity = jest.fn(({ children }: any) => <div data-testid="blast-board-intensity">{children}</div>);
-jest.mock('../BlastBoardIntensity', () => ({
+const MockBlastBoardIntensity = vi.fn(({ children }: any) => <div data-testid="blast-board-intensity">{children}</div>);
+vi.mock('../BlastBoardIntensity', () => ({
   __esModule: true,
   default: (props: any) => MockBlastBoardIntensity(props),
 }));
@@ -168,19 +168,19 @@ const baseProps = {
   comboDanger: false,
   formedWord: '',
   currentFeedback: null,
-  onWordSubmit: jest.fn(),
-  onPathSubmit: jest.fn(),
-  onWordChange: jest.fn(),
-  onExplosionComplete: jest.fn(),
-  onScorePopupComplete: jest.fn(),
-  onShuffle: jest.fn(),
-  onQuitRequest: jest.fn(),
-  onConfirmQuit: jest.fn(),
-  onEndGame: jest.fn(),
+  onWordSubmit: vi.fn(),
+  onPathSubmit: vi.fn(),
+  onWordChange: vi.fn(),
+  onExplosionComplete: vi.fn(),
+  onScorePopupComplete: vi.fn(),
+  onShuffle: vi.fn(),
+  onQuitRequest: vi.fn(),
+  onConfirmQuit: vi.fn(),
+  onEndGame: vi.fn(),
   showQuitConfirm: false,
-  setShowQuitConfirm: jest.fn(),
+  setShowQuitConfirm: vi.fn(),
   showEndGameConfirm: false,
-  setShowEndGameConfirm: jest.fn(),
+  setShowEndGameConfirm: vi.fn(),
   t,
 };
 
@@ -190,7 +190,7 @@ const baseProps = {
 
 describe('BlastGameLayout orphaned feature wiring', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders BlastComboStreakBadge when streak prop is provided with active streak', () => {

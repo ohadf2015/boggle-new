@@ -25,7 +25,7 @@ const mockTranslations: Record<string, string> = {
   'common.exit': 'Exit',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -34,7 +34,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const MockMotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) =>
@@ -63,14 +63,14 @@ describe('RetryAssistModal', () => {
     bestWords: 5,
     bestScore: 250,
     attemptCount: 3,
-    onRetry: jest.fn(),
-    onRetryWithBonus: jest.fn(),
-    onRetryWithHint: jest.fn(),
-    onExit: jest.fn(),
+    onRetry: vi.fn(),
+    onRetryWithBonus: vi.fn(),
+    onRetryWithHint: vi.fn(),
+    onExit: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Visibility', () => {
@@ -150,7 +150,7 @@ describe('RetryAssistModal', () => {
 
   describe('Button Callbacks', () => {
     it('should call onRetry when Try Again is clicked', () => {
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       render(<RetryAssistModal {...defaultProps} onRetry={onRetry} />);
 
       fireEvent.click(screen.getByRole('button', { name: /try again/i }));
@@ -158,7 +158,7 @@ describe('RetryAssistModal', () => {
     });
 
     it('should call onRetryWithBonus when Bonus Time is clicked', () => {
-      const onRetryWithBonus = jest.fn();
+      const onRetryWithBonus = vi.fn();
       render(
         <RetryAssistModal
           {...defaultProps}
@@ -172,7 +172,7 @@ describe('RetryAssistModal', () => {
     });
 
     it('should call onRetryWithHint when Start with Hint is clicked', () => {
-      const onRetryWithHint = jest.fn();
+      const onRetryWithHint = vi.fn();
       render(
         <RetryAssistModal
           {...defaultProps}
@@ -186,7 +186,7 @@ describe('RetryAssistModal', () => {
     });
 
     it('should call onExit when Exit is clicked', () => {
-      const onExit = jest.fn();
+      const onExit = vi.fn();
       render(<RetryAssistModal {...defaultProps} onExit={onExit} />);
 
       fireEvent.click(screen.getByRole('button', { name: /exit/i }));

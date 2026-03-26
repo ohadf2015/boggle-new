@@ -11,7 +11,7 @@ import { Sparkles, Trophy, X } from 'lucide-react';
 import { GameBadge } from '../GameBadge';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     span: ({ children, className, onClick, ...props }: any) => (
       <span className={className} onClick={onClick} data-testid="motion-span" {...props}>
@@ -23,7 +23,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useSafeTimeout - tracks timeout internally like the real hook
-jest.mock('@/hooks/useSafeTimeout', () => {
+vi.mock('@/hooks/useSafeTimeout', () => {
   let currentTimeout: NodeJS.Timeout | null = null;
   return {
     useSafeTimeout: () => ({
@@ -47,12 +47,12 @@ jest.mock('@/hooks/useSafeTimeout', () => {
 describe('GameBadge', () => {
   beforeEach(() => {
     jest.clearAllTimers();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Rendering', () => {
@@ -229,7 +229,7 @@ describe('GameBadge', () => {
 
   describe('Click Handling', () => {
     it('should call onClick when clicked', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <GameBadge onClick={handleClick}>Click Me</GameBadge>
       );
@@ -257,7 +257,7 @@ describe('GameBadge', () => {
 
   describe('Auto-Hide Functionality', () => {
     it('should auto-hide after specified time', async () => {
-      const onAutoHide = jest.fn();
+      const onAutoHide = vi.fn();
       render(
         <GameBadge autoHideMs={1000} onAutoHide={onAutoHide}>
           Auto Hide
@@ -267,7 +267,7 @@ describe('GameBadge', () => {
       expect(screen.getByText('Auto Hide')).toBeInTheDocument();
 
       // Fast-forward time
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       await waitFor(() => {
         expect(onAutoHide).toHaveBeenCalledTimes(1);
@@ -275,14 +275,14 @@ describe('GameBadge', () => {
     });
 
     it('should not auto-hide when autoHideMs is 0', async () => {
-      const onAutoHide = jest.fn();
+      const onAutoHide = vi.fn();
       render(
         <GameBadge autoHideMs={0} onAutoHide={onAutoHide}>
           No Auto Hide
         </GameBadge>
       );
 
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
 
       await waitFor(() => {
         expect(screen.getByText('No Auto Hide')).toBeInTheDocument();
@@ -291,14 +291,14 @@ describe('GameBadge', () => {
     });
 
     it('should not auto-hide when autoHideMs is not provided', async () => {
-      const onAutoHide = jest.fn();
+      const onAutoHide = vi.fn();
       render(
         <GameBadge onAutoHide={onAutoHide}>
           No Auto Hide
         </GameBadge>
       );
 
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
 
       await waitFor(() => {
         expect(screen.getByText('No Auto Hide')).toBeInTheDocument();
@@ -307,7 +307,7 @@ describe('GameBadge', () => {
     });
 
     it('should cleanup timer on unmount', () => {
-      const onAutoHide = jest.fn();
+      const onAutoHide = vi.fn();
       const { unmount } = render(
         <GameBadge autoHideMs={5000} onAutoHide={onAutoHide}>
           Will Unmount
@@ -316,7 +316,7 @@ describe('GameBadge', () => {
 
       unmount();
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       expect(onAutoHide).not.toHaveBeenCalled();
     });
@@ -397,7 +397,7 @@ describe('GameBadge', () => {
     });
 
     it('should render late joiner badge with auto-hide', () => {
-      const onHide = jest.fn();
+      const onHide = vi.fn();
       render(
         <GameBadge
           variant="late-joiner"
@@ -413,7 +413,7 @@ describe('GameBadge', () => {
       expect(screen.getByText('LATE JOINER')).toBeInTheDocument();
       expect(screen.getByText('🚀')).toBeInTheDocument();
 
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
 
       waitFor(() => {
         expect(onHide).toHaveBeenCalled();

@@ -450,18 +450,52 @@ export function generateObjectives(
     });
   }
 
-  // Secondary objectives based on level progression
-  // Breather levels skip secondary objectives for a relaxed experience
+  // =============================================
+  // SECONDARY OBJECTIVES
+  // Every level gets at least 2 secondaries (1 for breathers)
+  // so players can earn 1, 2, or 3 stars — not just 3-or-nothing.
+  // =============================================
+
+  // --- Secondary 1: Complementary objective (opposite of primary) ---
+  // If primary is wordCount, secondary is a score stretch goal (and vice versa)
+  const complementaryMultiplier = isBreatherLevel ? 0.5 : 0.7;
+  if (level % 2 === 1) {
+    // Primary is wordCount → secondary is scoreTarget
+    const AVERAGE_WORD_SCORE = 65;
+    const estimatedWordsInTime = timerSeconds / 5;
+    const difficultyFactor = 0.7 + (world - 1) * (0.4 / 9);
+    const target = Math.round(
+      estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * complementaryMultiplier
+    );
+    objectives.push({
+      type: OBJECTIVE_TYPES.SCORE_TARGET as ObjectiveType,
+      target: Math.max(target, 200),
+      isPrimary: false,
+    });
+  } else {
+    // Primary is scoreTarget → secondary is wordCount
+    const estimatedWordsInTime = timerSeconds / 5;
+    const target = Math.round(estimatedWordsInTime * complementaryMultiplier);
+    objectives.push({
+      type: OBJECTIVE_TYPES.WORD_COUNT as ObjectiveType,
+      target: Math.max(target, 3),
+      isPrimary: false,
+    });
+  }
+
+  // Breather levels get only 1 secondary (relaxed but not binary)
   if (isBreatherLevel) return objectives;
 
-  // Long words objective (level 3+)
+  // --- Secondary 2+: Skill-based objectives that scale with progression ---
+
+  // Long words objective (level 2+)
   // Only add if grid supports paths of LONG_WORD_LENGTH (5)
   const LONG_WORD_LENGTH = 5;
-  if (level >= 3) {
+  if (level >= 2) {
     const gridSupportsLongWords = !grid || hasPathOfLength(grid, LONG_WORD_LENGTH);
     if (gridSupportsLongWords) {
-      // 1 long word at level 3, +1 every 3 levels, max 5
-      const target = Math.min(1 + Math.floor((level - 3) / 3), 5);
+      // 1 long word at level 2, +1 every 3 levels, max 5
+      const target = Math.min(1 + Math.floor((level - 2) / 3), 5);
       objectives.push({
         type: OBJECTIVE_TYPES.LONG_WORDS as ObjectiveType,
         target,
@@ -478,10 +512,22 @@ export function generateObjectives(
     }
   }
 
-  // Clear ice objective (world 2+, level 5+)
-  if (world >= 2 && level >= 5) {
+  // For level 1, add a time bonus as the second secondary
+  // (since longWords doesn't kick in until level 2)
+  if (level === 1) {
+    // Easy time bonus: finish with 20%+ time remaining
+    const target = Math.max(Math.round(timerSeconds * 0.2), 15);
+    objectives.push({
+      type: OBJECTIVE_TYPES.TIME_BONUS as ObjectiveType,
+      target,
+      isPrimary: false,
+    });
+  }
+
+  // Clear ice objective (world 2+, level 4+)
+  if (world >= 2 && level >= 4) {
     // 2 ice tiles + 1 per 2 levels, max 10
-    const target = Math.min(2 + Math.floor((level - 5) / 2), 10);
+    const target = Math.min(2 + Math.floor((level - 4) / 2), 10);
     objectives.push({
       type: OBJECTIVE_TYPES.CLEAR_ICE as ObjectiveType,
       target,
@@ -489,8 +535,8 @@ export function generateObjectives(
     });
   }
 
-  // Time bonus objective (level 5+, worlds 3+)
-  if (world >= 3 && level >= 5 && !isBossLevel) {
+  // Time bonus objective (level 6+, worlds 3+)
+  if (world >= 3 && level >= 6 && !isBossLevel) {
     // Complete with 30+ seconds remaining
     const target = Math.max(30 - (world - 3) * 5, 10);
     objectives.push({

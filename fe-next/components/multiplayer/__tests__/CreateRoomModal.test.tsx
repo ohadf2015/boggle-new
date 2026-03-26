@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
 import CreateRoomModal from '../CreateRoomModal';
 import type { Language } from '@/shared/types/game';
 import { DEFAULT_AVATAR_CONFIG, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import * as profileStorage from '@/utils/profileStorage';
 
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
@@ -20,7 +21,7 @@ jest.mock('@/components/ui/dialog', () => ({
     <h2 className={className} data-testid="dialog-title">{children}</h2>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -45,16 +46,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestUser'),
-  getStoredCustomAvatar: jest.fn().mockReturnValue(null),
-  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', eyebrows: 'none', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4', shirtColor: '#4A90D9' }),
-  setStoredUsername: jest.fn(),
-  setStoredCustomAvatar: jest.fn(),
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: vi.fn().mockReturnValue('TestUser'),
+  getStoredCustomAvatar: vi.fn().mockReturnValue(null),
+  getOrCreateStoredCustomAvatar: vi.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', eyebrows: 'none', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4', shirtColor: '#4A90D9' }),
+  setStoredUsername: vi.fn(),
+  setStoredCustomAvatar: vi.fn(),
 }));
 
-jest.mock('@/utils/consts', () => ({
-  sanitizeRoomName: jest.fn((name: string) => name),
+vi.mock('@/utils/consts', () => ({
+  sanitizeRoomName: vi.fn((name: string) => name),
   NAME_VALID_PATTERN: /^[\p{L}\p{N}\s._-]+$/u,
   USERNAME_MIN_LENGTH: 2,
   USERNAME_MAX_LENGTH: 20,
@@ -72,7 +73,7 @@ jest.mock('@/utils/consts', () => ({
   PASSWORD_STRENGTH_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 }));
 
-jest.mock('@/utils/validation', () => ({
+vi.mock('@/utils/validation', () => ({
   validateUsername: (username: string) => {
     if (!username || username.trim().length < 2) {
       return { isValid: false, error: 'validation.usernameRequired' };
@@ -81,11 +82,11 @@ jest.mock('@/utils/validation', () => ({
   },
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
 }));
 
-jest.mock('@/components/multiplayer/AvatarSelector', () => ({
+vi.mock('@/components/multiplayer/AvatarSelector', () => ({
   AvatarSelector: ({ onAvatarChange }: {
     selectedAvatar?: CustomAvatarConfig | null;
     onAvatarChange: (config: CustomAvatarConfig) => void;
@@ -100,7 +101,7 @@ jest.mock('@/components/multiplayer/AvatarSelector', () => ({
   ),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   // Cache components to prevent unmount/remount on re-render
   const cache: Record<string, React.FC<Record<string, unknown>>> = {};
 
@@ -129,16 +130,16 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
 describe('CreateRoomModal', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     isCreating: false,
-    onCreate: jest.fn(),
+    onCreate: vi.fn(),
     defaultLanguage: 'en' as Language,
     isAuthenticated: false,
     displayName: null,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render AvatarSelector', () => {
@@ -159,9 +160,8 @@ describe('CreateRoomModal', () => {
 
   it('should show validation error on submit with empty name', async () => {
     const user = userEvent.setup();
-    const mockOnCreate = jest.fn();
-    const profileStorage = jest.requireMock('@/utils/profileStorage');
-    profileStorage.getStoredUsername.mockReturnValueOnce('');
+    const mockOnCreate = vi.fn();
+    (profileStorage.getStoredUsername as ReturnType<typeof vi.fn>).mockReturnValueOnce('');
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
     const createButton = screen.getByRole('button', { name: /create room/i });
@@ -178,7 +178,7 @@ describe('CreateRoomModal', () => {
 
   it('should call onCreate with correct config', async () => {
     const user = userEvent.setup();
-    const mockOnCreate = jest.fn();
+    const mockOnCreate = vi.fn();
 
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
@@ -215,7 +215,7 @@ describe('CreateRoomModal', () => {
 
   it('should switch language when clicking a flag pill', async () => {
     const user = userEvent.setup();
-    const mockOnCreate = jest.fn();
+    const mockOnCreate = vi.fn();
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
     // Wait for useEffect to populate state

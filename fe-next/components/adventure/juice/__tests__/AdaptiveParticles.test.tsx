@@ -12,8 +12,8 @@ import * as useParticleBudgetModule from '@/hooks/useParticleBudget';
 import * as confettiUtilsModule from '@/utils/confettiUtils';
 
 // Mock dependencies
-jest.mock('@/hooks/useParticleBudget');
-jest.mock('@/utils/confettiUtils');
+vi.mock('@/hooks/useParticleBudget');
+vi.mock('@/utils/confettiUtils');
 
 const mockUseParticleBudget = useParticleBudgetModule.useParticleBudget as jest.MockedFunction<
   typeof useParticleBudgetModule.useParticleBudget
@@ -25,7 +25,7 @@ const mockFireConfetti = confettiUtilsModule.fireConfetti as jest.MockedFunction
 
 describe('AdaptiveParticles', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('basic functionality', () => {
@@ -38,7 +38,7 @@ describe('AdaptiveParticles', () => {
         word: 10,
       });
 
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       mockFireConfetti.mockResolvedValue(null);
 
       render(
@@ -93,7 +93,7 @@ describe('AdaptiveParticles', () => {
         word: 10,
       });
 
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       mockFireConfetti.mockResolvedValue(null);
 
       render(
@@ -173,7 +173,7 @@ describe('AdaptiveParticles', () => {
 
       mockFireConfetti.mockResolvedValue(null);
 
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <AdaptiveParticles

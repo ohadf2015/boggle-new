@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: Profile Navigation UX - Prevent Tab Switching Confusion
  *
@@ -16,34 +17,34 @@ import GlobalBottomNav from '@/components/GlobalBottomNav';
 import React from 'react';
 
 // Mock Next.js navigation
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(),
-  useRouter: jest.fn(() => ({
-    push: jest.fn(),
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(),
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
   })),
 }));
 
 // Mock contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   useNavigation: () => ({
     isInGame: false,
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
   }),
 }));
 
-jest.mock('@/hooks/useSafeArea', () => ({
+vi.mock('@/hooks/useSafeArea', () => ({
   useSafeArea: () => ({
     top: 0,
     bottom: 0,
@@ -52,7 +53,7 @@ jest.mock('@/hooks/useSafeArea', () => ({
   }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
   }),
@@ -60,12 +61,12 @@ jest.mock('@/utils/ThemeContext', () => ({
 
 describe('Profile Navigation UX - Tab Consistency', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should remain visible on /profile path (fixed behavior)', () => {
     // GIVEN user is on profile page
-    (usePathname as jest.Mock).mockReturnValue('/en/profile');
+    (usePathname as Mock).mockReturnValue('/en/profile');
 
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
@@ -78,7 +79,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
 
   it('should remain visible on landing page (existing behavior)', () => {
     // GIVEN user is on landing page
-    (usePathname as jest.Mock).mockReturnValue('/en');
+    (usePathname as Mock).mockReturnValue('/en');
 
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
@@ -94,7 +95,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
     // Currently it will fail because GlobalBottomNav is hidden on /profile
 
     // GIVEN user is on profile page
-    (usePathname as jest.Mock).mockReturnValue('/en/profile');
+    (usePathname as Mock).mockReturnValue('/en/profile');
 
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
@@ -115,7 +116,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
       ];
 
       paths.forEach(path => {
-        (usePathname as jest.Mock).mockReturnValue(path);
+        (usePathname as Mock).mockReturnValue(path);
         const { unmount } = render(<GlobalBottomNav />);
 
         // All main sections should show GlobalBottomNav for consistency

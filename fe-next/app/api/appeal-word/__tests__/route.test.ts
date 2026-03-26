@@ -1,13 +1,14 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for POST /api/appeal-word
  * Player-facing endpoint to appeal rejected words from multiplayer results.
  */
 
 // Mock next/server BEFORE any imports
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn(),
   NextResponse: {
-    json: jest.fn((data: Record<string, unknown>, init?: { status?: number }) => ({
+    json: vi.fn((data: Record<string, unknown>, init?: { status?: number }) => ({
       json: async () => data,
       status: init?.status || 200,
     })),
@@ -15,8 +16,8 @@ jest.mock('next/server', () => ({
 }));
 
 // Mock Supabase
-const mockRpc = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
+const mockRpc = vi.fn();
+vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     rpc: mockRpc,
   }),
@@ -44,7 +45,7 @@ function makeRequest(body: Record<string, unknown>) {
 
 describe('POST /api/appeal-word', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRpc.mockResolvedValue({ error: null });
   });
 

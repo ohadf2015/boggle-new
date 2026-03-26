@@ -2,7 +2,7 @@
  * Test to verify pages use texture-halftone instead of gradient backgrounds
  */
 
-import { describe, it } from '@jest/globals';
+import { describe, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 

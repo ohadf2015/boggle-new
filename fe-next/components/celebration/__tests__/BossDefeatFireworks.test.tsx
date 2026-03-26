@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { BossDefeatFireworks, BOSS_TIER_CONFIG } from '../BossDefeatFireworks';
 
 // Mock NewYearFireworks
-jest.mock('../NewYearFireworks', () => ({
+vi.mock('../NewYearFireworks', () => ({
   __esModule: true,
   default: ({ active, count, duration }: { active: boolean; count: number; duration: number }) => (
     active ? (

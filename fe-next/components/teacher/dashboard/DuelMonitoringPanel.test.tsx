@@ -8,9 +8,9 @@ import { useClassroomActivity } from '@/hooks/useClassroomActivity';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock hooks
-jest.mock('@/hooks/useClassroomActivity');
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(),
+vi.mock('@/hooks/useClassroomActivity');
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(),
 }));
 
 const mockUseClassroomActivity = useClassroomActivity as jest.MockedFunction<typeof useClassroomActivity>;
@@ -21,7 +21,7 @@ describe('DuelMonitoringPanel', () => {
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       dir: 'ltr',
       currentFlag: '🇺🇸',
     });

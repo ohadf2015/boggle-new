@@ -9,7 +9,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { AdventureEffectsLayer } from '../AdventureEffectsLayer';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...p }: any) => <div {...p}>{children}</div> },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));

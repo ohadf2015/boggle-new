@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 
 // Mock framer-motion to avoid animation issues
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
     motion: {
         button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
         div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -14,65 +14,69 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock MusicControls and AuthButton
-jest.mock('../MusicControls', () => {
-    return function MockMusicControls() {
+vi.mock('../MusicControls', () => {
+  const MockMusicControls = () => {
         return <div data-testid="music-controls">Music</div>;
     };
+  return { default: MockMusicControls };
 });
 
-jest.mock('../auth/AuthButton', () => {
-    return function MockAuthButton() {
+vi.mock('../auth/AuthButton', () => {
+  const MockAuthButton = () => {
         return <div data-testid="auth-button">Auth</div>;
     };
+  return { default: MockAuthButton };
 });
 
-jest.mock('../QuickLanguageSwitcher', () => ({
+vi.mock('../QuickLanguageSwitcher', () => ({
     QuickLanguageSwitcher: function MockQuickLanguageSwitcher() {
         return <div data-testid="language-switcher">Language</div>;
     },
 }));
 
-jest.mock('../CoinBalance', () => ({
+vi.mock('../CoinBalance', () => ({
     CoinBalance: function MockCoinBalance({ coins }: { coins: number }) {
         return <div data-testid="coin-balance">{coins} coins</div>;
     },
 }));
 
-jest.mock('../gift/GiftNotificationBadge', () => ({
+vi.mock('../gift/GiftNotificationBadge', () => ({
     GiftNotificationBadge: function MockGiftNotificationBadge({ count }: { count: number }) {
         return <span data-testid="gift-badge">{count}</span>;
     },
 }));
 
-jest.mock('../auth/AuthModal', () => {
-    return function MockAuthModal() {
+vi.mock('../auth/AuthModal', () => {
+  const MockAuthModal = () => {
         return null;
     };
+  return { default: MockAuthModal };
 });
 
-jest.mock('../gift/AdminGiftModal', () => ({
+vi.mock('../gift/AdminGiftModal', () => ({
     AdminGiftModal: function MockAdminGiftModal() {
         return null;
     },
 }));
 
-jest.mock('next/link', () => {
-    return function MockLink({ children, href, ...props }: any) {
+vi.mock('next/link', () => {
+  const MockLink = ({ children, href, ...props }: any) => {
         return (
             <a href={href} {...props}>
                 {children}
             </a>
         );
     };
+  return { default: MockLink };
 });
 
 // Mock dependencies
-jest.mock('../../contexts/LanguageContext');
-jest.mock('../../contexts/AuthContext');
-jest.mock('@/hooks/useUnclaimedGifts');
-jest.mock('next/navigation', () => ({
+vi.mock('../../contexts/LanguageContext');
+vi.mock('../../contexts/AuthContext');
+vi.mock('@/hooks/useUnclaimedGifts');
+vi.mock('next/navigation', () => ({
     useRouter: () => ({
-        push: jest.fn(),
+        push: vi.fn(),
     }),
 }));
 
@@ -86,7 +90,7 @@ describe('Header Button Consistency', () => {
             t: (key: string) => key,
             language: 'en' as const,
             currentFlag: '🇺🇸',
-            setLanguage: jest.fn(),
+            setLanguage: vi.fn(),
             dir: 'ltr' as const,
         });
 
@@ -99,7 +103,7 @@ describe('Header Button Consistency', () => {
                 total_coins: 100,
                 total_xp: 50,
             } as any,
-            refreshProfile: jest.fn(),
+            refreshProfile: vi.fn(),
             user: null,
             loading: false,
             isSupabaseEnabled: true,
@@ -107,8 +111,8 @@ describe('Header Button Consistency', () => {
             canPlayRanked: true,
             gamesUntilRanked: 0,
             needsProfileCustomization: false,
-            setupProfile: jest.fn(),
-            updateProfile: jest.fn(),
+            setupProfile: vi.fn(),
+            updateProfile: vi.fn(),
             rankedProgress: null,
         });
 
@@ -123,13 +127,13 @@ describe('Header Button Consistency', () => {
             ] as any,
             loading: false,
             error: null,
-            refresh: jest.fn(),
-            claimGift: jest.fn(),
+            refresh: vi.fn(),
+            claimGift: vi.fn(),
         });
     });
 
     afterEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should render all header buttons with consistent Neo-Brutalist styling', () => {

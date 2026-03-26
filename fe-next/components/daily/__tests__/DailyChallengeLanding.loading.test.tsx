@@ -10,36 +10,36 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Mock the hooks and utilities
-jest.mock('@/utils/dailyChallenge/storage', () => ({
-  hasPlayedToday: jest.fn(() => false),
-  getWordHuntStatusToday: jest.fn(() => null), // null = not played yet
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedToday: vi.fn(() => false),
+  getWordHuntStatusToday: vi.fn(() => null), // null = not played yet
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: jest.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
 }));
 
-jest.mock('@/utils/dailyChallenge', () => ({
-  getSecondsUntilNextDaily: jest.fn(() => 3600),
-  formatCountdown: jest.fn(() => '01:00:00'),
+vi.mock('@/utils/dailyChallenge', () => ({
+  getSecondsUntilNextDaily: vi.fn(() => 3600),
+  formatCountdown: vi.fn(() => '01:00:00'),
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
-      onTouchStart: jest.fn(),
-      onTouchMove: jest.fn(),
-      onTouchEnd: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
@@ -47,8 +47,8 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  ...jest.requireActual('framer-motion'),
+vi.mock('framer-motion', () => ({
+  ...vi.importActual('framer-motion'),
   motion: {
     div: ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: React.ComponentProps<'span'>) => <span {...props}>{children}</span>,
@@ -58,7 +58,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock fetch for API calls
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -73,7 +73,7 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe('DailyChallengeLanding Loading State', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock responses - slow API
     mockFetch.mockImplementation((url: string) => {
       if (url.includes('check-availability')) {
@@ -106,7 +106,7 @@ describe('DailyChallengeLanding Loading State', () => {
 
   test('cards should render immediately without waiting for API calls', () => {
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -124,7 +124,7 @@ describe('DailyChallengeLanding Loading State', () => {
 
   test('cards should NOT have reduced opacity while status is loading', () => {
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -139,7 +139,7 @@ describe('DailyChallengeLanding Loading State', () => {
 
   test('status badge should show loading indicator while checking status', () => {
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -157,7 +157,7 @@ describe('DailyChallengeLanding Loading State', () => {
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -175,7 +175,7 @@ describe('DailyChallengeLanding Loading State', () => {
 
   test('card title and tagline should be visible immediately', () => {
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 

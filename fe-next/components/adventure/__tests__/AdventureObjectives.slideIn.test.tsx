@@ -11,14 +11,14 @@ import type { LevelObjective } from '@/types/adventure';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     t: (key: string) => key,
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -44,11 +44,11 @@ const mockObjectives: LevelObjective[] = [
 
 describe('AdventureObjectives - Slide-in Animation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('renders all objectives', () => {
@@ -64,7 +64,7 @@ describe('AdventureObjectives - Slide-in Animation', () => {
   });
 
   test('onSlideInComplete is called after animation duration', () => {
-    const onSlideInComplete = jest.fn();
+    const onSlideInComplete = vi.fn();
 
     render(
       <AdventureObjectives
@@ -79,14 +79,14 @@ describe('AdventureObjectives - Slide-in Animation', () => {
     // DEBT-01: 2 objectives * 80ms stagger + 250ms duration = 410ms
     const objectivesDuration = OPTIMIZED_TIMING.getObjectivesDuration(mockObjectives.length);
     act(() => {
-      jest.advanceTimersByTime(objectivesDuration + 10);
+      vi.advanceTimersByTime(objectivesDuration + 10);
     });
 
     expect(onSlideInComplete).toHaveBeenCalledTimes(1);
   });
 
   test('animation skipped when showSlideIn is false', () => {
-    const onSlideInComplete = jest.fn();
+    const onSlideInComplete = vi.fn();
 
     render(
       <AdventureObjectives
@@ -98,7 +98,7 @@ describe('AdventureObjectives - Slide-in Animation', () => {
 
     // Should not call callback since animation wasn't shown
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
 
     expect(onSlideInComplete).not.toHaveBeenCalled();
@@ -119,17 +119,17 @@ describe('AdventureObjectives - Slide-in Animation', () => {
 
 describe('AdventureObjectives - RTL Slide Direction', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.resetModules();
+    vi.useRealTimers();
+    vi.resetModules();
   });
 
   test('slides from left in Hebrew RTL mode', () => {
     // Override mock for Hebrew
-    jest.doMock('@/contexts/LanguageContext', () => ({
+    vi.doMock('@/contexts/LanguageContext', () => ({
       useLanguage: () => ({
         language: 'he',
         t: (key: string) => key,
@@ -145,7 +145,7 @@ describe('AdventureObjectives - RTL Slide Direction', () => {
 describe('AdventureObjectives - Reduced Motion', () => {
   test('completes immediately when prefersReducedMotion is true', () => {
     // Override mock for reduced motion
-    jest.doMock('@/hooks/useDevicePerformance', () => ({
+    vi.doMock('@/hooks/useDevicePerformance', () => ({
       useDevicePerformance: () => ({
         prefersReducedMotion: true,
         enableComplexAnimations: false,

@@ -9,7 +9,7 @@ let mockRemainingTime = 60;
 let mockComboLevel = 0;
 
 // --- Core animation / motion mocks ---
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
@@ -28,78 +28,78 @@ jest.mock('framer-motion', () => ({
 }));
 
 // --- Mascot mock: render testid so we can assert presence ---
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: { variant: string }) => <div data-testid={`mascot-${variant}`} />,
   MascotWithEntrance: ({ variant }: { variant: string }) => <div data-testid={`mascot-${variant}`} />,
 }));
 
 // --- Timer hook (controllable) ---
-jest.mock('@/hooks/useGameTimer', () => ({
+vi.mock('@/hooks/useGameTimer', () => ({
   useGameTimer: () => ({
     remainingTime: mockRemainingTime,
     remainingTimeRef: { current: mockRemainingTime },
     isRunning: true,
-    start: jest.fn(),
-    pause: jest.fn(),
+    start: vi.fn(),
+    pause: vi.fn(),
   }),
 }));
 
 // --- Combo hook (controllable) ---
-jest.mock('@/hooks/useComboSystem', () => ({
+vi.mock('@/hooks/useComboSystem', () => ({
   useComboSystem: () => ({
     comboLevel: mockComboLevel,
     comboTimeRemaining: 0,
     isDangerState: false,
     maxCombo: mockComboLevel,
-    incrementCombo: jest.fn(),
-    resetCombo: jest.fn(),
+    incrementCombo: vi.fn(),
+    resetCombo: vi.fn(),
   }),
 }));
 
 // --- Context mocks ---
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
-    awardComboMilestone: jest.fn().mockResolvedValue(0),
+    awardComboMilestone: vi.fn().mockResolvedValue(0),
   }),
 }));
 
 // --- Hook mocks ---
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useGameMusic', () => ({
-  useGameMusic: jest.fn(),
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: vi.fn(),
 }));
 
-jest.mock('@/hooks/useCrazyGamesLifecycle', () => ({
-  useCrazyGamesLifecycle: jest.fn(),
+vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
+  useCrazyGamesLifecycle: vi.fn(),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -107,45 +107,45 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useNavigationGuard', () => ({
-  useNavigationGuard: jest.fn(),
+vi.mock('@/hooks/useNavigationGuard', () => ({
+  useNavigationGuard: vi.fn(),
 }));
 
-jest.mock('@/hooks/useDirectionPatternGuidance', () => ({
+vi.mock('@/hooks/useDirectionPatternGuidance', () => ({
   useDirectionPatternGuidance: () => ({
     showDirectionGuidance: false,
-    trackWordPath: jest.fn(),
-    dismissDirectionGuidance: jest.fn(),
+    trackWordPath: vi.fn(),
+    dismissDirectionGuidance: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useContextualGuidance', () => ({
+vi.mock('@/hooks/useContextualGuidance', () => ({
   useContextualGuidance: () => ({
     showSwipeTip: false,
-    dismissSwipeTip: jest.fn(),
-    triggerSwipeTipGuidance: jest.fn(),
+    dismissSwipeTip: vi.fn(),
+    triggerSwipeTipGuidance: vi.fn(),
   }),
-  useSwipeTipGuidanceTrigger: jest.fn(),
+  useSwipeTipGuidanceTrigger: vi.fn(),
 }));
 
-jest.mock('@/hooks/useFirstPlayTutorial', () => ({
+vi.mock('@/hooks/useFirstPlayTutorial', () => ({
   useFirstPlayTutorial: () => ({
     tutorialPath: null,
     tutorialWord: null,
-    trackUserPath: jest.fn(),
+    trackUserPath: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useKeyboardWordInput', () => ({
+vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({
     highlightedCells: [],
     currentWord: '',
   }),
 }));
 
-jest.mock('@/hooks/useWordSubmission', () => ({
+vi.mock('@/hooks/useWordSubmission', () => ({
   useWordSubmission: () => ({
-    submitWord: jest.fn(),
+    submitWord: vi.fn(),
     foundWords: [],
     validWordCount: 0,
     currentFeedback: null,
@@ -153,70 +153,70 @@ jest.mock('@/hooks/useWordSubmission', () => ({
 }));
 
 // --- Heavy component mocks ---
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: () => <div role="grid" data-testid="grid-component" />,
 }));
 
-jest.mock('@/components/CircularTimer', () => ({
+vi.mock('@/components/CircularTimer', () => ({
   __esModule: true,
   default: () => <div data-testid="circular-timer" />,
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: () => <div data-testid="word-forming-area" />,
 }));
 
-jest.mock('@/components/game/ComboDisplay', () => ({
+vi.mock('@/components/game/ComboDisplay', () => ({
   __esModule: true,
   default: () => <div data-testid="combo-display" />,
 }));
 
-jest.mock('@/components/achievements/AchievementProgressTracker', () => ({
+vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,
 }));
 
-jest.mock('@/components/tutorial/TutorialCallout', () => ({
+vi.mock('@/components/tutorial/TutorialCallout', () => ({
   TutorialCallout: () => null,
 }));
 
-jest.mock('@/components/game/DirectionGuidanceTooltip', () => ({
+vi.mock('@/components/game/DirectionGuidanceTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/game/SwipeTipTooltip', () => ({
+vi.mock('@/components/game/SwipeTipTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/game/KeyboardHintTooltip', () => ({
+vi.mock('@/components/game/KeyboardHintTooltip', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/ConfirmationDialog', () => ({
+vi.mock('@/components/ui/ConfirmationDialog', () => ({
   ConfirmationDialog: () => null,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
     <button {...props as React.ButtonHTMLAttributes<HTMLButtonElement>}>{children}</button>
   ),
 }));
 
-jest.mock('@/components/game/FloatingCoinAnimation', () => ({
+vi.mock('@/components/game/FloatingCoinAnimation', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: () => null,
 }));
 
 // --- Mock fetch ---
-global.fetch = jest.fn().mockResolvedValue({
+global.fetch = vi.fn().mockResolvedValue({
   ok: true,
   json: () => Promise.resolve({ success: false }),
 } as unknown as Response);
@@ -233,15 +233,15 @@ const minimalProps = {
   puzzleNumber: 1,
   language: 'en' as const,
   duration: 180,
-  onComplete: jest.fn(),
-  onQuit: jest.fn(),
+  onComplete: vi.fn(),
+  onQuit: vi.fn(),
 };
 
 describe('DailyChallengeGame - mascots', () => {
   beforeEach(() => {
     mockRemainingTime = 60;
     mockComboLevel = 0;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('does not show panic mascot when time is above threshold', () => {

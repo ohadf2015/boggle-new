@@ -18,7 +18,7 @@ const mockImageConstructorCalls: string[] = [];
 let originalImage: typeof window.Image;
 
 // Mock Next.js Image component - just render a simple img
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: function MockImage({ src, alt, width, height }: any) {
     // Only pass standard HTML img attributes, filter out Next.js-specific props
@@ -28,7 +28,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock device performance hook to enable animations
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -38,7 +38,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 
 describe('InteractiveMascot - Lazy Loading', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     // Clear tracked constructor calls
     mockImageConstructorCalls.length = 0;
 
@@ -73,8 +73,8 @@ describe('InteractiveMascot - Lazy Loading', () => {
   afterEach(() => {
     // Restore original Image constructor
     window.Image = originalImage;
-    jest.useRealTimers();
-    jest.clearAllMocks();
+    vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   it('should NOT preload all mascot GIFs on initial render', async () => {
@@ -161,7 +161,7 @@ describe('InteractiveMascot - Lazy Loading', () => {
     });
 
     // Preloading is deferred via requestIdleCallback/setTimeout — advance timers
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
     await waitFor(() => {
       // Lazy preload: only hover (gaming) and click (celebration) variants should be preloaded
       expect(mockImageConstructorCalls.length).toBeGreaterThan(0);

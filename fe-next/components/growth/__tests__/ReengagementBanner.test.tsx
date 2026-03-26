@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ReengagementBanner } from '../ReengagementBanner';
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
       return key;
@@ -23,7 +23,7 @@ describe('ReengagementBanner', () => {
         daysAway={10}
         rewards={defaultRewards}
         isActive={false}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
     expect(container.innerHTML).toBe('');
@@ -35,7 +35,7 @@ describe('ReengagementBanner', () => {
         daysAway={45}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
 
@@ -50,7 +50,7 @@ describe('ReengagementBanner', () => {
         daysAway={20}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
 
@@ -63,7 +63,7 @@ describe('ReengagementBanner', () => {
         daysAway={10}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
 
@@ -76,7 +76,7 @@ describe('ReengagementBanner', () => {
         daysAway={3}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
 
@@ -89,7 +89,7 @@ describe('ReengagementBanner', () => {
         daysAway={10}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
       />
     );
 
@@ -100,7 +100,7 @@ describe('ReengagementBanner', () => {
   });
 
   it('calls onClaim on claim button click and dismisses', () => {
-    const onClaim = jest.fn();
+    const onClaim = vi.fn();
     render(
       <ReengagementBanner
         daysAway={10}
@@ -121,13 +121,13 @@ describe('ReengagementBanner', () => {
   });
 
   it('dismisses on X click and calls onDismiss', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(
       <ReengagementBanner
         daysAway={10}
         rewards={defaultRewards}
         isActive={true}
-        onClaim={jest.fn()}
+        onClaim={vi.fn()}
         onDismiss={onDismiss}
       />
     );

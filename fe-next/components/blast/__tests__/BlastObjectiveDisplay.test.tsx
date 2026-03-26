@@ -7,7 +7,7 @@ import { BlastObjectiveDisplay } from '../BlastObjectiveDisplay';
 import type { BlastObjectiveProgress } from '../types';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockDiv = React.forwardRef(function MockDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
     return <div ref={ref} {...props}>{children}</div>;
   });
@@ -18,7 +18,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Target: () => <span data-testid="icon-target" />,
   Star: () => <span data-testid="icon-star" />,
   Gem: () => <span data-testid="icon-gem" />,

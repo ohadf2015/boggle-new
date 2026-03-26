@@ -9,7 +9,7 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock the landscape hook to force landscape mode
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => true,
 }));
 

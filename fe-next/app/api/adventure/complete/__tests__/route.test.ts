@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Adventure Complete API Route Tests
@@ -7,23 +8,24 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
+  after: vi.fn((fn: () => Promise<void>) => fn()),
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-const mockRpc = jest.fn().mockResolvedValue({ data: null, error: null });
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+const mockRpc = vi.fn().mockResolvedValue({ data: null, error: null });
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -31,14 +33,16 @@ jest.mock('@/utils/supabase/server', () => ({
 }));
 
 // Mock getLevelFromXp
-jest.mock('@/shared/utils/adventureXpUtils', () => ({
-  getLevelFromXp: jest.fn((xp: number) => Math.floor(xp / 100) + 1),
+vi.mock('@/shared/utils/adventureXpUtils', () => ({
+  getLevelFromXp: vi.fn((xp: number) => Math.floor(xp / 100) + 1),
 }));
 
 // Mock upgradeConfig — getUpgradeEffect returns 0 by default (no upgrades)
-const mockGetUpgradeEffect = jest.fn().mockReturnValue(0);
-jest.mock('@/lib/adventure/upgradeConfig', () => ({
+const mockGetUpgradeEffect = vi.fn().mockReturnValue(0);
+const mockGetUpgradeTier = vi.fn().mockReturnValue(0);
+vi.mock('@/lib/adventure/upgradeConfig', () => ({
   getUpgradeEffect: (...args: unknown[]) => mockGetUpgradeEffect(...args),
+  getUpgradeTier: (...args: unknown[]) => mockGetUpgradeTier(...args),
 }));
 
 import { NextRequest } from 'next/server';
@@ -46,7 +50,7 @@ import { POST } from '../route';
 
 // ---------- Helpers ----------
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -67,13 +71,13 @@ const validBody = { world: 1, level: 1, stars: 3, score: 500, words: 10 };
 /** Reusable profiles table mock for inline mockFrom implementations */
 function mockProfilesTable() {
   return {
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        single: jest.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
       }),
     }),
-    update: jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null }),
+    update: vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ error: null }),
     }),
   };
 }
@@ -100,21 +104,21 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'player_progression') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: progressionData,
               error: progressionError,
             }),
           }),
         }),
-        insert: jest.fn().mockResolvedValue({ error: null }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                select: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
+        insert: vi.fn().mockResolvedValue({ error: null }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
                     data: updateError ? null : (progressionData ?? mockProgression),
                     error: updateError,
                   }),
@@ -127,11 +131,11 @@ function setupDbMocks({
     }
     if (table === 'level_completions') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: completionData,
                   error: completionError,
                 }),
@@ -139,9 +143,9 @@ function setupDbMocks({
             }),
           }),
         }),
-        upsert: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        upsert: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: upsertData ?? {
                 world: 1, level: 1, stars: 3,
                 best_score: 500, best_words: 10,
@@ -155,13 +159,13 @@ function setupDbMocks({
     }
     if (table === 'profiles') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: { premium_avatar_parts: [] }, error: null }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: null }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: null }),
         }),
       };
     }
@@ -173,8 +177,9 @@ function setupDbMocks({
 
 describe('POST /api/adventure/complete', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUpgradeEffect.mockReturnValue(0);
+    mockGetUpgradeTier.mockReturnValue(0);
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -392,6 +397,46 @@ describe('POST /api/adventure/complete', () => {
       mockGetUpgradeEffect.mockReturnValue(0);
     });
 
+    it('doubles gold on first completion with doubleFirstCompletionGold upgrade (Lucky Pickaxe T4)', async () => {
+      mockGetUpgradeTier.mockImplementation((_upgrades: unknown, key: string) => {
+        if (key === 'luckyPickaxe') return 4;
+        return 0;
+      });
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { luckyPickaxe: 4 } },
+        completionData: null,
+        completionError: { code: 'PGRST116', message: 'not found' },
+      });
+
+      const res = await POST(makeRequest({ ...validBody, stars: 2 }));
+      expect(res.status).toBe(200);
+      expect(res.data.isReplay).toBe(false);
+      // baseGold = (10+3)*2 = 26, no perfect bonus
+      // goldEarned before double = 26
+      // doubleFirstCompletionGold → 26 * 2 = 52
+      expect(res.data.goldEarned).toBe(52);
+      mockGetUpgradeTier.mockReturnValue(0);
+    });
+
+    it('does NOT double gold on replay even with doubleFirstCompletionGold upgrade', async () => {
+      mockGetUpgradeTier.mockImplementation((_upgrades: unknown, key: string) => {
+        if (key === 'luckyPickaxe') return 4;
+        return 0;
+      });
+      setupDbMocks({
+        progressionData: { ...mockProgression, upgrades: { luckyPickaxe: 4 } },
+        completionData: { stars: 1, best_score: 200, best_words: 5 },
+      });
+
+      const res = await POST(makeRequest({ ...validBody, stars: 3 }));
+      expect(res.status).toBe(200);
+      expect(res.data.isReplay).toBe(true);
+      // Replay with star improvement: no replay penalty but also no double
+      // baseGold = (10+3)*3 = 39, perfectClear = 50 → 89
+      expect(res.data.goldEarned).toBe(89);
+      mockGetUpgradeTier.mockReturnValue(0);
+    });
+
     it('caps gold at 500 per level', async () => {
       mockGetUpgradeEffect.mockReturnValue(50); // extreme bonus
       setupDbMocks({
@@ -542,31 +587,31 @@ describe('POST /api/adventure/complete', () => {
           // Build a chainable mock that supports both the 2-eq pattern (initial)
           // and 1-eq pattern (retry), plus standalone select for gold re-read
           const makeUpdateChain = () => {
-            const singleFn = jest.fn().mockResolvedValue({ data: null, error: null });
-            const selectFn = jest.fn().mockReturnValue({ single: singleFn });
-            const eqStars = jest.fn().mockReturnValue({ select: selectFn });
-            const eqGold = jest.fn().mockReturnValue({ eq: eqStars, select: selectFn });
-            const eqUser = jest.fn().mockReturnValue({ eq: eqGold, select: selectFn });
+            const singleFn = vi.fn().mockResolvedValue({ data: null, error: null });
+            const selectFn = vi.fn().mockReturnValue({ single: singleFn });
+            const eqStars = vi.fn().mockReturnValue({ select: selectFn });
+            const eqGold = vi.fn().mockReturnValue({ eq: eqStars, select: selectFn });
+            const eqUser = vi.fn().mockReturnValue({ eq: eqGold, select: selectFn });
             return { eq: eqUser };
           };
           const makeSelectChain = () => {
-            const singleFn = jest.fn().mockResolvedValue({ data: mockProgression, error: null });
-            const eqFn = jest.fn().mockReturnValue({ single: singleFn });
+            const singleFn = vi.fn().mockResolvedValue({ data: mockProgression, error: null });
+            const eqFn = vi.fn().mockReturnValue({ single: singleFn });
             return { eq: eqFn };
           };
           return {
-            select: jest.fn().mockReturnValue(makeSelectChain()),
-            insert: jest.fn().mockResolvedValue({ error: null }),
-            update: jest.fn().mockReturnValue(makeUpdateChain()),
+            select: vi.fn().mockReturnValue(makeSelectChain()),
+            insert: vi.fn().mockResolvedValue({ error: null }),
+            update: vi.fn().mockReturnValue(makeUpdateChain()),
           };
         }
         if (table === 'level_completions') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  eq: jest.fn().mockReturnValue({
-                    single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    single: vi.fn().mockResolvedValue({
                       data: null,
                       error: { code: 'PGRST116', message: 'not found' },
                     }),
@@ -574,9 +619,9 @@ describe('POST /api/adventure/complete', () => {
                 }),
               }),
             }),
-            upsert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            upsert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: {
                     world: 1, level: 1, stars: 3,
                     best_score: 500, best_words: 10,
@@ -669,25 +714,25 @@ describe('POST /api/adventure/complete', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'player_progression') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: mockProgression,
                   error: null,
                 }),
               }),
             }),
-            insert: jest.fn().mockResolvedValue({ error: null }),
-            update: jest.fn().mockReturnValue({
-              eq: jest.fn().mockImplementation(() => {
+            insert: vi.fn().mockResolvedValue({ error: null }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockImplementation(() => {
                 updateCallCount++;
                 if (updateCallCount === 1) {
                   // First call: optimistic lock chain → gold column error
                   return {
-                    eq: jest.fn().mockReturnValue({
-                      eq: jest.fn().mockReturnValue({
-                        select: jest.fn().mockReturnValue({
-                          single: jest.fn().mockResolvedValue({
+                    eq: vi.fn().mockReturnValue({
+                      eq: vi.fn().mockReturnValue({
+                        select: vi.fn().mockReturnValue({
+                          single: vi.fn().mockResolvedValue({
                             data: null,
                             error: { code: 'PGRST204', message: 'gold column not found' },
                           }),
@@ -704,11 +749,11 @@ describe('POST /api/adventure/complete', () => {
         }
         if (table === 'level_completions') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  eq: jest.fn().mockReturnValue({
-                    single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    single: vi.fn().mockResolvedValue({
                       data: null,
                       error: { code: 'PGRST116', message: 'not found' },
                     }),
@@ -716,9 +761,9 @@ describe('POST /api/adventure/complete', () => {
                 }),
               }),
             }),
-            upsert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            upsert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: {
                     world: 1, level: 1, stars: 3,
                     best_score: 500, best_words: 10,

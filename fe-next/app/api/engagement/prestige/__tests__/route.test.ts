@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Prestige API Route Tests
@@ -7,30 +8,30 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock Sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Mock supabase
-const mockGetUser = jest.fn();
-const mockSelect = jest.fn();
-const mockUpdate = jest.fn();
-const mockRpc = jest.fn();
+const mockGetUser = vi.fn();
+const mockSelect = vi.fn();
+const mockUpdate = vi.fn();
+const mockRpc = vi.fn();
 
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: () => ({
       select: (...args: unknown[]) => mockSelect(...args),
@@ -69,8 +70,8 @@ function mockProfile(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
   mockSelect.mockReturnValue({
-    eq: jest.fn().mockReturnValue({
-      single: jest.fn().mockResolvedValue({ data: profile, error: null }),
+    eq: vi.fn().mockReturnValue({
+      single: vi.fn().mockResolvedValue({ data: profile, error: null }),
     }),
   });
   return profile;
@@ -78,8 +79,8 @@ function mockProfile(overrides: Record<string, unknown> = {}) {
 
 function mockProfileError(error = { message: 'DB down' }) {
   mockSelect.mockReturnValue({
-    eq: jest.fn().mockReturnValue({
-      single: jest.fn().mockResolvedValue({ data: null, error }),
+    eq: vi.fn().mockReturnValue({
+      single: vi.fn().mockResolvedValue({ data: null, error }),
     }),
   });
 }
@@ -97,7 +98,7 @@ function mockRpcSuccess(prestige = 1) {
   });
   // Mock the follow-up update for prestige_unlocks
   mockUpdate.mockReturnValue({
-    eq: jest.fn().mockResolvedValue({ error: null }),
+    eq: vi.fn().mockResolvedValue({ error: null }),
   });
 }
 
@@ -121,7 +122,7 @@ function mockRpcError(error = { message: 'RPC failed' }) {
 
 describe('GET /api/engagement/prestige', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('rejects unauthenticated requests with 401', async () => {
@@ -188,7 +189,7 @@ describe('GET /api/engagement/prestige', () => {
 
 describe('POST /api/engagement/prestige', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ===== AUTH =====

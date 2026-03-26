@@ -32,33 +32,33 @@ const mockTranslations: Record<string, string> = {
   'common.exit': 'Exit',
 };
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
     coins: 100,
-    spendCoins: jest.fn(),
-    refreshCoins: jest.fn(),
-    awardGameCompletion: jest.fn().mockResolvedValue(null),
+    spendCoins: vi.fn(),
+    refreshCoins: vi.fn(),
+    awardGameCompletion: vi.fn().mockResolvedValue(null),
   }),
 }));
 
-jest.mock('@/components/ads/RewardedAdButton', () => ({
+vi.mock('@/components/ads/RewardedAdButton', () => ({
   RewardedAdButton: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -67,7 +67,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const createMockMotion = (element: string) => {
     const MockComponent = React.forwardRef(
@@ -88,9 +88,9 @@ jest.mock('framer-motion', () => {
 
   const mockMotionValue = {
     get: () => 0,
-    set: jest.fn(),
-    onChange: jest.fn(),
-    on: jest.fn(() => jest.fn()),
+    set: vi.fn(),
+    onChange: vi.fn(),
+    on: vi.fn(() => vi.fn()),
     current: 0,
   };
 
@@ -113,7 +113,7 @@ jest.mock('framer-motion', () => {
 
 // Mock useParallax hook
 const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
-jest.mock('@/hooks/useParallax', () => ({
+vi.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
     x: mockMotionValue(0),
     y: mockMotionValue(0),
@@ -122,12 +122,12 @@ jest.mock('@/hooks/useParallax', () => ({
 }));
 
 // Mock usePrefersReducedMotion hook
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
 // Mock useParticleBudget hook
-jest.mock('@/hooks/useParticleBudget', () => ({
+vi.mock('@/hooks/useParticleBudget', () => ({
   useParticleBudget: () => ({
     combo: 20,
     word: 10,
@@ -136,12 +136,12 @@ jest.mock('@/hooks/useParticleBudget', () => ({
 }));
 
 // Mock confettiUtils
-jest.mock('@/utils/confettiUtils', () => ({
-  fireVictoryConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireVictoryConfetti: vi.fn(),
 }));
 
 // Mock RewardedAdButton (uses ThemeProvider internally)
-jest.mock('@/components/ads/RewardedAdButton', () => ({
+vi.mock('@/components/ads/RewardedAdButton', () => ({
   RewardedAdButton: ({ children }: any) => children || null,
 }));
 
@@ -162,9 +162,9 @@ const defaultProps = {
   objectives: mockObjectives,
   levelNumber: 5,
   worldNumber: 1,
-  onContinue: jest.fn(),
-  onRetry: jest.fn(),
-  onExit: jest.fn(),
+  onContinue: vi.fn(),
+  onRetry: vi.fn(),
+  onExit: vi.fn(),
 };
 
 // ==============================================
@@ -173,7 +173,7 @@ const defaultProps = {
 
 describe('LevelCompleteModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {
@@ -310,7 +310,7 @@ describe('LevelCompleteModal', () => {
   describe('Action Buttons', () => {
     it('should call onContinue when continue button is clicked', () => {
       // GIVEN
-      const onContinue = jest.fn();
+      const onContinue = vi.fn();
       render(<LevelCompleteModal {...defaultProps} onContinue={onContinue} />);
 
       // WHEN
@@ -322,7 +322,7 @@ describe('LevelCompleteModal', () => {
 
     it('should call onRetry when retry button is clicked', () => {
       // GIVEN
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       render(<LevelCompleteModal {...defaultProps} onRetry={onRetry} />);
 
       // WHEN
@@ -334,7 +334,7 @@ describe('LevelCompleteModal', () => {
 
     it('should call onExit when exit button is clicked', () => {
       // GIVEN
-      const onExit = jest.fn();
+      const onExit = vi.fn();
       render(<LevelCompleteModal {...defaultProps} onExit={onExit} />);
 
       // WHEN

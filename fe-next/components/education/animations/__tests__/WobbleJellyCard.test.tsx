@@ -8,13 +8,13 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WobbleJellyCard } from '../WobbleJellyCard';
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} data-testid="wobble-card" {...rest}>{children}</div>
     ),
   },
-  useReducedMotion: jest.fn().mockReturnValue(false),
+  useReducedMotion: vi.fn().mockReturnValue(false),
 }));
 
 describe('WobbleJellyCard', () => {

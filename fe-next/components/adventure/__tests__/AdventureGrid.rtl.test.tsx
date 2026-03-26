@@ -8,7 +8,7 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState } from '@/types/adventure';
 
 // Mock the hooks and contexts
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -18,7 +18,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   AdventureThemeContext: React.createContext({ worldId: 1 }),
   useHUDTheme: () => ({
     headerBg: 'bg-neo-navy/90',
@@ -57,7 +57,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: React.HTMLAttributes<HTMLDivElement> & { style?: React.CSSProperties }) => (
       <div className={className} style={style} {...props}>

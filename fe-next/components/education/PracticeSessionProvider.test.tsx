@@ -10,25 +10,25 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock dependencies
-const mockAwardPracticeXp = jest.fn();
-const mockAcknowledgePersistence = jest.fn();
-const mockCheckForUnlocks = jest.fn();
-const mockAcknowledgeUnlock = jest.fn();
+const mockAwardPracticeXp = vi.fn();
+const mockAcknowledgePersistence = vi.fn();
+const mockCheckForUnlocks = vi.fn();
+const mockAcknowledgeUnlock = vi.fn();
 
 // Mock Supabase
-const mockSupabaseUpsert = jest.fn().mockResolvedValue({ data: null, error: null });
-jest.mock('@/lib/supabase', () => ({
+const mockSupabaseUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(() => ({
+    from: vi.fn(() => ({
       upsert: mockSupabaseUpsert,
     })),
   },
 }));
 
 // Mock useEducationXp hook
-jest.mock('@/hooks/useEducationXp', () => ({
+vi.mock('@/hooks/useEducationXp', () => ({
   __esModule: true,
-  default: jest.fn(() => ({
+  default: vi.fn(() => ({
     totalXp: 500,
     currentLevel: 3,
     xpProgress: {
@@ -49,7 +49,7 @@ jest.mock('@/hooks/useEducationXp', () => ({
     error: null,
     pendingUpdate: null,
   })),
-  useEducationXp: jest.fn(() => ({
+  useEducationXp: vi.fn(() => ({
     totalXp: 500,
     currentLevel: 3,
     xpProgress: {
@@ -73,9 +73,9 @@ jest.mock('@/hooks/useEducationXp', () => ({
 }));
 
 // Mock useAchievementUnlock hook
-jest.mock('@/hooks/useAchievementUnlock', () => ({
+vi.mock('@/hooks/useAchievementUnlock', () => ({
   __esModule: true,
-  default: jest.fn(() => ({
+  default: vi.fn(() => ({
     pendingUnlocks: [],
     currentUnlock: null,
     acknowledgeUnlock: mockAcknowledgeUnlock,
@@ -85,14 +85,14 @@ jest.mock('@/hooks/useAchievementUnlock', () => ({
 }));
 
 // Mock UnifiedAchievementModal component
-jest.mock('@/components/achievements/UnifiedAchievementModal', () => ({
+vi.mock('@/components/achievements/UnifiedAchievementModal', () => ({
   __esModule: true,
-  UnifiedAchievementModal: jest.fn(() => <div data-testid="achievement-modal">Achievement Modal</div>),
+  UnifiedAchievementModal: vi.fn(() => <div data-testid="achievement-modal">Achievement Modal</div>),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
@@ -136,7 +136,7 @@ function TestConsumer() {
 
 describe('PracticeSessionProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAwardPracticeXp.mockResolvedValue({
       totalXp: 100,
       breakdown: { flashcardCorrect: 90, accuracyBonus: 10 },
@@ -338,7 +338,7 @@ describe('PracticeSessionProvider', () => {
   describe('usePracticeSession hook', () => {
     it('throws error when used outside provider', () => {
       // Suppress console.error for this test
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       expect(() => {
         render(<TestConsumer />);
@@ -421,7 +421,7 @@ describe('PracticeSessionProvider', () => {
   describe('Error handling', () => {
     it('handles Supabase errors gracefully', async () => {
       const user = userEvent.setup();
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       mockSupabaseUpsert.mockResolvedValueOnce({
         data: null,
@@ -546,7 +546,7 @@ describe('PracticeSessionProvider', () => {
 
     it('renders AchievementUnlockModal when currentUnlock is set', () => {
       // Import the mock to modify it
-      const useAchievementUnlockModule = jest.requireMock('@/hooks/useAchievementUnlock');
+      const useAchievementUnlockModule = vi.importMock('@/hooks/useAchievementUnlock');
 
       // Set currentUnlock to a valid unlock payload
       useAchievementUnlockModule.default.mockReturnValue({
@@ -604,7 +604,7 @@ describe('PracticeSessionProvider', () => {
 
     it('does not re-trigger achievement check if XP award fails', async () => {
       const user = userEvent.setup();
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       mockAwardPracticeXp.mockRejectedValueOnce(new Error('XP award failed'));
 

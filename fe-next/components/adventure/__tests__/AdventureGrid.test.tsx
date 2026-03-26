@@ -11,8 +11,8 @@ import AdventureGrid from '../AdventureGrid';
 import type { GridTileState, TileType } from '@/types/adventure';
 
 // Mock geometry module - default behavior allows all selections
-jest.mock('../adventureGridGeometry', () => ({
-  measureAdventureGrid: jest.fn().mockReturnValue({
+vi.mock('../adventureGridGeometry', () => ({
+  measureAdventureGrid: vi.fn().mockReturnValue({
     gridRect: { left: 0, top: 0, width: 256, height: 256, right: 256, bottom: 256, x: 0, y: 0, toJSON: () => ({}) },
     cellWidth: 60,
     cellHeight: 60,
@@ -24,7 +24,7 @@ jest.mock('../adventureGridGeometry', () => ({
     cellWithGapHeight: 64,
     timestamp: Date.now(),
   }),
-  getCellAtPosition: jest.fn().mockImplementation((touchX: number, touchY: number, tiles: GridTileState[], gridSize: number) => {
+  getCellAtPosition: vi.fn().mockImplementation((touchX: number, touchY: number, tiles: GridTileState[], gridSize: number) => {
     // Simple mock: calculate cell based on position
     const col = Math.floor(touchX / 64);
     const row = Math.floor(touchY / 64);
@@ -41,10 +41,10 @@ jest.mock('../adventureGridGeometry', () => ({
     };
   }),
   getTileIndex: (row: number, col: number, gridSize: number) => row * gridSize + col,
-  isWithinSelectionThreshold: jest.fn().mockReturnValue(true), // Allow all selections by default
-  isDiagonalMove: jest.fn().mockReturnValue(false),
-  isAdjacentCell: jest.fn().mockReturnValue(true), // Allow all adjacency by default
-  hasExceededDeadzone: jest.fn().mockReturnValue(true), // Always exceed deadzone by default
+  isWithinSelectionThreshold: vi.fn().mockReturnValue(true), // Allow all selections by default
+  isDiagonalMove: vi.fn().mockReturnValue(false),
+  isAdjacentCell: vi.fn().mockReturnValue(true), // Allow all adjacency by default
+  hasExceededDeadzone: vi.fn().mockReturnValue(true), // Always exceed deadzone by default
   DEADZONE_THRESHOLD: 8,
   CELL_SELECTION_THRESHOLD: 0.85,
   DIAGONAL_SELECTION_THRESHOLD: 0.95,
@@ -208,7 +208,7 @@ describe('AdventureGrid', () => {
       // GIVEN
       const tiles = createMockTiles(4);
       tiles[0] = { ...tiles[0], isCleared: true };
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
 
       // WHEN
       render(
@@ -253,7 +253,7 @@ describe('AdventureGrid', () => {
     it('should call onTileSelect when tile is clicked', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
 
       // WHEN
       render(
@@ -298,7 +298,7 @@ describe('AdventureGrid', () => {
     it('should call onWordSubmit when word is submitted', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onWordSubmit = jest.fn();
+      const onWordSubmit = vi.fn();
       const selectedIndices = [0, 1, 2];
 
       // WHEN
@@ -427,7 +427,7 @@ describe('AdventureGrid', () => {
     it('should disable all interactions when disabled prop is true', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onTileSelect = jest.fn();
+      const onTileSelect = vi.fn();
 
       // WHEN
       render(
@@ -465,7 +465,7 @@ describe('AdventureGrid', () => {
     it('should call onDragStart when mouse is pressed on tile', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
 
       // WHEN
       render(
@@ -487,7 +487,7 @@ describe('AdventureGrid', () => {
     it('should call onDragEnter when mouse enters tile during drag', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
 
       // WHEN
       render(
@@ -511,7 +511,7 @@ describe('AdventureGrid', () => {
     it('should not call onDragEnter when not dragging', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnter = jest.fn();
+      const onDragEnter = vi.fn();
 
       // WHEN
       render(
@@ -534,7 +534,7 @@ describe('AdventureGrid', () => {
     it('should call onDragEnd when mouse is released', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragEnd = jest.fn();
+      const onDragEnd = vi.fn();
 
       // WHEN
       render(
@@ -557,8 +557,8 @@ describe('AdventureGrid', () => {
     it('should not call drag handlers when disabled', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
-      const onDragEnter = jest.fn();
+      const onDragStart = vi.fn();
+      const onDragEnter = vi.fn();
 
       // WHEN
       render(
@@ -584,7 +584,7 @@ describe('AdventureGrid', () => {
     it('should handle touch events for drag selection', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
+      const onDragStart = vi.fn();
 
       // WHEN
       render(
@@ -609,8 +609,8 @@ describe('AdventureGrid', () => {
     it('should handle touch move to select tiles during drag', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
-      const onDragEnter = jest.fn();
+      const onDragStart = vi.fn();
+      const onDragEnter = vi.fn();
 
       // Mock document.elementFromPoint to return grid cells
       const originalElementFromPoint = document.elementFromPoint;
@@ -636,7 +636,7 @@ describe('AdventureGrid', () => {
       expect(onDragStart).toHaveBeenCalledWith(0, tiles[0]);
 
       // Mock elementFromPoint to return second cell (fallback only)
-      document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
+      document.elementFromPoint = vi.fn().mockReturnValue(cells[1]);
 
       // Simulate touch move to cell 1 (row 0, col 1)
       // With 64px cell size: col 1 center = 64 + 30 = 94, row 0 center = 30
@@ -654,8 +654,8 @@ describe('AdventureGrid', () => {
     it('should not call onDragEnter twice for same tile during touch move', () => {
       // GIVEN
       const tiles = createMockTiles(4);
-      const onDragStart = jest.fn();
-      const onDragEnter = jest.fn();
+      const onDragStart = vi.fn();
+      const onDragEnter = vi.fn();
 
       const originalElementFromPoint = document.elementFromPoint;
 
@@ -679,7 +679,7 @@ describe('AdventureGrid', () => {
       });
 
       // Mock elementFromPoint to return second cell (fallback only)
-      document.elementFromPoint = jest.fn().mockReturnValue(cells[1]);
+      document.elementFromPoint = vi.fn().mockReturnValue(cells[1]);
 
       // Simulate multiple touch moves on same cell (cell 1 = row 0, col 1)
       // All coordinates within cell 1: x in [64, 127], y in [0, 63]

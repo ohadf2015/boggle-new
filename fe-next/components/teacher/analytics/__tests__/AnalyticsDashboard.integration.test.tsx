@@ -20,13 +20,13 @@ import * as useStudentProgressMetricsModule from '@/hooks/useStudentProgressMetr
 // MOCKS
 // ============================================
 
-const mockRefresh = jest.fn();
-const mockStudentRefresh = jest.fn();
+const mockRefresh = vi.fn();
+const mockStudentRefresh = vi.fn();
 
-jest.mock('@/hooks/useClassroomAnalytics');
-jest.mock('@/hooks/useStudentProgressMetrics');
+vi.mock('@/hooks/useClassroomAnalytics');
+vi.mock('@/hooks/useStudentProgressMetrics');
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -67,21 +67,21 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text || 'Loading...'}</div>
   ),
 }));
 
 // Mock StudentProgressReport (heavy component — not under test here)
-jest.mock('@/components/teacher/reports/StudentProgressReport', () => ({
+vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   StudentProgressReport: ({ studentId }: { studentId: string }) => (
     <div data-testid="student-progress-report">Report for {studentId}</div>
   ),
 }));
 
 // Mock LessonEffectivenessChart (lazy-loaded with recharts)
-jest.mock('../LessonEffectivenessChart', () => ({
+vi.mock('../LessonEffectivenessChart', () => ({
   __esModule: true,
   default: ({ classroomId }: { classroomId: string }) => (
     <div data-testid="lesson-effectiveness-chart">Chart for {classroomId}</div>
@@ -89,7 +89,7 @@ jest.mock('../LessonEffectivenessChart', () => ({
 }));
 
 // Mock Dialog from Radix (render as simple divs for testing)
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => (
@@ -162,14 +162,14 @@ function setupMocks(overrides?: {
   metrics?: typeof mockMetrics | null;
   students?: typeof mockStudents;
 }) {
-  jest.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+  vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
     metrics: overrides?.metrics !== undefined ? overrides.metrics : mockMetrics,
     isLoading: overrides?.metricsLoading ?? false,
     error: null,
     refresh: mockRefresh,
   });
 
-  jest.spyOn(useStudentProgressMetricsModule, 'useStudentProgressMetrics').mockReturnValue({
+  vi.spyOn(useStudentProgressMetricsModule, 'useStudentProgressMetrics').mockReturnValue({
     students: overrides?.students ?? mockStudents,
     isLoading: overrides?.studentsLoading ?? false,
     error: null,
@@ -189,7 +189,7 @@ function renderDashboard(props?: Partial<React.ComponentProps<typeof AnalyticsDa
 
 describe('AnalyticsDashboard - Student Progress Table Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMocks();
   });
 
@@ -218,7 +218,7 @@ describe('AnalyticsDashboard - Student Progress Table Integration', () => {
 
 describe('AnalyticsDashboard - Student Detail Dialog', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMocks();
   });
 
@@ -243,7 +243,7 @@ describe('AnalyticsDashboard - Student Detail Dialog', () => {
 
 describe('AnalyticsDashboard - Export Report Button', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMocks();
   });
 
@@ -263,7 +263,7 @@ describe('AnalyticsDashboard - Export Report Button', () => {
 
 describe('AnalyticsDashboard - Lesson Effectiveness Chart', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMocks();
   });
 
@@ -283,7 +283,7 @@ describe('AnalyticsDashboard - Lesson Effectiveness Chart', () => {
 
 describe('AnalyticsDashboard - Struggling Students Filter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMocks();
   });
 

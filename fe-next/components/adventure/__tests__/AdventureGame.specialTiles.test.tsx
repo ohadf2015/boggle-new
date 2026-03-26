@@ -18,9 +18,9 @@ import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import type { LevelConfig } from '@/types/adventure';
 
 // Mock hooks
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
-    validateWord: jest.fn(async (word: string) => ({
+    validateWord: vi.fn(async (word: string) => ({
       isValid: word.length >= 3,
       score: word.length * 10,
     })),
@@ -28,90 +28,90 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useParticleBudget', () => ({
+vi.mock('@/hooks/useParticleBudget', () => ({
   useParticleBudget: () => ({
     max: 60,
-    allocate: jest.fn((count: number) => count),
+    allocate: vi.fn((count: number) => count),
   }),
 }));
 
-jest.mock('@/hooks/useLexiReactions', () => ({
+vi.mock('@/hooks/useLexiReactions', () => ({
   useLexiReactions: () => ({
     reaction: null,
-    dismissReaction: jest.fn(),
+    dismissReaction: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useBossMechanics', () => ({
+vi.mock('@/hooks/useBossMechanics', () => ({
   useBossMechanics: () => ({
     isActive: false,
     boss: null,
     currentTaunt: null,
     showTaunt: false,
-    checkWord: jest.fn(() => ({
+    checkWord: vi.fn(() => ({
       meetsRequirement: false,
       scoreMultiplier: 1,
       triggerTaunt: null,
     })),
-    triggerTaunt: jest.fn(),
+    triggerTaunt: vi.fn(),
     bossState: { phase: 'idle' },
   }),
 }));
 
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: false,
-    getHint: jest.fn(),
+    getHint: vi.fn(),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureXp', () => ({
+vi.mock('@/hooks/useAdventureXp', () => ({
   useAdventureXp: () => ({
     totalXp: 0,
     currentLevel: 1,
     xpProgress: 0,
-    awardXp: jest.fn(() => ({ leveledUp: false })),
+    awardXp: vi.fn(() => ({ leveledUp: false })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useAdventureCurrency', () => ({
+vi.mock('@/hooks/useAdventureCurrency', () => ({
   useAdventureCurrency: () => ({
     gold: 0,
     upgrades: {},
-    addGold: jest.fn(),
-    purchase: jest.fn(),
-    getUpgradeEffect: jest.fn((type: string) => ({
+    addGold: vi.fn(),
+    purchase: vi.fn(),
+    getUpgradeEffect: vi.fn((type: string) => ({
       multiplier: 1,
       current: 0,
       max: 5,
     })),
     pendingUpdate: null,
-    acknowledgePersistence: jest.fn(),
+    acknowledgePersistence: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useScreenShake', () => ({
+vi.mock('@/hooks/useScreenShake', () => ({
   useScreenShake: () => ({
     shakeRef: { current: null },
-    shake: jest.fn(),
+    shake: vi.fn(),
   }),
 }));
 
 // Mock ExplosionEffect
-jest.mock('../juice/ExplosionEffect', () => ({
+vi.mock('../juice/ExplosionEffect', () => ({
   ExplosionEffect: () => null,
 }));
 
 // Mock useCascadeLoop
-const mockStartCascade = jest.fn();
-const mockReset = jest.fn();
+const mockStartCascade = vi.fn();
+const mockReset = vi.fn();
 let mockCascadeState = {
   phase: 'idle' as const,
   isProcessing: false,
@@ -121,7 +121,7 @@ let mockCascadeState = {
   spawningTiles: [],
 };
 
-jest.mock('@/hooks/useCascadeLoop', () => ({
+vi.mock('@/hooks/useCascadeLoop', () => ({
   useCascadeLoop: () => ({
     state: mockCascadeState,
     startCascade: mockStartCascade,
@@ -167,8 +167,8 @@ function renderGame(config = createTestLevelConfig(), grid = createTestGrid()) {
           <AdventureGame
             levelConfig={config}
             initialGrid={grid}
-            onLevelComplete={jest.fn()}
-            onExit={jest.fn()}
+            onLevelComplete={vi.fn()}
+            onExit={vi.fn()}
           />
         </AdventureThemeProvider>
       </ProgressionProvider>
@@ -178,8 +178,8 @@ function renderGame(config = createTestLevelConfig(), grid = createTestGrid()) {
 
 describe('AdventureGame Special Tile Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockCascadeState = {
       phase: 'idle',
       isProcessing: false,
@@ -192,7 +192,7 @@ describe('AdventureGame Special Tile Integration', () => {
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Frozen Tiles', () => {

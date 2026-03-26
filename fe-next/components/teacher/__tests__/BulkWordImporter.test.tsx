@@ -11,17 +11,17 @@ import BulkWordImporter from '../BulkWordImporter';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock word integration hook
-jest.mock('@/hooks/useWordIntegration', () => ({
+vi.mock('@/hooks/useWordIntegration', () => ({
   useWordIntegration: () => ({
-    checkWordIntegration: jest.fn((word: string) => ({
+    checkWordIntegration: vi.fn((word: string) => ({
       word,
       canIntegrate: word.length >= 3,
     })),
   }),
 }));
 
-const mockOnImport = jest.fn();
-const mockOnClose = jest.fn();
+const mockOnImport = vi.fn();
+const mockOnClose = vi.fn();
 
 const renderComponent = (props = {}) => {
   return render(
@@ -39,7 +39,7 @@ const renderComponent = (props = {}) => {
 
 describe('BulkWordImporter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {

@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import EducationBadgeGrid from './EducationBadgeGrid';
 
 // Mock LanguageContext
-jest.mock('../../contexts/LanguageContext', () => ({
+vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, vars?: Record<string, any>) => {
       const translations: Record<string, string> = {
@@ -44,7 +44,7 @@ jest.mock('../../contexts/LanguageContext', () => ({
 
 // Track pinned achievements for mock - can be modified in tests
 let mockPinnedKeys = new Set<string>(['first_lesson']);
-const mockTogglePin = jest.fn();
+const mockTogglePin = vi.fn();
 
 // Helper to set mock pinned keys in tests
 const setMockPinnedKeys = (keys: string[]) => {
@@ -52,13 +52,13 @@ const setMockPinnedKeys = (keys: string[]) => {
 };
 
 // Mock useAchievementPin hook
-jest.mock('../../hooks/useAchievementPin', () => ({
+vi.mock('../../hooks/useAchievementPin', () => ({
   useAchievementPin: () => ({
     pinnedKeys: mockPinnedKeys,
     togglePin: mockTogglePin,
     isLoading: false,
     error: null,
-    clearError: jest.fn(),
+    clearError: vi.fn(),
     maxPins: 3,
     pinCount: mockPinnedKeys.size,
     canPinMore: mockPinnedKeys.size < 3,
@@ -72,8 +72,8 @@ jest.mock('../../hooks/useAchievementPin', () => ({
 }));
 
 // Mock AchievementProgressCard
-jest.mock('./AchievementProgressCard', () => {
-  return function MockAchievementProgressCard({ achievement, isPinned, onTogglePin, canPin }: any) {
+vi.mock('./AchievementProgressCard', () => {
+  const MockAchievementProgressCard = ({ achievement, isPinned, onTogglePin, canPin }: any) => {
     return (
       <div data-testid={`card-${achievement.key}`} data-pinned={isPinned} data-can-pin={canPin}>
         <span>{achievement.key}</span>
@@ -83,6 +83,7 @@ jest.mock('./AchievementProgressCard', () => {
       </div>
     );
   };
+  return { default: MockAchievementProgressCard };
 });
 
 describe('EducationBadgeGrid', () => {

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Word Album Milestone Claim API Route Tests
@@ -6,35 +7,35 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow (overridden in rate-limit test)
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
 // Mock sentry
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // Mock word album milestones
-jest.mock('@/lib/adventure/wordAlbum', () => ({
+vi.mock('@/lib/adventure/wordAlbum', () => ({
   WORD_ALBUM_MILESTONES: [
     { target: 50, gold: 50, xp: 25, badge: 'collector-bronze' },
     { target: 100, gold: 100, xp: 50, badge: 'collector-silver' },
@@ -46,7 +47,7 @@ import { POST } from '../route';
 
 // ---------- Helpers ----------
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -67,9 +68,9 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'player_progression') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: fetchError
                 ? null
                 : { gold, xp, word_album: wordAlbum, word_album_claimed_milestones: claimedMilestones },
@@ -77,12 +78,12 @@ function setupDbMocks({
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              not: jest.fn().mockReturnValue({
-                select: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              not: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
                     data: updateData !== undefined
                       ? updateData
                       : (updateError ? null : { gold: gold + 50, xp: xp + 25 }),
@@ -103,7 +104,7 @@ function setupDbMocks({
 
 describe('POST /api/adventure/claim-milestone', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
     mockCheckApiRateLimit.mockReturnValue({ success: true });

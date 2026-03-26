@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
     return React.createElement('div', { ref, ...rest }, children);
@@ -12,7 +12,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockAdaptiveDiv({ children, ...rest }: any, ref: any) {
     const { initial, animate, exit, transition, whileHover, whileTap, whileFocus, whileDrag, whileInView, layout, layoutId, skipAnimation, ...htmlProps } = rest;
@@ -47,18 +47,18 @@ const defaultProps = {
     { type: 'collect_type' as const, tileType: 'gem' as const, target: 3 },
   ] as BlastObjective[],
   movesAllowed: 18,
-  onReady: jest.fn(),
+  onReady: vi.fn(),
   t: mockT,
 };
 
 describe('BlastWaveIntro', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    defaultProps.onReady = jest.fn();
+    vi.useFakeTimers();
+    defaultProps.onReady = vi.fn();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders wave number', () => {
@@ -82,25 +82,25 @@ describe('BlastWaveIntro', () => {
   });
 
   it('calls onReady when GO button is clicked', () => {
-    const onReady = jest.fn();
+    const onReady = vi.fn();
     render(<BlastWaveIntro {...defaultProps} onReady={onReady} />);
     screen.getByTestId('wave-intro-go-btn').click();
     expect(onReady).toHaveBeenCalledTimes(1);
   });
 
   it('auto-advances after 4000ms', () => {
-    const onReady = jest.fn();
+    const onReady = vi.fn();
     render(<BlastWaveIntro {...defaultProps} onReady={onReady} />);
     expect(onReady).not.toHaveBeenCalled();
-    act(() => { jest.advanceTimersByTime(4000); });
+    act(() => { vi.advanceTimersByTime(4000); });
     expect(onReady).toHaveBeenCalledTimes(1);
   });
 
   it('does not double-fire onReady on click then auto-advance', () => {
-    const onReady = jest.fn();
+    const onReady = vi.fn();
     render(<BlastWaveIntro {...defaultProps} onReady={onReady} />);
     screen.getByTestId('wave-intro-go-btn').click();
-    act(() => { jest.advanceTimersByTime(4000); });
+    act(() => { vi.advanceTimersByTime(4000); });
     expect(onReady).toHaveBeenCalledTimes(1);
   });
 

@@ -7,17 +7,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
 }));
 
-jest.mock('../../../../contexts/LanguageContext', () => ({
+vi.mock('../../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, layout, initial, animate, exit, ...props }: any) => (
       <div {...props}>{children}</div>
@@ -37,7 +37,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: ({ alt, ...props }: any) => <img alt={alt} {...props} />,
@@ -50,10 +50,10 @@ describe('UpgradeShop', () => {
     gold: 500,
     upgrades: {},
     currentWorld: 1,
-    onPurchase: jest.fn(),
+    onPurchase: vi.fn(),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   describe('rendering', () => {
     it('should show gold balance', () => {

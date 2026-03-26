@@ -10,13 +10,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock contexts
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key === 'adventure.level' ? 'Level' : key,
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableGlowEffects: true,
@@ -29,20 +29,20 @@ const capturedAnimations: Array<{
   transition: unknown;
 }> = [];
 
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
       ...actual.motion,
-      div: jest.fn().mockImplementation(({ children, animate, transition, ...props }) => {
+      div: vi.fn().mockImplementation(({ children, animate, transition, ...props }) => {
         // Capture animation props for verification
         if (animate && transition) {
           capturedAnimations.push({ animate, transition });
         }
         return <div data-testid="motion-div" {...props}>{children}</div>;
       }),
-      span: jest.fn().mockImplementation(({ children, ...props }) => (
+      span: vi.fn().mockImplementation(({ children, ...props }) => (
         <span {...props}>{children}</span>
       )),
     },
@@ -92,7 +92,7 @@ describe('LevelEntryOverlay spring animation constraint', () => {
 
   it('should render without Framer Motion errors', () => {
     // GIVEN: Console error spy
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // WHEN: Component renders
     render(

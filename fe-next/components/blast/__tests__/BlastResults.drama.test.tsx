@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion to avoid animation engine in JSDOM
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
     const { initial, animate, exit, transition, whileHover, whileTap, style, ...htmlProps } = rest;
@@ -28,12 +28,12 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, dir: 'ltr' }),
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockDiv({ children, ...rest }: any, ref: any) {
     const { initial, animate, exit, transition, whileHover, whileTap, style, ...htmlProps } = rest;
@@ -46,7 +46,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
 });
 
 // Mock useBlastResultSaver — we don't want fetch calls in unit tests
-jest.mock('../hooks/useBlastResultSaver', () => ({
+vi.mock('../hooks/useBlastResultSaver', () => ({
   useBlastResultSaver: () => ({
     saved: false,
     personalBests: null,
@@ -57,55 +57,55 @@ jest.mock('../hooks/useBlastResultSaver', () => ({
 }));
 
 // Mock canvas-confetti — capture calls for assertion
-const mockConfetti = jest.fn();
-jest.mock('canvas-confetti', () => ({
+const mockConfetti = vi.fn();
+vi.mock('canvas-confetti', () => ({
   __esModule: true,
   default: (...args: any[]) => mockConfetti(...args),
 }));
 
 // Mock useReducedMotion
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => false,
 }));
 
 // Mock Avatar
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 // Mock Mascot components
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => null,
 }));
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: () => null,
 }));
 
 // Mock confettiUtils
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
+  fireConfetti: vi.fn(),
 }));
 
-jest.mock('@/hooks/useAdPlacement', () => ({
-  useAdPlacement: () => ({ showInterstitial: jest.fn() }),
+vi.mock('@/hooks/useAdPlacement', () => ({
+  useAdPlacement: () => ({ showInterstitial: vi.fn() }),
 }));
 
 // Mock UI components
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => {
     const React = require('react');
     return React.createElement('button', props, children);
   },
 }));
 
-jest.mock('../BlastSkillBreakdown', () => ({
+vi.mock('../BlastSkillBreakdown', () => ({
   BlastSkillBreakdown: () => null,
 }));
 
-jest.mock('@/components/results/ResultsWinnerBanner', () => ({
+vi.mock('@/components/results/ResultsWinnerBanner', () => ({
   __esModule: true,
   default: ({ customMessage }: any) => {
     const React = require('react');
@@ -113,7 +113,7 @@ jest.mock('@/components/results/ResultsWinnerBanner', () => ({
   },
 }));
 
-jest.mock('../BlastResultsComponents', () => ({
+vi.mock('../BlastResultsComponents', () => ({
   StarRating: ({ stars }: any) => {
     const React = require('react');
     return React.createElement('div', { 'data-testid': 'star-rating' }, `${stars} stars`);
@@ -149,8 +149,8 @@ const defaultProps = {
   results: makeResults(),
   difficulty: 'medium' as const,
   language: 'en',
-  onPlayAgain: jest.fn(),
-  onBackToHome: jest.fn(),
+  onPlayAgain: vi.fn(),
+  onBackToHome: vi.fn(),
 };
 
 // ---------------------------------------------------------------------------
@@ -179,12 +179,12 @@ describe('BlastResults — hero banner', () => {
 
 describe('BlastResults — score count-up animation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockConfetti.mockClear();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the score in ResultsWinnerBanner', () => {

@@ -12,12 +12,12 @@ const mockWords: VocabularyWord[] = [
 
 describe('useBlitzGame', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('initialization', () => {
@@ -87,14 +87,14 @@ describe('useBlitzGame', () => {
 
       // Advance time by 1 second
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(result.current.remainingTime).toBe(59);
 
       // Advance time by 5 more seconds
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       expect(result.current.remainingTime).toBe(54);
@@ -110,19 +110,19 @@ describe('useBlitzGame', () => {
       // The timer updates every 100ms, so we advance by 100ms intervals
       // to let the timer tick and update state
       act(() => {
-        jest.advanceTimersByTime(1100); // 1 second + buffer for update
+        vi.advanceTimersByTime(1100); // 1 second + buffer for update
       });
       expect(result.current.remainingTime).toBe(59);
 
       act(() => {
-        jest.advanceTimersByTime(2500);
+        vi.advanceTimersByTime(2500);
       });
       // Should be at 56 or 57 depending on timing
       expect(result.current.remainingTime).toBeGreaterThanOrEqual(56);
       expect(result.current.remainingTime).toBeLessThanOrEqual(57);
 
       act(() => {
-        jest.advanceTimersByTime(3200);
+        vi.advanceTimersByTime(3200);
       });
       // Should be at 53 or 54 depending on timing
       expect(result.current.remainingTime).toBeGreaterThanOrEqual(52);
@@ -140,7 +140,7 @@ describe('useBlitzGame', () => {
 
       // Advance time beyond totalTime
       act(() => {
-        jest.advanceTimersByTime(6000);
+        vi.advanceTimersByTime(6000);
       });
 
       expect(result.current.isGameOver).toBe(true);
@@ -155,7 +155,7 @@ describe('useBlitzGame', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       expect(result.current.isGameOver).toBe(true);
@@ -163,7 +163,7 @@ describe('useBlitzGame', () => {
 
       // Advance more time
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       // Time should not decrease further
@@ -412,7 +412,7 @@ describe('useBlitzGame', () => {
 
       // Complete the game
       act(() => {
-        jest.advanceTimersByTime(61000);
+        vi.advanceTimersByTime(61000);
       });
 
       // Score = 39 + 40 (completion bonus) = 79
@@ -437,7 +437,7 @@ describe('useBlitzGame', () => {
 
       // Complete the game
       act(() => {
-        jest.advanceTimersByTime(6000);
+        vi.advanceTimersByTime(6000);
       });
 
       // Score after completion: 13 + 40 = 53
@@ -453,7 +453,7 @@ describe('useBlitzGame', () => {
 
       // Don't answer anything, just let time run out
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // Score should be 40 (completion bonus only)
@@ -481,7 +481,7 @@ describe('useBlitzGame', () => {
 
       // Wait for game to end
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       expect(result.current.isGameOver).toBe(true);
@@ -505,7 +505,7 @@ describe('useBlitzGame', () => {
       });
 
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       const timeAfter5Sec = result.current.remainingTime;

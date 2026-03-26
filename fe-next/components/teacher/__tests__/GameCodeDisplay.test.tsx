@@ -11,7 +11,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import GameCodeDisplay from '../GameCodeDisplay';
 
 // Mock hooks
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) =>
       ({
@@ -30,7 +30,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock clipboard
-const mockWriteText = jest.fn().mockResolvedValue(undefined);
+const mockWriteText = vi.fn().mockResolvedValue(undefined);
 Object.assign(navigator, {
   clipboard: {
     writeText: mockWriteText,
@@ -38,7 +38,7 @@ Object.assign(navigator, {
 });
 
 // Mock QRCodeSVG from qrcode.react
-jest.mock('qrcode.react', () => ({
+vi.mock('qrcode.react', () => ({
   QRCodeSVG: ({ value }: { value: string }) => (
     <svg data-testid="qr-code" data-value={value} />
   ),
@@ -132,7 +132,7 @@ describe('GameCodeDisplay', () => {
     });
 
     it('should call onProjectionMode when projection button clicked', () => {
-      const onProjectionMode = jest.fn();
+      const onProjectionMode = vi.fn();
       render(<GameCodeDisplay {...defaultProps} onProjectionMode={onProjectionMode} />);
 
       const projectButton = screen.getByRole('button', { name: /project/i });

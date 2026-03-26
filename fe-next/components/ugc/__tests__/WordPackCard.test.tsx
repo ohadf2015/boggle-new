@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WordPackCard from '../WordPackCard';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -16,7 +16,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: ({ size }: { size?: string }) => <div data-testid="avatar" data-size={size} />,
 }));
@@ -82,7 +82,7 @@ describe('WordPackCard', () => {
   });
 
   it('calls onPlay with packId when Play button clicked', async () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     const user = userEvent.setup();
     render(<WordPackCard pack={basePack} onPlay={onPlay} />);
     const playBtn = screen.getByText('ugc.pack.card.play');
@@ -91,7 +91,7 @@ describe('WordPackCard', () => {
   });
 
   it('calls onUpvote with packId when Upvote button clicked', async () => {
-    const onUpvote = jest.fn();
+    const onUpvote = vi.fn();
     const user = userEvent.setup();
     render(<WordPackCard pack={basePack} onUpvote={onUpvote} />);
     const upvoteBtn = screen.getByRole('button', { name: /42/i });
@@ -146,7 +146,7 @@ describe('WordPackCard (compact variant)', () => {
   });
 
   it('calls onPlay when compact card is clicked', async () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     const user = userEvent.setup();
     render(<WordPackCard pack={basePack} variant="compact" onPlay={onPlay} />);
     await user.click(screen.getByRole('button'));

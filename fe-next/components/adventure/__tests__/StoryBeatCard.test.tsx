@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { StoryBeatCard } from '../StoryBeatCard';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -21,7 +21,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const components = {
     div: React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
       return (
@@ -59,15 +59,15 @@ describe('StoryBeatCard', () => {
     characterName: 'Lexi',
     dialogueKey: 'adventure.story.w1.after2',
     isVisible: true,
-    onContinue: jest.fn(),
+    onContinue: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => vi.useRealTimers());
 
   it('renders when visible', () => {
     render(<StoryBeatCard {...defaultProps} />);
@@ -89,21 +89,21 @@ describe('StoryBeatCard', () => {
     // Initially partial text
     const dialogueText = 'Welcome to the word realm!';
     // After enough ticks, full text should appear
-    act(() => { jest.runAllTimers(); });
+    act(() => { vi.runAllTimers(); });
     expect(screen.getByText(dialogueText)).toBeInTheDocument();
   });
 
   it('shows continue button after text completes', () => {
     render(<StoryBeatCard {...defaultProps} />);
     const dialogueText = 'Welcome to the word realm!';
-    act(() => { jest.runAllTimers(); });
+    act(() => { vi.runAllTimers(); });
     expect(screen.getByText('Continue')).toBeInTheDocument();
   });
 
   it('calls onContinue when continue clicked', () => {
     render(<StoryBeatCard {...defaultProps} />);
     const dialogueText = 'Welcome to the word realm!';
-    act(() => { jest.runAllTimers(); });
+    act(() => { vi.runAllTimers(); });
     fireEvent.click(screen.getByText('Continue'));
     expect(defaultProps.onContinue).toHaveBeenCalledTimes(1);
   });

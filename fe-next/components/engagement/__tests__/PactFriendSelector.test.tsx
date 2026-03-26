@@ -10,20 +10,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWordPact } from '@/hooks/useWordPact';
 
 // Mock Supabase chain
-const mockSingle = jest.fn();
-const mockIn = jest.fn().mockResolvedValue({ data: [] });
-const mockEq = jest.fn().mockReturnValue({ or: jest.fn().mockReturnValue({ single: mockSingle }), in: mockIn });
-const mockSelect = jest.fn().mockReturnValue({ eq: mockEq, in: mockIn });
-const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
+const mockSingle = vi.fn();
+const mockIn = vi.fn().mockResolvedValue({ data: [] });
+const mockEq = vi.fn().mockReturnValue({ or: vi.fn().mockReturnValue({ single: mockSingle }), in: mockIn });
+const mockSelect = vi.fn().mockReturnValue({ eq: mockEq, in: mockIn });
+const mockFrom = vi.fn().mockReturnValue({ select: mockSelect });
 
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/hooks/useWordPact');
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/hooks/useWordPact');
+vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
@@ -37,13 +37,13 @@ const mockT = (key: string) => {
   return translations[key] ?? key;
 };
 
-const mockCreatePact = jest.fn();
+const mockCreatePact = vi.fn();
 
 describe('PactFriendSelector', () => {
-  const onClose = jest.fn();
+  const onClose = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
     (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-1' } });
     (useWordPact as jest.Mock).mockReturnValue({ createPact: mockCreatePact });
@@ -52,8 +52,8 @@ describe('PactFriendSelector', () => {
   it('renders the modal with title', async () => {
     // No friends
     mockEq.mockReturnValueOnce({
-      or: jest.fn().mockReturnValue({
-        single: jest.fn(),
+      or: vi.fn().mockReturnValue({
+        single: vi.fn(),
       }),
     });
 
@@ -75,11 +75,11 @@ describe('PactFriendSelector', () => {
 
   it('shows empty state when no friends', async () => {
     // Mock: friends query returns empty
-    const mockOrReturn = jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    const mockOrReturn = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
     });
     mockSelect.mockReturnValueOnce({
-      eq: jest.fn().mockReturnValue({ or: mockOrReturn }),
+      eq: vi.fn().mockReturnValue({ or: mockOrReturn }),
     });
 
     render(<PactFriendSelector onClose={onClose} />);

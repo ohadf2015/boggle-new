@@ -5,14 +5,14 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock dependencies before importing component
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
   },
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -32,16 +32,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
+vi.mock('@/components/Avatar', () => {
   const AvatarMock = ({ size }: { size?: string }) => (
     <div data-testid="avatar" data-size={size} />
   );
   AvatarMock.displayName = 'Avatar';
-  return AvatarMock;
+  return { default: AvatarMock };
 });
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 const MOCK_CREATORS = [
@@ -79,7 +79,7 @@ import CreatorLeaderboard from '../CreatorLeaderboard';
 
 describe('CreatorLeaderboard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders Top Creators heading', async () => {

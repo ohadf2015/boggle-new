@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import StreakMilestoneCelebration from '@/components/daily/StreakMilestoneCelebration';
 
-jest.mock('@/components/ui/CelebrationMascot', () => ({
+vi.mock('@/components/ui/CelebrationMascot', () => ({
   CelebrationMascotWithEntrance: ({ variant }: { variant: string }) => (
     <div data-testid={`celebration-mascot-${variant}`} />
   ),
@@ -11,7 +11,7 @@ jest.mock('@/components/ui/CelebrationMascot', () => ({
   ),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -19,10 +19,10 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({ fireConfetti: jest.fn() }));
+vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
-jest.mock('framer-motion', () => ({
-  ...jest.requireActual('framer-motion'),
+vi.mock('framer-motion', () => ({
+  ...vi.importActual('framer-motion'),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
@@ -47,7 +47,7 @@ jest.mock('framer-motion', () => ({
 
 const baseProps = {
   isOpen: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   streak: 7,
   emoji: '🔥',
   title: 'Week Warrior!',

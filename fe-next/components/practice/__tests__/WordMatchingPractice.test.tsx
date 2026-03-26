@@ -4,7 +4,7 @@ import { WordMatchingPractice } from '../WordMatchingPractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,47 +12,47 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: () => <div data-testid="mascot">Mascot</div>,
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@dnd-kit/core', () => ({
+vi.mock('@dnd-kit/core', () => ({
   DndContext: ({ children, onDragEnd }: any) => (
     <div data-testid="dnd-context" data-ondragend={onDragEnd ? 'exists' : 'missing'}>
       {children}
     </div>
   ),
-  useSensors: jest.fn(() => []),
-  useSensor: jest.fn(),
-  PointerSensor: jest.fn(),
-  KeyboardSensor: jest.fn(),
-  closestCenter: jest.fn(),
-  useDraggable: jest.fn((props) => ({
+  useSensors: vi.fn(() => []),
+  useSensor: vi.fn(),
+  PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
+  closestCenter: vi.fn(),
+  useDraggable: vi.fn((props) => ({
     attributes: {},
     listeners: {},
-    setNodeRef: jest.fn(),
+    setNodeRef: vi.fn(),
     transform: null,
     isDragging: false,
   })),
-  useDroppable: jest.fn((props) => ({
-    setNodeRef: jest.fn(),
+  useDroppable: vi.fn((props) => ({
+    setNodeRef: vi.fn(),
     isOver: false,
   })),
 }));
 
-jest.mock('@dnd-kit/sortable', () => ({
-  sortableKeyboardCoordinates: jest.fn(),
+vi.mock('@dnd-kit/sortable', () => ({
+  sortableKeyboardCoordinates: vi.fn(),
 }));
 
 // Mock AdaptiveMotion (it's an object with element-keyed components like .div, .span, etc.)
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const MockDiv = ({ children, ...props }: any) => (
     <div data-testid="adaptive-motion" {...props}>{children}</div>
   );
@@ -73,11 +73,11 @@ describe('WordMatchingPractice', () => {
     { word: 'book', definition: 'for reading', canIntegrate: true },
   ];
 
-  const mockOnComplete = jest.fn();
-  const mockOnBack = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnBack = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {

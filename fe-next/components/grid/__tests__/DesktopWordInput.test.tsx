@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import DesktopWordInput from '../DesktopWordInput';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -18,16 +18,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMediaQuery', () => ({
+vi.mock('@/hooks/useMediaQuery', () => ({
   useIsDesktop: () => true,
 }));
 
-jest.mock('@/utils/clientWordValidator', () => ({
-  couldBeOnBoard: jest.fn().mockReturnValue(true),
+vi.mock('@/utils/clientWordValidator', () => ({
+  couldBeOnBoard: vi.fn().mockReturnValue(true),
 }));
 
-jest.mock('@/utils/wordPathFinder', () => ({
-  findWordPath: jest.fn().mockReturnValue([{ row: 0, col: 0, letter: 'A' }]),
+vi.mock('@/utils/wordPathFinder', () => ({
+  findWordPath: vi.fn().mockReturnValue([{ row: 0, col: 0, letter: 'A' }]),
 }));
 
 const defaultGrid = [
@@ -41,12 +41,12 @@ const defaultProps = {
   grid: defaultGrid,
   language: 'en' as const,
   enabled: true,
-  onWordSubmit: jest.fn(),
+  onWordSubmit: vi.fn(),
 };
 
 describe('DesktopWordInput', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the input on desktop', () => {
@@ -68,7 +68,7 @@ describe('DesktopWordInput', () => {
   });
 
   it('submits word on Enter', async () => {
-    const onWordSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
     const user = userEvent.setup();
     render(<DesktopWordInput {...defaultProps} onWordSubmit={onWordSubmit} />);
     const input = screen.getByRole('textbox');
@@ -87,7 +87,7 @@ describe('DesktopWordInput', () => {
   });
 
   it('does not submit word shorter than minWordLength', async () => {
-    const onWordSubmit = jest.fn();
+    const onWordSubmit = vi.fn();
     const user = userEvent.setup();
     render(<DesktopWordInput {...defaultProps} onWordSubmit={onWordSubmit} minWordLength={3} />);
     const input = screen.getByRole('textbox');
@@ -96,7 +96,7 @@ describe('DesktopWordInput', () => {
   });
 
   it('calls onHighlightChange as user types', async () => {
-    const onHighlightChange = jest.fn();
+    const onHighlightChange = vi.fn();
     const user = userEvent.setup();
     render(<DesktopWordInput {...defaultProps} onHighlightChange={onHighlightChange} />);
     const input = screen.getByRole('textbox');
@@ -105,7 +105,7 @@ describe('DesktopWordInput', () => {
   });
 
   it('calls onTypingModeChange when typing starts/stops', async () => {
-    const onTypingModeChange = jest.fn();
+    const onTypingModeChange = vi.fn();
     const user = userEvent.setup();
     render(<DesktopWordInput {...defaultProps} onTypingModeChange={onTypingModeChange} />);
     const input = screen.getByRole('textbox');

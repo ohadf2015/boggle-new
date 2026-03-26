@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock framer-motion before imports
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, custom, variants, initial, animate, exit, transition, layoutId, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
@@ -20,13 +20,13 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
 // Mock language context with dir control
 const mockDir = { current: 'ltr' };
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: mockDir.current === 'rtl' ? 'he' : 'en',

@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Test suite for classroom join functionality
  *
@@ -10,22 +11,22 @@ import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
 // Note: jest.mock is hoisted, so we use a factory function
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
-    rpc: jest.fn(),
+    from: vi.fn(),
+    rpc: vi.fn(),
   },
 }));
 
 // Access the mocked functions after the mock is set up
-const mockFrom = (supabase?.from || jest.fn()) as jest.MockedFunction<any>;
-const mockRpc = ((supabase as any)?.rpc || jest.fn()) as jest.MockedFunction<any>;
+const mockFrom = (supabase?.from || vi.fn()) as MockedFunction<any>;
+const mockRpc = ((supabase as any)?.rpc || vi.fn()) as MockedFunction<any>;
 
 describe('joinClassroom', () => {
   const mockStudentId = 'student-123';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Bug: Code "4HCDMS" validation', () => {
@@ -39,19 +40,19 @@ describe('joinClassroom', () => {
         error: null,
       });
 
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: null,
         error: null,
       });
-      const mockInsert = jest.fn().mockResolvedValue({
+      const mockInsert = vi.fn().mockResolvedValue({
         error: null,
       });
 
       mockFrom.mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
             insert: mockInsert,
           } as any;
@@ -97,19 +98,19 @@ describe('joinClassroom', () => {
         error: null,
       });
 
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: null,
         error: null,
       });
-      const mockInsert = jest.fn().mockResolvedValue({
+      const mockInsert = vi.fn().mockResolvedValue({
         error: null,
       });
 
       mockFrom.mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
             insert: mockInsert,
           } as any;
@@ -148,7 +149,7 @@ describe('joinClassroom', () => {
         // RPC should not be called for invalid formats
         expect(mockRpc).not.toHaveBeenCalled();
 
-        jest.clearAllMocks();
+        vi.clearAllMocks();
       }
     });
   });
@@ -164,7 +165,7 @@ describe('joinClassroom', () => {
         error: null,
       });
 
-      const mockMaybeSingle = jest.fn().mockResolvedValue({
+      const mockMaybeSingle = vi.fn().mockResolvedValue({
         data: mockExisting,
         error: null,
       });
@@ -172,8 +173,8 @@ describe('joinClassroom', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'classroom_memberships') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
             maybeSingle: mockMaybeSingle,
           } as any;
         }

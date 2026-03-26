@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * Adventure Purchase API Route Tests
@@ -7,24 +8,24 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock rate limiter — always allow
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
-const mockGetUser = jest.fn();
-const mockUpdate = jest.fn();
-const mockSelect = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockUpdate = vi.fn();
+const mockSelect = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
@@ -38,14 +39,14 @@ import { POST } from '../route';
 function makeRequest(body: unknown): NextRequest {
   return {
     json: () => Promise.resolve(body),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
 function makeInvalidJsonRequest(): NextRequest {
   return {
     json: () => Promise.reject(new Error('Invalid JSON')),
-    headers: { get: jest.fn().mockReturnValue('127.0.0.1') },
+    headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
   } as unknown as NextRequest;
 }
 
@@ -58,19 +59,19 @@ function setupDbMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'player_progression') {
       return {
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: fetchError ? null : { gold, upgrades },
               error: fetchError,
             }),
           }),
         }),
-        update: jest.fn().mockImplementation((payload: Record<string, unknown>) => ({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
-                maybeSingle: jest.fn().mockResolvedValue({
+        update: vi.fn().mockImplementation((payload: Record<string, unknown>) => ({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
                   data: updateError ? null : { gold: payload.gold, upgrades: payload.upgrades },
                   error: updateError,
                 }),
@@ -88,7 +89,7 @@ function setupDbMocks({
 
 describe('POST /api/adventure/purchase', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,

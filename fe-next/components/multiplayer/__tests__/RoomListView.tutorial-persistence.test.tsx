@@ -9,43 +9,43 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import * as contextualGuidanceStorage from '@/utils/contextualGuidanceStorage';
 
 // Mock dependencies
-jest.mock('@/utils/contextualGuidanceStorage');
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/utils/contextualGuidanceStorage');
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
   }),
 }));
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: {
-    success: jest.fn(),
+    success: vi.fn(),
   },
 }));
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   );
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
-const mockShouldShowGuidance = contextualGuidanceStorage.shouldShowGuidance as jest.MockedFunction<typeof contextualGuidanceStorage.shouldShowGuidance>;
-const mockMarkGuidanceShown = contextualGuidanceStorage.markGuidanceShown as jest.MockedFunction<typeof contextualGuidanceStorage.markGuidanceShown>;
+const mockShouldShowGuidance = contextualGuidanceStorage.shouldShowGuidance as vi.MockedFunction<typeof contextualGuidanceStorage.shouldShowGuidance>;
+const mockMarkGuidanceShown = contextualGuidanceStorage.markGuidanceShown as vi.MockedFunction<typeof contextualGuidanceStorage.markGuidanceShown>;
 
 describe('RoomListView - Tutorial Persistence', () => {
   const mockProps = {
     activeRooms: [],
     roomsLoading: false,
-    onRefreshRooms: jest.fn(),
-    onRoomClick: jest.fn(),
-    onCreateRoom: jest.fn(),
-    onQuickPlay: jest.fn(),
+    onRefreshRooms: vi.fn(),
+    onRoomClick: vi.fn(),
+    onCreateRoom: vi.fn(),
+    onQuickPlay: vi.fn(),
     isQuickPlayLoading: false,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('shows welcome card on first visit when tutorial has not been shown', async () => {

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { OfflineFallback } from '../OfflineFallback';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -34,7 +34,7 @@ describe('OfflineFallback', () => {
   });
 
   it('should call onRetry when button clicked', () => {
-    const onRetry = jest.fn();
+    const onRetry = vi.fn();
     render(<OfflineFallback onRetry={onRetry} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Try Again' }));

@@ -7,7 +7,7 @@
 import { render } from '@testing-library/react';
 import { GameSidebar } from '../GameSidebar';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     locale: 'en',
@@ -15,7 +15,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('../../AdventureObjectives', () => ({
+vi.mock('../../AdventureObjectives', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-objectives" />,
 }));
@@ -24,7 +24,7 @@ describe('GameSidebar — Default Styling', () => {
   const defaultProps = {
     objectives: [],
     hasHintsAvailable: true,
-    onHintClick: jest.fn(),
+    onHintClick: vi.fn(),
     showAutoHint: false,
     currentHint: null,
     hintLevel: 'none' as const,

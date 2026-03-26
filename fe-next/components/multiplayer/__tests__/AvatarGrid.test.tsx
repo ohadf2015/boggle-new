@@ -15,7 +15,7 @@ import CreateRoomModal from '../CreateRoomModal';
 import type { ActiveRoom, Language } from '@/shared/types/game';
 import { type CustomAvatarConfig, DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -42,15 +42,15 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestPlayer'),
-  getStoredCustomAvatar: jest.fn().mockReturnValue(null),
-  getOrCreateStoredCustomAvatar: jest.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
-  setStoredUsername: jest.fn(),
-  setStoredCustomAvatar: jest.fn(),
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
+  getStoredCustomAvatar: vi.fn().mockReturnValue(null),
+  getOrCreateStoredCustomAvatar: vi.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
+  setStoredUsername: vi.fn(),
+  setStoredCustomAvatar: vi.fn(),
 }));
 
-jest.mock('@/utils/consts', () => ({
+vi.mock('@/utils/consts', () => ({
   sanitizeRoomName: (name: string) => name,
   NAME_VALID_PATTERN: /^[\p{L}\p{N}\s._-]+$/u,
   USERNAME_MIN_LENGTH: 2,
@@ -69,15 +69,15 @@ jest.mock('@/utils/consts', () => ({
   PASSWORD_STRENGTH_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 }));
 
-jest.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', () => ({
   cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
 }));
 
-jest.mock('@/lib/languageConfig', () => ({
+vi.mock('@/lib/languageConfig', () => ({
   LANGUAGE_FLAGS: { en: '🇺🇸', he: '🇮🇱' },
 }));
 
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
@@ -90,13 +90,13 @@ jest.mock('@/components/ui/dialog', () => ({
     <div className={className}>{children}</div>,
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, disabled, className }: React.PropsWithChildren<{
     onClick?: () => void; disabled?: boolean; className?: string; variant?: string; size?: string;
   }>) => <button onClick={onClick} disabled={disabled} className={className}>{children}</button>,
 }));
 
-jest.mock('@/components/ui/input', () => {
+vi.mock('@/components/ui/input', () => {
   const MockInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
     (props, ref) => <input ref={ref} {...props} />
   );
@@ -104,13 +104,13 @@ jest.mock('@/components/ui/input', () => {
   return { Input: MockInput };
 });
 
-jest.mock('@/components/ui/label', () => ({
+vi.mock('@/components/ui/label', () => ({
   Label: ({ children, className }: React.PropsWithChildren<{ className?: string }>) =>
     <label className={className}>{children}</label>,
 }));
 
-jest.mock('@/components/avatar/AvatarBuilderModal', () => {
-  return function MockAvatarBuilderModal({ isOpen, onSave }: {
+vi.mock('@/components/avatar/AvatarBuilderModal', () => {
+  return { default: function MockAvatarBuilderModal({ isOpen, onSave }: {
     isOpen: boolean;
     onClose: () => void;
     onSave: (config: CustomAvatarConfig) => void;
@@ -122,16 +122,16 @@ jest.mock('@/components/avatar/AvatarBuilderModal', () => {
         <button onClick={() => onSave({ ...DEFAULT_AVATAR_CONFIG, eyes: 'star' })}>Save Avatar</button>
       </div>
     );
-  };
+  } };
 });
 
-jest.mock('@/components/avatar/AvatarRenderer', () => {
-  return function MockAvatarRenderer() {
+vi.mock('@/components/avatar/AvatarRenderer', () => {
+  const MockAvatarRenderer = () => {
     return <div data-testid="avatar-renderer" />;
   };
 });
 
-jest.mock('@/components/join/LanguageSelector', () => ({
+vi.mock('@/components/join/LanguageSelector', () => ({
   LanguageSelector: ({ selectedLanguage, onLanguageChange }: { selectedLanguage: string; onLanguageChange: (lang: string) => void }) => (
     <select data-testid="language-selector" value={selectedLanguage} onChange={(e) => onLanguageChange(e.target.value)}>
       <option value="en">English</option>
@@ -153,10 +153,10 @@ describe('Avatar Builder Integration', () => {
   describe('JoinRoomModal', () => {
     const joinProps = {
       isOpen: true,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       room: mockRoom,
       isJoining: false,
-      onJoin: jest.fn(),
+      onJoin: vi.fn(),
       isAuthenticated: false,
       displayName: null,
     };
@@ -180,7 +180,7 @@ describe('Avatar Builder Integration', () => {
 
     it('should call onJoin with username on submit', async () => {
       const user = userEvent.setup();
-      const onJoin = jest.fn();
+      const onJoin = vi.fn();
       render(<JoinRoomModal {...joinProps} onJoin={onJoin} />);
 
       const joinButton = screen.getByRole('button', { name: /join game/i });
@@ -193,9 +193,9 @@ describe('Avatar Builder Integration', () => {
   describe('CreateRoomModal', () => {
     const createProps = {
       isOpen: true,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       isCreating: false,
-      onCreate: jest.fn(),
+      onCreate: vi.fn(),
       defaultLanguage: 'en' as Language,
       isAuthenticated: false,
       displayName: null,
@@ -210,7 +210,7 @@ describe('Avatar Builder Integration', () => {
 
     it('should call onCreate on submit', async () => {
       const user = userEvent.setup();
-      const onCreate = jest.fn();
+      const onCreate = vi.fn();
       render(<CreateRoomModal {...createProps} onCreate={onCreate} />);
 
       const createButton = screen.getByRole('button', { name: /create room/i });

@@ -83,6 +83,9 @@ const customJestConfig = {
     // Capacitor plugins (mock for web testing)
     '^@capgo/capacitor-social-login$': '<rootDir>/__mocks__/@capgo/capacitor-social-login.ts',
 
+    // Vitest compatibility — allow tests written with `import { vi } from 'vitest'` to run under Jest
+    '^vitest$': '<rootDir>/__mocks__/vitest.js',
+
     // Handle CSS imports (with CSS modules)
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
 

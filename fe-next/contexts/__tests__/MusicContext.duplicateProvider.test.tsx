@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test for duplicate MusicProvider issue and music transition bugs
  *
@@ -20,8 +21,8 @@ import { Howl, Howler } from 'howler';
 const createdHowls: any[] = [];
 
 // Mock Howler
-jest.mock('howler', () => {
-  const mockHowl = jest.fn().mockImplementation((options) => {
+vi.mock('howler', () => {
+  const mockHowl = vi.fn().mockImplementation((options) => {
     const howlInstance = {
       _options: options,
       _state: 'unloaded',
@@ -32,11 +33,11 @@ jest.mock('howler', () => {
       _seekPosition: 0,
       _instanceId: Math.random().toString(36).substring(7),
 
-      state: jest.fn(function(this: any) {
+      state: vi.fn(function(this: any) {
         return this._state;
       }),
 
-      load: jest.fn(function(this: any) {
+      load: vi.fn(function(this: any) {
         this._state = 'loading';
         setTimeout(() => {
           this._state = 'loaded';
@@ -47,27 +48,27 @@ jest.mock('howler', () => {
         return this;
       }),
 
-      play: jest.fn(function(this: any) {
+      play: vi.fn(function(this: any) {
         this._playing = true;
         return 1;
       }),
 
-      playing: jest.fn(function(this: any) {
+      playing: vi.fn(function(this: any) {
         return this._playing;
       }),
 
-      pause: jest.fn(function(this: any) {
+      pause: vi.fn(function(this: any) {
         this._playing = false;
         return this;
       }),
 
-      stop: jest.fn(function(this: any) {
+      stop: vi.fn(function(this: any) {
         this._playing = false;
         this._seekPosition = 0;
         return this;
       }),
 
-      volume: jest.fn(function(this: any, vol?: number) {
+      volume: vi.fn(function(this: any, vol?: number) {
         if (vol !== undefined) {
           this._volume = vol;
           return this;
@@ -75,11 +76,11 @@ jest.mock('howler', () => {
         return this._volume;
       }),
 
-      fade: jest.fn(function(this: any) {
+      fade: vi.fn(function(this: any) {
         return this;
       }),
 
-      seek: jest.fn(function(this: any, position?: number) {
+      seek: vi.fn(function(this: any, position?: number) {
         if (position !== undefined) {
           this._seekPosition = position;
           return this;
@@ -87,12 +88,12 @@ jest.mock('howler', () => {
         return this._seekPosition;
       }),
 
-      unload: jest.fn(function(this: any) {
+      unload: vi.fn(function(this: any) {
         this._state = 'unloaded';
         return this;
       }),
 
-      once: jest.fn(function(this: any, event: string, callback: () => void) {
+      once: vi.fn(function(this: any, event: string, callback: () => void) {
         if (event === 'end') {
           this._onEndCallback = callback;
         } else if (event === 'load') {
@@ -119,26 +120,26 @@ jest.mock('howler', () => {
     Howler: {
       ctx: {
         state: 'running',
-        resume: jest.fn().mockResolvedValue(undefined),
-        suspend: jest.fn()
+        resume: vi.fn().mockResolvedValue(undefined),
+        suspend: vi.fn()
       }
     }
   };
 });
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
 // Mock audio loader
-jest.mock('@/lib/audio/audioLoader', () => ({
-  createLazyHowl: jest.fn((src: string | string[], options?: any) => {
+vi.mock('@/lib/audio/audioLoader', () => ({
+  createLazyHowl: vi.fn((src: string | string[], options?: any) => {
     const { Howl } = require('howler');
     return new Howl({
       src: Array.isArray(src) ? src : [src],
@@ -147,7 +148,7 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       ...options
     });
   }),
-  preloadAudioOnDemand: jest.fn((howl: any) => {
+  preloadAudioOnDemand: vi.fn((howl: any) => {
     return new Promise<void>((resolve) => {
       if (howl.state() === 'unloaded') {
         howl.load();
@@ -159,13 +160,13 @@ jest.mock('@/lib/audio/audioLoader', () => ({
 
 describe('MusicContext - Duplicate Provider Issues', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     createdHowls.length = 0;
 
     // Mock window focus and visibility
     Object.defineProperty(document, 'hasFocus', {
       writable: true,
-      value: jest.fn(() => true)
+      value: vi.fn(() => true)
     });
 
     Object.defineProperty(document, 'visibilityState', {

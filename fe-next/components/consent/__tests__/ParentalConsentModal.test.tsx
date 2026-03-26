@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { ParentalConsentModal } from '../ParentalConsentModal';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -50,8 +50,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useParentalConsent
-const mockSubmitConsent = jest.fn();
-jest.mock('@/hooks/useParentalConsent', () => ({
+const mockSubmitConsent = vi.fn();
+vi.mock('@/hooks/useParentalConsent', () => ({
   useParentalConsent: () => ({
     submitConsent: mockSubmitConsent,
     loading: false,
@@ -62,12 +62,12 @@ jest.mock('@/hooks/useParentalConsent', () => ({
 describe('ParentalConsentModal', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
-    onSuccess: jest.fn(),
+    onClose: vi.fn(),
+    onSuccess: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSubmitConsent.mockResolvedValue(true);
   });
 
@@ -202,7 +202,7 @@ describe('ParentalConsentModal', () => {
 
     it('calls onSuccess after successful submission', async () => {
       const user = userEvent.setup();
-      const onSuccess = jest.fn();
+      const onSuccess = vi.fn();
       render(<ParentalConsentModal {...defaultProps} onSuccess={onSuccess} />);
 
       // Fill all fields

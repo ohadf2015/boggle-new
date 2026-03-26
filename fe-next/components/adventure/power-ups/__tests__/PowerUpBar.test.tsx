@@ -12,7 +12,7 @@ import type { TileState } from '@/types/adventure';
 import type { HintResult } from '@/hooks/usePowerUpEffects';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (key === 'adventure.powerUps.cascadeBlocked') {
@@ -30,7 +30,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/usePowerUpState', () => ({
+vi.mock('@/hooks/usePowerUpState', () => ({
   usePowerUpState: (type: string) => ({
     powerUp: {
       type,
@@ -38,26 +38,26 @@ jest.mock('@/hooks/usePowerUpState', () => ({
       remainingCooldown: 0,
       totalCooldown: 60,
     },
-    activate: jest.fn(() => true),
+    activate: vi.fn(() => true),
     isReady: true,
   }),
 }));
 
 // Create mock functions that persist across renders
-const mockActivateFreezeTime = jest.fn(() => ({ timeRemaining: 70 }));
-const mockActivateHint = jest.fn(() => ({
+const mockActivateFreezeTime = vi.fn(() => ({ timeRemaining: 70 }));
+const mockActivateHint = vi.fn(() => ({
   word: 'TEST',
   tiles: [
     { row: 0, col: 0 },
     { row: 0, col: 1 },
   ],
 }));
-const mockActivateScoreMultiplier = jest.fn(() => ({
+const mockActivateScoreMultiplier = vi.fn(() => ({
   multiplier: 2,
   expiresAt: Date.now() + 30000,
 }));
 
-jest.mock('@/hooks/usePowerUpEffects', () => ({
+vi.mock('@/hooks/usePowerUpEffects', () => ({
   usePowerUpEffects: () => ({
     activateFreezeTime: mockActivateFreezeTime,
     activateHint: mockActivateHint,
@@ -65,7 +65,7 @@ jest.mock('@/hooks/usePowerUpEffects', () => ({
   }),
 }));
 
-jest.mock('../PowerUpActivationEffect', () => ({
+vi.mock('../PowerUpActivationEffect', () => ({
   PowerUpActivationEffect: ({ type, onComplete }: { type: string; onComplete?: () => void }) => {
     React.useEffect(() => {
       onComplete?.();
@@ -75,8 +75,8 @@ jest.mock('../PowerUpActivationEffect', () => ({
 }));
 
 // Mock toast
-const mockToast = jest.fn();
-jest.mock('react-hot-toast', () => ({
+const mockToast = vi.fn();
+vi.mock('react-hot-toast', () => ({
   toast: (message: string) => mockToast(message),
 }));
 
@@ -94,14 +94,14 @@ describe('PowerUpBar', () => {
     tiles: mockTiles,
     wordsFound: [],
     cascadeActive: false,
-    onFreezeTime: jest.fn(),
-    onHint: jest.fn(),
-    onScoreMultiplier: jest.fn(),
+    onFreezeTime: vi.fn(),
+    onHint: vi.fn(),
+    onScoreMultiplier: vi.fn(),
     dictionary: new Set(['TEST']),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {
@@ -145,7 +145,7 @@ describe('PowerUpBar', () => {
     });
 
     it('should not call effect functions during cascade', () => {
-      const onFreezeTime = jest.fn();
+      const onFreezeTime = vi.fn();
       render(<PowerUpBar {...defaultProps} cascadeActive={true} onFreezeTime={onFreezeTime} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -157,7 +157,7 @@ describe('PowerUpBar', () => {
 
   describe('Freeze Time Activation', () => {
     it('should call onFreezeTime with new time value', async () => {
-      const onFreezeTime = jest.fn();
+      const onFreezeTime = vi.fn();
       render(<PowerUpBar {...defaultProps} onFreezeTime={onFreezeTime} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -169,7 +169,7 @@ describe('PowerUpBar', () => {
     });
 
     it('should integrate with usePowerUpState for cooldown management', async () => {
-      const onFreezeTime = jest.fn();
+      const onFreezeTime = vi.fn();
       render(<PowerUpBar {...defaultProps} onFreezeTime={onFreezeTime} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -183,7 +183,7 @@ describe('PowerUpBar', () => {
 
   describe('Hint Activation', () => {
     it('should call onHint with HintResult when hint found', async () => {
-      const onHint = jest.fn();
+      const onHint = vi.fn();
       render(<PowerUpBar {...defaultProps} onHint={onHint} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -201,7 +201,7 @@ describe('PowerUpBar', () => {
     });
 
     it('should integrate with usePowerUpState for cooldown management', async () => {
-      const onHint = jest.fn();
+      const onHint = vi.fn();
       render(<PowerUpBar {...defaultProps} onHint={onHint} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -215,7 +215,7 @@ describe('PowerUpBar', () => {
 
   describe('Score Multiplier Activation', () => {
     it('should call onScoreMultiplier with expiration timestamp', async () => {
-      const onScoreMultiplier = jest.fn();
+      const onScoreMultiplier = vi.fn();
       const now = Date.now();
       render(<PowerUpBar {...defaultProps} onScoreMultiplier={onScoreMultiplier} />);
 
@@ -231,7 +231,7 @@ describe('PowerUpBar', () => {
     });
 
     it('should integrate with usePowerUpState for cooldown management', async () => {
-      const onScoreMultiplier = jest.fn();
+      const onScoreMultiplier = vi.fn();
       render(<PowerUpBar {...defaultProps} onScoreMultiplier={onScoreMultiplier} />);
 
       const buttons = screen.getAllByTestId('power-up-button');
@@ -261,17 +261,17 @@ describe('PowerUpBar', () => {
 
   describe('Inventory Persistence Integration', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       mockActivateFreezeTime.mockClear();
       mockActivateHint.mockClear();
       mockActivateScoreMultiplier.mockClear();
     });
 
     it('should call inventory.startCooldown when power-up is activated', async () => {
-      const mockStartCooldown = jest.fn();
+      const mockStartCooldown = vi.fn();
 
       // Mock usePowerUpInventory to track startCooldown calls
-      jest.mock('@/hooks/usePowerUpInventory', () => ({
+      vi.mock('@/hooks/usePowerUpInventory', () => ({
         usePowerUpInventory: () => ({
           inventory: {
             freezeTimeUnlocked: true,
@@ -282,7 +282,7 @@ describe('PowerUpBar', () => {
           isUnlocked: () => true,
           startCooldown: mockStartCooldown,
           getCooldownRemaining: () => 0,
-          resetCooldowns: jest.fn(),
+          resetCooldowns: vi.fn(),
         }),
       }));
 
@@ -303,7 +303,7 @@ describe('PowerUpBar', () => {
       const thirtySecondsAgo = Date.now() - 30000;
 
       // Mock inventory with active cooldown
-      jest.mock('@/hooks/usePowerUpInventory', () => ({
+      vi.mock('@/hooks/usePowerUpInventory', () => ({
         usePowerUpInventory: () => ({
           inventory: {
             freezeTimeUnlocked: true,
@@ -316,10 +316,10 @@ describe('PowerUpBar', () => {
             },
           },
           isUnlocked: () => true,
-          startCooldown: jest.fn(),
+          startCooldown: vi.fn(),
           getCooldownRemaining: (type: string) =>
             type === 'freezeTime' ? 30 : 0,
-          resetCooldowns: jest.fn(),
+          resetCooldowns: vi.fn(),
         }),
       }));
 

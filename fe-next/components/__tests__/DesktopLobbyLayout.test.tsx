@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { DesktopLobbyLayout } from '../../host/components/pre-game/desktop/DesktopLobbyLayout';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>

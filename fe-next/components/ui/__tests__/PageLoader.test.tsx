@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react';
 import { PageLoader } from '../PageLoader';
 
 // Mock Mascot component
-jest.mock('../Mascot', () => ({
+vi.mock('../Mascot', () => ({
   Mascot: ({ variant, size }: { variant: string; size: string }) => (
     <div data-testid="mascot" data-variant={variant} data-size={size} />
   ),
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -17,7 +17,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
@@ -111,7 +111,7 @@ describe('PageLoader', () => {
 
   describe('reduced motion / low-end device fallback', () => {
     beforeEach(() => {
-      jest.resetModules();
+      vi.resetModules();
     });
 
     it('should render simple dots loader when prefersReducedMotion is true', () => {

@@ -15,7 +15,7 @@ import '@testing-library/jest-dom';
 import AdventureXpProgressBar from '../AdventureXpProgressBar';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -24,7 +24,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock adventureXpUtils
-jest.mock('@/shared/utils/adventureXpUtils', () => ({
+vi.mock('@/shared/utils/adventureXpUtils', () => ({
   getXpProgress: (totalXp: number) => {
     // Simple mock implementation
     if (totalXp >= 1000) {
@@ -138,7 +138,7 @@ describe('AdventureXpProgressBar', () => {
   describe('RTL Layout', () => {
     it('should apply RTL direction when dir is rtl', () => {
       // Override mock for this test
-      jest.mock('@/contexts/LanguageContext', () => ({
+      vi.mock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
           t: (key: string) => key,
           dir: 'rtl',
@@ -170,7 +170,7 @@ describe('AdventureXpProgressBar', () => {
   describe('Max Level Handling', () => {
     it('should display max level indicator when at max level', () => {
       // Mock max level scenario
-      jest.mock('@/shared/utils/adventureXpUtils', () => ({
+      vi.mock('@/shared/utils/adventureXpUtils', () => ({
         getXpProgress: () => ({
           currentLevel: 50,
           progressPercent: 100,
@@ -195,15 +195,15 @@ describe('AdventureXpProgressBar', () => {
       // Mock matchMedia for reduced motion
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
-        value: jest.fn().mockImplementation((query) => ({
+        value: vi.fn().mockImplementation((query) => ({
           matches: query === '(prefers-reduced-motion: reduce)',
           media: query,
           onchange: null,
-          addListener: jest.fn(),
-          removeListener: jest.fn(),
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          dispatchEvent: jest.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
         })),
       });
     });

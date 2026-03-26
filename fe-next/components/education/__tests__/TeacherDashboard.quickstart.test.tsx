@@ -12,13 +12,13 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
 
 // ── Navigation ──────────────────────────────────────────────────────────────
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 // ── LanguageContext ──────────────────────────────────────────────────────────
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) =>
       ({
@@ -49,53 +49,53 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // ── Heavy sub-components (rendered but not under test here) ─────────────────
-jest.mock('@/components/education/EducationHeader', () => ({
+vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
 
-jest.mock('@/components/education/TeacherOnboarding', () => ({
+vi.mock('@/components/education/TeacherOnboarding', () => ({
   TeacherOnboarding: () => <div data-testid="teacher-onboarding" />,
 }));
 
-jest.mock('@/components/teacher/ClassroomManager', () =>
+vi.mock('@/components/teacher/ClassroomManager', () =>
   function ClassroomManager() {
     return <div data-testid="classroom-manager" />;
   }
 );
 
-jest.mock('@/components/teacher/LessonBuilder', () =>
+vi.mock('@/components/teacher/LessonBuilder', () =>
   function LessonBuilder() {
     return <div data-testid="lesson-builder" />;
   }
 );
 
-jest.mock('@/components/teacher/assignments', () => ({
+vi.mock('@/components/teacher/assignments', () => ({
   AssignmentTrackingPanel: () => <div data-testid="assignment-tracking-panel" />,
   AssignmentCreator: () => <div data-testid="assignment-creator" />,
 }));
 
-jest.mock('@/components/teacher/dashboard', () => ({
+vi.mock('@/components/teacher/dashboard', () => ({
   DuelMonitoringPanel: () => <div data-testid="duel-monitoring-panel" />,
 }));
 
 // ── useClassrooms ────────────────────────────────────────────────────────────
-jest.mock('@/hooks/useClassroom', () => ({
+vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({ classrooms: [] }),
 }));
 
 // ── useRecentGameSettings (controlled per test) ──────────────────────────────
-const mockGetMostRecent = jest.fn<GameConfiguration | null, []>();
+const mockGetMostRecent = vi.fn<GameConfiguration | null, []>();
 const mockHasRecentConfig = { value: false };
 
-jest.mock('@/hooks/useRecentGameSettings', () => ({
+vi.mock('@/hooks/useRecentGameSettings', () => ({
   useRecentGameSettings: () => ({
     hasRecentConfig: mockHasRecentConfig.value,
     getMostRecent: mockGetMostRecent,
     recentConfigs: [],
-    saveConfig: jest.fn(),
-    getByClassroom: jest.fn(() => []),
-    removeConfig: jest.fn(),
-    clearAll: jest.fn(),
+    saveConfig: vi.fn(),
+    getByClassroom: vi.fn(() => []),
+    removeConfig: vi.fn(),
+    clearAll: vi.fn(),
   }),
 }));
 

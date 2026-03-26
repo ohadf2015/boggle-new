@@ -2,11 +2,11 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { VocabularyCardEnriched } from '../VocabularyCardEnriched';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'rtl', language: 'he' }),
 }));
 
-jest.mock('@/components/practice/PronunciationButton', () => ({
+vi.mock('@/components/practice/PronunciationButton', () => ({
   PronunciationButton: () => null,
 }));
 

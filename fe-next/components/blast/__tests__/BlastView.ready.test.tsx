@@ -2,30 +2,30 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BlastView from '../BlastView';
 
-jest.mock('next/navigation', () => ({ useRouter: () => ({ push: jest.fn() }) }));
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
-jest.mock('@/contexts/MusicContext', () => ({
-  useMusic: () => ({ unlockAudio: jest.fn() }),
+vi.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({ unlockAudio: vi.fn() }),
 }));
-jest.mock('@/components/ui/PlayfulBackground', () => ({
+vi.mock('@/components/ui/PlayfulBackground', () => ({
   PlayfulBackground: () => null,
 }));
-jest.mock('../BlastGame', () => ({
+vi.mock('../BlastGame', () => ({
   BlastGame: () => <div data-testid="blast-game" />,
 }));
-jest.mock('../BlastReadyScreen', () => ({
+vi.mock('../BlastReadyScreen', () => ({
   BlastReadyScreen: ({ onStart }: { onStart: () => void }) => (
     <div data-testid="blast-ready-screen">
       <button onClick={() => onStart()}>play</button>
     </div>
   ),
 }));
-jest.mock('../BlastWaveIntro', () => ({
+vi.mock('../BlastWaveIntro', () => ({
   BlastWaveIntro: ({ onReady }: { onReady: () => void }) => (
     <div data-testid="wave-intro">
       <button onClick={() => onReady()}>go</button>

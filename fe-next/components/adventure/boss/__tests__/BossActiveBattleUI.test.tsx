@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockMotionDiv({ children, animate, ...rest }: any, ref: any) {
       return <div ref={ref} data-animate={JSON.stringify(animate)} {...rest}>{children}</div>;
@@ -19,10 +19,11 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock BossDialogue
-jest.mock('../../BossDialogue', () => {
-  return function MockBossDialogue(props: any) {
+vi.mock('../../BossDialogue', () => {
+  const MockBossDialogue = (props: any) => {
     return <div data-testid="boss-dialogue" data-visible={props.isVisible} />;
   };
+  return { default: MockBossDialogue };
 });
 
 import BossActiveBattleUI, { type BossActiveBattleUIProps } from '../BossActiveBattleUI';
@@ -61,7 +62,7 @@ function renderBattleUI(overrides: Partial<BossActiveBattleUIProps> = {}) {
 
 describe('BossActiveBattleUI', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Structure', () => {

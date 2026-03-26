@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Test: MobileBottomNav z-index must be higher than Header overlays
  *
@@ -18,10 +19,10 @@ import { MobileBottomNav } from '@/host/components/pre-game/MobileBottomNav';
 
 describe('MobileBottomNav z-index', () => {
   const mockT = (key: string) => key;
-  const mockOnTabChange = jest.fn();
+  const mockOnTabChange = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should have z-index higher than Header overlay (z-70)', () => {

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { QuickReactions, FloatingReaction, REACTIONS } from '../QuickReactions';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return React.createElement('div', { ref, 'data-testid': props['data-testid'], ...props }, children);
@@ -16,7 +16,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return React.createElement('div', { ref, ...props }, children);
@@ -33,7 +33,7 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
 });
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -51,15 +51,15 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('QuickReactions', () => {
-  const mockOnReaction = jest.fn();
+  const mockOnReaction = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render a smile trigger button in collapsed state', () => {
@@ -106,7 +106,7 @@ describe('QuickReactions', () => {
     expect(mockOnReaction).toHaveBeenCalledTimes(1);
 
     // Advance past throttle window
-    act(() => { jest.advanceTimersByTime(2100); });
+    act(() => { vi.advanceTimersByTime(2100); });
 
     // Re-open and click clap (should work now)
     fireEvent.click(screen.getByRole('button', { name: 'Quick reactions' }));
@@ -155,7 +155,7 @@ describe('FloatingReaction', () => {
         username="player1"
         x={50}
         y={50}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
       />
     );
     expect(screen.getByText('🔥')).toBeInTheDocument();
@@ -169,15 +169,15 @@ describe('FloatingReaction', () => {
         username="player1"
         x={50}
         y={50}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
       />
     );
     expect(screen.getByText('player1')).toBeInTheDocument();
   });
 
   it('should call onComplete after animation duration', () => {
-    jest.useFakeTimers();
-    const onComplete = jest.fn();
+    vi.useFakeTimers();
+    const onComplete = vi.fn();
     render(
       <FloatingReaction
         id="r1"
@@ -188,9 +188,9 @@ describe('FloatingReaction', () => {
         onComplete={onComplete}
       />
     );
-    act(() => { jest.advanceTimersByTime(1600); });
+    act(() => { vi.advanceTimersByTime(1600); });
     expect(onComplete).toHaveBeenCalledWith('r1');
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });
 

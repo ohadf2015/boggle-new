@@ -36,7 +36,7 @@ const mockRequestPermissions = LocalNotifications.requestPermissions as jest.Moc
 
 describe('Push Notification Permissions', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('checkNotificationPermission', () => {

@@ -8,8 +8,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock the theme context
-const mockUseBossFightTheme = jest.fn();
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+const mockUseBossFightTheme = vi.fn();
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => mockUseBossFightTheme(),
 }));
 
@@ -47,7 +47,7 @@ function renderArena(worldId: number, arenaEffect = 'none') {
 
 describe('BossArena', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {

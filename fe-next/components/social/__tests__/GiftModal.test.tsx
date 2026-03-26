@@ -4,7 +4,7 @@ import GiftModal from '../GiftModal';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return <div ref={ref} {...props}>{children}</div>;
@@ -19,7 +19,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   X: () => <div>X</div>,
   Gift: () => <div>Gift</div>,
   Lightbulb: () => <div>Lightbulb</div>,
@@ -30,15 +30,15 @@ jest.mock('lucide-react', () => ({
 describe('GiftModal', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
-    onSend: jest.fn(),
+    onClose: vi.fn(),
+    onSend: vi.fn(),
     recipientName: 'Bob',
     senderBalance: 100,
     giftsRemaining: 2,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should render when isOpen is true', () => {

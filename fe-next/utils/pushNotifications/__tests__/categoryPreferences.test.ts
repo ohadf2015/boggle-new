@@ -18,27 +18,27 @@ import {
 // Mock localStorage
 const localStorageMap = new Map<string, string>();
 const mockLocalStorage = {
-  getItem: jest.fn((key: string) => localStorageMap.get(key) ?? null),
-  setItem: jest.fn((key: string, value: string) => {
+  getItem: vi.fn((key: string) => localStorageMap.get(key) ?? null),
+  setItem: vi.fn((key: string, value: string) => {
     localStorageMap.set(key, value);
   }),
-  removeItem: jest.fn((key: string) => {
+  removeItem: vi.fn((key: string) => {
     localStorageMap.delete(key);
   }),
-  clear: jest.fn(() => {
+  clear: vi.fn(() => {
     localStorageMap.clear();
   }),
   get length() {
     return localStorageMap.size;
   },
-  key: jest.fn(),
+  key: vi.fn(),
 };
 
 Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
 describe('categoryPreferences', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMap.clear();
   });
 
@@ -253,7 +253,7 @@ describe('categoryPreferences', () => {
     it('should set dismissal timestamp 7 days in the future', () => {
       // GIVEN - Current time
       const now = Date.now();
-      jest.spyOn(Date, 'now').mockReturnValue(now);
+      vi.spyOn(Date, 'now').mockReturnValue(now);
 
       // WHEN
       dismissPushPrompt();
@@ -265,7 +265,7 @@ describe('categoryPreferences', () => {
         String(expectedUntil)
       );
 
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
   });
 });

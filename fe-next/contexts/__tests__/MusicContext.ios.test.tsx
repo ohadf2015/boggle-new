@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * MusicContext iOS Safari Compatibility Tests
  *
@@ -15,40 +16,40 @@ import { renderHook, act } from '@testing-library/react';
 const howlConstructorCalls: Array<{ src: string[]; html5: boolean }> = [];
 
 // Mock Howler.js
-jest.mock('howler', () => ({
-  Howl: jest.fn().mockImplementation((options) => {
+vi.mock('howler', () => ({
+  Howl: vi.fn().mockImplementation((options) => {
     howlConstructorCalls.push({
       src: options.src,
       html5: options.html5,
     });
     return {
-      play: jest.fn(),
-      stop: jest.fn(),
-      pause: jest.fn(),
-      fade: jest.fn(),
-      volume: jest.fn(),
-      seek: jest.fn(),
-      unload: jest.fn(),
-      load: jest.fn(),
-      state: jest.fn().mockReturnValue('loaded'),
-      playing: jest.fn().mockReturnValue(false),
+      play: vi.fn(),
+      stop: vi.fn(),
+      pause: vi.fn(),
+      fade: vi.fn(),
+      volume: vi.fn(),
+      seek: vi.fn(),
+      unload: vi.fn(),
+      load: vi.fn(),
+      state: vi.fn().mockReturnValue('loaded'),
+      playing: vi.fn().mockReturnValue(false),
     };
   }),
   Howler: {
     ctx: {
       state: 'running',
-      resume: jest.fn().mockResolvedValue(undefined),
-      suspend: jest.fn().mockResolvedValue(undefined),
+      resume: vi.fn().mockResolvedValue(undefined),
+      suspend: vi.fn().mockResolvedValue(undefined),
     },
   },
 }));
 
 // Mock audioLoader to use mocked Howl constructor
-jest.mock('@/lib/audio/audioLoader', () => {
+vi.mock('@/lib/audio/audioLoader', () => {
   const { Howl } = require('howler');
   return {
-    ensureHowl: jest.fn().mockResolvedValue(Howl),
-    createLazyHowl: jest.fn((src: string | string[], options?: any) => {
+    ensureHowl: vi.fn().mockResolvedValue(Howl),
+    createLazyHowl: vi.fn((src: string | string[], options?: any) => {
       return new Howl({
         src: Array.isArray(src) ? src : [src],
         preload: false,
@@ -56,28 +57,28 @@ jest.mock('@/lib/audio/audioLoader', () => {
         ...options,
       });
     }),
-    preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
+    preloadAudioOnDemand: vi.fn().mockResolvedValue(undefined),
   };
 });
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
 // Mock useLocalStorageObject hook
-jest.mock('@/hooks/useLocalStorageState', () => ({
-  useLocalStorageObject: jest.fn(() => [
+vi.mock('@/hooks/useLocalStorageState', () => ({
+  useLocalStorageObject: vi.fn(() => [
     { volume: 0.7, muted: false },
-    jest.fn(),
-    jest.fn(),
+    vi.fn(),
+    vi.fn(),
   ]),
 }));
 
@@ -92,7 +93,7 @@ function createWrapper() {
 describe('MusicContext iOS Safari Compatibility', () => {
   beforeEach(() => {
     howlConstructorCalls.length = 0;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Howl configuration for iOS', () => {

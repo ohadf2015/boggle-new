@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test for music autoplay on landing page
  *
@@ -17,23 +18,23 @@ import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 
 // Create mock storage for mutable mock state
 const mockState = {
-  play: jest.fn(),
-  pause: jest.fn(),
-  stop: jest.fn(),
-  fade: jest.fn(),
-  volume: jest.fn().mockReturnValue(0.5),
-  state: jest.fn().mockReturnValue('loaded'),
-  playing: jest.fn().mockReturnValue(false),
-  unload: jest.fn(),
-  seek: jest.fn(),
+  play: vi.fn(),
+  pause: vi.fn(),
+  stop: vi.fn(),
+  fade: vi.fn(),
+  volume: vi.fn().mockReturnValue(0.5),
+  state: vi.fn().mockReturnValue('loaded'),
+  playing: vi.fn().mockReturnValue(false),
+  unload: vi.fn(),
+  seek: vi.fn(),
   ctxState: 'suspended' as string, // Start suspended like a real browser
-  resume: jest.fn().mockResolvedValue(undefined),
-  suspend: jest.fn(),
+  resume: vi.fn().mockResolvedValue(undefined),
+  suspend: vi.fn(),
 };
 
 // Mock modules using factory functions that reference mockState
-jest.mock('howler', () => ({
-  Howl: jest.fn(() => ({
+vi.mock('howler', () => ({
+  Howl: vi.fn(() => ({
     play: () => mockState.play(),
     pause: () => mockState.pause(),
     stop: () => mockState.stop(),
@@ -55,8 +56,8 @@ jest.mock('howler', () => ({
   },
 }));
 
-jest.mock('@/lib/audio/audioLoader', () => ({
-  createLazyHowl: jest.fn((_src, options) => {
+vi.mock('@/lib/audio/audioLoader', () => ({
+  createLazyHowl: vi.fn((_src, options) => {
     const callbacks = {
       onloaderror: options?.onloaderror,
       onplayerror: options?.onplayerror,
@@ -79,17 +80,17 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       ...callbacks,
     };
   }),
-  preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
-  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
+  preloadAudioOnDemand: vi.fn().mockResolvedValue(undefined),
+  ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
@@ -128,8 +129,8 @@ function TestLandingView() {
 
 describe('MusicContext - Landing Page Autoplay', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Reset mock state
     mockState.play.mockClear();
@@ -144,7 +145,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
     // Mock document focus
     Object.defineProperty(document, 'hasFocus', {
       writable: true,
-      value: jest.fn(() => true)
+      value: vi.fn(() => true)
     });
 
     Object.defineProperty(document, 'visibilityState', {
@@ -154,7 +155,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should play music when user clicks content area (not just sound controller)', async () => {
@@ -186,7 +187,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
 
     // Advance timers to allow the 100ms delay for pending track to play
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // CRITICAL: Music should now be playing
@@ -217,7 +218,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
 
     // Advance timers for pending track
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Music should play
@@ -248,7 +249,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
 
     // Advance timers
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Music should play
@@ -279,7 +280,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
 
     // Advance timers
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Music should play
@@ -338,7 +339,7 @@ describe('MusicContext - Landing Page Autoplay', () => {
 
     // Advance timers
     await act(async () => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // Music should play

@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
       <button className={className} onClick={onClick} {...props}>{children}</button>
@@ -26,11 +26,11 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -38,13 +38,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playErrorSound: jest.fn(),
+    playErrorSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDrillKeyboardSupport', () => ({
+vi.mock('@/hooks/useDrillKeyboardSupport', () => ({
   useDrillKeyboardSupport: () => ({
     isTypingMode: false,
     typedWord: '',
@@ -52,12 +52,12 @@ jest.mock('@/hooks/useDrillKeyboardSupport', () => ({
     isDesktop: false,
     showEnterHint: false,
     showQuickTip: false,
-    dismissQuickTip: jest.fn(),
+    dismissQuickTip: vi.fn(),
     isValidOnGrid: false,
   }),
 }));
 
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: ({ onWordSubmit }: { onWordSubmit?: (word: string) => void }) => (
     <div data-testid="grid-component">
@@ -70,13 +70,13 @@ jest.mock('@/components/GridComponent', () => ({
   ),
 }));
 
-jest.mock('@/components/keyboard', () => ({
+vi.mock('@/components/keyboard', () => ({
   KeyboardDesktopBadge: () => null,
   EnterKeyHint: () => null,
   KeyboardQuickTip: () => null,
 }));
 
-jest.mock('@/utils/utils', () => ({
+vi.mock('@/utils/utils', () => ({
   isWordOnBoard: () => true,
 }));
 
@@ -103,17 +103,17 @@ const defaultProps = {
   availableWords: mockAvailableWords,
   level: 1,
   language: 'en' as const,
-  onComplete: jest.fn(),
+  onComplete: vi.fn(),
 };
 
 describe('ComboMaster Drill Gameplay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // --- Phase Transitions ---
@@ -133,7 +133,7 @@ describe('ComboMaster Drill Gameplay', () => {
     });
 
     it('transitions to complete phase when finish button clicked', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
 
       fireEvent.click(screen.getByText('brain.drills.start'));
@@ -165,10 +165,10 @@ describe('ComboMaster Drill Gameplay', () => {
       render(<ComboMaster {...defaultProps} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
-      act(() => { jest.advanceTimersByTime(1000); });
+      act(() => { vi.advanceTimersByTime(1000); });
       expect(screen.getByRole('status')).toHaveTextContent('7s');
 
-      act(() => { jest.advanceTimersByTime(2000); });
+      act(() => { vi.advanceTimersByTime(2000); });
       expect(screen.getByRole('status')).toHaveTextContent('5s');
     });
 
@@ -180,7 +180,7 @@ describe('ComboMaster Drill Gameplay', () => {
       fireEvent.click(screen.getByTestId('submit-cat'));
 
       // Let timer expire (8 seconds)
-      act(() => { jest.advanceTimersByTime(8000); });
+      act(() => { vi.advanceTimersByTime(8000); });
 
       // Timer resets to 8 after combo break
       expect(screen.getByRole('status')).toHaveTextContent('8s');
@@ -191,7 +191,7 @@ describe('ComboMaster Drill Gameplay', () => {
 
   describe('score calculation', () => {
     it('calculates score using canonical scoring: calculateWordScore(word,0) * (1 + combo * 0.1)', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
@@ -206,7 +206,7 @@ describe('ComboMaster Drill Gameplay', () => {
     });
 
     it('accumulates score across multiple words with increasing combo', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
@@ -226,7 +226,7 @@ describe('ComboMaster Drill Gameplay', () => {
 
   describe('combo tracking', () => {
     it('increments combo on each valid word', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
@@ -241,7 +241,7 @@ describe('ComboMaster Drill Gameplay', () => {
     });
 
     it('tracks maxCombo correctly even after combo reset', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
@@ -250,7 +250,7 @@ describe('ComboMaster Drill Gameplay', () => {
       fireEvent.click(screen.getByTestId('submit-dog'));
 
       // Let timer expire to break combo
-      act(() => { jest.advanceTimersByTime(8000); });
+      act(() => { vi.advanceTimersByTime(8000); });
 
       // Build new combo to 1
       fireEvent.click(screen.getByTestId('submit-bat'));
@@ -266,27 +266,27 @@ describe('ComboMaster Drill Gameplay', () => {
 
   describe('game over on 3 combo breaks', () => {
     it('ends game after 3 combo breaks (MAX_COMBO_BREAKS)', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
       // 3 timeouts = 3 combo breaks = game over
       // Level 1 timeout = 8 seconds
-      act(() => { jest.advanceTimersByTime(8000); }); // break 1
-      act(() => { jest.advanceTimersByTime(8000); }); // break 2
-      act(() => { jest.advanceTimersByTime(8000); }); // break 3
+      act(() => { vi.advanceTimersByTime(8000); }); // break 1
+      act(() => { vi.advanceTimersByTime(8000); }); // break 2
+      act(() => { vi.advanceTimersByTime(8000); }); // break 3
 
       expect(screen.getByText('brain.drills.gameOver')).toBeInTheDocument();
       expect(onComplete).toHaveBeenCalled();
     });
 
     it('does not end game after only 2 combo breaks', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
       fireEvent.click(screen.getByText('brain.drills.start'));
 
-      act(() => { jest.advanceTimersByTime(8000); }); // break 1
-      act(() => { jest.advanceTimersByTime(8000); }); // break 2
+      act(() => { vi.advanceTimersByTime(8000); }); // break 1
+      act(() => { vi.advanceTimersByTime(8000); }); // break 2
 
       // Should still be playing
       expect(screen.getByTestId('grid-component')).toBeInTheDocument();

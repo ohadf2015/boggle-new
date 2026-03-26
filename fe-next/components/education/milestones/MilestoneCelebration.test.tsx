@@ -7,21 +7,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MilestoneCelebration } from './MilestoneCelebration';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
   }),
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireLevelUpConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireLevelUpConfetti: vi.fn(),
 }));
 
-const mockOnClose = jest.fn();
+const mockOnClose = vi.fn();
 
 describe('MilestoneCelebration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not render when milestone is null', () => {

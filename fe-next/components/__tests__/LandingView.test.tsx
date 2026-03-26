@@ -6,49 +6,49 @@
  */
 
 // Mock contexts (auto-mock pattern)
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/contexts/MusicContext');
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark', setTheme: jest.fn() }),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/MusicContext');
+vi.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', setTheme: vi.fn() }),
 }));
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
-    stopSound: jest.fn(),
+    playSound: vi.fn(),
+    stopSound: vi.fn(),
     isSoundEnabled: true,
-    toggleSound: jest.fn(),
+    toggleSound: vi.fn(),
   }),
 }));
-jest.mock('@/contexts/CoinContext', () => ({
-  useCoin: () => ({ coins: 0, updateCoins: jest.fn() }),
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoin: () => ({ coins: 0, updateCoins: vi.fn() }),
 }));
-jest.mock('@/contexts/HapticsContext', () => ({
-  useHapticsConfig: () => ({ isEnabled: true, toggle: jest.fn() }),
+vi.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({ isEnabled: true, toggle: vi.fn() }),
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useLiveRoomStats', () => ({
+vi.mock('@/hooks/useLiveRoomStats', () => ({
   useLiveRoomStats: () => ({
     openRooms: 0,
     totalPlayers: 0,
     activePlayers: 0,
-    refresh: jest.fn(),
+    refresh: vi.fn(),
   }),
 }));
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
-jest.mock('@/hooks/useMobilePortrait', () => ({
+vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
   }),
 }));
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),
   useTiltEffect: () => ({
     ref: { current: null },
@@ -56,10 +56,10 @@ jest.mock('@/hooks/useTiltEffect', () => ({
     handlers: {},
   }),
 }));
-jest.mock('@/hooks/usePlayerStats', () => ({
+vi.mock('@/hooks/usePlayerStats', () => ({
   usePlayerStats: () => ({ allTimeBest: null }),
 }));
-jest.mock('@/hooks/useDailyChallengeStatus', () => ({
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
   useDailyChallengeStatus: () => ({
     hasPlayed: false,
     hasSolved: false,
@@ -70,37 +70,40 @@ jest.mock('@/hooks/useDailyChallengeStatus', () => ({
 }));
 
 // Mock onboardingStorage
-jest.mock('@/utils/onboardingStorage', () => ({
-  hasCompletedOnboarding: jest.fn(() => true),
-  markOnboardingSkipped: jest.fn(),
+vi.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: vi.fn(() => true),
+  markOnboardingSkipped: vi.fn(),
 }));
-jest.mock('@/utils/perfVariant', () => ({
+vi.mock('@/utils/perfVariant', () => ({
   getPerfVariant: () => 'lite',
 }));
 
 // Mock lazy-loaded / dynamic components
-jest.mock('@/components/daily/DailyChallengeBanner', () => {
-  return function MockDailyChallengeBanner() {
+vi.mock('@/components/daily/DailyChallengeBanner', () => {
+  const MockDailyChallengeBanner = () => {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
+  return { default: MockDailyChallengeBanner };
 });
-jest.mock('@/components/OnboardingModal', () => {
-  return function MockOnboardingModal() {
+vi.mock('@/components/OnboardingModal', () => {
+  const MockOnboardingModal = () => {
     return null;
   };
+  return { default: MockOnboardingModal };
 });
-jest.mock('@/components/auth/AuthModal', () => {
-  return function MockAuthModal() {
+vi.mock('@/components/auth/AuthModal', () => {
+  const MockAuthModal = () => {
     return null;
   };
+  return { default: MockAuthModal };
 });
-jest.mock('@/components/ui/PlayfulBackground', () => ({
+vi.mock('@/components/ui/PlayfulBackground', () => ({
   PlayfulBackground: () => null,
 }));
-jest.mock('@/components/ui/IdleMascot', () => ({
+vi.mock('@/components/ui/IdleMascot', () => ({
   IdleMascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
 }));
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
@@ -110,11 +113,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 
-const mockPlayTrack = jest.fn();
+const mockPlayTrack = vi.fn();
 
 describe('LandingView', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     (useAuth as jest.Mock).mockReturnValue({
       isAuthenticated: false,
@@ -130,8 +133,8 @@ describe('LandingView', () => {
 
     (useMusic as jest.Mock).mockReturnValue({
       playTrack: mockPlayTrack,
-      unlockAudio: jest.fn(),
-      stopMusic: jest.fn(),
+      unlockAudio: vi.fn(),
+      stopMusic: vi.fn(),
       TRACKS: { LOBBY: 'lobby', BOSSA: 'bossa', BOSSA_ARCADE: 'bossaArcade' },
       currentTrack: null,
       isPlaying: false,

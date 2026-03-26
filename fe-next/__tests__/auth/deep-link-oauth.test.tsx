@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: Deep Link OAuth Callback Handler
  *
@@ -14,59 +15,59 @@ import DeepLinkHandler from '@/components/DeepLinkHandler';
 import * as platform from '@/utils/platform';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
 // Mock Capacitor App plugin
-jest.mock('@capacitor/app', () => ({
+vi.mock('@capacitor/app', () => ({
   App: {
-    addListener: jest.fn(),
-    removeAllListeners: jest.fn(),
+    addListener: vi.fn(),
+    removeAllListeners: vi.fn(),
   },
 }));
 
 // Mock Capacitor Browser plugin
-jest.mock('@capacitor/browser', () => ({
+vi.mock('@capacitor/browser', () => ({
   Browser: {
-    close: jest.fn(),
-    open: jest.fn(),
+    close: vi.fn(),
+    open: vi.fn(),
   },
 }));
 
 // Mock platform utils
-jest.mock('@/utils/platform', () => ({
-  isNative: jest.fn(),
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(),
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => {
-  const mockLog = jest.fn();
-  const mockError = jest.fn();
+vi.mock('@/utils/logger', () => {
+  const mockLog = vi.fn();
+  const mockError = vi.fn();
   return {
     __esModule: true,
     default: {
       log: mockLog,
       error: mockError,
-      warn: jest.fn(),
+      warn: vi.fn(),
     },
   };
 });
 
 describe('Deep Link OAuth Callback Handler', () => {
-  let mockRouter: { replace: jest.Mock };
-  let mockAddListener: jest.Mock;
-  let mockRemove: jest.Mock;
-  const mockIsNative = platform.isNative as jest.Mock;
+  let mockRouter: { replace: Mock };
+  let mockAddListener: Mock;
+  let mockRemove: Mock;
+  const mockIsNative = platform.isNative as Mock;
 
   beforeEach(() => {
     mockRouter = {
-      replace: jest.fn(),
+      replace: vi.fn(),
     };
-    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    (useRouter as Mock).mockReturnValue(mockRouter);
 
-    mockRemove = jest.fn();
-    mockAddListener = App.addListener as jest.Mock;
+    mockRemove = vi.fn();
+    mockAddListener = App.addListener as Mock;
     mockAddListener.mockClear();
     mockAddListener.mockResolvedValue({ remove: mockRemove });
 
@@ -74,11 +75,11 @@ describe('Deep Link OAuth Callback Handler', () => {
     mockIsNative.mockReturnValue(true);
 
     // Reset Browser mock
-    (Browser.close as jest.Mock).mockResolvedValue(undefined);
+    (Browser.close as Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should register deep link handler when component mounts', async () => {
@@ -233,7 +234,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
   it('should cleanup listener on unmount', async () => {
     // GIVEN: Mounted component with listener
-    const mockLocalRemove = jest.fn();
+    const mockLocalRemove = vi.fn();
     mockAddListener.mockResolvedValue({ remove: mockLocalRemove });
 
     const { unmount } = render(<DeepLinkHandler />);
@@ -333,7 +334,7 @@ describe('Deep Link OAuth Callback Handler', () => {
     it('should handle Browser.close error gracefully', async () => {
       // GIVEN: Browser.close throws (e.g., browser already closed)
       mockIsNative.mockReturnValue(true);
-      (Browser.close as jest.Mock).mockRejectedValue(new Error('Browser already closed'));
+      (Browser.close as Mock).mockRejectedValue(new Error('Browser already closed'));
       const deepLinkUrl = 'lexiclash://auth/callback?code=test-code&locale=en';
 
       let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;

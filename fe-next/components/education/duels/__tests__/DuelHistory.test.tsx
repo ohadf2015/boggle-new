@@ -17,8 +17,8 @@ import {
 // MOCKS
 // ============================================
 
-jest.mock('@/lib/supabase/education/duels');
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/lib/supabase/education/duels');
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, any>) => {
       const translations: Record<string, string> = {
@@ -101,7 +101,7 @@ const mockHistoryEntry: DuelHistoryEntry = {
 
 describe('DuelHistory', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Stats Panel', () => {

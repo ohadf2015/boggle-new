@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Tests for Teacher Profile PageClient
  */
@@ -11,13 +12,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useRouter } from 'next/navigation';
 
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/hooks/useClassroom');
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/hooks/useClassroom');
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
-jest.mock('@/components/education/EducationHeader', () => ({
+vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: ({ showBackButton }: { showBackButton?: boolean }) => (
     <div data-testid="education-header" data-show-back={String(showBackButton)}>
       EducationHeader
@@ -25,12 +26,12 @@ jest.mock('@/components/education/EducationHeader', () => ({
   ),
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseClassrooms = useClassrooms as jest.MockedFunction<typeof useClassrooms>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseClassrooms = useClassrooms as MockedFunction<typeof useClassrooms>;
+const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
 describe('TeacherProfilePageClient', () => {
   const mockTeacherProfile = {
@@ -48,14 +49,14 @@ describe('TeacherProfilePageClient', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
 
     mockUseLanguage.mockReturnValue({
       t: (key: string) => key,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       dir: 'ltr',
       currentFlag: '🇺🇸',
     } as any);
@@ -67,19 +68,19 @@ describe('TeacherProfilePageClient', () => {
       loading: false,
       isTeacher: true,
       isAdmin: true,
-      login: jest.fn(),
-      logout: jest.fn(),
-      updateProfile: jest.fn(),
+      login: vi.fn(),
+      logout: vi.fn(),
+      updateProfile: vi.fn(),
     } as any);
 
     mockUseClassrooms.mockReturnValue({
       classrooms: mockClassrooms as any,
       isLoading: false,
       error: null,
-      createClassroom: jest.fn(),
-      updateClassroom: jest.fn(),
-      deleteClassroom: jest.fn(),
-      refresh: jest.fn(),
+      createClassroom: vi.fn(),
+      updateClassroom: vi.fn(),
+      deleteClassroom: vi.fn(),
+      refresh: vi.fn(),
     } as any);
   });
 

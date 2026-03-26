@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Record Invalid Word API Tests
  *
@@ -14,7 +15,7 @@ const mockRpcCalls: Array<{ fnName: string; params: unknown }> = [];
 let mockRpcError: { message: string } | null = null;
 
 // Mock Supabase
-jest.mock('@supabase/supabase-js', () => ({
+vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     rpc: (fnName: string, params: unknown) => {
       mockRpcCalls.push({ fnName, params });
@@ -25,7 +26,7 @@ jest.mock('@supabase/supabase-js', () => ({
 
 describe('Record Invalid Word API Logic', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRpcCalls.length = 0;
     mockRpcError = null;
   });

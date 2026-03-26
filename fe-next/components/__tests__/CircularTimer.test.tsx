@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import CircularTimer from '../CircularTimer';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>

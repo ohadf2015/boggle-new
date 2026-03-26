@@ -5,7 +5,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
     return <div ref={ref} {...props}>{children}</div>;
@@ -17,14 +17,14 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Check: () => <div>Check</div>,
   X: () => <div>X</div>,
   Pencil: () => <div>Pencil</div>,
 }));
 
 // Mock AvatarSelectorButton
-jest.mock('@/components/join/AvatarSelectorButton', () => ({
+vi.mock('@/components/join/AvatarSelectorButton', () => ({
   __esModule: true,
   default: function MockAvatarSelectorButton() {
     return <div data-testid="avatar-selector-button">AvatarSelector</div>;
@@ -35,8 +35,8 @@ describe('ProfileSetupStep - deferred mode', () => {
   const defaultProps = {
     customAvatar: DEFAULT_AVATAR_CONFIG,
     displayName: 'Fox',
-    onAvatarSelect: jest.fn(),
-    onNameChange: jest.fn(),
+    onAvatarSelect: vi.fn(),
+    onNameChange: vi.fn(),
   };
 
   test('should render full profile setup when deferred is false', () => {

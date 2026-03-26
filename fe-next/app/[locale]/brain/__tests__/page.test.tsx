@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BrainTrainingPage from '../page';
@@ -11,46 +12,46 @@ import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import React from 'react';
 
 // Mock all dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/hooks/useBrainScore');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/utils/ThemeContext');
-jest.mock('@/contexts/HapticsContext', () => ({
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/hooks/useBrainScore');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/utils/ThemeContext');
+vi.mock('@/contexts/HapticsContext', () => ({
   useHapticsConfig: () => ({
     isEnabled: true,
-    toggle: jest.fn(),
+    toggle: vi.fn(),
   }),
 }));
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
 // Mock NavigationContext - AutoHideHeader uses useNavigation
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   useNavigation: () => ({
     isInGame: false,
-    setIsInGame: jest.fn(),
+    setIsInGame: vi.fn(),
     activeTab: 'brain',
-    setActiveTab: jest.fn(),
+    setActiveTab: vi.fn(),
   }),
-  useHideNavigation: () => jest.fn(),
+  useHideNavigation: () => vi.fn(),
   NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseBrainScore = useBrainScore as jest.MockedFunction<typeof useBrainScore>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseBrainScore = useBrainScore as MockedFunction<typeof useBrainScore>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseTheme = useTheme as MockedFunction<typeof useTheme>;
+const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
 describe('BrainTrainingPage - Loading States', () => {
   const mockRouter = {
-    push: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   };
 
   // Wrapper component to provide necessary contexts
@@ -63,20 +64,20 @@ describe('BrainTrainingPage - Loading States', () => {
   );
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock matchMedia for framer-motion
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
 
@@ -84,14 +85,14 @@ describe('BrainTrainingPage - Loading States', () => {
     mockUseRouter.mockReturnValue(mockRouter as any);
     mockUseLanguage.mockReturnValue({
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       t: (key: string) => key,
       dir: 'ltr',
       currentFlag: '🇺🇸',
     });
     mockUseTheme.mockReturnValue({
       theme: 'dark',
-      toggleTheme: jest.fn(),
+      toggleTheme: vi.fn(),
     });
   });
 
@@ -111,9 +112,9 @@ describe('BrainTrainingPage - Loading States', () => {
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is not loading
@@ -124,8 +125,8 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: false,
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
@@ -153,9 +154,9 @@ describe('BrainTrainingPage - Loading States', () => {
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is loading
@@ -166,8 +167,8 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: true, // Brain score is loading
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
@@ -191,9 +192,9 @@ describe('BrainTrainingPage - Loading States', () => {
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is not loading
@@ -204,8 +205,8 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: false,
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });

@@ -1,17 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import { WordClubCard } from '../WordClubCard';
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
     push: mockPush,
-    replace: jest.fn(),
+    replace: vi.fn(),
   })),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
       return key;
@@ -20,21 +20,21 @@ jest.mock('@/contexts/LanguageContext', () => ({
   })),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(() => ({
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
     user: { id: 'user-1' },
     isAuthenticated: true,
   })),
 }));
 
-const mockUseWordClubs = jest.fn();
-jest.mock('@/hooks/useWordClubs', () => ({
+const mockUseWordClubs = vi.fn();
+vi.mock('@/hooks/useWordClubs', () => ({
   useWordClubs: (...args: unknown[]) => mockUseWordClubs(...args),
 }));
 
 describe('WordClubCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when loading', () => {

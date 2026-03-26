@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { StreakFreezeIndicator } from '../StreakFreezeIndicator';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => {
       const { initial, animate, transition, ...rest } = props;

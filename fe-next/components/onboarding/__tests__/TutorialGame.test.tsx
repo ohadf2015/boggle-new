@@ -2,7 +2,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv(
     { children, onAnimationComplete, ...props }: any,
@@ -33,19 +33,19 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Sparkles: () => <div data-testid="sparkles-icon" />,
   Trophy: () => <div data-testid="trophy-icon" />,
   Target: () => <div data-testid="target-icon" />,
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: any) => <div data-testid={`mascot-${variant}`} />,
 }));
 
 // Mock MiniGrid
-jest.mock('../MiniGrid', () => {
+vi.mock('../MiniGrid', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -60,7 +60,7 @@ jest.mock('../MiniGrid', () => {
 });
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, fallback?: any) => {
       const translations: Record<string, string> = {
@@ -79,7 +79,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock tutorialBoardConfig
-jest.mock('../tutorialBoardConfig', () => ({
+vi.mock('../tutorialBoardConfig', () => ({
   getTutorialBoard: () => ({
     letters: [
       ['C', 'A', 'T', 'S'],
@@ -102,11 +102,11 @@ import TutorialGame from '../TutorialGame';
 
 describe('TutorialGame', () => {
   const defaultProps = {
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the tutorial grid with 4x4 size', () => {

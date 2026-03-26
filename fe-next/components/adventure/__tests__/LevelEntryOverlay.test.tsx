@@ -10,7 +10,7 @@ import LevelEntryOverlay from '../LevelEntryOverlay';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -22,7 +22,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableGlowEffects: true,
@@ -31,11 +31,11 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 
 describe('LevelEntryOverlay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('renders level number when visible', () => {
@@ -64,7 +64,7 @@ describe('LevelEntryOverlay', () => {
   });
 
   test('onComplete is called after animation duration', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
 
     render(
       <LevelEntryOverlay
@@ -80,7 +80,7 @@ describe('LevelEntryOverlay', () => {
     // DEBT-01: Total duration: 350 (burst) + 400 (hold) + 250 (fade) = 1000ms (was 1300ms)
     const titleDuration = OPTIMIZED_TIMING.getTitleDuration();
     act(() => {
-      jest.advanceTimersByTime(titleDuration + 10);
+      vi.advanceTimersByTime(titleDuration + 10);
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -114,11 +114,11 @@ describe('LevelEntryOverlay', () => {
 
 describe('LevelEntryOverlay - World Theming', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('applies world 1 theme (lime green)', () => {
@@ -174,9 +174,9 @@ describe('LevelEntryOverlay - World Theming', () => {
 
 describe('LevelEntryOverlay - Reduced Motion', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     // Override mock for reduced motion
-    jest.doMock('@/hooks/useDevicePerformance', () => ({
+    vi.doMock('@/hooks/useDevicePerformance', () => ({
       useDevicePerformance: () => ({
         prefersReducedMotion: true,
         enableGlowEffects: false,
@@ -185,8 +185,8 @@ describe('LevelEntryOverlay - Reduced Motion', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.resetModules();
+    vi.useRealTimers();
+    vi.resetModules();
   });
 
   test('completes immediately with reduced motion', () => {
@@ -198,15 +198,15 @@ describe('LevelEntryOverlay - Reduced Motion', () => {
 
 describe('LevelEntryOverlay - Timing', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('total animation is under 2 seconds', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
 
     render(
       <LevelEntryOverlay
@@ -222,7 +222,7 @@ describe('LevelEntryOverlay - Timing', () => {
     expect(titleDuration).toBeLessThanOrEqual(1100); // 1s with buffer
 
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     expect(onComplete).toHaveBeenCalled();

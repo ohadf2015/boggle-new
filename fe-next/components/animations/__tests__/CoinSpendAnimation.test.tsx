@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
 import { CoinSpendAnimation } from '../CoinSpendAnimation';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: any) => (
       <div className={className} style={style} data-testid="motion-div" {...props}>
@@ -22,7 +22,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -251,7 +251,7 @@ describe('CoinSpendAnimation', () => {
 
   describe('Callback Prop', () => {
     it('should accept onComplete callback', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       // This should not throw
       const { container } = render(
         <CoinSpendAnimation
@@ -264,7 +264,7 @@ describe('CoinSpendAnimation', () => {
     });
 
     it('should not call onComplete immediately', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(
         <CoinSpendAnimation
           trigger={true}

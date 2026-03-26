@@ -9,9 +9,9 @@ import type { GridTileState } from '@/types/adventure';
 import { useGridGestures } from '../useGridGestures';
 
 // Mock haptic feedback module
-jest.mock('@/components/grid/hapticFeedback', () => ({
-  vibrateCellTap: jest.fn(),
-  vibrateCellDrag: jest.fn(),
+vi.mock('@/components/grid/hapticFeedback', () => ({
+  vibrateCellTap: vi.fn(),
+  vibrateCellDrag: vi.fn(),
 }));
 
 import { vibrateCellTap, vibrateCellDrag } from '@/components/grid/hapticFeedback';
@@ -32,14 +32,14 @@ describe('useGridGestures - haptic feedback', () => {
     tiles: mockTiles,
     interactive: true,
     disabled: false,
-    onTileSelect: jest.fn(),
-    onDragStart: jest.fn(),
-    onDragEnter: jest.fn(),
-    onDragEnd: jest.fn(),
+    onTileSelect: vi.fn(),
+    onDragStart: vi.fn(),
+    onDragEnter: vi.fn(),
+    onDragEnd: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should trigger vibrateCellTap on drag start', () => {

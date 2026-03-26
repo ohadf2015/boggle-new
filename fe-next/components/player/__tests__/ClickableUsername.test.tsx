@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ClickableUsername from '../ClickableUsername';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (key: string) => key }),
 }));
 

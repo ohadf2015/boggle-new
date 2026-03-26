@@ -10,11 +10,11 @@ import '@testing-library/jest-dom';
 import { SpellingChallengePractice } from '../SpellingChallengePractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>
@@ -29,7 +29,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('../PracticeResultsCard', () => ({
+vi.mock('../PracticeResultsCard', () => ({
   __esModule: true,
   default: () => <div data-testid="practice-results-card" />,
 }));
@@ -43,8 +43,8 @@ describe('SpellingChallengePractice — WordContextRow integration', () => {
     render(
       <SpellingChallengePractice
         words={baseWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
     // Definition card still present
@@ -64,8 +64,8 @@ describe('SpellingChallengePractice — WordContextRow integration', () => {
     render(
       <SpellingChallengePractice
         words={[enrichedWord]}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 

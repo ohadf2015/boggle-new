@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, onError, ...props }: {
     src: string;
@@ -31,7 +31,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock framer-motion to simplify testing
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
@@ -40,7 +40,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Avatar component
-jest.mock('@/components/Avatar', () => ({
+vi.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: ({ avatarImage, ...props }: {
     avatarImage?: string;
@@ -55,7 +55,7 @@ jest.mock('@/components/Avatar', () => ({
 }));
 
 // Mock avatar config utilities
-jest.mock('@/utils/avatarConfig', () => ({
+vi.mock('@/utils/avatarConfig', () => ({
   AVATARS: [
     { id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' },
     { id: 'shroom-shelly', name: 'Shroom Shelly', filename: 'shroom-shelly.png' },
@@ -71,18 +71,18 @@ jest.mock('@/utils/avatarConfig', () => ({
 }));
 
 // Mock shared utils
-jest.mock('@/shared/utils', () => ({
+vi.mock('@/shared/utils', () => ({
   formatDistanceToNow: () => '5 minutes ago',
   getCountryFlag: (code: string | null | undefined) => code ? '🇺🇸' : null,
 }));
 
 // Mock ranking styles
-jest.mock('@/utils/rankingStyles', () => ({
+vi.mock('@/utils/rankingStyles', () => ({
   getRankDisplay: (rank: number) => `#${rank}`,
 }));
 
 // Mock daily challenge utils
-jest.mock('@/utils/dailyChallenge', () => ({
+vi.mock('@/utils/dailyChallenge', () => ({
   getPuzzleNumber: () => 42,
 }));
 
@@ -131,13 +131,13 @@ const createMockAllTimeParticipant = (overrides: Partial<AllTimeParticipant> = {
 });
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('TabbedDailyLeaderboard', () => {
   const mockT = (key: string) => key;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({

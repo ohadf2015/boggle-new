@@ -8,7 +8,7 @@ import { PushNotificationPrompt } from '../PushNotificationPrompt';
 import type { ReactNode } from 'react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({
       children,
@@ -25,7 +25,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -41,24 +41,24 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock categoryPreferences
-const mockShouldShow = jest.fn();
-const mockDismiss = jest.fn();
+const mockShouldShow = vi.fn();
+const mockDismiss = vi.fn();
 
-jest.mock('@/utils/pushNotifications', () => ({
+vi.mock('@/utils/pushNotifications', () => ({
   shouldShowPushPrompt: (...args: unknown[]) => mockShouldShow(...args),
   dismissPushPrompt: (...args: unknown[]) => mockDismiss(...args),
 }));
 
 // Mock registerPushToken
-jest.mock('@/utils/pushNotifications/tokenRegistration', () => ({
-  registerPushToken: jest.fn().mockResolvedValue(true),
+vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
+  registerPushToken: vi.fn().mockResolvedValue(true),
 }));
 
 describe('PushNotificationPrompt', () => {
   let originalNotification: typeof Notification;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     originalNotification = window.Notification;
     mockShouldShow.mockReturnValue(true);
   });
@@ -127,7 +127,7 @@ describe('PushNotificationPrompt', () => {
 
     it('should request permission when Enable is clicked', async () => {
       // GIVEN - Permission can be requested
-      const mockRequestPermission = jest.fn().mockResolvedValue('granted');
+      const mockRequestPermission = vi.fn().mockResolvedValue('granted');
       Object.defineProperty(window, 'Notification', {
         value: {
           permission: 'default',

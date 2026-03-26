@@ -12,7 +12,7 @@ import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue } from '../types';
 
 // Mock framer-motion to make tests synchronous
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, whileHover, whileTap, ...domProps } = props;

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { VocabularyReview } from '../VocabularyReview';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -49,12 +49,12 @@ const mockWords = [
 describe('VocabularyReview', () => {
   const defaultProps = {
     words: mockWords,
-    onReview: jest.fn(),
-    onComplete: jest.fn(),
+    onReview: vi.fn(),
+    onComplete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show the first word for review', () => {

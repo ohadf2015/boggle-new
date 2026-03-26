@@ -4,13 +4,13 @@ import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import type { StudentProgressSummary } from '@/lib/supabase/analytics';
 
 // Mock the hook
-jest.mock('@/hooks/useStudentProgressMetrics');
+vi.mock('@/hooks/useStudentProgressMetrics');
 const mockUseStudentProgressMetrics = useStudentProgressMetrics as jest.MockedFunction<
   typeof useStudentProgressMetrics
 >;
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: any) => {
       if (key === 'education.analytics.daysAgo' && params) {
@@ -23,7 +23,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock PageLoader
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
@@ -74,7 +74,7 @@ describe('StudentProgressTable', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render loading state', () => {
@@ -83,7 +83,7 @@ describe('StudentProgressTable', () => {
       students: [],
       isLoading: true,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -99,7 +99,7 @@ describe('StudentProgressTable', () => {
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -119,7 +119,7 @@ describe('StudentProgressTable', () => {
       students: [],
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -136,7 +136,7 @@ describe('StudentProgressTable', () => {
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -164,7 +164,7 @@ describe('StudentProgressTable', () => {
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -187,7 +187,7 @@ describe('StudentProgressTable', () => {
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -200,12 +200,12 @@ describe('StudentProgressTable', () => {
 
   it('should call onStudentClick when row clicked', () => {
     // GIVEN: Students data and click handler
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     mockUseStudentProgressMetrics.mockReturnValue({
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -226,7 +226,7 @@ describe('StudentProgressTable', () => {
       students: mockStudents,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN

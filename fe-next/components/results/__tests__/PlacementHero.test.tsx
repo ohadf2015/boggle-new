@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -16,20 +16,20 @@ jest.mock('framer-motion', () => {
     },
     useMotionValue: (initial: number) => ({
       get: () => initial,
-      set: jest.fn(),
-      on: () => jest.fn(),
+      set: vi.fn(),
+      on: () => vi.fn(),
     }),
     useTransform: (_mv: unknown, fn: (v: number) => number) => ({
       get: () => fn(0),
-      on: (_event: string, cb: (v: number) => void) => { cb(fn(0)); return jest.fn(); },
+      on: (_event: string, cb: (v: number) => void) => { cb(fn(0)); return vi.fn(); },
     }),
-    animate: () => ({ stop: jest.fn() }),
+    animate: () => ({ stop: vi.fn() }),
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
   };
 });
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string, params?: Record<string, string | number>) => {
     if (params) {
       let result = key;
@@ -40,16 +40,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }, dir: 'ltr' }),
 }));
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => false,
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireRankConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
 }));
 
-jest.mock('../../Avatar', () => ({
+vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: ({ size, className }: { size: string; className?: string }) => <div data-testid="avatar" data-size={size} className={className} />,
 }));
@@ -123,11 +123,11 @@ describe('PlacementHero — Clean Compact Layout', () => {
 
   it('fires confetti for top 3', () => {
     const { fireRankConfetti } = require('@/utils/confettiUtils');
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     render(<PlacementHero {...defaultProps} rank={2} />);
-    jest.advanceTimersByTime(600);
+    vi.advanceTimersByTime(600);
     expect(fireRankConfetti).toHaveBeenCalledWith(2, 'light');
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders correct ordinals for 2nd, 3rd, 4th', () => {

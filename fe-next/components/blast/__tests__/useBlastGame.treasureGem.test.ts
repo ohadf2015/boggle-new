@@ -17,38 +17,38 @@
 
 import { renderHook, act } from '@testing-library/react';
 
-jest.mock('@/utils/clientWordValidator', () => ({
-  validateWordLocally: jest.fn(() => ({ isValid: true })),
-  isWordOnBoard: jest.fn(() => true),
+vi.mock('@/utils/clientWordValidator', () => ({
+  validateWordLocally: vi.fn(() => ({ isValid: true })),
+  isWordOnBoard: vi.fn(() => true),
 }));
 
-jest.mock('@/hooks/useDictionaryCache', () => ({
+vi.mock('@/hooks/useDictionaryCache', () => ({
   useDictionaryCache: () => ({
-    checkWord: jest.fn(() => true),
+    checkWord: vi.fn(() => true),
     isLoaded: true,
   }),
 }));
 
-jest.mock('@/hooks/usePrevalidation', () => ({
+vi.mock('@/hooks/usePrevalidation', () => ({
   usePrevalidation: () => ({
-    prefetch: jest.fn(),
-    getCached: jest.fn(() => null),
-    clearCache: jest.fn(),
+    prefetch: vi.fn(),
+    getCached: vi.fn(() => null),
+    clearCache: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/haptics', () => ({
-  hapticForWordScore: jest.fn(),
-  hapticError: jest.fn(),
+vi.mock('@/utils/haptics', () => ({
+  hapticForWordScore: vi.fn(),
+  hapticError: vi.fn(),
 }));
 
-jest.mock('@/utils/invalidWordTracker', () => ({
-  recordNotOnBoard: jest.fn(),
-  recordNotInDictionary: jest.fn(),
+vi.mock('@/utils/invalidWordTracker', () => ({
+  recordNotOnBoard: vi.fn(),
+  recordNotInDictionary: vi.fn(),
 }));
 
-jest.mock('@/shared/utils/scoring', () => ({
-  getComboBonus: jest.fn(() => 0),
+vi.mock('@/shared/utils/scoring', () => ({
+  getComboBonus: vi.fn(() => 0),
 }));
 
 import { useBlastGame } from '../hooks/useBlastGame';
@@ -61,7 +61,7 @@ import {
 // ─── Shared fetch mock setup ─────────────────────────────────────────────────
 
 function setupFetchMock() {
-  global.fetch = jest.fn()
+  global.fetch = vi.fn()
     .mockResolvedValueOnce({
       ok: true,
       json: async () => ({ words: ['test', 'word', 'game', 'cat', 'do'] }),
@@ -76,12 +76,12 @@ function setupFetchMock() {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   setupFetchMock();
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 // ─── Constants ───────────────────────────────────────────────────────────────

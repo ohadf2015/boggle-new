@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for useComboSystem hook
  *
@@ -8,21 +9,21 @@ import { renderHook, act } from '@testing-library/react';
 import { useComboSystem } from '../useComboSystem';
 
 // Mock timers
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('useComboSystem', () => {
   const defaultOptions = {
-    playComboSound: jest.fn(),
-    onShieldUsed: jest.fn(),
-    getValidWordCount: jest.fn(() => 0),
+    playComboSound: vi.fn(),
+    onShieldUsed: vi.fn(),
+    getValidWordCount: vi.fn(() => 0),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe('initial state', () => {
@@ -58,7 +59,7 @@ describe('useComboSystem', () => {
 
       // Second word quickly after
       act(() => {
-        jest.advanceTimersByTime(1000); // 1 second later
+        vi.advanceTimersByTime(1000); // 1 second later
         result.current.actions.incrementCombo();
       });
 
@@ -75,7 +76,7 @@ describe('useComboSystem', () => {
 
       // Second word within window
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -83,7 +84,7 @@ describe('useComboSystem', () => {
 
       // Wait for combo to expire (base 6000 + level*1000 = 8000ms for level 2)
       act(() => {
-        jest.advanceTimersByTime(9000); // Past the combo window
+        vi.advanceTimersByTime(9000); // Past the combo window
       });
 
       // Combo should decay to 0
@@ -91,7 +92,7 @@ describe('useComboSystem', () => {
     });
 
     it('should play combo sound when combo increases', () => {
-      const playComboSound = jest.fn();
+      const playComboSound = vi.fn();
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, playComboSound })
       );
@@ -105,7 +106,7 @@ describe('useComboSystem', () => {
 
       // Second word within window
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -122,11 +123,11 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -141,8 +142,8 @@ describe('useComboSystem', () => {
     });
 
     it('should use shield if available instead of resetting', () => {
-      const onShieldUsed = jest.fn();
-      const getValidWordCount = jest.fn(() => 15); // 1 shield available (15/10 = 1)
+      const onShieldUsed = vi.fn();
+      const getValidWordCount = vi.fn(() => 15); // 1 shield available (15/10 = 1)
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, onShieldUsed, getValidWordCount })
@@ -153,7 +154,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -171,7 +172,7 @@ describe('useComboSystem', () => {
     });
 
     it('should force reset even with shields available', () => {
-      const getValidWordCount = jest.fn(() => 15);
+      const getValidWordCount = vi.fn(() => 15);
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, getValidWordCount })
@@ -182,7 +183,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -198,7 +199,7 @@ describe('useComboSystem', () => {
 
   describe('getAvailableShields', () => {
     it('should calculate shields based on valid word count', () => {
-      const getValidWordCount = jest.fn(() => 25); // 2 shields (25/10 = 2)
+      const getValidWordCount = vi.fn(() => 25); // 2 shields (25/10 = 2)
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, getValidWordCount })
@@ -208,8 +209,8 @@ describe('useComboSystem', () => {
     });
 
     it('should account for shields already used', () => {
-      const getValidWordCount = jest.fn(() => 25);
-      const onShieldUsed = jest.fn();
+      const getValidWordCount = vi.fn(() => 25);
+      const onShieldUsed = vi.fn();
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, getValidWordCount, onShieldUsed })
@@ -220,7 +221,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
       act(() => {
@@ -232,7 +233,7 @@ describe('useComboSystem', () => {
     });
 
     it('should return 0 when no valid words', () => {
-      const getValidWordCount = jest.fn(() => 5); // Less than 10
+      const getValidWordCount = vi.fn(() => 5); // Less than 10
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, getValidWordCount })
@@ -244,7 +245,7 @@ describe('useComboSystem', () => {
 
   describe('resetForNewGame', () => {
     it('should reset all state for new game', () => {
-      const getValidWordCount = jest.fn(() => 30);
+      const getValidWordCount = vi.fn(() => 30);
 
       const { result } = renderHook(() =>
         useComboSystem({ ...defaultOptions, getValidWordCount })
@@ -255,7 +256,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
       act(() => {
@@ -289,11 +290,11 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 
@@ -320,7 +321,7 @@ describe('useComboSystem', () => {
         result.current.actions.incrementCombo();
       });
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         result.current.actions.incrementCombo();
       });
 

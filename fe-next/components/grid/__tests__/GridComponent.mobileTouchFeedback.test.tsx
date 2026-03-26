@@ -12,16 +12,16 @@ import GridComponent from '@/components/GridComponent';
 import type { LetterGrid } from '@/types';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -29,20 +29,20 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useDisableFireRoundLights: () => false,
   useDisableEarthquakeEffects: () => false,
   useLargeLetters: () => false,
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playEarthquakeRumble: jest.fn(),
-    playEarthquakeShake: jest.fn(),
+    playEarthquakeRumble: vi.fn(),
+    playEarthquakeShake: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useEarthquakeAnimation', () => ({
+vi.mock('@/hooks/useEarthquakeAnimation', () => ({
   useEarthquakeAnimation: () => ({
     earthquakePhase: 'idle',
     earthquakeParticles: [],
@@ -67,7 +67,7 @@ const mockGrid: LetterGrid = [
 describe('GridComponent - Mobile Touch Feedback', () => {
   describe('Touch Event Handling', () => {
     it('should provide visual feedback through whileTap and animation props', () => {
-      const handleWordSubmit = jest.fn();
+      const handleWordSubmit = vi.fn();
 
       const { container } = render(
         <GridComponent

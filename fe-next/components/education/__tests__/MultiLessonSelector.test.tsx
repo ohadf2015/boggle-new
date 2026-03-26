@@ -6,8 +6,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MultiLessonSelector } from '../MultiLessonSelector';
 
 // Mock LanguageContext
-const mockT = jest.fn((key: string) => key);
-jest.mock('@/contexts/LanguageContext', () => ({
+const mockT = vi.fn((key: string) => key);
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -53,7 +53,7 @@ describe('MultiLessonSelector', () => {
 
   it('should render lesson options', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     // WHEN
     render(
@@ -71,7 +71,7 @@ describe('MultiLessonSelector', () => {
 
   it('should show word count for each lesson', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     // WHEN
     render(
@@ -90,7 +90,7 @@ describe('MultiLessonSelector', () => {
 
   it('should call onSelectChange when lesson is selected', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     render(
       <MultiLessonSelector
@@ -110,7 +110,7 @@ describe('MultiLessonSelector', () => {
 
   it('should allow selecting multiple lessons', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     render(
       <MultiLessonSelector
@@ -130,7 +130,7 @@ describe('MultiLessonSelector', () => {
 
   it('should allow deselecting a lesson', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     render(
       <MultiLessonSelector
@@ -150,7 +150,7 @@ describe('MultiLessonSelector', () => {
 
   it('should show empty state when no lessons available', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     // WHEN
     render(
@@ -167,7 +167,7 @@ describe('MultiLessonSelector', () => {
 
   it('should show selected count', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     // WHEN
     render(
@@ -187,7 +187,7 @@ describe('MultiLessonSelector', () => {
 
   it('should highlight selected lessons visually', () => {
     // GIVEN
-    const onSelectChange = jest.fn();
+    const onSelectChange = vi.fn();
 
     // WHEN
     render(
@@ -206,7 +206,7 @@ describe('MultiLessonSelector', () => {
   describe('Select All / Deselect All', () => {
     it('should show "Select All" button when not all lessons selected', () => {
       // GIVEN
-      const onSelectChange = jest.fn();
+      const onSelectChange = vi.fn();
 
       // WHEN
       render(
@@ -225,7 +225,7 @@ describe('MultiLessonSelector', () => {
 
     it('should select all lessons when "Select All" is clicked', () => {
       // GIVEN
-      const onSelectChange = jest.fn();
+      const onSelectChange = vi.fn();
 
       render(
         <MultiLessonSelector
@@ -246,7 +246,7 @@ describe('MultiLessonSelector', () => {
 
     it('should show "Deselect All" when all lessons are selected', () => {
       // GIVEN
-      const onSelectChange = jest.fn();
+      const onSelectChange = vi.fn();
 
       // WHEN
       render(
@@ -265,7 +265,7 @@ describe('MultiLessonSelector', () => {
 
     it('should deselect all lessons when "Deselect All" is clicked', () => {
       // GIVEN
-      const onSelectChange = jest.fn();
+      const onSelectChange = vi.fn();
 
       render(
         <MultiLessonSelector
@@ -286,7 +286,7 @@ describe('MultiLessonSelector', () => {
 
     it('should not show Select All button when no lessons available', () => {
       // GIVEN
-      const onSelectChange = jest.fn();
+      const onSelectChange = vi.fn();
 
       // WHEN
       render(

@@ -10,7 +10,7 @@ import PhaseIndicator from './PhaseIndicator';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock the theme context
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useBossFightTheme: () => ({
     phaseColors: {
       phase1: { bg: 'bg-neo-cyan', text: 'text-neo-black' },

@@ -1,34 +1,35 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 
 // --- Mock next/server ---
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // --- Mock rate limiter ---
-jest.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: jest.fn().mockReturnValue({ success: true }),
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
 // --- Mock sentry ---
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 // --- Mock customPuzzle utils ---
-jest.mock('@/utils/customPuzzle', () => ({
-  isValidPuzzleCode: jest.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
-  calculateCustomPuzzleScore: jest.fn(() => 120),
+vi.mock('@/utils/customPuzzle', () => ({
+  isValidPuzzleCode: vi.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
+  calculateCustomPuzzleScore: vi.fn(() => 120),
 }));
 
 // --- Supabase mock ---
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
 
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
@@ -42,7 +43,7 @@ import { POST } from '../route';
 function makeRequest(body: unknown, ip = '127.0.0.1'): NextRequest {
   return {
     json: () => Promise.resolve(body),
-    headers: { get: jest.fn().mockReturnValue(ip) },
+    headers: { get: vi.fn().mockReturnValue(ip) },
   } as unknown as NextRequest;
 }
 
@@ -93,23 +94,23 @@ function setupDefaultMocks({
   mockFrom.mockImplementation((table: string) => {
     if (table === 'custom_puzzles') {
       return {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: puzzle, error: puzzleError }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: puzzle, error: puzzleError }),
       };
     }
     if (table === 'profiles') {
       return {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: profileData, error: null }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: profileData, error: null }),
       };
     }
     if (table === 'custom_puzzle_attempts') {
       return {
-        insert: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: insertData, error: insertError }),
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: insertData, error: insertError }),
       };
     }
     return {};
@@ -118,7 +119,7 @@ function setupDefaultMocks({
 
 describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rate limiting', () => {
@@ -180,16 +181,16 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzles') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: { message: 'not found' } }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'not found' } }),
           };
         }
         if (table === 'profiles') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: null, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: null, error: null }),
           };
         }
         return {};
@@ -254,16 +255,16 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'custom_puzzles') {
           return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockPuzzle, error: null }),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockPuzzle, error: null }),
           };
         }
         if (table === 'custom_puzzle_attempts') {
           return {
-            insert: jest.fn().mockReturnThis(),
-            select: jest.fn().mockReturnThis(),
-            single: jest.fn().mockResolvedValue({ data: mockAttemptData, error: null }),
+            insert: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: mockAttemptData, error: null }),
           };
         }
         return {};

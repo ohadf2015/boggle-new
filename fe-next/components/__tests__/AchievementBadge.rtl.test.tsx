@@ -11,11 +11,11 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@testing-library/jest-dom';
 
 // Mock next/navigation for tests
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/he/singleplayer',
 }));

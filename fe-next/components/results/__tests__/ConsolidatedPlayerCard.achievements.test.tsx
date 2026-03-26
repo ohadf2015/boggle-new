@@ -4,7 +4,7 @@ import ConsolidatedPlayerCard from '../ConsolidatedPlayerCard';
 import type { Player } from '../types';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
@@ -20,39 +20,44 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('@/components/results/PlayerArchetypeBadge', () => {
-  return function MockBadge() { return <div data-testid="archetype-badge" />; };
+vi.mock('@/components/results/PlayerArchetypeBadge', () => {
+  const MockBadge = () => { return <div data-testid="archetype-badge" />; };
+  return { default: MockBadge };
 });
 
-jest.mock('@/components/AchievementBadge', () => ({
+vi.mock('@/components/AchievementBadge', () => ({
   AchievementBadge: function MockAch({ achievement }: any) {
     return <div data-testid="achievement-badge">{achievement.icon}</div>;
   },
 }));
 
-jest.mock('@/components/results/PlayerInsights', () => {
-  return function MockInsights() { return <div data-testid="player-insights" />; };
+vi.mock('@/components/results/PlayerInsights', () => {
+  const MockInsights = () => { return <div data-testid="player-insights" />; };
+  return { default: MockInsights };
 });
 
-jest.mock('@/components/results/XpBreakdownCard', () => {
-  return function MockXp() { return <div data-testid="xp-breakdown" />; };
+vi.mock('@/components/results/XpBreakdownCard', () => {
+  const MockXp = () => { return <div data-testid="xp-breakdown" />; };
+  return { default: MockXp };
 });
 
-jest.mock('@/components/results/BonusBadgesRow', () => {
-  return function MockBonusBadges() { return <div data-testid="bonus-badges" />; };
+vi.mock('@/components/results/BonusBadgesRow', () => {
+  const MockBonusBadges = () => { return <div data-testid="bonus-badges" />; };
+  return { default: MockBonusBadges };
 });
 
-jest.mock('../../Avatar', () => {
-  return function MockAvatar() { return <div data-testid="avatar" />; };
+vi.mock('../../Avatar', () => {
+  const MockAvatar = () => { return <div data-testid="avatar" />; };
+  return { default: MockAvatar };
 });
 
-jest.mock('../WordPointsGroup', () => ({
+vi.mock('../WordPointsGroup', () => ({
   WordPointsGroup: function MockWPG() { return <div data-testid="word-points-group" />; },
   SharedWordsSection: function MockSWS() { return <div data-testid="shared-words" />; },
   InvalidWordsSection: function MockIWS() { return <div data-testid="invalid-words" />; },
 }));
 
-jest.mock('../useWordCategories', () => ({
+vi.mock('../useWordCategories', () => ({
   useWordCategories: () => ({
     validWords: [],
     duplicateWords: [],
@@ -67,16 +72,16 @@ jest.mock('../useWordCategories', () => ({
   }),
 }));
 
-jest.mock('@/utils/gameInsights', () => ({
+vi.mock('@/utils/gameInsights', () => ({
   calculatePlayerInsights: () => null,
 }));
 
-jest.mock('@/utils/utils', () => ({
+vi.mock('@/utils/utils', () => ({
   applyHebrewFinalLetters: (s: string) => s,
 }));
 
 // filterGameAchievements: pass through for this test
-jest.mock('../utils', () => ({
+vi.mock('../utils', () => ({
   filterGameAchievements: (achievements: any[]) => achievements || [],
 }));
 

@@ -11,7 +11,7 @@ import { ScorePopup } from '../ScorePopup';
 import * as useDevicePerformanceModule from '@/hooks/useDevicePerformance';
 
 // Mock dependencies
-jest.mock('@/hooks/useDevicePerformance');
+vi.mock('@/hooks/useDevicePerformance');
 
 const mockUseDevicePerformance = useDevicePerformanceModule.useDevicePerformance as jest.MockedFunction<
   typeof useDevicePerformanceModule.useDevicePerformance
@@ -19,7 +19,7 @@ const mockUseDevicePerformance = useDevicePerformanceModule.useDevicePerformance
 
 describe('ScorePopup', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseDevicePerformance.mockReturnValue({
       isLowEnd: false,
       prefersReducedMotion: false,
@@ -117,7 +117,7 @@ describe('ScorePopup', () => {
     });
 
     it('should call onComplete after animation', async () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <ScorePopup
@@ -179,7 +179,7 @@ describe('ScorePopup', () => {
         isMobile: false,
       });
 
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <ScorePopup

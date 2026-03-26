@@ -98,10 +98,18 @@ export function getMinAnswerLength(language: string): number {
 
 /**
  * Minimum length for NON-TARGET discovered words in Word Hunt survival mode
- * Players can find any valid 2+ letter word on the board for life/tokens,
- * even though the target word itself must be 4+ letters (except Japanese).
+ * 3-letter minimum filters out trivial 2-letter entries (AA, AB, etc.)
+ * that feel "weird" and aren't real word-game words.
  */
-export const MIN_DISCOVERY_WORD_LENGTH = 2;
+export const MIN_DISCOVERY_WORD_LENGTH = 3;
+
+/**
+ * Maximum length for discovery words in Word Hunt survival mode.
+ * Caps at 8 letters to prevent absurdly long path-traced words that
+ * happen to match obscure dictionary entries. Matches the max target
+ * word length from WORD_LENGTH_RANGE.
+ */
+export const MAX_DISCOVERY_WORD_LENGTH = 8;
 
 // ==================== Room Settings ====================
 

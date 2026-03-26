@@ -1,30 +1,31 @@
+import { vi } from 'vitest';
 // @ts-nocheck
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
-jest.mock('@/utils/sentry', () => ({ captureApiError: jest.fn() }));
+vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -36,23 +37,23 @@ function makeRequest(body: unknown): NextRequest {
 /** Set up mockFrom to return player_level on select and succeed on update */
 function setupMocks(playerLevel = 10) {
   mockFrom.mockReturnValue({
-    select: jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        single: jest.fn().mockResolvedValue({
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
           data: { player_level: playerLevel },
           error: null,
         }),
       }),
     }),
-    update: jest.fn().mockReturnValue({
-      eq: jest.fn().mockResolvedValue({ error: null }),
+    update: vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ error: null }),
     }),
   });
 }
 
 describe('POST /api/adventure/skill-tree', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
@@ -164,16 +165,16 @@ describe('POST /api/adventure/skill-tree', () => {
   describe('Database errors', () => {
     it('returns 500 when update fails', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: { player_level: 10 },
               error: null,
             }),
           }),
         }),
-        update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: { message: 'DB down' } }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: { message: 'DB down' } }),
         }),
       });
       const res = await POST(makeRequest({ skillTree: { sword: 1 }, skillPoints: 5 }));

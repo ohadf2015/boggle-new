@@ -9,7 +9,7 @@ import { LetterTileWord } from '../LetterTileWord';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 
 // Mock AdaptiveMotion to render plain divs/spans for testability
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
       <div className={className} {...props}>{children}</div>

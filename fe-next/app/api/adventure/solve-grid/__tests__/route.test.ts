@@ -1,36 +1,37 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
-const mockCheckApiRateLimit = jest.fn().mockReturnValue({ success: true });
-jest.mock('@/lib/apiRateLimit', () => ({
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
-const mockGetUser = jest.fn();
-const mockFrom = jest.fn();
-jest.mock('@/utils/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
+const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
-jest.mock('@/utils/sentry', () => ({ captureApiError: jest.fn() }));
+vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 // Mock the dictionary loader
-const mockLoadDictionaryWords = jest.fn();
-jest.mock('@/app/api/word-solver/dictionaryLoader', () => ({
+const mockLoadDictionaryWords = vi.fn();
+vi.mock('@/app/api/word-solver/dictionaryLoader', () => ({
   loadDictionaryWords: (...args: unknown[]) => mockLoadDictionaryWords(...args),
 }));
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 
-const mockHeaders = { get: jest.fn().mockReturnValue('127.0.0.1') };
+const mockHeaders = { get: vi.fn().mockReturnValue('127.0.0.1') };
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -48,7 +49,7 @@ function makeBadJsonRequest(): NextRequest {
 
 describe('POST /api/adventure/solve-grid', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },

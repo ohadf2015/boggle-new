@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ForfeitConfirmDialog } from '../ForfeitConfirmDialog';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -17,7 +17,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock Radix AlertDialog
-jest.mock('@radix-ui/react-alert-dialog', () => ({
+vi.mock('@radix-ui/react-alert-dialog', () => ({
   Root: ({ children, open }: any) => (open ? <div data-testid="dialog-root">{children}</div> : null),
   Portal: ({ children }: any) => <div data-testid="dialog-portal">{children}</div>,
   Overlay: ({ children, ...props }: any) => <div data-testid="dialog-overlay" {...props}>{children}</div>,
@@ -41,8 +41,8 @@ describe('ForfeitConfirmDialog', () => {
     render(
       <ForfeitConfirmDialog
         open={false}
-        onConfirm={jest.fn()}
-        onCancel={jest.fn()}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -53,8 +53,8 @@ describe('ForfeitConfirmDialog', () => {
     render(
       <ForfeitConfirmDialog
         open={true}
-        onConfirm={jest.fn()}
-        onCancel={jest.fn()}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -64,12 +64,12 @@ describe('ForfeitConfirmDialog', () => {
   });
 
   it('should call onConfirm when confirm button clicked', () => {
-    const onConfirm = jest.fn();
+    const onConfirm = vi.fn();
     render(
       <ForfeitConfirmDialog
         open={true}
         onConfirm={onConfirm}
-        onCancel={jest.fn()}
+        onCancel={vi.fn()}
       />
     );
 
@@ -80,11 +80,11 @@ describe('ForfeitConfirmDialog', () => {
   });
 
   it('should call onCancel when cancel button clicked', () => {
-    const onCancel = jest.fn();
+    const onCancel = vi.fn();
     render(
       <ForfeitConfirmDialog
         open={true}
-        onConfirm={jest.fn()}
+        onConfirm={vi.fn()}
         onCancel={onCancel}
       />
     );

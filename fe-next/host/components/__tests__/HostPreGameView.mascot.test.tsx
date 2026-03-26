@@ -1,9 +1,10 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import HostPreGameView from '../HostPreGameView';
 
 // Mock all heavy dependencies
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -15,48 +16,48 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
-jest.mock('@/hooks/gameState', () => ({
+vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
-  useGameActions: () => ({ setGameMode: jest.fn() }),
+  useGameActions: () => ({ setGameMode: vi.fn() }),
 }));
 
-jest.mock('../../../components/Avatar', () => ({
+vi.mock('../../../components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
-jest.mock('../../../components/RoomChat', () => ({
+vi.mock('../../../components/RoomChat', () => ({
   __esModule: true,
   default: () => <div data-testid="room-chat">Chat</div>,
 }));
 
-jest.mock('../../../components/BotControls', () => ({
+vi.mock('../../../components/BotControls', () => ({
   __esModule: true,
   default: () => <div data-testid="bot-controls">BotControls</div>,
 }));
 
-jest.mock('../../../hooks/useCrazyGamesInvite', () => ({
+vi.mock('../../../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
     isInviteButtonVisible: false,
   }),
 }));
 
-jest.mock('../../../hooks/useNativeShare', () => ({
-  useNativeShare: () => ({ tryNativeShare: jest.fn() }),
+vi.mock('../../../hooks/useNativeShare', () => ({
+  useNativeShare: () => ({ tryNativeShare: vi.fn() }),
 }));
 
-jest.mock('../../../utils/share', () => ({
-  getJoinUrl: jest.fn(),
-  copyJoinUrl: jest.fn(),
+vi.mock('../../../utils/share', () => ({
+  getJoinUrl: vi.fn(),
+  copyJoinUrl: vi.fn(),
 }));
 
-jest.mock('../pre-game/PresetSelector', () => ({
+vi.mock('../pre-game/PresetSelector', () => ({
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'presets.fast' },
     party: { timer: 2, difficulty: 'MEDIUM', nameKey: 'presets.party' },
@@ -64,26 +65,26 @@ jest.mock('../pre-game/PresetSelector', () => ({
   },
 }));
 
-jest.mock('../pre-game/StartButton', () => ({
+vi.mock('../pre-game/StartButton', () => ({
   StartButton: () => <button data-testid="start-button">Start</button>,
 }));
 
-jest.mock('../pre-game/MobileShareSection', () => ({
+vi.mock('../pre-game/MobileShareSection', () => ({
   MobileShareSection: () => <div data-testid="mobile-share">Share</div>,
 }));
 
-jest.mock('../pre-game/PresetInfoDrawer', () => ({
+vi.mock('../pre-game/PresetInfoDrawer', () => ({
   PresetInfoDrawer: () => null,
 }));
 
-jest.mock('../pre-game/desktop', () => ({
+vi.mock('../pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
     <div data-testid="desktop-layout">{leftContent}{rightContent}</div>
   ),
   InviteCard: () => <div data-testid="invite-card">Invite</div>,
 }));
 
-jest.mock('../tv-broadcast/TvTutorialOverlay', () => {
+vi.mock('../tv-broadcast/TvTutorialOverlay', () => {
   const component = () => null;
   component.isTvTutorialComplete = () => true;
   return {
@@ -93,16 +94,16 @@ jest.mock('../tv-broadcast/TvTutorialOverlay', () => {
   };
 });
 
-jest.mock('@/components/GameModeSelector', () => ({
+vi.mock('@/components/GameModeSelector', () => ({
   GameModeSelector: () => <div data-testid="game-mode-selector">GameMode</div>,
 }));
 
-jest.mock('../../../components/ui/checkbox', () => ({
+vi.mock('../../../components/ui/checkbox', () => ({
   Checkbox: () => <input type="checkbox" data-testid="checkbox" />,
 }));
 
 // Mock DJMascot — this is what we're testing for
-jest.mock('@/components/ui/DJMascot', () => ({
+vi.mock('@/components/ui/DJMascot', () => ({
   DJMascotWithEntrance: ({ size }: { size?: string }) => (
     <div data-testid="dj-mascot" data-size={size}>DJ Mascot</div>
   ),
@@ -116,28 +117,28 @@ describe('HostPreGameView DJMascot', () => {
     username: 'Host',
     t: (key: string) => key,
     timerValue: 2,
-    setTimerValue: jest.fn(),
+    setTimerValue: vi.fn(),
     timerDirection: 0,
-    setTimerDirection: jest.fn(),
+    setTimerDirection: vi.fn(),
     difficulty: 'MEDIUM' as const,
-    setDifficulty: jest.fn(),
+    setDifficulty: vi.fn(),
     minWordLength: 2,
-    setMinWordLength: jest.fn(),
+    setMinWordLength: vi.fn(),
     gameType: 'regular' as const,
-    setGameType: jest.fn(),
+    setGameType: vi.fn(),
     tournamentRounds: 3,
-    setTournamentRounds: jest.fn(),
+    setTournamentRounds: vi.fn(),
     tournamentData: null,
     hostPlaying: true,
-    setHostPlaying: jest.fn(),
+    setHostPlaying: vi.fn(),
     playersReady: [{ username: 'Host', isHost: true }],
     playerWordCounts: {},
     shufflingGrid: null,
     highlightedCells: [],
     tableData: [['A', 'B'], ['C', 'D']],
-    onStartGame: jest.fn(),
-    onExitRoom: jest.fn(),
-    onCancelTournament: jest.fn(),
+    onStartGame: vi.fn(),
+    onExitRoom: vi.fn(),
+    onCancelTournament: vi.fn(),
     tournamentCreating: false,
   };
 

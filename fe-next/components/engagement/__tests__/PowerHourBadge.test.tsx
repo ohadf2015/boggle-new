@@ -8,13 +8,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock usePowerHour
-const mockUsePowerHour = jest.fn();
-jest.mock('@/hooks/usePowerHour', () => ({
+const mockUsePowerHour = vi.fn();
+vi.mock('@/hooks/usePowerHour', () => ({
   usePowerHour: () => mockUsePowerHour(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -29,13 +29,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock useReducedMotion
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
-  default: jest.fn(() => false),
+  default: vi.fn(() => false),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef(
     (
       { children, ...props }: React.PropsWithChildren<Record<string, unknown>>,
@@ -59,7 +59,7 @@ import { PowerHourBadge } from '../PowerHourBadge';
 
 describe('PowerHourBadge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render nothing when power hour is not active and not expired', () => {
@@ -68,7 +68,7 @@ describe('PowerHourBadge', () => {
       remainingMinutes: 0,
       remainingSeconds: 0,
       expired: false,
-      activate: jest.fn(),
+      activate: vi.fn(),
     });
 
     const { container } = render(<PowerHourBadge />);
@@ -81,7 +81,7 @@ describe('PowerHourBadge', () => {
       remainingMinutes: 47,
       remainingSeconds: 23,
       expired: false,
-      activate: jest.fn(),
+      activate: vi.fn(),
     });
 
     render(<PowerHourBadge />);
@@ -95,7 +95,7 @@ describe('PowerHourBadge', () => {
       remainingMinutes: 5,
       remainingSeconds: 3,
       expired: false,
-      activate: jest.fn(),
+      activate: vi.fn(),
     });
 
     render(<PowerHourBadge />);
@@ -108,7 +108,7 @@ describe('PowerHourBadge', () => {
       remainingMinutes: 0,
       remainingSeconds: 0,
       expired: true,
-      activate: jest.fn(),
+      activate: vi.fn(),
     });
 
     render(<PowerHourBadge />);
@@ -121,7 +121,7 @@ describe('PowerHourBadge', () => {
       remainingMinutes: 30,
       remainingSeconds: 0,
       expired: false,
-      activate: jest.fn(),
+      activate: vi.fn(),
     });
 
     render(<PowerHourBadge />);

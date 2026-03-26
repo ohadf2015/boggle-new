@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock Mascot before importing component
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
@@ -17,11 +17,11 @@ jest.mock('@/components/ui/Mascot', () => ({
   ),
 }));
 
-jest.mock('../../../../contexts/LanguageContext', () => ({
+vi.mock('../../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
@@ -33,7 +33,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
   default: (props: any) => <img {...props} />,
@@ -46,7 +46,7 @@ describe('UpgradeShop - shopkeeper mascot', () => {
     gold: 1000,
     upgrades: {},
     currentWorld: 1,
-    onPurchase: jest.fn(),
+    onPurchase: vi.fn(),
   };
 
   it('renders shopkeeper mascot in shop header', () => {

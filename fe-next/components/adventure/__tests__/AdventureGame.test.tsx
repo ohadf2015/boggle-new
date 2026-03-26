@@ -43,8 +43,8 @@ const mockGrid = [
 const defaultProps = {
   levelConfig: mockLevelConfig,
   initialGrid: mockGrid,
-  onLevelComplete: jest.fn(),
-  onExit: jest.fn(),
+  onLevelComplete: vi.fn(),
+  onExit: vi.fn(),
 };
 
 // ==============================================
@@ -70,27 +70,27 @@ const mockTranslations: Record<string, string> = {
 };
 
 // Mock ad component to avoid deep provider chain (ThemeContext, CoinContext, useRewardedAd)
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => null,
   RewardedAdGoldButton: () => null,
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
     isDarkMode: true,
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const langValue = {
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return {
     useLanguage: () => langValue,
@@ -99,29 +99,29 @@ jest.mock('@/contexts/LanguageContext', () => {
 });
 
 // Mock CoinContext - needed by RewardedAdGoldButton in the component tree
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
     coins: 100,
-    spendCoins: jest.fn(),
-    refreshCoins: jest.fn(),
-    awardGameCompletion: jest.fn().mockResolvedValue(null),
-    awardWatchedAd: jest.fn().mockResolvedValue(null),
+    spendCoins: vi.fn(),
+    refreshCoins: vi.fn(),
+    awardGameCompletion: vi.fn().mockResolvedValue(null),
+    awardWatchedAd: vi.fn().mockResolvedValue(null),
     rewards: { WATCH_AD: 50 },
   }),
 }));
 
-jest.mock('@/components/ads/RewardedAdGoldButton', () => ({
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
   __esModule: true,
   default: () => <div data-testid="rewarded-ad-gold-button">Ad</div>,
 }));
 
 // Mock useAdventureWordValidation hook
-const mockValidateWord = jest.fn().mockResolvedValue({
+const mockValidateWord = vi.fn().mockResolvedValue({
   isValid: true,
   score: 30,
 });
 
-jest.mock('@/hooks/useAdventureWordValidation', () => ({
+vi.mock('@/hooks/useAdventureWordValidation', () => ({
   useAdventureWordValidation: () => ({
     validateWord: mockValidateWord,
     isValidating: false,
@@ -130,11 +130,11 @@ jest.mock('@/hooks/useAdventureWordValidation', () => ({
 }));
 
 // Mock useAdventureSelection hook
-const mockSelectTile = jest.fn();
-const mockClearSelection = jest.fn();
-const mockGetPath = jest.fn().mockReturnValue([]);
+const mockSelectTile = vi.fn();
+const mockClearSelection = vi.fn();
+const mockGetPath = vi.fn().mockReturnValue([]);
 
-jest.mock('@/hooks/useAdventureSelection', () => ({
+vi.mock('@/hooks/useAdventureSelection', () => ({
   useAdventureSelection: () => ({
     selectedIndices: [],
     currentWord: '',
@@ -147,16 +147,16 @@ jest.mock('@/hooks/useAdventureSelection', () => ({
 
 // Mock ProgressionContext - tracks player progress
 // Define stable mock functions OUTSIDE the factory to prevent infinite re-renders
-const mockRecordAttempt = jest.fn();
-const mockGetLevelAttempt = jest.fn(() => null);
-const mockRefreshProgression = jest.fn();
-const mockCompleteLevel = jest.fn();
-const mockIsWorldUnlocked = jest.fn(() => true);
-const mockIsLevelUnlocked = jest.fn(() => true);
-const mockGetWorldStars = jest.fn(() => 0);
-const mockGetLevelCompletion = jest.fn(() => undefined);
+const mockRecordAttempt = vi.fn();
+const mockGetLevelAttempt = vi.fn(() => null);
+const mockRefreshProgression = vi.fn();
+const mockCompleteLevel = vi.fn();
+const mockIsWorldUnlocked = vi.fn(() => true);
+const mockIsLevelUnlocked = vi.fn(() => true);
+const mockGetWorldStars = vi.fn(() => 0);
+const mockGetLevelCompletion = vi.fn(() => undefined);
 
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     recordAttempt: mockRecordAttempt,
     getLevelAttempt: mockGetLevelAttempt,
@@ -174,7 +174,7 @@ jest.mock('@/contexts/ProgressionContext', () => ({
 }));
 
 // Mock useAdaptiveDifficulty hook
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: () => ({
     tier: 'normal',
     adjustedConfig: {
@@ -197,41 +197,41 @@ jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
     },
     hintData: { level: 'none' },
     powerUpCooldownMultiplier: 1.0,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   }),
 }));
 
 // Mock useAdventureHints hook
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: true,
-    getHint: jest.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
+    getHint: vi.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
     isLoading: false,
     error: null,
     remainingHintWords: ['TEST', 'WORD'],
-    findPathForWord: jest.fn(() => null),
+    findPathForWord: vi.fn(() => null),
   }),
 }));
 
 // Mock MusicContext - useMusic is called in AdventureGame to stop global music
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playMusic: jest.fn(),
-    pauseMusic: jest.fn(),
-    resumeMusic: jest.fn(),
+    stopMusic: vi.fn(),
+    playMusic: vi.fn(),
+    pauseMusic: vi.fn(),
+    resumeMusic: vi.fn(),
     isPlaying: false,
     currentTrack: null,
   }),
 }));
 
 // Mock framer-motion to avoid animation timing issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   // Create mock motion component factory
@@ -299,7 +299,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock AdventureThemeContext to avoid theme provider requirement
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
   // Create a mock context for direct useContext calls
   const MockAdventureThemeContext = React.createContext({
@@ -337,8 +337,8 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
       },
       worldId: 1,
       level: 1,
-      setWorld: jest.fn(),
-      setLevel: jest.fn(),
+      setWorld: vi.fn(),
+      setLevel: vi.fn(),
       isTransitioning: false,
       chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
     }),
@@ -382,42 +382,42 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 // Mock useFlashChallenge (wired in AdventureGame.tsx)
-jest.mock('@/hooks/useFlashChallenge', () => ({
+vi.mock('@/hooks/useFlashChallenge', () => ({
   useFlashChallenge: () => ({
     activeChallenge: null,
     isChallengeComplete: false,
-    dismiss: jest.fn(),
+    dismiss: vi.fn(),
   }),
 }));
 
 // Mock useBossMechanics (used by useAdventureBossOrchestration)
-jest.mock('@/hooks/useBossMechanics', () => ({
+vi.mock('@/hooks/useBossMechanics', () => ({
   useBossMechanics: () => ({
     checkWord: () => ({ meetsRequirement: false, scoreMultiplier: 1.0 }),
-    triggerTaunt: jest.fn(),
+    triggerTaunt: vi.fn(),
   }),
 }));
 
 // Mock SoundEffectsContext for UnifiedAchievementModal
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playAchievementSound: jest.fn(),
-    playSound: jest.fn(),
-    playWordSound: jest.fn(),
-    playGameStartSound: jest.fn(),
-    playGameEndSound: jest.fn(),
-    playSoloGameSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playAchievementSound: vi.fn(),
+    playSound: vi.fn(),
+    playWordSound: vi.fn(),
+    playGameStartSound: vi.fn(),
+    playGameEndSound: vi.fn(),
+    playSoloGameSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/lib/adventure/weeklyModifiers', () => ({
+vi.mock('@/lib/adventure/weeklyModifiers', () => ({
   getWeeklyModifiers: () => [],
   applyModifiers: (config: any) => config,
 }));
@@ -436,12 +436,12 @@ describe('AdventureGame', () => {
   const ENTRY_SEQUENCE_TIME = 3000;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Rendering', () => {
@@ -565,7 +565,7 @@ describe('AdventureGame', () => {
 
       // Then advance full timer duration (120 seconds) + buffer
       act(() => {
-        jest.advanceTimersByTime(125000);
+        vi.advanceTimersByTime(125000);
       });
 
       // THEN - timer should show 0 seconds remaining
@@ -578,7 +578,7 @@ describe('AdventureGame', () => {
   describe('Level Completion', () => {
     it('should show level complete modal when all primary objectives are met', async () => {
       // GIVEN
-      const onLevelComplete = jest.fn();
+      const onLevelComplete = vi.fn();
       render(
         <AdventureGame
           {...defaultProps}
@@ -609,7 +609,7 @@ describe('AdventureGame', () => {
 
       // Then advance full timer duration (120s) + buffer to trigger timeout
       act(() => {
-        jest.advanceTimersByTime(125000);
+        vi.advanceTimersByTime(125000);
       });
 
       // THEN - timer should show 0 seconds remaining
@@ -638,7 +638,7 @@ describe('AdventureGame', () => {
       // WHEN - pause and advance time
       fireEvent.click(screen.getByRole('button', { name: /pause/i }));
       act(() => {
-        jest.advanceTimersByTime(10000);
+        vi.advanceTimersByTime(10000);
       });
 
       // THEN - timer should still show same time (game is paused)
@@ -680,8 +680,8 @@ describe('AdventureGame', () => {
   describe('Exit Functionality', () => {
     it('should call onExit when exit button is clicked and user confirms', () => {
       // GIVEN
-      const onExit = jest.fn();
-      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      const onExit = vi.fn();
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
       render(<AdventureGame {...defaultProps} onExit={onExit} />);
 
       // WHEN - pause then exit (may have multiple exit buttons due to responsive design)
@@ -698,8 +698,8 @@ describe('AdventureGame', () => {
 
     it('should NOT call onExit when user cancels exit confirmation', () => {
       // GIVEN
-      const onExit = jest.fn();
-      jest.spyOn(window, 'confirm').mockReturnValue(false);
+      const onExit = vi.fn();
+      vi.spyOn(window, 'confirm').mockReturnValue(false);
       render(<AdventureGame {...defaultProps} onExit={onExit} />);
 
       // WHEN - pause then exit, user cancels

@@ -4,14 +4,14 @@ import QuickTipsStep from '../QuickTipsStep';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
 describe('QuickTipsStep - Color Contrast', () => {
-  const mockOnModeSelect = jest.fn();
+  const mockOnModeSelect = vi.fn();
 
   const renderWithLanguage = (component: React.ReactElement) => {
     return render(

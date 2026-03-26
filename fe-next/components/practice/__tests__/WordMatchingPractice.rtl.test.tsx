@@ -3,11 +3,11 @@ import '@testing-library/jest-dom';
 import { WordMatchingPractice } from '../WordMatchingPractice';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'rtl', language: 'he' }),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const MockDiv = ({ children, ...props }: any) => <div {...props}>{children}</div>;
   return {
     AdaptiveMotion: {
@@ -19,37 +19,37 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
   };
 });
 
-jest.mock('@dnd-kit/core', () => ({
+vi.mock('@dnd-kit/core', () => ({
   DndContext: ({ children }: any) => <div>{children}</div>,
-  useSensors: jest.fn(() => []),
-  useSensor: jest.fn(),
-  PointerSensor: jest.fn(),
-  KeyboardSensor: jest.fn(),
-  closestCenter: jest.fn(),
-  useDraggable: jest.fn(() => ({
+  useSensors: vi.fn(() => []),
+  useSensor: vi.fn(),
+  PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
+  closestCenter: vi.fn(),
+  useDraggable: vi.fn(() => ({
     attributes: {},
     listeners: {},
-    setNodeRef: jest.fn(),
+    setNodeRef: vi.fn(),
     transform: null,
     isDragging: false,
   })),
-  useDroppable: jest.fn(() => ({
-    setNodeRef: jest.fn(),
+  useDroppable: vi.fn(() => ({
+    setNodeRef: vi.fn(),
     isOver: false,
   })),
 }));
 
-jest.mock('@dnd-kit/sortable', () => ({
-  sortableKeyboardCoordinates: jest.fn(),
+vi.mock('@dnd-kit/sortable', () => ({
+  sortableKeyboardCoordinates: vi.fn(),
 }));
 
-jest.mock('../PracticeResultsCard', () => ({
+vi.mock('../PracticeResultsCard', () => ({
   __esModule: true,
   default: () => <div data-testid="results-card" />,
 }));
 
 // Mock useMatchingGame to return isComplete=true so the results screen renders
-jest.mock('../hooks/useMatchingGame', () => ({
+vi.mock('../hooks/useMatchingGame', () => ({
   useMatchingGame: () => ({
     wordColumn: [],
     definitionColumn: [],
@@ -58,8 +58,8 @@ jest.mock('../hooks/useMatchingGame', () => ({
     correctCount: 2,
     isComplete: true,
     accuracy: 100,
-    checkMatch: jest.fn(),
-    resetGame: jest.fn(),
+    checkMatch: vi.fn(),
+    resetGame: vi.fn(),
   }),
 }));
 
@@ -70,21 +70,21 @@ const mockWords: VocabularyWord[] = [
 
 describe('WordMatchingPractice RTL — results screen', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('applies dir=rtl on results screen container when language is Hebrew', async () => {
     const { container } = render(
-      <WordMatchingPractice words={mockWords} onComplete={jest.fn()} onBack={jest.fn()} />
+      <WordMatchingPractice words={mockWords} onComplete={vi.fn()} onBack={vi.fn()} />
     );
 
     // Advance past the 500ms timeout that sets showResults=true
     await act(async () => {
-      jest.advanceTimersByTime(600);
+      vi.advanceTimersByTime(600);
     });
 
     // Results screen should now be visible

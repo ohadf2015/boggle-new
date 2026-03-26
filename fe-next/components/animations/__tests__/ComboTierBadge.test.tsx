@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
 import { ComboTierBadge, getComboTier, COMBO_TIERS } from '../ComboTierBadge';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...props }: any) => (
       <div className={className} style={style} data-testid="motion-div" {...props}>
@@ -19,11 +19,11 @@ jest.mock('framer-motion', () => ({
     ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
-  useSpring: () => ({ set: jest.fn() }),
+  useSpring: () => ({ set: vi.fn() }),
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -33,7 +33,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock useLanguage hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -115,7 +115,7 @@ describe('ComboTierBadge', () => {
 
   describe('Tier Change Callback', () => {
     it('should call onTierChange when tier changes from nice to great', () => {
-      const onTierChange = jest.fn();
+      const onTierChange = vi.fn();
       const { rerender } = render(
         <ComboTierBadge comboCount={2} onTierChange={onTierChange} />
       );
@@ -126,7 +126,7 @@ describe('ComboTierBadge', () => {
     });
 
     it('should not call onTierChange when staying in same tier', () => {
-      const onTierChange = jest.fn();
+      const onTierChange = vi.fn();
       const { rerender } = render(
         <ComboTierBadge comboCount={2} onTierChange={onTierChange} />
       );

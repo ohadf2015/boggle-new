@@ -12,20 +12,20 @@ import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education
 // Mocks
 // ============================================================
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text}</div>
   ),
 }));
 
-jest.mock('../DailyChallengeCard', () => ({
+vi.mock('../DailyChallengeCard', () => ({
   DailyChallengeCard: ({ challenge, onClaim }: { challenge: DailyChallengeRow; onClaim: (id: string) => void }) => (
     <div data-testid={`daily-card-${challenge.id}`}>
       <span>{challenge.title}</span>
@@ -34,7 +34,7 @@ jest.mock('../DailyChallengeCard', () => ({
   ),
 }));
 
-jest.mock('../WeeklyChallengeCard', () => ({
+vi.mock('../WeeklyChallengeCard', () => ({
   WeeklyChallengeCard: ({ quest, onClaim }: { quest: WeeklyQuestRow; onClaim: (id: string) => void }) => (
     <div data-testid={`weekly-card-${quest.id}`}>
       <span>{quest.title}</span>
@@ -50,7 +50,7 @@ jest.mock('../WeeklyChallengeCard', () => ({
 function makeFetchResponse(body: object, ok = true) {
   return {
     ok,
-    json: jest.fn().mockResolvedValue(body),
+    json: vi.fn().mockResolvedValue(body),
   } as unknown as Response;
 }
 
@@ -108,11 +108,11 @@ const makeQuest = (overrides: Partial<WeeklyQuestRow> = {}): WeeklyQuestRow => (
 
 describe('ChallengePanel', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('loading state', () => {

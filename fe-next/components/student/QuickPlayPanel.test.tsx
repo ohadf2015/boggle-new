@@ -8,24 +8,24 @@ import '@testing-library/jest-dom';
 import QuickPlayPanel from './QuickPlayPanel';
 
 // Mock dependencies
-const mockPush = jest.fn();
-const mockT = jest.fn((key) => key);
+const mockPush = vi.fn();
+const mockT = vi.fn((key) => key);
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
   }),
 }));
 
-jest.mock('@/hooks/useStudentProgress', () => ({
-  useStudentProgress: jest.fn(() => ({
+vi.mock('@/hooks/useStudentProgress', () => ({
+  useStudentProgress: vi.fn(() => ({
     lessons: [],
     isLoading: false,
   })),
@@ -36,7 +36,7 @@ import { useStudentProgress } from '@/hooks/useStudentProgress';
 
 describe('QuickPlayPanel', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders two action buttons', () => {

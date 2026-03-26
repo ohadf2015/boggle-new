@@ -4,19 +4,19 @@ import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => {
     const translations: Record<string, string> = {
       'nextStep.challengeBots': 'Challenge the Bots!',
@@ -37,7 +37,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
@@ -49,10 +49,10 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt', () => {
-  const mockOnBackToLobby = jest.fn();
+  const mockOnBackToLobby = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Practice Mode', () => {
@@ -84,7 +84,7 @@ describe('NextStepPrompt', () => {
 
     it('calls onAction callback when provided instead of navigating', async () => {
       const user = userEvent.setup();
-      const mockOnAction = jest.fn();
+      const mockOnAction = vi.fn();
 
       render(
         <NextStepPrompt

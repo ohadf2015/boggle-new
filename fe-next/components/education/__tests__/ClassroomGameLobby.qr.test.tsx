@@ -13,7 +13,7 @@ import '@testing-library/jest-dom';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 
 // Mock qrcode.react — canvas doesn't work in jsdom
-jest.mock('qrcode.react', () => ({
+vi.mock('qrcode.react', () => ({
   QRCodeCanvas: ({ value }: { value: string }) => (
     <div data-testid="qr-code" data-value={value} />
   ),
@@ -21,7 +21,7 @@ jest.mock('qrcode.react', () => ({
 
 // ── contexts ──────────────────────────────────────────────────────────────────
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -29,7 +29,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'teacher-1', email: 'teacher@test.com' },
     profile: { display_name: 'Test Teacher' },
@@ -39,8 +39,8 @@ jest.mock('@/contexts/AuthContext', () => ({
 
 // ── supabase data layer ────────────────────────────────────────────────────────
 
-jest.mock('@/lib/supabase/education', () => ({
-  getLessons: jest.fn().mockResolvedValue({
+vi.mock('@/lib/supabase/education', () => ({
+  getLessons: vi.fn().mockResolvedValue({
     data: [
       {
         id: 'lesson-1',
@@ -49,44 +49,44 @@ jest.mock('@/lib/supabase/education', () => ({
       },
     ],
   }),
-  getClassrooms: jest.fn().mockResolvedValue({
+  getClassrooms: vi.fn().mockResolvedValue({
     data: [{ id: 'classroom-1', name: 'Class A', member_count: 10 }],
   }),
 }));
 
 // ── utilities ─────────────────────────────────────────────────────────────────
 
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn() },
 }));
 
 const stableQrSocket = {
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn(),
-  disconnect: jest.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  emit: vi.fn(),
+  disconnect: vi.fn(),
   connected: true,
 };
-jest.mock('@/utils/SocketContext', () => ({
-  getSocketURL: jest.fn(() => 'http://localhost:3000'),
-  getSharedSocket: jest.fn(() => stableQrSocket),
+vi.mock('@/utils/SocketContext', () => ({
+  getSocketURL: vi.fn(() => 'http://localhost:3000'),
+  getSharedSocket: vi.fn(() => stableQrSocket),
 }));
 
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
-  default: { success: jest.fn(), error: jest.fn() },
-  toast: { success: jest.fn(), error: jest.fn() },
+  default: { success: vi.fn(), error: vi.fn() },
+  toast: { success: vi.fn(), error: vi.fn() },
 }));
 
 // ── UI sub-components ─────────────────────────────────────────────────────────
 
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="page-loader" />,
 }));
 
 // WizardStep: always renders children + a Next button
-jest.mock('@/components/ui/WizardStep', () => ({
+vi.mock('@/components/ui/WizardStep', () => ({
   WizardStep: ({
     children,
     onNext,
@@ -106,7 +106,7 @@ jest.mock('@/components/ui/WizardStep', () => ({
 }));
 
 // MultiLessonSelector: one click selects all
-jest.mock('../MultiLessonSelector', () => ({
+vi.mock('../MultiLessonSelector', () => ({
   MultiLessonSelector: ({
     onSelectChange,
     lessons,
@@ -156,7 +156,7 @@ describe('ClassroomGameLobby — QR code', () => {
   });
 
   it('renders the QR code element in step 2', async () => {
-    render(<ClassroomGameLobby onBack={jest.fn()} />);
+    render(<ClassroomGameLobby onBack={vi.fn()} />);
     await goToStep2();
 
     // QR appears after joinUrl effect fires (gameCode must be set first)
@@ -167,7 +167,7 @@ describe('ClassroomGameLobby — QR code', () => {
   }, 15000);
 
   it('encodes a join URL containing the game code', async () => {
-    render(<ClassroomGameLobby onBack={jest.fn()} />);
+    render(<ClassroomGameLobby onBack={vi.fn()} />);
     await goToStep2();
 
     let qrValue = '';

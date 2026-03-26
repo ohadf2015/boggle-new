@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * ProgressionContext Tests
  *
@@ -14,7 +15,7 @@ import {
 import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock attempts response
@@ -25,7 +26,7 @@ const mockAttemptsResponse = {
 
 // Mock AuthContext with mutable user for per-test overrides
 let mockAuthUser: { id: string } | null = { id: 'test-user-123' };
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: mockAuthUser,
     loading: false,
@@ -64,7 +65,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 // Helper to create a mock that handles the combined adventure state endpoint
 function createFetchMock(progressionResponse: object | null) {
-  return jest.fn((url: string) => {
+  return vi.fn((url: string) => {
     if (url.includes('/api/adventure/state')) {
       if (progressionResponse === null) {
         return new Promise(() => {}); // Never resolves
@@ -126,7 +127,7 @@ describe('ProgressionContext', () => {
 
     it('should set error on fetch failure after retries', async () => {
       // GIVEN — all retries fail with 500
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       mockFetch.mockImplementation(createFetchMock({
         ok: false,
         status: 500,
@@ -139,7 +140,7 @@ describe('ProgressionContext', () => {
 
       // Advance through all retry delays (1s, 2s, 4s)
       for (let i = 0; i < 3; i++) {
-        await jest.advanceTimersByTimeAsync(5000);
+        await vi.advanceTimersByTimeAsync(5000);
       }
 
       // THEN
@@ -153,7 +154,7 @@ describe('ProgressionContext', () => {
         (c: [string]) => c[0].includes('/api/adventure/state')
       );
       expect(stateCalls.length).toBe(4);
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 

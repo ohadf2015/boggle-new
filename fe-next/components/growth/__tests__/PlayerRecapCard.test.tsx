@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { PlayerRecapCard } from '../PlayerRecapCard';
 
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string, params?: Record<string, string>) => {
       if (params) return `${key}:${JSON.stringify(params)}`;
       return key;
@@ -11,8 +11,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
   })),
 }));
 
-const mockUsePlayerRecap = jest.fn();
-jest.mock('@/hooks/usePlayerRecap', () => ({
+const mockUsePlayerRecap = vi.fn();
+vi.mock('@/hooks/usePlayerRecap', () => ({
   usePlayerRecap: (...args: unknown[]) => mockUsePlayerRecap(...args),
 }));
 
@@ -51,7 +51,7 @@ const monthlyRecap = {
 
 describe('PlayerRecapCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when loading', () => {
@@ -117,7 +117,7 @@ describe('PlayerRecapCard', () => {
   });
 
   it('share button copies recap to clipboard', async () => {
-    const writeText = jest.fn().mockResolvedValue(undefined);
+    const writeText = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, {
       clipboard: { writeText },
     });

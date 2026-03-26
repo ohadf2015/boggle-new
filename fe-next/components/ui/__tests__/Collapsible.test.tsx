@@ -11,7 +11,7 @@ import { Hash, Trophy } from 'lucide-react';
 import { Collapsible } from '../Collapsible';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: any) => (
       <div className={className} data-testid="motion-div" {...props}>
@@ -23,8 +23,8 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock useIsDesktop hook
-jest.mock('@/hooks/useMediaQuery', () => ({
-  useIsDesktop: jest.fn(() => false),
+vi.mock('@/hooks/useMediaQuery', () => ({
+  useIsDesktop: vi.fn(() => false),
 }));
 
 import { useIsDesktop } from '@/hooks/useMediaQuery';
@@ -72,7 +72,7 @@ describe('Collapsible', () => {
 
   describe('Controlled Mode', () => {
     it('should work in controlled mode', () => {
-      const handleToggle = jest.fn();
+      const handleToggle = vi.fn();
       const { rerender } = render(
         <Collapsible label="Controlled" isOpen={false} onToggle={handleToggle}>
           <div>Content</div>
@@ -105,7 +105,7 @@ describe('Collapsible', () => {
     });
 
     it('should call onToggle with correct state', () => {
-      const handleToggle = jest.fn();
+      const handleToggle = vi.fn();
       render(
         <Collapsible label="Test" isOpen={false} onToggle={handleToggle}>
           <div>Content</div>
@@ -164,7 +164,7 @@ describe('Collapsible', () => {
     });
 
     it('should call optional onToggle callback in uncontrolled mode', () => {
-      const handleToggle = jest.fn();
+      const handleToggle = vi.fn();
       render(
         <Collapsible label="Test" defaultExpanded={false} onToggle={handleToggle}>
           <div>Content</div>
@@ -484,7 +484,7 @@ describe('Collapsible', () => {
     });
 
     it('should replicate CollapsiblePanel functionality', () => {
-      const handleToggle = jest.fn();
+      const handleToggle = vi.fn();
       render(
         <Collapsible
           label="View All Words"

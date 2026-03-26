@@ -16,7 +16,7 @@ vi.mock('@capacitor/core', () => ({
 
 describe('Platform Detection Utility', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('isNative', () => {

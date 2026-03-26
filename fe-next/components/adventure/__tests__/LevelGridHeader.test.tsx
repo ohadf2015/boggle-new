@@ -12,11 +12,11 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en' }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
       return <div ref={ref} {...props}>{children}</div>;

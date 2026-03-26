@@ -14,7 +14,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
     return React.createElement('div', { ref, ...rest }, children);
@@ -25,11 +25,11 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockAdaptiveDiv({ children, ...rest }: any, ref: any) {
     const { initial, animate, exit, transition, whileHover, whileTap, whileFocus, whileDrag, whileInView, layout, layoutId, skipAnimation, ...htmlProps } = rest;
@@ -49,18 +49,18 @@ const defaultProps = {
   movesRemaining: 3,
   totalMoves: 20,
   stars: 2 as 1 | 2 | 3,
-  onContinue: jest.fn(),
+  onContinue: vi.fn(),
   isSequenceComplete: true,
 };
 
 describe('BlastLevelClearOverlay', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    defaultProps.onContinue = jest.fn();
+    vi.useFakeTimers();
+    defaultProps.onContinue = vi.fn();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the overlay container', () => {
@@ -112,7 +112,7 @@ describe('BlastLevelClearOverlay', () => {
   });
 
   it('calls onContinue when continue button is clicked', () => {
-    const onContinue = jest.fn();
+    const onContinue = vi.fn();
     render(<BlastLevelClearOverlay {...defaultProps} onContinue={onContinue} isSequenceComplete={true} />);
 
     const btn = screen.getByTestId('level-clear-continue-btn');
@@ -122,7 +122,7 @@ describe('BlastLevelClearOverlay', () => {
   });
 
   it('calls onContinue when overlay is clicked', () => {
-    const onContinue = jest.fn();
+    const onContinue = vi.fn();
     render(<BlastLevelClearOverlay {...defaultProps} onContinue={onContinue} isSequenceComplete={true} />);
 
     const overlay = screen.getByTestId('level-clear-overlay');
@@ -132,7 +132,7 @@ describe('BlastLevelClearOverlay', () => {
   });
 
   it('does NOT call onContinue when overlay is clicked before sequence completes', () => {
-    const onContinue = jest.fn();
+    const onContinue = vi.fn();
     render(<BlastLevelClearOverlay {...defaultProps} onContinue={onContinue} isSequenceComplete={false} />);
 
     const overlay = screen.getByTestId('level-clear-overlay');
@@ -142,24 +142,24 @@ describe('BlastLevelClearOverlay', () => {
   });
 
   it('auto-advances after 5000ms when sequence is complete', () => {
-    const onContinue = jest.fn();
+    const onContinue = vi.fn();
     render(<BlastLevelClearOverlay {...defaultProps} onContinue={onContinue} isSequenceComplete={true} />);
 
     expect(onContinue).not.toHaveBeenCalled();
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
   it('does not auto-advance before sequence is complete', () => {
-    const onContinue = jest.fn();
+    const onContinue = vi.fn();
     render(<BlastLevelClearOverlay {...defaultProps} onContinue={onContinue} isSequenceComplete={false} />);
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(onContinue).not.toHaveBeenCalled();

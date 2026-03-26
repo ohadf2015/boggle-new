@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import LootChestReveal from '../LootChestReveal';
 import type { LootDrop } from '@/types/adventure';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -11,7 +11,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -22,7 +22,7 @@ jest.mock('next/image', () => {
   };
 });
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MockComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
     const { initial, animate, exit, transition, variants, whileHover, whileTap, onAnimationComplete, ...rest } = props;
@@ -44,52 +44,52 @@ const mockDrops: LootDrop[] = [
 ];
 
 describe('LootChestReveal', () => {
-  beforeEach(() => jest.useFakeTimers());
-  afterEach(() => jest.useRealTimers());
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
   it('does not render when isOpen is false', () => {
     const { container } = render(
-      <LootChestReveal isOpen={false} drops={mockDrops} onComplete={jest.fn()} />
+      <LootChestReveal isOpen={false} drops={mockDrops} onComplete={vi.fn()} />
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('renders chest when isOpen is true', () => {
-    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} />);
     expect(screen.getByTestId('loot-chest')).toBeInTheDocument();
   });
 
   it('shows tap-to-open prompt initially', () => {
-    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} />);
     expect(screen.getByText('adventure.loot.tapToOpen')).toBeInTheDocument();
   });
 
   it('opens chest on click and reveals drops with stagger', () => {
-    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('loot-chest'));
 
     // First drop appears after first stagger
-    act(() => { jest.advanceTimersByTime(STAGGER_MS); });
+    act(() => { vi.advanceTimersByTime(STAGGER_MS); });
     expect(screen.getByTestId('loot-drop-gold')).toBeInTheDocument();
   });
 
   it('shows continue button after all drops revealed', () => {
-    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('loot-chest'));
 
     for (let i = 0; i < mockDrops.length; i++) {
-      act(() => { jest.advanceTimersByTime(STAGGER_MS); });
+      act(() => { vi.advanceTimersByTime(STAGGER_MS); });
     }
     expect(screen.getByTestId('loot-continue')).toBeInTheDocument();
   });
 
   it('calls onComplete when continue is clicked', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={onComplete} />);
     fireEvent.click(screen.getByTestId('loot-chest'));
 
     for (let i = 0; i < mockDrops.length; i++) {
-      act(() => { jest.advanceTimersByTime(STAGGER_MS); });
+      act(() => { vi.advanceTimersByTime(STAGGER_MS); });
     }
     fireEvent.click(screen.getByTestId('loot-continue'));
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -97,21 +97,21 @@ describe('LootChestReveal', () => {
 
   it('does not render for empty drops', () => {
     const { container } = render(
-      <LootChestReveal isOpen={true} drops={[]} onComplete={jest.fn()} />
+      <LootChestReveal isOpen={true} drops={[]} onComplete={vi.fn()} />
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('renders correct chest image for each tier', () => {
     const { rerender } = render(
-      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="wooden" />
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} chestTier="wooden" />
     );
     expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
       'src', '/images/adventure/loot/chest-wooden-closed.webp'
     );
 
     rerender(
-      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="golden" />
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} chestTier="golden" />
     );
     expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
       'src', '/images/adventure/loot/chest-golden-closed.webp'
@@ -120,7 +120,7 @@ describe('LootChestReveal', () => {
 
   it('switches to open chest image after click', () => {
     render(
-      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} chestTier="silver" />
+      <LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} chestTier="silver" />
     );
     fireEvent.click(screen.getByTestId('loot-chest'));
     expect(screen.getByAltText('adventure.loot.chest')).toHaveAttribute(
@@ -129,10 +129,10 @@ describe('LootChestReveal', () => {
   });
 
   it('renders loot drop images instead of emojis', () => {
-    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={jest.fn()} />);
+    render(<LootChestReveal isOpen={true} drops={mockDrops} onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('loot-chest'));
 
-    act(() => { jest.advanceTimersByTime(STAGGER_MS); });
+    act(() => { vi.advanceTimersByTime(STAGGER_MS); });
     const goldImg = screen.getByAltText('adventure.loot.gold');
     expect(goldImg).toHaveAttribute('src', '/images/adventure/loot/loot-gold-coins.webp');
   });

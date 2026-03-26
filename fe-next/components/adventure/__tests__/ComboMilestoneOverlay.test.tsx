@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { ComboMilestoneOverlay } from '../ComboMilestoneOverlay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & {
       initial?: object; animate?: object; exit?: object; transition?: object
@@ -16,7 +16,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {

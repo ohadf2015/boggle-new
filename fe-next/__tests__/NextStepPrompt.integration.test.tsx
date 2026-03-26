@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Integration test for NextStepPrompt routing in ResultsPage context
  * This test simulates the actual usage in ResultsPage to catch integration bugs
@@ -8,18 +9,18 @@ import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  usePathname: jest.fn(() => '/en/results'),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(() => '/en/results'),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
@@ -28,15 +29,15 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt Integration - ResultsPage Context', () => {
-  const mockPush = jest.fn();
-  const mockOnBackToLobby = jest.fn();
+  const mockPush = vi.fn();
+  const mockOnBackToLobby = vi.fn();
 
   // Get the mocked clearSession function
-  const { clearSessionPreservingUsername } = jest.requireMock('@/utils/session');
+  const { clearSessionPreservingUsername } = vi.importMock('@/utils/session');
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    (useRouter as Mock).mockReturnValue({
       push: mockPush,
     });
   });
@@ -102,7 +103,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
     const variants = ['mobile', 'desktop', 'landscape'] as const;
 
     for (const variant of variants) {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       const { container } = render(
         <LanguageProvider>
@@ -136,7 +137,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
     ];
 
     for (const { mode, expectedHref } of testCases) {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       const { container } = render(
         <LanguageProvider>

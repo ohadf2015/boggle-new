@@ -4,11 +4,11 @@
  * POST - Complete a level and update progression
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
-import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
+import { getUpgradeEffect, getUpgradeTier, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
 // Dynamic import to avoid Turbopack bundling backend logger transitively
@@ -293,6 +293,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Lucky Pickaxe T4: double gold on first-ever completion of a level
+    if (isFirstCompletion && getUpgradeTier(playerUpgrades, 'luckyPickaxe') >= 4) {
+      goldEarned = goldEarned * 2;
+    }
+
     // Cap gold per level to prevent edge-case abuse
     const MAX_GOLD_PER_LEVEL = 500;
     goldEarned = Math.min(goldEarned, MAX_GOLD_PER_LEVEL);
@@ -393,6 +398,10 @@ export async function POST(request: NextRequest) {
         if (freshPickaxe > 0) {
           freshGoldEarned = Math.round(freshGoldEarned + baseGold * freshPickaxe);
         }
+        // Lucky Pickaxe T4: double gold on first-ever completion
+        if (isFirstCompletion && getUpgradeTier(freshUpgrades, 'luckyPickaxe') >= 4) {
+          freshGoldEarned = freshGoldEarned * 2;
+        }
         freshGoldEarned = Math.min(freshGoldEarned, MAX_GOLD_PER_LEVEL);
         const freshGold = (freshProg.gold as number);
         const freshTotalStars = (freshProg.total_stars as number);
@@ -450,20 +459,28 @@ export async function POST(request: NextRequest) {
     const previousLevel = existingProgression?.player_level ?? 1;
     const leveledUp = newPlayerLevel > previousLevel;
 
-    // Mark daily mission as complete (fire-and-forget)
-    lazyCompleteMission(userId, 'adventure').catch((err) => {
-      console.error('[ADVENTURE COMPLETE API] Daily mission update failed:', err);
+    // Mark daily mission as complete (runs after response is sent)
+    after(async () => {
+      try {
+        await lazyCompleteMission(userId, 'adventure');
+      } catch (err) {
+        console.error('[ADVENTURE COMPLETE API] Daily mission update failed:', err);
+      }
     });
 
-    // Update weekly quest progress (fire-and-forget, don't block response)
+    // Update weekly quest progress (runs after response is sent)
     const questStats: GameStats = {
       gamesPlayed: 1,
       wordsFound: words,
       longWordsFound: validation.data.longWords ?? 0,
       maxScore: score,
     };
-    updateWeeklyQuestProgress(supabase, userId, questStats).catch((err) => {
-      console.error('[ADVENTURE COMPLETE API] Weekly quest update failed:', err);
+    after(async () => {
+      try {
+        await updateWeeklyQuestProgress(supabase, userId, questStats);
+      } catch (err) {
+        console.error('[ADVENTURE COMPLETE API] Weekly quest update failed:', err);
+      }
     });
 
     return NextResponse.json({

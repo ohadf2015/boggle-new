@@ -46,7 +46,7 @@ describe('Profile Customization Save Handler Integration', () => {
    * avatar_image, and has_customized_profile, missing avatar_emoji and avatar_color.
    */
   it('save handler should include avatar_emoji and avatar_color', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
     // This is the CORRECT implementation of the save handler
     const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
@@ -76,7 +76,7 @@ describe('Profile Customization Save Handler Integration', () => {
   });
 
   it('save handler should handle any avatar from AVATARS list', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
     const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
       const { emoji, color } = getAvatarEmojiAndColor(avatarId);

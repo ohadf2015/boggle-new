@@ -10,7 +10,7 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import GoRipplesAnimation from '../GoRipplesAnimation';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const MotionDiv = React.forwardRef(function MotionDiv(
@@ -40,19 +40,19 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock SoundEffectsContext
-jest.mock('../../contexts/SoundEffectsContext', () => ({
+vi.mock('../../contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playCountdownBeep: jest.fn(),
+    playCountdownBeep: vi.fn(),
   }),
 }));
 
 describe('GoRipplesAnimation', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('starts countdown at 3', () => {
@@ -62,7 +62,7 @@ describe('GoRipplesAnimation', () => {
   });
 
   it('counts down from 3 to GO!', async () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(<GoRipplesAnimation onComplete={onComplete} />);
 
     // Start at 3
@@ -70,25 +70,25 @@ describe('GoRipplesAnimation', () => {
 
     // Advance to 2
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(screen.getByText('2')).toBeInTheDocument();
 
     // Advance to 1
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(screen.getByText('1')).toBeInTheDocument();
 
     // Advance to GO!
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(screen.getByText('GO!')).toBeInTheDocument();
 
     // Advance to completion
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(onComplete).toHaveBeenCalled();
   });
@@ -107,7 +107,7 @@ describe('GoRipplesAnimation', () => {
      *
      * The fix should ensure countdown continues regardless of callback reference changes.
      */
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
 
     // Wrapper component that simulates parent re-renders with INLINE CALLBACKS
     // This is the actual pattern used in HostView.tsx that causes the bug
@@ -131,7 +131,7 @@ describe('GoRipplesAnimation', () => {
     // These should NOT reset the countdown timer
     for (let i = 1; i <= 5; i++) {
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
       rerender(<ParentComponent reRenderCount={i} />);
     }
@@ -141,7 +141,7 @@ describe('GoRipplesAnimation', () => {
 
     // Advance remaining 500ms to complete first second
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Should now be at 2 (countdown progressed despite re-renders)
@@ -150,13 +150,13 @@ describe('GoRipplesAnimation', () => {
     // Continue with more re-renders during countdown
     for (let i = 6; i <= 10; i++) {
       act(() => {
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
       });
       rerender(<ParentComponent reRenderCount={i} />);
     }
 
     act(() => {
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
     });
 
     // Should be at 1
@@ -164,23 +164,23 @@ describe('GoRipplesAnimation', () => {
 
     // Complete the countdown
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(screen.getByText('GO!')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(onComplete).toHaveBeenCalled();
   });
 
   it('handles unmount during countdown gracefully', () => {
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     const { unmount } = render(<GoRipplesAnimation onComplete={onComplete} />);
 
     // Advance partway through countdown
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     // Unmount should not throw
@@ -188,7 +188,7 @@ describe('GoRipplesAnimation', () => {
 
     // onComplete should not be called after unmount
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
     expect(onComplete).not.toHaveBeenCalled();
   });

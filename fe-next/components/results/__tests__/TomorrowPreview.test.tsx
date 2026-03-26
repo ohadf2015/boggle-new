@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import TomorrowPreview from '../TomorrowPreview';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, style, ...rest }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} data-testid={rest['data-testid' as keyof typeof rest] as string}>
@@ -16,7 +16,7 @@ jest.mock('framer-motion', () => ({
 
 // Mock useReducedMotion
 let mockReducedMotion = false;
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => mockReducedMotion,
   useReducedMotion: () => mockReducedMotion,
@@ -30,7 +30,7 @@ const translations: Record<string, string> = {
   'tomorrowPreview.seeYou': 'See you tomorrow',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => translations[key] || key,
     language: 'en',
@@ -40,12 +40,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('TomorrowPreview', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockReducedMotion = false;
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the singleplayer teaser for singleplayer mode', () => {
@@ -71,13 +71,13 @@ describe('TomorrowPreview', () => {
   });
 
   it('auto-dismisses after 3 seconds', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(<TomorrowPreview mode="singleplayer" onDismiss={onDismiss} />);
 
     expect(screen.getByText(translations['tomorrowPreview.singleplayer'])).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
@@ -99,11 +99,11 @@ describe('TomorrowPreview', () => {
   });
 
   it('calls onDismiss callback when auto-dismiss fires', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     render(<TomorrowPreview mode="blast" onDismiss={onDismiss} />);
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
     });
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
@@ -127,13 +127,13 @@ describe('TomorrowPreview', () => {
   });
 
   it('cleans up timer on unmount', () => {
-    const onDismiss = jest.fn();
+    const onDismiss = vi.fn();
     const { unmount } = render(<TomorrowPreview mode="singleplayer" onDismiss={onDismiss} />);
 
     unmount();
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     // onDismiss should NOT be called after unmount

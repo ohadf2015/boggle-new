@@ -3,11 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LandingHero } from '../LandingHero';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
     const safe = { ...props };
     for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
@@ -20,13 +20,13 @@ jest.mock('framer-motion', () => {
   return { motion: motionObj, AnimatePresence };
 });
 
-jest.mock('@/components/ui/IdleMascot', () => {
+vi.mock('@/components/ui/IdleMascot', () => {
   const IdleMascotWithEntrance = () => <div data-testid="mascot" />;
   IdleMascotWithEntrance.displayName = 'IdleMascotWithEntrance';
   return { IdleMascotWithEntrance };
 });
 
-jest.mock('../LandingLeaderboardPreview', () => {
+vi.mock('../LandingLeaderboardPreview', () => {
   const LandingLeaderboardPreview = () => <div data-testid="leaderboard-preview" />;
   LandingLeaderboardPreview.displayName = 'LandingLeaderboardPreview';
   return { LandingLeaderboardPreview };
@@ -35,9 +35,9 @@ jest.mock('../LandingLeaderboardPreview', () => {
 const player = { id: '1', username: 'alice', displayName: 'Alice', totalScore: 100, avatarImage: null, avatarConfig: null };
 
 describe('LandingHero', () => {
-  const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false, onPlayClick: jest.fn() };
+  const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false, onPlayClick: vi.fn() };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders mascot and title', () => {
     render(<LandingHero {...baseProps} />);

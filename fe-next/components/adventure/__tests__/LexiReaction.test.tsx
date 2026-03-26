@@ -10,7 +10,7 @@ import { LexiReaction } from '../LexiReaction';
 import type { LexiReaction as LexiReactionType } from '@/hooks/useLexiReactions';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -30,12 +30,12 @@ const mockDevicePerformance = {
   isLowEnd: false,
 };
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => mockDevicePerformance,
 }));
 
 // Mock InteractiveMascot
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: ({ variant, size }: { variant: string; size: string }) => (
     <div data-testid="interactive-mascot" data-variant={variant} data-size={size}>
       Mascot
@@ -44,7 +44,7 @@ jest.mock('@/components/ui/InteractiveMascot', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -66,17 +66,17 @@ describe('LexiReaction', () => {
     ...overrides,
   });
 
-  const mockOnDismiss = jest.fn();
+  const mockOnDismiss = vi.fn();
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockOnDismiss.mockClear();
     mockDevicePerformance.prefersReducedMotion = false;
     document.documentElement.dir = 'ltr';
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('rendering', () => {
@@ -163,7 +163,7 @@ describe('LexiReaction', () => {
 
       // Wait for timeout to not trigger double-tap
       act(() => {
-        jest.advanceTimersByTime(400);
+        vi.advanceTimersByTime(400);
       });
 
       // Speed indicator should appear (if visible in DOM)
@@ -180,7 +180,7 @@ describe('LexiReaction', () => {
 
       // Fast-forward past display duration
       act(() => {
-        jest.advanceTimersByTime(2500);
+        vi.advanceTimersByTime(2500);
       });
 
       expect(mockOnDismiss).toHaveBeenCalledTimes(1);
@@ -198,12 +198,12 @@ describe('LexiReaction', () => {
 
       // Wait past threshold to avoid double-tap
       act(() => {
-        jest.advanceTimersByTime(400);
+        vi.advanceTimersByTime(400);
       });
 
       // At 2x speed, should dismiss in ~1000ms instead of 2000ms
       act(() => {
-        jest.advanceTimersByTime(700);
+        vi.advanceTimersByTime(700);
       });
 
       expect(mockOnDismiss).toHaveBeenCalled();

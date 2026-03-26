@@ -7,14 +7,14 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BoardGallery from '../BoardGallery';
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
   },
   AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -22,13 +22,13 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
+vi.mock('@/components/Avatar', () => {
   const MockAvatar = () => <div data-testid="avatar" />;
   MockAvatar.displayName = 'Avatar';
-  return MockAvatar;
+  return { default: MockAvatar };
 });
 
-jest.mock('../BoardCard', () => {
+vi.mock('../BoardCard', () => {
   const MockBoardCard = ({ board, onPlay }: { board: { board_code: string; title: string }; onPlay?: (code: string) => void }) => (
     <div data-testid={`board-card-${board.board_code}`}>
       <span>{board.title}</span>
@@ -36,7 +36,7 @@ jest.mock('../BoardCard', () => {
     </div>
   );
   MockBoardCard.displayName = 'BoardCard';
-  return MockBoardCard;
+  return { default: MockBoardCard };
 });
 
 const mockBoards = [
@@ -71,7 +71,7 @@ const mockBoards = [
 ];
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 function buildFetchResponse(boards: typeof mockBoards, total = boards.length) {
@@ -83,7 +83,7 @@ function buildFetchResponse(boards: typeof mockBoards, total = boards.length) {
 
 describe('BoardGallery', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockReturnValue(buildFetchResponse(mockBoards));
   });
 

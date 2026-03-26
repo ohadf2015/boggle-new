@@ -9,25 +9,25 @@ import userEvent from '@testing-library/user-event';
 import WordPackBuilder from '../WordPackBuilder';
 
 // Mock hook
-const mockAddWord = jest.fn();
-const mockBulkAddWords = jest.fn();
-const mockPublishPack = jest.fn();
-const mockSetName = jest.fn();
+const mockAddWord = vi.fn();
+const mockBulkAddWords = vi.fn();
+const mockPublishPack = vi.fn();
+const mockSetName = vi.fn();
 
 const defaultHookState = {
   name: '',
   setName: mockSetName,
   description: '',
-  setDescription: jest.fn(),
+  setDescription: vi.fn(),
   language: 'en',
-  setLanguage: jest.fn(),
+  setLanguage: vi.fn(),
   themeEmoji: '',
-  setThemeEmoji: jest.fn(),
+  setThemeEmoji: vi.fn(),
   tags: [],
-  setTags: jest.fn(),
+  setTags: vi.fn(),
   words: [] as string[],
   addWord: mockAddWord,
-  removeWord: jest.fn(),
+  removeWord: vi.fn(),
   bulkAddWords: mockBulkAddWords,
   canPublish: false,
   isPublishing: false,
@@ -36,11 +36,11 @@ const defaultHookState = {
   publishPack: mockPublishPack,
 };
 
-jest.mock('@/hooks/useWordPackBuilder', () => ({
+vi.mock('@/hooks/useWordPackBuilder', () => ({
   useWordPackBuilder: () => defaultHookState,
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -51,11 +51,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 describe('WordPackBuilder', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset hook state
     defaultHookState.name = '';
     defaultHookState.words = [];
@@ -140,7 +140,7 @@ describe('WordPackBuilder', () => {
   });
 
   it('calls onClose when Cancel button clicked', async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     const user = userEvent.setup();
     render(<WordPackBuilder isOpen={true} onClose={onClose} />);
     const cancelBtn = screen.getByText('ugc.pack.builder.cancel');
@@ -164,7 +164,7 @@ describe('WordPackBuilder', () => {
   });
 
   it('does not render when isOpen is false', () => {
-    render(<WordPackBuilder isOpen={false} onClose={jest.fn()} />);
+    render(<WordPackBuilder isOpen={false} onClose={vi.fn()} />);
     expect(screen.queryByText('ugc.pack.builder.title')).not.toBeInTheDocument();
   });
 });

@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FriendActivityRow } from '../FriendActivityRow';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       if (key === 'friendsActivity.scored') return `scored ${params?.score} on Daily #${params?.number}`;
@@ -20,10 +20,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
-  return function MockAvatar({ userId }: { userId?: string }) {
+vi.mock('@/components/Avatar', () => {
+  const MockAvatar = ({ userId }: { userId?: string }) => {
     return <div data-testid="avatar" data-user-id={userId} />;
   };
+  return { default: MockAvatar };
 });
 
 describe('FriendActivityRow', () => {

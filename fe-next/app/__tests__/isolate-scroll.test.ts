@@ -1,6 +1,6 @@
 /**
  * Test for isolate-scroll CSS class height calculation
- * Using require to avoid jest.setup.js window mock issues
+ * Using require to avoid vitest.setup.js window mock issues
  */
 import { readFileSync } from 'fs';
 import { resolve } from 'path';

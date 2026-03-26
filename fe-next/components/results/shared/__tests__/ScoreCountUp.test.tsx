@@ -2,24 +2,24 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  useReducedMotion: jest.fn(() => false),
+vi.mock('framer-motion', () => ({
+  useReducedMotion: vi.fn(() => false),
 }));
 
 import { ScoreCountUp } from '../ScoreCountUp';
 import { useReducedMotion } from 'framer-motion';
 
-const mockUseReducedMotion = useReducedMotion as jest.Mock;
+const mockUseReducedMotion = useReducedMotion as vi.Mock;
 
 describe('ScoreCountUp', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockUseReducedMotion.mockReturnValue(false);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.clearAllMocks();
+    vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   it('renders the final score in aria-label for accessibility', () => {

@@ -9,22 +9,22 @@ import { render, screen } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 
 // Mock all dependencies
-jest.mock('@/hooks/useAdventureGame');
-jest.mock('@/hooks/useAdventureWordValidation');
-jest.mock('@/hooks/useAdventureSelection');
+vi.mock('@/hooks/useAdventureGame');
+vi.mock('@/hooks/useAdventureWordValidation');
+vi.mock('@/hooks/useAdventureSelection');
 // Note: useDevicePerformance is mocked globally in jest.setup.js
-jest.mock('@/contexts/LanguageContext', () => {
+vi.mock('@/contexts/LanguageContext', () => {
   const value = {
     t: (key: string) => key,
     language: 'en',
     dir: 'ltr',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   };
   return { useLanguage: () => value, useLanguageSafe: () => value };
 });
 
 // Mock useAdaptiveDifficulty hook
-jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
+vi.mock('@/hooks/useAdaptiveDifficulty', () => ({
   useAdaptiveDifficulty: () => ({
     tier: 'normal',
     adjustedConfig: {
@@ -41,12 +41,12 @@ jest.mock('@/hooks/useAdaptiveDifficulty', () => ({
     },
     hintData: { level: 'none' },
     powerUpCooldownMultiplier: 1.0,
-    recordCompletion: jest.fn(),
+    recordCompletion: vi.fn(),
   }),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const createMockMotion = (element: string) => {
@@ -107,19 +107,19 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock MusicContext - adventure mode stops global music when it starts
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playMusic: jest.fn(),
-    pauseMusic: jest.fn(),
-    resumeMusic: jest.fn(),
+    stopMusic: vi.fn(),
+    playMusic: vi.fn(),
+    pauseMusic: vi.fn(),
+    resumeMusic: vi.fn(),
     isPlaying: false,
     currentTrack: null,
   }),
 }));
 
 // Mock ProgressionContext - required by AdventureGame
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => ({
     progression: {
       userId: 'test-user',
@@ -134,21 +134,21 @@ jest.mock('@/contexts/ProgressionContext', () => ({
     },
     isLoading: false,
     error: null,
-    completeLevel: jest.fn(),
-    recordAttempt: jest.fn(),
-    isWorldUnlocked: jest.fn(() => true),
-    isLevelUnlocked: jest.fn(() => true),
-    getWorldStars: jest.fn(() => 0),
-    getLevelCompletion: jest.fn(() => undefined),
-    getLevelAttempt: jest.fn(() => undefined),
-    refreshProgression: jest.fn(),
+    completeLevel: vi.fn(),
+    recordAttempt: vi.fn(),
+    isWorldUnlocked: vi.fn(() => true),
+    isLevelUnlocked: vi.fn(() => true),
+    getWorldStars: vi.fn(() => 0),
+    getLevelCompletion: vi.fn(() => undefined),
+    getLevelAttempt: vi.fn(() => undefined),
+    refreshProgression: vi.fn(),
     attempts: [],
   }),
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock AdventureThemeContext
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const React = require('react');
   const MockAdventureThemeContext = React.createContext({
     worldId: 1,
@@ -185,8 +185,8 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
       },
       worldId: 1,
       level: 1,
-      setWorld: jest.fn(),
-      setLevel: jest.fn(),
+      setWorld: vi.fn(),
+      setLevel: vi.fn(),
       isTransitioning: false,
       chapter: { id: 1, name: 'Tutorial', levels: [1, 2], starThreshold: 0, accentColor: 'neo-lime' },
     }),
@@ -230,21 +230,21 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 // Mock SoundEffectsContext
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playAchievementSound: jest.fn(),
-    playSound: jest.fn(),
-    playWordSound: jest.fn(),
-    playGameStartSound: jest.fn(),
-    playGameEndSound: jest.fn(),
-    playSoloGameSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playAchievementSound: vi.fn(),
+    playSound: vi.fn(),
+    playWordSound: vi.fn(),
+    playGameStartSound: vi.fn(),
+    playGameEndSound: vi.fn(),
+    playSoloGameSound: vi.fn(),
   }),
 }));
 
@@ -258,8 +258,8 @@ interface ScorePopupProps {
 }
 
 // Mock ScorePopup to capture props
-const mockScorePopup = jest.fn<null, [ScorePopupProps]>();
-jest.mock('../juice/ScorePopup', () => ({
+const mockScorePopup = vi.fn<null, [ScorePopupProps]>();
+vi.mock('../juice/ScorePopup', () => ({
   ScorePopup: (props: ScorePopupProps) => {
     mockScorePopup(props);
     return <div data-testid="score-popup-fly">ScorePopup</div>;
@@ -267,7 +267,7 @@ jest.mock('../juice/ScorePopup', () => ({
 }));
 
 // Mock child components
-jest.mock('../AdventureGrid', () => {
+vi.mock('../AdventureGrid', () => {
   const React = require('react');
   const MockGrid = React.forwardRef(function AdventureGrid() {
     return React.createElement('div', { 'data-testid': 'adventure-grid' }, 'Grid');
@@ -276,27 +276,27 @@ jest.mock('../AdventureGrid', () => {
   return { __esModule: true, default: MockGrid };
 });
 
-jest.mock('../AdventureObjectives', () => ({
+vi.mock('../AdventureObjectives', () => ({
   __esModule: true,
   default: () => <div data-testid="objectives">Objectives</div>,
 }));
 
-jest.mock('../AdventureTimer', () => ({
+vi.mock('../AdventureTimer', () => ({
   __esModule: true,
   default: () => <div data-testid="timer">Timer</div>,
 }));
 
-jest.mock('../LevelCompleteModal', () => ({
+vi.mock('../LevelCompleteModal', () => ({
   __esModule: true,
   default: () => <div data-testid="level-complete-modal">Modal</div>,
 }));
 
-jest.mock('../themed/WorldBackground', () => ({
+vi.mock('../themed/WorldBackground', () => ({
   __esModule: true,
   default: () => <div data-testid="world-background">Background</div>,
 }));
 
-jest.mock('../themed/GameplayBackground', () => ({
+vi.mock('../themed/GameplayBackground', () => ({
   __esModule: true,
   default: () => <div data-testid="gameplay-background">Background</div>,
 }));
@@ -335,7 +335,7 @@ const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
 
 describe('AdventureGame - Score Popup Animation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup mock hooks with proper types
     const { useAdventureGame } = require('@/hooks/useAdventureGame');
@@ -379,19 +379,19 @@ describe('AdventureGame - Score Popup Animation', () => {
       canComplete: false,
       isPlaying: true,
       cascadeComplete: true,
-      submitWordWithPath: jest.fn(),
-      startGame: jest.fn(),
-      pauseGame: jest.fn(),
-      completeLevel: jest.fn(),
-      resetGame: jest.fn(),
-      markCascadeComplete: jest.fn(),
+      submitWordWithPath: vi.fn(),
+      startGame: vi.fn(),
+      pauseGame: vi.fn(),
+      completeLevel: vi.fn(),
+      resetGame: vi.fn(),
+      markCascadeComplete: vi.fn(),
       isCascading: false,
       cascadePhase: 'none',
-      addTime: jest.fn(),
+      addTime: vi.fn(),
     });
 
     useAdventureWordValidation.mockReturnValue({
-      validateWord: jest.fn(),
+      validateWord: vi.fn(),
       isValidating: false,
     });
 
@@ -399,9 +399,9 @@ describe('AdventureGame - Score Popup Animation', () => {
       selectedIndices: [],
       currentWord: '',
       isSelecting: false,
-      selectTile: jest.fn(),
-      clearSelection: jest.fn(),
-      getPath: jest.fn(() => []),
+      selectTile: vi.fn(),
+      clearSelection: vi.fn(),
+      getPath: vi.fn(() => []),
       pathPoints: [],
     });
   });
@@ -412,8 +412,8 @@ describe('AdventureGame - Score Popup Animation', () => {
       <AdventureGame
         levelConfig={mockLevelConfig}
         initialGrid={mockInitialGrid}
-        onLevelComplete={jest.fn()}
-        onExit={jest.fn()}
+        onLevelComplete={vi.fn()}
+        onExit={vi.fn()}
       />
     );
 

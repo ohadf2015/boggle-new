@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -5,12 +6,12 @@ import TvActivityPanel from '../TvActivityPanel';
 import { useGameMode } from '@/hooks/gameState/store';
 
 // Mock useGameMode
-jest.mock('@/hooks/gameState/store', () => ({
-  useGameMode: jest.fn(() => 'classic'),
+vi.mock('@/hooks/gameState/store', () => ({
+  useGameMode: vi.fn(() => 'classic'),
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: React.forwardRef(function MockDiv(
       { children, className, style, ...rest }: any,
@@ -27,8 +28,8 @@ jest.mock('@/components/motion/AdaptiveMotion', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -55,8 +56,8 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock AccessibilityContext
-jest.mock('@/contexts/AccessibilityContext', () => ({
-  useShouldReduceMotion: jest.fn(() => false),
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useShouldReduceMotion: vi.fn(() => false),
 }));
 
 const mockT = (key: string) => {
@@ -84,48 +85,48 @@ const defaultProps = {
 
 describe('TvActivityPanel', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useGameMode as jest.Mock).mockReturnValue('classic');
+    vi.clearAllMocks();
+    (useGameMode as Mock).mockReturnValue('classic');
   });
 
   it('renders classic panel when gameMode is classic', () => {
-    (useGameMode as jest.Mock).mockReturnValue('classic');
+    (useGameMode as Mock).mockReturnValue('classic');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-classic-panel')).toBeInTheDocument();
   });
 
   it('renders classic panel when gameMode is null', () => {
-    (useGameMode as jest.Mock).mockReturnValue(null);
+    (useGameMode as Mock).mockReturnValue(null);
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-classic-panel')).toBeInTheDocument();
   });
 
   it('renders blast panel when gameMode is blast', () => {
-    (useGameMode as jest.Mock).mockReturnValue('blast');
+    (useGameMode as Mock).mockReturnValue('blast');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-blast-panel')).toBeInTheDocument();
   });
 
   it('renders word hunt panel when gameMode is word-hunt', () => {
-    (useGameMode as jest.Mock).mockReturnValue('word-hunt');
+    (useGameMode as Mock).mockReturnValue('word-hunt');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-wordhunt-panel')).toBeInTheDocument();
   });
 
   it('shows mode badge label', () => {
-    (useGameMode as jest.Mock).mockReturnValue('classic');
+    (useGameMode as Mock).mockReturnValue('classic');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('CLASSIC');
   });
 
   it('shows BLAST mode badge for blast mode', () => {
-    (useGameMode as jest.Mock).mockReturnValue('blast');
+    (useGameMode as Mock).mockReturnValue('blast');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('BLAST');
   });
 
   it('shows WORD HUNT mode badge for word-hunt mode', () => {
-    (useGameMode as jest.Mock).mockReturnValue('word-hunt');
+    (useGameMode as Mock).mockReturnValue('word-hunt');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('WORD HUNT');
   });
@@ -141,13 +142,13 @@ describe('TvActivityPanel', () => {
   });
 
   it('blast panel renders cascade visualization area', () => {
-    (useGameMode as jest.Mock).mockReturnValue('blast');
+    (useGameMode as Mock).mockReturnValue('blast');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('blast-cascade-area')).toBeInTheDocument();
   });
 
   it('word hunt panel renders search visualization', () => {
-    (useGameMode as jest.Mock).mockReturnValue('word-hunt');
+    (useGameMode as Mock).mockReturnValue('word-hunt');
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByTestId('wordhunt-radar')).toBeInTheDocument();
   });

@@ -4,11 +4,11 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { getWorldParticleConfig } from '@/lib/adventure/worldThemes';
 
 // Mock dependencies
-jest.mock('@/hooks/useDevicePerformance');
-jest.mock('@/lib/adventure/worldThemes');
+vi.mock('@/hooks/useDevicePerformance');
+vi.mock('@/lib/adventure/worldThemes');
 
 // Mock framer-motion to avoid animation complexity in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, style, className, ...props }: any) => (
       <div style={style} className={className} data-testid="motion-div" {...props}>
@@ -24,8 +24,8 @@ const mockGetWorldParticleConfig = getWorldParticleConfig as jest.MockedFunction
 
 describe('ChainParticleBurst', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Default mock - high-end device
     mockUseDevicePerformance.mockReturnValue({
@@ -54,7 +54,7 @@ describe('ChainParticleBurst', () => {
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Rendering', () => {
@@ -234,7 +234,7 @@ describe('ChainParticleBurst', () => {
     });
 
     test('should accept onComplete callback prop', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       const { container } = render(
         <ChainParticleBurst

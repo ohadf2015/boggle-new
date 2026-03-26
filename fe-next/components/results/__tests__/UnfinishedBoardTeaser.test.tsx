@@ -10,7 +10,7 @@ import { render, screen } from '@testing-library/react';
 import UnfinishedBoardTeaser from '../UnfinishedBoardTeaser';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => (
       <div className={className} {...props}>{children}</div>
@@ -19,7 +19,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {

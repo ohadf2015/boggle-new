@@ -10,27 +10,27 @@ import GridComponent, { HighlightedCell } from '../GridComponent';
 import type { LetterGrid } from '@/types';
 
 // Mock framer-motion to avoid animation complexity in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, animate, initial, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
   useAnimation: () => ({
-    start: jest.fn(),
-    set: jest.fn(),
-    stop: jest.fn(),
+    start: vi.fn(),
+    set: vi.fn(),
+    stop: vi.fn(),
   }),
 }));
 
 // Mock hooks
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playWordRejectedSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playWordRejectedSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -43,17 +43,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMediaQuery', () => ({
+vi.mock('@/hooks/useMediaQuery', () => ({
   useIsDesktop: () => true,
 }));
 
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useDisableFireRoundLights: () => false,
   useDisableEarthquakeEffects: () => false,
   useLargeLetters: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,
@@ -62,7 +62,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useEarthquakeAnimation', () => ({
+vi.mock('@/hooks/useEarthquakeAnimation', () => ({
   useEarthquakeAnimation: () => ({
     earthquakePhase: 'idle',
     earthquakeParticles: [],
@@ -118,7 +118,7 @@ describe('GridComponent - Highlighted Path Animation and Fade-out', () => {
   });
 
   it('should apply fade-out class after blink animation completes', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const { container } = render(
       <GridComponent
@@ -134,14 +134,14 @@ describe('GridComponent - Highlighted Path Animation and Fade-out', () => {
     expect(cellA).toHaveClass('animate-hint-blink');
 
     // After 1.5 seconds (blink duration), should transition to fade-out
-    jest.advanceTimersByTime(1500);
+    vi.advanceTimersByTime(1500);
 
     await waitFor(() => {
       expect(cellA).not.toHaveClass('animate-hint-blink');
       expect(cellA).toHaveClass('animate-hint-fadeout');
     });
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should maintain hint glow effect during blink animation', () => {

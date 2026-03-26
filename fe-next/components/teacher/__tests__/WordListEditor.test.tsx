@@ -12,16 +12,16 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
 // Mock word integration hook
-jest.mock('@/hooks/useWordIntegration', () => ({
+vi.mock('@/hooks/useWordIntegration', () => ({
   useWordIntegration: () => ({
-    checkWordIntegration: jest.fn((word: string) => ({
+    checkWordIntegration: vi.fn((word: string) => ({
       word,
       canIntegrate: word.length >= 3,
     })),
   }),
 }));
 
-const mockOnWordsChange = jest.fn();
+const mockOnWordsChange = vi.fn();
 
 const sampleWords: VocabularyWord[] = [
   { word: 'apple', definition: 'A round fruit', canIntegrate: true },
@@ -44,7 +44,7 @@ const renderEditor = (props: Partial<React.ComponentProps<typeof WordListEditor>
 
 describe('WordListEditor', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {
@@ -171,7 +171,7 @@ describe('WordListEditor', () => {
 
   describe('bulk import button', () => {
     it('should show bulk import button when showBulkImport is true', () => {
-      const mockOpenBulkImport = jest.fn();
+      const mockOpenBulkImport = vi.fn();
       renderEditor({ showBulkImport: true, onBulkImportOpen: mockOpenBulkImport });
       expect(screen.getByText(/bulk import/i)).toBeInTheDocument();
     });
@@ -183,7 +183,7 @@ describe('WordListEditor', () => {
 
     it('should call onBulkImportOpen when bulk import clicked', async () => {
       const user = userEvent.setup();
-      const mockOpenBulkImport = jest.fn();
+      const mockOpenBulkImport = vi.fn();
       renderEditor({ showBulkImport: true, onBulkImportOpen: mockOpenBulkImport });
 
       await user.click(screen.getByText(/bulk import/i));

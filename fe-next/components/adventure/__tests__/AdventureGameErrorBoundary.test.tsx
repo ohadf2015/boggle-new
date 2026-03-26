@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string) => {
       const keys: Record<string, string> = {
@@ -32,12 +32,12 @@ function ThrowingChild({ shouldThrow }: { shouldThrow: boolean }) {
 describe('AdventureGameErrorBoundary', () => {
   // Suppress React error boundary console.error noise
   const originalError = console.error;
-  beforeAll(() => { console.error = jest.fn(); });
+  beforeAll(() => { console.error = vi.fn(); });
   afterAll(() => { console.error = originalError; });
 
   it('renders children when no error', () => {
     render(
-      <AdventureGameErrorBoundary onExit={jest.fn()}>
+      <AdventureGameErrorBoundary onExit={vi.fn()}>
         <ThrowingChild shouldThrow={false} />
       </AdventureGameErrorBoundary>
     );
@@ -46,7 +46,7 @@ describe('AdventureGameErrorBoundary', () => {
 
   it('shows error fallback when child throws', () => {
     render(
-      <AdventureGameErrorBoundary onExit={jest.fn()}>
+      <AdventureGameErrorBoundary onExit={vi.fn()}>
         <ThrowingChild shouldThrow={true} />
       </AdventureGameErrorBoundary>
     );
@@ -55,7 +55,7 @@ describe('AdventureGameErrorBoundary', () => {
   });
 
   it('shows return to levels button that calls onExit', () => {
-    const onExit = jest.fn();
+    const onExit = vi.fn();
     render(
       <AdventureGameErrorBoundary onExit={onExit}>
         <ThrowingChild shouldThrow={true} />
@@ -68,7 +68,7 @@ describe('AdventureGameErrorBoundary', () => {
 
   it('shows retry button that resets the error boundary', () => {
     const { rerender } = render(
-      <AdventureGameErrorBoundary onExit={jest.fn()}>
+      <AdventureGameErrorBoundary onExit={vi.fn()}>
         <ThrowingChild shouldThrow={true} />
       </AdventureGameErrorBoundary>
     );
@@ -83,7 +83,7 @@ describe('AdventureGameErrorBoundary', () => {
 
   it('has accessible role and aria attributes', () => {
     render(
-      <AdventureGameErrorBoundary onExit={jest.fn()}>
+      <AdventureGameErrorBoundary onExit={vi.fn()}>
         <ThrowingChild shouldThrow={true} />
       </AdventureGameErrorBoundary>
     );

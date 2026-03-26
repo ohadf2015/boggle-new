@@ -7,49 +7,49 @@ import { render } from '@testing-library/react';
 import DeepLinkHandler from '../DeepLinkHandler';
 
 // Mock next/navigation
-const mockReplace = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockReplace = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
 // Mock @capacitor/app
 let appUrlOpenHandler: ((event: { url: string }) => void) | null = null;
-const mockAddListener = jest.fn().mockImplementation((_event: string, handler: (event: { url: string }) => void) => {
+const mockAddListener = vi.fn().mockImplementation((_event: string, handler: (event: { url: string }) => void) => {
   appUrlOpenHandler = handler;
-  return Promise.resolve({ remove: jest.fn() });
+  return Promise.resolve({ remove: vi.fn() });
 });
 
-jest.mock('@capacitor/app', () => ({
+vi.mock('@capacitor/app', () => ({
   App: {
     addListener: (...args: unknown[]) => mockAddListener(...args),
   },
 }));
 
 // Mock @capacitor/browser
-jest.mock('@capacitor/browser', () => ({
-  Browser: { close: jest.fn().mockResolvedValue(undefined) },
+vi.mock('@capacitor/browser', () => ({
+  Browser: { close: vi.fn().mockResolvedValue(undefined) },
 }));
 
 // Mock platform
-jest.mock('@/utils/platform', () => ({
-  isNative: jest.fn(() => true),
+vi.mock('@/utils/platform', () => ({
+  isNative: vi.fn(() => true),
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
-  log: jest.fn(),
-  error: jest.fn(),
+vi.mock('@/utils/logger', () => ({
+  log: vi.fn(),
+  error: vi.fn(),
 }));
 
 // Mock i18n
-jest.mock('@/lib/i18n', () => ({
+vi.mock('@/lib/i18n', () => ({
   defaultLocale: 'en',
   locales: ['en', 'he', 'sv', 'ja'],
 }));
 
 describe('DeepLinkHandler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     appUrlOpenHandler = null;
   });
 

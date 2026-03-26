@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * CrazyGames Lifecycle Event Tests
  *
@@ -12,15 +13,15 @@
 import { renderHook, act } from '@testing-library/react';
 
 // Mock CrazyGames SDK BEFORE importing the hook
-const mockGameplayStart = jest.fn();
-const mockGameplayStop = jest.fn();
-const mockHappyTime = jest.fn();
-const mockShowMidgameAd = jest.fn((callbacks) => {
+const mockGameplayStart = vi.fn();
+const mockGameplayStop = vi.fn();
+const mockHappyTime = vi.fn();
+const mockShowMidgameAd = vi.fn((callbacks) => {
   callbacks?.adStarted?.();
   setTimeout(() => callbacks?.adFinished?.(), 100);
 });
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({
     isAvailable: true,
     isOnCrazyGamesPlatform: true,
@@ -36,11 +37,11 @@ import useCrazyGamesLifecycle from '@/hooks/useCrazyGamesLifecycle';
 
 describe('CrazyGames Lifecycle Events', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Gameplay Start Event', () => {
@@ -79,7 +80,7 @@ describe('CrazyGames Lifecycle Events', () => {
     });
 
     it('should call onGameplayStart callback', () => {
-      const onGameplayStart = jest.fn();
+      const onGameplayStart = vi.fn();
 
       renderHook(() =>
         useCrazyGamesLifecycle({
@@ -131,7 +132,7 @@ describe('CrazyGames Lifecycle Events', () => {
     });
 
     it('should call onGameplayStop callback', () => {
-      const onGameplayStop = jest.fn();
+      const onGameplayStop = vi.fn();
 
       const { rerender } = renderHook(
         ({ isGameOver }) =>
@@ -208,11 +209,11 @@ describe('CrazyGames Lifecycle Events', () => {
 
   describe('HappyTime Event', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('should trigger happyTime when player wins', () => {
@@ -318,7 +319,7 @@ describe('CrazyGames Lifecycle Events', () => {
 
       // Advance time by 29 seconds - still throttled
       act(() => {
-        jest.advanceTimersByTime(29000);
+        vi.advanceTimersByTime(29000);
       });
       act(() => {
         result.current.triggerHappyTime();
@@ -327,7 +328,7 @@ describe('CrazyGames Lifecycle Events', () => {
 
       // Advance time past 30 seconds - should work now
       act(() => {
-        jest.advanceTimersByTime(2000); // Total: 31 seconds
+        vi.advanceTimersByTime(2000); // Total: 31 seconds
       });
       act(() => {
         result.current.triggerHappyTime();
@@ -336,7 +337,7 @@ describe('CrazyGames Lifecycle Events', () => {
     });
 
     it('should call onHappyTime callback', () => {
-      const onHappyTime = jest.fn();
+      const onHappyTime = vi.fn();
 
       const { result } = renderHook(() =>
         useCrazyGamesLifecycle({
@@ -358,16 +359,16 @@ describe('CrazyGames Lifecycle Events', () => {
 
   describe('Midgame Ad Integration', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('should pause and resume game during ad', async () => {
-      const onAdStart = jest.fn();
-      const onAdEnd = jest.fn();
+      const onAdStart = vi.fn();
+      const onAdEnd = vi.fn();
 
       const { result } = renderHook(() =>
         useCrazyGamesLifecycle({
@@ -391,7 +392,7 @@ describe('CrazyGames Lifecycle Events', () => {
 
       // Advance time for ad to finish
       act(() => {
-        jest.advanceTimersByTime(150);
+        vi.advanceTimersByTime(150);
       });
 
       // VERIFY: onAdEnd called after ad
@@ -399,8 +400,8 @@ describe('CrazyGames Lifecycle Events', () => {
     });
 
     it('should not pause game if pauseOnAd is false', () => {
-      const onAdStart = jest.fn();
-      const onAdEnd = jest.fn();
+      const onAdStart = vi.fn();
+      const onAdEnd = vi.fn();
 
       const { result } = renderHook(() =>
         useCrazyGamesLifecycle({

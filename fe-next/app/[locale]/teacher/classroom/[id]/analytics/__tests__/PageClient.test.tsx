@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Analytics Page Client Tests
  *
@@ -20,39 +21,39 @@ import { useRouter } from 'next/navigation';
 // MOCKS
 // ============================================
 
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/hooks/useRealtimeClassroomProgress');
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/hooks/useRealtimeClassroomProgress');
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
 // Mock all analytics components
-jest.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
+vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
   AnalyticsDashboard: ({ classroomId }: any) => (
     <div data-testid="analytics-dashboard">Dashboard for {classroomId}</div>
   ),
 }));
 
-jest.mock('@/components/teacher/analytics/StudentProgressTable', () => ({
+vi.mock('@/components/teacher/analytics/StudentProgressTable', () => ({
   StudentProgressTable: ({ classroomId }: any) => (
     <div data-testid="student-progress-table">Table for {classroomId}</div>
   ),
 }));
 
-jest.mock('@/components/teacher/analytics/LessonEffectivenessChart', () => ({
+vi.mock('@/components/teacher/analytics/LessonEffectivenessChart', () => ({
   __esModule: true,
   default: ({ classroomId }: any) => (
     <div data-testid="lesson-effectiveness-chart">Chart for {classroomId}</div>
   ),
 }));
 
-jest.mock('@/components/teacher/analytics/VocabularyHeatmap', () => ({
+vi.mock('@/components/teacher/analytics/VocabularyHeatmap', () => ({
   VocabularyHeatmap: ({ classroomId }: any) => (
     <div data-testid="vocabulary-heatmap">Heatmap for {classroomId}</div>
   ),
 }));
 
-jest.mock('@/components/teacher/analytics/LiveActivityIndicator', () => ({
+vi.mock('@/components/teacher/analytics/LiveActivityIndicator', () => ({
   LiveActivityIndicator: ({ activeStudentsCount, connectionStatus }: any) => (
     <div data-testid="live-activity-indicator">
       {connectionStatus} - {activeStudentsCount} active
@@ -60,7 +61,7 @@ jest.mock('@/components/teacher/analytics/LiveActivityIndicator', () => ({
   ),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     locale: 'en',
@@ -71,7 +72,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 // TEST SETUP
 // ============================================
 
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 
 const defaultRealtimeReturn = {
   isConnected: true,
@@ -83,18 +84,18 @@ const defaultRealtimeReturn = {
 
 describe('AnalyticsPageClient', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    (useRouter as jest.Mock).mockReturnValue({
+    (useRouter as Mock).mockReturnValue({
       push: mockPush,
     });
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: { id: 'teacher-1', email: 'teacher@test.com' },
       loading: false,
     });
 
-    (useRealtimeClassroomProgress as jest.Mock).mockReturnValue(defaultRealtimeReturn);
+    (useRealtimeClassroomProgress as Mock).mockReturnValue(defaultRealtimeReturn);
   });
 
   // ============================================
@@ -173,7 +174,7 @@ describe('AnalyticsPageClient', () => {
   // ============================================
 
   it('should show loading state when auth loading', () => {
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: null,
       loading: true,
     });
@@ -184,7 +185,7 @@ describe('AnalyticsPageClient', () => {
   });
 
   it('should redirect to signin when not authenticated', () => {
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: null,
       loading: false,
     });
@@ -224,7 +225,7 @@ describe('AnalyticsPageClient', () => {
       ],
     };
 
-    (useRealtimeClassroomProgress as jest.Mock).mockReturnValue(mockRealtimeReturn);
+    (useRealtimeClassroomProgress as Mock).mockReturnValue(mockRealtimeReturn);
 
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
@@ -240,7 +241,7 @@ describe('AnalyticsPageClient', () => {
     ];
 
     statuses.forEach((status) => {
-      (useRealtimeClassroomProgress as jest.Mock).mockReturnValue({
+      (useRealtimeClassroomProgress as Mock).mockReturnValue({
         ...defaultRealtimeReturn,
         connectionStatus: status,
       });
@@ -275,7 +276,7 @@ describe('AnalyticsPageClient', () => {
   // ============================================
 
   it('should not show recent activity section when no activity', () => {
-    (useRealtimeClassroomProgress as jest.Mock).mockReturnValue({
+    (useRealtimeClassroomProgress as Mock).mockReturnValue({
       ...defaultRealtimeReturn,
       recentActivity: [],
     });
@@ -286,7 +287,7 @@ describe('AnalyticsPageClient', () => {
   });
 
   it('should show recent activity when available', () => {
-    (useRealtimeClassroomProgress as jest.Mock).mockReturnValue({
+    (useRealtimeClassroomProgress as Mock).mockReturnValue({
       ...defaultRealtimeReturn,
       recentActivity: [
         {
@@ -313,7 +314,7 @@ describe('AnalyticsPageClient', () => {
       timestamp: new Date(),
     }));
 
-    (useRealtimeClassroomProgress as jest.Mock).mockReturnValue({
+    (useRealtimeClassroomProgress as Mock).mockReturnValue({
       ...defaultRealtimeReturn,
       recentActivity: activities,
     });

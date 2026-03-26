@@ -14,21 +14,21 @@ import { render, screen } from '@testing-library/react';
 const mockLanguageContext = {
   t: (key: string) => key,
   language: 'en',
-  setLanguage: jest.fn(),
+  setLanguage: vi.fn(),
   dir: 'ltr',
 };
 
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => mockLanguageContext,
 }));
 
-jest.mock('../../../contexts/SoundEffectsContext', () => ({
+vi.mock('../../../contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
+    playSound: vi.fn(),
   }),
 }));
 
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
@@ -42,7 +42,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => {
     // eslint-disable-next-line @next/next/no-img-element

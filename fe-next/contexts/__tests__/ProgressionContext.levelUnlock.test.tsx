@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * ProgressionContext Level Unlock Bug Tests
  *
@@ -17,11 +18,11 @@ import {
 import type { PlayerProgression } from '@/types/adventure';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock AuthContext
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'test-user-123' },
     loading: false,

@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
 // Mock alert-dialog — interactive mock that responds to onOpenChange
-jest.mock('@/components/ui/alert-dialog', () => {
+vi.mock('@/components/ui/alert-dialog', () => {
   const DialogContext = React.createContext<{ open: boolean; setOpen: (v: boolean) => void }>({ open: false, setOpen: () => {} });
 
   return {
@@ -49,7 +49,7 @@ jest.mock('@/components/ui/alert-dialog', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Zap: ({ className }: { className?: string }) => <span data-testid="icon-zap" className={className} />,
   Loader2: ({ className }: { className?: string }) => <span data-testid="icon-loader" className={className} />,
   AlertTriangle: ({ className }: { className?: string }) => <span data-testid="icon-alert" className={className} />,
@@ -57,11 +57,11 @@ jest.mock('lucide-react', () => ({
 
 import { AutoPromoteButton } from '../AutoPromoteButton';
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 const originalFetch = global.fetch;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   global.fetch = mockFetch;
 });
 
@@ -72,7 +72,7 @@ afterAll(() => {
 const defaultProps = {
   candidateCount: 15,
   authToken: 'test-token',
-  onComplete: jest.fn(),
+  onComplete: vi.fn(),
 };
 
 describe('AutoPromoteButton', () => {

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for duel CRUD operations
  * Following TDD: RED-GREEN-REFACTOR cycle
@@ -17,33 +18,33 @@ import {
 } from '../duels';
 
 // Mock Supabase client
-jest.mock('@/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: jest.fn(),
+    from: vi.fn(),
   },
 }));
 
 // Mock logger
-jest.mock('@/utils/logger', () => ({
+vi.mock('@/utils/logger', () => ({
   __esModule: true,
-  default: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
+  default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
 import { supabase } from '@/lib/supabase';
 
 describe('Duel CRUD Operations', () => {
-  const mockFrom = supabase!.from as jest.Mock;
+  const mockFrom = supabase!.from as Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Helper: build chainable mock ending at .single()
   // Chain: from → insert/select/update → ... → select → single
   function chainInsertSelectSingle(resolvedValue: any) {
-    const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
-    const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
-    const mockInsert = jest.fn().mockReturnValue({ select: mockSelect });
+    const mockSingle = vi.fn().mockResolvedValue(resolvedValue);
+    const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+    const mockInsert = vi.fn().mockReturnValue({ select: mockSelect });
     mockFrom.mockReturnValue({ insert: mockInsert });
     return { mockInsert, mockSelect, mockSingle };
   }
@@ -147,9 +148,9 @@ describe('Duel CRUD Operations', () => {
   describe('getDuelById', () => {
     // Chain: from → select → eq → single
     function chainSelectEqSingle(resolvedValue: any) {
-      const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
-      const mockEq = jest.fn().mockReturnValue({ single: mockSingle });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockSingle = vi.fn().mockResolvedValue(resolvedValue);
+      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
       mockFrom.mockReturnValue({ select: mockSelect });
       return { mockSelect, mockEq, mockSingle };
     }
@@ -199,10 +200,10 @@ describe('Duel CRUD Operations', () => {
   describe('updateDuelStatus', () => {
     // Chain: from → update → eq → select → single
     function chainUpdateEqSelectSingle(resolvedValue: any) {
-      const mockSingle = jest.fn().mockResolvedValue(resolvedValue);
-      const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
-      const mockEq = jest.fn().mockReturnValue({ select: mockSelect });
-      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockSingle = vi.fn().mockResolvedValue(resolvedValue);
+      const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = vi.fn().mockReturnValue({ select: mockSelect });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq });
       mockFrom.mockReturnValue({ update: mockUpdate });
       return { mockUpdate, mockEq, mockSelect, mockSingle };
     }
@@ -263,18 +264,18 @@ describe('Duel CRUD Operations', () => {
     // Chain: from → select → eq → or → order (→ optional limit)
     function chainHistoryQuery(resolvedValue: any, withLimit = false) {
       if (withLimit) {
-        const mockLimit = jest.fn().mockResolvedValue(resolvedValue);
-        const mockOrder = jest.fn().mockReturnValue({ limit: mockLimit });
-        const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
-        const mockEq = jest.fn().mockReturnValue({ or: mockOr });
-        const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+        const mockLimit = vi.fn().mockResolvedValue(resolvedValue);
+        const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit });
+        const mockOr = vi.fn().mockReturnValue({ order: mockOrder });
+        const mockEq = vi.fn().mockReturnValue({ or: mockOr });
+        const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
         mockFrom.mockReturnValue({ select: mockSelect });
         return { mockSelect, mockEq, mockOr, mockOrder, mockLimit };
       }
-      const mockOrder = jest.fn().mockResolvedValue(resolvedValue);
-      const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockEq = jest.fn().mockReturnValue({ or: mockOr });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockOrder = vi.fn().mockResolvedValue(resolvedValue);
+      const mockOr = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockEq = vi.fn().mockReturnValue({ or: mockOr });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
       mockFrom.mockReturnValue({ select: mockSelect });
       return { mockSelect, mockEq, mockOr, mockOrder };
     }
@@ -340,10 +341,10 @@ describe('Duel CRUD Operations', () => {
   describe('getDuelStats', () => {
     // Chain: from → select → eq → or → order
     function chainStatsQuery(resolvedValue: any) {
-      const mockOrder = jest.fn().mockResolvedValue(resolvedValue);
-      const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockEq = jest.fn().mockReturnValue({ or: mockOr });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockOrder = vi.fn().mockResolvedValue(resolvedValue);
+      const mockOr = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockEq = vi.fn().mockReturnValue({ or: mockOr });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
       mockFrom.mockReturnValue({ select: mockSelect });
       return { mockSelect, mockEq, mockOr, mockOrder };
     }
@@ -489,10 +490,10 @@ describe('Duel CRUD Operations', () => {
       ];
 
       // Chain: from → select → eq → eq → order
-      const mockOrder = jest.fn().mockResolvedValue({ data: mockPendingDuels, error: null });
-      const mockEq2 = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockOrder = vi.fn().mockResolvedValue({ data: mockPendingDuels, error: null });
+      const mockEq2 = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockEq1 = vi.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEq1 });
       mockFrom.mockReturnValue({ select: mockSelect });
 
       const result = await getPendingDuelsForStudent('student-123');

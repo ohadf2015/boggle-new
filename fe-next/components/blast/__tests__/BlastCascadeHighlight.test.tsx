@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import type { CascadeHighlightData } from '../types';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const Div = React.forwardRef(function MockMotionDiv({ children, ...rest }: any, ref: any) {
     return React.createElement('div', { ref, ...rest }, children);

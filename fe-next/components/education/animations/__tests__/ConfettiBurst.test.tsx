@@ -11,26 +11,26 @@ import '@testing-library/jest-dom';
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation((query: string) => ({
+    value: vi.fn().mockImplementation((query: string) => ({
       matches: false,
       media: query,
       onchange: null,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
     })),
   });
 });
 
 // Mock canvas context (jsdom doesn't implement it)
 beforeAll(() => {
-  HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue({
-    clearRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    fillRect: jest.fn(),
+  HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+    clearRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    fillRect: vi.fn(),
     set globalAlpha(_: number) {},
     set fillStyle(_: string) {},
   });

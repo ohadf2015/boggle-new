@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Tests for /student/lessons redirect page
  *
@@ -8,15 +9,15 @@
 import { redirect } from 'next/navigation';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  redirect: jest.fn(),
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(),
 }));
 
 describe('StudentLessonsPage', () => {
-  const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
+  const mockRedirect = redirect as MockedFunction<typeof redirect>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should redirect to student dashboard with Hebrew locale', async () => {

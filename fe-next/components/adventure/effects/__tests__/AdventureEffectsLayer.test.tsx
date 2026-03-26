@@ -17,48 +17,48 @@ import type { LexiReaction } from '@/hooks/useLexiReactions';
 import type { BossTier } from '@/components/celebration/BossDefeatFireworks';
 
 // Mock all effect components
-jest.mock('../../juice/ScorePopup', () => ({
+vi.mock('../../juice/ScorePopup', () => ({
   ScorePopup: ({ onComplete }: { onComplete: () => void }) => (
     <div data-testid="score-popup" onClick={onComplete}>Score Popup</div>
   ),
 }));
 
-jest.mock('../../LexiReaction', () => ({
+vi.mock('../../LexiReaction', () => ({
   __esModule: true,
   default: ({ reaction, onDismiss }: { reaction: LexiReaction | null; onDismiss: () => void }) => (
     reaction ? <div data-testid="lexi-reaction" onClick={onDismiss}>Lexi: {reaction.type}</div> : null
   ),
 }));
 
-jest.mock('@/components/animations/ChainParticleBurst', () => ({
+vi.mock('@/components/animations/ChainParticleBurst', () => ({
   ChainParticleBurst: ({ onComplete }: { onComplete: () => void }) => (
     <div data-testid="chain-burst" onClick={onComplete}>Chain Burst</div>
   ),
 }));
 
-jest.mock('../../juice/AdaptiveParticles', () => ({
+vi.mock('../../juice/AdaptiveParticles', () => ({
   AdaptiveParticles: ({ onComplete }: { onComplete: () => void }) => (
     <div data-testid="adaptive-particles" onClick={onComplete}>Adaptive Particles</div>
   ),
 }));
 
-jest.mock('../../juice/ExplosionEffect', () => ({
+vi.mock('../../juice/ExplosionEffect', () => ({
   ExplosionEffect: ({ onComplete }: { onComplete: () => void }) => (
     <div data-testid="explosion" onClick={onComplete}>Explosion</div>
   ),
 }));
 
-jest.mock('@/components/education/LevelUpCelebration', () => ({
+vi.mock('@/components/education/LevelUpCelebration', () => ({
   LevelUpCelebration: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="level-up" onClick={onClose}>Level Up!</div>
   ),
 }));
 
-jest.mock('../../ComboMilestoneOverlay', () => ({
+vi.mock('../../ComboMilestoneOverlay', () => ({
   ComboMilestoneOverlay: () => <div data-testid="combo-milestone">Combo Milestone</div>,
 }));
 
-jest.mock('@/components/celebration/BossDefeatFireworks', () => ({
+vi.mock('@/components/celebration/BossDefeatFireworks', () => ({
   BossDefeatFireworks: () => <div data-testid="boss-fireworks">Boss Fireworks</div>,
 }));
 
@@ -76,19 +76,19 @@ describe('AdventureEffectsLayer', () => {
 
   const defaultProps: AdventureEffectsLayerProps = {
     currentPopup: null,
-    onPopupComplete: jest.fn(),
+    onPopupComplete: vi.fn(),
     scoreDisplayRef: mockScoreDisplayRef,
     reaction: null,
-    onDismissReaction: jest.fn(),
+    onDismissReaction: vi.fn(),
     chainBurstConfig: null,
-    onChainBurstComplete: jest.fn(),
+    onChainBurstComplete: vi.fn(),
     world: 1,
     particleConfig: null,
-    onParticleComplete: jest.fn(),
+    onParticleComplete: vi.fn(),
     pendingExplosions: [],
-    onExplosionComplete: jest.fn(),
+    onExplosionComplete: vi.fn(),
     levelUpData: null,
-    onLevelUpClose: jest.fn(),
+    onLevelUpClose: vi.fn(),
     currentMilestone: null,
     isBossLevel: false,
     showBossFireworks: false,
@@ -96,7 +96,7 @@ describe('AdventureEffectsLayer', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Score Popups', () => {
@@ -120,7 +120,7 @@ describe('AdventureEffectsLayer', () => {
     });
 
     it('should call onPopupComplete when popup completes', () => {
-      const onPopupComplete = jest.fn();
+      const onPopupComplete = vi.fn();
       const popup: ScorePopupData = {
         id: 1,
         value: 100,
@@ -158,7 +158,7 @@ describe('AdventureEffectsLayer', () => {
     });
 
     it('should call onDismissReaction when reaction is dismissed', () => {
-      const onDismissReaction = jest.fn();
+      const onDismissReaction = vi.fn();
       const mockReaction = createMockReaction('celebration');
 
       render(
@@ -194,7 +194,7 @@ describe('AdventureEffectsLayer', () => {
     });
 
     it('should call onChainBurstComplete when burst completes', () => {
-      const onChainBurstComplete = jest.fn();
+      const onChainBurstComplete = vi.fn();
       const config = {
         trigger: true,
         position: { x: 100, y: 100 },
@@ -247,7 +247,7 @@ describe('AdventureEffectsLayer', () => {
     });
 
     it('should call onExplosionComplete with correct id when explosion completes', () => {
-      const onExplosionComplete = jest.fn();
+      const onExplosionComplete = vi.fn();
       const explosions: PendingExplosion[] = [
         { id: 1, position: { x: 50, y: 50 }, intensity: 2 },
       ];

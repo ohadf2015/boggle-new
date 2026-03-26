@@ -12,7 +12,7 @@ function getScoreTierLabel(score: number): string | null {
 }
 
 // Mock adventure juice components
-jest.mock('@/components/adventure/juice/ExplosionEffect', () => ({
+vi.mock('@/components/adventure/juice/ExplosionEffect', () => ({
   ExplosionEffect: ({ position, intensity, color, particleCount, onComplete }: any) => (
     <div
       data-testid="explosion-effect"
@@ -25,7 +25,7 @@ jest.mock('@/components/adventure/juice/ExplosionEffect', () => ({
   ),
 }));
 
-jest.mock('@/components/adventure/juice/ScorePopup', () => ({
+vi.mock('@/components/adventure/juice/ScorePopup', () => ({
   ScorePopup: ({ score, position, onComplete }: any) => (
     <div
       data-testid="score-popup"
@@ -39,8 +39,8 @@ jest.mock('@/components/adventure/juice/ScorePopup', () => ({
 const baseProps = {
   explosions: [] as BlastExplosion[],
   scorePopups: [] as BlastScorePopup[],
-  onExplosionComplete: jest.fn(),
-  onScorePopupComplete: jest.fn(),
+  onExplosionComplete: vi.fn(),
+  onScorePopupComplete: vi.fn(),
   cellSize: 50,
   containerOffset: { x: 0, y: 0 },
 };

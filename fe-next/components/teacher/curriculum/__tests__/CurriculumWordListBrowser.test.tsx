@@ -16,9 +16,9 @@ import {
 } from '@/lib/supabase/education';
 
 // Mock the education data functions
-jest.mock('@/lib/supabase/education', () => ({
-  getCurriculumWordLists: jest.fn(),
-  importCurriculumToLesson: jest.fn(),
+vi.mock('@/lib/supabase/education', () => ({
+  getCurriculumWordLists: vi.fn(),
+  importCurriculumToLesson: vi.fn(),
 }));
 
 // Stable t function to avoid infinite re-renders (useCallback depends on t)
@@ -69,7 +69,7 @@ const stableT = (key: string, params?: Record<string, string | number>) => {
 };
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: stableT,
     language: 'en',
@@ -79,7 +79,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 
 // Mock useAuth
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'teacher-123', email: 'teacher@example.com' },
     isAuthenticated: true,
@@ -150,7 +150,7 @@ const mockedImportCurriculumToLesson = importCurriculumToLesson as jest.MockedFu
 
 describe('CurriculumWordListBrowser', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockedGetCurriculumWordLists.mockResolvedValue({ data: mockCurriculumLists, error: null });
     mockedImportCurriculumToLesson.mockResolvedValue({
       data: {
@@ -450,7 +450,7 @@ describe('CurriculumWordListBrowser', () => {
 
     it('calls onImportSuccess callback when import succeeds', async () => {
       const user = userEvent.setup();
-      const onImportSuccess = jest.fn();
+      const onImportSuccess = vi.fn();
 
       render(
         <CurriculumWordListBrowser teacherId="teacher-123" onImportSuccess={onImportSuccess} />

@@ -8,27 +8,27 @@ import { AdminGiftModal } from '../AdminGiftModal';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock modules
-jest.mock('gsap', () => ({
+vi.mock('gsap', () => ({
   __esModule: true,
   default: {
-    timeline: jest.fn(() => ({
-      to: jest.fn().mockReturnThis(),
-      from: jest.fn().mockReturnThis(),
-      kill: jest.fn(),
+    timeline: vi.fn(() => ({
+      to: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      kill: vi.fn(),
     })),
-    context: jest.fn((fn) => {
+    context: vi.fn((fn) => {
       fn();
-      return { revert: jest.fn() };
+      return { revert: vi.fn() };
     }),
   },
 }));
 
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // Mock useDevicePerformance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
     enableGlowEffects: false,
@@ -37,7 +37,7 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock Next.js Image component
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
@@ -59,8 +59,8 @@ describe('AdminGiftModal - Close Button Styling', () => {
         <AdminGiftModal
           gift={mockGift}
           show={true}
-          onClaim={jest.fn()}
-          onDismiss={jest.fn()}
+          onClaim={vi.fn()}
+          onDismiss={vi.fn()}
         />
       </LanguageProvider>
     );

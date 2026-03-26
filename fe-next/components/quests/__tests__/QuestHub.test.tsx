@@ -15,17 +15,17 @@ import { render, screen } from '@testing-library/react';
 
 // --- Mocks ---
 
-const mockUseDailyMissions = jest.fn();
-jest.mock('@/hooks/useDailyMissions', () => ({
+const mockUseDailyMissions = vi.fn();
+vi.mock('@/hooks/useDailyMissions', () => ({
   useDailyMissions: () => mockUseDailyMissions(),
 }));
 
-const mockUseWeeklyQuest = jest.fn();
-jest.mock('@/hooks/useWeeklyQuest', () => ({
+const mockUseWeeklyQuest = vi.fn();
+vi.mock('@/hooks/useWeeklyQuest', () => ({
   useWeeklyQuest: () => mockUseWeeklyQuest(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const map: Record<string, string> = {
@@ -56,7 +56,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     user: { id: 'test-user' },
@@ -64,7 +64,7 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const Div = React.forwardRef(
     ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) =>
       React.createElement('div', { ...props, ref }, children)
@@ -77,17 +77,17 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/hooks/useReducedMotion', () => ({
+vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
-  default: jest.fn(() => false),
+  default: vi.fn(() => false),
 }));
 
 // Mock next/link
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: React.PropsWithChildren<{ href: string }>) =>
     React.createElement('a', { href, ...props }, children);
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
 import { QuestHub } from '../QuestHub';
@@ -102,7 +102,7 @@ const defaultMissions = {
   isGrandSlam: false,
   grandSlamClaimed: false,
   loading: false,
-  refresh: jest.fn(),
+  refresh: vi.fn(),
 };
 
 const defaultWeekly = {
@@ -115,11 +115,11 @@ const defaultWeekly = {
   progress: 0,
   isComplete: false,
   loading: false,
-  selectQuest: jest.fn(),
+  selectQuest: vi.fn(),
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockUseDailyMissions.mockReturnValue(defaultMissions);
   mockUseWeeklyQuest.mockReturnValue(defaultWeekly);
 });

@@ -10,7 +10,7 @@ import '@testing-library/jest-dom';
 import { WordHuntLifeBar } from '../WordHuntLifeBar';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -18,7 +18,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef(({ children, className, style, animate, transition, ...rest }: any, ref: any) => (
     <div ref={ref} className={className} style={style} data-animate={JSON.stringify(animate)} {...rest}>{children}</div>
   ));
@@ -30,7 +30,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react Heart
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Heart: (props: any) => <svg data-testid="heart-icon" {...props} />,
 }));
 

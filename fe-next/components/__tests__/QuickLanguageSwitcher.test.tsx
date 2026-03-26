@@ -3,8 +3,8 @@ import '@testing-library/jest-dom';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 
 // Mock LanguageContext
-const mockSetLanguage = jest.fn();
-jest.mock('@/contexts/LanguageContext', () => ({
+const mockSetLanguage = vi.fn();
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     setLanguage: mockSetLanguage,
@@ -24,11 +24,11 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock scrollIntoView for Radix UI Select (JSDOM doesn't implement it)
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = vi.fn();
 
 describe('QuickLanguageSwitcher', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render current language flag', () => {

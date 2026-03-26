@@ -10,8 +10,8 @@ import TemplateLessonSelector from './TemplateLessonSelector';
 import type { Language } from '@/lib/supabase/education/types';
 
 // Mock translations
-jest.mock('@/contexts/LanguageContext', () => ({
-  ...jest.requireActual('@/contexts/LanguageContext'),
+vi.mock('@/contexts/LanguageContext', () => ({
+  ...vi.importActual('@/contexts/LanguageContext'),
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -26,17 +26,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
       return translations[key] || key;
     },
     language: 'en' as Language,
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     isRTL: false,
   }),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 describe('TemplateLessonSelector', () => {
-  const mockOnSelect = jest.fn();
+  const mockOnSelect = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render template selector with heading', () => {

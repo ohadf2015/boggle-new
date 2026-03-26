@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import ComboDisplay from '../ComboDisplay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -25,7 +25,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ priority, ...props }: Record<string, unknown>) => {
     return (
@@ -36,7 +36,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock InteractiveMascot to avoid framer-motion deep mocking issues
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: ({ variant, 'data-testid': dataTestId }: { variant: string; 'data-testid'?: string }) => (
     <div data-testid={dataTestId || 'combo-mascot'} data-variant={variant}>
       Mascot
@@ -45,7 +45,7 @@ jest.mock('@/components/ui/InteractiveMascot', () => ({
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,

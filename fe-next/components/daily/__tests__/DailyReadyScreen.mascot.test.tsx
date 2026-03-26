@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: ({ variant }: { variant: string }) => (
     <div data-testid={`mascot-${variant}`} />
   ),
@@ -10,9 +10,9 @@ jest.mock('@/components/ui/Mascot', () => ({
   ),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    preloadMusicTrack: jest.fn(),
+    preloadMusicTrack: vi.fn(),
     TRACKS: {
       LOBBY: 'lobby',
       BEFORE_GAME: 'beforeGame',
@@ -26,49 +26,49 @@ jest.mock('@/contexts/MusicContext', () => ({
     isMuted: false,
     isPlaying: false,
     audioUnlocked: false,
-    playTrack: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
-    setVolume: jest.fn(),
-    toggleMute: jest.fn(),
-    unlockAudio: jest.fn(),
+    playTrack: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
+    setVolume: vi.fn(),
+    toggleMute: vi.fn(),
+    unlockAudio: vi.fn(),
   }),
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: () => null,
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+vi.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: vi.fn() }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
     isAuthenticated: false,
     loading: false,
-    signIn: jest.fn(),
-    signOut: jest.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/daily/TabbedDailyLeaderboard', () => () => null);
-jest.mock('@/components/daily/DailyIntroCarousel', () => () => null);
-jest.mock('@/components/daily/CreateChallengeModal', () => ({ CreateChallengeModal: () => null }));
-jest.mock('@/components/daily/UnauthenticatedCreateChallengeSection', () => ({
+vi.mock('@/components/daily/TabbedDailyLeaderboard', () => ({ default: () => null }));
+vi.mock('@/components/daily/DailyIntroCarousel', () => ({ default: () => null }));
+vi.mock('@/components/daily/CreateChallengeModal', () => ({ CreateChallengeModal: () => null }));
+vi.mock('@/components/daily/UnauthenticatedCreateChallengeSection', () => ({
   UnauthenticatedCreateChallengeSection: () => null,
 }));
-jest.mock('@/components/auth/AuthModal', () => () => null);
-jest.mock('@/utils/dailyChallenge', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({ default: () => null }));
+vi.mock('@/utils/dailyChallenge', () => ({
   hasPlayedWordHuntToday: () => false,
 }));
 
@@ -85,10 +85,10 @@ const baseProps = {
   currentPlayerId: null,
   guestFingerprint: null,
   tutorialCompleted: true,
-  onLanguageChange: jest.fn(),
-  onStart: jest.fn(),
-  onBack: jest.fn(),
-  onShowTutorial: jest.fn(),
+  onLanguageChange: vi.fn(),
+  onStart: vi.fn(),
+  onBack: vi.fn(),
+  onShowTutorial: vi.fn(),
   t: (k: string) => k,
 };
 

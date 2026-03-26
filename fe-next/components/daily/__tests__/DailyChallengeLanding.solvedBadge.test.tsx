@@ -13,36 +13,36 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 // Mock the hooks and utilities
-jest.mock('@/utils/dailyChallenge/storage', () => ({
-  hasPlayedToday: jest.fn(() => false),
-  getWordHuntStatusToday: jest.fn(() => null), // null = not played yet
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedToday: vi.fn(() => false),
+  getWordHuntStatusToday: vi.fn(() => null), // null = not played yet
 }));
 
-jest.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: jest.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
 }));
 
-jest.mock('@/utils/dailyChallenge', () => ({
-  getSecondsUntilNextDaily: jest.fn(() => 3600),
-  formatCountdown: jest.fn(() => '01:00:00'),
+vi.mock('@/utils/dailyChallenge', () => ({
+  getSecondsUntilNextDaily: vi.fn(() => 3600),
+  formatCountdown: vi.fn(() => '01:00:00'),
 }));
 
-jest.mock('@/hooks/useTiltEffect', () => ({
+vi.mock('@/hooks/useTiltEffect', () => ({
   useTiltEffect: () => ({
     ref: { current: null },
     style: {},
     handlers: {
-      onMouseEnter: jest.fn(),
-      onMouseLeave: jest.fn(),
-      onMouseMove: jest.fn(),
-      onTouchStart: jest.fn(),
-      onTouchMove: jest.fn(),
-      onTouchEnd: jest.fn(),
+      onMouseEnter: vi.fn(),
+      onMouseLeave: vi.fn(),
+      onMouseMove: vi.fn(),
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: true,
     prefersReducedMotion: false,
@@ -50,8 +50,8 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 // Mock framer-motion to render elements without animation
-jest.mock('framer-motion', () => ({
-  ...jest.requireActual('framer-motion'),
+vi.mock('framer-motion', () => ({
+  ...vi.importActual('framer-motion'),
   motion: {
     div: ({ children, className, style, animate, initial, ...props }: React.ComponentProps<'div'> & { animate?: unknown; initial?: unknown }) => (
       <div className={className} style={style} {...props}>{children}</div>
@@ -70,7 +70,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock fetch for API calls
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -85,7 +85,7 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe('DailyChallengeLanding Solved Badge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock responses
     mockFetch.mockImplementation((url: string) => {
       if (url.includes('check-availability')) {
@@ -121,7 +121,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -141,7 +141,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -162,7 +162,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
@@ -186,7 +186,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
     storage.getWordHuntStatusToday.mockReturnValue({ solved: false }); // Lost state
 
     const mockProps = {
-      onSelectWordHunt: jest.fn(),
+      onSelectWordHunt: vi.fn(),
       currentLanguage: 'en' as const,
     };
 

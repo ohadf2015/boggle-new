@@ -15,17 +15,17 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@testing-library/jest-dom';
 
 // Mock next/navigation for tests
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/en/singleplayer',
 }));
 
 // Mock framer-motion to allow class inspection and simplify animations
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef<HTMLDivElement, React.PropsWithChildren<{ className?: string; style?: React.CSSProperties; onClick?: () => void }>>(
       function MotionDiv({ children, className, style, onClick, ...props }, ref) {
@@ -59,7 +59,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock Radix UI tooltip
-jest.mock('@radix-ui/react-tooltip', () => ({
+vi.mock('@radix-ui/react-tooltip', () => ({
   Provider: ({ children }: React.PropsWithChildren<object>) => <>{children}</>,
   Root: ({ children }: React.PropsWithChildren<object>) => <>{children}</>,
   Trigger: React.forwardRef<HTMLDivElement, React.PropsWithChildren<{ asChild?: boolean }>>(
@@ -72,7 +72,7 @@ jest.mock('@radix-ui/react-tooltip', () => ({
 }));
 
 // Mock getBoundingClientRect for button positioning
-const mockGetBoundingClientRect = jest.fn(() => ({
+const mockGetBoundingClientRect = vi.fn(() => ({
   top: 16,
   left: 300,
   right: 356, // 300 + 56 (button width)

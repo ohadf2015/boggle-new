@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MobileDetailsTab } from '../MobileDetailsTab';
 
 // Mock useLanguage hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -22,14 +22,14 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock dynamic imports
-jest.mock('next/dynamic', () => () => {
-  return function MockPerformanceChart() {
+vi.mock('next/dynamic', () => ({
+  default: () => function MockPerformanceChart() {
     return <div data-testid="performance-chart">PerformanceChart</div>;
-  };
-});
+  },
+}));
 
 // Mock child components
-jest.mock('../PerformanceSection', () => ({
+vi.mock('../PerformanceSection', () => ({
   PerformanceSection: ({ archetype }: { archetype?: { name: string } | null }) => (
     <div data-testid="performance-section">
       {archetype && <span data-testid="archetype">{archetype.name}</span>}
@@ -37,24 +37,24 @@ jest.mock('../PerformanceSection', () => ({
   ),
 }));
 
-jest.mock('../YourWordsSection', () => ({
+vi.mock('../YourWordsSection', () => ({
   YourWordsSection: ({ defaultExpanded }: { defaultExpanded?: boolean }) => (
     <div data-testid="your-words-section" data-expanded={defaultExpanded ? 'true' : 'false'}>YourWords</div>
   ),
 }));
 
-jest.mock('../AchievementsSection', () => ({
+vi.mock('../AchievementsSection', () => ({
   AchievementsSection: ({ defaultExpanded }: { defaultExpanded?: boolean }) => (
     <div data-testid="achievements-section" data-expanded={defaultExpanded ? 'true' : 'false'}>Achievements</div>
   ),
 }));
 
-jest.mock('../BotWordsSection', () => ({
+vi.mock('../BotWordsSection', () => ({
   BotWordsSection: () => <div data-testid="bot-words-section">BotWords</div>,
 }));
 
-jest.mock('@/components/ui/CollapsibleSection', () => {
-  return function MockCollapsibleSection({
+vi.mock('@/components/ui/CollapsibleSection', () => {
+  const MockCollapsibleSection = ({
     title,
     defaultExpanded,
     children
@@ -62,7 +62,7 @@ jest.mock('@/components/ui/CollapsibleSection', () => {
     title: string;
     defaultExpanded?: boolean;
     children: React.ReactNode
-  }) {
+  }) => {
     return (
       <div data-testid={`collapsible-${title.toLowerCase().replace(/\s/g, '-')}`} data-expanded={defaultExpanded ? 'true' : 'false'}>
         <div>{title}</div>
@@ -70,12 +70,14 @@ jest.mock('@/components/ui/CollapsibleSection', () => {
       </div>
     );
   };
+  return { default: MockCollapsibleSection };
 });
 
-jest.mock('@/components/results/MissedWords', () => {
-  return function MockMissedWords() {
+vi.mock('@/components/results/MissedWords', () => {
+  const MockMissedWords = () => {
     return <div data-testid="missed-words">MissedWords</div>;
   };
+  return { default: MockMissedWords };
 });
 
 describe('MobileDetailsTab with Bonuses', () => {

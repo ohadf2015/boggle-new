@@ -1,3 +1,4 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import HeaderMenuDropdown from '@/components/HeaderMenuDropdown';
@@ -5,11 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock contexts
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/contexts/LanguageContext');
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/contexts/LanguageContext');
 
 // Mock Next.js Link
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
     const MockLink = ({ children, href, onClick }: { children: React.ReactNode; href: string; onClick?: () => void }) => {
         return <a href={href} onClick={onClick}>{children}</a>;
     };
@@ -18,20 +19,20 @@ jest.mock('next/link', () => {
 });
 
 // Mock child components
-jest.mock('@/components/auth/AuthButton', () => {
-    return function MockAuthButton() {
+vi.mock('@/components/auth/AuthButton', () => ({
+  default: function MockAuthButton() {
         return <div data-testid="mock-auth-button">Auth Button</div>;
     };
 });
 
-jest.mock('@/components/MusicControls', () => {
-    return function MockMusicControls() {
+vi.mock('@/components/MusicControls', () => ({
+  default: function MockMusicControls() {
         return <div data-testid="mock-music-controls">Music Controls</div>;
     };
 });
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 
 describe('HeaderMenuDropdown', () => {
     const defaultAuthState = {
@@ -52,21 +53,21 @@ describe('HeaderMenuDropdown', () => {
         needsProfileCustomization: false,
 
         // Actions
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
     };
 
     const defaultLanguageState = {
         t: (key: string) => key,
         language: 'en' as const,
-        setLanguage: jest.fn(),
+        setLanguage: vi.fn(),
         currentFlag: '🇺🇸',
         dir: 'ltr' as const,
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockUseAuth.mockReturnValue(defaultAuthState);
         mockUseLanguage.mockReturnValue(defaultLanguageState);
     });

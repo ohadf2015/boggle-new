@@ -9,7 +9,7 @@ import { PowerUpButton } from '../PowerUpButton';
 import type { PowerUpType, PowerUpState } from '@/types/adventure';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       if (params && params.seconds !== undefined) {
@@ -23,7 +23,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock CooldownIndicator
-jest.mock('@/components/adventure/hud/CooldownIndicator', () => ({
+vi.mock('@/components/adventure/hud/CooldownIndicator', () => ({
   CooldownIndicator: ({
     icon,
     totalDuration,
@@ -45,7 +45,7 @@ jest.mock('@/components/adventure/hud/CooldownIndicator', () => ({
 }));
 
 describe('PowerUpButton', () => {
-  const mockOnActivate = jest.fn();
+  const mockOnActivate = vi.fn();
 
   const defaultProps = {
     type: 'freezeTime' as PowerUpType,
@@ -58,7 +58,7 @@ describe('PowerUpButton', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {

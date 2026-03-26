@@ -5,7 +5,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 import { useBlastResultSaver } from '../hooks/useBlastResultSaver';
@@ -26,7 +26,7 @@ const mockResults: BlastResultsData = {
 
 describe('useBlastResultSaver', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call POST /api/blast/result with correct payload', async () => {

@@ -7,14 +7,14 @@ import { render, screen } from '@testing-library/react';
 import { ChallengePanel } from '../ChallengePanel';
 
 // Mock supabase education calls to never resolve (keep component in loading state)
-jest.mock('@/lib/supabase/education', () => ({
-  getDailyChallenges: jest.fn(() => new Promise(() => {})),
-  getWeeklyQuests: jest.fn(() => new Promise(() => {})),
-  claimChallengeReward: jest.fn(),
-  claimQuestReward: jest.fn(),
+vi.mock('@/lib/supabase/education', () => ({
+  getDailyChallenges: vi.fn(() => new Promise(() => {})),
+  getWeeklyQuests: vi.fn(() => new Promise(() => {})),
+  claimChallengeReward: vi.fn(),
+  claimQuestReward: vi.fn(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -22,17 +22,17 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock PageLoader so we can detect its presence reliably
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text}</div>
   ),
 }));
 
 // Mock child card components (they import their own deps)
-jest.mock('../DailyChallengeCard', () => ({
+vi.mock('../DailyChallengeCard', () => ({
   DailyChallengeCard: () => <div data-testid="daily-card" />,
 }));
-jest.mock('../WeeklyChallengeCard', () => ({
+vi.mock('../WeeklyChallengeCard', () => ({
   WeeklyChallengeCard: () => <div data-testid="weekly-card" />,
 }));
 

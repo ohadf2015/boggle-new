@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock useLanguage
-const mockT = jest.fn((key: string) => {
+const mockT = vi.fn((key: string) => {
   const translations: Record<string, string> = {
     'wotd.teaser': 'Word of the Day',
     'wotd.play': 'Play now',
@@ -14,13 +14,13 @@ const mockT = jest.fn((key: string) => {
   return translations[key] || key;
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT, language: 'en', dir: 'ltr' }),
 }));
 
 // Mock useWordOfTheDay
-const mockUseWordOfTheDay = jest.fn();
-jest.mock('@/hooks/useWordOfTheDay', () => ({
+const mockUseWordOfTheDay = vi.fn();
+vi.mock('@/hooks/useWordOfTheDay', () => ({
   useWordOfTheDay: (...args: unknown[]) => mockUseWordOfTheDay(...args),
 }));
 
@@ -28,7 +28,7 @@ import { WotdTeaser } from '../WotdTeaser';
 
 describe('WotdTeaser', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render nothing while loading', () => {
@@ -106,7 +106,7 @@ describe('WotdTeaser', () => {
 
   it('should show last letter for RTL languages', () => {
     // Override useLanguage to return RTL
-    jest.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
+    vi.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
       t: mockT, language: 'he', dir: 'rtl',
     });
     mockUseWordOfTheDay.mockReturnValue({

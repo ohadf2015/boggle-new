@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  */
@@ -5,9 +6,9 @@
 import { speakWord, getAvailableVoices, cancelSpeech } from '../textToSpeech';
 
 // Mock Web Speech API
-const mockSpeak = jest.fn();
-const mockCancel = jest.fn();
-const mockGetVoices = jest.fn();
+const mockSpeak = vi.fn();
+const mockCancel = vi.fn();
+const mockGetVoices = vi.fn();
 
 beforeEach(() => {
   mockSpeak.mockClear();

@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuickPracticeButton } from '../QuickPracticeButton';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -21,12 +21,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('QuickPracticeButton', () => {
   const defaultProps = {
-    onPractice: jest.fn(),
+    onPractice: vi.fn(),
     lessonId: 'test-lesson-123',
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders practice button', () => {

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { AdUnit } from '../AdUnit';
 
 // Mock useLanguage
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
@@ -22,13 +22,13 @@ describe('AdUnit', () => {
   let pushSpy: jest.Mock;
 
   beforeEach(() => {
-    pushSpy = jest.fn();
+    pushSpy = vi.fn();
     (window as any).adsbygoogle = [];
     // Patch push on the array to spy
     (window as any).adsbygoogle.push = pushSpy;
     mockHostname('lexiclash.com');
     // jsdom returns 0 for offsetWidth; stub it so tryPush succeeds
-    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(300);
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(300);
   });
 
   afterEach(() => {

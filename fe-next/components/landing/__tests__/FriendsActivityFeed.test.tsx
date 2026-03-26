@@ -7,12 +7,12 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock hooks
-const mockUseFriendsActivity = jest.fn();
-jest.mock('@/hooks/useFriendsActivity', () => ({
+const mockUseFriendsActivity = vi.fn();
+vi.mock('@/hooks/useFriendsActivity', () => ({
   useFriendsActivity: () => mockUseFriendsActivity(),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -27,27 +27,29 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: true, user: { id: 'u1' } }),
 }));
 
-jest.mock('next/link', () => {
-  return function MockLink({ children, href }: { children: React.ReactNode; href: string }) {
+vi.mock('next/link', () => {
+  const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
+  return { default: MockLink };
 });
 
-jest.mock('@/components/Avatar', () => {
-  return function MockAvatar() {
+vi.mock('@/components/Avatar', () => {
+  const MockAvatar = () => {
     return <div data-testid="avatar" />;
   };
+  return { default: MockAvatar };
 });
 
 import { FriendsActivityFeed } from '../FriendsActivityFeed';
 
 describe('FriendsActivityFeed', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // GIVEN loading state
@@ -115,7 +117,7 @@ describe('FriendsActivityFeed', () => {
   // WHEN component renders
   // THEN returns null
   it('should return null for unauthenticated users', () => {
-    jest.spyOn(require('@/contexts/AuthContext'), 'useAuth').mockReturnValue({
+    vi.spyOn(require('@/contexts/AuthContext'), 'useAuth').mockReturnValue({
       isAuthenticated: false,
       user: null,
     });

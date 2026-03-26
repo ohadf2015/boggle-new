@@ -5,7 +5,7 @@
  * Games are stored in Supabase database tables (persistent storage), not in-memory.
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 describe('Today games persistence', () => {
   it('should verify games are stored in Supabase database (persistent), not in-memory', () => {

@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     button: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
       <button {...props}>{children}</button>
@@ -27,18 +27,18 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
 }));
 
 // Mock next/link
-jest.mock('next/link', () => {
-  return function MockLink({
+vi.mock('next/link', () => {
+  const MockLink = ({
     children,
     href,
     ...props
@@ -46,24 +46,25 @@ jest.mock('next/link', () => {
     children: React.ReactNode;
     href: string;
     [key: string]: unknown;
-  }) {
+  }) => {
     return (
       <a href={href} {...props}>
         {children}
       </a>
     );
   };
+  return { default: MockLink };
 });
 
 // Mock AuthContext - will be configured per test
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock LanguageContext
-const mockSetLanguage = jest.fn();
-jest.mock('@/contexts/LanguageContext', () => ({
+const mockSetLanguage = vi.fn();
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
     setLanguage: mockSetLanguage,
@@ -105,47 +106,50 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useUnclaimedGifts', () => ({
+vi.mock('@/hooks/useUnclaimedGifts', () => ({
   useUnclaimedGifts: () => ({
     unclaimedCount: 0,
     gifts: [],
-    refresh: jest.fn(),
-    claimGift: jest.fn(),
+    refresh: vi.fn(),
+    claimGift: vi.fn(),
   }),
 }));
 
 // Mock child components
-jest.mock('../auth/AuthButton', () => {
-  return function MockAuthButton() {
+vi.mock('../auth/AuthButton', () => {
+  const MockAuthButton = () => {
     return <button data-testid="auth-button">Auth</button>;
   };
+  return { default: MockAuthButton };
 });
 
-jest.mock('../MusicControls', () => {
-  return function MockMusicControls() {
+vi.mock('../MusicControls', () => {
+  const MockMusicControls = () => {
     return <div data-testid="music-controls">Music</div>;
   };
+  return { default: MockMusicControls };
 });
 
-jest.mock('../CoinBalance', () => ({
+vi.mock('../CoinBalance', () => ({
   CoinBalance: function MockCoinBalance({ coins }: { coins: number }) {
     return <span data-testid="coin-balance">{coins}</span>;
   },
 }));
 
-jest.mock('../auth/AuthModal', () => {
-  return function MockAuthModal() {
+vi.mock('../auth/AuthModal', () => {
+  const MockAuthModal = () => {
     return null;
   };
+  return { default: MockAuthModal };
 });
 
-jest.mock('../gift/GiftNotificationBadge', () => ({
+vi.mock('../gift/GiftNotificationBadge', () => ({
   GiftNotificationBadge: function MockGiftNotificationBadge() {
     return null;
   },
 }));
 
-jest.mock('../gift/AdminGiftModal', () => ({
+vi.mock('../gift/AdminGiftModal', () => ({
   AdminGiftModal: function MockAdminGiftModal() {
     return null;
   },
@@ -156,7 +160,7 @@ import Header from '../Header';
 
 describe('Header Settings Access', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Guest user (not authenticated)', () => {
@@ -165,7 +169,7 @@ describe('Header Settings Access', () => {
         isAuthenticated: false,
         isAdmin: false,
         profile: null,
-        refreshProfile: jest.fn(),
+        refreshProfile: vi.fn(),
       });
     });
 
@@ -224,7 +228,7 @@ describe('Header Settings Access', () => {
           id: 'user-123',
           total_coins: 500,
         },
-        refreshProfile: jest.fn(),
+        refreshProfile: vi.fn(),
       });
     });
 
@@ -289,7 +293,7 @@ describe('Header Settings Access', () => {
         isAuthenticated: false,
         isAdmin: false,
         profile: null,
-        refreshProfile: jest.fn(),
+        refreshProfile: vi.fn(),
       });
     });
 
@@ -316,7 +320,7 @@ describe('Header Settings Access', () => {
         isAuthenticated: false,
         isAdmin: false,
         profile: null,
-        refreshProfile: jest.fn(),
+        refreshProfile: vi.fn(),
       });
     });
 
@@ -345,12 +349,12 @@ describe('Header Settings Access', () => {
 
 describe('Header Mobile Menu Settings', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       isAdmin: false,
       profile: null,
-      refreshProfile: jest.fn(),
+      refreshProfile: vi.fn(),
     });
   });
 

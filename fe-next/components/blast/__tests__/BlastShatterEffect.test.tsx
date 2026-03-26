@@ -11,36 +11,36 @@ let rafIdCounter = 0;
 beforeEach(() => {
   rafCallbacks = [];
   rafIdCounter = 0;
-  jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
     rafCallbacks.push(cb);
     return ++rafIdCounter;
   });
-  jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+  vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 // Mock canvas context
 function mockCanvasContext() {
   const ctx = {
-    clearRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    fillRect: jest.fn(),
-    beginPath: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    closePath: jest.fn(),
-    fill: jest.fn(),
-    arc: jest.fn(),
+    clearRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    fillRect: vi.fn(),
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    closePath: vi.fn(),
+    fill: vi.fn(),
+    arc: vi.fn(),
     globalAlpha: 1,
     fillStyle: '',
   };
-  jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
     ctx as unknown as CanvasRenderingContext2D
   );
   return ctx;
@@ -51,7 +51,7 @@ import { BlastShatterEffect } from '../BlastShatterEffect';
 describe('BlastShatterEffect', () => {
   it('renders nothing when no triggers', () => {
     const { container } = render(
-      <BlastShatterEffect shatterTriggers={[]} cellSize={40} onComplete={jest.fn()} />
+      <BlastShatterEffect shatterTriggers={[]} cellSize={40} onComplete={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -62,7 +62,7 @@ describe('BlastShatterEffect', () => {
       <BlastShatterEffect
         shatterTriggers={[{ row: 0, col: 0, type: 'gold', id: 'a' }]}
         cellSize={40}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
       />
     );
     expect(screen.getByTestId('blast-shatter-canvas')).toBeInstanceOf(HTMLCanvasElement);
@@ -70,18 +70,18 @@ describe('BlastShatterEffect', () => {
 
   it('respects reduced motion — renders nothing', () => {
     // Mock matchMedia for prefers-reduced-motion
-    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
       matches: query === '(prefers-reduced-motion: reduce)',
       media: query,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     }));
 
     const { container } = render(
       <BlastShatterEffect
         shatterTriggers={[{ row: 0, col: 0, type: 'gold', id: 'a' }]}
         cellSize={40}
-        onComplete={jest.fn()}
+        onComplete={vi.fn()}
       />
     );
     expect(container.querySelector('canvas')).toBeNull();
@@ -90,11 +90,11 @@ describe('BlastShatterEffect', () => {
   it('caps particles at 80', () => {
     mockCanvasContext();
     // Ensure reduced motion is off
-    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
       matches: false,
       media: query,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     }));
 
     // Create 10 triggers — at 12 particles each that would be 120, should cap at 80
@@ -105,7 +105,7 @@ describe('BlastShatterEffect', () => {
       id: `t${i}`,
     }));
 
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(
       <BlastShatterEffect shatterTriggers={triggers} cellSize={40} onComplete={onComplete} />
     );
@@ -125,7 +125,7 @@ describe('BlastShatterEffect', () => {
 
   it('calls onComplete when particles from a trigger finish', () => {
     mockCanvasContext();
-    const onComplete = jest.fn();
+    const onComplete = vi.fn();
     render(
       <BlastShatterEffect
         shatterTriggers={[{ row: 0, col: 0, type: 'gold', id: 'done-1' }]}

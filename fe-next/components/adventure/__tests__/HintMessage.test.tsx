@@ -10,7 +10,7 @@ import { HintMessage } from '../HintMessage';
 import type { HintData } from '@/lib/adaptiveDifficulty';
 
 // Mock LanguageContext
-const mockT = jest.fn((key: string, params?: Record<string, string | number>) => {
+const mockT = vi.fn((key: string, params?: Record<string, string | number>) => {
   if (key === 'difficulty.hint.length') {
     return `The word is ${params?.length} letters long`;
   }
@@ -23,7 +23,7 @@ const mockT = jest.fn((key: string, params?: Record<string, string | number>) =>
   return key;
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -32,7 +32,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 describe('HintMessage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns null when hintData.level is none', () => {

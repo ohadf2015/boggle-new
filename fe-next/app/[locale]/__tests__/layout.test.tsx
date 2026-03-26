@@ -1,7 +1,8 @@
+import { vi, type Mock, } from 'vitest';
 import { render } from '@testing-library/react';
 
 // Mock next/dynamic
-jest.mock('next/dynamic', () => ({
+vi.mock('next/dynamic', () => ({
     __esModule: true,
     default: () => {
         const Component = () => null;
@@ -11,7 +12,7 @@ jest.mock('next/dynamic', () => ({
 }));
 
 // Mock next/script - render as script tag for testing
-jest.mock('next/script', () => ({
+vi.mock('next/script', () => ({
     __esModule: true,
     default: ({ src, strategy, crossOrigin, ...props }: any) => (
         // eslint-disable-next-line @next/next/no-sync-scripts
@@ -20,41 +21,41 @@ jest.mock('next/script', () => ({
 }));
 
 // Mock all child components
-jest.mock('@/components/Footer', () => ({
+vi.mock('@/components/Footer', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/GoogleAnalytics', () => ({
+vi.mock('@/components/GoogleAnalytics', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/CrazyGamesSDK', () => ({
+vi.mock('@/components/CrazyGamesSDK', () => ({
     CrazyGamesScript: () => null,
 }));
 
-jest.mock('@/components/SocialMediaPixels', () => ({
+vi.mock('@/components/SocialMediaPixels', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/WebVitalsReporter', () => ({
+vi.mock('@/components/WebVitalsReporter', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/PWAInstallPrompt', () => ({
+vi.mock('@/components/PWAInstallPrompt', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/ServiceWorkerRegistration', () => ({
+vi.mock('@/components/ServiceWorkerRegistration', () => ({
     __esModule: true,
     default: () => null,
 }));
 
-jest.mock('@/components/celebration/NewYearCountdown', () => ({
+vi.mock('@/components/celebration/NewYearCountdown', () => ({
     __esModule: true,
     default: () => null,
 }));
@@ -63,7 +64,7 @@ jest.mock('@/components/celebration/NewYearCountdown', () => ({
 const mockLanguageContext = {
     t: (key: string) => key,
     language: 'en' as const,
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     dir: 'ltr' as const,
     currentFlag: '🇺🇸',
 };
@@ -72,25 +73,25 @@ const mockNavigationContext = {
     shouldHideNav: false,
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
     LanguageContext: {
         Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     },
     useLanguage: () => mockLanguageContext,
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
     NavigationContext: {
         Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     },
     useNavigation: () => mockNavigationContext,
 }));
 
-jest.mock('../../providers', () => ({
+vi.mock('../../providers', () => ({
     Providers: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('../../fonts', () => ({
+vi.mock('../../fonts', () => ({
     fredoka: { variable: 'fredoka-var' },
     rubik: { variable: 'rubik-var' },
 }));
@@ -100,7 +101,7 @@ describe('LocaleLayout Hydration', () => {
         const LocaleLayout = (await import('../layout')).default;
 
         // Spy on console.error to catch React hydration warnings
-        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         const params = Promise.resolve({ locale: 'en' });
         const { container } = render(

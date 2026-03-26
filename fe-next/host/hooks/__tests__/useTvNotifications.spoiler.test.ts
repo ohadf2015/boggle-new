@@ -1,8 +1,9 @@
+import { vi, type Mock, } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTvNotifications } from '../useTvNotifications';
 
 // Mock TvNotification imports
-jest.mock('../../components/tv-broadcast/TvNotification', () => ({
+vi.mock('../../components/tv-broadcast/TvNotification', () => ({
   NOTIFICATION_LAYOUTS: {
     rare_word: 'left-mascot',
     epic_word: 'left-mascot',
@@ -51,10 +52,10 @@ describe('useTvNotifications - anti-spoiler', () => {
   const createMockSocket = () => {
     const handlers: Record<string, Function> = {};
     return {
-      on: jest.fn((event: string, handler: Function) => {
+      on: vi.fn((event: string, handler: Function) => {
         handlers[event] = handler;
       }),
-      off: jest.fn(),
+      off: vi.fn(),
       _trigger: (event: string, data: any) => {
         handlers[event]?.(data);
       },

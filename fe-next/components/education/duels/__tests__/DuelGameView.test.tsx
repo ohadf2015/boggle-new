@@ -13,9 +13,9 @@ import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '
 // MOCKS
 // ============================================
 
-jest.mock('@/lib/supabase/education/duels');
-jest.mock('@/hooks/useDuelSocket');
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/lib/supabase/education/duels');
+vi.mock('@/hooks/useDuelSocket');
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, any>) => {
       const translations: Record<string, string> = {
@@ -106,51 +106,51 @@ describe('DuelGameView', () => {
 
   beforeEach(() => {
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup socket hook mocks
-    mockSubmitScore = jest.fn();
-    mockOnDuelCompleted = jest.fn((cb) => {
+    mockSubmitScore = vi.fn();
+    mockOnDuelCompleted = vi.fn((cb) => {
       // Store callback for later invocation
       mockOnDuelCompleted.callback = cb;
-      return jest.fn(); // cleanup function
+      return vi.fn(); // cleanup function
     });
-    mockOnScoreSubmitted = jest.fn((cb) => {
+    mockOnScoreSubmitted = vi.fn((cb) => {
       mockOnScoreSubmitted.callback = cb;
-      return jest.fn();
+      return vi.fn();
     });
-    mockOnError = jest.fn((cb) => {
+    mockOnError = vi.fn((cb) => {
       mockOnError.callback = cb;
-      return jest.fn();
+      return vi.fn();
     });
 
     mockUseDuelSocket.mockReturnValue({
       socket: {} as any,
       isConnected: true,
-      joinLobby: jest.fn(),
-      leaveLobby: jest.fn(),
-      createChallenge: jest.fn(),
-      acceptChallenge: jest.fn(),
-      declineChallenge: jest.fn(),
-      cancelChallenge: jest.fn(),
+      joinLobby: vi.fn(),
+      leaveLobby: vi.fn(),
+      createChallenge: vi.fn(),
+      acceptChallenge: vi.fn(),
+      declineChallenge: vi.fn(),
+      cancelChallenge: vi.fn(),
       submitScore: mockSubmitScore,
-      submitWord: jest.fn(),
-      forfeitDuel: jest.fn(),
-      syncState: jest.fn(),
-      onChallengeReceived: jest.fn(),
-      onLobbyUpdate: jest.fn(),
-      onDuelAccepted: jest.fn(),
-      onDuelDeclined: jest.fn(),
+      submitWord: vi.fn(),
+      forfeitDuel: vi.fn(),
+      syncState: vi.fn(),
+      onChallengeReceived: vi.fn(),
+      onLobbyUpdate: vi.fn(),
+      onDuelAccepted: vi.fn(),
+      onDuelDeclined: vi.fn(),
       onDuelCompleted: mockOnDuelCompleted,
       onScoreSubmitted: mockOnScoreSubmitted,
       onError: mockOnError,
-      onDuelStarted: jest.fn(),
-      onWordAccepted: jest.fn(),
-      onWordRejected: jest.fn(),
-      onOpponentProgress: jest.fn(),
-      onOpponentDisconnected: jest.fn(),
-      onOpponentReconnected: jest.fn(),
-      onStateSynced: jest.fn(),
+      onDuelStarted: vi.fn(),
+      onWordAccepted: vi.fn(),
+      onWordRejected: vi.fn(),
+      onOpponentProgress: vi.fn(),
+      onOpponentDisconnected: vi.fn(),
+      onOpponentReconnected: vi.fn(),
+      onStateSynced: vi.fn(),
     });
   });
 

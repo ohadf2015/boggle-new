@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
 /**
  * CrazyGames Token Verification API Route Tests
@@ -6,21 +7,21 @@
  */
 
 // Mock next/server
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
+    json: vi.fn((data, init) => ({ data, status: init?.status ?? 200 })),
   },
 }));
 
 // Mock jose
-const mockJwtVerify = jest.fn();
-jest.mock('jose', () => ({
-  createRemoteJWKSet: jest.fn(() => 'mock-jwks'),
+const mockJwtVerify = vi.fn();
+vi.mock('jose', () => ({
+  createRemoteJWKSet: vi.fn(() => 'mock-jwks'),
   jwtVerify: (...args: unknown[]) => mockJwtVerify(...args),
 }));
 
-jest.mock('@/utils/sentry', () => ({
-  captureApiError: jest.fn(),
+vi.mock('@/utils/sentry', () => ({
+  captureApiError: vi.fn(),
 }));
 
 import { POST } from '../route';
@@ -31,7 +32,7 @@ function makeRequest(body: Record<string, unknown>) {
 
 describe('POST /api/auth/verify-crazygames', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 400 when token is missing', async () => {

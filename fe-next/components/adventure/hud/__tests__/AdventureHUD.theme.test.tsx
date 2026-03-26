@@ -20,12 +20,12 @@ const mockHUDTheme = {
   hintActiveText: 'text-emerald-950',
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   useHUDTheme: () => mockHUDTheme,
 }));
 
 // Mock child components
-jest.mock('../ObjectiveProgress', () => ({
+vi.mock('../ObjectiveProgress', () => ({
   ObjectiveProgress: ({ objectives }: any) => (
     <div data-testid="mock-objective-progress">
       {objectives.length} objectives
@@ -33,33 +33,33 @@ jest.mock('../ObjectiveProgress', () => ({
   ),
 }));
 
-jest.mock('../CooldownIndicator', () => ({
+vi.mock('../CooldownIndicator', () => ({
   CooldownIndicator: ({ icon }: any) => (
     <div data-testid="mock-cooldown">{icon}</div>
   ),
 }));
 
-jest.mock('../../../adventure/meta/AdventureXpProgressBar', () => ({
+vi.mock('../../../adventure/meta/AdventureXpProgressBar', () => ({
   __esModule: true,
   default: ({ totalXp }: any) => (
     <div data-testid="mock-xp-bar">XP: {totalXp}</div>
   ),
 }));
 
-jest.mock('../../../adventure/meta/CurrencyDisplay', () => ({
+vi.mock('../../../adventure/meta/CurrencyDisplay', () => ({
   CurrencyDisplay: ({ amount }: any) => (
     <div data-testid="mock-currency">Gold: {amount}</div>
   ),
 }));
 
-jest.mock('../../AdventureTimer', () => ({
+vi.mock('../../AdventureTimer', () => ({
   __esModule: true,
   default: ({ timeRemaining }: any) => (
     <div data-testid="mock-timer">Time: {timeRemaining}s</div>
   ),
 }));
 
-jest.mock('../../../../hooks/usePrefersReducedMotion', () => ({
+vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 

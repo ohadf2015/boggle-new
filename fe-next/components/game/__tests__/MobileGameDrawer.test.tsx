@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MobileGameDrawer } from '../MobileGameDrawer';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onClick, onDragEnd, animate, ...props }: Record<string, unknown>) => {
       const filteredProps = Object.fromEntries(
@@ -49,7 +49,7 @@ jest.mock('framer-motion', () => ({
     },
     span: ({ children, ...props }: Record<string, unknown>) => <span {...props}>{children as React.ReactNode}</span>,
   },
-  useMotionValue: () => ({ set: jest.fn(), get: () => 0 }),
+  useMotionValue: () => ({ set: vi.fn(), get: () => 0 }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 

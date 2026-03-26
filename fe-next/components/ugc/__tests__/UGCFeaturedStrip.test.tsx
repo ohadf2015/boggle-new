@@ -6,12 +6,12 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { UGCFeaturedStrip } from '../UGCFeaturedStrip';
 
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -19,14 +19,14 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/components/Avatar', () => {
+vi.mock('@/components/Avatar', () => {
   const MockAvatar = () => <div data-testid="avatar" />;
   MockAvatar.displayName = 'Avatar';
-  return MockAvatar;
+  return { default: MockAvatar };
 });
 
-jest.mock('@/utils/share', () => ({
-  shareBoard: jest.fn(),
+vi.mock('@/utils/share', () => ({
+  shareBoard: vi.fn(),
 }));
 
 const mockBoards = [
@@ -60,11 +60,11 @@ const mockBoards = [
 
 describe('UGCFeaturedStrip', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when no boards are fetched', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: [] }),
     });
@@ -76,7 +76,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('renders boards when fetch succeeds', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -89,7 +89,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('shows section title', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -101,7 +101,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('shows view all link by default', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -113,7 +113,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('hides view all link when showViewAll is false', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -126,7 +126,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('shows create CTA when showCreateCTA is true', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -138,7 +138,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('renders compact variant as vertical chips', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: mockBoards }),
     });
@@ -152,7 +152,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('respects minToShow — hides when fewer boards than minimum', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: [mockBoards[0]] }),
     });
@@ -165,7 +165,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('fetches with correct sort parameter', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ boards: [] }),
     });
@@ -182,7 +182,7 @@ describe('UGCFeaturedStrip', () => {
   });
 
   it('handles fetch failure gracefully', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
     const { container } = render(<UGCFeaturedStrip />);
     await waitFor(() => {

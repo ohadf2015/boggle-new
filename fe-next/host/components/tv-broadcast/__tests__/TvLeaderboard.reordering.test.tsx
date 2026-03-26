@@ -1,11 +1,12 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvLeaderboard from '../TvLeaderboard';
 
 // Mock framer-motion with LayoutGroup support
-jest.mock('framer-motion', () => {
-  const actual = jest.requireActual('framer-motion');
+vi.mock('framer-motion', () => {
+  const actual = vi.importActual('framer-motion');
   return {
     ...actual,
     motion: {
@@ -58,7 +59,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock @tanstack/react-virtual
-jest.mock('@tanstack/react-virtual', () => ({
+vi.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: () => ({
     getVirtualItems: () => [],
     getTotalSize: () => 0,
@@ -66,14 +67,14 @@ jest.mock('@tanstack/react-virtual', () => ({
 }));
 
 // Mock Avatar
-jest.mock('../../../../components/Avatar', () => {
-  return function MockAvatar({ className }: any) {
+vi.mock('../../../../components/Avatar', () => ({
+  default: function MockAvatar({ className }: any) {
     return <div data-testid="avatar" className={className} />;
   };
 });
 
 // Mock AnimatedCounter
-jest.mock('../../../../components/ui/AnimatedCounter', () => ({
+vi.mock('../../../../components/ui/AnimatedCounter', () => ({
   AnimatedCounter: ({ value, className }: any) => (
     <span data-testid="animated-counter" className={className}>
       {value}
@@ -88,7 +89,7 @@ jest.mock('../../../../components/ui/AnimatedCounter', () => ({
 }));
 
 // Mock useDevicePerformance
-jest.mock('../../../../hooks/useDevicePerformance', () => ({
+vi.mock('../../../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     prefersReducedMotion: false,

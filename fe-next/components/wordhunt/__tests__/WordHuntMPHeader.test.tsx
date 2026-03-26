@@ -11,12 +11,12 @@ import { WordHuntMPHeader } from '../WordHuntMPHeader';
 describe('WordHuntMPHeader', () => {
   const defaultProps = {
     score: 450,
-    onQuit: jest.fn(),
+    onQuit: vi.fn(),
     t: (key: string) => key,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should NOT render a CircularTimer', () => {

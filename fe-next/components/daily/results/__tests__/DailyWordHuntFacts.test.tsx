@@ -11,7 +11,7 @@ import type { WordHuntResult } from '@/utils/dailyChallenge';
 import type { WordHuntStats } from '../types';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} data-testid={props['data-testid'] as string} {...props}>{children}</div>
   ));
@@ -29,8 +29,8 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock the calculator to control facts output
-jest.mock('@/utils/dailyWordHuntFactsCalculator', () => ({
-  getWordHuntFacts: jest.fn(),
+vi.mock('@/utils/dailyWordHuntFactsCalculator', () => ({
+  getWordHuntFacts: vi.fn(),
 }));
 
 import { getWordHuntFacts } from '@/utils/dailyWordHuntFactsCalculator';
@@ -81,7 +81,7 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
 
 describe('DailyWordHuntFacts', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders null when no facts are available', () => {

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * CrazyGames Bundle Size Verification Tests
  *
@@ -14,7 +15,7 @@ import { createLazyHowl, preloadAudioOnDemand, ensureHowl, AUDIO_LOAD_PRIORITY }
 describe('CrazyGames Bundle Size Verification', () => {
   beforeEach(() => {
     // Reset fetch mock before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Ensure howler is loaded before tests that use createLazyHowl
@@ -26,7 +27,7 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should not load audio files on initial page load', async () => {
       // Track all fetch requests
       const audioRequests: string[] = [];
-      const mockFetch = jest.fn((url: RequestInfo | URL) => {
+      const mockFetch = vi.fn((url: RequestInfo | URL) => {
         const urlString = typeof url === 'string' ? url : url.toString();
         if (urlString.includes('.mp3') || urlString.includes('.wav') || urlString.includes('.ogg')) {
           audioRequests.push(urlString);
@@ -74,9 +75,9 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should load audio only when preloadAudioOnDemand is called', async () => {
       // Mock Howl in unloaded state
       const mockHowl = {
-        state: jest.fn().mockReturnValue('unloaded'),
-        load: jest.fn(),
-        once: jest.fn((event, callback) => {
+        state: vi.fn().mockReturnValue('unloaded'),
+        load: vi.fn(),
+        once: vi.fn((event, callback) => {
           if (event === 'load') {
             // Simulate successful load
             setTimeout(() => callback(), 0);
@@ -100,9 +101,9 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should not reload already loaded audio', async () => {
       // Mock Howl in loaded state
       const mockHowl = {
-        state: jest.fn().mockReturnValue('loaded'),
-        load: jest.fn(),
-        once: jest.fn(),
+        state: vi.fn().mockReturnValue('loaded'),
+        load: vi.fn(),
+        once: vi.fn(),
       };
 
       // Call preloadAudioOnDemand on already-loaded audio
@@ -115,9 +116,9 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should wait for audio already loading', async () => {
       // Mock Howl in loading state
       const mockHowl = {
-        state: jest.fn().mockReturnValue('loading'),
-        load: jest.fn(),
-        once: jest.fn((event, callback) => {
+        state: vi.fn().mockReturnValue('loading'),
+        load: vi.fn(),
+        once: vi.fn((event, callback) => {
           if (event === 'load') {
             setTimeout(() => callback(), 10);
           }
@@ -139,9 +140,9 @@ describe('CrazyGames Bundle Size Verification', () => {
     it('should handle load errors gracefully', async () => {
       // Mock Howl that will fail to load
       const mockHowl = {
-        state: jest.fn().mockReturnValue('unloaded'),
-        load: jest.fn(),
-        once: jest.fn((event, callback) => {
+        state: vi.fn().mockReturnValue('unloaded'),
+        load: vi.fn(),
+        once: vi.fn((event, callback) => {
           if (event === 'loaderror') {
             setTimeout(() => callback(null, 'Network error'), 0);
           }

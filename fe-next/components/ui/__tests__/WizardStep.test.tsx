@@ -8,7 +8,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { WizardStep } from '../WizardStep';
 
 // Mock useLanguage hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -111,7 +111,7 @@ describe('WizardStep', () => {
 
   describe('Navigation Buttons', () => {
     it('should show Next button when onNext is provided', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep currentStep={1} totalSteps={2} onNext={onNext}>
@@ -123,7 +123,7 @@ describe('WizardStep', () => {
     });
 
     it('should call onNext when Next button is clicked', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep currentStep={1} totalSteps={2} onNext={onNext}>
@@ -136,7 +136,7 @@ describe('WizardStep', () => {
     });
 
     it('should show Back button when onBack is provided', () => {
-      const onBack = jest.fn();
+      const onBack = vi.fn();
 
       render(
         <WizardStep currentStep={2} totalSteps={3} onBack={onBack}>
@@ -148,7 +148,7 @@ describe('WizardStep', () => {
     });
 
     it('should call onBack when Back button is clicked', () => {
-      const onBack = jest.fn();
+      const onBack = vi.fn();
 
       render(
         <WizardStep currentStep={2} totalSteps={3} onBack={onBack}>
@@ -161,7 +161,7 @@ describe('WizardStep', () => {
     });
 
     it('should show Finish button on last step', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep currentStep={3} totalSteps={3} onNext={onNext}>
@@ -173,7 +173,7 @@ describe('WizardStep', () => {
     });
 
     it('should disable Next button when nextDisabled is true', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep
@@ -204,7 +204,7 @@ describe('WizardStep', () => {
 
   describe('Custom Button Labels', () => {
     it('should use custom next button label', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep
@@ -221,7 +221,7 @@ describe('WizardStep', () => {
     });
 
     it('should use custom back button label', () => {
-      const onBack = jest.fn();
+      const onBack = vi.fn();
 
       render(
         <WizardStep
@@ -240,7 +240,7 @@ describe('WizardStep', () => {
 
   describe('Loading State', () => {
     it('should show loading spinner on Next button when loading', () => {
-      const onNext = jest.fn();
+      const onNext = vi.fn();
 
       render(
         <WizardStep
@@ -262,7 +262,7 @@ describe('WizardStep', () => {
   describe('RTL Support', () => {
     it('should apply RTL styles when language is Hebrew', () => {
       // Override mock for this test
-      jest.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
+      vi.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
         t: (key: string) => key,
         language: 'he',
       });

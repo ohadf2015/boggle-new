@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { PracticeResultsCard } from '../PracticeResultsCard';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -23,7 +23,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   __esModule: true,
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid="mascot">Mascot: {variant}</div>
@@ -37,12 +37,12 @@ describe('PracticeResultsCard', () => {
   const defaultProps = {
     correct: 8,
     total: 10,
-    onRestart: jest.fn(),
-    onBack: jest.fn(),
+    onRestart: vi.fn(),
+    onBack: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders percentage score', () => {

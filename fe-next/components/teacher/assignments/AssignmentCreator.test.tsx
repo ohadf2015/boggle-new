@@ -5,9 +5,9 @@ import AssignmentCreator from './AssignmentCreator';
 import { useAssignments } from '@/hooks/useAssignments';
 
 // Mock hooks
-jest.mock('@/hooks/useAssignments');
-jest.mock('@/hooks/useVocabularyLesson', () => ({
-  useLessons: jest.fn(() => ({
+vi.mock('@/hooks/useAssignments');
+vi.mock('@/hooks/useVocabularyLesson', () => ({
+  useLessons: vi.fn(() => ({
     lessons: [
       { id: 'lesson-1', name: 'Basic Vocabulary', words: [{word: 'test'}] },
       { id: 'lesson-2', name: 'Advanced Words', words: [{word: 'a'}, {word: 'b'}] },
@@ -15,36 +15,36 @@ jest.mock('@/hooks/useVocabularyLesson', () => ({
     isLoading: false,
   })),
 }));
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(() => ({
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
     user: { id: 'teacher-1' },
     isLoading: false,
   })),
 }));
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string) => key,
     language: 'en',
   })),
 }));
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: {
-    success: jest.fn(),
-    error: jest.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
   },
 }));
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
-const mockCreateAssignment = jest.fn();
-const mockOnComplete = jest.fn();
-const mockOnClose = jest.fn();
+const mockCreateAssignment = vi.fn();
+const mockOnComplete = vi.fn();
+const mockOnClose = vi.fn();
 
 describe('AssignmentCreator', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useAssignments as jest.Mock).mockReturnValue({
       createAssignment: mockCreateAssignment,
     });

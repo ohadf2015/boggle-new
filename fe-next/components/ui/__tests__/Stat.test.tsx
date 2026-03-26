@@ -275,7 +275,7 @@ describe('Stat', () => {
     });
 
     it('should apply hover effects when interactive and clickable', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       const { container } = render(
         <Stat value={42} label="Test" onClick={handleClick} interactive={true} />
       );
@@ -287,7 +287,7 @@ describe('Stat', () => {
     });
 
     it('should not apply hover effects when non-interactive', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       const { container } = render(
         <Stat value={42} label="Test" onClick={handleClick} interactive={false} />
       );
@@ -300,7 +300,7 @@ describe('Stat', () => {
 
   describe('Click Handling', () => {
     it('should call onClick when clicked (interactive)', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <Stat value={42} label="Test" onClick={handleClick} />
       );
@@ -310,7 +310,7 @@ describe('Stat', () => {
     });
 
     it('should call onClick when clicked (non-interactive but has onClick)', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(
         <Stat value={42} label="Test" onClick={handleClick} interactive={false} />
       );

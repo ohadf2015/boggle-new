@@ -15,7 +15,7 @@ import type { Language } from '@/types';
 import { generateProgressiveHints, generateFallbackHints } from '@/utils/aiHintGenerator';
 
 // Mock the AI hint generator to avoid API calls
-jest.mock('@/utils/aiHintGenerator', () => {
+vi.mock('@/utils/aiHintGenerator', () => {
   return {
     CLUE_SHOP_ITEMS: [
       {
@@ -40,12 +40,12 @@ jest.mock('@/utils/aiHintGenerator', () => {
         icon: '📝',
       },
     ],
-    generateProgressiveHints: jest.fn().mockResolvedValue({
+    generateProgressiveHints: vi.fn().mockResolvedValue({
       hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
       category: 'Test Category',
       exampleSentence: 'Test sentence with _____.',
     }),
-    generateFallbackHints: jest.fn().mockReturnValue({
+    generateFallbackHints: vi.fn().mockReturnValue({
       hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
       category: 'Unknown',
       exampleSentence: 'Test sentence.',
@@ -54,21 +54,21 @@ jest.mock('@/utils/aiHintGenerator', () => {
 });
 
 // Mock word rarity to avoid complex calculations
-jest.mock('@/utils/dailyChallenge/wordRarity', () => ({
-  getWordRarity: jest.fn().mockReturnValue(2), // Common word (not rare)
+vi.mock('@/utils/dailyChallenge/wordRarity', () => ({
+  getWordRarity: vi.fn().mockReturnValue(2), // Common word (not rare)
 }));
 
 describe('useSurvivalHints', () => {
   const defaultProps = {
     targetWord: 'APPLE',
     language: 'en' as Language,
-    playWordAcceptedSound: jest.fn(),
-    showToast: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    showToast: vi.fn(),
     t: (key: string) => key,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     (generateProgressiveHints as jest.Mock).mockResolvedValue({
       hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
@@ -322,7 +322,7 @@ describe('useSurvivalHints', () => {
   describe('no automatic first letter reveal', () => {
     it('should NOT auto-reveal first letter for any word regardless of rarity', () => {
       // Mock rare word (rarity >= 4)
-      const { getWordRarity } = jest.requireMock('@/utils/dailyChallenge/wordRarity');
+      const { getWordRarity } = vi.importMock('@/utils/dailyChallenge/wordRarity');
       (getWordRarity as jest.Mock).mockReturnValue(5); // LEGENDARY rarity
 
       const { result } = renderHook(() => useSurvivalHints(defaultProps));

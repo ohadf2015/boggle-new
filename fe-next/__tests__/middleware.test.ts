@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Proxy Tests — Supabase Session Refresh & API Route Coverage
  *
@@ -8,10 +9,10 @@
  */
 
 // Mock @supabase/ssr before imports
-const mockGetUser = jest.fn();
-const mockGetSession = jest.fn();
-jest.mock('@supabase/ssr', () => ({
-  createServerClient: jest.fn((_url: string, _key: string, _opts: { cookies: { setAll: (cookies: unknown[]) => void } }) => {
+const mockGetUser = vi.fn();
+const mockGetSession = vi.fn();
+vi.mock('@supabase/ssr', () => ({
+  createServerClient: vi.fn((_url: string, _key: string, _opts: { cookies: { setAll: (cookies: unknown[]) => void } }) => {
     return {
       auth: {
         getUser: mockGetUser,
@@ -22,20 +23,20 @@ jest.mock('@supabase/ssr', () => ({
 }));
 
 // Mock next/server
-const mockSet = jest.fn();
-jest.mock('next/server', () => {
+const mockSet = vi.fn();
+vi.mock('next/server', () => {
   const NextResponse = {
-    next: jest.fn(() => ({
+    next: vi.fn(() => ({
       cookies: { set: mockSet },
       headers: new Map(),
     })),
-    redirect: jest.fn((url: URL, status: number) => ({
+    redirect: vi.fn((url: URL, status: number) => ({
       url: url.toString(),
       status,
       cookies: { set: mockSet },
       headers: new Map(),
     })),
-    rewrite: jest.fn((url: URL) => ({
+    rewrite: vi.fn((url: URL) => ({
       url: url.toString(),
       cookies: { set: mockSet },
       headers: new Map(),
@@ -62,14 +63,14 @@ function makeRequest(pathname: string, opts?: { userAgent?: string; cookies?: Re
     cookies: {
       getAll: () => Array.from(cookieMap.entries()).map(([name, value]) => ({ name, value })),
       get: (name: string) => cookieMap.has(name) ? { value: cookieMap.get(name) } : undefined,
-      set: jest.fn(),
+      set: vi.fn(),
     },
   } as unknown as Parameters<typeof proxy>[0];
 }
 
 describe('Proxy — Supabase Auth Refresh', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null });
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Tests for Supabase Realtime Subscriptions
  * Tests subscribeToClassroomProgress function for real-time classroom updates
@@ -17,7 +18,7 @@ describe('subscribeToClassroomProgress', () => {
 
   it('should return unsubscribe function', () => {
     return import('../supabaseRealtime').then(module => {
-      const unsubscribe = module.subscribeToClassroomProgress('test-id', jest.fn());
+      const unsubscribe = module.subscribeToClassroomProgress('test-id', vi.fn());
       expect(typeof unsubscribe).toBe('function');
       unsubscribe(); // Should not throw
     });
@@ -25,7 +26,7 @@ describe('subscribeToClassroomProgress', () => {
 
   it('should handle missing classroomId gracefully', () => {
     return import('../supabaseRealtime').then(module => {
-      const unsubscribe = module.subscribeToClassroomProgress('', jest.fn());
+      const unsubscribe = module.subscribeToClassroomProgress('', vi.fn());
       expect(typeof unsubscribe).toBe('function');
       unsubscribe();
     });

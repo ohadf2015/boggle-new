@@ -18,7 +18,7 @@ describe('GameModeSelector', () => {
     render(
       <GameModeSelector
         selectedMode="random"
-        onSelectMode={jest.fn()}
+        onSelectMode={vi.fn()}
         t={mockT}
         showRandom
       />
@@ -34,7 +34,7 @@ describe('GameModeSelector', () => {
     render(
       <GameModeSelector
         selectedMode="classic"
-        onSelectMode={jest.fn()}
+        onSelectMode={vi.fn()}
         t={mockT}
         showRandom={false}
       />
@@ -50,7 +50,7 @@ describe('GameModeSelector', () => {
     render(
       <GameModeSelector
         selectedMode="blast"
-        onSelectMode={jest.fn()}
+        onSelectMode={vi.fn()}
         t={mockT}
         showRandom
       />
@@ -66,7 +66,7 @@ describe('GameModeSelector', () => {
   });
 
   it('should call onSelectMode when a mode button is clicked', () => {
-    const onSelectMode = jest.fn();
+    const onSelectMode = vi.fn();
     render(
       <GameModeSelector
         selectedMode="random"
@@ -87,7 +87,7 @@ describe('GameModeSelector', () => {
     const { container } = render(
       <GameModeSelector
         selectedMode="random"
-        onSelectMode={jest.fn()}
+        onSelectMode={vi.fn()}
         t={mockT}
         showRandom
       />
@@ -109,7 +109,7 @@ describe('GameModeSelector', () => {
     render(
       <GameModeSelector
         selectedMode="random"
-        onSelectMode={jest.fn()}
+        onSelectMode={vi.fn()}
         t={mockT}
         showRandom
       />

@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Tests for MusicContext auto-unmute on game start
  *
@@ -17,25 +18,25 @@ import { render, fireEvent, waitFor, screen, act, cleanup } from '@testing-libra
 
 // Create mock storage for mutable mock state
 const mockState = {
-  play: jest.fn(),
-  pause: jest.fn(),
-  stop: jest.fn(),
-  fade: jest.fn(),
-  volume: jest.fn().mockReturnValue(0.5),
-  state: jest.fn().mockReturnValue('loaded'),
-  playing: jest.fn().mockReturnValue(false),
-  unload: jest.fn(),
-  seek: jest.fn(),
+  play: vi.fn(),
+  pause: vi.fn(),
+  stop: vi.fn(),
+  fade: vi.fn(),
+  volume: vi.fn().mockReturnValue(0.5),
+  state: vi.fn().mockReturnValue('loaded'),
+  playing: vi.fn().mockReturnValue(false),
+  unload: vi.fn(),
+  seek: vi.fn(),
   ctxState: 'running' as string,
-  resume: jest.fn().mockResolvedValue(undefined),
-  suspend: jest.fn(),
+  resume: vi.fn().mockResolvedValue(undefined),
+  suspend: vi.fn(),
   // Track the actual volume set during fade
   lastFadeToVolume: 0,
 };
 
 // Mock modules using factory functions that reference mockState
-jest.mock('howler', () => ({
-  Howl: jest.fn(() => ({
+vi.mock('howler', () => ({
+  Howl: vi.fn(() => ({
     play: () => mockState.play(),
     pause: () => mockState.pause(),
     stop: () => mockState.stop(),
@@ -62,8 +63,8 @@ jest.mock('howler', () => ({
   },
 }));
 
-jest.mock('@/lib/audio/audioLoader', () => ({
-  createLazyHowl: jest.fn((_src, options) => {
+vi.mock('@/lib/audio/audioLoader', () => ({
+  createLazyHowl: vi.fn((_src, options) => {
     // Store callbacks from options but don't spread over methods
     const callbacks = {
       onloaderror: options?.onloaderror,
@@ -90,8 +91,8 @@ jest.mock('@/lib/audio/audioLoader', () => ({
       ...callbacks,
     };
   }),
-  preloadAudioOnDemand: jest.fn().mockResolvedValue(undefined),
-  ensureHowl: jest.fn().mockResolvedValue(jest.fn()),
+  preloadAudioOnDemand: vi.fn().mockResolvedValue(undefined),
+  ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
 }));
 
 import { MusicProvider, useMusic } from '../MusicContext';
@@ -141,15 +142,15 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
   const originalHasFocus = document.hasFocus;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Clear localStorage between tests
     localStorage.clear();
 
     // Mock document.hasFocus to return true (simulates focused window)
     // Without this, JSDOM returns false and fade() is skipped
-    document.hasFocus = jest.fn().mockReturnValue(true);
+    document.hasFocus = vi.fn().mockReturnValue(true);
 
     // Reset mock state
     mockState.play.mockClear();
@@ -165,7 +166,7 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
 
   afterEach(() => {
     cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
     // Restore original hasFocus
     document.hasFocus = originalHasFocus;
   });
@@ -215,7 +216,7 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
 
       // Advance timers for internal delays
       await act(async () => {
-        jest.advanceTimersByTime(200);
+        vi.advanceTimersByTime(200);
       });
 
       // Music should start playing
@@ -256,7 +257,7 @@ describe('MusicContext - Auto Unmute on Game Start', () => {
 
       // Advance timers - need enough time for pending track processing (100ms) + fade
       await act(async () => {
-        jest.advanceTimersByTime(300);
+        vi.advanceTimersByTime(300);
       });
 
       // THEN: Music should fade to the default volume (0.5)

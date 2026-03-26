@@ -18,29 +18,29 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import '@testing-library/jest-dom';
 
 // Mock next/navigation for tests
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   usePathname: () => '/en/play',
 }));
 
 // Mock SoundEffectsContext for UnifiedAchievementModal
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playAchievementSound: jest.fn(),
+    playAchievementSound: vi.fn(),
   }),
 }));
 
 // Mock confetti
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef<HTMLDivElement, React.PropsWithChildren<{ className?: string; onClick?: () => void }>>(
       function MotionDiv({ children, className, onClick, ...props }, ref) {
@@ -93,12 +93,12 @@ jest.mock('framer-motion', () => ({
 
 describe('AchievementQueueProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   const testAchievement = {
@@ -156,7 +156,7 @@ describe('AchievementQueueProvider', () => {
 
     // Allow notification to appear
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
 
     // THEN: Achievement notification should show with icon and name
@@ -177,7 +177,7 @@ describe('AchievementQueueProvider', () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
 
     // THEN: Only ONE notification should be visible
@@ -194,7 +194,7 @@ describe('AchievementQueueProvider', () => {
       screen.getByText('Trigger Multiple').click();
     });
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
 
     // First notification visible
@@ -202,7 +202,7 @@ describe('AchievementQueueProvider', () => {
 
     // WHEN: First notification auto-dismisses (3000ms + 500ms gap)
     act(() => {
-      jest.advanceTimersByTime(2500);
+      vi.advanceTimersByTime(2500);
     });
 
     // THEN: Second notification should now be visible
@@ -223,7 +223,7 @@ describe('AchievementQueueProvider', () => {
 
     // Allow time for any modal to appear
     act(() => {
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
     });
 
     // THEN: Full-screen modal should NOT be displayed
@@ -239,7 +239,7 @@ describe('AchievementQueueProvider', () => {
       screen.getByText('Trigger Achievement').click();
     });
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
 
     // THEN: Achievement name should be displayed
@@ -250,7 +250,7 @@ describe('AchievementQueueProvider', () => {
   });
 
   it('should provide queueAchievement function via context', () => {
-    const onContext = jest.fn();
+    const onContext = vi.fn();
 
     const ContextCapture = ({ onCapture }: { onCapture: (ctx: ReturnType<typeof useAchievementQueue>) => void }) => {
       const context = useAchievementQueue();
@@ -274,7 +274,7 @@ describe('AchievementQueueProvider', () => {
 
   it('should throw error when useAchievementQueue is used outside provider', () => {
     // Suppress console.error for this test
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const TestComponent = () => {
       useAchievementQueue();
@@ -296,13 +296,13 @@ describe('AchievementQueueProvider', () => {
       screen.getByText('Trigger Achievement').click();
     });
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
     expect(screen.getByTestId('achievement-inline-toast')).toBeInTheDocument();
 
     // WHEN: Auto-dismiss timeout expires (2000ms)
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
 
     // THEN: Notification should be gone
@@ -336,7 +336,7 @@ describe('AchievementQueueProvider', () => {
       screen.getByText('Trigger Many').click();
     });
     act(() => {
-      jest.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
 
     // First one showing, rest in queue (max 5 total)
@@ -346,7 +346,7 @@ describe('AchievementQueueProvider', () => {
     let shownCount = 1;
     for (let i = 0; i < 10; i++) {
       act(() => {
-        jest.advanceTimersByTime(2500);
+        vi.advanceTimersByTime(2500);
       });
       if (screen.queryByTestId('achievement-inline-toast')) {
         shownCount++;

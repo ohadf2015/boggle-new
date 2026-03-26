@@ -13,7 +13,7 @@ import RoomListView from '../RoomListView';
 import type { ActiveRoom } from '@/shared/types/game';
 
 // Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: 'ltr',
@@ -21,7 +21,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_target, prop) => {
       const Component = React.forwardRef(function MotionMock(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
@@ -38,34 +38,34 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
   }),
 }));
 
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
-jest.mock('@/components/LandscapeIndicator', () => () => null);
-jest.mock('@/components/HowToPlay', () => {
+vi.mock('@/components/LandscapeIndicator', () => ({ default: () => null }));
+vi.mock('@/components/HowToPlay', () => {
   return function HowToPlayMock({ onClose }: { onClose: () => void }) {
     return <button onClick={onClose}>Close HowToPlay</button>;
   };
 });
-jest.mock('@/components/ui/Loader', () => ({
+vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <span>Loading...</span>,
 }));
-jest.mock('@/components/ui/PageLoader', () => ({
+vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <span>Loading page...</span>,
 }));
-jest.mock('@/utils/contextualGuidanceStorage', () => ({
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
-  markGuidanceShown: jest.fn(),
+  markGuidanceShown: vi.fn(),
 }));
-jest.mock('@/components/ui/dialog', () => ({
+vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
     open ? <div role="dialog">{children}</div> : null,
   DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -97,16 +97,16 @@ const mockRooms: ActiveRoom[] = [
 const defaultProps = {
   activeRooms: mockRooms,
   roomsLoading: false,
-  onRefreshRooms: jest.fn(),
-  onRoomClick: jest.fn(),
-  onCreateRoom: jest.fn(),
-  onQuickPlay: jest.fn(),
+  onRefreshRooms: vi.fn(),
+  onRoomClick: vi.fn(),
+  onCreateRoom: vi.fn(),
+  onQuickPlay: vi.fn(),
   isQuickPlayLoading: false,
 };
 
 describe('RoomListView accessibility', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ARIA list pattern', () => {

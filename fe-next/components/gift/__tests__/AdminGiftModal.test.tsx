@@ -9,7 +9,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const {
       whileHover,
@@ -49,25 +49,25 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock GSAP
-jest.mock('gsap', () => ({
-  timeline: jest.fn(() => ({
-    to: jest.fn().mockReturnThis(),
-    from: jest.fn().mockReturnThis(),
-    kill: jest.fn(),
+vi.mock('gsap', () => ({
+  timeline: vi.fn(() => ({
+    to: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    kill: vi.fn(),
   })),
-  context: jest.fn((callback) => {
+  context: vi.fn((callback) => {
     callback();
-    return { revert: jest.fn() };
+    return { revert: vi.fn() };
   }),
 }));
 
 // Mock confetti utility
-jest.mock('@/utils/confettiUtils', () => ({
-  fireConfetti: jest.fn(),
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
 }));
 
 // Mock useDevicePerformance
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: true,
     enableGlowEffects: false,
@@ -91,7 +91,7 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -114,11 +114,11 @@ describe('AdminGiftModal', () => {
     },
   };
 
-  const mockOnClaim = jest.fn().mockResolvedValue(undefined);
-  const mockOnDismiss = jest.fn();
+  const mockOnClaim = vi.fn().mockResolvedValue(undefined);
+  const mockOnDismiss = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Rendering', () => {
@@ -364,7 +364,7 @@ describe('AdminGiftModal', () => {
 
     it('disables claim button while claiming', async () => {
       // Make onClaim return a pending promise
-      const slowClaim = jest.fn((_giftId: string): Promise<void> => new Promise(() => {}));
+      const slowClaim = vi.fn((_giftId: string): Promise<void> => new Promise(() => {}));
 
       render(
         <AdminGiftModal

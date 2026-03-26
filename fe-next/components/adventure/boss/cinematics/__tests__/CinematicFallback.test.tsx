@@ -9,7 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       // Forward data-testid and other relevant props
@@ -44,7 +44,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('../../../../../contexts/LanguageContext', () => ({
+vi.mock('../../../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -64,7 +64,7 @@ jest.mock('../../../../../contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 import { CinematicFallback, CinematicFallbackProps } from '../CinematicFallback';
 
@@ -76,11 +76,11 @@ describe('CinematicFallback', () => {
       wordsFound: 12,
     },
     durationSeconds: 8,
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.clearAllTimers();
   });
 
@@ -141,18 +141,18 @@ describe('CinematicFallback', () => {
       render(<CinematicFallback {...defaultProps} />);
 
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       expect(screen.getByTestId('fallback-skip-button')).not.toBeDisabled();
     });
 
     it('should call onComplete when skip button is clicked after delay', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(<CinematicFallback {...defaultProps} onComplete={onComplete} />);
 
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
 
       fireEvent.click(screen.getByTestId('fallback-skip-button'));
@@ -163,7 +163,7 @@ describe('CinematicFallback', () => {
 
   describe('auto-completion', () => {
     it('should call onComplete after durationSeconds', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       render(
         <CinematicFallback {...defaultProps} durationSeconds={5} onComplete={onComplete} />
       );
@@ -172,7 +172,7 @@ describe('CinematicFallback', () => {
 
       // Advance to just past the duration
       act(() => {
-        jest.advanceTimersByTime(5100);
+        vi.advanceTimersByTime(5100);
       });
 
       expect(onComplete).toHaveBeenCalledTimes(1);
@@ -207,7 +207,7 @@ describe('CinematicFallback', () => {
         bossName: 'Fire Dragon',
       },
       durationSeconds: 8,
-      onComplete: jest.fn(),
+      onComplete: vi.fn(),
     };
 
     it('should render boss image when cinematicType is bossEntrance', () => {

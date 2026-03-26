@@ -5,8 +5,8 @@ import { useVocabularyMastery } from '@/hooks/useVocabularyMastery';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock hooks
-jest.mock('@/hooks/useVocabularyMastery');
-jest.mock('@/contexts/LanguageContext');
+vi.mock('@/hooks/useVocabularyMastery');
+vi.mock('@/contexts/LanguageContext');
 
 const mockT = (key: string) => {
   const translations: Record<string, string> = {
@@ -25,11 +25,11 @@ const mockT = (key: string) => {
 
 describe('VocabularyHeatmap', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useLanguage as jest.Mock).mockReturnValue({
       t: mockT,
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
     });
   });
 
@@ -39,7 +39,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: null,
       isLoading: true,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -113,7 +113,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -140,7 +140,7 @@ describe('VocabularyHeatmap', () => {
       },
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -196,7 +196,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -239,7 +239,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -258,7 +258,7 @@ describe('VocabularyHeatmap', () => {
 
   it('should call onCellClick when cell clicked', () => {
     // GIVEN: Hook returns heatmap data and onCellClick callback
-    const mockOnCellClick = jest.fn();
+    const mockOnCellClick = vi.fn();
     const mockData = {
       students: [{ id: 'student-1', name: 'Alice' }],
       words: ['word1'],
@@ -278,7 +278,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -316,7 +316,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: mockData,
       isLoading: false,
       error: null,
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN
@@ -336,7 +336,7 @@ describe('VocabularyHeatmap', () => {
       heatmapData: null,
       isLoading: false,
       error: new Error('Failed to load data'),
-      refresh: jest.fn(),
+      refresh: vi.fn(),
     });
 
     // WHEN

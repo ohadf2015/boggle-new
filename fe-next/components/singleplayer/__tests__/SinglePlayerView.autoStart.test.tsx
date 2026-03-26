@@ -10,14 +10,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock search params - will be set per test
 let mockSearchParams = new Map<string, string>();
-const mockRouterPush = jest.fn();
+const mockRouterPush = vi.fn();
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
   useSearchParams: () => ({
     get: (key: string) => mockSearchParams.get(key) || null,
@@ -25,7 +25,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -34,27 +34,27 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock NavigationContext
-const mockSetIsInGame = jest.fn();
-jest.mock('@/contexts/NavigationContext', () => ({
+const mockSetIsInGame = vi.fn();
+vi.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => mockSetIsInGame,
 }));
 
 // Mock MusicContext
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    unlockAudio: jest.fn(),
-    playBackgroundMusic: jest.fn(),
-    stopBackgroundMusic: jest.fn(),
+    unlockAudio: vi.fn(),
+    playBackgroundMusic: vi.fn(),
+    stopBackgroundMusic: vi.fn(),
     isPlaying: false,
   }),
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useGameMusic', () => ({
-  useGameMusic: jest.fn(),
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: vi.fn(),
 }));
 
-jest.mock('@/hooks/usePullToRefresh', () => ({
+vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
     pullToRefreshHandlers: {},
     pullState: { pullDistance: 0, isRefreshing: false },
@@ -62,66 +62,66 @@ jest.mock('@/hooks/usePullToRefresh', () => ({
 }));
 
 // Mock contextual guidance storage - skip pre-game tutorial
-jest.mock('@/utils/contextualGuidanceStorage', () => ({
-  shouldShowGuidance: jest.fn().mockReturnValue(false),
-  markGuidanceShown: jest.fn(),
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: vi.fn().mockReturnValue(false),
+  markGuidanceShown: vi.fn(),
 }));
 
 // Mock feature unlock notifications
-jest.mock('@/hooks/useFeatureUnlockNotifications', () => ({
-  useFeatureUnlockNotifications: jest.fn(),
+vi.mock('@/hooks/useFeatureUnlockNotifications', () => ({
+  useFeatureUnlockNotifications: vi.fn(),
 }));
 
 // Mock playerStats
-jest.mock('@/utils/playerStats', () => ({
-  recordGameResult: jest.fn().mockReturnValue({ isNewHighScore: false, previousBest: null, isNewAllTimeBest: false }),
-  getConfigRecord: jest.fn().mockReturnValue(null),
+vi.mock('@/utils/playerStats', () => ({
+  recordGameResult: vi.fn().mockReturnValue({ isNewHighScore: false, previousBest: null, isNewAllTimeBest: false }),
+  getConfigRecord: vi.fn().mockReturnValue(null),
 }));
 
 // Mock child components
-jest.mock('../SinglePlayerGame', () => {
+vi.mock('../SinglePlayerGame', () => {
   const MockSinglePlayerGame = () => <div data-testid="game">Game</div>;
   MockSinglePlayerGame.displayName = 'MockSinglePlayerGame';
-  return MockSinglePlayerGame;
+  return { default: MockSinglePlayerGame };
 });
 
-jest.mock('../SinglePlayerResults', () => {
+vi.mock('../SinglePlayerResults', () => {
   const MockSinglePlayerResults = () => <div data-testid="results">Results</div>;
   MockSinglePlayerResults.displayName = 'MockSinglePlayerResults';
-  return MockSinglePlayerResults;
+  return { default: MockSinglePlayerResults };
 });
 
-jest.mock('../PreGameTutorial', () => {
+vi.mock('../PreGameTutorial', () => {
   const MockPreGameTutorial = () => <div data-testid="pre-game-tutorial">Tutorial</div>;
   MockPreGameTutorial.displayName = 'MockPreGameTutorial';
-  return MockPreGameTutorial;
+  return { default: MockPreGameTutorial };
 });
 
-jest.mock('@/components/AutoHideHeader', () => {
+vi.mock('@/components/AutoHideHeader', () => {
   const MockAutoHideHeader = () => null;
   MockAutoHideHeader.displayName = 'MockAutoHideHeader';
-  return MockAutoHideHeader;
+  return { default: MockAutoHideHeader };
 });
 
-jest.mock('@/components/ui/PullToRefreshIndicator', () => ({
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
 // Mock high score manager
-jest.mock('../highScoreManager', () => ({
-  getHighScore: jest.fn().mockReturnValue(null),
-  getAllTimeBest: jest.fn().mockReturnValue(null),
+vi.mock('../highScoreManager', () => ({
+  getHighScore: vi.fn().mockReturnValue(null),
+  getAllTimeBest: vi.fn().mockReturnValue(null),
 }));
 
 // Mock player progress storage
-jest.mock('@/utils/playerProgressStorage', () => ({
-  incrementTrainingGames: jest.fn(),
+vi.mock('@/utils/playerProgressStorage', () => ({
+  incrementTrainingGames: vi.fn(),
 }));
 
 // Mock preset config - use factory function to avoid initialization issues
-jest.mock('../presetConfig', () => ({
-  getMinWordLength: jest.fn().mockReturnValue(3),
-  getDefaultPreset: jest.fn().mockImplementation((mode: string) => {
+vi.mock('../presetConfig', () => ({
+  getMinWordLength: vi.fn().mockReturnValue(3),
+  getDefaultPreset: vi.fn().mockImplementation((mode: string) => {
     if (mode === 'solo-bots') {
       return {
         id: 'standard',
@@ -146,7 +146,7 @@ jest.mock('../presetConfig', () => ({
     }
     return null;
   }),
-  getPresetById: jest.fn().mockReturnValue(null),
+  getPresetById: vi.fn().mockReturnValue(null),
 }));
 
 // Import after mocks
@@ -155,7 +155,7 @@ import { getDefaultPreset } from '../presetConfig';
 
 describe('SinglePlayerView - autoStart=bots URL parameter', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSearchParams = new Map();
   });
 

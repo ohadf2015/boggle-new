@@ -4,7 +4,7 @@ import { DailyChallengeCard } from './DailyChallengeCard';
 import type { DailyChallengeRow } from '@/lib/supabase/education/types';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -23,7 +23,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('DailyChallengeCard', () => {
-  const mockOnClaim = jest.fn();
+  const mockOnClaim = vi.fn();
 
   const baseMockChallenge: DailyChallengeRow = {
     id: 'challenge-1',

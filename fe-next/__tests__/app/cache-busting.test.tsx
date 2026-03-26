@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  *
@@ -9,7 +10,7 @@
  * 3. Manifest version tracking
  */
 
-import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -20,16 +21,16 @@ describe('Cache Busting Mechanisms', () => {
   beforeEach(() => {
     // Mock service worker
     mockServiceWorker = {
-      register: jest.fn(),
+      register: vi.fn(),
       controller: null,
-      getRegistrations: jest.fn(),
+      getRegistrations: vi.fn(),
     };
 
     // Mock cache storage
     mockCaches = {
-      keys: jest.fn(),
-      delete: jest.fn(),
-      open: jest.fn(),
+      keys: vi.fn(),
+      delete: vi.fn(),
+      open: vi.fn(),
     };
 
     Object.defineProperty(global, 'navigator', {
@@ -46,7 +47,7 @@ describe('Cache Busting Mechanisms', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Service Worker Cache Versioning', () => {
@@ -171,11 +172,11 @@ describe('Cache Busting Mechanisms', () => {
 
     it('should unregister old service workers on version mismatch', async () => {
       // Given: Mock service worker registration
-      const mockUnregister: any = jest.fn();
+      const mockUnregister: any = vi.fn();
       mockUnregister.mockResolvedValue(true);
       const mockRegistration = {
         unregister: mockUnregister,
-        update: jest.fn(),
+        update: vi.fn(),
       } as unknown as ServiceWorkerRegistration;
       mockServiceWorker.getRegistrations.mockResolvedValue([mockRegistration] as any);
 
@@ -237,7 +238,7 @@ describe('Cache Busting Mechanisms', () => {
       // Given: New service worker installed
       const mockNewWorker = {
         state: 'installed',
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
       };
 
       // When: Service worker detects update
@@ -269,9 +270,9 @@ describe('Cache Busting on Version Change - Integration', () => {
     // 4. Force reload page
     // 5. Register new service worker
 
-    const mockClearCache = jest.fn();
-    const mockUnregister = jest.fn();
-    const mockReload = jest.fn();
+    const mockClearCache = vi.fn();
+    const mockUnregister = vi.fn();
+    const mockReload = vi.fn();
 
     const forceVersionUpdate = async () => {
       // Step 1: Clear all caches

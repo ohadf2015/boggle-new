@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import DragReleaseHint from '../DragReleaseHint';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -12,7 +12,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMediaQuery', () => ({
+vi.mock('@/hooks/useMediaQuery', () => ({
   useIsDesktop: () => true,
 }));
 
@@ -20,8 +20,8 @@ jest.mock('@/hooks/useMediaQuery', () => ({
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
     clear: () => { store = {}; },
   };
 })();
@@ -31,7 +31,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 describe('DragReleaseHint', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('shows hint when dragging with 2+ cells and not previously dismissed', () => {

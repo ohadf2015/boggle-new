@@ -9,22 +9,22 @@ import { PowerUpActivationEffect } from '../PowerUpActivationEffect';
 import type { PowerUpType } from '@/types/adventure';
 
 // Mock hooks
-const mockShake = jest.fn();
-const mockPrefersReducedMotion = jest.fn(() => false);
+const mockShake = vi.fn();
+const mockPrefersReducedMotion = vi.fn(() => false);
 
-jest.mock('@/hooks/useScreenShake', () => ({
+vi.mock('@/hooks/useScreenShake', () => ({
   useScreenShake: () => ({
     shakeRef: { current: null },
     shake: mockShake,
   }),
 }));
 
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => mockPrefersReducedMotion(),
 }));
 
 // Mock AdaptiveParticles
-jest.mock('@/components/adventure/juice/AdaptiveParticles', () => ({
+vi.mock('@/components/adventure/juice/AdaptiveParticles', () => ({
   AdaptiveParticles: ({
     type,
     intensity,
@@ -47,17 +47,17 @@ jest.mock('@/components/adventure/juice/AdaptiveParticles', () => ({
 }));
 
 describe('PowerUpActivationEffect', () => {
-  const mockOnComplete = jest.fn();
+  const mockOnComplete = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockPrefersReducedMotion.mockReturnValue(false);
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Animation with Motion', () => {
@@ -98,7 +98,7 @@ describe('PowerUpActivationEffect', () => {
 
       expect(mockOnComplete).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
 
       expect(mockOnComplete).toHaveBeenCalledTimes(1);
     });
@@ -227,7 +227,7 @@ describe('PowerUpActivationEffect', () => {
           />
         );
 
-        jest.advanceTimersByTime(250);
+        vi.advanceTimersByTime(250);
       }).not.toThrow();
     });
   });

@@ -2,12 +2,12 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock dependencies
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -22,23 +22,23 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: true,
     prefersReducedMotion: false,
   }),
 }));
 
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
-const mockRecordImpression = jest.fn();
-jest.mock('@/hooks/useWordHuntPromo', () => ({
+const mockRecordImpression = vi.fn();
+vi.mock('@/hooks/useWordHuntPromo', () => ({
   useWordHuntPromo: () => ({ canShow: true, recordImpression: mockRecordImpression }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const ReactMock = require('react');
   const MotionButton = ReactMock.forwardRef(({ children, onMouseEnter, onMouseLeave, ...props }: any, ref: any) => (
     <button ref={ref} onClick={props.onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} className={props.className}>{children}</button>
@@ -62,7 +62,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 
 describe('WordHuntAnnouncementBanner', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the announcement text', () => {
@@ -90,9 +90,9 @@ describe('WordHuntAnnouncementBanner', () => {
   });
 
   it('returns null when impression limit reached', () => {
-    jest.spyOn(require('@/hooks/useWordHuntPromo'), 'useWordHuntPromo').mockReturnValue({
+    vi.spyOn(require('@/hooks/useWordHuntPromo'), 'useWordHuntPromo').mockReturnValue({
       canShow: false,
-      recordImpression: jest.fn(),
+      recordImpression: vi.fn(),
     });
 
     const { container } = render(<WordHuntAnnouncementBanner />);
@@ -101,7 +101,7 @@ describe('WordHuntAnnouncementBanner', () => {
 
   it('respects reduced motion preferences', () => {
     // Override to prefer reduced motion
-    jest.spyOn(require('@/hooks/useDevicePerformance'), 'useDevicePerformance').mockReturnValue({
+    vi.spyOn(require('@/hooks/useDevicePerformance'), 'useDevicePerformance').mockReturnValue({
       enableComplexAnimations: false,
       prefersReducedMotion: true,
     });

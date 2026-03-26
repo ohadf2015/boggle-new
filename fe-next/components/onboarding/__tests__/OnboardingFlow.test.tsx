@@ -2,7 +2,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv(
     { children, ...props }: any,
@@ -23,11 +23,11 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock onboardingStorage
-const mockMarkComplete = jest.fn();
-const mockMarkSkipped = jest.fn();
-const mockConsumePendingRoom = jest.fn((): string | null => null);
-const mockHasPendingRoom = jest.fn(() => false);
-jest.mock('@/utils/onboardingStorage', () => ({
+const mockMarkComplete = vi.fn();
+const mockMarkSkipped = vi.fn();
+const mockConsumePendingRoom = vi.fn((): string | null => null);
+const mockHasPendingRoom = vi.fn(() => false);
+vi.mock('@/utils/onboardingStorage', () => ({
   markOnboardingComplete: (...args: any[]) => mockMarkComplete(...args),
   markOnboardingSkipped: (...args: any[]) => mockMarkSkipped(...args),
   hasCompletedOnboarding: () => false,
@@ -36,13 +36,13 @@ jest.mock('@/utils/onboardingStorage', () => ({
 }));
 
 // Mock next/navigation
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -51,7 +51,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock sub-components
-jest.mock('../TutorialGame', () => {
+vi.mock('../TutorialGame', () => {
   return {
     __esModule: true,
     default: ({ onComplete }: any) => (
@@ -64,7 +64,7 @@ jest.mock('../TutorialGame', () => {
   };
 });
 
-jest.mock('../QuickProfileSetup', () => {
+vi.mock('../QuickProfileSetup', () => {
   return {
     __esModule: true,
     default: ({ onComplete, onSkip }: any) => (
@@ -76,7 +76,7 @@ jest.mock('../QuickProfileSetup', () => {
   };
 });
 
-jest.mock('../ScoreReveal', () => {
+vi.mock('../ScoreReveal', () => {
   return {
     __esModule: true,
     default: ({ onTryAgain, onContinue }: any) => (
@@ -88,7 +88,7 @@ jest.mock('../ScoreReveal', () => {
   };
 });
 
-jest.mock('../ModeFork', () => {
+vi.mock('../ModeFork', () => {
   return {
     __esModule: true,
     default: ({ onSelectMode, hasPendingInvite }: any) => (
@@ -107,11 +107,11 @@ import OnboardingFlow from '../OnboardingFlow';
 
 describe('OnboardingFlow', () => {
   const defaultProps = {
-    onComplete: jest.fn(),
+    onComplete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('starts with the tutorial game step', () => {

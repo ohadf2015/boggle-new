@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Test: GlobalBottomNav z-index must be higher than other fixed elements
  *
@@ -19,44 +20,44 @@ import { render, screen } from '@testing-library/react';
 import { GlobalBottomNav } from '@/components/GlobalBottomNav';
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   usePathname: () => '/en',
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   useNavigation: () => ({
     isInGame: false,
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
   }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
-  useTheme: jest.fn(() => ({ theme: 'dark' })),
+vi.mock('@/utils/ThemeContext', () => ({
+  useTheme: vi.fn(() => ({ theme: 'dark' })),
 }));
 
-jest.mock('@/components/auth/AuthModal', () => ({
+vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
     isOpen ? <div data-testid="auth-modal" onClick={onClose}>AuthModal</div> : null
   ),
 }));
 
-jest.mock('@/hooks/useSafeArea', () => ({
+vi.mock('@/hooks/useSafeArea', () => ({
   useSafeArea: () => ({
     top: 0,
     bottom: 0,

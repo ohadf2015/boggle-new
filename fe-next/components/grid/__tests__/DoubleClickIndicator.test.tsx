@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import DoubleClickIndicator from '../DoubleClickIndicator';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {

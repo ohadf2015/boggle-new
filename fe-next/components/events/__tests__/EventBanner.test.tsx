@@ -19,7 +19,7 @@ const mockT = (key: string) => {
   return translations[key] || key;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     language: 'en',
@@ -28,7 +28,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
       <div data-testid="adaptive-motion" {...props}>{children}</div>
@@ -50,16 +50,16 @@ const baseEvent = {
 };
 
 describe('EventBanner', () => {
-  const mockOnJoin = jest.fn();
-  const mockOnDismiss = jest.fn();
+  const mockOnJoin = vi.fn();
+  const mockOnDismiss = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render event name and description', () => {

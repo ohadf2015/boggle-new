@@ -6,7 +6,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { DesktopWordList } from '../DesktopWordList';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<object>) => <div {...props}>{children}</div>,
   },

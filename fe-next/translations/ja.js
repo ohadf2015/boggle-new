@@ -4521,6 +4521,7 @@ const ja = {
     "quitConfirmMessage": "進行状況が失われます！",
     "feedback": {
       "tooShort": "📏 最低3文字必要",
+      "tooLong": "📏 最大8文字まで",
       "duplicate": "🔁 既に見つかりました！",
       "notOnBoardPenalty": "⚠️ ボードにない -5 ❤️",
       "notFormablePenalty": "⚠️ ボードにない -5 ❤️",

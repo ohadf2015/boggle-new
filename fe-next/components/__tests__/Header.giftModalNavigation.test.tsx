@@ -13,25 +13,26 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import React from 'react';
 
 // Mock fetch for API calls
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   }),
 }));
 
-jest.mock('next/link', () => {
-  return function MockLink({ children, href }: { children: React.ReactNode; href: string }) {
+vi.mock('next/link', () => {
+  const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
     return <a href={href}>{children}</a>;
   };
+  return { default: MockLink };
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -39,7 +40,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const mockRefreshProfile = jest.fn().mockResolvedValue(undefined);
+const mockRefreshProfile = vi.fn().mockResolvedValue(undefined);
 
 // Configurable mock values - can be changed per test
 let mockProfile = {
@@ -64,7 +65,7 @@ let mockGifts = [
   },
 ];
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     isAdmin: false,
@@ -73,19 +74,19 @@ jest.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useUnclaimedGifts', () => ({
+vi.mock('@/hooks/useUnclaimedGifts', () => ({
   useUnclaimedGifts: () => ({
     unclaimedCount: mockGifts.filter(g => !g.claimed).length,
     gifts: mockGifts,
     loading: false,
     error: null,
-    refresh: jest.fn(),
-    claimGift: jest.fn(),
+    refresh: vi.fn(),
+    claimGift: vi.fn(),
   }),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...props}>{children}</button>,
@@ -94,31 +95,31 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock components that are not relevant to this test
-jest.mock('@/components/auth/AuthButton', () => function MockAuthButton() {
+vi.mock('@/components/auth/AuthButton', () => function MockAuthButton() {
   return <button>Auth</button>;
 });
 
-jest.mock('@/components/MusicControls', () => function MockMusicControls() {
+vi.mock('@/components/MusicControls', () => function MockMusicControls() {
   return <button>Music</button>;
 });
 
-jest.mock('@/components/CoinBalance', () => ({
+vi.mock('@/components/CoinBalance', () => ({
   CoinBalance: function MockCoinBalance() {
     return <span>100 coins</span>;
   },
 }));
 
-jest.mock('@/components/auth/AuthModal', () => function MockAuthModal() {
+vi.mock('@/components/auth/AuthModal', () => function MockAuthModal() {
   return null;
 });
 
-jest.mock('@/components/gift/GiftNotificationBadge', () => ({
+vi.mock('@/components/gift/GiftNotificationBadge', () => ({
   GiftNotificationBadge: function MockBadge({ count }: { count: number }) {
     return <span data-testid="gift-badge">{count}</span>;
   },
 }));
 
-jest.mock('@/components/gift/AdminGiftModal', () => ({
+vi.mock('@/components/gift/AdminGiftModal', () => ({
   AdminGiftModal: function MockGiftModal({
     show,
     onDismiss,
@@ -139,7 +140,7 @@ jest.mock('@/components/gift/AdminGiftModal', () => ({
   },
 }));
 
-jest.mock('@/components/QuickLanguageSwitcher', () => ({
+vi.mock('@/components/QuickLanguageSwitcher', () => ({
   QuickLanguageSwitcher: function MockLanguageSwitcher() {
     return <button>Language</button>;
   },
@@ -150,7 +151,7 @@ import Header from '../Header';
 
 describe('Header - Gift Modal Database Persistence', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockFetch.mockClear();
     mockRefreshProfile.mockClear();
     // Reset mock values to defaults
@@ -182,8 +183,8 @@ describe('Header - Gift Modal Database Persistence', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.clearAllMocks();
+    vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   describe('database persistence on dismissal', () => {
@@ -192,7 +193,7 @@ describe('Header - Gift Modal Database Persistence', () => {
 
       // Wait for auto-show timer (3 seconds)
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // Modal should be shown
@@ -216,7 +217,7 @@ describe('Header - Gift Modal Database Persistence', () => {
 
       // Wait for auto-show timer
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       await waitFor(() => {
@@ -263,7 +264,7 @@ describe('Header - Gift Modal Database Persistence', () => {
 
       // Wait for potential auto-show (should NOT happen)
       act(() => {
-        jest.advanceTimersByTime(4000);
+        vi.advanceTimersByTime(4000);
       });
 
       // Modal should NOT be shown because gift was created before dismissal timestamp
@@ -309,7 +310,7 @@ describe('Header - Gift Modal Database Persistence', () => {
 
       // Wait for auto-show timer
       act(() => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       // Modal SHOULD be shown because gift was created after dismissal timestamp

@@ -8,26 +8,26 @@ import HostPreGameView from '../../host/components/HostPreGameView';
 import { SocketContext } from '../../utils/SocketContext';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
-    push: jest.fn(),
-    back: jest.fn(),
-    prefetch: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    back: vi.fn(),
+    prefetch: vi.fn(),
   })),
-  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
 }));
 
 // Mock CrazyGames invite hook
-jest.mock('../../hooks/useCrazyGamesInvite', () => ({
+vi.mock('../../hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    showInviteButton: jest.fn(),
-    hideInviteButton: jest.fn(),
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
     isInviteButtonVisible: false,
   }),
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...props}>{children}</button>,
@@ -37,7 +37,7 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock RoomChat component since it requires LanguageProvider
-jest.mock('../../components/RoomChat', () => ({
+vi.mock('../../components/RoomChat', () => ({
   __esModule: true,
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
@@ -45,13 +45,13 @@ jest.mock('../../components/RoomChat', () => ({
 }));
 
 // Mock BotControls component since it requires LanguageProvider
-jest.mock('../../components/BotControls', () => ({
+vi.mock('../../components/BotControls', () => ({
   __esModule: true,
   default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
 // Mock TvTutorialOverlay to avoid UI library dependency issues in tests
-jest.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
+vi.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
   __esModule: true,
   default: () => null,
   isTvTutorialComplete: () => true,
@@ -67,35 +67,35 @@ const defaultProps = {
   username: 'TestHost',
   t: mockT,
   timerValue: 2,
-  setTimerValue: jest.fn(),
+  setTimerValue: vi.fn(),
   timerDirection: 0,
-  setTimerDirection: jest.fn(),
+  setTimerDirection: vi.fn(),
   difficulty: 'MEDIUM' as const,
-  setDifficulty: jest.fn(),
+  setDifficulty: vi.fn(),
   minWordLength: 2,
-  setMinWordLength: jest.fn(),
+  setMinWordLength: vi.fn(),
   gameType: 'regular' as const,
-  setGameType: jest.fn(),
+  setGameType: vi.fn(),
   tournamentRounds: 3,
-  setTournamentRounds: jest.fn(),
+  setTournamentRounds: vi.fn(),
   tournamentData: null,
   hostPlaying: true,
-  setHostPlaying: jest.fn(),
+  setHostPlaying: vi.fn(),
   playersReady: [],
   playerWordCounts: {},
   shufflingGrid: null,
   highlightedCells: [],
   tableData: [['A', 'B'], ['C', 'D']],
-  onStartGame: jest.fn(),
-  onExitRoom: jest.fn(),
-  onCancelTournament: jest.fn(),
+  onStartGame: vi.fn(),
+  onExitRoom: vi.fn(),
+  onCancelTournament: vi.fn(),
   tournamentCreating: false,
 };
 
 const mockSocket = {
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  emit: vi.fn(),
   connected: true,
   id: 'test-socket-id',
 };
@@ -107,12 +107,12 @@ const socketContextValue = {
   isReconnecting: false,
   reconnectAttempt: 0,
   maxReconnectAttempts: 5,
-  manualReconnect: jest.fn(),
+  manualReconnect: vi.fn(),
 };
 
 describe('HostPreGameView Height Constraint', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should use flex-1 instead of h-[100dvh] to fit within parent container', () => {

@@ -15,7 +15,7 @@ import type { PlayerProgression } from '@/types/adventure';
 // ==============================================
 
 // Mock framer-motion with all hooks used by components
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   // Create mock motion component factory
@@ -48,9 +48,9 @@ jest.mock('framer-motion', () => {
   // Mock motion value with on() method for subscriptions
   const mockMotionValue = {
     get: () => 0,
-    set: jest.fn(),
-    onChange: jest.fn(),
-    on: jest.fn(() => jest.fn()), // Return unsubscribe function
+    set: vi.fn(),
+    onChange: vi.fn(),
+    on: vi.fn(() => vi.fn()), // Return unsubscribe function
     current: 0,
   };
 
@@ -72,7 +72,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
-jest.mock('next/dynamic', () => {
+vi.mock('next/dynamic', () => {
   const React = require('react');
   return (_importFn: unknown, _opts?: unknown) => {
     const Dynamic = (props: Record<string, unknown>) => {
@@ -85,16 +85,16 @@ jest.mock('next/dynamic', () => {
   };
 });
 
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const MockLink = ({ children, href, ...props }: any) => {
     return React.createElement('a', { href, ...props }, children);
   };
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
 // Mock Next.js Image
-jest.mock('next/image', () => {
+vi.mock('next/image', () => {
   const MockImage = ({ src, alt, ...props }: any) => {
      
     return React.createElement('img', { src, alt, ...props });
@@ -105,7 +105,7 @@ jest.mock('next/image', () => {
 
 // Mock useParallax hook
 const mockMotionValue = (v: number) => ({ get: () => v, set: () => {}, on: () => () => {} });
-jest.mock('@/hooks/useParallax', () => ({
+vi.mock('@/hooks/useParallax', () => ({
   useParallax: () => ({
     x: mockMotionValue(0),
     y: mockMotionValue(0),
@@ -139,7 +139,7 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
   return result;
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: mockT,
     dir: 'ltr',
@@ -153,26 +153,26 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock NavigationContext - AdventureView uses useHideNavigation
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   useNavigation: () => ({
     isInGame: false,
-    setIsInGame: jest.fn(),
+    setIsInGame: vi.fn(),
     activeTab: 'home',
-    setActiveTab: jest.fn(),
+    setActiveTab: vi.fn(),
   }),
-  useHideNavigation: () => jest.fn(),
+  useHideNavigation: () => vi.fn(),
   NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock MusicContext - adventure mode stops global music when it starts
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
-    playTrack: jest.fn(),
-    fadeToTrack: jest.fn(),
-    setVolume: jest.fn(),
-    toggleMute: jest.fn(),
-    unlockAudio: jest.fn(),
+    stopMusic: vi.fn(),
+    playTrack: vi.fn(),
+    fadeToTrack: vi.fn(),
+    setVolume: vi.fn(),
+    toggleMute: vi.fn(),
+    unlockAudio: vi.fn(),
     isPlaying: false,
     isMuted: false,
     audioUnlocked: true,
@@ -182,29 +182,29 @@ jest.mock('@/contexts/MusicContext', () => ({
 }));
 
 // Mock SoundEffectsContext - required by MusicControls component
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playComboBreakSound: jest.fn(),
-    playCountdownBeep: jest.fn(),
-    playComboMilestoneSound: jest.fn(),
-    playComboSavedSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playComboBreakSound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playComboMilestoneSound: vi.fn(),
+    playComboSavedSound: vi.fn(),
+    setGameActive: vi.fn(),
     sfxVolume: 0.5,
-    setSfxVolume: jest.fn(),
+    setSfxVolume: vi.fn(),
     sfxMuted: false,
-    toggleSfxMute: jest.fn(),
-    playErrorSound: jest.fn(),
-    playBonusSound: jest.fn(),
+    toggleSfxMute: vi.fn(),
+    playErrorSound: vi.fn(),
+    playBonusSound: vi.fn(),
   }),
 }));
 
 // Mock HapticsContext - required by MusicControls component
-jest.mock('@/contexts/HapticsContext', () => ({
+vi.mock('@/contexts/HapticsContext', () => ({
   useHapticsConfig: () => ({
     enabled: true,
-    setEnabled: jest.fn(),
+    setEnabled: vi.fn(),
   }),
 }));
 
@@ -219,43 +219,43 @@ let mockProgressionState: {
   progression: null,
   isLoading: false,
   error: null,
-  completeLevel: jest.fn(),
-  getLevelAttempt: jest.fn().mockReturnValue(null),
+  completeLevel: vi.fn(),
+  getLevelAttempt: vi.fn().mockReturnValue(null),
 };
 
-jest.mock('@/contexts/ProgressionContext', () => ({
+vi.mock('@/contexts/ProgressionContext', () => ({
   useProgression: () => mockProgressionState,
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock useAdventureHints hook - required by AdventureGame
-jest.mock('@/hooks/useAdventureHints', () => ({
+vi.mock('@/hooks/useAdventureHints', () => ({
   useAdventureHints: () => ({
     hasHintsAvailable: true,
-    getHint: jest.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
+    getHint: vi.fn(() => ({ word: 'TEST', path: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })),
     currentHint: null,
-    clearCurrentHint: jest.fn(),
-    recordActivity: jest.fn(),
+    clearCurrentHint: vi.fn(),
+    recordActivity: vi.fn(),
     showAutoHint: false,
-    dismissAutoHint: jest.fn(),
+    dismissAutoHint: vi.fn(),
     isLoading: false,
     error: null,
     remainingHintWords: ['TEST', 'WORD'],
-    findPathForWord: jest.fn(() => null),
+    findPathForWord: vi.fn(() => null),
   }),
 }));
 
 // Mock useAdventureMusic hook
-jest.mock('@/hooks/useAdventureMusic', () => ({
+vi.mock('@/hooks/useAdventureMusic', () => ({
   useAdventureMusic: () => ({
     currentTrack: 1,
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
     hasMusic: true,
   }),
 }));
 
 // Mock AdventureThemeProvider to avoid context errors
-jest.mock('@/contexts/AdventureThemeContext', () => ({
+vi.mock('@/contexts/AdventureThemeContext', () => ({
   AdventureThemeProvider: ({ children }: { children: React.ReactNode }) => children,
   useAdventureTheme: () => ({
     worldId: 1,
@@ -274,12 +274,12 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
       colors: { primary: '#000', secondary: '#fff', accent: '#f00' },
     },
     isTransitioning: false,
-    setWorld: jest.fn(),
-    setLevel: jest.fn(),
-    getTileConfig: jest.fn(),
-    getChapter: jest.fn(),
-    isBoss: jest.fn(() => false),
-    getLevelPosition: jest.fn(() => 1),
+    setWorld: vi.fn(),
+    setLevel: vi.fn(),
+    getTileConfig: vi.fn(),
+    getChapter: vi.fn(),
+    isBoss: vi.fn(() => false),
+    getLevelPosition: vi.fn(() => 1),
   }),
   useHUDTheme: () => ({
     headerBg: 'bg-neo-navy/90',
@@ -319,7 +319,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => ({
 }));
 
 // Mock adventure lib to provide grid/level config for gameplay
-jest.mock('@/lib/adventure', () => ({
+vi.mock('@/lib/adventure', () => ({
   WORLD_CONFIGS: Array.from({ length: 10 }, (_, i) => ({
     id: i + 1, name: `World ${i + 1}`, theme: 'forest', mechanic: null,
     bossName: 'Boss', colorPrimary: 'neo-lime', colorSecondary: 'neo-lime-light',
@@ -357,7 +357,7 @@ jest.mock('@/lib/adventure', () => ({
 }));
 
 // Mock WorldMap to provide clickable world buttons with expected testids
-jest.mock('../WorldMap', () => {
+vi.mock('../WorldMap', () => {
   const MockWorldMap = ({
     onWorldSelect,
   }: {
@@ -369,12 +369,12 @@ jest.mock('../WorldMap', () => {
     </div>
   );
   MockWorldMap.displayName = 'MockWorldMap';
-  return MockWorldMap;
+  return { default: MockWorldMap };
 });
 
 // Mock LevelGrid to provide clickable level buttons with expected testids
 // Level 7 is always "locked" (doesn't call onLevelSelect) to test locked-level handling
-jest.mock('../LevelGrid', () => {
+vi.mock('../LevelGrid', () => {
   function MockLevelGrid({
     onLevelSelect,
     world,
@@ -399,11 +399,11 @@ jest.mock('../LevelGrid', () => {
     );
   }
   MockLevelGrid.displayName = 'MockLevelGrid';
-  return MockLevelGrid;
+  return { default: MockLevelGrid };
 });
 
 // Mock AdventureHub — renders a simple button to navigate to world map
-jest.mock('../AdventureHub', () => {
+vi.mock('../AdventureHub', () => {
   const MockAdventureHub = ({
     onOpenWorldMap,
     onPlayLevel,
@@ -417,25 +417,25 @@ jest.mock('../AdventureHub', () => {
     </div>
   );
   MockAdventureHub.displayName = 'MockAdventureHub';
-  return MockAdventureHub;
+  return { default: MockAdventureHub };
 });
 
 // Mock useDailyQuests for hub
-jest.mock('@/hooks/useDailyQuests', () => ({
+vi.mock('@/hooks/useDailyQuests', () => ({
   useDailyQuests: () => ({
     quests: [],
-    recordProgress: jest.fn(),
+    recordProgress: vi.fn(),
     completedQuests: [],
     todayStr: '2026-03-18',
   }),
 }));
 
 // Mock adventureStreak for hub
-jest.mock('@/lib/adventure/adventureStreak', () => ({
+vi.mock('@/lib/adventure/adventureStreak', () => ({
   getStreakMultiplier: () => 1.0,
 }));
 
-jest.mock('@/lib/adventure/weeklyChallenge', () => ({
+vi.mock('@/lib/adventure/weeklyChallenge', () => ({
   getWeeklyChallengeConfig: () => ({
     weekId: '2026-W11',
     grid: Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A')),
@@ -446,20 +446,20 @@ jest.mock('@/lib/adventure/weeklyChallenge', () => ({
   getCurrentWeekId: () => '2026-W11',
 }));
 
-jest.mock('../WordAlbumPanel', () => {
+vi.mock('../WordAlbumPanel', () => {
   const Mock = () => null;
   Mock.displayName = 'MockWordAlbumPanel';
-  return Mock;
+  return { default: Mock };
 });
 
-jest.mock('../WeeklyChallengePanel', () => {
+vi.mock('../WeeklyChallengePanel', () => {
   const Mock = () => null;
   Mock.displayName = 'MockWeeklyChallengePanel';
-  return Mock;
+  return { default: Mock };
 });
 
 // Mock AdventureGame to simplify testing of AdventureView integration
-jest.mock('../AdventureGame', () => {
+vi.mock('../AdventureGame', () => {
   const MockAdventureGame = ({
     onExit,
     onTimerStateChange,
@@ -486,7 +486,7 @@ jest.mock('../AdventureGame', () => {
     );
   };
   MockAdventureGame.displayName = 'MockAdventureGame';
-  return MockAdventureGame;
+  return { default: MockAdventureGame };
 });
 
 // ==============================================
@@ -541,14 +541,14 @@ const renderAdventureView = () => {
 
 describe('AdventureView Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset to default loaded state
     mockProgressionState = {
       progression: createMockProgression(),
       isLoading: false,
       error: null,
-      completeLevel: jest.fn().mockResolvedValue(undefined),
-      getLevelAttempt: jest.fn().mockReturnValue(null),
+      completeLevel: vi.fn().mockResolvedValue(undefined),
+      getLevelAttempt: vi.fn().mockReturnValue(null),
     };
   });
 
@@ -670,14 +670,14 @@ describe('AdventureView Integration', () => {
   describe('Level Grid → Back to World Map', () => {
     beforeEach(() => {
       // Mock history.back to dispatch popstate with correct state
-      jest.spyOn(window.history, 'back').mockImplementation(() => {
+      vi.spyOn(window.history, 'back').mockImplementation(() => {
         const worldMapState = { adventureView: 'worldMap', worldId: null, levelId: null };
         window.dispatchEvent(new PopStateEvent('popstate', { state: worldMapState }));
       });
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should return to world map when back button is clicked', () => {
@@ -714,13 +714,13 @@ describe('AdventureView Integration', () => {
       originalBack = window.history.back;
 
       // Mock pushState to track history
-      jest.spyOn(window.history, 'pushState').mockImplementation((state) => {
+      vi.spyOn(window.history, 'pushState').mockImplementation((state) => {
         currentIndex++;
         historyStack.splice(currentIndex, historyStack.length - currentIndex, { state });
       });
 
       // Mock replaceState to update current entry
-      jest.spyOn(window.history, 'replaceState').mockImplementation((state) => {
+      vi.spyOn(window.history, 'replaceState').mockImplementation((state) => {
         if (currentIndex < 0) {
           currentIndex = 0;
           historyStack = [{ state }];
@@ -730,7 +730,7 @@ describe('AdventureView Integration', () => {
       });
 
       // Mock back to dispatch popstate with correct state
-      jest.spyOn(window.history, 'back').mockImplementation(() => {
+      vi.spyOn(window.history, 'back').mockImplementation(() => {
         if (currentIndex > 0) {
           currentIndex--;
           const previousState = historyStack[currentIndex]?.state || null;
@@ -744,7 +744,7 @@ describe('AdventureView Integration', () => {
       window.history.pushState = originalPushState;
       window.history.replaceState = originalReplaceState;
       window.history.back = originalBack;
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should navigate from level grid to world map when browser back is pressed', async () => {
@@ -786,7 +786,7 @@ describe('AdventureView Integration', () => {
     it('should push history state when navigating to level grid', () => {
       // GIVEN
       renderAdventureView();
-      const pushStateSpy = jest.spyOn(window.history, 'pushState');
+      const pushStateSpy = vi.spyOn(window.history, 'pushState');
 
       // WHEN
       fireEvent.click(screen.getByTestId('world-1'));
@@ -802,7 +802,7 @@ describe('AdventureView Integration', () => {
       // GIVEN
       renderAdventureView();
       fireEvent.click(screen.getByTestId('world-1'));
-      const pushStateSpy = jest.spyOn(window.history, 'pushState');
+      const pushStateSpy = vi.spyOn(window.history, 'pushState');
       pushStateSpy.mockClear(); // Clear calls from world selection
 
       // WHEN
@@ -820,7 +820,7 @@ describe('AdventureView Integration', () => {
       renderAdventureView();
       fireEvent.click(screen.getByTestId('world-1'));
       expect(screen.getByTestId('level-grid')).toBeInTheDocument();
-      const backSpy = jest.spyOn(window.history, 'back');
+      const backSpy = vi.spyOn(window.history, 'back');
 
       // WHEN
       fireEvent.click(screen.getByRole('button', { name: /back/i }));
@@ -860,14 +860,14 @@ describe('AdventureView Integration', () => {
   describe('Playing → Back to Level Grid', () => {
     beforeEach(() => {
       // Mock history.back to dispatch popstate with level grid state
-      jest.spyOn(window.history, 'back').mockImplementation(() => {
+      vi.spyOn(window.history, 'back').mockImplementation(() => {
         const levelGridState = { adventureView: 'levelGrid', worldId: 1, levelId: null };
         window.dispatchEvent(new PopStateEvent('popstate', { state: levelGridState }));
       });
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should return to level grid when exit button is clicked in header', () => {
@@ -894,7 +894,7 @@ describe('AdventureView Integration', () => {
       navigationStack = [{ view: 'worldMap', worldId: null }];
 
       // Mock history.pushState to track navigation
-      jest.spyOn(window.history, 'pushState').mockImplementation((state: unknown) => {
+      vi.spyOn(window.history, 'pushState').mockImplementation((state: unknown) => {
         const adventureState = state as { adventureView: string; worldId: number | null };
         if (adventureState?.adventureView) {
           navigationStack.push({ view: adventureState.adventureView, worldId: adventureState.worldId });
@@ -902,7 +902,7 @@ describe('AdventureView Integration', () => {
       });
 
       // Mock history.back to pop from stack and dispatch popstate
-      jest.spyOn(window.history, 'back').mockImplementation(() => {
+      vi.spyOn(window.history, 'back').mockImplementation(() => {
         if (navigationStack.length > 1) {
           navigationStack.pop();
           const previousState = navigationStack[navigationStack.length - 1];
@@ -917,7 +917,7 @@ describe('AdventureView Integration', () => {
     });
 
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should support complete navigation: world → level → play → back → world', () => {

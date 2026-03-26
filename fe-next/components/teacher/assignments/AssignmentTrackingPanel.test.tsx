@@ -5,15 +5,15 @@ import AssignmentTrackingPanel from './AssignmentTrackingPanel';
 import { useAssignments } from '@/hooks/useAssignments';
 
 // Mock hooks
-jest.mock('@/hooks/useAssignments');
-jest.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: jest.fn(() => ({
+vi.mock('@/hooks/useAssignments');
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: vi.fn(() => ({
     t: (key: string) => key,
     language: 'en',
   })),
 }));
 
-const mockGetAssignmentStatus = jest.fn((assignment) => {
+const mockGetAssignmentStatus = vi.fn((assignment) => {
   if (assignment.completion_count >= assignment.student_count) return 'completed';
   if (assignment.due_date && new Date(assignment.due_date) < new Date()) return 'overdue';
   return 'active';
@@ -69,7 +69,7 @@ const mockAssignments = [
 
 describe('AssignmentTrackingPanel', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (useAssignments as jest.Mock).mockReturnValue({
       assignments: mockAssignments,
       isLoading: false,

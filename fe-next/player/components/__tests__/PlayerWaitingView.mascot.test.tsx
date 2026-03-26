@@ -1,9 +1,10 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PlayerWaitingView from '../PlayerWaitingView';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -15,28 +16,28 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('../../../components/Avatar', () => ({
+vi.mock('../../../components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
-jest.mock('../../../components/RoomChat', () => ({
+vi.mock('../../../components/RoomChat', () => ({
   __esModule: true,
   default: () => <div data-testid="room-chat">Chat</div>,
 }));
 
-jest.mock('../../../host/components/pre-game/MobileShareSection', () => ({
+vi.mock('../../../host/components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => <div data-testid="mobile-share">Share</div>,
 }));
 
-jest.mock('../../../host/components/pre-game/desktop', () => ({
+vi.mock('../../../host/components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
     <div data-testid="desktop-layout">{leftContent}{rightContent}</div>
   ),
   InviteCard: () => <div data-testid="invite-card">Invite</div>,
 }));
 
-jest.mock('../../../components/ui/alert-dialog', () => ({
+vi.mock('../../../components/ui/alert-dialog', () => ({
   AlertDialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AlertDialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   AlertDialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -49,12 +50,12 @@ jest.mock('../../../components/ui/alert-dialog', () => ({
   AlertDialogCancel: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
 }));
 
-jest.mock('../../../contexts/AuthContext', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: false }),
 }));
 
 // Mock IdleMascot — what we're testing for
-jest.mock('@/components/ui/IdleMascot', () => ({
+vi.mock('@/components/ui/IdleMascot', () => ({
   IdleMascot: ({ baseVariant, size }: { baseVariant?: string; size?: string }) => (
     <div data-testid="idle-mascot" data-variant={baseVariant} data-size={size}>Idle Mascot</div>
   ),
@@ -68,11 +69,11 @@ describe('PlayerWaitingView IdleMascot', () => {
     t: (key: string) => key,
     playersReady: [{ username: 'Player1', isHost: false }],
     showQR: false,
-    setShowQR: jest.fn(),
+    setShowQR: vi.fn(),
     showExitConfirm: false,
-    setShowExitConfirm: jest.fn(),
-    onExitRoom: jest.fn(),
-    onConfirmExit: jest.fn(),
+    setShowExitConfirm: vi.fn(),
+    onExitRoom: vi.fn(),
+    onConfirmExit: vi.fn(),
   };
 
   // GIVEN the player waiting view

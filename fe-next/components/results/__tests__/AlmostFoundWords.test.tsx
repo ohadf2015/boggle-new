@@ -4,7 +4,7 @@ import AlmostFoundWords from '../AlmostFoundWords';
 import type { AlmostFoundWord } from '@/shared/utils/nearMissCalculator';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => {
     const translations: Record<string, string> = {
       'almostFound.title': 'You Almost Found...',
@@ -20,7 +20,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} {...props}>{children}</div>
@@ -79,7 +79,7 @@ describe('AlmostFoundWords', () => {
   });
 
   it('should call onWordSelect when a word is clicked', () => {
-    const onWordSelect = jest.fn();
+    const onWordSelect = vi.fn();
     render(<AlmostFoundWords words={mockWords} onWordSelect={onWordSelect} />);
     fireEvent.click(screen.getByText('QUANTUM'));
     expect(onWordSelect).toHaveBeenCalledWith('QUANTUM', mockWords[0].wordPath);

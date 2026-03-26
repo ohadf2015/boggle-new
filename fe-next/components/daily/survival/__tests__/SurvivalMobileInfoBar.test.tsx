@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockMotionDiv = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
     <div ref={ref} {...Object.fromEntries(Object.entries(props).filter(([k]) => !['initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'variants'].includes(k)))}>{children}</div>
   ));
@@ -15,14 +15,15 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock Avatar component
-jest.mock('@/components/Avatar', () => {
-  return function MockAvatar() {
+vi.mock('@/components/Avatar', () => {
+  const MockAvatar = () => {
     return <div data-testid="avatar" />;
   };
+  return { default: MockAvatar };
 });
 
 // Mock rankingStyles
-jest.mock('@/utils/rankingStyles', () => ({
+vi.mock('@/utils/rankingStyles', () => ({
   getRankDisplay: (rank: number) => `#${rank}`,
 }));
 
@@ -43,7 +44,7 @@ const mockT = (key: string) => {
 };
 
 // Mock fetch for leaderboard
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 beforeEach(() => {

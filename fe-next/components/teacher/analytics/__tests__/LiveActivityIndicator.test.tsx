@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import { LiveActivityIndicator } from '../LiveActivityIndicator';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: any) => {
       if (key === 'education.analytics.activeNow' && params?.count !== undefined) {
@@ -28,7 +28,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
     },
     language: 'en',
     locale: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
   }),
 }));
 

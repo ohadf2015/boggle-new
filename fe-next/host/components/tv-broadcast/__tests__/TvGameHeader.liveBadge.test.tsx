@@ -1,10 +1,11 @@
+import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvGameHeader from '../TvGameHeader';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: React.forwardRef(function MotionDiv(
       { children, className, style, ...rest }: any,
@@ -44,8 +45,8 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock CircularTimer
-jest.mock('../../../../components/CircularTimer', () => {
-  return function MockCircularTimer() {
+vi.mock('../../../../components/CircularTimer', () => ({
+  default: function MockCircularTimer() {
     return <div data-testid="circular-timer" />;
   };
 });

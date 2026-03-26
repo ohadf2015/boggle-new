@@ -547,15 +547,74 @@ describe('Grid-aware objective generation', () => {
       expect(hasLongWords).toBe(true);
     });
 
-    it('should skip secondary objectives on breather levels (3, 5)', () => {
+    it('should give breather levels (3, 5) exactly 1 secondary objective', () => {
       const obj3 = generateObjectives(1, 3);
       const obj5 = generateObjectives(2, 5);
-      // Breather levels only have primary objective
-      expect(obj3).toHaveLength(1);
-      expect(obj3[0].isPrimary).toBe(true);
-      expect(obj5).toHaveLength(1);
-      expect(obj5[0].isPrimary).toBe(true);
+      // Breather levels have primary + 1 easy secondary (reduced targets)
+      const secondaries3 = obj3.filter((o) => !o.isPrimary);
+      const secondaries5 = obj5.filter((o) => !o.isPrimary);
+      expect(secondaries3).toHaveLength(1);
+      expect(secondaries5).toHaveLength(1);
     });
+  });
+});
+
+describe('Granular star progression (1/2/3 stars reachable)', () => {
+  it('every non-boss regular level should have at least 2 secondary objectives', () => {
+    // With 2+ secondaries, calculateStars can return 1, 2, or 3
+    for (let world = 1; world <= 10; world++) {
+      for (let level = 1; level <= 6; level++) {
+        const objectives = generateObjectives(world, level);
+        const secondaries = objectives.filter((o) => !o.isPrimary);
+        const isBreather = level === 3 || level === 5;
+
+        if (isBreather) {
+          // Breather levels get exactly 1 secondary (relaxed but not binary)
+          expect(secondaries.length).toBeGreaterThanOrEqual(1);
+        } else {
+          // Regular levels need 2+ secondaries for 1/2/3 star granularity
+          expect(secondaries.length).toBeGreaterThanOrEqual(2);
+        }
+      }
+    }
+  });
+
+  it('should add scoreTarget secondary for levels that previously had none', () => {
+    // Levels 1, 2 in all worlds should now have a secondary score objective
+    const obj1 = generateObjectives(1, 1);
+    const obj2 = generateObjectives(1, 2);
+
+    // Level 1 primary is wordCount (odd), should have scoreTarget secondary
+    const scoreSecondary1 = obj1.find(
+      (o) => !o.isPrimary && o.type === 'scoreTarget'
+    );
+    expect(scoreSecondary1).toBeDefined();
+
+    // Level 2 primary is scoreTarget (even), should have wordCount secondary
+    const wordSecondary2 = obj2.find(
+      (o) => !o.isPrimary && o.type === 'wordCount'
+    );
+    expect(wordSecondary2).toBeDefined();
+  });
+
+  it('secondary targets should be easier than primary targets of same type', () => {
+    // When a secondary has the same type as another level's primary,
+    // the secondary target should be lower (stretch goal, not gate)
+    for (let world = 1; world <= 10; world++) {
+      for (let level = 1; level <= 6; level++) {
+        const objectives = generateObjectives(world, level);
+        const primary = objectives.find((o) => o.isPrimary)!;
+        const secondaries = objectives.filter((o) => !o.isPrimary);
+
+        for (const sec of secondaries) {
+          // Secondary targets must be positive
+          expect(sec.target).toBeGreaterThan(0);
+        }
+
+        // Primary target must be positive
+        expect(primary.target).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

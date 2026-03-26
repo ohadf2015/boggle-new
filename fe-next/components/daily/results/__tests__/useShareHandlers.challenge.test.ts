@@ -8,16 +8,16 @@ import { useShareHandlers } from '../useShareHandlers';
 import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 
 // Mock generateWordHuntShareableResult and image utilities
-jest.mock('@/utils/dailyChallenge', () => ({
-  generateWordHuntShareableResult: jest.fn().mockReturnValue('Shared result text'),
+vi.mock('@/utils/dailyChallenge', () => ({
+  generateWordHuntShareableResult: vi.fn().mockReturnValue('Shared result text'),
 }));
 
-jest.mock('@/utils/dailyShareImage', () => ({
-  generateDailyShareImage: jest.fn(),
-  downloadDailyShareImage: jest.fn(),
+vi.mock('@/utils/dailyShareImage', () => ({
+  generateDailyShareImage: vi.fn(),
+  downloadDailyShareImage: vi.fn(),
 }));
 
-const mockShare = jest.fn();
+const mockShare = vi.fn();
 Object.defineProperty(window, 'navigator', {
   value: { share: mockShare },
   writable: true,
@@ -58,7 +58,7 @@ const baseProps = {
 
 describe('useShareHandlers - challenge share', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns handleChallengeShare function', () => {

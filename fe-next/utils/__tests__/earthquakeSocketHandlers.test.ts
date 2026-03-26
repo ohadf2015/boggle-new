@@ -17,19 +17,19 @@ describe('createEarthquakeSocketHandlers', () => {
   let fireRoundIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
-    setEarthquakeState = jest.fn();
-    setFireRoundActive = jest.fn();
-    setFireRoundRemaining = jest.fn();
-    setLetterGrid = jest.fn();
+    setEarthquakeState = vi.fn();
+    setFireRoundActive = vi.fn();
+    setFireRoundRemaining = vi.fn();
+    setLetterGrid = vi.fn();
     gameSessionIdRef = { current: 123 };
     fireRoundIntervalRef = { current: null };
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('handleFireRoundStart', () => {
@@ -76,15 +76,15 @@ describe('createEarthquakeSocketHandlers', () => {
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(15);
 
       // After 1 second, should be 14
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(14);
 
       // After 2 more seconds, should be 12
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(12);
 
       // After 5 more seconds, should be 7
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(7);
     });
 
@@ -105,7 +105,7 @@ describe('createEarthquakeSocketHandlers', () => {
       });
 
       // Advance through the full countdown
-      jest.advanceTimersByTime(5000); // More than duration
+      vi.advanceTimersByTime(5000); // More than duration
 
       // Should have called with 3, 2, 1, 0 (no negatives)
       const calls = setFireRoundRemaining.mock.calls.map((c: [number]) => c[0]);
@@ -156,7 +156,7 @@ describe('createEarthquakeSocketHandlers', () => {
       });
 
       // Advance 3 seconds
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(12);
 
       // Start another fire round (simulating multiple earthquakes or reconnect)
@@ -170,7 +170,7 @@ describe('createEarthquakeSocketHandlers', () => {
       expect(setFireRoundRemaining).toHaveBeenCalledWith(10);
 
       // Advance 1 second - should count down from 10, not from 12
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(9);
     });
   });
@@ -211,14 +211,14 @@ describe('createEarthquakeSocketHandlers', () => {
         duration: 15,
       });
 
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
       setFireRoundRemaining.mockClear();
 
       // End fire round
       handlers.handleFireRoundEnd({ gameSessionId: 123 });
 
       // Advance time - countdown should not continue
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       // Only call should be the reset to 0 from handleFireRoundEnd
       expect(setFireRoundRemaining).toHaveBeenCalledTimes(1);
@@ -280,14 +280,14 @@ describe('createEarthquakeSocketHandlers', () => {
         duration: 15,
       });
 
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
       setFireRoundRemaining.mockClear();
 
       // Cleanup (simulates component unmount)
       handlers.cleanup();
 
       // Advance time - countdown should not continue
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       // No calls after cleanup
       expect(setFireRoundRemaining).not.toHaveBeenCalled();
@@ -316,7 +316,7 @@ describe('createEarthquakeSocketHandlers', () => {
       });
 
       // Advance 3 seconds, countdown should be at 12
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(12);
 
       // Simulate useEffect cleanup and re-creation (what happens when deps change)
@@ -352,7 +352,7 @@ describe('createEarthquakeSocketHandlers', () => {
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(10);
 
       // Advance and verify countdown works with new handlers
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(8);
     });
 
@@ -376,7 +376,7 @@ describe('createEarthquakeSocketHandlers', () => {
       });
 
       // Advance 3 seconds
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(12);
 
       // Create new handlers WITHOUT calling cleanup on old ones
@@ -395,7 +395,7 @@ describe('createEarthquakeSocketHandlers', () => {
       expect(fireRoundIntervalRef.current).not.toBeNull();
 
       // Advance another 2 seconds - countdown should continue
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(setFireRoundRemaining).toHaveBeenLastCalledWith(10);
 
       // Cleanup with new handlers should work
@@ -407,7 +407,7 @@ describe('createEarthquakeSocketHandlers', () => {
   describe('host role', () => {
     it('should work for HOST role with tableDataRef', () => {
       const tableDataRef = { current: null };
-      const setTableData = jest.fn();
+      const setTableData = vi.fn();
 
       const handlers = createEarthquakeSocketHandlers({
         setEarthquakeState,

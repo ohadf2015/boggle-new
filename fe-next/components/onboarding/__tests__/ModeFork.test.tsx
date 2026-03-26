@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv(
     { children, ...props }: any,
@@ -43,7 +43,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock lucide-react
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Trophy: () => <div data-testid="trophy-icon" />,
   Target: () => <div data-testid="target-icon" />,
   Users: () => <div data-testid="users-icon" />,
@@ -51,7 +51,7 @@ jest.mock('lucide-react', () => ({
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -72,11 +72,11 @@ import ModeFork from '../ModeFork';
 
 describe('ModeFork', () => {
   const defaultProps = {
-    onSelectMode: jest.fn(),
+    onSelectMode: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the mode fork component', () => {

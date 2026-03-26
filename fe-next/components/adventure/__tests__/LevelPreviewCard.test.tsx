@@ -39,7 +39,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.tiles.time': 'Time (+5 sec)',
 };
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
     language: 'en',
@@ -48,7 +48,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
 
   const MockMotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) =>
@@ -88,12 +88,12 @@ describe('LevelPreviewCard', () => {
     levelConfig: mockLevelConfig,
     worldNumber: 1,
     levelNumber: 3,
-    onStart: jest.fn(),
-    onBack: jest.fn(),
+    onStart: vi.fn(),
+    onBack: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Level Information', () => {
@@ -192,7 +192,7 @@ describe('LevelPreviewCard', () => {
     });
 
     it('should call onStart when Start is clicked', () => {
-      const onStart = jest.fn();
+      const onStart = vi.fn();
       render(<LevelPreviewCard {...defaultProps} onStart={onStart} />);
 
       fireEvent.click(screen.getByRole('button', { name: /start level/i }));
@@ -200,7 +200,7 @@ describe('LevelPreviewCard', () => {
     });
 
     it('should call onBack when Back is clicked', () => {
-      const onBack = jest.fn();
+      const onBack = vi.fn();
       render(<LevelPreviewCard {...defaultProps} onBack={onBack} />);
 
       fireEvent.click(screen.getByRole('button', { name: /back/i }));

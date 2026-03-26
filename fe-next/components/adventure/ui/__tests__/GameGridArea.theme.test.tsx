@@ -21,7 +21,7 @@ const mockHUDTheme = {
   hintActiveText: 'text-emerald-950',
 };
 
-jest.mock('@/contexts/AdventureThemeContext', () => {
+vi.mock('@/contexts/AdventureThemeContext', () => {
   const R = require('react');
   return {
     useHUDTheme: () => mockHUDTheme,
@@ -29,7 +29,7 @@ jest.mock('@/contexts/AdventureThemeContext', () => {
   };
 });
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     locale: 'en',
@@ -37,12 +37,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('../../AdventureGrid', () => ({
+vi.mock('../../AdventureGrid', () => ({
   __esModule: true,
   default: React.forwardRef(function MockAdventureGrid() { return <div data-testid="mock-grid" />; }),
 }));
 
-jest.mock('@/components/game/WordFormingArea', () => ({
+vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: ({ word }: any) => <div data-testid="mock-word-area">{word}</div>,
 }));
@@ -55,16 +55,16 @@ describe('GameGridArea — Theme Integration', () => {
     ],
     gridSize: 4,
     selectedIndices: [],
-    onTileSelect: jest.fn(),
-    onWordSubmit: jest.fn(),
-    onDragStart: jest.fn(),
-    onDragEnter: jest.fn(),
+    onTileSelect: vi.fn(),
+    onWordSubmit: vi.fn(),
+    onDragStart: vi.fn(),
+    onDragEnter: vi.fn(),
     gridRef: { current: null },
     isInteractive: true,
     isDisabled: false,
     entryPhase: 'play',
     showCascade: false,
-    onCascadeComplete: jest.fn(),
+    onCascadeComplete: vi.fn(),
     hintHighlightIndices: [],
     pathPoints: [],
     validationError: null,

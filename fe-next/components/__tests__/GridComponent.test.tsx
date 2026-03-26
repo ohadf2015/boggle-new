@@ -10,7 +10,7 @@ import GridComponent from '../GridComponent';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, initial, animate, exit, whileTap, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
@@ -21,28 +21,28 @@ jest.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
   useAnimation: () => ({
-    start: jest.fn(),
-    stop: jest.fn(),
-    set: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    set: vi.fn(),
   }),
 }));
 
 // Mock accessibility context
-jest.mock('@/contexts/AccessibilityContext', () => ({
+vi.mock('@/contexts/AccessibilityContext', () => ({
   useDisableFireRoundLights: () => false,
   useDisableEarthquakeEffects: () => false,
   useLargeLetters: () => false,
 }));
 
 // Mock sound effects context
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playLetterSelectSound: jest.fn(),
+    playLetterSelectSound: vi.fn(),
   }),
 }));
 
 // Mock device performance hook
-jest.mock('../../hooks/useDevicePerformance', () => ({
+vi.mock('../../hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -51,7 +51,7 @@ jest.mock('../../hooks/useDevicePerformance', () => ({
 }));
 
 // Mock earthquake animation hook
-jest.mock('../../hooks/useEarthquakeAnimation', () => ({
+vi.mock('../../hooks/useEarthquakeAnimation', () => ({
   useEarthquakeAnimation: () => ({
     earthquakePhase: 'idle',
     earthquakeParticles: [],

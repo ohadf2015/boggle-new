@@ -9,34 +9,34 @@ import type { VocabularyWord } from '@/lib/supabase/education';
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-jest.mock('@/hooks/useSpeechSynthesis', () => ({
-  useSpeechSynthesis: () => ({ speak: jest.fn(), isSpeaking: false }),
+vi.mock('@/hooks/useSpeechSynthesis', () => ({
+  useSpeechSynthesis: () => ({ speak: vi.fn(), isSpeaking: false }),
 }));
 
 // Provide a socket that emits vocabularyEnriched so enrichedWords gets populated
 const mockSocket = {
-  emit: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
+  emit: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
 };
 
-jest.mock('@/utils/SocketContext', () => ({
+vi.mock('@/utils/SocketContext', () => ({
   useSocketOptional: () => ({ socket: mockSocket }),
 }));
 
-jest.mock('../PronunciationButton', () => ({
+vi.mock('../PronunciationButton', () => ({
   PronunciationButton: () => null,
 }));
 
-jest.mock('../FlashcardSwipeStack', () => ({
+vi.mock('../FlashcardSwipeStack', () => ({
   FlashcardSwipeStack: () => <div data-testid="swipe-stack" />,
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>
@@ -48,7 +48,7 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@/components/motion/AdaptiveMotion', () => {
+vi.mock('@/components/motion/AdaptiveMotion', () => {
   const React = require('react');
   const MockDiv = React.forwardRef(({ children, ...props }: any, ref: any) => (
     <div ref={ref} {...props}>{children}</div>
@@ -60,11 +60,11 @@ jest.mock('@/components/motion/AdaptiveMotion', () => {
   };
 });
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
-jest.mock('@/components/ui/card', () => ({
+vi.mock('@/components/ui/card', () => ({
   Card: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   CardContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
 }));
@@ -102,15 +102,15 @@ function triggerEnrichment() {
 
 describe('FlashcardReview — WordContextRow integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('shows part-of-speech on the word face when enriched data is available', () => {
     render(
       <FlashcardReview
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 
@@ -124,8 +124,8 @@ describe('FlashcardReview — WordContextRow integration', () => {
     render(
       <FlashcardReview
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 
@@ -142,8 +142,8 @@ describe('FlashcardReview — WordContextRow integration', () => {
     render(
       <FlashcardReview
         words={mockWords}
-        onComplete={jest.fn()}
-        onBack={jest.fn()}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
       />
     );
 

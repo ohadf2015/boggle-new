@@ -1,3 +1,4 @@
+import { vi, type Mock, } from 'vitest';
 /**
  * Analytics Logger Tests
  *
@@ -5,7 +6,7 @@
  * DDA-04: Analytics track difficulty effectiveness
  */
 
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, jest, beforeEach } from 'vitest';
 import {
   createDDAEvent,
   createDDAAnalyticsPayload,
@@ -16,7 +17,7 @@ import {
 import { DEFAULT_INTENSITY } from '../constants';
 
 // Mock fetch with proper typing
-const mockFetch = jest.fn<() => Promise<Partial<Response>>>();
+const mockFetch = vi.fn<() => Promise<Partial<Response>>>();
 global.fetch = mockFetch as typeof fetch;
 
 describe('createDDAEvent', () => {

@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const stripFramerProps = (props: Record<string, unknown>) => {
     const {
       whileHover,

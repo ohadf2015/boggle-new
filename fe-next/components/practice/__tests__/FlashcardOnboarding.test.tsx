@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { FlashcardOnboarding } from '../FlashcardOnboarding';
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -21,7 +21,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock Mascot
-jest.mock('@/components/ui/Mascot', () => ({
+vi.mock('@/components/ui/Mascot', () => ({
   __esModule: true,
   Mascot: ({ variant }: { variant: string }) => (
     <div data-testid="mascot">Mascot: {variant}</div>
@@ -35,14 +35,14 @@ jest.mock('@/components/ui/Mascot', () => ({
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
   };
@@ -54,11 +54,11 @@ Object.defineProperty(window, 'localStorage', {
 
 describe('FlashcardOnboarding', () => {
   const defaultProps = {
-    onDismiss: jest.fn(),
+    onDismiss: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
   });
 
@@ -116,7 +116,7 @@ describe('FlashcardOnboarding', () => {
 
 describe('FlashcardOnboarding localStorage utilities', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
   });
 

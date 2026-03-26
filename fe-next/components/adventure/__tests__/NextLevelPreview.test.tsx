@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NextLevelPreview } from '../NextLevelPreview';
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
@@ -14,7 +14,7 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const MockDiv = React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
     return (
       <div ref={ref} data-testid={props['data-testid']} {...filterMotionProps(props)}>
@@ -54,11 +54,11 @@ describe('NextLevelPreview', () => {
     gridSize: 5,
     objectives: ['adventure.objectives.score', 'adventure.objectives.words'],
     isVisible: true,
-    onPlay: jest.fn(),
-    onDismiss: jest.fn(),
+    onPlay: vi.fn(),
+    onDismiss: vi.fn(),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders when visible', () => {
     render(<NextLevelPreview {...defaultProps} />);
@@ -82,12 +82,12 @@ describe('NextLevelPreview', () => {
   });
 
   it('calls onPlay when Play button clicked', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     render(<NextLevelPreview {...defaultProps} />);
-    act(() => { jest.advanceTimersByTime(2000); });
+    act(() => { vi.advanceTimersByTime(2000); });
     fireEvent.click(screen.getByText('adventure.play'));
     expect(defaultProps.onPlay).toHaveBeenCalledTimes(1);
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('calls onDismiss when Later clicked', () => {

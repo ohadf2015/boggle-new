@@ -16,7 +16,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import type { LetterGrid, Language } from '@/types';
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
@@ -27,27 +27,27 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock contexts and hooks
-jest.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => jest.fn(),
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playErrorSound: jest.fn(),
-    setGameActive: jest.fn(),
-    playSound: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    playMusic: jest.fn(),
-    stopMusic: jest.fn(),
-    fadeToTrack: jest.fn(),
+    playMusic: vi.fn(),
+    stopMusic: vi.fn(),
+    fadeToTrack: vi.fn(),
     isMuted: false,
-    toggleMute: jest.fn(),
+    toggleMute: vi.fn(),
     TRACKS: {
       BOSSA_ARCADE: 'bossa_arcade',
       MENU: 'menu',
@@ -56,11 +56,11 @@ jest.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -68,20 +68,20 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useNavigationGuard', () => ({
+vi.mock('@/hooks/useNavigationGuard', () => ({
   useNavigationGuard: () => {},
 }));
 
-jest.mock('@/hooks/useContextualGuidance', () => ({
+vi.mock('@/hooks/useContextualGuidance', () => ({
   useContextualGuidance: () => ({
     showSwipeTip: false,
-    dismissSwipeTip: jest.fn(),
-    triggerSwipeTipGuidance: jest.fn(),
+    dismissSwipeTip: vi.fn(),
+    triggerSwipeTipGuidance: vi.fn(),
   }),
   useSwipeTipGuidanceTrigger: () => {},
 }));
 
-jest.mock('@/hooks/useKeyboardWordInput', () => ({
+vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({
     highlightedCells: [],
   }),
@@ -133,8 +133,8 @@ describe('Hebrew RTL Layout', () => {
           puzzleNumber={1}
           language="he"
           targetWord="שלום"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -154,8 +154,8 @@ describe('Hebrew RTL Layout', () => {
           puzzleNumber={1}
           language="he"
           targetWord={longHebrewWord}
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -172,8 +172,8 @@ describe('Hebrew RTL Layout', () => {
           puzzleNumber={1}
           language="he"
           targetWord="שלום"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -195,8 +195,8 @@ describe('Hebrew RTL Layout', () => {
           puzzleNumber={1}
           language="he"
           targetWord="שלום"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -216,8 +216,8 @@ describe('Hebrew RTL Layout', () => {
           puzzleNumber={42}
           language="he"
           targetWord="שלום"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -249,8 +249,8 @@ describe('Japanese Character Handling', () => {
             puzzleNumber={1}
             language="ja"
             targetWord={word}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -272,8 +272,8 @@ describe('Japanese Character Handling', () => {
             puzzleNumber={1}
             language="ja"
             targetWord={word}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -294,8 +294,8 @@ describe('Japanese Character Handling', () => {
             puzzleNumber={1}
             language="ja"
             targetWord={word}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -315,8 +315,8 @@ describe('Japanese Character Handling', () => {
           puzzleNumber={1}
           language="ja"
           targetWord={mixedWord}
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -334,8 +334,8 @@ describe('Japanese Character Handling', () => {
           puzzleNumber={1}
           language="ja"
           targetWord="あいう"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -369,8 +369,8 @@ describe('Swedish Special Characters', () => {
             puzzleNumber={1}
             language="sv"
             targetWord={word}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -390,8 +390,8 @@ describe('Swedish Special Characters', () => {
           puzzleNumber={1}
           language="sv"
           targetWord={uppercaseWord}
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -408,8 +408,8 @@ describe('Swedish Special Characters', () => {
           puzzleNumber={1}
           language="sv"
           targetWord="ÅLDER"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -427,8 +427,8 @@ describe('Swedish Special Characters', () => {
           puzzleNumber={1}
           language="sv"
           targetWord="smörgåsbord"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -452,8 +452,8 @@ describe('English Baseline', () => {
           puzzleNumber={1}
           language="en"
           targetWord="HOUSE"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -473,8 +473,8 @@ describe('English Baseline', () => {
           puzzleNumber={1}
           language="en"
           targetWord={longWord}
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
@@ -532,8 +532,8 @@ describe('Cross-Language Validation', () => {
             puzzleNumber={1}
             language={lang}
             targetWord={targetWords[lang]}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -568,8 +568,8 @@ describe('Cross-Language Validation', () => {
             puzzleNumber={42}
             language={lang}
             targetWord={targetWords[lang]}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -588,8 +588,8 @@ describe('Cross-Language Validation', () => {
             puzzleNumber={1}
             language={lang}
             targetWord={targetWords[lang]}
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -622,8 +622,8 @@ describe('RTL Shadow Flip Verification', () => {
             puzzleNumber={1}
             language={lang as Language}
             targetWord="TEST"
-            onComplete={jest.fn()}
-            onQuit={jest.fn()}
+            onComplete={vi.fn()}
+            onQuit={vi.fn()}
           />
         </LanguageProvider>
       );
@@ -644,8 +644,8 @@ describe('RTL Shadow Flip Verification', () => {
           puzzleNumber={1}
           language="he"
           targetWord="שלום"
-          onComplete={jest.fn()}
-          onQuit={jest.fn()}
+          onComplete={vi.fn()}
+          onQuit={vi.fn()}
         />
       </LanguageProvider>
     );
