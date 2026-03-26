@@ -45,3 +45,4 @@ fe-next/app-debug.apk
 tmp/
 fe-next/tmp/
 .vercel
+.claude/worktrees/
