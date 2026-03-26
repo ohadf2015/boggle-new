@@ -9,8 +9,9 @@ const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseSer
 // ==================== Admin middleware ====================
 
 const adminProcedure = loggedProcedure.use(async ({ ctx, next }) => {
-  const adminKey = ctx.req.headers['x-admin-key'];
-  if (adminKey !== process.env.ADMIN_API_KEY) {
+  const adminKey = ctx.req.headers['x-admin-key'] as string | undefined;
+  const expectedKey = process.env.ADMIN_API_KEY;
+  if (!expectedKey || !adminKey || adminKey !== expectedKey) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Admin access required' });
   }
   return next();

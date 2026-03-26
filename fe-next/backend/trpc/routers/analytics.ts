@@ -24,10 +24,8 @@ export const analyticsRouter = router({
       }
 
       const supabase = getSupabase();
-      const country_code =
-        (ctx.req as any).geoData?.countryCode ||
-        (ctx.req.headers['x-country-code'] as string) ||
-        null;
+      // Only trust server-side geo middleware, never client headers
+      const country_code = (ctx.req as any).geoData?.countryCode || null;
 
       const enrichedMetadata: Record<string, unknown> = {
         ...(input.metadata ?? {}),

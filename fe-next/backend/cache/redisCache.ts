@@ -40,8 +40,12 @@ export async function cacheAside<T>(
 
 export async function invalidateCache(pattern: string): Promise<void> {
   const redis = getCacheClient();
-  const keys = await redis.keys(pattern); // Use SCAN in production with large keyspaces
-  if (keys.length > 0) await redis.del(...keys);
+  const stream = redis.scanStream({ match: pattern, count: 100 });
+  const keysToDelete: string[] = [];
+  for await (const chunk of stream) {
+    keysToDelete.push(...(chunk as string[]));
+  }
+  if (keysToDelete.length > 0) await redis.del(...keysToDelete);
 }
 
 export async function closeCacheClient(): Promise<void> {

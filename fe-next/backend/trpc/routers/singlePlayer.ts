@@ -9,9 +9,9 @@ const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseSer
 export const singlePlayerRouter = router({
   submitScore: loggedProcedure
     .input(z.object({
-      userId: z.string().min(1),
-      score: z.number().int().min(0),
-      wordsFound: z.number().int().min(0),
+      userId: z.string().min(1).max(100),
+      score: z.number().int().min(0).max(100000),
+      wordsFound: z.number().int().min(0).max(500),
       longestWord: z.string().optional(),
       language: z.enum(['en', 'he', 'sv', 'ja', 'es']).default('en'),
       gameMode: z.string().min(1),

@@ -56,7 +56,8 @@ export const leaderboardRouter = router({
             .limit(input.limit);
 
           if (error) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `Leaderboard fetch error: ${error.message}` });
+            logger.error('TRPC', 'Leaderboard fetch error', { error: error.message });
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to fetch leaderboard' });
           }
           entries = data || [];
         }

@@ -119,7 +119,13 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     res.json(getRoomMetrics());
   });
 
-  app.get('/metrics/reset', (_req: Request, res: Response): void => {
+  app.post('/metrics/reset', (req: Request, res: Response): void => {
+    const adminKey = req.headers['x-admin-key'];
+    const expectedKey = process.env.ADMIN_API_KEY;
+    if (!expectedKey || !adminKey || adminKey !== expectedKey) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
     resetAll();
     res.json({ ok: true });
   });
