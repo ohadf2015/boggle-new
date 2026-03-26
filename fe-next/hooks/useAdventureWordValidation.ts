@@ -150,7 +150,7 @@ const gridSolutionCache = new Map<string, Set<string>>();
 function gridCacheSet(key: string, value: Set<string>) {
   // Delete first so re-insertion moves key to end (Map preserves insertion order)
   gridSolutionCache.delete(key);
-  gridCacheSet(key, value);
+  gridSolutionCache.set(key, value);
   // Evict oldest entries if over limit
   if (gridSolutionCache.size > MAX_CACHE_ENTRIES) {
     const oldest = gridSolutionCache.keys().next().value;
