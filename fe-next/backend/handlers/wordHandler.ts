@@ -23,7 +23,7 @@ import {
 import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
 import { isProfane } from '../utils/profanityFilter.js';
-import { isDictionaryWord } from '../dictionary.js';
+import { isDictionaryWord, isValidWordCached } from '../dictionary.js';
 import { isSupabaseConfigured, recordPlayerWrongWord } from '../modules/supabaseServer.js';
 import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
@@ -320,8 +320,8 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Check dictionary and community validation
-      const isInDictionary = isDictionaryWord(normalizedWord, game.language);
+      // Check dictionary and community validation (Redis cache → in-memory fallback)
+      const isInDictionary = await isValidWordCached(normalizedWord, game.language);
       const isCommunityValidated = isWordCommunityValid(normalizedWord, game.language);
       const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;

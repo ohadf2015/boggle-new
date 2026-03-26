@@ -482,6 +482,24 @@ export {
 export const load = (): Promise<void> => dictionary.load();
 export const loadEnglishOnly = (): Promise<void> => dictionary.loadEnglishOnly();
 export const isValidWord = (word: string, language: Language): boolean | null => dictionary.isValidWord(word, language);
+/**
+ * Async word validation with Redis cache layer.
+ * Checks cache first, falls back to in-memory dictionary, then populates cache.
+ * Use this in async paths (socket handlers, API routes) where the cache hit
+ * avoids needing the dictionary loaded in memory for that language.
+ */
+export const isValidWordCached = async (word: string, language: Language): Promise<boolean | null> => {
+  const { getCachedWordValidation, setCachedWordValidation } = await import('./cache/wordCache');
+  const cached = await getCachedWordValidation(language, word);
+  if (cached !== null) return cached;
+
+  const result = dictionary.isValidWord(word, language);
+  if (result !== null) {
+    // fire-and-forget cache population
+    setCachedWordValidation(language, word, result).catch(() => {});
+  }
+  return result;
+};
 export const isValidEnglishWord = (word: string): boolean | null => dictionary.isValidEnglishWord(word);
 export const isValidHebrewWord = (word: string): boolean | null => dictionary.isValidHebrewWord(word);
 export const isValidSwedishWord = (word: string): boolean | null => dictionary.isValidSwedishWord(word);

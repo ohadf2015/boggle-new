@@ -10,6 +10,7 @@ import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
 import { broadcastActiveRooms } from '../backend/utils/socketHelpers';
 import { registerDuelHandlers } from '../backend/handlers/duel';
+import { checkConnectionRateLimit } from '../backend/middleware/rateLimiterRedis';
 
 import type { Server as HttpServer } from 'http';
 
@@ -50,6 +51,18 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     connectionStateRecovery: {
       maxDisconnectionDuration: 2 * 60 * 1000 // 2 minutes
     }
+  });
+
+  // Connection rate limit middleware - prevents rapid reconnect abuse per IP
+  io.use(async (socket, next) => {
+    const ip = socket.handshake.headers['x-forwarded-for'] as string || socket.handshake.address;
+    const allowed = await checkConnectionRateLimit(ip);
+    if (!allowed) {
+      socketLogger.warn({ ip }, 'Connection rejected: rate limit exceeded');
+      next(new Error('Too many connections'));
+      return;
+    }
+    next();
   });
 
   // Connection limit middleware - prevents resource exhaustion on low-end devices
