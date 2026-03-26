@@ -136,7 +136,7 @@ const { sharedHowl } = vi.hoisted(() => {
 vi.mock('@/lib/audio/audioLoader', () => ({
   createLazyHowl: vi.fn((src: string | string[], options?: any) => {
     if (!sharedHowl.ref) return null;
-    return new sharedHowl.ref({
+    return sharedHowl.ref({
       src: Array.isArray(src) ? src : [src],
       preload: false,
       html5: true,
@@ -191,21 +191,21 @@ describe('MusicContext - Auto-play and Transitions', () => {
       await new Promise(resolve => setTimeout(resolve, 50));
     });
 
-    // Get the Howl instance for inGame track
+    // Get the Howl instance for inGame track via mock calls
     const HowlConstructor = Howl as MockedClass<typeof Howl>;
-    const inGameHowl = HowlConstructor.mock.results.find(r =>
-      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_game.mp3'
-    )?.value;
+    await waitFor(() => {
+      expect(HowlConstructor.mock.calls.length).toBeGreaterThan(0);
+    });
+    const callIdx = HowlConstructor.mock.calls.findIndex(call =>
+      call[0]?.src?.[0] === '/music/in_game.mp3'
+    );
+    expect(callIdx).toBeGreaterThanOrEqual(0);
+    // Verify loop: true was passed in options
+    expect(HowlConstructor.mock.calls[callIdx][0].loop).toBe(true);
 
+    // Get the instance via mock.results
+    const inGameHowl = HowlConstructor.mock.results[callIdx]?.value;
     expect(inGameHowl).toBeDefined();
-    expect(inGameHowl._playing).toBe(true);
-
-    // Verify native looping is enabled - this means Howler handles the loop
-    // automatically without needing to call play() again
-    expect(inGameHowl._options.loop).toBe(true);
-
-    // With native loop: true, the track continues playing indefinitely
-    // without needing to trigger onend manually
     expect(inGameHowl._playing).toBe(true);
   });
 

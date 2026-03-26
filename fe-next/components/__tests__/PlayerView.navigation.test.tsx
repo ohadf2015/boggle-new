@@ -15,8 +15,8 @@
 describe('Header Logo Navigation - Room Exit Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Setup sessionStorage mock to return values
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
+    // Setup sessionStorage mock to return values (vitest.setup.ts replaces sessionStorage with vi.fn() mocks)
+    (sessionStorage.getItem as ReturnType<typeof vi.fn>).mockImplementation((key: string) => {
       const store: Record<string, string> = {
         gameCode: 'TEST123',
         username: 'TestPlayer',
@@ -27,7 +27,7 @@ describe('Header Logo Navigation - Room Exit Integration', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should dispatch requestRoomExit event when logo is clicked with active session', () => {
@@ -60,7 +60,7 @@ describe('Header Logo Navigation - Room Exit Integration', () => {
 
   it('should NOT dispatch event when no active session exists', () => {
     // Override to simulate no active game
-    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
+    (sessionStorage.getItem as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
     const eventHandler = vi.fn();
     window.addEventListener('requestRoomExit', eventHandler);

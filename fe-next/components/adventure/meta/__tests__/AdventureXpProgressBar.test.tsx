@@ -14,48 +14,60 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AdventureXpProgressBar from '../AdventureXpProgressBar';
 
-// Mock LanguageContext
+// Mock LanguageContext with configurable dir
+let mockDir = 'ltr';
+let mockLocale = 'en';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
-    dir: 'ltr',
-    locale: 'en',
+    dir: mockDir,
+    locale: mockLocale,
   }),
 }));
 
-// Mock adventureXpUtils
-vi.mock('@/shared/utils/adventureXpUtils', () => ({
-  getXpProgress: (totalXp: number) => {
-    // Simple mock implementation
-    if (totalXp >= 1000) {
-      return {
-        currentLevel: 10,
-        progressPercent: 75,
-        xpInCurrentLevel: 150,
-        xpNeededForNextLevel: 200,
-        isMaxLevel: false,
-      };
-    }
-    if (totalXp >= 500) {
-      return {
-        currentLevel: 5,
-        progressPercent: 50,
-        xpInCurrentLevel: 100,
-        xpNeededForNextLevel: 200,
-        isMaxLevel: false,
-      };
-    }
+// Mock adventureXpUtils with configurable override for max level tests
+let mockGetXpProgressOverride: ((totalXp: number) => any) | null = null;
+const defaultGetXpProgress = (totalXp: number) => {
+  if (totalXp >= 1000) {
     return {
-      currentLevel: 1,
-      progressPercent: 25,
-      xpInCurrentLevel: 25,
-      xpNeededForNextLevel: 100,
+      currentLevel: 10,
+      progressPercent: 75,
+      xpInCurrentLevel: 150,
+      xpNeededForNextLevel: 200,
       isMaxLevel: false,
     };
+  }
+  if (totalXp >= 500) {
+    return {
+      currentLevel: 5,
+      progressPercent: 50,
+      xpInCurrentLevel: 100,
+      xpNeededForNextLevel: 200,
+      isMaxLevel: false,
+    };
+  }
+  return {
+    currentLevel: 1,
+    progressPercent: 25,
+    xpInCurrentLevel: 25,
+    xpNeededForNextLevel: 100,
+    isMaxLevel: false,
+  };
+};
+vi.mock('@/shared/utils/adventureXpUtils', () => ({
+  getXpProgress: (totalXp: number) => {
+    if (mockGetXpProgressOverride) return mockGetXpProgressOverride(totalXp);
+    return defaultGetXpProgress(totalXp);
   },
 }));
 
 describe('AdventureXpProgressBar', () => {
+  afterEach(() => {
+    mockGetXpProgressOverride = null;
+    mockDir = 'ltr';
+    mockLocale = 'en';
+  });
+
   describe('Rendering', () => {
     it('should render progress bar with correct percentage', () => {
       render(<AdventureXpProgressBar totalXp={500} />);
@@ -137,19 +149,17 @@ describe('AdventureXpProgressBar', () => {
 
   describe('RTL Layout', () => {
     it('should apply RTL direction when dir is rtl', () => {
-      // Override mock for this test
-      vi.mock('@/contexts/LanguageContext', () => ({
-        useLanguage: () => ({
-          t: (key: string) => key,
-          dir: 'rtl',
-          locale: 'he',
-        }),
-      }));
+      mockDir = 'rtl';
+      mockLocale = 'he';
 
       render(<AdventureXpProgressBar totalXp={500} />);
 
       const wrapper = screen.getByTestId('adventure-xp-progress-wrapper');
       expect(wrapper).toHaveAttribute('dir', 'rtl');
+
+      // Restore defaults
+      mockDir = 'ltr';
+      mockLocale = 'en';
     });
   });
 
@@ -169,16 +179,14 @@ describe('AdventureXpProgressBar', () => {
 
   describe('Max Level Handling', () => {
     it('should display max level indicator when at max level', () => {
-      // Mock max level scenario
-      vi.mock('@/shared/utils/adventureXpUtils', () => ({
-        getXpProgress: () => ({
-          currentLevel: 50,
-          progressPercent: 100,
-          xpInCurrentLevel: 0,
-          xpNeededForNextLevel: 0,
-          isMaxLevel: true,
-        }),
-      }));
+      // Override for max level scenario
+      mockGetXpProgressOverride = () => ({
+        currentLevel: 50,
+        progressPercent: 100,
+        xpInCurrentLevel: 0,
+        xpNeededForNextLevel: 0,
+        isMaxLevel: true,
+      });
 
       render(<AdventureXpProgressBar totalXp={100000} />);
 

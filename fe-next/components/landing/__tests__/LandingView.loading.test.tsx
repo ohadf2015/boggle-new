@@ -284,8 +284,10 @@ describe('LandingView Loading State', () => {
     const { container } = render(<LandingView />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      const centerContainer = container.querySelector('.items-center.justify-center');
-      expect(centerContainer).toBeInTheDocument();
+      // The main content section uses flex layout with centering via mx-auto
+      const section = container.querySelector('section');
+      expect(section).toBeInTheDocument();
+      expect(section!.className).toContain('mx-auto');
     });
   });
 

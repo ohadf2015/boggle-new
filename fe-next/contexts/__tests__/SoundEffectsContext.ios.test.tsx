@@ -52,7 +52,7 @@ vi.mock('@/lib/audio/audioLoader', async () => {
   return {
     ensureHowl: vi.fn().mockResolvedValue(Howl),
     createLazyHowl: vi.fn((src: string | string[], options?: any) => {
-      return new Howl({
+      return Howl({
         src: Array.isArray(src) ? src : [src],
         preload: false,
         html5: true,

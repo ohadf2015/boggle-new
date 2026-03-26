@@ -43,7 +43,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/lib/supabaseRealtimeNotifications', () => ({
-  subscribeToNotifications: vi.fn(() => ({ unsubscribe: vi.fn() })),
+  subscribeToNotifications: vi.fn(() => vi.fn()),
+}));
+
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    markAsRead: vi.fn(),
+    markAllAsRead: vi.fn(),
+  }),
 }));
 
 vi.mock('@/utils/supabase/client', () => ({
@@ -52,6 +61,83 @@ vi.mock('@/utils/supabase/client', () => ({
 
 vi.mock('@supabase/ssr', () => ({
   createBrowserClient: vi.fn(() => null),
+}));
+
+vi.mock('@/components/auth/AuthModal', () => ({
+  default: () => <div data-testid="auth-modal">Auth Modal</div>,
+}));
+
+vi.mock('@/components/ugc/CreatorProfileStats', () => ({
+  default: () => <div>Creator Stats</div>,
+}));
+
+vi.mock('@/utils/creatorRewards', () => ({
+  getCreatorStats: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock('@/components/settings/EmailPreferences', () => ({
+  EmailPreferences: () => <div>Email Preferences</div>,
+}));
+
+vi.mock('@/components/profile/ReferralCard', () => ({
+  ReferralCard: () => <div>Referral Card</div>,
+}));
+
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+  PanInfo: {},
+}));
+
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoin: () => ({ coins: 100, updateCoins: vi.fn() }),
+  useCoinsFromContext: () => ({ coins: 100, updateCoins: vi.fn() }),
+  CoinProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+vi.mock('react-hot-toast', () => ({
+  default: { success: vi.fn(), error: vi.fn() },
+}));
+
+vi.mock('@/components/ui/EnhancedButton', () => ({
+  EnhancedButton: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+}));
+
+vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
+  PullToRefreshIndicator: () => null,
+}));
+
+vi.mock('@/components/AutoHideHeader', () => ({
+  default: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock('next/link', () => ({
+  default: ({ children, href }: any) => <a href={href}>{children}</a>,
+}));
+
+vi.mock('@/components/profile', () => ({
+  ProfileHeader: () => <div data-testid="profile-header">Header</div>,
+  ProfileXpSection: ({ profile, isDarkMode, compact }: any) => (
+    <div>
+      <h3 className="text-lg font-bold">Player Level</h3>
+      <span>{profile?.total_xp} XP</span>
+    </div>
+  ),
+  ProfileStatsGrid: () => <div>Stats Grid</div>,
+  ProfileCoinsSection: ({ profile, isDarkMode, compact }: any) => (
+    <div>
+      <h3 className="text-lg font-bold">Coins & Rewards</h3>
+      <span>{profile?.total_coins} coins</span>
+    </div>
+  ),
+  ProfileRankedProgress: () => <div>Ranked Progress</div>,
+  ProfileAchievements: () => <div>Achievements</div>,
+  ProfileCollection: () => <div>Collection</div>,
+  ProfileBackButtons: () => <div>Back Buttons</div>,
 }));
 
 vi.mock('@/utils/ThemeContext', () => ({

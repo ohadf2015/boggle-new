@@ -65,6 +65,7 @@ vi.mock('@/hooks/useMobilePortrait', () => ({
 }));
 vi.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),
+  useTiltEffect: () => ({ ref: { current: null }, style: {}, handlers: {} }),
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -77,6 +78,102 @@ vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,
   markOnboardingSkipped: vi.fn(),
 }));
+
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
+
+vi.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    enableComplexAnimations: false,
+    prefersReducedMotion: true,
+  }),
+}));
+
+vi.mock('@/hooks/usePlayerStats', () => ({
+  usePlayerStats: () => ({ allTimeBest: null }),
+}));
+
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => ({ hasCompleted: false, isLoading: false }),
+}));
+
+vi.mock('@/utils/perfVariant', () => ({
+  getPerfVariant: () => 'control',
+}));
+
+vi.mock('next/dynamic', () => ({
+  default: () => {
+    const DynamicComponent = () => <div>Mocked Dynamic Component</div>;
+    return DynamicComponent;
+  },
+}));
+
+vi.mock('framer-motion', () => {
+  const motionObj = {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
+    p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  };
+  return {
+    motion: motionObj,
+    m: motionObj,
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+    useMotionValue: (init: number) => ({ get: () => init, set: () => {}, on: () => () => {} }),
+    useSpring: (v: any) => v,
+    useInView: () => true,
+    animate: () => ({ stop: () => {} }),
+  };
+});
+
+vi.mock('next/link', () => {
+  const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
+    return <a href={href}>{children}</a>;
+  };
+  MockLink.displayName = 'MockLink';
+  return { default: MockLink };
+});
+
+vi.mock('@/components/Header', () => {
+  const MockHeader = () => <header data-testid="header">Header</header>;
+  return { default: MockHeader };
+});
+
+vi.mock('@/components/ui/PlayfulBackground', () => ({
+  PlayfulBackground: () => <div data-testid="playful-background">Background</div>,
+}));
+
+vi.mock('@/components/ui/InteractiveMascot', () => ({
+  InteractiveMascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
+}));
+
+vi.mock('@/components/ui/IdleMascot', () => ({
+  IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Idle Mascot</div>,
+}));
+
+vi.mock('../LandingShareBanner', () => ({
+  LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
+    <button data-testid="landing-share-banner" onClick={onShareClick}>Share</button>
+  ),
+}));
+
+vi.mock('../LandingSEOSection', () => ({
+  LandingSEOSection: () => <div data-testid="seo-section">SEO Content</div>,
+  ScrollIndicator: () => <div data-testid="scroll-indicator">Scroll</div>,
+}));
+
+vi.mock('@/components/auth/AuthModal', () => {
+  return { default: () => <div data-testid="auth-modal">Auth Modal</div> };
+});
+
+vi.mock('../ModeCard', () => {
+  const MockModeCard = ({ title }: { title: string }) => {
+    return <div data-testid={`mode-card-${title}`}>{title}</div>;
+  };
+  return { default: MockModeCard };
+});
 
 // Mock components that are lazy loaded
 vi.mock('@/components/daily/DailyChallengeBanner', () => {
