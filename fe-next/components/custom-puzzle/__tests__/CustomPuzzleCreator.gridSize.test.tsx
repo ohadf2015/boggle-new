@@ -1,8 +1,18 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CustomPuzzleCreator from '../CustomPuzzleCreator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext');
@@ -96,13 +106,11 @@ describe('CustomPuzzleCreator - Grid Size', () => {
       })),
     });
 
-    render(
-      <CustomPuzzleCreator
+    render(<CustomPuzzleCreator
         isOpen={true}
         onClose={mockOnClose}
         language="en"
-      />
-    );
+      />, { wrapper: createWrapper() });
 
     // Enter a valid word
     const input = screen.getByPlaceholderText(/customPuzzle.enterWordPlaceholder/i);
@@ -135,13 +143,11 @@ describe('CustomPuzzleCreator - Grid Size', () => {
   it('should display share functionality after completing the puzzle', async () => {
     const user = userEvent.setup({ delay: null }); // Disable delay for faster tests
 
-    render(
-      <CustomPuzzleCreator
+    render(<CustomPuzzleCreator
         isOpen={true}
         onClose={mockOnClose}
         language="en"
-      />
-    );
+      />, { wrapper: createWrapper() });
 
     // Enter a valid word
     const input = screen.getByPlaceholderText(/customPuzzle.enterWordPlaceholder/i);
@@ -176,13 +182,11 @@ describe('CustomPuzzleCreator - Grid Size', () => {
 
     const user = userEvent.setup();
 
-    render(
-      <CustomPuzzleCreator
+    render(<CustomPuzzleCreator
         isOpen={true}
         onClose={mockOnClose}
         language="en"
-      />
-    );
+      />, { wrapper: createWrapper() });
 
     // Enter a valid word
     const input = screen.getByPlaceholderText(/customPuzzle.enterWordPlaceholder/i);

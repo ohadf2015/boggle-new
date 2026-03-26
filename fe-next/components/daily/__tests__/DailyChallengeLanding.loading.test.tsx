@@ -8,6 +8,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import * as storage from '@/utils/dailyChallenge/storage';
 
 // Mock the hooks and utilities
 vi.mock('@/utils/dailyChallenge/storage', () => ({
@@ -153,7 +154,7 @@ describe('DailyChallengeLanding Loading State', () => {
 
   test('status badge should update to checkmark after API confirms completion', async () => {
     // Mock getWordHuntStatusToday to return won state for this test
-    const storage = require('@/utils/dailyChallenge/storage');
+
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {

@@ -5,6 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MilestoneCelebration } from './MilestoneCelebration';
+import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -176,7 +177,7 @@ describe('MilestoneCelebration', () => {
   });
 
   it('should fire confetti when milestone shown', () => {
-    const { fireLevelUpConfetti } = require('@/utils/confettiUtils');
+
 
     const milestone = {
       level: 5,

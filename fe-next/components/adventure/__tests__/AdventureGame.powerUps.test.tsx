@@ -7,6 +7,7 @@
 import { render } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { useAdventureGame: mockHook } from '@/hooks/useAdventureGame';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -507,7 +508,7 @@ describe('AdventureGame - Power-Up Integration', () => {
     // Full integration tested via PowerUpBar component tests
 
     // Verify addTime is included in hook destructuring
-    const { useAdventureGame: mockHook } = require('@/hooks/useAdventureGame');
+
     const mockAddTime = mockHook().addTime;
 
     expect(mockAddTime).toBeDefined();
@@ -593,7 +594,7 @@ describe('AdventureGame - Power-Up Integration', () => {
       // 2. handleFreezeTime is defined and calls addTime(10)
       // 3. PowerUpBar calls handleFreezeTime on activation
 
-      const { useAdventureGame: mockHook } = require('@/hooks/useAdventureGame');
+
       const mockAddTime = mockHook().addTime;
 
       // Verify addTime exists (destructured from hook)

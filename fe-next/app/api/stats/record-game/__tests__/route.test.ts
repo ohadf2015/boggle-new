@@ -56,6 +56,7 @@ vi.mock('@/utils/supabase/server', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 
 function makeRequest(body: unknown): NextRequest {
   return {
@@ -166,7 +167,7 @@ describe('POST /api/stats/record-game', () => {
   });
 
   it('handles rate limiting', async () => {
-    const { checkApiRateLimit } = require('@/lib/apiRateLimit');
+
     checkApiRateLimit.mockReturnValueOnce({ success: false, retryAfter: 30 });
 
     const result = await POST(makeRequest(validBody));

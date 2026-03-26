@@ -2,6 +2,15 @@ import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PlayerWaitingView from '../PlayerWaitingView';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -80,7 +89,7 @@ describe('PlayerWaitingView IdleMascot', () => {
   // WHEN it renders
   // THEN IdleMascot(s) should be visible (renders in both mobile + desktop layouts)
   it('should render IdleMascot in the waiting view', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+    render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
     const mascots = screen.getAllByTestId('idle-mascot');
     expect(mascots.length).toBeGreaterThanOrEqual(1);
@@ -90,7 +99,7 @@ describe('PlayerWaitingView IdleMascot', () => {
   // WHEN it renders
   // THEN it should use 'waving' as the base variant (welcoming)
   it('should render IdleMascot with waving base variant', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+    render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
     const mascots = screen.getAllByTestId('idle-mascot');
     expect(mascots[0]).toHaveAttribute('data-variant', 'waving');
@@ -100,7 +109,7 @@ describe('PlayerWaitingView IdleMascot', () => {
   // WHEN it renders
   // THEN it should use size 'sm'
   it('should render IdleMascot with sm size', () => {
-    render(<PlayerWaitingView {...defaultProps} />);
+    render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
     const mascots = screen.getAllByTestId('idle-mascot');
     expect(mascots[0]).toHaveAttribute('data-size', 'sm');

@@ -12,6 +12,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
+import { useAdventureGame } from '@/hooks/useAdventureGame';
+import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
+import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -600,12 +603,7 @@ vi.mock('@/lib/adventure/weeklyModifiers', () => ({
 }));
 // runeSystem removed — useAdventureGameInit uses inline defaults now
 
-// Import mocks after jest.mock declarations
-const useAdventureGame = require('@/hooks/useAdventureGame').useAdventureGame as jest.Mock;
-const useAdventureWordValidation = require('@/hooks/useAdventureWordValidation')
-  .useAdventureWordValidation as jest.Mock;
-const useAdventureSelection = require('@/hooks/useAdventureSelection')
-  .useAdventureSelection as jest.Mock;
+// Mocks are available via top-level imports (auto-mocked by vi.mock above)
 
 describe('AdventureGame - Chain Combo Visual Feedback Integration', () => {
   // Sample level config

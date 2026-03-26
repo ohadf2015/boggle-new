@@ -4,6 +4,7 @@ import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvActivityPanel from '../TvActivityPanel';
 import { useGameMode } from '@/hooks/gameState/store';
+import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 // Mock useGameMode
 vi.mock('@/hooks/gameState/store', () => ({
@@ -169,7 +170,7 @@ describe('TvActivityPanel', () => {
   });
 
   it('respects reduced motion (no animations)', () => {
-    const { useShouldReduceMotion } = require('@/contexts/AccessibilityContext');
+
     useShouldReduceMotion.mockReturnValue(true);
 
     render(<TvActivityPanel {...defaultProps} />);

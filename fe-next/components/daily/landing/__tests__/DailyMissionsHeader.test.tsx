@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { DailyMissionsHeader } from '../DailyMissionsHeader';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 
 vi.mock('@/utils/dailyChallenge/dateUtils', () => ({
   getSecondsUntilNextDaily: vi.fn(() => 3661),
@@ -75,7 +76,7 @@ describe('DailyMissionsHeader', () => {
   });
 
   test('updates countdown every second', () => {
-    const { getSecondsUntilNextDaily } = require('@/utils/dailyChallenge/dateUtils');
+
     getSecondsUntilNextDaily.mockReturnValue(3661);
 
     renderWithProviders(<DailyMissionsHeader completedCount={0} />);

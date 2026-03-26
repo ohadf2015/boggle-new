@@ -52,6 +52,8 @@ vi.mock('@/backend/modules/educationXpManager', () => ({
 
 import { NextRequest } from 'next/server';
 import { PATCH } from '../route';
+import { createClient } from '@/utils/supabase/server';
+import * as logger from '@/utils/logger';
 
 describe('PATCH /api/education/practice', () => {
   let mockSupabase: any;
@@ -89,7 +91,7 @@ describe('PATCH /api/education/practice', () => {
     };
 
     // Mock createClient to return our mock
-    const { createClient } = require('@/utils/supabase/server');
+
     createClient.mockResolvedValue(mockSupabase);
   });
 
@@ -333,7 +335,7 @@ describe('PATCH /api/education/practice', () => {
       });
 
       // THEN: Error was logged
-      const logger = require('@/utils/logger');
+
       expect(logger.default.error).toHaveBeenCalledWith(
         'Failed to award education XP:',
         expect.objectContaining({ message: 'RPC function not found' })

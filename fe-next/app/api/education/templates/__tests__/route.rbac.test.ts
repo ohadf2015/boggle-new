@@ -48,6 +48,7 @@ vi.mock('@/utils/logger', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST, PATCH, DELETE } from '../route';
+import { createClient } from '@/utils/supabase/server';
 
 interface MockSupabase {
   auth: { getUser: Mock };
@@ -65,7 +66,7 @@ beforeEach(() => {
   mockAuth = { getUser: vi.fn() };
   mockSupabase = { auth: mockAuth, from: mockFrom };
 
-  const { createClient } = require('@/utils/supabase/server');
+
   createClient.mockResolvedValue(mockSupabase);
 });
 

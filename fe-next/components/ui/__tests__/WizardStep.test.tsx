@@ -6,6 +6,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WizardStep } from '../WizardStep';
+import * as _mod_contexts_LanguageContext from '@/contexts/LanguageContext';
 
 // Mock useLanguage hook
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -262,7 +263,7 @@ describe('WizardStep', () => {
   describe('RTL Support', () => {
     it('should apply RTL styles when language is Hebrew', () => {
       // Override mock for this test
-      vi.spyOn(require('@/contexts/LanguageContext'), 'useLanguage').mockReturnValue({
+      vi.spyOn(_mod_contexts_LanguageContext, 'useLanguage').mockReturnValue({
         t: (key: string) => key,
         language: 'he',
       });

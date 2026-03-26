@@ -9,6 +9,15 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -562,7 +571,7 @@ describe('AdventureGame Layout Stability', () => {
           onLevelComplete={vi.fn()}
           onExit={vi.fn()}
         />
-      );
+      , { wrapper: createWrapper() });
 
       // THEN - game layout should be rendered
       expect(container.querySelector('[data-testid="game-layout"]')).toBeInTheDocument();
@@ -577,7 +586,7 @@ describe('AdventureGame Layout Stability', () => {
           onLevelComplete={vi.fn()}
           onExit={vi.fn()}
         />
-      );
+      , { wrapper: createWrapper() });
 
       // THEN - all layout sections should exist
       expect(container.querySelector('[data-testid="game-header"]')).toBeInTheDocument();

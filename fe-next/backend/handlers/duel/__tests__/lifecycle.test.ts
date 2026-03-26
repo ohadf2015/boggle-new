@@ -6,6 +6,7 @@
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerLifecycleHandlers } from '../lifecycle';
+import { generateRandomTable } from '@/backend/utils/gameUtils';
 
 // Mock dependencies
 jest.mock('@/backend/utils/logger', () => ({
@@ -160,7 +161,7 @@ describe('Duel Lifecycle Handlers', () => {
     });
 
     test('should generate board using generateRandomTable', async () => {
-      const { generateRandomTable } = require('@/backend/utils/gameUtils');
+
 
       const validPayload = {
         opponentId: '550e8400-e29b-41d4-a716-446655440000',

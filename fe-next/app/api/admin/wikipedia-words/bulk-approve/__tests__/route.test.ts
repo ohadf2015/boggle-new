@@ -24,8 +24,9 @@ vi.mock('@/lib/ai-service', () => ({
 }));
 
 import { gameAIService } from '@/lib/ai-service';
+import { verifyAdminAuth as mockVerifyAdminAuth } from '@/lib/auth/adminAuth';
 
-const mockVerifyAdminAuth = require('@/lib/auth/adminAuth').verifyAdminAuth;
+
 const mockCreateClient = require('@supabase/supabase-js').createClient;
 
 describe('Bulk Approve Business Logic', () => {

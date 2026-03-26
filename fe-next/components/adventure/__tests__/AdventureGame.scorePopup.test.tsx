@@ -7,6 +7,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
+import { useAdventureGame } from '@/hooks/useAdventureGame';
+import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
+import { useAdventureSelection } from '@/hooks/useAdventureSelection';
 
 // Mock all dependencies
 vi.mock('@/hooks/useAdventureGame');
@@ -338,9 +341,9 @@ describe('AdventureGame - Score Popup Animation', () => {
     vi.clearAllMocks();
 
     // Setup mock hooks with proper types
-    const { useAdventureGame } = require('@/hooks/useAdventureGame');
-    const { useAdventureWordValidation } = require('@/hooks/useAdventureWordValidation');
-    const { useAdventureSelection } = require('@/hooks/useAdventureSelection');
+
+
+
 
     mockUseDevicePerformance.mockReturnValue({
       isLowEnd: false,

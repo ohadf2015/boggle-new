@@ -6,6 +6,11 @@
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerRealtimeHandlers, realtimeGames, startRealtimeDuel } from '../realtime';
+import { getSupabase } from '@/backend/modules/supabase/client';
+import { isDictionaryWord } from '@/backend/dictionary';
+import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
+import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
+import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 
 // Mock dependencies
 jest.mock('@/backend/modules/supabase/client');
@@ -71,7 +76,7 @@ describe('Real-Time Duel Handlers', () => {
     };
 
     // Mock getSupabase
-    const { getSupabase } = require('@/backend/modules/supabase/client');
+
     getSupabase.mockReturnValue(mockSupabaseClient);
   });
 
@@ -124,7 +129,7 @@ describe('Real-Time Duel Handlers', () => {
       });
 
       // Mock dictionary validation
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(false);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -162,10 +167,10 @@ describe('Real-Time Duel Handlers', () => {
         opponentScore: 0,
       });
 
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(true);
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockResolvedValue(false);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -203,10 +208,10 @@ describe('Real-Time Duel Handlers', () => {
         opponentScore: 0,
       });
 
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(true);
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockResolvedValue(true);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -279,13 +284,13 @@ describe('Real-Time Duel Handlers', () => {
         opponentScore: 0,
       });
 
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(true);
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockResolvedValue(true);
 
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
+
       calculateWordScore.mockReturnValue(3);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -328,13 +333,13 @@ describe('Real-Time Duel Handlers', () => {
         opponentScore: 0,
       });
 
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(true);
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockResolvedValue(true);
 
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
+
       calculateWordScore.mockReturnValue(3);
 
       // Mock socket.to() to emit to room
@@ -464,7 +469,7 @@ describe('Real-Time Duel Handlers', () => {
       // RED: Test should fail
       const duelId = '550e8400-e29b-41d4-a716-446655440001';
 
-      const { EDUCATION_XP_CONFIG } = require('@/backend/modules/educationXpManager');
+
 
       // Start duel (which starts timer)
       const duel = {
@@ -539,7 +544,7 @@ describe('Real-Time Duel Handlers', () => {
       // RED: Test should fail
       const duelId = '550e8400-e29b-41d4-a716-446655440001';
 
-      const { EDUCATION_XP_CONFIG } = require('@/backend/modules/educationXpManager');
+
 
       const duel = {
         id: duelId,

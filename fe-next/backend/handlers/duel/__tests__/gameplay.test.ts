@@ -6,6 +6,10 @@
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerGameplayHandlers } from '../gameplay';
+import { getSupabase } from '@/backend/modules/supabase/client';
+import { isDictionaryWord } from '@/backend/dictionary';
+import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
+import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 
 // Mock dependencies
 jest.mock('@/backend/modules/supabase/client');
@@ -63,7 +67,7 @@ describe('Duel Gameplay Handlers', () => {
     };
 
     // Mock getSupabase
-    const { getSupabase } = require('@/backend/modules/supabase/client');
+
     getSupabase.mockReturnValue(mockSupabaseClient);
   });
 
@@ -157,18 +161,18 @@ describe('Duel Gameplay Handlers', () => {
       });
 
       // Mock word validation
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockImplementation((word: string) => {
         return ['test', 'word'].includes(word.toLowerCase());
       });
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockImplementation((word: string) => {
         return Promise.resolve(['test', 'word'].includes(word.toLowerCase()));
       });
 
       // Mock score calculation
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
+
       calculateWordScore.mockImplementation((word: string) => word.length - 1);
 
       // Register handlers
@@ -423,13 +427,13 @@ describe('Duel Gameplay Handlers', () => {
       let studentDuelsCallCount = 0;
       let duelTurnsCallCount = 0;
 
-      const { isDictionaryWord } = require('@/backend/dictionary');
+
       isDictionaryWord.mockReturnValue(true);
 
-      const { isWordOnBoardAsync } = require('@/backend/modules/wordValidatorPool');
+
       isWordOnBoardAsync.mockResolvedValue(true);
 
-      const { calculateWordScore } = require('@/backend/modules/scoringEngine.types');
+
       calculateWordScore.mockReturnValue(5);
 
       // Build the completion update chain: update -> eq -> eq -> select

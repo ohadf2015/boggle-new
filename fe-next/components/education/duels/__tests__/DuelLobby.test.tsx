@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DuelLobby from '../DuelLobby';
 import { useDuelSocket, type OpponentInfo, type ChallengeReceivedData } from '@/hooks/useDuelSocket';
+import { getPendingDuelsForStudent } from '@/lib/supabase/education/duels';
 
 // Mock dependencies
 vi.mock('@/hooks/useDuelSocket');
@@ -67,7 +68,7 @@ describe('DuelLobby', () => {
       onChallengeReceived: mockOnChallengeReceived,
     });
 
-    const { getPendingDuelsForStudent } = require('@/lib/supabase/education/duels');
+
     getPendingDuelsForStudent.mockResolvedValue({
       data: [],
       error: null,
@@ -104,7 +105,7 @@ describe('DuelLobby', () => {
 
   describe('pending challenges section', () => {
     it('renders pending challenges when they exist', async () => {
-      const { getPendingDuelsForStudent } = require('@/lib/supabase/education/duels');
+
       getPendingDuelsForStudent.mockResolvedValue({
         data: [
           {
@@ -133,7 +134,7 @@ describe('DuelLobby', () => {
     });
 
     it('calls acceptChallenge when Accept button clicked', async () => {
-      const { getPendingDuelsForStudent } = require('@/lib/supabase/education/duels');
+
       getPendingDuelsForStudent.mockResolvedValue({
         data: [
           {
@@ -157,7 +158,7 @@ describe('DuelLobby', () => {
     });
 
     it('calls declineChallenge when Decline button clicked', async () => {
-      const { getPendingDuelsForStudent } = require('@/lib/supabase/education/duels');
+
       getPendingDuelsForStudent.mockResolvedValue({
         data: [
           {

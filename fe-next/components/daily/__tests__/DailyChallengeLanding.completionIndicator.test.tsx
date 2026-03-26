@@ -12,6 +12,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import * as storage from '@/utils/dailyChallenge/storage';
 
 // Mock the hooks and utilities
 vi.mock('@/utils/dailyChallenge/storage', () => ({
@@ -119,7 +120,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
   describe('Completion badge on card icon', () => {
     test('completed Word Hunt card should show won badge', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
+
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
       const mockProps = {
@@ -138,7 +139,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
     });
 
     test('lost Word Hunt card should show lost badge with pink styling', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
+
       storage.getWordHuntStatusToday.mockReturnValue({ solved: false });
 
       const mockProps = {
@@ -160,7 +161,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
   describe('Status refresh on visibility change', () => {
     test('should refresh status when page becomes visible', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
+
       // Initial state: not played
       storage.getWordHuntStatusToday.mockReturnValue(null);
 
@@ -200,7 +201,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
 
   describe('Visual hierarchy', () => {
     test('completed Word Hunt shows hero card instead of quest card', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
+
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
       const mockProps = {
@@ -220,7 +221,7 @@ describe('DailyChallengeLanding Completion Indicator', () => {
     });
 
     test('button should say "VIEW RESULTS" when completed', async () => {
-      const storage = require('@/utils/dailyChallenge/storage');
+
       storage.getWordHuntStatusToday.mockReturnValue({ solved: true });
 
       const mockProps = {

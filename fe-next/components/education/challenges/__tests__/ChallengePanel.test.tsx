@@ -1,12 +1,22 @@
+import React from 'react';
 /**
  * ChallengePanel — full behavior tests (TDD)
  * Component now uses API routes instead of direct Supabase calls.
  */
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChallengePanel } from '../ChallengePanel';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // ============================================================
 // Mocks
@@ -119,7 +129,7 @@ describe('ChallengePanel', () => {
     it('renders PageLoader while fetching data', () => {
       (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
@@ -127,7 +137,7 @@ describe('ChallengePanel', () => {
     it('does not render challenge-panel while loading', () => {
       (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       expect(screen.queryByTestId('challenge-panel')).not.toBeInTheDocument();
     });
@@ -137,7 +147,7 @@ describe('ChallengePanel', () => {
     it('calls the daily challenges API endpoint', async () => {
       setupFetch([], []);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/daily');
@@ -147,7 +157,7 @@ describe('ChallengePanel', () => {
     it('calls the weekly challenges API endpoint', async () => {
       setupFetch([], []);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/api/education/challenges/weekly');
@@ -158,7 +168,7 @@ describe('ChallengePanel', () => {
       const challenges = [makeChallenge({ id: 'ch-a' }), makeChallenge({ id: 'ch-b' })];
       setupFetch(challenges, []);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-card-ch-a')).toBeInTheDocument();
@@ -170,7 +180,7 @@ describe('ChallengePanel', () => {
       const quests = [makeQuest({ id: 'wq-a' })];
       setupFetch([], quests);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('weekly-card-wq-a')).toBeInTheDocument();
@@ -180,7 +190,7 @@ describe('ChallengePanel', () => {
     it('shows noChallenges message when both collections are empty', async () => {
       setupFetch([], []);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByText('challenges.noChallenges')).toBeInTheDocument();
@@ -190,7 +200,7 @@ describe('ChallengePanel', () => {
     it('does NOT show noChallenges when challenges are present', async () => {
       setupFetch([makeChallenge()], []);
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.queryByText('challenges.noChallenges')).not.toBeInTheDocument();
@@ -208,7 +218,7 @@ describe('ChallengePanel', () => {
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-card-ch-claim-1')).toBeInTheDocument();
@@ -233,7 +243,7 @@ describe('ChallengePanel', () => {
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-card-ch-refetch-1')).toBeInTheDocument();
@@ -255,7 +265,7 @@ describe('ChallengePanel', () => {
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [{ ...quest, claimed: true }] }));
 
-      render(<ChallengePanel playerId="player-1" />);
+      render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('weekly-card-wq-claim-1')).toBeInTheDocument();
@@ -281,13 +291,13 @@ describe('ChallengePanel', () => {
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 
-      const { rerender } = render(<ChallengePanel playerId="player-1" />);
+      const { rerender } = render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('challenge-panel')).toBeInTheDocument();
       });
 
-      rerender(<ChallengePanel playerId="player-2" />);
+      rerender(<ChallengePanel playerId="player-2" />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         // 4 total fetch calls: 2 on mount + 2 on playerId change

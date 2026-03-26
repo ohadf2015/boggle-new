@@ -6,6 +6,7 @@
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerDisconnectionHandlers, handleReconnection } from '../disconnection';
+import { getSupabase } from '@/backend/modules/supabase/client';
 
 // Mock dependencies
 jest.mock('@/backend/modules/supabase/client');
@@ -74,7 +75,7 @@ describe('Duel Disconnection Handlers', () => {
     };
 
     // Mock getSupabase
-    const { getSupabase } = require('@/backend/modules/supabase/client');
+
     getSupabase.mockReturnValue(mockSupabaseClient);
   });
 

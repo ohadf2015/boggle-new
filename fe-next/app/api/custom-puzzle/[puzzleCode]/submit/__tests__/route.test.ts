@@ -37,6 +37,8 @@ vi.mock('@/utils/supabase/server', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { calculateCustomPuzzleScore } from '@/utils/customPuzzle';
 
 // --- Helpers ---
 
@@ -124,7 +126,7 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
 
   describe('Rate limiting', () => {
     it('returns 429 when rate limit exceeded', async () => {
-      const { checkApiRateLimit } = require('@/lib/apiRateLimit');
+
       checkApiRateLimit.mockReturnValueOnce({ success: false });
 
       const res = await POST(makeRequest(validBody), makeParams());
@@ -222,7 +224,7 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
     });
 
     it('marks beatCreator as false when efficiency score does not exceed creator score', async () => {
-      const { calculateCustomPuzzleScore } = require('@/utils/customPuzzle');
+
       calculateCustomPuzzleScore.mockReturnValueOnce(80); // below creator's 100
 
       setupDefaultMocks();
@@ -241,7 +243,7 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
     });
 
     it('server recalculates efficiency score ignoring client value', async () => {
-      const { calculateCustomPuzzleScore } = require('@/utils/customPuzzle');
+
       setupDefaultMocks();
 
       await POST(makeRequest({ ...validBody, efficiencyScore: 9999 }), makeParams());

@@ -1,12 +1,22 @@
+import React from 'react';
 import { vi } from 'vitest';
 /**
  * @jest-environment jsdom
  */
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import type { ProfileData } from '@/contexts/auth/authTypes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('next/image', () => ({
   __esModule: true,
@@ -80,7 +90,7 @@ describe('ProfileHeader design tokens', () => {
         updateProfile={async () => ({ data: null, error: null })}
         refreshProfile={noop}
       />
-    );
+    , { wrapper: createWrapper() });
 
     const root = getByTestId('profile-header-root');
     const rootClass = root.className;

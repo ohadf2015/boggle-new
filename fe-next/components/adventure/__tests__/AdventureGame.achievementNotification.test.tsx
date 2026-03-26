@@ -9,6 +9,15 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 // ==============================================
 // TEST FIXTURES
@@ -558,7 +567,7 @@ describe('AdventureGame Achievement Notifications', () => {
 
   describe('Achievement Toast Display', () => {
     it('should show achievement toast when first word achievement is earned', async () => {
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // Verify the game renders
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
@@ -585,7 +594,7 @@ describe('AdventureGame Achievement Notifications', () => {
       // Pre-populate achievement as already earned
       mockAchievementCounts = { FIRST_WORD: 1 };
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // Submit a word
       const submitBtn = screen.getByTestId('submit-word-btn');
@@ -601,7 +610,7 @@ describe('AdventureGame Achievement Notifications', () => {
     });
 
     it('should call earnAchievement with correct achievement ID', async () => {
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // Submit a word to trigger achievement
       const submitBtn = screen.getByTestId('submit-word-btn');
@@ -616,7 +625,7 @@ describe('AdventureGame Achievement Notifications', () => {
     });
 
     it('should show toast with auto-dismiss duration of 3000ms', async () => {
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       const submitBtn = screen.getByTestId('submit-word-btn');
 
@@ -634,7 +643,7 @@ describe('AdventureGame Achievement Notifications', () => {
 
   describe('Achievement Toast Non-Blocking Behavior', () => {
     it('should render game grid while toast is shown', async () => {
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       const submitBtn = screen.getByTestId('submit-word-btn');
 
@@ -652,7 +661,7 @@ describe('AdventureGame Achievement Notifications', () => {
     });
 
     it('should position toast at top-center to not block game grid', async () => {
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       const submitBtn = screen.getByTestId('submit-word-btn');
 

@@ -1,13 +1,23 @@
+import React from 'react';
 /**
  * Test: Daily Challenge Banner is inside the mode cards grid on mobile view
  * Updated: Banner moved from full-width above grid to col-span-2 inside grid
  */
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 import { render } from '@testing-library/react';
 import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock all required contexts and hooks
 vi.mock('@/contexts/AuthContext');
@@ -120,7 +130,7 @@ describe('LandingView - Daily Challenge Banner Spacing', () => {
   });
 
   it('should render Daily Challenge Banner inside the mode cards grid on mobile landscape', () => {
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
 
     // The Daily Challenge Banner is now inside the 2-col grid as a col-span-2 item
     const cardsGrid = container.querySelector('.grid.grid-cols-2');
@@ -142,7 +152,7 @@ describe('LandingView - Daily Challenge Banner Spacing', () => {
       useMobilePortrait: () => true,
     }));
 
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
 
     const cardsGrid = container.querySelector('.grid.grid-cols-2');
     expect(cardsGrid).toBeTruthy();

@@ -11,6 +11,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import * as storage from '@/utils/dailyChallenge/storage';
 
 // Mock the hooks and utilities
 vi.mock('@/utils/dailyChallenge/storage', () => ({
@@ -117,7 +118,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
   });
 
   test('won badge should have data-testid for easy selection', async () => {
-    const storage = require('@/utils/dailyChallenge/storage');
+
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
@@ -137,7 +138,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
   });
 
   test('won badge should contain Check icon', async () => {
-    const storage = require('@/utils/dailyChallenge/storage');
+
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
@@ -158,7 +159,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
   });
 
   test('won badge should have neo-brutalist styling (solid background, border)', async () => {
-    const storage = require('@/utils/dailyChallenge/storage');
+
     storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
 
     const mockProps = {
@@ -182,7 +183,7 @@ describe('DailyChallengeLanding Solved Badge', () => {
   });
 
   test('lost badge should show X icon and pink background', async () => {
-    const storage = require('@/utils/dailyChallenge/storage');
+
     storage.getWordHuntStatusToday.mockReturnValue({ solved: false }); // Lost state
 
     const mockProps = {

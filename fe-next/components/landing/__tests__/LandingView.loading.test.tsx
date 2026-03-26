@@ -1,6 +1,14 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
@@ -10,6 +18,7 @@ vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
 import LandingView from '../LandingView';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock all the contexts and hooks
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -236,12 +245,12 @@ describe('LandingView Loading State', () => {
   it('should render loading skeleton initially', () => {
     // Note: The skeleton is only shown for a brief moment before useEffect sets isMounted=true
     // This test verifies the component structure exists even if skeleton isn't visible
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
     expect(container).toBeInTheDocument();
   });
 
   it('should show content after mount', async () => {
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     // Wait for content to appear
     await waitFor(() => {
@@ -250,7 +259,7 @@ describe('LandingView Loading State', () => {
   });
 
   it('should display mode cards after loading', async () => {
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByTestId('mode-card-landing.multiplayer')).toBeInTheDocument();
@@ -261,7 +270,7 @@ describe('LandingView Loading State', () => {
   it('should prevent flash of unstyled content', async () => {
     // The loading skeleton prevents FOUC by showing placeholder content
     // This test verifies content loads properly without errors
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     // Wait for content
     await waitFor(() => {
@@ -271,12 +280,12 @@ describe('LandingView Loading State', () => {
 
   it('should render component without errors', () => {
     // Verify the component renders successfully
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
     expect(container.querySelector('section')).toBeInTheDocument();
   });
 
   it('should center mode cards after loading', async () => {
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       const centerContainer = container.querySelector('.items-center.justify-center');
@@ -293,7 +302,7 @@ describe('LandingView Loading State', () => {
     };
 
     // WHEN
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     // THEN
     await waitFor(() => {

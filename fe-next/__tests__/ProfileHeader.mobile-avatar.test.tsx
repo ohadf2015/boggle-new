@@ -1,12 +1,22 @@
+import React from 'react';
 import { vi, type Mock, } from 'vitest';
 /**
  * @jest-environment jsdom
  */
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import type { ProfileData } from '@/contexts/auth/authTypes';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock dependencies
 vi.mock('next/image', () => ({
@@ -59,7 +69,7 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
 
   describe('Touch Target Size', () => {
     it('edit avatar button should have w-6 h-6 classes in compact mode', () => {
-      render(<ProfileHeader {...mockProps} />);
+      render(<ProfileHeader {...mockProps} />, { wrapper: createWrapper() });
 
       const editButton = screen.getByTitle('profile.chooseAvatar');
       const classes = editButton.className;
@@ -71,7 +81,7 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
 
   describe('Button Positioning and Spacing', () => {
     it('should use absolute positioning for avatar control buttons', () => {
-      render(<ProfileHeader {...mockProps} />);
+      render(<ProfileHeader {...mockProps} />, { wrapper: createWrapper() });
 
       const editButton = screen.getByTitle('profile.chooseAvatar');
 
@@ -82,7 +92,7 @@ describe('ProfileHeader - Mobile Avatar Controls Usability', () => {
 
   describe('Mobile Layout Optimization', () => {
     it('should have visible labels or clear icons for all avatar controls', () => {
-      render(<ProfileHeader {...mockProps} />);
+      render(<ProfileHeader {...mockProps} />, { wrapper: createWrapper() });
 
       const editButton = screen.getByTitle('profile.chooseAvatar');
 

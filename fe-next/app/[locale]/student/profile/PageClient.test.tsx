@@ -14,6 +14,7 @@ import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { getDuelStats, getDuelHistory } from '@/lib/supabase/education/duels';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import * as mockSupabase from '@/lib/supabase';
 
 // Mock dependencies
 vi.mock('@/contexts/AuthContext');
@@ -103,7 +104,7 @@ describe('StudentProfilePageClient - Duel Features', () => {
     } as any);
 
     // Mock Supabase achievements query
-    const mockSupabase = require('@/lib/supabase');
+
     mockSupabase.supabase = {
       from: vi.fn(() => ({
         select: vi.fn(() => ({

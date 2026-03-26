@@ -4,6 +4,14 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 // Mock dependencies before importing component
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
@@ -76,6 +84,7 @@ const MOCK_CREATORS = [
 
 // Import AFTER mocks
 import CreatorLeaderboard from '../CreatorLeaderboard';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('CreatorLeaderboard', () => {
   beforeEach(() => {
@@ -88,7 +97,7 @@ describe('CreatorLeaderboard', () => {
       json: async () => ({ creators: MOCK_CREATORS }),
     });
 
-    render(<CreatorLeaderboard />);
+    render(<CreatorLeaderboard />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Top Creators')).toBeInTheDocument();
   });
@@ -97,7 +106,7 @@ describe('CreatorLeaderboard', () => {
     // Never resolves during this test
     mockFetch.mockReturnValueOnce(new Promise(() => {}));
 
-    const { container } = render(<CreatorLeaderboard />);
+    const { container } = render(<CreatorLeaderboard />, { wrapper: createWrapper() });
 
     // Loading state renders skeleton pulse divs instead of text
     const skeletons = container.querySelectorAll('.animate-pulse');
@@ -110,7 +119,7 @@ describe('CreatorLeaderboard', () => {
       json: async () => ({ creators: MOCK_CREATORS }),
     });
 
-    render(<CreatorLeaderboard />);
+    render(<CreatorLeaderboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       // WordWizard appears in spotlight + table row
@@ -137,7 +146,7 @@ describe('CreatorLeaderboard', () => {
       json: async () => ({ creators: MOCK_CREATORS }),
     });
 
-    render(<CreatorLeaderboard />);
+    render(<CreatorLeaderboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByText('Creator of the Month')).toBeInTheDocument();
@@ -154,7 +163,7 @@ describe('CreatorLeaderboard', () => {
       json: async () => ({ creators: [] }),
     });
 
-    render(<CreatorLeaderboard />);
+    render(<CreatorLeaderboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByText('No creators yet')).toBeInTheDocument();

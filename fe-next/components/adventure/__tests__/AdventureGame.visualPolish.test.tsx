@@ -14,6 +14,9 @@ import { render, screen } from '@testing-library/react';
 import { fireVictoryConfetti, fireLayeredCelebration } from '@/utils/confettiUtils';
 import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { BossDefeatFireworks } from '@/components/celebration/BossDefeatFireworks';
+import { CinematicPlayer } from '@/components/adventure/boss/cinematics/CinematicPlayer';
+import { VictoryCinematic, DefeatCinematic } from '@/components/adventure/cinematics';
 
 // Mock confetti utilities
 vi.mock('@/utils/confettiUtils', () => ({
@@ -81,20 +84,20 @@ describe('AdventureGame Visual Polish Integration', () => {
   describe('POLISH-02: Fireworks on boss defeat', () => {
     it('BossDefeatFireworks component can be activated', () => {
       // Verify the mocked component renders when active
-      const { BossDefeatFireworks } = require('@/components/celebration/BossDefeatFireworks');
+
       render(<BossDefeatFireworks active={true} bossTier="standard" />);
       expect(screen.getByTestId('boss-fireworks')).toBeInTheDocument();
       expect(screen.getByTestId('boss-fireworks')).toHaveAttribute('data-tier', 'standard');
     });
 
     it('BossDefeatFireworks is hidden when not active', () => {
-      const { BossDefeatFireworks } = require('@/components/celebration/BossDefeatFireworks');
+
       render(<BossDefeatFireworks active={false} bossTier="standard" />);
       expect(screen.queryByTestId('boss-fireworks')).not.toBeInTheDocument();
     });
 
     it('supports all boss tiers', () => {
-      const { BossDefeatFireworks } = require('@/components/celebration/BossDefeatFireworks');
+
 
       // Mini tier
       const { rerender } = render(<BossDefeatFireworks active={true} bossTier="mini" />);
@@ -108,8 +111,8 @@ describe('AdventureGame Visual Polish Integration', () => {
 
   describe('POLISH-05: Victory/Defeat Cinematics', () => {
     it('CinematicPlayer can render VictoryCinematic', () => {
-      const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
-      const { VictoryCinematic } = require('@/components/adventure/cinematics');
+
+
       const onComplete = vi.fn();
 
       render(
@@ -126,8 +129,8 @@ describe('AdventureGame Visual Polish Integration', () => {
     });
 
     it('CinematicPlayer can render DefeatCinematic', () => {
-      const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
-      const { DefeatCinematic } = require('@/components/adventure/cinematics');
+
+
       const onComplete = vi.fn();
 
       render(
@@ -144,8 +147,8 @@ describe('AdventureGame Visual Polish Integration', () => {
     });
 
     it('cinematics can be skipped via onComplete callback', () => {
-      const { CinematicPlayer } = require('@/components/adventure/boss/cinematics/CinematicPlayer');
-      const { VictoryCinematic } = require('@/components/adventure/cinematics');
+
+
       const onComplete = vi.fn();
 
       render(

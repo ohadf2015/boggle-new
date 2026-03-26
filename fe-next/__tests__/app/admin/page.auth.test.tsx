@@ -9,6 +9,8 @@ import { vi, type Mock, } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import AdminPage from '@/app/[locale]/admin/page';
+import { useAuth } from '@/contexts/AuthContext';
+import { getSession } from '@/lib/supabase';
 
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -96,7 +98,7 @@ describe('Admin Dashboard Authentication', () => {
 
   it('should show "Access Required" for non-admin users', async () => {
     // GIVEN: User is authenticated but NOT admin
-    const { useAuth } = require('@/contexts/AuthContext');
+
     useAuth.mockReturnValue({
       user: { id: 'user-1', email: 'user@example.com' },
       profile: { username: 'RegularUser' },
@@ -116,7 +118,7 @@ describe('Admin Dashboard Authentication', () => {
 
   it('should show "Access Required" for unauthenticated users', async () => {
     // GIVEN: User is NOT authenticated
-    const { useAuth } = require('@/contexts/AuthContext');
+
     useAuth.mockReturnValue({
       user: null,
       profile: null,
@@ -135,7 +137,7 @@ describe('Admin Dashboard Authentication', () => {
 
   it('should show loading state while checking authentication', () => {
     // GIVEN: Authentication is still loading
-    const { useAuth } = require('@/contexts/AuthContext');
+
     useAuth.mockReturnValue({
       user: null,
       profile: null,
@@ -152,7 +154,7 @@ describe('Admin Dashboard Authentication', () => {
 
   it('should allow access for admin users', async () => {
     // GIVEN: User is authenticated AND admin
-    const { useAuth } = require('@/contexts/AuthContext');
+
     useAuth.mockReturnValue({
       user: { id: 'admin-1', email: 'admin@example.com' },
       profile: { username: 'AdminUser' },
@@ -160,7 +162,7 @@ describe('Admin Dashboard Authentication', () => {
       loading: false,
     });
 
-    const { getSession } = require('@/lib/supabase');
+
     getSession.mockResolvedValue({
       data: {
         session: {

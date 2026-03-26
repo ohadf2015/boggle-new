@@ -8,6 +8,14 @@ import { vi, type Mock, } from 'vitest';
  * 3. Navigation arrows properly flip direction for RTL languages
  */
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -120,6 +128,7 @@ vi.mock('@/utils/session', () => ({
 import ProfilePageClient from '../PageClient';
 import { ProfileXpSection } from '@/components/profile/ProfileXpSection';
 import { ProfileCoinsSection } from '@/components/profile/ProfileCoinsSection';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('Profile UI Styling', () => {
   describe('Section Title Sizing', () => {
@@ -131,9 +140,7 @@ describe('Profile UI Styling', () => {
         current_level: 5
       };
 
-      const { container } = render(
-        <ProfileXpSection profile={mockProfile as any} isDarkMode={true} compact={true} />
-      );
+      const { container } = render(<ProfileXpSection profile={mockProfile as any} isDarkMode={true} compact={true} />, { wrapper: createWrapper() });
 
       // Find the section title
       const title = screen.getByText(/Player Level/i);
@@ -156,9 +163,7 @@ describe('Profile UI Styling', () => {
         total_coins: 500
       };
 
-      const { container } = render(
-        <ProfileCoinsSection profile={mockProfile as any} isDarkMode={true} compact={true} />
-      );
+      const { container } = render(<ProfileCoinsSection profile={mockProfile as any} isDarkMode={true} compact={true} />, { wrapper: createWrapper() });
 
       const title = screen.getByText(/Coins & Rewards/i);
       expect(title).toBeInTheDocument();
@@ -176,7 +181,7 @@ describe('Profile UI Styling', () => {
 
   describe('Neo-Brutalist Tab Navigation', () => {
     it('should display tab buttons with section labels', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find section tabs by role
       const tabs = screen.getAllByRole('tab');
@@ -184,7 +189,7 @@ describe('Profile UI Styling', () => {
     });
 
     it('should use neo-brutalist styling for active tab', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find active tab (selected)
       const activeTab = screen.getAllByRole('tab').find(tab =>
@@ -206,7 +211,7 @@ describe('Profile UI Styling', () => {
     });
 
     it('should use hard shadows on active tab', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       const activeTab = screen.getAllByRole('tab').find(tab =>
         tab.getAttribute('aria-selected') === 'true'
@@ -220,7 +225,7 @@ describe('Profile UI Styling', () => {
     });
 
     it('should use chunky borders on active tab', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       const activeTab = screen.getAllByRole('tab').find(tab =>
         tab.getAttribute('aria-selected') === 'true'
@@ -272,7 +277,7 @@ describe('Profile UI Styling', () => {
     });
 
     it('should flip navigation arrow directions for RTL', () => {
-      const { container } = render(<ProfilePageClient />);
+      const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Buttons use logical properties (start/end) which automatically flip for RTL
       // Previous button uses start-2 (left in LTR, right in RTL)
@@ -294,7 +299,7 @@ describe('Profile UI Styling', () => {
     });
 
     it('should rotate chevron icons for RTL', () => {
-      const { container } = render(<ProfilePageClient />);
+      const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // ChevronLeft and ChevronRight SVGs should have rtl:rotate-180 class
       const prevButton = screen.queryByLabelText(/previous section/i);

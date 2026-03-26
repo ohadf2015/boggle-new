@@ -2,6 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Socket } from 'socket.io-client';
+import { useTvFullscreen } from '@/host/hooks/useTvFullscreen';
+import { useTvPlayerCombos } from '@/host/hooks/useTvPlayerCombos';
+import { useTvSounds } from '@/host/hooks/useTvSounds';
+import { useTvNotifications } from '@/host/hooks/useTvNotifications';
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => ({
@@ -111,10 +115,10 @@ describe('TvBroadcastView Layout Issues', () => {
   };
 
   beforeEach(() => {
-    const { useTvFullscreen } = require('@/host/hooks/useTvFullscreen');
-    const { useTvPlayerCombos } = require('@/host/hooks/useTvPlayerCombos');
-    const { useTvSounds } = require('@/host/hooks/useTvSounds');
-    const { useTvNotifications } = require('@/host/hooks/useTvNotifications');
+
+
+
+
 
     useTvFullscreen.mockReturnValue({
       isFullscreen: false,
@@ -168,7 +172,7 @@ describe('TvBroadcastView Layout Issues', () => {
   });
 
   it('should properly handle fullscreen layout', () => {
-    const { useTvFullscreen } = require('@/host/hooks/useTvFullscreen');
+
     useTvFullscreen.mockReturnValueOnce({
       isFullscreen: true,
       toggleFullscreen: vi.fn(),
