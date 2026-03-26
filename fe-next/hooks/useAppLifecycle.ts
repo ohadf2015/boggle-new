@@ -1,63 +1,39 @@
 /**
  * App Lifecycle Hook
- * Provides callbacks for app foreground/background transitions on native
+ * Provides callbacks for app foreground/background transitions on native.
+ * Capacitor is dynamically imported to avoid Turbopack SWC helper errors.
  */
 
 import { useEffect, useRef } from 'react';
-import { App } from '@capacitor/app';
-import type { PluginListenerHandle } from '@capacitor/core';
 import { isNative } from '../utils/platform';
 
 interface UseAppLifecycleOptions {
-  /**
-   * Callback fired when app comes to foreground (becomes active)
-   */
   onForeground?: () => void;
-
-  /**
-   * Callback fired when app goes to background (becomes inactive)
-   */
   onBackground?: () => void;
 }
 
-/**
- * Hook to listen for app lifecycle events (foreground/background)
- * Only active in native environment, no-op on web
- *
- * @param options - Lifecycle callbacks
- *
- * @example
- * useAppLifecycle({
- *   onForeground: () => console.log('App active'),
- *   onBackground: () => console.log('App inactive')
- * });
- */
 export function useAppLifecycle({
   onForeground,
   onBackground,
 }: UseAppLifecycleOptions): void {
-  // Use refs to always access latest callback
   const onForegroundRef = useRef(onForeground);
   const onBackgroundRef = useRef(onBackground);
 
-  // Update refs when callbacks change
   useEffect(() => {
     onForegroundRef.current = onForeground;
     onBackgroundRef.current = onBackground;
   }, [onForeground, onBackground]);
 
   useEffect(() => {
-    // Only register listeners in native environment
-    if (!isNative()) {
-      return;
-    }
+    if (!isNative()) return;
 
-    let listener: PluginListenerHandle | null = null;
+    let removed = false;
+    let removeListener: (() => void) | null = null;
 
-    // Register listener asynchronously
     const registerListener = async () => {
       try {
-        listener = await App.addListener('appStateChange', (state) => {
+        const { App } = await import('@capacitor/app');
+        const listener = await App.addListener('appStateChange', (state) => {
           try {
             if (state.isActive) {
               onForegroundRef.current?.();
@@ -65,10 +41,14 @@ export function useAppLifecycle({
               onBackgroundRef.current?.();
             }
           } catch (error) {
-            // Silently catch callback errors to prevent crash
             console.error('App lifecycle callback error:', error);
           }
         });
+        if (removed) {
+          listener.remove();
+        } else {
+          removeListener = () => listener.remove();
+        }
       } catch (error) {
         console.error('Failed to register app lifecycle listener:', error);
       }
@@ -76,13 +56,9 @@ export function useAppLifecycle({
 
     registerListener();
 
-    // Cleanup listener on unmount
     return () => {
-      try {
-        listener?.remove();
-      } catch (error) {
-        console.error('Failed to remove app lifecycle listener:', error);
-      }
+      removed = true;
+      try { removeListener?.(); } catch {}
     };
-  }, []); // Empty deps - only run once, use refs for latest callbacks
+  }, []);
 }

@@ -1,12 +1,10 @@
-import { vi, type Mock, } from 'vitest';
+import { vi, type Mock } from 'vitest';
 /**
  * Analytics Logger Tests
  *
  * Tests DDA analytics event creation, logging, and aggregation.
  * DDA-04: Analytics track difficulty effectiveness
  */
-
-import { describe, it, expect, jest, beforeEach } from 'vitest';
 import {
   createDDAEvent,
   createDDAAnalyticsPayload,

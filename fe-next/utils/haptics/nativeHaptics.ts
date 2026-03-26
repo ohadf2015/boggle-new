@@ -1,4 +1,3 @@
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { isNative } from '../platform';
 import {
   HapticPattern,
@@ -9,23 +8,9 @@ import {
 
 /**
  * Native haptics implementation using Capacitor Haptics plugin.
- * Provides rich haptic feedback on iOS and Android.
+ * Capacitor is dynamically imported to avoid Turbopack SWC helper errors on web.
  */
 export class NativeHaptics implements IHapticsImplementation {
-  private readonly patternMap: Record<HapticPattern, () => Promise<void>> = {
-    [HapticPattern.TAP]: () => Haptics.impact({ style: ImpactStyle.Light }),
-    [HapticPattern.SUCCESS]: () => Haptics.notification({ type: NotificationType.Success }),
-    [HapticPattern.ERROR]: () => Haptics.notification({ type: NotificationType.Error }),
-    [HapticPattern.WARNING]: () => Haptics.notification({ type: NotificationType.Warning }),
-    [HapticPattern.SELECTION]: () => Haptics.selectionStart(),
-  };
-
-  private readonly intensityMap: Record<HapticIntensity, ImpactStyle> = {
-    [HapticIntensity.LIGHT]: ImpactStyle.Light,
-    [HapticIntensity.MEDIUM]: ImpactStyle.Medium,
-    [HapticIntensity.HEAVY]: ImpactStyle.Heavy,
-  };
-
   isSupported(): boolean {
     return isNative();
   }
@@ -34,9 +19,16 @@ export class NativeHaptics implements IHapticsImplementation {
     if (!this.isSupported()) return;
 
     try {
-      await this.patternMap[pattern]();
+      const { Haptics, ImpactStyle, NotificationType } = await import('@capacitor/haptics');
+      const patternMap: Record<HapticPattern, () => Promise<void>> = {
+        [HapticPattern.TAP]: () => Haptics.impact({ style: ImpactStyle.Light }),
+        [HapticPattern.SUCCESS]: () => Haptics.notification({ type: NotificationType.Success }),
+        [HapticPattern.ERROR]: () => Haptics.notification({ type: NotificationType.Error }),
+        [HapticPattern.WARNING]: () => Haptics.notification({ type: NotificationType.Warning }),
+        [HapticPattern.SELECTION]: () => Haptics.selectionStart(),
+      };
+      await patternMap[pattern]();
     } catch (error) {
-      // Silently fail if haptics unavailable
       console.warn('[NativeHaptics] Failed to trigger haptic:', error);
     }
   }
@@ -45,7 +37,13 @@ export class NativeHaptics implements IHapticsImplementation {
     if (!this.isSupported()) return;
 
     try {
-      const style = this.intensityMap[pattern.intensity];
+      const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
+      const intensityMap: Record<HapticIntensity, typeof ImpactStyle[keyof typeof ImpactStyle]> = {
+        [HapticIntensity.LIGHT]: ImpactStyle.Light,
+        [HapticIntensity.MEDIUM]: ImpactStyle.Medium,
+        [HapticIntensity.HEAVY]: ImpactStyle.Heavy,
+      };
+      const style = intensityMap[pattern.intensity];
       await Haptics.impact({ style });
     } catch (error) {
       console.warn('[NativeHaptics] Failed to trigger custom haptic:', error);

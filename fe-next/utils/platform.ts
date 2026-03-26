@@ -1,9 +1,20 @@
 /**
  * Platform Detection Utility
- * Detects native vs web environment with graceful degradation
+ * Detects native vs web environment with graceful degradation.
+ *
+ * Uses globalThis.__CAPACITOR__ (set by Capacitor runtime) instead of
+ * importing @capacitor/core directly, which causes Turbopack SWC helper
+ * resolution failures in dev mode.
  */
 
-import { Capacitor } from '@capacitor/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+function getCapacitor(): any {
+  if (typeof globalThis !== 'undefined' && (globalThis as any).Capacitor) {
+    return (globalThis as any).Capacitor;
+  }
+  return null;
+}
 
 /**
  * Check if running in native environment (iOS/Android via Capacitor)
@@ -11,9 +22,9 @@ import { Capacitor } from '@capacitor/core';
  */
 export function isNative(): boolean {
   try {
-    return Capacitor.isNativePlatform();
+    const cap = getCapacitor();
+    return cap?.isNativePlatform?.() ?? false;
   } catch {
-    // Capacitor not available (web build or tree-shaken)
     return false;
   }
 }
@@ -24,7 +35,8 @@ export function isNative(): boolean {
  */
 export function isIOS(): boolean {
   try {
-    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+    const cap = getCapacitor();
+    return cap?.isNativePlatform?.() && cap?.getPlatform?.() === 'ios';
   } catch {
     return false;
   }
@@ -36,7 +48,8 @@ export function isIOS(): boolean {
  */
 export function isAndroid(): boolean {
   try {
-    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+    const cap = getCapacitor();
+    return cap?.isNativePlatform?.() && cap?.getPlatform?.() === 'android';
   } catch {
     return false;
   }
@@ -56,7 +69,8 @@ export function isWeb(): boolean {
  */
 export function getPlatform(): 'ios' | 'android' | 'web' {
   try {
-    return Capacitor.getPlatform() as 'ios' | 'android' | 'web';
+    const cap = getCapacitor();
+    return (cap?.getPlatform?.() as 'ios' | 'android' | 'web') ?? 'web';
   } catch {
     return 'web';
   }

@@ -3,7 +3,6 @@
  * Handles checking and requesting notification permissions on native platforms
  */
 
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { isNative } from '../platform';
 import type { PermissionResult, NotificationPermissionStatus } from './types';
 
@@ -30,6 +29,7 @@ export async function checkNotificationPermission(): Promise<PermissionResult> {
   }
 
   try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
     const result = await LocalNotifications.checkPermissions();
     const status = mapPermissionStatus(result.display);
 
@@ -61,6 +61,7 @@ export async function requestNotificationPermission(): Promise<PermissionResult>
   }
 
   try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
     const result = await LocalNotifications.requestPermissions();
     const status = mapPermissionStatus(result.display);
 

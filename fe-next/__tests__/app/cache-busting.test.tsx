@@ -1,4 +1,4 @@
-import { vi, type Mock, } from 'vitest';
+import { vi, type Mock } from 'vitest';
 /**
  * @jest-environment jsdom
  *
@@ -9,8 +9,6 @@ import { vi, type Mock, } from 'vitest';
  * 2. Force reload mechanism on version mismatch
  * 3. Manifest version tracking
  */
-
-import { describe, it, expect, beforeEach, afterEach, jest } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 

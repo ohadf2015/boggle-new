@@ -5,8 +5,6 @@ import { vi } from 'vitest';
  * Tests Zustand store integration and boss battle exclusion.
  * DDA-05: Boss battles excluded from adaptive difficulty adjustments.
  */
-
-import { describe, it, expect, beforeEach, afterEach, jest } from 'vitest';
 import { act } from '@testing-library/react';
 import { useAIDirectorStore } from './aiDirectorStore';
 import { DEFAULT_INTENSITY } from '@/lib/aiDirector/constants';

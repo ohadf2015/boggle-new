@@ -132,13 +132,18 @@ function requestTimeout(): RequestHandler {
     '/api/cron/',
   ];
 
+  const isDev = process.env.NODE_ENV !== 'production';
+
   return (req: Request, res: Response, next: NextFunction): void => {
     // Skip timeout for routes with custom timeout handling
     const hasCustomTimeout = ROUTES_WITH_CUSTOM_TIMEOUT.some(route =>
       req.path.startsWith(route)
     );
 
-    if (hasCustomTimeout) {
+    // In dev, skip timeout for Next.js page routes (first compilation can be slow)
+    const isNextPage = isDev && !req.path.startsWith('/api/') && !req.path.startsWith('/_next/');
+
+    if (hasCustomTimeout || isNextPage) {
       // Let the route handle its own timeout (Next.js maxDuration or internal timeout)
       next();
       return;

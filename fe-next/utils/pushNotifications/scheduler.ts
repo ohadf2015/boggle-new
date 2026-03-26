@@ -3,7 +3,6 @@
  * Handles scheduling and managing daily challenge notifications
  */
 
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { isNative } from '../platform';
 import { canScheduleNotifications } from './permissions';
 import {
@@ -108,6 +107,7 @@ export async function scheduleDailyNotification(
     const content = buildNotificationContent(messageIndex, actualLetterHint);
 
     // Schedule the notification
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
     const result = await LocalNotifications.schedule({
       notifications: [
         {
@@ -158,6 +158,7 @@ export async function cancelDailyNotification(): Promise<void> {
   }
 
   try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
     await LocalNotifications.cancel({
       notifications: [{ id: NOTIFICATION_IDS.DAILY_CHALLENGE }],
     });
@@ -176,6 +177,7 @@ export async function hasPendingDailyNotification(): Promise<boolean> {
   }
 
   try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
     const pending = await LocalNotifications.getPending();
     return pending.notifications.some((n) => n.id === NOTIFICATION_IDS.DAILY_CHALLENGE);
   } catch {
