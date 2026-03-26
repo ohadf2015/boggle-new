@@ -12,6 +12,16 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useWordBank } from '../useWordBank';
 import type { Language } from '@/types';
 
+// Mock Supabase SSR
+vi.mock('@supabase/ssr', () => ({
+  createBrowserClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ data: [], error: null, count: 0 })),
+    })),
+    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }) },
+  })),
+}));
+
 // Mock fetch
 global.fetch = vi.fn();
 

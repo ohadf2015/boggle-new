@@ -2,7 +2,7 @@
  * blastObjectiveGuarantee - Tests for guaranteeing board has enough tiles
  * of each type required by wave objectives.
  */
-import { guaranteeObjectiveTiles } from '../blastObjectiveGuarantee';
+import { guaranteeObjectiveTiles, MIN_STANDARD_RATIO } from '../blastObjectiveGuarantee';
 import type { BlastTileState, BlastObjective, BlastTileType } from '../../types';
 
 // Helper: create a grid of all-standard tiles
@@ -370,9 +370,6 @@ describe('guaranteeObjectiveTiles', () => {
     });
 
     it('should export MIN_STANDARD_RATIO constant equal to 0.6', () => {
-      // Verify the constant is exported for external verification
-       
-      const { MIN_STANDARD_RATIO } = require('../blastObjectiveGuarantee');
       expect(MIN_STANDARD_RATIO).toBe(0.6);
     });
   });

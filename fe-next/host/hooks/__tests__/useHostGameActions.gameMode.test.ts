@@ -27,12 +27,14 @@ jest.mock('@/utils/logger', () => ({
   __esModule: true,
   default: { info: jest.fn(), error: jest.fn(), warn: jest.fn(), log: jest.fn() },
 }));
-jest.mock('@/hooks/gameState', () => ({
-  useGameMode: jest.fn().mockReturnValue('blast'),
+vi.mock('@/hooks/gameState', () => ({
+  useGameMode: vi.fn().mockReturnValue('blast'),
 }));
 
 import { renderHook, act } from '@testing-library/react';
 import { useHostGameActions } from '../useHostGameActions';
+import { useGameMode } from '@/hooks/gameState';
+import { generateRandomTable } from '@/utils/utils';
 
 describe('useHostGameActions - gameMode in handleStartNewGame', () => {
   const mockEmit = jest.fn();
@@ -112,8 +114,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
 
   it('should default gameMode to random when undefined', () => {
     // GIVEN: useGameMode returns undefined (mocked)
-    const { useGameMode } = require('@/hooks/gameState');
-    (useGameMode as jest.Mock).mockReturnValue(undefined);
+    (useGameMode as any).mockReturnValue(undefined);
 
     const { result } = renderHook(() => useHostGameActions(baseOptions));
 
@@ -134,9 +135,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
 
   it('should force 6x6 grid when gameMode is blast (startGame)', () => {
     // GIVEN: gameMode is blast (already mocked as blast at top)
-    const { useGameMode } = require('@/hooks/gameState');
-    (useGameMode as jest.Mock).mockReturnValue('blast');
-    const { generateRandomTable } = require('@/utils/utils');
+    (useGameMode as any).mockReturnValue('blast');
 
     const { result } = renderHook(() => useHostGameActions(baseOptions));
 
@@ -151,9 +150,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
 
   it('should force 6x6 grid when gameMode is blast (handleStartNewGame)', () => {
     // GIVEN
-    const { useGameMode } = require('@/hooks/gameState');
-    (useGameMode as jest.Mock).mockReturnValue('blast');
-    const { generateRandomTable } = require('@/utils/utils');
+    (useGameMode as any).mockReturnValue('blast');
     generateRandomTable.mockClear();
 
     const { result } = renderHook(() => useHostGameActions(baseOptions));
@@ -169,9 +166,7 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
 
   it('should use difficulty-based grid size for non-blast modes', () => {
     // GIVEN
-    const { useGameMode } = require('@/hooks/gameState');
-    (useGameMode as jest.Mock).mockReturnValue('classic');
-    const { generateRandomTable } = require('@/utils/utils');
+    (useGameMode as any).mockReturnValue('classic');
     generateRandomTable.mockClear();
 
     const { result } = renderHook(() => useHostGameActions(baseOptions));
