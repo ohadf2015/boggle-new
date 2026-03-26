@@ -36,7 +36,7 @@ export async function checkPoolHealth(): Promise<{ ok: boolean; latencyMs: numbe
   try {
     const client = getPooledSupabaseClient();
     const { error } = await client.from('profiles').select('id').limit(1);
-    if (error) throw error;
+    if (error) throw new Error(error.message || JSON.stringify(error));
     return { ok: true, latencyMs: Date.now() - start };
   } catch (err) {
     return { ok: false, latencyMs: Date.now() - start, error: err instanceof Error ? err.message : String(err) };
