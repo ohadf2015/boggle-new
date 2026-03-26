@@ -184,7 +184,11 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       // Estimated gold for UI display — server calculates the real value
       const baseGold = (10 + levelConfig.world * 3) * gameState.stars;
       const perfectClearGoldBonus = isPerfectClear ? 50 : 0;
-      const computedGold = baseGold + perfectClearGoldBonus;
+      let computedGold = baseGold + perfectClearGoldBonus;
+      // Lucky Pickaxe T4: double gold on first completion (matches server logic)
+      if (props.isFirstCompletion && props.upgradeEffects?.doubleFirstCompletionGold) {
+        computedGold = computedGold * 2;
+      }
       earnedGoldRef.current = computedGold;
       setEarnedGold(computedGold);
       // NOTE: addGold() is NOT called — gold is updated from server response
@@ -207,7 +211,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     if ((gameState.isComplete || timeRemaining === 0) && !hasAwardedLevelRewards && gameState.stars === 0) {
       setHasAwardedLevelRewards(true);
     }
-  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, currentLevel, upgradeBonuses.xpBonus, isBossLevel, props.isFirstCompletion]);
+  }, [gameState.isComplete, gameState.stars, gameState.comboCount, gameState.score, gameState.wordsFound, timeRemaining, hasAwardedLevelRewards, levelConfig.level, levelConfig.world, timerSeconds, awardXp, currentLevel, upgradeBonuses.xpBonus, isBossLevel, props.isFirstCompletion, props.upgradeEffects?.doubleFirstCompletionGold]);
 
   // Victory/Defeat Detection & Cinematic Trigger
   useEffect(() => {

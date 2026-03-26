@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -53,7 +53,7 @@ export function useAvatarPremium() {
     staleTime: 5 * 60_000,
   });
 
-  const permanentUnlocks = premiumData?.premiumAvatarParts ?? [];
+  const permanentUnlocks = useMemo(() => premiumData?.premiumAvatarParts ?? [], [premiumData?.premiumAvatarParts]);
 
   const purchaseMutation = useMutation({
     mutationFn: async ({ category, partId }: { category: string; partId: string }) => {

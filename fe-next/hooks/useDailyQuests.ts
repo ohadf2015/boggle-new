@@ -119,7 +119,7 @@ export function useDailyQuests({
       localStorage.removeItem(LS_KEY);
       return merged;
     });
-  }, [isAuthenticated, todayStr, onProgressChange]);
+  }, [isAuthenticated, todayStr, onProgressChange, syncProgressMutation]);
 
   const recordProgress = useCallback((type: DailyQuest['type'], amount = 1) => {
     setProgress(prev => {

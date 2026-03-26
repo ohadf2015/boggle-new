@@ -269,7 +269,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         };
       }
     },
-    [totalXp, currentLevel, studentId, lessonId]
+    [totalXp, currentLevel, studentId, lessonId, recordXpMutation]
   );
 
   /**

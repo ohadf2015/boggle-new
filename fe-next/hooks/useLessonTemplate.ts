@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import logger from '@/utils/logger';
@@ -169,7 +169,7 @@ export type UseTemplatesReturn = UseTemplatesState & UseTemplatesActions;
 export function useTemplates(lessonId: string | undefined): UseTemplatesReturn {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ['education', 'templates', lessonId] as const;
+  const queryKey = useMemo(() => ['education', 'templates', lessonId] as const, [lessonId]);
 
   const { data: templates = [], isLoading, error: queryError, refetch } = useQuery<LessonTemplate[], Error>({
     queryKey,
@@ -277,7 +277,7 @@ export type UseTemplateReturn = UseTemplateState & UseTemplateActions;
  */
 export function useTemplate(templateId: string | undefined): UseTemplateReturn {
   const queryClient = useQueryClient();
-  const queryKey = ['education', 'template', templateId] as const;
+  const queryKey = useMemo(() => ['education', 'template', templateId] as const, [templateId]);
 
   const { data: template = null, isLoading, error: queryError, refetch } = useQuery<LessonTemplate | null, Error>({
     queryKey,
