@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface ReferralMilestoneData {
   id: string;
@@ -42,10 +43,19 @@ interface UseReferralDashboardReturn {
   refresh: () => Promise<void>;
 }
 
+async function fetchReferralStats(): Promise<ReferralDashboardData> {
+  const res = await fetch('/api/referral/stats');
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('unauthorized');
+    throw new Error('Failed to fetch referral stats');
+  }
+  const result = await res.json();
+  if (result.success) return result.data;
+  throw new Error(result.error || 'Unknown error');
+}
+
 export function useReferralDashboard(): UseReferralDashboardReturn {
-  const [data, setData] = useState<ReferralDashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,48 +65,31 @@ export function useReferralDashboard(): UseReferralDashboardReturn {
     };
   }, []);
 
-  const fetchStats = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/referral/stats');
-      if (!res.ok) {
-        if (res.status === 401) {
-          setError('unauthorized');
-          return;
-        }
-        throw new Error('Failed to fetch referral stats');
-      }
-      const result = await res.json();
-      if (result.success) {
-        setData(result.data);
-      } else {
-        throw new Error(result.error || 'Unknown error');
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('Error fetching referral stats:', msg);
-      setError(msg);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const { data = null, isLoading, error: queryError } = useQuery<ReferralDashboardData>({
+    queryKey: ['referral', 'stats'],
+    queryFn: fetchReferralStats,
+    staleTime: 5 * 60_000,
+  });
 
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const error = queryError ? (queryError instanceof Error ? queryError.message : String(queryError)) : null;
+
+  const shareUrl = data?.shareUrl ?? null;
 
   const handleCopy = useCallback(async () => {
-    if (!data?.shareUrl) return;
+    if (!shareUrl) return;
     try {
-      await navigator.clipboard.writeText(data.shareUrl);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // clipboard unavailable
     }
-  }, [data?.shareUrl]);
+  }, [shareUrl]);
 
-  return { data, isLoading, error, copied, handleCopy, refresh: fetchStats };
+  const refresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['referral', 'stats'] });
+  }, [queryClient]);
+
+  return { data, isLoading, error, copied, handleCopy, refresh };
 }

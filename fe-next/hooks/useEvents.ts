@@ -5,7 +5,8 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export interface ClientGameEvent {
   id: string;
@@ -19,6 +20,12 @@ export interface ClientGameEvent {
   rewards: Array<{ position: number; coins: number; title?: string; badge?: string }>;
 }
 
+interface EventsData {
+  active: ClientGameEvent[];
+  upcoming: ClientGameEvent[];
+  myEvents: ClientGameEvent[];
+}
+
 export interface UseEventsReturn {
   activeEvents: ClientGameEvent[];
   upcomingEvents: ClientGameEvent[];
@@ -28,50 +35,60 @@ export interface UseEventsReturn {
 }
 
 export function useEvents(): UseEventsReturn {
-  const [activeEvents, setActiveEvents] = useState<ClientGameEvent[]>([]);
-  const [upcomingEvents, setUpcomingEvents] = useState<ClientGameEvent[]>([]);
-  const [myEvents, setMyEvents] = useState<ClientGameEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [optimisticMyEvents, setOptimisticMyEvents] = useState<ClientGameEvent[]>([]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const { data, isLoading } = useQuery<EventsData>({
+    queryKey: ['events'],
+    queryFn: async () => {
+      const res = await fetch('/api/events');
+      if (!res.ok) throw new Error('Failed to fetch events');
+      const json = await res.json();
+      return {
+        active: json.active ?? [],
+        upcoming: json.upcoming ?? [],
+        myEvents: json.myEvents ?? [],
+      };
+    },
+    staleTime: 2 * 60_000,
+  });
 
-    async function fetchEvents() {
-      try {
-        const res = await fetch('/api/events');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (cancelled) return;
-        setActiveEvents(data.active ?? []);
-        setUpcomingEvents(data.upcoming ?? []);
-        setMyEvents(data.myEvents ?? []);
-      } catch {
-        // Silently fail - events are non-critical
-      } finally {
-        if (!cancelled) setIsLoading(false);
+  const joinMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      const res = await fetch('/api/events/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId }),
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to join event');
       }
-    }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
 
-    fetchEvents();
-    return () => { cancelled = true; };
-  }, []);
+  const activeEvents = data?.active ?? [];
+  const upcomingEvents = data?.upcoming ?? [];
+  const serverMyEvents = data?.myEvents ?? [];
+
+  // Merge server myEvents with optimistic additions
+  const myEventIds = new Set(serverMyEvents.map(e => e.id));
+  const mergedMyEvents = [
+    ...serverMyEvents,
+    ...optimisticMyEvents.filter(e => !myEventIds.has(e.id)),
+  ];
 
   const joinEvent = useCallback(async (eventId: string) => {
-    const res = await fetch('/api/events/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventId }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || 'Failed to join event');
-    }
     // Optimistically add to myEvents
     const joined = activeEvents.find((e) => e.id === eventId);
     if (joined) {
-      setMyEvents((prev) => [...prev, joined]);
+      setOptimisticMyEvents((prev) => [...prev, joined]);
     }
-  }, [activeEvents]);
+    await joinMutation.mutateAsync(eventId);
+  }, [activeEvents, joinMutation]);
 
-  return { activeEvents, upcomingEvents, myEvents, joinEvent, isLoading };
+  return { activeEvents, upcomingEvents, myEvents: mergedMyEvents, joinEvent, isLoading };
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPremiumPart } from '@/shared/types/customAvatar';
@@ -30,29 +31,58 @@ function saveTempUnlocks(unlocks: TempUnlocks): void {
 }
 
 export function useAvatarPremium() {
+  const queryClient = useQueryClient();
   const { coins, refreshCoins } = useCoinsFromContext();
   const { user, isAuthenticated } = useAuth();
-  const [permanentUnlocks, setPermanentUnlocks] = useState<string[]>([]);
   const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>({});
-  const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Load temp unlocks from localStorage after hydration (avoid SSR mismatch)
   useEffect(() => {
     setTempUnlocks(getTempUnlocks());
   }, []);
 
-  // Load permanent unlocks from profile on mount
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-    fetch('/api/avatar/premium-parts')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.premiumAvatarParts) {
-          setPermanentUnlocks(data.premiumAvatarParts);
-        }
-      })
-      .catch(() => { /* silent fail */ });
-  }, [isAuthenticated, user]);
+  // Load permanent unlocks from profile via TanStack Query
+  const { data: premiumData } = useQuery<{ premiumAvatarParts: string[] }>({
+    queryKey: ['avatar', 'premium-parts'],
+    queryFn: async () => {
+      const res = await fetch('/api/avatar/premium-parts');
+      if (!res.ok) throw new Error('Failed to fetch premium parts');
+      return res.json();
+    },
+    enabled: !!isAuthenticated && !!user,
+    staleTime: 5 * 60_000,
+  });
+
+  const permanentUnlocks = premiumData?.premiumAvatarParts ?? [];
+
+  const purchaseMutation = useMutation({
+    mutationFn: async ({ category, partId }: { category: string; partId: string }) => {
+      const res = await fetch('/api/avatar/purchase-part', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, partId }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || 'Purchase failed');
+      }
+
+      return res.json();
+    },
+    onSuccess: async (data) => {
+      if (data.premiumAvatarParts) {
+        queryClient.setQueryData(['avatar', 'premium-parts'], { premiumAvatarParts: data.premiumAvatarParts });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['avatar', 'premium-parts'] });
+      }
+      await refreshCoins();
+      toast('🎉 Unlocked!', { duration: 1500 });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : 'Purchase failed \u2014 try again', { duration: 2000 });
+    },
+  });
 
   const isPartUnlocked = useCallback((category: string, value: string): boolean => {
     if (!isPremiumPart(category, value)) return true;
@@ -78,43 +108,19 @@ export function useAvatarPremium() {
   }, []);
 
   const purchaseWithGold = useCallback(async (category: string, partId: string): Promise<boolean> => {
-    setIsPurchasing(true);
     try {
-      const res = await fetch('/api/avatar/purchase-part', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, partId }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        toast.error(errData?.error || 'Purchase failed', { duration: 2000 });
-        setIsPurchasing(false);
-        return false;
-      }
-
-      const data = await res.json();
-      if (data.premiumAvatarParts) {
-        setPermanentUnlocks(data.premiumAvatarParts);
-      } else {
-        setPermanentUnlocks(prev => [...prev, `${category}:${partId}`]);
-      }
-      await refreshCoins();
-      toast('🎉 Unlocked!', { duration: 1500 });
-      setIsPurchasing(false);
+      await purchaseMutation.mutateAsync({ category, partId });
       return true;
     } catch {
-      toast.error('Purchase failed \u2014 try again');
-      setIsPurchasing(false);
       return false;
     }
-  }, [refreshCoins]);
+  }, [purchaseMutation]);
 
   return {
     isPartUnlocked,
     unlockTemporarily,
     purchaseWithGold,
-    isPurchasing,
+    isPurchasing: purchaseMutation.isPending,
     permanentUnlocks,
     coins,
   };
