@@ -52,7 +52,7 @@ describe('HapticsManager', () => {
       const mockIsSupported = jest.fn().mockReturnValue(true);
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: mockIsSupported,
-      }));
+      })});
 
       const manager = new HapticsManager();
       const result = manager.isSupported();
@@ -66,7 +66,7 @@ describe('HapticsManager', () => {
       const mockIsSupported = jest.fn().mockReturnValue(false);
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: mockIsSupported,
-      }));
+      })});
 
       const manager = new HapticsManager();
       const result = manager.isSupported();
@@ -82,7 +82,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.trigger(HapticPattern.TAP);
@@ -96,7 +96,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => false,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.trigger(HapticPattern.TAP);
@@ -112,7 +112,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         triggerCustom: mockTriggerCustom,
-      }));
+      })});
 
       const customPattern = { duration: 50, intensity: HapticIntensity.MEDIUM };
       const manager = new HapticsManager();
@@ -127,7 +127,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => false,
         triggerCustom: mockTriggerCustom,
-      }));
+      })});
 
       const customPattern = { duration: 50, intensity: HapticIntensity.MEDIUM };
       const manager = new HapticsManager();
@@ -147,7 +147,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.tap();
@@ -160,7 +160,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.success();
@@ -173,7 +173,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.error();
@@ -186,7 +186,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.warning();
@@ -199,7 +199,7 @@ describe('HapticsManager', () => {
       (WebHaptics as jest.Mock).mockImplementation(function(this: any) { return Object.assign(this, {
         isSupported: () => true,
         trigger: mockTrigger,
-      }));
+      })});
 
       const manager = new HapticsManager();
       await manager.selection();
