@@ -19,6 +19,8 @@ export function useDailyMissions(userId: string | null) {
       return res.json();
     },
     enabled: !!userId,
-    staleTime: 30 * 1000,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    // TODO: Verify /api/daily-challenge?type=missions endpoint exists and returns DailyMission[]
   });
 }

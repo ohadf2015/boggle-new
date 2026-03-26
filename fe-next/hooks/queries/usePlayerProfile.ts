@@ -19,6 +19,7 @@ export function usePlayerProfile(userId: string | null) {
       return res.json();
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   });
 }
