@@ -11,7 +11,9 @@ import { cleanProfanity } from '../utils/profanityFilter';
 import { sanitizeHtml } from '../utils/sanitize';
 import { emitError, ErrorMessages } from '../utils/errorHandler';
 import { checkRateLimit } from '../utils/rateLimiter';
+import { checkSocketRateLimit } from '../middleware/rateLimiterRedis';
 import { inc } from '../utils/metrics';
+import logger from '../utils/logger';
 import { isSocketMigrating } from './shared';
 import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
 
@@ -36,12 +38,20 @@ interface ChatHistoryRequest {
 function registerChatHandlers(io: Server, socket: Socket): void {
 
   // Handle chat messages
-  socket.on('chatMessage', (data: ChatMessageData) => {
+  socket.on('chatMessage', async (data: ChatMessageData) => {
     if (isSocketMigrating(socket)) return;
 
     if (!checkRateLimit(socket.id, CHAT_WEIGHT)) {
       inc('rateLimited');
       socket.emit('rateLimited');
+      return;
+    }
+
+    // Per-action rate limit for chat messages (3/s)
+    const rl = await checkSocketRateLimit(socket.id, 'chatMessage');
+    if (!rl.allowed) {
+      logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'chatMessage' });
+      socket.emit('rate-limited', { action: 'chatMessage', retryAfterMs: rl.retryAfterMs });
       return;
     }
 

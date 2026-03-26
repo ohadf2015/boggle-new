@@ -38,6 +38,7 @@ import {
 
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { checkSocketRateLimit } from '../middleware/rateLimiterRedis.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { clearGameTimer } from '../utils/timerManager.js';
 import { saveGameState } from '../redisClient.js';
@@ -98,6 +99,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       if (!checkRateLimit(socket.id)) {
         inc('rateLimited');
         socket.emit('rateLimited');
+        return;
+      }
+
+      // Per-action rate limit for room creation
+      const rl = await checkSocketRateLimit(socket.id, 'roomCreate');
+      if (!rl.allowed) {
+        logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'roomCreate' });
+        socket.emit('rate-limited', { action: 'roomCreate', retryAfterMs: rl.retryAfterMs });
         return;
       }
 

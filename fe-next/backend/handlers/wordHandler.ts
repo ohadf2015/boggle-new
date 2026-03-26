@@ -28,6 +28,7 @@ import { isSupabaseConfigured, recordPlayerWrongWord } from '../modules/supabase
 import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { checkSocketRateLimit } from '../middleware/rateLimiterRedis.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import timerManager from '../utils/timerManager.js';
@@ -146,6 +147,14 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     if (!checkRateLimit(socket.id, SUBMIT_WORD_WEIGHT)) {
       socket.emit('rateLimited');
+      return;
+    }
+
+    // Per-action rate limit for word submissions (5/s)
+    const rl = await checkSocketRateLimit(socket.id, 'wordSubmit');
+    if (!rl.allowed) {
+      logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'wordSubmit' });
+      socket.emit('rate-limited', { action: 'wordSubmit', retryAfterMs: rl.retryAfterMs });
       return;
     }
 
