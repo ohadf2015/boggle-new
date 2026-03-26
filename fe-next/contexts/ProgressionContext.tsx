@@ -212,7 +212,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       } catch (err) {
         const isNetworkError = err instanceof TypeError && err.message === 'Failed to fetch';
         const isRetryable = isNetworkError ||
-          (err instanceof Error && /: (429|5\d{2})$/.test(err.message));
+          (err instanceof Error && /HTTP (429|5\d{2})/.test(err.message));
 
         if (isRetryable && attempt < MAX_RETRIES) {
           const delay = BASE_DELAY * Math.pow(2, attempt);

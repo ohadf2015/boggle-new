@@ -131,6 +131,7 @@ describe('ProgressionContext', () => {
         ok: false,
         status: 500,
         json: async () => ({ error: 'Server error' }),
+        text: async () => 'Server error',
       }));
 
       // WHEN
