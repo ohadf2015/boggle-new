@@ -14,6 +14,16 @@ import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // ==============================================
 // TEST FIXTURES
@@ -434,7 +444,7 @@ describe('AdventureGame Word Feedback', () => {
 
   it('should call validateWord when word is submitted with explicit word/indices', async () => {
     // GIVEN — React selection hook returns empty (simulating external submission)
-    render(<AdventureGame {...defaultProps} />);
+    render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
     advancePastEntrySequence();
 
     // Verify we captured the onWordSubmit callback from GameGridArea mock
@@ -460,7 +470,7 @@ describe('AdventureGame Word Feedback', () => {
   it('should show accepted feedback when explicitly-submitted word is valid', async () => {
     // GIVEN
     mockValidateWord.mockResolvedValueOnce({ isValid: true, score: 30 });
-    render(<AdventureGame {...defaultProps} />);
+    render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
     advancePastEntrySequence();
 
     // WHEN — submitting "CAT" with explicit indices
@@ -478,7 +488,7 @@ describe('AdventureGame Word Feedback', () => {
   it('should show rejected feedback when explicitly-submitted word is invalid', async () => {
     // GIVEN
     mockValidateWord.mockResolvedValueOnce({ isValid: false, errorKey: 'adventure.errors.notInDictionary' });
-    render(<AdventureGame {...defaultProps} />);
+    render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
     advancePastEntrySequence();
 
     // WHEN — submitting an invalid word with explicit indices
@@ -495,7 +505,7 @@ describe('AdventureGame Word Feedback', () => {
 
   it('should not submit when word is shorter than minWordLength', async () => {
     // GIVEN
-    render(<AdventureGame {...defaultProps} />);
+    render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
     advancePastEntrySequence();
 
     // WHEN — submit a word with only 1 letter (minWordLength is typically 3)
@@ -510,7 +520,7 @@ describe('AdventureGame Word Feedback', () => {
   it('should convert indices to path using gridSize for validation', async () => {
     // GIVEN — gridSize is 4, so index 5 = row 1, col 1 (5 / 4 = 1.25 → row=1, 5 % 4 = 1 → col=1)
     mockValidateWord.mockResolvedValueOnce({ isValid: true, score: 50 });
-    render(<AdventureGame {...defaultProps} />);
+    render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
     advancePastEntrySequence();
 
     // WHEN — submit "DOG" at indices [4, 5, 6] = (1,0), (1,1), (1,2)

@@ -9,8 +9,56 @@
  * - Jest compatibility layer (globalThis.jest = vi)
  */
 
-import { vi, beforeAll, afterAll, afterEach } from 'vitest';
+import { vi, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+
+// ==========================================
+// Global TanStack Query Provider for Tests
+// ==========================================
+// Wraps @testing-library/react render to auto-provide QueryClient
+const originalRender = await vi.importActual<typeof import('@testing-library/react')>('@testing-library/react');
+
+const globalQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false, gcTime: 0 },
+    mutations: { retry: false },
+  },
+});
+
+// Reset query client between tests
+beforeEach(() => {
+  globalQueryClient.clear();
+});
+
+// Override render to wrap in QueryClientProvider unless a wrapper is already provided
+const customRender: typeof originalRender.render = (ui, options) => {
+  const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
+  );
+  return originalRender.render(ui, { ...options, wrapper: Wrapper });
+};
+
+// Make custom render available globally
+vi.mock('@testing-library/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@testing-library/react')>();
+  return {
+    ...actual,
+    render: (ui: React.ReactElement, options?: any) => {
+      const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
+        React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
+      );
+      return actual.render(ui, { ...options, wrapper: Wrapper });
+    },
+    renderHook: (hook: any, options?: any) => {
+      const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
+        React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
+      );
+      return actual.renderHook(hook, { ...options, wrapper: Wrapper });
+    },
+  };
+});
 
 // ==========================================
 // Jest Compatibility Layer

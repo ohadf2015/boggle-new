@@ -6,11 +6,14 @@ import { vi, type Mock, } from 'vitest';
 
 // Mock Next.js server runtime BEFORE any imports
 vi.mock('next/server', () => ({
-  NextRequest: vi.fn().mockImplementation((url: string) => ({
-    url,
-  })),
+  NextRequest: class MockNextRequest {
+    url: string;
+    constructor(url: string) {
+      this.url = url;
+    }
+  },
   NextResponse: {
-    json: vi.fn((data, init) => ({
+    json: vi.fn((data: unknown, init?: { status?: number }) => ({
       json: () => Promise.resolve(data),
       status: init?.status || 200,
     })),

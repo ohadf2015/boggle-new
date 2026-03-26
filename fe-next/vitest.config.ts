@@ -14,7 +14,7 @@ export default defineConfig({
       '@/shared': path.resolve(__dirname, './shared'),
       '@/types': path.resolve(__dirname, './types'),
       // Mock remotion packages
-      'remotion': path.resolve(__dirname, './__mocks__/remotion.cjs'),
+      'remotion': path.resolve(__dirname, './__mocks__/remotion.ts'),
       '@remotion/media': path.resolve(__dirname, './__mocks__/@remotion/media.ts'),
       '@remotion/player': path.resolve(__dirname, './__mocks__/@remotion/player.ts'),
       '@remotion/transitions': path.resolve(__dirname, './__mocks__/@remotion/transitions.ts'),

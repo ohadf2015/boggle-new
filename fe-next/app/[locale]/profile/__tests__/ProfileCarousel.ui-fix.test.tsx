@@ -110,12 +110,34 @@ vi.mock('@/utils/session', () => ({
   getSession: () => null
 }));
 
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ notifications: [], unreadCount: 0 }),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => ({
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
+    removeChannel: vi.fn(),
+  }),
+}));
+
 import ProfilePageClient from '../PageClient';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 describe('Profile Mobile Tab Navigation', () => {
   describe('Tab Navigation', () => {
     it('should display tabs with section labels', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find all section tab buttons by role
       const tabs = screen.getAllByRole('tab');
@@ -129,7 +151,7 @@ describe('Profile Mobile Tab Navigation', () => {
     });
 
     it('should have an active tab with yellow background', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find active tab (selected)
       const activeTab = screen.getAllByRole('tab').find(tab =>
@@ -142,7 +164,7 @@ describe('Profile Mobile Tab Navigation', () => {
     });
 
     it('should have inactive tabs with subtle styling', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find inactive tabs
       const tabs = screen.getAllByRole('tab');
@@ -162,7 +184,7 @@ describe('Profile Mobile Tab Navigation', () => {
 
   describe('Navigation Arrows Removed', () => {
     it('should NOT have fixed yellow arrow buttons at bottom', () => {
-      render(<ProfilePageClient />);
+      render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // The fixed yellow navigation arrows should be removed
       const prevButton = screen.queryByLabelText(/previous section/i);
@@ -176,7 +198,7 @@ describe('Profile Mobile Tab Navigation', () => {
 
   describe('Swipe Indicators', () => {
     it('should show swipe indicator on right side when not on last section', () => {
-      const { container } = render(<ProfilePageClient />);
+      const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find the right-side swipe indicator gradient
       const rightIndicator = container.querySelector('[aria-hidden="true"].bg-gradient-to-l');
@@ -184,7 +206,7 @@ describe('Profile Mobile Tab Navigation', () => {
     });
 
     it('should have RTL rotation on swipe indicator chevron icons', () => {
-      const { container } = render(<ProfilePageClient />);
+      const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
       // Find the chevron icons in swipe indicators (end side for "next" direction)
       const rightIndicator = container.querySelector('[aria-hidden="true"].end-0');
@@ -226,7 +248,7 @@ describe('Profile RTL Swipe Direction', () => {
     // This test documents that the swipe direction must be RTL-aware
     // In RTL: swipe right = next, swipe left = previous (opposite of LTR)
     // The component should use the language context's dir property to determine direction
-    const { container } = render(<ProfilePageClient />);
+    const { container } = render(<ProfilePageClient />, { wrapper: createWrapper() });
 
     // The motion.div with drag="x" should exist for swipe handling
     const swipeableContainer = container.querySelector('[draggable]') ||

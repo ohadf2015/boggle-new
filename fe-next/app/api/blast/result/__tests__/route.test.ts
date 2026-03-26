@@ -148,6 +148,8 @@ function setupDbMocks({
 describe('POST /api/blast/result', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -439,6 +441,8 @@ describe('POST /api/blast/result', () => {
 describe('GET /api/blast/result', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,

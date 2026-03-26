@@ -8,10 +8,13 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 
 // Mock Remotion Player — stores event listeners so we can simulate frameupdate
-const playerEventListeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+const { playerEventListeners, playerCalls } = vi.hoisted(() => ({
+  playerEventListeners: {} as Record<string, ((...args: unknown[]) => void)[]>,
+  playerCalls: [] as any[][],
+}));
 
-vi.mock('@remotion/player', () => {
-  const React = require('react');
+vi.mock('@remotion/player', async () => {
+  const React = await import('react');
   const instance = {
     addEventListener: (event: string, handler: (...args: unknown[]) => void) => {
       if (!playerEventListeners[event]) playerEventListeners[event] = [];
@@ -23,9 +26,7 @@ vi.mock('@remotion/player', () => {
       }
     },
   };
-   
-  // Track calls manually for mockClear/mock.calls support
-  const playerCalls: any[][] = [];
+
   const Player = React.forwardRef((props: any, ref: any) => {
     playerCalls.push([props]);
     React.useImperativeHandle(ref, () => instance);
@@ -79,20 +80,22 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock LanguageContext
-const mockT = (key: string, params?: Record<string, unknown>) => {
-  const translations: Record<string, string> = {
-    'adventure.bosses.cinematics.skip': 'Skip',
-    'adventure.bosses.cinematics.skipIn': `Skip in ${params?.seconds || 2}...`,
-    'adventure.bosses.cinematics.progress': 'Cinematic progress',
-    'adventure.bosses.cinematics.loading': 'Loading...',
-    'adventure.bosses.cinematics.errorTapToSkip': 'Tap Skip to continue',
+vi.mock('../../../../../contexts/LanguageContext', () => {
+  const mockT = (key: string, params?: Record<string, unknown>) => {
+    const translations: Record<string, string> = {
+      'adventure.bosses.cinematics.skip': 'Skip',
+      'adventure.bosses.cinematics.skipIn': `Skip in ${params?.seconds || 2}...`,
+      'adventure.bosses.cinematics.progress': 'Cinematic progress',
+      'adventure.bosses.cinematics.loading': 'Loading...',
+      'adventure.bosses.cinematics.errorTapToSkip': 'Tap Skip to continue',
+    };
+    return translations[key] || key;
   };
-  return translations[key] || key;
-};
-vi.mock('../../../../../contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: mockT }),
-  useLanguageSafe: () => ({ t: mockT }),
-}));
+  return {
+    useLanguage: () => ({ t: mockT }),
+    useLanguageSafe: () => ({ t: mockT }),
+  };
+});
 
 // Mock timers
 vi.useFakeTimers();
@@ -391,14 +394,13 @@ describe('CinematicPlayer', () => {
     });
 
     it('should use 16:9 letterbox height in portrait fullscreen mode', () => {
-      const { Player } = require('@remotion/player');
-      Player.mockClear();
+      playerCalls.length = 0;
 
       render(<CinematicPlayer {...defaultProps} fullscreen />);
       waitForReady();
 
       // In portrait (390x844), height should be 390 * (720/1280) ≈ 219, not 844
-      const calls = Player.mock.calls as unknown[][];
+      const calls = playerCalls as unknown[][];
       const lastCall = calls[calls.length - 1]?.[0] as Record<string, unknown>;
       const style = lastCall?.style as React.CSSProperties | undefined;
       const height = style?.height;
@@ -409,13 +411,12 @@ describe('CinematicPlayer', () => {
     });
 
     it('should keep full width in portrait fullscreen mode', () => {
-      const { Player } = require('@remotion/player');
-      Player.mockClear();
+      playerCalls.length = 0;
 
       render(<CinematicPlayer {...defaultProps} fullscreen />);
       waitForReady();
 
-      const calls = Player.mock.calls as unknown[][];
+      const calls = playerCalls as unknown[][];
       const lastCall = calls[calls.length - 1]?.[0] as Record<string, unknown>;
       const style = lastCall?.style as React.CSSProperties | undefined;
 

@@ -80,8 +80,17 @@ vi.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
 
 import HostPreGameView from '../../host/components/HostPreGameView';
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockT = (key: string) => key;
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 describe('Multiplayer Desktop Functionality Access', () => {
   describe('HostPreGameView', () => {
@@ -119,7 +128,7 @@ describe('Multiplayer Desktop Functionality Access', () => {
     };
 
     it('should show chat content on desktop (not hidden behind tabs)', () => {
-      render(<HostPreGameView {...defaultHostProps} />);
+      render(<HostPreGameView {...defaultHostProps} />, { wrapper: createWrapper() });
 
       // Desktop two-column layout renders chat in right column with data-testid="desktop-chat-area"
       const desktopChatArea = screen.queryByTestId('desktop-chat-area');
@@ -127,7 +136,7 @@ describe('Multiplayer Desktop Functionality Access', () => {
     });
 
     it('should have a visible start game button on desktop', () => {
-      render(<HostPreGameView {...defaultHostProps} />);
+      render(<HostPreGameView {...defaultHostProps} />, { wrapper: createWrapper() });
 
       // StartButton renders with text from t('hostView.startBattle')
       // mockT returns the key itself, so button text is 'hostView.startBattle'
@@ -172,7 +181,7 @@ describe('Multiplayer Desktop Functionality Access', () => {
     };
 
     it('should show chat content on desktop (not hidden behind tabs)', () => {
-      render(<PlayerWaitingView {...defaultPlayerProps} />);
+      render(<PlayerWaitingView {...defaultPlayerProps} />, { wrapper: createWrapper() });
 
       // Desktop two-column layout renders chat in right column with data-testid="desktop-chat-area"
       const desktopChatArea = screen.queryByTestId('desktop-chat-area');
@@ -180,7 +189,7 @@ describe('Multiplayer Desktop Functionality Access', () => {
     });
 
     it('should show both players list and chat simultaneously on desktop', () => {
-      render(<PlayerWaitingView {...defaultPlayerProps} />);
+      render(<PlayerWaitingView {...defaultPlayerProps} />, { wrapper: createWrapper() });
 
       // Desktop layout uses DesktopLobbyLayout with left/right columns
       // Left column has data-testid="desktop-left-column" (players + waiting status)

@@ -17,18 +17,22 @@ import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
-  const actual = vi.importActual('framer-motion');
+  const motionProxy = new Proxy({}, {
+    get: (_target: unknown, prop: string) => {
+      return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
+        const { children, initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt, variants: _v, whileInView: _wiv, viewport: _vp, layout: _l, layoutId: _li, onAnimationComplete: _oac, ...rest } = props;
+        return React.createElement(prop, { ...rest, ref } as React.HTMLAttributes<HTMLElement>, children as React.ReactNode);
+      });
+    },
+  });
   return {
-    ...actual,
-    m: new Proxy({}, {
-      get: (_target: unknown, prop: string) => {
-        return React.forwardRef(function MotionComponent(props: Record<string, unknown>, ref: React.Ref<HTMLElement>) {
-          const { children, initial: _i, animate: _a, exit: _e, transition: _t, whileHover: _wh, whileTap: _wt, ...rest } = props;
-          return React.createElement(prop, { ...rest, ref } as React.HTMLAttributes<HTMLElement>, children as React.ReactNode);
-        });
-      },
-    }),
+    motion: motionProxy,
+    m: motionProxy,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+    useInView: () => true,
+    useMotionValue: (val: number) => ({ get: () => val, set: vi.fn() }),
+    useTransform: () => ({ get: () => 0, set: vi.fn() }),
   };
 });
 

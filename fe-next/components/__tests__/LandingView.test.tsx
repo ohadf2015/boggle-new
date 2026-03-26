@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * LandingView Component Tests
  *
@@ -72,10 +73,25 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
 // Mock onboardingStorage
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: vi.fn(() => true),
+  markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
+  savePendingRoomInvite: vi.fn(),
 }));
 vi.mock('@/utils/perfVariant', () => ({
   getPerfVariant: () => 'lite',
+}));
+
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ notifications: [], unreadCount: 0 }),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => ({
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
+    removeChannel: vi.fn(),
+  }),
 }));
 
 // Mock lazy-loaded / dynamic components
@@ -112,8 +128,17 @@ import LandingView from '../landing/LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockPlayTrack = vi.fn();
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 describe('LandingView', () => {
   beforeEach(() => {
@@ -142,7 +167,7 @@ describe('LandingView', () => {
   });
 
   it('renders game mode selection cards', () => {
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     const links = screen.getAllByRole('link');
     const hasSinglePlayer = links.some(link =>
@@ -156,13 +181,13 @@ describe('LandingView', () => {
   });
 
   it('plays lobby music on mount', () => {
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
   });
 
   it('has accessible navigation links', () => {
-    render(<LandingView />);
+    render(<LandingView />, { wrapper: createWrapper() });
 
     const links = screen.getAllByRole('link');
     expect(links.length).toBeGreaterThan(0);

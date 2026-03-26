@@ -17,6 +17,7 @@ import { useLandingStats } from '@/hooks/useLandingStats';
 import { useDailySolveRate } from '@/hooks/useDailySolveRate';
 import { useHallOfFame } from '@/hooks/useHallOfFame';
 import { AdPlaceholder } from '@/components/ads';
+import { hasCompletedOnboarding, markOnboardingComplete, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
 import { LandingSocialProofBar } from './LandingSocialProofBar';
@@ -111,7 +112,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   // who may have cleared localStorage or are on a new device.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const { hasCompletedOnboarding, markOnboardingComplete, savePendingRoomInvite } = require('@/utils/onboardingStorage');
     if (hasCompletedOnboarding()) return;
 
     // Authenticated user with games played = returning player, skip FTUE

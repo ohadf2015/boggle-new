@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Test: Daily Challenge Banner container positioning on mobile view
  * Updated: Banner is now inside the 2-col grid as col-span-2, not a separate element above it
@@ -8,6 +9,7 @@ import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock all required contexts and hooks
 vi.mock('@/contexts/AuthContext');
@@ -64,7 +66,22 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,
+  markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
+  savePendingRoomInvite: vi.fn(),
+}));
+
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ notifications: [], unreadCount: 0 }),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => ({
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
+    removeChannel: vi.fn(),
+  }),
 }));
 
 // Mock components that are lazy loaded
@@ -81,6 +98,14 @@ vi.mock('@/components/OnboardingModal', () => {
   };
   return { default: MockOnboardingModal };
 });
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 describe('LandingView - Daily Challenge Banner Container', () => {
   beforeEach(() => {
@@ -118,7 +143,7 @@ describe('LandingView - Daily Challenge Banner Container', () => {
   });
 
   it('should render Daily Challenge Banner inside main-container on mobile landscape', () => {
-    const { container } = render(<LandingView />);
+    const { container } = render(<LandingView />, { wrapper: createWrapper() });
 
     // Find the section element (the main content container)
     const mainContainer = container.querySelector('section');

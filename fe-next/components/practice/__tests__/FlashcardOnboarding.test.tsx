@@ -120,9 +120,9 @@ describe('FlashcardOnboarding localStorage utilities', () => {
     localStorageMock.clear();
   });
 
-  it('hasSeenOnboarding returns false when not set', () => {
+  it('hasSeenOnboarding returns false when not set', async () => {
     // Import the utility after mocking localStorage
-    const { hasSeenFlashcardOnboarding } = require('../FlashcardOnboarding');
+    const { hasSeenFlashcardOnboarding } = await import('../FlashcardOnboarding');
 
     expect(hasSeenFlashcardOnboarding()).toBe(false);
     expect(localStorageMock.getItem).toHaveBeenCalledWith(
@@ -130,15 +130,15 @@ describe('FlashcardOnboarding localStorage utilities', () => {
     );
   });
 
-  it('hasSeenOnboarding returns true when set', () => {
+  it('hasSeenOnboarding returns true when set', async () => {
     localStorageMock.getItem.mockReturnValueOnce('true');
-    const { hasSeenFlashcardOnboarding } = require('../FlashcardOnboarding');
+    const { hasSeenFlashcardOnboarding } = await import('../FlashcardOnboarding');
 
     expect(hasSeenFlashcardOnboarding()).toBe(true);
   });
 
-  it('markOnboardingComplete sets localStorage flag', () => {
-    const { markFlashcardOnboardingComplete } = require('../FlashcardOnboarding');
+  it('markOnboardingComplete sets localStorage flag', async () => {
+    const { markFlashcardOnboardingComplete } = await import('../FlashcardOnboarding');
 
     markFlashcardOnboardingComplete();
 

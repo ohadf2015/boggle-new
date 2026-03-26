@@ -190,7 +190,7 @@ describe('SinglePlayerGame - Word Submission', () => {
     const mockOnGameEnd = vi.fn();
     const mockOnQuit = vi.fn();
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame

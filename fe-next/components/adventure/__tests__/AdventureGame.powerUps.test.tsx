@@ -8,6 +8,16 @@ import { render } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
 import { useAdventureGame as mockHook } from '@/hooks/useAdventureGame';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {

@@ -1,11 +1,13 @@
 // Shared mock functions for supabase auth tests
-// Defined in a separate file to avoid TDZ issues with jest.mock hoisting
+// Defined in a separate file to avoid TDZ issues with vi.mock hoisting
+import { vi } from 'vitest';
+
 export const mockAuth = {
-  signInWithOtp: jest.fn(),
-  signInWithOAuth: jest.fn(),
-  signInWithPassword: jest.fn(),
-  signUp: jest.fn(),
-  signOut: jest.fn(),
-  getSession: jest.fn(),
-  getUser: jest.fn(),
+  signInWithOtp: vi.fn(),
+  signInWithOAuth: vi.fn(),
+  signInWithPassword: vi.fn(),
+  signUp: vi.fn(),
+  signOut: vi.fn(),
+  getSession: vi.fn(),
+  getUser: vi.fn(),
 };

@@ -18,6 +18,16 @@ import '@testing-library/jest-dom';
 import { usePlayerHealth, type PlayerHealthState } from '@/hooks/usePlayerHealth';
 import { useBossEffectExecutor, type EffectCallbacks } from '@/hooks/useBossEffectExecutor';
 import { PlayerHealthBar } from '@/components/adventure/boss';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 describe('AdventureGame - Player Health Integration', () => {
   // ==============================================

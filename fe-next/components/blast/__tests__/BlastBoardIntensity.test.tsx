@@ -3,8 +3,11 @@ import { render, screen } from '@testing-library/react';
 import BlastBoardIntensity from '../BlastBoardIntensity';
 
 // Mock framer-motion
+const { mockUseReducedMotion } = vi.hoisted(() => ({
+  mockUseReducedMotion: vi.fn(() => false),
+}));
 vi.mock('framer-motion', () => ({
-  useReducedMotion: vi.fn(() => false),
+  useReducedMotion: mockUseReducedMotion,
 }));
 
 describe('BlastBoardIntensity', () => {
@@ -53,8 +56,7 @@ describe('BlastBoardIntensity', () => {
   });
 
   it('skips all effects when reduced motion is preferred', () => {
-    const { useReducedMotion } = require('framer-motion');
-    useReducedMotion.mockReturnValue(true);
+    mockUseReducedMotion.mockReturnValue(true);
 
     render(
       <BlastBoardIntensity intensity={5}>
@@ -64,6 +66,6 @@ describe('BlastBoardIntensity', () => {
     expect(screen.queryByTestId('blast-border-glow')).not.toBeInTheDocument();
     expect(screen.queryByTestId('blast-vignette')).not.toBeInTheDocument();
 
-    useReducedMotion.mockReturnValue(false);
+    mockUseReducedMotion.mockReturnValue(false);
   });
 });

@@ -128,6 +128,16 @@ describe('Fix 1: LevelCompleteModal canRetryFree prop', () => {
 
 // ─── Fix 2 & 3: useAdventureLevelCompletion sends loot + retainedScore ──
 import { useAdventureLevelCompletion } from '../hooks/useAdventureLevelCompletion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 vi.mock('@/shared/utils/adventureXpUtils', () => ({
   calculateAdventureXp: () => 100,

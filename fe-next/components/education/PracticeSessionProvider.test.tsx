@@ -10,13 +10,23 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock dependencies
-const mockAwardPracticeXp = vi.fn();
-const mockAcknowledgePersistence = vi.fn();
-const mockCheckForUnlocks = vi.fn();
-const mockAcknowledgeUnlock = vi.fn();
+const {
+  mockAwardPracticeXp,
+  mockAcknowledgePersistence,
+  mockCheckForUnlocks,
+  mockAcknowledgeUnlock,
+  mockSupabaseUpsert,
+  mockUseAchievementUnlock,
+} = vi.hoisted(() => ({
+  mockAwardPracticeXp: vi.fn(),
+  mockAcknowledgePersistence: vi.fn(),
+  mockCheckForUnlocks: vi.fn(),
+  mockAcknowledgeUnlock: vi.fn(),
+  mockSupabaseUpsert: vi.fn().mockResolvedValue({ data: null, error: null }),
+  mockUseAchievementUnlock: vi.fn(),
+}));
 
 // Mock Supabase
-const mockSupabaseUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
@@ -73,15 +83,16 @@ vi.mock('@/hooks/useEducationXp', () => ({
 }));
 
 // Mock useAchievementUnlock hook
+mockUseAchievementUnlock.mockReturnValue({
+  pendingUnlocks: [],
+  currentUnlock: null,
+  acknowledgeUnlock: mockAcknowledgeUnlock,
+  checkForUnlocks: mockCheckForUnlocks,
+  isChecking: false,
+});
 vi.mock('@/hooks/useAchievementUnlock', () => ({
   __esModule: true,
-  default: vi.fn(() => ({
-    pendingUnlocks: [],
-    currentUnlock: null,
-    acknowledgeUnlock: mockAcknowledgeUnlock,
-    checkForUnlocks: mockCheckForUnlocks,
-    isChecking: false,
-  })),
+  default: mockUseAchievementUnlock,
 }));
 
 // Mock UnifiedAchievementModal component
@@ -546,10 +557,8 @@ describe('PracticeSessionProvider', () => {
 
     it('renders AchievementUnlockModal when currentUnlock is set', () => {
       // Import the mock to modify it
-      const useAchievementUnlockModule = vi.importMock('@/hooks/useAchievementUnlock');
-
-      // Set currentUnlock to a valid unlock payload
-      useAchievementUnlockModule.default.mockReturnValue({
+      // Set currentUnlock to a valid unlock payload via the hoisted mock
+      mockUseAchievementUnlock.mockReturnValue({
         pendingUnlocks: [],
         currentUnlock: {
           achievementKey: 'test-achievement',

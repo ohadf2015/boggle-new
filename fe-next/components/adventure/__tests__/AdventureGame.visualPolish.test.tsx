@@ -17,6 +17,16 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { BossDefeatFireworks } from '@/components/celebration/BossDefeatFireworks';
 import { CinematicPlayer } from '@/components/adventure/boss/cinematics/CinematicPlayer';
 import { VictoryCinematic, DefeatCinematic } from '@/components/adventure/cinematics';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // Mock confetti utilities
 vi.mock('@/utils/confettiUtils', () => ({

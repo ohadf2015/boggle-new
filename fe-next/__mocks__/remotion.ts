@@ -1,7 +1,8 @@
-// Jest mock for the 'remotion' package
+// Vitest mock for the 'remotion' package
 // remotion's CJS bundle uses internal state that fails in jsdom
-// Exports use jest.fn() so tests can override via mockReturnValue/mockImplementation
+// Exports use vi.fn() so tests can override via mockReturnValue/mockImplementation
 import React from 'react';
+import { vi } from 'vitest';
 
 export const AbsoluteFill = React.forwardRef(
   ({ children, style, ...props }: any, ref: any) =>
@@ -17,18 +18,18 @@ export const Img = React.forwardRef(
 );
 Img.displayName = 'Img';
 
-export const useCurrentFrame = jest.fn(() => 0);
-export const useVideoConfig = jest.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 }));
+export const useCurrentFrame = vi.fn(() => 0);
+export const useVideoConfig = vi.fn(() => ({ fps: 30, durationInFrames: 90, width: 1920, height: 1080 }));
 
-export const interpolate = jest.fn((frame: number, inputRange: number[], outputRange: number[]) => {
+export const interpolate = vi.fn((frame: number, inputRange: number[], outputRange: number[]) => {
   if (frame <= inputRange[0]) return outputRange[0];
   if (frame >= inputRange[inputRange.length - 1]) return outputRange[outputRange.length - 1];
   return outputRange[0];
 });
 
-export const spring = jest.fn(() => 0);
-export const staticFile = jest.fn((path: string) => path);
-export const registerRoot = jest.fn();
+export const spring = vi.fn(() => 0);
+export const staticFile = vi.fn((path: string) => path);
+export const registerRoot = vi.fn();
 
 export const Easing = {
   bezier: () => (t: number) => t,

@@ -30,8 +30,8 @@ vi.mock('remotion', () => ({
   ),
 }));
 
- 
-const remotion = require('remotion');
+
+import * as remotion from 'remotion';
 
 // Mock fonts
 vi.mock('../../fonts', () => ({
@@ -42,9 +42,9 @@ vi.mock('../../fonts', () => ({
 import { TitleReveal } from '../TitleReveal';
 
 beforeEach(() => {
-  remotion.useCurrentFrame.mockReturnValue(10);
-  remotion.useVideoConfig.mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
-  remotion.spring.mockReturnValue(1);
+  vi.mocked(remotion.useCurrentFrame).mockReturnValue(10);
+  vi.mocked(remotion.useVideoConfig).mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
+  vi.mocked(remotion.spring).mockReturnValue(1);
 });
 
 describe('TitleReveal responsive scaling', () => {

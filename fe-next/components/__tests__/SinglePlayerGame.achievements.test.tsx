@@ -228,7 +228,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     // WHEN: Game is rendered
     render(
@@ -263,7 +263,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame
@@ -303,7 +303,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame
@@ -335,7 +335,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame
@@ -372,7 +372,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame
@@ -405,7 +405,7 @@ describe('SinglePlayerGame - Achievement Display', () => {
       mode: 'solo-bots' as const,
     };
 
-    const SinglePlayerGame = require('../singleplayer/SinglePlayerGame').default;
+    const { default: SinglePlayerGame } = await import('../singleplayer/SinglePlayerGame');
 
     render(
       <SinglePlayerGame

@@ -54,8 +54,11 @@ vi.mock('@/utils/aiHintGenerator', () => {
 });
 
 // Mock word rarity to avoid complex calculations
+const { mockGetWordRarity } = vi.hoisted(() => ({
+  mockGetWordRarity: vi.fn().mockReturnValue(2), // Common word (not rare)
+}));
 vi.mock('@/utils/dailyChallenge/wordRarity', () => ({
-  getWordRarity: vi.fn().mockReturnValue(2), // Common word (not rare)
+  getWordRarity: mockGetWordRarity,
 }));
 
 describe('useSurvivalHints', () => {
@@ -322,8 +325,7 @@ describe('useSurvivalHints', () => {
   describe('no automatic first letter reveal', () => {
     it('should NOT auto-reveal first letter for any word regardless of rarity', () => {
       // Mock rare word (rarity >= 4)
-      const { getWordRarity } = vi.importMock('@/utils/dailyChallenge/wordRarity');
-      (getWordRarity as jest.Mock).mockReturnValue(5); // LEGENDARY rarity
+      mockGetWordRarity.mockReturnValue(5); // LEGENDARY rarity
 
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 

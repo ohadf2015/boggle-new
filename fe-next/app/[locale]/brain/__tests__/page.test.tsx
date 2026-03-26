@@ -9,6 +9,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 // Mock all dependencies
@@ -55,12 +56,15 @@ describe('BrainTrainingPage - Loading States', () => {
   };
 
   // Wrapper component to provide necessary contexts
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const AllTheProviders = ({ children }: { children: React.ReactNode }) => (
-    <MusicProvider>
-      <SoundEffectsProvider>
-        {children}
-      </SoundEffectsProvider>
-    </MusicProvider>
+    <QueryClientProvider client={queryClient}>
+      <MusicProvider>
+        <SoundEffectsProvider>
+          {children}
+        </SoundEffectsProvider>
+      </MusicProvider>
+    </QueryClientProvider>
   );
 
   beforeEach(() => {

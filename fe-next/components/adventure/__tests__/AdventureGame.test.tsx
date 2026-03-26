@@ -9,6 +9,16 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // ==============================================
 // TEST FIXTURES
@@ -447,7 +457,7 @@ describe('AdventureGame', () => {
   describe('Rendering', () => {
     it('should render game container', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
@@ -455,7 +465,7 @@ describe('AdventureGame', () => {
 
     it('should display level number', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - Level badge shows compact "W1 · L1" format
       const gameContainer = screen.getByTestId('adventure-game');
@@ -466,7 +476,7 @@ describe('AdventureGame', () => {
 
     it('should render the game grid', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       expect(screen.getByRole('grid')).toBeInTheDocument();
@@ -474,7 +484,7 @@ describe('AdventureGame', () => {
 
     it('should render the timer', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       expect(screen.getByRole('timer')).toBeInTheDocument();
@@ -482,7 +492,7 @@ describe('AdventureGame', () => {
 
     it('should render objectives list', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - objectives list exists (may have multiple due to mobile/desktop responsive)
       const objectivesLists = screen.getAllByRole('list', { name: /objectives/i });
@@ -493,7 +503,7 @@ describe('AdventureGame', () => {
   describe('Game State', () => {
     it('should show initial time remaining', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - timer should exist and show 120 seconds
       const timer = screen.getByRole('timer');
@@ -503,7 +513,7 @@ describe('AdventureGame', () => {
 
     it('should show initial score of 0', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - score display exists with initial score of 0
       const scoreDisplay = screen.getByTestId('score-display');
@@ -514,7 +524,7 @@ describe('AdventureGame', () => {
 
     it('should display all objectives', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - objectives exist (may have multiples due to responsive design)
       const wordCountObjectives = screen.getAllByTestId('objective-wordCount');
@@ -527,7 +537,7 @@ describe('AdventureGame', () => {
   describe('Timer Countdown', () => {
     it('should countdown timer every second', async () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
       const timer = screen.getByRole('timer');
       expect(timer).toHaveAttribute('aria-label', '120 seconds remaining');
 
@@ -554,7 +564,7 @@ describe('AdventureGame', () => {
 
     it('should stop countdown at 0:00', () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // WHEN - Run all entry sequence timers
       for (let i = 0; i < 10; i++) {
@@ -598,7 +608,7 @@ describe('AdventureGame', () => {
 
     it('should show time up state when timer reaches 0', () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // WHEN - Run all entry sequence timers
       for (let i = 0; i < 10; i++) {
@@ -622,7 +632,7 @@ describe('AdventureGame', () => {
   describe('Pause Functionality', () => {
     it('should have a pause button', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument();
@@ -630,7 +640,7 @@ describe('AdventureGame', () => {
 
     it('should stop timer when paused', () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
       const timer = screen.getByRole('timer');
       const initialAriaLabel = timer.getAttribute('aria-label');
       expect(initialAriaLabel).toBe('120 seconds remaining');
@@ -649,7 +659,7 @@ describe('AdventureGame', () => {
 
     it('should show pause overlay when paused', () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // WHEN
       fireEvent.click(screen.getByRole('button', { name: /pause/i }));
@@ -660,7 +670,7 @@ describe('AdventureGame', () => {
 
     it('should resume game when resume button is clicked', () => {
       // GIVEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByRole('button', { name: /pause/i }));
       const pauseOverlay = screen.getByTestId('pause-overlay');
       expect(pauseOverlay).toBeInTheDocument();
@@ -682,7 +692,7 @@ describe('AdventureGame', () => {
       // GIVEN
       const onExit = vi.fn();
       vi.spyOn(window, 'confirm').mockReturnValue(true);
-      render(<AdventureGame {...defaultProps} onExit={onExit} />);
+      render(<AdventureGame {...defaultProps} onExit={onExit} />, { wrapper: createWrapper() });
 
       // WHEN - pause then exit (may have multiple exit buttons due to responsive design)
       fireEvent.click(screen.getByRole('button', { name: /pause/i }));
@@ -700,7 +710,7 @@ describe('AdventureGame', () => {
       // GIVEN
       const onExit = vi.fn();
       vi.spyOn(window, 'confirm').mockReturnValue(false);
-      render(<AdventureGame {...defaultProps} onExit={onExit} />);
+      render(<AdventureGame {...defaultProps} onExit={onExit} />, { wrapper: createWrapper() });
 
       // WHEN - pause then exit, user cancels
       fireEvent.click(screen.getByRole('button', { name: /pause/i }));
@@ -717,7 +727,7 @@ describe('AdventureGame', () => {
   describe('Score Display', () => {
     it('should display score in header', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       expect(screen.getByTestId('score-display')).toBeInTheDocument();
@@ -730,7 +740,7 @@ describe('AdventureGame', () => {
   describe('Accessibility', () => {
     it('should have accessible game region', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN
       const gameRegion = screen.getByTestId('adventure-game');
@@ -739,7 +749,7 @@ describe('AdventureGame', () => {
 
     it('should have accessible label for objectives', () => {
       // GIVEN / WHEN
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // THEN - objectives are rendered in the sidebar (both mobile and desktop layouts)
       // Multiple objectives lists may exist for responsive design
@@ -758,7 +768,7 @@ describe('AdventureGame', () => {
 
       // WHEN / THEN - should not crash
       expect(() => {
-        render(<AdventureGame {...defaultProps} levelConfig={invalidConfig} />);
+        render(<AdventureGame {...defaultProps} levelConfig={invalidConfig} />, { wrapper: createWrapper() });
       }).not.toThrow();
     });
   });

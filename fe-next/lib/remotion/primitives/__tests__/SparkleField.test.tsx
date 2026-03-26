@@ -27,8 +27,8 @@ vi.mock('remotion', () => ({
   ),
 }));
 
- 
-const remotion = require('remotion');
+
+import * as remotion from 'remotion';
 
 // Mock seededRandom util
 vi.mock('../../utils/seededRandom', () => ({
@@ -44,7 +44,7 @@ vi.mock('../../utils/seededRandom', () => ({
 import { SparkleField } from '../SparkleField';
 
 beforeEach(() => {
-  remotion.useVideoConfig.mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
+  vi.mocked(remotion.useVideoConfig).mockReturnValue({ width: 390, height: 219, fps: 30, durationInFrames: 90 });
 });
 
 describe('SparkleField responsive scaling', () => {

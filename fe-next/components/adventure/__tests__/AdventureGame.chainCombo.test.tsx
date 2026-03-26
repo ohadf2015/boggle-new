@@ -15,6 +15,7 @@ import AdventureGame from '../AdventureGame';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { useAdventureSelection } from '@/hooks/useAdventureSelection';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -605,6 +606,14 @@ vi.mock('@/lib/adventure/weeklyModifiers', () => ({
 
 // Mocks are available via top-level imports (auto-mocked by vi.mock above)
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 describe('AdventureGame - Chain Combo Visual Feedback Integration', () => {
   // Sample level config
   const levelConfig = {
@@ -703,7 +712,8 @@ describe('AdventureGame - Chain Combo Visual Feedback Integration', () => {
           initialGrid={initialGrid}
           onLevelComplete={vi.fn()}
           onExit={vi.fn()}
-        />
+        />,
+        { wrapper: createWrapper() }
       );
 
       // THEN: Particle burst is not rendered
@@ -719,10 +729,12 @@ describe('AdventureGame - Chain Combo Visual Feedback Integration', () => {
     // Combo badge overlap, particle z-index, and score popup tests removed:
     // ComboTierBadge UI was removed per user request, and chain particle/score popup
     // tests require complex effect triggering setup not feasible with current mocks
+    it.skip('placeholder — tests removed (ComboTierBadge UI removed)', () => {});
   });
 
   describe('Multiplayer Isolation', () => {
     // Combo isolation test removed: ComboTierBadge UI was removed, and the isolation
     // is inherently verified by the component rendering without multiplayer dependencies
+    it.skip('placeholder — inherently verified by component rendering', () => {});
   });
 });

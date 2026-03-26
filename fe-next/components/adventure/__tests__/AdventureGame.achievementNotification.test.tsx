@@ -172,26 +172,17 @@ vi.mock('@/utils/confettiUtils', () => ({
 }));
 
 // Mock react-hot-toast to capture toast calls
-// Must be declared before jest.mock to avoid hoisting issues
-vi.mock('react-hot-toast', () => {
-  const mockCustom = vi.fn().mockReturnValue('mock-toast-id');
-  const mockDismiss = vi.fn();
-  return {
-    __esModule: true,
-    default: {
-      custom: mockCustom,
-      dismiss: mockDismiss,
-    },
-    // Export for test assertions
-    mockCustom,
-    mockDismiss,
-  };
-});
-
-// Get the mock functions after the module is mocked
-const toastModule = vi.importMock('react-hot-toast') as { mockCustom: jest.Mock; mockDismiss: jest.Mock };
-const mockToastCustom = toastModule.mockCustom;
-const mockToastDismiss = toastModule.mockDismiss;
+const { mockToastCustom, mockToastDismiss } = vi.hoisted(() => ({
+  mockToastCustom: vi.fn().mockReturnValue('mock-toast-id'),
+  mockToastDismiss: vi.fn(),
+}));
+vi.mock('react-hot-toast', () => ({
+  __esModule: true,
+  default: {
+    custom: mockToastCustom,
+    dismiss: mockToastDismiss,
+  },
+}));
 
 // Mock word validation - always returns valid
 const mockValidateWord = vi.fn().mockResolvedValue({

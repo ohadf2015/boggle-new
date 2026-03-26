@@ -1,18 +1,32 @@
 import { vi } from 'vitest';
+
 /**
  * Supabase Auth Functions Tests
  *
  * Tests for signInWithMagicLink, signInWithEmail, signUpWithEmail, OAuth.
  */
 
-import { mockAuth } from './__mocks__/supabaseAuthMocks';
+vi.hoisted(() => {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+});
+
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: {
+    signInWithOtp: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+    getSession: vi.fn(),
+    getUser: vi.fn(),
+  },
+}));
 
 vi.mock('@supabase/ssr', () => {
-   
-  const { mockAuth: auth } = require('./__mocks__/supabaseAuthMocks');
   return {
     createBrowserClient: () => ({
-      auth,
+      auth: mockAuth,
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),

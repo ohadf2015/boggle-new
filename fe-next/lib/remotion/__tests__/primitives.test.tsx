@@ -30,8 +30,8 @@ vi.mock('remotion', () => ({
   ),
 }));
 
- 
-const remotion = require('remotion');
+
+import * as remotion from 'remotion';
 
 // Mock fonts
 vi.mock('../fonts', () => ({
@@ -40,9 +40,9 @@ vi.mock('../fonts', () => ({
 }));
 
 beforeEach(() => {
-  remotion.useVideoConfig.mockReturnValue({ width: 1280, height: 720, fps: 30, durationInFrames: 240 });
-  remotion.spring.mockReturnValue(1);
-  remotion.staticFile.mockImplementation((path: string) => `/static/${path}`);
+  vi.mocked(remotion.useVideoConfig).mockReturnValue({ width: 1280, height: 720, fps: 30, durationInFrames: 240 });
+  vi.mocked(remotion.spring).mockReturnValue(1);
+  vi.mocked(remotion.staticFile).mockImplementation((path: string) => `/static/${path}`);
 });
 
 import { BackgroundGlow } from '../primitives/BackgroundGlow';

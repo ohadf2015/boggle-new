@@ -11,6 +11,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import AdminPage from '@/app/[locale]/admin/page';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSession } from '@/lib/supabase';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -91,6 +92,27 @@ vi.mock('@/utils/mobileAccessibility', () => ({
   isMobileDevice: () => false,
 }));
 
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ notifications: [], unreadCount: 0 }),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => ({
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
+    removeChannel: vi.fn(),
+  }),
+}));
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 describe('Admin Dashboard Authentication', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -107,7 +129,7 @@ describe('Admin Dashboard Authentication', () => {
     });
 
     // WHEN: Admin page is rendered
-    render(<AdminPage />);
+    render(<AdminPage />, { wrapper: createWrapper() });
 
     // THEN: Should show access denied message (lines 56-74 in page.tsx)
     await waitFor(() => {
@@ -127,7 +149,7 @@ describe('Admin Dashboard Authentication', () => {
     });
 
     // WHEN: Admin page is rendered
-    render(<AdminPage />);
+    render(<AdminPage />, { wrapper: createWrapper() });
 
     // THEN: Should show access denied message
     await waitFor(() => {
@@ -146,7 +168,7 @@ describe('Admin Dashboard Authentication', () => {
     });
 
     // WHEN: Admin page is rendered
-    render(<AdminPage />);
+    render(<AdminPage />, { wrapper: createWrapper() });
 
     // THEN: Should show loading state (lines 77-83 in page.tsx)
     expect(screen.getByText('common.loading')).toBeInTheDocument();
@@ -172,7 +194,7 @@ describe('Admin Dashboard Authentication', () => {
     });
 
     // WHEN: Admin page is rendered
-    render(<AdminPage />);
+    render(<AdminPage />, { wrapper: createWrapper() });
 
     // THEN: Should NOT show access denied (should show admin content)
     await waitFor(() => {

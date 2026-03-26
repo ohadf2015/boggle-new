@@ -483,9 +483,19 @@ describe('AdventureGame - Boss Battle Integration', () => {
  * - Phase transitions work (World 10)
  */
 
-// Import real hooks for integration testing using requireActual to bypass mocks
-const { useBossMechanics: realUseBossMechanics } = vi.importActual('@/hooks/useBossMechanics');
+// Import real hooks for integration testing using importActual to bypass mocks
+const { useBossMechanics: realUseBossMechanics } = await vi.importActual<typeof import('@/hooks/useBossMechanics')>('@/hooks/useBossMechanics');
 import { getBossConfig } from '@/lib/adventure/bossConfig';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // Boss test data for all 10 worlds
 const BOSS_WORLDS = [

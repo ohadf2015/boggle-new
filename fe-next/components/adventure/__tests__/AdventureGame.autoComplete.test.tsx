@@ -11,6 +11,16 @@ import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useAdventureGame } from '@/hooks/useAdventureGame';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // ==============================================
 // TEST FIXTURES

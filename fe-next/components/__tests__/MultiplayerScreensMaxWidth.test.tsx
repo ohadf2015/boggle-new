@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock hooks that require providers
 vi.mock('../../utils/SocketContext', () => ({
@@ -46,6 +47,14 @@ vi.mock('../../components/RoomChat', () => ({
 // Test: Multiplayer screens should have reasonable max-width constraints on desktop
 // This prevents content from stretching too wide on large screens
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 describe('Multiplayer Screens Max Width', () => {
   describe('HostPreGameView', () => {
     it('should have max-width constraint on desktop via inner content', async () => {
@@ -83,7 +92,7 @@ describe('Multiplayer Screens Max Width', () => {
         tournamentCreating: false,
       };
 
-      const { container } = render(<HostPreGameView {...mockProps} />);
+      const { container } = render(<HostPreGameView {...mockProps} />, { wrapper: createWrapper() });
 
       // The root should have a max-width constraint for desktop
       const rootDiv = container.firstChild as HTMLElement;
@@ -118,7 +127,7 @@ describe('Multiplayer Screens Max Width', () => {
         onConfirmExit: vi.fn(),
       };
 
-      const { container } = render(<PlayerWaitingView {...mockProps} />);
+      const { container } = render(<PlayerWaitingView {...mockProps} />, { wrapper: createWrapper() });
 
       // The root container should have max-width constraint for desktop
       const rootDiv = container.firstChild as HTMLElement;
@@ -146,7 +155,7 @@ describe('Multiplayer Screens Max Width', () => {
         onCreateRoom: vi.fn(),
       };
 
-      const { container } = render(<RoomListView {...mockProps} />);
+      const { container } = render(<RoomListView {...mockProps} />, { wrapper: createWrapper() });
 
       // The component should have max-width constraint on main content area
       const contentArea = container.querySelector('[class*="flex-1"]');

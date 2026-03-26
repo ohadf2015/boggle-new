@@ -105,7 +105,7 @@ describe('MobileShareSection', () => {
 
   describe('copy functionality', () => {
     it('copies link to clipboard when copy button is clicked', async () => {
-      const { copyJoinUrl } = require('../../../../utils/share');
+      const { copyJoinUrl } = await import('../../../../utils/share');
       render(<MobileShareSection gameCode="COPY123" t={mockT} />);
 
       const copyButton = screen.getByTestId('mobile-copy-link-button');
@@ -143,7 +143,7 @@ describe('MobileShareSection', () => {
     });
 
     it('does not show Copied! when copyJoinUrl fails', async () => {
-      const { copyJoinUrl } = require('../../../../utils/share');
+      const { copyJoinUrl } = await import('../../../../utils/share');
       copyJoinUrl.mockResolvedValueOnce(false);
 
       render(<MobileShareSection gameCode="FAIL123" t={mockT} />);
@@ -159,7 +159,7 @@ describe('MobileShareSection', () => {
 
   describe('social share buttons', () => {
     it('calls shareViaWhatsApp when WhatsApp button clicked', async () => {
-      const { shareViaWhatsApp } = require('../../../../utils/share');
+      const { shareViaWhatsApp } = await import('../../../../utils/share');
 
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
 
@@ -172,7 +172,7 @@ describe('MobileShareSection', () => {
     });
 
     it('calls shareViaTelegram when Telegram button clicked', async () => {
-      const { shareViaTelegram } = require('../../../../utils/share');
+      const { shareViaTelegram } = await import('../../../../utils/share');
 
       render(<MobileShareSection gameCode="SOCIAL123" t={mockT} />);
 

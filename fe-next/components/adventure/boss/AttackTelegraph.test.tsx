@@ -10,8 +10,11 @@ import { AttackTelegraph } from './AttackTelegraph';
 import { LanguageProvider } from '../../../contexts/LanguageContext';
 
 // Mock hooks
+const { mockUsePrefersReducedMotion } = vi.hoisted(() => ({
+  mockUsePrefersReducedMotion: vi.fn(() => false),
+}));
 vi.mock('../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: vi.fn(() => false),
+  usePrefersReducedMotion: mockUsePrefersReducedMotion,
 }));
 
 // Mock framer-motion to avoid animation issues in tests
@@ -87,8 +90,7 @@ describe('AttackTelegraph', () => {
 
   describe('Reduced Motion', () => {
     it('should show static fallback when reduced motion preferred', () => {
-      const { usePrefersReducedMotion } = require('../../../hooks/usePrefersReducedMotion');
-      usePrefersReducedMotion.mockReturnValue(true);
+      mockUsePrefersReducedMotion.mockReturnValue(true);
 
       renderWithProviders(<AttackTelegraph {...defaultProps} />);
       const telegraph = screen.getByTestId('attack-telegraph');
@@ -96,7 +98,7 @@ describe('AttackTelegraph', () => {
       const fallback = telegraph.querySelector('[aria-hidden="true"]');
       expect(fallback).toBeInTheDocument();
 
-      usePrefersReducedMotion.mockReturnValue(false);
+      mockUsePrefersReducedMotion.mockReturnValue(false);
     });
   });
 

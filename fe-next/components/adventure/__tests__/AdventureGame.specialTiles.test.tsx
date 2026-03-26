@@ -16,6 +16,16 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProgressionProvider } from '@/contexts/ProgressionContext';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 import type { LevelConfig } from '@/types/adventure';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // Mock hooks
 vi.mock('@/hooks/useAdventureWordValidation', () => ({

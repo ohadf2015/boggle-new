@@ -19,6 +19,7 @@ import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock all required contexts and hooks
 vi.mock('@/contexts/AuthContext');
@@ -98,8 +99,22 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({ locale: 'en' }),
 }));
 vi.mock('@/utils/onboardingStorage', () => ({
-
   hasCompletedOnboarding: () => true,
+  markOnboardingComplete: vi.fn(),
+  savePendingRoomInvite: vi.fn(),
+}));
+
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ notifications: [], unreadCount: 0 }),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => ({
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
+    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
+    removeChannel: vi.fn(),
+  }),
 }));
 
 // Mock components that are lazy loaded
@@ -123,6 +138,14 @@ vi.mock('@/components/ProfileCustomizationModal', () => {
   };
   return { default: MockProfileCustomizationModal };
 });
+
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
 
 describe('LandingView - Adventure Mode Visibility', () => {
   beforeEach(() => {
@@ -164,7 +187,7 @@ describe('LandingView - Adventure Mode Visibility', () => {
     });
 
     it('should show adventure mode for non-admin users', () => {
-      render(<LandingView />);
+      render(<LandingView />, { wrapper: createWrapper() });
 
       // Adventure mode is visible to all authenticated users
       const adventureText = screen.getByText('Adventure');
@@ -187,7 +210,7 @@ describe('LandingView - Adventure Mode Visibility', () => {
     });
 
     it('should show adventure mode for admin users', () => {
-      render(<LandingView />);
+      render(<LandingView />, { wrapper: createWrapper() });
 
       // Adventure mode should be visible for admins
       const adventureText = screen.getByText('Adventure');
@@ -210,7 +233,7 @@ describe('LandingView - Adventure Mode Visibility', () => {
     });
 
     it('should show adventure mode even while loading auth state', () => {
-      render(<LandingView />);
+      render(<LandingView />, { wrapper: createWrapper() });
 
       // Adventure is available to all users, shown regardless of auth loading state
       const adventureText = screen.getByText('Adventure');

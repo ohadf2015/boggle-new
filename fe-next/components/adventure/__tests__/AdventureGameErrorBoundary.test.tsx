@@ -22,6 +22,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Must import AFTER mocks
 import { AdventureGameErrorBoundary } from '../AdventureGameErrorBoundary';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // A component that throws
 function ThrowingChild({ shouldThrow }: { shouldThrow: boolean }) {

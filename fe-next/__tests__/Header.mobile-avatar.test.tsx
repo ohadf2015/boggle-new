@@ -1,3 +1,4 @@
+import React from 'react';
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * @jest-environment jsdom
@@ -9,6 +10,7 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -82,6 +84,14 @@ const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
 const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+};
+
 describe('Header - Mobile Menu Avatar Bug', () => {
   beforeEach(() => {
     mockPush.mockClear();
@@ -121,7 +131,7 @@ describe('Header - Mobile Menu Avatar Bug', () => {
       refreshProfile: vi.fn(),
     } as any);
 
-    render(<Header />);
+    render(<Header />, { wrapper: createWrapper() });
 
     // Find all menu buttons (there are multiple: desktop dropdown + mobile hamburger)
     const menuButtons = screen.getAllByLabelText(/menu/i);
@@ -161,7 +171,7 @@ describe('Header - Mobile Menu Avatar Bug', () => {
       refreshProfile: vi.fn(),
     } as any);
 
-    render(<Header />);
+    render(<Header />, { wrapper: createWrapper() });
 
     // Find all menu buttons (there are multiple: desktop dropdown + mobile hamburger)
     const menuButtons = screen.getAllByLabelText(/menu/i);

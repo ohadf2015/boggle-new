@@ -19,11 +19,19 @@ import AuthModal from '../AuthModal';
 
 // --- Mocks ---
 
-const mockSignInWithGoogle = vi.fn();
-const mockSignInWithDiscord = vi.fn();
-const mockSignUpWithEmail = vi.fn();
-const mockSignInWithEmail = vi.fn();
-const mockSignInWithMagicLink = vi.fn();
+const {
+  mockSignInWithGoogle,
+  mockSignInWithDiscord,
+  mockSignUpWithEmail,
+  mockSignInWithEmail,
+  mockSignInWithMagicLink,
+} = vi.hoisted(() => ({
+  mockSignInWithGoogle: vi.fn(),
+  mockSignInWithDiscord: vi.fn(),
+  mockSignUpWithEmail: vi.fn(),
+  mockSignInWithEmail: vi.fn(),
+  mockSignInWithMagicLink: vi.fn(),
+}));
 
 vi.mock('../../../lib/supabase', () => ({
   signInWithGoogle: (...args: any[]) => mockSignInWithGoogle(...args),
@@ -96,12 +104,12 @@ vi.mock('../../../utils/guestManager', () => ({
 }));
 
 // Mock framer-motion to render immediately
-vi.mock('framer-motion', () => {
-  const { forwardRef } = vi.importActual('react');
-  const MotionDiv = forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
-    return <div ref={ref} {...props}>{children}</div>;
+vi.mock('framer-motion', async () => {
+  const React = await vi.importActual<typeof import('react')>('react');
+  const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
+    return React.createElement('div', { ref, ...props }, children);
   });
-  function AnimatePresence({ children }: any) { return <>{children}</>; }
+  function AnimatePresence({ children }: any) { return children; }
   return { motion: { div: MotionDiv }, AnimatePresence };
 });
 

@@ -11,6 +11,16 @@ import AdventureGame from '../AdventureGame';
 import type { LevelConfig } from '@/types/adventure';
 import type { DifficultyTier } from '@/types/difficulty';
 import type { HintData } from '@/lib/adaptiveDifficulty';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
+};
 
 // Mock all dependencies
 vi.mock('@/contexts/LanguageContext', () => {
@@ -390,7 +400,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // Verify hook was called with correct params
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalledWith({
@@ -413,7 +423,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalledWith({
         world: 1,
@@ -430,7 +440,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalledWith({
         world: 1,
@@ -456,7 +466,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} levelConfig={bossConfig} />);
+      render(<AdventureGame {...defaultProps} levelConfig={bossConfig} />, { wrapper: createWrapper() });
 
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalledWith({
         world: 1,
@@ -475,7 +485,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // PowerUpBar should receive cooldownMultiplier prop
       // Verified by no errors during render (TypeScript would catch missing prop)
@@ -493,7 +503,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByTestId('adventure-game')).toBeInTheDocument();
@@ -511,7 +521,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // HintMessage should not be in document
       expect(screen.queryByText(/Hint:/)).not.toBeInTheDocument();
@@ -532,7 +542,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // When hintLevel is 'length', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
@@ -557,7 +567,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // When hintLevel is 'lengthAndStart', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
@@ -584,7 +594,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // When hintLevel is 'fullReveal', the hint text uses the translation key
       // Multiple elements due to responsive design (mobile + desktop)
@@ -608,7 +618,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: vi.fn(),
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalledWith({
         world: 1,
@@ -629,7 +639,7 @@ describe('AdventureGame - Adaptive Difficulty Integration', () => {
         recordCompletion: mockRecordCompletion,
       });
 
-      render(<AdventureGame {...defaultProps} />);
+      render(<AdventureGame {...defaultProps} />, { wrapper: createWrapper() });
 
       // Verify hook was called and recordCompletion is available
       expect(mockUseAdaptiveDifficulty).toHaveBeenCalled();

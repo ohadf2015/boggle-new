@@ -8,18 +8,17 @@ import { render, screen } from '@testing-library/react';
 import { CooldownIndicator } from '../CooldownIndicator';
 
 // Mock usePrefersReducedMotion hook
-vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: vi.fn(() => false),
+const { mockUsePrefersReducedMotion } = vi.hoisted(() => ({
+  mockUsePrefersReducedMotion: vi.fn(() => false),
 }));
-
-const { usePrefersReducedMotion } = vi.importMock(
-  '../../../../hooks/usePrefersReducedMotion'
-);
+vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: mockUsePrefersReducedMotion,
+}));
 
 describe('CooldownIndicator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (usePrefersReducedMotion as jest.Mock).mockReturnValue(false);
+    mockUsePrefersReducedMotion.mockReturnValue(false);
   });
 
   describe('Basic Rendering', () => {
@@ -272,7 +271,7 @@ describe('CooldownIndicator', () => {
 
   describe('Reduced Motion', () => {
     it('should show numeric countdown instead of arc when reduced motion', () => {
-      (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+      mockUsePrefersReducedMotion.mockReturnValue(true);
 
       render(
         <CooldownIndicator
@@ -291,7 +290,7 @@ describe('CooldownIndicator', () => {
     });
 
     it('should show "Ready!" when complete with reduced motion', () => {
-      (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+      mockUsePrefersReducedMotion.mockReturnValue(true);
 
       render(
         <CooldownIndicator
