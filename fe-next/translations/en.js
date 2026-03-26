@@ -7280,6 +7280,10 @@ const en = {
     "chainCounter": "CHAIN x{{count}}"
   },
   "student": {
+        "nav": {
+          "profile": "My Profile",
+          "achievements": "Achievements"
+        },
         "joinClassroom": "Join a Classroom",
         "joinClassroomDescription": "Enter your teacher's code to join",
         "activeGame": {
@@ -7418,7 +7422,9 @@ const en = {
       "selectClassroom": "Select Classroom",
       "createClassroomFirst": "Create a classroom first to track assignments and duel activity",
       "analytics": "Analytics",
-      "insights": "INSIGHTS"
+      "insights": "INSIGHTS",
+      "viewReports": "View Reports",
+      "viewReportsDesc": "View detailed reports and analytics for your classrooms"
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -9149,6 +9155,13 @@ const en = {
     "totalCoins": "{{coins}} Coins"
   },
   "education": {
+    "duels": {
+      "lobby": "Lobby",
+      "history": "History",
+      "classmates": "Classmates",
+      "findingClassmates": "Finding classmates...",
+      "joinClassroomToDuel": "Join a classroom to duel"
+    },
     "achievements": {
       "completion": "{{percent}}% complete",
       "continue": "Keep going!",

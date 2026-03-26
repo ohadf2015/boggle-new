@@ -7241,6 +7241,10 @@ const ja = {
     "chainCounter": "チェーン x{{count}}"
   },
   "student": {
+    "nav": {
+      "profile": "マイプロフィール",
+      "achievements": "実績"
+    },
     "activeGame": {
       "title": "ゲーム開始！",
       "teacherStarted": "{{teacher}}がクラスゲームを開始しました",
@@ -7379,7 +7383,9 @@ const ja = {
       "selectClassroom": "クラスを選択",
       "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください",
       "analytics": "アナリティクス",
-      "insights": "インサイト"
+      "insights": "インサイト",
+      "viewReports": "レポートを見る",
+      "viewReportsDesc": "クラスの詳細なレポートと分析を表示"
     },
     "game": {
       "qrCode": "QRコードを表示",
@@ -8522,6 +8528,13 @@ const ja = {
   "notParticipant": "このデュエルの参加者ではありません",
   "education": {
     "reviewDue": "復習する単語が{count}個あります",
+    "duels": {
+      "lobby": "ロビー",
+      "history": "履歴",
+      "classmates": "クラスメート",
+      "findingClassmates": "クラスメートを探しています...",
+      "joinClassroomToDuel": "デュエルするにはクラスに参加してください"
+    },
     "achievements": {
       "completion": "{{percent}}%達成",
       "continue": "この調子で！",

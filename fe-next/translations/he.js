@@ -7214,6 +7214,10 @@ const he = {
     "chainCounter": "רצף x{{count}}"
   },
   "student": {
+    "nav": {
+      "profile": "הפרופיל שלי",
+      "achievements": "הישגים"
+    },
     "activeGame": {
       "title": "משחק מתחיל! 🎮",
       "teacherStarted": "{{teacher}} פתח משחק כיתתי",
@@ -7352,7 +7356,9 @@ const he = {
       "selectClassroom": "בחר כיתה",
       "createClassroomFirst": "צור כיתה ראשונה כדי לעקוב אחר משימות ופעילות דו-קרבות",
       "analytics": "אנליטיקה",
-      "insights": "תובנות"
+      "insights": "תובנות",
+      "viewReports": "צפה בדוחות",
+      "viewReportsDesc": "צפה בדוחות מפורטים ואנליטיקה עבור הכיתות שלך"
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -8549,6 +8555,13 @@ const he = {
   "duelComplete": "הדו-קרב הסתיים!",
   "education": {
     "reviewDue": "{count} מילים לחזרה",
+    "duels": {
+      "lobby": "לובי",
+      "history": "היסטוריה",
+      "classmates": "חברים לכיתה",
+      "findingClassmates": "מחפש חברים לכיתה...",
+      "joinClassroomToDuel": "הצטרף לכיתה כדי להתחרות"
+    },
     "achievements": {
       "completion": "{{percent}}% הושלם",
       "continue": "קדימה!",

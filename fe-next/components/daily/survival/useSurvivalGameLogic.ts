@@ -429,10 +429,9 @@ export function useSurvivalGameLogic({
     };
   }, [state.clueTokens, hintState.nextHintItem, buyNextHint, showAutoClueNotification]);
 
-  // Keep callback refs in sync
-  useEffect(() => {
-    handleGameOverRef.current = handleGameOver;
-  }, [handleGameOver]);
+  // Keep callback ref in sync — assign synchronously (not in useEffect)
+  // to avoid a one-render lag where the ref holds a stale callback
+  handleGameOverRef.current = handleGameOver;
 
   // UI state setters using dispatch
   const setShowShop = useCallback((show: boolean) => {

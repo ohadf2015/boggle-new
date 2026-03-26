@@ -809,7 +809,7 @@ describe('useAdventureGame', () => {
     it('should throw error for invalid level config', () => {
       // GIVEN
       const invalidConfig = {
-        world: 0, // Invalid
+        world: -1, // Invalid (0 is valid for weekly challenges)
         level: 1,
         gridSize: 4,
         timerSeconds: 120,

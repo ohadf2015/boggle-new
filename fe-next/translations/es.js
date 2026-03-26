@@ -7268,6 +7268,10 @@ const es = {
     "chainCounter": "CADENA x{{count}}"
   },
   "student": {
+    "nav": {
+      "profile": "Mi perfil",
+      "achievements": "Logros"
+    },
     "joinClassroom": "Unirse a un aula",
     "joinClassroomDescription": "Ingresa el código que te dio tu profe para entrar al aula",
     "dashboard": {
@@ -7393,7 +7397,9 @@ const es = {
       "selectClassroom": "Seleccionar Salón",
       "createClassroomFirst": "Crea un salón primero para rastrear tareas y actividad de duelos",
       "analytics": "Analíticas",
-      "insights": "DATOS"
+      "insights": "DATOS",
+      "viewReports": "Ver informes",
+      "viewReportsDesc": "Ver informes detallados y análisis de tus aulas"
     },
     "game": {
       "qrCode": "Mostrar Código QR",
@@ -8532,6 +8538,13 @@ const es = {
   },
   "education": {
     "reviewDue": "{count} palabras por repasar",
+    "duels": {
+      "lobby": "Sala",
+      "history": "Historial",
+      "classmates": "Compañeros",
+      "findingClassmates": "Buscando compañeros...",
+      "joinClassroomToDuel": "Únete a una clase para competir"
+    },
     "achievements": {
       "completion": "{{percent}}% completado",
       "continue": "¡Sigue así!",

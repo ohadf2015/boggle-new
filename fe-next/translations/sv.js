@@ -7189,6 +7189,10 @@ const sv = {
     "chainCounter": "KEDJA x{{count}}"
   },
   "student": {
+    "nav": {
+      "profile": "Min profil",
+      "achievements": "Prestationer"
+    },
     "activeGame": {
       "title": "Spel startar!",
       "teacherStarted": "{{teacher}} startade ett klassrumsspel",
@@ -7327,7 +7331,9 @@ const sv = {
       "selectClassroom": "Välj klassrum",
       "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet",
       "analytics": "Analys",
-      "insights": "INSIKTER"
+      "insights": "INSIKTER",
+      "viewReports": "Visa rapporter",
+      "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum"
     },
     "game": {
       "qrCode": "Visa QR-kod",
@@ -8488,6 +8494,13 @@ const sv = {
   },
   "education": {
     "reviewDue": "{count} ord att repetera",
+    "duels": {
+      "lobby": "Lobby",
+      "history": "Historik",
+      "classmates": "Klasskompisar",
+      "findingClassmates": "Söker klasskompisar...",
+      "joinClassroomToDuel": "Gå med i ett klassrum för att duellera"
+    },
     "achievements": {
       "completion": "{{percent}}% klart",
       "continue": "Fortsätt kämpa!",

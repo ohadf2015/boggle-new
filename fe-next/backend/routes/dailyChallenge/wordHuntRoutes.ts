@@ -565,7 +565,7 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
 
     let query = supabase
       .from('daily_word_hunt_attempts')
-      .select('id, solved, attempts_used, efficiency_score, words_discovered, life_remaining, target_word, attempt_words, completed_at')
+      .select('id, solved, attempts_used, efficiency_score, words_discovered, life_remaining, target_word, attempt_words, completed_at, clue_tokens_earned, clue_tokens_spent, hints_unlocked')
       .eq('puzzle_date', date)
       .eq('language', language);
 
@@ -611,7 +611,10 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
           lifeRemaining: existingAttempt.life_remaining,
           targetWord: existingAttempt.target_word,
           attempts: existingAttempt.attempt_words,
-          completedAt: existingAttempt.completed_at
+          completedAt: existingAttempt.completed_at,
+          clueTokensEarned: existingAttempt.clue_tokens_earned ?? 0,
+          clueTokensSpent: existingAttempt.clue_tokens_spent ?? 0,
+          hintsUnlocked: existingAttempt.hints_unlocked ?? 0
         },
         streak: streakData
       });

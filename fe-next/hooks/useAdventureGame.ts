@@ -104,7 +104,8 @@ export function useAdventureGame({
   upgradeConfig,
   language = 'en',
 }: UseAdventureGameProps): UseAdventureGameReturn {
-  if (levelConfig.world < 1 || levelConfig.world > WORLDS_COUNT) {
+  // world=0 is valid for weekly challenges (special non-progression mode)
+  if (levelConfig.world < 0 || levelConfig.world > WORLDS_COUNT) {
     throw new Error(`Invalid world: ${levelConfig.world}`);
   }
   if (levelConfig.level < 1 || levelConfig.level > LEVELS_PER_WORLD) {

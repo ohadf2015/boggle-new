@@ -270,6 +270,9 @@ export interface ServerWordHuntResult {
   lifeRemaining?: number;
   efficiencyScore?: number;
   completedAt?: string;
+  clueTokensEarned?: number;
+  clueTokensSpent?: number;
+  hintsUnlocked?: number;
 }
 
 /**
@@ -304,9 +307,9 @@ export function mapServerResultToStoredResult(
       attempts: serverResult.attempts || [],
       wordsDiscovered: serverResult.wordsDiscovered || [],
       lifeRemaining: serverResult.lifeRemaining || 0,
-      clueTokensEarned: 0,
-      clueTokensSpent: 0,
-      hintsUnlocked: 0,
+      clueTokensEarned: serverResult.clueTokensEarned ?? 0,
+      clueTokensSpent: serverResult.clueTokensSpent ?? 0,
+      hintsUnlocked: serverResult.hintsUnlocked ?? 0,
       efficiencyScore: serverResult.efficiencyScore || 0,
       streakDays,
       completedAt,

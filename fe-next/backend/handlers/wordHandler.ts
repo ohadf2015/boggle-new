@@ -90,14 +90,14 @@ function handleSpamDetection(socket: Socket, gameCode: string, username: string,
 
     case PenaltyTier.PENALTY:
       if (result.penaltyApplied && result.penaltyApplied > 0) {
-        // Apply point deduction using atomic delta to avoid race with concurrent valid word updates
+        // Apply point deduction using atomic delta
         updatePlayerScore(gameCode, username, -result.penaltyApplied, true);
-        // Clamp to 0 — score should never go negative
+        // Clamp to 0 atomically — write directly to avoid race with concurrent valid word updates
         const postPenaltyScore = game.playerScores?.[username] || 0;
         if (postPenaltyScore < 0) {
-          updatePlayerScore(gameCode, username, 0, false);
+          game.playerScores[username] = 0;
         }
-        const newScore = Math.max(0, postPenaltyScore);
+        const newScore = Math.max(0, game.playerScores?.[username] || 0);
 
         socket.emit('spamPenalty', {
           invalidCount: result.invalidCount,
