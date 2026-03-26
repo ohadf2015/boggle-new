@@ -61,8 +61,16 @@ jest.mock('@/utils/logger', () => ({
   default: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
 }));
 
+const stableQrSocket = {
+  on: jest.fn(),
+  off: jest.fn(),
+  emit: jest.fn(),
+  disconnect: jest.fn(),
+  connected: true,
+};
 jest.mock('@/utils/SocketContext', () => ({
   getSocketURL: jest.fn(() => 'http://localhost:3000'),
+  getSharedSocket: jest.fn(() => stableQrSocket),
 }));
 
 jest.mock('react-hot-toast', () => ({

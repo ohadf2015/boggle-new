@@ -4,8 +4,16 @@
  * Grand Slam bonus (500 XP) when all 4 complete
  */
 
-import { getSupabase } from './supabaseServer';
-import logger from '../utils/logger';
+import { getSupabase } from './supabase/client';
+
+// Use a lightweight logger shim instead of backend/utils/logger
+// because this module is imported from both Express handlers AND Next.js API routes.
+// The full backend logger uses crypto + AsyncLocalStorage which fail in Turbopack builds.
+const logger = {
+  info: (tag: string, msg: string) => console.log(`[${tag}] ${msg}`),
+  error: (tag: string, msg: string) => console.error(`[${tag}] ${msg}`),
+  warn: (tag: string, msg: string) => console.warn(`[${tag}] ${msg}`),
+};
 
 export type MissionType = 'word_hunt' | 'brain_drill' | 'adventure' | 'community';
 

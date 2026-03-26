@@ -28,7 +28,7 @@ mockUpsert.mockReturnValue(chainable);
 const mockFrom = jest.fn().mockReturnValue(chainable);
 const mockSupabase = { from: mockFrom };
 
-jest.mock('../supabaseServer', () => ({
+jest.mock('../supabase/client', () => ({
   getSupabase: () => mockSupabase,
 }));
 

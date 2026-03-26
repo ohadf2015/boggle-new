@@ -28,8 +28,9 @@ import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import {
   Gamepad2, BookPlus, ChevronDown, Swords, ClipboardList, Users,
-  ListTodo, Hammer, BarChart3,
+  ListTodo, Hammer, BarChart3, FileText,
 } from 'lucide-react';
+import Link from 'next/link';
 
 // --- Animation variants ---
 
@@ -485,6 +486,28 @@ export default function TeacherDashboard() {
             </HudSection>
           </motion.div>
         </div>
+
+        {/* Reports quick link */}
+        {classrooms.length > 0 && selectedClassroomId && (
+          <motion.div variants={slideInUp} className="mt-8">
+            <Link
+              href={`/${language}/teacher/reports`}
+              className={cn(
+                'flex items-center gap-4 p-5 rounded-neo-xl border-4 border-black',
+                'bg-white shadow-hard-lg hover:shadow-hard-xl transition-shadow',
+                'text-black font-neo-body font-bold'
+              )}
+            >
+              <div className="w-12 h-12 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
+                <FileText className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <p className="text-lg font-black uppercase">{t('teacher.dashboard.viewReports')}</p>
+                <p className="text-sm text-black/60">{t('teacher.dashboard.viewReportsDesc')}</p>
+              </div>
+            </Link>
+          </motion.div>
+        )}
 
         {/* Commander's Intel tip card */}
         <motion.div

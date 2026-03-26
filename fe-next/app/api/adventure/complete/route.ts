@@ -11,7 +11,12 @@ import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import { getUpgradeEffect, type UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
-import { completeMission } from '@/backend/modules/dailyMissionsManager';
+// Dynamic import to avoid Turbopack bundling backend logger transitively
+// dailyMissionsManager uses backend/utils/logger which has Node.js-only APIs
+const lazyCompleteMission = async (playerId: string, type: 'adventure') => {
+  const { completeMission } = await import('@/backend/modules/dailyMissionsManager');
+  return completeMission(playerId, type);
+};
 
 /**
  * XP awarded per star earned (new stars only)
@@ -422,7 +427,7 @@ export async function POST(request: NextRequest) {
     const leveledUp = newPlayerLevel > previousLevel;
 
     // Mark daily mission as complete (fire-and-forget)
-    completeMission(userId, 'adventure').catch((err) => {
+    lazyCompleteMission(userId, 'adventure').catch((err) => {
       console.error('[ADVENTURE COMPLETE API] Daily mission update failed:', err);
     });
 

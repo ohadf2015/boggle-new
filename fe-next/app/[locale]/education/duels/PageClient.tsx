@@ -45,7 +45,7 @@ export default function DuelsPageClient() {
   if (!user) return null;
 
   if (loading) {
-    return <PageLoader text="Finding your classmates..." size="lg" nested />;
+    return <PageLoader text={t('education.duels.findingClassmates')} size="lg" nested />;
   }
 
   if (!classroom) {
@@ -53,16 +53,16 @@ export default function DuelsPageClient() {
       <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-dvh p-8">
         <Swords className="w-16 h-16 text-neo-white/30 mb-4" />
         <p className="text-neo-white/70 font-neo-body text-lg text-center">
-          {t('joinClassroomToDuel')}
+          {t('education.duels.joinClassroomToDuel')}
         </p>
       </div>
     );
   }
 
   const tabs: { id: Tab; label: string; icon: typeof Swords }[] = [
-    { id: 'lobby', label: t('lobby'), icon: Swords },
-    { id: 'history', label: t('history'), icon: Trophy },
-    { id: 'classmates', label: t('classmates'), icon: Users },
+    { id: 'lobby', label: t('education.duels.lobby'), icon: Swords },
+    { id: 'history', label: t('education.duels.history'), icon: Trophy },
+    { id: 'classmates', label: t('education.duels.classmates'), icon: Users },
   ];
 
   const lessonOptions = lessons.map((l) => ({ id: l.id, name: l.name }));

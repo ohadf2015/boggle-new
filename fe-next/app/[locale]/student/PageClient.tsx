@@ -33,7 +33,7 @@ import { ReviewDueBadge } from '@/components/education/ReviewDueBadge';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
-import { Trophy, Zap, Flame, UserPlus } from 'lucide-react';
+import { Trophy, Zap, Flame, UserPlus, User, Award } from 'lucide-react';
 import Link from 'next/link';
 
 // --- Animation variants ---
@@ -382,6 +382,24 @@ export default function StudentPageClient() {
             <StudentReviewBadge />
           </div>
         </motion.div>
+
+        {/* Quick nav links: Profile + Achievements */}
+        <div className="flex gap-3 mb-6">
+          <Link
+            href={`/${language}/student/profile`}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 border-2 border-neo-white/20 rounded-neo text-neo-white font-bold text-sm hover:bg-white/20 transition-colors"
+          >
+            <User className="w-4 h-4" />
+            {t('student.nav.profile')}
+          </Link>
+          <Link
+            href={`/${language}/student/achievements`}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 border-2 border-neo-white/20 rounded-neo text-neo-white font-bold text-sm hover:bg-white/20 transition-colors"
+          >
+            <Award className="w-4 h-4" />
+            {t('student.nav.achievements')}
+          </Link>
+        </div>
 
         {/* Join Classroom CTA (when no classroom) */}
         {!classroomId && (
