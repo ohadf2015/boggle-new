@@ -260,7 +260,7 @@ export function ReferralCard() {
         <Button
           onClick={() => handleShare('telegram')}
           size="sm"
-          className="flex-1 h-10 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-xl font-bold"
+          className="flex-1 h-10 bg-brand-telegram hover:bg-brand-telegram-hover text-white rounded-xl font-bold"
         >
           <TelegramIcon className="w-4 h-4 me-1.5" />
           <span className="hidden sm:inline">Telegram</span>

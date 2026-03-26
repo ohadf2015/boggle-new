@@ -77,6 +77,16 @@ module.exports = {
           // Error color
           red: "var(--neo-red)",
 
+          // Deep space variants
+          abyss: "var(--neo-abyss)",
+          "abyss-deep": "var(--neo-abyss-deep)",
+          "abyss-mid": "var(--neo-abyss-mid)",
+          "abyss-light": "var(--neo-abyss-light)",
+
+          // Navy elevated variants
+          "navy-elevated": "var(--neo-navy-elevated)",
+          "navy-radial": "var(--neo-navy-radial)",
+
           // Structural colors
           navy: "var(--neo-navy)",
           "navy-light": "var(--neo-navy-light)",
@@ -114,6 +124,9 @@ module.exports = {
           linkedin: "var(--brand-linkedin)",
           "linkedin-hover": "var(--brand-linkedin-hover)",
           "linkedin-dark": "var(--brand-linkedin-dark)",
+          telegram: "var(--brand-telegram)",
+          "telegram-hover": "var(--brand-telegram-hover)",
+          "telegram-dark": "var(--brand-telegram-dark)",
         },
         // Achievement tier colors
         tier: {

@@ -179,6 +179,25 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
 
         if (!response.ok) {
+          // 404 = route unreachable (stale cache, proxy issue) — fall back
+          // to initial state so the user can still play.
+          if (response.status === 404) {
+            logger.warn('[ProgressionContext] /api/adventure/state returned 404 — using initial state');
+            setProgression({
+              userId: user!.id,
+              playerLevel: 1, xp: 0,
+              currentWorld: 1, currentLevel: 1,
+              totalStars: 0, gold: 0,
+              upgrades: {}, skillPoints: 0, skillTree: {},
+              runeFragments: 0, runes: [],
+              endlessHighFloor: 0, completions: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
+            setAttempts([]);
+            setIsLoading(false);
+            return;
+          }
           // Capture response body for debugging mobile failures
           let body = '';
           try { body = await response.text(); } catch { /* ignore */ }

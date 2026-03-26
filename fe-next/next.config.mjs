@@ -1,7 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { withSentryConfig } from '@sentry/nextjs';
-import million from 'million/compiler';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,10 +26,10 @@ const isCrazyGamesEnabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // NOTE: output: 'standalone' removed — incompatible with custom Express server.
-  // Next.js 16 warns: "next start" does not work with standalone config.
-  // The custom server.ts uses next({ dev }) directly, not the standalone server.js.
-  // Keeping full node_modules on Railway is fine — disk is cheap, stability matters.
+  // Standalone output for minimal Docker images.
+  // The custom Express server is bundled separately by esbuild (dist/server.cjs),
+  // so standalone's server.js is unused — we only want the minimal node_modules.
+  output: 'standalone',
 
   // Enable gzip compression — Railway edge does NOT compress responses,
   // so the app must do it. Without this, 1.5MB+ JS chunks are sent raw.
@@ -66,6 +65,9 @@ const nextConfig = {
 
   // Enable system TLS certs for Turbopack to fetch Google Fonts
   // optimizePackageImports automatically tree-shakes common packages like lucide-react
+  // React Compiler — auto-memoizes all components (replaces Million.js)
+  reactCompiler: true,
+
   experimental: {
     turbopackUseSystemTlsCerts: true,
     optimizePackageImports: [
@@ -408,30 +410,4 @@ const sentryConfig = withSentryConfig(nextConfig, {
   },
 });
 
-// Million.js - React compiler for faster rendering (70% faster virtual DOM)
-// auto: true enables automatic optimization of all components
-// Disabled in development for faster HMR
-const millionConfig = million.next(
-  withBundleAnalyzer(sentryConfig),
-  {
-    auto: {
-      // Skip components that use unsupported patterns
-      // Remotion compositions use internal context hooks (useCurrentFrame, useVideoConfig)
-      // that Million.js optimization breaks
-      skip: [
-        'Header', 'ModeCard', 'IdleMascotWithEntrance',
-        'CinematicPlayer', 'CinematicPlayerInner',
-        'VictoryCinematic', 'DefeatCinematic',
-        'BossEntranceCinematic', 'BossDefeatCinematic',
-        'WorldUnlockCinematic', 'StreakMilestoneCinematic', 'AchievementCinematic',
-        'BackgroundGlow', 'ParticleLayer', 'FlashEffect',
-        'TitleReveal', 'SparkleField', 'StatsPanel', 'StatItem',
-        'Confetti', 'ExplosionRing', 'ShatterFragment', 'RewardDisplay',
-      ],
-      rsc: true, // Enable React Server Components support
-    },
-    mute: true, // Suppress console warnings in production
-  }
-);
-
-export default process.env.NODE_ENV === 'production' ? millionConfig : withBundleAnalyzer(sentryConfig);
+export default withBundleAnalyzer(sentryConfig);

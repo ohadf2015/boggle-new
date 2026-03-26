@@ -198,7 +198,7 @@ function WeeklyQuestSection() {
         className={cn(
           'rounded-neo-lg p-4',
           'border-3 border-neo-cyan/30',
-          'bg-[#1e1e3a]',
+          'bg-neo-navy-light',
           'shadow-hard-sm',
         )}
       >

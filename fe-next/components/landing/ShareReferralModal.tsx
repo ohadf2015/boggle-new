@@ -165,7 +165,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 onClick={() => handleShare('telegram')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 h-11',
-                  'bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold',
+                  'bg-brand-telegram hover:bg-brand-telegram-hover text-white font-bold',
                   'rounded-neo border-3 border-neo-black shadow-hard',
                   'transition-shadow hover:shadow-hard-lg active:shadow-none',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'

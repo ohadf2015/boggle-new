@@ -49,6 +49,16 @@
   /* Error color */
   --neo-red: #FF3366;
 
+  /* Deep space variants (darker than navy for immersive backgrounds) */
+  --neo-abyss: #0a0a1a;
+  --neo-abyss-deep: #050510;
+  --neo-abyss-mid: #0a0a2a;
+  --neo-abyss-light: #0d1033;
+
+  /* Navy elevated variant (slightly lighter for subtle card distinction) */
+  --neo-navy-elevated: #2a2a4e;
+  --neo-navy-radial: #1e1e3f;
+
   /* Structural colors */
   --neo-navy: #1a1a2e;
   --neo-navy-light: #16213e;
@@ -185,6 +195,10 @@
   --brand-linkedin: #0A66C2;
   --brand-linkedin-hover: #094F9B;
   --brand-linkedin-dark: #073d74;
+
+  --brand-telegram: #0088cc;
+  --brand-telegram-hover: #0077b5;
+  --brand-telegram-dark: #006699;
 
   /* ========================================
      AVATAR COLORS - Character-Specific

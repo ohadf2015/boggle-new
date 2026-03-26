@@ -59,12 +59,15 @@
 - Use `border-neo` (3px) or `border-neo-thick` (4px) with black
 - Border radius: `rounded-neo` (4px), minimal rounding
 
-**Color Palette:**
-- Primary: `neo-yellow` (#FFE135)
-- Secondary: `neo-orange` (#FF6B35)
-- Accent: `neo-pink` (#FF1493), `neo-cyan` (#00FFFF)
-- Background: `neo-navy` (#1a1a2e)
-- Text: `neo-white` (#FFFFFF)
+**Color Palette (4 families):**
+- Lime (Primary): `neo-lime` (#BFFF00), `neo-lime-light`, `neo-lime-muted`, `neo-lime-dark`
+- Pink (Multiplayer): `neo-pink` (#FF1493), `neo-pink-light`, `neo-pink-muted`, `neo-pink-dark`
+- Cyan (Single Player): `neo-cyan` (#00FFFF), `neo-cyan-light`, `neo-cyan-muted`, `neo-cyan-dark`
+- Purple (Brain Training): `neo-purple` (#8B5CF6), `neo-purple-light`, `neo-purple-muted`, `neo-purple-dark`
+- Error: `neo-red` (#FF3366)
+- Background: `neo-navy` (#1a1a2e), `neo-navy-light` (#16213e)
+- Text: `neo-white`, `neo-cream` (#FFFEF0)
+- DEPRECATED (do not use in new code): `neo-yellow`, `neo-orange`
 
 **Typography:**
 - Display: Fredoka (`font-neo-display`)

@@ -46,7 +46,7 @@ export function QuestCard({
       className={cn(
         'group relative flex items-center gap-3 p-3.5 sm:p-4',
         'rounded-neo-lg border-3 border-neo-black',
-        'bg-[#1e1e3a]',
+        'bg-neo-navy-light',
         'shadow-hard-sm',
         'transition-all duration-200',
         'hover:-translate-y-1 hover:shadow-hard',

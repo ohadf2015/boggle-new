@@ -123,7 +123,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
               <Button
                 onClick={onTelegram}
-                className="py-3 bg-[#0088cc] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
+                className="py-3 bg-brand-telegram text-white border-3 border-neo-black rounded-neo hover:bg-brand-telegram-hover"
               >
                 <Send className="me-2 w-5 h-5" />
                 Telegram

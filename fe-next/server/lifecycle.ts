@@ -7,6 +7,7 @@ import type { Server as HttpServer } from 'http';
 import type { Server } from 'socket.io';
 import * as Sentry from '@sentry/nextjs';
 
+import { lifecycleLogger } from './logger';
 import * as dictionary from '../backend/dictionary';
 import { restoreTournamentsFromRedis } from '../backend/modules/tournamentManager';
 import { pool as wordValidatorPool } from '../backend/modules/wordValidatorPool';
@@ -40,35 +41,35 @@ export async function initializeServer(io: Server): Promise<void> {
   try {
     await restoreTournamentsFromRedis();
   } catch (error) {
-    console.error('Failed to restore tournaments:', error);
+    lifecycleLogger.error({ err: error }, 'Failed to restore tournaments');
   }
 
   // Load ALL dictionaries on startup to prevent race conditions and delays during gameplay
   // Memory cost is ~10-15MB for all 5 languages, but eliminates latency issues
   try {
-    console.log('[STARTUP] Loading all dictionaries (en, he, sv, ja, es)...');
+    lifecycleLogger.info('Loading all dictionaries (en, he, sv, ja, es)');
     await dictionary.load();
-    console.log('[STARTUP] All dictionaries loaded successfully');
+    lifecycleLogger.info('All dictionaries loaded successfully');
   } catch (error) {
-    console.error('Failed to load dictionaries:', error);
+    lifecycleLogger.error({ err: error }, 'Failed to load dictionaries');
   }
 
   // Warm up worker pool
   try {
     await wordValidatorPool.initialize();
-    console.log('[WORKER POOL] Worker pool warmed up');
+    lifecycleLogger.info('Worker pool warmed up');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn('[WORKER POOL] Failed to warm up:', errorMessage);
+    lifecycleLogger.warn({ err: errorMessage }, 'Failed to warm up worker pool');
   }
 
   // Start all cron schedulers (Wikipedia, Daily Words, Bot Difficulty)
   try {
     cronTasks = startAllCronJobs();
-    console.log(`[STARTUP] Started ${cronTasks.length} cron schedulers`);
+    lifecycleLogger.info({ count: cronTasks.length }, 'Started cron schedulers');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[STARTUP] Failed to start cron schedulers:', errorMessage);
+    lifecycleLogger.error({ err: errorMessage }, 'Failed to start cron schedulers');
   }
 }
 

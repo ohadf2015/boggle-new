@@ -141,7 +141,7 @@ const BoardFrame = memo<BoardFrameProps>(({ children, className }) => {
         'board-frame',
         frameClass,
         'relative',
-        'bg-[#FFFEF0] border-4 border-neo-black shadow-hard-lg rounded-neo-lg p-2',
+        'bg-neo-cream border-4 border-neo-black shadow-hard-lg rounded-neo-lg p-2',
         className
       )}
       data-world={worldId}

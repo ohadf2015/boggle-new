@@ -16,7 +16,7 @@
 export type OAuthProvider = 'google' | 'discord' | 'apple';
 export type OAuthState = 'default' | 'hover' | 'dark';
 
-export type SharePlatform = 'whatsapp' | 'facebook' | 'twitter' | 'linkedin';
+export type SharePlatform = 'whatsapp' | 'facebook' | 'twitter' | 'linkedin' | 'telegram';
 
 export type AvatarCharacter =
   | 'broccoli-bob' | 'drippy-drop' | 'sunny-steve' | 'cloudy-carl'
@@ -112,6 +112,7 @@ export function getShareBrandColor(platform: SharePlatform): string {
     facebook: 'brand-facebook',
     twitter: 'brand-twitter',
     linkedin: 'brand-linkedin',
+    telegram: 'brand-telegram',
   };
 
   return colorMap[platform];
