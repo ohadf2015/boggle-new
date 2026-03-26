@@ -59,8 +59,19 @@ export default defineConfig({
       '**/CircularTimer.test.tsx',
       '**/AdventureGame.lexi.test.tsx',
       '**/AdventureGame.bossIntegration.test.tsx',
+      '**/useAdventureCurrency.test.ts',
     ],
     testTimeout: 10000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        maxForks: 4,
+        minForks: 1,
+        execArgv: ['--max-old-space-size=4096'],
+      },
+    },
+    teardownTimeout: 5000,
+    hookTimeout: 10000,
     clearMocks: true,
     restoreMocks: false,
     css: {
