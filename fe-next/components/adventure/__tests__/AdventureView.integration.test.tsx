@@ -74,7 +74,7 @@ vi.mock('framer-motion', () => {
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 vi.mock('next/dynamic', () => {
   const React = require('react');
-  return (_importFn: unknown, _opts?: unknown) => {
+  return { default: (_importFn: unknown, _opts?: unknown) => {
     const Dynamic = (props: Record<string, unknown>) => {
       const AdventureGame = require('../AdventureGame');
       const Comp = AdventureGame.default || AdventureGame;
@@ -82,7 +82,7 @@ vi.mock('next/dynamic', () => {
     };
     Dynamic.displayName = 'NextDynamic';
     return Dynamic;
-  };
+  } };
 });
 
 vi.mock('next/link', () => {

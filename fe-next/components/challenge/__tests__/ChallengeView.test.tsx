@@ -48,8 +48,8 @@ vi.mock('@/utils/challenges', () => ({
 }));
 
 // --- Mock SinglePlayerGame ---
-vi.mock('@/components/singleplayer/SinglePlayerGame', () =>
-  function MockSinglePlayerGame({ onGameEnd, onQuit }: { onGameEnd: (r: any) => void; onQuit: () => void }) {
+vi.mock('@/components/singleplayer/SinglePlayerGame', () => ({
+  default: function MockSinglePlayerGame({ onGameEnd, onQuit }: { onGameEnd: (r: any) => void; onQuit: () => void }) {
     return (
       <div data-testid="single-player-game">
         <button onClick={() => onGameEnd({
@@ -60,8 +60,8 @@ vi.mock('@/components/singleplayer/SinglePlayerGame', () =>
         <button onClick={onQuit}>Quit</button>
       </div>
     );
-  }
-);
+  },
+}));
 
 // --- Mock ChallengeResults ---
 vi.mock('../ChallengeResults', () =>

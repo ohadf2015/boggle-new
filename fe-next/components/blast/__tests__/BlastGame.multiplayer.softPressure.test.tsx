@@ -58,7 +58,7 @@ vi.mock('@/components/singleplayer/game/hooks/useSpamDetection', () => ({
   useSpamDetection: () => ({}),
 }));
 
-vi.mock('canvas-confetti', () => vi.fn());
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 // Capture useBlastGame options
 let capturedUseBlastGameOptions: any = null;

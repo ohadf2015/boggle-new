@@ -31,14 +31,14 @@ vi.mock('next/link', () => ({
 // Mock next/dynamic - handles all dynamic imports
 vi.mock('next/dynamic', () => {
   const React = require('react');
-  return vi.fn((loader: any, options?: any) => {
+  return { default: vi.fn((loader: any, options?: any) => {
     // Create a mock component that will be used for all dynamic imports
     const DynamicComponent = (props: any) => {
       return React.createElement('div', { 'data-testid': 'dynamic-component', ...props });
     };
     DynamicComponent.displayName = 'DynamicComponent';
     return DynamicComponent;
-  });
+  }) };
 });
 
 // Mock onboardingStorage

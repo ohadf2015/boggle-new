@@ -32,8 +32,8 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
   const mockPush = vi.fn();
   const mockOnBackToLobby = vi.fn();
 
-  // Get the mocked clearSession function
-  const { clearSessionPreservingUsername } = vi.importMock('@/utils/session');
+  // Import the already-mocked function
+  const { clearSessionPreservingUsername } = await import('@/utils/session') as any;
 
   beforeEach(() => {
     vi.clearAllMocks();

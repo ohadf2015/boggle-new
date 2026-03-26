@@ -21,7 +21,7 @@ vi.mock('next/link', () => {
     return <a href={href} {...props}>{children}</a>;
   };
   MockLink.displayName = 'MockLink';
-  return MockLink;
+  return { default: MockLink };
 });
 
 vi.mock('../../components/auth/AuthButton', () => {

@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react';
 // Mocks (same pattern as BlastGame.completion.test.tsx)
 // ---------------------------------------------------------------------------
 
-vi.mock('canvas-confetti', () => vi.fn());
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),

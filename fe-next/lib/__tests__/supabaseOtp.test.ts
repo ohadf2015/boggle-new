@@ -23,7 +23,7 @@ vi.mock('@supabase/ssr', () => ({
   })),
 }));
 
-vi.mock('@/utils/logger', () => ({ warn: vi.fn(), log: vi.fn(), error: vi.fn() }));
+vi.mock('@/utils/logger', () => ({ default: { warn: vi.fn(), log: vi.fn(), error: vi.fn() }, warn: vi.fn(), log: vi.fn(), error: vi.fn() }));
 vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: vi.fn() }));
 vi.mock('@/utils/platform', () => ({ isNative: vi.fn(() => true) }));
 

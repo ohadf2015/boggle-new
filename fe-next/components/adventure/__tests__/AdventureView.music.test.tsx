@@ -83,19 +83,19 @@ vi.mock('next/link', () => {
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 // We intercept this and return the jest-mocked AdventureGame synchronously
 vi.mock('next/dynamic', () => {
-   
+
   const React = require('react');
-  return (_importFn: unknown, _opts?: unknown) => {
+  return { default: (_importFn: unknown, _opts?: unknown) => {
     // Return a component that renders the mocked AdventureGame
     const Dynamic = (props: Record<string, unknown>) => {
-       
+
       const AdventureGame = require('../AdventureGame');
       const Comp = AdventureGame.default || AdventureGame;
       return React.createElement(Comp, props);
     };
     Dynamic.displayName = 'NextDynamic';
     return Dynamic;
-  };
+  } };
 });
 
 // Mock Next.js Image

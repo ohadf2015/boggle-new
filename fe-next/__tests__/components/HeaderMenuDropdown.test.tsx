@@ -15,7 +15,7 @@ vi.mock('next/link', () => {
         return <a href={href} onClick={onClick}>{children}</a>;
     };
     MockLink.displayName = 'MockLink';
-    return MockLink;
+    return { default: MockLink };
 });
 
 // Mock child components

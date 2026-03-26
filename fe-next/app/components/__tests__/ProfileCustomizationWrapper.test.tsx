@@ -21,11 +21,13 @@ vi.mock('@/utils/logger', () => ({
   debug: vi.fn(),
 }));
 
-vi.mock('next/dynamic', () => () => {
-  const MockComponent = () => null;
-  MockComponent.displayName = 'DynamicComponent';
-  return MockComponent;
-});
+vi.mock('next/dynamic', () => ({
+  default: () => {
+    const MockComponent = () => null;
+    MockComponent.displayName = 'DynamicComponent';
+    return MockComponent;
+  },
+}));
 
 import { useAuth } from '@/contexts/AuthContext';
 

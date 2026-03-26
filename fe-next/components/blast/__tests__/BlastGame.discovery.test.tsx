@@ -13,7 +13,7 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
-vi.mock('canvas-confetti', () => vi.fn());
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),

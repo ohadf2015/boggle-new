@@ -15,9 +15,11 @@ import type { Session } from '@/types';
 
 // Mock js-cookie
 vi.mock('js-cookie', () => ({
-  set: vi.fn(),
-  get: vi.fn(),
-  remove: vi.fn(),
+  default: {
+    set: vi.fn(),
+    get: vi.fn(),
+    remove: vi.fn(),
+  },
 }));
 
 import Cookies from 'js-cookie';
