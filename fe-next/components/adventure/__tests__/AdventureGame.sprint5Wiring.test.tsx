@@ -78,12 +78,10 @@ vi.mock('@/utils/confettiUtils', () => ({
 vi.mock('../ui/RollingNumber', () => ({
   RollingNumber: ({ value }: { value: number }) => <span>{value}</span>,
 }));
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: (_t: unknown, name: string) => {
-    if (name === '__esModule') return true;
-    return (props: Record<string, unknown>) => React.createElement('svg', { 'data-icon': name, ...props });
-  },
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>();
+  return actual;
+});
 
 import LevelCompleteModal from '../LevelCompleteModal';
 

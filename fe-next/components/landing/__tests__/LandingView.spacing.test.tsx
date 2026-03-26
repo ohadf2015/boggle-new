@@ -10,6 +10,7 @@ const createWrapper = () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+  return Wrapper;
 };
 
 import { render } from '@testing-library/react';

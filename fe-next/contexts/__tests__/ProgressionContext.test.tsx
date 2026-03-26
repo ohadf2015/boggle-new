@@ -719,17 +719,17 @@ describe('ProgressionContext', () => {
       const { result } = renderHook(() => useProgression(), { wrapper });
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-      // WHEN — update quest progress (this triggers fire-and-forget with retry)
+      // WHEN — update quest progress (this triggers debounced persist with 2s window)
       act(() => {
         result.current.updateChapterQuestProgress('wordsFound', 5, ['quest-1']);
       });
 
-      // THEN — first call happens immediately
-      await waitFor(() => expect(questCallCount).toBe(1));
+      // THEN — first call happens after 2s debounce
+      await waitFor(() => expect(questCallCount).toBe(1), { timeout: 3000 });
 
-      // Wait for retry (1s base delay)
+      // Wait for retry (1s base delay after first failure)
       await act(async () => {
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 2000));
       });
 
       // THEN — retried after transient 500

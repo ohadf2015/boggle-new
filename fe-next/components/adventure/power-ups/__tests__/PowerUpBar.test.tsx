@@ -74,6 +74,23 @@ vi.mock('../PowerUpActivationEffect', () => ({
   },
 }));
 
+// Mock usePowerUpInventory at module scope
+const mockStartCooldownTop = vi.fn();
+vi.mock('@/hooks/usePowerUpInventory', () => ({
+  usePowerUpInventory: () => ({
+    inventory: {
+      freezeTimeUnlocked: true,
+      hintUnlocked: true,
+      scoreMultiplierUnlocked: true,
+      cooldownStartedAt: { freezeTime: 0, hint: 0, scoreMultiplier: 0 },
+    },
+    isUnlocked: () => true,
+    startCooldown: mockStartCooldownTop,
+    getCooldownRemaining: () => 0,
+    resetCooldowns: vi.fn(),
+  }),
+}));
+
 // Mock toast
 const mockToast = vi.fn();
 vi.mock('react-hot-toast', () => ({
@@ -268,24 +285,6 @@ describe('PowerUpBar', () => {
     });
 
     it('should call inventory.startCooldown when power-up is activated', async () => {
-      const mockStartCooldown = vi.fn();
-
-      // Mock usePowerUpInventory to track startCooldown calls
-      vi.mock('@/hooks/usePowerUpInventory', () => ({
-        usePowerUpInventory: () => ({
-          inventory: {
-            freezeTimeUnlocked: true,
-            hintUnlocked: true,
-            scoreMultiplierUnlocked: true,
-            cooldownStartedAt: { freezeTime: 0, hint: 0, scoreMultiplier: 0 },
-          },
-          isUnlocked: () => true,
-          startCooldown: mockStartCooldown,
-          getCooldownRemaining: () => 0,
-          resetCooldowns: vi.fn(),
-        }),
-      }));
-
       render(<PowerUpBar {...defaultProps} />);
 
       const buttons = screen.getAllByRole('button');
@@ -300,27 +299,6 @@ describe('PowerUpBar', () => {
     });
 
     it('should initialize power-up states with cooldowns from inventory', () => {
-      // Mock inventory with active cooldown
-      vi.mock('@/hooks/usePowerUpInventory', () => ({
-        usePowerUpInventory: () => ({
-          inventory: {
-            freezeTimeUnlocked: true,
-            hintUnlocked: true,
-            scoreMultiplierUnlocked: true,
-            cooldownStartedAt: {
-              freezeTime: Date.now() - 30000,
-              hint: 0,
-              scoreMultiplier: 0,
-            },
-          },
-          isUnlocked: () => true,
-          startCooldown: vi.fn(),
-          getCooldownRemaining: (type: string) =>
-            type === 'freezeTime' ? 30 : 0,
-          resetCooldowns: vi.fn(),
-        }),
-      }));
-
       render(<PowerUpBar {...defaultProps} />);
 
       // Buttons should render (integration verified at hook level)

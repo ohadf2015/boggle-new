@@ -5,6 +5,10 @@ import { vi, type Mock, } from 'vitest';
  * Core gameplay API — every game mode depends on this.
  */
 
+// Set env vars so getSupabase() returns a mock client
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+
 // Polyfill Response.json for jsdom (lacks full fetch API)
 if (typeof globalThis.Response === 'undefined' || !globalThis.Response.json) {
   class MockResponse {

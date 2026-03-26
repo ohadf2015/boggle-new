@@ -111,9 +111,11 @@ vi.mock('@/components/CoinBalance', () => ({
   },
 }));
 
-vi.mock('@/components/auth/AuthModal', () => function MockAuthModal() {
-  return null;
-});
+vi.mock('@/components/auth/AuthModal', () => ({
+  default: function MockAuthModal() {
+    return null;
+  },
+}));
 
 vi.mock('@/components/gift/GiftNotificationBadge', () => ({
   GiftNotificationBadge: function MockBadge({ count }: { count: number }) {

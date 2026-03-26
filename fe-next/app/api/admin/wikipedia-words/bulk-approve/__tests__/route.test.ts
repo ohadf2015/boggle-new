@@ -27,7 +27,8 @@ import { gameAIService } from '@/lib/ai-service';
 import { verifyAdminAuth as mockVerifyAdminAuth } from '@/lib/auth/adminAuth';
 
 
-const mockCreateClient = require('@supabase/supabase-js').createClient;
+import { createClient } from '@supabase/supabase-js';
+const mockCreateClient = createClient as unknown as Mock;
 
 describe('Bulk Approve Business Logic', () => {
   let mockSupabase: any;

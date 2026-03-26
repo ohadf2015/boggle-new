@@ -74,7 +74,7 @@ describe('BackgroundGlow', () => {
     render(<BackgroundGlow color="#00FF00" opacity={1} />);
     const glow = screen.getByTestId('background-glow');
     expect(glow.style.position).toBe('absolute');
-    expect(glow.style.inset).toBe('0');
+    expect(['0', '0px']).toContain(glow.style.inset);
   });
 });
 
@@ -168,7 +168,9 @@ describe('ExplosionRing', () => {
     render(<ExplosionRing frame={15} color="#FFE135" delay={0} size={100} />);
     const ring = screen.getByTestId('explosion-ring');
     expect(ring).toBeInTheDocument();
-    expect(ring.style.border.toLowerCase()).toContain('#ffe135');
+    // jsdom may convert hex to rgb
+    const border = ring.style.border.toLowerCase();
+    expect(border.includes('#ffe135') || border.includes('rgb(255, 225, 53)')).toBe(true);
   });
 });
 
@@ -217,7 +219,8 @@ describe('StatsPanel', () => {
       </StatsPanel>
     );
     const panel = screen.getByTestId('stats-panel');
-    expect(panel.style.border.toLowerCase()).toContain('#ff6b35');
+    const border = panel.style.border.toLowerCase();
+    expect(border.includes('#ff6b35') || border.includes('rgb(255, 107, 53)')).toBe(true);
   });
 });
 

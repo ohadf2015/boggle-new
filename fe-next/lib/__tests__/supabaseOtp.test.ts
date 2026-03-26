@@ -4,13 +4,16 @@ import { vi } from 'vitest';
  * Tests for email OTP sign-in (mobile-friendly magic link alternative)
  */
 
-// Set env vars before module loads so supabase client is created
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
-
-// Must mock before importing the module
-const mockSignInWithOtp = vi.fn();
-const mockVerifyOtp = vi.fn();
+// Must use vi.hoisted so these are available to vi.mock (which is hoisted above imports)
+const { mockSignInWithOtp, mockVerifyOtp } = vi.hoisted(() => {
+  // Set env vars before module loads so supabase client is created
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  return {
+    mockSignInWithOtp: vi.fn(),
+    mockVerifyOtp: vi.fn(),
+  };
+});
 
 vi.mock('@supabase/ssr', () => ({
   createBrowserClient: vi.fn(() => ({
@@ -22,6 +25,7 @@ vi.mock('@supabase/ssr', () => ({
       signInWithPassword: vi.fn(),
       signOut: vi.fn(),
       getUser: vi.fn(),
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
       onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     },
   })),

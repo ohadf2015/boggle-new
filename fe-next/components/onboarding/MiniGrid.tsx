@@ -360,7 +360,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 <motion.span
                   className="relative z-10"
                   animate={isSel ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
-                  transition={SPRING_BOUNCE}
+                  transition={isSel ? { scale: { type: 'tween', duration: 0.4, ease: 'easeOut' } } : SPRING_BOUNCE}
                 >
                   {letter}
                 </motion.span>

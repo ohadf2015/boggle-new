@@ -14,20 +14,26 @@
 
 describe('Header Logo Navigation - Room Exit Integration', () => {
   beforeEach(() => {
-    // Setup sessionStorage
-    sessionStorage.setItem('gameCode', 'TEST123');
-    sessionStorage.setItem('username', 'TestPlayer');
-    sessionStorage.setItem('isHost', 'false');
+    vi.clearAllMocks();
+    // Setup sessionStorage mock to return values
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
+      const store: Record<string, string> = {
+        gameCode: 'TEST123',
+        username: 'TestPlayer',
+        isHost: 'false',
+      };
+      return store[key] ?? null;
+    });
   });
 
   afterEach(() => {
-    sessionStorage.clear();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should dispatch requestRoomExit event when logo is clicked with active session', () => {
-    // Setup event listener spy
-    const eventHandler = vi.fn();
+    // Setup event listener to capture event
+    let capturedEvent: CustomEvent | null = null;
+    const eventHandler = (e: Event) => { capturedEvent = e as CustomEvent; };
     window.addEventListener('requestRoomExit', eventHandler);
 
     // Simulate the Header's handleLogoClick logic
@@ -41,24 +47,20 @@ describe('Header Logo Navigation - Room Exit Integration', () => {
     }
 
     // Verify event was dispatched with correct data
-    expect(eventHandler).toHaveBeenCalledTimes(1);
-    expect(eventHandler).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'requestRoomExit',
-        detail: {
-          gameCode: 'TEST123',
-          username: 'TestPlayer',
-          source: 'logo'
-        }
-      })
-    );
+    expect(capturedEvent).not.toBeNull();
+    expect(capturedEvent!.type).toBe('requestRoomExit');
+    expect(capturedEvent!.detail).toEqual({
+      gameCode: 'TEST123',
+      username: 'TestPlayer',
+      source: 'logo'
+    });
 
     window.removeEventListener('requestRoomExit', eventHandler);
   });
 
   it('should NOT dispatch event when no active session exists', () => {
-    // Clear session to simulate no active game
-    sessionStorage.clear();
+    // Override to simulate no active game
+    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
 
     const eventHandler = vi.fn();
     window.addEventListener('requestRoomExit', eventHandler);

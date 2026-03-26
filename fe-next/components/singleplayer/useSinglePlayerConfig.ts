@@ -261,7 +261,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Handle pre-game tutorial completion
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
-    markOnboardingComplete();
+    markOnboardingComplete({ avatarId: '', displayName: '', selectedMode: 'single' });
     wasFirstTimerPracticeRef.current = true;
     const practicePreset = getDefaultPreset('practice');
     if (practicePreset) {

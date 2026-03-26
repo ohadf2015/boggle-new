@@ -129,12 +129,14 @@ vi.mock('@/utils/logger', () => ({
   }
 }));
 
-// Mock audio loader
-vi.mock('@/lib/audio/audioLoader', async () => {
-  const { Howl } = await import('howler');
-  return {
+// Mock audio loader - use vi.hoisted to share Howl ref
+const { sharedHowl } = vi.hoisted(() => {
+  return { sharedHowl: { ref: null as any } };
+});
+vi.mock('@/lib/audio/audioLoader', () => ({
   createLazyHowl: vi.fn((src: string | string[], options?: any) => {
-    return new Howl({
+    if (!sharedHowl.ref) return null;
+    return new sharedHowl.ref({
       src: Array.isArray(src) ? src : [src],
       preload: false,
       html5: true,
@@ -143,17 +145,17 @@ vi.mock('@/lib/audio/audioLoader', async () => {
   }),
   preloadAudioOnDemand: vi.fn((howl: any) => {
     return new Promise<void>((resolve) => {
-      // Simulate async load
-      if (howl.state() === 'unloaded') {
+      if (howl && howl.state() === 'unloaded') {
         howl.load();
       }
-      // Wait for load to complete
       setTimeout(() => resolve(), 20);
     });
   }),
   ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
-  };
-});
+}));
+
+// Wire up the shared Howl reference after imports
+sharedHowl.ref = Howl;
 
 describe('MusicContext - Auto-play and Transitions', () => {
   beforeEach(() => {
@@ -192,7 +194,7 @@ describe('MusicContext - Auto-play and Transitions', () => {
     // Get the Howl instance for inGame track
     const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const inGameHowl = HowlConstructor.mock.results.find(r =>
-      r.value._options.src[0] === '/music/in_game.mp3'
+      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_game.mp3'
     )?.value;
 
     expect(inGameHowl).toBeDefined();
@@ -227,7 +229,7 @@ describe('MusicContext - Auto-play and Transitions', () => {
 
     const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const lobbyHowl = HowlConstructor.mock.results.find(r =>
-      r.value._options.src[0] === '/music/in_lobby.mp3'
+      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_lobby.mp3'
     )?.value;
 
     expect(lobbyHowl._playing).toBe(true);
@@ -239,7 +241,7 @@ describe('MusicContext - Auto-play and Transitions', () => {
     });
 
     const inGameHowl = HowlConstructor.mock.results.find(r =>
-      r.value._options.src[0] === '/music/in_game.mp3'
+      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_game.mp3'
     )?.value;
 
     // Track should be playing after preload completes

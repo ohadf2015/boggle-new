@@ -12,8 +12,8 @@ import { render, screen } from '@testing-library/react';
 
 // Mock useCinematic — control isStalled from tests
 const mockUseCinematic = vi.fn();
-vi.mock('../../../../../hooks/useCinematic', () => ({
-  ...vi.importActual('../../../../../hooks/useCinematic'),
+vi.mock('../../../../../hooks/useCinematic', async () => ({
+  ...(await vi.importActual('../../../../../hooks/useCinematic')),
   useCinematic: (...args: unknown[]) => mockUseCinematic(...args),
 }));
 
@@ -60,6 +60,11 @@ vi.mock('framer-motion', () => ({
 
 // Mock LanguageContext
 vi.mock('../../../../../contexts/LanguageContext', () => ({
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -126,7 +131,7 @@ describe('CinematicPlayer - stall fallback', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn());
     mockUseDevicePerformance.mockReturnValue(createDevicePerf());
   });
@@ -168,7 +173,7 @@ describe('CinematicPlayer - mobile bypass', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn());
   });
 
@@ -209,7 +214,7 @@ describe('CinematicPlayer - mobile error text', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     mockUseCinematic.mockReturnValue(createCinematicReturn({ canSkip: true }));
   });
 

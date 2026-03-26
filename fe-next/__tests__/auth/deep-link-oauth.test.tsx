@@ -42,7 +42,7 @@ vi.mock('@/utils/platform', () => ({
 
 // Mock push notification listeners
 vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
-  setupPushListeners: vi.fn().mockReturnValue(vi.fn()),
+  setupPushListeners: vi.fn().mockResolvedValue(vi.fn()),
 }));
 
 // Mock logger

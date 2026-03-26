@@ -13,15 +13,16 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MobileTooltip } from '../MobileTooltip';
 
-// Store mock handlers in an object to avoid reassignment lint errors
-const mockHandlers = {
+// Store mock handlers in globalThis so vi.mock factory (hoisted) can access them
+(globalThis as any).__mobileTooltipMockHandlers = {
   openChange: null as ((open: boolean) => void) | null,
   pointerDownOutside: null as (() => void) | null,
 };
+const mockHandlers = (globalThis as any).__mobileTooltipMockHandlers;
 
 // Mock Radix UI Tooltip primitives
-vi.mock('../tooltip', () => {
-  const React = require('react');
+vi.mock('../tooltip', async () => {
+  const React = await import('react');
 
   const MockTooltipProvider = ({
     children,
@@ -45,7 +46,7 @@ vi.mock('../tooltip', () => {
     onOpenChange?: (open: boolean) => void;
   }) => {
     // Store in external object to avoid lint error
-    const handlers = require('./MobileTooltip.test.tsx').mockHandlers;
+    const handlers = (globalThis as any).__mobileTooltipMockHandlers;
     handlers.openChange = onOpenChange || null;
     return (
       <div data-testid="tooltip" data-open={open}>
@@ -89,7 +90,7 @@ vi.mock('../tooltip', () => {
     onPointerDownOutside?: () => void;
   }) => {
     // Store in external object to avoid lint error
-    const handlers = require('./MobileTooltip.test.tsx').mockHandlers;
+    const handlers = (globalThis as any).__mobileTooltipMockHandlers;
     handlers.pointerDownOutside = onPointerDownOutside || null;
     return (
       <div

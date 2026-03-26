@@ -7,12 +7,8 @@ const createWrapper = () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+  return Wrapper;
 };
-
-vi.mock('@/utils/contextualGuidanceStorage', () => ({
-  shouldShowGuidance: () => false,
-}));
-import '@testing-library/jest-dom';
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,

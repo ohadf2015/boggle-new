@@ -55,7 +55,7 @@ describe('DuelsPageClient — loading state', () => {
   it('shows contextual loading text', () => {
     render(<DuelsPageClient />);
 
-    expect(screen.getByText('Finding your classmates...')).toBeInTheDocument();
+    expect(screen.getByText('education.duels.findingClassmates')).toBeInTheDocument();
   });
 
   it('does not render tabs while loading', () => {

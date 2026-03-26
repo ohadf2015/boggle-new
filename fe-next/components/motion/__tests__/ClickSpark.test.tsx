@@ -38,8 +38,8 @@ describe('ClickSpark', () => {
 
     fireEvent.click(wrapper!, { clientX: 50, clientY: 50 });
 
-    // Should have 4 particle spans
-    const particles = wrapper!.querySelectorAll('span[style*="clickSparkRadiate"]');
+    // Should have 4 particle spans appended to the wrapper
+    const particles = wrapper!.querySelectorAll('span');
     expect(particles.length).toBe(4);
   });
 

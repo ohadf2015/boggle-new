@@ -90,7 +90,8 @@ vi.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogAction: ({ children, ...rest }: any) => <button {...rest}>{children}</button>,
 }));
 
-vi.mock('lucide-react', () => ({
+vi.mock('lucide-react', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, any>>()),
   Gem: () => <span data-testid="gem-icon" />,
   Bomb: () => <span data-testid="bomb-icon" />,
   Rainbow: () => <span data-testid="rainbow-icon" />,

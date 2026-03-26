@@ -96,14 +96,15 @@ vi.mock('@sentry/nextjs', () => ({
 // Mock Browser APIs
 // ==========================================
 
-// Mock localStorage
+// Mock localStorage with functional storage
+const localStorageStore: Record<string, string> = {};
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-  length: 0,
-  key: vi.fn(),
+  getItem: vi.fn((key: string) => localStorageStore[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => { localStorageStore[key] = value; }),
+  removeItem: vi.fn((key: string) => { delete localStorageStore[key]; }),
+  clear: vi.fn(() => { Object.keys(localStorageStore).forEach(k => delete localStorageStore[k]); }),
+  get length() { return Object.keys(localStorageStore).length; },
+  key: vi.fn((i: number) => Object.keys(localStorageStore)[i] ?? null),
 };
 (global as any).localStorage = localStorageMock;
 

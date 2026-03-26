@@ -261,18 +261,10 @@ describe('PracticeResults — Celebratory Redesign', () => {
   // ── Missed words ──
 
   describe('missed words section', () => {
-    it('shows missed words when available', () => {
+    it('does not render MissedWords component directly (handled by sub-views)', () => {
       render(<PracticeResults {...defaultProps} />);
-      expect(screen.getByTestId('missed-words')).toBeInTheDocument();
-    });
-
-    it('hides missed words when none exist', () => {
-      render(
-        <PracticeResults
-          {...defaultProps}
-          results={makeResults({ allPossibleWords: ['hello', 'world', 'test'] })}
-        />
-      );
+      // PracticeResults doesn't render MissedWords directly —
+      // missed words are shown in MobileDetailsTab sub-component
       expect(screen.queryByTestId('missed-words')).not.toBeInTheDocument();
     });
   });

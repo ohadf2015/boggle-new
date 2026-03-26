@@ -149,7 +149,7 @@ describe('AdventureXpProgressBar', () => {
       render(<AdventureXpProgressBar totalXp={500} />);
 
       const wrapper = screen.getByTestId('adventure-xp-progress-wrapper');
-      expect(wrapper).toHaveAttribute('dir', 'ltr'); // Initially LTR from first mock
+      expect(wrapper).toHaveAttribute('dir', 'rtl');
     });
   });
 

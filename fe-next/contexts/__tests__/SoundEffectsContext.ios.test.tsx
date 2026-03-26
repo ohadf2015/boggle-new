@@ -10,7 +10,7 @@ import { vi, type Mock, } from 'vitest';
  */
 
 import React from 'react';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 
 // Track Howl constructor calls and their options
 const howlConstructorCalls: Array<{ src: string[]; html5: boolean }> = [];
@@ -121,13 +121,14 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
 
   describe('Howl configuration for iOS', () => {
     it('should use html5: true for iOS Safari sound effects', async () => {
-      renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+      await act(async () => {
+        renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+      });
 
       // Wait for ensureHowl().then() to resolve and create sound instances
-      await new Promise((r) => setTimeout(r, 0));
-
-      // Sound effects should be configured for iOS
-      expect(howlConstructorCalls.length).toBeGreaterThan(0);
+      await waitFor(() => {
+        expect(howlConstructorCalls.length).toBeGreaterThan(0);
+      });
 
       // All sound effects should use html5: true for iOS compatibility
       const hasHtml5False = howlConstructorCalls.some((call) => call.html5 === false);
@@ -138,10 +139,14 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
     });
 
     it('should configure all sound effects with html5: true', async () => {
-      renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+      await act(async () => {
+        renderHook(() => useSoundEffects(), { wrapper: createWrapper() });
+      });
 
       // Wait for ensureHowl().then() to resolve and create sound instances
-      await new Promise((r) => setTimeout(r, 0));
+      await waitFor(() => {
+        expect(howlConstructorCalls.length).toBeGreaterThan(0);
+      });
 
       // Expected sound effects
       const expectedSounds = [

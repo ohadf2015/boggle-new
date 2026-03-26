@@ -218,7 +218,7 @@ describe('MusicContext - Crossfade Looping', () => {
     // Get the Howl instance for inGame track
     const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const inGameHowl = HowlConstructor.mock.results.find(r =>
-      r.value._options.src[0] === '/music/in_game.mp3'
+      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_game.mp3'
     )?.value;
 
     expect(inGameHowl).toBeDefined();
@@ -266,7 +266,7 @@ describe('MusicContext - Crossfade Looping', () => {
 
     const HowlConstructor = Howl as MockedClass<typeof Howl>;
     const inGameHowl = HowlConstructor.mock.results.find(r =>
-      r.value._options.src[0] === '/music/in_game.mp3'
+      r.type === 'return' && r.value?._options?.src?.[0] === '/music/in_game.mp3'
     )?.value;
 
     howlCallLog.length = 0;

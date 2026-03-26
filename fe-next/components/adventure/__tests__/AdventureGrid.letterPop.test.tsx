@@ -296,6 +296,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
 
   describe('Multiple tile selections', () => {
     it('should update sparkle key on each new selection', () => {
+      vi.useFakeTimers();
       const { container } = render(
         <AdventureGrid
           tiles={mockTiles}
@@ -321,6 +322,7 @@ describe('AdventureGrid - Letter Pop Animation', () => {
 
       // Keys should be different (timestamp-based)
       expect(key1).not.toBe(key2);
+      vi.useRealTimers();
     });
   });
 

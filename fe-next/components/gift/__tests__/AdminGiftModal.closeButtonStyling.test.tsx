@@ -126,13 +126,9 @@ describe('AdminGiftModal - Close Button Styling', () => {
 
     const closeButton = screen.getByRole('button', { name: /close/i });
 
-    // Should have some background (not transparent)
-    const styles = window.getComputedStyle(closeButton);
-    const bgColor = styles.backgroundColor;
-
-    // backgroundColor should be set (not transparent)
-    expect(bgColor).not.toBe('transparent');
-    expect(bgColor).not.toBe('rgba(0, 0, 0, 0)');
+    // Should have a background class (Tailwind bg-* class)
+    // jsdom doesn't process Tailwind, so check className instead of computed style
+    expect(closeButton.className).toMatch(/bg-/);
   });
 
   it('should have proper positioning in corner with adequate spacing', () => {

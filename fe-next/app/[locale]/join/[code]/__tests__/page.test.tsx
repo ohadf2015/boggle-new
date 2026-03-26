@@ -20,6 +20,9 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
+vi.mock('@/components/ui/PageLoader', () => ({
+  PageLoader: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
+}));
 vi.mock('@/components/student/JoinClassroomForm', () => ({
   default: function MockJoinClassroomForm({ initialCode }: { initialCode: string }) {
     return <div data-testid="join-form">Join Form: {initialCode}</div>;
@@ -131,7 +134,7 @@ describe('JoinWithCodePage - Bug Reproduction', () => {
 
     // THEN: Should save code and redirect to landing page
     await waitFor(() => {
-      expect(sessionStorage.getItem('joinClassroomReturnCode')).toBe('4HCDMS');
+      expect(sessionStorage.setItem).toHaveBeenCalledWith('joinClassroomReturnCode', '4HCDMS');
       expect(mockPush).toHaveBeenCalledWith('/en');
     });
   });

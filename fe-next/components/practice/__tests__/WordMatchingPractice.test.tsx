@@ -188,8 +188,8 @@ describe('WordMatchingPractice', () => {
       expect(backButton).toHaveAttribute('aria-label');
     });
 
-    it('should support keyboard navigation via dnd-kit sensors', () => {
-      const { useSensors, useSensor, KeyboardSensor } = require('@dnd-kit/core');
+    it('should support keyboard navigation via dnd-kit sensors', async () => {
+      const dndKit = await import('@dnd-kit/core');
 
       render(
         <WordMatchingPractice
@@ -199,9 +199,9 @@ describe('WordMatchingPractice', () => {
         />
       );
 
-      // Verify keyboard sensor is configured
-      expect(useSensors).toHaveBeenCalled();
-      expect(useSensor).toHaveBeenCalled();
+      // Verify keyboard sensor is configured (mocked via vi.mock)
+      expect(dndKit.useSensors).toHaveBeenCalled();
+      expect(dndKit.useSensor).toHaveBeenCalled();
     });
   });
 

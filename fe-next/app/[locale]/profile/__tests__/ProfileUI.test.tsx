@@ -14,6 +14,7 @@ const createWrapper = () => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
+  return Wrapper;
 };
 
 import React from 'react';
@@ -39,6 +40,18 @@ let mockLanguageData = {
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => mockLanguageData
+}));
+
+vi.mock('@/lib/supabaseRealtimeNotifications', () => ({
+  subscribeToNotifications: vi.fn(() => ({ unsubscribe: vi.fn() })),
+}));
+
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: () => null,
+}));
+
+vi.mock('@supabase/ssr', () => ({
+  createBrowserClient: vi.fn(() => null),
 }));
 
 vi.mock('@/utils/ThemeContext', () => ({

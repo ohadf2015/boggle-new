@@ -82,24 +82,17 @@ vi.mock('next/link', () => {
 
 // Mock next/dynamic — AdventureView uses dynamic(() => import('./AdventureGame'))
 // We intercept this and return the jest-mocked AdventureGame synchronously
-vi.mock('next/dynamic', () => ({
-  default: (importFn: () => Promise<any>, _opts?: unknown) => {
-    const Dynamic = (props: Record<string, unknown>) => {
-      const [Comp, setComp] = React.useState<React.ComponentType | null>(null);
-      React.useEffect(() => {
-        let mounted = true;
-        importFn().then((mod: any) => {
-          if (mounted) setComp(() => mod.default || mod);
-        });
-        return () => { mounted = false; };
-      }, []);
-      if (!Comp) return null;
-      return React.createElement(Comp, props);
-    };
-    Dynamic.displayName = 'NextDynamic';
-    return Dynamic;
-  },
-}));
+vi.mock('next/dynamic', async () => {
+  const adventureMod = await import('../AdventureGame');
+  return {
+    default: (_importFn: () => Promise<any>, _opts?: unknown) => {
+      const Comp = (adventureMod as any).default || adventureMod;
+      const Dynamic = (props: Record<string, unknown>) => React.createElement(Comp, props);
+      Dynamic.displayName = 'NextDynamic';
+      return Dynamic;
+    },
+  };
+});
 
 // Mock Next.js Image
 vi.mock('next/image', () => {
