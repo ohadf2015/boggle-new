@@ -121,8 +121,17 @@ jest.mock('../../../backend/handlers/shared', () => ({
 }));
 
 jest.mock('../../../backend/modules/boggleSolver', () => ({
-  findAllWords: jest.fn().mockReturnValue([]),
+  findAllWords: jest.fn().mockReturnValue(['hello', 'world', 'testing', 'player']),
   getCachedTrie: jest.fn(),
+}));
+
+jest.mock('../../../backend/modules/wordHuntManager', () => ({
+  selectTargetWordWithFallback: jest.fn().mockReturnValue('testing'),
+  initWordHuntState: jest.fn().mockReturnValue({
+    targetWord: 'testing',
+    targetWordLength: 7,
+    playerProgress: {},
+  }),
 }));
 
 jest.mock('../../../backend/utils/socketValidation', () => ({

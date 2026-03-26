@@ -226,19 +226,35 @@ Output a summary in chat:
 
 ---
 
-## Phase 8: Sentry Issue Management (Optional)
+## Phase 8: Resolve Fixed Issues in Sentry (MANDATORY)
 
-If fixes are confirmed working:
+After fixing issues, mark them as resolved in Sentry to keep the dashboard clean.
 
-### 8.1 Resolve Issues in Sentry
-```
-mcp__sentry__update_issue with issue_id: [id], status: "resolved"
+### 8.1 Resolve via Sentry Dashboard
+The Sentry MCP server is **read-only** — it cannot update issue status.
+Provide the user with direct links to resolve each fixed issue:
+
+```markdown
+### Issues to Resolve in Sentry
+
+Click each link → click "Resolve" button:
+- [ISSUE-ID](https://lexiclash.sentry.io/issues/ISSUE-ID/) — [brief description of fix]
 ```
 
-### 8.2 Add Resolution Comment
+### 8.2 Bulk Resolve Non-Actionable Issues
+For issues that are not code bugs (transient errors, third-party, stale deployments),
+recommend the user bulk-resolve or ignore them in the Sentry dashboard:
+
+```markdown
+### Issues to Ignore (not code bugs)
+- [ISSUE-ID](link) — transient Supabase 502
+- [ISSUE-ID](link) — browser extension / third-party
+- [ISSUE-ID](link) — already handled with graceful degradation
 ```
-mcp__sentry__add_issue_comment with issue_id: [id], comment: "Fixed in commit [hash]"
-```
+
+### 8.3 Noise Reduction
+When `logger.warn()` sends non-actionable errors to Sentry, downgrade to `logger.debug()`.
+This prevents future Sentry noise while keeping dev-mode visibility.
 
 ---
 
