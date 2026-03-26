@@ -181,15 +181,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const currentGameState = game.gameState;
     logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
 
-    // Guard: reject startGame if game is currently in-progress to prevent
-    // silently discarding players' scores and words
-    if (currentGameState === 'in-progress') {
-      logger.warn('SOCKET', `Rejected startGame for ${gameCode}: game is already in-progress`);
-      emitError(socket, 'Game is already in progress');
-      return;
-    }
-
-    // Self-healing: if in 'finished' or 'validating' state, reset first
+    // Self-healing: if game is not in 'waiting' state, force-reset before starting.
+    // This handles 'finished', 'validating', and stale 'in-progress' states
+    // (e.g., when endGame failed to transition properly but results were shown).
     if (!canTransitionGameState(gameCode, 'START')) {
       logger.info('SOCKET', `Game ${gameCode} in state ${currentGameState}, auto-resetting before start`);
 

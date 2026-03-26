@@ -237,7 +237,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setShowResults(false);
       setResultsData(null);
     },
-    onGameReset: () => { setResultsData(null); },
+    onGameReset: () => { /* Keep results visible until startGame arrives with new grid */ },
     onHostLeftRoomClosing: () => {
       clearSessionPreservingUsername(username);
       setIsActive(false); setIsHost(false); setGameCode('');
