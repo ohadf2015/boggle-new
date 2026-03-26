@@ -258,7 +258,7 @@ export interface PlayerProgression {
   /** Forged runes inventory */
   runes: PlayerRune[];
   /** Adventure streak (consecutive play days) */
-  streak?: { currentStreak: number; bestStreak: number; lastPlayedDate: string | null };
+  streak?: { currentStreak: number; bestStreak: number; lastPlayedAt: string | null; freezesUsedThisWeek: number; lastFreezeWeek: string | null };
   /** Boss trophies earned (boss defeats across all modes) */
   bossTrophies?: number;
   /** Prestige level (resets after completing all worlds) */

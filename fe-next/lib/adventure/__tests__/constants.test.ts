@@ -15,9 +15,7 @@ import {
   BASE_COMPLETION_XP,
   XP_PER_STAR,
   // Progression constants
-  STARS_TO_UNLOCK_NEXT_LEVEL,
   STARS_TO_UNLOCK_NEXT_WORLD,
-  TOTAL_STARS_FOR_FINAL_WORLD,
   // Tile and objective constants
   TILE_TYPES,
   OBJECTIVE_TYPES,
@@ -155,6 +153,13 @@ describe('World Unlock Functions', () => {
     it('should require 99 stars for world 10 (same formula as other worlds: 11 * 9)', () => {
       // World 10 uses the standard formula to prevent early skip-ahead
       expect(getWorldUnlockRequirement(10)).toBe(99);
+    });
+
+    it('should use formula (N-1)*11 for all worlds, preventing skip-ahead', () => {
+      // Regression: W10 previously required only 45 stars, letting players skip W3-W9
+      for (let world = 2; world <= WORLDS_COUNT; world++) {
+        expect(getWorldUnlockRequirement(world)).toBe((world - 1) * STARS_TO_UNLOCK_NEXT_WORLD);
+      }
     });
 
     it('should handle invalid world numbers', () => {

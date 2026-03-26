@@ -77,7 +77,7 @@ export const GameHeader = memo(function GameHeader({
     <header
       className={cn(
         'flex items-center justify-between relative',
-        'px-3 py-1.5 gap-2 sm:gap-3 lg:gap-4',
+        'px-3 py-1.5 gap-2 sm:gap-3 lg:gap-4 pt-[max(0.375rem,env(safe-area-inset-top,0.375rem))]',
         hudTheme.headerBg, 'backdrop-blur-md',
         'border-b-3', hudTheme.headerBorder,
         'shadow-hard-sm',

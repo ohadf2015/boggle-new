@@ -1,44 +1,84 @@
 /**
  * Adventure Streak — tracks consecutive days of adventure play.
  * Multiplier grows from 1.0x (day 0) to 2.0x (day 7+).
+ *
+ * Grace period: 36 hours between plays (not calendar day).
+ * Streak freeze: 1 free freeze per week — auto-consumed when streak would break.
  */
+
+const GRACE_HOURS = 36;
+const MIN_GAP_HOURS = 1; // ignore plays within 1h (same session)
+const FREEZE_COOLDOWN_DAYS = 7;
 
 export interface AdventureStreakState {
   currentStreak: number;
   bestStreak: number;
-  lastPlayedDate: string | null; // YYYY-MM-DD
+  lastPlayedAt: string | null; // ISO timestamp
+  freezesUsedThisWeek: number;
+  lastFreezeWeek: string | null; // ISO timestamp of when freeze counter last reset
 }
 
-/**
- * Check if two dates are within the streak grace period.
- * Allows up to 2 calendar days apart (36h effective grace window)
- * to prevent streaks breaking from timezone shifts or late-night play.
- */
-function isWithinStreakGrace(prev: string, current: string): boolean {
-  const prevDate = new Date(prev + 'T00:00:00Z');
-  const currDate = new Date(current + 'T00:00:00Z');
-  const diffMs = currDate.getTime() - prevDate.getTime();
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-  return diffDays >= 1 && diffDays <= 2;
+function hoursBetween(a: string, b: string): number {
+  return (new Date(b).getTime() - new Date(a).getTime()) / 3_600_000;
+}
+
+/** Check if the free weekly freeze is available */
+function isFreezeAvailable(state: AdventureStreakState, now: string): boolean {
+  if (state.freezesUsedThisWeek === 0) return true;
+  if (!state.lastFreezeWeek) return true;
+  const daysSinceReset = hoursBetween(state.lastFreezeWeek, now) / 24;
+  return daysSinceReset >= FREEZE_COOLDOWN_DAYS;
 }
 
 /** Update streak state when player completes an adventure level */
 export function updateStreak(
   state: AdventureStreakState,
-  todayStr: string, // YYYY-MM-DD
+  now: string, // ISO timestamp
 ): AdventureStreakState {
-  // Same day — no change
-  if (state.lastPlayedDate === todayStr) return state;
+  // First play ever
+  if (!state.lastPlayedAt) {
+    return { ...state, currentStreak: 1, bestStreak: Math.max(state.bestStreak, 1), lastPlayedAt: now };
+  }
 
-  const isConsecutive = state.lastPlayedDate !== null && isWithinStreakGrace(state.lastPlayedDate, todayStr);
+  const gap = hoursBetween(state.lastPlayedAt, now);
 
-  const newStreak = isConsecutive ? state.currentStreak + 1 : 1;
-  const newBest = Math.max(state.bestStreak, newStreak);
+  // Same session (<1h) — no change
+  if (gap < MIN_GAP_HOURS) return state;
 
+  // Within grace period — increment streak
+  if (gap <= GRACE_HOURS) {
+    const newStreak = state.currentStreak + 1;
+    return {
+      ...state,
+      currentStreak: newStreak,
+      bestStreak: Math.max(state.bestStreak, newStreak),
+      lastPlayedAt: now,
+    };
+  }
+
+  // Beyond grace — try freeze
+  const canFreeze = state.currentStreak > 0 && isFreezeAvailable(state, now);
+
+  if (canFreeze) {
+    // Determine if freeze week resets
+    const weekReset = !state.lastFreezeWeek
+      || hoursBetween(state.lastFreezeWeek, now) / 24 >= FREEZE_COOLDOWN_DAYS;
+    return {
+      ...state,
+      lastPlayedAt: now,
+      freezesUsedThisWeek: weekReset ? 1 : state.freezesUsedThisWeek + 1,
+      lastFreezeWeek: weekReset ? now : state.lastFreezeWeek,
+    };
+  }
+
+  // Reset streak
   return {
-    currentStreak: newStreak,
-    bestStreak: newBest,
-    lastPlayedDate: todayStr,
+    ...state,
+    currentStreak: 1,
+    bestStreak: Math.max(state.bestStreak, 1),
+    lastPlayedAt: now,
+    freezesUsedThisWeek: state.freezesUsedThisWeek,
+    lastFreezeWeek: state.lastFreezeWeek,
   };
 }
 

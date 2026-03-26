@@ -5,7 +5,7 @@
  * Uses the new flexible upgrade system from upgradeConfig.ts.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   getUpgradeTier,
   getUpgradeEffect as getConfigEffect,
@@ -40,6 +40,25 @@ export function useAdventureCurrency(
   // without stale closures (e.g., rapid double-purchase scenario)
   const goldRef = useRef(initialGold);
   const upgradesRef = useRef<UpgradeState>(initialUpgrades);
+
+  // Sync upgrades when initialUpgrades changes (e.g., async progression load)
+  // useState only reads initialUpgrades on first mount; this effect handles
+  // subsequent prop changes when progression data arrives from the server.
+  const initialUpgradesRef = useRef(initialUpgrades);
+  useEffect(() => {
+    // Skip if same reference or if initial value (already set by useState)
+    if (initialUpgrades === initialUpgradesRef.current) return;
+    // Only sync if local state hasn't diverged (no local purchases yet)
+    const localKeys = Object.keys(upgradesRef.current);
+    const initialKeys = Object.keys(initialUpgradesRef.current);
+    const hasLocalChanges = localKeys.length !== initialKeys.length ||
+      localKeys.some(k => upgradesRef.current[k] !== initialUpgradesRef.current[k]);
+    if (!hasLocalChanges) {
+      setUpgrades(initialUpgrades);
+      upgradesRef.current = initialUpgrades;
+    }
+    initialUpgradesRef.current = initialUpgrades;
+  }, [initialUpgrades]);
 
   const addGold = useCallback(
     (amount: number) => {

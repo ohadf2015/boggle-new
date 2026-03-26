@@ -55,12 +55,29 @@ describe('getPrestigeMultiplier', () => {
     expect(getPrestigeMultiplier(0)).toBe(1.0);
   });
 
-  it('returns 1.25 for prestige 5', () => {
-    expect(getPrestigeMultiplier(5)).toBe(1.25);
+  it('returns 1.05 for prestige 1 (only rank 1 bonus)', () => {
+    expect(getPrestigeMultiplier(1)).toBe(1.05);
   });
 
-  it('returns 1.0 for invalid prestige', () => {
-    expect(getPrestigeMultiplier(99)).toBe(1.0);
+  it('accumulates bonuses across ranks (prestige 2 = 1.0 + 0.05 + 0.10 = 1.15)', () => {
+    expect(getPrestigeMultiplier(2)).toBe(1.15);
+  });
+
+  it('accumulates bonuses across ranks (prestige 3 = 1.0 + 0.05 + 0.10 + 0.15 = 1.30)', () => {
+    expect(getPrestigeMultiplier(3)).toBe(1.30);
+  });
+
+  it('accumulates bonuses across ranks (prestige 5 = 1.0 + 0.05 + 0.10 + 0.15 + 0.20 + 0.25 = 1.75)', () => {
+    expect(getPrestigeMultiplier(5)).toBe(1.75);
+  });
+
+  it('caps at max prestige for out-of-range values', () => {
+    // Prestige 99 clamps to MAX_PRESTIGE (5), returns full accumulated bonus
+    expect(getPrestigeMultiplier(99)).toBe(getPrestigeMultiplier(5));
+  });
+
+  it('returns 1.0 for negative prestige', () => {
+    expect(getPrestigeMultiplier(-1)).toBe(1.0);
   });
 });
 

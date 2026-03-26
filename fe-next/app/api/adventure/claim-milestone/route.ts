@@ -76,7 +76,9 @@ export async function POST(request: NextRequest) {
     const newXp = (prog.xp as number ?? 0) + milestone.xp;
     const newClaimed = [...claimed, milestone.target];
 
-    // Optimistic lock: check both gold AND claimed milestones to prevent double-claim race
+    // Optimistic lock: check gold AND ensure this milestone hasn't been claimed yet (Bug C7).
+    // The `not.cs` filter rejects the update if the target milestone is already in the array,
+    // preventing a race where two concurrent requests both pass the in-memory check above.
     const { data: updatedRow, error: updateError } = await supabase
       .from('player_progression')
       .update({
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
       })
       .eq('user_id', user.id)
       .eq('gold', prog.gold as number ?? 0)
-      .contains('word_album_claimed_milestones', claimed)
+      .not('word_album_claimed_milestones', 'cs', `{${milestone.target}}`)
       .select()
       .single();
 

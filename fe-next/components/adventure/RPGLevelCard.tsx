@@ -40,7 +40,7 @@ function getBannerClasses(isPerfect: boolean, isCurrent: boolean, isUnlocked: bo
 
 function getBannerTextColor(isPerfect: boolean, isBoss: boolean, isUnlocked: boolean) {
   if (isPerfect || isBoss) return 'text-neo-black';
-  if (!isUnlocked) return 'text-neo-white/40';
+  if (!isUnlocked) return 'text-neo-white/60';
   return 'text-neo-white/80';
 }
 
@@ -130,7 +130,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
 
           {/* Level Number or Lock */}
           {isLocked ? (
-            <Lock data-testid="lock-icon" className="w-8 h-8 text-neo-white/30 mb-2" />
+            <Lock data-testid="lock-icon" className="w-8 h-8 text-neo-white/60 mb-2" />
           ) : (
             <span
               data-testid="level-number"

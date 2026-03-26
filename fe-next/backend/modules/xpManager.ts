@@ -332,10 +332,19 @@ export function canPrestige(currentLevel: number, currentPrestige: number): bool
 }
 
 /**
- * Get the XP multiplier for a prestige level
+ * Get the XP multiplier for a prestige level.
+ * Accumulates bonuses from all ranks up to and including the given level.
+ * E.g. prestige 3 = 1.0 + (1.05-1.0) + (1.10-1.0) + (1.15-1.0) = 1.30
  */
 export function getPrestigeMultiplier(prestigeLevel: number): number {
-  return PRESTIGE_CONFIG.MULTIPLIERS[prestigeLevel] || 1.00;
+  if (prestigeLevel <= 0) return 1.0;
+  const maxLevel = Math.min(prestigeLevel, PRESTIGE_CONFIG.MAX_PRESTIGE);
+  let accumulated = 1.0;
+  for (let rank = 1; rank <= maxLevel; rank++) {
+    const rankMultiplier = PRESTIGE_CONFIG.MULTIPLIERS[rank] ?? 1.0;
+    accumulated += rankMultiplier - 1.0;
+  }
+  return Math.round(accumulated * 100) / 100;
 }
 
 /**

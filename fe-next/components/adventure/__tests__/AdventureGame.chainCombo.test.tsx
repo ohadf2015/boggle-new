@@ -502,7 +502,7 @@ jest.mock('../hooks/useAdventureGameInit', () => ({
       bossHealPerWord: 0, goldMultiplier: 1, longWordGoldBonus: 0,
       doubleFirstCompletionGold: false, comboDecayMultiplier: 1, comboScoreMultiplier: 1,
       failureGold: 0, retryScoreRetention: 0, freeRetriesPerWorld: 0,
-      hintRechargeMultiplier: 1, hintsPerLevel: 1, freeStartHint: false,
+      hintRechargeMultiplier: 1, hintsPerLevel: 1, freeStartHint: false, bonusHintsPerLevel: 0,
       specialTileBoost: 0, guaranteedGoldTile: false, iceTileReduction: false,
       bombTimerInvert: false, scrambleImmunity: false, shuffleUsesPerLevel: 0,
       canDetonateWords: false, timeFreezeSeconds: 0, freezeHighlightsWord: false,

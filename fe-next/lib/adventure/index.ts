@@ -131,6 +131,8 @@ export {
 export {
   getDailyQuests,
   DAILY_QUEST_POOL,
+  DAILY_QUEST_COMPLETION_BONUS,
+  checkAllDailyQuestsComplete,
   type DailyQuest,
 } from './dailyQuests';
 

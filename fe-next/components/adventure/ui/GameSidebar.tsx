@@ -216,7 +216,7 @@ export const GameSidebar = memo(function GameSidebar({
               ? showAutoHint
                 ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
                 : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
-              : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+              : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
           )}
         >
           <Lightbulb className="w-4 h-4" />
@@ -236,7 +236,7 @@ export const GameSidebar = memo(function GameSidebar({
                 ? isFrozen
                   ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
-                : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+                : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
             )}
           >
             <Timer className="w-4 h-4" />
@@ -345,7 +345,7 @@ export const GameSidebar = memo(function GameSidebar({
                 ? showAutoHint
                   ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_16px_3px_rgba(255,225,53,0.5)] animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg'
-                : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+                : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
             )}
           >
             <Lightbulb className="w-4 h-4" />
@@ -367,7 +367,7 @@ export const GameSidebar = memo(function GameSidebar({
                   ? isFrozen
                     ? 'bg-neo-cyan text-neo-black border-neo-black animate-pulse motion-reduce:animate-none'
                     : 'bg-neo-cyan/80 text-neo-black border-neo-black hover:shadow-hard-lg'
-                  : 'bg-neo-black/30 text-neo-white/40 border-neo-white/10 cursor-not-allowed'
+                  : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
               )}
             >
               <Timer className="w-4 h-4" />

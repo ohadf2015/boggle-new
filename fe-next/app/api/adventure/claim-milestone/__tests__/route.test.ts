@@ -80,7 +80,7 @@ function setupDbMocks({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
-              contains: jest.fn().mockReturnValue({
+              not: jest.fn().mockReturnValue({
                 select: jest.fn().mockReturnValue({
                   single: jest.fn().mockResolvedValue({
                     data: updateData !== undefined

@@ -56,6 +56,8 @@ export interface UpgradeEffects {
   shuffleUsesPerLevel: number;
   /** Can detonate words? (Word Dynamite T3) */
   canDetonateWords: boolean;
+  /** Bonus hints per level from Deep Drill upgrade */
+  bonusHintsPerLevel: number;
   /** Time freeze seconds per level (Time Freeze) */
   timeFreezeSeconds: number;
   /** Highlight longest word during freeze? (Time Freeze T2) */
@@ -85,6 +87,7 @@ const DEFAULT_EFFECTS: UpgradeEffects = {
   scrambleImmunity: false,
   shuffleUsesPerLevel: 0,
   canDetonateWords: false,
+  bonusHintsPerLevel: 0,
   timeFreezeSeconds: 0,
   freezeHighlightsWord: false,
 };
@@ -124,6 +127,10 @@ export function computeUpgradeEffects(upgrades: UpgradeState): UpgradeEffects {
   if (radar >= 1) effects.hintRechargeMultiplier = [1, 1.3, 1.5, 1.5, 1.5, 1.5][radar];
   if (radar >= 3) effects.hintsPerLevel = [1, 1, 1, 2, 3, 3][radar];
   if (radar >= 5) effects.freeStartHint = true;
+
+  // ── Deep Drill ──
+  const drill = getUpgradeTier(upgrades, 'deepDrill');
+  if (drill >= 1) effects.bonusHintsPerLevel = [0, 2, 3, 4, 5][drill];
 
   // ── Gem Detector ──
   const gem = getUpgradeTier(upgrades, 'gemDetector');

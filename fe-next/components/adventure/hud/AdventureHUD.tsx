@@ -141,7 +141,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
           data-testid="hud-bottom-bar"
           className={cn(
             'fixed bottom-0 left-0 right-0',
-            'flex items-end justify-between gap-2 p-2',
+            'flex items-end justify-between gap-2 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))]',
             hudTheme.headerBg, 'backdrop-blur-sm',
             'border-t-2', hudTheme.headerBorder,
             'pointer-events-auto'

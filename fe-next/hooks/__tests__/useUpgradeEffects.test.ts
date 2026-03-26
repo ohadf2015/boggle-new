@@ -69,6 +69,188 @@ describe('computeUpgradeEffects', () => {
     });
   });
 
+  // ── Deep Drill (extra hints per level) ──
+  describe('deepDrill', () => {
+    it('returns 0 bonusHints for empty upgrades', () => {
+      const effects = computeUpgradeEffects({});
+      expect(effects.bonusHintsPerLevel).toBe(0);
+    });
+
+    it('T1 gives 2 bonus hints', () => {
+      const effects = computeUpgradeEffects({ deepDrill: 1 });
+      expect(effects.bonusHintsPerLevel).toBe(2);
+    });
+
+    it('T2 gives 3 bonus hints', () => {
+      const effects = computeUpgradeEffects({ deepDrill: 2 });
+      expect(effects.bonusHintsPerLevel).toBe(3);
+    });
+
+    it('T3 gives 4 bonus hints', () => {
+      const effects = computeUpgradeEffects({ deepDrill: 3 });
+      expect(effects.bonusHintsPerLevel).toBe(4);
+    });
+
+    it('T4 gives 5 bonus hints', () => {
+      const effects = computeUpgradeEffects({ deepDrill: 4 });
+      expect(effects.bonusHintsPerLevel).toBe(5);
+    });
+
+    it('stacks with wordRadar hintsPerLevel', () => {
+      const effects = computeUpgradeEffects({ deepDrill: 2, wordRadar: 3 });
+      // wordRadar T3 = 2 hintsPerLevel, deepDrill T2 = 3 bonusHints
+      expect(effects.hintsPerLevel).toBe(2);
+      expect(effects.bonusHintsPerLevel).toBe(3);
+    });
+  });
+
+  // ── Word Radar ──
+  describe('wordRadar', () => {
+    it('T1 gives 1.3 hintRechargeMultiplier', () => {
+      const effects = computeUpgradeEffects({ wordRadar: 1 });
+      expect(effects.hintRechargeMultiplier).toBeCloseTo(1.3);
+      expect(effects.hintsPerLevel).toBe(1);
+      expect(effects.freeStartHint).toBe(false);
+    });
+
+    it('T2 gives 1.5 hintRechargeMultiplier', () => {
+      const effects = computeUpgradeEffects({ wordRadar: 2 });
+      expect(effects.hintRechargeMultiplier).toBeCloseTo(1.5);
+      expect(effects.hintsPerLevel).toBe(1);
+    });
+
+    it('T3 gives 2 hintsPerLevel', () => {
+      const effects = computeUpgradeEffects({ wordRadar: 3 });
+      expect(effects.hintsPerLevel).toBe(2);
+    });
+
+    it('T4 gives 3 hintsPerLevel', () => {
+      const effects = computeUpgradeEffects({ wordRadar: 4 });
+      expect(effects.hintsPerLevel).toBe(3);
+    });
+
+    it('T5 enables freeStartHint', () => {
+      const effects = computeUpgradeEffects({ wordRadar: 5 });
+      expect(effects.freeStartHint).toBe(true);
+      expect(effects.hintsPerLevel).toBe(3);
+    });
+  });
+
+  // ── Fuel Tank ──
+  describe('fuelTank', () => {
+    it('T1 gives 10 bonus seconds', () => {
+      const effects = computeUpgradeEffects({ fuelTank: 1 });
+      expect(effects.bonusTimeSeconds).toBe(10);
+    });
+
+    it('T4 gives 40 bonus seconds', () => {
+      const effects = computeUpgradeEffects({ fuelTank: 4 });
+      expect(effects.bonusTimeSeconds).toBe(40);
+    });
+  });
+
+  // ── Armor Plating ──
+  describe('armorPlating', () => {
+    it('T1 reduces boss damage to 0.9', () => {
+      const effects = computeUpgradeEffects({ armorPlating: 1 });
+      expect(effects.bossDamageMultiplier).toBe(0.9);
+      expect(effects.blockFirstAttack).toBe(false);
+      expect(effects.bossHealPerWord).toBe(0);
+    });
+
+    it('T3 enables blockFirstAttack', () => {
+      const effects = computeUpgradeEffects({ armorPlating: 3 });
+      expect(effects.bossDamageMultiplier).toBe(0.65);
+      expect(effects.blockFirstAttack).toBe(true);
+    });
+
+    it('T4 enables bossHealPerWord', () => {
+      const effects = computeUpgradeEffects({ armorPlating: 4 });
+      expect(effects.bossHealPerWord).toBe(5);
+      expect(effects.bossDamageMultiplier).toBe(0.5);
+    });
+  });
+
+  // ── Lucky Pickaxe ──
+  describe('luckyPickaxe', () => {
+    it('T1 gives 1.1 goldMultiplier', () => {
+      const effects = computeUpgradeEffects({ luckyPickaxe: 1 });
+      expect(effects.goldMultiplier).toBeCloseTo(1.1);
+      expect(effects.longWordGoldBonus).toBe(0);
+    });
+
+    it('T3 gives longWordGoldBonus', () => {
+      const effects = computeUpgradeEffects({ luckyPickaxe: 3 });
+      expect(effects.goldMultiplier).toBeCloseTo(1.5);
+      expect(effects.longWordGoldBonus).toBe(5);
+    });
+
+    it('T4 enables doubleFirstCompletionGold', () => {
+      const effects = computeUpgradeEffects({ luckyPickaxe: 4 });
+      expect(effects.doubleFirstCompletionGold).toBe(true);
+    });
+  });
+
+  // ── Cargo Bay ──
+  describe('cargoBay', () => {
+    it('T1 gives 0.7 comboDecayMultiplier', () => {
+      const effects = computeUpgradeEffects({ cargoBay: 1 });
+      expect(effects.comboDecayMultiplier).toBeCloseTo(0.7);
+      expect(effects.comboScoreMultiplier).toBe(1);
+    });
+
+    it('T3 gives 1.5 comboScoreMultiplier', () => {
+      const effects = computeUpgradeEffects({ cargoBay: 3 });
+      expect(effects.comboScoreMultiplier).toBe(1.5);
+      expect(effects.comboDecayMultiplier).toBeCloseTo(0.5);
+    });
+  });
+
+  // ── Salvage Claw ──
+  describe('salvageClaw', () => {
+    it('T1 gives failureGold', () => {
+      const effects = computeUpgradeEffects({ salvageClaw: 1 });
+      expect(effects.failureGold).toBe(5);
+      expect(effects.retryScoreRetention).toBe(0);
+    });
+
+    it('T2 gives retryScoreRetention', () => {
+      const effects = computeUpgradeEffects({ salvageClaw: 2 });
+      expect(effects.retryScoreRetention).toBe(0.5);
+    });
+
+    it('T3 gives freeRetriesPerWorld', () => {
+      const effects = computeUpgradeEffects({ salvageClaw: 3 });
+      expect(effects.freeRetriesPerWorld).toBe(1);
+    });
+  });
+
+  // ── Combined upgrades ──
+  describe('combined upgrades', () => {
+    it('all upgrades at max tier compute without error', () => {
+      const effects = computeUpgradeEffects({
+        wordRadar: 5,
+        deepDrill: 4,
+        gemDetector: 3,
+        fuelTank: 4,
+        armorPlating: 4,
+        blastShield: 3,
+        luckyPickaxe: 4,
+        cargoBay: 3,
+        salvageClaw: 3,
+        wordDynamite: 3,
+        timeFreeze: 2,
+      });
+      expect(effects.bonusTimeSeconds).toBe(40);
+      expect(effects.freeStartHint).toBe(true);
+      expect(effects.scrambleImmunity).toBe(true);
+      expect(effects.canDetonateWords).toBe(true);
+      expect(effects.freezeHighlightsWord).toBe(true);
+      expect(effects.guaranteedGoldTile).toBe(true);
+      expect(effects.doubleFirstCompletionGold).toBe(true);
+    });
+  });
+
   // ── Time Freeze ──
   describe('timeFreeze', () => {
     it('T1 gives 5 seconds', () => {

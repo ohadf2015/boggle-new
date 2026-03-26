@@ -6088,7 +6088,8 @@ const en = {
       "wordAlbum": "Word Album",
       "bossRush": "Boss Rush",
       "bossRushLocked": "Defeat all bosses to unlock Boss Rush",
-      "allQuestsComplete": "All daily quests complete! Bonus earned!"
+      "allQuestsComplete": "All daily quests complete! Bonus earned!",
+      "dailyQuestBonusComplete": "All quests complete! +50 bonus gold"
     },
     "retryLevel": "Retry",
     "freeRetry": "Free Retry",
@@ -6294,6 +6295,12 @@ const en = {
       "shieldBlocked": "Shield blocked {percent}% damage!",
       "allObjectivesComplete": "All Objectives Complete!",
       "gridAriaLabel": "Adventure game board"
+    },
+    "nearMiss": {
+      "almostThere": "Almost There!",
+      "scoreAway": "Just {{remaining}} points away!",
+      "wordsAway": "Just {{remaining}} more word needed!",
+      "countAway": "Only {{remaining}} more to go!"
     },
     "hints": {
       "minLetters2": "2+ letters",
@@ -9168,6 +9175,25 @@ const en = {
       "unlocked": "Unlocked!",
       "unpin": "Unpin",
       "upgraded": "Badge Upgraded!"
+    },
+    "mastery": {
+      "flashcardPerfect": "Perfect! You mastered all {{count}} words!",
+      "flashcardProgress": "You learned {{count}} words!",
+      "newWordsDiscovered": "You discovered {{count}} new vocabulary words!",
+      "keepPracticing": "Great practice! Keep finding those words!",
+      "matchingPerfect": "Perfect matching!",
+      "matchingProgress": "You matched {{count}} pairs!",
+      "spellingPerfect": "Perfect spelling!",
+      "spellingProgress": "You spelled {{count}} words correctly!",
+      "blitzResult": "You found {{count}} words in 60 seconds!",
+      "dailyChallengeComplete": "Daily challenge complete!",
+      "lessonMastered": "Lesson mastered! You know these words!",
+      "lessonProgress": "Nice work! Keep practicing to master this lesson.",
+      "duel": {
+        "win": "Victory! Well played!",
+        "loss": "Good effort! You'll get them next time!",
+        "draw": "A draw! Evenly matched!"
+      }
     },
     "analytics": {
       "accuracy": "Accuracy",

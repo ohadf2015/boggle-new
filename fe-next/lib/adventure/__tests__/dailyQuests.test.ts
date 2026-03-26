@@ -1,6 +1,8 @@
 import {
   getDailyQuests,
   DAILY_QUEST_POOL,
+  DAILY_QUEST_COMPLETION_BONUS,
+  checkAllDailyQuestsComplete,
   type DailyQuest,
 } from '../dailyQuests';
 
@@ -45,5 +47,53 @@ describe('dailyQuests', () => {
     const quests = getDailyQuests('2026-03-14');
     const ids = quests.map(q => q.id);
     expect(new Set(ids).size).toBe(3);
+  });
+
+  describe('checkAllDailyQuestsComplete', () => {
+    it('should return true when all 3 quests meet their targets', () => {
+      const quests = getDailyQuests('2026-03-14');
+      const progress: Record<string, number> = {};
+      for (const q of quests) {
+        progress[q.id] = q.target;
+      }
+      expect(checkAllDailyQuestsComplete(quests, progress)).toBe(true);
+    });
+
+    it('should return true when progress exceeds targets', () => {
+      const quests = getDailyQuests('2026-03-14');
+      const progress: Record<string, number> = {};
+      for (const q of quests) {
+        progress[q.id] = q.target + 10;
+      }
+      expect(checkAllDailyQuestsComplete(quests, progress)).toBe(true);
+    });
+
+    it('should return false when one quest is incomplete', () => {
+      const quests = getDailyQuests('2026-03-14');
+      const progress: Record<string, number> = {};
+      for (const q of quests) {
+        progress[q.id] = q.target;
+      }
+      progress[quests[2].id] = quests[2].target - 1;
+      expect(checkAllDailyQuestsComplete(quests, progress)).toBe(false);
+    });
+
+    it('should return false when progress is empty', () => {
+      const quests = getDailyQuests('2026-03-14');
+      expect(checkAllDailyQuestsComplete(quests, {})).toBe(false);
+    });
+
+    it('should return false when quests array is not exactly 3', () => {
+      const quests = getDailyQuests('2026-03-14').slice(0, 2);
+      const progress: Record<string, number> = {};
+      for (const q of quests) {
+        progress[q.id] = q.target;
+      }
+      expect(checkAllDailyQuestsComplete(quests, progress)).toBe(false);
+    });
+
+    it('should export DAILY_QUEST_COMPLETION_BONUS as 50', () => {
+      expect(DAILY_QUEST_COMPLETION_BONUS).toBe(50);
+    });
   });
 });

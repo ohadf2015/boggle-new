@@ -60,3 +60,15 @@ export function getDailyQuests(dateStr: string): DailyQuest[] {
 
   return selected;
 }
+
+/** Bonus gold awarded when all 3 daily quests are completed */
+export const DAILY_QUEST_COMPLETION_BONUS = 50;
+
+/** Check if all 3 daily quests are complete based on progress map */
+export function checkAllDailyQuestsComplete(
+  quests: DailyQuest[],
+  progress: Record<string, number>
+): boolean {
+  if (quests.length !== 3) return false;
+  return quests.every(q => (progress[q.id] ?? 0) >= q.target);
+}

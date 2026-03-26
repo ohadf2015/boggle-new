@@ -249,13 +249,13 @@ const WorldNode = memo(function WorldNode({
           )} />
           <span className={cn(
             'text-xs sm:text-sm font-bold',
-            isUnlocked ? 'text-neo-yellow' : 'text-neo-white/40'
+            isUnlocked ? 'text-neo-yellow' : 'text-neo-white/60'
           )}>
             {currentStars}/{totalWorldStars}
           </span>
           <span className={cn(
             'text-xs sm:text-sm',
-            isUnlocked ? 'text-neo-white/60' : 'text-neo-white/30'
+            isUnlocked ? 'text-neo-white/60' : 'text-neo-white/60'
           )}>
             · {completedLevels}/{LEVELS_PER_WORLD}
           </span>

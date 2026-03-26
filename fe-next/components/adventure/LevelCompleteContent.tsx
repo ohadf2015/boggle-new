@@ -13,6 +13,7 @@ import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 const LOOT_DROP_IMAGES: Record<string, string> = {
@@ -215,36 +216,30 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </AdaptiveMotion.div>
       )}
 
-      {/* Near-miss feedback — show how close each objective was */}
-      {isFailed && objectives.length > 0 && (
-        <AdaptiveMotion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-4 p-4 rounded-neo bg-neo-orange/10 border-2 border-neo-orange/30"
-        >
-          <p className="text-neo-orange font-bold text-sm uppercase tracking-wide mb-2">
-            {t('adventure.game.soClose')}
-          </p>
-          <div className="space-y-1.5">
-            {objectives.filter(o => !o.isComplete).map((obj, i) => {
-              const current = obj.current ?? 0;
-              const pct = Math.min(Math.round((current / obj.target) * 100), 99);
-              const remaining = obj.target - current;
-              return (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="text-neo-white/70">
-                    {t(OBJECTIVE_TRANSLATION_KEYS[obj.type] ?? obj.type)}
-                  </span>
-                  <span className="text-neo-orange font-bold tabular-nums">
-                    {pct}% — {remaining} {t('adventure.game.more')}
-                  </span>
+      {/* Near-miss feedback — encouraging messages when close to passing */}
+      {isFailed && (() => {
+        const nearMisses = getNearMissMessages(objectives);
+        if (nearMisses.length === 0) return null;
+        return (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-4 p-4 rounded-neo bg-neo-orange/10 border-2 border-neo-orange/30"
+          >
+            <p className="text-neo-orange font-bold text-sm uppercase tracking-wide mb-2">
+              {t('adventure.nearMiss.almostThere')}
+            </p>
+            <div className="space-y-1.5">
+              {nearMisses.map((msg, i) => (
+                <div key={i} className="text-sm text-neo-white/80 font-bold">
+                  {t(msg.translationKey, msg.params)}
                 </div>
-              );
-            })}
-          </div>
-        </AdaptiveMotion.div>
-      )}
+              ))}
+            </div>
+          </AdaptiveMotion.div>
+        );
+      })()}
 
       {/* Partial Progress (failed attempts) */}
       {isFailed && bestAttempt && bestAttempt.attemptCount > 1 && (

@@ -38,7 +38,7 @@ export default function AdventureViewHeader({
   const worldMapUsesHistoryBack = viewState === 'worldMap' && hasHub;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0">
+    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Back button */}
         {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (
