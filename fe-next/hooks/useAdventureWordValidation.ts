@@ -7,7 +7,8 @@
  * 3. Falls back to per-word API validation if pre-solve fails
  */
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { Language } from '@/types';
 
@@ -180,7 +181,6 @@ export function useAdventureWordValidation({
 
   // Pre-solved word set for instant client-side validation
   const validWordsRef = useRef<Set<string> | null>(null);
-  const solveInFlightRef = useRef<boolean>(false);
 
   // Abort controller for fallback API calls
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -191,64 +191,40 @@ export function useAdventureWordValidation({
     [foundWords]
   );
 
-  // Pre-solve grid on mount / grid change
+  // Pre-solve grid on mount / grid change via TanStack Query
   const gridKey = useMemo(() => gridCacheKey(grid), [grid]);
 
-  useEffect(() => {
-    // Check module-level cache first
-    const cached = gridSolutionCache.get(`${language}:${gridKey}`);
-    if (cached) {
-      validWordsRef.current = cached;
-      return;
-    }
+  const { data: solvedWords } = useQuery<Set<string>>({
+    queryKey: ['adventure-solve-grid', language, gridKey],
+    queryFn: async ({ signal }): Promise<Set<string>> => {
+      // Check module-level cache first
+      const cached = gridSolutionCache.get(`${language}:${gridKey}`);
+      if (cached) return cached;
 
-    if (solveInFlightRef.current) return;
-    solveInFlightRef.current = true;
-
-    const controller = new AbortController();
-    let retryTimer: ReturnType<typeof setTimeout> | null = null;
-    // Capture the gridKey at fetch time so we can verify the result is still relevant
-    const fetchGridKey = gridKey;
-
-    const fetchSolve = (attempt: number) => {
-      fetch('/api/adventure/solve-grid', {
+      const res = await fetch('/api/adventure/solve-grid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ grid, language, minLength: minWordLength }),
-        signal: controller.signal,
-      })
-        .then(res => {
-          if (!res.ok) throw new Error(`solve-grid ${res.status}`);
-          return res.json();
-        })
-        .then(data => {
-          if (data.words && Array.isArray(data.words)) {
-            const wordSet = new Set<string>(data.words);
-            validWordsRef.current = wordSet;
-            gridCacheSet(`${language}:${fetchGridKey}`, wordSet);
-          }
-        })
-        .catch((err) => {
-          // Retry once after 2s if first attempt failed (not aborted)
-          if (attempt === 0 && !(err instanceof Error && err.name === 'AbortError')) {
-            retryTimer = setTimeout(() => fetchSolve(1), 2000);
-            return;
-          }
-        })
-        .finally(() => {
-          solveInFlightRef.current = false;
-        });
-    };
+        signal,
+      });
+      if (!res.ok) throw new Error(`solve-grid ${res.status}`);
+      const data = await res.json();
+      if (data.words && Array.isArray(data.words)) {
+        const wordSet = new Set<string>(data.words);
+        gridCacheSet(`${language}:${gridKey}`, wordSet);
+        return wordSet;
+      }
+      return new Set<string>();
+    },
+    staleTime: Infinity,
+    retry: 1,
+    retryDelay: 2000,
+  });
 
-    fetchSolve(0);
-
-    return () => {
-      controller.abort();
-      // Clear pending retry so it doesn't fire with stale grid data
-      if (retryTimer) clearTimeout(retryTimer);
-      solveInFlightRef.current = false;
-    };
-  }, [grid, language, minWordLength, gridKey]);
+  // Keep ref in sync with query data for use in validateWord callback
+  if (solvedWords) {
+    validWordsRef.current = solvedWords;
+  }
 
   const validateWord = useCallback(
     async (

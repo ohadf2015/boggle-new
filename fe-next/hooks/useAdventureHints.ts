@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 // ==============================================
 // TYPES
@@ -214,13 +215,6 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
   const hintsRemaining = maxHintsPerLevel !== undefined ? Math.max(0, maxHintsPerLevel - hintsUsed) : undefined;
 
   // State
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [allWords, setAllWords] = useState<{
-    easy: string[];
-    medium: string[];
-    hard: string[];
-  }>({ easy: [], medium: [], hard: [] });
   const [showAutoHint, setShowAutoHint] = useState(false);
   const [currentHint, setCurrentHint] = useState<HintResult | null>(null);
 
@@ -242,50 +236,39 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
 
   // Note: remainingHintWordsRef is updated after remainingHintWords is declared below
 
-  // Fetch valid words from solve-grid API
-  useEffect(() => {
-    let cancelled = false;
+  // Fetch valid words from solve-grid API via TanStack Query
+  const gridKey = useMemo(() => grid.map(row => row.join('')).join('|'), [grid]);
 
-    async function fetchWords() {
-      setIsLoading(true);
-      setError(null);
+  const {
+    data: allWords = { easy: [], medium: [], hard: [] },
+    isLoading,
+    error: queryError,
+  } = useQuery<{ easy: string[]; medium: string[]; hard: string[] }>({
+    queryKey: ['adventure-hints-solve-grid', language, gridKey],
+    queryFn: async ({ signal }) => {
+      const response = await fetch('/api/solve-grid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grid, language }),
+        signal,
+      });
 
-      try {
-        const response = await fetch('/api/solve-grid', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ grid, language }),
-        });
-
-        if (cancelled) return;
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'Failed to fetch words');
-        }
-
+      if (!response.ok) {
         const data = await response.json();
-        if (!data.success || !data.words) {
-          throw new Error('Invalid response from solve-grid');
-        }
-
-        setAllWords(data.words);
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+        throw new Error(data.error || 'Failed to fetch words');
       }
-    }
 
-    fetchWords();
+      const data = await response.json();
+      if (!data.success || !data.words) {
+        throw new Error('Invalid response from solve-grid');
+      }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [grid, language]);
+      return data.words;
+    },
+    staleTime: Infinity,
+  });
+
+  const error = queryError ? (queryError instanceof Error ? queryError.message : 'Unknown error') : null;
 
   // Calculate remaining words (not yet found)
   const remainingHintWords = useMemo(() => {
