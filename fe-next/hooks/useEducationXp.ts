@@ -16,6 +16,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import {
   calculatePracticeXp,
   EDUCATION_XP_CONFIG,
@@ -159,6 +160,18 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
   const [error, setError] = useState<Error | null>(null);
   const [pendingUpdate, setPendingUpdate] = useState<PendingXpUpdate | null>(null);
 
+  const recordXpMutation = useMutation({
+    mutationFn: async (params: { xpAmount: number; lessonId: string; activityType: string }) => {
+      await fetch('/api/education/record-xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+    },
+    onSuccess: () => setPendingUpdate(null),
+    // On error, pendingUpdate stays set for retry
+  });
+
   // ==================== Derived State ====================
 
   // xpProgress is derived from totalXp via useMemo
@@ -224,18 +237,10 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         setPendingUpdate(update);
 
         // Persist XP to Supabase via API (fire-and-forget)
-        fetch('/api/education/record-xp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            xpAmount: xpResult.totalXp,
-            lessonId,
-            activityType: session.type,
-          }),
-        }).then(() => {
-          setPendingUpdate(null);
-        }).catch(() => {
-          // pendingUpdate stays set for retry
+        recordXpMutation.mutate({
+          xpAmount: xpResult.totalXp,
+          lessonId,
+          activityType: session.type,
         });
 
         // Build result

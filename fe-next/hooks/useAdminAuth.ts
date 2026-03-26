@@ -23,7 +23,8 @@
  * ```
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
@@ -44,140 +45,70 @@ interface UseAdminAuthReturn {
   error: string | null;
 }
 
-export function useAdminAuth(): UseAdminAuthReturn {
-  const [authToken, setAuthToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Track initial load
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isMountedRef = useRef(true);
-  const retryCountRef = useRef(0);
+/**
+ * Fetch fresh token from Supabase session with retry logic
+ */
+async function fetchTokenWithRetry(): Promise<string | null> {
+  let lastError: Error | null = null;
 
-  /**
-   * Fetch fresh token from Supabase session with retry logic
-   */
-  const fetchToken = useCallback(async (): Promise<string | null> => {
-    let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+    try {
+      const { data: { session } } = await getSession();
 
-    // Retry loop with exponential backoff
-    for (let attempt = 0; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
-      try {
-        const { data: { session } } = await getSession();
-
-        if (!session?.access_token) {
-          // No session available
-          if (attempt < MAX_RETRY_ATTEMPTS) {
-            const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt);
-            logger.debug('ADMIN_AUTH', `No access token in session, retrying in ${delayMs}ms (attempt ${attempt + 1}/${MAX_RETRY_ATTEMPTS})`);
-            await new Promise(resolve => setTimeout(resolve, delayMs));
-            continue; // Try again
-          }
-
-          // Max retries exceeded - set error
-          logger.warn('ADMIN_AUTH', 'No access token after max retries');
-          setError('Session not available - please log in again');
-          return null;
-        }
-
-        // Success - clear error and return token
-        setError(null);
-        retryCountRef.current = 0;
-        return session.access_token;
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error('Unknown error');
-
-        // Log and retry
+      if (!session?.access_token) {
         if (attempt < MAX_RETRY_ATTEMPTS) {
           const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt);
-          logger.debug('ADMIN_AUTH', `Token fetch error, retrying in ${delayMs}ms: ${lastError.message}`);
+          logger.debug('ADMIN_AUTH', `No access token, retrying in ${delayMs}ms (attempt ${attempt + 1}/${MAX_RETRY_ATTEMPTS})`);
           await new Promise(resolve => setTimeout(resolve, delayMs));
-          continue; // Try again
+          continue;
         }
+        logger.warn('ADMIN_AUTH', 'No access token after max retries');
+        throw new Error('Session not available - please log in again');
+      }
+
+      return session.access_token;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error('Unknown error');
+      if (attempt < MAX_RETRY_ATTEMPTS) {
+        const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt);
+        logger.debug('ADMIN_AUTH', `Token fetch error, retrying in ${delayMs}ms: ${lastError.message}`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        continue;
       }
     }
+  }
 
-    // Max retries exceeded
-    const message = lastError?.message || 'Unknown error';
-    logger.error('ADMIN_AUTH', `Token fetch failed after max retries: ${message}`);
-    setError(message);
-    return null;
-  }, []);
+  const message = lastError?.message || 'Unknown error';
+  logger.error('ADMIN_AUTH', `Token fetch failed after max retries: ${message}`);
+  throw new Error(message);
+}
 
-  /**
-   * Refresh token and update state
-   */
-  const refreshToken = useCallback(async (isInitialLoad = false): Promise<string | null> => {
-    if (!isMountedRef.current) return null;
+export function useAdminAuth(): UseAdminAuthReturn {
+  const queryClient = useQueryClient();
 
-    setIsRefreshing(true);
-    if (isInitialLoad) {
-      setIsLoading(true);
-    }
+  const tokenQuery = useQuery({
+    queryKey: ['admin-auth-token'],
+    queryFn: fetchTokenWithRetry,
+    staleTime: TOKEN_REFRESH_INTERVAL,
+    refetchInterval: TOKEN_REFRESH_INTERVAL,
+    retry: false, // retry logic is inside fetchTokenWithRetry
+  });
+
+  const refreshToken = useCallback(async (): Promise<string | null> => {
     logger.debug('ADMIN_AUTH', 'Refreshing admin token');
-
-    const token = await fetchToken();
-
-    if (isMountedRef.current) {
-      setAuthToken(token);
-      setIsRefreshing(false);
-      if (isInitialLoad) {
-        setIsLoading(false);
-      }
-
-      if (token) {
-        logger.debug('ADMIN_AUTH', 'Token refreshed successfully');
-      }
-    }
-
-    return token;
-  }, [fetchToken]);
-
-  // Initial token fetch on mount
-  useEffect(() => {
-    refreshToken(true); // isInitialLoad = true
-  }, [refreshToken]);
-
-  // Set up automatic token refresh interval
-  useEffect(() => {
-    // Clear any existing interval
-    if (refreshIntervalRef.current) {
-      clearInterval(refreshIntervalRef.current);
-    }
-
-    // Only set up refresh if we have a token
-    if (authToken) {
-      logger.debug('ADMIN_AUTH', `Setting up token refresh every ${TOKEN_REFRESH_INTERVAL / 60000} minutes`);
-
-      refreshIntervalRef.current = setInterval(() => {
-        logger.debug('ADMIN_AUTH', 'Auto-refreshing token');
-        refreshToken();
-      }, TOKEN_REFRESH_INTERVAL);
-    }
-
-    // Cleanup interval on unmount or token change
-    return () => {
-      if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
-        refreshIntervalRef.current = null;
-      }
-    };
-  }, [authToken, refreshToken]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-      if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
-      }
-    };
-  }, []);
+    const result = await queryClient.fetchQuery({
+      queryKey: ['admin-auth-token'],
+      queryFn: fetchTokenWithRetry,
+      staleTime: 0, // force fresh fetch
+    });
+    return result;
+  }, [queryClient]);
 
   return {
-    authToken,
+    authToken: tokenQuery.data ?? null,
     refreshToken,
-    isLoading,
-    isRefreshing,
-    error,
+    isLoading: tokenQuery.isLoading,
+    isRefreshing: tokenQuery.isFetching && !tokenQuery.isLoading,
+    error: tokenQuery.error?.message ?? null,
   };
 }

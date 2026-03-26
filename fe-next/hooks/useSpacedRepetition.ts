@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   createWordReviewData,
   calculateNextReview,
@@ -78,28 +79,10 @@ function mergeDbIntoLocal(
  * Fetch review schedule from the API. Returns empty array on failure.
  */
 async function fetchDbSchedule(lessonId: string): Promise<WordReviewData[]> {
-  try {
-    const res = await fetch(`/api/education/spaced-repetition?lessonId=${encodeURIComponent(lessonId)}`);
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json.reviews ?? []) as WordReviewData[];
-  } catch (err) {
-    logger.error('useSpacedRepetition: failed to fetch from DB', err);
-    return [];
-  }
-}
-
-/**
- * Background PATCH a single review to the DB. Fire-and-forget.
- */
-function syncReviewToDb(lessonId: string, word: string, quality: number): void {
-  fetch('/api/education/spaced-repetition', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ lessonId, word, quality }),
-  }).catch(err => {
-    logger.error('useSpacedRepetition: failed to sync review to DB', err);
-  });
+  const res = await fetch(`/api/education/spaced-repetition?lessonId=${encodeURIComponent(lessonId)}`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.reviews ?? []) as WordReviewData[];
 }
 
 /**
@@ -115,6 +98,8 @@ export function useSpacedRepetition(
   words: string[],
   lessonId: string
 ): UseSpacedRepetitionReturn {
+  const wordsKey = words.join(',');
+
   const [reviewSchedule, setReviewSchedule] = useState<Record<string, WordReviewData>>(() => {
     const stored = loadSchedule(lessonId);
     return buildSchedule(words, stored);
@@ -124,32 +109,49 @@ export function useSpacedRepetition(
     computeWordsForToday(buildSchedule(words, loadSchedule(lessonId)))
   );
 
-  const [isLoading, setIsLoading] = useState(false);
-  const hasFetchedRef = useRef(false);
+  // Fetch DB schedule via useQuery
+  const dbQuery = useQuery({
+    queryKey: ['spaced-repetition', lessonId, wordsKey],
+    queryFn: () => fetchDbSchedule(lessonId),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  // Re-initialize when words or lessonId changes, then fetch from DB
+  const isLoading = dbQuery.isLoading;
+
+  // Re-initialize when words or lessonId changes
   useEffect(() => {
     const stored = loadSchedule(lessonId);
     const localSchedule = buildSchedule(words, stored);
     setReviewSchedule(localSchedule);
     setWordsForToday(computeWordsForToday(localSchedule));
+  }, [lessonId, wordsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Fetch from DB and merge
-    hasFetchedRef.current = false;
-    setIsLoading(true);
-    fetchDbSchedule(lessonId).then(dbReviews => {
-      if (dbReviews.length > 0) {
-        const freshLocal = loadSchedule(lessonId);
-        const freshSchedule = buildSchedule(words, freshLocal);
-        const merged = mergeDbIntoLocal(freshSchedule, dbReviews);
-        saveSchedule(lessonId, merged);
-        setReviewSchedule(merged);
-        setWordsForToday(computeWordsForToday(merged));
-      }
-      hasFetchedRef.current = true;
-      setIsLoading(false);
-    });
-  }, [lessonId, words.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Merge DB results into local state when query resolves
+  useEffect(() => {
+    const dbReviews = dbQuery.data;
+    if (dbReviews && dbReviews.length > 0) {
+      const freshLocal = loadSchedule(lessonId);
+      const freshSchedule = buildSchedule(words, freshLocal);
+      const merged = mergeDbIntoLocal(freshSchedule, dbReviews);
+      saveSchedule(lessonId, merged);
+      setReviewSchedule(merged);
+      setWordsForToday(computeWordsForToday(merged));
+    }
+  }, [dbQuery.data, lessonId, wordsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mutation for syncing a review to DB (fire-and-forget)
+  const syncReviewMutation = useMutation({
+    mutationFn: async (params: { lessonId: string; word: string; quality: number }) => {
+      await fetch('/api/education/spaced-repetition', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+    },
+    onError: (err) => {
+      logger.error('useSpacedRepetition: failed to sync review to DB', err);
+    },
+  });
 
   const recordReview = useCallback(
     (word: string, quality: 0 | 1 | 2 | 3 | 4 | 5) => {
@@ -164,12 +166,12 @@ export function useSpacedRepetition(
         setWordsForToday(computeWordsForToday(newSchedule));
 
         // Sync to DB in background
-        syncReviewToDb(lessonId, word, quality);
+        syncReviewMutation.mutate({ lessonId, word, quality });
 
         return newSchedule;
       });
     },
-    [lessonId]
+    [lessonId, syncReviewMutation]
   );
 
   return {

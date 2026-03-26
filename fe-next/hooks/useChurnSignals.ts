@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 
 const STORAGE_KEY = 'lexiclash_churn_signals';
@@ -71,34 +72,43 @@ export function useChurnSignals(): UseChurnSignalsReturn {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const reportMutation = useMutation({
+    mutationFn: async (payload: {
+      userId: string;
+      avgSessionLengthSeconds: number;
+      gamesPerSession: number;
+      socialInteractions: number;
+      notificationDismissals: number;
+    }) => {
+      await fetch('/api/growth/churn-signals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess: () => {
+      signalsRef.current = {
+        ...signalsRef.current,
+        lastReportedAt: Date.now(),
+      };
+      saveSignals(signalsRef.current);
+    },
+  });
+
   const reportSignals = useCallback(async () => {
     if (!userId) return;
 
     const signals = signalsRef.current;
     const sessionLengthSeconds = Math.floor((Date.now() - signals.sessionStartedAt) / 1000);
 
-    try {
-      await fetch('/api/growth/churn-signals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          avgSessionLengthSeconds: sessionLengthSeconds,
-          gamesPerSession: signals.gamesPlayed,
-          socialInteractions: signals.socialInteractions,
-          notificationDismissals: signals.notificationDismissals,
-        }),
-      });
-
-      signalsRef.current = {
-        ...signals,
-        lastReportedAt: Date.now(),
-      };
-      saveSignals(signalsRef.current);
-    } catch {
-      // Best-effort reporting
-    }
-  }, [userId]);
+    reportMutation.mutate({
+      userId,
+      avgSessionLengthSeconds: sessionLengthSeconds,
+      gamesPerSession: signals.gamesPlayed,
+      socialInteractions: signals.socialInteractions,
+      notificationDismissals: signals.notificationDismissals,
+    });
+  }, [userId, reportMutation]);
 
   const trackGamePlayed = useCallback(() => {
     signalsRef.current.gamesPlayed += 1;

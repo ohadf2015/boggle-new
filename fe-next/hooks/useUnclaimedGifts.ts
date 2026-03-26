@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface BadgeInfo {
@@ -49,223 +50,126 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
  */
 export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   const { isAuthenticated } = useAuth();
-  const [unclaimedCount, setUnclaimedCount] = useState(0);
+  const queryClient = useQueryClient();
   const [gifts, setGifts] = useState<GiftMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [unclaimedCount, setUnclaimedCount] = useState(0);
 
   // Track locally claimed gift IDs to preserve claimed status during refresh
-  // This handles eventual consistency - API may return stale claimed status
   const locallyClaimedIdsRef = useRef<Set<string>>(new Set());
 
-  // Check cached count
-  const getCachedCount = useCallback((): number | null => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const { count, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          return count;
-        }
-      }
-    } catch (e) {
-      // Ignore cache errors
-    }
-    return null;
-  }, []);
-
-  // Save to cache
+  // Save to localStorage cache
   const setCachedCount = useCallback((count: number) => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify({
-        count,
-        timestamp: Date.now(),
-      }));
-    } catch (e) {
-      // Ignore cache errors
-    }
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ count, timestamp: Date.now() }));
+    } catch { /* Ignore cache errors */ }
   }, []);
 
-  // Fetch unclaimed count from API
-  const fetchUnclaimedCount = useCallback(async () => {
+  // Query: unclaimed count
+  const countQuery = useQuery({
+    queryKey: ['gifts', 'unclaimed-count'],
+    queryFn: async () => {
+      const response = await fetch('/api/player/gifts/unclaimed-count');
+      if (response.status === 401) return { count: 0 };
+      if (!response.ok) throw new Error('Failed to fetch unclaimed count');
+      return response.json() as Promise<{ count: number }>;
+    },
+    enabled: isAuthenticated,
+    staleTime: CACHE_DURATION,
+    refetchInterval: CACHE_DURATION,
+    placeholderData: () => {
+      // Use localStorage as placeholder
+      if (typeof window === 'undefined') return undefined;
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { count, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_DURATION) return { count };
+        }
+      } catch { /* ignore */ }
+      return undefined;
+    },
+  });
+
+  // Sync count query into local state + localStorage
+  useEffect(() => {
+    const count = countQuery.data?.count ?? 0;
+    setUnclaimedCount(count);
+    if (countQuery.data) setCachedCount(count);
+  }, [countQuery.data, setCachedCount]);
+
+  // Query: full gift list (only when count > 0)
+  const giftsQuery = useQuery({
+    queryKey: ['gifts', 'list'],
+    queryFn: async () => {
+      const response = await fetch('/api/player/gifts');
+      if (response.status === 401) return { gifts: [] };
+      if (!response.ok) throw new Error('Failed to fetch gifts');
+      return response.json() as Promise<{ gifts: GiftMessage[] }>;
+    },
+    enabled: isAuthenticated && unclaimedCount > 0,
+    staleTime: CACHE_DURATION,
+  });
+
+  // Merge fetched gifts with locally claimed state
+  useEffect(() => {
+    const fetchedGifts = giftsQuery.data?.gifts ?? [];
+    const unclaimedOnly = fetchedGifts.filter(g => !g.claimed);
+    const mergedGifts = unclaimedOnly.map(g => {
+      if (locallyClaimedIdsRef.current.has(g.id)) {
+        return { ...g, claimed: true, claimed_at: g.claimed_at || new Date().toISOString() };
+      }
+      return g;
+    });
+    setGifts(mergedGifts);
+    const unclaimed = mergedGifts.filter(g => !g.claimed).length;
+    setUnclaimedCount(unclaimed);
+    setCachedCount(unclaimed);
+  }, [giftsQuery.data, setCachedCount]);
+
+  // Claim mutation
+  const claimMutation = useMutation({
+    mutationFn: async (giftId: string) => {
+      const response = await fetch(`/api/player/gifts/${giftId}/claim`, { method: 'POST' });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to claim gift');
+      }
+      return { giftId, ...(await response.json()) as { xpAwarded: number; coinsAwarded: number } };
+    },
+    onSuccess: ({ giftId }) => {
+      locallyClaimedIdsRef.current.add(giftId);
+      setGifts(prev => prev.map(g =>
+        g.id === giftId ? { ...g, claimed: true, claimed_at: new Date().toISOString() } : g
+      ));
+      setUnclaimedCount(prev => {
+        const next = Math.max(0, prev - 1);
+        setCachedCount(next);
+        return next;
+      });
+    },
+  });
+
+  const claimGift = useCallback(async (giftId: string) => {
+    const result = await claimMutation.mutateAsync(giftId);
+    return { xpAwarded: result.xpAwarded || 0, coinsAwarded: result.coinsAwarded || 0 };
+  }, [claimMutation]);
+
+  const refresh = useCallback(async () => {
+    if (typeof window !== 'undefined') localStorage.removeItem(CACHE_KEY);
+    await queryClient.invalidateQueries({ queryKey: ['gifts'] });
+  }, [queryClient]);
+
+  // Reset when not authenticated
+  useEffect(() => {
     if (!isAuthenticated) {
       setUnclaimedCount(0);
       setGifts([]);
-      return;
     }
+  }, [isAuthenticated]);
 
-    // Check cache first
-    const cached = getCachedCount();
-    if (cached !== null) {
-      setUnclaimedCount(cached);
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/player/gifts/unclaimed-count');
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setUnclaimedCount(0);
-          return;
-        }
-        throw new Error('Failed to fetch unclaimed count');
-      }
-
-      const data = await response.json();
-      setUnclaimedCount(data.count || 0);
-      setCachedCount(data.count || 0);
-    } catch (err) {
-      // Serialize error message properly for logging (Error objects don't stringify well)
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      // Network errors are common on mobile - use warn instead of error to reduce noise
-      const isNetworkError = err instanceof TypeError && errorMessage.includes('fetch');
-      if (isNetworkError) {
-        console.warn('[Gifts] Network error fetching unclaimed count - will retry on next poll');
-      } else {
-        console.error('[Gifts] Error fetching unclaimed gifts:', errorMessage);
-      }
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated, getCachedCount, setCachedCount]);
-
-  // Fetch full gift list
-  // Preserves locally claimed gifts to handle eventual consistency with API
-  const fetchGifts = useCallback(async () => {
-    if (!isAuthenticated) {
-      setGifts([]);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/player/gifts');
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setGifts([]);
-          return;
-        }
-        throw new Error('Failed to fetch gifts');
-      }
-
-      const data = await response.json();
-      const fetchedGifts: GiftMessage[] = data.gifts || [];
-
-      // Safety filter: API should only return unclaimed gifts (claimed = false filter in query)
-      // but we defensively filter here too in case of any edge cases
-      const unclaimedOnly = fetchedGifts.filter(g => !g.claimed);
-
-      // Merge with locally claimed status to handle eventual consistency
-      // If we locally marked a gift as claimed, preserve that status
-      const mergedGifts = unclaimedOnly.map(fetchedGift => {
-        // If we locally marked this gift as claimed, preserve that status
-        if (locallyClaimedIdsRef.current.has(fetchedGift.id)) {
-          return { ...fetchedGift, claimed: true, claimed_at: fetchedGift.claimed_at || new Date().toISOString() };
-        }
-        return fetchedGift;
-      });
-
-      setGifts(mergedGifts);
-
-      // Calculate unclaimed count, respecting locally claimed gifts
-      const unclaimed = mergedGifts.filter(g => !g.claimed).length;
-      setUnclaimedCount(unclaimed);
-      setCachedCount(unclaimed);
-    } catch (err) {
-      // Serialize error message properly for logging (Error objects don't stringify well)
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      // Network errors are common on mobile - use warn instead of error to reduce noise
-      const isNetworkError = err instanceof TypeError && errorMessage.includes('fetch');
-      if (isNetworkError) {
-        console.warn('[Gifts] Network error fetching gifts - will retry on refresh');
-      } else {
-        console.error('[Gifts] Error fetching gifts:', errorMessage);
-      }
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated, setCachedCount]);
-
-  // Claim a gift
-  const claimGift = useCallback(async (giftId: string): Promise<{ xpAwarded: number; coinsAwarded: number }> => {
-    const response = await fetch(`/api/player/gifts/${giftId}/claim`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to claim gift');
-    }
-
-    const result = await response.json();
-
-    // Track this gift as locally claimed to preserve status during refresh
-    // This handles eventual consistency - API may return stale claimed status
-    locallyClaimedIdsRef.current.add(giftId);
-
-    // Update local state
-    setGifts(prev => prev.map(g =>
-      g.id === giftId ? { ...g, claimed: true, claimed_at: new Date().toISOString() } : g
-    ));
-
-    // Use functional form to avoid stale closure over unclaimedCount
-    let newCount = 0;
-    setUnclaimedCount(prev => {
-      newCount = Math.max(0, prev - 1);
-      return newCount;
-    });
-    setCachedCount(newCount);
-
-    return {
-      xpAwarded: result.xpAwarded || 0,
-      coinsAwarded: result.coinsAwarded || 0,
-    };
-  }, [setCachedCount]);
-
-  // Refresh function
-  const refresh = useCallback(async () => {
-    // Clear cache to force fresh fetch
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(CACHE_KEY);
-    }
-    await fetchGifts();
-  }, [fetchGifts]);
-
-  // Initial fetch - when count is loaded and > 0, also fetch full gifts
-  useEffect(() => {
-    fetchUnclaimedCount();
-  }, [fetchUnclaimedCount]);
-
-  // When unclaimed count > 0 and gifts array is empty, fetch full gifts
-  // This ensures gifts are available when user clicks the gift button
-  useEffect(() => {
-    if (unclaimedCount > 0 && gifts.length === 0 && !loading) {
-      fetchGifts();
-    }
-  }, [unclaimedCount, gifts.length, loading, fetchGifts]);
-
-  // Poll for new gifts every 5 minutes
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const interval = setInterval(() => {
-      fetchUnclaimedCount();
-    }, CACHE_DURATION);
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, fetchUnclaimedCount]);
+  const loading = countQuery.isLoading || giftsQuery.isLoading;
+  const error = countQuery.error?.message ?? giftsQuery.error?.message ?? null;
 
   return {
     unclaimedCount,

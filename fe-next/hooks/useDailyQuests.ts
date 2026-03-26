@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { getDailyQuests, type DailyQuest } from '@/lib/adventure/dailyQuests';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -76,6 +77,16 @@ export function useDailyQuests({
   const { isAuthenticated } = useAuth();
   const hasSyncedRef = useRef(false);
 
+  const syncProgressMutation = useMutation({
+    mutationFn: async (progress: Record<string, number>) => {
+      await fetch('/api/adventure/quest-progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chapterQuestProgress: progress }),
+      });
+    },
+  });
+
   // Reset progress if date changed; for guests, hydrate from localStorage
   const [progress, setProgress] = useState<Record<string, number>>(() => {
     if (lastQuestDate === todayStr && initialProgress) return initialProgress;
@@ -102,11 +113,7 @@ export function useDailyQuests({
       onProgressChange?.(merged, todayStr);
       // Post directly as fallback if no onProgressChange provided
       if (!onProgressChange) {
-        fetch('/api/adventure/quest-progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chapterQuestProgress: merged }),
-        }).catch(() => { /* best-effort */ });
+        syncProgressMutation.mutate(merged);
       }
       // Clear localStorage now that server has the data
       localStorage.removeItem(LS_KEY);
