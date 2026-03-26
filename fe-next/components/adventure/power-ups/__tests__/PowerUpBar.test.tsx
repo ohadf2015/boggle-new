@@ -300,8 +300,6 @@ describe('PowerUpBar', () => {
     });
 
     it('should initialize power-up states with cooldowns from inventory', () => {
-      const thirtySecondsAgo = Date.now() - 30000;
-
       // Mock inventory with active cooldown
       vi.mock('@/hooks/usePowerUpInventory', () => ({
         usePowerUpInventory: () => ({
@@ -310,7 +308,7 @@ describe('PowerUpBar', () => {
             hintUnlocked: true,
             scoreMultiplierUnlocked: true,
             cooldownStartedAt: {
-              freezeTime: thirtySecondsAgo,
+              freezeTime: Date.now() - 30000,
               hint: 0,
               scoreMultiplier: 0,
             },

@@ -165,23 +165,23 @@ vi.mock('../StreakMilestoneCelebration', () => ({
   },
 }));
 
-vi.mock('../TabbedDailyLeaderboard', () =>
-  function MockLeaderboard() {
+vi.mock('../TabbedDailyLeaderboard', () => ({
+  default: function MockLeaderboard() {
     return <div data-testid="tabbed-leaderboard" />;
-  }
-);
+  },
+}));
 
-vi.mock('../WatchAdButton', () =>
-  function MockWatchAd() {
+vi.mock('../WatchAdButton', () => ({
+  default: function MockWatchAd() {
     return <div data-testid="watch-ad" />;
-  }
-);
+  },
+}));
 
-vi.mock('@/components/custom-puzzle/CustomPuzzleCreator', () =>
-  function MockCustomPuzzle() {
+vi.mock('@/components/custom-puzzle/CustomPuzzleCreator', () => ({
+  default: function MockCustomPuzzle() {
     return <div data-testid="custom-puzzle" />;
-  }
-);
+  },
+}));
 
 vi.mock('@/components/animations/CoinSpendAnimation', () => ({
   CoinSpendAnimation: () => <div data-testid="coin-spend" />,

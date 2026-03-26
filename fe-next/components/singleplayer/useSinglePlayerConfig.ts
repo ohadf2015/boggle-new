@@ -7,7 +7,7 @@ import {
   shouldShowGuidance,
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
-import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
@@ -261,6 +261,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Handle pre-game tutorial completion
   const handleTutorialComplete = useCallback(() => {
     markGuidanceShown('firstPlayTutorialCompleted');
+    markOnboardingComplete();
     wasFirstTimerPracticeRef.current = true;
     const practicePreset = getDefaultPreset('practice');
     if (practicePreset) {

@@ -5,7 +5,6 @@
  * ensuring it renders at document root instead of inline.
  */
 
-import { describe, it, expect } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 

@@ -111,6 +111,10 @@ export default logger;
 export { Logger };
 
 // CommonJS compatibility for mixed codebase
-module.exports = logger;
-module.exports.default = logger;
-module.exports.Logger = Logger;
+try {
+  module.exports = logger;
+  module.exports.default = logger;
+  module.exports.Logger = Logger;
+} catch {
+  // ESM environment (e.g., Vitest) — skip CJS exports
+}

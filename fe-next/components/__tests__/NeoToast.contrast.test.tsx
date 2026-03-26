@@ -2,8 +2,6 @@
  * NeoToast Contrast Tests
  * Validates color contrast ratios meet WCAG AA standards
  */
-import { describe, it, expect } from '@jest/globals';
-
 /**
  * Calculate relative luminance of an RGB color
  * Formula from WCAG 2.1: https://www.w3.org/TR/WCAG21/#dfn-relative-luminance

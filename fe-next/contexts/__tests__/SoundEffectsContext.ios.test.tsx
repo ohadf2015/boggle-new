@@ -47,8 +47,8 @@ vi.mock('howler', () => ({
 }));
 
 // Mock audioLoader to use mocked Howl constructor
-vi.mock('@/lib/audio/audioLoader', () => {
-  const { Howl } = require('howler');
+vi.mock('@/lib/audio/audioLoader', async () => {
+  const { Howl } = await import('howler');
   return {
     ensureHowl: vi.fn().mockResolvedValue(Howl),
     createLazyHowl: vi.fn((src: string | string[], options?: any) => {

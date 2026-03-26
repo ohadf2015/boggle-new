@@ -24,11 +24,15 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  Maximize: () => <div data-testid="maximize-icon">Maximize</div>,
-  Minimize: () => <div data-testid="minimize-icon">Minimize</div>,
-  HelpCircle: () => <div data-testid="help-icon">?</div>,
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>();
+  return {
+    ...actual,
+    Maximize: () => <div data-testid="maximize-icon">Maximize</div>,
+    Minimize: () => <div data-testid="minimize-icon">Minimize</div>,
+    HelpCircle: () => <div data-testid="help-icon">?</div>,
+  };
+});
 
 // Mock the subcomponents
 vi.mock('@/host/components/tv-broadcast/TvJoinBar', () => ({

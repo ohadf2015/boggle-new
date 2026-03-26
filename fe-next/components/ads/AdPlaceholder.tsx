@@ -18,6 +18,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/utils/ThemeContext';
 import { AdUnit } from './AdUnit';
 
 type AdZoneType =
@@ -76,9 +77,6 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
 
 /** Dev-only placeholder that uses ThemeContext for styling */
 const DevPlaceholder: React.FC<{ zone: AdZoneType; className?: string }> = ({ zone, className }) => {
-  // useTheme is only called when showPlaceholder=true (dev mode)
-  // Lazy-require avoids the hook call in production/test paths
-  const { useTheme } = require('@/utils/ThemeContext');
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 

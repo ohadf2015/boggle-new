@@ -4,6 +4,10 @@ import { vi } from 'vitest';
  * Tests for email OTP sign-in (mobile-friendly magic link alternative)
  */
 
+// Set env vars before module loads so supabase client is created
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+
 // Must mock before importing the module
 const mockSignInWithOtp = vi.fn();
 const mockVerifyOtp = vi.fn();

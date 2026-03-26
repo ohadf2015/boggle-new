@@ -40,6 +40,11 @@ vi.mock('@/utils/platform', () => ({
   isNative: vi.fn(),
 }));
 
+// Mock push notification listeners
+vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
+  setupPushListeners: vi.fn().mockReturnValue(vi.fn()),
+}));
+
 // Mock logger
 vi.mock('@/utils/logger', () => {
   const mockLog = vi.fn();
@@ -58,6 +63,7 @@ describe('Deep Link OAuth Callback Handler', () => {
   let mockRouter: { replace: Mock };
   let mockAddListener: Mock;
   let mockRemove: Mock;
+  let mockBrowserClose: Mock;
   const mockIsNative = platform.isNative as Mock;
 
   beforeEach(() => {
@@ -67,19 +73,31 @@ describe('Deep Link OAuth Callback Handler', () => {
     (useRouter as Mock).mockReturnValue(mockRouter);
 
     mockRemove = vi.fn();
-    mockAddListener = App.addListener as Mock;
-    mockAddListener.mockClear();
-    mockAddListener.mockResolvedValue({ remove: mockRemove });
+    mockAddListener = vi.fn().mockResolvedValue({ remove: mockRemove });
+
+    mockBrowserClose = vi.fn().mockResolvedValue(undefined);
+
+    // Set up globalThis.Capacitor.Plugins which DeepLinkHandler actually uses
+    (globalThis as any).Capacitor = {
+      Plugins: {
+        App: {
+          addListener: mockAddListener,
+          removeAllListeners: vi.fn(),
+        },
+        Browser: {
+          close: mockBrowserClose,
+          open: vi.fn(),
+        },
+      },
+    };
 
     // Default to native environment
     mockIsNative.mockReturnValue(true);
-
-    // Reset Browser mock
-    (Browser.close as Mock).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
+    delete (globalThis as any).Capacitor;
   });
 
   it('should register deep link handler when component mounts', async () => {
@@ -279,7 +297,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // THEN: Should call Browser.close to dismiss the in-app browser
       await waitFor(() => {
-        expect(Browser.close).toHaveBeenCalled();
+        expect(mockBrowserClose).toHaveBeenCalled();
       });
     });
 
@@ -304,7 +322,7 @@ describe('Deep Link OAuth Callback Handler', () => {
       }
 
       // THEN: Should NOT call Browser.close
-      expect(Browser.close).not.toHaveBeenCalled();
+      expect(mockBrowserClose).not.toHaveBeenCalled();
     });
 
     it('should NOT close browser on non-native platforms', async () => {
@@ -328,13 +346,13 @@ describe('Deep Link OAuth Callback Handler', () => {
       }
 
       // THEN: Should NOT call Browser.close (not native)
-      expect(Browser.close).not.toHaveBeenCalled();
+      expect(mockBrowserClose).not.toHaveBeenCalled();
     });
 
     it('should handle Browser.close error gracefully', async () => {
       // GIVEN: Browser.close throws (e.g., browser already closed)
       mockIsNative.mockReturnValue(true);
-      (Browser.close as Mock).mockRejectedValue(new Error('Browser already closed'));
+      mockBrowserClose.mockRejectedValue(new Error('Browser already closed'));
       const deepLinkUrl = 'lexiclash://auth/callback?code=test-code&locale=en';
 
       let appUrlOpenCallback: ((event: { url: string }) => Promise<void>) | null = null;
@@ -412,7 +430,7 @@ describe('Deep Link OAuth Callback Handler', () => {
 
       // THEN: Should close the browser
       await waitFor(() => {
-        expect(Browser.close).toHaveBeenCalled();
+        expect(mockBrowserClose).toHaveBeenCalled();
       });
     });
 

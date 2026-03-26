@@ -160,11 +160,11 @@ vi.mock('../WatchAdButton', () =>
   }
 );
 
-vi.mock('@/components/custom-puzzle/CustomPuzzleCreator', () =>
-  function MockCustomPuzzle() {
+vi.mock('@/components/custom-puzzle/CustomPuzzleCreator', () => ({
+  default: function MockCustomPuzzle() {
     return <div data-testid="custom-puzzle" />;
-  }
-);
+  },
+}));
 
 vi.mock('@/components/animations/CoinSpendAnimation', () => ({
   CoinSpendAnimation: () => <div data-testid="coin-spend" />,

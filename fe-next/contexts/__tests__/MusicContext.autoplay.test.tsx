@@ -130,9 +130,10 @@ vi.mock('@/utils/logger', () => ({
 }));
 
 // Mock audio loader
-vi.mock('@/lib/audio/audioLoader', () => ({
+vi.mock('@/lib/audio/audioLoader', async () => {
+  const { Howl } = await import('howler');
+  return {
   createLazyHowl: vi.fn((src: string | string[], options?: any) => {
-    const { Howl } = require('howler');
     return new Howl({
       src: Array.isArray(src) ? src : [src],
       preload: false,
@@ -151,7 +152,8 @@ vi.mock('@/lib/audio/audioLoader', () => ({
     });
   }),
   ensureHowl: vi.fn().mockResolvedValue(vi.fn()),
-}));
+  };
+});
 
 describe('MusicContext - Auto-play and Transitions', () => {
   beforeEach(() => {

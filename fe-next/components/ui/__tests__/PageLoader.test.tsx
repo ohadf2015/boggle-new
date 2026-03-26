@@ -110,21 +110,14 @@ describe('PageLoader', () => {
   });
 
   describe('reduced motion / low-end device fallback', () => {
-    beforeEach(() => {
-      vi.resetModules();
-    });
-
     it('should render simple dots loader when prefersReducedMotion is true', () => {
-      jest.doMock('@/hooks/useDevicePerformance', () => ({
-        useDevicePerformance: () => ({
-          prefersReducedMotion: true,
-          enableComplexAnimations: true,
-        }),
-      }));
+      (globalThis as any).mockUseDevicePerformance.mockReturnValue({
+        ...(globalThis as any).defaultDevicePerformanceValue,
+        prefersReducedMotion: true,
+        enableComplexAnimations: true,
+      });
 
-      // Re-import after mocking
-      const { PageLoader: PageLoaderReduced } = require('../PageLoader');
-      render(<PageLoaderReduced />);
+      render(<PageLoader />);
 
       const loader = screen.getByTestId('page-loader');
       expect(loader).toBeInTheDocument();

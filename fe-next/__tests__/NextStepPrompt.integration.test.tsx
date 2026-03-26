@@ -28,12 +28,12 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+// Import the already-mocked session module at top-level
+import { clearSessionPreservingUsername } from '@/utils/session';
+
 describe('NextStepPrompt Integration - ResultsPage Context', () => {
   const mockPush = vi.fn();
   const mockOnBackToLobby = vi.fn();
-
-  // Import the already-mocked function
-  const { clearSessionPreservingUsername } = await import('@/utils/session') as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
