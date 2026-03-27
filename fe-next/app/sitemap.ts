@@ -171,6 +171,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
     { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },
     { locale: 'es', path: '/juego-de-palabras-multijugador', img: 'es' },
+    { locale: 'en', path: '/lexiclash-vs-wordle', img: 'en' },
+    { locale: 'en', path: '/lexiclash-vs-scrabble', img: 'en' },
+    { locale: 'en', path: '/best-online-word-games', img: 'en' },
+    { locale: 'he', path: '/lexiclash-neged-wordle', img: 'he' },
+    { locale: 'es', path: '/lexiclash-contra-wordle', img: 'es' },
   ] as const;
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({

@@ -39,61 +39,31 @@ export const GameLayout = memo(function GameLayout({
   return (
     <div
       className={cn(
-        // Full viewport height with safe area insets for notched devices
         'h-dvh w-full',
         'flex flex-col',
         'overflow-hidden',
         'relative',
-        // Safe area padding for header (notch) and bottom (home indicator)
         'pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]',
         className
       )}
     >
-      {/* Header - Fixed height, flex-shrink-0 */}
+      {/* Header - Fixed height */}
       <div className="flex-shrink-0 z-20">
         {header}
       </div>
 
       {/*
-        Main Content Area — takes remaining height, no scroll.
-        Layout stack:
-          - portrait mobile/tablet: column (grid on top, sidebar strip below)
-          - landscape mobile:       row (grid left, sidebar right — same as desktop)
-          - desktop (lg+):          row (grid left, sidebar right)
-        Landscape detection uses the `landscape` Tailwind variant which maps to
-        the @media (orientation: landscape) query.
+        Main Content Area — portrait: column (grid top, sidebar bottom);
+        landscape/desktop: row (grid left, sidebar right).
       */}
       <div className="flex-1 min-h-0 flex flex-col landscape:flex-row lg:flex-row relative">
-        {/*
-          Sidebar — on portrait mobile/tablet it sits ABOVE the grid so
-          objectives are always visible (not clipped below).
-          On landscape/desktop it stays as a right column.
-        */}
-        <div
-          className={cn(
-            'flex-shrink-0 transition-all duration-300',
-            // Boss active: collapse sidebar completely — boss HUD replaces objectives
-            isBossActive
-              ? 'h-0 landscape:w-0 lg:w-0 overflow-hidden opacity-0'
-              : [
-                  // Portrait: compact bar above grid (visible objectives)
-                  'h-20 md:h-24',
-                  // Landscape / desktop: full-height column to the right (order-last)
-                  'landscape:h-full landscape:w-64 landscape:order-last',
-                  'lg:h-full lg:w-80 xl:w-96 lg:order-last',
-                  'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
-                  'lg:overflow-y-auto lg:overflow-x-hidden',
-                  'opacity-100',
-                ],
-            'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
-            'z-10'
-          )}
-        >
-          {sidebar}
+        {/* Grid Area - Main gameplay space, takes priority */}
+        <div className="flex-1 min-h-0 relative overflow-hidden">
+          {gridArea}
         </div>
 
         {/*
-          Gradient divider — portrait: horizontal rule below sidebar chip bar;
+          Gradient divider — portrait: horizontal rule above sidebar bar;
           landscape/desktop: vertical rule between grid and sidebar column.
         */}
         <div
@@ -107,13 +77,35 @@ export const GameLayout = memo(function GameLayout({
           aria-hidden="true"
         />
 
-        {/* Grid Area - Main gameplay space, takes remaining height */}
-        <div className="flex-1 min-h-0 relative overflow-hidden">
-          {gridArea}
+        {/*
+          Sidebar — portrait mobile: sits BELOW the grid as a bottom action bar
+          filling the space under the square grid.
+          Landscape/desktop: right column.
+        */}
+        <div
+          className={cn(
+            'flex-shrink-0 transition-all duration-300',
+            isBossActive
+              ? 'h-0 landscape:w-0 lg:w-0 overflow-hidden opacity-0'
+              : [
+                  // Portrait: flexible bottom bar — fills remaining space below grid
+                  'min-h-20 max-h-48 flex-shrink-[2]',
+                  // Landscape / desktop: full-height column to the right
+                  'landscape:h-full landscape:w-64 landscape:max-h-none landscape:min-h-0',
+                  'lg:h-full lg:w-80 xl:w-96 lg:max-h-none lg:min-h-0',
+                  'overflow-x-auto overflow-y-hidden landscape:overflow-y-auto landscape:overflow-x-hidden',
+                  'lg:overflow-y-auto lg:overflow-x-hidden',
+                  'opacity-100',
+                ],
+            'bg-neo-black/20 landscape:bg-neo-black/30 lg:bg-neo-black/30',
+            'z-10'
+          )}
+        >
+          {sidebar}
         </div>
       </div>
 
-      {/* Overlays (Pause, Boss, etc.) */}
+      {/* Overlays */}
       {overlays}
     </div>
   );

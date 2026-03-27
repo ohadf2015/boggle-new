@@ -25,8 +25,8 @@ import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
-import { fetchGeolocation, fetchRandomPlayerName } from '../authUtils';
-import type { ProfileData, RankedProgress, AuthStateSetters } from '../authTypes';
+import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from '../authUtils';
+import type { ProfileData, AuthStateSetters } from '../authTypes';
 
 interface UseProfileManagementParams {
   user: User | null;
@@ -45,20 +45,6 @@ interface ProfileManagementResult {
     updates: Partial<ProfileData>
   ) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
   refreshProfile: () => Promise<void>;
-}
-
-/**
- * Helper to extract first name from full name with proper capitalization
- */
-function getFirstName(fullName: string): string {
-  if (!fullName) return '';
-  const firstName = fullName.split(' ')[0];
-  // Capitalize first letter, lowercase rest for Latin chars: "ANDERS" -> "Anders"
-  // For non-Latin (Hebrew, etc.), just return as-is
-  if (/^[A-Z]+$/.test(firstName)) {
-    return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-  }
-  return firstName;
 }
 
 /**
@@ -128,13 +114,10 @@ async function createNewProfile(
 ): Promise<void> {
   logger.info('Profile not found, creating minimal profile for user:', userId);
 
-  // Get display name from OAuth provider if available
-  // Extract FIRST NAME only from OAuth (e.g., "Anders Ekdahl" -> "Anders")
-  const oauthFullName =
-    (userMetadata?.full_name as string) || (userMetadata?.name as string);
-  const oauthFirstName = oauthFullName ? getFirstName(oauthFullName) : null;
+  // Extract name from OAuth provider (Google, Discord, Apple)
+  const oauthName = extractOAuthDisplayName(userMetadata);
 
-  // Generate username and avatar: use OAuth first name if available, otherwise get a fun random name
+  // Generate username and avatar: use OAuth name if available, otherwise get a fun random name
   let username: string;
   let displayName: string;
 
@@ -142,10 +125,9 @@ async function createNewProfile(
   const randomAvatar = getRandomAvatar();
   const avatarImage = randomAvatar.id;
 
-  if (oauthFirstName) {
-    // OAuth provided a display name - use first name
-    username = oauthFirstName;
-    displayName = oauthFirstName;
+  if (oauthName) {
+    username = oauthName;
+    displayName = oauthName;
   } else {
     // No OAuth display name - generate a fun random name
     const randomData = await fetchRandomPlayerName();

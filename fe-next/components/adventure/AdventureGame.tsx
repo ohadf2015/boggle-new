@@ -233,10 +233,19 @@ const AdventureGame = memo<AdventureGameProps>(
       onClickSubmit: handleClickSubmit,
     });
 
-    const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord } = useAdventureHints({
+    const handleSpendGold = useCallback((amount: number): boolean => {
+      if (init.gold < amount) return false;
+      init.addGold(-amount);
+      return true;
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using init.gold and init.addGold, not the whole init object
+    }, [init.gold, init.addGold]);
+
+    const { hasHintsAvailable, getHint, currentHint, clearCurrentHint, recordActivity, showAutoHint, dismissAutoHint, remainingHintWords, findPathForWord, nextHintCost } = useAdventureHints({
       grid: initialGrid, language: language || 'en', foundWords: gameState.wordsFound,
       isPlaying: isPlaying && entryPhase === 'playing' && !isPaused, inactivityThresholdMs: init.adjustedInactivityThresholdMs,
       maxHintsPerLevel: init.upgradeEffects.hintsPerLevel + init.upgradeEffects.bonusHintsPerLevel,
+      freeHintsPerLevel: init.upgradeEffects.hintsPerLevel,
+      onSpendGold: handleSpendGold,
     });
 
     // Gem Detector upgrade: highlight starting tiles of highest-scoring available words
@@ -459,7 +468,7 @@ const AdventureGame = memo<AdventureGameProps>(
     }
 
     return (
-      <div ref={effects.shakeRef} data-testid="adventure-game" role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
+      <div ref={effects.shakeRef} data-testid="adventure-game" data-adventure-game role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura } as React.CSSProperties}>
         <GameplayBackground className="absolute inset-0 -z-10" />
         <GameLayout
           isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
@@ -499,6 +508,7 @@ const AdventureGame = memo<AdventureGameProps>(
               hasHintsAvailable={hasHintsAvailable} onHintClick={handleHintClick}
               showAutoHint={showAutoHint} currentHint={currentHint}
               hintLevel={init.hintData.level}
+              nextHintCost={nextHintCost}
               freezeSeconds={init.upgradeEffects.timeFreezeSeconds}
               freezeUsed={freezeUsed}
               isFrozen={isFrozen}

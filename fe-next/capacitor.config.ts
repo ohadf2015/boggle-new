@@ -38,7 +38,7 @@ const config: CapacitorConfig = {
     },
     LocalNotifications: {
       smallIcon: 'ic_stat_icon_config_sample',
-      iconColor: '#FFE135', // neo-yellow
+      iconColor: '#BFFF00', // neo-lime (primary brand color)
       sound: 'default',
     },
     PushNotifications: {

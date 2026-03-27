@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { LandingShareBanner } from './LandingShareBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { trackModeSelected } from '@/utils/growthTracking';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
@@ -123,6 +124,7 @@ export function LandingMobileCards({
         >
           <Link
             href={`/${language}/multiplayer`}
+            onClick={() => trackModeSelected('multiplayer', 'home_mobile')}
             className={cn(
               'flex flex-col items-center justify-center gap-1 sm:gap-2 p-1.5 sm:p-3',
               'bg-gradient-to-br from-neo-pink to-pink-400',
@@ -182,6 +184,7 @@ export function LandingMobileCards({
         >
           <Link
             href={`/${language}/adventure`}
+            onClick={() => trackModeSelected('adventure', 'home_mobile')}
             className={cn(
               'flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-2.5 relative',
               'bg-gradient-to-br from-neo-lime via-lime-400 to-lime-500',

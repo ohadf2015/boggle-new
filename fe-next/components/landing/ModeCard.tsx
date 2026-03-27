@@ -49,6 +49,8 @@ interface ModeCardProps {
   lockedMessage?: string;
   /** Callback when locked card is clicked */
   onLockedClick?: () => void;
+  /** Callback when card is clicked (for analytics tracking) */
+  onClick?: () => void;
   /** Optional badge to display (e.g., "NEW", "HOT") */
   badge?: string;
   /** Highlighted state for first-time players — adds pulsing glow and animated badge */
@@ -82,6 +84,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   loading = false,
   lockedMessage,
   onLockedClick,
+  onClick,
   badge,
   highlighted = false,
   highlightLabel,
@@ -510,7 +513,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   }
 
   return (
-    <Link href={href} className={wrapperClassName}>
+    <Link href={href} className={wrapperClassName} onClick={onClick}>
       {cardContent}
     </Link>
   );

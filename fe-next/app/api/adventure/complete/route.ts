@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
       .eq('gold', currentGold)
       .eq('total_stars', currentTotalStars)
       .select()
-      .single();
+      .maybeSingle();
 
     // If gold column doesn't exist yet (migration pending), retry without gold lock
     if (updateError && (updateError.code === 'PGRST204' || updateError.message?.includes('gold'))) {
@@ -428,7 +428,7 @@ export async function POST(request: NextRequest) {
           .eq('gold', freshGold)
           .eq('total_stars', freshTotalStars)
           .select()
-          .single();
+          .maybeSingle();
         if (retryError || !retryRow) {
           console.error('[ADVENTURE COMPLETE API] Optimistic lock retry failed:', retryError);
           return NextResponse.json(

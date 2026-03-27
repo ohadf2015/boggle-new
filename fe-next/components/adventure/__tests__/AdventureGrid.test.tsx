@@ -295,10 +295,11 @@ describe('AdventureGrid', () => {
       expect(screen.getByText('CAT')).toBeInTheDocument();
     });
 
-    it('should call onWordSubmit when word is submitted', () => {
-      // GIVEN
+    it('should call onDragEnd when drag ends with selected tiles', () => {
+      // GIVEN — word submission on mouseUp is routed through onDragEnd
+      // (not directly via onWordSubmit on the grid div)
       const tiles = createMockTiles(4);
-      const onWordSubmit = vi.fn();
+      const onDragEnd = vi.fn();
       const selectedIndices = [0, 1, 2];
 
       // WHEN
@@ -307,17 +308,19 @@ describe('AdventureGrid', () => {
           tiles={tiles}
           gridSize={4}
           selectedIndices={selectedIndices}
-          onWordSubmit={onWordSubmit}
+          onDragEnd={onDragEnd}
           interactive
         />
       );
 
-      // Simulate word submission (e.g., by releasing touch/mouse)
+      // Start a drag then release — onDragEnd fires via useGridGestures
+      const firstCell = screen.getAllByRole('gridcell')[0];
+      fireEvent.mouseDown(firstCell);
       const grid = screen.getByRole('grid');
       fireEvent.mouseUp(grid);
 
       // THEN
-      expect(onWordSubmit).toHaveBeenCalledWith('ABC', selectedIndices);
+      expect(onDragEnd).toHaveBeenCalled();
     });
   });
 

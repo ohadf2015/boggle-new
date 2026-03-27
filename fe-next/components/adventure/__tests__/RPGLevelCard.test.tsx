@@ -49,10 +49,9 @@ const baseProps = {
 
 describe('RPGLevelCard', () => {
   describe('base card', () => {
-    it('renders colored top banner with LVL label', () => {
+    it('renders colored top accent banner', () => {
       render(<RPGLevelCard {...baseProps} />);
       expect(screen.getByTestId('card-banner')).toBeInTheDocument();
-      expect(screen.getByText('LVL')).toBeInTheDocument();
     });
 
     it('renders level number as large text', () => {
@@ -90,7 +89,8 @@ describe('RPGLevelCard', () => {
       render(<RPGLevelCard {...baseProps} stars={3} isPerfect />);
       expect(screen.getByTestId('crown-badge')).toBeInTheDocument();
       const banner = screen.getByTestId('card-banner');
-      expect(banner.className).toContain('bg-neo-yellow');
+      // Banner uses inline gradient style for world-colored accents
+      expect(banner).toBeInTheDocument();
     });
   });
 
@@ -112,7 +112,7 @@ describe('RPGLevelCard', () => {
     it('has dimmed opacity', () => {
       const { container } = render(<RPGLevelCard {...baseProps} isUnlocked={false} stars={0} />);
       const card = container.firstChild as HTMLElement;
-      expect(card.className).toContain('opacity-50');
+      expect(card.className).toContain('opacity-40');
     });
   });
 

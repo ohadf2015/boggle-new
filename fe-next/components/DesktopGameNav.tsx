@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Swords, Zap, Calendar, Mountain, Brain, Trophy } from 'lucide-react';
+import { Home, Swords, Zap, Calendar, Mountain, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -22,8 +22,6 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, route: '/multiplayer', color: 'text-neo-white/50', activeColor: 'text-neo-pink border-neo-pink' },
   { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
   { id: 'adventure', labelKey: 'nav.adventure', icon: Mountain, route: '/adventure', color: 'text-neo-white/50', activeColor: 'text-neo-lime border-neo-lime' },
-  { id: 'blast', labelKey: 'nav.blast', icon: Zap, route: '/blast', color: 'text-neo-white/50', activeColor: 'text-neo-orange border-neo-orange' },
-  { id: 'brain', labelKey: 'nav.brain', icon: Brain, route: '/brain', color: 'text-neo-white/50', activeColor: 'text-neo-purple border-neo-purple' },
   { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
 ];
 
@@ -50,7 +48,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
 
   return (
     <nav
-      className="hidden md:block w-full bg-neo-navy/80 backdrop-blur-sm border-b-2 border-neo-white/10 sticky top-0 z-[55]"
+      className="hidden md:block relative w-full bg-neo-navy/80 backdrop-blur-sm border-b-2 border-neo-white/10 flex-shrink-0 z-[55]"
       aria-label={t('nav.gameNavigation') || 'Game navigation'}
     >
       <div className="max-w-7xl mx-auto px-4">

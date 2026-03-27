@@ -36,6 +36,7 @@ import { useAttackTelegraph } from '../../../hooks/useAttackTelegraph';
 import { useBossEffectExecutor, type EffectCallbacks } from '../../../hooks/useBossEffectExecutor';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import type { BossConfig } from '@/types/boss';
+import { getBossAnimations } from '@/lib/adventure/bossAnimations';
 import type { AdventureGameState } from '@/types/adventure';
 import { BOSS_PHASE_THRESHOLDS, type BossStateMachineState, type BossStateMachineContext } from '@/types/bossStateMachine';
 
@@ -152,8 +153,9 @@ const BossOverlay = memo<BossOverlayProps>(
       smState === 'phase1' || smState === 'phase2' || smState === 'enraged'
     );
 
-    // --- Boss avatar reaction ---
-    const [bossReaction, setBossReaction] = useState<'idle' | 'attacking' | 'hit'>('idle');
+    // --- Boss visual state for image switching ---
+    type BossReaction = 'idle' | 'attacking' | 'hit';
+    const [bossReaction, setBossReaction] = useState<BossReaction>('idle');
     const reactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [playerDmgFloat, setPlayerDmgFloat] = useState<{ id: number; amount: number } | null>(null);
     const playerDmgIdRef = useRef(0);
@@ -286,6 +288,18 @@ const BossOverlay = memo<BossOverlayProps>(
     const showingActivePhase = effectiveIsActive && !showingIntro;
     const borderClass = avatarBorderClass(derivedPhase);
 
+    // Per-boss unique animations
+    const bossAnims = getBossAnimations(boss.id);
+
+    // Derive boss image based on reaction + phase
+    const bossImageSrc = (() => {
+      if (!boss.images) return boss.imagePath;
+      if (bossReaction === 'attacking') return boss.images.attack;
+      if (bossReaction === 'hit') return boss.images.hurt;
+      if (derivedPhase === 'enraged') return boss.images.enraged;
+      return boss.images.idle;
+    })();
+
     // ==============================================
     // RENDER
     // ==============================================
@@ -318,60 +332,90 @@ const BossOverlay = memo<BossOverlayProps>(
               <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 pt-1.5">
                 {/* Boss Avatar + HP Bar row */}
                 <div className="flex items-center gap-2 sm:gap-3">
-                  {/* Boss Avatar — compact */}
+                  {/* Boss Avatar — larger with rich state animations */}
                   <div className="relative flex-shrink-0">
+                    {/* Enraged outer glow ring — per-boss color */}
+                    {derivedPhase === 'enraged' && (
+                      <AdaptiveMotion.div
+                        className="absolute -inset-1.5 rounded-neo blur-sm z-0"
+                        style={{ backgroundColor: bossAnims.enragedGlowColor }}
+                        animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.7, 0.3] }}
+                        transition={{ repeat: Infinity, duration: 0.8, ease: 'easeInOut' }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <AdaptiveMotion.div
-                      className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light`}
+                      className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light z-10`}
                       animate={
                         bossReaction === 'attacking'
-                          ? { scale: [1, 1.12, 1], rotate: [0, -4, 4, 0] }
+                          ? bossAnims.attack.animate
                           : bossReaction === 'hit'
-                            ? { x: [0, -2, 2, -1, 1, 0], scale: [1, 0.95, 1] }
-                            : { scale: [1, 1.02, 1], rotate: 0, x: 0 }
+                            ? bossAnims.hit.animate
+                            : derivedPhase === 'enraged'
+                              ? bossAnims.enraged.animate
+                              : bossAnims.idle.animate
                       }
                       transition={
-                        bossReaction === 'idle'
-                          ? { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-                          : { duration: 0.25 }
+                        bossReaction === 'attacking'
+                          ? bossAnims.attack.transition
+                          : bossReaction === 'hit'
+                            ? bossAnims.hit.transition
+                            : derivedPhase === 'enraged'
+                              ? bossAnims.enraged.transition
+                              : bossAnims.idle.transition
                       }
+                      style={derivedPhase === 'enraged' && bossAnims.enragedFilter ? { filter: bossAnims.enragedFilter } : undefined}
                       data-testid="boss-avatar"
                     >
-                      {boss.imagePath ? (
+                      {bossImageSrc ? (
                         <Image
-                          src={boss.imagePath}
+                          src={bossImageSrc}
                           alt={t(boss.displayName)}
                           fill
                           className="object-cover"
-                          sizes="48px"
+                          sizes="64px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Swords className="w-5 h-5 text-neo-yellow" />
                         </div>
                       )}
+                      {/* Hit flash overlay */}
+                      <AdaptiveAnimatePresence>
+                        {bossReaction === 'hit' && (
+                          <AdaptiveMotion.div
+                            className="absolute inset-0 bg-neo-lime/40 rounded-neo"
+                            initial={{ opacity: 0.8 }}
+                            animate={{ opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+                      </AdaptiveAnimatePresence>
+                      {/* Enraged border pulse */}
                       {derivedPhase === 'enraged' && (
                         <AdaptiveMotion.div
                           className="absolute inset-0 border-2 border-neo-red rounded-neo"
-                          animate={{ opacity: [0.4, 0.8, 0.4] }}
+                          animate={{ opacity: [0.3, 0.9, 0.3], boxShadow: ['inset 0 0 8px rgba(255,51,102,0.2)', 'inset 0 0 16px rgba(255,51,102,0.5)', 'inset 0 0 8px rgba(255,51,102,0.2)'] }}
                           transition={{ repeat: Infinity, duration: 0.6 }}
                         />
                       )}
                     </AdaptiveMotion.div>
 
-                    {/* Floating damage text */}
+                    {/* Floating damage text — spring physics pop */}
                     <AdaptiveAnimatePresence>
                       {playerDmgFloat && (
                         <AdaptiveMotion.div
                           key={playerDmgFloat.id}
-                          className="absolute -top-1 -end-1 pointer-events-none z-10"
-                          initial={{ y: 0, opacity: 1, scale: 0.8 }}
-                          animate={{ y: -20, opacity: 0, scale: 1.1 }}
+                          className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none z-20"
+                          initial={{ y: 0, opacity: 1, scale: 0.4 }}
+                          animate={{ y: -32, opacity: 0, scale: 1.4 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.7, ease: 'easeOut' }}
+                          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                           aria-hidden="true"
                         >
-                          <span className="font-neo-display text-[10px] font-black text-neo-lime drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                            +{playerDmgFloat.amount}
+                          <span className="font-neo-display text-base sm:text-lg font-black text-neo-lime drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] whitespace-nowrap">
+                            -{playerDmgFloat.amount}
                           </span>
                         </AdaptiveMotion.div>
                       )}
@@ -443,26 +487,53 @@ const BossOverlay = memo<BossOverlayProps>(
               </div>
             </div>
 
-            {/* Phase Transition Banner — centered, brief */}
+            {/* Phase Transition Banner — dramatic with boss portrait */}
             <AdaptiveAnimatePresence>
               {phaseBanner && (
                 <AdaptiveMotion.div
-                  className="fixed inset-x-0 top-1/3 z-50 flex items-center justify-center pointer-events-none"
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                   aria-live="assertive"
                   role="status"
                 >
-                  <div className="px-6 py-3 bg-neo-red border-3 border-neo-black rounded-neo shadow-hard-lg">
-                    <span
-                      className="font-neo-display text-3xl sm:text-4xl font-black text-neo-white tracking-widest uppercase"
-                      style={{ textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}
-                    >
-                      {phaseBanner}
-                    </span>
-                  </div>
+                  {/* Red flash overlay */}
+                  <AdaptiveMotion.div
+                    className="absolute inset-0 bg-neo-red/20"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.4, 0] }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  {/* Banner with boss enraged portrait */}
+                  <AdaptiveMotion.div
+                    className="flex items-center gap-4 px-6 py-4 bg-neo-navy border-3 border-neo-red rounded-neo shadow-hard-lg"
+                    initial={{ scale: 0.5, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 1.1, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  >
+                    {/* Mini enraged boss portrait */}
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-red overflow-hidden flex-shrink-0 shadow-hard-sm">
+                      <img
+                        src={boss.images?.enraged ?? boss.imagePath}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="text-start">
+                      <span
+                        className="font-neo-display text-2xl sm:text-3xl font-black text-neo-red tracking-widest uppercase block"
+                        style={{ textShadow: '0 2px 6px rgba(0,0,0,0.7)' }}
+                      >
+                        {phaseBanner}
+                      </span>
+                      <span className="text-neo-white/60 text-xs font-bold">
+                        {t(boss.displayName)}
+                      </span>
+                    </div>
+                  </AdaptiveMotion.div>
                 </AdaptiveMotion.div>
               )}
             </AdaptiveAnimatePresence>
@@ -489,7 +560,66 @@ const BossOverlay = memo<BossOverlayProps>(
             />
 
             {/* Boss Attack Effect */}
-            <BossAttackEffect attackEffect={attackEffect} />
+            <BossAttackEffect attackEffect={attackEffect} bossId={boss.id} />
+
+            {/* Screen shake on boss attack — CSS animation on the game viewport */}
+            {attackEffect && (
+              <style jsx global>{`
+                @keyframes bossScreenShake {
+                  0%, 100% { transform: translate(0, 0); }
+                  10% { transform: translate(-4px, 2px); }
+                  20% { transform: translate(3px, -3px); }
+                  30% { transform: translate(-2px, 4px); }
+                  40% { transform: translate(4px, -1px); }
+                  50% { transform: translate(-3px, 3px); }
+                  60% { transform: translate(2px, -4px); }
+                  70% { transform: translate(-4px, 1px); }
+                  80% { transform: translate(3px, -2px); }
+                  90% { transform: translate(-1px, 3px); }
+                }
+                [data-adventure-game] {
+                  animation: bossScreenShake 0.4s ease-out;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  [data-adventure-game] { animation: none !important; }
+                }
+              `}</style>
+            )}
+
+            {/* Boss attack flash portrait — dramatic slam-in from right with spring physics */}
+            <AdaptiveAnimatePresence>
+              {bossReaction === 'attacking' && (
+                <AdaptiveMotion.div
+                  className="fixed inset-0 z-40 flex items-start justify-end pointer-events-none pe-3 sm:pe-5 pt-28 sm:pt-32"
+                  initial={{ opacity: 0, scale: 0.3, x: 80, rotate: 8 }}
+                  animate={{ opacity: 1, scale: 1, x: 0, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.7, x: 30, rotate: -4 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 22, mass: 0.8 }}
+                  aria-hidden="true"
+                >
+                  <AdaptiveMotion.div
+                    className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-neo border-3 border-neo-red shadow-hard-lg overflow-hidden bg-neo-navy-dark"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 0.4, repeat: 1, ease: 'easeInOut' }}
+                  >
+                    <Image
+                      src={boss.images?.attack ?? boss.imagePath}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="112px"
+                    />
+                    {/* Red danger overlay flash */}
+                    <AdaptiveMotion.div
+                      className="absolute inset-0 bg-neo-red/30"
+                      initial={{ opacity: 0.6 }}
+                      animate={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </AdaptiveMotion.div>
+                </AdaptiveMotion.div>
+              )}
+            </AdaptiveAnimatePresence>
           </>
         )}
 
@@ -499,7 +629,7 @@ const BossOverlay = memo<BossOverlayProps>(
             composition={BossDefeatCinematic as unknown as React.ComponentType<Record<string, unknown>>}
             compositionProps={{
               bossName: t(boss.displayName),
-              bossImagePath: boss.imagePath,
+              bossImagePath: boss.images?.defeated ?? boss.imagePath,
               primaryColor: '#FFE135',
               secondaryColor: '#00FFFF',
               goldEarned: score > 500 ? 150 : 100,

@@ -6,7 +6,7 @@
  * Translation keys reference entries in translations/*.js files.
  */
 
-import type { BossConfig, BossPhaseConfig, BossTaunts, BossTauntEvent, BossTwistMechanic } from '@/types/boss';
+import type { BossConfig, BossImageSet, BossPhaseConfig, BossTaunts, BossTauntEvent, BossTwistMechanic } from '@/types/boss';
 
 // ==============================================
 // TAUNT BUILDER
@@ -49,6 +49,17 @@ function buildPhases(
 // BOSS BUILDER
 // ==============================================
 
+function buildImages(imageSlug: string): BossImageSet {
+  const base = `/images/bosses/boss-${imageSlug}`;
+  return {
+    idle: `${base}.png`,
+    attack: `${base}-attack.png`,
+    hurt: `${base}-hurt.png`,
+    enraged: `${base}-enraged.png`,
+    defeated: `${base}-defeated.png`,
+  };
+}
+
 function defineBoss(
   worldId: number,
   id: string,
@@ -58,13 +69,16 @@ function defineBoss(
   twistMechanic: BossTwistMechanic,
   phases: BossPhaseConfig[]
 ): BossConfig {
+  const images = buildImages(imageSlug);
   return {
     id,
     worldId,
     displayName: `adventure.bosses.${id}.name`,
     personality,
     visualTheme,
-    imagePath: `/images/bosses/boss-${imageSlug}.webp`,
+    imagePath: images.idle, // backwards compat — use images.X for state-specific
+    images,
+    storylineIntro: `adventure.bosses.${id}.storyline`,
     twistMechanic: {
       ...twistMechanic,
       description: `adventure.bosses.${id}.mechanic`,
@@ -247,14 +261,16 @@ export function getBossTaunt(worldId: number, event: BossTauntEvent): string {
 }
 
 /**
- * Get the image path for a boss
+ * Get the image path for a boss in a specific visual state
  *
  * @param worldId - World number (1-10)
+ * @param state - Visual state (idle, attack, hurt, enraged, defeated)
  * @returns Image path or empty string if invalid world
  */
-export function getBossImagePath(worldId: number): string {
+export function getBossImagePath(worldId: number, state: import('@/types/boss').BossVisualState = 'idle'): string {
   const boss = getBossConfig(worldId);
-  return boss?.imagePath ?? '';
+  if (!boss) return '';
+  return boss.images[state];
 }
 
 /**

@@ -27,6 +27,9 @@ export interface HintResult {
   path: GridPosition[];
 }
 
+/** Default gold cost for a paid hint */
+export const DEFAULT_HINT_GOLD_COST = 15;
+
 export interface UseAdventureHintsOptions {
   /** The current grid letters */
   grid: string[][];
@@ -40,6 +43,12 @@ export interface UseAdventureHintsOptions {
   inactivityThresholdMs?: number;
   /** Max hints per level from Word Radar upgrade (undefined = unlimited) */
   maxHintsPerLevel?: number;
+  /** Free hints per level before gold is charged (default: 1) */
+  freeHintsPerLevel?: number;
+  /** Gold cost per hint after free hints are used (default: 15) */
+  goldCostPerHint?: number;
+  /** Callback to deduct gold — returns true if player can afford it */
+  onSpendGold?: (amount: number) => boolean;
   /** Callback when auto-hint is triggered */
   onAutoHint?: (hint: HintResult) => void;
 }
@@ -69,6 +78,10 @@ export interface UseAdventureHintsReturn {
   clearCurrentHint: () => void;
   /** Remaining hint budget (undefined = unlimited) */
   hintsRemaining?: number;
+  /** Free hints remaining before gold is charged */
+  freeHintsRemaining: number;
+  /** Gold cost of the next hint (0 if free hints remain) */
+  nextHintCost: number;
 }
 
 // Direction vectors for 8-way adjacent movement (matching boggleSolver)
@@ -208,6 +221,9 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     isPlaying,
     inactivityThresholdMs = 15000,
     maxHintsPerLevel,
+    freeHintsPerLevel = 1,
+    goldCostPerHint = DEFAULT_HINT_GOLD_COST,
+    onSpendGold,
     onAutoHint,
   } = options;
 
@@ -310,10 +326,24 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     return findWordPath(grid, word);
   }, [grid]);
 
+  // Free hints remaining before gold is charged
+  const freeHintsRemaining = Math.max(0, freeHintsPerLevel - hintsUsed);
+  const nextHintCost = freeHintsRemaining > 0 ? 0 : goldCostPerHint;
+
   // Get a hint
   const getHint = useCallback((): HintResult | null => {
     if (!hasHintsAvailable || remainingHintWords.length === 0) {
       return null;
+    }
+
+    // Check if this hint costs gold (free hints exhausted)
+    const isFreeHint = hintsUsed < freeHintsPerLevel;
+    if (!isFreeHint) {
+      // Try to charge gold
+      if (onSpendGold) {
+        const canAfford = onSpendGold(goldCostPerHint);
+        if (!canAfford) return null;
+      }
     }
 
     // Get first remaining word (prioritized by difficulty)
@@ -328,7 +358,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     setCurrentHint(hint);
     setHintsUsed(prev => prev + 1);
     return hint;
-  }, [hasHintsAvailable, remainingHintWords, findPathForWord]);
+  }, [hasHintsAvailable, remainingHintWords, findPathForWord, hintsUsed, freeHintsPerLevel, goldCostPerHint, onSpendGold]);
 
   // Ref to track if timer was started (declared before recordActivity)
   const timerStartedRef = useRef(false);
@@ -409,5 +439,7 @@ export function useAdventureHints(options: UseAdventureHintsOptions): UseAdventu
     currentHint,
     clearCurrentHint,
     hintsRemaining,
+    freeHintsRemaining,
+    nextHintCost,
   };
 }

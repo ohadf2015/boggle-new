@@ -5,9 +5,9 @@
  * Celebratory style if player found the word, muted style if missed.
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Eye } from 'lucide-react';
+import { Sparkles, Eye, Share2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
@@ -28,6 +28,37 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
   const { t, language } = useLanguage();
   const { word, stats, loading } = useWordOfTheDay(language);
 
+  const normalizedPlayerWords = playerWords.map(w => w.toLowerCase().trim());
+  const found = word ? normalizedPlayerWords.includes(word.toLowerCase()) : false;
+  const percent = stats.foundPercent;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(async () => {
+    if (!word) return;
+    const emoji = found ? '\u{2728}' : '\u{1F440}';
+    const status = found ? t('wotd.found') : t('wotd.missed');
+    const shareText = [
+      `${emoji} ${t('wotd.title')} — ${status}`,
+      `"${word.toUpperCase()}"`,
+      found ? t('wotd.foundPercent').replace('{{percent}}', String(percent)) : '',
+      '',
+      'lexiclash.live/word-of-the-day',
+    ].filter(Boolean).join('\n');
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ text: shareText, url: `https://lexiclash.live/${language}/word-of-the-day` });
+        return;
+      } catch { /* cancelled, fall through to copy */ }
+    }
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* silently fail */ }
+  }, [found, word, percent, t, language]);
+
   if (loading) {
     return (
       <div
@@ -43,10 +74,6 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
   }
 
   if (!word) return null;
-
-  const normalizedPlayerWords = playerWords.map(w => w.toLowerCase().trim());
-  const found = normalizedPlayerWords.includes(word.toLowerCase());
-  const percent = stats.foundPercent;
 
   return (
     <motion.div
@@ -77,7 +104,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
           >
             {word}
           </p>
-          <p className="text-sm text-neo-white/70">
+          <p className="text-sm text-neo-white/70 mb-3">
             {t('wotd.foundPercent').replace('{{percent}}', String(percent))}
           </p>
         </>
@@ -95,11 +122,26 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
           >
             {word}
           </p>
-          <p className="text-xs text-white/30">
+          <p className="text-xs text-white/30 mb-3">
             {t('wotd.missedHint')}
           </p>
         </>
       )}
+
+      {/* Share button */}
+      <button
+        onClick={handleShare}
+        className={cn(
+          'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-neo text-xs font-bold uppercase tracking-wider',
+          'border-2 border-neo-black transition-all',
+          found
+            ? 'bg-neo-yellow/20 text-neo-yellow hover:bg-neo-yellow/30'
+            : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70',
+        )}
+      >
+        {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+        {copied ? t('common.copied') : t('share.emojiCard.share')}
+      </button>
     </motion.div>
   );
 }

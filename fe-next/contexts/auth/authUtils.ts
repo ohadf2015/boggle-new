@@ -34,6 +34,48 @@ export async function fetchGeolocation(): Promise<{
 }
 
 /**
+ * Extract display name from OAuth user metadata.
+ * Handles Google (full_name, name), Discord (global_name, preferred_username, full_name),
+ * and Apple (full_name, name) metadata shapes.
+ */
+export function extractOAuthDisplayName(
+  userMetadata: Record<string, unknown> | undefined
+): string | null {
+  if (!userMetadata) return null;
+
+  // Try standard fields first (Google, Apple)
+  const fullName =
+    (userMetadata.full_name as string) || (userMetadata.name as string);
+  if (fullName) {
+    // Extract first name, capitalize properly
+    const firstName = fullName.split(' ')[0];
+    if (/^[A-Z]+$/.test(firstName)) {
+      return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    }
+    return firstName;
+  }
+
+  // Discord: custom_claims.global_name or preferred_username
+  const customClaims = userMetadata.custom_claims as Record<string, unknown> | undefined;
+  if (customClaims?.global_name) return customClaims.global_name as string;
+  if (userMetadata.preferred_username) return userMetadata.preferred_username as string;
+
+  // Email prefix as last resort
+  const email = userMetadata.email as string | undefined;
+  if (email) return email.split('@')[0];
+
+  return null;
+}
+
+// Hardcoded fun names for when the random name API fails — never show "Player_xxxx"
+const FALLBACK_NAMES = [
+  'WordNinja', 'LetterWizard', 'VowelViking', 'SyllableStar',
+  'GrammarGhost', 'SpellingBee', 'AlphabetAce', 'LexiconLion',
+  'PuzzlePanda', 'DictionaryDog', 'VocabViper', 'SyntaxSailor',
+  'PhonicsPhoenix', 'BookwormBear', 'RuneRanger', 'QuillQuokka',
+];
+
+/**
  * Fetch a random player name with suited avatar
  */
 export async function fetchRandomPlayerName(
@@ -50,8 +92,9 @@ export async function fetchRandomPlayerName(
     return await response.json();
   } catch (error) {
     logger.warn('Failed to fetch random name, using fallback:', error);
+    const name = FALLBACK_NAMES[Math.floor(Math.random() * FALLBACK_NAMES.length)];
     return {
-      name: 'Player ' + Math.floor(Math.random() * 1000),
+      name,
       avatar: { emoji: '😀', color: '#8B5CF6' },
     };
   }

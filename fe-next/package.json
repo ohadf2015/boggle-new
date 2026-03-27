@@ -60,6 +60,7 @@
     "mobile:ios:release": "bash scripts/mobile/build-ios.sh --release",
     "mobile:android": "bash scripts/mobile/build-android.sh",
     "mobile:android:release": "bash scripts/mobile/build-android.sh --release",
+    "mobile:android:play": "bash scripts/mobile/build-android.sh --aab",
     "mobile:open:ios": "npx cap open ios",
     "mobile:open:android": "npx cap open android",
     "render:cinematics": "npx tsx scripts/render-cinematics.ts",

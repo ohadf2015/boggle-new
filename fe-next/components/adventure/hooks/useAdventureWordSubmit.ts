@@ -169,97 +169,104 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       isSubmittingRef.current = false;
 
       // Silently ignore cancelled validations (aborted by a newer submission)
-      if (!result.isValid && !result.errorKey && !result.score) return;
+      // Still clear selection so tiles don't stay highlighted ("stuck word" bug)
+      if (!result.isValid && !result.errorKey && !result.score) {
+        clearSelection();
+        return;
+      }
 
       if (result.isValid && result.score) {
-        const startPos = getPopupStartPosition();
-        let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus * getScoreMultiplier());
+        try {
+          const startPos = getPopupStartPosition();
+          let scoreValue = Math.floor(result.score * upgradeBonuses.scoreBonus * getScoreMultiplier());
 
-        // World mechanic bonus
-        const mechanicEval = evaluateWorldMechanic(word, worldMechanic ?? null, wordsFound);
-        if (mechanicEval.bonus) {
-          scoreValue = Math.floor(scoreValue * mechanicEval.multiplier);
-        }
-
-        let bossBonus: string | undefined;
-        if (isBossActive && bossConfig) {
-          const mechResult = checkBossWord(word);
-          scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
-
-          let baseDamage = Math.floor(scoreValue / 10);
-          baseDamage = Math.floor(baseDamage * skillEffects.bossDamageMultiplier);
-          baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(word.length));
-
-          const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
-          dealBossDamage(baseDamage, comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
-
-          if (mechResult.triggerTaunt) {
-            triggerBossTaunt(mechResult.triggerTaunt);
-          } else if (scoreValue >= 50) {
-            triggerBossTaunt('onGoodWord');
+          // World mechanic bonus
+          const mechanicEval = evaluateWorldMechanic(word, worldMechanic ?? null, wordsFound);
+          if (mechanicEval.bonus) {
+            scoreValue = Math.floor(scoreValue * mechanicEval.multiplier);
           }
 
-          if (mechResult.meetsRequirement) {
-            bossBonus = 'BOSS!';
+          let bossBonus: string | undefined;
+          if (isBossActive && bossConfig) {
+            const mechResult = checkBossWord(word);
+            scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
+
+            let baseDamage = Math.floor(scoreValue / 10);
+            baseDamage = Math.floor(baseDamage * skillEffects.bossDamageMultiplier);
+            baseDamage = Math.floor(baseDamage * skillEffects.getLongWordDamageMultiplier(word.length));
+
+            const mechanicMultiplier = mechResult.meetsRequirement ? 2.0 : 1.0;
+            dealBossDamage(baseDamage, comboCount, mechanicMultiplier, skillEffects.comboMultiplierBonus);
+
+            if (mechResult.triggerTaunt) {
+              triggerBossTaunt(mechResult.triggerTaunt);
+            } else if (scoreValue >= 50) {
+              triggerBossTaunt('onGoodWord');
+            }
+
+            if (mechResult.meetsRequirement) {
+              bossBonus = 'BOSS!';
+            }
+
+            // Armor Plating T4: heal player on every word during boss fight
+            if (bossHealPerWord > 0 && healPlayerHealth) {
+              healPlayerHealth(bossHealPerWord);
+            }
           }
 
-          // Armor Plating T4: heal player on every word during boss fight
-          if (bossHealPerWord > 0 && healPlayerHealth) {
-            healPlayerHealth(bossHealPerWord);
+          const comboBonus = comboCount > 1 ? `${comboCount}x` : undefined;
+          const mechanicBonus = mechanicEval.bonus && mechanicEval.feedbackKey
+            ? t(mechanicEval.feedbackKey)
+            : undefined;
+
+          addScorePopup({
+            id: ++popupIdCounter,
+            value: scoreValue,
+            x: startPos.x,
+            y: startPos.y,
+            word,
+            bonus: bossBonus || mechanicBonus || comboBonus,
+          });
+
+          hapticSuccess();
+          setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
+          setLastAccepted({ word, score: scoreValue });
+          setWordFeedback({ id: `${++popupIdCounter}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
+          lastSubmittedWordRef.current = { word, path };
+
+          submitWordWithPath(word, scoreValue, path, { detonate: detonateActive });
+          clearCurrentHint();
+          recordActivity();
+          resetOnGameAction();
+          recordAIWord(true, comboCount);
+
+          if (wordsFound.length === 0) {
+            handleEarnAchievement('FIRST_WORD');
           }
-        }
+          if (word.length >= 6) {
+            handleEarnAchievement('LONG_WORD_6');
+          }
+          if (word.length >= 8) {
+            handleEarnAchievement('LONG_WORD_8');
+          }
+          if (comboCount >= 5) {
+            handleEarnAchievement('WORD_STREAK_5');
+          }
+          if (comboCount >= 10) {
+            handleEarnAchievement('WORD_STREAK_10');
+          }
+          if (comboCount >= 15) {
+            handleEarnAchievement('COMBO_KING');
+          }
 
-        const comboBonus = comboCount > 1 ? `${comboCount}x` : undefined;
-        const mechanicBonus = mechanicEval.bonus && mechanicEval.feedbackKey
-          ? t(mechanicEval.feedbackKey)
-          : undefined;
-
-        addScorePopup({
-          id: ++popupIdCounter,
-          value: scoreValue,
-          x: startPos.x,
-          y: startPos.y,
-          word,
-          bonus: bossBonus || mechanicBonus || comboBonus,
-        });
-
-        hapticSuccess();
-        setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
-        setLastAccepted({ word, score: scoreValue });
-        setWordFeedback({ id: `${++popupIdCounter}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
-        lastSubmittedWordRef.current = { word, path };
-
-        submitWordWithPath(word, scoreValue, path, { detonate: detonateActive });
-        clearSelection();
-        clearCurrentHint();
-        recordActivity();
-        resetOnGameAction();
-        recordAIWord(true, comboCount);
-
-        if (wordsFound.length === 0) {
-          handleEarnAchievement('FIRST_WORD');
+          wordSubmittedTimeoutRef.current = setTimeout(() => {
+            setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
+            setLastAccepted(null);
+            setWordFeedback(null);
+          }, 1200);
+        } finally {
+          clearSelection();
         }
-        if (word.length >= 6) {
-          handleEarnAchievement('LONG_WORD_6');
-        }
-        if (word.length >= 8) {
-          handleEarnAchievement('LONG_WORD_8');
-        }
-        if (comboCount >= 5) {
-          handleEarnAchievement('WORD_STREAK_5');
-        }
-        if (comboCount >= 10) {
-          handleEarnAchievement('WORD_STREAK_10');
-        }
-        if (comboCount >= 15) {
-          handleEarnAchievement('COMBO_KING');
-        }
-
-        wordSubmittedTimeoutRef.current = setTimeout(() => {
-          setValidationFeedback({ error: null, wasSubmitted: false, isValid: false });
-          setLastAccepted(null);
-          setWordFeedback(null);
-        }, 1200);
       } else if (result.errorKey) {
         const errorMessage = t(result.errorKey) || result.errorKey;
         setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });

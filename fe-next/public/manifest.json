@@ -46,8 +46,8 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
-  "theme_color": "#667eea",
-  "background_color": "#4a4a7a",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
   "categories": [
     "games",
     "education",

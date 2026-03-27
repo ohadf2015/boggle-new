@@ -128,15 +128,15 @@ describe('useAdventureMusic', () => {
         { wrapper: createWrapper() }
       );
 
-      // Should not create any adventure music Howl instances (world 4 has no music)
-      // MusicProvider creates its own Howls for global music, but adventure hook should not
+      // World 4 has a single-track music file — should create exactly 1 Howl
       const adventureMusicCalls = Howl.mock.calls.filter(
         (call: unknown[]) => {
           const src = (call[0] as { src?: string[] })?.src?.[0];
           return src?.includes('/music/adventure/');
         }
       );
-      expect(adventureMusicCalls).toHaveLength(0);
+      expect(adventureMusicCalls).toHaveLength(1);
+      expect(adventureMusicCalls[0][0].src[0]).toBe('/music/adventure/Sunrise Coconut Quest.mp3');
     });
 
     it('returns hasMusic=true for worlds 1-3', () => {
@@ -144,11 +144,24 @@ describe('useAdventureMusic', () => {
       expect(result.current.hasMusic).toBe(true);
     });
 
-    it('returns hasMusic=false for worlds 4+', () => {
+    it('returns hasMusic=true for all worlds 1-10', () => {
+      for (const world of [4, 5, 6, 7, 8, 9, 10]) {
+        const { result } = renderHook(() =>
+          useAdventureMusic({
+            ...defaultProps,
+            worldNumber: world,
+          }),
+          { wrapper: createWrapper() }
+        );
+        expect(result.current.hasMusic).toBe(true);
+      }
+    });
+
+    it('returns hasMusic=false for worlds beyond 10', () => {
       const { result } = renderHook(() =>
         useAdventureMusic({
           ...defaultProps,
-          worldNumber: 5,
+          worldNumber: 11,
         }),
         { wrapper: createWrapper() }
       );

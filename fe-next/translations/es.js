@@ -5956,7 +5956,8 @@ const es = {
     },
     "share": {
       "bossDefeated": "¡Derroté a {{boss}} en {{world}}!",
-      "shareCard": "Compartir victoria"
+      "shareCard": "Compartir victoria",
+      "killingWord": "Palabra letal"
     },
     "weeklyChallenge": {
       "title": "Desafío semanal",
@@ -6106,6 +6107,8 @@ const es = {
       "bossWins": "El jefe gana...",
       "nearMiss": "¡TAN CERCA!",
       "nearMissDesc": "¡Solo {{hp}}% HP restante! ¡Casi lo tenías!",
+      "fragmentCollected": "¡FRAGMENTO DEL LÉXICO RECUPERADO!",
+      "fragmentCount": "Fragmento {{current}} de {{total}} recolectado",
       "twistMechanic": "Giro del jefe",
       "skipIntro": "Saltar",
       "readyToFight": "¡Vamos!",
@@ -6124,6 +6127,7 @@ const es = {
       "msGrammar": {
         "name": "Srta. Gramática",
         "mechanic": "Protocolo de examen sorpresa - ¡Encuentra palabras que cumplan mis requisitos!",
+        "storyline": "El antiguo Léxico — un libro que contenía cada palabra jamás pronunciada — se ha fragmentado en 10 pedazos. La Srta. Gramática, la estricta guardiana del Mundo 1, posee el primer fragmento. Demuestra que tu vocabulario es digno.",
         "phases": {
           "lecture": "Clase",
           "popTest": "Examen Sorpresa",
@@ -6146,6 +6150,7 @@ const es = {
       "spellingBee": {
         "name": "La Abeja Ortográfica",
         "mechanic": "Caos de la colmena - ¡Fichas pegajosas y desafíos de sinónimos!",
+        "storyline": "Con el primer fragmento recuperado, los susurros del poder del Léxico llegan al Archivo de Miel. La Reina Abeja Ortográfica custodia el segundo fragmento — tejido en las pegajosas redes de palabras de su colmena.",
         "taunts": {
           "start1": "Bienvenidos a MI colmena. Espero que les guste la miel... y el FRACASO.",
           "start2": "¡Buzz buzz! Ese es el sonido de su destino. Además soy una abeja.",
@@ -6163,6 +6168,7 @@ const es = {
       "professorThesaurus": {
         "name": "Profesor Tesauro",
         "mechanic": "Excavación etimológica - ¡Las palabras con raíces compartidas crean combos!",
+        "storyline": "Dos fragmentos resuenan juntos y revelan un mapa antiguo hacia las Cuevas de Cristal. El Profesor Tesauro ha estudiado el tercer fragmento durante siglos — enterrado en lo más profundo de las raíces del lenguaje.",
         "taunts": {
           "start1": "Ah, ¡un retador se acerca! ¿O debería decir, un adversario avanza?",
           "start2": "He olvidado más palabras de las que jamás aprenderán. Literalmente. Soy muy viejo.",
@@ -6180,6 +6186,7 @@ const es = {
       "captainMetaphor": {
         "name": "Capitán Metáfora",
         "mechanic": "Batalla de la flota figurativa - ¡Encuentren las palabras literales de mis modismos!",
+        "storyline": "Los tres fragmentos forman una brújula que apunta a los Mares Figurativos. El Capitán Metáfora navega estas aguas hablando solo en modismos. No entregará el cuarto fragmento — tendrás que hablar su idioma.",
         "taunts": {
           "start1": "¡Alto! ¡Están ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
           "start2": "¡Tiemblen ante mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
@@ -6197,6 +6204,7 @@ const es = {
       "baronBuildaword": {
         "name": "Barón Construyepalabras",
         "mechanic": "Asalto de la línea de ensamblaje - ¡Construyan palabras compuestas para bonos enormes!",
+        "storyline": "La brújula del Léxico conduce a la Fundición de Vapor. El Barón Construyepalabras ha soldado el quinto fragmento a su Ensamblador de Palabras 3000. Solo superándolo como ingeniero podrás arrancarlo.",
         "taunts": {
           "start1": "¡INEFICIENTE! ¡Podrían estar COMPONIENDO! ¡Piensen MARIPOSA, no 'mari'!",
           "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos su ingeniería!",
@@ -6214,6 +6222,7 @@ const es = {
       "puzzleMaster": {
         "name": "Maestro del Puzzle",
         "mechanic": "Realidad revuelta - ¡Las letras se mezclan! ¡Encuentren anagramas para bonos!",
+        "storyline": "Cinco fragmentos pulsan al unísono y revelan un laberinto que cambia como un anagrama. El Maestro del Puzzle escondió el sexto fragmento dentro de un acertijo envuelto en un enigma — naturalmente.",
         "taunts": {
           "start1": "Reordenen 'NOTAS' y díganme qué encuentran. Esperaré. Tengo nueve vidas.",
           "start2": "Todo es un puzzle. Incluso esta frase. Especialmente esta frase.",
@@ -6231,6 +6240,7 @@ const es = {
       "reflectionKing": {
         "name": "Rey del Reflejo",
         "mechanic": "Caos del combate espejo - ¡La cuadrícula se refleja! ¡Encuentren palíndromos para poder!",
+        "storyline": "Seis fragmentos crean un espejo — y en su reflejo se ve el Palacio de Hielo. El Rey del Reflejo ha congelado el séptimo fragmento en su corona. Solo palabras de simetría perfecta pueden romper el hielo.",
         "taunts": {
           "start1": "¡Contemplen mi perfección! También busquen palíndromos - ¡las únicas palabras bastante hermosas!",
           "start2": "¡Esta batalla será LEGENDARIA! Escribirán EPOPEYAS sobre... principalmente yo.",
@@ -6248,6 +6258,7 @@ const es = {
       "cosmicWordsmith": {
         "name": "Forjador Cósmico de Palabras",
         "mechanic": "Forja estelar de palabras - ¡Las letras evolucionan! ¡Letras raras crean supernovas!",
+        "storyline": "Siete fragmentos brillan lo suficiente para atravesar el vacío. En la Nebulosa Estelar, el Forjador Cósmico de Palabras — antiguo inventor del lenguaje — custodia el octavo fragmento entre estrellas en evolución.",
         "taunts": {
           "start1": "Estuve PRESENTE cuando sus ancestros gruñeron sus primeras palabras. Esperaba más.",
           "start2": "Usan 'literalmente' para decir 'figuradamente.' Inventé ambas. La ironía es CÓSMICA.",
@@ -6265,6 +6276,7 @@ const es = {
       "linguistSage": {
         "name": "Sabio Lingüista",
         "mechanic": "La cumbre de Babel - ¡El idioma cambia! ¡Palabras universales ganan bonos enormes!",
+        "storyline": "Ocho fragmentos vibran en todas las lenguas a la vez. En la cima de la Torre de Babel, el Sabio Lingüista medita ante el noveno fragmento — un trozo que habla TODOS los idiomas simultáneamente.",
         "taunts": {
           "start1": "Ah, '¡hola!' O 'konnichiwa.' O 'bonjour.' O... ¿qué estábamos haciendo?",
           "start2": "¡Toda palabra es prestada! '¡Kindergarten' es alemán! '¡Safari' es suajili!",
@@ -6282,6 +6294,7 @@ const es = {
       "lexiconDragon": {
         "name": "Dragón del Léxico",
         "mechanic": "La Última Palabra - ¡TODAS las mecánicas combinadas! ¡Construyan el GOLPE LÉXICO!",
+        "storyline": "Nueve fragmentos se ensamblan en una llave que abre la Biblioteca del Dragón — donde se guarda cada palabra jamás escrita. El Dragón del Léxico custodia el fragmento final: la portada del Léxico original. Derrótalo y restaura el libro que mantiene unido todo el lenguaje.",
         "taunts": {
           "start1": "¡GUAU UN RETADOR! ¿Quieren ver mi diario de palabras? ¡Son solo 47 tomos!",
           "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TÉMANME! ¡Rawr!",
@@ -6538,6 +6551,7 @@ const es = {
       "soCloseDesc": "Llegaste a {{current}}/{{target}} — ¡solo un poco más!",
       "more": "más",
       "hint": "Pista",
+      "hintCost": "Pista ({{cost}}g)",
       "hintAvailable": "¿Necesitas una pista?",
       "hintUsed": "¡Prueba esta palabra!",
       "noHints": "No hay más pistas disponibles",

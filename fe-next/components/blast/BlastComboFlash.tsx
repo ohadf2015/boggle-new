@@ -3,137 +3,62 @@
 import React from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import type { BlastComboType } from './utils/blastCombos';
-
-// ==================== Types ====================
 
 export interface BlastComboFlashProps {
-  activeFlash: { id: string; comboType: BlastComboType } | null;
-  onComplete: (id: string) => void;
+  flash: { id: string; tier: 1 | 2 | 3 } | null;
+  onComplete: () => void;
 }
 
-// ==================== Tier system ====================
+const TIER_CONFIG: Record<1 | 2 | 3, { color: string; duration: number; opacity: number }> = {
+  1: { color: '#00FFFF', duration: 0.2, opacity: 0.15 },
+  2: { color: '#FF6B35', duration: 0.3, opacity: 0.25 },
+  3: { color: 'linear-gradient(135deg, #FF1493, #FFE135, #00FFFF, #FF6B35)', duration: 0.45, opacity: 0.35 },
+};
 
-/** Tier 3: Ultimate combos (scoreMultiplier >= 6) */
-const TIER_3_TYPES: ReadonlySet<BlastComboType> = new Set([
-  'prism_prism',
-  'prism_rainbow',
-  'lightning_prism',
-]);
-
-/** Tier 2: Powerful combos (scoreMultiplier 4-5) */
-const TIER_2_TYPES: ReadonlySet<BlastComboType> = new Set([
-  'bomb_prism',
-  'bomb_magnet',
-  'bomb_rainbow',
-  'bomb_mirror',
-  'bomb_gem',
-  'bomb_lightning',
-  'lightning_lightning',
-  'lightning_rainbow',
-  'lightning_mirror',
-  'lightning_magnet',
-  'lightning_gem',
-  'prism_mirror',
-  'prism_magnet',
-  'prism_gem',
-  'prism_frozen',
-  'rainbow_mirror',
-  'rainbow_magnet',
-  'rainbow_gem',
-  'mirror_magnet',
-  'mirror_gem',
-  'mirror_frozen',
-  'magnet_gem',
-  'magnet_frozen',
-  'gem_frozen',
-]);
-
-/**
- * Map a combo type to its tier (1=moderate, 2=powerful, 3=ultimate).
- * Exported for testing.
- */
-export function getComboTier(comboType: BlastComboType): 1 | 2 | 3 {
-  if (TIER_3_TYPES.has(comboType)) return 3;
-  if (TIER_2_TYPES.has(comboType)) return 2;
-  return 1;
-}
-
-/**
- * Return the flash background CSS value for a given tier.
- * Exported for testing.
- */
-export function getComboFlashColor(tier: 1 | 2 | 3): string {
-  switch (tier) {
-    case 3:
-      return 'linear-gradient(135deg, #FF1493, #FFE135, #00FFFF, #FF6B35)';
-    case 2:
-      return '#FF6B35';
-    case 1:
-    default:
-      return '#00FFFF';
-  }
-}
-
-// ==================== Component ====================
-
-/**
- * BlastComboFlash — full-screen color overlay triggered on combo detection.
- * Tier 1 (moderate) = cyan, Tier 2 (powerful) = orange, Tier 3 (ultimate) = rainbow.
- * Auto-dismisses after 400ms animation via onComplete callback.
- * Respects reduced motion: immediately calls onComplete with no visible flash.
- */
-export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProps) {
+export function BlastComboFlash({ flash, onComplete }: BlastComboFlashProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  if (!activeFlash) return null;
+  if (!flash) return null;
 
-  // Reduced motion: skip flash, call onComplete synchronously via effect
   if (shouldReduceMotion) {
-    return (
-      <ReducedMotionFlash id={activeFlash.id} onComplete={onComplete} />
-    );
+    return <ReducedMotionFlash onComplete={onComplete} />;
   }
 
-  const tier = getComboTier(activeFlash.comboType);
-  const background = getComboFlashColor(tier);
+  const cfg = TIER_CONFIG[flash.tier];
+  const isGradient = flash.tier === 3;
+  const bgValue = isGradient
+    ? `radial-gradient(circle, ${cfg.color}, transparent 70%)`
+    : `radial-gradient(circle, ${cfg.color}, transparent 60%)`;
 
   return (
     <AdaptiveAnimatePresence>
       <AdaptiveMotion.div
-        key={activeFlash.id}
+        key={flash.id}
         data-testid="combo-flash"
         className="absolute inset-0 pointer-events-none z-40 overflow-hidden"
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
-        transition={{ duration: tier === 3 ? 0.45 : tier === 2 ? 0.3 : 0.2, ease: 'easeOut' }}
-        onAnimationComplete={() => onComplete(activeFlash.id)}
+        transition={{ duration: cfg.duration, ease: 'easeOut' }}
+        onAnimationComplete={onComplete}
       >
-        {/* Radial flash — expands from center like a shockwave */}
         <AdaptiveMotion.div
           className="absolute"
-          style={{
-            inset: '-50%',
-            background: tier === 3
-              ? `radial-gradient(circle, ${background}, transparent 70%)`
-              : `radial-gradient(circle, ${background}, transparent 60%)`,
-          }}
-          initial={{ scale: 0.3, opacity: tier === 3 ? 0.35 : tier === 2 ? 0.25 : 0.15 }}
+          style={{ inset: '-50%', background: bgValue }}
+          initial={{ scale: 0.3, opacity: cfg.opacity }}
           animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ duration: tier === 3 ? 0.4 : tier === 2 ? 0.28 : 0.18, ease: 'easeOut' }}
+          transition={{ duration: cfg.duration * 0.9, ease: 'easeOut' }}
         />
-        {/* Horizontal sweep line for tier 2+ */}
-        {tier >= 2 && (
+        {flash.tier >= 2 && (
           <AdaptiveMotion.div
             style={{
               position: 'absolute',
               top: '50%',
               left: 0,
               width: '100%',
-              height: tier === 3 ? 4 : 2,
-              background: tier === 3
+              height: flash.tier === 3 ? 4 : 2,
+              background: isGradient
                 ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)'
-                : `linear-gradient(90deg, transparent, ${background}80, transparent)`,
+                : `linear-gradient(90deg, transparent, ${cfg.color}80, transparent)`,
               transform: 'translateY(-50%)',
             }}
             initial={{ scaleX: 0, opacity: 1 }}
@@ -146,10 +71,7 @@ export function BlastComboFlash({ activeFlash, onComplete }: BlastComboFlashProp
   );
 }
 
-/** Thin helper that fires onComplete immediately for reduced-motion users */
-function ReducedMotionFlash({ id, onComplete }: { id: string; onComplete: (id: string) => void }) {
-  React.useEffect(() => {
-    onComplete(id);
-  }, [id, onComplete]);
+function ReducedMotionFlash({ onComplete }: { onComplete: () => void }) {
+  React.useEffect(() => { onComplete(); }, [onComplete]);
   return null;
 }

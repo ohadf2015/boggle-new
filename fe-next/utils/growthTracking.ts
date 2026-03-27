@@ -23,27 +23,54 @@ export type GrowthEvent =
   | 'first_game_played'
   | 'first_word_found'
   | 'first_game_won'
+  // Session & Game lifecycle
+  | 'session_start'
+  | 'game_started'
+  | 'game_completed'
+  | 'game_abandoned'
+  | 'mode_selected'
   // Retention
   | 'return_visit'
   | 'streak_continued'
   | 'streak_milestone'
+  | 'streak_broken'
+  | 'streak_freeze_used'
   | 'daily_challenge_completed'
-  // Referral
+  | 'daily_puzzle_opened'
+  | 'daily_puzzle_completed'
+  // Adventure
+  | 'adventure_level_start'
+  | 'adventure_level_pass'
+  | 'adventure_level_fail'
+  | 'adventure_quit'
+  // Social
   | 'share_link_copied'
   | 'share_whatsapp_clicked'
   | 'share_qr_generated'
   | 'share_win_prompt_shown'
   | 'share_win_prompt_clicked'
+  | 'share_card_generated'
+  | 'friend_added'
+  | 'challenge_sent'
   // Engagement
   | 'achievement_earned'
   | 'achievement_shared'
   | 'leaderboard_viewed'
   | 'profile_viewed'
+  | 'feature_first_use'
+  | 'hint_used'
   // Conversion
   | 'signup_prompt_shown'
   | 'signup_completed'
   | 'first_win_signup_shown'
-  | 'first_win_signup_completed';
+  | 'first_win_signup_completed'
+  | 'guest_conversion'
+  // Monetization
+  | 'iap_viewed'
+  | 'iap_purchased'
+  | 'rewarded_ad_offered'
+  | 'rewarded_ad_watched'
+  | 'rewarded_ad_declined';
 
 export interface GrowthEventData {
   // Common properties
@@ -149,8 +176,45 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   }
   trackGA4Event(`growth_${event}`, ga4Data);
 
+  // Persist to Supabase via analytics API (fire and forget)
+  persistToSupabase(event, enrichedData);
+
   // Store key events in localStorage for analysis
   storeEventLocally(event, enrichedData);
+};
+
+/**
+ * Persist event to Supabase analytics_events table via API
+ * Fire-and-forget — never blocks the UI
+ */
+const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
+  if (typeof window === 'undefined') return;
+
+  // Throttle: skip high-frequency events that would overwhelm the DB
+  const skipPersist: GrowthEvent[] = ['page_view']; // page_view already tracked via trackPageView
+  if (skipPersist.includes(event)) return;
+
+  const utmData = getStoredUtmData();
+  const guestSessionId = getGuestSessionId();
+
+  // Build metadata from event data (exclude fields stored as top-level columns)
+  const { sessionId: _sid, referralSource: _ref, timestamp: _ts, ...metadata } = data;
+
+  fetch('/api/analytics/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event_type: event,
+      session_id: guestSessionId || data.sessionId || null,
+      utm_source: utmData?.utm_source || utmData?.ref || null,
+      utm_medium: utmData?.utm_medium || null,
+      utm_campaign: utmData?.utm_campaign || null,
+      referrer: utmData?.referrer || null,
+      metadata,
+    }),
+  }).catch(() => {
+    // Silently fail — analytics should never break the game
+  });
 };
 
 /**
@@ -439,6 +503,93 @@ export const trackPageView = (path?: string): void => {
   });
 };
 
+/**
+ * Track game start across any mode (SP, MP, daily, adventure, drill, blast)
+ */
+export const trackGameStart = (
+  mode: string,
+  extras: Record<string, unknown> = {}
+): void => {
+  trackGrowthEvent('game_started', { ...extras, gameMode: mode });
+};
+
+/**
+ * Track game completion across any mode
+ */
+export const trackGameEnd = (
+  mode: string,
+  score: number,
+  wordCount: number,
+  completed: boolean,
+  durationSec?: number,
+  extras: Record<string, unknown> = {}
+): void => {
+  trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
+    ...extras,
+    gameMode: mode,
+    score,
+    wordCount,
+    durationSec,
+  });
+};
+
+/**
+ * Track adventure level events
+ */
+export const trackAdventureLevel = (
+  action: 'start' | 'pass' | 'fail' | 'quit',
+  world: number,
+  level: number,
+  extras: Record<string, unknown> = {}
+): void => {
+  const eventMap = {
+    start: 'adventure_level_start' as const,
+    pass: 'adventure_level_pass' as const,
+    fail: 'adventure_level_fail' as const,
+    quit: 'adventure_quit' as const,
+  };
+  trackGrowthEvent(eventMap[action], { ...extras, world, level });
+};
+
+/**
+ * Track mode selection from home screen
+ */
+export const trackModeSelected = (mode: string, fromScreen: string = 'home'): void => {
+  trackGrowthEvent('mode_selected', { gameMode: mode, fromScreen });
+};
+
+/**
+ * Track first use of a feature (deduplicated in localStorage)
+ */
+export const trackFeatureFirstUse = (feature: string): void => {
+  if (typeof window === 'undefined') return;
+  const key = `lexiclash_first_use_${feature}`;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  trackGrowthEvent('feature_first_use', { feature });
+};
+
+/**
+ * Track daily puzzle engagement
+ */
+export const trackDailyPuzzle = (
+  action: 'opened' | 'completed',
+  puzzleType: string,
+  extras: Record<string, unknown> = {}
+): void => {
+  trackGrowthEvent(
+    action === 'opened' ? 'daily_puzzle_opened' : 'daily_puzzle_completed',
+    { ...extras, puzzleType }
+  );
+};
+
+/**
+ * Track hint usage
+ */
+export const trackHintUsed = (mode: string, hintType: string = 'standard'): void => {
+  trackGrowthEvent('hint_used', { gameMode: mode, hintType });
+};
+
 const growthTracking = {
   trackGrowthEvent,
   trackShare,
@@ -454,6 +605,13 @@ const growthTracking = {
   trackGuestJoin,
   trackGuestGameComplete,
   trackPageView,
+  trackGameStart,
+  trackGameEnd,
+  trackAdventureLevel,
+  trackModeSelected,
+  trackFeatureFirstUse,
+  trackDailyPuzzle,
+  trackHintUsed,
 };
 
 export default growthTracking;

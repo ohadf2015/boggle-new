@@ -9,6 +9,7 @@ import ModeCard from './ModeCard';
 import { LandingShareBanner } from './LandingShareBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { trackModeSelected } from '@/utils/growthTracking';
 
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
@@ -73,6 +74,7 @@ export function LandingDesktopCards({
             } : undefined}
             highlighted={isFirstTimer}
             highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
+            onClick={() => trackModeSelected('singleplayer')}
           />
         </motion.div>
 
@@ -100,6 +102,7 @@ export function LandingDesktopCards({
               count: activePlayers,
               label: t('landing.playingNow'),
             }}
+            onClick={() => trackModeSelected('multiplayer')}
           />
         </motion.div>
 
@@ -142,6 +145,7 @@ export function LandingDesktopCards({
             icon={<Map className="w-6 h-6" />}
             variant="lime"
             className="w-full"
+            onClick={() => trackModeSelected('adventure')}
           />
         </motion.div>
 
@@ -157,6 +161,7 @@ export function LandingDesktopCards({
               secondary
               badge="ADMIN"
               className="w-full"
+              onClick={() => trackModeSelected('blast')}
             />
           </div>
         )}

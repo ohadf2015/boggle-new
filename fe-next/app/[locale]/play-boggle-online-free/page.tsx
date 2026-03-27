@@ -224,6 +224,24 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
         </section>
 
         <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Compare Word Games</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
+            </Link>
+            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">No ads, no bots, real players</p>
+            </Link>
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
+            </Link>
+          </div>
+        </section>
+
+        <section className="mb-12">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start Playing Now</h2>
           <p className="mt-4 text-neo-gray-200">
             Stop searching for &quot;boggle online free no download&quot; — you found it! LexiClash is the best

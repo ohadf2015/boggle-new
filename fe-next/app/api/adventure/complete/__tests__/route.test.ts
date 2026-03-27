@@ -119,6 +119,10 @@ function setupDbMocks({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
+                  maybeSingle: vi.fn().mockResolvedValue({
+                    data: updateError ? null : (progressionData ?? mockProgression),
+                    error: updateError,
+                  }),
                   single: vi.fn().mockResolvedValue({
                     data: updateError ? null : (progressionData ?? mockProgression),
                     error: updateError,
@@ -589,7 +593,7 @@ describe('POST /api/adventure/complete', () => {
           // and 1-eq pattern (retry), plus standalone select for gold re-read
           const makeUpdateChain = () => {
             const singleFn = vi.fn().mockResolvedValue({ data: null, error: null });
-            const selectFn = vi.fn().mockReturnValue({ single: singleFn });
+            const selectFn = vi.fn().mockReturnValue({ maybeSingle: singleFn, single: singleFn });
             const eqStars = vi.fn().mockReturnValue({ select: selectFn });
             const eqGold = vi.fn().mockReturnValue({ eq: eqStars, select: selectFn });
             const eqUser = vi.fn().mockReturnValue({ eq: eqGold, select: selectFn });
@@ -733,6 +737,10 @@ describe('POST /api/adventure/complete', () => {
                     eq: vi.fn().mockReturnValue({
                       eq: vi.fn().mockReturnValue({
                         select: vi.fn().mockReturnValue({
+                          maybeSingle: vi.fn().mockResolvedValue({
+                            data: null,
+                            error: { code: 'PGRST204', message: 'gold column not found' },
+                          }),
                           single: vi.fn().mockResolvedValue({
                             data: null,
                             error: { code: 'PGRST204', message: 'gold column not found' },

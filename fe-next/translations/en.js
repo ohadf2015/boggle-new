@@ -6201,7 +6201,8 @@ const en = {
     },
     "share": {
       "bossDefeated": "I defeated {{boss}} in {{world}}!",
-      "shareCard": "Share Victory"
+      "shareCard": "Share Victory",
+      "killingWord": "Killing Word"
     },
     "quest": {
       "title": "Chapter Quests",
@@ -6293,6 +6294,7 @@ const en = {
       "soCloseDesc": "You reached {{current}}/{{target}} — just a little more!",
       "more": "more",
       "hint": "Hint",
+      "hintCost": "Hint ({{cost}}g)",
       "hintAvailable": "Need a hint?",
       "hintUsed": "Try this word!",
       "noHints": "No more hints available",
@@ -6523,6 +6525,8 @@ const en = {
       "bossWins": "Boss Wins...",
       "nearMiss": "SO CLOSE!",
       "nearMissDesc": "Only {{hp}}% HP left! You almost had them!",
+      "fragmentCollected": "LEXICON FRAGMENT RECOVERED!",
+      "fragmentCount": "Fragment {{current}} of {{total}} collected",
       "twistMechanic": "Boss Twist",
       "skipIntro": "Skip",
       "readyToFight": "Let's Go!",
@@ -6673,6 +6677,7 @@ const en = {
       "msGrammar": {
         "name": "Ms. Grammar",
         "mechanic": "Pop Quiz Protocol - Find words matching my requirements!",
+        "storyline": "The ancient Lexicon — a book containing every word ever spoken — has been shattered into 10 fragments. Ms. Grammar, the strict guardian of World 1, holds the first piece. Prove your vocabulary is worthy.",
         "phases": {
           "lecture": "Lecture",
           "popTest": "Pop Test",
@@ -6695,6 +6700,7 @@ const en = {
       "spellingBee": {
         "name": "Spelling Bee",
         "mechanic": "Hive Mind Havoc - Sticky tiles and synonym challenges!",
+        "storyline": "With the first fragment recovered, whispers of the Lexicon's power reach the Honey Archives. The Spelling Bee Queen guards the second fragment — woven into her hive's sticky word-webs.",
         "taunts": {
           "start1": "Welcome to MY hive. I hope you like honey... and FAILURE.",
           "start2": "Buzz buzz! That's the sound of your doom. Also I'm a bee.",
@@ -6712,6 +6718,7 @@ const en = {
       "professorThesaurus": {
         "name": "Professor Thesaurus",
         "mechanic": "Etymology Excavation - Words with shared roots create combos!",
+        "storyline": "Two fragments resonate together, revealing an ancient map to the Crystal Caves. Professor Thesaurus has been studying the third fragment for centuries — buried deep in the roots of language itself.",
         "taunts": {
           "start1": "Ah, a challenger approaches! Or should I say, an adversary advances?",
           "start2": "I've forgotten more words than you'll ever learn. Literally. I'm very old.",
@@ -6729,6 +6736,7 @@ const en = {
       "captainMetaphor": {
         "name": "Captain Metaphor",
         "mechanic": "Figurative Fleet Battle - Find literal words from my idioms!",
+        "storyline": "The three fragments form a compass pointing to the Figurative Seas. Captain Metaphor sails these waters, speaking only in idioms. He won't hand over the fourth fragment — you'll have to speak his language.",
         "taunts": {
           "start1": "Avast! You're barking up the wrong tree! Which is strange because we're at SEA!",
           "start2": "Shiver me metaphors! A new challenger walks the plank of destiny!",
@@ -6746,6 +6754,7 @@ const en = {
       "baronBuildaword": {
         "name": "Baron Buildaword",
         "mechanic": "Assembly Line Assault - Build compound words for massive bonuses!",
+        "storyline": "The Lexicon compass leads to the Steamwork Foundry. Baron Buildaword has welded the fifth fragment into his Word-Assembly-Matic 3000. Only by out-engineering him can you pry it free.",
         "taunts": {
           "start1": "INEFFICIENT! You could be COMPOUNDING! Think BUTTER-FLY, not 'butter'!",
           "start2": "My Word-Assembly-Matic 3000 is ready! Let's see your engineering!",
@@ -6763,6 +6772,7 @@ const en = {
       "puzzleMaster": {
         "name": "Puzzle Master",
         "mechanic": "Scrambled Reality - Letters scramble! Find anagrams for bonuses!",
+        "storyline": "Five fragments pulse in unison, revealing a labyrinth that shifts like an anagram. The Puzzle Master hid the sixth fragment inside a riddle wrapped in an enigma — naturally.",
         "taunts": {
           "start1": "Rearrange 'NOTES' and tell me what you find. I'll wait. I have nine lives.",
           "start2": "Everything is a puzzle. Even this sentence. Especially this sentence.",
@@ -6780,6 +6790,7 @@ const en = {
       "reflectionKing": {
         "name": "Reflection King",
         "mechanic": "Mirror Match Mayhem - The grid mirrors! Find palindromes for power!",
+        "storyline": "Six fragments create a mirror — and in its reflection you see the Ice Palace. The Reflection King has frozen the seventh fragment into his crown. Only words of perfect symmetry can crack the ice.",
         "taunts": {
           "start1": "Behold my perfection! Also look for palindromes - the only words beautiful enough!",
           "start2": "This battle shall be LEGENDARY! They'll write EPICS about... mainly me.",
@@ -6797,6 +6808,7 @@ const en = {
       "cosmicWordsmith": {
         "name": "Cosmic Wordsmith",
         "mechanic": "Stellar Word Forge - Letters evolve! Use rare letters for supernovas!",
+        "storyline": "Seven fragments burn bright enough to pierce the void. In the Stellar Nebula, the Cosmic Wordsmith — ancient inventor of language itself — guards the eighth fragment among evolving stars.",
         "taunts": {
           "start1": "I was PRESENT when your ancestors grunted their first words. I expected more by now.",
           "start2": "You use 'literally' to mean 'figuratively.' I INVENTED both. The irony is COSMIC.",
@@ -6814,6 +6826,7 @@ const en = {
       "linguistSage": {
         "name": "Linguist Sage",
         "mechanic": "Babel's Summit - Language shifts! Universal words earn huge bonuses!",
+        "storyline": "Eight fragments hum in every tongue at once. At the peak of Babel's Summit, the Linguist Sage meditates upon the ninth fragment — a shard that speaks ALL languages simultaneously.",
         "taunts": {
           "start1": "Ah, 'hello'! Or 'konnichiwa.' Or 'bonjour.' Or... what were we doing?",
           "start2": "Every word is borrowed! 'Kindergarten' is German! 'Safari' is Swahili!",
@@ -6831,6 +6844,7 @@ const en = {
       "lexiconDragon": {
         "name": "Lexicon Dragon",
         "mechanic": "The Final Word - ALL mechanics combined! Build the LEXICON STRIKE!",
+        "storyline": "Nine fragments assemble into a key that opens the Dragon's Library — where every word ever written is kept. The Lexicon Dragon guards the final fragment: the title page of the original Lexicon. Defeat him and restore the book that holds all language together.",
         "taunts": {
           "start1": "OH WOW A CHALLENGER! Want to see my word journal? It's only 47 volumes!",
           "start2": "I've been WAITING for someone to play with! I mean... FEAR ME! Rawr!",

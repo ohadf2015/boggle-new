@@ -172,11 +172,11 @@ export const TREASURE_GEM_SPAWN_COUNT = 2;
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 3;
-/** Maximum vertical words cleared per cascade level (limits simultaneous explosions) */
-export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
+export const MAX_CASCADE_CHAIN = 5;
+/** Maximum words/clusters cleared per cascade level */
+export const MAX_CASCADE_WORDS_PER_LEVEL = 3;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
-export const CASCADE_MIN_WORD_LENGTH = 4;
+export const CASCADE_MIN_WORD_LENGTH = 3;
 /** Delay (ms) before scanning for cascade words after grid settles.
  * Reduced from 700ms → 400ms to eliminate the "frozen board" dead gap. */
 export const CASCADE_DETECTION_DELAY = 200;

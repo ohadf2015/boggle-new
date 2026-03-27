@@ -13,6 +13,7 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
+import { trackModeSelected } from '@/utils/growthTracking';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { useDailySolveRate } from '@/hooks/useDailySolveRate';
 import { useHallOfFame } from '@/hooks/useHallOfFame';
@@ -149,6 +150,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const handlePlayClick = () => {
     unlockAudio();
+    trackModeSelected('singleplayer', 'home_mobile_cta');
     router.push(`/${language}/multiplayer?autoCreate=true`);
   };
 

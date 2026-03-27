@@ -5937,7 +5937,8 @@ const sv = {
     },
     "share": {
       "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",
-      "shareCard": "Dela seger"
+      "shareCard": "Dela seger",
+      "killingWord": "Dödande ord"
     },
     "weeklyChallenge": {
       "title": "Veckoutmaning",
@@ -6206,6 +6207,7 @@ const sv = {
       "soCloseDesc": "Du nådde {{current}}/{{target}} — bara lite till!",
       "more": "till",
       "hint": "Tips",
+      "hintCost": "Tips ({{cost}}g)",
       "hintAvailable": "Behöver du ett tips?",
       "hintUsed": "Prova det här ordet!",
       "noHints": "Inga fler tips tillgängliga",
@@ -6432,6 +6434,8 @@ const sv = {
       "bossWins": "Bossen vinner...",
       "nearMiss": "SÅ NÄRA!",
       "nearMissDesc": "Bara {{hp}}% HP kvar! Du hade nästan!",
+      "fragmentCollected": "LEXIKON-FRAGMENT ÅTERSTÄLLT!",
+      "fragmentCount": "Fragment {{current}} av {{total}} insamlat",
       "twistMechanic": "Boss-twist",
       "skipIntro": "Hoppa over",
       "readyToFight": "Kör igång!",
@@ -6582,6 +6586,7 @@ const sv = {
       "msGrammar": {
         "name": "Fröken Grammatik",
         "mechanic": "Prov-protokollet - Hitta ord som matchar mina krav!",
+        "storyline": "Det uråldriga Lexikonet — en bok som innehöll varje ord som någonsin yttrats — har splittrats i 10 fragment. Fröken Grammatik, den stränga väktaren av Värld 1, håller den första biten. Bevisa att ditt ordförråd är värdigt.",
         "phases": {
           "lecture": "Föreläsning",
           "popTest": "Prov",
@@ -6604,6 +6609,7 @@ const sv = {
       "spellingBee": {
         "name": "Stavningsbiet",
         "mechanic": "Bikupans kaos - Klibbiga brickor och synonymutmaningar!",
+        "storyline": "Med det första fragmentet återfunnet når viskningar om Lexikonets kraft Honungsarkivet. Stavningsbidrottningen vaktar det andra fragmentet — invävt i kupans klibbiga ordvävar.",
         "taunts": {
           "start1": "Välkomna till MIN bikupa. Hoppas ni gillar honung... och NEDERLAG.",
           "start2": "Surr surr! Det är ljudet av ert öde. Jag är dessutom ett bi.",
@@ -6621,6 +6627,7 @@ const sv = {
       "professorThesaurus": {
         "name": "Professor Thesaurus",
         "mechanic": "Etymologisk utgrävning - Ord med gemensamma rötter skapar kombos!",
+        "storyline": "Två fragment vibrerar tillsammans och avslöjar en uråldrig karta till Kristallgrottorna. Professor Thesaurus har studerat det tredje fragmentet i århundraden — begravt djupt i språkets rötter.",
         "taunts": {
           "start1": "Ah, en utmanare närmar sig! Eller ska jag säga, en motståndare avancerar?",
           "start2": "Jag har glömt fler ord än ni någonsin kommer lära er. Bokstavligen. Jag är väldigt gammal.",
@@ -6638,6 +6645,7 @@ const sv = {
       "captainMetaphor": {
         "name": "Kapten Metafor",
         "mechanic": "Figurativt flottslag - Hitta bokstavliga ord från mina idiom!",
+        "storyline": "De tre fragmenten bildar en kompass som pekar mot de Figurativa Haven. Kapten Metafor seglar dessa vatten och talar bara i idiom. Han lämnar inte ifrån sig det fjärde fragmentet — du måste tala hans språk.",
         "taunts": {
           "start1": "Ohoj! Ni skäller på fel träd! Vilket är konstigt för vi är till HAVS!",
           "start2": "Skaka mina metaforer! En ny utmanare går plankan av ödet!",
@@ -6655,6 +6663,7 @@ const sv = {
       "baronBuildaword": {
         "name": "Baron Byggaord",
         "mechanic": "Löpandebands-attack - Bygg sammansatta ord för enorma bonusar!",
+        "storyline": "Lexikonkompassen leder till Ångverksstöderiet. Baron Byggaord har svetsat fast det femte fragmentet i sin Ordmonteringsmaskin 3000. Bara genom att överträffa honom som ingenjör kan du frigöra det.",
         "taunts": {
           "start1": "INEFFEKTIVT! Ni kunde SAMMANSÄTTA! Tänk FJÄRIL, inte 'fjär'!",
           "start2": "Min Ord-Monterings-Maskin 3000 är redo! Låt oss se er ingenjörskonst!",
@@ -6672,6 +6681,7 @@ const sv = {
       "puzzleMaster": {
         "name": "Pusselmästaren",
         "mechanic": "Förvrängd verklighet - Bokstäver blandas! Hitta anagram för bonusar!",
+        "storyline": "Fem fragment pulserar i takt och avslöjar en labyrint som skiftar som ett anagram. Pusselmästaren gömde det sjätte fragmentet i en gåta insvept i ett mysterium — naturligtvis.",
         "taunts": {
           "start1": "Ordna om 'NOTER' och berätta vad ni hittar. Jag väntar. Jag har nio liv.",
           "start2": "Allt är ett pussel. Även denna mening. Särskilt denna mening.",
@@ -6689,6 +6699,7 @@ const sv = {
       "reflectionKing": {
         "name": "Reflektionskungen",
         "mechanic": "Spegelkampens kaos - Rutnätet speglas! Hitta palindromer för kraft!",
+        "storyline": "Sex fragment skapar en spegel — och i dess reflektion syns Ispalatset. Reflektionskungen har frusit det sjunde fragmentet i sin krona. Bara ord med perfekt symmetri kan spräcka isen.",
         "taunts": {
           "start1": "Skåda min perfektion! Leta också efter palindromer - de enda orden vackra nog!",
           "start2": "Denna kamp ska bli LEGENDARISK! De skriver EPOS om... mest mig.",
@@ -6706,6 +6717,7 @@ const sv = {
       "cosmicWordsmith": {
         "name": "Kosmiska Ordsmeden",
         "mechanic": "Stjärnordsmedjan - Bokstäver utvecklas! Sällsynta bokstäver skapar supernovor!",
+        "storyline": "Sju fragment lyser tillräckligt starkt för att genomtränga tomrummet. I Stjärnnebulosan vaktar den Kosmiska Ordsmeden — språkets uråldriga uppfinnare — det åttonde fragmentet bland evolverande stjärnor.",
         "taunts": {
           "start1": "Jag var NÄRVARANDE när era förfäder grymtade sina första ord. Jag förväntade mig mer.",
           "start2": "Ni använder 'bokstavligen' bildligt. Jag UPPFANN båda. Ironin är KOSMISK.",
@@ -6723,6 +6735,7 @@ const sv = {
       "linguistSage": {
         "name": "Lingvistiske Visen",
         "mechanic": "Babels topp - Språket skiftar! Universella ord ger enorma bonusar!",
+        "storyline": "Åtta fragment surrar på alla tungomål samtidigt. På toppen av Babels torn mediterar den Lingvistiske Visen över det nionde fragmentet — en skärva som talar ALLA språk på en gång.",
         "taunts": {
           "start1": "Ah, 'hej'! Eller 'konnichiwa.' Eller 'bonjour.' Eller... vad höll vi på med?",
           "start2": "Varje ord är lånat! 'Kindergarten' är tyska! 'Safari' är swahili!",
@@ -6740,6 +6753,7 @@ const sv = {
       "lexiconDragon": {
         "name": "Lexikondraken",
         "mechanic": "Det Sista Ordet - ALLA mekaniker kombinerade! Bygg LEXIKON-STREJKEN!",
+        "storyline": "Nio fragment sammanfogas till en nyckel som öppnar Drakens Bibliotek — där varje ord som någonsin skrivits förvaras. Lexikondraken vaktar det sista fragmentet: titelsidan av det ursprungliga Lexikonet. Besegra honom och återställ boken som håller samman allt språk.",
         "taunts": {
           "start1": "Å VAD EN UTMANARE! Vill ni se min orddagbok? Det är bara 47 volymer!",
           "start2": "Jag har VÄNTAT på att någon ska leka med! Alltså... FRUKTA MIG! Rawr!",

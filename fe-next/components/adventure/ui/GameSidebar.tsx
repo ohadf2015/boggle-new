@@ -64,6 +64,8 @@ interface GameSidebarProps {
   showAutoHint: boolean;
   currentHint: { word: string } | null;
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
+  /** Gold cost for the next hint (0 = free) */
+  nextHintCost?: number;
   /** Time Freeze upgrade: seconds available (0 = no upgrade) */
   freezeSeconds?: number;
   /** Whether freeze has been used this level */
@@ -102,6 +104,7 @@ export const GameSidebar = memo(function GameSidebar({
   showAutoHint,
   currentHint,
   hintLevel,
+  nextHintCost = 0,
   freezeSeconds = 0,
   freezeUsed = false,
   isFrozen = false,
@@ -133,188 +136,223 @@ export const GameSidebar = memo(function GameSidebar({
         className
       )}
     >
-      {/* Mobile: Compact horizontal scrollable chip bar (fits h-16) */}
-      <div className="lg:hidden flex flex-row items-center gap-1.5 px-2 py-1.5 h-full overflow-x-auto scrollbar-hide">
-        {/* Star projection chip */}
-        <div className={cn(
-          'flex-shrink-0 flex items-center gap-0.5 px-2 py-1',
-          'rounded-neo border-2 min-h-10',
-          currentStars === 3 ? 'bg-neo-yellow/20 border-neo-yellow' :
-          currentStars > 0 ? 'bg-neo-yellow/10 border-neo-yellow/40' :
-          'bg-neo-black/40 border-neo-white/10'
-        )}>
-          {[0, 1, 2].map(i => (
-            <Star key={i} className={cn('w-4 h-4 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/25')} />
-          ))}
-        </div>
+      {/* Mobile: Bottom action panel with objectives + action buttons */}
+      <div className="lg:hidden flex flex-col h-full px-2.5 py-2 gap-1.5 overflow-y-auto scrollbar-hide">
+        {/* Row 1: Stars + Objectives — compact chips with circular mini-progress */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          {/* Star projection */}
+          <div className={cn(
+            'flex-shrink-0 flex items-center gap-0.5 px-2 py-1.5',
+            'rounded-full border min-h-9',
+            currentStars === 3 ? 'bg-neo-yellow/15 border-neo-yellow/50' :
+            currentStars > 0 ? 'bg-neo-yellow/8 border-neo-yellow/25' :
+            'bg-neo-black/30 border-neo-white/8'
+          )}>
+            {[0, 1, 2].map(i => (
+              <Star key={i} className={cn('w-3.5 h-3.5 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/20')} />
+            ))}
+          </div>
 
-        {objectives.map((obj) => {
-          const current = obj.current ?? 0;
-          const pct = Math.min((current / obj.target) * 100, 100);
-          const Icon = OBJECTIVE_ICONS[obj.type];
-          return (
-            <div
-              key={obj.type}
-              data-testid={`objective-${obj.type}`}
-              className={cn(
-                'flex-shrink-0 flex items-center gap-1.5 px-2 py-1',
-                'rounded-neo border-2 min-w-16 min-h-11',
-                'transition-all duration-300',
-                obj.isComplete
-                  ? 'bg-neo-lime/20 border-neo-lime'
-                  : obj.isPrimary
-                    ? 'bg-neo-yellow/10 border-neo-yellow/40'
-                    : 'bg-neo-black/40 border-neo-white/10'
-              )}
-            >
-              <Icon
+          {objectives.map((obj) => {
+            const current = obj.current ?? 0;
+            const pct = Math.min((current / obj.target) * 100, 100);
+            const Icon = OBJECTIVE_ICONS[obj.type];
+            const ringC = 2 * Math.PI * 8;
+            return (
+              <div
+                key={obj.type}
+                data-testid={`objective-${obj.type}`}
                 className={cn(
-                  'w-4 h-4 flex-shrink-0',
-                  obj.isComplete ? 'text-neo-lime' : OBJECTIVE_COLORS[obj.type]
+                  'flex-shrink-0 flex items-center gap-1 px-2 py-1',
+                  'rounded-full border min-h-9',
+                  'transition-all duration-300',
+                  obj.isComplete
+                    ? 'bg-neo-lime/12 border-neo-lime/30'
+                    : obj.isPrimary
+                      ? 'bg-neo-white/5 border-neo-white/12'
+                      : 'bg-neo-black/20 border-neo-white/6'
                 )}
-              />
-              <div className="flex flex-col gap-px flex-1 min-w-0">
+              >
+                {/* Icon with circular progress ring */}
+                <div className="relative w-5 h-5 flex-shrink-0">
+                  <svg viewBox="0 0 20 20" className="absolute inset-0 -rotate-90">
+                    <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
+                    <circle
+                      cx="10" cy="10" r="8" fill="none"
+                      strokeWidth="2" strokeLinecap="round"
+                      className={cn(obj.isComplete ? 'stroke-neo-lime' : 'stroke-neo-yellow')}
+                      strokeDasharray={ringC}
+                      strokeDashoffset={ringC * (1 - pct / 100)}
+                      style={{ transition: 'stroke-dashoffset 0.5s' }}
+                    />
+                  </svg>
+                  <Icon
+                    className={cn(
+                      'absolute inset-0 m-auto w-2.5 h-2.5',
+                      obj.isComplete ? 'text-neo-lime' : OBJECTIVE_COLORS[obj.type]
+                    )}
+                  />
+                </div>
                 <span
                   className={cn(
-                    'text-[11px] font-mono font-black tabular-nums leading-tight',
-                    obj.isComplete ? 'text-neo-lime' : 'text-neo-white/80'
+                    'text-[10px] font-mono font-bold tabular-nums leading-tight',
+                    obj.isComplete ? 'text-neo-lime' : 'text-neo-white/70'
                   )}
                 >
                   {current}/{obj.target}
                 </span>
-                <div className="h-1 bg-neo-black/50 rounded-full overflow-hidden">
-                  <div
-                    data-testid={`progress-bar-${obj.type}`}
-                    className={cn(
-                      'h-full rounded-full transition-all duration-500',
-                      obj.isComplete ? 'bg-neo-lime' : 'bg-neo-yellow'
-                    )}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
+                {obj.isComplete && (
+                  <Check className="w-3 h-3 text-neo-lime flex-shrink-0" strokeWidth={3} />
+                )}
               </div>
-              {obj.isComplete && (
-                <Check className="w-3.5 h-3.5 text-neo-lime flex-shrink-0" strokeWidth={3} />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
-        {/* Divider */}
-        <div className="flex-shrink-0 w-px h-6 bg-neo-white/15" />
-
-        {/* Hint chip — glows when auto-hint suggests using it */}
-        <button
-          onClick={onHintClick}
-          disabled={!hasHintsAvailable}
-          className={cn(
-            'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-            'rounded-neo border-2',
-            'min-w-10 min-h-10',
-            'transition-all duration-500',
-            hasHintsAvailable
-              ? showAutoHint
-                ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
-                : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
-              : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
-          )}
-        >
-          <Lightbulb className="w-4 h-4" />
-          <span className="text-xs font-bold">{t('adventure.game.hint')}</span>
-        </button>
-
-        {/* Time Freeze chip (only if upgrade purchased) */}
-        {freezeSeconds > 0 && (
+        {/* Row 2: Action buttons — evenly spaced */}
+        <div className="flex items-center gap-2">
+          {/* Hint button */}
           <button
-            onClick={onFreezeClick}
-            disabled={freezeUsed}
-            aria-label={isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}
+            onClick={onHintClick}
+            disabled={!hasHintsAvailable}
             className={cn(
-              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-10 min-h-10',
-              !freezeUsed
-                ? isFrozen
-                  ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
-                  : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
+              'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+              'rounded-neo border-2',
+              'transition-all duration-500',
+              hasHintsAvailable
+                ? showAutoHint
+                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
+                  : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
                 : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
             )}
           >
-            <Timer className="w-4 h-4" />
-            <span className="text-xs font-bold">{freezeSeconds}s</span>
+            <Lightbulb className="w-4 h-4" />
+            <span className="text-xs font-bold">
+              {nextHintCost > 0 ? t('adventure.game.hintCost', { cost: nextHintCost }) : t('adventure.game.hint')}
+            </span>
           </button>
-        )}
 
-        {/* Shuffle chip (only if upgrade purchased) */}
-        {shufflesRemaining > 0 && (
-          <button
-            onClick={onShuffleClick}
-            aria-label={t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}
-            className={cn(
-              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-10 min-h-10',
-              'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
-            )}
-          >
-            <Shuffle className="w-4 h-4" />
-            <span className="text-xs font-bold">×{shufflesRemaining}</span>
-          </button>
-        )}
+          {/* Time Freeze (only if upgrade purchased) */}
+          {freezeSeconds > 0 && (
+            <button
+              onClick={onFreezeClick}
+              disabled={freezeUsed}
+              aria-label={isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'rounded-neo border-2',
+                !freezeUsed
+                  ? isFrozen
+                    ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
+                    : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
+                  : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
+              )}
+            >
+              <Timer className="w-4 h-4" />
+              <span className="text-xs font-bold">{freezeSeconds}s</span>
+            </button>
+          )}
 
-        {/* Detonate chip (Word Dynamite T3) */}
-        {canDetonate && (
-          <button
-            onClick={onDetonateToggle}
-            aria-label={t('adventure.game.detonate')}
-            className={cn(
-              'flex-shrink-0 flex items-center gap-1 px-2 py-1',
-              'rounded-neo border-2 min-w-10 min-h-10',
-              detonateActive
-                ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
-                : 'bg-neo-red/60 text-neo-black border-neo-black shadow-hard-sm'
-            )}
-            aria-pressed={detonateActive}
-          >
-            <Bomb className="w-4 h-4" />
-          </button>
-        )}
+          {/* Shuffle (only if upgrade purchased) */}
+          {shufflesRemaining > 0 && (
+            <button
+              onClick={onShuffleClick}
+              aria-label={t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'rounded-neo border-2',
+                'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
+              )}
+            >
+              <Shuffle className="w-4 h-4" />
+              <span className="text-xs font-bold">×{shufflesRemaining}</span>
+            </button>
+          )}
+
+          {/* Detonate (Word Dynamite T3) */}
+          {canDetonate && (
+            <button
+              onClick={onDetonateToggle}
+              aria-label={t('adventure.game.detonate')}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'rounded-neo border-2',
+                detonateActive
+                  ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
+                  : 'bg-neo-red/60 text-neo-black border-neo-black shadow-hard-sm'
+              )}
+              aria-pressed={detonateActive}
+            >
+              <Bomb className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Current Hint Display (mobile) */}
+        <AdaptiveAnimatePresence>
+          {currentHint && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={cn(
+                'px-3 py-2 rounded-neo',
+                'bg-neo-lime/20 border-2 border-neo-lime/50',
+                'text-center'
+              )}
+            >
+              <span className="text-xs font-bold text-neo-lime">{t('adventure.game.hintUsed')}: </span>
+              <span className="text-sm font-black text-neo-white tracking-wider">{currentHint.word}</span>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* Desktop: Vertical stack layout */}
-      <div className="hidden lg:flex flex-col gap-3 p-3 h-full overflow-y-auto">
-        {/* Star Projection */}
-        <div className="flex items-center justify-center gap-2 py-2">
+      <div className="hidden lg:flex flex-col gap-2.5 p-3 h-full overflow-y-auto">
+        {/* Star Projection — centered with subtle glow */}
+        <div className="flex items-center justify-center gap-2.5 py-2">
           {[0, 1, 2].map(i => (
             <Star key={i} className={cn(
-              'w-5 h-5 transition-all duration-300',
-              i < currentStars ? 'text-neo-yellow fill-neo-yellow scale-110' : 'text-neo-white/25 scale-90'
-            )} />
+              'transition-all duration-300',
+              i < currentStars
+                ? 'w-6 h-6 text-neo-yellow fill-neo-yellow'
+                : 'w-5 h-5 text-neo-white/15 scale-90'
+            )}
+            style={i < currentStars ? { filter: 'drop-shadow(0 0 4px rgba(255,225,53,0.4))' } : undefined}
+            />
           ))}
         </div>
 
-        {/* Objectives Card */}
+        {/* Objectives Card — refined borders and glow */}
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'bg-neo-black/40 backdrop-blur-sm',
-            'border-3 rounded-neo-lg p-3',
+            'bg-neo-black/30 backdrop-blur-sm',
+            'border-2 rounded-neo-lg p-3',
             'transition-all duration-500',
-            // Objectives card border glow: grey → neo-yellow (partial) → neo-lime (all done)
             allComplete
-              ? 'border-neo-lime shadow-[0_0_16px_2px_rgba(163,230,53,0.4)]'
+              ? 'border-neo-lime/60 shadow-[0_0_16px_2px_rgba(163,230,53,0.3)]'
               : partiallyComplete
-                ? 'border-neo-yellow/70 shadow-[0_0_12px_2px_rgba(255,225,53,0.25)]'
-                : 'border-neo-black/50 shadow-hard'
+                ? 'border-neo-yellow/40 shadow-[0_0_10px_2px_rgba(255,225,53,0.15)]'
+                : 'border-neo-white/8'
           )}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-neo bg-neo-yellow/20 border-2 border-neo-yellow/40 flex items-center justify-center">
-              <Target className="w-3.5 h-3.5 text-neo-yellow" />
+          <div className="flex items-center gap-2 mb-2.5">
+            <div className={cn(
+              'w-6 h-6 rounded-full flex items-center justify-center',
+              allComplete ? 'bg-neo-lime/20' : 'bg-neo-yellow/15'
+            )}>
+              <Target className={cn('w-3 h-3', allComplete ? 'text-neo-lime' : 'text-neo-yellow/80')} />
             </div>
-            <h2 className="text-xs font-black text-neo-white/80 uppercase tracking-wide">
+            <h2 className="text-[11px] font-black text-neo-white/60 uppercase tracking-wider">
               {t('adventure.game.objectives')}
             </h2>
+            <span className="ms-auto text-[10px] font-mono font-bold text-neo-white/30 tabular-nums">
+              {completedCount}/{totalCount}
+            </span>
           </div>
           <AdventureObjectives
             objectives={objectives}
@@ -349,7 +387,9 @@ export const GameSidebar = memo(function GameSidebar({
             )}
           >
             <Lightbulb className="w-4 h-4" />
-            <span>{t('adventure.game.hint')}</span>
+            <span>
+              {nextHintCost > 0 ? t('adventure.game.hintCost', { cost: nextHintCost }) : t('adventure.game.hint')}
+            </span>
           </AdaptiveMotion.button>
 
           {/* Time Freeze Button (desktop — only if upgrade purchased) */}

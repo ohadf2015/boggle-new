@@ -60,12 +60,14 @@ export async function POST(request: NextRequest) {
 
     // Auto-create profile if it doesn't exist (OAuth users may not have one yet)
     if (!profile && (!fetchError || fetchError.code === 'PGRST116')) {
+      const { extractOAuthDisplayName } = await import('@/contexts/auth/authUtils');
+      const oauthName = extractOAuthDisplayName(user.user_metadata) || user.email?.split('@')[0] || 'WordWizard';
       const { error: createError } = await supabase
         .from('profiles')
         .insert({
           id: user.id,
-          username: user.email?.split('@')[0] || `player_${user.id.slice(0, 8)}`,
-          display_name: user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Player',
+          username: oauthName,
+          display_name: oauthName,
           avatar_emoji: '😊',
           avatar_color: '#4F46E5',
           total_coins: 0,

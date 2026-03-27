@@ -13,7 +13,6 @@ import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
-import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 const LOOT_DROP_IMAGES: Record<string, string> = {
@@ -29,8 +28,8 @@ export interface LevelCompleteContentProps {
   stars: number;
   score: number;
   objectives: LevelObjective[];
-  worldNumber: number;
-  levelNumber: number;
+  worldNumber?: number;
+  levelNumber?: number;
   isHighScore: boolean;
   isFailed: boolean;
   onContinue: () => void;
@@ -44,20 +43,22 @@ export interface LevelCompleteContentProps {
   storyBeatText?: string;
   canRetryFree: boolean;
   nextLevelPreview?: { worldName: string; levelNumber: number; mechanic?: string } | null;
-  bossDefeatShare?: { bossId: string; bossName: string; worldName: string; killingWord: string; playerName: string } | null;
+  bossDefeatShare?: null;
   bestAttempt?: LevelAttempt | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LevelCompleteContent = memo<LevelCompleteContentProps>(({
-  stars, score, objectives, worldNumber, levelNumber, isHighScore, isFailed,
-  onContinue, onRetry, onExit, xpEarned, goldEarned,
-  isLastLevelOfWorld, onNextWorld, lootDrops, storyBeatText,
-  canRetryFree, nextLevelPreview, bossDefeatShare, bestAttempt, t,
+  stars, score, objectives, isHighScore, isFailed,
+  xpEarned, goldEarned,
+  lootDrops, storyBeatText,
+  nextLevelPreview, bestAttempt, t,
+  // Kept in interface for backwards compat but used by LevelCompleteActions now
+  onContinue: _onContinue, onRetry: _onRetry, onExit: _onExit,
+  isLastLevelOfWorld: _isLastLevelOfWorld, onNextWorld: _onNextWorld,
+  canRetryFree: _canRetryFree, bossDefeatShare: _bossDefeatShare,
 }) => {
-  const [goldDoubled, setGoldDoubled] = useState(false);
   const baseGold = goldEarned ?? (stars > 0 ? stars * 10 + (stars === 3 ? 50 : 0) : 0);
-  const displayGold = goldDoubled ? baseGold * 2 : baseGold;
   const completedCount = objectives.filter((o) => o.isComplete).length;
 
   return (
@@ -82,17 +83,11 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
           <RollingNumber value={xpEarned ?? Math.floor(score / 100)} variant="default" className="text-xl md:text-2xl text-neo-purple" />
         </div>
         {/* Gold */}
-        <div className={cn(
-          'backdrop-blur-sm border-3 rounded-neo p-3',
-          goldDoubled ? 'bg-neo-yellow/30 border-neo-yellow' : 'bg-neo-yellow/20 border-neo-yellow/60'
-        )}>
+        <div className="backdrop-blur-sm border-3 rounded-neo p-3 bg-neo-yellow/20 border-neo-yellow/60">
           <div className="text-neo-yellow text-xs font-bold mb-1 flex items-center gap-1 justify-center uppercase">
             <Coins className="w-3 h-3" />+{t('common.gold')}
           </div>
-          <RollingNumber value={displayGold} variant="default" className="text-xl md:text-2xl text-neo-yellow" />
-          {goldDoubled && (
-            <div className="text-neo-yellow text-[10px] font-bold uppercase mt-0.5">2x!</div>
-          )}
+          <RollingNumber value={baseGold} variant="default" className="text-xl md:text-2xl text-neo-yellow" />
         </div>
       </AdaptiveMotion.div>
 
@@ -108,30 +103,6 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
             <Trophy className="w-5 h-5 text-neo-lime" />
             <span className="text-neo-lime font-bold">{t('adventure.game.newHighScore')}</span>
           </div>
-        </AdaptiveMotion.div>
-      )}
-
-      {/* Share Card — all level completions */}
-      {!isFailed && (
-        <AdaptiveMotion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.85 }}
-          className="mb-4"
-        >
-          <GameEmojiShareCard
-            data={{
-              mode: 'adventure',
-              score,
-              stars,
-              worldNumber,
-              levelNumber,
-              objectivesCompleted: completedCount,
-              objectivesTotal: objectives.length,
-              isBoss: !!bossDefeatShare,
-            }}
-            t={t}
-          />
         </AdaptiveMotion.div>
       )}
 
@@ -255,7 +226,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
       )}
 
       {/* Next Level Preview */}
-      {!isFailed && nextLevelPreview && !isLastLevelOfWorld && (
+      {!isFailed && nextLevelPreview && !_isLastLevelOfWorld && (
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -274,69 +245,95 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </AdaptiveMotion.div>
       )}
 
-      {/* Double Coins Rewarded Ad (single ad offer per level completion) */}
+    </>
+  );
+});
+
+LevelCompleteContent.displayName = 'LevelCompleteContent';
+
+// ==============================================
+// ACTION BUTTONS — rendered separately for sticky positioning
+// ==============================================
+
+export interface LevelCompleteActionsProps {
+  isFailed: boolean;
+  isLastLevelOfWorld: boolean;
+  onNextWorld?: () => void;
+  onContinue: () => void;
+  onRetry: () => void;
+  onExit: () => void;
+  canRetryFree: boolean;
+  stars: number;
+  goldEarned?: number;
+  t: (key: string, params?: Record<string, string | number>) => string;
+}
+
+export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
+  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, t,
+}) => {
+  const [goldDoubled, setGoldDoubled] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-2 p-4 md:p-6 pt-3 border-t border-neo-white/10 bg-neo-navy/95 backdrop-blur-sm flex-shrink-0">
+      {/* Double Coins Rewarded Ad */}
       {stars > 0 && !goldDoubled && (
-        <div className="mb-4">
-          <RewardedAdButton name="adventure-double-coins" onReward={() => setGoldDoubled(true)} className="w-full">
-            {t('adventure.watchAdDoubleCoins')}
-          </RewardedAdButton>
-        </div>
+        <RewardedAdButton name="adventure-double-coins" onReward={() => setGoldDoubled(true)} className="w-full">
+          {t('adventure.watchAdDoubleCoins')}
+        </RewardedAdButton>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-3">
-        {!isFailed && (
-          <button
-            onClick={isLastLevelOfWorld && onNextWorld ? onNextWorld : onContinue}
-            className={cn(
-              'btn-primary w-full py-3 px-4',
-              'bg-neo-lime text-neo-black font-black text-lg',
-              'border-3 border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
-              'active:translate-y-0.5 active:shadow-hard-pressed',
-              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-              'transition-all duration-200'
-            )}
-          >
-            {isLastLevelOfWorld ? t('adventure.nextWorld') : t('adventure.continueToNext')}
-          </button>
-        )}
-
+      {!isFailed && (
         <button
-          onClick={onRetry}
+          onClick={isLastLevelOfWorld && onNextWorld ? onNextWorld : onContinue}
           className={cn(
-            isFailed ? 'btn-primary' : '',
-            'w-full py-3 px-4 flex items-center justify-center gap-2',
-            isFailed ? 'bg-neo-orange text-neo-black' : 'bg-neo-white/10 text-neo-white',
-            'font-black text-lg border-3 border-neo-black rounded-neo',
+            'btn-primary w-full py-3 px-4',
+            'bg-neo-lime text-neo-black font-black text-lg',
+            'border-3 border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
             'active:translate-y-0.5 active:shadow-hard-pressed',
             'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
             'transition-all duration-200'
           )}
         >
-          <RotateCcw className="w-5 h-5" />
+          {isLastLevelOfWorld ? t('adventure.nextWorld') : t('adventure.continueToNext')}
+        </button>
+      )}
+
+      <div className="flex gap-2">
+        <button
+          onClick={onRetry}
+          className={cn(
+            'flex-1 py-2.5 px-4 flex items-center justify-center gap-2',
+            isFailed ? 'bg-neo-orange text-neo-black' : 'bg-neo-white/10 text-neo-white',
+            'font-black text-base border-3 border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg',
+            'active:translate-y-0.5 active:shadow-hard-pressed',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            'transition-all duration-200'
+          )}
+        >
+          <RotateCcw className="w-4 h-4" />
           {canRetryFree ? t('adventure.freeRetry') : t('adventure.retryLevel')}
         </button>
 
         <button
           onClick={onExit}
           className={cn(
-            'w-full py-2 px-4 flex items-center justify-center gap-2',
-            'bg-transparent text-neo-white/70 font-bold text-base',
+            'py-2.5 px-4 flex items-center justify-center gap-2',
+            'bg-transparent text-neo-white/60 font-bold text-base',
             'hover:text-neo-white hover:bg-neo-white/5',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
-            'rounded-neo transition-all duration-200'
+            'rounded-neo border-2 border-neo-white/10 transition-all duration-200'
           )}
         >
           <DoorOpen className="w-4 h-4" />
           {t('common.exit')}
         </button>
       </div>
-    </>
+    </div>
   );
 });
 
-LevelCompleteContent.displayName = 'LevelCompleteContent';
+LevelCompleteActions.displayName = 'LevelCompleteActions';
 
 export default LevelCompleteContent;

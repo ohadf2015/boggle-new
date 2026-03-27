@@ -504,6 +504,208 @@ describe('useAdventureHints', () => {
     });
   });
 
+  describe('Hint Cost System', () => {
+    it('should allow 1 free hint per level by default (no gold cost)', async () => {
+      // GIVEN — no gold callback, default freeHintsPerLevel=1
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          maxHintsPerLevel: 5,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // WHEN — first hint
+      let hint: ReturnType<typeof result.current.getHint> = null;
+      act(() => { hint = result.current.getHint(); });
+
+      // THEN — hint succeeds, freeHintsRemaining decreases
+      expect(hint).not.toBeNull();
+      expect(result.current.freeHintsRemaining).toBe(0);
+      expect(result.current.nextHintCost).toBe(15);
+    });
+
+    it('should require gold for hints after free hints are exhausted', async () => {
+      // GIVEN — 1 free hint, gold=100, goldCostPerHint=15
+      const onSpendGold = vi.fn().mockReturnValue(true);
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          maxHintsPerLevel: 5,
+          freeHintsPerLevel: 1,
+          goldCostPerHint: 15,
+          onSpendGold,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // Use free hint
+      act(() => { result.current.getHint(); });
+      expect(onSpendGold).not.toHaveBeenCalled();
+
+      // WHEN — second hint (paid)
+      act(() => { result.current.getHint(); });
+
+      // THEN — gold was deducted
+      expect(onSpendGold).toHaveBeenCalledWith(15);
+    });
+
+    it('should block hint when player cannot afford gold cost', async () => {
+      // GIVEN — free hints used, onSpendGold returns false (insufficient gold)
+      const onSpendGold = vi.fn().mockReturnValue(false);
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          maxHintsPerLevel: 5,
+          freeHintsPerLevel: 1,
+          goldCostPerHint: 15,
+          onSpendGold,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // Use free hint
+      act(() => { result.current.getHint(); });
+
+      // WHEN — try paid hint but can't afford
+      let hint: ReturnType<typeof result.current.getHint> = null;
+      act(() => { hint = result.current.getHint(); });
+
+      // THEN — returns null, no hint given
+      expect(hint).toBeNull();
+      expect(onSpendGold).toHaveBeenCalledWith(15);
+    });
+
+    it('should respect freeHintsPerLevel from upgrade tiers', async () => {
+      // GIVEN — Word Radar T4 gives 3 free hints
+      const onSpendGold = vi.fn().mockReturnValue(true);
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          maxHintsPerLevel: 10,
+          freeHintsPerLevel: 3,
+          goldCostPerHint: 15,
+          onSpendGold,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // WHEN — use 3 hints
+      act(() => { result.current.getHint(); });
+      act(() => { result.current.getHint(); });
+      act(() => { result.current.getHint(); });
+
+      // THEN — all 3 were free
+      expect(onSpendGold).not.toHaveBeenCalled();
+      expect(result.current.freeHintsRemaining).toBe(0);
+
+      // WHEN — 4th hint costs gold
+      act(() => { result.current.getHint(); });
+      expect(onSpendGold).toHaveBeenCalledWith(15);
+    });
+
+    it('should report nextHintCost as 0 when free hints remain', async () => {
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          maxHintsPerLevel: 5,
+          freeHintsPerLevel: 2,
+          goldCostPerHint: 15,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // THEN — still have free hints
+      expect(result.current.nextHintCost).toBe(0);
+      expect(result.current.freeHintsRemaining).toBe(2);
+
+      // Use one
+      act(() => { result.current.getHint(); });
+      expect(result.current.nextHintCost).toBe(0);
+      expect(result.current.freeHintsRemaining).toBe(1);
+
+      // Use second
+      act(() => { result.current.getHint(); });
+      expect(result.current.nextHintCost).toBe(15);
+      expect(result.current.freeHintsRemaining).toBe(0);
+    });
+
+    it('should reset free hints on level reset (hintsUsed resets)', async () => {
+      const onSpendGold = vi.fn().mockReturnValue(true);
+      const { result, rerender } = renderHook(
+        ({ foundWords }) =>
+          useAdventureHints({
+            grid: testGrid,
+            language: 'en',
+            foundWords,
+            isPlaying: true,
+            maxHintsPerLevel: 5,
+            freeHintsPerLevel: 1,
+            goldCostPerHint: 15,
+            onSpendGold,
+          }),
+        { initialProps: { foundWords: [] as string[] }, wrapper }
+      );
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // Use free hint + paid hint
+      act(() => { result.current.getHint(); });
+      act(() => { result.current.getHint(); });
+      expect(onSpendGold).toHaveBeenCalledTimes(1);
+      expect(result.current.freeHintsRemaining).toBe(0);
+    });
+
+    it('should not charge gold for auto-hints triggered by inactivity', async () => {
+      // Auto-hints (inactivity-based) should be free — they help stuck players
+      const onSpendGold = vi.fn().mockReturnValue(true);
+      const onAutoHint = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureHints({
+          grid: testGrid,
+          language: 'en',
+          foundWords: [],
+          isPlaying: true,
+          inactivityThresholdMs: 15000,
+          maxHintsPerLevel: 5,
+          freeHintsPerLevel: 0,
+          goldCostPerHint: 15,
+          onSpendGold,
+          onAutoHint,
+        })
+      , { wrapper });
+
+      await waitFor(() => { expect(result.current.isLoading).toBe(false); });
+
+      // WHEN — auto-hint triggers
+      act(() => { vi.advanceTimersByTime(15000); });
+
+      // THEN — no gold charged for auto-hint
+      expect(onAutoHint).toHaveBeenCalled();
+      expect(onSpendGold).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Current Hint Highlight', () => {
     it('should track current hint for UI highlighting', async () => {
       // GIVEN

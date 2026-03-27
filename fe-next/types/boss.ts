@@ -119,6 +119,25 @@ export interface BossPhaseConfig {
 /**
  * Complete configuration for a single boss character
  */
+/**
+ * State-based image paths for boss visual reactions
+ */
+export interface BossImageSet {
+  /** Default idle/standing pose */
+  idle: string;
+  /** Aggressive attacking pose */
+  attack: string;
+  /** Recoiling hurt pose */
+  hurt: string;
+  /** Enraged low-HP pose */
+  enraged: string;
+  /** Defeated/slumped pose */
+  defeated: string;
+}
+
+/** Visual state the boss avatar can be in */
+export type BossVisualState = keyof BossImageSet;
+
 export interface BossConfig {
   /** Unique boss identifier matching WORLD_CONFIGS bossName */
   id: string;
@@ -130,8 +149,12 @@ export interface BossConfig {
   personality: string;
   /** Visual theme identifier for styling */
   visualTheme: string;
-  /** Path to the boss character image */
+  /** Path to the boss character image (idle state, backwards compat) */
   imagePath: string;
+  /** State-based image set for visual reactions */
+  images: BossImageSet;
+  /** Translation key for the boss storyline intro text */
+  storylineIntro: string;
   /** The boss's unique twist mechanic */
   twistMechanic: BossTwistMechanic;
   /** Boss dialogue lines */

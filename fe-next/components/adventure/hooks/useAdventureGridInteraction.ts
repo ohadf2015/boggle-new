@@ -102,18 +102,14 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
     }, [isPlaying, isPaused, isValidating, selectTile]
   );
 
-  // Refs for latest selection state — avoids stale closure in handleDragEnd
-  const selectedIndicesRef = useRef(selectedIndices);
-  const currentWordRef = useRef(currentWord);
-  useEffect(() => { selectedIndicesRef.current = selectedIndices; }, [selectedIndices]);
-  useEffect(() => { currentWordRef.current = currentWord; }, [currentWord]);
-
   const handleDragEnd = useCallback(() => {
-    const word = currentWordRef.current;
-    const indices = selectedIndicesRef.current;
-    if (!word || indices.length === 0) return;
-    handleWordSubmit(word, indices);
-  }, [handleWordSubmit]);
+    // Read state directly — selectedIndices/currentWord are stable within
+    // the same render cycle that produced this callback.  The previous
+    // useEffect-based ref sync could lag behind by one frame, causing the
+    // "stuck word" bug where a valid drag selection silently dropped.
+    if (!currentWord || selectedIndices.length === 0) return;
+    handleWordSubmit(currentWord, selectedIndices);
+  }, [handleWordSubmit, currentWord, selectedIndices]);
 
   // Popup queue auto-dismiss
   const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

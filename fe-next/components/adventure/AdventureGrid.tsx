@@ -302,31 +302,13 @@ const AdventureGrid = memo(
     // Handle tile click (use hook's version directly)
     const handleTileClick = handleTileClickFromHook;
 
-    // Refs for latest selection — avoids stale closure when RAF batches lag behind touchend
-    const selectedIndicesRef = useRef(selectedIndices);
-    const formedWordRef = useRef(formedWord);
-    useEffect(() => { selectedIndicesRef.current = selectedIndices; }, [selectedIndices]);
-    useEffect(() => { formedWordRef.current = formedWord; }, [formedWord]);
-
-    // Guard against ghost click double-submission (touchend + synthetic mouseup)
-    const lastSubmitTimeRef = useRef(0);
-
     // Handle word submission (on mouse/touch up)
+    // Word submission is handled by onDragEnd (via gridInteraction.handleDragEnd)
+    // which is called inside handleMouseUpFromHook → useGridGestures.handleDragEnd.
+    // No secondary submission needed here — it caused double-submit races.
     const handleMouseUp = useCallback(() => {
       handleMouseUpFromHook();
-
-      // Debounce: ignore if another submit happened within 300ms (ghost click prevention)
-      const now = Date.now();
-      if (now - lastSubmitTimeRef.current < 300) return;
-
-      const indices = selectedIndicesRef.current;
-      const word = formedWordRef.current;
-      if (disabled || indices.length === 0) return;
-      if (onWordSubmit) {
-        lastSubmitTimeRef.current = now;
-        onWordSubmit(word, indices);
-      }
-    }, [disabled, onWordSubmit, handleMouseUpFromHook]);
+    }, [handleMouseUpFromHook]);
 
     // Prevent ghost mouseup from touch events
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {

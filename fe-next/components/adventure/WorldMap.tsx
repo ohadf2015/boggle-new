@@ -99,11 +99,17 @@ const WorldNode = memo(function WorldNode({
 
   const prefersReducedMotion = usePrefersReducedMotion();
 
+  // Progress ring SVG math
+  const progressPct = totalWorldStars > 0 ? currentStars / totalWorldStars : 0;
+  const ringR = 54;
+  const ringC = 2 * Math.PI * ringR;
+  const ringOffset = ringC - progressPct * ringC;
+
   return (
     <AdaptiveMotion.div
       className={cn(
-        'relative w-full px-4 sm:px-8 lg:px-12',
-        'flex items-center gap-3 sm:gap-6 lg:gap-8',
+        'relative w-full px-3 sm:px-6 lg:px-10',
+        'flex items-center gap-2 sm:gap-4 lg:gap-6',
         isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
         isLeft ? 'flex-row' : 'flex-row-reverse'
       )}
@@ -111,8 +117,8 @@ const WorldNode = memo(function WorldNode({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, type: 'spring', stiffness: 100, damping: 15 }}
     >
-      {/* World node container */}
-      <div className="flex-shrink-0 min-w-[6rem] sm:min-w-[7rem]">
+      {/* World orb with progress ring */}
+      <div className="flex-shrink-0">
         <div className="relative">
           <WorldOrbitingLetters
             worldId={world.id}
@@ -142,148 +148,227 @@ const WorldNode = memo(function WorldNode({
                 : 'grayscale(1) brightness(0.5)',
             }}
           >
+            {/* Ambient glow behind the orb */}
             {isUnlocked && (
               <div
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
-                  transform: 'scale(1.5)',
-                  filter: 'blur(14px)',
+                  transform: 'scale(1.6)',
+                  filter: 'blur(16px)',
                   zIndex: 0,
                 }}
               />
             )}
 
+            {/* SVG progress ring wrapping the orb */}
+            {isUnlocked && progressPct > 0 && (
+              <svg
+                className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] -rotate-90 pointer-events-none z-20"
+                viewBox="0 0 120 120"
+              >
+                {/* Track */}
+                <circle cx="60" cy="60" r={ringR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                {/* Fill */}
+                <circle
+                  cx="60" cy="60" r={ringR}
+                  fill="none"
+                  stroke={glowColor}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeDasharray={ringC}
+                  strokeDashoffset={ringOffset}
+                  className="transition-all duration-700"
+                  style={{ filter: `drop-shadow(0 0 4px ${glowColor})` }}
+                />
+              </svg>
+            )}
+
             <div className={cn(
-              'relative z-10 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36',
+              'relative z-10 w-[5.5rem] h-[5.5rem] sm:w-[6.5rem] sm:h-[6.5rem] md:w-[7.5rem] md:h-[7.5rem] lg:w-[8.5rem] lg:h-[8.5rem]',
               'rounded-full overflow-hidden',
-              'border-[5px] border-neo-black',
-              isUnlocked && 'ring-[3px] ring-neo-yellow/60'
+              'border-[4px] border-neo-black',
+              isUnlocked && isComplete && 'ring-[3px] ring-neo-lime/70',
+              isUnlocked && !isComplete && 'ring-[3px] ring-neo-white/20'
             )}>
-            <Image
-              src={worldImage}
-              alt={worldName}
-              fill
-              className={cn(
-                'object-cover scale-110',
-                !isUnlocked && 'opacity-40'
+              <Image
+                src={worldImage}
+                alt={worldName}
+                fill
+                className={cn(
+                  'object-cover scale-110',
+                  !isUnlocked && 'opacity-40'
+                )}
+              />
+              {/* Inner vignette for depth */}
+              {isUnlocked && (
+                <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.4)' }} />
               )}
-            />
-            {!isUnlocked && (
-              <div className="absolute inset-0 flex items-center justify-center bg-neo-black/50">
-                <Lock className="w-10 h-10 sm:w-12 sm:h-12 text-neo-white/70" />
+              {!isUnlocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-neo-black/50">
+                  <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white/60" />
+                </div>
+              )}
+              {fogState === 'heavy' && (
+                <div className="absolute inset-0 rounded-full bg-neo-navy/70 opacity-30 blur-sm pointer-events-none" />
+              )}
+              {fogState === 'shimmer' && (
+                <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none world-fog-shimmer" />
+              )}
+            </div>
+
+            {/* World number badge — overlaid at bottom-center of orb */}
+            <div
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-0.5 rounded-neo border-3 border-neo-black shadow-hard-sm font-neo-display font-black text-sm"
+              style={{
+                backgroundColor: isUnlocked ? glowColor : 'rgba(50,50,70,0.9)',
+                color: isUnlocked ? '#000' : 'rgba(255,255,255,0.5)',
+              }}
+            >
+              {world.id}
+            </div>
+
+            {isFinalWorld && isUnlocked && (
+              <AdaptiveMotion.div
+                className="absolute -top-5 left-1/2 -translate-x-1/2 z-20"
+                animate={prefersReducedMotion ? {} : { y: [0, -4, 0] }}
+                transition={prefersReducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
+              >
+                <Crown className="w-9 h-9 sm:w-10 sm:h-10 text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]" />
+              </AdaptiveMotion.div>
+            )}
+
+            {isComplete && (
+              <div className="absolute -top-1 -end-1 w-7 h-7 sm:w-8 sm:h-8 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-20">
+                <span className="text-neo-black font-black text-sm">✓</span>
               </div>
             )}
-            {fogState === 'heavy' && (
-              <div className="absolute inset-0 rounded-full bg-neo-navy/70 opacity-30 blur-sm pointer-events-none" />
+
+            {isNextWorld && !isComplete && (
+              <div className="absolute -top-2 -start-2 z-20 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none">
+                {t('adventure.next')}
+              </div>
             )}
-            {fogState === 'shimmer' && (
-              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none world-fog-shimmer" />
+
+            {/* Pulsing ring for incomplete unlocked worlds */}
+            {isUnlocked && !isComplete && !prefersReducedMotion && (
+              <AdaptiveMotion.div
+                className="absolute -inset-1 rounded-full border-[3px] pointer-events-none"
+                style={{ borderColor: glowColor }}
+                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              />
             )}
-          </div>
-
-          {isFinalWorld && isUnlocked && (
-            <AdaptiveMotion.div
-              className="absolute -top-5 left-1/2 -translate-x-1/2"
-              animate={prefersReducedMotion ? {} : { y: [0, -4, 0] }}
-              transition={prefersReducedMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
-            >
-              <Crown className="w-9 h-9 sm:w-10 sm:h-10 text-neo-yellow fill-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.8)]" />
-            </AdaptiveMotion.div>
-          )}
-
-          {isComplete && (
-            <div className="absolute -bottom-1 -end-1 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard z-10">
-              <span className="text-neo-black font-black text-base sm:text-lg">✓</span>
-            </div>
-          )}
-
-          {isNextWorld && !isComplete && (
-            <div className="absolute -top-2 -start-2 z-10 px-2 py-0.5 bg-neo-lime text-neo-black text-[10px] font-black uppercase rounded-neo border-2 border-neo-black shadow-hard-sm">
-              {t('adventure.next')}
-            </div>
-          )}
-
-          {isUnlocked && !isComplete && !prefersReducedMotion && (
-            <AdaptiveMotion.div
-              className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow"
-              animate={{ scale: [1, 1.18, 1], opacity: [0.7, 0, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          )}
-          {isUnlocked && !isComplete && prefersReducedMotion && (
-            <div className="absolute -inset-1 rounded-full border-[3px] border-neo-yellow/50" />
-          )}
-        </AdaptiveMotion.button>
+            {isUnlocked && !isComplete && prefersReducedMotion && (
+              <div className="absolute -inset-1 rounded-full border-[3px] pointer-events-none" style={{ borderColor: glowColor, opacity: 0.4 }} />
+            )}
+          </AdaptiveMotion.button>
         </div>
       </div>
 
-      {/* World Info Card */}
+      {/* World Info Card — redesigned with layered depth */}
       <AdaptiveMotion.div
         className={cn(
-          'flex-shrink min-w-0',
-          'w-[140px] sm:w-[200px] lg:w-[220px]',
-          'bg-neo-navy-light border-4 border-neo-black rounded-neo',
-          'p-3 sm:p-4 shadow-hard overflow-hidden',
-          !isUnlocked && 'opacity-60'
+          'flex-shrink min-w-0 relative',
+          'w-[160px] sm:w-[210px] lg:w-[240px]',
+          !isUnlocked && 'opacity-50'
         )}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: index * 0.08 + 0.1 }}
+        initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.08 + 0.12, type: 'spring', stiffness: 120, damping: 18 }}
       >
-        <h3
-          className={cn(
-            'font-black text-xs sm:text-sm md:text-base uppercase tracking-tight leading-tight',
-            'line-clamp-2',
-            isUnlocked ? 'text-neo-white' : 'text-neo-white/50'
-          )}
-          title={worldName}
-        >
-          {worldName}
-        </h3>
+        {/* Card background with world-colored top accent bar */}
+        <div className={cn(
+          'relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard',
+          'bg-neo-navy-light',
+        )}>
+          {/* Colored accent bar at top */}
+          <div
+            className="h-1.5"
+            style={{ background: isUnlocked ? `linear-gradient(90deg, ${glowColor}, transparent)` : 'rgba(255,255,255,0.05)' }}
+          />
 
-        <div dir="ltr" className="flex items-center gap-1.5 sm:gap-2 mt-2 whitespace-nowrap">
-          <Star className={cn(
-            'w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0',
-            currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/50 fill-neo-white/10'
-          )} />
-          <span className={cn(
-            'text-xs sm:text-sm font-bold',
-            isUnlocked ? 'text-neo-yellow' : 'text-neo-white/60'
-          )}>
-            {currentStars}/{totalWorldStars}
-          </span>
-          <span className={cn(
-            'text-xs sm:text-sm',
-            isUnlocked ? 'text-neo-white/60' : 'text-neo-white/60'
-          )}>
-            · {completedLevels}/{LEVELS_PER_WORLD}
-          </span>
-        </div>
-
-        {masteryTier != null && masteryTier > 0 && (
-          <div className="mt-1.5">
-            <MasteryBadge tier={masteryTier} />
-          </div>
-        )}
-
-        {!isUnlocked && (() => {
-          const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
-          return (
-            <div className="mt-2.5 space-y-1">
-              <div className="flex items-center gap-1.5 text-xs text-neo-white/50 whitespace-nowrap">
-                <Lock className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>{unlockRequirement}</span>
-                <Star className="w-3.5 h-3.5 flex-shrink-0 text-neo-yellow/50" />
-              </div>
-              {starsNeeded > 0 && starsNeeded <= unlockRequirement && (
-                <p className="text-[10px] font-bold text-neo-cyan/70">
-                  {t('adventure.starsToUnlock', { count: starsNeeded })}
-                </p>
+          <div className="p-3 sm:p-3.5">
+            {/* World name */}
+            <h3
+              className={cn(
+                'font-neo-display font-black text-sm sm:text-base uppercase tracking-tight leading-tight',
+                'line-clamp-2',
+                isUnlocked ? 'text-neo-white' : 'text-neo-white/40'
               )}
+              title={worldName}
+            >
+              {worldName}
+            </h3>
+
+            {/* Star progress bar */}
+            <div className="mt-2.5">
+              <div dir="ltr" className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1">
+                  <Star className={cn(
+                    'w-3.5 h-3.5 flex-shrink-0',
+                    currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30 fill-neo-white/10'
+                  )} />
+                  <span className={cn(
+                    'text-xs font-mono font-bold tabular-nums',
+                    isUnlocked ? 'text-neo-yellow' : 'text-neo-white/40'
+                  )}>
+                    {currentStars}/{totalWorldStars}
+                  </span>
+                </div>
+                <span className={cn('text-[10px] font-mono tabular-nums', isUnlocked ? 'text-neo-white/40' : 'text-neo-white/25')}>
+                  {completedLevels}/{LEVELS_PER_WORLD} {t('adventure.lvl')}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-neo-black/50 overflow-hidden border border-neo-black/30">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${(currentStars / totalWorldStars) * 100}%`,
+                    background: isUnlocked
+                      ? `linear-gradient(90deg, ${glowColor}, ${glowColor.replace(/[\d.]+\)$/, '0.6)')})`
+                      : 'rgba(255,255,255,0.1)',
+                    boxShadow: isUnlocked && currentStars > 0 ? `0 0 8px ${glowColor}` : 'none',
+                  }}
+                />
+              </div>
             </div>
-          );
-        })()}
+
+            {masteryTier != null && masteryTier > 0 && (
+              <div className="mt-2">
+                <MasteryBadge tier={masteryTier} />
+              </div>
+            )}
+          </div>
+
+          {/* Locked state — star requirement */}
+          {!isUnlocked && (() => {
+            const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
+            return (
+              <div className="px-3 pb-3 space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-neo-white/40 font-mono">
+                  <Lock className="w-3 h-3 flex-shrink-0" />
+                  <span>{unlockRequirement}</span>
+                  <Star className="w-3 h-3 flex-shrink-0 text-neo-yellow/40" />
+                  <span>{t('adventure.stars')}</span>
+                </div>
+                {starsNeeded > 0 && starsNeeded <= unlockRequirement && (
+                  <p className="text-[10px] font-bold text-neo-cyan/60">
+                    {t('adventure.starsToUnlock', { count: starsNeeded })}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Subtle world-colored gradient at bottom for depth */}
+          {isUnlocked && (
+            <div
+              className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+              style={{ background: `linear-gradient(to top, ${glowColor.replace(/[\d.]+\)$/, '0.06)')}, transparent)` }}
+            />
+          )}
+        </div>
       </AdaptiveMotion.div>
     </AdaptiveMotion.div>
   );

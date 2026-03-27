@@ -26,15 +26,30 @@ interface UseAdventureMusicOptions {
 
 interface AdventureTrackPaths {
   track1: string;
-  track2: string;
+  /** track2 is null for single-track worlds (4-10) */
+  track2: string | null;
 }
 
 // ==============================================
 // CONSTANTS
 // ==============================================
 
-/** Worlds that have adventure music tracks (1-3 for now) */
-const WORLDS_WITH_MUSIC = [1, 2, 3];
+/** All worlds with adventure music tracks */
+const WORLDS_WITH_MUSIC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+/**
+ * Single-track worlds (4-10) mapped to their filenames.
+ * These worlds loop one track for the entire level instead of crossfading between two.
+ */
+const SINGLE_TRACK_WORLDS: Record<number, string> = {
+  4: 'Sunrise Coconut Quest',
+  5: 'Canyon Riddles',
+  6: 'Labyrinth of Dusty Tomes',
+  7: 'Ethereal Ice Palace Loop',
+  8: 'Celestial Drift',
+  9: 'Summit of Thin Air',
+  10: 'Crown of the Final Kingdom',
+};
 
 /**
  * Percentage of time elapsed to trigger track transition
@@ -57,6 +72,17 @@ function getWorldTrackPaths(worldNumber: number): AdventureTrackPaths | null {
   if (!WORLDS_WITH_MUSIC.includes(worldNumber)) {
     return null;
   }
+
+  // Single-track worlds (4-10)
+  const singleTrack = SINGLE_TRACK_WORLDS[worldNumber];
+  if (singleTrack) {
+    return {
+      track1: `/music/adventure/${singleTrack}.mp3`,
+      track2: null,
+    };
+  }
+
+  // Dual-track worlds (1-3)
   return {
     track1: `/music/adventure/${worldNumber}_level_1.mp3`,
     track2: `/music/adventure/${worldNumber}_level_2.mp3`,
@@ -314,7 +340,9 @@ export function useAdventureMusic({
 
     // Create new tracks
     track1Ref.current = createHowl(paths.track1, `World ${worldNumber} Track 1`);
-    track2Ref.current = createHowl(paths.track2, `World ${worldNumber} Track 2`);
+    track2Ref.current = paths.track2
+      ? createHowl(paths.track2, `World ${worldNumber} Track 2`)
+      : null;
 
     // Reset state
     setCurrentTrack(null);

@@ -76,14 +76,23 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
             {t('adventure.bosses.bossIntro')}
           </AdaptiveMotion.h1>
 
-          {/* Boss Image with scared mascot */}
+          {/* Boss Image with dramatic reveal + scared mascot */}
           <div className="relative mb-4">
+            {/* Danger glow behind boss portrait */}
             <AdaptiveMotion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 14 }}
+              className="absolute -inset-3 rounded-neo blur-md"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: [0, 0.6, 0.4], scale: 1 }}
+              transition={{ delay: 0.15, duration: 1, ease: 'easeOut' }}
+              style={{ background: bossFightTheme.avatarGlow }}
+              aria-hidden="true"
+            />
+            <AdaptiveMotion.div
+              initial={{ scale: 0, rotate: -10, y: 30 }}
+              animate={{ scale: 1, rotate: 0, y: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 14, mass: 1.2 }}
               className={cn(
-                'w-40 h-40 md:w-48 md:h-48',
+                'relative w-40 h-40 md:w-48 md:h-48',
                 'border-neo-thick border-neo-black',
                 'rounded-neo shadow-hard-lg',
                 'overflow-hidden bg-neo-navy/50'
@@ -94,15 +103,16 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                 src={boss.imagePath}
                 alt={bossName}
                 className="w-full h-full object-cover"
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
+                initial={{ scale: 1.3, filter: 'brightness(0)' }}
+                animate={{ scale: 1, filter: 'brightness(1)' }}
+                transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               />
             </AdaptiveMotion.div>
+            {/* Scared mascot bounces in from bottom-right */}
             <AdaptiveMotion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 15 }}
+              initial={{ scale: 0, opacity: 0, y: 20 }}
+              animate={{ scale: [0, 1.2, 0.9, 1], opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="absolute -bottom-2 -right-4"
             >
               <Mascot variant="scared" size="sm" />
@@ -123,6 +133,24 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
           >
             {bossName}
           </AdaptiveMotion.h1>
+
+          {/* Storyline Text */}
+          {boss.storylineIntro && (
+            <AdaptiveMotion.div
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className={cn(
+                'w-full p-3 mb-3 rounded-neo',
+                'bg-neo-cyan/5 border-2 border-neo-cyan/20',
+                'text-center'
+              )}
+            >
+              <p className="text-neo-white/80 text-xs md:text-sm italic leading-relaxed">
+                {t(boss.storylineIntro)}
+              </p>
+            </AdaptiveMotion.div>
+          )}
 
           {/* Twist Mechanic Section */}
           <AdaptiveMotion.div

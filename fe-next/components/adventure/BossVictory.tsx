@@ -145,33 +145,57 @@ const BossVictory = memo<BossVictoryProps>(
                 : t('adventure.bosses.bossWins')}
             </AdaptiveMotion.h2>
 
-            {/* Boss Image */}
+            {/* Boss Image — victory: defeated boss wobbles in, defeat: attack boss slams in */}
             <AdaptiveMotion.div
               className="flex justify-center mb-3"
-              initial={{ scale: 0 }}
+              initial={isVictory
+                ? { scale: 0, rotate: 10, y: -20 }
+                : { scale: 0, x: 40, rotate: 8 }
+              }
               animate={isVictory
-                ? { scale: [0, 1.1, 1], rotate: [0, -5, 0] }
-                : { scale: [0, 1.1, 1] }
+                ? { scale: [0, 1.15, 0.95, 1.02, 1], rotate: [10, -8, 4, -1, 0], y: [-20, 5, -2, 0] }
+                : { scale: [0, 1.2, 1], x: [40, -5, 0], rotate: [8, -2, 0] }
               }
               transition={{
                 delay: 0.2,
                 type: 'spring',
-                stiffness: 180,
-                damping: 15,
+                stiffness: isVictory ? 150 : 300,
+                damping: isVictory ? 10 : 18,
+                mass: 1.2,
               }}
             >
-              <AdaptiveMotion.img
-                src={boss.imagePath}
-                alt={bossName}
-                className={cn(
-                  'w-24 h-24 md:w-32 md:h-32',
-                  'object-contain',
-                  'border-3 border-neo-black rounded-neo',
-                  isVictory
-                    ? 'grayscale-[50%] opacity-80'
-                    : 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]'
+              <div className="relative">
+                <AdaptiveMotion.img
+                  src={isVictory ? (boss.images?.defeated ?? boss.imagePath) : (boss.images?.attack ?? boss.imagePath)}
+                  alt={bossName}
+                  className={cn(
+                    'w-28 h-28 md:w-36 md:h-36',
+                    'object-contain',
+                    'border-3 border-neo-black rounded-neo',
+                    isVictory
+                      ? 'opacity-90 grayscale-[20%]'
+                      : 'drop-shadow-[0_0_16px_rgba(239,68,68,0.6)]'
+                  )}
+                  animate={isVictory
+                    ? { rotate: [0, 1, -1, 0] }
+                    : { scale: [1, 1.02, 1] }
+                  }
+                  transition={isVictory
+                    ? { delay: 1, duration: 2, repeat: Infinity, ease: 'easeInOut' }
+                    : { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+                  }
+                />
+                {/* Victory: defeated X eyes overlay shimmer */}
+                {isVictory && (
+                  <AdaptiveMotion.div
+                    className="absolute inset-0 rounded-neo"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.15, 0] }}
+                    transition={{ delay: 0.8, duration: 1.5, repeat: 2 }}
+                    style={{ background: 'linear-gradient(135deg, transparent 30%, rgba(191,255,0,0.2) 50%, transparent 70%)' }}
+                  />
                 )}
-              />
+              </div>
             </AdaptiveMotion.div>
 
             {/* Boss Name */}
@@ -224,6 +248,27 @@ const BossVictory = memo<BossVictoryProps>(
                 <BossStarDisplay key={i} filled={i < stars} index={i} />
               ))}
             </div>
+
+            {/* Lexicon Fragment collected (victory only) */}
+            {isVictory && (
+              <AdaptiveMotion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 15 }}
+                className={cn(
+                  'mx-auto mb-4 px-4 py-2.5 rounded-neo',
+                  'bg-neo-lime/10 border-2 border-neo-lime/40',
+                  'text-center'
+                )}
+              >
+                <p className="text-neo-lime font-black text-sm">
+                  {t('adventure.bosses.fragmentCollected')}
+                </p>
+                <p className="text-neo-white/60 text-xs mt-0.5">
+                  {t('adventure.bosses.fragmentCount', { current: boss.worldId, total: 10 })}
+                </p>
+              </AdaptiveMotion.div>
+            )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 mb-6">

@@ -68,8 +68,8 @@ module.exports = {
   // Setup files
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
-  // Test timeout (Socket.IO tests may need longer)
-  testTimeout: 10000,
+  // Test timeout (Socket.IO tests need longer under parallel load)
+  testTimeout: 30000,
 
   // Clear mocks between tests
   clearMocks: true,

@@ -20,7 +20,7 @@ import { useParticleBudget } from '@/hooks/useParticleBudget';
 import { InteractiveMascot, type ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import LevelCompleteContent from './LevelCompleteContent';
+import LevelCompleteContent, { LevelCompleteActions } from './LevelCompleteContent';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 // ==============================================
@@ -107,7 +107,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     storyBeatText,
     canRetryFree = false,
     nextLevelPreview,
-    bossDefeatShare,
+    bossDefeatShare: _bossDefeatShare,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -164,152 +164,168 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
-              'p-6 md:p-8',
-              'max-h-[90vh] overflow-y-auto'
+              'max-h-[90vh] flex flex-col overflow-hidden'
             )}
           >
-            {/* Title */}
-            <AdaptiveMotion.div
-              initial={{ y: -30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="mb-2"
-            >
-              <h2
-                id="level-complete-title"
-                className={cn(
-                  'text-center text-3xl md:text-4xl font-black uppercase tracking-tight',
-                  isFailed ? 'text-neo-red' : isPerfect ? 'text-neo-yellow' : 'text-neo-white'
-                )}
+            {/* Scrollable content area */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 pb-0">
+              {/* Title */}
+              <AdaptiveMotion.div
+                initial={{ y: -30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="mb-2"
               >
-                {isFailed ? t('adventure.game.tryAgain') : isPerfect
-                  ? t('adventure.perfect')
-                  : t('adventure.levelComplete')}
-              </h2>
-            </AdaptiveMotion.div>
-
-            {/* Level Badge */}
-            <AdaptiveMotion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex justify-center mb-4"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
-                <span className="text-neo-white/60 text-sm font-bold uppercase">
-                  {t('adventure.world')} {worldNumber}
-                </span>
-                <span className="text-neo-white/30">|</span>
-                <span className="text-neo-white/80 text-sm font-bold">
-                  {t('adventure.level')} {levelNumber}
-                </span>
-              </div>
-            </AdaptiveMotion.div>
-
-            {/* Mascot */}
-            <AdaptiveMotion.div
-              className="flex justify-center mb-4"
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
-            >
-              <InteractiveMascot
-                variant={getMascotVariantForStars(stars)}
-                size="lg"
-                animated
-                enableHover={false}
-                enableClick={false}
-              />
-            </AdaptiveMotion.div>
-
-            {/* Perfect Badge */}
-            {isPerfect && (
-              <AdaptiveMotion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-center text-lg font-black text-neo-yellow mb-4"
-              >
-                {t('adventure.game.perfect')}
-              </AdaptiveMotion.p>
-            )}
-
-            {/* Stars */}
-            <div className="flex justify-center gap-3 mb-6">
-              {[0, 1, 2].map((i) => (
-                <AdaptiveMotion.div
-                  key={`star-${i}`}
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{
-                    scale: i < stars ? 1 : 0.8,
-                    opacity: i < stars ? 1 : 0.5,
-                  }}
-                  transition={{
-                    delay: 0.3 + i * 0.1,
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 20,
-                  }}
+                <h2
+                  id="level-complete-title"
+                  className={cn(
+                    'text-center text-3xl md:text-4xl font-black uppercase tracking-tight',
+                    isFailed ? 'text-neo-red' : isPerfect ? 'text-neo-yellow' : 'text-neo-white'
+                  )}
                 >
-                  <Star
-                    className={cn(
-                      'w-12 h-12 md:w-14 md:h-14',
-                      i < stars
-                        ? 'text-neo-yellow fill-neo-yellow'
-                        : 'text-neo-white/50 fill-neo-white/10'
-                    )}
-                  />
-                </AdaptiveMotion.div>
-              ))}
-            </div>
+                  {isFailed ? t('adventure.game.tryAgain') : isPerfect
+                    ? t('adventure.perfect')
+                    : t('adventure.levelComplete')}
+                </h2>
+              </AdaptiveMotion.div>
 
-            {/* Show previous best stars when current attempt earned fewer */}
-            {previousBestStars > stars && (
+              {/* Level Badge */}
               <AdaptiveMotion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="flex justify-center items-center gap-1.5 -mt-4 mb-4"
+                transition={{ delay: 0.2 }}
+                className="flex justify-center mb-3"
               >
-                <span className="text-neo-white/50 text-xs font-bold uppercase">
-                  {t('adventure.bestStars')}:
-                </span>
-                {[0, 1, 2].map((i) => (
-                  <Star
-                    key={`best-${i}`}
-                    className={cn(
-                      'w-4 h-4',
-                      i < previousBestStars
-                        ? 'text-neo-yellow/60 fill-neo-yellow/60'
-                        : 'text-neo-white/20 fill-neo-white/5'
-                    )}
-                  />
-                ))}
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
+                  <span className="text-neo-white/60 text-sm font-bold uppercase">
+                    {t('adventure.world')} {worldNumber}
+                  </span>
+                  <span className="text-neo-white/30">|</span>
+                  <span className="text-neo-white/80 text-sm font-bold">
+                    {t('adventure.level')} {levelNumber}
+                  </span>
+                </div>
               </AdaptiveMotion.div>
-            )}
 
-            {/* Rewards, Objectives, Actions — extracted component */}
-            <LevelCompleteContent
-              stars={stars}
-              score={score}
-              objectives={objectives}
-              worldNumber={worldNumber}
-              levelNumber={levelNumber}
-              isHighScore={isHighScore}
+              {/* Mascot — smaller on mobile to save space */}
+              <AdaptiveMotion.div
+                className="flex justify-center mb-3"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+              >
+                <InteractiveMascot
+                  variant={getMascotVariantForStars(stars)}
+                  size="lg"
+                  animated
+                  enableHover={false}
+                  enableClick={false}
+                />
+              </AdaptiveMotion.div>
+
+              {/* Perfect Badge */}
+              {isPerfect && (
+                <AdaptiveMotion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-center text-lg font-black text-neo-yellow mb-3"
+                >
+                  {t('adventure.game.perfect')}
+                </AdaptiveMotion.p>
+              )}
+
+              {/* Stars */}
+              <div className="flex justify-center gap-3 mb-4">
+                {[0, 1, 2].map((i) => (
+                  <AdaptiveMotion.div
+                    key={`star-${i}`}
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{
+                      scale: i < stars ? 1 : 0.8,
+                      opacity: i < stars ? 1 : 0.5,
+                    }}
+                    transition={{
+                      delay: 0.3 + i * 0.1,
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 20,
+                    }}
+                  >
+                    <Star
+                      className={cn(
+                        'w-12 h-12 md:w-14 md:h-14',
+                        i < stars
+                          ? 'text-neo-yellow fill-neo-yellow'
+                          : 'text-neo-white/50 fill-neo-white/10'
+                      )}
+                    />
+                  </AdaptiveMotion.div>
+                ))}
+              </div>
+
+              {/* Show previous best stars when current attempt earned fewer */}
+              {previousBestStars > stars && (
+                <AdaptiveMotion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex justify-center items-center gap-1.5 -mt-2 mb-4"
+                >
+                  <span className="text-neo-white/50 text-xs font-bold uppercase">
+                    {t('adventure.bestStars')}:
+                  </span>
+                  {[0, 1, 2].map((i) => (
+                    <Star
+                      key={`best-${i}`}
+                      className={cn(
+                        'w-4 h-4',
+                        i < previousBestStars
+                          ? 'text-neo-yellow/60 fill-neo-yellow/60'
+                          : 'text-neo-white/20 fill-neo-white/5'
+                      )}
+                    />
+                  ))}
+                </AdaptiveMotion.div>
+              )}
+
+              {/* Rewards, Objectives — scrollable body (no action buttons) */}
+              <LevelCompleteContent
+                stars={stars}
+                score={score}
+                objectives={objectives}
+                worldNumber={worldNumber}
+                levelNumber={levelNumber}
+                isHighScore={isHighScore}
+                isFailed={isFailed}
+                onContinue={onContinue}
+                onRetry={onRetry}
+                onExit={onExit}
+                xpEarned={xpEarned}
+                goldEarned={goldEarned}
+                isLastLevelOfWorld={isLastLevelOfWorld}
+                onNextWorld={onNextWorld}
+                lootDrops={lootDrops}
+                storyBeatText={storyBeatText}
+                canRetryFree={canRetryFree}
+                nextLevelPreview={nextLevelPreview}
+                bossDefeatShare={null}
+                bestAttempt={bestAttempt}
+                t={t}
+              />
+            </div>
+
+            {/* Sticky action buttons — always visible */}
+            <LevelCompleteActions
               isFailed={isFailed}
+              isLastLevelOfWorld={isLastLevelOfWorld}
+              onNextWorld={onNextWorld}
               onContinue={onContinue}
               onRetry={onRetry}
               onExit={onExit}
-              xpEarned={xpEarned}
-              goldEarned={goldEarned}
-              isLastLevelOfWorld={isLastLevelOfWorld}
-              onNextWorld={onNextWorld}
-              lootDrops={lootDrops}
-              storyBeatText={storyBeatText}
               canRetryFree={canRetryFree}
-              nextLevelPreview={nextLevelPreview}
-              bossDefeatShare={bossDefeatShare}
-              bestAttempt={bestAttempt}
+              stars={stars}
+              goldEarned={goldEarned}
               t={t}
             />
           </AdaptiveMotion.div>

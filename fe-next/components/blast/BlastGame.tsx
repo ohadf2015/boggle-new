@@ -1,406 +1,283 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-// canvas-confetti is lazy-loaded on board completion (saves ~3kB from initial chunk)
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
-import { useBlastGame } from './hooks/useBlastGame';
-import { useBlastSugarCrush } from './hooks/useBlastSugarCrush';
-import { BlastComboFlash } from './BlastComboFlash';
-import { BlastComboDiscovery } from './BlastComboDiscovery';
-import { useBlastHint } from './hooks/useBlastHint';
-import { useBlastPersonalBest } from './hooks/useBlastPersonalBest';
+import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
-import { useBlastNearMiss } from './hooks/useBlastNearMiss';
-import { calculateBonusMoves } from './utils/blastMoveUtils';
-import { BlastGameLayout } from './BlastGameLayout';
-import { useDictionaryCache } from '@/hooks/useDictionaryCache';
-import type { BlastGameConfig, BlastResultsData } from './types';
+import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
+import { useBlastSequencer } from './hooks/useBlastSequencer';
+import { BlastStage } from './BlastStage';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
-import { useBlastComboSync } from '@/hooks/gameState';
-import { useBlastComboStreak, getComboWindowMs } from './hooks/useBlastComboStreak';
-import { useBlastHotTiles } from './hooks/useBlastHotTiles';
-import { useBlastIntensity } from './hooks/useBlastIntensity';
+import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, type BlastGameConfig, type BlastResultsData, type BlastTileState } from './types';
+import { detectVerticalWords, detectHorizontalWords } from './utils/blastVerticalScanner';
+import { detectMatch3Clusters } from './utils/blastMatch3Detector';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import type { ScoreFlyEvent } from './BlastScoreFly';
 
 interface BlastGameProps {
   config: BlastGameConfig;
-  /** Game mode: 'singleplayer' uses objectives, sugar crush, waves; 'multiplayer' skips them */
   mode?: 'singleplayer' | 'multiplayer';
-  /** Current wave number (1-based) */
   waveNumber?: number;
-  /** Wave-specific config from blastWaveConfig */
   waveConfig?: WaveConfig;
-  /** Cumulative score from previous waves */
   cumulativeScore?: number;
-  /** Called when the board is cleared and score threshold is met */
   onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onQuit: () => void;
-  /** Called when a combo is detected — for first-time discovery tracking */
   onComboDetected?: (combos: SpecialCombo[]) => void;
-  /** Non-null when a first-time discovery banner is pending display */
   pendingDiscovery?: BlastComboType | null;
-  /** Clears pendingDiscovery after banner auto-dismisses */
   acknowledgeDiscovery?: () => void;
-  /**
-   * Multiplayer: called when local player submits a word with a detected combo.
-   * Parent can use this to include comboType in the socket submitWord emit.
-   */
   onWordWithComboType?: (word: string, comboType: string | null) => void;
-  /** Discovered combos for in-game codex access */
-  discoveredCombos?: Set<import('./utils/blastCombos').BlastComboType>;
-  /**
-   * Pre-built tile states from server overlay (multiplayer).
-   * When provided, useBlastGame skips generateTileStates and uses these directly.
-   */
-  initialTileStates?: import('./types').BlastTileState[][] | null;
-  /**
-   * Seed for deterministic multiplayer refills.
-   * Broadcast by server with startGame; ensures cascade refills are identical.
-   */
+  discoveredCombos?: Set<BlastComboType>;
+  initialTileStates?: BlastTileState[][] | null;
   blastSeed?: number | null;
-  /** Multiplayer: seconds remaining from server timer */
   remainingTime?: number | null;
-  /** Multiplayer: total game duration in seconds */
   totalTime?: number;
-  /** Multiplayer: current leaderboard */
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
-  /** Multiplayer: current player's username */
   username?: string;
 }
 
 /**
- * BlastGame - Connects useBlastGame hook with word submission,
- * combo system, and the layout component.
- *
- * Key difference from SinglePlayerGame: no timer, no bots.
- * Word submission intercepts valid words to clear tiles.
+ * BlastGame — main orchestrator for Blast Mode.
+ * Connects engine, word validation, combos, objectives, and renders BlastStage.
  */
 export function BlastGame({
   config,
   mode = 'singleplayer',
   waveNumber = 1,
   waveConfig,
-  cumulativeScore = 0,
+  cumulativeScore: _cumulativeScore = 0,
   onWaveComplete,
   onGameEnd,
   onQuit,
   onComboDetected,
   pendingDiscovery,
-  acknowledgeDiscovery,
+  acknowledgeDiscovery: _acknowledgeDiscovery,
   onWordWithComboType,
-  discoveredCombos,
+  discoveredCombos: _discoveredCombos,
   initialTileStates,
   blastSeed,
-  remainingTime,
-  totalTime,
-  leaderboard,
-  username,
+  remainingTime: _remainingTime,
+  totalTime: _totalTime,
+  leaderboard: _leaderboard,
+  username: _username,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
-  const { isLowEnd } = useDevicePerformance();
+
+  const minWordLength = waveConfig?.minWordLength ?? 2;
+
+  // Wave objectives (SP only)
+  const waveObjectives = useMemo(
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber)),
+    [waveNumber, isMultiplayer],
+  );
+
+  // Core engine
+  const engine = useBlastEngine(config, {
+    movesAllowed: waveConfig?.movesAllowed,
+    waveObjectives,
+    currentWave: waveNumber,
+    isMultiplayer,
+    blastSeed: isMultiplayer ? blastSeed : undefined,
+    initialTileStates: isMultiplayer ? initialTileStates : undefined,
+  });
 
   // Combo system
   const combo = useComboSystem({
     trackMaxCombo: true,
     onComboSound: playComboSound,
-    timerIntervalMs: isLowEnd ? 500 : 250,
+    timerIntervalMs: 250,
   });
 
-  // Auto-cascade word callback: play sound but do NOT increment player combo.
-  // Cascades are game-generated events — boosting the player's combo for them
-  // creates phantom feedback that cheapens intentional combos.
-  const handleAutoCascadeWord = useCallback(() => {
-    playWordAcceptedSound();
-  }, [playWordAcceptedSound]);
+  // Animation sequencer
+  const sequencer = useBlastSequencer();
 
-  // Memoize wave objectives so they don't cause re-initialization
-  // MP doesn't use wave objectives — skip computation entirely
-  const waveObjectives = useMemo(
-    () => isMultiplayer ? [] : getWaveObjectives(waveNumber),
-    [waveNumber, isMultiplayer],
-  );
-
-  // Objective tile types for highlighting (memoized Set for BlastTileOverlay)
-  const objectiveTileTypes = useMemo(() => {
-    if (isMultiplayer) return new Set<string>();
-    const types = new Set<string>();
-    for (const obj of waveObjectives) {
-      if ((obj.type === 'collect_type' || obj.type === 'clear_all_type') && obj.tileType) {
-        types.add(obj.tileType);
-      }
-    }
-    return types;
-  }, [waveObjectives, isMultiplayer]);
-
-  // Sugar Crush sequence (PSYC-03): fires when moves run out, converting tiles to specials
-  const sugarCrush = useBlastSugarCrush();
-
-  // Ref to sugarCrush.start — allows onMovesExhausted to reference latest start without stale closure
-  const sugarCrushStartRef = useRef(sugarCrush.start);
-  sugarCrushStartRef.current = sugarCrush.start;
-
-  // Sugar crush callback — fires when moves run out
-  const handleMovesExhausted = useCallback(() => {
-    sugarCrushStartRef.current(
-      blastTileStatesRef.current,
-      config.gridSize,
-      blastSetTileStatesRef.current,
-      blastAddExplosionRef.current,
-      blastAddBonusScoreRef.current,
-      blastEndGameRef.current,
-    );
-  }, [config.gridSize]);
-
-  // Core blast game state (with cascade callback + move limit from wave config)
-  const blast = useBlastGame(config, {
-    onAutoCascadeWord: handleAutoCascadeWord,
-    movesAllowed: waveConfig?.movesAllowed,
-    waveObjectives,
-    isMultiplayer,
-    onSynergyDetected: useCallback((_comboType: BlastComboType, scoreMultiplier: number) => {
-      // Scale audio intensity with combo power: 2x→1, 3x→2, 4-5x→3, 6x→4
-      playComboSound(Math.min(5, Math.ceil(scoreMultiplier / 1.5)));
-    }, [playComboSound]),
-    onComboDetected: useCallback((combos: SpecialCombo[]) => {
-      onComboDetected?.(combos);
-    }, [onComboDetected]),
-    onMovesExhausted: handleMovesExhausted,
-    initialTileStates: isMultiplayer ? initialTileStates : undefined,
-    blastSeed: isMultiplayer ? blastSeed : undefined,
-  });
-
-  // Stable refs to blast methods for use inside onMovesExhausted callback
-  // (avoids stale closure over blast object which changes on each render)
-   
-  const blastTileStatesRef = useRef(blast.tileStates);
-  blastTileStatesRef.current = blast.tileStates;  
-
-   
-  const blastSetTileStatesRef = useRef(blast.setTileStates);
-  blastSetTileStatesRef.current = blast.setTileStates;  
-
-   
-  const blastAddExplosionRef = useRef(blast.addExplosion);
-  blastAddExplosionRef.current = blast.addExplosion;  
-
-   
-  const blastAddBonusScoreRef = useRef(blast.addBonusScore);
-  blastAddBonusScoreRef.current = blast.addBonusScore;  
-
-  // After sugar crush completes: in singleplayer end the game; in multiplayer unlock moves
-  // (soft pressure — server timer is authoritative for game end in multiplayer)
-  const blastEndGameRef = useRef<(totalBonus: number) => void>(() => {});
-
-  blastEndGameRef.current = useCallback((totalBonus: number) => {
-    void totalBonus;
-    if (isMultiplayer) {
-      // Soft pressure: Sugar Crush spectacle done, switch to unlimited moves
-      blast.unlockMoves();
-    } else {
-      blast.endGame();
-    }
-  }, [blast, isMultiplayer]);
-
-  // Multiplayer combo sync — show another player's combo flash when blastComboSync fires.
-  // blastComboSync is set by usePlayerGameEvents when the server broadcasts the event.
-  // Each new sync has a unique id so this effect fires once per event.
-  const blastComboSync = useBlastComboSync();
-  useEffect(() => {
-    if (blastComboSync) {
-      blast.triggerComboFlash(blastComboSync.comboType);
-    }
-  // Only fire when a new combo sync arrives (id is unique per event)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blastComboSync?.id]);
-
-  // Min word length from wave config (defaults to 2) — hoisted for use by combo streak
-  const minWordLength = waveConfig?.minWordLength ?? 2;
-
-  // Personal best (loss aversion hook: shows target to beat)
-  const personalBest = useBlastPersonalBest();
-
-  // Near-miss shimmer (psychological hook: shows what the player almost got)
-  const nearMiss = useBlastNearMiss();
-
-  // Combo streak — tracks consecutive word submissions within a time window
+  // Combo streak
   const comboStreak = useBlastComboStreak(getComboWindowMs(minWordLength));
-
-  // Pause combo timer during cascades to prevent unfair decay
-  useEffect(() => {
-    if (blast.cascadePhase === 'clearing' || blast.cascadePhase === 'falling' || blast.cascadePhase === 'appearing') {
-      comboStreak.pauseTimer();
-    } else {
-      comboStreak.resumeTimer();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- comboStreak object ref changes; we only need pause/resume fns
-  }, [blast.cascadePhase, comboStreak.pauseTimer, comboStreak.resumeTimer]);
-
-  // Hot tiles — bonus multiplier tiles in the last 25% of timed rounds (SP only)
-  const hotTiles = useBlastHotTiles({
-    gridSize: config.gridSize,
-    roundDuration: (totalTime ?? 120) * 1000,
-    tileStates: blast.tileStates,
-    enabled: !isMultiplayer,
-  });
-
-  // Intensity — drives reactive background and board glow based on game state
-  const intensity = useBlastIntensity({
-    comboLevel: combo.comboLevel,
-    cascadeChainLevel: blast.cascadeChainLevel ?? 0,
-    comboStreakLevel: comboStreak.streak.level,
-    isHotPhase: hotTiles.isHotPhase,
-    wordsFoundCount: blast.gameState.wordsFound.length,
-  });
 
   // Spam detection
   const spamDetection = useSpamDetection();
 
-  // Dictionary for hint system
+  // Dictionary cache for cascade word detection
   const { checkWord } = useDictionaryCache(config.language);
 
-  // Hint system — gated in multiplayer (no hints in MP)
-  const foundWordsSet = useMemo(
-    () => new Set(blast.gameState.wordsFound),
-    [blast.gameState.wordsFound],
-  );
-  const spHint = useBlastHint(
-    blast.modifiedGrid ?? [],
-    config.language,
-    checkWord,
-    foundWordsSet,
-    minWordLength,
-  );
-  const hintPath = isMultiplayer ? null : spHint.hintPath;
-  const hasHintAvailable = isMultiplayer ? false : spHint.hasHintAvailable;
-  const requestHint = isMultiplayer ? undefined : spHint.requestHint;
-  const clearHint = isMultiplayer ? undefined : spHint.clearHint;
+  // Effects state
+  const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
+  const [comboFlash, setComboFlash] = useState<{ id: string; tier: 1 | 2 | 3 } | null>(null);
+  const flyIdRef = useRef(0);
 
-  // Objective tracking
-  const spObjectives = useBlastObjectives({
-    gameState: blast.gameState,
-    tileTypeClears: blast.gameState.tileTypeClears,
-    waveNumber,
-    wordsFound: blast.gameState.wordsFound,
-  });
-  const objectiveProgress = spObjectives.objectiveProgress;
-  const allObjectivesComplete = spObjectives.allObjectivesComplete;
-
-  // Game timing - initialized once via effect
-  const gameStartTimeRef = useRef(0);
-  useEffect(() => {
-    if (gameStartTimeRef.current === 0) {
-      gameStartTimeRef.current = Date.now();
-    }
-  }, []);
-
-  // Hot tile timer update — check elapsed time every second to activate hot phase
-  useEffect(() => {
-    if (isMultiplayer || !gameStartTimeRef.current) return;
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - gameStartTimeRef.current;
-      hotTiles.onTimerUpdate(elapsed);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isMultiplayer, hotTiles]);
-
-  // Confetti burst + celebration Sugar Crush on board complete (SP only)
-  const confettiFiredRef = useRef(false);
-  useEffect(() => {
-    if (isMultiplayer) return;
-    if (blast.gameState.isComplete && !confettiFiredRef.current) {
-      confettiFiredRef.current = true;
-      import('canvas-confetti').then(({ default: confetti }) => {
-        confetti({
-          particleCount: 40,
-          spread: 50,
-          origin: { y: 0.6 },
-          colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#7FFF00'],
-        });
-      });
-      // Celebration Sugar Crush: fire when ≥3 moves remain (reward, not consolation)
-      if (blast.gameState.movesRemaining >= 3 && isFinite(blast.gameState.totalMoves)) {
-        sugarCrushStartRef.current(
-          blastTileStatesRef.current,
-          config.gridSize,
-          blastSetTileStatesRef.current,
-          blastAddExplosionRef.current,
-          blastAddBonusScoreRef.current,
-          () => {}, // no-op onComplete — board already complete
-        );
-      }
-    }
-    // Reset guard when wave resets (waveNumber prop changes)
-  }, [blast.gameState.isComplete, blast.gameState.movesRemaining, blast.gameState.totalMoves, isMultiplayer, config.gridSize]);
-
-  // Word forming state (from GridComponent drag)
+  // Word forming state
   const [formedWord, setFormedWord] = useState('');
 
-  // Quit dialog
-  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
-
-  // End game confirmation dialog
-  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
-
-  // Bonus move popup (auto-clears after animation)
-  const [bonusMoveAwarded, setBonusMoveAwarded] = useState<number | undefined>();
-  const bonusMoveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Track last submitted path for tile clearing
+  // Track last submitted path
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
-
-  // Ref to onWordWithComboType — avoids stale closure in handleWordAccepted
+  const [gameStartTime] = useState(() => Date.now());
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
 
-  // Direct callback when a word is accepted
-  const handleWordAccepted = useCallback((data: { word: string; score: number }) => {
-    // Check for bonus moves from long words
-    const bonus = calculateBonusMoves(data.word.length);
-    if (bonus > 0) {
-      setBonusMoveAwarded(bonus);
-      if (bonusMoveTimerRef.current) clearTimeout(bonusMoveTimerRef.current);
-      bonusMoveTimerRef.current = setTimeout(() => setBonusMoveAwarded(undefined), 1500);
+  // Handle accepted word: clear tiles, cascade, track combos
+  const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
+    if (lastPathRef.current.length === 0) return;
+
+    const path = lastPathRef.current;
+    lastPathRef.current = [];
+
+    // Detect combos on the path
+    const detectedCombos = detectSpecialCombos(path, engine.tileStates);
+    const hadCombo = detectedCombos.length > 0;
+
+    // Report combo to parent (MP socket)
+    if (onWordWithComboTypeRef.current) {
+      onWordWithComboTypeRef.current(data.word, hadCombo ? detectedCombos[0].type : null);
     }
 
-    if (lastPathRef.current.length > 0) {
-      const path = lastPathRef.current;
+    // Notify parent of combo discovery
+    if (hadCombo && onComboDetected) {
+      onComboDetected(detectedCombos);
+    }
 
-      // Detect combos once — pass to clearTilesForWord to avoid redundant O(P²) detection
-      const detectedCombos = detectSpecialCombos(path, blast.tileStates);
-      const hadCombo = detectedCombos.length > 0;
+    // 1. Animate word clear (anticipation → clearing)
+    const clearedInfo = path.map(p => ({
+      row: p.row,
+      col: p.col,
+      type: engine.tileStates[p.row]?.[p.col]?.type ?? 'standard',
+    }));
+    await sequencer.animateWordClear(clearedInfo);
 
-      // Report detected comboType to parent for multiplayer socket emit
-      if (onWordWithComboTypeRef.current) {
-        const comboType = hadCombo ? detectedCombos[0].type : null;
-        onWordWithComboTypeRef.current(data.word, comboType);
+    // 2. Submit to engine (instant state update)
+    const result = engine.submitWord(path, data.word, data.score);
+
+    // 3. Score fly effect
+    const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
+    const avgCol = path.reduce((s, p) => s + p.col, 0) / path.length;
+    const flyId = `fly-${++flyIdRef.current}`;
+    const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
+    setScoreFlyEvents(prev => [...prev.slice(-2), {
+      id: flyId, score: result.score, startX: avgCol * 60, startY: avgRow * 60, tier,
+    }]);
+
+    // 4. Combo flash effect
+    if (hadCombo && detectedCombos[0]) {
+      const mult = detectedCombos[0].scoreMultiplier;
+      const flashTier: 1 | 2 | 3 = mult >= 6 ? 3 : mult >= 4 ? 2 : 1;
+      setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
+    }
+
+    // 5. Run cascade + animate with multi-chain support
+    let chainLevel = 0;
+    let cascadeResult = engine.startCascade();
+    await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
+    cascadeResult.commit?.();
+
+    // Chain cascades: match-3 clusters + auto-formed words after gravity
+    const foundWordsSet = new Set(engine.gameState.wordsFound);
+    while (chainLevel < MAX_CASCADE_CHAIN) {
+      const grid = engine.grid;
+      if (!grid) break;
+
+      const affectedCols = new Set(cascadeResult.gravity.newTiles.map(t => t.col));
+      const affectedRows = new Set(cascadeResult.gravity.newTiles.map(t => t.row));
+      // Also include rows where tiles fell TO
+      for (const ft of cascadeResult.gravity.fallingTiles) {
+        affectedRows.add(ft.row);
+        affectedCols.add(ft.col);
       }
 
-      blast.clearTilesForWord(path, data.word, data.score, detectedCombos);
-      lastPathRef.current = [];
+      let hadClears = false;
 
-      // Trigger near-miss shimmer if no combo was already triggered
-      nearMiss.check(path, blast.modifiedGrid ?? [], blast.tileStates, config.gridSize, hadCombo);
+      // 1. Match-3 clusters (Candy Crush mechanic — most frequent cascade source)
+      const clusters = detectMatch3Clusters(grid, engine.tileStates, affectedCols);
+      if (clusters.length > 0) {
+        chainLevel++;
+        hadClears = true;
+        for (const cluster of clusters) {
+          const bonus = Math.round(cluster.cells.length * 3 * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          engine.submitWord(cluster.cells, `[${cluster.letter}×${cluster.cells.length}]`, bonus);
+        }
+      }
+
+      // 2. Vertical auto-words
+      const vertWords = detectVerticalWords(
+        grid, engine.tileStates, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
+      );
+      if (vertWords.length > 0) {
+        if (!hadClears) chainLevel++;
+        hadClears = true;
+        const toClear = vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
+        for (const vw of toClear) {
+          const bonus = Math.round(vw.word.length * vw.word.length * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          engine.submitWord(vw.path, vw.word, bonus);
+          foundWordsSet.add(vw.word);
+        }
+      }
+
+      // 3. Horizontal auto-words
+      const horizWords = detectHorizontalWords(
+        grid, engine.tileStates, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
+      );
+      if (horizWords.length > 0) {
+        if (!hadClears) chainLevel++;
+        hadClears = true;
+        const toClear = horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
+        for (const hw of toClear) {
+          const bonus = Math.round(hw.word.length * hw.word.length * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          engine.submitWord(hw.path, hw.word, bonus);
+          foundWordsSet.add(hw.word);
+        }
+      }
+
+      if (!hadClears) break;
+
+      // Chain score fly — show chain multiplier at grid center
+      const chainFlyId = `chain-${++flyIdRef.current}`;
+      const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
+      const chainBonus = chainLevel * 5;
+      setScoreFlyEvents(prev => [...prev.slice(-3), {
+        id: chainFlyId, score: chainBonus,
+        startX: (config.gridSize / 2) * 60, startY: (config.gridSize / 2) * 60,
+        tier: chainTier,
+      }]);
+
+      // Chain combo flash
+      if (chainLevel >= 2) {
+        setComboFlash({ id: `chain-flash-${flyIdRef.current}`, tier: chainTier });
+      }
+
+      // Cascade again with chain acceleration
+      cascadeResult = engine.startCascade();
+      await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
+      cascadeResult.commit?.();
+
+      playWordAcceptedSound();
     }
 
-    // Track combo streak — consecutive word submissions within time window
+    // Track combo streak
     comboStreak.onWordSubmitted();
-  }, [blast, nearMiss, config.gridSize, comboStreak]);
 
-  // Word submission hook - reuses proven validation pipeline
+    playWordAcceptedSound();
+  }, [engine, comboStreak, onComboDetected, playWordAcceptedSound, sequencer, checkWord, config.gridSize]);
+
+  // Score fly + combo flash handlers
+  const handleScoreFlyComplete = useCallback((id: string) => {
+    setScoreFlyEvents(prev => prev.filter(e => e.id !== id));
+  }, []);
+  const handleComboFlashComplete = useCallback(() => {
+    setComboFlash(null);
+  }, []);
+
+  // Word submission pipeline
   const wordSubmission = useWordSubmission({
     language: config.language,
     minWordLength,
-    grid: blast.modifiedGrid,
-    gameStartTime: gameStartTimeRef.current,
+    grid: engine.grid,
+    gameStartTime,
     getScoreMultiplier: () => getComboMultiplier(combo.comboLevel),
     fireRoundActive: false,
     combo,
@@ -413,177 +290,119 @@ export function BlastGame({
     onWordAccepted: handleWordAccepted,
   });
 
-  // DDA: silently track word rejections (PSYC-04)
-  // After 3+ consecutive rejections, next gravity refill spawns more special tiles
-  const lastFeedbackIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    const fb = wordSubmission.currentFeedback;
-    if (fb && fb.type === 'rejected' && fb.id !== lastFeedbackIdRef.current) {
-      lastFeedbackIdRef.current = fb.id;
-      blast.trackWordFail();
-    }
-  }, [wordSubmission.currentFeedback, blast]);
-
-  // Handle word submission: validate via useWordSubmission
+  // Handlers
   const handleWordSubmit = useCallback((word: string) => {
     wordSubmission.handleWordSubmit(word);
   }, [wordSubmission]);
 
-  // Handle path submission (stores the path for tile clearing)
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     lastPathRef.current = cells;
   }, []);
 
-  // Handle word change from grid (for word display)
   const handleWordChange = useCallback((word: string) => {
     setFormedWord(word);
   }, []);
 
-  // Detect game completion or dead end
-  // In multiplayer, server timer is authoritative — skip local game-end triggers
-  // Priority: objectives met → wave complete, board cleared without objectives → game end, dead end → game end
+  const handleQuit = useCallback(() => {
+    onQuit();
+  }, [onQuit]);
+
+  // Objective tracking
+  const objectives = useBlastObjectives({
+    gameState: engine.gameState,
+    tileTypeClears: engine.gameState.tileTypeClears,
+    waveNumber,
+    wordsFound: engine.gameState.wordsFound,
+  });
+
+  // Game end detection (SP only — MP uses server timer)
   useEffect(() => {
-    // Multiplayer: server controls game end via timer; local state doesn't trigger onGameEnd
     if (isMultiplayer) return undefined;
 
-    // All objectives met → wave complete (regardless of board clear state)
-    if (allObjectivesComplete) {
-      const { score, wordsFound, tilesCleared, totalTiles } = blast.gameState;
+    // All objectives met
+    if (objectives.allObjectivesComplete) {
+      const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
 
       if (onWaveComplete && (!scoreThreshold || score >= scoreThreshold)) {
-        const timer = setTimeout(() => {
-          onWaveComplete(score, wordsFound, clearPct);
-        }, 2000);
+        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
         return () => clearTimeout(timer);
       }
 
-      // Objectives met but score threshold not met — game ends
-      const results = blast.getResultsData(combo.maxCombo);
-      const timer = setTimeout(() => {
-        onGameEnd(results);
-      }, 2000);
+      const results = engine.getResults(combo.maxCombo);
+      const timer = setTimeout(() => onGameEnd(results), 2000);
       return () => clearTimeout(timer);
     }
 
-    // Board cleared but objectives NOT met — game ends (failed wave)
-    if (blast.gameState.isComplete) {
-      const results = blast.getResultsData(combo.maxCombo);
-      const timer = setTimeout(() => {
-        onGameEnd(results);
-      }, 2000);
+    // Board cleared (no objectives or objectives not met)
+    if (engine.gameState.isComplete) {
+      const results = engine.getResults(combo.maxCombo);
+      const timer = setTimeout(() => onGameEnd(results), 2000);
       return () => clearTimeout(timer);
     }
 
-    // Dead end (no valid words or moves exhausted) — game ends
-    if (blast.gameState.isDeadEnd) {
-      const results = blast.getResultsData(combo.maxCombo);
-      const timer = setTimeout(() => {
-        onGameEnd(results);
-      }, 500);
+    // Dead end
+    if (engine.gameState.isDeadEnd) {
+      const results = engine.getResults(combo.maxCombo);
+      const timer = setTimeout(() => onGameEnd(results), 500);
       return () => clearTimeout(timer);
     }
 
     return undefined;
-  }, [blast.gameState.isComplete, blast.gameState.isDeadEnd, allObjectivesComplete, blast, combo.maxCombo, onGameEnd, onWaveComplete, waveConfig, isMultiplayer]);
+  }, [
+    engine.gameState.isComplete,
+    engine.gameState.isDeadEnd,
+    objectives.allObjectivesComplete,
+    engine,
+    combo.maxCombo,
+    onGameEnd,
+    onWaveComplete,
+    waveConfig,
+    isMultiplayer,
+  ]);
 
-  const handleQuitRequest = useCallback(() => {
-    setShowQuitConfirm(true);
-  }, []);
-
-  const handleConfirmQuit = useCallback(() => {
-    setShowQuitConfirm(false);
-    onQuit();
-  }, [onQuit]);
-
-  const handleEndGame = useCallback(() => {
-    setShowEndGameConfirm(false);
-    blast.endGame();
-  }, [blast]);
-
-  if (!blast.modifiedGrid) {
+  // Loading state
+  if (!engine.grid) {
     return (
       <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-neo-lime border-t-transparent rounded-full animate-spin" />
-          <span className="text-neo-white/60 text-sm font-bold">{t('blast.generating') || 'Generating grid...'}</span>
+          <span className="text-neo-white/60 text-sm font-bold">
+            {t('blast.generating') || 'Generating grid...'}
+          </span>
         </div>
       </div>
     );
   }
 
-  // Block grid during discovery banners or Sugar Crush sequence
-  const isDiscoveryActive = pendingDiscovery != null || sugarCrush.isActive;
-
   return (
     <div className="relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
-      <BlastComboFlash
-        activeFlash={blast.activeComboFlash}
-        onComplete={blast.clearComboFlash}
+      <BlastStage
+        grid={engine.grid}
+        tileStates={engine.tileStates}
+        gridSize={config.gridSize}
+        language={config.language}
+        gameState={engine.gameState}
+        waveNumber={waveNumber}
+        comboLevel={combo.comboLevel}
+        objectiveProgress={objectives.objectiveProgress}
+        formedWord={formedWord}
+        currentFeedback={wordSubmission.currentFeedback}
+        sequencerState={sequencer.state}
+        interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null}
+        onWordSubmit={handleWordSubmit}
+        onPathSubmit={handlePathSubmit}
+        onWordChange={handleWordChange}
+        onShuffle={engine.shuffleGrid}
+        onQuit={handleQuit}
+        noWordsRemaining={engine.noWordsRemaining}
+        scoreFlyEvents={scoreFlyEvents}
+        onScoreFlyComplete={handleScoreFlyComplete}
+        comboFlash={comboFlash}
+        onComboFlashComplete={handleComboFlashComplete}
+        t={(key: string) => t(key) || undefined}
       />
-      <BlastComboDiscovery
-        pendingDiscovery={pendingDiscovery ?? null}
-        onComplete={acknowledgeDiscovery ?? (() => {})}
-      />
-      <BlastGameLayout
-      isMultiplayer={isMultiplayer}
-      remainingTime={remainingTime}
-      totalTime={totalTime}
-      leaderboard={leaderboard}
-      username={username}
-      isDiscoveryActive={isDiscoveryActive}
-      shimmerCells={nearMiss.shimmerCells}
-      grid={blast.modifiedGrid}
-      tileStates={blast.tileStates}
-      gridSize={config.gridSize}
-      language={config.language}
-      explosions={blast.explosions}
-      scorePopups={blast.scorePopups}
-      cascadePhase={blast.cascadePhase}
-      cascadeAnimationData={blast.cascadeAnimationData}
-      cascadeChainLevel={blast.cascadeChainLevel}
-      cascadeHighlightData={blast.cascadeHighlightData}
-      cascadeHighlightPhase={blast.cascadeHighlightPhase}
-      gameState={blast.gameState}
-      waveNumber={waveNumber}
-      cumulativeScore={cumulativeScore}
-      scoreThreshold={waveConfig?.scoreThreshold}
-      comboLevel={combo.comboLevel}
-      comboTimeRemaining={combo.comboTimeRemaining}
-      comboDanger={combo.isDangerState}
-      formedWord={formedWord}
-      currentFeedback={wordSubmission.currentFeedback}
-      onWordSubmit={handleWordSubmit}
-      onPathSubmit={handlePathSubmit}
-      onWordChange={handleWordChange}
-      noWordsRemaining={blast.noWordsRemaining}
-      onExplosionComplete={blast.dismissExplosion}
-      onScorePopupComplete={blast.dismissScorePopup}
-      onShuffle={blast.shuffleRemainingTiles}
-      onQuitRequest={handleQuitRequest}
-      onConfirmQuit={handleConfirmQuit}
-      onEndGame={handleEndGame}
-      showQuitConfirm={showQuitConfirm}
-      setShowQuitConfirm={setShowQuitConfirm}
-      showEndGameConfirm={showEndGameConfirm}
-      setShowEndGameConfirm={setShowEndGameConfirm}
-      objectiveProgress={objectiveProgress}
-      objectiveTileTypes={objectiveTileTypes}
-      bonusMoveAwarded={bonusMoveAwarded}
-      hintPath={hintPath}
-      hasHintAvailable={hasHintAvailable}
-      onRequestHint={requestHint}
-      onClearHint={clearHint}
-      discoveredCombos={discoveredCombos}
-      personalBestScore={personalBest?.bestScore ?? null}
-      streak={comboStreak.streak}
-      arcRef={comboStreak.arcRef}
-      hotTiles={hotTiles.hotTiles}
-      isHotPhase={hotTiles.isHotPhase}
-      intensity={intensity}
-      t={(key: string) => t(key) || undefined}
-    />
     </div>
   );
 }

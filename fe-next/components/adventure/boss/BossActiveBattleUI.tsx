@@ -15,7 +15,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Swords } from 'lucide-react';
 import BossDialogue from '../BossDialogue';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { BossConfig } from '@/types/boss';
+import type { BossConfig, BossVisualState } from '@/types/boss';
 import type { BossPhaseNew } from '@/hooks/useAdventureBossNew';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -34,6 +34,8 @@ export interface BossActiveBattleUIProps {
   phase: BossPhaseNew;
   /** Current taunt translation key */
   currentTaunt: string | null;
+  /** Current visual state for image switching */
+  visualState?: BossVisualState;
 }
 
 // ==============================================
@@ -63,6 +65,7 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
   maxHP,
   phase,
   currentTaunt,
+  visualState,
 }) => {
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -89,6 +92,15 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
 
   const hpPct = maxHP > 0 ? Math.max(0, Math.min(100, (currentHP / maxHP) * 100)) : 0;
 
+  // Derive the correct image for the current visual state
+  const bossImageSrc = (() => {
+    if (!boss.images) return boss.imagePath;
+    if (visualState) return boss.images[visualState];
+    if (bossReaction === 'hit') return boss.images.hurt;
+    if (phase === 'desperate') return boss.images.enraged;
+    return boss.images.idle;
+  })();
+
   return (
     <>
       {/* Boss HP Bar + Avatar Row */}
@@ -106,9 +118,9 @@ const BossActiveBattleUI = memo<BossActiveBattleUIProps>(({
               transition={{ duration: 0.3 }}
               data-testid="boss-avatar"
             >
-              {boss.imagePath ? (
+              {bossImageSrc ? (
                 <Image
-                  src={boss.imagePath}
+                  src={bossImageSrc}
                   alt={t(boss.displayName)}
                   fill
                   className="object-cover"

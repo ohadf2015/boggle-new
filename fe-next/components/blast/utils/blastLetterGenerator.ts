@@ -59,20 +59,38 @@ const VOWELS: Record<string, Set<string>> = {
   ja: new Set(['\u3042', '\u3044', '\u3046', '\u3048', '\u304A']),
 };
 
+/**
+ * Number of distinct letters to use in Blast mode.
+ * Fewer letters = more match-3 cascades. 10 gives ~3.6 of each on a 6×6 grid,
+ * making triple matches happen naturally after gravity fills gaps.
+ */
+export const BLAST_POOL_SIZE = 10;
+
 /** Pre-built weighted pools for fast random selection */
 const poolCache = new Map<string, string[]>();
 
-function getPool(language: Language, vowelModifier = 1.0): string[] {
-  // Cache key includes modifier to avoid stale pools
-  const cacheKey = `${language}-${vowelModifier}`;
+function getPool(language: Language, vowelModifier = 1.0, maxLetters?: number): string[] {
+  const cacheKey = `${language}-${vowelModifier}-${maxLetters ?? 'all'}`;
   if (poolCache.has(cacheKey)) return poolCache.get(cacheKey)!;
 
   const lang = language as string;
   const weights = LETTER_WEIGHTS[lang] || LETTER_WEIGHTS.en;
   const vowelSet = VOWELS[lang] || VOWELS.en;
-  const pool: string[] = [];
 
-  for (const [letter, weight] of Object.entries(weights)) {
+  // Sort by weight descending and take top N letters if maxLetters specified
+  let entries = Object.entries(weights).sort((a, b) => b[1] - a[1]);
+  if (maxLetters && maxLetters < entries.length) {
+    // Ensure at least 3 vowels in the reduced pool for word formation
+    const vowelEntries = entries.filter(([l]) => vowelSet.has(l));
+    const consonantEntries = entries.filter(([l]) => !vowelSet.has(l));
+    const minVowels = Math.min(3, vowelEntries.length);
+    const selectedVowels = vowelEntries.slice(0, minVowels);
+    const selectedConsonants = consonantEntries.slice(0, maxLetters - minVowels);
+    entries = [...selectedVowels, ...selectedConsonants];
+  }
+
+  const pool: string[] = [];
+  for (const [letter, weight] of entries) {
     const isVowel = vowelSet.has(letter);
     const adjustedWeight = isVowel ? Math.max(1, Math.round(weight * vowelModifier)) : weight;
     for (let i = 0; i < adjustedWeight; i++) {
@@ -90,8 +108,19 @@ function getPool(language: Language, vowelModifier = 1.0): string[] {
  * @param rng - Optional random number generator; defaults to Math.random (singleplayer).
  *              Pass a seeded RNG (via createSeededRandom) for deterministic multiplayer refills.
  */
-export function generateBlastLetter(language: Language, vowelModifier = 1.0, rng: () => number = Math.random): string {
-  const pool = getPool(language, vowelModifier);
+/**
+ * Generate a weighted random letter for the given language.
+ * @param vowelModifier - Multiplier for vowel frequency (1.0 = normal)
+ * @param rng - Optional random number generator; defaults to Math.random.
+ * @param poolSize - Max distinct letters (default: BLAST_POOL_SIZE for cascade-friendly grids)
+ */
+export function generateBlastLetter(
+  language: Language,
+  vowelModifier = 1.0,
+  rng: () => number = Math.random,
+  poolSize: number = BLAST_POOL_SIZE,
+): string {
+  const pool = getPool(language, vowelModifier, poolSize);
   return pool[Math.floor(rng() * pool.length)];
 }
 

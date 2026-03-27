@@ -51,7 +51,7 @@ export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
 
   // Fallback
   const fallback: GuestDailyPlayer = {
-    displayName: 'Player ' + Math.floor(Math.random() * 1000),
+    displayName: ['WordNinja', 'LetterWizard', 'VowelViking', 'SyllableStar', 'GrammarGhost', 'SpellingBee', 'AlphabetAce', 'LexiconLion'][Math.floor(Math.random() * 8)],
     avatarEmoji: '🎯',
     avatarColor: '#6366f1',
   };
