@@ -101,8 +101,7 @@ export function getTodayDateString(): string {
  */
 export function getDefaultDateRange(days: number = DEFAULT_DATE_RANGE_DAYS): { start: string; end: string } {
   const end = new Date();
-  const start = new Date();
-  start.setDate(start.getDate() - days);
+  const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
 
   return {
     start: start.toISOString().split('T')[0],

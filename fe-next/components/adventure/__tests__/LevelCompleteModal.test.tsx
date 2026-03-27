@@ -406,7 +406,8 @@ describe('LevelCompleteModal', () => {
 
       // THEN
       const retryButton = screen.getByRole('button', { name: /retry/i });
-      expect(retryButton).toHaveClass('btn-primary');
+      // In failed state, retry button gets prominent orange styling as primary action
+      expect(retryButton).toHaveClass('bg-neo-orange');
     });
   });
 

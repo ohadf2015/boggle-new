@@ -12,6 +12,8 @@ import { renderHook, act } from '@testing-library/react';
 const storageBackend: Record<string, string> = {};
 beforeEach(() => {
   vi.useFakeTimers();
+  // Set a fixed time at noon UTC to avoid DST boundary issues
+  vi.setSystemTime(new Date('2026-03-15T12:00:00Z'));
   // Clear storage backend
   Object.keys(storageBackend).forEach(k => delete storageBackend[k]);
   vi.clearAllMocks();

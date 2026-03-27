@@ -304,7 +304,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
           onClick={onRetry}
           className={cn(
             'flex-1 py-2.5 px-4 flex items-center justify-center gap-2',
-            isFailed ? 'bg-neo-orange text-neo-black' : 'bg-neo-white/10 text-neo-white',
+            isFailed ? 'btn-primary bg-neo-orange text-neo-black' : 'bg-neo-white/10 text-neo-white',
             'font-black text-base border-3 border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg',
             'active:translate-y-0.5 active:shadow-hard-pressed',
