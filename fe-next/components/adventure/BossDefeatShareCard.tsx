@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, Share2, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -196,8 +196,8 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
   const [copied, setCopied] = useState(false);
 
   const theme = BOSS_THEMES[bossId] || DEFAULT_THEME;
-  const tauntIndexRef = useRef(Math.floor(Math.random() * theme.taunts.length));
-  const taunt = theme.taunts[tauntIndexRef.current % theme.taunts.length];
+  const [tauntIndex] = useState(() => Math.floor(Math.random() * theme.taunts.length));
+  const taunt = theme.taunts[tauntIndex % theme.taunts.length];
 
   const shareText = useMemo(
     () => buildBossShareText(props, theme, taunt),
