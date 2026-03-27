@@ -96,8 +96,11 @@ export async function loadSwedishDictionary(
       if (arrayMatch) {
         const arrayContent = arrayMatch[1];
         const decodeJsEscapes = (str: string): string | null => {
-          const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-          try { return JSON.parse(jsonCompatible); }
+          // Convert \xNN to actual characters, then parse as JSON string
+          const decoded = str.replace(/\\x([0-9A-Fa-f]{2})/g, (_match, hex) =>
+            String.fromCharCode(parseInt(hex, 16))
+          );
+          try { return JSON.parse(decoded); }
           catch { return null; }
         };
 

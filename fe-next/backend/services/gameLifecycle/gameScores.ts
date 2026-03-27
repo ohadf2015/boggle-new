@@ -1,7 +1,7 @@
 /**
  * Game Scores Service
  *
- * Handles final score calculation, AI validation, achievements,
+ * Handles final score calculation, achievements,
  * and broadcasting results to all players.
  */
 
@@ -11,9 +11,7 @@ import { isDictionaryWord } from '../../dictionary';
 import {
   isWordCommunityValid,
   isWordValidForScoring,
-  filterWordsForAIValidation,
 } from '../../modules/communityWordManager';
-import { validateWordsWithAI, isAIServiceAvailable } from '../../modules/aiValidationService';
 import { calculateGameScores, type PlayerScoreResult } from '../../modules/scoringEngine';
 import { sortWithWordHuntWinner } from '@/shared/utils/scoring';
 import {
@@ -84,45 +82,17 @@ export async function calculateAndBroadcastFinalScores(
     }
   }
 
-  // AI validation for non-dictionary words
-   
+  // Non-dictionary words are rejected (no AI validation)
   const aiValidatedWords = new Map<string, any>();
 
   if (nonDictionaryWords.length > 0) {
-    const { wordsForAI, skippedWords } = filterWordsForAIValidation(
-      nonDictionaryWords,
-      language,
-      gameCode
-    );
-
-    for (const [word, result] of skippedWords.entries()) {
+    logger.info('FINAL_SCORES', `Rejecting ${nonDictionaryWords.length} non-dictionary words (AI validation disabled)`);
+    for (const word of nonDictionaryWords) {
       aiValidatedWords.set(word, {
-        isValid: result.isValid,
+        isValid: false,
         isAiVerified: false,
-        source: result.source,
-        reason: result.reason,
+        reason: 'Not in dictionary',
       });
-    }
-
-    if (wordsForAI.length > 0) {
-      const aiAvailable = await isAIServiceAvailable();
-      if (aiAvailable) {
-        try {
-          const aiResults = await validateWordsWithAI(wordsForAI, language);
-          // validateWordsWithAI returns a Map<string, AIValidationResult>
-          for (const [word, result] of aiResults.entries()) {
-            aiValidatedWords.set(word, {
-              isValid: result.isValid,
-              isAiVerified: true,
-              confidence: result.confidence,
-              reason: result.reason,
-            });
-          }
-        } catch (err: unknown) {
-          const error = err as Error;
-          logger.error('AI_VALIDATION', `AI validation failed: ${error.message}`);
-        }
-      }
     }
   }
 
