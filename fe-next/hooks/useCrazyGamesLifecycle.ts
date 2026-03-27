@@ -228,6 +228,7 @@ export function useCrazyGamesLifecycle({
         console.log('[CrazyGames Lifecycle] gameplayStart called');
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- score/maxCombo/wordsFound intentionally excluded: only snapshot initial values via refs
   }, [isGameActive, isGameOver, gameplayStart, loadingStop, onGameplayStart]);
 
   // Handle gameplay end
