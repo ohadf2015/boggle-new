@@ -52,7 +52,7 @@ describe('Boss Configuration', () => {
     it('should have valid image paths for each boss', () => {
       for (const config of Object.values(BOSS_CONFIGS)) {
         expect(config.imagePath).toMatch(
-          /^\/images\/bosses\/boss-.+\.webp$/
+          /^\/images\/bosses\/boss-.+\.png$/
         );
       }
     });
@@ -149,7 +149,7 @@ describe('Boss Configuration', () => {
     it('should return the correct image path for each world', () => {
       for (let world = 1; world <= WORLDS_COUNT; world++) {
         const path = getBossImagePath(world);
-        expect(path).toMatch(/^\/images\/bosses\/boss-.+\.webp$/);
+        expect(path).toMatch(/^\/images\/bosses\/boss-.+\.png$/);
       }
     });
 

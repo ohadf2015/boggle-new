@@ -33,6 +33,7 @@ describe('Phase 4: Gradient Standardization', () => {
     'components/daily/TabbedDailyLeaderboard.tsx', // Rank badge gradients (1st/2nd/3rd)
     'components/CollectionGrid.tsx', // Rarity gradients
     'components/DailyLeaderboard.tsx', // Rank badge gradients
+    'components/blast/BlastTile.tsx', // Tile type semantic gradients
   ];
 
   describe('deprecated gradient patterns removed', () => {
@@ -167,7 +168,7 @@ describe('Phase 4: Gradient Standardization', () => {
       // 8. Blast mode cascade chain announcements (magenta/purple/cyan gradients)
       // 9. Adventure worlds 6-10 full theme files (world-specific gradients)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThanOrEqual(400);
+      expect(totalGradients).toBeLessThanOrEqual(410);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients

@@ -111,7 +111,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
       {/* Static JSON-LD content — all hardcoded strings, safe for dangerouslySetInnerHTML */}
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger -- static content only, no user input
+         
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',

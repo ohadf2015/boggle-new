@@ -22,7 +22,7 @@ describe('CrazyGames Integration Wiring', () => {
       'components/views/ResultsPage.tsx',
       'components/singleplayer/SinglePlayerResults.tsx',
       'components/daily/DailyChallengeResults.tsx',
-      'components/blast/BlastResults.tsx',
+      // BlastResults.tsx was removed during blast mode rebuild
     ];
 
     resultsScreens.forEach((screenPath) => {
