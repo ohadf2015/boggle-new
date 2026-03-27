@@ -158,9 +158,17 @@ export async function GET(request: NextRequest) {
     const { data: completionsRows, error: completionsError } = completionsResult;
     const { data: attemptsRows, error: attemptsError } = attemptsResult;
 
-    // If no progression exists, return initial state
+    // If no progression exists, still return any existing completions.
+    // This handles the case where level_completions rows exist but player_progression
+    // was never created (e.g., the INSERT in /api/adventure/complete failed transiently
+    // after the level_completions upsert already succeeded).
     if (progressionError && progressionError.code === 'PGRST116') {
-      const initialProgression = transformProgression(null, []);
+      if (completionsError) {
+        console.error('[ADVENTURE STATE API] Completions fetch error (no progression):', JSON.stringify(completionsError));
+        return NextResponse.json({ error: 'Failed to fetch completions' }, { status: 500 });
+      }
+      const completions = (completionsRows || []).map(transformCompletion);
+      const initialProgression = transformProgression(null, completions);
       initialProgression.userId = userId;
       return NextResponse.json({
         progression: initialProgression,
