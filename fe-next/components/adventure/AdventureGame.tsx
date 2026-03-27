@@ -120,7 +120,7 @@ const AdventureGame = memo<AdventureGameProps>(
       [getLevelAttempt, levelConfig.world, levelConfig.level]
     );
     const previousBestStars = useMemo(
-      () => getLevelCompletion(levelConfig.world, levelConfig.level)?.stars ?? 0,
+      () => getLevelCompletion?.(levelConfig.world, levelConfig.level)?.stars ?? 0,
       [getLevelCompletion, levelConfig.world, levelConfig.level]
     );
 

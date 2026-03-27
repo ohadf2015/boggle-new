@@ -6,6 +6,14 @@
 
 import { Z_INDEX } from '../confettiUtils';
 
+// canvas-confetti uses requestAnimationFrame internally; stub it for jsdom
+beforeAll(() => {
+  if (typeof globalThis.requestAnimationFrame === 'undefined') {
+    globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number;
+    globalThis.cancelAnimationFrame = (id: number) => clearTimeout(id);
+  }
+});
+
 describe('confettiUtils', () => {
   describe('Z_INDEX constants', () => {
     it('should define BACKGROUND_PARTICLES constant', () => {

@@ -30,6 +30,7 @@ import { useMultiplayerEventNotifications } from '@/hooks/useMultiplayerEventNot
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useGameActions } from '@/hooks/gameState';
+import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 
@@ -98,6 +99,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
+  // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
+  const { user: cgUser, isCrazyGames } = useCrazyGamesAuth();
   const { playTrack, TRACKS } = useMusic();
 
   const {
@@ -322,7 +325,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             handleJoin={handleJoin} refreshRooms={refreshRooms}
             activeRooms={activeRooms} roomsLoading={roomsLoading}
             isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate}
-            displayName={profile?.display_name ?? ''} profileAvatar={profile?.avatar_config}
+            displayName={(isCrazyGames && cgUser?.username) || profile?.display_name || ''} profileAvatar={profile?.avatar_config}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}

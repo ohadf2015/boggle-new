@@ -44,9 +44,9 @@ export function GamePageSeoContent({
           className="w-full flex items-center justify-between text-left group"
           aria-expanded={isExpanded}
         >
-          <h1 className="text-lg font-semibold text-white/80 group-hover:text-white transition-colors">
+          <h2 className="text-base font-medium text-white/60 group-hover:text-white/80 transition-colors">
             {title}
-          </h1>
+          </h2>
           <ChevronDown
             className={cn(
               'w-5 h-5 text-white/40 transition-transform duration-200',
@@ -55,7 +55,7 @@ export function GamePageSeoContent({
           />
         </button>
 
-        <p className="mt-2 text-sm text-white/50 leading-relaxed">
+        <p className="mt-1.5 text-xs text-white/40 leading-relaxed">
           {description}
         </p>
 

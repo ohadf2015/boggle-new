@@ -18,37 +18,37 @@ const ja = {
     "locale": "ja_JP",
     "language": "Japanese",
     "leaderboard": {
-      "title": "グローバルリーダーボード - トッププレイヤー",
+      "title": "グローバルリーダーボード - トップワードゲームプレイヤー世界ランキング",
       "description": "LexiClashグローバルリーダーボードでトッププレイヤーをチェック。世界中のワードゲーム愛好家と競い合い、自分の成長を記録しよう。",
       "ogTitle": "グローバルリーダーボード - トップワードゲームプレイヤー",
       "ogDescription": "最高のワードゲームプレイヤーの中で自分のランクを確認しよう。LexiClashに参加してトップを目指そう！"
     },
     "profile": {
-      "title": "あなたのプロフィールと統計",
+      "title": "プレイヤープロフィール、統計 & ゲーム実績",
       "description": "LexiClashプロフィール、ゲーム統計、実績、進捗を表示。この競争的なワードゲームで勝利数、合計スコア、見つけた単語、プレイ時間を追跡しましょう。",
       "ogTitle": "プレイヤープロフィールとゲーム統計 - LexiClash",
       "ogDescription": "ワードゲームの実績、統計を追跡し、リーダーボードランキングを登りましょう。"
     },
     "studentProfile": {
-      "title": "生徒プロフィールと進捗",
+      "title": "生徒プロフィール、学習進捗 & 教育実績",
       "description": "LexiClash生徒プロフィール、XP進捗、レッスン完了状況、教育実績を表示。学習の旅と語彙マスタリーを追跡しましょう。",
       "ogTitle": "生徒プロフィール - LexiClash 教育",
       "ogDescription": "LexiClash 教育で学習進捗、実績、語彙マスタリーを追跡しましょう。"
     },
     "terms": {
-      "title": "利用規約",
+      "title": "利用規約 - ユーザー契約とポリシー",
       "description": "LexiClash利用規約を読む。このマルチプレイヤーワードゲームプラットフォームのユーザー権利、利用規定、アカウント管理、ゲームポリシーについて学びましょう。",
       "ogTitle": "利用規約 - LexiClash",
       "ogDescription": "LexiClash利用規約 - ユーザー権利と利用規定ポリシー。"
     },
     "privacy": {
-      "title": "プライバシーポリシー",
+      "title": "プライバシーポリシー - データ保護と安全性",
       "description": "LexiClashプライバシーポリシー - データの収集、使用、保護方法を学びましょう。私たちはあなたのプライバシーを優先し、業界標準のセキュリティ対策を使用しています。",
       "ogTitle": "プライバシーポリシー - LexiClash",
       "ogDescription": "LexiClashがあなたのプライバシーをどのように保護し、データを安全に処理するかを学びましょう。"
     },
     "legal": {
-      "title": "法的情報",
+      "title": "法的情報 - 利用規約、プライバシー & ポリシー",
       "description": "LexiClash法的情報 - 利用規約とプライバシーポリシーにアクセス。あなたの権利と私たちがどのようにデータを保護するかを学びましょう。",
       "ogTitle": "法的情報 - LexiClash",
       "ogDescription": "LexiClash利用規約とプライバシーポリシーにアクセス。"
@@ -72,25 +72,25 @@ const ja = {
       "ogDescription": "リアルタイムマルチプレイヤーワードゲーム - ルームをホスト、友達を招待、ライブワードバトルで競争！"
     },
     "about": {
-      "title": "私たちについて - ストーリーとミッション",
+      "title": "LexiClashについて - ミッション、ストーリーとチーム",
       "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、5言語にわたる成長するコミュニティをご覧ください。",
       "ogTitle": "LexiClashについて - ワードゲームイノベーション",
       "ogDescription": "LexiClashの物語：リアルタイムワードバトルを通じて言語学習を楽しく競争的に。"
     },
     "contact": {
-      "title": "お問い合わせ",
+      "title": "お問い合わせ - LexiClashチームへのご連絡",
       "description": "LexiClashについてご質問やフィードバックがありますか？メールまたはソーシャルメディアでチームにお問い合わせください。",
       "ogTitle": "LexiClashにお問い合わせ",
       "ogDescription": "LexiClashチームにご連絡ください。フィードバック、問題報告、またはご挨拶をお待ちしています。"
     },
     "faq": {
-      "title": "よくある質問",
+      "title": "よくある質問 - LexiClashワードゲームについて",
       "description": "LexiClashワードゲームに関するよくある質問への回答。ゲームプレイ、スコアリング、アカウント管理、マルチプレイヤー機能、テクニカルサポートについて学びましょう。",
       "ogTitle": "FAQ - LexiClashワードゲーム",
       "ogDescription": "LexiClashのゲームプレイ、スコアリング、アカウントなどに関するよくある質問への回答。"
     },
     "blog": {
-      "title": "ブログとワードゲームリソース",
+      "title": "LexiClashブログ - ワードゲームのヒント、戦略 & リソース",
       "description": "ワードゲーム愛好家のためのヒント、戦略、洞察。語彙力の向上、単語発見テクニックの習得、LexiClashチャンピオンになる方法を学びましょう。",
       "ogTitle": "LexiClashブログ - ワードゲームのヒントと戦略",
       "ogDescription": "ワードゲームスキルを向上させるための専門的なヒント、戦略、洞察。"
@@ -275,11 +275,16 @@ const ja = {
   },
   "nav": {
     "bottomNavigation": "下部ナビゲーション",
+    "gameNavigation": "ゲームナビ",
     "home": "ホーム",
+    "singleplayer": "ソロ",
+    "daily": "デイリー",
+    "adventure": "アドベンチャー",
+    "blast": "ブラスト",
     "brain": "脳トレ",
     "leaderboard": "ランキング",
     "profile": "プロフィール",
-    "play": "プレイ",
+    "play": "マルチプレイ",
     "quests": "クエスト",
     "howToPlay": "遊び方",
     "blog": "ブログ",
@@ -583,6 +588,9 @@ const ja = {
     "emojiCard": {
       "classicHeader": "LexiClash デイリー #{number}",
       "blastHeader": "LexiClash Blast 💥",
+      "singleplayerHeader": "LexiClash ⚔️",
+      "adventureHeader": "LexiClash アドベンチャー W{world}-L{level}",
+      "drillHeader": "LexiClash {type} 🧠",
       "share": "シェア",
       "copy": "コピー"
     }

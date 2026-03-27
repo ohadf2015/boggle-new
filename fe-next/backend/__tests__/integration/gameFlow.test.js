@@ -68,14 +68,17 @@ describe('Game Flow Integration', () => {
       expect(socket2.getEmittedEvents()).toContainEvent('error');
     });
 
-    test('game creation broadcasts active rooms', async () => {
+    test('game creation broadcasts active rooms to lobby (not host)', async () => {
       const hostSocket = env.createSocket();
+      const lobbySocket = env.createSocket(); // separate lobby observer
       const gameData = env.createGameData();
 
       await hostSocket.receiveEvent('createGame', gameData);
 
-      // Check that activeRooms was broadcast
-      expect(hostSocket.getEmittedEvents()).toContainEvent('activeRooms');
+      // Host left lobby on join — should NOT receive activeRooms
+      expect(hostSocket.getEmittedEvents()).not.toContainEvent('activeRooms');
+      // Lobby observers still receive the broadcast
+      expect(lobbySocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
   });
 

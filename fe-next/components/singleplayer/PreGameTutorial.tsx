@@ -72,16 +72,16 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
       {/* Subtle radial gradient backdrop */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(132,204,22,0.06)_0%,transparent_70%)] pointer-events-none" />
 
-      {/* Skip button */}
-      <motion.button
-        onClick={onComplete}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
-        transition={{ delay: 0.5 }}
-        className="absolute top-4 right-4 z-10 text-neo-white/60 hover:text-neo-white text-sm font-bold px-3 py-1.5 rounded-neo border border-neo-white/20 hover:border-neo-white/40 transition-colors"
+      {/* Skip button — higher z-index to stay above step animations */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onComplete();
+        }}
+        className="absolute top-4 right-4 z-[60] text-neo-white/70 hover:text-neo-white text-sm font-bold px-4 py-2 rounded-neo border-2 border-neo-white/30 hover:border-neo-white/60 hover:bg-neo-white/10 transition-colors cursor-pointer"
       >
         {t('preGameTutorial.skip')}
-      </motion.button>
+      </button>
 
       {/* Step content with directional transitions */}
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-center relative">

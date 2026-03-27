@@ -15,7 +15,9 @@ import { captureApiError } from '@/utils/sentry';
  */
 
 // Cache the JWKS fetcher — jose handles key rotation automatically
-const CRAZYGAMES_JWKS_URL = new URL('https://crazygames.com/.well-known/jwks.json');
+// CrazyGames documents their public key at https://sdk.crazygames.com/publicKey.json
+// but jose's createRemoteJWKSet requires JWKS format — CG also exposes JWKS here:
+const CRAZYGAMES_JWKS_URL = new URL('https://sdk.crazygames.com/.well-known/jwks.json');
 const jwks = createRemoteJWKSet(CRAZYGAMES_JWKS_URL);
 
 // Expected issuer and audience for CrazyGames tokens

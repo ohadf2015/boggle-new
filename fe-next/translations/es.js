@@ -18,37 +18,37 @@ const es = {
     "locale": "es_ES",
     "language": "Spanish",
     "leaderboard": {
-      "title": "Clasificación Global - Mejores Jugadores",
+      "title": "Clasificacion Global - Mejores Jugadores de Palabras del Mundo",
       "description": "Ve a los jugadores mejor clasificados en la tabla de LexiClash. Compite con entusiastas de juegos de palabras de todo el mundo.",
       "ogTitle": "Clasificación Global - Mejores Jugadores de Palabras",
       "ogDescription": "¡Mira dónde te clasificas entre los mejores jugadores de palabras!"
     },
     "profile": {
-      "title": "Tu Perfil y Estadísticas",
+      "title": "Tu Perfil de Jugador, Estadisticas & Logros del Juego",
       "description": "Ve tu perfil de LexiClash, estadísticas de juego, logros y progreso.",
       "ogTitle": "Perfil del Jugador y Estadísticas - LexiClash",
       "ogDescription": "Mira tus logros y estadísticas de juegos de palabras."
     },
     "studentProfile": {
-      "title": "Perfil de Estudiante y Progreso",
+      "title": "Perfil de Estudiante, Progreso de Aprendizaje & Logros",
       "description": "Ve tu perfil de estudiante de LexiClash, progreso de XP, lecciones completadas y logros educativos. Rastrea tu viaje de aprendizaje y dominio del vocabulario.",
       "ogTitle": "Perfil de Estudiante - LexiClash Educación",
       "ogDescription": "Rastrea tu progreso de aprendizaje, logros y dominio del vocabulario en LexiClash Educación."
     },
     "terms": {
-      "title": "Términos de Servicio",
+      "title": "Terminos de Servicio - Acuerdo de Usuario & Politicas",
       "description": "Lee los Términos de Servicio de LexiClash.",
       "ogTitle": "Términos de Servicio - LexiClash",
       "ogDescription": "Términos de Servicio de LexiClash."
     },
     "privacy": {
-      "title": "Política de Privacidad",
+      "title": "Politica de Privacidad - Como Protegemos Tus Datos",
       "description": "Política de Privacidad de LexiClash - Aprende cómo protegemos tus datos.",
       "ogTitle": "Política de Privacidad - LexiClash",
       "ogDescription": "Aprende cómo LexiClash protege tu privacidad."
     },
     "legal": {
-      "title": "Información Legal",
+      "title": "Informacion Legal - Terminos, Privacidad & Politicas",
       "description": "Información legal de LexiClash - Términos de Servicio y Política de Privacidad.",
       "ogTitle": "Información Legal - LexiClash",
       "ogDescription": "Accede a los Términos de Servicio y Política de Privacidad de LexiClash."
@@ -72,25 +72,25 @@ const es = {
       "ogDescription": "Juego de palabras multijugador en tiempo real - crea salas, invita amigos y compite en batallas de palabras en vivo."
     },
     "about": {
-      "title": "Sobre Nosotros - Nuestra Historia y Misión",
+      "title": "Sobre LexiClash - Nuestra Historia, Mision y Equipo",
       "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
       "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
       "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
     },
     "contact": {
-      "title": "Contáctanos",
+      "title": "Contactanos - Habla con el Equipo de LexiClash",
       "description": "¿Tienes preguntas o comentarios sobre LexiClash? Contacta a nuestro equipo por correo electrónico o redes sociales. Nos encantaría saber de ti.",
       "ogTitle": "Contacta a LexiClash",
       "ogDescription": "Ponte en contacto con el equipo de LexiClash. Envía comentarios, reporta problemas o simplemente saluda."
     },
     "faq": {
-      "title": "Preguntas Frecuentes",
+      "title": "Preguntas Frecuentes Sobre LexiClash Juego de Palabras",
       "description": "Encuentra respuestas a preguntas comunes sobre el juego de palabras LexiClash. Aprende sobre jugabilidad, puntuación, gestión de cuentas, funciones multijugador y soporte técnico.",
       "ogTitle": "FAQ - LexiClash Juego de Palabras",
       "ogDescription": "Respuestas a preguntas frecuentes sobre LexiClash: jugabilidad, puntuación, cuentas y más."
     },
     "blog": {
-      "title": "Blog y Recursos de Juegos de Palabras",
+      "title": "Blog LexiClash - Consejos, Estrategias & Recursos Gratis",
       "description": "Consejos, estrategias e información para entusiastas de juegos de palabras. Aprende a mejorar tu vocabulario, dominar técnicas de búsqueda de palabras y convertirte en campeón de LexiClash.",
       "ogTitle": "Blog de LexiClash - Consejos y Estrategias",
       "ogDescription": "Consejos expertos, estrategias e información para mejorar tus habilidades en juegos de palabras."
@@ -275,11 +275,16 @@ const es = {
   },
   "nav": {
     "bottomNavigation": "Navegación inferior",
+    "gameNavigation": "Navegación del juego",
     "home": "Inicio",
+    "singleplayer": "Solo",
+    "daily": "Diario",
+    "adventure": "Aventura",
+    "blast": "Blast",
     "brain": "Cerebro",
     "leaderboard": "Ranking",
     "profile": "Perfil",
-    "play": "Jugar",
+    "play": "Multijugador",
     "quests": "Misiones",
     "howToPlay": "Cómo jugar",
     "blog": "Blog",
@@ -564,6 +569,9 @@ const es = {
     "emojiCard": {
       "classicHeader": "LexiClash Diario #{number}",
       "blastHeader": "LexiClash Blast 💥",
+      "singleplayerHeader": "LexiClash ⚔️",
+      "adventureHeader": "LexiClash Aventura W{world}-L{level}",
+      "drillHeader": "LexiClash {type} 🧠",
       "share": "Compartir",
       "copy": "Copiar"
     }

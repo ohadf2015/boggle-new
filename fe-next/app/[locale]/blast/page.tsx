@@ -10,6 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const path = `/${locale}/blast`;
   return {
+    title: 'Blast Mode - Chain Words Into Combos for High Scores',
+    description: 'Play Blast Mode in LexiClash! Chain words into explosive combos, build multipliers, and chase high scores. Fast-paced word game action — free, no download.',
     alternates: {
       canonical: `${BASE_URL}${path}`,
       languages: Object.fromEntries(LOCALES.map(l => [l, `${BASE_URL}/${l}/blast`])),

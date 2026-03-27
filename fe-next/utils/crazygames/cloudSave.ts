@@ -162,6 +162,14 @@ export async function saveToCloud(data: SaveData): Promise<boolean> {
     // Always stamp current version before saving
     const versioned = { ...data, version: CURRENT_VERSION };
     const serialized = JSON.stringify(versioned);
+
+    // CrazyGames enforces a 1MB limit per game for cloud data
+    const MAX_CLOUD_SAVE_BYTES = 1_000_000;
+    if (serialized.length > MAX_CLOUD_SAVE_BYTES) {
+      console.warn(`Cloud save exceeds 1MB limit (${serialized.length} bytes), save aborted`);
+      return false;
+    }
+
     await sdk.saveData('save_data_v1', serialized);
     return true;
   } catch (error) {

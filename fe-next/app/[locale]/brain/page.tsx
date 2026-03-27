@@ -10,6 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const path = `/${locale}/brain`;
   return {
+    title: 'Brain Training Drills - Sharpen Your Word Skills',
+    description: 'Train your brain with LexiClash word drills. Practice pattern recognition, memory, speed, and vocabulary with targeted exercises. Free brain training games.',
     alternates: {
       canonical: `${BASE_URL}${path}`,
       languages: Object.fromEntries(LOCALES.map(l => [l, `${BASE_URL}/${l}/brain`])),

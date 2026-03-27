@@ -128,12 +128,12 @@ async function loadWordsFromJSON(
   try {
     const jsonPath = path.join(process.cwd(), 'data', 'wikipedia-words', `${language}.json`);
 
-    if (!fs.existsSync(jsonPath)) {
+    try { await fs.promises.access(jsonPath); } catch {
       logger.info('WikiPopulator', `No local JSON file found for ${language}`, { jsonPath });
       return null;
     }
 
-    const fileContent = fs.readFileSync(jsonPath, 'utf-8');
+    const fileContent = await fs.promises.readFile(jsonPath, 'utf-8');
     const data = JSON.parse(fileContent) as {
       language: string;
       lastUpdated: string;

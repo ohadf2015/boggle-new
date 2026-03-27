@@ -7,7 +7,7 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
   en: {
-    title: 'Global Leaderboard - Top Word Game Players',
+    title: 'Global Leaderboard - Top Word Game Players Worldwide',
     description: 'See where you rank among the best word game players worldwide. Compete in LexiClash multiplayer matches and daily challenges to climb the rankings.',
     features: [
       'Live-updating global rankings with real-time scores',
@@ -22,25 +22,25 @@ const seoContent: Record<string, { title: string; description: string; features:
     ],
   },
   he: {
-    title: 'טבלת מובילים עולמית - שחקני משחקי מילים מובילים',
+    title: 'טבלת מובילים עולמית - השחקנים הטובים ביותר במשחקי מילים',
     description: 'ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים בעולם. התחרו במשחקים ואתגרים יומיים כדי לטפס בדירוגים.',
     features: ['דירוגים עולמיים מתעדכנים בזמן אמת', 'מעקב אחרי ניקוד כולל לאורך כל המשחקים', 'השוו ניקוד עם חברים ושחקנים מובילים'],
     faq: [],
   },
   ja: {
-    title: 'グローバルリーダーボード - トップワードゲームプレイヤー',
+    title: 'グローバルリーダーボード - トップワードゲームプレイヤー世界ランキング',
     description: '世界中のワードゲームプレイヤーの中であなたの順位を確認しましょう。',
     features: ['リアルタイム更新のグローバルランキング', '全ゲームの累計スコア追跡'],
     faq: [],
   },
   sv: {
-    title: 'Global Topplista - Baesta Ordspelarna',
+    title: 'Global Topplista - Världens Bästa Ordspelare & Rankningar',
     description: 'Se var du rankas bland vaerldens baesta ordspelare.',
     features: ['Realtidsuppdaterade globala rankningar'],
     faq: [],
   },
   es: {
-    title: 'Tabla de Clasificacion Global - Mejores Jugadores',
+    title: 'Tabla de Clasificacion Global - Mejores Jugadores de Palabras',
     description: 'Descubre tu posicion entre los mejores jugadores de juegos de palabras del mundo.',
     features: ['Rankings globales actualizados en tiempo real'],
     faq: [],
@@ -215,6 +215,12 @@ export default async function LeaderboardLayout({ children, params }: Leaderboar
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, itemListSchema, collectionPageSchema]) }}
       />
       {children}
+      <GamePageSeoContent
+        title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
+        description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
+        features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
+        faq={seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq}
+      />
     </>
   );
 }

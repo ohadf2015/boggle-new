@@ -14,41 +14,82 @@ import {
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
 import { isWordHuntQuality } from '@/shared/utils/wordQuality';
-import * as fs from 'fs';
+import { promises as fsAsync, readFileSync } from 'fs';
 import * as path from 'path';
 
 /**
  * Per-language curated word sets for Word Hunt target selection.
  * ~600-800 words per language, hand-curated for imageability,
  * discovery satisfaction, and age-appropriate familiarity.
- * Loaded lazily on first use.
+ * Loaded lazily on first use, cached permanently in memory.
  */
 const commonWordsByLang: Record<string, Set<string>> = {};
+const loadingPromises: Record<string, Promise<Set<string>>> = {};
 
-function loadWordFile(filename: string): Set<string> {
+function parseWordFile(content: string): Set<string> {
+  return new Set(
+    content.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0),
+  );
+}
+
+async function loadWordFileAsync(filename: string): Promise<Set<string>> {
   try {
     const filePath = path.join(__dirname, '..', filename);
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return new Set(
-      content.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0),
-    );
+    const content = await fsAsync.readFile(filePath, 'utf-8');
+    return parseWordFile(content);
   } catch {
     return new Set<string>();
   }
 }
 
+/** Sync fallback — only used on first call before async load completes */
+function loadWordFileSync(filename: string): Set<string> {
+  try {
+    const filePath = path.join(__dirname, '..', filename);
+    const content = readFileSync(filePath, 'utf-8');
+    return parseWordFile(content);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+const FILE_MAP: Record<string, string> = {
+  en: 'common_hunt_words.txt',
+  he: 'common_hunt_words_he.txt',
+  sv: 'common_hunt_words_sv.txt',
+  ja: 'common_hunt_words_ja.txt',
+  es: 'common_hunt_words_es.txt',
+};
+
+/**
+ * Get common words for a language. Returns cached set if available,
+ * otherwise loads asynchronously. Deduplicates concurrent loads.
+ */
+export async function getCommonWordsAsync(lang = 'en'): Promise<Set<string>> {
+  if (commonWordsByLang[lang]) return commonWordsByLang[lang];
+
+  // Deduplicate concurrent loads for the same language
+  if (!loadingPromises[lang]) {
+    loadingPromises[lang] = loadWordFileAsync(FILE_MAP[lang] || `common_hunt_words_${lang}.txt`)
+      .then(words => {
+        commonWordsByLang[lang] = words;
+        delete loadingPromises[lang];
+        return words;
+      });
+  }
+  return loadingPromises[lang];
+}
+
+/**
+ * Synchronous getter — returns cached words or falls back to sync load.
+ * Prefer getCommonWordsAsync in new code to avoid blocking the event loop.
+ */
 export function getCommonWords(lang = 'en'): Set<string> {
   if (commonWordsByLang[lang]) return commonWordsByLang[lang];
 
-  const fileMap: Record<string, string> = {
-    en: 'common_hunt_words.txt',
-    he: 'common_hunt_words_he.txt',
-    sv: 'common_hunt_words_sv.txt',
-    ja: 'common_hunt_words_ja.txt',
-    es: 'common_hunt_words_es.txt',
-  };
-
-  commonWordsByLang[lang] = loadWordFile(fileMap[lang] || `common_hunt_words_${lang}.txt`);
+  // Sync fallback: loads file synchronously on first call only.
+  // Subsequent calls hit cache. This keeps backward compat for sync callers.
+  commonWordsByLang[lang] = loadWordFileSync(FILE_MAP[lang] || `common_hunt_words_${lang}.txt`);
   return commonWordsByLang[lang];
 }
 

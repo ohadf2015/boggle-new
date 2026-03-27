@@ -24,16 +24,25 @@ export interface ExtendedSocketServer extends Server {
  * @returns Whether Redis adapter was successfully configured
  */
 export async function setupRedisAdapter(io: ExtendedSocketServer): Promise<boolean> {
+  const isProduction = process.env.NODE_ENV === 'production';
   const redisConnected = await initRedis();
 
   if (!redisConnected) {
-    redisLogger.info('Running in single instance mode (no Redis adapter)');
+    if (isProduction) {
+      redisLogger.error('Redis adapter REQUIRED in production for horizontal scaling — refusing to start in single-instance mode');
+      throw new Error('Redis adapter is required in production. Set REDIS_URL or REDIS_HOST to enable horizontal scaling.');
+    }
+    redisLogger.info('Running in single instance mode (no Redis adapter) — OK for development');
     return false;
   }
 
   try {
     const clients = createPubSubClients();
     if (!clients) {
+      if (isProduction) {
+        redisLogger.error('Redis pub/sub clients failed — cannot run production without cross-instance communication');
+        throw new Error('Redis pub/sub clients required in production for Socket.IO adapter.');
+      }
       redisLogger.info('Running in single instance mode (no pub/sub clients)');
       return false;
     }

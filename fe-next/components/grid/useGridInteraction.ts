@@ -125,30 +125,41 @@ export function useGridInteraction({
       setAdjacentCells([]);
     }
   }, [selectedCells, grid]);
-  const startSequentialFadeOut = useCallback((isCombo = false) => {
-    if (selectedCells.length === 0) return;
+  // Track fade timeouts so they can be cancelled when a new selection starts
+  const fadeTimerIdsRef = useRef<NodeJS.Timeout[]>([]);
+  const cancelFadeOut = useCallback(() => {
     if (fadeTimeoutRef.current) {
       clearTimeout(fadeTimeoutRef.current);
       fadeTimeoutRef.current = null;
     }
+    fadeTimerIdsRef.current.forEach(id => clearTimeout(id));
+    fadeTimerIdsRef.current = [];
+    setFadingCells([]);
+  }, []);
+  const startSequentialFadeOut = useCallback((isCombo = false) => {
+    if (selectedCells.length === 0) return;
+    cancelFadeOut();
     const cellsToFade = [...selectedCells];
     setFadingCells(cellsToFade);
-    const cellFadeDelay = isCombo ? 120 : 80;
-    const initialHold = isCombo ? 500 : 0;
+    // Reduced delays for snappier desktop feel
+    const cellFadeDelay = isCombo ? 80 : 50;
+    const initialHold = isCombo ? 200 : 0;
     cellsToFade.forEach((cell, index) => {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         setFadingCells(prev => prev.filter(c => !(c.row === cell.row && c.col === cell.col)));
       }, initialHold + index * cellFadeDelay);
+      fadeTimerIdsRef.current.push(id);
     });
-    const totalDelay = initialHold + cellsToFade.length * cellFadeDelay + (isCombo ? 800 : 200);
+    const totalDelay = initialHold + cellsToFade.length * cellFadeDelay + (isCombo ? 300 : 100);
     fadeTimeoutRef.current = setTimeout(() => {
       if (!isTouchingRef.current) {
         setSelectedCells([]);
         setFadingCells([]);
       }
       fadeTimeoutRef.current = null;
+      fadeTimerIdsRef.current = [];
     }, totalDelay);
-  }, [selectedCells, setSelectedCells]);
+  }, [selectedCells, setSelectedCells, cancelFadeOut]);
   const submitWord = useCallback(() => {
     if (selectedCells.length === 0) return;
     const formedWord = selectedCells.map(c => c.letter).join('');
@@ -158,7 +169,7 @@ export function useGridInteraction({
     if (comboLevel > 0) {
       startSequentialFadeOut(true);
     } else {
-      setTimeout(() => setSelectedCells([]), 500);
+      setTimeout(() => setSelectedCells([]), 150);
     }
     setIsClickSelectMode(false);
   }, [selectedCells, onWordSubmit, onPathSubmit, comboLevel, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
@@ -200,11 +211,8 @@ export function useGridInteraction({
     isTouchingRef.current = true;
     hasMovedRef.current = false;
     isScrollGestureRef.current = false;
-    if (fadeTimeoutRef.current) {
-      clearTimeout(fadeTimeoutRef.current);
-      fadeTimeoutRef.current = null;
-    }
-    setFadingCells([]);
+    // Cancel any in-progress fade-out so player can immediately start selecting
+    cancelFadeOut();
     const touch = 'touches' in event ? event.touches?.[0] : event;
     if (!touch) return;
     startPosRef.current = { x: touch.clientX, y: touch.clientY };
@@ -213,7 +221,7 @@ export function useGridInteraction({
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
     setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
     vibrateCellTap(fireRoundActive);
-  }, [interactive, setSelectedCells, fireRoundActive]);
+  }, [interactive, setSelectedCells, fireRoundActive, cancelFadeOut]);
 
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);
@@ -308,7 +316,7 @@ export function useGridInteraction({
       if (comboLevel > 0) {
         startSequentialFadeOut(true);
       } else {
-        setTimeout(() => setSelectedCells([]), 500);
+        setTimeout(() => setSelectedCells([]), 150);
       }
     } else {
       if (selectedCells.length === 1 && !hasMovedRef.current && isTouchDeviceRef.current && onSingleTapDetected) {

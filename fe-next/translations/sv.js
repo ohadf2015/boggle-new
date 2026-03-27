@@ -18,37 +18,37 @@ const sv = {
     "locale": "sv_SE",
     "language": "Swedish",
     "leaderboard": {
-      "title": "Global Topplista - Toppspelare",
+      "title": "Global Topplista - Bästa Ordspelarna i Världen & Rankningar",
       "description": "Visa de högst rankade spelarna på LexiClash globala topplista. Tävla med ordspelsentusiaster över hela världen och följ dina framsteg.",
       "ogTitle": "Global topplista - Topp ordspelspelare",
       "ogDescription": "Se var du rankas bland de bästa ordspelsspelarna. Gå med i LexiClash och tävla om toppplatsen!"
     },
     "profile": {
-      "title": "Din Profil och Statistik",
+      "title": "Din Spelarprofil, Statistik & Spelframsteg",
       "description": "Visa din LexiClash-profil, spelstatistik, prestationer och framsteg. Följ dina vinster, totala poäng, hittade ord och speltid i detta tävlingsinriktade ordspel.",
       "ogTitle": "Spelarprofil och spelstatistik - LexiClash",
       "ogDescription": "Följ dina ordspelsprestationer, statistik och klättra i topplistans rankningar."
     },
     "studentProfile": {
-      "title": "Elevprofil och Framsteg",
+      "title": "Elevprofil, Lärande Framsteg & Prestationer",
       "description": "Visa din LexiClash-elevprofil, XP-framsteg, lektionsslutförande och utbildningsprestationer. Följ din inlärningsresa och ordförrådsbehärskning.",
       "ogTitle": "Elevprofil - LexiClash Utbildning",
       "ogDescription": "Följ dina inlärningsframsteg, prestationer och ordförrådsbehärskning i LexiClash Utbildning."
     },
     "terms": {
-      "title": "Användarvillkor",
+      "title": "Användarvillkor - Användaravtal & Policyer",
       "description": "Läs LexiClash användarvillkor. Lär dig om användarrättigheter, acceptabel användning, kontohantering och våra spelregler för denna multiplayer-ordspelsplattform.",
       "ogTitle": "Användarvillkor - LexiClash",
       "ogDescription": "LexiClash användarvillkor - Användarrättigheter och policyer för acceptabel användning."
     },
     "privacy": {
-      "title": "Integritetspolicy",
+      "title": "Integritetspolicy - Hur Vi Skyddar Dina Data",
       "description": "LexiClash integritetspolicy - Lär dig hur vi samlar in, använder och skyddar dina data. Vi prioriterar din integritet och använder branschstandardiserade säkerhetsåtgärder.",
       "ogTitle": "Integritetspolicy - LexiClash",
       "ogDescription": "Lär dig hur LexiClash skyddar din integritet och hanterar dina data säkert."
     },
     "legal": {
-      "title": "Juridisk Information",
+      "title": "Juridisk Information - Villkor, Integritet & Policyer",
       "description": "LexiClash juridisk information - Få tillgång till våra användarvillkor och integritetspolicy. Lär dig om dina rättigheter och hur vi skyddar dina data.",
       "ogTitle": "Juridisk information - LexiClash",
       "ogDescription": "Få tillgång till LexiClash användarvillkor och integritetspolicy."
@@ -72,25 +72,25 @@ const sv = {
       "ogDescription": "Realtids multiplayer ordspel - var värd för rum, bjud in vänner och tävla i live ordstrider!"
     },
     "about": {
-      "title": "Om Oss - Vår Historia och Mission",
+      "title": "Om LexiClash - Vårt Uppdrag, Berättelse & Team",
       "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
       "ogTitle": "Om LexiClash - Innovation inom Ordspel",
       "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
     },
     "contact": {
-      "title": "Kontakta Oss",
+      "title": "Kontakta Oss - Nå LexiClash-Teamet & Support",
       "description": "Har du frågor eller feedback om LexiClash? Kontakta vårt team via e-post eller sociala medier. Vi vill gärna höra från dig.",
       "ogTitle": "Kontakta LexiClash",
       "ogDescription": "Kontakta LexiClash-teamet. Skicka feedback, rapportera problem eller bara säg hej."
     },
     "faq": {
-      "title": "Vanliga Frågor",
+      "title": "Vanliga Frågor om LexiClash Ordspel & Gameplay",
       "description": "Hitta svar på vanliga frågor om LexiClash ordspel. Lär dig om gameplay, poängsättning, kontohantering, multiplayer-funktioner och teknisk support.",
       "ogTitle": "FAQ - LexiClash Ordspel",
       "ogDescription": "Svar på vanliga frågor om LexiClash gameplay, poängsättning, konton och mer."
     },
     "blog": {
-      "title": "Blogg och Ordspelsresurser",
+      "title": "LexiClash Blogg - Ordspelstips, Strategier & Resurser",
       "description": "Tips, strategier och insikter för ordspelsentusiaster. Lär dig förbättra ditt ordförråd, bemästra ordsökningstekniker och bli en LexiClash-mästare.",
       "ogTitle": "LexiClash Blogg - Ordspelstips & Strategier",
       "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."
@@ -275,11 +275,16 @@ const sv = {
   },
   "nav": {
     "bottomNavigation": "Nedre navigering",
+    "gameNavigation": "Spelnavigering",
     "home": "Hem",
+    "singleplayer": "Solo",
+    "daily": "Daglig",
+    "adventure": "Äventyr",
+    "blast": "Blast",
     "brain": "Hjärna",
     "leaderboard": "Rankning",
     "profile": "Profil",
-    "play": "Spela",
+    "play": "Multiplayer",
     "quests": "Uppdrag",
     "howToPlay": "Hur man spelar",
     "blog": "Blogg",
@@ -583,6 +588,9 @@ const sv = {
     "emojiCard": {
       "classicHeader": "LexiClash Daglig #{number}",
       "blastHeader": "LexiClash Blast 💥",
+      "singleplayerHeader": "LexiClash ⚔️",
+      "adventureHeader": "LexiClash Äventyr W{world}-L{level}",
+      "drillHeader": "LexiClash {type} 🧠",
       "share": "Dela",
       "copy": "Kopiera"
     }

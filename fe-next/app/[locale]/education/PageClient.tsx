@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -204,6 +204,23 @@ export default function EducationPageClient() {
   const { isAuthenticated, loading: authLoading, profile } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const router = useRouter();
+
+  // Only allow access via direct URL (typed/bookmarked/external link).
+  // Any in-app navigation (referrer from same origin) redirects home,
+  // even from other education pages — this is the landing/hub, not a sub-route.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ref = document.referrer;
+    if (ref) {
+      try {
+        if (new URL(ref).origin === window.location.origin) {
+          router.replace(`/${language}`);
+        }
+      } catch {
+        // Malformed referrer — treat as direct access
+      }
+    }
+  }, [router, language]);
 
   // Determine the user's role for dashboard shortcut
   const userRole = profile?.user_role;

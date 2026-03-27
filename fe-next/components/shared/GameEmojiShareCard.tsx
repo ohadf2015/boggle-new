@@ -27,7 +27,37 @@ export interface BlastShareData {
   waveResults: Array<{ waveNumber: number; clearPercentage: number }>;
 }
 
-export type GameShareData = ClassicDailyShareData | BlastShareData;
+export interface SingleplayerShareData {
+  mode: 'singleplayer';
+  score: number;
+  words: string[];
+  maxCombo?: number;
+  rank?: number;
+  totalPlayers?: number;
+  isNewHighScore?: boolean;
+}
+
+export interface AdventureShareData {
+  mode: 'adventure';
+  score: number;
+  stars: number;
+  worldNumber: number;
+  levelNumber: number;
+  objectivesCompleted: number;
+  objectivesTotal: number;
+  isBoss?: boolean;
+}
+
+export interface DrillShareData {
+  mode: 'drill';
+  drillType: string;
+  score: number;
+  wordsFound: number;
+  totalWords?: number;
+  timeSpent?: number;
+}
+
+export type GameShareData = ClassicDailyShareData | BlastShareData | SingleplayerShareData | AdventureShareData | DrillShareData;
 
 export interface GameEmojiShareCardProps {
   data: GameShareData;
@@ -78,25 +108,94 @@ function buildBlastRows(data: BlastShareData): string[] {
   return rows;
 }
 
+/** Singleplayer: word count blocks + combo flame + rank */
+function buildSingleplayerRows(data: SingleplayerShareData): string[] {
+  const rows: string[] = [];
+  // Word length distribution as colored blocks
+  const lengths = data.words.map(w => w.length);
+  const grouped = new Map<number, number>();
+  for (const len of lengths) grouped.set(len, (grouped.get(len) || 0) + 1);
+  const sortedLens = [...grouped.entries()].sort((a, b) => b[0] - a[0]);
+  for (const [len, count] of sortedLens.slice(0, 5)) {
+    rows.push(`${'🟩'.repeat(Math.min(count, 8))} ${len}${'\u20E3'}`);
+  }
+  // Combo
+  if (data.maxCombo && data.maxCombo >= 3) {
+    rows.push('🔥'.repeat(Math.min(data.maxCombo, 6)) + ` ${data.maxCombo}x combo`);
+  }
+  // Rank
+  if (data.rank && data.totalPlayers) {
+    const medal = data.rank === 1 ? '🥇' : data.rank === 2 ? '🥈' : data.rank === 3 ? '🥉' : '🏅';
+    rows.push(`${medal} #${data.rank}/${data.totalPlayers}`);
+  }
+  if (data.isNewHighScore) rows.push('🏆 New High Score!');
+  return rows;
+}
+
+/** Adventure: stars + objectives + world/level */
+function buildAdventureRows(data: AdventureShareData): string[] {
+  const rows: string[] = [];
+  rows.push('⭐'.repeat(data.stars) + '☆'.repeat(Math.max(0, 3 - data.stars)));
+  rows.push(`✅ ${data.objectivesCompleted}/${data.objectivesTotal} objectives`);
+  if (data.isBoss) rows.push('👹 Boss defeated!');
+  return rows;
+}
+
+/** Drill: score + accuracy + time */
+function buildDrillRows(data: DrillShareData): string[] {
+  const rows: string[] = [];
+  if (data.totalWords) {
+    const pct = Math.round((data.wordsFound / data.totalWords) * 100);
+    const bars = Math.round(pct / 10);
+    rows.push('🟩'.repeat(bars) + '⬜'.repeat(10 - bars) + ` ${pct}%`);
+  }
+  rows.push(`📝 ${data.wordsFound} words`);
+  if (data.timeSpent) rows.push(`⏱️ ${data.timeSpent}s`);
+  return rows;
+}
+
+/** Get header + rows + score line for any mode */
+function getShareParts(data: GameShareData, t: (key: string) => string): { header: string; rows: string[]; scoreLine: string } {
+  switch (data.mode) {
+    case 'classic':
+      return {
+        header: t('share.emojiCard.classicHeader').replace('{number}', String(data.puzzleNumber)),
+        rows: buildClassicRows(data.words),
+        scoreLine: `${data.score.toLocaleString()} ${t('common.pts')}`,
+      };
+    case 'blast':
+      return {
+        header: t('share.emojiCard.blastHeader'),
+        rows: buildBlastRows(data),
+        scoreLine: `${data.score.toLocaleString()} ${t('common.pts')} · ${data.clearPercentage}% ${t('blast.cleared')}`,
+      };
+    case 'singleplayer':
+      return {
+        header: t('share.emojiCard.singleplayerHeader'),
+        rows: buildSingleplayerRows(data),
+        scoreLine: `${data.score.toLocaleString()} ${t('common.pts')} · ${data.words.length} ${t('common.words')}`,
+      };
+    case 'adventure':
+      return {
+        header: t('share.emojiCard.adventureHeader')
+          .replace('{world}', String(data.worldNumber))
+          .replace('{level}', String(data.levelNumber)),
+        rows: buildAdventureRows(data),
+        scoreLine: `${data.score.toLocaleString()} ${t('common.pts')}`,
+      };
+    case 'drill':
+      return {
+        header: t('share.emojiCard.drillHeader').replace('{type}', data.drillType),
+        rows: buildDrillRows(data),
+        scoreLine: `${data.score.toLocaleString()} ${t('common.pts')}`,
+      };
+  }
+}
+
 /** Build plain-text share string */
 function buildShareText(data: GameShareData, t: (key: string) => string): string {
-  if (data.mode === 'classic') {
-    const rows = buildClassicRows(data.words);
-    return [
-      t('share.emojiCard.classicHeader').replace('{number}', String(data.puzzleNumber)),
-      rows.join('\n'),
-      `${data.score} ${t('common.pts')}`,
-      'lexiclash.live',
-    ].join('\n');
-  } else {
-    const rows = buildBlastRows(data);
-    return [
-      t('share.emojiCard.blastHeader'),
-      rows.join('\n'),
-      `${data.score} ${t('common.pts')} · ${data.clearPercentage}% ${t('blast.cleared')}`,
-      'lexiclash.live',
-    ].join('\n');
-  }
+  const { header, rows, scoreLine } = getShareParts(data, t);
+  return [header, rows.join('\n'), scoreLine, 'lexiclash.live'].join('\n');
 }
 
 // ==================== Component ====================
@@ -129,15 +228,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t 
     }
   }, [shareText, handleCopy]);
 
-  const emojiRows =
-    data.mode === 'classic'
-      ? buildClassicRows(data.words)
-      : buildBlastRows(data);
-
-  const header =
-    data.mode === 'classic'
-      ? t('share.emojiCard.classicHeader').replace('{number}', String(data.puzzleNumber))
-      : t('share.emojiCard.blastHeader');
+  const { header, rows: emojiRows, scoreLine } = getShareParts(data, t);
 
   return (
     <motion.div
@@ -161,14 +252,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t 
 
       {/* Score + domain */}
       <div className="border-t border-slate-700/50 pt-2 mt-2 mb-3">
-        <div className="text-neo-white font-bold text-sm">
-          {data.score.toLocaleString()} {t('common.pts')}
-          {data.mode === 'blast' && (
-            <span className="text-slate-400 font-normal ms-2">
-              · {data.clearPercentage}% {t('blast.cleared')}
-            </span>
-          )}
-        </div>
+        <div className="text-neo-white font-bold text-sm">{scoreLine}</div>
         <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
       </div>
 

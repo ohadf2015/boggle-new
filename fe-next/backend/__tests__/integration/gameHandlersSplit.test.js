@@ -69,13 +69,17 @@ describe('Game Lifecycle Handler', () => {
       expect(socket2.getEmittedEvents()).toContainEvent('error');
     });
 
-    test('broadcasts activeRooms after creation', async () => {
+    test('host leaves lobby after game creation (no activeRooms to self)', async () => {
       const socket = env.createSocket();
+      const lobbySocket = env.createSocket(); // separate lobby observer
       const gameData = env.createGameData();
 
       await socket.receiveEvent('createGame', gameData);
 
-      expect(socket.getEmittedEvents()).toContainEvent('activeRooms');
+      // Host left lobby on join — should NOT receive activeRooms
+      expect(socket.getEmittedEvents()).not.toContainEvent('activeRooms');
+      // Lobby observers still receive the broadcast
+      expect(lobbySocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
 
     test('broadcasts updateUsers to room after creation', async () => {
@@ -440,19 +444,24 @@ describe('Room Management Handler', () => {
       expect(playerSocket.getEmittedEvents()).not.toContainEvent('roomClosed');
     });
 
-    test('closeRoom broadcasts updated activeRooms', async () => {
+    test('closeRoom broadcasts updated activeRooms to lobby (not host)', async () => {
       const hostSocket = env.createSocket();
+      const lobbySocket = env.createSocket(); // separate lobby observer
       const gameData = env.createGameData();
 
       await hostSocket.receiveEvent('createGame', gameData);
       hostSocket.clearTracking();
+      lobbySocket.clearTracking();
 
       await hostSocket.receiveEvent('closeRoom', {});
 
       // Flush throttled broadcast
       jest.advanceTimersByTime(500);
 
-      expect(hostSocket.getEmittedEvents()).toContainEvent('activeRooms');
+      // Host left lobby on game join — doesn't receive activeRooms
+      expect(hostSocket.getEmittedEvents()).not.toContainEvent('activeRooms');
+      // Lobby observers still receive the broadcast
+      expect(lobbySocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
   });
 

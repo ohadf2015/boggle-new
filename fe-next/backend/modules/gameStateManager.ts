@@ -233,6 +233,15 @@ function resetGameForNewRound(gameCode: string): boolean {
   peerValidationManager.resetPeerValidation(asBase<PeerValidationGameBase>(game));
   readyStateManager.clearPlayersReadyForNextGame(asBase<ReadyStateGameBase>(game));
 
+  // Stop all bots for this game — they'll be re-added when the next round starts.
+  // Without this, bot timers accumulate across rounds.
+  try {
+    const { stopAllBots } = require('../modules/botManager');
+    stopAllBots(gameCode);
+  } catch {
+    // botManager may not be loaded in test environments
+  }
+
   // Clear all player reconnection timeouts to prevent orphaned timeouts
   // from removing players from the NEW game after reset
   for (const [, userData] of Object.entries(game.users)) {

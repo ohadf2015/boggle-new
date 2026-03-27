@@ -152,7 +152,7 @@ export function useEarthquakeAnimation({
       setEarthquakePhase('rumble');
       playEarthquakeRumble();
 
-      // Phase 2: Main quake (after 300ms) - dust covers the board
+      // Phase 2: Main quake (after 150ms) - dust covers the board
       const quakeTimeout = setTimeout(() => {
         setEarthquakePhase('quake');
         playEarthquakeShake();
@@ -162,26 +162,26 @@ export function useEarthquakeAnimation({
           setEarthquakeParticles(generateParticles());
           setEarthquakeDust(generateDustClouds());
           setShowCracks(true);
-          setDustPhase('cover'); // Comic dust covers the board
+          setDustPhase('cover');
         }
-      }, 300);
+      }, 150);
 
-      // Phase 3: Settle (after 1100ms) - comic reveal effect
+      // Phase 3: Settle (after 550ms) - comic reveal effect
       const settleTimeout = setTimeout(() => {
         setEarthquakePhase('settle');
         setEarthquakeParticles([]);
         setEarthquakeDust([]);
         if (useEnhancedMode) {
-          setDustPhase('reveal'); // Comic book reveal with action lines
+          setDustPhase('reveal');
         }
-      }, 1100);
+      }, 550);
 
-      // Phase 4: Back to idle (after 1700ms)
+      // Phase 4: Back to idle (after 850ms) - reduced from 1700ms
       const idleTimeout = setTimeout(() => {
         setEarthquakePhase('idle');
         setShowCracks(false);
         setDustPhase('idle');
-      }, 1700);
+      }, 850);
 
       prevEarthquakeShakingRef.current = earthquakeShaking;
 

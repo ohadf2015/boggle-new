@@ -174,8 +174,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     loading: dailyChallengeStatus.loading,
   };
 
-  // FTUE: Full-screen onboarding for first-time users
-  if (showFTUE) {
+  // FTUE: Full-screen onboarding for mobile first-time users only.
+  // Desktop users see the full landing page with a tutorial banner instead.
+  if (showFTUE && !isDesktopWidth) {
     return <OnboardingFlow onComplete={() => setShowFTUE(false)} />;
   }
 

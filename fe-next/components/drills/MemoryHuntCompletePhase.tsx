@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Trophy, RotateCcw, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 
 interface MemoryHuntCompletePhaseProps {
   isDarkMode: boolean;
@@ -85,6 +86,25 @@ export function MemoryHuntCompletePhase({
           </motion.div>
         </div>
       </motion.div>
+      {results.score > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+        >
+          <GameEmojiShareCard
+            data={{
+              mode: 'drill',
+              drillType: 'Memory Hunt',
+              score: results.score,
+              wordsFound: results.wordsFound,
+              totalWords: results.totalWords,
+              timeSpent: results.timeSpent,
+            }}
+            t={t}
+          />
+        </motion.div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

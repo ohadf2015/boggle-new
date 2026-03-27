@@ -376,11 +376,12 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         />
 
         {/* Top bar: step counter + close */}
-        <div className="relative flex items-center justify-between px-5 pt-4 pb-2">
+        <div data-testid="progress-section" className="relative flex items-center justify-between px-5 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">
               {t('howToPlay.missionBriefing')}
             </span>
+            <span className="text-slate-400 text-xs font-mono">{currentStep + 1} / {steps.length}</span>
           </div>
           <button
             onClick={onClose}
@@ -392,7 +393,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         </div>
 
         {/* Step title area */}
-        <div className="relative px-5 pb-5 pt-1">
+        <div data-testid="compact-header" className="relative px-5 pb-5 pt-1">
           <div className="flex items-center gap-3.5">
             {/* Icon with glow ring */}
             <motion.div
@@ -414,16 +415,17 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
             <div className="flex-1 min-w-0">
               <AnimatePresence mode="wait">
-                <motion.h2
+                <motion.div
                   key={activeStep.id}
                   initial={{ y: 8, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -8, opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="font-neo-display font-black text-xl text-white uppercase leading-none"
                 >
-                  {activeStep.title}
-                </motion.h2>
+                  <h2 className="font-neo-display font-black text-xl text-white uppercase leading-none">
+                    {activeStep.title}
+                  </h2>
+                </motion.div>
               </AnimatePresence>
               <p className="text-slate-500 text-xs font-bold uppercase tracking-wide mt-1">
                 {activeStep.subtitle}
@@ -512,7 +514,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         </button>
 
         {/* Step indicator — mobile-visible pill dots */}
-        <div data-testid="step-dots" className="flex items-center gap-2">
+        <div data-testid="step-dots" className="hidden sm:flex items-center gap-2">
           {steps.map((step, index) => {
             const isActive = index === currentStep;
             return (

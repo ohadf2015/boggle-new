@@ -1,5 +1,5 @@
 import { RateLimiterMemory, RateLimiterRedis, RateLimiterAbstract } from 'rate-limiter-flexible';
-import { getRedisClient, isRedisAvailable } from '../redis/connection';
+import { getRateLimitClient, isRedisAvailable } from '../redis/connection';
 import { RATE_LIMITS } from '../config/rateLimits';
 
 import logger from '../utils/logger';
@@ -9,7 +9,7 @@ import logger from '../utils/logger';
  * This ensures rate limits are shared across horizontal replicas.
  */
 function createRateLimiter(keyPrefix: string, points: number, duration: number): RateLimiterAbstract {
-  const redis = isRedisAvailable() ? getRedisClient() : null;
+  const redis = isRedisAvailable() ? getRateLimitClient() : null;
   if (redis) {
     return new RateLimiterRedis({
       storeClient: redis,

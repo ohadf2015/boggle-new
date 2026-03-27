@@ -63,13 +63,9 @@ export default defineConfig({
     ],
     testTimeout: 10000,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        maxForks: 4,
-        minForks: 1,
-        execArgv: ['--max-old-space-size=4096'],
-      },
-    },
+    maxForks: 4,
+    minForks: 1,
+    execArgv: ['--max-old-space-size=8192'],
     teardownTimeout: 5000,
     hookTimeout: 10000,
     clearMocks: true,

@@ -15,6 +15,7 @@ const logger = require('../utils/logger');
 
 // State Management
 let _redisClient: RedisClient | null = null;
+let _rateLimitClient: RedisClient | null = null; // Dedicated connection for rate limiting
 let _isRedisAvailable = false;
 let _errorReported = false; // Prevent repeated error events to Sentry
 let _highLatencyReported = false; // Prevent repeated high-latency warnings to Sentry
@@ -280,6 +281,21 @@ export async function initRedis(): Promise<boolean> {
     _isRedisAvailable = true;
     logger.info('REDIS', 'Redis connection test successful');
 
+    // Create dedicated rate-limit client to prevent rate-limit queries
+    // from blocking game state operations on the main connection.
+    try {
+      _rateLimitClient = _redisClient.duplicate();
+      _rateLimitClient.on('error', (err: Error) => {
+        logger.debug('REDIS', `Rate-limit client error: ${err.message}`);
+      });
+      await _rateLimitClient.connect();
+      logger.info('REDIS', 'Dedicated rate-limit Redis client ready');
+    } catch (rlErr: unknown) {
+      const err = rlErr as Error;
+      logger.warn('REDIS', `Rate-limit client failed, sharing main connection: ${err.message}`);
+      _rateLimitClient = null; // Falls back to main client
+    }
+
     startHealthMonitoring();
 
     return true;
@@ -301,6 +317,16 @@ export async function closeRedis(): Promise<void> {
   if (memoryCheckInterval) {
     clearInterval(memoryCheckInterval);
     memoryCheckInterval = null;
+  }
+
+  if (_rateLimitClient) {
+    try {
+      await _rateLimitClient.quit();
+      logger.debug('REDIS', 'Rate-limit Redis client closed');
+    } catch {
+      // Ignore — main client close is the priority
+    }
+    _rateLimitClient = null;
   }
 
   if (_redisClient) {
@@ -349,6 +375,16 @@ export function isRedisAvailable(): boolean {
 
 export function getRedisClient(): RedisClient | null {
   return _redisClient;
+}
+
+/**
+ * Get dedicated rate-limit Redis client.
+ * Falls back to main client if dedicated one isn't available.
+ * This prevents rate-limit INCR/EXPIRE ops from queuing behind
+ * game state HSET/HGET ops on the single main connection.
+ */
+export function getRateLimitClient(): RedisClient | null {
+  return _rateLimitClient || _redisClient;
 }
 
 export function getWordApprovalScriptSha(): string | null {

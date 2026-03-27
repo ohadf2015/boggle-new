@@ -7,12 +7,13 @@
 import { memo, useState } from 'react';
 import Image from 'next/image';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
+import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
 const LOOT_DROP_IMAGES: Record<string, string> = {
@@ -49,7 +50,7 @@ export interface LevelCompleteContentProps {
 }
 
 const LevelCompleteContent = memo<LevelCompleteContentProps>(({
-  stars, score, objectives, worldNumber, isHighScore, isFailed,
+  stars, score, objectives, worldNumber, levelNumber, isHighScore, isFailed,
   onContinue, onRetry, onExit, xpEarned, goldEarned,
   isLastLevelOfWorld, onNextWorld, lootDrops, storyBeatText,
   canRetryFree, nextLevelPreview, bossDefeatShare, bestAttempt, t,
@@ -110,44 +111,28 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </AdaptiveMotion.div>
       )}
 
-      {/* Boss Defeat Share Button */}
-      {bossDefeatShare && !isFailed && (
-        <AdaptiveMotion.button
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.85, type: 'spring' }}
-          onClick={() => {
-            const params = new URLSearchParams({
-              world: String(worldNumber),
-              boss: bossDefeatShare.bossId,
-              word: bossDefeatShare.killingWord,
-              player: bossDefeatShare.playerName,
-              stars: String(stars),
-            });
-            const shareUrl = `${window.location.origin}/api/og/boss-defeat?${params}`;
-            const shareText = t('adventure.share.bossDefeated', {
-              boss: bossDefeatShare.bossName,
-              world: bossDefeatShare.worldName,
-            });
-            if (navigator.share) {
-              navigator.share({ title: 'LexiClash', text: shareText, url: shareUrl }).catch(() => {});
-            } else {
-              navigator.clipboard?.writeText(`${shareText}\n${shareUrl}`).catch(() => {});
-            }
-          }}
-          className={cn(
-            'w-full mb-4 py-2.5 px-4',
-            'flex items-center justify-center gap-2',
-            'bg-neo-pink/20 text-neo-pink',
-            'font-bold text-sm',
-            'border-2 border-neo-pink/40 rounded-neo',
-            'hover:bg-neo-pink/30',
-            'transition-all duration-150'
-          )}
+      {/* Share Card — all level completions */}
+      {!isFailed && (
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.85 }}
+          className="mb-4"
         >
-          <Share2 className="w-4 h-4" />
-          {t('adventure.share.shareCard')}
-        </AdaptiveMotion.button>
+          <GameEmojiShareCard
+            data={{
+              mode: 'adventure',
+              score,
+              stars,
+              worldNumber,
+              levelNumber,
+              objectivesCompleted: completedCount,
+              objectivesTotal: objectives.length,
+              isBoss: !!bossDefeatShare,
+            }}
+            t={t}
+          />
+        </AdaptiveMotion.div>
       )}
 
       {/* Objectives Summary */}

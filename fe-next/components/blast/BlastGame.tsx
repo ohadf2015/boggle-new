@@ -503,7 +503,14 @@ export function BlastGame({
   }, [blast]);
 
   if (!blast.modifiedGrid) {
-    return null; // Grid still loading
+    return (
+      <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-neo-lime border-t-transparent rounded-full animate-spin" />
+          <span className="text-neo-white/60 text-sm font-bold">{t('blast.generating') || 'Generating grid...'}</span>
+        </div>
+      </div>
+    );
   }
 
   // Block grid during discovery banners or Sugar Crush sequence

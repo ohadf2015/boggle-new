@@ -8,7 +8,7 @@
  */
 
 import { REDIS_PREFIX, REDIS_VERSION } from './config';
-import { getRedisClient, isRedisAvailable } from './connection';
+import { getRateLimitClient as getRedisClient, isRedisAvailable } from './connection';
 import logger from '../utils/logger';
 
 // Key patterns for rate limiting

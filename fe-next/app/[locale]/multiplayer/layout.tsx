@@ -192,6 +192,12 @@ export default async function MultiplayerLayout({ children, params }: Multiplaye
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
       />
       {children}
+      <GamePageSeoContent
+        title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
+        description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
+        features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
+        faq={seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq}
+      />
     </>
   );
 }

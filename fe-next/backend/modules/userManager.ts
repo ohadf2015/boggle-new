@@ -77,6 +77,46 @@ export interface AuthContext {
 type GamesMap = Record<string, GameBase>;
 
 /**
+ * Get diagnostic sizes of all internal maps.
+ * Useful for health check endpoints and monitoring.
+ */
+export function getSocketMapSizes(): { socketToGame: number; socketToUsername: number; usernameToSocket: number; authUserConnections: number } {
+  return {
+    socketToGame: socketToGame.size,
+    socketToUsername: socketToUsername.size,
+    usernameToSocket: usernameToSocket.size,
+    authUserConnections: authUserConnections.size,
+  };
+}
+
+/**
+ * Purge stale socket entries that reference sockets no longer in the Socket.IO server.
+ * Call periodically (e.g. every 5 min) to prevent unbounded map growth from
+ * orphaned entries where disconnect events were missed.
+ */
+export function purgeStaleSocketEntries(activeSocketIds: Set<string>): number {
+  let purged = 0;
+
+  for (const [socketId] of socketToGame) {
+    if (!activeSocketIds.has(socketId)) {
+      socketToGame.delete(socketId);
+      socketToUsername.delete(socketId);
+      purged++;
+    }
+  }
+
+  // Clean usernameToSocket entries pointing to dead sockets
+  for (const [key, socketId] of usernameToSocket) {
+    if (!activeSocketIds.has(socketId)) {
+      usernameToSocket.delete(key);
+      purged++;
+    }
+  }
+
+  return purged;
+}
+
+/**
  * Add a user to a game
  */
 export function addUserToGame(
@@ -469,6 +509,8 @@ module.exports = {
   clearSocketMappingsForLeave,
   cleanupUserMappings,
   cleanupStaleAuthConnections,
+  getSocketMapSizes,
+  purgeStaleSocketEntries,
 
   // Expose maps for testing
   _socketToGame: socketToGame,

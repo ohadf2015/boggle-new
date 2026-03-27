@@ -8,7 +8,9 @@ import type { Server } from 'socket.io';
 import { isRedisAvailable, getRedisMetrics, getRedisClient } from '../backend/redisClient';
 import { circuitBreaker } from '../backend/redis/circuitBreaker';
 import { checkPoolHealth } from '../backend/db/supabasePool';
-import { getAllGames } from '../backend/modules/gameStateManager';
+import { getAllGames, getGameCount } from '../backend/modules/gameStateManager';
+import { getSocketMapSizes } from '../backend/modules/userManager';
+import { getBotManagerStats } from '../backend/modules/botManager';
 import { getMetrics, getRoomMetrics, resetAll } from '../backend/utils/metrics';
 import * as dictionary from '../backend/dictionary';
 
@@ -108,23 +110,48 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
   });
 
-  // Detailed health check for scaling/load balancer
+  // Detailed health check for scaling/load balancer with capacity metrics
   app.get('/health/scaling', (_req: Request, res: Response): void => {
     const games: GameInfo[] = getAllGames();
+    const socketConnections = io.sockets.sockets.size;
+    const maxConnections = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '500', 10);
+    const socketMaps = getSocketMapSizes();
+    const botStats = getBotManagerStats();
+    const memUsage = process.memoryUsage();
+
     res.json({
       status: 'ok',
       scaling: {
         horizontalReady: !!extendedIo.pubClient && isRedisAvailable(),
         redisAdapter: !!extendedIo.pubClient,
         redisAvailable: isRedisAvailable(),
-        instanceId: process.env.RAILWAY_REPLICA_ID || process.env.HOSTNAME || 'local'
+        clusterEnabled: process.env.CLUSTER_ENABLED === 'true',
+        instanceId: process.env.RAILWAY_REPLICA_ID || process.env.HOSTNAME || 'local',
+        workerId: process.pid,
       },
-      stats: {
-        activeGames: games.length,
+      capacity: {
+        socketConnections,
+        maxConnections,
+        utilizationPercent: Math.round((socketConnections / maxConnections) * 100),
+        activeGames: getGameCount(),
         totalPlayers: games.reduce((sum: number, g: GameInfo) => sum + g.playerCount, 0),
-        socketConnections: io.sockets.sockets.size
       },
-      timestamp: Date.now()
+      internals: {
+        socketMaps,
+        bots: {
+          activeGames: botStats.activeGames,
+          activeBots: botStats.activeBots,
+          activeTimers: botStats.activeTimers,
+        },
+      },
+      memory: {
+        heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
+        rssMB: Math.round(memUsage.rss / 1024 / 1024),
+        externalMB: Math.round(memUsage.external / 1024 / 1024),
+      },
+      uptime: Math.round(process.uptime()),
+      timestamp: Date.now(),
     });
   });
 

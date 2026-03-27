@@ -3,20 +3,22 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
-// Default thresholds for happyTime trigger
-const DEFAULT_SCORE_THRESHOLD = 100;
-const DEFAULT_COMBO_THRESHOLD = 5;
-const DEFAULT_WORDS_THRESHOLD = 10;
+// Default thresholds for happyTime trigger — CrazyGames requires these to be
+// "major achievements only" (boss defeated, high score). Keep thresholds high
+// to avoid QA rejection for over-triggering.
+const DEFAULT_SCORE_THRESHOLD = 500;
+const DEFAULT_COMBO_THRESHOLD = 10;
+const DEFAULT_WORDS_THRESHOLD = 25;
 
 /**
  * Configurable thresholds for triggering CrazyGames happyTime
  */
 interface HappyTimeThresholds {
-  /** Score threshold to trigger happyTime (default: 100) */
+  /** Score threshold to trigger happyTime (default: 500) */
   score?: number;
-  /** Combo threshold to trigger happyTime (default: 5) */
+  /** Combo threshold to trigger happyTime (default: 10) */
   combo?: number;
-  /** Words found threshold to trigger happyTime (default: 10) */
+  /** Words found threshold to trigger happyTime (default: 25) */
   wordsFound?: number;
 }
 
@@ -118,6 +120,8 @@ export function useCrazyGamesLifecycle({
     gameplayStart,
     gameplayStop,
     happyTime,
+    loadingStart,
+    loadingStop,
     showMidgameAd: sdkShowMidgameAd,
     isAvailable,
     isOnCrazyGamesPlatform,
@@ -191,17 +195,32 @@ export function useCrazyGamesLifecycle({
     });
   }, [isAvailable, sdkShowMidgameAd, pauseOnAd, onAdStart, onAdEnd]);
 
+  // Signal loading between game sessions (CrazyGames uses this for load time metrics)
+  const hasSignaledLoadingRef = useRef(false);
+  useEffect(() => {
+    // When game is not active and hasn't started yet, signal loading
+    if (!isGameActive && !hasStartedRef.current && !hasSignaledLoadingRef.current) {
+      hasSignaledLoadingRef.current = true;
+      loadingStart?.();
+    }
+  }, [isGameActive, loadingStart]);
+
   // Handle gameplay start
   useEffect(() => {
     if (isGameActive && !hasStartedRef.current && !isGameOver) {
+      // Stop loading signal if we sent one
+      if (hasSignaledLoadingRef.current) {
+        loadingStop?.();
+        hasSignaledLoadingRef.current = false;
+      }
       hasStartedRef.current = true;
       hasEndedRef.current = false;
       hasTriggeredHappyTimeRef.current = false;
       isPlayingRef.current = true;
-      // Reset threshold tracking refs so happyTime triggers fresh each game
-      lastScoreRef.current = 0;
-      lastMaxComboRef.current = 0;
-      lastWordsFoundRef.current = 0;
+      // Snapshot current values so only future changes trigger happyTime
+      lastScoreRef.current = score;
+      lastMaxComboRef.current = maxCombo;
+      lastWordsFoundRef.current = wordsFound;
       gameplayStart();
       onGameplayStart?.();
 
@@ -209,7 +228,7 @@ export function useCrazyGamesLifecycle({
         console.log('[CrazyGames Lifecycle] gameplayStart called');
       }
     }
-  }, [isGameActive, isGameOver, gameplayStart, onGameplayStart]);
+  }, [isGameActive, isGameOver, gameplayStart, loadingStop, onGameplayStart]);
 
   // Handle gameplay end
   useEffect(() => {
@@ -232,19 +251,25 @@ export function useCrazyGamesLifecycle({
     }
   }, [isWinner, triggerHappyTimeInternal]);
 
-  // Handle happyTime for score threshold
+  // Handle happyTime for score threshold (only after gameplay started, skip initial snapshot)
+  const scoreTriggeredRef = useRef(false);
   useEffect(() => {
+    if (!hasStartedRef.current) return;
+    // Skip first effect run after game start to snapshot the baseline
+    if (lastScoreRef.current === score) return;
     if (
-      score >= scoreThreshold &&
-      lastScoreRef.current < scoreThreshold
+      !scoreTriggeredRef.current &&
+      score >= scoreThreshold
     ) {
+      scoreTriggeredRef.current = true;
       triggerHappyTimeInternal();
     }
     lastScoreRef.current = score;
   }, [score, scoreThreshold, triggerHappyTimeInternal]);
 
-  // Handle happyTime for combo threshold
+  // Handle happyTime for combo threshold (only after gameplay started)
   useEffect(() => {
+    if (!hasStartedRef.current) return;
     if (
       maxCombo >= comboThreshold &&
       lastMaxComboRef.current < comboThreshold
@@ -254,8 +279,9 @@ export function useCrazyGamesLifecycle({
     lastMaxComboRef.current = maxCombo;
   }, [maxCombo, comboThreshold, triggerHappyTimeInternal]);
 
-  // Handle happyTime for words found threshold
+  // Handle happyTime for words found threshold (only after gameplay started)
   useEffect(() => {
+    if (!hasStartedRef.current) return;
     if (
       wordsFound >= wordsThreshold &&
       lastWordsFoundRef.current < wordsThreshold
@@ -265,35 +291,21 @@ export function useCrazyGamesLifecycle({
     lastWordsFoundRef.current = wordsFound;
   }, [wordsFound, wordsThreshold, triggerHappyTimeInternal]);
 
-  // Handle visibility change - pause gameplay when tab hidden
+  // Pause/resume gameplay on tab visibility changes
   useEffect(() => {
-    if (!hasStartedRef.current || hasEndedRef.current) return;
-
     const handleVisibilityChange = () => {
+      if (!isPlayingRef.current) return;
       if (document.hidden) {
-        // Tab hidden - pause gameplay
-        if (isPlayingRef.current) {
-          isPlayingRef.current = false;
-          gameplayStop();
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[CrazyGames Lifecycle] gameplayStop called (tab hidden)');
-          }
-        }
+        gameplayStop();
       } else {
-        // Tab visible - resume gameplay (only if game is still active)
-        if (!isPlayingRef.current && isGameActive && !isGameOver) {
-          isPlayingRef.current = true;
-          gameplayStart();
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[CrazyGames Lifecycle] gameplayStart called (tab visible)');
-          }
-        }
+        gameplayStart();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isGameActive, isGameOver, gameplayStart, gameplayStop]);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [gameplayStart, gameplayStop]);
 
   // Cleanup on unmount - ensure gameplayStop is called
   useEffect(() => {

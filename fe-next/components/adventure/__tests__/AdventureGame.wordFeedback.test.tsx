@@ -377,6 +377,198 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
+// Mock heavy composite hooks to prevent OOM from deep import trees
+vi.mock('../effects/hooks/useAdventureEffects', () => ({
+  useAdventureEffects: () => ({
+    screenShake: { isShaking: false, trigger: vi.fn() },
+    particleBudget: { canSpawn: vi.fn(() => true), record: vi.fn() },
+    lexiReaction: null,
+    scorePopups: [],
+    addScorePopup: vi.fn(),
+    pendingExplosions: [],
+    addExplosion: vi.fn(),
+    clearExplosion: vi.fn(),
+    particles: [],
+    addParticles: vi.fn(),
+    chainBursts: [],
+    addChainBurst: vi.fn(),
+    triggerWordEffect: vi.fn(),
+  }),
+}));
+
+vi.mock('../hooks/useAdventureCinematics', () => ({
+  useAdventureCinematics: () => ({
+    showVictoryCinematic: false,
+    showDefeatCinematic: false,
+    showWorldUnlockCinematic: false,
+    worldUnlockData: null,
+    triggerVictory: vi.fn(),
+    triggerDefeat: vi.fn(),
+    triggerWorldUnlock: vi.fn(),
+    dismissCinematic: vi.fn(),
+  }),
+}));
+
+vi.mock('../hooks/useAdventureGameInit', () => ({
+  useAdventureGameInit: () => ({
+    tier: 'normal',
+    hintData: { level: 'none' },
+    powerUpCooldownMultiplier: 1.0,
+    recordCompletion: vi.fn(),
+    adjustedLevelConfig: {
+      world: 1, level: 1, gridSize: 4, timerSeconds: 120,
+      objectives: [{ type: 'wordCount', target: 5, isPrimary: true }],
+      specialTiles: [], difficulty: 'EASY', chapterNumber: 1, levelInChapter: 1, isBossLevel: false,
+    },
+    intensityAdjustments: { hintEscalationRate: 1, difficultyScale: 1, comboDecayRate: 1 },
+    flowState: 'normal',
+    startAIDirector: vi.fn(),
+    endAIDirector: vi.fn(),
+    recordAIWord: vi.fn(),
+    handleAITransition: vi.fn(),
+    isAIBossBattle: false,
+    totalXp: 0, currentLevel: 1, xpProgress: 0, awardXp: vi.fn(),
+    gold: 0, upgrades: {}, addGold: vi.fn(), purchase: vi.fn(),
+    getUpgradeEffect: vi.fn(() => 0),
+    upgradeBonuses: { scoreBonus: 1, goldBonus: 1 },
+    upgradeEffects: {
+      bonusTimeSeconds: 0, bossDamageMultiplier: 1, blockFirstAttack: false,
+      bossHealPerWord: 0, goldMultiplier: 1, longWordGoldBonus: 0,
+      doubleFirstCompletionGold: false, comboDecayMultiplier: 1, comboScoreMultiplier: 1,
+      failureGold: 0, retryScoreRetention: 0, freeRetriesPerWorld: 0,
+      hintRechargeMultiplier: 1, hintsPerLevel: 1, freeStartHint: false,
+      specialTileBoost: 0, guaranteedGoldTile: false, iceTileReduction: false,
+      bombTimerInvert: false, scrambleImmunity: false, shuffleUsesPerLevel: 0,
+      canDetonateWords: false, bonusHintsPerLevel: 0, timeFreezeSeconds: 0,
+      freezeHighlightsWord: false,
+    },
+    skillEffects: { bossDamageMultiplier: 1 },
+    handleEarnAchievement: vi.fn(),
+    currentMilestone: null, checkMilestone: vi.fn(),
+    adjustedInactivityThresholdMs: 15000,
+    runeEffects: { scoreMultiplier: 1, goldMultiplier: 1, timeBonus: 0, comboDecay: 1, hintBonus: 0, bossDamage: 1 },
+    streakMultiplier: 1,
+    weeklyModifiers: [],
+  }),
+}));
+
+vi.mock('../hooks/useAdventureLevelCompletion', () => ({
+  useAdventureLevelCompletion: () => ({
+    handleLevelComplete: vi.fn(),
+    goldEarned: 0,
+  }),
+}));
+
+vi.mock('../hooks/useAdventureBossOrchestration', () => ({
+  useAdventureBossOrchestration: () => ({
+    bossState: null,
+    bossActions: { dealDamage: vi.fn(), takeDamage: vi.fn() },
+    isBossFight: false,
+    isBossActive: false,
+    bossCurrentHP: 0,
+    bossMaxHP: 0,
+    bossConfig: null,
+    bossHealthState: { phase: 'phase1' },
+    playerHealthState: { currentHP: 100, maxHP: 100, isDead: false },
+    gridEffectTrigger: null,
+    triggerBossTaunt: vi.fn(),
+    handleBossWordSubmit: vi.fn(),
+    dealBossDamage: vi.fn(),
+    healPlayer: vi.fn(),
+    resetPlayerHealth: vi.fn(),
+    endBossBattle: vi.fn(),
+    showBossIntro: false,
+    showBossFireworks: false,
+    handleBossIntroStart: vi.fn(),
+    handleBossIntroSkip: vi.fn(),
+    defeatedBossTier: null,
+    lockedTiles: [],
+    bossEffectCallbacks: { onTileFreeze: vi.fn(), onTileShuffle: vi.fn() },
+    bossDialogue: null,
+    bossTelegraph: null,
+    bossPhase: null,
+    bossDefeated: false,
+  }),
+}));
+
+vi.mock('@/hooks/useLexiStuckDetection', () => ({
+  useLexiStuckDetection: () => ({
+    isStuck: false,
+    stuckDuration: 0,
+    resetOnGameAction: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useGemDetectorHighlights', () => ({
+  useGemDetectorHighlights: () => ({
+    highlightedTiles: [],
+  }),
+}));
+
+vi.mock('@/hooks/useFlashChallenge', () => ({
+  useFlashChallenge: () => ({
+    activeChallenge: null,
+    startChallenge: vi.fn(),
+    checkWord: vi.fn(),
+    completeChallenge: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useDailyQuests', () => ({
+  useDailyQuests: () => ({
+    quests: [],
+    refreshQuests: vi.fn(),
+    recordProgress: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useChapterQuests', () => ({
+  useChapterQuests: () => ({
+    quests: [],
+    refreshQuests: vi.fn(),
+    recordProgress: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
+  useCrazyGamesLifecycle: () => ({
+    gameplayStart: vi.fn(),
+    gameplayStop: vi.fn(),
+    happyTime: vi.fn(),
+    loadingStart: vi.fn(),
+    loadingStop: vi.fn(),
+  }),
+}));
+
+vi.mock('../hooks/useAdventureGameCallbacks', () => ({
+  useAdventureGameCallbacks: () => ({
+    handlePause: vi.fn(),
+    handleResume: vi.fn(),
+    handleExit: vi.fn(),
+  }),
+}));
+
+vi.mock('../hooks/useAdventureQuestTracking', () => ({
+  useAdventureQuestTracking: () => ({}),
+}));
+
+vi.mock('../hooks/useAdventureGridInteraction', () => ({
+  useAdventureGridInteraction: () => ({
+    handleTileSelect: vi.fn(),
+    handleTileDragEnd: vi.fn(),
+  }),
+}));
+
+vi.mock('../AdventureGameOverlays', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+vi.mock('../themed/GameplayBackground', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 // Capture the onWordSubmit callback from GameGridArea
 let capturedOnWordSubmit: ((word: string, indices: number[]) => void) | null = null;
 let capturedGridProps: any = null;

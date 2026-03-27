@@ -58,6 +58,8 @@ import {
 
 import { StatsCardGrid } from '@/components/results/shared';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
+import type { SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -294,6 +296,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     ]} />
   );
 
+  const shareData: SingleplayerShareData = useMemo(() => ({
+    mode: 'singleplayer' as const,
+    score: results.playerScore,
+    words: results.playerWords || [],
+    maxCombo: results.maxCombo,
+    rank: mode === 'solo-bots' ? playerRank : undefined,
+    totalPlayers: mode === 'solo-bots' ? allParticipants.length : undefined,
+    isNewHighScore: results.isNewHighScore,
+  }), [results.playerScore, results.playerWords, results.maxCombo, results.isNewHighScore, mode, playerRank, allParticipants.length]);
+
+  const shareBlock = results.playerScore > 0 ? (
+    <GameEmojiShareCard data={shareData} t={t} />
+  ) : null;
+
   const achievementsBlock = (
     ((results.achievements && results.achievements.length > 0) || totalComboBonus > 0 || totalFireRoundBonus > 0) ? (
       <div className="space-y-2">
@@ -398,6 +414,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <div className="space-y-4">
                 {statsBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
+                {shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
                 {ctaBlock}
@@ -410,6 +427,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
             {ctaBlock}{analysisBlock}

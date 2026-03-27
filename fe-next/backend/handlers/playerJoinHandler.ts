@@ -31,6 +31,7 @@ import {
   getGameRoom,
   joinRoom,
   leaveRoom,
+  LOBBY_ROOM,
 } from '../utils/socketHelpers.js';
 
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
@@ -155,6 +156,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       });
 
       joinRoom(socket, getGameRoom(gameCode));
+      leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
       socket.emit('joinedAsSpectator', {
         success: true,
         gameCode,
@@ -192,6 +194,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     });
 
     joinRoom(socket, getGameRoom(gameCode));
+    leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
     socket.emit('joined', {
       success: true,
@@ -286,6 +289,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     }
 
     leaveRoom(socket, getGameRoom(gameCode));
+    joinRoom(socket, LOBBY_ROOM); // Rejoin lobby to receive room list updates
     socket.emit('leftRoom', { success: true });
 
     // Check if room is now empty and close it immediately

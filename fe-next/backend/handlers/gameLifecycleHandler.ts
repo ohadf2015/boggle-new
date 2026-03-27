@@ -35,7 +35,8 @@ import {
   leaveRoom,
   safeEmit,
   getSocketById,
-  disconnectSocket
+  disconnectSocket,
+  LOBBY_ROOM
 } from '../utils/socketHelpers.js';
 
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
@@ -169,6 +170,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       });
 
       joinRoom(socket, getGameRoom(gameCode));
+      leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
       socket.emit('joined', {
         success: true,

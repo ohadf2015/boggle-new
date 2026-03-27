@@ -9,6 +9,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
 import { broadcastActiveRooms } from '../backend/utils/socketHelpers';
+import { purgeStaleSocketEntries, getSocketMapSizes } from '../backend/modules/userManager';
 import { registerDuelHandlers } from '../backend/handlers/duel';
 import { checkConnectionRateLimit } from '../backend/middleware/rateLimiterRedis';
 
@@ -18,9 +19,10 @@ import type { Server as HttpServer } from 'http';
 const cleanupTimers: Set<NodeJS.Timeout> = new Set();
 
 // Maximum concurrent connections allowed (prevents resource exhaustion).
-// Lowered from 1000 to 200 — each socket can trigger multiple Supabase queries,
-// and Supabase's Varnish layer has a ~20-60 max_conn limit.
-const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '200', 10);
+// Set to 500 to support 300+ concurrent players with headroom.
+// Each socket can trigger Supabase queries — ensure PgBouncer pool size
+// supports this (recommended: pool_size >= MAX_CONNECTIONS / 5).
+const MAX_CONNECTIONS = parseInt(process.env.MAX_SOCKET_CONNECTIONS || '500', 10);
 
 /**
  * Create and configure Socket.IO server
@@ -65,12 +67,17 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     next();
   });
 
-  // Connection limit middleware - prevents resource exhaustion on low-end devices
+  // Connection limit middleware with backpressure.
+  // Soft limit (80%): log warning. Hard limit (100%): reject with retry hint.
+  const SOFT_LIMIT = Math.floor(MAX_CONNECTIONS * 0.8);
   io.use((_socket, next) => {
     const currentConnections = io.sockets.sockets.size;
     if (currentConnections >= MAX_CONNECTIONS) {
-      socketLogger.warn({ currentConnections, maxConnections: MAX_CONNECTIONS }, 'Connection rejected: limit reached');
+      socketLogger.warn({ currentConnections, maxConnections: MAX_CONNECTIONS }, 'Connection rejected: hard limit reached');
       return next(new Error('Server at capacity, please try again later'));
+    }
+    if (currentConnections >= SOFT_LIMIT) {
+      socketLogger.info({ currentConnections, softLimit: SOFT_LIMIT }, 'Connection accepted: approaching capacity');
     }
     next();
   });
@@ -208,14 +215,34 @@ export function setupConnectionMonitoring(io: Server): void {
  * @param io - Socket.IO server instance
  */
 export function setupCleanupTimers(io: Server): void {
-  // Cleanup stale games every 5 minutes
+  // Cleanup stale games every 5 minutes (reduced from 30min to 10min max age)
   const staleGamesTimer = setInterval(() => {
-    const cleaned = cleanupStaleGames();
+    const cleaned = cleanupStaleGames(10 * 60 * 1000); // 10 min instead of 30
     if (cleaned > 0) {
       socketLogger.info({ count: cleaned }, 'Removed stale games');
     }
   }, 5 * 60 * 1000);
   cleanupTimers.add(staleGamesTimer);
+
+  // Purge orphaned socket map entries every 5 minutes.
+  // Collects active socket IDs from Socket.IO and removes any map entries
+  // pointing to sockets that no longer exist (missed disconnect events).
+  const socketPurgeTimer = setInterval(() => {
+    const activeSocketIds = new Set<string>();
+    for (const [id] of io.sockets.sockets) {
+      activeSocketIds.add(id);
+    }
+    const purged = purgeStaleSocketEntries(activeSocketIds);
+    if (purged > 0) {
+      socketLogger.info({ purged }, 'Purged stale socket map entries');
+    }
+    // Log map sizes for monitoring
+    const sizes = getSocketMapSizes();
+    if (sizes.socketToGame > 100) {
+      socketLogger.info(sizes, 'Socket map sizes');
+    }
+  }, 5 * 60 * 1000);
+  cleanupTimers.add(socketPurgeTimer);
 
   // Cleanup empty rooms every 30 seconds
   const emptyRoomsTimer = setInterval(() => {

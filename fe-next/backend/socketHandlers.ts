@@ -78,9 +78,15 @@ function initializeSocketHandlers(io: Server): void {
       logger.debug('SOCKET', `Socket ${socket.id} joined user room user:${userId}`);
     });
 
-    // Clean up rate limiting on disconnect
+    // Clean up rate limiting and all listeners on disconnect.
+    // removeAllListeners() prevents listener accumulation from reconnects
+    // (20+ handlers × multiple reconnects = thousands of orphaned listeners).
     socket.on('disconnect', () => {
       resetRateLimit(socket.id);
+      // Run on next tick so other disconnect handlers complete first
+      process.nextTick(() => {
+        socket.removeAllListeners();
+      });
     });
 
     logger.info('SOCKET', `New connection: ${socket.id} from IP: ${clientIp}`);

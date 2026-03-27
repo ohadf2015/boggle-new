@@ -80,6 +80,7 @@ export function LandingChallengeCards({
   playerAllTimeBest,
   t,
   dailyChallengeStats,
+  solveRate,
   gameModeStats,
 }: LandingChallengeCardsProps) {
   const [isFirstTimer, setIsFirstTimer] = useState(false);
@@ -135,6 +136,11 @@ export function LandingChallengeCards({
         return (
           <motion.div key="daily" initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay }} className="w-full h-full flex flex-col">
             <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
+            {solveRate !== null && (
+              <p className="text-center text-neo-white/50 text-xs mt-1.5 pb-1 font-medium">
+                {t('landing.solvedPercent').replace('{percent}', String(solveRate))}
+              </p>
+            )}
           </motion.div>
         );
 

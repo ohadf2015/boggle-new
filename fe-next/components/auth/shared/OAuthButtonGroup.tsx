@@ -60,7 +60,7 @@ export function OAuthButtonGroup({
           disabled={isAnyLoading}
           className={cn(
             'w-full h-12 text-base font-medium rounded-xl transition-all',
-            'bg-neo-orange text-white hover:bg-neo-orange/90'
+            'bg-neo-pink text-white hover:bg-neo-pink/90'
           )}
         >
           {loadingProvider === 'crazygames' ? (

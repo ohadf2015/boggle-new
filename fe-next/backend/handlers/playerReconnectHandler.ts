@@ -29,7 +29,8 @@ import {
   leaveRoom,
   safeEmit,
   getSocketById,
-  disconnectSocket
+  disconnectSocket,
+  LOBBY_ROOM
 } from '../utils/socketHelpers.js';
 
 import { clearGameTimer } from '../utils/timerManager.js';
@@ -197,6 +198,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
   }
 
   joinRoom(socket, getGameRoom(gameCode));
+  leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
   socket.emit('joined', {
     success: true,

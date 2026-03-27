@@ -304,8 +304,8 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           // Signal loading lifecycle to CrazyGames
           if (env === 'crazygames') {
             // sdkGameLoadingStart signals the game is loading assets/hydrating.
-            // sdkGameLoadingStop is deferred until the app is interactive (next frame).
-            // This gives CrazyGames a meaningful "time to playable" metric.
+            // sdkGameLoadingStop is deferred until after hydration settles (~500ms)
+            // so CrazyGames gets a meaningful "time to playable" metric.
             window.CrazyGames.SDK.game.sdkGameLoadingStart();
             requestAnimationFrame(() => {
               window.CrazyGames?.SDK?.game?.sdkGameLoadingStop();
