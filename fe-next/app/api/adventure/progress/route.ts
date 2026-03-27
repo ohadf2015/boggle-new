@@ -127,9 +127,10 @@ export async function GET(request: NextRequest) {
     const { data: progressionRow, error: progressionError } = progressionResult;
     const { data: completionsRows, error: completionsError } = completionsResult;
 
-    // If no progression exists, return initial state
+    // If no progression exists, return initial state with any existing completions
     if (progressionError && progressionError.code === 'PGRST116') {
-      const initialProgression = transformProgression(null, []);
+      const completions = completionsError ? [] : (completionsRows || []).map(transformCompletion);
+      const initialProgression = transformProgression(null, completions);
       initialProgression.userId = userId;
       return NextResponse.json(initialProgression);
     }

@@ -173,16 +173,23 @@ export async function POST(request: NextRequest) {
 
     // If no progression, create it
     if (progressionError && progressionError.code === 'PGRST116') {
-      await supabase.from('player_progression').insert({
+      // Use upsert (not insert) to be idempotent — safe on concurrent requests and retries
+      const { error: insertError } = await supabase.from('player_progression').upsert({
         user_id: userId,
         player_level: 1,
         xp: 0,
         current_world: 1,
         current_level: 1,
         total_stars: 0,
-      });
+        gold: 0,
+      }, { onConflict: 'user_id' });
+      if (insertError) {
+        console.error('[ADVENTURE COMPLETE API] Failed to create player_progression:', JSON.stringify(insertError));
+        // Don't return 500 here — the level_completions upsert hasn't run yet,
+        // so no inconsistent state exists yet. The update below will fail cleanly.
+      }
       // Set defaults so downstream code works
-      existingProgression = { xp: 0, total_stars: 0, current_world: 1, current_level: 1, player_level: 1, upgrades: {} } as typeof existingProgression;
+      existingProgression = { xp: 0, total_stars: 0, current_world: 1, current_level: 1, player_level: 1, upgrades: {}, gold: 0 } as typeof existingProgression;
     } else if (progressionError) {
       console.error('[ADVENTURE COMPLETE API] Progression fetch error:', progressionError);
       return NextResponse.json({ error: 'Failed to fetch progression' }, { status: 500 });
