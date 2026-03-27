@@ -59,7 +59,7 @@ else
   # Run frontend tests if frontend files changed (uses vitest)
   if [ -n "$FRONTEND_FILES" ]; then
     echo "  🎨 Running frontend tests for changed files..."
-    if ! npx vitest run --reporter=verbose --passWithNoTests --related $FRONTEND_FILES; then
+    if ! npx vitest run --reporter=verbose --passWithNoTests $FRONTEND_FILES; then
       echo ""
       echo "❌ Frontend tests failed. Please fix the failing tests above before pushing."
       exit 1
