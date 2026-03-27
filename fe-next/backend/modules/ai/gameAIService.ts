@@ -171,7 +171,7 @@ export class GameAIService {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error(
+      logger.debug(
         'AI_SERVICE',
         `validateAndSaveWord error for "${word}": ${errorMessage}`
       );

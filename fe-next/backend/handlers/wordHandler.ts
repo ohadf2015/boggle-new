@@ -336,9 +336,16 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       }
 
       // Check dictionary and community validation (Redis cache → in-memory fallback)
-      const isInDictionary = await isValidWordCached(normalizedWord, game.language);
-      const isCommunityValidated = isWordCommunityValid(normalizedWord, game.language);
-      const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
+      const lang = game.language || 'en';
+      let isInDictionary: boolean | null;
+      try {
+        isInDictionary = await isValidWordCached(normalizedWord, lang);
+      } catch {
+        // Fallback to in-memory dictionary check if cache layer fails
+        isInDictionary = isDictionaryWord(normalizedWord, lang);
+      }
+      const isCommunityValidated = isWordCommunityValid(normalizedWord, lang);
+      const hasPositiveScore = isWordValidForScoring(normalizedWord, lang);
       const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
       const comboType = (validation.data as SubmitWordPayload).comboType ?? null;

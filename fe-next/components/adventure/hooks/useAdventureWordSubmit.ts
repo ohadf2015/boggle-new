@@ -154,7 +154,15 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         row: tiles[i]?.row ?? Math.floor(i / gridSize),
         col: tiles[i]?.col ?? i % gridSize,
       }));
-      const result = await validateWord(word, path);
+      let result;
+      try {
+        result = await validateWord(word, path);
+      } catch {
+        // Network error or unexpected failure — unblock future submissions
+        isSubmittingRef.current = false;
+        setValidationFeedback(prev => ({ ...prev, error: 'validationError' }));
+        return;
+      }
       isSubmittingRef.current = false;
 
       // Silently ignore cancelled validations (aborted by a newer submission)

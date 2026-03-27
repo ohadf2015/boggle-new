@@ -255,6 +255,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       leaderboard={leaderboard}
 
       // Callbacks
+      onExitRoom={onStopGame}
       onWordSubmit={onWordSubmit}
 
       // Earthquake/Fire Round

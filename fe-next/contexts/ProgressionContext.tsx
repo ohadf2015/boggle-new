@@ -269,8 +269,9 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return false;
       }
 
-      // If an identical save is already in-flight, piggyback on it
-      const levelKey = `${world}-${level}`;
+      // If an identical-or-worse save is already in-flight, piggyback on it.
+      // Include stars in the key so a higher-star save always fires a new request.
+      const levelKey = `${world}-${level}-${stars}`;
       if (completeLevelInFlightRef.current === levelKey && completeLevelPromiseRef.current) {
         logger.info('[ProgressionContext] Piggy-backing on in-flight completeLevel for', levelKey);
         return completeLevelPromiseRef.current;

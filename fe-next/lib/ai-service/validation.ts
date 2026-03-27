@@ -37,7 +37,7 @@ export async function checkCommunityWords(
     .maybeSingle();
 
   if (error) {
-    logger.warn('AI_SERVICE', ' community_words lookup error:', error.message);
+    logger.debug('AI_SERVICE', ' community_words lookup error:', error.message);
     return false;
   }
 
@@ -64,7 +64,7 @@ export async function checkWordScores(
     .maybeSingle();
 
   if (error) {
-    logger.warn('AI_SERVICE', ' word_scores lookup error:', error.message);
+    logger.debug('AI_SERVICE', ' word_scores lookup error:', error.message);
     return false;
   }
 
@@ -188,7 +188,7 @@ Respond with ONLY valid JSON (no markdown):
 
     // Handle non-successful finish reasons
     if (finishReason && finishReason !== 'STOP') {
-      logger.warn('AI_SERVICE', `Non-standard finish reason for "${word}": ${finishReason}`);
+      logger.debug('AI_SERVICE', `Non-standard finish reason for "${word}": ${finishReason}`);
 
       // MAX_TOKENS: Response was cut off - retry
       if (finishReason === 'MAX_TOKENS') {
@@ -347,7 +347,7 @@ export async function withRetry<T>(
         RETRY_CONFIG.maxDelayMs
       );
 
-      logger.warn('AI_SERVICE', `${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms`);
+      logger.debug('AI_SERVICE', `${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }

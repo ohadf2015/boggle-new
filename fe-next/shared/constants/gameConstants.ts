@@ -98,10 +98,9 @@ export function getMinAnswerLength(language: string): number {
 
 /**
  * Minimum length for NON-TARGET discovered words in Word Hunt survival mode
- * 3-letter minimum filters out trivial 2-letter entries (AA, AB, etc.)
- * that feel "weird" and aren't real word-game words.
+ * 2-letter minimum allows short valid words (GO, IT, etc.)
  */
-export const MIN_DISCOVERY_WORD_LENGTH = 3;
+export const MIN_DISCOVERY_WORD_LENGTH = 2;
 
 /**
  * Maximum length for discovery words in Word Hunt survival mode.

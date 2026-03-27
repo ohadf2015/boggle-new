@@ -96,14 +96,14 @@ function QuestOption({
 
       {/* Description */}
       <p className="text-sm text-neo-white/90 font-medium">
-        {t(quest.description, { target: quest.target })}
+        {t(quest.description, { target: quest.displayTarget ?? quest.target })}
       </p>
 
       {/* Select button */}
       <button
         type="button"
         onClick={() => onSelect(quest.id)}
-        aria-label={`${t('weeklyQuest.selectQuest')} - ${t(quest.description, { target: quest.target })}`}
+        aria-label={`${t('weeklyQuest.selectQuest')} - ${t(quest.description, { target: quest.displayTarget ?? quest.target })}`}
         className={cn(
           'w-full py-1.5 rounded-neo text-sm font-black',
           'border-neo border-black shadow-hard-sm',

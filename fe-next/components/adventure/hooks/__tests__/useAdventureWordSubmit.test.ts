@@ -287,6 +287,28 @@ describe('useAdventureWordSubmit', () => {
     expect(result.current.validationFeedback.error).toBeNull();
   });
 
+  it('should reset isSubmitting and show error when validateWord throws', async () => {
+    mockValidateWord.mockRejectedValue(new Error('Network timeout'));
+
+    const { result } = renderHook(() => useAdventureWordSubmit(defaultProps));
+
+    // First submission — validateWord throws
+    await act(async () => {
+      await result.current.handleWordSubmit('hello', [0, 1, 2, 3, 4]);
+    });
+
+    expect(result.current.validationFeedback.error).toBe('validationError');
+
+    // Second submission should NOT be blocked (isSubmittingRef was reset)
+    mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
+    await act(async () => {
+      await result.current.handleWordSubmit('world', [5, 6, 7, 8, 9]);
+    });
+
+    expect(mockValidateWord).toHaveBeenCalledTimes(2);
+    expect(result.current.validationFeedback.isValid).toBe(true);
+  });
+
   it('should store last submitted word path for explosion effects', async () => {
     mockValidateWord.mockResolvedValue({ isValid: true, score: 50 });
 

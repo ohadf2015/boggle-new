@@ -65,7 +65,7 @@ export class SupabaseWordStore {
         .maybeSingle();
 
       if (error) {
-        logger.warn(
+        logger.debug(
           'AI_SERVICE',
           `community_words lookup error: ${error.message}`
         );
@@ -76,7 +76,7 @@ export class SupabaseWordStore {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.warn('AI_SERVICE', `community_words check failed: ${errorMessage}`);
+      logger.debug('AI_SERVICE', `community_words check failed: ${errorMessage}`);
       return false;
     }
   }
@@ -98,7 +98,7 @@ export class SupabaseWordStore {
         .maybeSingle();
 
       if (error) {
-        logger.warn('AI_SERVICE', `word_scores lookup error: ${error.message}`);
+        logger.debug('AI_SERVICE', `word_scores lookup error: ${error.message}`);
         return false;
       }
 
@@ -106,7 +106,7 @@ export class SupabaseWordStore {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.warn('AI_SERVICE', `word_scores check failed: ${errorMessage}`);
+      logger.debug('AI_SERVICE', `word_scores check failed: ${errorMessage}`);
       return false;
     }
   }

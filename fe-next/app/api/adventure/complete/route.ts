@@ -351,8 +351,15 @@ export async function POST(request: NextRequest) {
       xp: newTotalXp,
       total_stars: newTotalStars,
       gold: newGold,
-      current_world: Math.max(existingProgression?.current_world ?? 1, nextWorld),
-      current_level: Math.max(existingProgression?.current_level ?? 1, nextLevel),
+      // Only advance the high-water mark if the completed level is truly beyond
+      // the current frontier. Comparing world-then-level avoids the bug where
+      // replaying an earlier world's high level corrupts current_level.
+      ...(() => {
+        const curW = existingProgression?.current_world ?? 1;
+        const curL = existingProgression?.current_level ?? 1;
+        const isAdvance = nextWorld > curW || (nextWorld === curW && nextLevel > curL);
+        return { current_world: isAdvance ? nextWorld : curW, current_level: isAdvance ? nextLevel : curL };
+      })(),
       updated_at: new Date().toISOString(),
     };
 

@@ -2,7 +2,7 @@ import { RateLimiterMemory, RateLimiterRedis, RateLimiterAbstract } from 'rate-l
 import { getRedisClient, isRedisAvailable } from '../redis/connection';
 import { RATE_LIMITS } from '../config/rateLimits';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /**
  * Create a rate limiter that uses Redis when available, falling back to in-memory.

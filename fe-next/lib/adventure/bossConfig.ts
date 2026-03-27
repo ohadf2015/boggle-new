@@ -89,7 +89,7 @@ export const BOSS_CONFIGS: Record<number, BossConfig> = {
     buildPhases('msGrammar', ['lecture', 'popTest', 'finalExam'], [
       { speedMultiplier: 1, bonusMultiplier: 1.5 },
       { speedMultiplier: 1.5, bonusMultiplier: 2.0, mechanicOverride: { requirementDuration: 12 } },
-      { speedMultiplier: 2.0, bonusMultiplier: 2.5, gridEffect: 'combined-quiz', bossDamageMultiplier: 1.5 },
+      { speedMultiplier: 1.6, bonusMultiplier: 2.5, gridEffect: 'combined-quiz', bossDamageMultiplier: 1.5 },
     ])
   ),
 

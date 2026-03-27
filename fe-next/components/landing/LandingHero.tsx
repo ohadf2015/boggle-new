@@ -78,18 +78,17 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
             </>
           )}
 
-          <motion.p
-            className={cn(
-              'font-medium text-neo-black/80 dark:text-neo-white/90 max-w-md',
-              isMobilePortrait ? 'text-sm mb-3' : 'text-base md:text-lg mb-5'
-            )}
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.25 }}
-          >
-            {t('landing.welcomeSubtitle')}
-          </motion.p>
+          {!isMobilePortrait && (
+            <motion.p
+              className="font-medium text-neo-black/80 dark:text-neo-white/90 max-w-md text-base md:text-lg mb-5"
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.25 }}
+            >
+              {t('landing.welcomeSubtitle')}
+            </motion.p>
+          )}
 
         </div>
 
@@ -110,7 +109,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
       {/* Leaderboard below CTA on mobile — compact 3-player view */}
       {isMobilePortrait && (
         <motion.div
-          className="mt-4"
+          className="mt-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

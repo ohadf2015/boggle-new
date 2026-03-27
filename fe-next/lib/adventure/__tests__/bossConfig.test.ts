@@ -294,4 +294,28 @@ describe('Boss Configuration', () => {
       expect(boss.twistMechanic.type).toBe('finalWord');
     });
   });
+
+  describe('Early game difficulty balance', () => {
+    it('W1 boss (Ms. Grammar) phase 3 speed should be 1.6x (not 2.0x) to avoid first-boss wall', () => {
+      const boss = getBossConfig(1) as BossConfig;
+      const phase3 = boss.phases[2];
+      expect(phase3.mechanicModifiers.speedMultiplier).toBe(1.6);
+    });
+
+    it('W1 boss phase 3 damage multiplier should remain at 1.5x', () => {
+      const boss = getBossConfig(1) as BossConfig;
+      const phase3 = boss.phases[2];
+      expect(phase3.mechanicModifiers.bossDamageMultiplier).toBe(1.5);
+    });
+
+    it('W1 boss should still have 3 phases', () => {
+      const boss = getBossConfig(1) as BossConfig;
+      expect(boss.phases).toHaveLength(3);
+    });
+
+    it('W2+ bosses should not be affected by W1 softening', () => {
+      const boss2 = getBossConfig(2) as BossConfig;
+      expect(boss2.phases[2].mechanicModifiers.speedMultiplier).toBe(1.8);
+    });
+  });
 });

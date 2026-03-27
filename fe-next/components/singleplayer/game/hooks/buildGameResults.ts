@@ -108,6 +108,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
     botWordsForValidation,
     gameSessionId,
     language: language as Language,
+    maxCombo,
   };
 }
 

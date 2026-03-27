@@ -298,6 +298,20 @@ const DailyChallenge: React.FC = () => {
       completedAt: new Date().toISOString(),
     });
     setPhase('completed');
+
+    // Update weekly quest progress for daily challenge completion
+    if (isAuthenticated && result.solved) {
+      fetch('/api/stats/record-game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: result.efficiencyScore ?? 0,
+          wordCount: result.wordsDiscovered?.length ?? 0,
+          mode: 'daily-challenge',
+          isDailyChallenge: true,
+        }),
+      }).catch(() => { /* non-critical */ });
+    }
   }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
 
   const handleTutorialComplete = useCallback(() => {

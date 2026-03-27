@@ -227,7 +227,7 @@ export function getGridSize(world: number): 4 | 5 | 6 | 7 {
 export const TIMER_DURATIONS: Record<number, number> = {
   1: 120, // 4x4 (16 tiles) — 7.5s/tile — generous tutorial
   2: 115, // 4x4 (16 tiles) — 7.2s/tile
-  3: 130, // 5x5 (25 tiles) — 5.2s/tile — grid grows, timer bumps up
+  3: 145, // 5x5 (25 tiles) — 5.8s/tile — grid grows, generous bump to smooth W2→W3 transition
   4: 125, // 5x5 (25 tiles) — 5.0s/tile
   5: 120, // 5x5 (25 tiles) — 4.8s/tile
   6: 150, // 6x6 (36 tiles) — 4.2s/tile — grid grows again, timer bumps

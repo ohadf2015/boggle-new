@@ -128,7 +128,7 @@ export const UPGRADES: UpgradeDefinition[] = [
     nameKey: 'adventure.upgrades.blastShield.name',
     descriptionKey: 'adventure.upgrades.blastShield.desc',
     icon: 'upgrade-blast-shield.png',
-    unlockWorld: 5,
+    unlockWorld: 3,
     tiers: [
       { level: 1, cost: 120, effectKey: 'adventure.upgrades.blastShield.t1', value: 1 },
       { level: 2, cost: 250, effectKey: 'adventure.upgrades.blastShield.t2', value: 1 },

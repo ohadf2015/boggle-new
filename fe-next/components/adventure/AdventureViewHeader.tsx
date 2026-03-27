@@ -1,19 +1,16 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Star, Sparkles, Map, Zap, Coins, Hammer } from 'lucide-react';
+import { ArrowLeft, Star, Sparkles, Map, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MusicControls from '@/components/MusicControls';
 
 interface AdventureViewHeaderProps {
   viewState: 'worldMap' | 'levelGrid';
-  isRTL: boolean;
   totalStars: number;
   playerLevel: number;
-  gold: number;
   onBack: () => void;
-  onOpenShop: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Current world name for breadcrumb (only shown on levelGrid) */
   worldName?: string;
@@ -23,12 +20,9 @@ interface AdventureViewHeaderProps {
 
 export default function AdventureViewHeader({
   viewState,
-  isRTL,
   totalStars,
   playerLevel,
-  gold,
   onBack,
-  onOpenShop,
   t,
   worldName,
   hasHub,
@@ -88,9 +82,9 @@ export default function AdventureViewHeader({
         </div>
 
         {/* Player Stats and Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Total Stars */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo">
+          <div className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-3 bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo">
             <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
             <span className="font-bold text-neo-yellow text-sm">
               {totalStars}
@@ -98,28 +92,12 @@ export default function AdventureViewHeader({
           </div>
 
           {/* Player Level */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
+          <div className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-3 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
             <Zap className="w-4 h-4 text-neo-purple" />
             <span className="font-bold text-neo-purple text-sm">
               {t('adventure.levelWithNumber', { level: playerLevel })}
             </span>
           </div>
-
-          {/* Gold + Word Forge Shop */}
-          <button
-            onClick={onOpenShop}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5',
-              'bg-neo-orange/20 border-2 border-neo-orange rounded-neo',
-              'hover:bg-neo-orange/30 transition-colors',
-              'font-bold text-neo-orange text-sm'
-            )}
-            aria-label={t('adventure.shop.open')}
-          >
-            <Coins className="w-4 h-4" />
-            <span>{gold}</span>
-            <Hammer className="w-3.5 h-3.5 ms-1 opacity-70" />
-          </button>
 
           {/* Sound Controller */}
           <MusicControls />

@@ -271,4 +271,18 @@ describe('upgradeConfig', () => {
       expect(getUpgradeEffect({ wordRadar: 99 }, 'wordRadar')).toBe(0);
     });
   });
+
+  describe('Blast Shield unlock timing (difficulty audit)', () => {
+    it('blastShield should unlock at World 3 (when ice/bomb tiles appear)', () => {
+      const blastShield = getUpgrade('blastShield');
+      expect(blastShield).toBeDefined();
+      expect(blastShield!.unlockWorld).toBe(3);
+    });
+
+    it('blastShield should be available in World 3 upgrades list', () => {
+      const w3Upgrades = getAvailableUpgrades(3);
+      const ids = w3Upgrades.map((u) => u.id);
+      expect(ids).toContain('blastShield');
+    });
+  });
 });

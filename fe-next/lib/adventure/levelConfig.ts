@@ -431,9 +431,9 @@ export function generateObjectives(
     // rainbow tiles (+25%) are common in adventure — effective avg ~65 pts
     const AVERAGE_WORD_SCORE = 65;
     const estimatedWordsInTime = timerSeconds / 5; // ~1 word per 5 seconds
-    // difficultyFactor scales from 0.7 (world 1) to 1.1 (world 10)
-    // Players should need ~70% of estimated output in W1, full output by W10
-    const difficultyFactor = 0.7 + (world - 1) * (0.4 / 9);
+    // difficultyFactor scales from 0.35 (world 1) to 1.1 (world 10)
+    // W1 needs only ~35% of estimated output (new player friendly), ramping to full by W10
+    const difficultyFactor = 0.35 + (world - 1) * (0.75 / 9);
     // Level progression bonus: +1.5% per global level beyond first
     const levelBonus = 1 + (globalLevel - 1) * 0.015;
     // Cap scales linearly per world so late worlds still have progression

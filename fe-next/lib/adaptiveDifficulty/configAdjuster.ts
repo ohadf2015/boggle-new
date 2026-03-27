@@ -73,8 +73,16 @@ export function applyTierAdjustments(
   baseConfig: LevelConfig,
   tier: DifficultyTier
 ): LevelConfig {
-  // Boss levels always use base config (CONTEXT.md requirement)
+  // Boss levels use base config — except World 1 boss gets a light timer
+  // boost on easy tier to prevent first-boss churn (objectives stay unchanged)
   if (baseConfig.isBossLevel) {
+    if (baseConfig.world === 1 && tier === 'easy') {
+      const adjustments = getTierAdjustments(tier);
+      return {
+        ...baseConfig,
+        timerSeconds: Math.floor(baseConfig.timerSeconds * adjustments.timerMultiplier),
+      };
+    }
     return baseConfig;
   }
 

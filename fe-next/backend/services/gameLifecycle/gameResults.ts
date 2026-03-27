@@ -317,11 +317,16 @@ async function updateWeeklyQuestProgressForPlayers(
     const authInfo = userAuthMap[player.username];
     if (!authInfo?.authUserId) return;
 
+    // Extract max combo from word details (each word records its comboLevel)
+    const playerMaxCombo = (player.wordDetails ?? []).reduce(
+      (max, w) => Math.max(max, w.comboLevel ?? 0), 0
+    );
+
     const stats: GameStats = {
       gamesPlayed: 1,
       wordsFound: player.wordDetails?.length ?? 0,
       longWordsFound: player.wordDetails?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
-      maxCombo: 0,
+      maxCombo: playerMaxCombo,
       maxScore: player.totalScore ?? 0,
       multiplayerWins: isWin(player.username) ? 1 : 0,
     };

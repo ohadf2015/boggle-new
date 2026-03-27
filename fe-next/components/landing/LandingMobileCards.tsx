@@ -78,10 +78,10 @@ export function LandingMobileCards({
             href={`/${language}/singleplayer${isFirstTimer ? '' : '?autoStart=bots'}`}
             onClick={onSinglePlayerClick}
             className={cn(
-              'relative flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+              'relative flex flex-col items-center justify-center gap-1 sm:gap-2 p-1.5 sm:p-3',
               'bg-gradient-to-br from-neo-cyan to-cyan-400',
               'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-              'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
+              'transition-all duration-200 min-h-[68px] sm:min-h-[88px]',
               'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(0_255_255/0.4))]',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
               isFirstTimer && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy [filter:drop-shadow(0_0_24px_rgb(0_255_255/0.5))]'
@@ -124,10 +124,10 @@ export function LandingMobileCards({
           <Link
             href={`/${language}/multiplayer`}
             className={cn(
-              'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+              'flex flex-col items-center justify-center gap-1 sm:gap-2 p-1.5 sm:p-3',
               'bg-gradient-to-br from-neo-pink to-pink-400',
               'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-              'transition-all duration-200 min-h-[80px] sm:min-h-[100px]',
+              'transition-all duration-200 min-h-[68px] sm:min-h-[88px]',
               'group-hover:shadow-hard-lg group-hover:[filter:drop-shadow(0_0_20px_rgb(255_20_147/0.4))]',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
             )}
@@ -157,8 +157,8 @@ export function LandingMobileCards({
         <div className="col-span-2">
           <Suspense fallback={
             <div
-              className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
-              style={{ minHeight: '60px' }}
+              className="w-full p-1.5 sm:p-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500"
+              style={{ minHeight: '52px' }}
             >
               <div className="flex items-center gap-3 sm:gap-4 animate-pulse">
                 <div className="w-10 h-10 rounded-neo bg-neo-navy shrink-0" />

@@ -99,8 +99,8 @@ describe('Word Hunt Minimum Word Length', () => {
       expect(MIN_ANSWER_LENGTH.ja).toBe(2);
     });
 
-    it('should have discovery word minimum of 3', () => {
-      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(3);
+    it('should have discovery word minimum of 2', () => {
+      expect(MIN_DISCOVERY_WORD_LENGTH).toBe(2);
     });
 
     it('should have discovery word maximum of 8', () => {

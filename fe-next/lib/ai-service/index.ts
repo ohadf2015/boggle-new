@@ -5,7 +5,7 @@
 
 import type { GenerativeModel, VertexAI } from '@google-cloud/vertexai';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { captureAIServiceError } from '@/utils/sentry';
+
 
 // Import all modules
 import type {
@@ -193,12 +193,7 @@ class GameAIService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('AI_SERVICE', ' validateAndSaveWord error:', errorMessage);
-      captureAIServiceError(error instanceof Error ? error : new Error(errorMessage), {
-        operation: 'validateAndSaveWord',
-        word: normalizedWord,
-        language,
-      });
+      logger.debug('AI_SERVICE', ' validateAndSaveWord error:', errorMessage);
 
       return {
         isValid: false,

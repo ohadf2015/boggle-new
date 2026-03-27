@@ -200,9 +200,9 @@ describe('configAdjuster', () => {
     });
 
     describe('Boss level exclusion', () => {
-      it('should return unmodified config for boss level with easy tier', () => {
-        // GIVEN
-        const baseConfig = getLevelConfig(1, 7); // Boss level
+      it('should return unmodified config for W2+ boss level with easy tier', () => {
+        // GIVEN — W2 boss (W1 boss has light DDA exception)
+        const baseConfig = getLevelConfig(2, 7); // Boss level
         const tier: DifficultyTier = 'easy';
 
         // Verify this is a boss level (dependency validation)
@@ -278,6 +278,46 @@ describe('configAdjuster', () => {
         // THEN
         expect(baseConfig.timerSeconds).toBe(originalTimerSeconds);
         expect(JSON.stringify(baseConfig.objectives)).toBe(originalObjectives);
+      });
+    });
+
+    describe('World 1 boss light DDA (difficulty audit)', () => {
+      it('should apply timer boost to W1 boss on easy tier', () => {
+        // GIVEN
+        const baseConfig = getLevelConfig(1, 7); // W1 boss
+        const tier: DifficultyTier = 'easy';
+        expect(baseConfig.isBossLevel).toBe(true);
+
+        // WHEN
+        const adjusted = applyTierAdjustments(baseConfig, tier);
+
+        // THEN — W1 boss gets timer boost (120 * 1.2 = 144)
+        expect(adjusted.timerSeconds).toBe(Math.floor(baseConfig.timerSeconds * 1.2));
+      });
+
+      it('should NOT apply timer boost to W2+ boss on easy tier', () => {
+        // GIVEN
+        const baseConfig = getLevelConfig(2, 7); // W2 boss
+        const tier: DifficultyTier = 'easy';
+        expect(baseConfig.isBossLevel).toBe(true);
+
+        // WHEN
+        const adjusted = applyTierAdjustments(baseConfig, tier);
+
+        // THEN — W2+ bosses remain fully exempt
+        expect(adjusted.timerSeconds).toBe(baseConfig.timerSeconds);
+      });
+
+      it('should NOT modify W1 boss objectives even on easy tier', () => {
+        // GIVEN
+        const baseConfig = getLevelConfig(1, 7);
+        const tier: DifficultyTier = 'easy';
+
+        // WHEN
+        const adjusted = applyTierAdjustments(baseConfig, tier);
+
+        // THEN — objectives unchanged
+        expect(adjusted.objectives).toEqual(baseConfig.objectives);
       });
     });
   });

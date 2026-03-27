@@ -74,6 +74,7 @@ export interface SinglePlayerResultsData {
   botWordsForValidation?: string[]; // Bot words to show in validation modal
   gameSessionId?: string; // Unique session ID for vote tracking
   language?: Language; // Game language
+  maxCombo?: number; // Highest combo reached in this game
 }
 
 /**
@@ -203,6 +204,8 @@ const SinglePlayerView: React.FC = () => {
           timePlayed: results.gameDuration,
           achievementCount: results.achievements?.length || 0,
           mode: gameState.mode,
+          maxCombo: results.maxCombo ?? 0,
+          longWordsFound: (results.playerWords || []).filter(w => w.length >= 6).length,
         }),
       }).catch(() => { /* non-critical — localStorage is the fallback */ });
     }

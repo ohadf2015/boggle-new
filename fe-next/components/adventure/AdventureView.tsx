@@ -310,12 +310,9 @@ function AdventureView(): React.JSX.Element {
       {(viewState === 'worldMap' || viewState === 'levelGrid') && (
         <AdventureViewHeader
           viewState={viewState}
-          isRTL={isRTL}
           totalStars={totalStars}
           playerLevel={playerLevel}
-          gold={gold}
           onBack={historyBack}
-          onOpenShop={openShop}
           t={t}
           worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}
           hasHub={hasCompletions}

@@ -20,6 +20,8 @@ export interface QuestTemplate {
   type: string;
   description: string;
   target: number;
+  /** Display target for UI (e.g. combo shows 15 even though internal target is 1) */
+  displayTarget?: number;
   xpReward: number;
   avatarPartReward: AvatarPartReward;
 }
@@ -30,6 +32,8 @@ export interface ActiveQuest {
   title: string;
   description: string;
   target: number;
+  /** Display target for UI (e.g. combo shows 15 even though internal target is 1) */
+  displayTarget?: number;
   current: number;
   xpReward: number;
   completed: boolean;
@@ -110,13 +114,13 @@ const EASY_QUESTS: QuestWithoutIdAndReward[] = [
 const MEDIUM_QUESTS: QuestWithoutIdAndReward[] = [
   { difficulty: 'medium', type: 'long_words', description: 'weeklyQuest.desc.longWords', target: 20, xpReward: 500 },
   { difficulty: 'medium', type: 'mp_wins', description: 'weeklyQuest.desc.mpWins', target: 3, xpReward: 500 },
-  { difficulty: 'medium', type: 'combo_15', description: 'weeklyQuest.desc.combo', target: 15, xpReward: 500 },
+  { difficulty: 'medium', type: 'combo_15', description: 'weeklyQuest.desc.combo', target: 1, displayTarget: 15, xpReward: 500 },
 ];
 
 const HARD_QUESTS: QuestWithoutIdAndReward[] = [
   { difficulty: 'hard', type: 'find_words_session', description: 'weeklyQuest.desc.findWordsSession', target: 100, xpReward: 1000 },
   { difficulty: 'hard', type: 'daily_missions_streak', description: 'weeklyQuest.desc.dailyMissionsStreak', target: 3, xpReward: 1000 },
-  { difficulty: 'hard', type: 'high_score', description: 'weeklyQuest.desc.highScore', target: 500, xpReward: 1000 },
+  { difficulty: 'hard', type: 'high_score', description: 'weeklyQuest.desc.highScore', target: 1, displayTarget: 650, xpReward: 1000 },
 ];
 
 // --- Pure Helpers ---
@@ -169,6 +173,13 @@ export function getDifficultyFromType(type: string): QuestDifficulty {
   return 'hard';
 }
 
+/** Get display target for a quest type (e.g. combo_15 shows 15 even though internal target is 1) */
+export function getDisplayTargetForType(type: string): number | undefined {
+  const allQuests = [...EASY_QUESTS, ...MEDIUM_QUESTS, ...HARD_QUESTS];
+  const quest = allQuests.find(q => q.type === type);
+  return quest?.displayTarget;
+}
+
 /** Map stat to quest progress delta */
 export function getStatDelta(questType: string, stats: GameStats): number {
   switch (questType) {
@@ -177,10 +188,10 @@ export function getStatDelta(questType: string, stats: GameStats): number {
     case 'daily_challenges': return stats.dailyChallengesCompleted ?? 0;
     case 'long_words': return stats.longWordsFound ?? 0;
     case 'mp_wins': return stats.multiplayerWins ?? 0;
-    case 'combo_15': return stats.maxCombo ?? 0;
+    case 'combo_15': return (stats.maxCombo ?? 0) >= 15 ? 1 : 0;
     case 'find_words_session': return stats.wordsInSession ?? 0;
     case 'daily_missions_streak': return stats.dailyMissionDaysCompleted ?? 0;
-    case 'high_score': return stats.maxScore ?? 0;
+    case 'high_score': return (stats.maxScore ?? 0) >= 650 ? 1 : 0;
     default: return 0;
   }
 }

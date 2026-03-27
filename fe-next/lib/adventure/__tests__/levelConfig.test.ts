@@ -752,11 +752,11 @@ describe('Score target calibration (Fix 1)', () => {
     const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
 
     // Average word ~65 pts (accounts for gold/rainbow tile multipliers)
-    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.7
-    // expected ~ 24 * 65 * 0.7 * 1.015 = ~1108
+    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.35
+    // expected ~ 24 * 65 * 0.35 * 1.015 = ~554
     expect(scoreObj).toBeDefined();
-    expect(scoreObj!.target).toBeGreaterThanOrEqual(900);
-    expect(scoreObj!.target).toBeLessThanOrEqual(1300);
+    expect(scoreObj!.target).toBeGreaterThanOrEqual(450);
+    expect(scoreObj!.target).toBeLessThanOrEqual(650);
   });
 
   it('should produce higher score targets in later worlds', () => {
@@ -840,5 +840,36 @@ describe('Word count backpressure from timer (Fix 2)', () => {
     expect(wordObj!.target).toBeLessThanOrEqual(28);
     // Still a challenging target
     expect(wordObj!.target).toBeGreaterThanOrEqual(20);
+  });
+
+  describe('Early game score targets (difficulty curve audit)', () => {
+    it('W1 L2 score target should be under 600 (new player friendly)', () => {
+      const config = getLevelConfig(1, 2);
+      const scoreObj = config.objectives.find(
+        (o) => o.type === 'scoreTarget' && o.isPrimary
+      );
+      expect(scoreObj).toBeDefined();
+      expect(scoreObj!.target).toBeLessThanOrEqual(600);
+      expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
+    });
+
+    it('W1 L4 score target should be under 600 (gentle ramp)', () => {
+      const config = getLevelConfig(1, 4);
+      const scoreObj = config.objectives.find(
+        (o) => o.type === 'scoreTarget' && o.isPrimary
+      );
+      expect(scoreObj).toBeDefined();
+      expect(scoreObj!.target).toBeLessThanOrEqual(600);
+      expect(scoreObj!.target).toBeGreaterThanOrEqual(500);
+    });
+
+    it('difficulty should still ramp up by W5+', () => {
+      const w5config = getLevelConfig(5, 2);
+      const scoreObj = w5config.objectives.find(
+        (o) => o.type === 'scoreTarget' && o.isPrimary
+      );
+      expect(scoreObj).toBeDefined();
+      expect(scoreObj!.target).toBeGreaterThanOrEqual(1200);
+    });
   });
 });

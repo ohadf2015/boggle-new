@@ -3,6 +3,7 @@
  * from AdventureGame to reduce file size.
  */
 import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 
@@ -149,7 +150,9 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
         worldNumber, levelNumber,
         gameStars as 0 | 1 | 2 | 3,
         gameScore, wordsFoundList.length, earnedGold, longWords
-      ).catch(() => { /* onLevelComplete below will also retry via ProgressionContext */ });
+      ).catch(() => {
+        toast.error('Progress could not be saved. It will retry next time.', { duration: 4000 });
+      });
     }
 
     onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);

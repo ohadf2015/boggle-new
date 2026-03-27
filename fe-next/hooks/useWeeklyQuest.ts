@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
   getAvailableQuests, getWeekStart, getWeekNumber, pickAvatarReward,
-  getDifficultyFromType,
+  getDifficultyFromType, getDisplayTargetForType,
   type QuestTemplate, type ActiveQuest,
 } from '@/shared/weeklyQuestTemplates';
 
@@ -42,6 +42,7 @@ function parseRow(row: Record<string, unknown>): ActiveQuest {
     title: row.title as string,
     description: row.description as string,
     target: reqs?.target ?? 0,
+    displayTarget: getDisplayTargetForType(questType),
     current: prog?.current ?? 0,
     xpReward: row.xp_reward as number,
     completed: row.completed as boolean,

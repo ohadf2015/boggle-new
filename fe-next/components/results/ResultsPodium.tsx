@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Crown, Trophy } from 'lucide-react';
+import { Crown, Trophy, SmilePlus } from 'lucide-react';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { PlayerScore } from '@/hooks/useResultsData';
@@ -367,13 +367,16 @@ export default function ResultsPodium({
                     <button
                       onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
                       className={cn(
-                        'w-6 h-6 flex items-center justify-center text-sm rounded-full',
-                        'bg-neo-white/5 hover:bg-neo-white/15 active:scale-90 transition-all',
-                        openPicker === player.username && 'bg-neo-white/15 ring-1 ring-neo-white/20'
+                        'w-7 h-7 flex items-center justify-center rounded-neo',
+                        'bg-neo-navy border-2 border-neo-white/20 shadow-hard-sm',
+                        'hover:bg-neo-white/10 hover:border-neo-lime/40',
+                        'active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+                        'transition-all',
+                        openPicker === player.username && 'bg-neo-lime/15 border-neo-lime/50'
                       )}
                       aria-label={`Send emoji to ${player.username}`}
                     >
-                      😊
+                      <SmilePlus className="w-3.5 h-3.5 text-neo-white/70" />
                     </button>
                     <AnimatePresence>
                       {openPicker === player.username && (

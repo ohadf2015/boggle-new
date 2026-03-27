@@ -19,6 +19,9 @@ interface RecordGameRequest {
   timePlayed?: number;
   achievementCount?: number;
   mode: string;
+  maxCombo?: number;
+  isDailyChallenge?: boolean;
+  longWordsFound?: number;
 }
 
 function validateBody(body: Record<string, unknown>): {
@@ -26,7 +29,7 @@ function validateBody(body: Record<string, unknown>): {
   error?: string;
   data?: RecordGameRequest;
 } {
-  const { score, wordCount, longestWord, timePlayed, achievementCount, mode } = body;
+  const { score, wordCount, longestWord, timePlayed, achievementCount, mode, maxCombo, isDailyChallenge, longWordsFound } = body;
 
   if (typeof score !== 'number' || typeof wordCount !== 'number') {
     return { valid: false, error: 'Missing required fields: score, wordCount' };
@@ -49,6 +52,9 @@ function validateBody(body: Record<string, unknown>): {
       timePlayed: typeof timePlayed === 'number' ? Math.min(Math.max(timePlayed, 0), 600) : undefined,
       achievementCount: typeof achievementCount === 'number' ? Math.min(Math.max(achievementCount, 0), 20) : 0,
       mode: typeof mode === 'string' ? mode : 'solo-bots',
+      maxCombo: typeof maxCombo === 'number' ? Math.min(Math.max(maxCombo, 0), 100) : 0,
+      isDailyChallenge: isDailyChallenge === true,
+      longWordsFound: typeof longWordsFound === 'number' ? Math.min(Math.max(longWordsFound, 0), 200) : 0,
     },
   };
 }
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { score, wordCount, longestWord, timePlayed, achievementCount } = validation.data;
+    const { score, wordCount, longestWord, timePlayed, achievementCount, maxCombo, isDailyChallenge, longWordsFound } = validation.data;
     const userId = user.id;
 
     // Calculate XP (singleplayer = no win bonus, playerCount=1)
@@ -180,6 +186,21 @@ export async function POST(request: NextRequest) {
           .update({ player_title: newTitle })
           .eq('id', userId);
       }
+    }
+
+    // Update weekly quest progress for singleplayer games
+    try {
+      const { updateQuestProgress } = await import('@/backend/modules/weeklyQuestManager');
+      await updateQuestProgress(userId, {
+        gamesPlayed: 1,
+        wordsFound: wordCount,
+        longWordsFound: longWordsFound ?? 0,
+        maxCombo: maxCombo ?? 0,
+        maxScore: score,
+        dailyChallengesCompleted: isDailyChallenge ? 1 : 0,
+      });
+    } catch {
+      // Non-critical — don't fail the response
     }
 
     return NextResponse.json({
