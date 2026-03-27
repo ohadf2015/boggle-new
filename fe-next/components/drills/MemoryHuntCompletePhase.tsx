@@ -26,7 +26,7 @@ export function MemoryHuntCompletePhase({
         transition={{ type: 'spring', damping: 12, delay: 0.2 }}
       >
         <Trophy className={cn(
-          'w-20 h-20 mx-auto',
+          'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
           results.wordsFound > 0 ? 'text-neo-lime' : 'text-gray-400'
         )} />
       </motion.div>
@@ -54,7 +54,7 @@ export function MemoryHuntCompletePhase({
             {results.score}
           </motion.span> {t('brain.drills.points')}
         </motion.div>
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}

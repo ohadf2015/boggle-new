@@ -279,7 +279,7 @@ export default function RareGems({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <Gem className="w-20 h-20 mx-auto text-neo-purple" />
+            <Gem className="w-14 h-14 sm:w-20 sm:h-20 mx-auto text-neo-purple" />
             <h2 className={cn(
               'text-2xl font-black',
               'text-neo-white'
@@ -311,7 +311,7 @@ export default function RareGems({
         )}
 
         {phase === 'playing' && (
-          <div className="w-full max-w-md space-y-4 relative">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4 relative">
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
               <div className="flex justify-center">
@@ -441,7 +441,7 @@ export default function RareGems({
               transition={{ type: 'spring', damping: 12, delay: 0.2 }}
             >
               <Trophy className={cn(
-                'w-20 h-20 mx-auto',
+                'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
                 rareWordsFound >= levelConfig.targetRare ? 'text-neo-lime' : 'text-gray-400'
               )} />
             </AdaptiveMotion.div>
@@ -482,7 +482,7 @@ export default function RareGems({
               </AdaptiveMotion.div>
               
               {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                 <AdaptiveMotion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

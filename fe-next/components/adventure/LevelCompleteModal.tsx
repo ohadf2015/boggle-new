@@ -39,6 +39,7 @@ interface LevelCompleteModalProps {
   onRetry: () => void;
   onExit: () => void;
   totalStars?: number;
+  previousBestStars?: number;
   bestAttempt?: LevelAttempt | null;
   xpEarned?: number;
   goldEarned?: number;
@@ -96,6 +97,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     onRetry,
     onExit,
     totalStars: _totalStars = 0,
+    previousBestStars = 0,
     bestAttempt,
     xpEarned,
     goldEarned,
@@ -260,6 +262,31 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 </AdaptiveMotion.div>
               ))}
             </div>
+
+            {/* Show previous best stars when current attempt earned fewer */}
+            {previousBestStars > stars && (
+              <AdaptiveMotion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex justify-center items-center gap-1.5 -mt-4 mb-4"
+              >
+                <span className="text-neo-white/50 text-xs font-bold uppercase">
+                  {t('adventure.bestStars')}:
+                </span>
+                {[0, 1, 2].map((i) => (
+                  <Star
+                    key={`best-${i}`}
+                    className={cn(
+                      'w-4 h-4',
+                      i < previousBestStars
+                        ? 'text-neo-yellow/60 fill-neo-yellow/60'
+                        : 'text-neo-white/20 fill-neo-white/5'
+                    )}
+                  />
+                ))}
+              </AdaptiveMotion.div>
+            )}
 
             {/* Rewards, Objectives, Actions — extracted component */}
             <LevelCompleteContent

@@ -125,7 +125,7 @@ describe('Word Hunt Minimum Word Length', () => {
       expect(result.current[0].discoveredWords).toHaveLength(0);
     });
 
-    it('should reject 2-letter English words as too-short', async () => {
+    it('should accept 2-letter English words (MIN_DISCOVERY_WORD_LENGTH is 2)', async () => {
       const { result } = renderHook(() =>
         useSurvivalGameLogic(createProps('en'))
       );
@@ -135,7 +135,8 @@ describe('Word Hunt Minimum Word Length', () => {
       });
 
       await waitFor(() => {
-        expect(result.current[0].feedbackType).toBe('too-short');
+        // 2-letter words are valid since MIN_DISCOVERY_WORD_LENGTH=2
+        expect(result.current[0].feedbackType).not.toBe('too-short');
       });
     });
 

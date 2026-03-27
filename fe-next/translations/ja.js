@@ -5887,6 +5887,7 @@ const ja = {
     "progressNotSaved": "進行状況を保存できませんでした。サインインして冒険を続けよう！",
     "levelComplete": "レベルクリア！",
     "starsEarned": "獲得した星",
+    "bestStars": "ベスト",
     "continueToNext": "続ける",
     "nextWorld": "次のワールド",
     "retryLevel": "リトライ",

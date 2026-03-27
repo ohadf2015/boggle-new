@@ -455,14 +455,22 @@ export async function POST(request: NextRequest) {
     // Without this, adventure XP stays siloed in player_progression and the main
     // profile level never advances for adventure-only players.
     if (xpEarned > 0) {
-      // Fire-and-forget: sync adventure XP to main profile without blocking response
+      // Fire-and-forget with one retry: sync adventure XP to main profile
       (async () => {
-        const { error: xpSyncError } = await supabase.rpc('increment_player_xp', {
+        let { error: xpSyncError } = await supabase.rpc('increment_player_xp', {
           p_player_id: userId,
           p_xp_amount: xpEarned,
         });
         if (xpSyncError) {
-          console.error('[ADVENTURE COMPLETE API] Failed to sync XP to profiles:', xpSyncError);
+          console.warn('[ADVENTURE COMPLETE API] XP sync failed, retrying:', xpSyncError.message);
+          await new Promise(r => setTimeout(r, 500));
+          ({ error: xpSyncError } = await supabase.rpc('increment_player_xp', {
+            p_player_id: userId,
+            p_xp_amount: xpEarned,
+          }));
+          if (xpSyncError) {
+            console.error('[ADVENTURE COMPLETE API] XP sync retry also failed:', xpSyncError);
+          }
         }
       })().catch((err) => {
         console.error('[ADVENTURE COMPLETE API] XP sync error:', err);

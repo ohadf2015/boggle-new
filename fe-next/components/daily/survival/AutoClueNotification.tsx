@@ -27,7 +27,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       onDismiss();
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [onDismiss]);

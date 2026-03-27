@@ -107,7 +107,7 @@ export const GameHeader = memo(function GameHeader({
           intercepting clicks on the level badge or control buttons beneath it
           on narrow screens. */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none max-w-[40%] sm:max-w-none"
         aria-live="polite"
         aria-atomic="true"
         data-testid="score-display"

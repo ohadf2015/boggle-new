@@ -325,10 +325,9 @@ const DailyChallenge: React.FC = () => {
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   const handleBack = useCallback(() => { window.location.href = `/${language}`; }, [language]);
 
-  const isResultsPhase = phase === 'completed' || phase === 'already-played';
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? 'overflow-hidden' : 'overflow-y-auto'}`}
+      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'}`}
     >
       <AutoHideHeader />
 

@@ -308,8 +308,12 @@ export function useAdventureBossNew({
       setPhase(newPhase);
       phaseRef.current = newPhase;
 
-      // Restart attack timer with new frequency
-      startAttackTimer(newPhase);
+      // Only restart attack timer if battle is still active (ref check avoids
+      // the race where endBattle set isActiveRef=false but isActive state
+      // hasn't propagated to this effect yet)
+      if (isActiveRef.current) {
+        startAttackTimer(newPhase);
+      }
 
       // Emit grid effect for this phase (boss visual signature)
       if (boss?.phases) {

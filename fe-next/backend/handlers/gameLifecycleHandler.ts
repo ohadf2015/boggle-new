@@ -20,9 +20,11 @@ import {
   getAuthUserConnection,
   isRoomEmpty,
   markPlayerReadyForNextGame,
+  unmarkPlayerReady,
   getPlayersReadyCount,
   removeUserFromGame,
-  updateUsernameMapping
+  updateUsernameMapping,
+  getLeaderboard
 } from '../modules/gameStateManager.js';
 
 import {
@@ -346,6 +348,15 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
           wordHuntPlayerLives: game.wordHuntState.playerLives || {},
         } : {}),
       });
+    } else if (game.gameState === 'finished') {
+      // Reconnecting to a finished game — resend results so the player sees the results screen
+      logger.info('SOCKET', `Resending results to reconnecting player in finished game ${gameCode}`);
+      const leaderboard = getLeaderboard(gameCode);
+      safeEmit(socket, 'validatedScores', {
+        leaderboard,
+        gameMode: game.gameMode || 'classic',
+        reconnect: true,
+      });
     }
   });
 
@@ -474,7 +485,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (data?.ready) {
       markPlayerReadyForNextGame(gameCode, username);
     } else {
-      delete game.playersReadyForNextGame[username];
+      unmarkPlayerReady(gameCode, username);
     }
 
     const result = getPlayersReadyCount(gameCode);
@@ -513,6 +524,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (trimmedName !== username) {
       delete game.users[username];
       updateUsernameMapping(gameCode, username, trimmedName, socket.id);
+      // Migrate ready state under the new name
+      if (game.playersReadyForNextGame[username]) {
+        game.playersReadyForNextGame[trimmedName] = true;
+        delete game.playersReadyForNextGame[username];
+      }
     }
 
     socket.emit('guestNameUpdated', { oldName: username, newName: trimmedName });

@@ -496,7 +496,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[600px] mx-auto">
+            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[min(480px,50vh)] mx-auto">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -559,7 +559,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
           {/* Mobile: Split-view with compact leaderboard + words */}
           {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[140px] short:max-h-[90px] scrollbar-thin">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 flex-shrink-0 overflow-y-auto max-h-[120px] sm:max-h-[140px] short:max-h-[80px] scrollbar-thin">
               <CompactLeaderboard
                 players={leaderboard.map((p) => ({
                   username: p.username,

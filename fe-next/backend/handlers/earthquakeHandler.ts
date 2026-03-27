@@ -26,6 +26,7 @@ import { generateRandomTable } from '../utils/gameUtils.js';
 import { DIFFICULTIES } from '../utils/consts.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import logger from '../utils/logger.js';
+import timerManager from '../utils/timerManager';
 import { gameCleanupEmitter } from '../events/gameCleanup';
 
 // Subscribe to cleanup events (breaks circular dependency with shared.ts)
@@ -56,19 +57,12 @@ const EARTHQUAKE_CONFIG = {
   fireRoundDurationSeconds: 15, // 15 seconds
 };
 
-// Track active earthquake timers per game
-const gameEarthquakeTimers = new Map<string, ReturnType<typeof setTimeout>[]>();
-
 /**
- * Clear all earthquake timers for a game
+ * Clear all earthquake timers for a game via centralized timerManager
  * @param gameCode - Game code
  */
 function clearEarthquakeTimers(gameCode: string): void {
-  const timers = gameEarthquakeTimers.get(gameCode);
-  if (timers) {
-    timers.forEach(timer => clearTimeout(timer));
-    gameEarthquakeTimers.delete(gameCode);
-  }
+  timerManager.clearTimersWithPrefix(`earthquake:${gameCode}`);
 }
 
 /**
@@ -144,7 +138,6 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
  */
 function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): void {
   const room = getGameRoom(gameCode);
-  const timers: ReturnType<typeof setTimeout>[] = [];
 
   logger.info('EARTHQUAKE', `Starting earthquake sequence for game ${gameCode}`);
 
@@ -157,7 +150,7 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
   logger.debug('EARTHQUAKE', `Game ${gameCode}: WARNING phase`);
 
   // Phase 2: SHAKE (after 2 seconds)
-  const shakeTimer = setTimeout(() => {
+  timerManager.setTimeout(`earthquake:${gameCode}:shake`, () => {
     broadcastToRoom(io, room, 'earthquakeShake', {
       gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
     });
@@ -165,10 +158,8 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
     logger.debug('EARTHQUAKE', `Game ${gameCode}: SHAKE phase`);
   }, EARTHQUAKE_CONFIG.warningDurationMs);
 
-  timers.push(shakeTimer);
-
   // Phase 3: FIRE ROUND START (after 3 seconds = 2s warning + 1s shake)
-  const fireStartTimer = setTimeout(() => {
+  timerManager.setTimeout(`earthquake:${gameCode}:fireStart`, () => {
     try {
       // Generate new grid based on game settings
       const difficulty = game.difficulty || 'MEDIUM';
@@ -208,10 +199,8 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
     }
   }, EARTHQUAKE_CONFIG.warningDurationMs + EARTHQUAKE_CONFIG.shakeDurationMs);
 
-  timers.push(fireStartTimer);
-
   // Phase 4: FIRE ROUND END (after 18 seconds = 3s + 15s fire round)
-  const fireEndTimer = setTimeout(() => {
+  timerManager.setTimeout(`earthquake:${gameCode}:fireEnd`, () => {
     // Mark fire round inactive in server game state
     updateGame(gameCode, { fireRoundActive: false });
 
@@ -224,11 +213,6 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
     // Clean up timers
     clearEarthquakeTimers(gameCode);
   }, EARTHQUAKE_CONFIG.warningDurationMs + EARTHQUAKE_CONFIG.shakeDurationMs + (EARTHQUAKE_CONFIG.fireRoundDurationSeconds * 1000));
-
-  timers.push(fireEndTimer);
-
-  // Store timers for cleanup
-  gameEarthquakeTimers.set(gameCode, timers);
 }
 
 /**

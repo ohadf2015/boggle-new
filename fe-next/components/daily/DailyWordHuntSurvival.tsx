@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -94,6 +94,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       return false;
     },
   });
+
+  const feedbackKeyRef = useRef(0);
+  const prevFeedbackRef = useRef(state.feedbackType);
+  if (state.feedbackType && state.feedbackType !== prevFeedbackRef.current) {
+    feedbackKeyRef.current += 1;
+  }
+  prevFeedbackRef.current = state.feedbackType;
 
   const isGameActive = !state.isGameOver && state.lifePoints > 0;
 
@@ -249,7 +256,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe pt-3 sm:pt-2"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
-        ['--game-chrome-height' as string]: '420px',
       } as React.CSSProperties}
     >
       {/* Top bar */}
@@ -261,7 +267,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         t={t}
       />
 
-      {/* Target word clue boxes */}
+      {/* Target word clue boxes + inline feedback */}
       <div className="flex-shrink-0">
         <SurvivalClueBoxes
           ref={actions.clueContainerRef}
@@ -278,6 +284,32 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           gameDir={actions.gameDir}
           t={t}
         />
+
+        {/* Minimal word feedback pill — shows life delta near clue boxes */}
+        <div className="h-6 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {state.feedbackType && (
+              <motion.div
+                key={`${state.feedbackType}-${feedbackKeyRef.current}`}
+                initial={{ opacity: 0, y: -6, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 4, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+                className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                  state.feedbackType === 'valid-word'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/40'
+                    : state.feedbackType === 'duplicate'
+                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
+                      : state.feedbackType === 'target-found'
+                        ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/40'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                }`}
+              >
+                {state.feedbackMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Category and example hints (if unlocked) */}
@@ -319,11 +351,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           highlightedPath={keyboardInput.highlightedCells}
           t={t}
         />
-      </div>
-
-      {/* Word Feedback — inline WordFormingArea */}
-      <div className="flex justify-center py-1 flex-shrink-0">
-        <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
       </div>
 
       {/* Mobile Info Bar — rank + loot with expandable bottom sheet */}

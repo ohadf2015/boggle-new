@@ -211,8 +211,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     };
 
     return (
-      <div className="flex h-dvh w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
-        <div className="w-1/2 flex flex-col items-center gap-2 overflow-y-auto scrollable-area">
+      <div className="flex h-dvh w-full overflow-hidden bg-slate-900 text-white p-1.5 sm:p-2 gap-1.5 sm:gap-2">
+        <div className="w-1/2 flex flex-col items-center gap-1.5 sm:gap-2 overflow-y-auto scrollable-area">
           <LandscapeBanner
             playerScore={results.playerScore} validWordCount={validWordCount}
             isWinner={isWinner} isNewHighScore={results.isNewHighScore}

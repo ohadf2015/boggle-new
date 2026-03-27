@@ -106,7 +106,7 @@ const AdventureGame = memo<AdventureGameProps>(
     });
 
     const tiles = useMemoizedFlatTiles(tiles2D, tilesVersion);
-    const { recordAttempt, getLevelAttempt, progression, updateWordAlbum, completeLevel: persistCompletion } = useProgression();
+    const { recordAttempt, getLevelAttempt, getLevelCompletion, progression, updateWordAlbum, completeLevel: persistCompletion } = useProgression();
     // Wrap to ensure correct return type for saveCompletion prop
     const saveCompletionToDb = useCallback(
       async (world: number, level: number, stars: 0 | 1 | 2 | 3, score: number, words: number, goldEarned?: number, longWords?: number): Promise<boolean> => {
@@ -118,6 +118,10 @@ const AdventureGame = memo<AdventureGameProps>(
     const bestAttempt = useMemo(
       () => getLevelAttempt(levelConfig.world, levelConfig.level),
       [getLevelAttempt, levelConfig.world, levelConfig.level]
+    );
+    const previousBestStars = useMemo(
+      () => getLevelCompletion(levelConfig.world, levelConfig.level)?.stars ?? 0,
+      [getLevelCompletion, levelConfig.world, levelConfig.level]
     );
 
     const [isPaused, setIsPaused] = useState(false);
@@ -535,7 +539,7 @@ const AdventureGame = memo<AdventureGameProps>(
               worldUnlockProps={cinematics.worldUnlockProps}
               timeRemaining={timeRemaining} t={t}
               showLootChest={showLootChest} lootDrops={levelCompletion.lootDrops}
-              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt}
+              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt} previousBestStars={previousBestStars}
               earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
               retriesUsed={retriesUsed} freeRetriesPerWorld={init.upgradeEffects.freeRetriesPerWorld ?? 0}

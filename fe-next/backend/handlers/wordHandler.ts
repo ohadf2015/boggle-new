@@ -166,10 +166,12 @@ function registerWordHandlers(io: Server, socket: Socket): void {
     }
 
     let gracePeriodLockId: string | null = null;
+    let outerGameCode: string | null = null;
     try {
       const { word } = validation.data as SubmitWordPayload;
 
       const gameCode = getGameBySocketId(socket.id);
+      outerGameCode = gameCode;
       const username = getUsernameBySocketId(socket.id);
 
       // Check for spam cooldown
@@ -393,9 +395,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       if (submittedWord) {
         socket.emit('wordRejected', { word: submittedWord, reason: 'error' });
       }
-      // Release grace period lock if acquired
+      // Release grace period lock if acquired — use outerGameCode as fallback
+      // since socket may have disconnected and getGameBySocketId returns null
       if (gracePeriodLockId) {
-        const catchGameCode2 = getGameBySocketId(socket.id);
+        const catchGameCode2 = getGameBySocketId(socket.id) || outerGameCode;
         if (catchGameCode2) {
           await releaseGracePeriodLock(catchGameCode2, gracePeriodLockId);
         }

@@ -193,6 +193,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       const resetSuccess = resetGameForNewRound(gameCode);
       if (!resetSuccess) {
+        // Last-resort self-heal: bypass state machine intentionally.
+        // resetGameForNewRound clears player data; if it failed, ensure
+        // at minimum the state allows a fresh start. Timer and bots are
+        // already stopped above (clearGameTimer + stopAllBots).
         logger.warn('SOCKET', `resetGameForNewRound failed for ${gameCode}, forcing state to waiting`);
         game.gameState = 'waiting';
       }

@@ -5835,6 +5835,7 @@ const sv = {
     "progressNotSaved": "Kunde inte spara framstegen. Logga in för att behålla ditt äventyr!",
     "levelComplete": "Nivå klar!",
     "starsEarned": "Stjärnor intjänade",
+    "bestStars": "Bäst",
     "continueToNext": "Fortsätt",
     "nextWorld": "Nästa värld",
     "retryLevel": "Försök igen",

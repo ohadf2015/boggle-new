@@ -52,7 +52,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         "mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg transition-all duration-300",
         "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
         showFeedbackOverlay
-          ? "clue-feedback-active clue-container-attention"
+          ? "clue-feedback-active clue-container-attention animate-pulse ring-2 ring-neo-lime/60"
           : isClueGaining
             ? "clue-container-green-glow"
             : "clue-container-glow"

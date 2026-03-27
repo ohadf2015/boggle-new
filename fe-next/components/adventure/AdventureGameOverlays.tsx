@@ -78,6 +78,7 @@ export interface AdventureGameOverlaysProps {
   objectives: LevelObjective[];
   totalStars?: number;
   bestAttempt: any;
+  previousBestStars: number;
   earnedXp: number;
   earnedGold: number;
   isLastLevelOfWorld: boolean;
@@ -115,7 +116,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
   showVictoryCinematic, showDefeatCinematic, showWorldUnlockCinematic, worldUnlockProps,
   timeRemaining, t,
   showLootChest, lootDrops,
-  objectives, totalStars, bestAttempt, earnedXp, earnedGold, isLastLevelOfWorld, onNextWorld,
+  objectives, totalStars, bestAttempt, previousBestStars, earnedXp, earnedGold, isLastLevelOfWorld, onNextWorld,
   retriesUsed, freeRetriesPerWorld,
   storyBeat, showStoryBeat,
   currentPopup, scoreDisplayRef, reaction, dismissReaction,
@@ -211,7 +212,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
         stars={gameStars as 0 | 1 | 2 | 3} score={gameScore} objectives={objectives}
         levelNumber={levelNumber} worldNumber={worldNumber}
         onContinue={handleContinue} onRetry={handleRetry} onExit={onExit}
-        totalStars={totalStars} bestAttempt={bestAttempt}
+        totalStars={totalStars} bestAttempt={bestAttempt} previousBestStars={previousBestStars}
         xpEarned={earnedXp} goldEarned={earnedGold}
         isLastLevelOfWorld={isLastLevelOfWorld}
         onNextWorld={onNextWorld}

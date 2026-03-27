@@ -142,7 +142,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   t,
 }) => {
   return (
-    <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white">
+    <div className="relative flex items-center justify-center w-full h-dvh overflow-hidden bg-slate-900 text-white">
       {/* Word Feedback — inline WordFormingArea */}
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40">
         <WordFormingArea
@@ -184,7 +184,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
       </div>
 
       {/* Center: Target Word + Grid */}
-      <div className="flex flex-col items-center justify-center w-full h-full px-[80px] sm:px-[100px] md:px-[120px] lg:px-[150px] py-2 gap-2 landscape-grid-container">
+      <div className="flex flex-col items-center justify-center w-full h-full px-[12vw] sm:px-[14vw] md:px-[15vw] lg:px-[16vw] py-2 gap-2 landscape-grid-container">
         {/* Target word hint boxes - compact for landscape */}
         {currentHint && (
           <LandscapeClueBoxes

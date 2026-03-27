@@ -14,6 +14,9 @@ import type { GridTileState } from '@/types/adventure';
 import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
 import { useHaptics } from '@/hooks/useHaptics';
 
+// Monotonic counter for unique IDs (avoids Date.now() collisions on rapid submission)
+let popupIdCounter = 0;
+
 interface ValidationFeedback {
   error: string | null;
   wasSubmitted: boolean;
@@ -212,7 +215,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           : undefined;
 
         addScorePopup({
-          id: Date.now(),
+          id: ++popupIdCounter,
           value: scoreValue,
           x: startPos.x,
           y: startPos.y,
@@ -223,7 +226,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
         hapticSuccess();
         setValidationFeedback({ error: null, isValid: true, wasSubmitted: true });
         setLastAccepted({ word, score: scoreValue });
-        setWordFeedback({ id: `${Date.now()}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
+        setWordFeedback({ id: `${++popupIdCounter}`, type: 'accepted', word, score: scoreValue, timestamp: Date.now() });
         lastSubmittedWordRef.current = { word, path };
 
         submitWordWithPath(word, scoreValue, path, { detonate: detonateActive });
@@ -260,7 +263,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       } else if (result.errorKey) {
         const errorMessage = t(result.errorKey) || result.errorKey;
         setValidationFeedback({ error: errorMessage, isValid: false, wasSubmitted: false });
-        setWordFeedback({ id: `${Date.now()}`, type: 'rejected', word, message: errorMessage, timestamp: Date.now() });
+        setWordFeedback({ id: `${++popupIdCounter}`, type: 'rejected', word, message: errorMessage, timestamp: Date.now() });
         clearSelection();
 
         recordAIWord(false, 0);

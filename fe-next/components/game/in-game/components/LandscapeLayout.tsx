@@ -377,7 +377,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
             </div>
 
             {isPlaying && leaderboard.length > 1 && (
-              <div className="absolute top-2 start-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
+              <div className="absolute top-1 sm:top-2 start-1/2 -translate-x-1/2 z-30 w-auto max-w-[220px] sm:max-w-[280px]">
                 <CompactLeaderboard
                   players={leaderboard.map((p, index) => ({
                     username: p.username,

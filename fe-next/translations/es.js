@@ -5854,6 +5854,7 @@ const es = {
     "progressNotSaved": "No se pudo guardar tu progreso. ¡Inicia sesión para conservar tu aventura!",
     "levelComplete": "¡Nivel completado!",
     "starsEarned": "Estrellas ganadas",
+    "bestStars": "Mejor",
     "continueToNext": "Continuar",
     "nextWorld": "Siguiente mundo",
     "retryLevel": "Reintentar",

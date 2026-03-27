@@ -108,7 +108,7 @@ export default function MemoryHunt({
             className="text-center space-y-6"
           >
             <Brain className={cn(
-              'w-20 h-20 mx-auto',
+              'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
               'text-neo-purple'
             )} />
             <h2 className={cn(
@@ -148,7 +148,7 @@ export default function MemoryHunt({
 
         {/* Study Phase */}
         {game.phase === 'study' && (
-          <div className="w-full max-w-md space-y-4">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4">
             <div className="relative">
               <GridComponent
                 grid={grid}
@@ -255,7 +255,7 @@ export default function MemoryHunt({
 
         {/* Recall Phase */}
         {(game.phase === 'recall' || game.phase === 'feedback') && (
-          <div className="w-full max-w-md space-y-4">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4">
             <div className="flex items-center justify-center gap-2">
               <EyeOff className={cn(
                 'w-5 h-5',
@@ -307,9 +307,9 @@ export default function MemoryHunt({
                     )}
                   >
                     {game.lastFeedback === 'correct' ? (
-                      <CheckCircle2 className="w-20 h-20 text-white drop-shadow-lg" />
+                      <CheckCircle2 className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
                     ) : (
-                      <XCircle className="w-20 h-20 text-white drop-shadow-lg" />
+                      <XCircle className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
                     )}
                   </AdaptiveMotion.div>
                 )}

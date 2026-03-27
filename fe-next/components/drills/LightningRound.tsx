@@ -245,7 +245,7 @@ export default function LightningRound({
             className="text-center space-y-6"
           >
             <Zap className={cn(
-              'w-20 h-20 mx-auto',
+              'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
               'text-neo-lime'
             )} />
             <h2 className={cn(
@@ -284,7 +284,7 @@ export default function LightningRound({
 
         {/* Playing Phase */}
         {phase === 'playing' && (
-          <div className="w-full max-w-md space-y-4">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4">
             <div className="flex items-center justify-center gap-2">
               <Zap className="w-5 h-5 text-neo-lime animate-pulse" />
               <span className={cn(
@@ -405,7 +405,7 @@ export default function LightningRound({
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, delay: 0.2 }}
             >
-              <Trophy className="w-20 h-20 mx-auto text-neo-lime" />
+              <Trophy className="w-14 h-14 sm:w-20 sm:h-20 mx-auto text-neo-lime" />
             </AdaptiveMotion.div>
             <AdaptiveMotion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -444,7 +444,7 @@ export default function LightningRound({
               </AdaptiveMotion.div>
               
               {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                 <AdaptiveMotion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

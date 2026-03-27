@@ -149,7 +149,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
   // ==================== Shared Header ====================
   const renderHeader = () => (
-    <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+    <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isHost && <DJMascotWithEntrance size="sm" delay={0.3} />}
@@ -343,7 +343,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             <MobileShareSection gameCode={gameCode} t={t} />
           </motion.div>
           <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={4}>
-            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
+            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-48 sm:h-64 lg:h-80">
               <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
             </div>
           </motion.div>

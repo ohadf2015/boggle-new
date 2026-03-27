@@ -269,6 +269,11 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return false;
       }
 
+      // Capture userId eagerly — the `user` object may change by the time
+      // the setProgression updater runs, causing a stale-closure where
+      // user.id is undefined and the local state merge silently breaks.
+      const userId = user.id;
+
       // If an identical-or-worse save is already in-flight, piggyback on it.
       // Include stars in the key so a higher-star save always fires a new request.
       const levelKey = `${world}-${level}-${stars}`;
@@ -345,7 +350,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           if (!prev) {
             // No previous progression - create new one with the completion
             return {
-              userId: user.id,
+              userId,
               playerLevel: data.progression.playerLevel,
               xp: data.progression.xp,
               currentWorld: data.progression.currentWorld,

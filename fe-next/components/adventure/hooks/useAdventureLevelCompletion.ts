@@ -138,7 +138,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
   const handleEarnAchievementRef = useRef(handleEarnAchievement);
   const updateWordAlbumRef = useRef(props.updateWordAlbum);
 
-  // Keep callback refs in sync and reset completion flag on level change
+  // Keep callback refs in sync (separated from reset to avoid clearing
+  // completion guards when only a callback reference changes — H8 fix)
   useEffect(() => {
     recordAttemptRef.current = recordAttempt;
     recordCompletionRef.current = recordCompletion;
@@ -146,12 +147,15 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     endAIDirectorRef.current = endAIDirector;
     handleEarnAchievementRef.current = handleEarnAchievement;
     updateWordAlbumRef.current = props.updateWordAlbum;
+  }); // runs every render — ref sync is cheap, no deps needed
+
+  // Reset completion flags ONLY on actual level change
+  useEffect(() => {
     completionProcessedRef.current = false;
     attemptRecordedRef.current = false;
     completionSavedRef.current = false;
     completionSaveFailedRef.current = false;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs synced intentionally without triggering re-render
-  }, [recordAttempt, recordCompletion, props.saveCompletion, endAIDirector, handleEarnAchievement, levelConfig.world, levelConfig.level]);
+  }, [levelConfig.world, levelConfig.level]);
 
   // Calculate estimated XP and gold for UI display on level completion.
   // Actual state updates happen server-side via ProgressionContext.completeLevel().

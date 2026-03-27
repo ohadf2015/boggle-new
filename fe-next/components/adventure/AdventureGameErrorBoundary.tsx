@@ -20,6 +20,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  retryCount: number;
 }
 
 /** Functional wrapper to provide translations to the class component fallback */
@@ -73,7 +74,7 @@ function GameErrorFallback({ onExit, onRetry, error }: { onExit: () => void; onR
 export class AdventureGameErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, retryCount: 0 };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -85,7 +86,10 @@ export class AdventureGameErrorBoundary extends Component<Props, State> {
   }
 
   handleRetry = (): void => {
-    this.setState({ hasError: false, error: null });
+    // Increment retryCount to change the key on children, forcing a full
+    // remount. This resets all useReducer state, refs (isSubmittingRef,
+    // hasTriggered, completionSavedRef, etc.) that would otherwise persist.
+    this.setState(prev => ({ hasError: false, error: null, retryCount: prev.retryCount + 1 }));
   };
 
   render(): ReactNode {
@@ -98,6 +102,7 @@ export class AdventureGameErrorBoundary extends Component<Props, State> {
         />
       );
     }
-    return this.props.children;
+    // Key forces full remount on retry — resets all hooks, refs, and reducer state
+    return <div key={this.state.retryCount}>{this.props.children}</div>;
   }
 }

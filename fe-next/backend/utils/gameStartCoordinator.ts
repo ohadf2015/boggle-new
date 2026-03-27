@@ -409,6 +409,16 @@ class GameStartCoordinator {
   hasActiveSequence(gameCode: string): boolean {
     return this.activeSequences.has(gameCode);
   }
+
+  /**
+   * Clear all active sequences (for graceful shutdown or tests).
+   * Cancels all timeouts to prevent orphaned callbacks.
+   */
+  clearAll(): void {
+    for (const gameCode of Array.from(this.activeSequences.keys())) {
+      this.cancelSequence(gameCode);
+    }
+  }
 }
 
 // Export singleton instance

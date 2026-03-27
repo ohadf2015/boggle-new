@@ -5882,6 +5882,7 @@ const he = {
     "progressNotSaved": "לא הצלחנו לשמור את ההתקדמות. התחבר כדי לשמור את ההרפתקה!",
     "levelComplete": "השלב הושלם!",
     "starsEarned": "כוכבים שנצברו",
+    "bestStars": "שיא",
     "continueToNext": "המשך",
     "nextWorld": "העולם הבא",
     "retryLevel": "נסה שוב",

@@ -6087,6 +6087,7 @@ const en = {
     "progressNotSaved": "Couldn't save your progress. Sign in to keep your adventure!",
     "levelComplete": "Level Complete!",
     "starsEarned": "Stars Earned",
+    "bestStars": "Best",
     "continueToNext": "Continue",
     "nextWorld": "Next World",
     "nextUp": "Next Up",
