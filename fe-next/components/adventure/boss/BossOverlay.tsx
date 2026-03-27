@@ -516,6 +516,7 @@ const BossOverlay = memo<BossOverlayProps>(
                   >
                     {/* Mini enraged boss portrait */}
                     <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-red overflow-hidden flex-shrink-0 shadow-hard-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={boss.images?.enraged ?? boss.imagePath}
                         alt=""
