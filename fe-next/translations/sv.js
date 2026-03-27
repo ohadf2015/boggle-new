@@ -3153,7 +3153,20 @@ const sv = {
     "hint": "💡 Hitta fler ord för att klättra!",
     "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0.",
     "wordsPerMin": "Ord/min",
-    "topCreators": "Toppkreatörer"
+    "topCreators": "Toppkreatörer",
+    "tierUp": {
+      "title": "Nivå upp!",
+      "message": "Du har nått {tier}!"
+    },
+    "tiers": {
+      "stone": "Sten",
+      "bronze": "Brons",
+      "silver": "Silver",
+      "gold": "Guld",
+      "platinum": "Platina",
+      "diamond": "Diamant",
+      "grandmaster": "Grandmästare"
+    }
   },
   "ugc": {
     "createBoard": "Skapa bräda",

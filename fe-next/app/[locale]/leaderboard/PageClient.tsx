@@ -24,6 +24,14 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
+import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
+import { useTierPromotion } from '@/hooks/useTierPromotion';
+import {
+  getGlobalLeaderboardTier,
+  getLeaderboardTierProgress,
+  getNextTierThreshold,
+  GLOBAL_LEADERBOARD_TIERS,
+} from '@/lib/ranked/leaderboardTiers';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
@@ -55,6 +63,13 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   } = useLeaderboard({ limit: 100, enabled: isSupabaseEnabled });
 
   const { rank: userRank } = useUserRank(user?.id);
+
+  // Compute current user's tier for promotion detection
+  const currentUserTier = userRank?.total_score != null
+    ? getGlobalLeaderboardTier(userRank.total_score)
+    : null;
+
+  useTierPromotion({ userId: user?.id, currentTier: currentUserTier, t });
 
   const handleRefresh = async () => {
     refetch();
@@ -225,15 +240,30 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
                       #{userRank.rank_position || '—'}
                     </p>
+                    {currentUserTier && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <TierBadge tier={currentUserTier} size="sm" showLabel />
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className={cn('text-sm', 'text-gray-600')}>
-                    {t('leaderboard.score')}
-                  </p>
-                  <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                    {userRank.total_score?.toLocaleString() || 0}
-                  </p>
+                <div className="text-right flex flex-col items-end gap-2">
+                  <div>
+                    <p className={cn('text-sm', 'text-gray-600')}>
+                      {t('leaderboard.score')}
+                    </p>
+                    <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                      {userRank.total_score?.toLocaleString() || 0}
+                    </p>
+                  </div>
+                  {currentUserTier && (
+                    <TierProgressBar
+                      tier={currentUserTier}
+                      progress={getLeaderboardTierProgress(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
+                      nextThreshold={getNextTierThreshold(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
+                      className="w-32"
+                    />
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -344,7 +374,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       <Link
                         href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
                         className={cn(
-                          'font-medium truncate text-sm flex-1 hover:underline',
+                          'font-medium truncate text-sm hover:underline',
                           isCurrentUser
                             ? isDarkMode
                               ? 'text-cyan-400'
@@ -356,6 +386,11 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       >
                         {entry.display_name || entry.username}
                       </Link>
+                      <TierBadge
+                        tier={getGlobalLeaderboardTier(entry.total_score ?? 0)}
+                        size="xs"
+                        animated={isCurrentUser}
+                      />
                       <div className={cn(
                         'sm:hidden font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'
