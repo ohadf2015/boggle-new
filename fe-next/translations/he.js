@@ -3539,7 +3539,20 @@ const he = {
     "hint": "מצא מילים ארוכות כדי לעלות בדירוג! 💡",
     "multiplayerTip": "מילים ייחודיות = נקודות! מילים משותפות = אפס 🎯",
     "wordsPerMin": "מילים/דקה",
-    "topCreators": "יוצרים מובילים"
+    "topCreators": "יוצרים מובילים",
+    "tierUp": {
+      "title": "עלייה בדרגה!",
+      "message": "הגעת ל-{tier}!"
+    },
+    "tiers": {
+      "stone": "אבן",
+      "bronze": "ברונזה",
+      "silver": "כסף",
+      "gold": "זהב",
+      "platinum": "פלטינה",
+      "diamond": "יהלום",
+      "grandmaster": "גרנדמאסטר"
+    }
   },
   "ugc": {
     "createBoard": "צור לוח",

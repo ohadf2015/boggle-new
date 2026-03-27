@@ -3625,7 +3625,20 @@ const en = {
     "hint": "Tap names to see their words!",
     "multiplayerTip": "Unique words score more!",
     "wordsPerMin": "Words/min",
-    "topCreators": "Top Creators"
+    "topCreators": "Top Creators",
+    "tierUp": {
+      "title": "Tier Up!",
+      "message": "You've reached {tier}!"
+    },
+    "tiers": {
+      "stone": "Stone",
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond",
+      "grandmaster": "Grandmaster"
+    }
   },
   "ugc": {
     "createBoard": "Create Board",

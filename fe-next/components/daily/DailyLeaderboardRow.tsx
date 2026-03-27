@@ -7,6 +7,8 @@ import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
+import { TierBadge } from '@/components/ui/TierBadge';
+import { getDailyLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import { getRankColors, getRankBadgeColors } from './leaderboardUtils';
 import type { DailyParticipant, AllTimeParticipant } from './TabbedDailyLeaderboard';
 
@@ -92,6 +94,13 @@ export const TodayParticipantRow = memo<{
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU
             </span>
+          )}
+          {participant.score != null && (
+            <TierBadge
+              tier={getDailyLeaderboardTier(participant.score)}
+              size="xs"
+              animated={rank === 1}
+            />
           )}
           {rank === 1 && (
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-tier-gold shrink-0 animate-pulse" />
@@ -209,6 +218,13 @@ export const AllTimeParticipantRow = memo<{
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU
             </span>
+          )}
+          {participant.best_efficiency != null && (
+            <TierBadge
+              tier={getDailyLeaderboardTier(participant.best_efficiency)}
+              size="xs"
+              animated={rank === 1}
+            />
           )}
           {rank === 1 && (
             <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />

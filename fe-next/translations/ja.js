@@ -3153,7 +3153,20 @@ const ja = {
     "hint": "💡 もっと単語を見つけて順位を上げよう！",
     "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。",
     "wordsPerMin": "語/分",
-    "topCreators": "トップクリエイター"
+    "topCreators": "トップクリエイター",
+    "tierUp": {
+      "title": "ランクアップ！",
+      "message": "{tier}に昇格しました！"
+    },
+    "tiers": {
+      "stone": "ストーン",
+      "bronze": "ブロンズ",
+      "silver": "シルバー",
+      "gold": "ゴールド",
+      "platinum": "プラチナ",
+      "diamond": "ダイヤモンド",
+      "grandmaster": "グランドマスター"
+    }
   },
   "ugc": {
     "createBoard": "ボードを作成",
