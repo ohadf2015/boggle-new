@@ -58,6 +58,10 @@ const customJestConfig = {
     'ClassroomGameLobby.test.tsx',
     'useAdaptiveDifficulty.test.ts',
     'MusicContext.duplicateProvider.test.tsx',
+    // These are Vitest tests (use vi.mock) — Jest can't run them; exclude to prevent false failures
+    'app/api/adventure/state/__tests__/route.test.ts',
+    'app/api/adventure/progress/__tests__/route.test.ts',
+    'app/api/adventure/complete/__tests__/route.test.ts',
   ],
 
   // Prevent jest-haste-map from indexing the local remotion/ folder as the 'remotion' module
