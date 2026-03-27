@@ -12,6 +12,8 @@ import type { Namespace } from 'socket.io';
 import type { DuelSocket, forfeitDuelSchema } from './types';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import { getSupabase } from '@/backend/modules/supabase/client';
+import { realtimeGames } from './realtime';
+import timerManager from '@/backend/utils/timerManager';
 import logger from '@/backend/utils/logger';
 
 // ==========================================
@@ -217,16 +219,19 @@ export async function handleReconnection(
       opponentId: userId,
     });
 
-    // Sync game state to reconnecting player
-    // Note: In a full implementation, we'd sync from realtime game state
-    // For now, we emit a basic state sync
+    // Sync game state from in-memory realtime state (or fall back to DB)
+    const gameState = realtimeGames.get(duel.id);
+    const timeRemaining = gameState
+      ? Math.max(0, gameState.timeLimit - Math.floor((Date.now() - new Date(gameState.startTime).getTime()) / 1000))
+      : 0;
+
     socket.emit('duel:state-synced', {
       duelId: duel.id,
-      challengerScore: duel.challenger_score || 0,
-      opponentScore: duel.opponent_score || 0,
-      challengerWords: [],
-      opponentWords: [],
-      timeRemaining: 0, // Would calculate from start time in full implementation
+      challengerScore: gameState?.challengerScore ?? (duel.challenger_score || 0),
+      opponentScore: gameState?.opponentScore ?? (duel.opponent_score || 0),
+      challengerWords: gameState?.challengerWords ?? [],
+      opponentWords: gameState?.opponentWords ?? [],
+      timeRemaining,
     });
 
     logger.info('DUEL', `User ${userId} reconnected to duel ${duel.id}`);
@@ -301,6 +306,10 @@ async function forfeitDuel(
     }
 
     namespace.to(duelRoom).emit('duel:completed', eventData);
+
+    // Clean up in-memory state and timers (mirrors completeRealtimeDuel cleanup)
+    timerManager.clearTimer(`duel:${duelId}`);
+    realtimeGames.delete(duelId);
 
     logger.info(
       'DUEL',

@@ -490,6 +490,10 @@ function clearPlayersReadyForNextGame(gameCode: string): void {
   persistGameState(gameCode);
 }
 
+function unmarkPlayerReady(gameCode: string, username: string): void {
+  readyStateManager.removePlayerFromReadyList(asBase<ReadyStateGameBase>(games[gameCode]), username);
+}
+
 // Game Queries Delegation
 const getAllGames = () => gameQueryManager.getAllGames(games as unknown as Record<string, QueryGameBase>);
 const getDetailedGames = () => gameQueryManager.getDetailedGames(games as unknown as Record<string, QueryGameBase>);

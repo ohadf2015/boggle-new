@@ -12,6 +12,12 @@ jest.mock('../utils/rateLimiter');
 jest.mock('../utils/metrics');
 jest.mock('../handlers/shared');
 jest.mock('../utils/socketValidation');
+jest.mock('../utils/sanitize', () => ({
+  sanitizeHtml: jest.fn((text) => text),
+}));
+jest.mock('../middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+}));
 
 const { registerChatHandlers } = require('../handlers/chatHandler');
 const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
@@ -68,11 +74,11 @@ describe('Chat Handler', () => {
       expect(mockSocket.on).toHaveBeenCalledWith('chatMessage', expect.any(Function));
     });
 
-    it('should broadcast chat message to room', () => {
+    it('should broadcast chat message to room', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello world',
         gameCode: 'ABCDEF'
       });
@@ -89,11 +95,11 @@ describe('Chat Handler', () => {
       );
     });
 
-    it('should store message in game chat history', () => {
+    it('should store message in game chat history', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello world',
         gameCode: 'ABCDEF'
       });
@@ -107,11 +113,11 @@ describe('Chat Handler', () => {
       });
     });
 
-    it('should mark host messages correctly', () => {
+    it('should mark host messages correctly', async () => {
       const game = { hostSocketId: 'socket-123', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello from host',
         gameCode: 'ABCDEF'
       });
@@ -127,7 +133,7 @@ describe('Chat Handler', () => {
       );
     });
 
-    it('should limit chat history to 100 messages', () => {
+    it('should limit chat history to 100 messages', async () => {
       const existingHistory = Array(100).fill(null).map((_, i) => ({
         message: `old-${i}`,
         username: 'User',
@@ -141,7 +147,7 @@ describe('Chat Handler', () => {
       };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'New message',
         gameCode: 'ABCDEF'
       });
@@ -150,10 +156,10 @@ describe('Chat Handler', () => {
       expect(game.chatHistory[99].message).toBe('New message');
     });
 
-    it('should emit error if game not found', () => {
+    it('should emit error if game not found', async () => {
       getGame.mockReturnValue(null);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello',
         gameCode: 'INVALID'
       });
@@ -254,12 +260,12 @@ describe('Chat Handler', () => {
   });
 
   describe('message timestamps', () => {
-    it('should include timestamp in broadcast', () => {
+    it('should include timestamp in broadcast', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
       const beforeTime = Date.now();
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello',
         gameCode: 'ABCDEF'
       });

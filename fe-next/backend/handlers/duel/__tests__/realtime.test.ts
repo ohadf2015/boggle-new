@@ -20,6 +20,11 @@ jest.mock('@/backend/modules/scoringEngine.types');
 jest.mock('@/backend/utils/logger');
 jest.mock('@/backend/modules/educationXpManager');
 
+const mockedGetSupabase = jest.mocked(getSupabase);
+const mockedIsDictionaryWord = jest.mocked(isDictionaryWord);
+const mockedIsWordOnBoardAsync = jest.mocked(isWordOnBoardAsync);
+const mockedCalculateWordScore = jest.mocked(calculateWordScore);
+
 describe('Real-Time Duel Handlers', () => {
   let mockSocket: Partial<DuelSocket>;
   let mockNamespace: Partial<Namespace>;
@@ -77,7 +82,7 @@ describe('Real-Time Duel Handlers', () => {
 
     // Mock getSupabase
 
-    getSupabase.mockReturnValue(mockSupabaseClient);
+    mockedGetSupabase.mockReturnValue(mockSupabaseClient);
   });
 
   afterEach(() => {
@@ -130,7 +135,7 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock dictionary validation
 
-      isDictionaryWord.mockReturnValue(false);
+      mockedIsDictionaryWord.mockReturnValue(false);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
@@ -168,10 +173,10 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      isDictionaryWord.mockReturnValue(true);
+      mockedIsDictionaryWord.mockReturnValue(true);
 
 
-      isWordOnBoardAsync.mockResolvedValue(false);
+      mockedIsWordOnBoardAsync.mockResolvedValue(false);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
@@ -209,10 +214,10 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      isDictionaryWord.mockReturnValue(true);
+      mockedIsDictionaryWord.mockReturnValue(true);
 
 
-      isWordOnBoardAsync.mockResolvedValue(true);
+      mockedIsWordOnBoardAsync.mockResolvedValue(true);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
@@ -285,13 +290,13 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      isDictionaryWord.mockReturnValue(true);
+      mockedIsDictionaryWord.mockReturnValue(true);
 
 
-      isWordOnBoardAsync.mockResolvedValue(true);
+      mockedIsWordOnBoardAsync.mockResolvedValue(true);
 
 
-      calculateWordScore.mockReturnValue(3);
+      mockedCalculateWordScore.mockReturnValue(3);
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
@@ -334,13 +339,13 @@ describe('Real-Time Duel Handlers', () => {
       });
 
 
-      isDictionaryWord.mockReturnValue(true);
+      mockedIsDictionaryWord.mockReturnValue(true);
 
 
-      isWordOnBoardAsync.mockResolvedValue(true);
+      mockedIsWordOnBoardAsync.mockResolvedValue(true);
 
 
-      calculateWordScore.mockReturnValue(3);
+      mockedCalculateWordScore.mockReturnValue(3);
 
       // Mock socket.to() to emit to room
       const mockRoomEmit = jest.fn();

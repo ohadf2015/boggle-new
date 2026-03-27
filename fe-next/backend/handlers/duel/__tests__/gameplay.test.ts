@@ -18,6 +18,11 @@ jest.mock('@/backend/dictionary');
 jest.mock('@/backend/modules/scoringEngine.types');
 jest.mock('@/backend/utils/logger');
 
+const mockedGetSupabase = jest.mocked(getSupabase);
+const mockedIsDictionaryWord = jest.mocked(isDictionaryWord);
+const mockedIsWordOnBoardAsync = jest.mocked(isWordOnBoardAsync);
+const mockedCalculateWordScore = jest.mocked(calculateWordScore);
+
 describe('Duel Gameplay Handlers', () => {
   let mockSocket: Partial<DuelSocket>;
   let mockNamespace: Partial<Namespace>;
@@ -68,7 +73,7 @@ describe('Duel Gameplay Handlers', () => {
 
     // Mock getSupabase
 
-    getSupabase.mockReturnValue(mockSupabaseClient);
+    mockedGetSupabase.mockReturnValue(mockSupabaseClient);
   });
 
   describe('duel:submit-score', () => {
@@ -162,18 +167,18 @@ describe('Duel Gameplay Handlers', () => {
 
       // Mock word validation
 
-      isDictionaryWord.mockImplementation((word: string) => {
+      mockedIsDictionaryWord.mockImplementation((word: string) => {
         return ['test', 'word'].includes(word.toLowerCase());
       });
 
 
-      isWordOnBoardAsync.mockImplementation((word: string) => {
+      mockedIsWordOnBoardAsync.mockImplementation((word: string) => {
         return Promise.resolve(['test', 'word'].includes(word.toLowerCase()));
       });
 
       // Mock score calculation
 
-      calculateWordScore.mockImplementation((word: string) => word.length - 1);
+      mockedCalculateWordScore.mockImplementation((word: string) => word.length - 1);
 
       // Register handlers
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
@@ -428,13 +433,13 @@ describe('Duel Gameplay Handlers', () => {
       let duelTurnsCallCount = 0;
 
 
-      isDictionaryWord.mockReturnValue(true);
+      mockedIsDictionaryWord.mockReturnValue(true);
 
 
-      isWordOnBoardAsync.mockResolvedValue(true);
+      mockedIsWordOnBoardAsync.mockResolvedValue(true);
 
 
-      calculateWordScore.mockReturnValue(5);
+      mockedCalculateWordScore.mockReturnValue(5);
 
       // Build the completion update chain: update -> eq -> eq -> select
       const completionUpdateMock = options.completionResult

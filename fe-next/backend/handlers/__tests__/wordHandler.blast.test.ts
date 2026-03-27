@@ -64,6 +64,10 @@ jest.mock('../../../backend/utils/rateLimiter', () => ({
   checkRateLimit: jest.fn().mockReturnValue(true),
 }));
 
+jest.mock('../../../backend/middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+}));
+
 jest.mock('../../../backend/utils/metrics', () => ({
   inc: jest.fn(),
   incPerGame: jest.fn(),

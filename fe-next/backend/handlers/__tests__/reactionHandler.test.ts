@@ -9,6 +9,9 @@ jest.mock('../../utils/socketHelpers');
 jest.mock('../../utils/rateLimiter');
 jest.mock('../../utils/metrics', () => ({ inc: jest.fn() }));
 jest.mock('../shared');
+jest.mock('../../middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+}));
 
 const mockGetGameBySocketId = getGameBySocketId as jest.Mock;
 const mockGetUsernameBySocketId = getUsernameBySocketId as jest.Mock;
@@ -24,6 +27,7 @@ function createMockSocket() {
       id: 'socket-123',
       on: jest.fn((event: string, handler: Function) => { handlers[event] = handler; }),
       to: jest.fn(() => ({ emit: toEmit })),
+      emit: jest.fn(),
     },
     handlers,
     toEmit,
@@ -48,22 +52,22 @@ describe('reactionHandler', () => {
     expect(socket.on).toHaveBeenCalledWith('quickReaction', expect.any(Function));
   });
 
-  it('should broadcast valid reaction to room', () => {
+  it('should broadcast valid reaction to room', async () => {
     const { socket, handlers, toEmit } = createMockSocket();
     registerReactionHandlers(mockIo, socket as any);
 
-    handlers['quickReaction']({ reactionId: 'fire', username: 'Alice' });
+    await handlers['quickReaction']({ reactionId: 'fire', username: 'Alice' });
 
     expect(socket.to).toHaveBeenCalledWith('game:GAME1');
     expect(toEmit).toHaveBeenCalledWith('quickReaction', { reactionId: 'fire', username: 'Alice' });
   });
 
-  it('should use server-side username not client-sent', () => {
+  it('should use server-side username not client-sent', async () => {
     const { socket, handlers, toEmit } = createMockSocket();
     registerReactionHandlers(mockIo, socket as any);
 
     // Client sends spoofed username
-    handlers['quickReaction']({ reactionId: 'clap', username: 'FakeUser' });
+    await handlers['quickReaction']({ reactionId: 'clap', username: 'FakeUser' });
 
     expect(toEmit).toHaveBeenCalledWith('quickReaction', { reactionId: 'clap', username: 'Alice' });
   });

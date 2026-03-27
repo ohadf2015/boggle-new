@@ -12,6 +12,8 @@ import { getSupabase } from '@/backend/modules/supabase/client';
 jest.mock('@/backend/modules/supabase/client');
 jest.mock('@/backend/utils/logger');
 
+const mockedGetSupabase = jest.mocked(getSupabase);
+
 // Enable fake timers for grace period testing
 jest.useFakeTimers();
 
@@ -76,7 +78,7 @@ describe('Duel Disconnection Handlers', () => {
 
     // Mock getSupabase
 
-    getSupabase.mockReturnValue(mockSupabaseClient);
+    mockedGetSupabase.mockReturnValue(mockSupabaseClient);
   });
 
   afterEach(() => {

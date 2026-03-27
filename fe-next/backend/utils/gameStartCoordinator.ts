@@ -306,7 +306,8 @@ class GameStartCoordinator {
     sequence.ackTimeout = setTimeout(() => {
       const currentSequence = this.activeSequences.get(gameCode);
 
-      if (!currentSequence || currentSequence.cancelled || currentSequence.timerStarted) {
+      // Guard: sequence gone, cancelled, timer already started, or ackTimeout was cleared by another path
+      if (!currentSequence || currentSequence.cancelled || currentSequence.timerStarted || !currentSequence.ackTimeout) {
         return;
       }
 

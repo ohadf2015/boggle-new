@@ -30,6 +30,16 @@ jest.mock('../../redisClient', () => ({
   })),
 }));
 
+jest.mock('../../redis/circuitBreaker', () => ({
+  circuitBreaker: {
+    getState: jest.fn(() => ({ state: 'CLOSED', failureCount: 0 })),
+  },
+}));
+
+jest.mock('../../db/supabasePool', () => ({
+  checkPoolHealth: jest.fn().mockResolvedValue({ ok: true, latencyMs: 5 }),
+}));
+
 jest.mock('../../modules/gameStateManager', () => ({
   getAllGames: jest.fn(() => []),
 }));
@@ -120,12 +130,13 @@ describe('Health Routes', () => {
       expect(res.body.checks.redis.error).toContain('Connection refused');
     });
 
-    it('skips Supabase check when env vars missing', async () => {
-      delete process.env.NEXT_PUBLIC_SUPABASE_URL;
-      delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    it('returns degraded when Supabase pool check fails', async () => {
+      const { checkPoolHealth } = require('../../db/supabasePool');
+      (checkPoolHealth as jest.Mock).mockResolvedValueOnce({ ok: false, latencyMs: 10, error: 'No pool' });
 
       const res = await request(app).get('/health/ready');
-      expect(res.body.checks.supabase.status).toBe('skipped');
+      expect(res.body.checks.supabase.status).toBe('error');
+      expect(res.body.status).toBe('degraded');
     });
   });
 });

@@ -41,24 +41,28 @@ export function useAdventureCurrency(
   const goldRef = useRef(initialGold);
   const upgradesRef = useRef<UpgradeState>(initialUpgrades);
 
-  // Sync upgrades when initialUpgrades changes (e.g., async progression load)
-  // useState only reads initialUpgrades on first mount; this effect handles
-  // subsequent prop changes when progression data arrives from the server.
+  // Sync from server-authoritative values when they change.
+  // This handles both initial load AND rollback after failed purchases
+  // (ProgressionContext calls fetchProgression on purchase failure, which
+  // updates initialGold/initialUpgrades, triggering this sync).
+  const initialGoldRef = useRef(initialGold);
   const initialUpgradesRef = useRef(initialUpgrades);
   useEffect(() => {
-    // Skip if same reference or if initial value (already set by useState)
-    if (initialUpgrades === initialUpgradesRef.current) return;
-    // Only sync if local state hasn't diverged (no local purchases yet)
-    const localKeys = Object.keys(upgradesRef.current);
-    const initialKeys = Object.keys(initialUpgradesRef.current);
-    const hasLocalChanges = localKeys.length !== initialKeys.length ||
-      localKeys.some(k => upgradesRef.current[k] !== initialUpgradesRef.current[k]);
-    if (!hasLocalChanges) {
+    const goldChanged = initialGold !== initialGoldRef.current;
+    const upgradesChanged = initialUpgrades !== initialUpgradesRef.current;
+    if (!goldChanged && !upgradesChanged) return;
+
+    if (goldChanged) {
+      setGold(initialGold);
+      goldRef.current = initialGold;
+      initialGoldRef.current = initialGold;
+    }
+    if (upgradesChanged) {
       setUpgrades(initialUpgrades);
       upgradesRef.current = initialUpgrades;
+      initialUpgradesRef.current = initialUpgrades;
     }
-    initialUpgradesRef.current = initialUpgrades;
-  }, [initialUpgrades]);
+  }, [initialGold, initialUpgrades]);
 
   const addGold = useCallback(
     (amount: number) => {

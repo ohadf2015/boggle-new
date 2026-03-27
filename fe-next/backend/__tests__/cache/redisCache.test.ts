@@ -17,6 +17,25 @@ jest.mock('ioredis', () => {
       const matched = [...store.keys()].filter((k) => k.startsWith(prefix));
       return Promise.resolve(matched);
     }),
+    scanStream: jest.fn((opts: { match: string; count?: number }) => {
+      const prefix = opts.match.replace('*', '');
+      const matched = [...store.keys()].filter((k) => k.startsWith(prefix));
+      // Return an async iterable that yields one chunk
+      return {
+        [Symbol.asyncIterator]() {
+          let done = false;
+          return {
+            next() {
+              if (!done) {
+                done = true;
+                return Promise.resolve({ value: matched, done: false });
+              }
+              return Promise.resolve({ value: undefined, done: true });
+            },
+          };
+        },
+      };
+    }),
     quit: jest.fn(() => Promise.resolve()),
   }));
 });
