@@ -58,8 +58,7 @@ import {
 
 import { StatsCardGrid } from '@/components/results/shared';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
-import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
-import type { SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
+import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
@@ -202,6 +201,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const gameLanguage = results.language || language;
 
+  const shareData: SingleplayerShareData = useMemo(() => ({
+    mode: 'singleplayer' as const,
+    score: results.playerScore,
+    words: results.playerWords || [],
+    maxCombo: results.maxCombo,
+    rank: mode === 'solo-bots' ? playerRank : undefined,
+    totalPlayers: mode === 'solo-bots' ? allParticipants.length : undefined,
+    isNewHighScore: results.isNewHighScore,
+  }), [results.playerScore, results.playerWords, results.maxCombo, results.isNewHighScore, mode, playerRank, allParticipants.length]);
+
   // --- LANDSCAPE MODE ---
   if (isLandscape) {
     const bannerLabels = {
@@ -295,16 +304,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       { label: t('results.coinsEarned'), value: coinReward ? `+${coinReward.awarded}` : '-', icon: '🪙', accent: 'amber' as const },
     ]} />
   );
-
-  const shareData: SingleplayerShareData = useMemo(() => ({
-    mode: 'singleplayer' as const,
-    score: results.playerScore,
-    words: results.playerWords || [],
-    maxCombo: results.maxCombo,
-    rank: mode === 'solo-bots' ? playerRank : undefined,
-    totalPlayers: mode === 'solo-bots' ? allParticipants.length : undefined,
-    isNewHighScore: results.isNewHighScore,
-  }), [results.playerScore, results.playerWords, results.maxCombo, results.isNewHighScore, mode, playerRank, allParticipants.length]);
 
   const shareBlock = results.playerScore > 0 ? (
     <GameEmojiShareCard data={shareData} t={t} />
