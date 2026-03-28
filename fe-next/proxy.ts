@@ -54,7 +54,17 @@ export async function proxy(request: NextRequest) {
 
   const isBot = isBotRequest(request);
 
-  // Create Supabase client for session refresh (skip for bots — no session)
+  // Routes that need Supabase session refresh (game pages, API, auth)
+  // Public routes (landing, SEO, static pages) skip auth for faster navigation
+  const AUTH_ROUTES = [
+    '/api', '/multiplayer', '/singleplayer', '/adventure', '/daily',
+    '/challenge', '/join', '/brain', '/custom', '/party-screen',
+    '/teacher', '/student', '/auth', '/settings', '/profile',
+  ];
+  const pathWithoutLocale = pathname.replace(/^\/(en|he|sv|ja|es)/, '');
+  const needsAuth = AUTH_ROUTES.some(route => pathWithoutLocale.startsWith(route));
+
+  // Create Supabase client for session refresh (skip for bots and public pages)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -62,7 +72,7 @@ export async function proxy(request: NextRequest) {
     request,
   });
 
-  if (!isBot && supabaseUrl && supabaseAnonKey) {
+  if (needsAuth && !isBot && supabaseUrl && supabaseAnonKey) {
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
@@ -101,8 +111,14 @@ export async function proxy(request: NextRequest) {
   }
 
   // API routes: allow through after auth refresh — never locale-redirect
+  // Also handle locale-prefixed API calls (e.g., /he/api/...) by rewriting
+  // to strip the locale prefix — prevents 404s from relative URL resolution.
   if (pathname.startsWith('/api')) {
     return response;
+  }
+  if (pathWithoutLocale.startsWith('/api') && pathnameHasLocale) {
+    const apiUrl = new URL(`${pathWithoutLocale}${search}`, request.url);
+    return NextResponse.rewrite(apiUrl, { request, headers: response.headers });
   }
 
   // Handle paths without locale prefix

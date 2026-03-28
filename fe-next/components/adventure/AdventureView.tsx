@@ -99,9 +99,15 @@ function AdventureView(): React.JSX.Element {
     enabled: true,
   });
 
-  const totalStars = progression?.totalStars ?? 0;
   const playerLevel = progression?.playerLevel ?? 1;
   const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);
+  // Derive totalStars from completions (source of truth) instead of
+  // progression.totalStars which can be stale after level completion.
+  // This ensures the modal and level cards always show consistent star counts.
+  const totalStars = useMemo(
+    () => completions.reduce((sum, c) => sum + c.stars, 0),
+    [completions]
+  );
 
   const masteryTiers = useMemo(() => {
     const tiers: Record<number, MasteryTier> = {};

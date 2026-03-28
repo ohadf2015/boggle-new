@@ -117,7 +117,7 @@ export async function validateWordWithAI(word: string, language: string = 'en'):
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('AI_SERVICE', `AI validation failed for "${word}" after ${duration}ms: ${errorMessage}`);
+    logger.warn('AI_SERVICE', `AI validation failed for "${word}" after ${duration}ms: ${errorMessage}`);
     return { isValid: false, isAiVerified: false, reason: 'Validation error' };
   }
 }

@@ -500,7 +500,7 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
   currentLevel: 6,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  totalStars: 15,
+  totalStars: 12,
   playerLevel: 3,
   completions: [
     { world: 1, level: 1, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
@@ -612,7 +612,8 @@ describe('AdventureView Integration', () => {
   describe('World Map View', () => {
     it('should display player stats in header', () => {
       renderAdventureView(); // auto-navigates past hub
-      expect(screen.getByText('15')).toBeInTheDocument();
+      // totalStars derived from completions: 3+2+3+2+2 = 12
+      expect(screen.getByText('12')).toBeInTheDocument();
       expect(screen.getByText('Lv. 3')).toBeInTheDocument();
     });
 
@@ -989,12 +990,28 @@ describe('AdventureView Integration', () => {
       mockProgressionState.progression = createMockProgression({
         totalStars: 42,
         playerLevel: 7,
+        completions: [
+          { world: 1, level: 1, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 1, level: 2, stars: 3, bestScore: 1200, bestWords: 12, completedAt: new Date().toISOString() },
+          { world: 1, level: 3, stars: 3, bestScore: 1800, bestWords: 18, completedAt: new Date().toISOString() },
+          { world: 1, level: 4, stars: 3, bestScore: 1100, bestWords: 11, completedAt: new Date().toISOString() },
+          { world: 1, level: 5, stars: 3, bestScore: 1300, bestWords: 13, completedAt: new Date().toISOString() },
+          { world: 1, level: 6, stars: 3, bestScore: 1400, bestWords: 14, completedAt: new Date().toISOString() },
+          { world: 1, level: 7, stars: 3, bestScore: 1600, bestWords: 16, completedAt: new Date().toISOString() },
+          { world: 1, level: 8, stars: 3, bestScore: 1700, bestWords: 17, completedAt: new Date().toISOString() },
+          { world: 1, level: 9, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 1, level: 10, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 2, level: 1, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 2, level: 2, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 2, level: 3, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+          { world: 2, level: 4, stars: 3, bestScore: 1500, bestWords: 15, completedAt: new Date().toISOString() },
+        ],
       });
 
       // WHEN
       renderAdventureView();
 
-      // THEN
+      // THEN - 14 completions × 3 stars = 42
       expect(screen.getByText('42')).toBeInTheDocument();
       expect(screen.getByText('Lv. 7')).toBeInTheDocument();
     });

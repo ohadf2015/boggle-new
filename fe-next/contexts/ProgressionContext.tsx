@@ -324,11 +324,16 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             }
           }
 
+          const mergedCompletions = Array.from(mergedMap.values());
+          // Recalculate totalStars from merged completions — this is the
+          // source of truth. Avoids stale Math.max between server/cache
+          // that caused stars to disappear after cache expiry.
+          const recalculatedStars = mergedCompletions.reduce((sum, c) => sum + c.stars, 0);
+
           return {
             ...data.progression,
-            completions: Array.from(mergedMap.values()),
-            // Keep the higher totalStars between server and local
-            totalStars: Math.max(data.progression.totalStars ?? 0, prev.totalStars ?? 0),
+            completions: mergedCompletions,
+            totalStars: recalculatedStars,
             // Keep the higher gold value (server is authoritative after save)
             gold: Math.max(data.progression.gold ?? 0, prev.gold ?? 0),
           };

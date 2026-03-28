@@ -66,7 +66,7 @@ COPY --from=builder /app/backend/*.txt ./backend/
 COPY --from=builder /app/backend/data ./backend/data
 
 # Create cache dir AFTER all COPY steps so it isn't overwritten
-RUN mkdir -p .next/cache && chown nextjs:nodejs .next/cache
+RUN mkdir -p .next/cache && chown -R nextjs:nodejs .next
 
 USER nextjs
 

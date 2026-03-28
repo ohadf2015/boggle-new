@@ -32,13 +32,13 @@ async function loadDictionary(language: string): Promise<string[]> {
 
   switch (language) {
     case 'en': {
-      const { default: englishWords } = await import('an-array-of-english-words');
+      const { default: englishWords } = await import('an-array-of-english-words', { with: { type: 'json' } });
       words = englishWords.map((w: string) => w.toLowerCase());
       break;
     }
 
     case 'es': {
-      const { default: spanishWords } = await import('an-array-of-spanish-words');
+      const { default: spanishWords } = await import('an-array-of-spanish-words', { with: { type: 'json' } });
       words = spanishWords.map((w: string) => w.toLowerCase());
       break;
     }
