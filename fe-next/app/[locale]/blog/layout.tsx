@@ -115,6 +115,9 @@ export default async function BlogLayout({ children, params }: BlogLayoutProps):
     { slug: 'why-word-games-are-addictive', name: 'Why Word Games Are Addictive - The Psychology Explained' },
     { slug: 'best-boggle-alternatives-2026', name: 'Best Boggle Alternatives in 2026' },
     { slug: 'word-games-for-brain-training', name: 'Word Games for Brain Training - The Research' },
+    { slug: 'boggle-vs-wordle', name: 'Boggle vs Wordle - Which Word Game Is Better?' },
+    { slug: 'boggle-vs-scrabble', name: 'Boggle vs Scrabble - Speed vs Strategy' },
+    { slug: 'boggle-vs-words-with-friends', name: 'Boggle vs Words With Friends - Real-Time vs Async' },
   ];
 
   // Safe: all content is from static article metadata, not user input

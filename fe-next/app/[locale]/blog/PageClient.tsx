@@ -108,6 +108,21 @@ const blogPosts: BlogPost[] = [
     image: '/images/blog/vocabulary-building.jpg',
     date: '2026-03-05',
   },
+  {
+    slug: 'boggle-vs-wordle',
+    image: '/images/blog/boggle-vs-wordle.jpg',
+    date: '2026-03-28',
+  },
+  {
+    slug: 'boggle-vs-scrabble',
+    image: '/images/blog/boggle-vs-scrabble.jpg',
+    date: '2026-03-28',
+  },
+  {
+    slug: 'boggle-vs-words-with-friends',
+    image: '/images/blog/boggle-vs-wwf.jpg',
+    date: '2026-03-28',
+  },
 ];
 
 // Localized content for all languages
@@ -207,6 +222,24 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '11 min read',
         category: 'Learning',
       },
+      'boggle-vs-wordle': {
+        title: 'Boggle vs Wordle: One Grid, Two Completely Different Brain Workouts',
+        excerpt: 'Pattern recognition versus deductive logic. Unlimited rounds versus one a day. Which word game actually fits your brain?',
+        readTime: '9 min read',
+        category: 'Comparison',
+      },
+      'boggle-vs-scrabble': {
+        title: 'Boggle vs Scrabble: Speed Demon or Strategic Mastermind?',
+        excerpt: 'One gives you 3 minutes and chaos. The other lets you stare at tiles for 20. Which classic word game is actually better?',
+        readTime: '10 min read',
+        category: 'Comparison',
+      },
+      'boggle-vs-words-with-friends': {
+        title: 'Boggle vs Words With Friends: Real-Time Rush or Async Chess Match?',
+        excerpt: 'Grid scanning at 100mph versus carefully placing tiles over three days. Plus: one of them charges you for power-ups.',
+        readTime: '9 min read',
+        category: 'Comparison',
+      },
     },
   },
   he: {
@@ -303,6 +336,24 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'חזרה מרווחת, זכירה אקטיבית, טריקים מורפולוגיים, ושגרות יומיות שבאמת נתקעות.',
         readTime: '11 דקות קריאה',
         category: 'למידה',
+      },
+      'boggle-vs-wordle': {
+        title: 'בוגל מול וורדל: שני משחקי מילים, שני מוחות שונים לגמרי',
+        excerpt: 'זיהוי דפוסים מול היגיון דדוקטיבי. סיבובים אינסופיים מול פעם ביום. איזה משחק מילים באמת מתאים לכם?',
+        readTime: '9 דקות קריאה',
+        category: 'השוואה',
+      },
+      'boggle-vs-scrabble': {
+        title: 'בוגל מול סקרבל: מהירות או אסטרטגיה?',
+        excerpt: 'אחד נותן לכם 3 דקות וכאוס. השני נותן לכם לבהות באריחים 20 דקות. איזה קלאסיקה באמת יותר טובה?',
+        readTime: '10 דקות קריאה',
+        category: 'השוואה',
+      },
+      'boggle-vs-words-with-friends': {
+        title: 'בוגל מול Words With Friends: מרוץ בזמן אמת או שחמט איטי?',
+        excerpt: 'סריקת לוח ב-100 קמ״ש מול הנחת אריחים לאורך שלושה ימים. ואחד מהם גובה כסף על פאוור-אפס.',
+        readTime: '9 דקות קריאה',
+        category: 'השוואה',
       },
     },
   },
@@ -401,6 +452,24 @@ const contentByLocale: Record<string, PageContent> = {
         readTime: '11 min läsning',
         category: 'Lärande',
       },
+      'boggle-vs-wordle': {
+        title: 'Boggle vs Wordle: Två ordspel, två helt olika hjärnträningar',
+        excerpt: 'Mönsterigenkänning mot deduktiv logik. Obegränsade rundor mot en om dagen. Vilket ordspel passar din hjärna?',
+        readTime: '9 min läsning',
+        category: 'Jämförelse',
+      },
+      'boggle-vs-scrabble': {
+        title: 'Boggle vs Scrabble: Fartdemon eller strategiskt geni?',
+        excerpt: 'Det ena ger dig 3 minuter och kaos. Det andra låter dig stirra på brickor i 20. Vilken klassiker är bäst?',
+        readTime: '10 min läsning',
+        category: 'Jämförelse',
+      },
+      'boggle-vs-words-with-friends': {
+        title: 'Boggle vs Words With Friends: Realtidsrush eller asynkront schack?',
+        excerpt: 'Rutnätsskanning i 100 km/h mot att lägga brickor under tre dagar. Plus: ett av dem tar betalt för power-ups.',
+        readTime: '9 min läsning',
+        category: 'Jämförelse',
+      },
     },
   },
   ja: {
@@ -491,6 +560,24 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: '協調的認知、競争的トラッシュトーク、他の人間がいると脳が文字通りもっと輝く理由。',
         readTime: '10分で読める',
         category: '社会科学',
+      },
+      'boggle-vs-wordle': {
+        title: 'Boggle vs Wordle：同じ「言葉」でも全く違う脳トレ',
+        excerpt: 'パターン認識 vs 演繹的推理。無制限ラウンド vs 1日1回。あなたの脳に合うワードゲームはどっち？',
+        readTime: '9分で読める',
+        category: '比較',
+      },
+      'boggle-vs-scrabble': {
+        title: 'Boggle vs Scrabble：スピード狂か戦略の達人か？',
+        excerpt: '一方は3分間のカオス。もう一方は20分間タイルを見つめる。どっちのクラシックが本当に優れてる？',
+        readTime: '10分で読める',
+        category: '比較',
+      },
+      'boggle-vs-words-with-friends': {
+        title: 'Boggle vs Words With Friends：リアルタイムの疾走 vs 非同期チェス',
+        excerpt: 'グリッドを時速100kmでスキャン vs 3日かけてタイルを配置。しかも片方はパワーアップに課金。',
+        readTime: '9分で読める',
+        category: '比較',
       },
       'vocabulary-building-strategies': {
         title: '30日で500の新しい単語を覚えた方法（具体的に教えます）',
@@ -594,6 +681,24 @@ const contentByLocale: Record<string, PageContent> = {
         excerpt: 'Repetición espaciada, recuerdo activo, trucos morfológicos y rutinas diarias que realmente se quedan.',
         readTime: '11 min de lectura',
         category: 'Aprendizaje',
+      },
+      'boggle-vs-wordle': {
+        title: 'Boggle vs Wordle: Dos Juegos de Palabras, Dos Cerebros Distintos',
+        excerpt: 'Reconocimiento de patrones vs lógica deductiva. Rondas ilimitadas vs una al día. ¿Cuál le va mejor a tu cerebro?',
+        readTime: '9 min de lectura',
+        category: 'Comparación',
+      },
+      'boggle-vs-scrabble': {
+        title: 'Boggle vs Scrabble: ¿Velocidad o Estrategia?',
+        excerpt: 'Uno te da 3 minutos de caos. El otro te deja mirar fichas 20 minutos. ¿Cuál clásico es realmente mejor?',
+        readTime: '10 min de lectura',
+        category: 'Comparación',
+      },
+      'boggle-vs-words-with-friends': {
+        title: 'Boggle vs Words With Friends: Adrenalina en Tiempo Real o Partida Eterna',
+        excerpt: 'Escanear grillas a toda velocidad vs colocar fichas durante tres días. Y uno de ellos cobra por power-ups.',
+        readTime: '9 min de lectura',
+        category: 'Comparación',
       },
     },
   },

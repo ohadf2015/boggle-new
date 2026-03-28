@@ -175,9 +175,9 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'he';
-    const dir = translations[validLocale]?.direction || 'rtl';
-    const seo = translations[validLocale]?.seo || translations.he.seo;
+    const validLocale = (locale as Locale) || 'en';
+    const dir = translations[validLocale]?.direction || 'ltr';
+    const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
 
