@@ -43,14 +43,22 @@ export async function POST(request: NextRequest) {
     }
 
     const tree = skillTree as Record<string, number>;
+    // Skill tree has 3 paths × 5 tiers max = 15 skills max. Cap at 50 for future headroom.
     const MAX_SKILLS = 50;
+    // Each skill can have up to 100 points allocated (budget check below enforces real cap)
+    const MAX_SKILL_VALUE = 100;
     const entries = Object.entries(tree);
     if (entries.length > MAX_SKILLS) {
       return NextResponse.json({ error: 'Too many skills' }, { status: 400 });
     }
+    // Validate: keys must be alphanumeric/dash/underscore, values integer 0-MAX_SKILL_VALUE
+    const validKeyPattern = /^[a-zA-Z][a-zA-Z0-9_-]{0,49}$/;
     for (const [key, value] of entries) {
-      if (typeof key !== 'string' || key.length > 50 || typeof value !== 'number' || value < 0 || value > 100) {
-        return NextResponse.json({ error: 'Invalid skill entry' }, { status: 400 });
+      if (typeof key !== 'string' || !validKeyPattern.test(key)) {
+        return NextResponse.json({ error: `Invalid skill key: ${key}` }, { status: 400 });
+      }
+      if (typeof value !== 'number' || !Number.isInteger(value) || value < 0 || value > MAX_SKILL_VALUE) {
+        return NextResponse.json({ error: `Invalid skill entry: ${key}=${value}` }, { status: 400 });
       }
     }
 

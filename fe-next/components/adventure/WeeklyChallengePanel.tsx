@@ -7,7 +7,7 @@
 
 'use client';
 
-import { memo, useEffect, useState, useMemo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, X, Clock, ChevronRight, Crown, Medal } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -41,7 +41,16 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
   const [loading, setLoading] = useState(true);
   const [weekId, setWeekId] = useState('');
 
-  const resetMs = useMemo(() => getTimeUntilReset(), []);
+  const [resetMs, setResetMs] = useState(() => getTimeUntilReset());
+
+  // Tick the countdown every 60s so "resets in" stays fresh
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = setInterval(() => {
+      setResetMs(getTimeUntilReset());
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;

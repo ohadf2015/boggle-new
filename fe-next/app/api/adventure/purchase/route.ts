@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // Fetch current progression from DB (server is source of truth)
     const { data: progression, error: fetchError } = await supabase
       .from('player_progression')
-      .select('gold, upgrades')
+      .select('gold, upgrades, current_world')
       .eq('user_id', userId)
       .single();
 
@@ -60,6 +60,17 @@ export async function POST(request: NextRequest) {
 
     const currentGold = (progression.gold as number) ?? 0;
     const currentUpgrades = (progression.upgrades as UpgradeState) ?? {};
+    const currentWorld = (progression.current_world as number) || 0;
+
+    // Enforce world unlock requirement — prevent buying upgrades before reaching the required world
+    // Skip check if current_world is not yet tracked (0 = unknown, allow all purchases)
+    const upgrade = getUpgrade(upgradeId as string);
+    if (upgrade && currentWorld > 0 && upgrade.unlockWorld > currentWorld) {
+      return NextResponse.json(
+        { error: `Upgrade requires world ${upgrade.unlockWorld}, currently at world ${currentWorld}` },
+        { status: 403 }
+      );
+    }
 
     // Server-side purchase validation using shared config
     const result = purchaseUpgrade(currentUpgrades, upgradeId, currentGold);

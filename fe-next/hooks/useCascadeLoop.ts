@@ -33,8 +33,7 @@ const MAX_CASCADE_ITERATIONS = 10;
 /** Duration of each cascade phase in milliseconds */
 const PHASE_DURATION_MS = 250;
 
-/** Common English letters weighted by frequency for tile generation */
-const LETTER_FREQUENCY = 'EEEEEEEEEEEEETTTTTTTTTAAAAAAAAOOOOOOOIIIIIINNNNNSSSSSHHHHHRRRRRLDDDCCUUMMWFGYPBVKJXQZ';
+// Letter frequency moved to gridGenerator.ts — removed dead code here
 
 // ==============================================
 // TYPES
@@ -239,18 +238,10 @@ export function spawnNewTiles(tiles: TileState[][], gridSize: number): string[] 
  * @param tiles - Current grid state
  * @returns True if matches found, false otherwise
  */
-export function checkForMatches(tiles: TileState[][]): boolean {
+export function checkForMatches(_tiles: TileState[][]): boolean {
   // MVP: Always return false (no auto-cascade)
   // Future enhancement: Implement word matching logic
   return false;
-}
-
-/**
- * Generate a random letter weighted by English frequency
- */
-function getRandomLetter(): string {
-  const index = Math.floor(Math.random() * LETTER_FREQUENCY.length);
-  return LETTER_FREQUENCY[index];
 }
 
 // ==============================================
@@ -293,6 +284,14 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const phaseDuration = prefersReducedMotion ? 0 : PHASE_DURATION_MS;
+
+  /**
+   * Update the tiles reference so gravity/spawn calculations use real grid data.
+   * Must be called whenever the tile grid changes (after SUBMIT_WORD, etc.).
+   */
+  const updateTiles = useCallback((tiles: TileState[][]) => {
+    tilesRef.current = tiles;
+  }, []);
 
   /**
    * Start a new cascade with the given removed tiles
@@ -397,6 +396,7 @@ export function useCascadeLoop(options: CascadeLoopOptions = {}) {
   return {
     state,
     startCascade,
+    updateTiles,
     reset,
   };
 }

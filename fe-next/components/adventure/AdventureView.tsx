@@ -64,6 +64,7 @@ function AdventureView(): React.JSX.Element {
   const closeShop = useCallback(() => setShowShop(false), []);
   const openWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(true), []);
   const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
+  const openWordAlbum = useCallback(() => setShowWordAlbum(true), []);
   const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
@@ -192,14 +193,16 @@ function AdventureView(): React.JSX.Element {
 
   const userId = progression?.userId;
   const handleWeeklyChallengeComplete = useCallback(async (
-    _stars: number, score: number, wordsFound: number, _goldEarned: number
+    _stars: number, score: number, wordsFound: number, _goldEarned: number, _longWords?: number, wordList?: string[]
   ) => {
+    // Find the longest word from the game session
+    const longestWord = wordList?.reduce((a, b) => b.length > a.length ? b : a, '') ?? '';
     try {
       await fetch('/api/adventure/weekly-challenge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ score, wordsFound, longestWord: '', playerName: userId ? 'Player' : 'Guest' }),
+        body: JSON.stringify({ score, wordsFound, longestWord, playerName: userId ? 'Player' : 'Guest' }),
       });
     } catch { /* Fire and forget */ }
     setViewState('hub');
@@ -371,6 +374,7 @@ function AdventureView(): React.JSX.Element {
                 onWeeklyChallenge={openWeeklyChallenge}
                 onBossRush={handleStartBossRush}
                 canBossRush={bossRush.canStartBossRush}
+                onOpenWordAlbum={openWordAlbum}
               />
             </motion.div>
           )}

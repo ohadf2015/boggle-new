@@ -89,11 +89,30 @@ export function useFlashChallenge({
     }
   }, [timeRemaining, isPlaying, totalTimeSeconds, worldId, locale, activeChallenge, wordsFound]);
 
-  // Live countdown timer
+  // Track accumulated pause time so the challenge clock freezes when game is paused.
+  const pauseStartRef = useRef<number>(0);
+  const totalPausedMsRef = useRef<number>(0);
+
+  // Accumulate paused time when isPlaying toggles off/on
+  useEffect(() => {
+    if (!activeChallenge || isChallengeComplete) return;
+    if (!isPlaying) {
+      // Game just paused — record when
+      pauseStartRef.current = Date.now();
+    } else if (pauseStartRef.current > 0) {
+      // Game just resumed — add paused duration
+      totalPausedMsRef.current += Date.now() - pauseStartRef.current;
+      pauseStartRef.current = 0;
+    }
+  }, [isPlaying, activeChallenge, isChallengeComplete]);
+
+  // Live countdown timer — subtracts paused time from elapsed calculation
   useEffect(() => {
     if (!activeChallenge || isChallengeComplete) return;
     const interval = setInterval(() => {
-      const elapsed = (Date.now() - challengeStartTime.current) / 1000;
+      // Don't tick while paused
+      if (!isPlaying) return;
+      const elapsed = (Date.now() - challengeStartTime.current - totalPausedMsRef.current) / 1000;
       const remaining = Math.max(0, activeChallenge.durationSeconds - elapsed);
       setChallengeTimeLeft(Math.ceil(remaining));
       if (remaining <= 0) {
@@ -106,7 +125,7 @@ export function useFlashChallenge({
       }
     }, 200);
     return () => clearInterval(interval);
-  }, [activeChallenge, isChallengeComplete]);
+  }, [activeChallenge, isChallengeComplete, isPlaying]);
 
   // Track gold tile usage from lastWordTileTypes prop
   useEffect(() => {
@@ -202,6 +221,8 @@ export function useFlashChallenge({
     challengeStartTime.current = 0;
     usedGoldTile.current = false;
     lastWordTimestamp.current = 0;
+    pauseStartRef.current = 0;
+    totalPausedMsRef.current = 0;
   }, []);
 
   return { activeChallenge, isChallengeComplete, isChallengeFailed, challengeTimeLeft, dismiss, reset };

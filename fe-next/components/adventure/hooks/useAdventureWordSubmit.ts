@@ -249,13 +249,16 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
           if (word.length >= 8) {
             handleEarnAchievement('LONG_WORD_8');
           }
-          if (comboCount >= 5) {
+          // comboCount is the pre-submit value; the reducer increments it in
+          // SUBMIT_WORD. So the actual streak after this word = comboCount + 1.
+          const postSubmitCombo = comboCount + 1;
+          if (postSubmitCombo >= 5) {
             handleEarnAchievement('WORD_STREAK_5');
           }
-          if (comboCount >= 10) {
+          if (postSubmitCombo >= 10) {
             handleEarnAchievement('WORD_STREAK_10');
           }
-          if (comboCount >= 15) {
+          if (postSubmitCombo >= 15) {
             handleEarnAchievement('COMBO_KING');
           }
 

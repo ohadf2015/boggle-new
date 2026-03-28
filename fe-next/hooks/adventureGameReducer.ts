@@ -151,14 +151,28 @@ export function createInitialState(
 }
 
 export function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
-  // Each completed objective earns 1 star (capped at 3).
-  // Any objective counts — primary or secondary — so players always
-  // feel progress even if they miss the main goal.
-  const completedCount = objectives.filter(
+  if (objectives.length === 0) return 0;
+
+  // Primary objectives must ALL be complete to earn any stars.
+  // Without this gate, 3 completed secondary objectives on a failed
+  // level would award 3 stars (timer-expired but secondaries met).
+  const primaryObjectives = objectives.filter((o) => o.isPrimary);
+  // If no primaries exist (shouldn't happen in practice), require at least one completed objective
+  if (primaryObjectives.length === 0) {
+    const completedCount = objectives.filter((o) => (o.current ?? 0) >= o.target).length;
+    return Math.min(completedCount, 3) as 0 | 1 | 2 | 3;
+  }
+  const allPrimaryMet = primaryObjectives.every(
     (o) => (o.current ?? 0) >= o.target
+  );
+  if (!allPrimaryMet) return 0;
+
+  // 1 star for completing all primaries, +1 per completed secondary (capped at 3).
+  const secondaryCompleted = objectives.filter(
+    (o) => !o.isPrimary && (o.current ?? 0) >= o.target
   ).length;
 
-  return Math.min(completedCount, 3) as 0 | 1 | 2 | 3;
+  return Math.min(1 + secondaryCompleted, 3) as 0 | 1 | 2 | 3;
 }
 
 /**

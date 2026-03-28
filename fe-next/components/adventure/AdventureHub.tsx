@@ -9,7 +9,7 @@
 
 import { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -46,8 +46,7 @@ interface AdventureHubProps {
   onWeeklyChallenge?: () => void;
   onBossRush?: () => void;
   canBossRush?: boolean;
-  collectionCount?: number;
-  onOpenCollection?: () => void;
+  onOpenWordAlbum?: () => void;
 }
 
 // ==============================================
@@ -57,6 +56,9 @@ interface AdventureHubProps {
 const AdventureHub = memo<AdventureHubProps>(({
   streakDays,
   dailyQuests,
+  totalStars,
+  playerLevel,
+  gold,
   completions,
   currentWorld,
   onOpenWorldMap,
@@ -64,6 +66,8 @@ const AdventureHub = memo<AdventureHubProps>(({
   onBossRush,
   canBossRush = false,
   onWeeklyChallenge,
+  wordAlbumCount,
+  onOpenWordAlbum,
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
@@ -88,6 +92,21 @@ const AdventureHub = memo<AdventureHubProps>(({
         >
           ← {t('common.home')}
         </Link>
+      </div>
+
+      {/* Player Stats — level, stars, gold */}
+      <div className="w-full flex items-center justify-between gap-2 text-sm">
+        <div className="flex items-center gap-1.5 text-neo-cyan">
+          <span className="font-black tabular-nums">{t('adventure.hub.level')} {playerLevel}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-neo-yellow font-bold tabular-nums">
+            <Star className="w-3.5 h-3.5" /> {totalStars}
+          </span>
+          <span className="flex items-center gap-1 text-neo-lime font-bold tabular-nums">
+            <Coins className="w-3.5 h-3.5" /> {gold}
+          </span>
+        </div>
       </div>
 
       {/* Streak — compact inline */}
@@ -260,6 +279,27 @@ const AdventureHub = memo<AdventureHubProps>(({
           >
             <Trophy className="w-4 h-4" />
             {t('adventure.weeklyChallenge.title')}
+          </button>
+        )}
+
+        {/* Word Album */}
+        {onOpenWordAlbum && (
+          <button
+            onClick={onOpenWordAlbum}
+            className={cn(
+              'flex-1 py-2.5 px-3',
+              'flex items-center justify-center gap-1.5',
+              'bg-neo-white/5 text-neo-white/70',
+              'font-bold text-xs',
+              'border border-neo-white/15 rounded-neo',
+              'hover:bg-neo-white/10 transition-colors'
+            )}
+          >
+            <BookOpen className="w-4 h-4" />
+            {t('adventure.hub.wordAlbum')}
+            {(wordAlbumCount ?? 0) > 0 && (
+              <span className="text-[10px] tabular-nums text-neo-cyan">{wordAlbumCount}</span>
+            )}
           </button>
         )}
 

@@ -217,16 +217,19 @@ interface CrazyGamesContextType {
 
 const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
 
-const CRAZYGAMES_ENABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'true';
+// Force-disable via env var; otherwise auto-detect CrazyGames iframe at runtime
+const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
 
 /**
  * CrazyGames SDK Script Component
  *
- * Loads the CrazyGames SDK script when enabled via environment variable.
- * Set NEXT_PUBLIC_CRAZYGAMES_ENABLED=true to enable.
+ * Always loads the SDK script unless explicitly disabled via
+ * NEXT_PUBLIC_CRAZYGAMES_ENABLED=false. The SDK self-detects whether
+ * it's running inside a CrazyGames iframe and reports environment
+ * accordingly ('crazygames' | 'disabled').
  */
 export function CrazyGamesScript() {
-  if (!CRAZYGAMES_ENABLED) {
+  if (CRAZYGAMES_FORCE_DISABLED) {
     return null;
   }
 
@@ -255,11 +258,11 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
 
   // Prevent page scrolling in CrazyGames iframe (delegates to dedicated hook)
-  useCrazyGamesScrollPrevention(CRAZYGAMES_ENABLED);
+  useCrazyGamesScrollPrevention(!CRAZYGAMES_FORCE_DISABLED);
 
   // Initialize SDK and set up CrazyGames-specific handlers
   useEffect(() => {
-    if (!CRAZYGAMES_ENABLED) {
+    if (CRAZYGAMES_FORCE_DISABLED) {
       setIsLoading(false);
       return;
     }

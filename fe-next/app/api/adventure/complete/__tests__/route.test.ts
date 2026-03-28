@@ -1,5 +1,5 @@
-import { vi, type Mock, } from 'vitest';
 // @ts-nocheck
+import { vi, type Mock, } from 'vitest';
 /**
  * Adventure Complete API Route Tests
  *

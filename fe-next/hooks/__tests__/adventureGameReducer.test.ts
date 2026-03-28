@@ -24,12 +24,13 @@ describe('calculateStars', () => {
     expect(calculateStars(objectives)).toBe(0);
   });
 
-  it('returns 1 when only secondary completed (primary missed)', () => {
+  it('returns 0 when only secondary completed (primary missed)', () => {
+    // Primary must be complete to earn any stars — prevents 3-star failed levels
     const objectives = [
       makeObjective({ isPrimary: true, target: 100, current: 50 }),
       makeObjective({ isPrimary: false, target: 10, current: 10 }),
     ];
-    expect(calculateStars(objectives)).toBe(1);
+    expect(calculateStars(objectives)).toBe(0);
   });
 
   it('returns 1 when only primary completed', () => {

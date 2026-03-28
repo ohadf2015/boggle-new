@@ -104,8 +104,8 @@ export const UPGRADES: UpgradeDefinition[] = [
     tiers: [
       { level: 1, cost: 50, effectKey: 'adventure.upgrades.fuelTank.t1', value: 10 },
       { level: 2, cost: 100, effectKey: 'adventure.upgrades.fuelTank.t2', value: 20 },
-      { level: 3, cost: 200, effectKey: 'adventure.upgrades.fuelTank.t3', value: 25 },
-      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 30 },
+      { level: 3, cost: 200, effectKey: 'adventure.upgrades.fuelTank.t3', value: 30 },
+      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 40 },
     ],
   },
   {

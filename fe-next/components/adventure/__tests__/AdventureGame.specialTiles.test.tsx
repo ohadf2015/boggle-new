@@ -135,6 +135,7 @@ vi.mock('@/hooks/useCascadeLoop', () => ({
   useCascadeLoop: () => ({
     state: mockCascadeState,
     startCascade: mockStartCascade,
+    updateTiles: vi.fn(),
     reset: mockReset,
   }),
 }));

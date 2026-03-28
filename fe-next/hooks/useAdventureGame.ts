@@ -124,6 +124,12 @@ export function useAdventureGame({
     onPhaseChange: (_phase: CascadePhase) => {},
   });
 
+  // Keep cascade's tile reference in sync with the reducer's tile grid
+  // so gravity and spawn calculations operate on real data (not empty []).
+  useEffect(() => {
+    cascade.updateTiles(state.tiles);
+  }, [state.tiles, cascade]);
+
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Pub/sub store that mirrors timeRemaining for leaf-component subscriptions.
@@ -259,13 +265,17 @@ export function useAdventureGame({
     dispatch({ type: 'UPDATE_OBJECTIVE', payload: { objectiveType, value, mode } });
   }, []);
 
+  const isShufflingRef = useRef(false);
   const useShuffle = useCallback(() => {
-    if (state.shufflesRemaining <= 0) return;
+    if (state.shufflesRemaining <= 0 || isShufflingRef.current) return;
+    isShufflingRef.current = true;
     dispatch({ type: 'USE_SHUFFLE' });
     // Regenerate the grid with language-aware letter distribution
     const gridSize = levelConfig.gridSize as 4 | 5 | 6 | 7;
     const freshGrid = generateAdventureGrid(gridSize, undefined, language);
     dispatch({ type: 'REGENERATE_GRID', payload: { grid: freshGrid } });
+    // Release guard after React processes the state update
+    requestAnimationFrame(() => { isShufflingRef.current = false; });
   }, [state.shufflesRemaining, levelConfig.gridSize, language]);
 
   return {
