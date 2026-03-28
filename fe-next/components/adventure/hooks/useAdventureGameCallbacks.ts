@@ -145,7 +145,7 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     const longWords = wordsFoundList.filter(w => w.length >= 6).length;
 
     // If the eager save failed, retry before navigating away
-    if (completionSaveFailedRef.current && gameStars > 0) {
+    if (completionSaveFailedRef?.current && gameStars > 0) {
       retrySaveCompletion(
         worldNumber, levelNumber,
         gameStars as 0 | 1 | 2 | 3,

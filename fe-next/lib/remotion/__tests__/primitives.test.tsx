@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { vi, type Mock, } from 'vitest';
 /**
  * Shared Remotion Primitives Tests

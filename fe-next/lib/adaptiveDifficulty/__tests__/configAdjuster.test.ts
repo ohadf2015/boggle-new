@@ -77,15 +77,15 @@ describe('configAdjuster', () => {
     describe('Easy tier', () => {
       it('should increase timer by 20% for easy tier', () => {
         // GIVEN
-        const baseConfig = getLevelConfig(1, 1); // 120 seconds
+        const baseConfig = getLevelConfig(1, 1); // 150 seconds (World 1)
         const tier: DifficultyTier = 'easy';
 
         // WHEN
         const adjusted = applyTierAdjustments(baseConfig, tier);
 
         // THEN
-        // 120 * 1.2 = 144
-        expect(adjusted.timerSeconds).toBe(144);
+        // 150 * 1.2 = 180
+        expect(adjusted.timerSeconds).toBe(180);
       });
 
       it('should decrease score target by 20% for easy tier', () => {
@@ -163,15 +163,15 @@ describe('configAdjuster', () => {
     describe('Hard tier', () => {
       it('should decrease timer by 15% for hard tier', () => {
         // GIVEN
-        const baseConfig = getLevelConfig(1, 1); // 120 seconds
+        const baseConfig = getLevelConfig(1, 1); // 150 seconds (World 1)
         const tier: DifficultyTier = 'hard';
 
         // WHEN
         const adjusted = applyTierAdjustments(baseConfig, tier);
 
         // THEN
-        // 120 * 0.85 = 102
-        expect(adjusted.timerSeconds).toBe(102);
+        // 150 * 0.85 = 127.5, floored to 127
+        expect(adjusted.timerSeconds).toBe(127);
       });
 
       it('should not modify score targets for hard tier', () => {

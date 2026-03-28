@@ -91,6 +91,11 @@ describe('ProgressionContext', () => {
   beforeEach(() => {
     mockFetch.mockClear();
     mockAuthUser = { id: 'test-user-123' };
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('Initial Loading', () => {

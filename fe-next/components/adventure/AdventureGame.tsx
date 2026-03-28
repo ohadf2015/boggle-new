@@ -594,7 +594,7 @@ const AdventureGame = memo<AdventureGameProps>(
               objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt} previousBestStars={previousBestStars}
               earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
-              saveFailed={levelCompletion.completionSaveFailedRef.current && showLevelComplete}
+              saveFailed={levelCompletion.completionSaveFailedRef?.current && showLevelComplete}
               onRetrySave={() => {
                 saveCompletionToDb(
                   levelConfig.world, levelConfig.level,
@@ -603,8 +603,8 @@ const AdventureGame = memo<AdventureGameProps>(
                   levelCompletion.earnedGold
                 ).then((ok) => {
                   if (ok) {
-                    levelCompletion.completionSaveFailedRef.current = false;
-                    levelCompletion.completionSavedRef.current = true;
+                    if (levelCompletion.completionSaveFailedRef) levelCompletion.completionSaveFailedRef.current = false;
+                    if (levelCompletion.completionSavedRef) levelCompletion.completionSavedRef.current = true;
                   }
                 });
               }}

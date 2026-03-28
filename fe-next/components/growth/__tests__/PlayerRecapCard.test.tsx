@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { PlayerRecapCard } from '../PlayerRecapCard';
 

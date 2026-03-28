@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * AdventureGame Word Feedback Tests
  *

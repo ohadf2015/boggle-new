@@ -23,10 +23,10 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: ['./vitest.setup.ts'],
     environmentMatchGlobs: [
-      // Pure logic tests don't need jsdom — run in fast node environment
+      // Pure logic tests don't need a DOM — run in fast node environment
       ['utils/**/*.test.ts', 'node'],
       ['shared/**/*.test.ts', 'node'],
       ['lib/**/*.test.ts', 'node'],
@@ -70,8 +70,8 @@ export default defineConfig({
     ],
     testTimeout: 10000,
     pool: 'threads',
-    maxThreads: 8,
-    minThreads: 2,
+    maxThreads: 12,
+    minThreads: 4,
     useAtomics: true,
     teardownTimeout: 5000,
     hookTimeout: 10000,
@@ -80,6 +80,28 @@ export default defineConfig({
     restoreMocks: false,
     css: {
       modules: { classNameStrategy: 'non-scoped' },
+    },
+    // Deps optimizer: bundle heavy node_modules into single files to reduce import overhead
+    deps: {
+      optimizer: {
+        web: {
+          enabled: true,
+          include: [
+            'framer-motion',
+            '@radix-ui/*',
+            '@tanstack/react-query',
+            'zustand',
+            'zod',
+            'socket.io-client',
+            '@testing-library/react',
+            '@testing-library/jest-dom',
+          ],
+        },
+      },
+    },
+    // Cache transformed modules to disk for faster reruns
+    experimental: {
+      fsModuleCache: true,
     },
     coverage: {
       provider: 'v8',

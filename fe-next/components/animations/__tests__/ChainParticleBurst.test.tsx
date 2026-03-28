@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { render, screen, act } from '@testing-library/react';
 import { ChainParticleBurst } from '../ChainParticleBurst';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';

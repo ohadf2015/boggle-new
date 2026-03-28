@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Test: PlayerWaitingView - Command Center Style
  *

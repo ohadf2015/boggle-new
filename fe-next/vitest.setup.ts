@@ -17,9 +17,6 @@ import React from 'react';
 // ==========================================
 // Global TanStack Query Provider for Tests
 // ==========================================
-// Wraps @testing-library/react render to auto-provide QueryClient
-const originalRender = await vi.importActual<typeof import('@testing-library/react')>('@testing-library/react');
-
 const globalQueryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false, gcTime: 0 },
@@ -32,15 +29,7 @@ beforeEach(() => {
   globalQueryClient.clear();
 });
 
-// Override render to wrap in QueryClientProvider unless a wrapper is already provided
-const customRender: typeof originalRender.render = (ui, options) => {
-  const Wrapper = options?.wrapper || (({ children }: { children: React.ReactNode }) =>
-    React.createElement(QueryClientProvider, { client: globalQueryClient }, children)
-  );
-  return originalRender.render(ui, { ...options, wrapper: Wrapper });
-};
-
-// Make custom render available globally
+// Override render/renderHook to wrap in QueryClientProvider unless a wrapper is already provided.
 vi.mock('@testing-library/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@testing-library/react')>();
   return {

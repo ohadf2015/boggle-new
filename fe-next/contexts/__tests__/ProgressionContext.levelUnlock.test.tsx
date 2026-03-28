@@ -59,6 +59,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('ProgressionContext - Level Unlock Bug', () => {
   beforeEach(() => {
     mockFetch.mockClear();
+    localStorage.clear();
   });
 
   describe('Bug: Stars and unlock not updating after level completion', () => {
