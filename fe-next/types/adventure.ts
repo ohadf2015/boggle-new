@@ -564,10 +564,18 @@ export interface WorldMastery {
 // ==============================================
 
 /** Types of loot drops from level completion */
-export type LootType = 'gold' | 'runeFragment' | 'loreScroll' | 'bossTrophy';
+export type LootType =
+  | 'gold'
+  | 'runeFragment'
+  | 'loreScroll'
+  | 'bossTrophy'
+  | 'goldenQuill'
+  | 'worldEssence'
+  | 'ancientRelic'
+  | 'cosmicShard';
 
 /** Rarity tier for loot drops */
-export type LootRarity = 'common' | 'rare' | 'epic';
+export type LootRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 /** A single loot drop from level completion */
 export interface LootDrop {

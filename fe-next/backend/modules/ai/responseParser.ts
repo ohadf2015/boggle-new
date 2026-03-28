@@ -240,7 +240,7 @@ export function parseBatchResponse(
     const parsed = JSON.parse(jsonMatch[0]) as BatchValidationItem[];
 
     if (!Array.isArray(parsed)) {
-      logger.warn('AI_SERVICE', 'Batch response is not an array');
+      logger.info('AI_SERVICE', 'Batch response is not an array');
       return words.map(() => ({
         isValid: false,
         reason: 'Invalid AI response format',
@@ -262,7 +262,7 @@ export function parseBatchResponse(
 
     const errorMessage =
       parseError instanceof Error ? parseError.message : String(parseError);
-    logger.warn('AI_SERVICE', `JSON parse error: ${errorMessage}`);
+    logger.info('AI_SERVICE', `JSON parse error: ${errorMessage}`);
     return words.map(() => ({
       isValid: false,
       reason: 'Failed to parse AI response',

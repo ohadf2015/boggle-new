@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback, memo } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, memo, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
@@ -99,6 +99,20 @@ const WorldNode = memo(function WorldNode({
 
   const prefersReducedMotion = usePrefersReducedMotion();
 
+  // Only render expensive animations (orbiting letters, pulsing ring) when near viewport
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+  useEffect(() => {
+    const el = nodeRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsNearViewport(entry.isIntersecting),
+      { rootMargin: '200px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Progress ring SVG math
   const progressPct = totalWorldStars > 0 ? currentStars / totalWorldStars : 0;
   const ringR = 54;
@@ -107,6 +121,7 @@ const WorldNode = memo(function WorldNode({
 
   return (
     <AdaptiveMotion.div
+      ref={nodeRef}
       className={cn(
         'relative w-full px-3 sm:px-6 lg:px-10',
         'flex items-center gap-2 sm:gap-4 lg:gap-6',
@@ -120,12 +135,14 @@ const WorldNode = memo(function WorldNode({
       {/* World orb with progress ring */}
       <div className="flex-shrink-0">
         <div className="relative">
-          <WorldOrbitingLetters
-            worldId={world.id}
-            worldName={worldName}
-            isUnlocked={isUnlocked}
-            colorPrimary={world.colorPrimary}
-          />
+          {isNearViewport && (
+            <WorldOrbitingLetters
+              worldId={world.id}
+              worldName={worldName}
+              isUnlocked={isUnlocked}
+              colorPrimary={world.colorPrimary}
+            />
+          )}
 
           <AdaptiveMotion.button
             onClick={onClick}
@@ -144,7 +161,9 @@ const WorldNode = memo(function WorldNode({
             )}
             style={{
               filter: isUnlocked
-                ? `drop-shadow(0 0 16px ${glowColor}) drop-shadow(0 0 32px ${glowColor})`
+                ? isNearViewport
+                  ? `drop-shadow(0 0 16px ${glowColor}) drop-shadow(0 0 32px ${glowColor})`
+                  : `drop-shadow(0 0 16px ${glowColor})`
                 : 'grayscale(1) brightness(0.5)',
             }}
           >
@@ -250,8 +269,8 @@ const WorldNode = memo(function WorldNode({
               </div>
             )}
 
-            {/* Pulsing ring for incomplete unlocked worlds */}
-            {isUnlocked && !isComplete && !prefersReducedMotion && (
+            {/* Pulsing ring for incomplete unlocked worlds - only when near viewport */}
+            {isNearViewport && isUnlocked && !isComplete && !prefersReducedMotion && (
               <AdaptiveMotion.div
                 className="absolute -inset-1 rounded-full border-[3px] pointer-events-none"
                 style={{ borderColor: glowColor }}
@@ -384,7 +403,8 @@ const WorldMap = memo(function WorldMap({
   onWorldSelect,
   masteryTiers,
 }: WorldMapProps): React.JSX.Element {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRtl = dir === 'rtl';
   const { enableComplexAnimations } = useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -505,7 +525,7 @@ const WorldMap = memo(function WorldMap({
       {/* World trail */}
       <div className="relative z-10 py-8 sm:py-12 lg:max-w-4xl lg:mx-auto">
         {worldsData.map((data, index) => {
-          const isLeft = index % 2 === 0;
+          const isLeft = isRtl ? index % 2 !== 0 : index % 2 === 0;
 
           return (
             <React.Fragment key={data.world.id}>

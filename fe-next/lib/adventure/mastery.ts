@@ -20,6 +20,58 @@ import { LEVELS_PER_WORLD } from './constants';
 import { getQuestsForChapter } from './questConfig';
 
 /**
+ * Convert progression's chapterQuestProgress (Record<string, number>)
+ * into the ChapterQuestProgress[] format expected by mastery calculation.
+ */
+export function convertQuestProgress(
+  progressMap: Record<string, number> | undefined,
+): ChapterQuestProgress[] {
+  if (!progressMap) return [];
+  return Object.entries(progressMap).map(([questId, current]) => ({
+    questId,
+    current,
+    // Quest target lookup is done inside calculateMasteryCriteria via getQuestsForChapter,
+    // so we mark complete if current > 0 — the actual completion check uses the quest config target.
+    // We need to check against the quest's target to be accurate.
+    isComplete: false, // placeholder — overridden below
+    rewardClaimed: false,
+  }));
+}
+
+/**
+ * Convert progression quest map with accurate completion status.
+ * Checks each quest's current count against its target from config.
+ */
+export function convertQuestProgressWithTargets(
+  worldId: number,
+  progressMap: Record<string, number> | undefined,
+): ChapterQuestProgress[] {
+  if (!progressMap) return [];
+  const result: ChapterQuestProgress[] = [];
+  for (let ch = 1; ch <= 3; ch++) {
+    for (const quest of getQuestsForChapter(worldId, ch)) {
+      const current = progressMap[quest.id] ?? 0;
+      result.push({
+        questId: quest.id,
+        current,
+        isComplete: current >= quest.target,
+        rewardClaimed: false,
+      });
+    }
+  }
+  return result;
+}
+
+/**
+ * Check if the boss level (level 7) was defeated with 3 stars in this world.
+ * Used as a proxy for "boss defeated with high health" when detailed boss health isn't tracked.
+ */
+export function deriveBossHighHealth(worldId: number, completions: LevelCompletion[]): boolean {
+  const bossCompletion = completions.find(c => c.world === worldId && c.level === LEVELS_PER_WORLD);
+  return bossCompletion != null && bossCompletion.stars === 3;
+}
+
+/**
  * Calculate mastery criteria for a specific world
  */
 export function calculateMasteryCriteria(

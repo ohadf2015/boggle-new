@@ -25,8 +25,9 @@ mockEq.mockReturnValue(chainable);
 mockUpdate.mockReturnValue(chainable);
 mockUpsert.mockReturnValue(chainable);
 
+const mockRpc = jest.fn().mockResolvedValue({ error: null });
 const mockFrom = jest.fn().mockReturnValue(chainable);
-const mockSupabase = { from: mockFrom };
+const mockSupabase = { from: mockFrom, rpc: mockRpc };
 
 jest.mock('../supabase/client', () => ({
   getSupabase: () => mockSupabase,
@@ -153,7 +154,7 @@ describe('checkAndClaimGrandSlam', () => {
     expect(result.reward).toBe(0);
   });
 
-  it('claims grand slam when all 4 complete', async () => {
+  it('claims grand slam when all 4 complete and grants XP', async () => {
     // getDailyMissions
     mockSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
 
@@ -164,6 +165,11 @@ describe('checkAndClaimGrandSlam', () => {
 
     expect(result.claimed).toBe(true);
     expect(result.reward).toBe(500);
+    // Verify XP was actually granted
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', {
+      p_player_id: PLAYER_ID,
+      p_xp_amount: 500,
+    });
   });
 
   it('returns already claimed when grand_slam_claimed is true', async () => {
@@ -176,5 +182,16 @@ describe('checkAndClaimGrandSlam', () => {
 
     expect(result.claimed).toBe(true);
     expect(result.reward).toBe(0);
+    // Should NOT grant XP again
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('does not grant XP when missions are incomplete', async () => {
+    mockSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+
+    const result = await checkAndClaimGrandSlam(PLAYER_ID);
+
+    expect(result.claimed).toBe(false);
+    expect(mockRpc).not.toHaveBeenCalled();
   });
 });

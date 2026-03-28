@@ -90,8 +90,8 @@ describe('CompactLeaderboard combo event badges', () => {
 describe('CompactLeaderboard input method icons', () => {
   it('should show keyboard icon when player inputMethod is keyboard', () => {
     const players: CompactPlayer[] = [
-      { username: 'alice', score: 300, rank: 1, inputMethod: 'keyboard' },
-      { username: 'bob', score: 200, rank: 2 },
+      { username: 'alice', score: 300, rank: 1 },
+      { username: 'bob', score: 200, rank: 2, inputMethod: 'keyboard' },
     ];
 
     render(

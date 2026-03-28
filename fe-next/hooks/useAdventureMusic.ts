@@ -42,13 +42,13 @@ const WORLDS_WITH_MUSIC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
  * These worlds loop one track for the entire level instead of crossfading between two.
  */
 const SINGLE_TRACK_WORLDS: Record<number, string> = {
-  4: 'Sunrise Coconut Quest',
-  5: 'Canyon Riddles',
-  6: 'Labyrinth of Dusty Tomes',
-  7: 'Ethereal Ice Palace Loop',
-  8: 'Celestial Drift',
-  9: 'Summit of Thin Air',
-  10: 'Crown of the Final Kingdom',
+  4: 'Sunrise-Coconut-Quest',
+  5: 'Canyon-Riddles',
+  6: 'Labyrinth-of-Dusty-Tomes',
+  7: 'Ethereal-Ice-Palace-Loop',
+  8: 'Celestial-Drift',
+  9: 'Summit-of-Thin-Air',
+  10: 'Crown-of-the-Final-Kingdom',
 };
 
 /**
@@ -272,9 +272,10 @@ export function useAdventureMusic({
       loop: false, // Manual looping for crossfade
       volume: 0,
       preload: true, // Preload immediately so tracks are ready when needed
-      // Using HTML5 Audio API (html5: true) for iOS Safari compatibility
-      // iOS Safari has strict Web Audio API restrictions that cause audio to not play
-      html5: true,
+      // Web Audio API decodes the entire file upfront — playback starts instantly once loaded.
+      // HTML5 Audio streams but has buffering delays on slower connections.
+      // iOS autoplay is handled by resuming AudioContext on user interaction (see onplayerror).
+      html5: false,
       onload: () => {
         logger.log(`[AdventureMusic] ${trackName} loaded successfully`);
       },

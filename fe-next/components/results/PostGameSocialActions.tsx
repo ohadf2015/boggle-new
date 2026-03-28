@@ -98,8 +98,8 @@ export const PostGameSocialActions: React.FC<PostGameSocialActionsProps> = ({
 
   if (!isAuthenticated) return null;
 
-  // Filter to non-friend, non-bot opponents
-  const addableOpponents = opponents.filter(p =>
+  // Filter to non-friend, non-bot opponents (only after friendship check completes)
+  const addableOpponents = !loaded ? [] : opponents.filter(p =>
     !p.isBot &&
     friendStatuses.get(p.username) === 'none' &&
     !sentRequests.has(p.username)

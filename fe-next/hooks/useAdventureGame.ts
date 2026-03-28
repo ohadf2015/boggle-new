@@ -139,6 +139,8 @@ export function useAdventureGame({
   }, [timerStore, state.timeRemaining]);
 
   // Timer effect - only depends on isPlaying
+  // Boss levels have no countdown timer — the fight lasts until boss dies or player dies.
+  // We still dispatch TICK for elapsed-time tracking but the reducer won't decrement.
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
 

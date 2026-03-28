@@ -9,6 +9,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import { getUpgradeEffect, getUpgradeTier, type UpgradeState } from '@/lib/adventure/upgradeConfig';
+import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
 // Dynamic import to avoid Turbopack bundling backend logger transitively
@@ -41,13 +42,12 @@ function validateRequestBody(body: Record<string, unknown>): {
     score: number;
     words: number;
     longWords?: number;
-    lootDrops?: unknown[];
     retainedScore?: number;
     wordsFound?: string[];
     flashChallengeGold?: number;
   };
 } {
-  const { world, level, stars, score, words, longWords, lootDrops, retainedScore, flashChallengeGold } = body;
+  const { world, level, stars, score, words, longWords, retainedScore, flashChallengeGold } = body;
 
   // Check required fields
   if (
@@ -89,9 +89,7 @@ function validateRequestBody(body: Record<string, unknown>): {
     valid: true,
     data: {
       world, level, stars, score, words,
-      // TODO: persist lootDrops to inventory table once schema exists
       ...(typeof longWords === 'number' && longWords >= 0 && { longWords }),
-      ...(Array.isArray(lootDrops) && { lootDrops }),
       ...(typeof retainedScore === 'number' && { retainedScore }),
       ...(typeof flashChallengeGold === 'number' && flashChallengeGold >= 0 && { flashChallengeGold: Math.min(flashChallengeGold, 100) }),
       ...(Array.isArray(body.wordsFound) && { wordsFound: body.wordsFound as string[] }),
@@ -145,11 +143,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { world, level, stars, score, words, longWords, lootDrops: _lootDrops, retainedScore: _retainedScore } = validation.data;
+    const { world, level, stars, score, words, longWords, retainedScore: _retainedScore } = validation.data;
 
-    // TODO: persist lootDrops to a player_inventory table once the DB schema is created
     // TODO: persist retainedScore once retry scoring schema exists
-    void _lootDrops;
     void _retainedScore;
 
     // Fetch progression and existing completion in parallel
@@ -490,6 +486,50 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // Persist loot drops to player_inventory (runs after response is sent)
+    const lootDrops = generateLevelLoot({
+      world, level,
+      stars: stars as 0 | 1 | 2 | 3,
+      score, isFirstCompletion,
+      isBossLevel: level === 7,
+    });
+    after(async () => {
+      try {
+        // Filter out gold (tracked in player_progression, not inventory)
+        const collectibleDrops = lootDrops.filter(d => d.type !== 'gold');
+        if (collectibleDrops.length === 0) return;
+
+        const LOOT_CATEGORY: Record<string, string> = {
+          runeFragment: 'rune', loreScroll: 'scroll', bossTrophy: 'trophy',
+          goldenQuill: 'relic', worldEssence: 'relic', ancientRelic: 'relic', cosmicShard: 'relic',
+        };
+
+        for (const drop of collectibleDrops) {
+          const itemId = drop.type === 'runeFragment' ? 'rune-fragment'
+            : drop.type === 'loreScroll' ? `lore-scroll-w${world}-l${level}`
+            : drop.type === 'bossTrophy' ? `boss-trophy-w${world}`
+            : drop.type === 'worldEssence' ? `world-essence-w${world}`
+            : drop.type === 'ancientRelic' ? `ancient-relic-w${world}`
+            : drop.type === 'cosmicShard' ? 'cosmic-shard'
+            : drop.type === 'goldenQuill' ? 'golden-quill'
+            : drop.type;
+
+          await supabase.from('player_inventory').upsert({
+            user_id: userId,
+            item_id: itemId,
+            item_type: drop.type,
+            category: LOOT_CATEGORY[drop.type] ?? 'relic',
+            rarity: drop.rarity,
+            quantity: drop.quantity,
+            source_world: world,
+            source_level: level,
+          }, { onConflict: 'user_id,item_id' });
+        }
+      } catch (err) {
+        console.error('[ADVENTURE COMPLETE API] Inventory persistence failed:', err);
+      }
+    });
+
     // Update weekly quest progress (runs after response is sent)
     const questStats: GameStats = {
       gamesPlayed: 1,
@@ -530,6 +570,7 @@ export async function POST(request: NextRequest) {
       },
       leveledUp,
       previousLevel: leveledUp ? previousLevel : undefined,
+      lootDrops,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/complete', { method: 'POST' });

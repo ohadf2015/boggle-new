@@ -28,7 +28,20 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'user-123' } }),
 }));
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+vi.mock('@/components/quests/QuestCompletionToast', () => ({
+  showQuestCompletionToast: vi.fn(),
+}));
+
 import { useDailyMissions } from '../useDailyMissions';
+import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToast';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -123,5 +136,30 @@ describe('useDailyMissions', () => {
     });
 
     expect(result.current.grandSlamClaimed).toBe(true);
+  });
+
+  it('shows Grand Slam toast when all 4 missions complete', async () => {
+    mockSingle.mockResolvedValueOnce({ data: FULL_DATA, error: null });
+
+    renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isGrandSlam: true,
+          xpReward: 500,
+        }),
+      );
+    });
+  });
+
+  it('does NOT show Grand Slam toast when missions are incomplete', async () => {
+    mockSingle.mockResolvedValueOnce({ data: EMPTY_DATA, error: null });
+
+    renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).not.toHaveBeenCalled();
+    });
   });
 });

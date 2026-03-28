@@ -91,14 +91,14 @@ const TAUNT_DURATION = 3500;
 /** Lock tiles duration in ms */
 const LOCK_DURATION = 5000;
 
-/** All possible attack types */
-const ATTACK_TYPES: BossAttackType[] = ['lockTiles', 'scramble', 'timePenalty', 'damage'];
+/** All possible attack types — no timePenalty since boss fights are untimed */
+const ATTACK_TYPES: BossAttackType[] = ['lockTiles', 'scramble', 'damage', 'damage', 'gridEffect'];
 
-/** Base damage per phase */
+/** Base damage per phase — scales with worldId in executeAttack */
 const PHASE_DAMAGE: Record<BossPhaseNew, number> = {
-  normal: 8,
-  angry: 12,
-  desperate: 18,
+  normal: 10,
+  angry: 15,
+  desperate: 22,
 };
 
 // ==============================================
@@ -232,14 +232,26 @@ export function useAdventureBossNew({
       lockTimerRef.current = setTimeout(() => {
         setLockedTiles([]);
       }, LOCK_DURATION);
-    } else if (attackType === 'timePenalty') {
-      attack.seconds = randomInt(3, 5);
     } else if (attackType === 'damage') {
-      attack.damage = PHASE_DAMAGE[phaseRef.current] + randomInt(0, 5);
+      // Damage scales with world: later bosses hit harder
+      const worldScale = 1 + ((worldId ?? 1) - 1) * 0.1;
+      attack.damage = Math.floor((PHASE_DAMAGE[phaseRef.current] + randomInt(0, 5)) * worldScale);
+    } else if (attackType === 'gridEffect') {
+      // Trigger the boss's phase-specific grid effect
+      const phaseIndex = phaseRef.current === 'normal' ? 0 : phaseRef.current === 'angry' ? 1 : 2;
+      const phaseConfig = boss?.phases?.[phaseIndex];
+      const effectName = phaseConfig?.mechanicModifiers?.gridEffect as string | undefined;
+      if (effectName) {
+        attack.gridEffect = effectName;
+      } else {
+        // Fallback: deal damage instead
+        attack.type = 'damage';
+        attack.damage = PHASE_DAMAGE[phaseRef.current] + randomInt(0, 5);
+      }
     }
 
     onAttackRef.current?.(attack);
-  }, [gridSize]);
+  }, [gridSize, boss?.phases, worldId]);
 
   const startAttackTimer = useCallback((forPhase: BossPhaseNew) => {
     clearAttackTimer();

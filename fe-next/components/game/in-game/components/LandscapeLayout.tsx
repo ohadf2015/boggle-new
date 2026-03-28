@@ -300,7 +300,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
               'gap-1.5 py-1'
             )}
           >
-            {isPlaying && (
+            {isPlaying && gameMode !== 'word-hunt' && (
               <div className="relative mb-1 flex-shrink-0 z-50">
                 <LeadChangeBanner event={leadChangeEvent ?? null} />
                 <WordFormingArea
@@ -327,6 +327,7 @@ export const LandscapeLayout = memo<LandscapeLayoutProps>(function LandscapeLayo
                   attempts={wordHuntAttempts ?? []}
                   onSubmit={onWordHuntGuess}
                   found={wordHuntFound ?? false}
+                  wordFeedback={currentFeedback}
                 />
               </div>
             )}

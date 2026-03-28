@@ -131,8 +131,23 @@ export async function updateQuestProgress(
     return null;
   }
 
-  // Grant avatar part reward on completion
+  // Grant XP + avatar part reward on completion
   if (completed) {
+    // Grant XP reward
+    try {
+      const xpReward = quest.xpReward ?? 0;
+      if (xpReward > 0) {
+        await supabase.rpc('increment_player_xp', {
+          p_player_id: playerId,
+          p_xp_amount: xpReward,
+        });
+        logger.info('weeklyQuest', `Granted ${xpReward} XP to ${playerId} for weekly quest`);
+      }
+    } catch (err) {
+      logger.error('weeklyQuest', `Failed to grant XP for ${playerId}: ${err}`);
+    }
+
+    // Grant avatar part reward
     try {
       await grantAvatarPartReward(supabase, playerId, quest.questType, quest.weekStart);
     } catch (err) {

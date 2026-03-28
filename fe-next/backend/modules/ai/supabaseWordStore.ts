@@ -147,7 +147,7 @@ export class SupabaseWordStore {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error('AI_SERVICE', `saveToCommunityWords failed: ${errorMessage}`);
+      logger.debug('AI_SERVICE', `saveToCommunityWords failed: ${errorMessage}`);
     }
   }
 
@@ -177,7 +177,7 @@ export class SupabaseWordStore {
       });
 
       if (error) {
-        logger.error('AI_SERVICE', `Batch save failed: ${error.message}`);
+        logger.debug('AI_SERVICE', `Batch save failed: ${error.message}`);
       } else {
         logger.info(
           'AI_SERVICE',

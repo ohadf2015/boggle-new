@@ -182,7 +182,7 @@ class GameAIService {
       // Save valid words to database (fire and forget)
       if (aiResult.isValid) {
         saveToCommunityWords(this.supabaseAdmin, normalizedWord, language).catch((err) => {
-          logger.error('AI_SERVICE', ' Background save failed:', err);
+          logger.debug('AI_SERVICE', ' Background save failed:', err);
         });
       }
 
@@ -216,7 +216,7 @@ class GameAIService {
       await this.initialize();
       return checkDatabaseOnly(this.supabaseAdmin, word, language, minWordLength);
     } catch (error) {
-      logger.error('AI_SERVICE', ' checkDatabaseOnly error:', error);
+      logger.debug('AI_SERVICE', ' checkDatabaseOnly error:', error);
       return { isValid: false, source: 'unknown' };
     }
   }

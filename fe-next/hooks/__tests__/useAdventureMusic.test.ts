@@ -11,7 +11,7 @@ import { useAdventureMusic } from '../useAdventureMusic';
 import { MusicProvider } from '@/contexts/MusicContext';
 
 // Mock Howler.js — use vi.hoisted so vars exist when vi.mock factory runs (hoisted above imports)
-const { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance } = vi.hoisted(() => {
+const { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance, capturedCallbacks } = vi.hoisted(() => {
   const mockPlay = vi.fn();
   const mockStop = vi.fn();
   const mockPause = vi.fn();
@@ -27,11 +27,23 @@ const { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnloa
     volume: mockVolume, seek: mockSeek, unload: mockUnload, load: mockLoad,
     state: mockState, playing: mockPlaying,
   };
-  return { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance };
+  // Store captured callbacks from Howl constructors keyed by src path
+  const capturedCallbacks = new Map<string, Record<string, (...args: unknown[]) => void>>();
+  return { mockPlay, mockStop, mockPause, mockFade, mockVolume, mockSeek, mockUnload, mockLoad, mockState, mockPlaying, mockHowlInstance, capturedCallbacks };
 });
 
 vi.mock('howler', () => ({
-  Howl: vi.fn(function() { return mockHowlInstance; }),
+  Howl: vi.fn(function(config: { src?: string[]; onend?: () => void; onload?: () => void; onloaderror?: () => void; onplayerror?: () => void }) {
+    // Capture callbacks for adventure tracks
+    const src = config?.src?.[0] ?? '';
+    if (src.includes('/music/adventure/')) {
+      const cbs: Record<string, (...args: unknown[]) => void> = {};
+      if (config.onend) cbs.onend = config.onend;
+      if (config.onload) cbs.onload = config.onload;
+      capturedCallbacks.set(src, cbs);
+    }
+    return mockHowlInstance;
+  }),
   Howler: {
     ctx: {
       state: 'running',
@@ -75,6 +87,7 @@ describe('useAdventureMusic', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    capturedCallbacks.clear();
     mockPlaying.mockReturnValue(false);
     mockState.mockReturnValue('loaded');
   });
@@ -93,7 +106,7 @@ describe('useAdventureMusic', () => {
       renderHook(() => useAdventureMusic(defaultProps), { wrapper: createWrapper() });
 
       // Filter for adventure music Howl instances only
-      const adventureMusicCalls = Howl.mock.calls.filter(
+      const adventureMusicCalls = (Howl as unknown as ReturnType<typeof vi.fn>).mock.calls.filter(
         (call: unknown[]) => {
           const src = (call[0] as { src?: string[] })?.src?.[0];
           return src?.includes('/music/adventure/');
@@ -114,7 +127,7 @@ describe('useAdventureMusic', () => {
       );
     });
 
-    it('does NOT initialize tracks for worlds without music (4+)', async () => {
+    it('initializes single-track for world 4+', async () => {
       const { Howl } = await import('howler');
 
       // Clear mocks to ignore MusicProvider's Howl calls
@@ -129,14 +142,14 @@ describe('useAdventureMusic', () => {
       );
 
       // World 4 has a single-track music file — should create exactly 1 Howl
-      const adventureMusicCalls = Howl.mock.calls.filter(
+      const adventureMusicCalls = (Howl as unknown as ReturnType<typeof vi.fn>).mock.calls.filter(
         (call: unknown[]) => {
           const src = (call[0] as { src?: string[] })?.src?.[0];
           return src?.includes('/music/adventure/');
         }
       );
       expect(adventureMusicCalls).toHaveLength(1);
-      expect(adventureMusicCalls[0][0].src[0]).toBe('/music/adventure/Sunrise Coconut Quest.mp3');
+      expect(adventureMusicCalls[0][0].src[0]).toBe('/music/adventure/Sunrise-Coconut-Quest.mp3');
     });
 
     it('returns hasMusic=true for worlds 1-3', () => {
@@ -219,7 +232,6 @@ describe('useAdventureMusic', () => {
   describe('track switching', () => {
     it('switches to track 2 when 50% time has elapsed', () => {
       const totalTime = 120;
-      const switchTime = 60; // 50% elapsed = 60 seconds remaining
 
       const { rerender } = renderHook(
         ({ timeRemaining }) =>
@@ -236,7 +248,7 @@ describe('useAdventureMusic', () => {
       vi.clearAllMocks();
 
       // Time drops below 50% threshold
-      rerender({ timeRemaining: switchTime - 1 });
+      rerender({ timeRemaining: 59 });
 
       // Should fade out track 1 and fade in track 2
       expect(mockFade).toHaveBeenCalled();
@@ -269,7 +281,6 @@ describe('useAdventureMusic', () => {
       rerender({ timeRemaining: 58 });
 
       // Should NOT call play again (already on track 2)
-      // Note: play might be called for other reasons, but not for switching
       expect(mockPlay.mock.calls.length).toBeLessThanOrEqual(firstCallCount);
     });
   });
@@ -355,19 +366,7 @@ describe('useAdventureMusic', () => {
   });
 
   describe('continuous looping', () => {
-    it('loops music when track ends in adventure mode', async () => {
-      // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
-      const { Howl } = await import('howler');
-      const capturedOnEndCallbacks: (() => void)[] = [];
-
-      Howl.mockImplementation(function(config: { onend?: () => void; src?: string[] }) {
-        // Only capture onend from adventure music tracks, not MusicProvider
-        if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
-          capturedOnEndCallbacks.push(config.onend);
-        }
-        return mockHowlInstance;
-      });
-
+    it('loops music when track ends in adventure mode', () => {
       renderHook(() =>
         useAdventureMusic({
           ...defaultProps,
@@ -384,9 +383,10 @@ describe('useAdventureMusic', () => {
       mockFade.mockClear();
 
       // WHEN - track ends (simulate onend callback from track 1)
-      expect(capturedOnEndCallbacks.length).toBeGreaterThan(0);
+      const track1Cbs = capturedCallbacks.get('/music/adventure/1_level_1.mp3');
+      expect(track1Cbs?.onend).toBeDefined();
       act(() => {
-        capturedOnEndCallbacks[0](); // First adventure track's onend
+        track1Cbs!.onend();
       });
 
       // THEN - should loop: seek to 0, play again, fade in
@@ -395,19 +395,7 @@ describe('useAdventureMusic', () => {
       expect(mockFade).toHaveBeenCalled();
     });
 
-    it('continues looping even when window was briefly unfocused', async () => {
-      // GIVEN - capture onend callback from adventure music Howl (not MusicProvider)
-      const { Howl } = await import('howler');
-      const capturedOnEndCallbacks: (() => void)[] = [];
-
-      Howl.mockImplementation(function(config: { onend?: () => void; src?: string[] }) {
-        // Only capture onend from adventure music tracks, not MusicProvider
-        if (config.onend && config.src?.[0]?.includes('/music/adventure/')) {
-          capturedOnEndCallbacks.push(config.onend);
-        }
-        return mockHowlInstance;
-      });
-
+    it('continues looping even when window was briefly unfocused', () => {
       renderHook(() =>
         useAdventureMusic({
           worldNumber: 1,
@@ -425,29 +413,18 @@ describe('useAdventureMusic', () => {
       mockFade.mockClear();
 
       // WHEN - track ends (even if window focus state varies)
-      expect(capturedOnEndCallbacks.length).toBeGreaterThan(0);
+      const track1Cbs = capturedCallbacks.get('/music/adventure/1_level_1.mp3');
+      expect(track1Cbs?.onend).toBeDefined();
       act(() => {
-        capturedOnEndCallbacks[0](); // First adventure track's onend
+        track1Cbs!.onend();
       });
 
       // THEN - should ALWAYS loop in adventure mode
-      // Music should restart regardless of window focus state
       expect(mockSeek).toHaveBeenCalledWith(0);
       expect(mockPlay).toHaveBeenCalled();
     });
 
-    it('does NOT loop when music is disabled', async () => {
-      // GIVEN
-      const { Howl } = await import('howler');
-      let capturedOnEnd: (() => void) | undefined;
-
-      Howl.mockImplementation(function(config: { onend?: () => void }) {
-        if (config.onend) {
-          capturedOnEnd = config.onend;
-        }
-        return mockHowlInstance;
-      });
-
+    it('does NOT loop when music is disabled', () => {
       const { rerender } = renderHook(
         ({ enabled }) =>
           useAdventureMusic({
@@ -465,9 +442,10 @@ describe('useAdventureMusic', () => {
       mockSeek.mockClear();
 
       // WHEN - track ends while disabled
-      expect(capturedOnEnd).toBeDefined();
+      const track1Cbs = capturedCallbacks.get('/music/adventure/1_level_1.mp3');
+      expect(track1Cbs?.onend).toBeDefined();
       act(() => {
-        capturedOnEnd!();
+        track1Cbs!.onend();
       });
 
       // THEN - should NOT loop
@@ -475,18 +453,7 @@ describe('useAdventureMusic', () => {
       expect(mockPlay).not.toHaveBeenCalled();
     });
 
-    it('does NOT loop when game is paused', async () => {
-      // GIVEN
-      const { Howl } = await import('howler');
-      let capturedOnEnd: (() => void) | undefined;
-
-      Howl.mockImplementation(function(config: { onend?: () => void }) {
-        if (config.onend) {
-          capturedOnEnd = config.onend;
-        }
-        return mockHowlInstance;
-      });
-
+    it('does NOT loop when game is paused', () => {
       const { rerender } = renderHook(
         ({ isPaused }) =>
           useAdventureMusic({
@@ -504,9 +471,10 @@ describe('useAdventureMusic', () => {
       mockSeek.mockClear();
 
       // WHEN - track ends while paused
-      expect(capturedOnEnd).toBeDefined();
+      const track1Cbs = capturedCallbacks.get('/music/adventure/1_level_1.mp3');
+      expect(track1Cbs?.onend).toBeDefined();
       act(() => {
-        capturedOnEnd!();
+        track1Cbs!.onend();
       });
 
       // THEN - should NOT loop when paused

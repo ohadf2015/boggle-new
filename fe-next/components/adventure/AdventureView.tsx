@@ -25,7 +25,7 @@ import {
 import dynamic from 'next/dynamic';
 import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 
-import { calculateWorldMastery } from '@/lib/adventure/mastery';
+import { calculateWorldMastery, convertQuestProgressWithTargets, deriveBossHighHealth } from '@/lib/adventure/mastery';
 import type { MasteryTier } from '@/types/adventure';
 import AdventureHub from './AdventureHub';
 import AdventureViewHeader from './AdventureViewHeader';
@@ -109,14 +109,17 @@ function AdventureView(): React.JSX.Element {
     [completions]
   );
 
+  const questProgressMap = progression?.chapterQuestProgress;
   const masteryTiers = useMemo(() => {
     const tiers: Record<number, MasteryTier> = {};
     for (let worldId = 1; worldId <= 10; worldId++) {
-      const mastery = calculateWorldMastery(worldId, completions, [], false, 0);
+      const questProgress = convertQuestProgressWithTargets(worldId, questProgressMap);
+      const bossHighHealth = deriveBossHighHealth(worldId, completions);
+      const mastery = calculateWorldMastery(worldId, completions, questProgress, bossHighHealth, 0);
       tiers[worldId] = mastery.tier;
     }
     return tiers;
-  }, [completions]);
+  }, [completions, questProgressMap]);
 
   // Boss Rush
   const bossRush = useBossRush(completions);

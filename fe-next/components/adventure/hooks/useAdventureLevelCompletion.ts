@@ -225,7 +225,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     const playerDied = isBossLevel && playerIsDead;
 
     const shouldComplete = isBossLevel
-      ? bossHealthPhase === 'victory' || bossHealthPhase === 'defeat' || timeRemaining === 0 || playerDied
+      ? bossHealthPhase === 'victory' || bossHealthPhase === 'defeat' || playerDied
       : gameState.isComplete || timeRemaining === 0;
 
     if (!shouldComplete) return;
@@ -252,7 +252,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
 
         if (isVictory) {
           handleEarnAchievementRef.current('BOSS_SLAYER');
-          if (timeRemaining > timerSeconds * 0.5) {
+          // Boss timer counts UP (elapsed seconds) — speedrun if under 60s
+          if (timeRemaining < 60) {
             handleEarnAchievementRef.current('BOSS_SPEEDRUN');
           }
           if (!playerIsDead && !playerTookDamageRef.current) {

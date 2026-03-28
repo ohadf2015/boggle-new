@@ -6,15 +6,18 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LetterFeedback } from '@/shared/types/game';
+import type { WordFeedback } from './WordFormingArea';
 
 interface WordHuntTargetAreaProps {
   targetLength: number;
   attempts: Array<{ guess: string; feedback: LetterFeedback[] }>;
   onSubmit: (guess: string) => void;
   found: boolean;
+  /** Word submission feedback (accepted/rejected/duplicate) shown inline */
+  wordFeedback?: WordFeedback | null;
 }
 
 const FEEDBACK_COLORS: Record<LetterFeedback, string> = {
@@ -28,9 +31,22 @@ export function WordHuntTargetArea({
   attempts,
   onSubmit,
   found,
+  wordFeedback,
 }: WordHuntTargetAreaProps) {
   const { t } = useLanguage();
   const [guess, setGuess] = useState('');
+  const [visibleFeedback, setVisibleFeedback] = useState<WordFeedback | null>(null);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Show word feedback for 2 seconds then auto-clear
+  useEffect(() => {
+    if (wordFeedback) {
+      setVisibleFeedback(wordFeedback);
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = setTimeout(() => setVisibleFeedback(null), 2000);
+    }
+    return () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); };
+  }, [wordFeedback]);
 
   const handleSubmit = () => {
     const trimmed = guess.trim();
@@ -59,6 +75,26 @@ export function WordHuntTargetArea({
           </div>
         ))}
       </div>
+
+      {/* Word submission feedback (accepted/rejected/duplicate) */}
+      {visibleFeedback && (
+        <div
+          data-testid="word-hunt-feedback"
+          className={`flex items-center gap-2 px-3 py-1 rounded-neo text-sm font-neo-body ${
+            visibleFeedback.type === 'accepted'
+              ? 'bg-green-500/20 text-green-400'
+              : visibleFeedback.type === 'duplicate'
+                ? 'bg-yellow-500/20 text-yellow-400'
+                : 'bg-red-500/20 text-red-400'
+          }`}
+        >
+          <span>{visibleFeedback.type === 'accepted' ? '✓' : visibleFeedback.type === 'duplicate' ? '⟳' : '✗'}</span>
+          <span>{visibleFeedback.word}</span>
+          {visibleFeedback.score && visibleFeedback.type === 'accepted' && (
+            <span className="font-neo-display text-neo-lime">+{visibleFeedback.score}</span>
+          )}
+        </div>
+      )}
 
       {/* Previous attempts */}
       {attempts.map((attempt, attemptIndex) => (

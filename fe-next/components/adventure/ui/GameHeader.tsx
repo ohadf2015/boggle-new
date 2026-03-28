@@ -10,7 +10,7 @@
 
 import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, MapPin, Coins, Flame } from 'lucide-react';
+import { Pause, Play, X, MapPin, Coins, Flame, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -47,6 +47,10 @@ interface GameHeaderProps {
   streakDays?: number;
   /** Streak multiplier (1.0-2.0) */
   streakMultiplier?: number;
+  /** Boss level — hides countdown timer, shows elapsed time instead */
+  isBossLevel?: boolean;
+  /** Elapsed time in seconds for boss fights (counts up from 0) */
+  elapsedTime?: number;
   className?: string;
 }
 
@@ -67,6 +71,8 @@ export const GameHeader = memo(function GameHeader({
   xpProgress,
   streakDays = 0,
   streakMultiplier = 1,
+  isBossLevel = false,
+  elapsedTime = 0,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -143,12 +149,21 @@ export const GameHeader = memo(function GameHeader({
 
       {/* Right: Timer & Controls — tighter spacing */}
       <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-        {/* Timer */}
-        <AdventureTimer
-          timerStore={timerStore}
-          timeRemaining={timeRemaining}
-          size="compact"
-        />
+        {/* Timer — hidden in boss fights, replaced with elapsed time */}
+        {isBossLevel ? (
+          <div className="flex items-center gap-1 px-2 py-1 bg-neo-red/15 rounded-neo border border-neo-red/30">
+            <Swords className="w-3.5 h-3.5 text-neo-red" />
+            <span className="text-xs font-mono font-bold text-neo-white tabular-nums">
+              {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
+            </span>
+          </div>
+        ) : (
+          <AdventureTimer
+            timerStore={timerStore}
+            timeRemaining={timeRemaining}
+            size="compact"
+          />
+        )}
 
         {/* Control Buttons — minimal chrome */}
         <div className="flex items-center gap-1">

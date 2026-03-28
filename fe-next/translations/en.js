@@ -6121,6 +6121,7 @@ const en = {
       "dailyQuestBonusComplete": "All quests complete! +50 bonus gold"
     },
     "retryLevel": "Retry",
+    "backToLevels": "World Map",
     "freeRetry": "Free Retry",
     "album": {
       "title": "Word Album",
@@ -7089,7 +7090,110 @@ const en = {
       "loreScroll": "Lore Scroll",
       "runeFragment": "Rune Fragment",
       "tapToOpen": "Tap to open",
-      "xp": "Experience"
+      "xp": "Experience",
+      "goldenQuill": "Golden Quill",
+      "worldEssence": "World Essence",
+      "ancientRelic": "Ancient Relic",
+      "cosmicShard": "Cosmic Shard"
+    },
+    "collection": {
+      "title": "Collection",
+      "collected": "collected",
+      "items": "items",
+      "category": {
+        "trophy": "Trophies",
+        "scroll": "Scrolls",
+        "rune": "Runes",
+        "relic": "Relics"
+      },
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "runeFragment": "Rune Fragment",
+      "runeFragmentDesc": "A glowing shard of ancient power",
+      "goldenQuill": "Golden Quill",
+      "goldenQuillDesc": "Awarded for a perfect first clear",
+      "cosmicShard": "Cosmic Shard",
+      "cosmicShardDesc": "The rarest treasure — a fragment of the cosmos itself",
+      "bossTrophy": {
+        "w1": "Forest Guardian Trophy",
+        "w2": "Desert Pharaoh Trophy",
+        "w3": "Ocean Leviathan Trophy",
+        "w4": "Mountain Titan Trophy",
+        "w5": "Jungle Serpent Trophy",
+        "w6": "Tundra Yeti Trophy",
+        "w7": "Volcano Dragon Trophy",
+        "w8": "Sky Griffon Trophy",
+        "w9": "Shadow Wraith Trophy",
+        "w10": "Cosmic Overlord Trophy"
+      },
+      "bossTrophyDesc": {
+        "w1": "Defeated the Forest Guardian",
+        "w2": "Defeated the Desert Pharaoh",
+        "w3": "Defeated the Ocean Leviathan",
+        "w4": "Defeated the Mountain Titan",
+        "w5": "Defeated the Jungle Serpent",
+        "w6": "Defeated the Tundra Yeti",
+        "w7": "Defeated the Volcano Dragon",
+        "w8": "Defeated the Sky Griffon",
+        "w9": "Defeated the Shadow Wraith",
+        "w10": "Defeated the Cosmic Overlord"
+      },
+      "loreScroll": {
+        "w1": "Forest Scroll",
+        "w2": "Desert Scroll",
+        "w3": "Ocean Scroll",
+        "w4": "Mountain Scroll",
+        "w5": "Jungle Scroll",
+        "w6": "Tundra Scroll",
+        "w7": "Volcano Scroll",
+        "w8": "Sky Scroll",
+        "w9": "Shadow Scroll",
+        "w10": "Cosmic Scroll"
+      },
+      "worldEssence": {
+        "w1": "Forest Essence",
+        "w2": "Desert Essence",
+        "w3": "Ocean Essence",
+        "w4": "Mountain Essence",
+        "w5": "Jungle Essence",
+        "w6": "Tundra Essence",
+        "w7": "Volcano Essence",
+        "w8": "Sky Essence",
+        "w9": "Shadow Essence",
+        "w10": "Cosmic Essence"
+      },
+      "worldEssenceDesc": {
+        "w1": "The pure spirit of the enchanted forest",
+        "w2": "The burning heart of the desert",
+        "w3": "A drop of the primordial ocean",
+        "w4": "The unbreakable core of the mountain",
+        "w5": "The wild pulse of the jungle",
+        "w6": "A frozen crystal of eternal winter",
+        "w7": "A spark from the volcano's heart",
+        "w8": "A feather from the highest clouds",
+        "w9": "A whisper from the shadow realm",
+        "w10": "A fragment of the cosmos itself"
+      },
+      "ancientRelic": {
+        "w5": "Jungle Idol",
+        "w6": "Frozen Compass",
+        "w7": "Obsidian Mask",
+        "w8": "Wind Chime",
+        "w9": "Shadow Mirror",
+        "w10": "Star Map"
+      },
+      "ancientRelicDesc": {
+        "w5": "An ancient idol from the depths of the jungle",
+        "w6": "A compass that always points to the coldest place",
+        "w7": "A mask forged in the heart of the volcano",
+        "w8": "A chime that plays the song of the wind",
+        "w9": "A mirror that reflects what was, not what is",
+        "w10": "A map showing paths between the stars"
+      }
     },
     "later": "Later",
     "nextLevel": "Next: Level",

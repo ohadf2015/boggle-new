@@ -35,8 +35,8 @@ export interface UseAdventureBossOrchestrationProps {
 
 export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrationProps) {
   const {
-    isBossLevel, worldId, levelNumber, showBossIntroConfig,
-    timeRemaining, isPlaying, startGame, startAIDirector,
+    isBossLevel, worldId, levelNumber: _levelNumber, showBossIntroConfig,
+    timeRemaining: _timeRemaining, isPlaying, startGame, startAIDirector,
     addTime, shake,
     bossDamageMultiplier = 1, blockFirstAttack = false, scrambleImmunity = false,
   } = props;
@@ -90,9 +90,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     setShowEdgeVignette(true);
     vignetteTimeoutRef.current = setTimeout(() => setShowEdgeVignette(false), 400);
 
-    if (attack.type === 'timePenalty' && attack.seconds) {
-      addTime(-attack.seconds);
-    } else if (attack.type === 'scramble') {
+    if (attack.type === 'scramble') {
       if (scrambleImmunity) return; // Blast Shield T3
       shake(3);
     } else if (attack.type === 'lockTiles') {
@@ -106,7 +104,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
       setGridEffectTrigger({ name: attack.gridEffect, id: gridEffectIdRef.current });
       shake(3);
     }
-  }, [addTime, shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity]);
+  }, [shake, playerHealth, bossDamageMultiplier, blockFirstAttack, scrambleImmunity]);
 
   // Victory handler
   const handleVictory = useCallback(() => {
@@ -166,23 +164,23 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     }
   }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime, bossMechanics]);
 
-  // Low time taunt
-  const lowTimeTriggedRef = useRef(false);
+  // Low health taunt (replaces low-time taunt since boss fights are untimed)
+  const lowHealthTriggedRef = useRef(false);
   useEffect(() => {
     if (
       bossIsActive &&
       isPlaying &&
-      timeRemaining <= 15 &&
-      timeRemaining > 0 &&
-      !lowTimeTriggedRef.current
+      playerHealth.healthState.currentHP > 0 &&
+      playerHealth.healthState.currentHP <= 25 &&
+      !lowHealthTriggedRef.current
     ) {
-      lowTimeTriggedRef.current = true;
-      bossTriggerTaunt('onLowTime');
+      lowHealthTriggedRef.current = true;
+      bossTriggerTaunt('onLowTime'); // Reuse taunt key — contextually fits "you're almost done"
     }
-    if (timeRemaining > 15) {
-      lowTimeTriggedRef.current = false;
+    if (playerHealth.healthState.currentHP > 25) {
+      lowHealthTriggedRef.current = false;
     }
-  }, [bossIsActive, isPlaying, timeRemaining, bossTriggerTaunt]);
+  }, [bossIsActive, isPlaying, playerHealth.healthState.currentHP, bossTriggerTaunt]);
 
   // Boss intro start handler
   const handleBossIntroStart = useCallback(() => {
@@ -249,7 +247,7 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     bossReset();
     setBattleState({ result: 'none', showFireworks: false, defeatedTier: 'standard' });
     firstAttackBlockedRef.current = false;
-    lowTimeTriggedRef.current = false;
+    lowHealthTriggedRef.current = false;
     // Reset boss intro so retry can re-trigger the battle start
     if (isBossLevel && showBossIntroConfig) {
       setShowBossIntro(true);

@@ -10,7 +10,7 @@
 
 import { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen, Home, Swords } from 'lucide-react';
+import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen, Home, Swords, Package } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -64,6 +64,10 @@ interface AdventureHubProps {
   onBossRush?: () => void;
   /** Whether Boss Rush is available (player has defeated at least 1 boss) */
   canBossRush?: boolean;
+  /** Number of collectible items the player owns */
+  collectionCount?: number;
+  /** Open the Collection panel */
+  onOpenCollection?: () => void;
 }
 
 // ==============================================
@@ -86,6 +90,8 @@ const AdventureHub = memo<AdventureHubProps>(({
   onWeeklyChallenge,
   onBossRush,
   canBossRush = false,
+  collectionCount = 0,
+  onOpenCollection,
   xp = 0,
 }) => {
   const { t } = useLanguageSafe();
@@ -378,6 +384,25 @@ const AdventureHub = memo<AdventureHubProps>(({
           <BookOpen className="w-5 h-5" />
           <span>{wordAlbumCount} {t('adventure.album.uniqueWords')}</span>
         </div>
+
+        {/* Collection */}
+        {onOpenCollection && (
+          <button
+            onClick={onOpenCollection}
+            className={cn(
+              'flex-1 py-3 px-4',
+              'flex flex-col items-center gap-1',
+              'bg-neo-purple/10 text-neo-purple',
+              'font-bold text-sm',
+              'border-2 border-neo-purple/30 rounded-neo',
+              'hover:bg-neo-purple/20',
+              'transition-all duration-150'
+            )}
+          >
+            <Package className="w-5 h-5" />
+            <span>{collectionCount} {t('adventure.collection.items')}</span>
+          </button>
+        )}
 
         {/* World Map */}
         <button

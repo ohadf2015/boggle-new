@@ -105,16 +105,12 @@ const LevelGrid = memo(function LevelGrid({
 
   useEffect(() => {
     const el = currentLevelRef.current;
-    const container = scrollContainerRef.current;
-    if (!el || !container) return;
+    if (!el) return;
 
-    // Small delay to let framer-motion stagger animation start
+    // Wait for parent slide-in (300ms) + stagger animations to settle
     const timer = setTimeout(() => {
-      const containerRect = container.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const scrollTop = container.scrollTop + (elRect.top - containerRect.top) - containerRect.height / 3;
-      container.scrollTo({ top: scrollTop, behavior: 'smooth' });
-    }, 400);
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [world.id]);

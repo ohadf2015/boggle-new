@@ -12,14 +12,16 @@
  */
 
 import toast from 'react-hot-toast';
-import { Trophy, Star, Sparkles } from 'lucide-react';
+import { Trophy, Star, Sparkles, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fireVictoryConfetti, fireFireworks } from '@/utils/confettiUtils';
 
 interface QuestCompletionOptions {
   questName: string;
   xpReward: number;
   goldReward?: number;
   isGrandSlam?: boolean;
+  isAllComplete?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -32,8 +34,42 @@ export function showQuestCompletionToast({
   xpReward,
   goldReward,
   isGrandSlam = false,
+  isAllComplete = false,
   t,
 }: QuestCompletionOptions) {
+  // Fire confetti based on achievement tier
+  if (isAllComplete) {
+    fireFireworks(4, 2500);
+  } else if (isGrandSlam) {
+    fireFireworks(3, 2000);
+  } else {
+    fireVictoryConfetti();
+  }
+
+  const bgStyle = isAllComplete
+    ? 'bg-gradient-to-br from-neo-lime/20 via-neo-navy to-neo-cyan/10 border-neo-lime'
+    : isGrandSlam
+      ? 'bg-gradient-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
+      : 'bg-neo-navy';
+
+  const iconBg = isAllComplete
+    ? 'bg-neo-lime shadow-[0_0_20px_rgba(191,255,0,0.4)]'
+    : isGrandSlam
+      ? 'bg-neo-yellow shadow-[0_0_20px_rgba(255,225,53,0.4)]'
+      : 'bg-neo-lime shadow-[0_0_12px_rgba(191,255,0,0.3)]';
+
+  const title = isAllComplete
+    ? t('quests.allComplete')
+    : isGrandSlam
+      ? t('quests.completion.grandSlam')
+      : questName;
+
+  const rewardColor = isAllComplete
+    ? 'text-neo-lime'
+    : isGrandSlam
+      ? 'text-neo-yellow'
+      : 'text-neo-lime';
+
   toast.custom(
     (toastInstance) => (
       <div
@@ -42,9 +78,7 @@ export function showQuestCompletionToast({
           'max-w-sm w-full mx-auto',
           'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          isGrandSlam
-            ? 'bg-gradient-to-br from-neo-yellow/20 via-neo-navy to-neo-yellow/10 border-neo-yellow'
-            : 'bg-neo-navy',
+          bgStyle,
           toastInstance.visible ? 'animate-neo-pop' : 'opacity-0 scale-75',
           'transition-all duration-300',
         )}
@@ -69,12 +103,12 @@ export function showQuestCompletionToast({
             className={cn(
               'flex-shrink-0 w-12 h-12 flex items-center justify-center',
               'rounded-full border-3 border-neo-black',
-              isGrandSlam
-                ? 'bg-neo-yellow shadow-[0_0_20px_rgba(255,225,53,0.4)]'
-                : 'bg-neo-lime shadow-[0_0_12px_rgba(191,255,0,0.3)]',
+              iconBg,
             )}
           >
-            {isGrandSlam ? (
+            {isAllComplete ? (
+              <Crown className="w-6 h-6 text-neo-black" aria-hidden="true" />
+            ) : isGrandSlam ? (
               <Sparkles className="w-6 h-6 text-neo-black" aria-hidden="true" />
             ) : (
               <Trophy className="w-6 h-6 text-neo-black" aria-hidden="true" />
@@ -84,15 +118,20 @@ export function showQuestCompletionToast({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <p className="font-neo-display text-sm font-black text-neo-white truncate">
-              {isGrandSlam ? t('quests.completion.grandSlam') : questName}
+              {title}
             </p>
+            {isAllComplete && (
+              <p className="font-neo-body text-xs text-neo-white/70 mt-0.5">
+                {t('quests.allCompleteDesc')}
+              </p>
+            )}
             <div className="flex items-center gap-3 mt-1">
               {/* XP reward */}
               <span
                 className={cn(
                   'inline-flex items-center gap-1',
                   'font-neo-display text-xs font-black',
-                  isGrandSlam ? 'text-neo-yellow' : 'text-neo-lime',
+                  rewardColor,
                 )}
               >
                 <Star className="w-3.5 h-3.5" aria-hidden="true" />
@@ -110,7 +149,7 @@ export function showQuestCompletionToast({
       </div>
     ),
     {
-      duration: 4000,
+      duration: isAllComplete ? 6000 : isGrandSlam ? 5000 : 4000,
       position: 'top-center',
     },
   );

@@ -75,13 +75,13 @@ function fetchWithRetry(
         await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, retryCount)));
         return attempt(retryCount + 1);
       }
-      logger.warn(`[ProgressionContext] ${url} failed:`, res.status);
+      logger.debug(`[ProgressionContext] ${url} failed:`, res.status);
     } catch (err) {
       if (retryCount < maxRetries) {
         await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, retryCount)));
         return attempt(retryCount + 1);
       }
-      logger.warn(`[ProgressionContext] ${url} error after ${maxRetries} retries:`, err instanceof Error ? err.message : err);
+      logger.debug(`[ProgressionContext] ${url} error after ${maxRetries} retries:`, err instanceof Error ? err.message : err);
     }
   }
   attempt(0);

@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 
 export type MissionType = 'wordHunt' | 'brainDrill' | 'adventure' | 'community';
@@ -55,8 +56,11 @@ function buildMissions(data: {
 
 export function useDailyMissions(): UseDailyMissionsReturn {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const playerId = user?.id ?? null;
   const isMounted = useRef(true);
+  const prevGrandSlamRef = useRef(false);
+  const hasShownGrandSlamToast = useRef(false);
 
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));
   const [grandSlamClaimed, setGrandSlamClaimed] = useState(false);
@@ -124,6 +128,22 @@ export function useDailyMissions(): UseDailyMissionsReturn {
 
   const completedCount = missions.filter(m => m.completed).length;
   const isGrandSlam = completedCount === 4;
+
+  // Show Grand Slam celebration toast when all 4 missions are completed
+  useEffect(() => {
+    if (isGrandSlam && !prevGrandSlamRef.current && !loading && !hasShownGrandSlamToast.current) {
+      hasShownGrandSlamToast.current = true;
+      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+        showQuestCompletionToast({
+          questName: '',
+          xpReward: 500,
+          isGrandSlam: true,
+          t,
+        });
+      });
+    }
+    prevGrandSlamRef.current = isGrandSlam;
+  }, [isGrandSlam, loading, t]);
 
   const refresh = useCallback(async () => {
     setLoading(true);

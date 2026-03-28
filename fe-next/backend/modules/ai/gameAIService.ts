@@ -163,7 +163,7 @@ export class GameAIService {
       // Step 6: Persist valid words (fire and forget)
       if (aiResult.isValid) {
         this.wordStore.saveToCommunityWords(normalizedWord, language).catch((err) => {
-          logger.error('AI_SERVICE', `Background save failed: ${err.message}`);
+          logger.debug('AI_SERVICE', `Background save failed: ${err.message}`);
         });
       }
 
@@ -293,7 +293,7 @@ export class GameAIService {
           `Saving ${validWords.length} AI-validated words to database`
         );
         this.wordStore.batchSaveToCommunityWords(validWords, language).catch((err) => {
-          logger.error('AI_SERVICE', `Batch save failed: ${err.message}`);
+          logger.debug('AI_SERVICE', `Batch save failed: ${err.message}`);
         });
       }
 
@@ -301,7 +301,7 @@ export class GameAIService {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error('AI_SERVICE', `Batch AI validation failed: ${errorMessage}`);
+      logger.warn('AI_SERVICE', `Batch AI validation failed: ${errorMessage}`);
 
       // Fill remaining results with errors
       for (const word of wordsNeedingAI) {

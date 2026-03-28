@@ -339,14 +339,16 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
           onClick={onExit}
           className={cn(
             'py-2.5 px-4 flex items-center justify-center gap-2',
-            'bg-transparent text-neo-white/60 font-bold text-base',
-            'hover:text-neo-white hover:bg-neo-white/5',
+            isFailed
+              ? 'flex-1 bg-neo-white/10 text-neo-white font-black text-base border-3 border-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
+              : 'bg-transparent text-neo-white/60 font-bold text-base border-2 border-neo-white/10',
+            'hover:text-neo-white hover:bg-neo-white/10',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
-            'rounded-neo border-2 border-neo-white/10 transition-all duration-200'
+            'rounded-neo transition-all duration-200'
           )}
         >
           <DoorOpen className="w-4 h-4" />
-          {t('common.exit')}
+          {isFailed ? t('adventure.backToLevels') : t('common.exit')}
         </button>
       </div>
     </div>

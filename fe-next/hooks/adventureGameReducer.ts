@@ -139,7 +139,7 @@ export function createInitialState(
     tiles: initializeTiles(grid, levelConfig),
     tilesVersion: 0,
     objectives: initializeObjectives(levelConfig),
-    timeRemaining: levelConfig.timerSeconds,
+    timeRemaining: levelConfig.isBossLevel ? 0 : levelConfig.timerSeconds,
     isPlaying: false,
     levelConfig,
     cascadeComplete: false,
@@ -356,6 +356,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'TICK': {
       if (!state.isPlaying) return state;
 
+      // Boss levels have no countdown — fight lasts until boss dies or player dies.
+      // Timer counts UP (elapsed time) for display purposes only.
+      if (state.levelConfig.isBossLevel) {
+        return { ...state, timeRemaining: state.timeRemaining + 1 };
+      }
+
       // Time Freeze: decrement freeze counter instead of game timer
       if (state.freezeRemaining > 0) {
         return { ...state, freezeRemaining: state.freezeRemaining - 1 };
@@ -397,6 +403,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'ADD_TIME': {
+      // Boss levels have no countdown — ignore time adjustments
+      if (state.levelConfig.isBossLevel) return state;
       const newTime = Math.max(
         0,
         Math.min(

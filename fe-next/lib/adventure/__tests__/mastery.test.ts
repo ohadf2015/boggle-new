@@ -1,4 +1,4 @@
-import { calculateMasteryTier, calculateMasteryCriteria, calculateWorldMastery } from '../mastery';
+import { calculateMasteryTier, calculateMasteryCriteria, calculateWorldMastery, convertQuestProgressWithTargets, deriveBossHighHealth } from '../mastery';
 import { getQuestsForChapter } from '../questConfig';
 import type { LevelCompletion, ChapterQuestProgress, ChapterQuest } from '@/types/adventure';
 
@@ -146,6 +146,46 @@ describe('mastery', () => {
       );
       const mastery = calculateWorldMastery(1, world2Completions, [], false, 0);
       expect(mastery.criteria.allLevelsCompleted).toBe(false);
+    });
+  });
+
+  describe('convertQuestProgressWithTargets', () => {
+    it('should return empty array for undefined input', () => {
+      expect(convertQuestProgressWithTargets(1, undefined)).toEqual([]);
+    });
+
+    it('should mark quests as complete when current >= target', () => {
+      const quests = getQuestsForChapter(1, 1);
+      const progressMap: Record<string, number> = {};
+      for (const q of quests) {
+        progressMap[q.id] = q.target; // exactly at target
+      }
+      const result = convertQuestProgressWithTargets(1, progressMap);
+      const chapter1Results = result.filter(r => quests.some(q => q.id === r.questId));
+      expect(chapter1Results.every(r => r.isComplete)).toBe(true);
+    });
+
+    it('should mark quests as incomplete when below target', () => {
+      const progressMap: Record<string, number> = {};
+      const result = convertQuestProgressWithTargets(1, progressMap);
+      expect(result.every(r => !r.isComplete)).toBe(true);
+    });
+  });
+
+  describe('deriveBossHighHealth', () => {
+    it('should return true when boss level (7) has 3 stars', () => {
+      const completions = makeCompletions([3, 3, 3, 3, 3, 3, 3]);
+      expect(deriveBossHighHealth(1, completions)).toBe(true);
+    });
+
+    it('should return false when boss level has < 3 stars', () => {
+      const completions = makeCompletions([3, 3, 3, 3, 3, 3, 1]);
+      expect(deriveBossHighHealth(1, completions)).toBe(false);
+    });
+
+    it('should return false when boss level not completed', () => {
+      const completions = makeCompletions([3, 3, 3, 3, 3, 3]);
+      expect(deriveBossHighHealth(1, completions)).toBe(false);
     });
   });
 });

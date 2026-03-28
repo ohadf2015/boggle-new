@@ -9,6 +9,7 @@
  * Design: RPG Quest Board meets Neo-Brutalist.
  */
 
+import { useEffect, useRef } from 'react';
 import { Trophy, Sword, Users, Gift, Sparkles, Target, Flame, Puzzle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
@@ -386,9 +387,27 @@ function AllQuestsCompleteBanner({ t }: { t: (key: string) => string }) {
 
 export function QuestHub() {
   const { t } = useLanguage();
-  const { missions, isGrandSlam, grandSlamClaimed, loading } =
+  const { missions, isGrandSlam, loading } =
     useDailyMissions();
   const { isComplete: weeklyComplete } = useWeeklyQuest();
+  const hasShownAllCompleteToast = useRef(false);
+
+  // Show "All Quests Complete" celebration when both daily + weekly are done
+  const allComplete = isGrandSlam && weeklyComplete;
+  useEffect(() => {
+    if (allComplete && !loading && !hasShownAllCompleteToast.current) {
+      hasShownAllCompleteToast.current = true;
+      import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+        showQuestCompletionToast({
+          questName: '',
+          xpReward: 250,
+          goldReward: 200,
+          isAllComplete: true,
+          t,
+        });
+      });
+    }
+  }, [allComplete, loading, t]);
 
   // Filter to only the 3 quests we show (no brain drill)
   const dailyCompleted = DAILY_QUEST_CONFIGS.filter((config) => {
@@ -464,8 +483,8 @@ export function QuestHub() {
           })}
         </AdaptiveMotion.div>
 
-        {/* Grand Slam — bouncy scale pop */}
-        {isGrandSlam && !grandSlamClaimed && (
+        {/* Grand Slam — show when all daily quests done (claimed or unclaimed) */}
+        {isGrandSlam && (
           <AdaptiveMotion.div
             className="mt-4"
             variants={grandSlamVariants}

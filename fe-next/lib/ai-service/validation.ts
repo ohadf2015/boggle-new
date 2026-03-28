@@ -106,10 +106,10 @@ export async function saveToCommunityWords(
       .eq('language', language);
 
     if (updateError) {
-      logger.error('AI_SERVICE', ' Failed to update community_words:', updateError.message);
+      logger.debug('AI_SERVICE', ' Failed to update community_words:', updateError.message);
     }
   } else if (insertError) {
-    logger.error('AI_SERVICE', ' Failed to insert community_words:', insertError.message);
+    logger.debug('AI_SERVICE', ' Failed to insert community_words:', insertError.message);
   }
 }
 
@@ -389,7 +389,7 @@ export async function checkDatabaseOnly(
     // Not in database - needs AI validation
     return { isValid: false, source: 'unknown' };
   } catch (error) {
-    logger.error('AI_SERVICE', ' checkDatabaseOnly error:', error);
+    logger.debug('AI_SERVICE', ' checkDatabaseOnly error:', error);
     return { isValid: false, source: 'unknown' };
   }
 }

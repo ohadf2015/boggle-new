@@ -236,15 +236,10 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
 
   if (totalPlayers === 0 || !currentUser) return null;
 
-  // Get top 3 players for race visualization (or fewer if less players)
-  const raceParticipants = sortedPlayers.slice(0, Math.min(4, totalPlayers));
-  const userInTop = raceParticipants.some(p => p.username === currentUsername);
-
-  // If user not in top, add them to race view
-  if (!userInTop && currentUser) {
-    raceParticipants.pop(); // Remove last of top 3
-    raceParticipants.push(currentUser);
-  }
+  // Get top 3 OTHER players for race visualization (exclude current user)
+  const raceParticipants = sortedPlayers
+    .filter(p => p.username !== currentUsername)
+    .slice(0, 3);
 
   return (
     <div className={cn(
@@ -314,12 +309,10 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                   <div className="absolute right-0 top-0 bottom-0 w-2 bg-[repeating-linear-gradient(0deg,#000,#000_2px,#fff_2px,#fff_4px)]" />
                 </div>
 
-                {/* Position indicator (race car on track) */}
-                <motion.div
-                  className="absolute top-0 bottom-0 flex items-center"
-                  initial={{ left: '0%' }}
-                  animate={{ left: `${Math.max(0, position - 15)}%` }}
-                  transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+                {/* Position indicator (race car on track) — static, no spring animation */}
+                <div
+                  className="absolute top-0 bottom-0 flex items-center transition-[left] duration-500 ease-out"
+                  style={{ left: `${Math.max(0, position - 15)}%` }}
                 >
                   {/* Player marker */}
                   <div className={cn(
@@ -348,14 +341,9 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                     />
 
                     {/* Score */}
-                    <motion.span
-                      key={player.score}
-                      initial={{ scale: 1.3 }}
-                      animate={{ scale: 1 }}
-                      className="text-xs font-black text-neo-black tabular-nums"
-                    >
+                    <span className="text-xs font-black text-neo-black tabular-nums">
                       {player.score}
-                    </motion.span>
+                    </span>
 
                     {/* Rank change indicator */}
                     <AnimatePresence>
@@ -390,7 +378,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
 
                 {/* Player name (right side) + streak flame + combo badge */}
                 <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">

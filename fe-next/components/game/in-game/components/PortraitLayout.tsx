@@ -423,8 +423,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Word Forming Area - tight spacing to board */}
-          {isPlaying && (
+          {/* Word Forming Area - tight spacing to board (hidden in word-hunt mode, feedback goes to clue boxes) */}
+          {isPlaying && gameMode !== 'word-hunt' && (
             <div className="relative flex items-center justify-center flex-shrink-0 mt-1 lg:mt-2 mb-1">
               <LeadChangeBanner event={leadChangeEvent ?? null} />
               <WordFormingArea
@@ -483,6 +483,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 attempts={wordHuntAttempts ?? []}
                 onSubmit={onWordHuntGuess}
                 found={wordHuntFound ?? false}
+                wordFeedback={currentFeedback}
               />
             </div>
           )}

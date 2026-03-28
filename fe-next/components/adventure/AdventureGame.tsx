@@ -158,12 +158,13 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [gameState.wordsFound.length, prevWordsFoundLen, tiles]);
 
+    // Flash challenges disabled during boss fights — boss mechanics are the challenge
     const flashChallenge = useFlashChallenge({
       worldId: levelConfig.world,
       totalTimeSeconds: levelConfig.timerSeconds ?? 120,
-      timeRemaining,
+      timeRemaining: isBossLevel ? 999 : timeRemaining,
       wordsFound: gameState.wordsFound,
-      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+      isPlaying: !isBossLevel && isPlaying && entryPhase === 'playing' && !isPaused,
       lastWordTileTypes,
       locale: language,
     });
@@ -517,7 +518,8 @@ const AdventureGame = memo<AdventureGameProps>(
             <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}
               score={gameState.score} timerStore={timerStore} isPaused={isPaused}
               onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
-              gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100} />
+              gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100}
+              isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}

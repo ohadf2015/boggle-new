@@ -45,6 +45,18 @@ const IGNORED_ERROR_PATTERNS = [
   /LogRocket has already been loaded/i,
   // Gifts network errors - transient errors with automatic retry (JAVASCRIPT-NEXTJS-8A, JAVASCRIPT-NEXTJS-74)
   /\[Gifts\].*Network error.*will retry/i,
+  // Realtime leaderboard connection retries - transient, auto-recovers (JAVASCRIPT-NEXTJS-31)
+  /\[Realtime\].*Leaderboard connection failed.*retrying/i,
+  // Socket not connected on join - transient state during page load (JAVASCRIPT-NEXTJS-35)
+  /\[JOIN\].*Cannot join.*socket not connected/i,
+  // Supabase auth lock timeout - React Strict Mode race condition (JAVASCRIPT-NEXTJS-Q1)
+  /Lock.*was not released within.*Forcefully acquiring/i,
+  // Clipboard copy failures - browser permission issue, not a bug (JAVASCRIPT-NEXTJS-NJ)
+  /Clipboard copy failed/i,
+  // PWA service worker registration - expected failure on some browsers (JAVASCRIPT-NEXTJS-32)
+  /\[PWA\].*Service worker registration failed/i,
+  // Duplicate completeLevel - defensive guard, not a bug (JAVASCRIPT-NEXTJS-PN)
+  /\[ProgressionContext\].*Skipping duplicate completeLevel/i,
 ] as const;
 
 // Store original console methods

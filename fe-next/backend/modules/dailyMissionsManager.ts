@@ -186,6 +186,16 @@ export async function checkAndClaimGrandSlam(
     return { claimed: false, reward: 0 };
   }
 
+  // Actually grant the XP reward
+  const { error: xpError } = await supabase.rpc('increment_player_xp', {
+    p_player_id: playerId,
+    p_xp_amount: GRAND_SLAM_XP,
+  });
+
+  if (xpError) {
+    logger.error('DAILY_MISSIONS', `Grand slam XP grant failed for ${playerId}: ${xpError.message}`);
+  }
+
   logger.info('DAILY_MISSIONS', `Grand Slam claimed by ${playerId}: ${GRAND_SLAM_XP} XP`);
   return { claimed: true, reward: GRAND_SLAM_XP };
 }

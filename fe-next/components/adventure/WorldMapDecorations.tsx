@@ -156,8 +156,7 @@ export function TrailPath({
             stroke="#FFE135"
             strokeWidth="10"
             strokeLinecap="round"
-            opacity={0.2}
-            style={{ filter: 'blur(12px)' }}
+            opacity={0.15}
           />
         )}
         <path

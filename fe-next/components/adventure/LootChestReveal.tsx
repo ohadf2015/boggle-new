@@ -22,6 +22,7 @@ const RARITY_GLOW: Record<LootRarity, string> = {
   common: 'shadow-hard-sm',
   rare: 'shadow-[0_0_12px_theme(colors.neo-cyan)]',
   epic: 'shadow-[0_0_16px_theme(colors.neo-pink)]',
+  legendary: 'shadow-[0_0_20px_theme(colors.neo-yellow)] ring-2 ring-neo-yellow/50',
 };
 
 const CHEST_IMAGES: Record<ChestTier, { closed: string; open: string }> = {
@@ -46,6 +47,10 @@ const DROP_IMAGES: Record<string, string> = {
   bossTrophy: '/images/adventure/loot/loot-boss-trophy.webp',
   runeFragment: '/images/runes/rune-goldvein.webp',
   loreScroll: '/images/adventure/floating-scroll.webp',
+  goldenQuill: '/images/adventure/loot/loot-golden-quill.webp',
+  worldEssence: '/images/adventure/loot/loot-world-essence.webp',
+  ancientRelic: '/images/adventure/loot/loot-ancient-relic.webp',
+  cosmicShard: '/images/adventure/loot/loot-cosmic-shard.webp',
 };
 
 const DROP_NAME_KEYS: Record<string, string> = {
@@ -55,6 +60,10 @@ const DROP_NAME_KEYS: Record<string, string> = {
   runeFragment: 'adventure.loot.runeFragment',
   loreScroll: 'adventure.loot.loreScroll',
   bossTrophy: 'adventure.loot.bossTrophy',
+  goldenQuill: 'adventure.loot.goldenQuill',
+  worldEssence: 'adventure.loot.worldEssence',
+  ancientRelic: 'adventure.loot.ancientRelic',
+  cosmicShard: 'adventure.loot.cosmicShard',
 };
 
 const CHEST_TIER_BORDER: Record<ChestTier, string> = {
