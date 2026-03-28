@@ -3,8 +3,7 @@ FROM node:22-alpine AS deps
 
 WORKDIR /app
 
-# Copy only package files — source changes won't bust this layer
-COPY fe-next/package.json fe-next/package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 
 RUN npm ci --no-audit --no-fund
 
@@ -16,7 +15,7 @@ FROM node:22-alpine AS proddeps
 
 WORKDIR /app
 
-COPY fe-next/package.json fe-next/package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 
 RUN npm ci --no-audit --no-fund --omit=dev
 
@@ -25,19 +24,17 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Reuse cached node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY fe-next/ ./
+COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Build the Express server bundle (esbuild — ~2s)
+RUN node scripts/bundle-server.mjs
+
 # Build Next.js with standalone output → .next/standalone/
 RUN npm run build --ignore-scripts
-
-# Bundle the custom Express server with esbuild → dist/server.cjs
-# This replaces runtime tsx transpilation for faster cold starts
-RUN node scripts/bundle-server.mjs
 
 # ── Stage 4: Production image (slim) ─────────────────────────────────
 FROM node:22-alpine AS runner
@@ -45,6 +42,10 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 # Combine apk + supabase CLI into one layer to reduce layer count
 RUN apk add --no-cache curl bash && \
@@ -53,33 +54,33 @@ RUN apk add --no-cache curl bash && \
 
 # Production node_modules for Express server externals (socket.io, ioredis, etc.)
 # Copied FIRST so standalone's traced node_modules overlay correctly
-COPY --from=proddeps --chown=node:node /app/node_modules ./node_modules
+COPY --from=proddeps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Next.js standalone output overlays on top (has its own traced deps in node_modules/)
-COPY --from=builder --chown=node:node --link /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Copy static assets and public (not included in standalone output)
-COPY --from=builder --chown=node:node --link /app/.next/static ./.next/static
-COPY --from=builder --chown=node:node /app/public ./public
-
-# Copy bundled server + worker + dictionary files
-COPY --from=builder --chown=node:node /app/dist ./dist
-
-# Copy dictionary txt files to app root for dictionaryEnrichment.ts
-# (uses path.resolve(__dirname, '../hebrew_words_approved.txt') from dist/)
-COPY --from=builder --chown=node:node /app/backend/*.txt ./
+# Custom Express server bundle + runtime files
+COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nextjs:nodejs /app/backend/*.txt ./backend/
+COPY --from=builder --chown=nextjs:nodejs /app/backend/data ./backend/data
 
 # Copy supabase migrations
-COPY --from=builder --chown=node:node /app/supabase ./supabase
+COPY --from=builder --chown=nextjs:nodejs /app/supabase ./supabase
 
-# Copy scripts
-COPY --from=builder --chown=node:node /app/scripts/docker-migrate.sh /app/scripts/docker-entrypoint.sh ./scripts/
+# Copy docker scripts
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/docker-migrate.sh /app/scripts/docker-entrypoint.sh ./scripts/
 RUN chmod +x ./scripts/*.sh
 
-# Run as non-root for security (node user exists in node:alpine)
-USER node
+# Create cache dir AFTER all COPY steps so it isn't overwritten
+RUN mkdir -p .next/cache && chown -R nextjs:nodejs .next
+
+USER nextjs
 
 EXPOSE 3001
+ENV PORT=3001
+ENV HOSTNAME="0.0.0.0"
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3001/health/live || exit 1
