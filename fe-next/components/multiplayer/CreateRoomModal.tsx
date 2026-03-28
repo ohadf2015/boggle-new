@@ -203,6 +203,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   maxLength={MAX_NAME_LENGTH}
                   autoFocus
+                  aria-required="true"
+                  aria-invalid={!!nameError}
+                  aria-describedby={nameError ? 'create-username-error' : undefined}
                   className={cn(
                     'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
                     'border-b-3 pb-1.5 outline-none transition-colors',
@@ -223,6 +226,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     {nameError ? (
                       <AdaptiveMotion.span
                         key="error"
+                        id="create-username-error"
                         initial={{ opacity: 0, x: -4 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0 }}
@@ -319,7 +323,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         </div>
 
         {/* ── CTA ── */}
-        <div className="px-5 pb-5 pt-1">
+        <div className="px-5 pt-1" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
           <AdaptiveMotion.button
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

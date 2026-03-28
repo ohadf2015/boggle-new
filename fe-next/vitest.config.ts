@@ -25,6 +25,13 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
+    environmentMatchGlobs: [
+      // Pure logic tests don't need jsdom — run in fast node environment
+      ['utils/**/*.test.ts', 'node'],
+      ['shared/**/*.test.ts', 'node'],
+      ['lib/**/*.test.ts', 'node'],
+      ['types/**/*.test.ts', 'node'],
+    ],
     include: [
       'components/**/*.test.{ts,tsx}',
       'hooks/**/*.test.{ts,tsx}',
@@ -62,12 +69,13 @@ export default defineConfig({
       '**/useAdventureCurrency.test.ts',
     ],
     testTimeout: 10000,
-    pool: 'forks',
-    maxForks: 4,
-    minForks: 1,
-    execArgv: ['--max-old-space-size=8192'],
+    pool: 'threads',
+    maxThreads: 8,
+    minThreads: 2,
+    useAtomics: true,
     teardownTimeout: 5000,
     hookTimeout: 10000,
+    fileParallelism: true,
     clearMocks: true,
     restoreMocks: false,
     css: {

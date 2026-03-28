@@ -73,7 +73,7 @@ const BossVictory = memo<BossVictoryProps>(
     const isNearMiss = !isVictory && bossHpDepleted >= 85; // boss had <15% HP left
     const dialogRef = useRef<HTMLDivElement>(null);
 
-    useFocusTrap(dialogRef, true);
+    useFocusTrap(dialogRef, true, onContinue);
 
     const formattedScore = useMemo(
       () => score.toLocaleString(),

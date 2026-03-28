@@ -60,6 +60,8 @@ interface LevelCompleteModalProps {
     killingWord: string;
     playerName: string;
   } | null;
+  saveFailed?: boolean;
+  onRetrySave?: () => void;
 }
 
 // ==============================================
@@ -108,6 +110,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     canRetryFree = false,
     nextLevelPreview,
     bossDefeatShare: _bossDefeatShare,
+    saveFailed,
+    onRetrySave,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -326,6 +330,8 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               canRetryFree={canRetryFree}
               stars={stars}
               goldEarned={goldEarned}
+              saveFailed={saveFailed}
+              onRetrySave={onRetrySave}
               t={t}
             />
           </AdaptiveMotion.div>

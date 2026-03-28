@@ -172,7 +172,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           </div>
         </DialogBody>
 
-        <DialogFooter className="sticky bottom-0 bg-inherit z-10">
+        <DialogFooter className="sticky bottom-0 bg-inherit z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
           <Button
             variant="default"
             size="lg"

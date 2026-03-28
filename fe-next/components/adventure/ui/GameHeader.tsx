@@ -159,7 +159,7 @@ export const GameHeader = memo(function GameHeader({
             whileTap={{ scale: 0.92 }}
             className={cn(
               'p-1.5 sm:p-2 rounded-neo',
-              'min-w-9 min-h-9 sm:min-w-10 sm:min-h-10 flex items-center justify-center',
+              'min-w-11 min-h-11 flex items-center justify-center',
               'transition-colors duration-200',
               isPaused
                 ? 'bg-neo-lime text-neo-black'
@@ -181,7 +181,7 @@ export const GameHeader = memo(function GameHeader({
             whileTap={{ scale: 0.92 }}
             className={cn(
               'p-1.5 sm:p-2 rounded-neo',
-              'min-w-9 min-h-9 sm:min-w-10 sm:min-h-10 flex items-center justify-center',
+              'min-w-11 min-h-11 flex items-center justify-center',
               'bg-neo-white/5 text-neo-white/40',
               'hover:bg-neo-red/15 hover:text-neo-red/80',
               'transition-colors duration-200'

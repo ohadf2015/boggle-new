@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Copy, LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../RoomChat';
@@ -122,6 +122,16 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   // Display all players (including host) to everyone
   const displayPlayers = filteredPlayers ?? playersReady;
 
+  // Copy feedback
+  const [codeCopied, setCodeCopied] = useState(false);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const handleCopyCode = useCallback(() => {
+    navigator.clipboard.writeText(gameCode);
+    setCodeCopied(true);
+    clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = setTimeout(() => setCodeCopied(false), 2000);
+  }, [gameCode]);
+
   // Avatar builder (player-only)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -171,11 +181,16 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
               </span>
               {isHost && (
                 <button
-                  onClick={() => navigator.clipboard.writeText(gameCode)}
-                  className="text-slate-400 hover:text-neo-white transition-colors p-1"
-                  aria-label={t('roomCode.copy')}
+                  onClick={handleCopyCode}
+                  className={cn(
+                    'p-1.5 rounded transition-colors',
+                    codeCopied
+                      ? 'text-neo-lime'
+                      : 'text-slate-400 hover:text-neo-white',
+                  )}
+                  aria-label={codeCopied ? t('roomCode.copied') : t('roomCode.copy')}
                 >
-                  <Copy className="w-4 h-4" />
+                  {codeCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
               )}
             </div>

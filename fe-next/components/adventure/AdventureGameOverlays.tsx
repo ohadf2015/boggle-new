@@ -85,6 +85,9 @@ export interface AdventureGameOverlaysProps {
   onNextWorld?: () => void;
   retriesUsed: number;
   freeRetriesPerWorld: number;
+  // Save state
+  saveFailed?: boolean;
+  onRetrySave?: () => void;
   // Story beat
   storyBeat: any;
   showStoryBeat: boolean;
@@ -117,7 +120,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
   timeRemaining, t,
   showLootChest, lootDrops,
   objectives, totalStars, bestAttempt, previousBestStars, earnedXp, earnedGold, isLastLevelOfWorld, onNextWorld,
-  retriesUsed, freeRetriesPerWorld,
+  retriesUsed, freeRetriesPerWorld, saveFailed, onRetrySave,
   storyBeat, showStoryBeat,
   currentPopup, scoreDisplayRef, reaction, dismissReaction,
   chainBurstConfig, setChainBurstConfig, particleConfig, setParticleConfig,
@@ -216,7 +219,8 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
         xpEarned={earnedXp} goldEarned={earnedGold}
         isLastLevelOfWorld={isLastLevelOfWorld}
         onNextWorld={onNextWorld}
-        canRetryFree={retriesUsed < freeRetriesPerWorld} />
+        canRetryFree={retriesUsed < freeRetriesPerWorld}
+        saveFailed={saveFailed} onRetrySave={onRetrySave} />
     )}
 
     {storyBeat && (

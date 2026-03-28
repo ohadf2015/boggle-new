@@ -353,6 +353,18 @@ const AdventureGame = memo<AdventureGameProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState.comboCount, isPlaying, entryPhase, isPaused, init]);
 
+    // Auto-pause when tab/app goes to background (prevents timer drain on mobile)
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (document.hidden && isPlaying && entryPhase === 'playing' && !isPaused) {
+          pauseGame();
+          setIsPaused(true);
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [isPlaying, entryPhase, isPaused, pauseGame]);
+
     const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => () => { if (hintTimerRef.current) clearTimeout(hintTimerRef.current); }, []);
 
@@ -588,6 +600,20 @@ const AdventureGame = memo<AdventureGameProps>(
               objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt} previousBestStars={previousBestStars}
               earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
+              saveFailed={levelCompletion.completionSaveFailedRef.current && showLevelComplete}
+              onRetrySave={() => {
+                saveCompletionToDb(
+                  levelConfig.world, levelConfig.level,
+                  gameState.stars as 0 | 1 | 2 | 3,
+                  gameState.score, gameState.wordsFound.length,
+                  levelCompletion.earnedGold
+                ).then((ok) => {
+                  if (ok) {
+                    levelCompletion.completionSaveFailedRef.current = false;
+                    levelCompletion.completionSavedRef.current = true;
+                  }
+                });
+              }}
               retriesUsed={retriesUsed} freeRetriesPerWorld={init.upgradeEffects.freeRetriesPerWorld ?? 0}
               storyBeat={storyBeat} showStoryBeat={showStoryBeat}
               currentPopup={effects.currentPopup} scoreDisplayRef={effects.scoreDisplayRef}

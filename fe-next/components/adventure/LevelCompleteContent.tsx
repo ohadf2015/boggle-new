@@ -265,16 +265,35 @@ export interface LevelCompleteActionsProps {
   canRetryFree: boolean;
   stars: number;
   goldEarned?: number;
+  saveFailed?: boolean;
+  onRetrySave?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
-  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, t,
+  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, t,
 }) => {
   const [goldDoubled, setGoldDoubled] = useState(false);
 
   return (
     <div className="flex flex-col gap-2 p-4 md:p-6 pt-3 border-t border-neo-white/10 bg-neo-navy/95 backdrop-blur-sm flex-shrink-0">
+      {/* Save failed warning banner */}
+      {saveFailed && (
+        <div className="flex items-center gap-2 p-2.5 bg-neo-red/20 border-2 border-neo-red/50 rounded-neo" role="alert">
+          <span className="text-neo-red text-xs font-bold flex-1">
+            {t('adventure.saveFailedWarning')}
+          </span>
+          {onRetrySave && (
+            <button
+              onClick={onRetrySave}
+              className="px-3 py-1 bg-neo-red text-neo-white text-xs font-black rounded-neo border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
+            >
+              {t('adventure.retrySave')}
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Double Coins Rewarded Ad */}
       {stars > 0 && !goldDoubled && (
         <RewardedAdButton name="adventure-double-coins" onReward={() => setGoldDoubled(true)} className="w-full">

@@ -93,8 +93,10 @@ vi.mock('@sentry/nextjs', () => ({
 }));
 
 // ==========================================
-// Mock Browser APIs
+// Mock Browser APIs (only in jsdom environment)
 // ==========================================
+
+const isBrowser = typeof window !== 'undefined';
 
 // Mock localStorage with functional storage
 const localStorageStore: Record<string, string> = {};
@@ -106,7 +108,6 @@ const localStorageMock = {
   get length() { return Object.keys(localStorageStore).length; },
   key: vi.fn((i: number) => Object.keys(localStorageStore)[i] ?? null),
 };
-(global as any).localStorage = localStorageMock;
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -117,24 +118,28 @@ const sessionStorageMock = {
   length: 0,
   key: vi.fn(),
 };
-(global as any).sessionStorage = sessionStorageMock;
 
-// Mock matchMedia
-const createMatchMediaMock = () => (query: string) => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addListener: vi.fn(),
-  removeListener: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
-});
+if (isBrowser) {
+  (global as any).localStorage = localStorageMock;
+  (global as any).sessionStorage = sessionStorageMock;
 
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: createMatchMediaMock(),
-});
+  // Mock matchMedia
+  const createMatchMediaMock = () => (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  });
+
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: createMatchMediaMock(),
+  });
+}
 
 // Mock ResizeObserver
 class MockResizeObserver {
