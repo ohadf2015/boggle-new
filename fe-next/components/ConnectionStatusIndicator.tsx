@@ -265,9 +265,11 @@ interface ConnectionBannerProps {
   className?: string;
   /** Show "Your score is safe" reassurance during active game */
   showScoreSafe?: boolean;
+  /** Callback to leave the game — shown as escape hatch when reconnection is failing */
+  onLeaveGame?: () => void;
 }
 
-export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, showScoreSafe }) => {
+export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, showScoreSafe, onLeaveGame }) => {
   const {
     isConnected,
     isReconnecting,
@@ -426,6 +428,23 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               </motion.span>
               <span>{t('connection.retryNow')}</span>
             </button>
+
+            {/* Leave Game escape hatch — visible after 3+ failed attempts */}
+            {onLeaveGame && reconnectAttempt >= 3 && (
+              <button
+                onClick={onLeaveGame}
+                className={cn(
+                  'px-4 py-2 rounded-neo',
+                  'bg-neo-black/50 text-neo-white/80',
+                  'font-bold text-xs uppercase tracking-wide',
+                  'border-2 border-neo-white/20',
+                  'hover:bg-neo-black/70 hover:text-neo-white',
+                  'transition-all duration-100'
+                )}
+              >
+                {t('adventure.leaveGame')}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>

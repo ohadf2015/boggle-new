@@ -5,7 +5,16 @@
  */
 
 import { getSupabase } from './supabase/client';
-import logger from '../utils/logger';
+// Dynamic import may produce nested { default: { default: ... } } due to CJS/ESM interop.
+// Unwrap until we find the actual Logger instance with .info().
+import _loggerImport from '../utils/logger';
+function _resolveLogger(obj: any, depth = 0): any {
+  if (depth > 5) return obj;
+  if (typeof obj?.info === 'function') return obj;
+  if (obj?.default) return _resolveLogger(obj.default, depth + 1);
+  return obj;
+}
+const logger = _resolveLogger(_loggerImport) as typeof _loggerImport;
 
 export type MissionType = 'word_hunt' | 'brain_drill' | 'adventure' | 'community';
 

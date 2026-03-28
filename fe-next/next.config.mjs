@@ -392,8 +392,8 @@ const nextConfig = {
 };
 
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
-// Source map upload options are optional (for better stack traces in Sentry dashboard)
-// Wrap with bundle analyzer (only active when ANALYZE=true)
+// Source map upload only in CI/production (SENTRY_AUTH_TOKEN present) — saves ~10-20s locally
+const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
 const sentryConfig = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
@@ -401,6 +401,7 @@ const sentryConfig = withSentryConfig(nextConfig, {
   silent: true,
   hideSourceMaps: true,
   sourcemaps: {
+    disable: !hasSentryToken,
     deleteSourcemapsAfterUpload: true,
   },
   webpack: {

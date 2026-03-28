@@ -27,6 +27,33 @@ import {
 } from '@/lib/adventure';
 
 // ==============================================
+// LOCAL STORAGE CACHE
+// ==============================================
+
+const PROGRESSION_CACHE_KEY = 'lexiclash_adventure_progression';
+
+function cacheProgression(data: PlayerProgression): void {
+  try {
+    localStorage.setItem(PROGRESSION_CACHE_KEY, JSON.stringify(data));
+  } catch { /* quota exceeded or SSR — ignore */ }
+}
+
+function loadCachedProgression(userId: string): PlayerProgression | null {
+  try {
+    const raw = localStorage.getItem(PROGRESSION_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PlayerProgression;
+    // Only use cache if it belongs to the current user
+    if (parsed.userId !== userId) return null;
+    return parsed;
+  } catch { return null; }
+}
+
+function clearCachedProgression(): void {
+  try { localStorage.removeItem(PROGRESSION_CACHE_KEY); } catch { /* ignore */ }
+}
+
+// ==============================================
 // HELPERS
 // ==============================================
 
@@ -137,11 +164,26 @@ interface ProgressionProviderProps {
 
 export function ProgressionProvider({ children }: ProgressionProviderProps) {
   const { user, loading: authLoading } = useAuth();
-  const [progression, setProgression] = useState<PlayerProgression | null>(null);
+  const [progression, setProgressionRaw] = useState<PlayerProgression | null>(null);
   const [attempts, setAttempts] = useState<LevelAttempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isAuthError, setIsAuthError] = useState(false);
+
+  // Wrap setProgression to also persist to localStorage.
+  // IMPORTANT: Setting to null does NOT clear the cache — this prevents auth hiccups
+  // from destroying cached progress. Cache is only cleared on explicit sign-out
+  // via clearProgressionCache().
+  const setProgression = useCallback((
+    update: PlayerProgression | null | ((prev: PlayerProgression | null) => PlayerProgression | null)
+  ) => {
+    setProgressionRaw((prev) => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      if (next) cacheProgression(next);
+      // Don't clear cache on null — auth failures shouldn't destroy cached progress
+      return next;
+    });
+  }, []);
 
   // Fetch progression and attempts from combined API endpoint
   // Uses /api/adventure/state which returns both in one request (~50-100ms faster)
@@ -150,10 +192,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     const BASE_DELAY = 1000;
 
     if (!user?.id) {
-      setProgression(null);
-      setAttempts([]);
-      setError(null);
-      setIsAuthError(false);
+      // No user — clear React state but keep cache (handled by hydration effect)
       setIsLoading(false);
       return;
     }
@@ -169,8 +208,9 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         });
 
         // Handle auth failures — flag as auth error so UI can offer re-login
+        // but DON'T clear localStorage cache (progress survives auth hiccups)
         if (response.status === 401) {
-          setProgression(null);
+          setProgressionRaw(null);
           setAttempts([]);
           setIsAuthError(true);
           setError(new Error('Session expired'));
@@ -683,12 +723,41 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [user?.id]
   );
 
-  // Initial fetch on mount (when auth is ready)
+  // Track previous user ID to detect sign-out (user changes from ID → null)
+  const prevUserIdRef = useRef<string | null>(null);
+
+  // Hydrate from localStorage immediately while waiting for API
   useEffect(() => {
-    if (!authLoading) {
-      fetchProgression();
+    const prevUserId = prevUserIdRef.current;
+    const currentUserId = user?.id ?? null;
+
+    if (!authLoading && currentUserId) {
+      // User is authenticated — load cache then fetch from server
+      const cached = loadCachedProgression(currentUserId);
+      if (cached && !progression) {
+        setProgressionRaw(cached);
+        setIsLoading(false); // Show cached data immediately
+      }
+      fetchProgression(); // Then refresh from server
+    } else if (!authLoading && !currentUserId) {
+      // No user — clear React state
+      setProgressionRaw(null);
+      setAttempts([]);
+      setError(null);
+      setIsAuthError(false);
+      setIsLoading(false);
+
+      // Only clear localStorage cache on explicit sign-out
+      // (previous user was set, now it's null = deliberate sign-out)
+      // Don't clear on initial load when prevUserId is still null
+      if (prevUserId) {
+        clearCachedProgression();
+      }
     }
-  }, [authLoading, fetchProgression]);
+
+    prevUserIdRef.current = currentUserId;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id]);
 
   // Memoize context value
   const contextValue = useMemo<ProgressionContextType>(

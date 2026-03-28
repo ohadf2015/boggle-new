@@ -37,6 +37,8 @@ export interface PowerUpBarProps {
   onScoreMultiplier: (expiresAt: number) => void;
   /** Optional dictionary for hint validation */
   dictionary?: Set<string>;
+  /** Cost of next hint (0 = free) — used for gold confirmation */
+  nextHintCost?: number;
   className?: string;
 }
 
@@ -79,9 +81,11 @@ export function PowerUpBar({
   onHint,
   onScoreMultiplier,
   dictionary = new Set(),
+  nextHintCost = 0,
   className,
 }: PowerUpBarProps) {
   const { t } = useLanguage();
+  const [pendingGoldConfirm, setPendingGoldConfirm] = useState(false);
 
   // Inventory for persistence
   const inventory = usePowerUpInventory();
@@ -164,6 +168,28 @@ export function PowerUpBar({
   /**
    * Handle Hint activation
    */
+  const executeHint = useCallback(() => {
+    // Activate power-up state machine
+    const success = hintState.activate();
+    if (!success) return;
+
+    // Persist cooldown to inventory
+    inventory.startCooldown('hint');
+
+    // Apply effect
+    const result = activateHint();
+    if (result === false) return;
+
+    // Trigger visual effect
+    setActiveEffect({
+      type: 'hint',
+      origin: { x: 0.5, y: 0.9 },
+    });
+
+    // Call parent callback with result
+    onHint(result as HintResult);
+  }, [hintState, inventory, activateHint, onHint]);
+
   const handleHint = useCallback(() => {
     // Check cascade blocking
     if (cascadeActive) {
@@ -171,30 +197,37 @@ export function PowerUpBar({
       return;
     }
 
-    // Activate power-up state machine
-    const success = hintState.activate();
-    if (!success) {
+    // Confirm gold spend when hint costs gold
+    if (nextHintCost > 0 && !pendingGoldConfirm) {
+      setPendingGoldConfirm(true);
+      toast(
+        (toastRef) => (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-bold">
+              {t('adventure.confirmSpendGold', { amount: String(nextHintCost) })}
+            </span>
+            <button
+              onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); executeHint(); }}
+              className="px-3 py-1 bg-neo-lime text-neo-black text-xs font-black rounded-neo border-2 border-neo-black"
+            >
+              {t('adventure.retrySave') === 'Retry' ? 'OK' : t('common.confirm') || 'OK'}
+            </button>
+            <button
+              onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); }}
+              className="px-2 py-1 text-xs font-bold text-neo-white/60"
+            >
+              ✕
+            </button>
+          </div>
+        ),
+        { duration: 8000, id: 'hint-gold-confirm' }
+      );
       return;
     }
 
-    // Persist cooldown to inventory
-    inventory.startCooldown('hint');
-
-    // Apply effect
-    const result = activateHint();
-    if (result === false) {
-      return;
-    }
-
-    // Trigger visual effect
-    setActiveEffect({
-      type: 'hint',
-      origin: { x: 0.5, y: 0.9 }, // Bottom-center position
-    });
-
-    // Call parent callback with result
-    onHint(result as HintResult);
-  }, [cascadeActive, hintState, inventory, activateHint, onHint, t]);
+    setPendingGoldConfirm(false);
+    executeHint();
+  }, [cascadeActive, nextHintCost, pendingGoldConfirm, executeHint, t]);
 
   /**
    * Handle Score Multiplier activation

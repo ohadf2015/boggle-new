@@ -409,11 +409,13 @@ export function generateObjectives(
 
   if (level % 2 === 1) {
     // Odd levels: word count
-    // Base: 8 words, +2 every 5 global levels, max 25
-    let target = Math.min(8 + Math.floor(globalLevel / 5) * 2, 25);
+    // Base: 5 words for W1, 6 for W2, 7 for W3, then ramps up
+    // Previous base of 8 was too punishing on small 4x4 grids for new players
+    const baseWords = world <= 1 ? 5 : world <= 2 ? 6 : world <= 3 ? 7 : 8;
+    let target = Math.min(baseWords + Math.floor(globalLevel / 5) * 2, 25);
 
     // Breather reduction for levels 3/5
-    target = Math.max(5, Math.round(target * breatherMultiplier));
+    target = Math.max(4, Math.round(target * breatherMultiplier));
 
     // Backpressure: cap wordCount based on available timer
     // 1 word per 4 seconds is very fast; cap at 80% of that
@@ -431,9 +433,8 @@ export function generateObjectives(
     // rainbow tiles (+25%) are common in adventure — effective avg ~65 pts
     const AVERAGE_WORD_SCORE = 65;
     const estimatedWordsInTime = timerSeconds / 5; // ~1 word per 5 seconds
-    // difficultyFactor scales from 0.35 (world 1) to 1.1 (world 10)
-    // W1 needs only ~35% of estimated output (new player friendly), ramping to full by W10
-    const difficultyFactor = 0.35 + (world - 1) * (0.75 / 9);
+    // difficultyFactor scales from 0.3 (world 1) to 1.1 (world 10)
+    const difficultyFactor = 0.3 + (world - 1) * (0.8 / 9);
     // Level progression bonus: +1.5% per global level beyond first
     const levelBonus = 1 + (globalLevel - 1) * 0.015;
     // Cap scales linearly per world so late worlds still have progression
@@ -458,12 +459,14 @@ export function generateObjectives(
 
   // --- Secondary 1: Complementary objective (opposite of primary) ---
   // If primary is wordCount, secondary is a score stretch goal (and vice versa)
-  const complementaryMultiplier = isBreatherLevel ? 0.5 : 0.7;
+  // Relax secondary objectives for early worlds so 3-star feels achievable
+  const worldSecondaryEase = world <= 2 ? 0.5 : world <= 4 ? 0.6 : 0.7;
+  const complementaryMultiplier = isBreatherLevel ? 0.4 : worldSecondaryEase;
   if (level % 2 === 1) {
     // Primary is wordCount → secondary is scoreTarget
     const AVERAGE_WORD_SCORE = 65;
     const estimatedWordsInTime = timerSeconds / 5;
-    const difficultyFactor = 0.7 + (world - 1) * (0.4 / 9);
+    const difficultyFactor = 0.5 + (world - 1) * (0.6 / 9);
     const target = Math.round(
       estimatedWordsInTime * AVERAGE_WORD_SCORE * difficultyFactor * complementaryMultiplier
     );
@@ -515,8 +518,8 @@ export function generateObjectives(
   // For level 1, add a time bonus as the second secondary
   // (since longWords doesn't kick in until level 2)
   if (level === 1) {
-    // Easy time bonus: finish with 20%+ time remaining
-    const target = Math.max(Math.round(timerSeconds * 0.2), 15);
+    // Easy time bonus: finish with 10%+ time remaining (very achievable for first-timers)
+    const target = Math.max(Math.round(timerSeconds * 0.1), 10);
     objectives.push({
       type: OBJECTIVE_TYPES.TIME_BONUS as ObjectiveType,
       target,

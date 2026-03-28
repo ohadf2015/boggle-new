@@ -34,6 +34,7 @@ interface JoinRoomModalProps {
   room: ActiveRoom | null;
   isJoining: boolean;
   onJoin: (username: string) => void;
+  onSpectate?: (username: string) => void;
   isAuthenticated: boolean;
   displayName: string | null;
   profileAvatar?: CustomAvatarConfig | null;
@@ -45,6 +46,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   room,
   isJoining,
   onJoin,
+  onSpectate,
   isAuthenticated,
   displayName,
   profileAvatar,
@@ -118,9 +120,17 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               <p className="font-bold text-neo-white truncate text-lg" title={room.roomName || room.gameCode}>
                 {room.roomName || room.gameCode}
               </p>
-              <p className="text-sm text-neo-cyan flex items-center gap-1.5 font-medium">
+              <p className={cn(
+                'text-sm flex items-center gap-1.5 font-medium',
+                room.maxPlayers && room.playerCount >= room.maxPlayers ? 'text-neo-red' : 'text-neo-cyan'
+              )}>
                 <Users className="w-4 h-4" />
-                {room.playerCount || 0} {t('joinView.players')}
+                {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
+                {room.maxPlayers && room.playerCount >= room.maxPlayers && (
+                  <span className="text-xs font-black uppercase ml-1">
+                    {t('adventure.roomFull')}
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -172,18 +182,35 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           </div>
         </DialogBody>
 
-        <DialogFooter className="sticky bottom-0 bg-inherit z-10" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
-          <Button
-            variant="default"
-            size="lg"
-            onClick={handleJoin}
-            disabled={isJoining}
-            className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-          >
-            {isJoining
-              ? t('multiplayerFlow.joinModal.joining')
-              : t('multiplayerFlow.joinModal.joinButton')}
-          </Button>
+        <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
+          {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
+            <>
+              <p className="text-xs text-center text-neo-white/60 font-bold">
+                {t('adventure.roomFullSpectate')}
+              </p>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => onSpectate?.(username.trim()) || handleJoin()}
+                disabled={isJoining}
+                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                {t('adventure.spectateButton')}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="default"
+              size="lg"
+              onClick={handleJoin}
+              disabled={isJoining}
+              className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            >
+              {isJoining
+                ? t('multiplayerFlow.joinModal.joining')
+                : t('multiplayerFlow.joinModal.joinButton')}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

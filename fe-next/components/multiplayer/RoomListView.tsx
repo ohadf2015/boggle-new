@@ -11,6 +11,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
+import { cn } from '@/lib/utils';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
 import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeCard';
@@ -407,8 +408,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               {LANGUAGE_FLAGS[room.language] || '🎮'} {mode.label}
                             </span>
                             <span className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className="text-[7px] font-bold text-white/40 uppercase">
-                              {room.playerCount || 0} {t('joinView.players')}
+                            <span className={cn(
+                              'text-[7px] font-bold uppercase',
+                              room.maxPlayers && room.playerCount >= room.maxPlayers
+                                ? 'text-neo-red/70'
+                                : 'text-white/40'
+                            )}>
+                              {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
                             </span>
                             {room.gameState === 'in-progress' && (
                               <>

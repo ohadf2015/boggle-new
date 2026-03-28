@@ -5,6 +5,7 @@
  */
 
 import type { Language, GameMode, GameUser, Spectator, LetterGrid } from '@/shared/types/game';
+import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
 
 // Game state type
 type GameStateValue = 'waiting' | 'in-progress' | 'validating' | 'finished';
@@ -41,6 +42,7 @@ export interface GameSummary {
   roomName: string;
   hostUsername: string | null;
   playerCount: number;
+  maxPlayers: number;
   gameState: string;
   language: Language;
   gameMode: GameMode;
@@ -79,6 +81,7 @@ export function getAllGames(games: Record<string, QueryGameBase>): GameSummary[]
     roomName: game.roomName,
     hostUsername: game.hostUsername,
     playerCount: Object.keys(game.users).length,
+    maxPlayers: MAX_PLAYERS_PER_ROOM,
     gameState: game.gameState,
     language: game.language,
     gameMode: game.gameMode || 'classic',
@@ -169,6 +172,7 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
       roomName: game.roomName,
       hostUsername: game.hostUsername,
       playerCount: humanCount,
+      maxPlayers: MAX_PLAYERS_PER_ROOM,
       gameState: game.gameState,
       language: game.language,
       gameMode: game.gameMode || 'classic',

@@ -128,8 +128,8 @@ describe('Adventure Constants', () => {
         const perTile = TIMER_DURATIONS[world] / GRID_TILES[world];
         // Every world should give at least 3 seconds per tile
         expect(perTile).toBeGreaterThanOrEqual(3);
-        // And no more than 8 (tutorial generosity)
-        expect(perTile).toBeLessThanOrEqual(8);
+        // And no more than 10 (early worlds are intentionally generous)
+        expect(perTile).toBeLessThanOrEqual(10);
       }
     });
   });

@@ -260,6 +260,7 @@ export interface ActiveRoom {
   roomName: string;
   language: Language;
   playerCount: number;
+  maxPlayers?: number;
   gameState: GameState;
   isRanked: boolean;
   createdAt: number;

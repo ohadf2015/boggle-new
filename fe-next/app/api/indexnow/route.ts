@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
+import { discoverPublicRoutes } from '@/utils/discoverRoutes';
 
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY || '207c6c1a7de212bfab82a5acf0b02280';
 const BASE_URL = 'https://www.lexiclash.live';
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
 
 /**
  * POST /api/indexnow - Submit URLs to IndexNow for faster indexing
  * Called by cron or manually after content changes (new blog posts, daily puzzles, etc.)
+ * Dynamically discovers all public routes from the filesystem.
  */
 export async function POST(request: Request) {
   if (!INDEXNOW_KEY) {
@@ -17,15 +20,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     urls = body.urls;
   } catch {
-    // Default: submit key pages
-    const locales = ['en', 'he', 'sv', 'ja', 'es'];
-    urls = locales.flatMap(l => [
-      `${BASE_URL}/${l}`,
-      `${BASE_URL}/${l}/daily`,
-      `${BASE_URL}/${l}/multiplayer`,
-      `${BASE_URL}/${l}/singleplayer`,
-      `${BASE_URL}/${l}/leaderboard`,
-    ]);
+    // Default: discover all public pages across all locales
+    const routes = await discoverPublicRoutes();
+    urls = LOCALES.flatMap(l => routes.map(r => `${BASE_URL}/${l}${r}`));
   }
 
   const payload = {

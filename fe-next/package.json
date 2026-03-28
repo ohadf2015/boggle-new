@@ -32,6 +32,7 @@
     "lighthouse:ci:mobile": "lhci autorun --config=./lighthouserc.mobile.cjs",
     "lighthouse:ci:desktop": "lhci autorun --config=./lighthouserc.desktop.cjs",
     "lighthouse:ci": "npm run lighthouse:ci:mobile && npm run lighthouse:ci:desktop",
+    "deploy": "bash scripts/deploy.sh",
     "stress": "node scripts/stress-test.js --clients=100 --duration=30",
     "db:drizzle:generate": "drizzle-kit generate",
     "db:drizzle:studio": "drizzle-kit studio",

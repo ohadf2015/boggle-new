@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Globe, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
-const PAGES = ['', '/daily', '/multiplayer', '/singleplayer', '/leaderboard'] as const;
 const BASE_URL = 'https://www.lexiclash.live';
 
 export function IndexNowPanel() {
@@ -15,8 +14,18 @@ export function IndexNowPanel() {
   const [error, setError] = useState<string | null>(null);
   const [customUrls, setCustomUrls] = useState('');
   const [mode, setMode] = useState<'all' | 'custom'>('all');
+  const [routes, setRoutes] = useState<string[]>([]);
+  const [routesLoading, setRoutesLoading] = useState(true);
 
-  const allUrls = LOCALES.flatMap(l => PAGES.map(p => `${BASE_URL}/${l}${p}`));
+  useEffect(() => {
+    fetch('/api/admin/routes')
+      .then(res => res.json())
+      .then(data => setRoutes(data.routes || []))
+      .catch(() => setRoutes([]))
+      .finally(() => setRoutesLoading(false));
+  }, []);
+
+  const allUrls = LOCALES.flatMap(l => routes.map(r => `${BASE_URL}/${l}${r}`));
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -70,7 +79,7 @@ export function IndexNowPanel() {
               : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
           )}
         >
-          All pages ({allUrls.length})
+          All pages ({routesLoading ? '...' : allUrls.length})
         </button>
         <button
           onClick={() => setMode('custom')}

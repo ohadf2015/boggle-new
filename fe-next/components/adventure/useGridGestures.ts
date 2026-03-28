@@ -295,7 +295,9 @@ export function useGridGestures({
           const gridRect = gridElement.getBoundingClientRect();
           const isOutsideGrid = touchY < gridRect.top || touchY > gridRect.bottom;
           if (isOutsideGrid) {
-            isDraggingRef.current = false;
+            // Cancel drag but still fire onDragEnd so any partial selection
+            // gets validated/cleared instead of hanging indefinitely.
+            handleDragEnd();
             return;
           }
         }
@@ -304,7 +306,7 @@ export function useGridGestures({
 
       processTouchMove(touchX, touchY);
     },
-    [disabled, interactive, processTouchMove, gridRef]
+    [disabled, interactive, processTouchMove, gridRef, handleDragEnd]
   );
 
   // Handle mouse up (ends drag)
@@ -351,7 +353,9 @@ export function useGridGestures({
           const gridRect = gridElement.getBoundingClientRect();
           const isOutsideGrid = touchY < gridRect.top || touchY > gridRect.bottom;
           if (isOutsideGrid) {
-            isDraggingRef.current = false;
+            // Cancel drag but still fire onDragEnd so any partial selection
+            // gets validated/cleared instead of hanging indefinitely.
+            handleDragEnd();
             return;
           }
         }
@@ -376,7 +380,7 @@ export function useGridGestures({
 
     element.addEventListener('touchmove', nativeTouchMoveHandler, { passive: false });
     return () => element.removeEventListener('touchmove', nativeTouchMoveHandler);
-  }, [gridRef, disabled, interactive, performanceConfig.isLowEnd, processTouchMove]);
+  }, [gridRef, disabled, interactive, performanceConfig.isLowEnd, processTouchMove, handleDragEnd]);
 
   // Clean up RAF on unmount
   useEffect(() => {

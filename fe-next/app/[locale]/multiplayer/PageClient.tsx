@@ -365,7 +365,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       <ErrorBoundary>
         <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-hidden">
           {/* Banners inside h-dvh so they participate in flex layout */}
-          {isActive ? <ConnectionBanner showScoreSafe /> : <ConnectionDot />}
+          {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
+            setIsActive(false); setIsHost(false); setGameCode('');
+            clearSession();
+            toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
+          }} /> : <ConnectionDot />}
           <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
           {isClassroomMode ? (
             <>

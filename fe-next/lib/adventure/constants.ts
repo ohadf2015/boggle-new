@@ -225,11 +225,11 @@ export function getGridSize(world: number): 4 | 5 | 6 | 7 {
  * New curve accounts for grid area growth at Worlds 3, 6, and 9.
  */
 export const TIMER_DURATIONS: Record<number, number> = {
-  1: 120, // 4x4 (16 tiles) — 7.5s/tile — generous tutorial
-  2: 115, // 4x4 (16 tiles) — 7.2s/tile
-  3: 145, // 5x5 (25 tiles) — 5.8s/tile — grid grows, generous bump to smooth W2→W3 transition
-  4: 125, // 5x5 (25 tiles) — 5.0s/tile
-  5: 120, // 5x5 (25 tiles) — 4.8s/tile
+  1: 120, // 4x4 (16 tiles) — 7.5s/tile — tutorial, comfortable but not trivial
+  2: 110, // 4x4 (16 tiles) — 6.9s/tile — slight pressure increase
+  3: 140, // 5x5 (25 tiles) — 5.6s/tile — grid grows, timer bumps to compensate
+  4: 135, // 5x5 (25 tiles) — 5.4s/tile
+  5: 125, // 5x5 (25 tiles) — 5.0s/tile
   6: 150, // 6x6 (36 tiles) — 4.2s/tile — grid grows again, timer bumps
   7: 140, // 6x6 (36 tiles) — 3.9s/tile
   8: 135, // 6x6 (36 tiles) — 3.8s/tile

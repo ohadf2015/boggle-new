@@ -751,12 +751,11 @@ describe('Score target calibration (Fix 1)', () => {
     const objectives = generateObjectives(1, 2);
     const scoreObj = objectives.find((o) => o.type === 'scoreTarget');
 
-    // Average word ~65 pts (accounts for gold/rainbow tile multipliers)
-    // estimatedWords = 120/5 = 24, difficultyFactor for world 1 = 0.35
-    // expected ~ 24 * 65 * 0.35 * 1.015 = ~554
+    // Average word ~65 pts, estimatedWords = 120/5 = 24, difficultyFactor = 0.3
+    // expected ~ 24 * 65 * 0.3 * 1.015 = ~475
     expect(scoreObj).toBeDefined();
-    expect(scoreObj!.target).toBeGreaterThanOrEqual(450);
-    expect(scoreObj!.target).toBeLessThanOrEqual(650);
+    expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
+    expect(scoreObj!.target).toBeLessThanOrEqual(550);
   });
 
   it('should produce higher score targets in later worlds', () => {
@@ -843,27 +842,27 @@ describe('Word count backpressure from timer (Fix 2)', () => {
   });
 
   describe('Early game score targets (difficulty curve audit)', () => {
-    it('W1 L2 score target should be under 600 (new player friendly)', () => {
+    it('W1 L2 score target should be moderate (normal difficulty)', () => {
       const config = getLevelConfig(1, 2);
       const scoreObj = config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
       );
       expect(scoreObj).toBeDefined();
-      expect(scoreObj!.target).toBeLessThanOrEqual(600);
+      expect(scoreObj!.target).toBeLessThanOrEqual(550);
       expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
     });
 
-    it('W1 L4 score target should be under 600 (gentle ramp)', () => {
+    it('W1 L4 score target should ramp slightly', () => {
       const config = getLevelConfig(1, 4);
       const scoreObj = config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary
       );
       expect(scoreObj).toBeDefined();
-      expect(scoreObj!.target).toBeLessThanOrEqual(600);
-      expect(scoreObj!.target).toBeGreaterThanOrEqual(500);
+      expect(scoreObj!.target).toBeLessThanOrEqual(550);
+      expect(scoreObj!.target).toBeGreaterThanOrEqual(400);
     });
 
-    it('difficulty should still ramp up by W5+', () => {
+    it('difficulty should ramp up by W5+', () => {
       const w5config = getLevelConfig(5, 2);
       const scoreObj = w5config.objectives.find(
         (o) => o.type === 'scoreTarget' && o.isPrimary

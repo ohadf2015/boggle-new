@@ -1,23 +1,20 @@
+# Nixpacks config for Railway (fallback if Dockerfile is not used)
+# Railway auto-detects Dockerfile first; this is only used if Dockerfile is deleted.
+
 [phases.setup]
-nixPkgs = ['nodejs_20']
-aptPkgs = []
+nixPkgs = ["nodejs_22"]
 
 [phases.install]
-dependsOn = ['setup']
-cmds = [
-    'NODE_ENV=development npm install --no-audit --no-fund --loglevel=error --force'
-]
-cacheDirectories = ['.next/cache']
+cmds = ["npm ci --prefer-offline"]
+cacheDirectories = ["node_modules"]
 
 [phases.build]
-dependsOn = ['install']
 cmds = [
-    'NODE_ENV=production npm run build --loglevel=error 2>&1 | grep -v "baseline-browser-mapping"'
+  "npm run build:schemas || true",
+  "node scripts/bundle-server.mjs",
+  "npm run build:fast",
 ]
-cacheDirectories = ['.next/cache']
+cacheDirectories = [".next/cache"]
 
 [start]
-cmd = 'npm start'
-
-[variables]
-NPM_CONFIG_LOGLEVEL = 'error'
+cmd = "node dist/server.cjs"
