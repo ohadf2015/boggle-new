@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json .npmrc ./
 # Full install (dev + prod) for building
-RUN npm ci --prefer-offline --legacy-peer-deps
+RUN npm ci --prefer-offline
 
 # ─── Stage 2: Production deps only ───────────────────────────────────
 # Separate stage for lean production node_modules
@@ -14,7 +14,7 @@ FROM node:22-alpine AS proddeps
 WORKDIR /app
 
 COPY package.json package-lock.json .npmrc ./
-RUN npm ci --prefer-offline --omit=dev --legacy-peer-deps
+RUN npm ci --prefer-offline --omit=dev
 
 # ─── Stage 3: Build ──────────────────────────────────────────────────
 FROM node:22-alpine AS builder
