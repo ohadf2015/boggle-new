@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # ── Stage 1: Install ALL dependencies (dev + prod) for building ──────
 FROM node:22-alpine AS deps
 
@@ -8,10 +6,7 @@ WORKDIR /app
 # Copy only package files — source changes won't bust this layer
 COPY fe-next/package.json fe-next/package-lock.json ./
 
-# npm ci: deterministic, skips resolution. Cache mount persists across builds.
-# --no-audit --no-fund: skip advisory checks during install (saves ~5s)
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 
 # ── Stage 2: Production deps only ────────────────────────────────────
 # Separate stage for lean production node_modules that includes ALL
@@ -23,8 +18,7 @@ WORKDIR /app
 
 COPY fe-next/package.json fe-next/package-lock.json ./
 
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund --omit=dev
+RUN npm ci --no-audit --no-fund --omit=dev
 
 # ── Stage 3: Build Next.js (standalone) + bundle server ──────────────
 FROM node:22-alpine AS builder
@@ -35,15 +29,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY fe-next/ ./
 
-# Persist .next/cache across builds — webpack/SWC compilation cache
 ENV NODE_ENV=production
-
-# NEXT_TELEMETRY_DISABLED: skip telemetry network calls during build
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build Next.js with standalone output → .next/standalone/
-RUN --mount=type=cache,target=/app/.next/cache \
-    npm run build --ignore-scripts
+RUN npm run build --ignore-scripts
 
 # Bundle the custom Express server with esbuild → dist/server.cjs
 # This replaces runtime tsx transpilation for faster cold starts
