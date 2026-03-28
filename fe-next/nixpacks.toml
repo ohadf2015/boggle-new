@@ -10,9 +10,8 @@ cacheDirectories = ["node_modules"]
 
 [phases.build]
 cmds = [
-  "npm run build:schemas || true",
   "node scripts/bundle-server.mjs",
-  "npm run build:fast",
+  "npm run build",
 ]
 cacheDirectories = [".next/cache"]
 

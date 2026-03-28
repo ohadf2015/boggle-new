@@ -23,15 +23,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build schemas (incremental)
-RUN npm run build:schemas || true
-
 # Build the Express server bundle (esbuild — ~2s)
 RUN node scripts/bundle-server.mjs
 
-# Build Next.js (standalone output)
+# Build schemas + Next.js (standalone output)
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build:fast
+RUN npm run build
 
 # ─── Stage 4: Production ─────────────────────────────────────────────
 FROM node:22-alpine AS runner
