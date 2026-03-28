@@ -39,7 +39,7 @@ But the question stuck with me. Boggle vs Scrabble. It's the Coke vs Pepsi of wo
 
 Boggle showed up later, in 1972, created by Allan Turoff and published by Parker Brothers. It was the rebellious younger sibling. No board. No tiles to place carefully. Just a tray of dice you shake like you're angry at the alphabet, a three-minute timer, and pure chaos. While Scrabble players were carefully calculating triple-word scores, Boggle players were scribbling words at light speed and arguing about whether "QI" counts.
 
-Both games survived the digital revolution. Both spawned countless imitators. But they represent fundamentally different philosophies about what a word game should be.`,
+Both games survived the digital revolution. Both spawned countless imitators. But they have totally different ideas about what a word game should be.`,
       },
       {
         title: 'Gameplay: Chess vs Speed Chess',
@@ -51,7 +51,7 @@ Boggle is real-time chaos. Everyone stares at the same 16-letter grid simultaneo
 
 Scrabble rewards vocabulary depth and strategic positioning. Knowing obscure two-letter words (ZA, QI, XI, JO) is basically a superpower. Boggle rewards pattern recognition speed and spatial awareness. You need to see connections between adjacent letters faster than everyone else.
 
-I genuinely love both, but they exercise completely different parts of your brain. If Scrabble is chess, Boggle is speed chess played during an earthquake.`,
+I love both, but they exercise completely different parts of your brain. If Scrabble is chess, Boggle is speed chess played during an earthquake.`,
       },
       {
         title: 'The Social Experience',
@@ -83,7 +83,7 @@ The honest truth about digital word games: almost all of them are worse than the
         title: 'Which Is Better for Your Brain?',
         content: `I looked into the research because I'm that kind of person.
 
-Both games are legitimately good for cognitive health. The science is pretty clear on word games in general: they strengthen verbal fluency, working memory, and processing speed. But they do it differently.
+Both games are good for cognitive health — the science on this is pretty clear. The science is pretty clear on word games in general: they strengthen verbal fluency, working memory, and processing speed. But they do it differently.
 
 Scrabble engages strategic thinking, planning ahead, and deep vocabulary recall. A 2014 study from the University of Calgary found that competitive Scrabble players develop enhanced visual word recognition, basically they process letter combinations faster than non-players. The strategic element also exercises executive function and decision-making.
 
@@ -95,7 +95,7 @@ If you can only pick one and you're worried about keeping your mind sharp? Boggl
       },
       {
         title: 'The Skill Ceiling',
-        content: `Scrabble has one of the highest skill ceilings of any board game, period. Top Scrabble players memorize the entire Official Scrabble Players Dictionary. All 180,000+ words. They study tile distribution probabilities. They know the optimal opening moves, the rack-balancing strategies, the endgame techniques. The gap between a casual player and a competitive player is enormous.
+        content: `Scrabble has one of the highest skill ceilings of any board game, period. Top Scrabble players memorize the entire Official Scrabble Players Dictionary. All 180,000+ words. They study tile distribution probabilities. They know the optimal opening moves, the rack-balancing strategies, the endgame techniques. The gap between someone who plays on weekends and someone who memorized the entire dictionary is basically a different sport.
 
 Boggle's skill ceiling is real but different. You can definitely get better at pattern recognition. Experienced players develop systematic scanning techniques, working through the grid methodically instead of randomly. But the element of randomness in each shake means that even a weaker player can occasionally beat an expert if the grid falls right.
 
@@ -174,7 +174,7 @@ Incredibly good. The strategic element means you're not just recognizing words b
 
 בוגל הופיע מאוחר יותר, ב-1972. הוא היה האח הצעיר המורד. בלי לוח. בלי אריחים לסדר בזהירות. רק מגש קוביות שמנערים כאילו כועסים על האלף-בית, טיימר של שלוש דקות, וכאוס טהור. בזמן שחקני סקראבל חישבו בזהירות ניקוד כפול-משולש, שחקני בוגל שרבטו מילים במהירות האור.
 
-שני המשחקים שרדו את המהפכה הדיגיטלית. שניהם הולידו חיקויים אינספור. אבל הם מייצגים פילוסופיות שונות לחלוטין של מה משחק מילים צריך להיות.`,
+שני המשחקים שרדו את המהפכה הדיגיטלית. שניהם הולידו חיקויים אינספור. אבל יש להם גישות שונות לחלוטין לשאלה מה בכלל משחק מילים צריך להיות.`,
       },
       {
         title: 'המשחקיות: שחמט מול שחמט בזק',
@@ -190,7 +190,7 @@ Incredibly good. The strategic element means you're not just recognizing words b
         title: 'החוויה החברתית',
         content: `כאן המשחקים באמת מתפצלים.
 
-סקראבל הוא משחק לשניים עד ארבעה, אבל בכנות הוא הכי טוב כדו-קרב. אתה ועוד בן אדם אחד, נעולים בקרב אינטלקטואלי איטי. יש טראש טוק, אבל מתוחכם. "אה, אתה שם מילה בלי ו'? אמיץ." אם מפסידים, יודעים בדיוק מי ניצח ואיך.
+סקראבל הוא משחק לשניים עד ארבעה, אבל בכנות הוא הכי טוב כדו-קרב. אתה ועוד בן אדם אחד, נעולים בקרב אינטלקטואלי איטי. יש פיקות, אבל מתוחכמות. "אה, אתה שם מילה בלי ו'? אמיץ." אם מפסידים, יודעים בדיוק מי ניצח ואיך.
 
 בוגל הוא משחק מסיבות שלובש תחפושת של משחק מילים. שישה אנשים סביב השולחן, כולם משחקים בו-זמנית, אף אחד לא מחכה, הטיימר נגמר ומישהו צורח "היה לי את זה!" כשקוראים את הרשימה. שיטת הניקוד, שבה מילים משותפות מתבטלות, אומרת שהמשחק האמיתי הוא למצוא מילים שאף אחד אחר לא מצא.
 
@@ -291,7 +291,7 @@ Men fragan drojde sig kvar. Boggle mot Scrabble. Det ar ordspelens Coca-Cola mot
 
 Boggle dok upp senare, 1972. Det var den rebelliska yngre syskonet. Inget brade. Inga brickor att placera forsiktigt. Bara ett fat med tarningar som man skakar som om man ar arg pa alfabetet, en tre-minuters timer och rent kaos.
 
-Bada spelen overlevde den digitala revolutionen. Bada fodde otaliga efterapare. Men de representerar fundamentalt olika filosofier om vad ett ordspel bor vara. I Sverige har vi en sarskild plats for ordspel tack vare Alfapet, var egen Scrabble-variant, sa vi fostar ordspelskulturen i dubbel dos.`,
+Bada spelen overlevde den digitala revolutionen. Bada fodde otaliga efterapare. Men de har helt olika syn pa vad ett ordspel egentligen ska vara. I Sverige har vi en sarskild plats for ordspel tack vare Alfapet, var egen Scrabble-variant, sa vi fostar ordspelskulturen i dubbel dos.`,
       },
       {
         title: 'Spelmekanik: Schack mot Blixtschack',
@@ -301,7 +301,7 @@ Scrabble ar turbaserad strategi. Du far sju brickor. Du stirrar pa dem. Du arran
 
 Boggle ar kaos i realtid. Alla stirrar pa samma 16-bokstavs-rutnatt samtidigt. Du har tre minuter. Hitta varje ord du kan. Kor. Det finns ingen turordning. Det finns ingen vantan. Det finns bara ljudet av pennor som skribblar och den tysta paniken nar sanden rinner ut.
 
-Scrabble belonar ordforadets djup och strategisk placering. Boggle belonar monsterigankanningens hastighet och rumslig medvetenhet. Jag alskar genuint bada, men de tratar helt olika delar av hjarnan.`,
+Scrabble belonar ordforadets djup och strategisk placering. Boggle belonar monsterigankanningens hastighet och rumslig medvetenhet. Jag alskar bada, men de tratar helt olika delar av hjarnan.`,
       },
       {
         title: 'Den Sociala Upplevelsen',
@@ -410,7 +410,7 @@ Otroligt bra. Det strategiska elementet betyder att du inte bara kanner igen ord
 
 日本ではしりとり文化があるので、「限られた時間で言葉を見つける」というボグルの感覚は意外と馴染みがあるかもしれません。スクラブルは漢字文化圏では少しハードルが高いですが、英語学習ツールとしては最強クラスです。
 
-両ゲームともデジタル革命を生き延びました。しかし、言葉ゲームとは何であるべきかについて、根本的に異なる哲学を代表しています。`,
+両ゲームともデジタル革命を生き延びました。しかし、「言葉ゲームとは何か」という問いへの答えが、まるで違います。`,
       },
       {
         title: 'ゲームプレイ：将棋 vs 早指し将棋',
@@ -442,7 +442,7 @@ Words With Friendsは基本的にダイエットスクラブルで、同じ課�
 
 ボグルのデジタル史はもっと混沌としています。公式版はまあまあから放棄まで様々。本当のイノベーションはクローンや精神的後継者で起きました。
 
-今の最高のデジタルボグル体験は、このブログを書いている立場なのでバイアスはありますが、LexiClashです。リアルタイムマルチプレイヤー、デイリーチャレンジ、複数のゲームモード。Pay-to-winのゴミなし。日本語対応も。`,
+今の最高のデジタルボグル体験は、このブログを書いている立場なのでバイアスはありますが、LexiClashです。リアルタイムマルチプレイヤー、デイリーチャレンジ、複数のゲームモード。課金で有利になる仕組みなし。日本語完全対応。`,
       },
       {
         title: '脳トレにはどちらが良い？',
@@ -537,7 +537,7 @@ Scrabble es estrategia por turnos. Recibes siete fichas. Las miras fijamente. La
 
 Boggle es caos en tiempo real. Todos miran la misma cuadricula de 16 letras simultaneamente. Tienes tres minutos. Encuentra cada palabra que puedas. Ya. No hay orden de turnos. No hay espera. Solo el sonido de lapices garabateando y el panico silencioso de ver la arena caer.
 
-Scrabble premia la profundidad del vocabulario y el posicionamiento estrategico. Boggle premia la velocidad de reconocimiento de patrones y la conciencia espacial. Amo genuinamente ambos, pero ejercitan partes completamente diferentes del cerebro.`,
+Scrabble premia la profundidad del vocabulario y el posicionamiento estrategico. Boggle premia la velocidad de reconocimiento de patrones y la conciencia espacial. Amo los dos, pero ejercitan partes completamente diferentes del cerebro.`,
       },
       {
         title: 'La Experiencia Social',

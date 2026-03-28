@@ -51,19 +51,19 @@ The core mechanic is tile placement and point optimization. You're not finding w
       },
       {
         title: 'Speed vs Strategy: The Core Divide',
-        content: `This is the fundamental split. Boggle is a sprint. Words With Friends is a chess match played in slow motion.
+        content: `This is the whole thing. Boggle is a sprint. Words With Friends is a chess match played in slow motion.
 
 In Boggle, you have maybe 120 seconds. Your brain enters a flow state where conscious thought takes a back seat and pure pattern recognition drives. You're not thinking "is QUIXOTIC in this grid?" — you're scanning letter clusters and your subconscious is shouting "THERE! THERE! THAT ONE!" It's almost athletic.
 
 Words With Friends gives you unlimited time per turn. You can stare at your tiles for twenty minutes, rearrange them, try different combinations, check if that weird word you half-remember from a crossword is actually valid. It's cerebral. Deliberate. Occasionally tedious.
 
-Neither is objectively better. But they scratch completely different itches. If you want adrenaline, Boggle wins by a landslide. If you want to feel like a sophisticated wordsmith pondering your next move over coffee, WWF has that vibe.
+They're solving different problems. If you want adrenaline, Boggle wins by a landslide. If you want to feel like a sophisticated wordsmith pondering your next move over coffee, WWF has that vibe.
 
 Personally? I want the adrenaline. Life is short and I've already had my coffee.`,
       },
       {
         title: 'Multiplayer: Real-Time vs "I\'ll Get Back to You"',
-        content: `Boggle multiplayer is electric. Everyone plays the same grid at the same time. When the timer hits zero, you compare word lists. The tension of knowing someone else is finding words you're missing RIGHT NOW is what makes it addictive. LexiClash nails this with live rooms where you can see opponents' scores ticking up in real time.
+        content: `Boggle multiplayer is alive in a way WWF never is. Everyone plays the same grid at the same time. When the timer hits zero, you compare word lists. The tension of knowing someone else is finding words you're missing RIGHT NOW is what makes it addictive. LexiClash nails this with live rooms where you can see opponents' scores ticking up in real time.
 
 Words With Friends multiplayer is... email. With tiles. You make a move. You get a notification three hours later. You make another move. You forget about the game for two days. Your opponent nudges you. You feel guilty. You play a word. Repeat for three weeks until someone wins by 12 points and neither of you really cares anymore.
 
@@ -75,7 +75,7 @@ I currently have seven active WWF games. I care deeply about zero of them. My la
 
 Boggle-style games have traditionally been simple. Grid, timer, words, done. The free versions either show you a few ads or offer a premium tier that removes them. LexiClash is completely free with no pay-to-win mechanics whatsoever. You win because you found more words, period.
 
-Words With Friends 2? Strap in. "Word Radar" highlights the best available word on the board. "Swap+" lets you exchange tiles without losing your turn. "Hindsight" shows you all the words you missed after each move. These are purchasable power-ups that give paying players a direct competitive advantage.
+Words With Friends 2? Strap in. "Word Radar" highlights the best available word on the board. "Swap+" lets you exchange tiles without losing your turn. "Hindsight" shows you all the words you missed after each move. Purchasable power-ups, all of them, that hand paying players a direct competitive advantage.
 
 Let me be blunt: if your opponent can spend $4.99 to see the optimal move and you can't, that's not a game. That's an auction.
 
@@ -89,7 +89,7 @@ Boggle's purity is its greatest feature. The grid doesn't care about your credit
 
 Words With Friends solo mode pits you against bots of varying difficulty. It's fine. The bots play like robots (obviously) — they always find the optimal word, which is either too easy on lower settings or demoralizing on higher ones. There's no flow state because there's no time pressure. You're just... placing tiles. Against a computer. In silence.
 
-For brain training, Boggle's time-pressure format is genuinely better. Studies show that timed word-finding tasks activate more neural pathways than untimed word placement. Your brain has to work faster, make connections quicker, and process visual patterns under stress. It's a workout. WWF solo is more like a crossword — pleasant, but not exactly cardio for your neurons.`,
+For brain training, Boggle's time-pressure format is just better. Studies show that timed word-finding tasks activate more neural pathways than untimed word placement. Your brain has to work faster, make connections quicker, and process visual patterns under stress. It's a workout. WWF solo is more like a crossword — pleasant, but not exactly cardio for your neurons.`,
       },
       {
         title: 'Community and Social Features',
@@ -116,19 +116,19 @@ For what it's worth, LexiClash combines the best of Boggle's real-time intensity
       {
         title: 'FAQ: Boggle vs Words With Friends',
         content: `Is Boggle harder than Words With Friends?
-Different hard. Boggle tests speed and pattern recognition under pressure. WWF tests vocabulary depth and strategic tile placement. Boggle is harder in the "my hands are shaking" sense. WWF is harder in the "I stared at my tiles for ten minutes" sense.
+Different kind of hard. Boggle tests speed and pattern recognition under pressure. WWF tests vocabulary depth and strategic tile placement. Boggle is harder in the "my hands are shaking" sense. WWF is harder in the "I stared at my tiles for ten minutes" sense.
 
 Can you play Boggle online for free?
-Yes. LexiClash offers free online Boggle-style gameplay with no downloads, no pay-to-win, and real-time multiplayer. Daily challenges and Adventure Mode included.
+Yes. LexiClash is free, no downloads, no pay-to-win, real-time multiplayer. Daily challenges and Adventure Mode included.
 
 Is Words With Friends pay-to-win?
-Effectively, yes. Power-ups like Word Radar and Swap+ give paying players direct competitive advantages. You can play without them, but you'll lose to people who use them.
+Effectively, yes. Word Radar and Swap+ give paying players a direct edge. You can play without them, but you will lose to people who use them.
 
 Which game is better for your brain?
-Timed word-finding (Boggle) activates more neural pathways than untimed tile placement (WWF). Both are good for vocabulary, but Boggle adds processing speed and visual scanning.
+Timed word-finding (Boggle) lights up more neural pathways than untimed tile placement (WWF). Both help with vocabulary, but Boggle also trains processing speed and visual scanning.
 
 Can I play both?
-Of course. They scratch different itches. But if you have to pick one, pick the one that doesn't charge you to compete fairly.`,
+Obviously. But if you have to pick one, pick the one that doesn't charge you to compete fairly.`,
       },
     ],
     backToBlog: 'Back to Blog',
@@ -163,7 +163,7 @@ Of course. They scratch different itches. But if you have to pick one, pick the 
         title: 'מה זה מילים עם חברים בעצם?',
         content: `מילים עם חברים (Words With Friends) הוא בעצם סקרבל עם לוח שונה ומילון יותר מתירני. שמים אריחים על לוח, צוברים נקודות לפי ערך אותיות ומשבצות בונוס, ואז מחכים שהיריב ישחק. ומחכים. ומחכים עוד.
 
-המשחק יצא ב-2009 והפך למשחק מילים הדיפולטיבי בטלפונים כי הוא פיצח את הזווית החברתית. אפשר לשחק עם הדודה בפלורידה בזמן שאתם אמורים לעבוד. הפורמט האסינכרוני אומר שמשחק בודד יכול להימשך ימים או שבועות.
+המשחק יצא ב-2009 והפך למשחק מילים הסטנדרטי בטלפונים כי הוא פיצח את הזווית החברתית. אפשר לשחק עם הדודה בפלורידה בזמן שאתם אמורים לעבוד. הפורמט האסינכרוני אומר שמשחק בודד יכול להימשך ימים או שבועות.
 
 המכניקה המרכזית היא הנחת אריחים ואופטימיזציה של ניקוד. לא מוצאים מילים תחת לחץ — מחפשים את המילה עם הכי הרבה נקודות מתוך שבעה אריחים, אידיאלית על משבצת כפולה-משולשת.`,
       },
@@ -175,13 +175,13 @@ Of course. They scratch different itches. But if you have to pick one, pick the 
 
 מילים עם חברים נותן זמן בלתי מוגבל לכל תור. אפשר לבהות באריחים עשרים דקות, לסדר אותם מחדש, לנסות שילובים שונים. זה מחושב. מכוון. לפעמים משעמם.
 
-אף אחד לא טוב יותר באובייקטיב. אבל הם מגרדים גירודים שונים לגמרי. רוצים אדרנלין? בוגל. רוצים להרגיש כמו פרופסור ללשון? WWF.
+הם פשוט פותרים בעיות שונות. קיימים בשביל מצבי רוח שונים לגמרי. רוצים אדרנלין? בוגל. רוצים להרגיש כמו פרופסור ללשון? WWF.
 
 באופן אישי? אני רוצה את האדרנלין. החיים קצרים.`,
       },
       {
         title: 'מולטיפלייר: זמן אמת מול "אחזור אליך"',
-        content: `מולטיפלייר בבוגל הוא חשמלי. כולם משחקים על אותו לוח באותו זמן. כשהטיימר מגיע לאפס, משווים רשימות. המתח של לדעת שמישהו אחר מוצא מילים שאתם מפספסים עכשיו ממש — זה מה שהופך את זה לממכר. ב-LexiClash יש חדרים חיים עם לידרבורד בזמן אמת.
+        content: `מולטיפלייר בבוגל חי ופועם. כולם משחקים על אותו לוח באותו זמן. כשהטיימר מגיע לאפס, משווים רשימות. המתח של לדעת שמישהו אחר מוצא מילים שאתם מפספסים עכשיו ממש — זה מה שהופך את זה לממכר. ב-LexiClash יש חדרים חיים עם לידרבורד בזמן אמת.
 
 מולטיפלייר ב-WWF הוא... אימייל. עם אריחים. משחקים מהלך. מקבלים התראה אחרי שלוש שעות. שוכחים מהמשחק ליומיים. היריב דוחף אתכם. מרגישים אשמה. משחקים מילה. חוזרים על זה שלושה שבועות.
 

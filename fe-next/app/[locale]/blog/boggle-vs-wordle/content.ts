@@ -39,7 +39,7 @@ Here's the thing: comparing Boggle and Wordle is like comparing tennis and golf.
 
 The magic of Boggle is the scanning. Your eyes dart across the grid, your brain pattern-matches like a caffeinated supercomputer, and suddenly you see QUARTZ hiding in the corner and you feel like a genius. For about two seconds, until the timer runs out and you realize you missed PIZZA right in the middle.
 
-It's fast, it's frantic, and it rewards both vocabulary size and spatial recognition. The best Boggle players have this weird peripheral vision thing where they see words that aren't even there yet. It's honestly a little creepy to watch.`,
+It moves fast, it's a little chaotic, and it rewards both vocabulary size and spatial recognition. The best Boggle players have this weird peripheral vision thing where they see words that aren't even there yet. It's honestly a little creepy to watch.`,
       },
       {
         title: 'How Wordle works (for the one person who doesn\'t know)',
@@ -53,9 +53,9 @@ Wordle is a deduction game. You're eliminating possibilities, narrowing the spac
         title: 'The key differences (a.k.a. why this debate exists)',
         content: `Here's the breakdown that would have saved me a hundred DMs.
 
-Speed vs. Patience. Boggle is a sprint — 3 minutes of pure adrenaline. Wordle is a slow burn — could be 30 seconds, could be 15 minutes of staring at your phone muttering "what five-letter word has a T and an R but not an E?"
+Speed vs. Patience. Boggle is a sprint, 3 minutes of pure adrenaline. Wordle is a slow burn. Could be 30 seconds, could be 15 minutes of staring at your phone muttering "what five-letter word has a T and an R but not an E?"
 
-Finding vs. Guessing. In Boggle, the words are there. You just have to see them. In Wordle, the word is hidden. You have to deduce it. One is pattern recognition, the other is logical elimination. Fundamentally different cognitive skills.
+Finding vs. Guessing. In Boggle, the words are there. You just have to see them. In Wordle, the word is hidden. You have to deduce it. One is pattern recognition, the other is logical elimination. Your brain does genuinely different work.
 
 Many words vs. One word. Boggle asks "how many can you find?" Wordle asks "can you find THE one?" Quantity vs. precision. Shotgun vs. sniper rifle.
 
@@ -73,7 +73,7 @@ The social element is unmatched. That little emoji grid you share — no spoiler
 
 Wordle is also the perfect "brain warm-up." It's the crossword puzzle of our generation. Quick, satisfying, done. You don't need to block out time for it. You do it while waiting for your coffee, while on hold with the cable company, while pretending to listen in a meeting.
 
-And the constraint — one puzzle, one chance — creates genuine stakes. There's no practice mode. No do-overs. When you get it in two guesses, you genuinely feel something. When you fail, it stings until tomorrow. That emotional range from a free browser game? Remarkable.
+And the constraint — one puzzle, one chance — creates genuine stakes. There's no practice mode. No do-overs. When you get it in two guesses, you genuinely feel something. When you fail, it stings until tomorrow. That emotional range from a free browser game? I didn't expect it either.
 
 For people who want a clean, minimal, no-commitment word game: Wordle is perfect. Genuinely perfect. I will not hear otherwise.`,
       },
@@ -81,9 +81,9 @@ For people who want a clean, minimal, no-commitment word game: Wordle is perfect
         title: 'When Boggle wins',
         content: `But here's where Boggle fans get smug.
 
-Boggle is a deeper game. I said it. The skill ceiling is astronomically higher. A casual Boggle player finds 15-20 words in three minutes. A competitive player finds 60-80. That gap? That's hundreds of hours of developing your spatial scanning, expanding your vocabulary, training your brain to see seven-letter words hiding in a grid of seemingly random letters.
+Boggle is a deeper game. I said it. The skill ceiling is way, way higher. A casual Boggle player finds 15-20 words in three minutes. A competitive player finds 60-80. That gap? That's hundreds of hours of developing your spatial scanning, expanding your vocabulary, training your brain to see seven-letter words hiding in a grid of seemingly random letters.
 
-Boggle also has that competitive edge that Wordle completely lacks. When you're playing against another human in real time and you both spot the same word at the same moment — that rush is electric. Wordle gives you a score. Boggle gives you a rivalry.
+Boggle also has that competitive edge that Wordle completely lacks. When you're playing against another human in real time and you both spot the same word at the same moment — that rush is something else. Wordle gives you a score. Boggle gives you a rivalry.
 
 The variety is another huge factor. Every Boggle board is different. Truly, meaningfully different. Some boards are generous — vowels everywhere, common letter combos. Others are brutal — consonant clusters that mock your vocabulary. You adapt or you lose. Wordle's daily word is fixed; your strategy is basically the same every time (start with CRANE or SLATE or whatever your starter word religion dictates).
 
@@ -99,31 +99,33 @@ Boggle is a hobby. It's the gym for your brain. You go when you have time, you p
 
 The real question isn't "which is better?" It's "what do you want right now?" And for most people, the answer changes depending on the day. Tuesday morning commute? Wordle. Saturday night with friends? Boggle. Wednesday at 2 AM when you can't sleep? Also Boggle, apparently. (Just me? Fine.)
 
-I play both. Every day. Wordle first — it takes three minutes and warms up my brain. Then I switch to LexiClash for the deeper Boggle-style gameplay, daily challenges, and the competitive multiplayer that scratches the itch Wordle can't reach. They complement each other perfectly.`,
+I play both. Every day. Wordle first — it takes three minutes and warms up my brain. Then I open LexiClash, which is where I get the deeper Boggle-style stuff, the daily challenges, the competitive multiplayer. It's what I actually use when Wordle isn't enough. The two don't step on each other at all.`,
       },
       {
         title: 'What about modern alternatives?',
         content: `Both Boggle and Wordle have spawned a universe of clones, variants, and spiritual successors. Some are good. Most are not.
 
-Wordle clones worth knowing: Quordle (four puzzles at once for the masochists), Connections (from the NYT, more of a categorization game), and Dordle (two at once, the gateway drug).
+Wordle clones worth knowing: Quordle (four puzzles at once for the masochists), Connections (from the NYT, more of a categorization game), and Dordle (two at once, a solid entry point).
 
 Boggle-style games that don't suck: Word Blitz (fast and pure, but thin), and LexiClash (full disclosure: this is the one I play daily — it takes the Boggle formula and adds boss battles, daily challenges, multiplayer lobbies, and a progression system that actually keeps me coming back). Boggle With Friends exists but Zynga buried it under pay-to-win power-ups, so I can't recommend it with a straight face.
 
 The interesting trend is that Wordle stayed simple while Boggle-style games evolved. Nobody wants a complicated Wordle — the simplicity IS the product. But people absolutely want a richer Boggle experience, which is why games like LexiClash are finding an audience.`,
       },
       {
-        title: 'FAQ: Boggle vs Wordle',
-        content: `"Which is harder?" Boggle. Not close. Wordle has a skill ceiling you hit in a few months. Boggle's skill ceiling is essentially limitless. Competitive Boggle players are terrifying humans.
+        title: 'Things people actually ask me',
+        content: `People keep asking me the same questions, so here.
 
-"Which is more addictive?" Depends on your personality. Wordle's one-a-day constraint is addictive through scarcity. Boggle is addictive through abundance — the "one more round" trap.
+Harder? Boggle, not even close. Wordle's skill ceiling is real and you hit it in a few months. Boggle's ceiling is basically nowhere in sight — competitive players are a different species.
 
-"Can I play Boggle online for free?" Yes. LexiClash is free with no pay-to-win mechanics. There are other options too, but most of them have aggressive monetization.
+More addictive? Depends on you. Wordle hooks you through scarcity. One a day, no exceptions. Boggle hooks you through the "one more round" trap. Different poison, same result.
 
-"Is Wordle still popular in 2026?" Incredibly yes. The NYT acquisition didn't kill it. The daily ritual stuck. Millions still play every single day.
+Free online Boggle? Yes. LexiClash is free, no pay-to-win, which is more than I can say for most of the competition.
 
-"Which is better for kids?" Wordle for younger kids — simpler rules, less pressure, great for spelling practice. Boggle for older kids — develops vocabulary faster, spatial reasoning, and the ability to handle time pressure.
+Still popular in 2026? Wordle, yes, wildly so. The NYT acquisition didn't kill it. Millions daily, four-plus years in.
 
-"Can playing these games actually make me smarter?" Both exercise your brain, but differently. Wordle trains deductive reasoning. Boggle trains pattern recognition, vocabulary recall, and processing speed. Neither will make you Einstein, but both are better than doomscrolling.`,
+Better for kids? Wordle for younger ones — low stakes, great for spelling. Boggle for older kids who need more of a challenge.
+
+Make you smarter? Both exercise your brain but in different ways. Wordle is deductive reasoning. Boggle is pattern recognition and vocabulary recall. Neither makes you Einstein. Both beat doomscrolling.`,
       },
       {
         title: 'My final take',
@@ -158,7 +160,7 @@ Now go play something. Your brain will thank you. Your productivity won't, but y
 
 כל שבוע מישהו שולח לי הודעה עם איזושהי וריאציה של "באגל או וורדל?" וכל שבוע אני מתאפק לא לכתוב מאמר של 3,000 מילה בתגובה. היום נכנעתי. בבקשה. או סליחה. תלוי איך אתם מרגישים לגבי דעות חזקות על משחקי מילים.
 
-העניין הוא ככה: להשוות בין באגל לוורדל זה כמו להשוות בין טניס לגולף. בשניהם צריך מיומנות. שניהם מספקים. אבל הם מגרדים גירודים שונים לחלוטין. אני במקרה אוהב את שניהם, מה שהופך אותי או למגוון או לחולה נפש.`,
+העניין הוא ככה: להשוות בין באגל לוורדל זה כמו להשוות בין טניס לגולף. בשניהם צריך מיומנות. שניהם מספקים. אבל הם פונים לצרכים שונים לגמרי. אני במקרה אוהב את שניהם, מה שהופך אותי או למגוון או לחולה נפש.`,
       },
       {
         title: 'איך באגל עובד (למי שאיכשהו לא יודע)',
@@ -182,7 +184,7 @@ Now go play something. Your brain will thank you. Your productivity won't, but y
 
 מהירות מול סבלנות. באגל הוא ספרינט — 3 דקות של אדרנלין טהור. וורדל הוא שריפה איטית — יכול לקחת 30 שניות או 15 דקות של בהייה בטלפון ומלמול "איזו מילה בת חמש אותיות יש בה ת' ו-ר' אבל לא א'?"
 
-חיפוש מול ניחוש. בבאגל, המילים שם. אתם רק צריכים לראות אותן. בוורדל, המילה מוסתרת. צריך להסיק. אחד הוא זיהוי דפוסים, השני הוא אלימינציה לוגית. מיומנויות קוגניטיביות שונות מהותית.
+חיפוש מול ניחוש. בבאגל, המילים שם. אתם רק צריכים לראות אותן. בוורדל, המילה מוסתרת. צריך להסיק. אחד הוא זיהוי דפוסים, השני הוא חשיבה ניכויית. המוח עובד אחרת לגמרי בכל אחד מהם.
 
 הרבה מילים מול מילה אחת. באגל שואל "כמה תצליחו למצוא?" וורדל שואל "תצליחו למצוא את האחת?" כמות מול דיוק. שוטגאן מול רובה צלפים.
 
@@ -228,7 +230,7 @@ Now go play something. Your brain will thank you. Your productivity won't, but y
         title: 'מה עם אלטרנטיבות מודרניות?',
         content: `גם באגל וגם וורדל הולידו יקום של חיקויים ווריאנטים. חלקם טובים. רובם לא.
 
-קלונים של וורדל ששווה להכיר: Quordle (ארבע חידות בו-זמנית למזוכיסטים), Connections (מ-NYT, יותר משחק מיון), ו-Dordle (שתיים בו-זמנית, סם השער).
+קלונים של וורדל ששווה להכיר: Quordle (ארבע חידות בו-זמנית למזוכיסטים), Connections (מ-NYT, יותר משחק מיון), ו-Dordle (שתיים בו-זמנית, נקודת כניסה טובה).
 
 משחקי סגנון באגל שלא מאכזבים: Word Blitz (מהיר וטהור, אבל רזה), ו-LexiClash (גילוי נאות: זה מה שאני משחק כל יום — הוא לוקח את הנוסחה של באגל ומוסיף קרבות בוסים, אתגרים יומיים, לובי מולטיפלייר, ומערכת התקדמות שבאמת מחזירה אותי). Boggle With Friends קיים אבל Zynga קברה אותו תחת פאוור-אפים של pay-to-win.
 
@@ -281,7 +283,7 @@ Now go play something. Your brain will thank you. Your productivity won't, but y
 
 Varje vecka skickar någon mig någon variant av "ska jag spela Boggle eller Wordle?" och varje vecka håller jag mig från att skriva en essä om 3 000 ord som svar. Idag ger jag efter. Varsågod. Eller förlåt. Beror på hur ni känner för starka åsikter om ordspel.
 
-Saken är den: att jämföra Boggle och Wordle är som att jämföra tennis och golf. Båda kräver skicklighet. Båda är tillfredställande. Men de kliar på helt olika ställen, och de som älskar det ena älskar inte alltid det andra. Jag råkar älska båda, vilket gör mig antingen mångsidig eller djupt störd.`,
+Saken är den: att jämföra Boggle och Wordle är som att jämföra tennis och golf. Båda kräver skicklighet. Båda är tillfredställande. Men de tilltalar helt olika typer av spelhjärnor, och de som älskar det ena älskar inte alltid det andra. Jag råkar älska båda, vilket gör mig antingen mångsidig eller djupt störd.`,
       },
       {
         title: 'Hur Boggle funkar (för de tre som inte vet)',
@@ -327,9 +329,9 @@ Och begränsningen — ett pussel, en chans — skapar genuina stakes. Ingen öv
         title: 'När Boggle vinner',
         content: `Men här börjar Boggle-fansen le.
 
-Boggle är ett djupare spel. Jag sa det. Skillnadstaket är astronomiskt högre. En casual Boggle-spelare hittar 15-20 ord på tre minuter. En tävlingsspelare hittar 60-80. Det gapet? Hundratals timmar av utveckling.
+Boggle är ett djupare spel. Jag sa det. Skicklighetstaket ligger enormt mycket högre. En casual Boggle-spelare hittar 15-20 ord på tre minuter. En tävlingsspelare hittar 60-80. Det gapet? Hundratals timmar av utveckling.
 
-Boggle har också den tävlingsförmåga som Wordle helt saknar. När du spelar mot en annan människa i realtid och ni båda ser samma ord i samma sekund — den rushen är elektrisk. Wordle ger dig en poäng. Boggle ger dig en rivalitet.
+Boggle har också den tävlingsförmåga som Wordle helt saknar. När du spelar mot en annan människa i realtid och ni båda ser samma ord i samma sekund — den rushen är något alldeles eget. Wordle ger dig en poäng. Boggle ger dig en rivalitet.
 
 Variationen är en annan enorm faktor. Varje Boggle-bräde är annorlunda. Verkligt, meningsfullt annorlunda. Wordles dagliga ord är fast; din strategi är i princip densamma varje gång.
 
@@ -377,7 +379,7 @@ Den intressanta trenden: Wordle förblev enkelt medan Boggle-spel utvecklades. I
 
 Om du vill ha elegans, ritual och ett delat kulturellt ögonblick: Wordle. För alltid.
 
-Om du vill ha djup, tävling och den elektriska kicken av att hitta ett ord ingen annan hittade: Boggle. Och specifikt en modern version som inte nickel-och-dimar dig med power-ups.
+Om du vill ha djup, tävling och den elektriska kicken av att hitta ett ord ingen annan hittade: Boggle. Och specifikt en modern version som inte mjölkar dig på pengar med power-ups.
 
 Om du är som jag och vill ha båda: Wordle på morgonen, LexiClash för allt annat. Det har varit min dagliga rutin i månader och jag planerar inte ändra den.
 
@@ -404,7 +406,7 @@ Gå och spela nu. Din hjärna tackar dig. Din produktivitet gör det inte, men d
 
 毎週誰かが「BoggleとWordle、どっちをやるべき？」と聞いてくる。毎週3,000字の返信を書きたい衝動を抑えている。今日は降参する。どういたしまして。あるいは、ごめんなさい。ワードゲームへの強い意見をどう思うかによる。
 
-BoggleとWordleを比べるのは、テニスとゴルフを比べるようなもの。どちらもスキルが必要。どちらも満足感がある。でも全く違うところを掻いている。僕はたまたま両方好きで、それは多才なのか重症なのかのどちらかだ。`,
+BoggleとWordleを比べるのは、テニスとゴルフを比べるようなもの。どちらもスキルが必要。どちらも満足感がある。でも、まったく別の何かに応えている。僕はたまたま両方好きで、それは多才なのか重症なのかのどちらかだ。`,
       },
       {
         title: 'Boggleの仕組み（知らない3人のために）',
@@ -452,7 +454,7 @@ Wordleは完璧な「脳のウォーミングアップ」でもある。僕ら�
 
 Boggleはより深いゲームだ。言った。スキルの天井は天文学的に高い。カジュアルプレイヤーは3分で15-20語見つける。競技プレイヤーは60-80語。そのギャップ？何百時間もの空間スキャン開発、語彙拡張、グリッドに隠れた7文字の単語を見つける脳トレーニング。
 
-Boggleには、Wordleに完全に欠けている競争性がある。リアルタイムで他の人間と対戦して、同じ瞬間に同じ単語を見つけた時 — あのラッシュは電撃的だ。Wordleはスコアをくれる。Boggleはライバル関係をくれる。
+Boggleには、Wordleに完全に欠けている競争性がある。リアルタイムで他の人間と対戦して、同じ瞬間に同じ単語を見つけた時 — あのラッシュは何とも言えない感覚だ。Wordleはスコアをくれる。Boggleはライバル関係をくれる。
 
 バリエーションも大きなファクター。Boggleのボードは毎回違う。本当に意味のある違い。Wordleの日替わり単語は固定で、戦略は基本的に毎回同じ。
 
@@ -468,7 +470,7 @@ Boggleは趣味。脳のジム。時間がある時に行き、自分を追い�
 
 本当の質問は「どっちが上？」じゃなくて「今、何がしたい？」。そしてほとんどの人にとって、答えは日によって変わる。火曜の朝の通勤？Wordle。土曜の夜、友達と？Boggle。水曜の夜中2時、眠れない時？やっぱりBoggle。（僕だけ？そうか。）
 
-僕は両方やる。毎日。まずWordle — 3分で脳をウォーミングアップ。それからLexiClashで深いBoggle系ゲームプレイ、デイリーチャレンジ、Wordleでは届かない場所を掻く対戦マルチプレイ。完璧な補完関係だ。`,
+僕は両方やる。毎日。まずWordle — 3分で脳をウォーミングアップ。それからLexiClashを開く。深めのBoggle系ゲームプレイ、デイリーチャレンジ、対戦マルチプレイ。Wordleじゃ物足りない部分を埋めてくれる。お互いの邪魔をしない、ちょうどいい組み合わせ。`,
       },
       {
         title: '現代の代替ゲームは？',
@@ -527,13 +529,13 @@ Boggleは趣味。脳のジム。時間がある時に行き、自分を追い�
 
 Cada semana alguien me manda alguna variación de "¿debería jugar Boggle o Wordle?" y cada semana resisto el impulso de escribir un ensayo de 3.000 palabras como respuesta. Hoy me rindo. De nada. O lo siento. Depende de cómo te sientas respecto a las opiniones fuertes sobre juegos de palabras.
 
-El tema es así: comparar Boggle y Wordle es como comparar el tenis y el golf. Ambos requieren habilidad. Ambos son satisfactorios. Pero rascan picores completamente diferentes, y la gente que ama uno no siempre ama el otro. Yo resulta que amo los dos, lo que me hace o versátil o un caso clínico.`,
+El tema es así: comparar Boggle y Wordle es como comparar el tenis y el golf. Ambos requieren habilidad. Ambos son satisfactorios. Pero satisfacen necesidades completamente distintas, y la gente que ama uno no siempre ama el otro. Yo resulta que amo los dos, lo que me hace o versátil o un caso clínico.`,
       },
       {
         title: 'Cómo funciona Boggle (para los tres que no lo saben)',
         content: `Boggle es una cuadrícula de letras aleatorias — tradicionalmente 4x4, a veces 5x5 — y tienes un tiempo fijo (normalmente 3 minutos) para encontrar tantas palabras como sea posible. Las palabras se forman conectando letras adyacentes (incluidas diagonales). No puedes reutilizar el mismo cubo de letra en una sola palabra.
 
-La magia de Boggle es el escaneo. Tus ojos recorren la cuadrícula, tu cerebro hace pattern matching como un supercomputador con cafeína, y de repente ves CONSTITUCIÓN escondido en la esquina y te sientes un genio. Por unos dos segundos, hasta que el temporizador se acaba y te das cuenta de que te perdiste PIZZA justo en el medio.
+La magia de Boggle es el escaneo. Tus ojos recorren la cuadrícula, tu cerebro reconoce patrones como un supercomputador con cafeína, y de repente ves CONSTITUCIÓN escondido en la esquina y te sientes un genio. Por unos dos segundos, hasta que el temporizador se acaba y te das cuenta de que te perdiste PIZZA justo en el medio.
 
 Es rápido, es frenético, y recompensa tanto el vocabulario como el reconocimiento espacial. En España y Latinoamérica tenemos tradición de juegos de palabras — desde el Pasapalabra hasta los crucigramas del periódico — así que Boggle encaja como anillo al dedo.`,
       },
@@ -575,7 +577,7 @@ Y la restricción — un puzzle, una oportunidad — crea tensión real. No hay 
 
 Boggle es un juego más profundo. Lo dije. El techo de habilidad es astronómicamente más alto. Un jugador casual encuentra 15-20 palabras en tres minutos. Un jugador competitivo encuentra 60-80. ¿Esa diferencia? Son cientos de horas de desarrollo.
 
-Boggle también tiene esa ventaja competitiva que Wordle no tiene en absoluto. Cuando estás jugando contra otro ser humano en tiempo real y los dos veis la misma palabra en el mismo momento — esa descarga es eléctrica. Wordle te da una puntuación. Boggle te da una rivalidad.
+Boggle también tiene esa ventaja competitiva que Wordle no tiene en absoluto. Cuando estás jugando contra otro ser humano en tiempo real y los dos veis la misma palabra en el mismo momento — esa descarga no tiene nombre. Wordle te da una puntuación. Boggle te da una rivalidad.
 
 La variedad es otro factor enorme. Cada tablero de Boggle es diferente. De verdad, significativamente diferente. La palabra diaria de Wordle es fija; tu estrategia es básicamente la misma cada vez.
 
@@ -623,7 +625,7 @@ La tendencia interesante: Wordle se mantuvo simple mientras los juegos estilo Bo
 
 Si quieres elegancia, ritual y un momento cultural compartido: Wordle. Para siempre.
 
-Si quieres profundidad, competición y la emoción eléctrica de encontrar una palabra que nadie más encontró: Boggle. Y específicamente una versión moderna que no te saque dinero con power-ups.
+Si quieres profundidad, competición y ese subidón de encontrar una palabra que nadie más encontró: Boggle. Y específicamente una versión moderna que no te saque dinero con power-ups.
 
 Si eres como yo y quieres ambos: Wordle por la mañana, LexiClash para todo lo demás. Esa ha sido mi rutina diaria durante meses y tengo cero planes de cambiarla.
 
