@@ -61,6 +61,8 @@ export interface AdventureTileProps {
   getTileAriaLabel: (tile: GridTileState) => string;
   /** Optional chain cascade delay (overrides tile.cascadeDelay) */
   chainCascadeDelay?: number;
+  /** Whether tile is focused via keyboard navigation */
+  isKeyboardFocused?: boolean;
   /** Whether tile is locked by boss ability (prevents selection, shows lock overlay) */
   isLocked?: boolean;
 }
@@ -107,6 +109,7 @@ export const AdventureTile = memo(({
   onTileDragEnter,
   getTileAriaLabel,
   chainCascadeDelay,
+  isKeyboardFocused = false,
   isLocked = false,
 }: AdventureTileProps) => {
   // Stable handlers that don't create new closures per render
@@ -201,6 +204,8 @@ export const AdventureTile = memo(({
         isLocked && 'opacity-50 pointer-events-none cursor-not-allowed ring-2 ring-neo-red/60',
         // Enhanced selection: CSS handles glow, ring, and animation
         isSelected && 'tile-selected-enhanced',
+        // Keyboard focus indicator — visible ring for arrow key navigation
+        isKeyboardFocused && !isSelected && 'ring-2 ring-neo-lime ring-offset-1 ring-offset-transparent z-10',
         tile.isFrozen && tile.type === 'ice' && 'tile-frozen',
 
         // Bomb row preview: highlight tiles in bomb's row when bomb is selected

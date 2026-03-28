@@ -33,7 +33,8 @@ import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { trackAdventureLevel, trackFeatureFirstUse } from '@/utils/growthTracking';
+import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShortcuts';
+import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
@@ -195,16 +196,11 @@ const AdventureGame = memo<AdventureGameProps>(
       recordQuestProgress, chapterQuests, updateObjective,
     });
 
-    // SFX: gate sounds to active gameplay, countdown beep in last 10s
-    useEffect(() => { setGameActive(isPlaying); return () => setGameActive(false); }, [isPlaying, setGameActive]);
-    useEffect(() => { if (isPlaying && timeRemaining <= 10 && timeRemaining > 0) playCountdownBeep(timeRemaining); }, [isPlaying, timeRemaining, playCountdownBeep]);
-    // SFX: play word accepted sound when a new word is found (reuses prevWordsFoundLen from above)
-    useEffect(() => {
-      if (prevWordsFoundLen !== undefined && gameState.wordsFound.length > prevWordsFoundLen && isPlaying) {
-        playWordAcceptedSound();
-        if (gameState.comboCount >= 2) playComboSound(gameState.comboCount);
-      }
-    }, [gameState.wordsFound.length, prevWordsFoundLen, gameState.comboCount, isPlaying, playWordAcceptedSound, playComboSound]);
+    useAdventureSFX({
+      isPlaying, timeRemaining, wordsFoundLength: gameState.wordsFound.length,
+      prevWordsFoundLen, comboCount: gameState.comboCount,
+      sfx: { setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound },
+    });
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
       isGameOver: gameState.isComplete,
@@ -213,18 +209,6 @@ const AdventureGame = memo<AdventureGameProps>(
       maxCombo: gameState.comboCount,
       wordsFound: gameState.wordsFound.length,
     });
-
-    // Analytics: track first adventure use (deduplicated in localStorage)
-    useEffect(() => { trackFeatureFirstUse('adventure'); }, []);
-
-    // Analytics: track level start when gameplay begins
-    const hasTrackedStartRef = useRef(false);
-    useEffect(() => {
-      if (isPlaying && entryPhase === 'playing' && !hasTrackedStartRef.current) {
-        hasTrackedStartRef.current = true;
-        trackAdventureLevel('start', levelConfig.world, levelConfig.level);
-      }
-    }, [isPlaying, entryPhase, levelConfig.world, levelConfig.level]);
 
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
@@ -398,26 +382,14 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [levelCompletion.lootDrops, gameState.stars]);
 
-    // Analytics: track level pass/fail when completion is determined
-    const hasTrackedResultRef = useRef(false);
-    useEffect(() => {
-      if (hasTrackedResultRef.current) return;
-      // Non-boss: nonBossCompleted fires; Boss: cinematic triggers first
-      const completed = levelCompletion.nonBossCompleted || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic;
-      if (!completed) return;
-      hasTrackedResultRef.current = true;
-      if (gameState.stars > 0) {
-        trackAdventureLevel('pass', levelConfig.world, levelConfig.level, {
-          score: gameState.score, stars: gameState.stars,
-        });
-      } else {
-        trackAdventureLevel('fail', levelConfig.world, levelConfig.level, {
-          score: gameState.score,
-          consecutiveFailures: (bestAttempt?.consecutiveFailures ?? 0) + 1,
-        });
-      }
-    }, [levelCompletion.nonBossCompleted, cinematics.showVictoryCinematic, cinematics.showDefeatCinematic,
-      gameState.stars, gameState.score, levelConfig.world, levelConfig.level, bestAttempt]);
+    const { resetTracking } = useAdventureAnalytics({
+      isPlaying, entryPhase, worldNumber: levelConfig.world, levelNumber: levelConfig.level,
+      gameStars: gameState.stars, gameScore: gameState.score,
+      nonBossCompleted: levelCompletion.nonBossCompleted,
+      showVictoryCinematic: cinematics.showVictoryCinematic,
+      showDefeatCinematic: cinematics.showDefeatCinematic,
+      consecutiveFailures: (bestAttempt?.consecutiveFailures ?? 0) + 1,
+    });
 
     useEffect(() => {
       if (levelCompletion.nonBossCompleted) {
@@ -469,11 +441,10 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleRetry = useCallback(() => {
       hintsUsedRef.current = 0;
       hasAwardedFlashGoldRef.current = false;
-      hasTrackedStartRef.current = false;
-      hasTrackedResultRef.current = false;
+      resetTracking();
       setLastWordTileTypes([]);
       handleRetryBase();
-    }, [handleRetryBase]);
+    }, [handleRetryBase, resetTracking]);
 
     const [hintGoldPending, setHintGoldPending] = useState(false);
     const executeHintAction = useCallback(() => {
@@ -521,36 +492,13 @@ const AdventureGame = memo<AdventureGameProps>(
       if (window.confirm(t('adventure.game.confirmExitDesc'))) onExit();
     }, [onExit, showLevelComplete, t]);
 
-    // Keyboard shortcuts for power-ups (H=Hint, F=Freeze, S=Shuffle, D=Detonate, P=Pause)
-    useEffect(() => {
-      if (entryPhase !== 'playing' || showLevelComplete) return;
-      const handleKeyDown = (e: KeyboardEvent) => {
-        // Ignore if user is typing in an input
-        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-        switch (e.key.toLowerCase()) {
-          case 'h':
-            if (hasHintsAvailable) handleHintClick();
-            break;
-          case 'f':
-            if (init.upgradeEffects.timeFreezeSeconds > 0 && !freezeUsed)
-              activateFreeze(init.upgradeEffects.timeFreezeSeconds);
-            break;
-          case 's':
-            if (shufflesRemaining > 0) shuffleTiles();
-            break;
-          case 'd':
-            if (init.upgradeEffects.canDetonateWords) setDetonateActive(prev => !prev);
-            break;
-          case 'p':
-          case ' ':
-            e.preventDefault();
-            gridInteraction.handlePauseToggle();
-            break;
-        }
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [entryPhase, showLevelComplete, hasHintsAvailable, handleHintClick, freezeUsed, activateFreeze, init.upgradeEffects.timeFreezeSeconds, init.upgradeEffects.canDetonateWords, shufflesRemaining, shuffleTiles, gridInteraction]);
+    useAdventureKeyboardShortcuts({
+      entryPhase, showLevelComplete, hasHintsAvailable, onHintClick: handleHintClick,
+      freezeUsed, timeFreezeSeconds: init.upgradeEffects.timeFreezeSeconds,
+      activateFreeze, shufflesRemaining, shuffleTiles,
+      canDetonateWords: init.upgradeEffects.canDetonateWords,
+      setDetonateActive, handlePauseToggle: gridInteraction.handlePauseToggle,
+    });
 
     if (!isValidConfig) {
       return (

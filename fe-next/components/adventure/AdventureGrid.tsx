@@ -18,6 +18,7 @@ import { useCascadeAnimation } from '@/hooks/useCascadeAnimation';
 import BoardFrame from '@/components/adventure/themed/BoardFrame';
 import { AdventureThemeContext } from '@/contexts/AdventureThemeContext';
 import { AdventureTile } from './AdventureTile';
+import { useGridKeyboardNav } from '@/hooks/useGridKeyboardNav';
 import './AdventureTile.css';
 import { useGridGestures } from './useGridGestures';
 import { OPTIMIZED_TIMING } from '@/lib/adventure/entryTiming';
@@ -277,6 +278,28 @@ const AdventureGrid = memo(
       [adjacentIndices]
     );
 
+    // Keyboard navigation for accessibility (arrow keys, Enter, Escape)
+    const handleKeyboardSubmit = useCallback(() => {
+      if (onWordSubmit && selectedIndices.length >= 2) {
+        const word = selectedIndices.map(i => tiles[i]?.letter || '').join('');
+        onWordSubmit(word, selectedIndices);
+      }
+    }, [onWordSubmit, selectedIndices, tiles]);
+
+    const keyboardSelectTile = useCallback((index: number) => {
+      if (onTileSelect && tiles[index]) onTileSelect(index, tiles[index]);
+    }, [onTileSelect, tiles]);
+
+    const { focusedIndex } = useGridKeyboardNav({
+      gridSize,
+      totalTiles: tiles.length,
+      disabled: disabled || !interactive || !onTileSelect,
+      selectTile: keyboardSelectTile,
+      clearSelection: () => { /* Escape clears focus in hook; word selection cleared via Backspace */ },
+      selectedIndices,
+      onSubmit: handleKeyboardSubmit,
+    });
+
     // Build locked tile set for boss abilities
     const lockedSet = useMemo(
       () => new Set(lockedTileIndices),
@@ -404,6 +427,7 @@ const AdventureGrid = memo(
                 isSelected={isSelected}
                 isHintHighlighted={isHintHighlighted}
                 isAdjacentHint={isAdjacentHint}
+                isKeyboardFocused={focusedIndex === index}
                 canInteract={canInteract}
                 worldId={worldId}
                 bombRowPreview={bombRowPreview}
