@@ -11,14 +11,14 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useProgression } from '@/contexts/ProgressionContext';
+import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useSkillTreeStore } from '@/hooks/useSkillTreeStore';
 import { SkillTreeView, SkillUnlockModal } from '@/components/adventure/SkillTree';
 import type { SkillNode } from '@/types/adventure';
 
 export function SkillTreePageClient() {
   const { t } = useLanguage();
-  const { progression } = useProgression();
+  const { progression } = useProgressionData();
   const hydrateFromDB = useSkillTreeStore((s) => s.hydrateFromDB);
   const [unlockedSkill, setUnlockedSkill] = useState<SkillNode | null>(null);
 

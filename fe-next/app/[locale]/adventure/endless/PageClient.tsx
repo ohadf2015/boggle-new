@@ -15,7 +15,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
-import { useProgression } from '@/contexts/ProgressionContext';
+import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useEndlessMode } from '@/hooks/useEndlessMode';
 import { generateAdventureGrid } from '@/lib/adventure';
 import type { LevelConfig } from '@/types/adventure';
@@ -36,7 +36,7 @@ type EndlessPhase = 'lobby' | 'playing' | 'floorCleared' | 'runOver';
 
 export default function EndlessPageClient(): React.JSX.Element {
   const { t, language } = useLanguageSafe();
-  const { progression } = useProgression();
+  const { progression } = useProgressionData();
   const [phase, setPhase] = useState<EndlessPhase>('lobby');
   const [lastScore, setLastScore] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);

@@ -20,10 +20,10 @@ import localFont from 'next/font/local';
  * The root layout at app/[locale]/layout.tsx should include only the
  * font variable(s) relevant to the active locale.
  *
- * TODO: Wire locale-specific font variables in app/[locale]/layout.tsx:
+ * DONE: Locale-specific font variables wired in app/[locale]/layout.tsx:
  *   - locales ['en','sv','ja','es'] → fredokaLatin + rubikLatin
- *   - locale  'he'                 → fredokaHebrew + rubikHebrew
- * This would save ~60-80KB of preloaded fonts per non-Hebrew page visit.
+ *   - locale  'he'                 → all 4 fonts (Latin + Hebrew)
+ * Saves ~60-80KB of preloaded fonts per non-Hebrew page visit.
  */
 
 // Latin script fonts (English, Swedish, Japanese, Spanish)

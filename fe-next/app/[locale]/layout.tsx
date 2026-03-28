@@ -19,7 +19,7 @@ import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
-import { fredoka, rubik } from '../fonts';
+import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
 const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
@@ -180,6 +180,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const seo = translations[validLocale]?.seo || translations.he.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
+
+    // Locale-aware font preloading: Hebrew pages get all 4 font variables,
+    // non-Hebrew pages skip Hebrew font preloads (~60-80KB saved)
+    const fontClasses = validLocale === 'he'
+      ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''}`
+      : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
 
     // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
     // This is passed to ConditionalProviders → EssentialProviders → LanguageProvider
@@ -476,7 +482,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     ];
 
     return (
-        <html lang={validLocale} dir={dir} className={`dark ${fredoka.variable || ''} ${rubik.variable || ''}`} suppressHydrationWarning>
+        <html lang={validLocale} dir={dir} className={`dark ${fontClasses}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
                 {/* Preconnect hints for faster resource loading on slow connections */}

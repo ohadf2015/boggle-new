@@ -318,9 +318,23 @@ const DailyChallenge: React.FC = () => {
           mode: 'daily-challenge',
           isDailyChallenge: true,
         }),
-      }).catch(() => { /* non-critical */ });
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.questUpdate?.completed) {
+            import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+              showQuestCompletionToast({
+                questName: t(data.questUpdate.description),
+                xpReward: data.questUpdate.xpReward,
+                t,
+              });
+            });
+          }
+        })
+        .catch(() => { /* non-critical */ });
     }
-  }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
+}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak]);
 
   const handleTutorialComplete = useCallback(() => {
     const tutorialKey = getWordHuntTutorialKey(gameLanguage);

@@ -9411,6 +9411,8 @@ const es = {
     "grandSlam": "¡Grand Slam!",
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Parte de Avatar",
+    "allComplete": "¡Maestro de Misiones!",
+    "allCompleteDesc": "¡Todas las misiones diarias + semanales completadas! ¡Estás en racha!",
     "avatarReward": "+1 Parte de Avatar",
     "avatarPartCategory": {
       "eyes": "Ojos",

@@ -207,7 +207,20 @@ const SinglePlayerView: React.FC = () => {
           maxCombo: results.maxCombo ?? 0,
           longWordsFound: (results.playerWords || []).filter(w => w.length >= 6).length,
         }),
-      }).catch(() => { /* non-critical — localStorage is the fallback */ });
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.questUpdate?.completed) {
+            import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+              showQuestCompletionToast({
+                questName: t(data.questUpdate.description),
+                xpReward: data.questUpdate.xpReward,
+                t,
+              });
+            });
+          }
+        })
+        .catch(() => { /* non-critical — localStorage is the fallback */ });
     }
 
     if (boardCode) {
@@ -221,7 +234,8 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
+}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, boardCode, setPhase, isAuthenticated, user?.id]);
 
   return (
     <div

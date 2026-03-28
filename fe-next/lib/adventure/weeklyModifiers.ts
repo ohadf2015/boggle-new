@@ -43,16 +43,30 @@ function seededRandom(year: number, week: number): () => number {
   };
 }
 
-/** Get 3 weekly modifiers for a given year and ISO week number */
+/** Get 3 weekly modifiers for a given year and ISO week number.
+ *  Prevents multiple timer-reducing modifiers from stacking
+ *  (e.g. Blitz 0.4× + Gold Rush 0.8× = 0.32× would make levels unplayable). */
 export function getWeeklyModifiers(year: number, week: number): WeeklyModifier[] {
   const rng = seededRandom(year, week);
   const pool = [...MODIFIER_POOL];
   const selected: WeeklyModifier[] = [];
+  let hasTimerReduction = false;
 
   for (let i = 0; i < 3 && pool.length > 0; i++) {
     const idx = Math.floor(rng() * pool.length);
-    selected.push(pool[idx]);
+    const candidate = pool[idx];
     pool.splice(idx, 1);
+
+    // Skip timer-reducing modifiers if one is already selected
+    const reducesTimer = (candidate.effects.timerMultiplier ?? 1) < 1;
+    if (reducesTimer && hasTimerReduction) {
+      // Try next candidate from remaining pool instead of wasting a slot
+      i--;
+      continue;
+    }
+
+    selected.push(candidate);
+    if (reducesTimer) hasTimerReduction = true;
   }
 
   return selected;
@@ -64,6 +78,9 @@ export interface ModifiableConfig {
   minWordLength: number;
 }
 
+/** Minimum timer after all modifiers — prevents unplayable levels */
+const MIN_TIMER_SECONDS = 45;
+
 /** Apply active modifiers to a level config */
 export function applyModifiers(config: ModifiableConfig, modifiers: WeeklyModifier[]): ModifiableConfig {
   let { timerSeconds, scoreMultiplier, minWordLength } = config;
@@ -73,6 +90,11 @@ export function applyModifiers(config: ModifiableConfig, modifiers: WeeklyModifi
     if (e.timerMultiplier) timerSeconds = Math.round(timerSeconds * e.timerMultiplier);
     if (e.scoreMultiplier) scoreMultiplier *= e.scoreMultiplier;
     if (e.minWordLength) minWordLength = Math.max(minWordLength, e.minWordLength);
+  }
+
+  // Floor: never let modifiers reduce timer below minimum playable threshold
+  if (timerSeconds > 0) {
+    timerSeconds = Math.max(timerSeconds, MIN_TIMER_SECONDS);
   }
 
   return { timerSeconds, scoreMultiplier, minWordLength };

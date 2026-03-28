@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
 
     const { score, wordCount, longestWord, timePlayed, achievementCount, maxCombo, isDailyChallenge, longWordsFound } = validation.data;
     const userId = user.id;
+    let questUpdate: { completed: boolean; questType: string; xpReward: number; description: string } | null = null;
 
     // Calculate XP (singleplayer = no win bonus, playerCount=1)
     const xpResult = calculateGameXp({
@@ -191,14 +192,23 @@ export async function POST(request: NextRequest) {
     // Update weekly quest progress for singleplayer games
     try {
       const { updateQuestProgress } = await import('@/backend/modules/weeklyQuestManager');
-      await updateQuestProgress(userId, {
+      const questResult = await updateQuestProgress(userId, {
         gamesPlayed: 1,
         wordsFound: wordCount,
+        wordsInSession: wordCount,
         longWordsFound: longWordsFound ?? 0,
         maxCombo: maxCombo ?? 0,
         maxScore: score,
         dailyChallengesCompleted: isDailyChallenge ? 1 : 0,
       });
+      if (questResult?.completed) {
+        questUpdate = {
+          completed: true,
+          questType: questResult.questType,
+          xpReward: questResult.xpReward,
+          description: questResult.description,
+        };
+      }
     } catch {
       // Non-critical — don't fail the response
     }
@@ -210,6 +220,7 @@ export async function POST(request: NextRequest) {
       newTotalXp,
       newLevel,
       leveledUp: levelUpInfo.leveledUp,
+      ...(questUpdate ? { questUpdate } : {}),
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/stats/record-game', { method: 'POST' });

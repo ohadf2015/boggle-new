@@ -23,7 +23,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'test-user-id' } }),
 }));
 vi.mock('@/contexts/ProgressionContext', () => ({
-  useProgression: () => ({ progression: { xp: 0, gold: 0, upgrades: {} } }),
+  useProgressionData: () => ({ progression: { xp: 0, gold: 0, upgrades: {} } }),
 }));
 vi.mock('@/hooks/useUpgradeEffects', () => ({
   useUpgradeEffects: () => ({

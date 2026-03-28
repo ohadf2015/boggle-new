@@ -9368,6 +9368,8 @@ const he = {
     "grandSlam": "!גרנד סלאם",
     "grandSlamBonus": "בונוס XP 500+",
     "grandSlamAvatar": "חלק אווטאר +1",
+    "allComplete": "אלוף המשימות!",
+    "allCompleteDesc": "כל המשימות היומיות + השבועיות הושלמו! אתם על אש!",
     "avatarReward": "חלק אווטאר +1",
     "avatarPartCategory": {
       "eyes": "עיניים",

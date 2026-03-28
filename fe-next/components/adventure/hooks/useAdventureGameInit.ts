@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useProgression } from '@/contexts/ProgressionContext';
+import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useAdaptiveDifficulty } from '@/hooks/useAdaptiveDifficulty';
 import { useAIDirector } from '@/hooks/useAIDirector';
 import { useAdventureXp } from '@/hooks/useAdventureXp';
@@ -41,7 +41,7 @@ export interface UseAdventureGameInitProps {
 
 export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventureGameInitProps) {
   const { user } = useAuth();
-  const { progression } = useProgression();
+  const { progression } = useProgressionData();
   const userId = user?.id ?? 'anonymous';
 
   // Register abilities once on mount
@@ -174,9 +174,11 @@ export function useAdventureGameInit({ world, level, timerSeconds }: UseAdventur
   const adjustedLevelConfig = useMemo(() => {
     const baseTimer = adjustedConfig.timerSeconds + upgradeEffects.bonusTimeSeconds + runeEffects.timeBonus;
     const weeklyTimerMod = weeklyModifiers.reduce((m, mod) => m * (mod.effects.timerMultiplier ?? 1), 1);
+    // Floor at 45s — even with aggressive modifiers, levels must remain playable
+    const effectiveTimer = Math.max(Math.round(baseTimer * weeklyTimerMod), 45);
     return {
       ...adjustedConfig,
-      timerSeconds: Math.round(baseTimer * weeklyTimerMod),
+      timerSeconds: effectiveTimer,
       minWordLength: Math.max(adjustedConfig.minWordLength ?? 2, weeklyApplied.minWordLength) as 2 | 3,
     };
   }, [adjustedConfig, upgradeEffects.bonusTimeSeconds, runeEffects.timeBonus, weeklyModifiers, weeklyApplied.minWordLength]);

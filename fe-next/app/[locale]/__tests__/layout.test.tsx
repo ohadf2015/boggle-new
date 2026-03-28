@@ -94,6 +94,10 @@ vi.mock('../../providers', () => ({
 vi.mock('../../fonts', () => ({
     fredoka: { variable: 'fredoka-var' },
     rubik: { variable: 'rubik-var' },
+    fredokaLatin: { variable: 'fredoka-latin-var' },
+    fredokaHebrew: { variable: 'fredoka-hebrew-var' },
+    rubikLatin: { variable: 'rubik-latin-var' },
+    rubikHebrew: { variable: 'rubik-hebrew-var' },
 }));
 
 describe('LocaleLayout Hydration', () => {

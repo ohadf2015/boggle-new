@@ -9363,6 +9363,8 @@ const sv = {
     "grandSlam": "Grand Slam!",
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Avatardel",
+    "allComplete": "Uppdragsmästare!",
+    "allCompleteDesc": "Alla dagliga + veckouppdraget klara! Du är i elden!",
     "avatarReward": "+1 Avatardel",
     "avatarPartCategory": {
       "eyes": "Ögon",

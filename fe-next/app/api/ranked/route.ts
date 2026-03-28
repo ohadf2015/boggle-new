@@ -43,36 +43,53 @@ export async function GET(request: NextRequest) {
     const authSupabase = await createClient();
     const { data: { user } } = await authSupabase.auth.getUser();
 
-    // Fetch leaderboard top 50
-    const { data: leaderboard, error: leaderboardError } = await serviceClient
-      .from('player_ratings')
-      .select(`
-        user_id,
-        rating,
-        rating_deviation,
-        games_played,
-        wins,
-        losses,
-        peak_rating
-      `)
-      .order('rating', { ascending: false })
-      .limit(50);
+    // Phase 1: Fetch leaderboard and user rating in parallel
+    const [leaderboardResult, userRatingResult] = await Promise.all([
+      serviceClient
+        .from('player_ratings')
+        .select(`
+          user_id,
+          rating,
+          rating_deviation,
+          games_played,
+          wins,
+          losses,
+          peak_rating
+        `)
+        .order('rating', { ascending: false })
+        .limit(50),
+      user
+        ? serviceClient.from('player_ratings').select('*').eq('user_id', user.id).single()
+        : Promise.resolve({ data: null, error: null }),
+    ]);
+
+    const { data: leaderboard, error: leaderboardError } = leaderboardResult;
 
     if (leaderboardError) {
       captureApiError(leaderboardError, 'ranked-leaderboard');
       return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
     }
 
-    // Enrich leaderboard with profile info and rank tiers
+    // Phase 2: Fetch profiles and rank count in parallel (both depend on phase 1)
     const userIds = (leaderboard || []).map(r => r.user_id);
-    const { data: profiles } = userIds.length > 0
-      ? await serviceClient
-          .from('profiles')
-          .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color')
-          .in('id', userIds)
-      : { data: [] };
+    const userRating = userRatingResult.data;
 
-    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+    const [profilesResult, rankResult] = await Promise.all([
+      userIds.length > 0
+        ? serviceClient
+            .from('profiles')
+            .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color')
+            .in('id', userIds)
+        : Promise.resolve({ data: [] as Array<{ id: string; username: string; display_name: string; avatar_image: string; avatar_emoji: string; avatar_color: string }> }),
+      userRating
+        ? serviceClient
+            .from('player_ratings')
+            .select('id', { count: 'exact', head: true })
+            .gt('rating', userRating.rating)
+        : Promise.resolve({ count: null }),
+    ]);
+
+    const profileMap = new Map((profilesResult.data || []).map(p => [p.id, p]));
 
     const enrichedLeaderboard = (leaderboard || []).map((entry, index) => {
       const profile = profileMap.get(entry.user_id);
@@ -98,23 +115,11 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Fetch current user's rating if authenticated
+    // Build current user's rating response
     let myRating = null;
     if (user) {
-      const { data: userRating } = await serviceClient
-        .from('player_ratings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
       if (userRating) {
         const tier = getRankTier(userRating.rating);
-        // Find user's rank position
-        const { count: higherCount } = await serviceClient
-          .from('player_ratings')
-          .select('id', { count: 'exact', head: true })
-          .gt('rating', userRating.rating);
-
         myRating = {
           rating: userRating.rating,
           ratingDeviation: userRating.rating_deviation,
@@ -125,7 +130,7 @@ export async function GET(request: NextRequest) {
           tier: tier.name,
           tierColor: tier.color,
           tierMinRating: tier.minRating,
-          rankPosition: (higherCount || 0) + 1,
+          rankPosition: (rankResult.count || 0) + 1,
         };
       } else {
         // User has no rating yet

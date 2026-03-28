@@ -177,10 +177,19 @@ vi.mock('@/contexts/AdventureThemeContext', () => {
 });
 
 vi.mock('@/contexts/ProgressionContext', () => ({
-  useProgression: () => ({
+  useProgressionData: () => ({
     attempts: [],
     recordAttempt: vi.fn(),
     getLevelAttempt: vi.fn(() => null),
+    progression: { xp: 0, gold: 0, upgrades: {} },
+  }),
+  useProgression: () => ({
+    recordAttempt: vi.fn(),
+    getLevelAttempt: vi.fn(() => null),
+    getLevelCompletion: vi.fn(() => null),
+    progression: { xp: 0, gold: 0, upgrades: {} },
+    updateWordAlbum: vi.fn(),
+    completeLevel: vi.fn(),
   }),
 }));
 

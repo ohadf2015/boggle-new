@@ -46,3 +46,4 @@ tmp/
 fe-next/tmp/
 .vercel
 .claude/worktrees/
+fe-next/dist/

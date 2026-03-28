@@ -170,6 +170,16 @@ export function useResultsSocketEvents({
       showToast({ type: 'info', title, message, duration: 8000 });
     };
 
+    const handleWeeklyQuestCompleted = (data: { questType: string; xpReward: number; description: string }) => {
+      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+        showQuestCompletionToast({
+          questName: t(data.description),
+          xpReward: data.xpReward,
+          t,
+        });
+      });
+    };
+
     socket.on('showWordFeedback', handleShowWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);
     socket.on('xpGained', handleXpGained);
@@ -177,6 +187,7 @@ export function useResultsSocketEvents({
     socket.on('engagement:nearMisses', handleNearMisses);
     socket.on('engagement:referralMilestone', handleReferralMilestone);
     socket.on('engagement:oneMoreGame', handleOneMoreGame);
+    socket.on('weeklyQuestCompleted', handleWeeklyQuestCompleted);
 
     return () => {
       socket.off('showWordFeedback', handleShowWordFeedback);
@@ -186,6 +197,7 @@ export function useResultsSocketEvents({
       socket.off('engagement:nearMisses', handleNearMisses);
       socket.off('engagement:referralMilestone', handleReferralMilestone);
       socket.off('engagement:oneMoreGame', handleOneMoreGame);
+      socket.off('weeklyQuestCompleted', handleWeeklyQuestCompleted);
     };
   }, [socket, t]);
 

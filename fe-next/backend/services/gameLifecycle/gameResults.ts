@@ -117,7 +117,7 @@ export async function recordGameResultsToSupabase(
     await processEngagementEvents(io, scoresArray, game, gameCode);
 
     // Update weekly quest progress for each authenticated player
-    await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap);
+    await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap, io);
 
     // Increment word approval counts for dictionary words
     // OPTIMIZATION: Batch all operations with Promise.all instead of sequential awaits
@@ -305,8 +305,9 @@ async function incrementWordApprovals(
  */
 async function updateWeeklyQuestProgressForPlayers(
   scoresArray: PlayerResult[],
-  _game: GameState,
+  game: GameState,
   userAuthMap: Record<string, UserAuthInfo>,
+  io?: Server,
 ): Promise<void> {
   const isWin = (username: string) => {
     const sorted = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
@@ -322,9 +323,11 @@ async function updateWeeklyQuestProgressForPlayers(
       (max, w) => Math.max(max, w.comboLevel ?? 0), 0
     );
 
+    const wordsCount = player.wordDetails?.length ?? 0;
     const stats: GameStats = {
       gamesPlayed: 1,
-      wordsFound: player.wordDetails?.length ?? 0,
+      wordsFound: wordsCount,
+      wordsInSession: wordsCount,
       longWordsFound: player.wordDetails?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
       maxCombo: playerMaxCombo,
       maxScore: player.totalScore ?? 0,
@@ -332,7 +335,17 @@ async function updateWeeklyQuestProgressForPlayers(
     };
 
     try {
-      await updateQuestProgress(authInfo.authUserId, stats);
+      const questResult = await updateQuestProgress(authInfo.authUserId, stats);
+      if (questResult?.completed && io) {
+        const userData = game.users?.[player.username];
+        if (userData?.socketId) {
+          io.to(userData.socketId).emit('weeklyQuestCompleted', {
+            questType: questResult.questType,
+            xpReward: questResult.xpReward,
+            description: questResult.description,
+          });
+        }
+      }
     } catch (err) {
       logger.error('WEEKLY_QUEST', `Failed to update quest for ${player.username}: ${err}`);
     }

@@ -21,6 +21,7 @@ interface UseWeeklyQuestReturn {
   isComplete: boolean;
   loading: boolean;
   selectQuest: (questId: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 function parseRow(row: Record<string, unknown>): ActiveQuest {
@@ -124,5 +125,6 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     isComplete: activeQuest?.completed ?? false,
     loading,
     selectQuest: handleSelectQuest,
+    refetch: fetchQuest,
   };
 }

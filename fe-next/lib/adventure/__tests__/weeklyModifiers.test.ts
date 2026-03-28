@@ -84,5 +84,49 @@ describe('weeklyModifiers', () => {
       expect(result.timerSeconds).toBe(120);
       expect(result.scoreMultiplier).toBe(1.0);
     });
+
+    it('should enforce minimum timer floor of 45 seconds', () => {
+      const blitz: WeeklyModifier = {
+        id: 'test-blitz',
+        nameKey: 'test',
+        descriptionKey: 'test',
+        icon: '💥',
+        effects: { timerMultiplier: 0.2 },
+      };
+      // 120 * 0.2 = 24, but floor is 45
+      const result = applyModifiers({ timerSeconds: 120, scoreMultiplier: 1.0, minWordLength: 3 }, [blitz]);
+      expect(result.timerSeconds).toBe(45);
+    });
+
+    it('should not apply floor when timerSeconds is 0 (used for non-timer configs)', () => {
+      const mod: WeeklyModifier = {
+        id: 'test',
+        nameKey: 'test',
+        descriptionKey: 'test',
+        icon: '⚡',
+        effects: { timerMultiplier: 0.5 },
+      };
+      const result = applyModifiers({ timerSeconds: 0, scoreMultiplier: 1.0, minWordLength: 3 }, [mod]);
+      expect(result.timerSeconds).toBe(0);
+    });
+  });
+
+  describe('getWeeklyModifiers — timer stacking prevention', () => {
+    it('should never select two timer-reducing modifiers', () => {
+      // Test across 100 weeks to ensure no stacking ever occurs
+      for (let week = 1; week <= 100; week++) {
+        const mods = getWeeklyModifiers(2026, week);
+        const timerReducers = mods.filter(m => (m.effects.timerMultiplier ?? 1) < 1);
+        expect(timerReducers.length).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('should still return 3 modifiers when stacking is prevented', () => {
+      // Across many weeks, we should always get 3 modifiers
+      for (let week = 1; week <= 50; week++) {
+        const mods = getWeeklyModifiers(2026, week);
+        expect(mods.length).toBe(3);
+      }
+    });
   });
 });

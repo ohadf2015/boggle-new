@@ -238,6 +238,9 @@ vi.mock('@/contexts/ProgressionContext', () => ({
     getWorldStars: vi.fn(() => 0),
     attempts: [],
   }),
+  useProgressionData: () => ({
+    progression: { xp: 0, gold: 0, upgrades: {} },
+  }),
 }));
 
 // Mock useAdaptiveDifficulty

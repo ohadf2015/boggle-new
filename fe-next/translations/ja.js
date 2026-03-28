@@ -9344,6 +9344,8 @@ const ja = {
     "grandSlam": "グランドスラム！",
     "grandSlamBonus": "+500 XPボーナス",
     "grandSlamAvatar": "+1 アバターパーツ",
+    "allComplete": "クエストマスター！",
+    "allCompleteDesc": "デイリー＋ウィークリー全達成！絶好調！",
     "avatarReward": "+1 アバターパーツ",
     "avatarPartCategory": {
       "eyes": "目",

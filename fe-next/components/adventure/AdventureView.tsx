@@ -224,7 +224,10 @@ function AdventureView(): React.JSX.Element {
     else { setViewState('levelGrid'); setSelectedLevel(null); }
   }, [setViewState, setSelectedLevel]);
 
-  if (isLoading) {
+  // Only show full-screen spinner when there's no cached progression at all.
+  // When cached data exists, render the UI immediately with stale data —
+  // the API fetch will merge fresh data in the background.
+  if (isLoading && !progression) {
     return (
       <div className="h-screen bg-neo-navy flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

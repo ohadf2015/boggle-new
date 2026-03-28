@@ -412,6 +412,14 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
         const grandSlam = await checkAndClaimGrandSlam(playerId);
         if (grandSlam.claimed) {
           safeEmit(socket, 'engagement:grandSlamClaimed', grandSlam);
+
+          // Track daily missions streak for weekly quest
+          try {
+            const { updateQuestProgress } = await import('../modules/weeklyQuestManager');
+            await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
+          } catch {
+            // Non-critical
+          }
         }
       }
 

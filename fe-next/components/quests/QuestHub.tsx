@@ -245,7 +245,7 @@ function WeeklyQuestSection() {
               </span>
             </div>
             <p className="font-neo-body text-sm text-neo-white/90 font-medium">
-              {t(activeQuest.description, { target: activeQuest.target })}
+              {t(activeQuest.description, { target: activeQuest.displayTarget ?? activeQuest.target })}
             </p>
             {/* Reward preview */}
             <div className="flex items-center gap-3 text-xs">
@@ -323,7 +323,7 @@ function WeeklyQuestSection() {
                         {t(`weeklyQuest.${quest.difficulty}`)}
                       </span>
                       <span className="font-neo-body text-sm text-neo-white/80 text-start">
-                        {t(quest.description, { target: quest.target })}
+                        {t(quest.description, { target: quest.displayTarget ?? quest.target })}
                       </span>
                     </div>
                     <div className="flex flex-col items-end gap-0.5 ms-3 flex-shrink-0">
@@ -343,10 +343,52 @@ function WeeklyQuestSection() {
   );
 }
 
+function AllQuestsCompleteBanner({ t }: { t: (key: string) => string }) {
+  return (
+    <AdaptiveMotion.div
+      className="mt-4"
+      variants={grandSlamVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div
+        className={cn(
+          'relative overflow-hidden',
+          'flex items-center gap-4 p-5 rounded-neo-lg',
+          'border-3 border-neo-lime bg-gradient-to-br from-neo-lime/15 via-neo-navy to-neo-cyan/10',
+          'shadow-hard animate-neo-pop',
+        )}
+        role="status"
+        aria-live="polite"
+      >
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-neo-lime/10 to-transparent animate-shimmer"
+          aria-hidden="true"
+        />
+        <div className="relative flex items-center gap-2">
+          <div className="w-12 h-12 rounded-full bg-neo-lime/20 border-2 border-neo-lime flex items-center justify-center">
+            <Sparkles className="w-7 h-7 text-neo-lime" aria-hidden="true" />
+          </div>
+          <Trophy className="w-5 h-5 text-neo-yellow animate-float" aria-hidden="true" />
+        </div>
+        <div className="relative flex-1">
+          <p className="font-neo-display text-lg font-black text-neo-lime">
+            {t('quests.allComplete')}
+          </p>
+          <p className="font-neo-body text-sm text-neo-white/80 font-medium mt-0.5">
+            {t('quests.allCompleteDesc')}
+          </p>
+        </div>
+      </div>
+    </AdaptiveMotion.div>
+  );
+}
+
 export function QuestHub() {
   const { t } = useLanguage();
   const { missions, isGrandSlam, grandSlamClaimed, loading } =
     useDailyMissions();
+  const { isComplete: weeklyComplete } = useWeeklyQuest();
 
   // Filter to only the 3 quests we show (no brain drill)
   const dailyCompleted = DAILY_QUEST_CONFIGS.filter((config) => {
@@ -443,6 +485,11 @@ export function QuestHub() {
       >
         <WeeklyQuestSection />
       </AdaptiveMotion.div>
+
+      {/* --- All Quests Complete Banner --- */}
+      {isGrandSlam && weeklyComplete && (
+        <AllQuestsCompleteBanner t={t} />
+      )}
     </div>
   );
 }

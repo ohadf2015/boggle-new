@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { ArrowLeft, Swords, Skull, Trophy, Coins, Zap, Lock, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
-import { useProgression } from '@/contexts/ProgressionContext';
+import { useProgressionData } from '@/contexts/ProgressionContext';
 import { useBossRush } from '@/hooks/useBossRush';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { LEVELS_PER_WORLD } from '@/lib/adventure';
@@ -20,7 +20,7 @@ import { getWorldConfig } from '@/lib/adventure/levelConfig';
 
 export function BossRushPageClient() {
   const { t } = useLanguageSafe();
-  const { progression, isLoading } = useProgression();
+  const { progression, isLoading } = useProgressionData();
   const { state, currentBossWorldId, isActive, startRush, reportResult, rewards, reset } = useBossRush();
 
   const completions = useMemo(() => progression?.completions ?? [], [progression?.completions]);

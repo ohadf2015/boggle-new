@@ -9049,6 +9049,8 @@ const en = {
     "grandSlam": "Grand Slam!",
     "grandSlamBonus": "+500 XP Bonus",
     "grandSlamAvatar": "+1 Avatar Part",
+    "allComplete": "Quest Master!",
+    "allCompleteDesc": "All daily + weekly quests done! You're on fire!",
     "avatarReward": "+1 Avatar Part",
     "avatarPartCategory": {
       "eyes": "Eyes",

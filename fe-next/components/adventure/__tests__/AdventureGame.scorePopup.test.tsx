@@ -133,7 +133,7 @@ vi.mock('@/contexts/MusicContext', () => ({
 
 // Mock ProgressionContext - required by AdventureGame
 vi.mock('@/contexts/ProgressionContext', () => ({
-  useProgression: () => ({
+  useProgressionData: () => ({
     progression: {
       userId: 'test-user',
       xp: 0,
@@ -156,6 +156,14 @@ vi.mock('@/contexts/ProgressionContext', () => ({
     getLevelAttempt: vi.fn(() => undefined),
     refreshProgression: vi.fn(),
     attempts: [],
+  }),
+  useProgression: () => ({
+    recordAttempt: vi.fn(),
+    getLevelAttempt: vi.fn(() => undefined),
+    getLevelCompletion: vi.fn(() => undefined),
+    progression: { xp: 0, gold: 0, upgrades: {} },
+    updateWordAlbum: vi.fn(),
+    completeLevel: vi.fn(),
   }),
   ProgressionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
