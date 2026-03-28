@@ -3,10 +3,32 @@
  *
  * DFS-based path finding for word placement in grids,
  * and functions to embed single or multiple words into grids.
+ *
+ * Optimizations:
+ * - Numeric visited set (row * cols + col) instead of string keys
+ * - Fisher-Yates shuffle instead of sort for direction randomization
+ * - Pre-allocated direction scratch array to avoid per-call allocations
+ * - Smart start position selection: prefer cells with matching first letter
  */
 
 import type { Language, LetterGrid } from '@/types';
 import { normalizeHebrewFinalLetters, MIN_SAME_LENGTH_WORDS } from './constants';
+
+/** Fisher-Yates shuffle in place — O(n) vs sort's O(n log n) */
+function shuffleInPlace<T>(arr: T[], random: () => number): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
+/** Encode row,col as a single number for fast Set operations */
+function cellKey(row: number, col: number, cols: number): number {
+  return row * cols + col;
+}
 
 /**
  * Find a valid adjacent path for a word starting from given position
@@ -22,13 +44,14 @@ export function findWordPath(
   directions: Array<{ dr: number; dc: number }>
 ): Array<{ row: number; col: number }> | null {
   const path: Array<{ row: number; col: number }> = [];
-  const visited = new Set<string>();
+  const visited = new Set<number>();
+  const dirScratch = directions.slice();
 
   function dfs(row: number, col: number, charIndex: number): boolean {
     if (charIndex === word.length) return true;
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
 
-    const key = `${row},${col}`;
+    const key = cellKey(row, col, cols);
     if (visited.has(key)) return false;
 
     visited.add(key);
@@ -36,9 +59,9 @@ export function findWordPath(
 
     if (charIndex === word.length - 1) return true;
 
-    const shuffledDirs = [...directions].sort(() => random() - 0.5);
-    for (const dir of shuffledDirs) {
-      if (dfs(row + dir.dr, col + dir.dc, charIndex + 1)) return true;
+    shuffleInPlace(dirScratch, random);
+    for (let d = 0; d < dirScratch.length; d++) {
+      if (dfs(row + dirScratch[d].dr, col + dirScratch[d].dc, charIndex + 1)) return true;
     }
 
     visited.delete(key);
@@ -63,16 +86,17 @@ export function findWordPathInPartialGrid(
   random: () => number,
   directions: Array<{ dr: number; dc: number }>,
   grid: (string | null)[][],
-  usedCells: Set<string>
+  _usedCells: Set<string>
 ): Array<{ row: number; col: number }> | null {
   const path: Array<{ row: number; col: number }> = [];
-  const visited = new Set<string>();
+  const visited = new Set<number>();
+  const dirScratch = directions.slice();
 
   function dfs(row: number, col: number, charIndex: number): boolean {
     if (charIndex === word.length) return true;
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
 
-    const key = `${row},${col}`;
+    const key = cellKey(row, col, cols);
     if (visited.has(key)) return false;
 
     const cellValue = grid[row][col];
@@ -84,9 +108,9 @@ export function findWordPathInPartialGrid(
 
     if (charIndex === word.length - 1) return true;
 
-    const shuffledDirs = [...directions].sort(() => random() - 0.5);
-    for (const dir of shuffledDirs) {
-      if (dfs(row + dir.dr, col + dir.dc, charIndex + 1)) return true;
+    shuffleInPlace(dirScratch, random);
+    for (let d = 0; d < dirScratch.length; d++) {
+      if (dfs(row + dirScratch[d].dr, col + dirScratch[d].dc, charIndex + 1)) return true;
     }
 
     visited.delete(key);
@@ -115,18 +139,25 @@ export function embedWordInGrid(
   rows: number,
   cols: number,
   random: () => number,
-  language: Language
+  _language: Language
 ): LetterGrid {
   const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
   const wordUpper = word.toUpperCase();
 
   let placed = false;
-  const maxAttempts = 100;
 
-  for (let attempt = 0; attempt < maxAttempts && !placed; attempt++) {
-    const startRow = Math.floor(random() * rows);
-    const startCol = Math.floor(random() * cols);
-    const path = findWordPath(wordUpper, startRow, startCol, rows, cols, random, EIGHT_DIRECTIONS);
+  // Generate shuffled start positions (all cells, since grid is empty)
+  const allCells: Array<{ row: number; col: number }> = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      allCells.push({ row: r, col: c });
+    }
+  }
+  shuffleInPlace(allCells, random);
+
+  for (const start of allCells) {
+    if (placed) break;
+    const path = findWordPath(wordUpper, start.row, start.col, rows, cols, random, EIGHT_DIRECTIONS);
 
     if (path && path.length === wordUpper.length) {
       for (let i = 0; i < path.length; i++) {
@@ -155,9 +186,45 @@ export function embedWordInGrid(
 }
 
 /**
+ * Collect grid cells where a given letter already exists, plus some random starts.
+ * Trying matching cells first increases letter reuse and packing density.
+ */
+function getSmartStartPositions(
+  firstChar: string,
+  grid: (string | null)[][],
+  rows: number,
+  cols: number,
+  random: () => number,
+  maxPositions: number
+): Array<{ row: number; col: number }> {
+  const matching: Array<{ row: number; col: number }> = [];
+  const empty: Array<{ row: number; col: number }> = [];
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r][c] === firstChar) {
+        matching.push({ row: r, col: c });
+      } else if (grid[r][c] === null) {
+        empty.push({ row: r, col: c });
+      }
+    }
+  }
+
+  shuffleInPlace(matching, random);
+  shuffleInPlace(empty, random);
+
+  // Matching cells first (reuse letters), then empty cells
+  const combined = [...matching, ...empty];
+  return combined.slice(0, maxPositions);
+}
+
+/**
  * Embed multiple words into a grid for survival mode playability
  * First embeds the target word (required), then tries to embed bonus words
  * Finally fills remaining cells with random letters
+ *
+ * Optimized: uses smart start positions (prefer cells with matching first letter)
+ * to reduce wasted attempts and improve letter reuse / grid density.
  */
 export function embedMultipleWordsInGrid(
   targetWord: string,
@@ -177,13 +244,16 @@ export function embedMultipleWordsInGrid(
     targetUpper = normalizeHebrewFinalLetters(targetUpper);
   }
   let targetPlaced = false;
-  const maxAttempts = 100;
 
-  for (let attempt = 0; attempt < maxAttempts && !targetPlaced; attempt++) {
-    const startRow = Math.floor(random() * rows);
-    const startCol = Math.floor(random() * cols);
+  // For the target word on empty grid, any position works — use random starts
+  const targetStarts = getSmartStartPositions(
+    targetUpper[0], grid, rows, cols, random, 100
+  );
+
+  for (const start of targetStarts) {
+    if (targetPlaced) break;
     const path = findWordPathInPartialGrid(
-      targetUpper, startRow, startCol, rows, cols, random, EIGHT_DIRECTIONS, grid, usedCells
+      targetUpper, start.row, start.col, rows, cols, random, EIGHT_DIRECTIONS, grid, usedCells
     );
 
     if (path && path.length === targetUpper.length) {
@@ -203,7 +273,7 @@ export function embedMultipleWordsInGrid(
     }
   }
 
-  // Embed bonus words
+  // Embed bonus words — prefer starts where first letter already matches
   let embeddedCount = 0;
   let sameLengthEmbedded = 0;
   const targetLength = targetUpper.length;
@@ -217,13 +287,16 @@ export function embedMultipleWordsInGrid(
     if (language === 'he') {
       wordUpper = normalizeHebrewFinalLetters(wordUpper);
     }
-    let wordPlaced = false;
 
-    for (let attempt = 0; attempt < 30 && !wordPlaced; attempt++) {
-      const startRow = Math.floor(random() * rows);
-      const startCol = Math.floor(random() * cols);
+    const starts = getSmartStartPositions(
+      wordUpper[0], grid, rows, cols, random, 30
+    );
+
+    let wordPlaced = false;
+    for (const start of starts) {
+      if (wordPlaced) break;
       const path = findWordPathInPartialGrid(
-        wordUpper, startRow, startCol, rows, cols, random, EIGHT_DIRECTIONS, grid, usedCells
+        wordUpper, start.row, start.col, rows, cols, random, EIGHT_DIRECTIONS, grid, usedCells
       );
 
       if (path && path.length === wordUpper.length) {
@@ -270,23 +343,22 @@ export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
   const cols = grid[0].length;
   const wordNormalized = normalizeHebrewFinalLetters(word).toUpperCase();
 
-  const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
-  ];
+  // Pre-uppercase grid once to avoid repeated .toUpperCase() in DFS
+  const upperGrid: string[][] = grid.map(row => row.map(c => c.toUpperCase()));
 
-  function dfs(row: number, col: number, index: number, visited: Set<string>): boolean {
+  const visited = new Set<number>();
+
+  function dfs(row: number, col: number, index: number): boolean {
     if (index === wordNormalized.length) return true;
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
 
-    const key = `${row},${col}`;
+    const key = cellKey(row, col, cols);
     if (visited.has(key)) return false;
-    if (grid[row][col].toUpperCase() !== wordNormalized[index]) return false;
+    if (upperGrid[row][col] !== wordNormalized[index]) return false;
 
     visited.add(key);
-    for (const [dr, dc] of directions) {
-      if (dfs(row + dr, col + dc, index + 1, visited)) return true;
+    for (let d = 0; d < EIGHT_DIRECTIONS.length; d++) {
+      if (dfs(row + EIGHT_DIRECTIONS[d].dr, col + EIGHT_DIRECTIONS[d].dc, index + 1)) return true;
     }
     visited.delete(key);
     return false;
@@ -294,8 +366,8 @@ export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      if (grid[r][c].toUpperCase() === wordNormalized[0]) {
-        if (dfs(r, c, 0, new Set())) return true;
+      if (upperGrid[r][c] === wordNormalized[0]) {
+        if (dfs(r, c, 0)) return true;
       }
     }
   }

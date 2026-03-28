@@ -36,6 +36,17 @@ import {
 // Re-export for consumers
 export { isWordOnGrid } from './gridPathFinding';
 
+/** Fisher-Yates shuffle in place */
+function shuffleFY<T>(arr: T[], random: () => number): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
 // ==========================================
 // Basic Grid Generation
 // ==========================================
@@ -103,7 +114,7 @@ function generateSeededJapaneseGrid(
   const totalCells = rows * cols;
   const targetCompounds = Math.floor(totalCells / 5);
 
-  const shuffledCompounds = [...kanjiCompounds].sort(() => random() - 0.5);
+  const shuffledCompounds = shuffleFY([...kanjiCompounds], random);
   const twoCharCompounds = shuffledCompounds.filter((w) => w.length === 2);
   const threeCharCompounds = shuffledCompounds.filter((w) => w.length === 3);
 
@@ -151,7 +162,7 @@ function tryEmbedCompoundSeeded(
     { dr: 1, dc: 1 }, { dr: 1, dc: -1 }, { dr: -1, dc: -1 }, { dr: -1, dc: 1 },
   ];
 
-  const shuffledDirs = [...directions].sort(() => random() - 0.5);
+  const shuffledDirs = shuffleFY([...directions], random);
 
   for (let attempt = 0; attempt < 50; attempt++) {
     const startRow = Math.floor(random() * rows);

@@ -163,6 +163,17 @@ const SWEDISH_LETTER_WEIGHTS: Record<string, number> = {
 // SEEDED RANDOM
 // ==============================================
 
+/** Fisher-Yates shuffle in place — O(n) vs sort's O(n log n) */
+function shuffleArray<T>(arr: T[], random: () => number): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
 /**
  * Simple seeded random number generator (Mulberry32)
  * Returns a function that generates pseudo-random numbers [0, 1)
@@ -322,8 +333,8 @@ function generateJapaneseGrid(size: GridSize, random: () => number): string[][] 
   const totalCells = rows * cols;
   const targetCompounds = Math.floor(totalCells / 4); // Embed more compounds
 
-  // Shuffle compounds using seeded random
-  const shuffledCompounds = [...kanjiCompounds].sort(() => random() - 0.5);
+  // Shuffle compounds using Fisher-Yates
+  const shuffledCompounds = shuffleArray([...kanjiCompounds], random);
   const twoCharCompounds = shuffledCompounds.filter((w) => w.length === 2);
   const threeCharCompounds = shuffledCompounds.filter((w) => w.length === 3);
 
@@ -381,7 +392,7 @@ function tryEmbedCompound(
     { dr: -1, dc: -1 }, // diagonal up-left
   ];
 
-  const shuffledDirs = [...directions].sort(() => random() - 0.5);
+  const shuffledDirs = shuffleArray([...directions], random);
   const attempts = 40;
 
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -431,19 +442,26 @@ function weightedRandomLetter(subset: string[], random: () => number): string {
   return subset[Math.floor(random() * subset.length)];
 }
 
+/** Pre-computed weighted pool cache to avoid rebuilding each call */
+const weightedPoolCache = new Map<Record<string, number>, string[]>();
+
 /**
  * Pick a weighted random letter from a weights map
+ * Caches the expanded pool so it's built once per weights object
  */
 function weightedRandomFromWeights(
   weights: Record<string, number>,
   random: () => number
 ): string {
-  // Build weighted pool
-  const pool: string[] = [];
-  for (const [letter, weight] of Object.entries(weights)) {
-    for (let i = 0; i < weight; i++) {
-      pool.push(letter);
+  let pool = weightedPoolCache.get(weights);
+  if (!pool) {
+    pool = [];
+    for (const [letter, weight] of Object.entries(weights)) {
+      for (let i = 0; i < weight; i++) {
+        pool.push(letter);
+      }
     }
+    weightedPoolCache.set(weights, pool);
   }
   return pool[Math.floor(random() * pool.length)];
 }
