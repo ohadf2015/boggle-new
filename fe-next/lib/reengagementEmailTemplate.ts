@@ -21,7 +21,6 @@ const LOCALIZED_STRINGS: Record<string, {
   question: string;
   cta: string;
   footerReason: string;
-  socialProof: string;
   urgency: string;
   streakLost: string;
   unsubscribe: string;
@@ -33,7 +32,6 @@ const LOCALIZED_STRINGS: Record<string, {
     question: 'Can you figure it out?',
     cta: 'Play Now',
     footerReason: 'You subscribed to daily challenges.',
-    socialProof: '2,847 players already solved it today',
     urgency: 'Expires at midnight',
     streakLost: 'Your streak is fading...',
     unsubscribe: 'Unsubscribe',
@@ -45,7 +43,7 @@ const LOCALIZED_STRINGS: Record<string, {
     question: '?תצליח/י לגלות',
     cta: 'שחקו עכשיו',
     footerReason: '.נרשמת לאתגר היומי',
-    socialProof: '2,847 שחקנים כבר פתרו את זה היום',
+
     urgency: 'נגמר בחצות',
     streakLost: '...הרצף שלך נעלם',
     unsubscribe: 'ביטול הרשמה',
@@ -57,7 +55,7 @@ const LOCALIZED_STRINGS: Record<string, {
     question: 'Kan du lista ut det?',
     cta: 'Spela nu',
     footerReason: 'Du prenumererar på dagliga utmaningar.',
-    socialProof: '2 847 spelare har redan klarat det idag',
+
     urgency: 'Slutar vid midnatt',
     streakLost: 'Din streak bleknar...',
     unsubscribe: 'Avprenumerera',
@@ -69,7 +67,7 @@ const LOCALIZED_STRINGS: Record<string, {
     question: 'わかりますか？',
     cta: '今すぐプレイ',
     footerReason: 'デイリーチャレンジに登録しています。',
-    socialProof: '今日すでに2,847人がクリア',
+
     urgency: '深夜0時に終了',
     streakLost: '連続記録が消えかけています...',
     unsubscribe: '配信停止',
@@ -81,7 +79,7 @@ const LOCALIZED_STRINGS: Record<string, {
     question: '¿Puedes adivinarla?',
     cta: 'Jugar ahora',
     footerReason: 'Te suscribiste al desafío diario.',
-    socialProof: '2.847 jugadores ya lo resolvieron hoy',
+
     urgency: 'Expira a medianoche',
     streakLost: 'Tu racha se desvanece...',
     unsubscribe: 'Cancelar suscripción',
@@ -175,12 +173,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const shadowDir = isRTL ? '-' : '';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
-  // Flip gradient direction for RTL so colors flow naturally
-  const gradDeg = isRTL ? '270deg' : '90deg';
   // Flip play arrow for RTL
   const playArrow = isRTL ? '&#9664;' : '&#9654;';
-  // Mystery tile opacities — fade from bright to dim for intrigue
-  const mysteryOpacities = ['0.85', '0.65', '0.45', '0.3'];
 
   const html = `
 <!DOCTYPE html>
@@ -202,50 +196,50 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
     * { box-sizing: border-box; }
     body {
       margin: 0; padding: 0;
-      background-color: #0a0a1a;
+      background-color: #0d0d1f;
       font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     a.cta-link:hover { transform: translate(2px, 2px) !important; box-shadow: ${shadowDir}3px 3px 0px ${colors.black} !important; }
     @media only screen and (max-width: 600px) {
-      .container { padding: 12px !important; }
-      .main-card { padding: 28px 16px 32px !important; }
-      .word-tile { width: 50px !important; height: 50px !important; font-size: 24px !important; line-height: 44px !important; }
-      .mascot-img { width: 72px !important; height: 72px !important; }
-      .greeting-text { font-size: 22px !important; }
-      .teaser-text { font-size: 13px !important; }
-      .cta-link { padding: 16px 36px !important; font-size: 18px !important; }
-      .streak-badge { font-size: 11px !important; padding: 6px 14px !important; }
-      .urgency-text { font-size: 11px !important; }
+      .container { padding: 16px !important; }
+      .main-card { padding: 32px 20px 36px !important; }
+      .word-tile { width: 48px !important; height: 48px !important; font-size: 22px !important; line-height: 42px !important; }
+      .mascot-img { width: 80px !important; height: 80px !important; }
+      .greeting-text { font-size: 24px !important; }
+      .teaser-text { font-size: 14px !important; }
+      .cta-link { padding: 16px 40px !important; font-size: 19px !important; }
+      .streak-badge { font-size: 12px !important; padding: 7px 16px !important; }
+      .urgency-text { font-size: 12px !important; }
     }
   </style>
 </head>
 <body>
   <!-- Preheader -->
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0a0a1a;">
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0d0d1f;">
     ${strings.teaser} ${firstLetter} — ${strings.question} &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0a0a1a;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0d0d1f;">
     <tr>
-      <td align="center" class="container" style="padding: 32px 20px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 520px;">
+      <td align="center" class="container" style="padding: 40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 480px;">
 
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding-bottom: 24px;">
+            <td align="center" style="padding-bottom: 28px;">
               <a href="${playUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="120" style="display: block; max-width: 120px; height: auto;" />
+                <img src="${logoUrl}" alt="LexiClash" width="140" style="display: block; max-width: 140px; height: auto;" />
               </a>
             </td>
           </tr>
 
           <!-- Streak Lost Badge -->
           <tr>
-            <td align="center" style="padding-bottom: 20px;">
+            <td align="center" style="padding-bottom: 24px;">
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td class="streak-badge" style="background: rgba(255, 20, 147, 0.15); border: 2px solid rgba(255, 20, 147, 0.4); border-radius: 24px; padding: 8px 20px; font-size: 13px; color: ${colors.pink}; font-weight: 600; letter-spacing: 0.5px;">
+                  <td class="streak-badge" style="background: #2a1028; border: 2px solid ${colors.pink}; border-radius: 24px; padding: 8px 22px; font-size: 14px; color: ${colors.pinkLight}; font-weight: 600; letter-spacing: 0.3px;">
                     &#x1F525; ${strings.streakLost}
                   </td>
                 </tr>
@@ -256,21 +250,21 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           <!-- Main Card -->
           <tr>
             <td>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: linear-gradient(180deg, #151530 0%, #1a1a3a 50%, #1e1e42 100%); border: 3px solid #2a2a50; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; overflow: hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: #1a1a35; border: 3px solid ${colors.black}; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; overflow: hidden;">
 
-                <!-- Top gradient bar (flips for RTL) -->
+                <!-- Accent bar — single color, clean -->
                 <tr>
-                  <td style="background: linear-gradient(${gradDeg}, ${colors.lime} 0%, ${colors.cyan} 50%, ${colors.pink} 100%); height: 5px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td style="background: ${colors.lime}; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
                 </tr>
 
                 <tr>
-                  <td class="main-card" style="padding: 36px 32px 40px;">
+                  <td class="main-card" style="padding: 40px 32px 44px;">
 
                     <!-- Mascot -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 16px;">
-                          <img src="${mascotUrl}" alt="Lexi" width="88" height="88" class="mascot-img" style="display: block; width: 88px; height: 88px;" />
+                        <td align="center" style="padding-bottom: 20px;">
+                          <img src="${mascotUrl}" alt="Lexi" width="100" height="100" class="mascot-img" style="display: block; width: 100px; height: 100px;" />
                         </td>
                       </tr>
                     </table>
@@ -278,8 +272,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Greeting -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 4px;">
-                          <h1 class="greeting-text" style="color: ${colors.white}; font-size: 26px; margin: 0; font-weight: 700; text-align: center; line-height: 1.3; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 8px;">
+                          <h1 class="greeting-text" style="color: ${colors.white}; font-size: 28px; margin: 0; font-weight: 700; text-align: center; line-height: 1.3; direction: ${dir};">
                             ${strings.greeting(recipientName)}
                           </h1>
                         </td>
@@ -289,8 +283,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Teaser -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 28px;">
-                          <p class="teaser-text" style="color: #8888aa; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
+                          <p class="teaser-text" style="color: #a0a0c0; font-size: 16px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
                             ${strings.teaser}
                           </p>
                         </td>
@@ -300,22 +294,20 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Tile Row -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 16px;">
+                        <td align="center" style="padding-bottom: 20px;">
                           <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
                             <tr>
                               ${Array.from({ length: WORD_TILE_COUNT }, (_, i) => {
                                 const isFirst = isRTL ? i === WORD_TILE_COUNT - 1 : i === 0;
                                 if (isFirst) {
-                                  return `<td style="padding: 0 5px;">
-                                    <div class="word-tile" style="width: 58px; height: 58px; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}4px 4px 0px ${colors.black}, 0 0 20px rgba(191, 255, 0, 0.3); text-align: center; line-height: 52px; font-size: 30px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                  return `<td style="padding: 0 4px;">
+                                    <div class="word-tile" style="width: 56px; height: 56px; background: ${colors.lime}; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 50px; font-size: 28px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
                                       ${firstLetter}
                                     </div>
                                   </td>`;
                                 }
-                                const idx = isRTL ? WORD_TILE_COUNT - 1 - i : i;
-                                const opacity = mysteryOpacities[idx - 1] || '0.25';
-                                return `<td style="padding: 0 5px;">
-                                  <div class="word-tile" style="width: 58px; height: 58px; background: linear-gradient(180deg, #1e1e40 0%, #252550 100%); border: 2px solid rgba(100, 100, 170, ${opacity}); border-radius: 12px; text-align: center; line-height: 52px; font-size: 24px; font-weight: 600; color: rgba(140, 140, 200, ${opacity}); font-family: 'Fredoka', Arial, sans-serif;">
+                                return `<td style="padding: 0 4px;">
+                                  <div class="word-tile" style="width: 56px; height: 56px; background: #2a2a50; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 50px; font-size: 22px; font-weight: 700; color: #555588; font-family: 'Fredoka', Arial, sans-serif;">
                                     ?
                                   </div>
                                 </td>`;
@@ -329,8 +321,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Question -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 28px;">
-                          <p style="color: ${colors.cyan}; font-size: 15px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
+                          <p style="color: ${colors.cyan}; font-size: 16px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
                             ${strings.question}
                           </p>
                         </td>
@@ -340,7 +332,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 20px;">
+                        <td align="center" style="padding-bottom: 24px;">
                           <!--[if mso]>
                           <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:56px;v-text-anchor:middle;width:280px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
                             <w:anchorlock/>
@@ -348,7 +340,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: linear-gradient(180deg, ${colors.lime} 0%, ${colors.limeMuted} 100%); color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 16px 56px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px;">
+                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 60px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px;">
                             ${playArrow}&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
@@ -356,11 +348,11 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       </tr>
                     </table>
 
-                    <!-- Urgency -->
+                    <!-- Urgency + Social Proof (inside card) -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}">
-                          <p class="urgency-text" style="color: #666688; font-size: 12px; text-align: center; margin: 0; font-weight: 500; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 8px;">
+                          <p class="urgency-text" style="color: ${colors.pink}; font-size: 13px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
                             &#x23F0; ${strings.urgency}
                           </p>
                         </td>
@@ -369,42 +361,13 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
 
                   </td>
                 </tr>
-
-                <!-- Bottom gradient bar (flips for RTL) -->
-                <tr>
-                  <td style="background: linear-gradient(${gradDeg}, ${colors.pink} 0%, ${colors.cyan} 50%, ${colors.lime} 100%); height: 5px; font-size: 0; line-height: 0;">&nbsp;</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Social Proof -->
-          <tr>
-            <td align="center" dir="${dir}" style="padding: 24px 0 20px;">
-              <table role="presentation" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="background: rgba(0, 255, 255, 0.08); border: 1px solid rgba(0, 255, 255, 0.15); border-radius: 20px; padding: 10px 24px;">
-                    <span style="color: #8888aa; font-size: 13px; font-weight: 500; direction: ${dir};">&#x2705; ${strings.socialProof}</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Divider -->
-          <tr>
-            <td style="padding: 0 40px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td style="border-top: 1px solid #1a1a35;">&nbsp;</td>
-                </tr>
               </table>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td align="center" dir="${dir}" style="padding: 16px 0 8px;">
+            <td align="center" dir="${dir}" style="padding: 28px 0 8px;">
               <p style="color: #404060; font-size: 12px; margin: 0 0 10px 0; line-height: 1.6; direction: ${dir};">
                 ${strings.footerReason}
               </p>
@@ -419,7 +382,7 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           </tr>
 
           <tr>
-            <td align="center" style="padding: 12px 0 0;">
+            <td align="center" style="padding: 8px 0 0;">
               <span style="color: #2a2a45; font-size: 11px;">&copy; ${currentYear} LexiClash</span>
             </td>
           </tr>
@@ -450,8 +413,6 @@ ${strings.question}
 \u23F0 ${strings.urgency}
 
 ---
-
-\u2705 ${strings.socialProof}
 
 ${strings.footerReason}
 ${strings.unsubscribe}: ${unsubscribeUrl}

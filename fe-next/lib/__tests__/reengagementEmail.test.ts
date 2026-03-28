@@ -330,8 +330,6 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('התגעגענו');
     // RTL shadow direction (negative x offset)
     expect(html).toContain('-6px 6px 0px');
-    // RTL gradient direction (flipped)
-    expect(html).toContain('270deg');
     // RTL play arrow (left-pointing)
     expect(html).toContain('&#9664;');
     // Localized footer links
