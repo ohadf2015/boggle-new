@@ -222,7 +222,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           // 404 = route unreachable (stale cache, proxy issue) — fall back
           // to initial state so the user can still play.
           if (response.status === 404) {
-            logger.warn('[ProgressionContext] /api/adventure/state returned 404 — using initial state');
+            logger.debug('[ProgressionContext] /api/adventure/state returned 404 — using initial state');
             setProgression({
               userId: user!.id,
               playerLevel: 1, xp: 0,

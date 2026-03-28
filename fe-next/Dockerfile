@@ -38,7 +38,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 nextjs && \
+    mkdir -p .next/cache && chown nextjs:nodejs .next/cache
 
 # Production node_modules for Express server externals (socket.io, ioredis, etc.)
 # Copied FIRST so standalone's traced node_modules overlay correctly

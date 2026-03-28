@@ -333,12 +333,7 @@ export async function withRetry<T>(
 
       if (!retryable || attempt === RETRY_CONFIG.maxRetries - 1) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
-        logger.error('AI_SERVICE', `${operationName} failed after ${attempt + 1} attempts:`, msg);
-        captureAIServiceError(error instanceof Error ? error : new Error(msg), {
-          operation: operationName,
-          retryAttempt: attempt + 1,
-          isRateLimited: msg.toLowerCase().includes('rate limit') || msg.includes('429'),
-        });
+        logger.info('AI_SERVICE', `${operationName} failed after ${attempt + 1} attempts:`, msg);
         throw error;
       }
 

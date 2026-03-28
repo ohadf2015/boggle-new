@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -132,6 +132,28 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 </Link>
                 <MusicControls />
                 {isAuthenticated && <NotificationBell />}
+
+                {/* Sign In button for guests */}
+                {!isAuthenticated && (
+                    <button
+                        onClick={onSignIn}
+                        className={cn(
+                            "flex items-center gap-1.5 flex-shrink-0",
+                            "px-3 h-11 min-h-[44px]",
+                            "bg-neo-cyan text-neo-black",
+                            "border-3 border-neo-black",
+                            "rounded-neo shadow-hard-sm",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                            "transition-all duration-100",
+                            "text-xs font-bold"
+                        )}
+                        aria-label={t('auth.signIn')}
+                    >
+                        <User size={14} aria-hidden="true" />
+                        <span>{t('auth.signIn')}</span>
+                    </button>
+                )}
 
                 {/* Animated Hamburger Button */}
                 <button

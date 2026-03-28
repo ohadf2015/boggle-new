@@ -11,14 +11,17 @@ import { NotificationBell } from '../notifications/NotificationBell';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import MusicControls from '../MusicControls';
 import HeaderMenuDropdown from '../HeaderMenuDropdown';
+import AuthButton from '../auth/AuthButton';
 import { getStoredCustomAvatar } from '../../utils/profileStorage';
 
 interface HeaderDesktopControlsProps {
     unclaimedCount: number;
     onOpenGiftModal: () => void;
+    onSignIn: () => void;
+    onSignUp: () => void;
 }
 
-const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal }) => {
+const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, profile, user } = useAuth();
 
@@ -101,6 +104,13 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
             >
                 <Users size={18} />
             </Link>
+
+            {!isAuthenticated && (
+                <AuthButton
+                    onSignInClick={onSignIn}
+                    onSignUpClick={onSignUp}
+                />
+            )}
 
             <QuickLanguageSwitcher compact />
 

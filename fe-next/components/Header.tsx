@@ -79,6 +79,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 <HeaderDesktopControls
                     unclaimedCount={unclaimedCount}
                     onOpenGiftModal={handleOpenGiftModal}
+                    onSignIn={openSignIn}
+                    onSignUp={openSignUp}
                 />
 
                 <HeaderMobileMenu
