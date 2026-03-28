@@ -49,7 +49,7 @@ PID_TSC=$!
   fi
 
   if [ -n "$FRONTEND_FILES" ]; then
-    ./node_modules/.bin/vitest run --reporter=verbose --related --passWithNoTests $FRONTEND_FILES 2>&1 || FAIL=1
+    ./node_modules/.bin/vitest run --reporter=verbose --changed origin/master --passWithNoTests 2>&1 || FAIL=1
   fi
 
   if [ -z "$BACKEND_FILES" ] && [ -z "$FRONTEND_FILES" ]; then
