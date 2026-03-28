@@ -23,6 +23,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# NEXT_PUBLIC_* vars must be present at build time — Next.js inlines them into client JS.
+# Railway automatically forwards env vars matching ARG names as build args.
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_GA4_MEASUREMENT_ID
+ARG NEXT_PUBLIC_ADSENSE_CLIENT_ID
+ARG NEXT_PUBLIC_ADSENSE_REWARDED_SLOT
+ARG NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID
+ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
+
 # Build the Express server bundle (esbuild — ~2s)
 RUN node scripts/bundle-server.mjs
 
