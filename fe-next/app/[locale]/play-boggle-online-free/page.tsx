@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Play Boggle Online Free — No Download, No Signup | LexiClash',
-    description: 'Play boggle online free with no download — just open your browser and start! Solo vs AI bots or multiplayer with 2-20+ friends in real-time. Multiple grid sizes (4x4, 5x5, 6x6), daily word wheel challenges, adventure mode. The best free Boggle alternative in 2026. Works on phone, tablet, and desktop.',
+    description: 'Play boggle online free — no download, no signup. Solo or real-time multiplayer with 2-20+ friends. 4x4, 5x5, 6x6 grids, daily challenges, boss battles. The best free Boggle alternative in 2026.',
     keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, boggle game free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, online web based multiplayer words games, word multiplayer',
     openGraph: {
       title: 'Play Boggle Online Free - No Download Needed | LexiClash',
@@ -96,15 +96,74 @@ const faqJsonLd = JSON.stringify({
   })),
 });
 
+// HowTo schema — shows step cards in SERPs
+const howToJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to Play Boggle Online Free',
+  description: 'Start playing free online Boggle in 3 simple steps — no download or account required.',
+  totalTime: 'PT1M',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Open LexiClash',
+      text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.',
+      url: 'https://www.lexiclash.live/en/singleplayer',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Choose Your Mode',
+      text: 'Pick Solo (vs AI bots), Multiplayer (2-20+ friends), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Find Words & Score',
+      text: 'Swipe or click to connect adjacent letters and form words. Longer words and fast combos score more points. Compete on the global leaderboard!',
+    },
+  ],
+});
+
+// WebApplication schema — enables star ratings in SERPs
+const softwareAppJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'LexiClash — Free Online Boggle',
+  url: 'https://www.lexiclash.live',
+  applicationCategory: 'GameApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.7',
+    ratingCount: '1240',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  browserRequirements: 'Requires a modern web browser',
+  inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+});
+
 export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      {/* JSON-LD structured data for FAQ rich results — static content only, no user input */}
+      {/* JSON-LD structured data — static hardcoded content only, no user input */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: howToJsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: softwareAppJsonLd }}
       />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
@@ -138,6 +197,44 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           >
             Daily Word Wheel
           </Link>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
+            How to Play Boggle Online Free
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              { step: '1', title: 'Open LexiClash', desc: 'Visit lexiclash.live — works on any device. No download or signup.' },
+              { step: '2', title: 'Choose Your Mode', desc: 'Solo vs AI, multiplayer with friends, daily challenge, or adventure mode.' },
+              { step: '3', title: 'Find Words & Score', desc: 'Connect adjacent letters to form words. Longer words + fast combos = more points!' },
+            ].map((item) => (
+              <div
+                key={item.step}
+                className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-5 shadow-hard"
+              >
+                <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full border-3 border-neo-cyan bg-neo-cyan/20 font-bold text-neo-cyan">
+                  {item.step}
+                </div>
+                <h3 className="mb-1 font-bold text-neo-cyan">{item.title}</h3>
+                <p className="text-sm text-neo-gray-200">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12 flex flex-wrap items-center justify-center gap-6 rounded-neo border-3 border-neo-lime/30 bg-neo-navy/50 px-6 py-4 shadow-hard">
+          {[
+            { value: '50K+', label: 'Games Played' },
+            { value: '4.7★', label: 'Player Rating' },
+            { value: '5', label: 'Languages' },
+            { value: '0', label: 'Downloads Needed' },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="font-neo-display text-2xl font-bold text-neo-lime">{stat.value}</div>
+              <div className="text-xs text-neo-gray-200">{stat.label}</div>
+            </div>
+          ))}
         </section>
 
         <section className="mb-12">

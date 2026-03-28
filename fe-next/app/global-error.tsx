@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Sparkles, RefreshCw } from "lucide-react";
 import { captureError } from "@/utils/sentry";
 import { getCachedTranslation } from "@/translations/loadTranslation";
 import type { Language } from "@/types";
@@ -111,7 +112,7 @@ export default function GlobalError({
         <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-cyan-50 via-lime-50 to-cyan-100">
           <div className="max-w-xl w-full text-center p-8 neo-card bg-neo-cream text-neo-black rotate-[-1deg] animate-neo-pop">
             {/* Floating icon with gentle animation */}
-            <div className="text-7xl mb-6 animate-pulse">🌟</div>
+            <div className="mb-6 animate-pulse flex justify-center"><Sparkles className="w-16 h-16 text-neo-cyan" /></div>
 
             <h1 className="text-3xl font-black mb-4 uppercase tracking-wide text-neo-black font-neo-display">
               {t("errors.somethingWentWrong")}
@@ -127,7 +128,7 @@ export default function GlobalError({
                 className="btn-neo-primary px-6 py-3 text-lg"
                 aria-label={t("errors.refreshPage")}
               >
-                🔄 {t("errors.refreshPage")}
+                <RefreshCw className="w-5 h-5 inline-block me-1" /> {t("errors.refreshPage")}
               </button>
               <button
                 onClick={() => (window.location.href = "/")}

@@ -11,7 +11,7 @@
 
 import React, { useCallback, useRef, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast } from '@/components/NeoToast';
+import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -133,7 +133,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     // Validate socket connection
     if (!socket || !socket.connected) {
       logger.warn('[HOST] Cannot start game: socket not connected');
-      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: '🔌', duration: 4000 });
+      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: TOAST_ICONS.plug, duration: 4000 });
       return;
     }
 
@@ -152,7 +152,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         if (!tournamentData) {
           setTournamentCreating(false);
           neoErrorToast(t('hostView.tournamentCreateFailed'), {
-            icon: '❌',
+            icon: TOAST_ICONS.xCircle,
             duration: 5000,
           });
         }
@@ -195,7 +195,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     });
 
     neoSuccessToast(t('common.gameStarted'), {
-      icon: '🎮',
+      icon: TOAST_ICONS.gamepad,
       duration: 3000,
     });
   }, [
@@ -232,7 +232,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     // No players at all (host not playing and nobody joined)
     if (otherPlayers <= 0 && !hostPlaying) {
       logger.warn('[HOST] Cannot start game: no players');
-      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
+      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: TOAST_ICONS.alertTriangle, duration: 3000 });
       return;
     }
 
@@ -255,7 +255,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     socket?.emit('endGame', { gameCode });
     setRemainingTime(null);
     setGameStarted(false);
-    neoInfoToast(t('hostView.gameStopped'), { icon: '⏹️' });
+    neoInfoToast(t('hostView.gameStopped'), { icon: TOAST_ICONS.stopCircle });
   }, [socket, gameCode, t, setRemainingTime, setGameStarted]);
 
   const handleExitRoom = useCallback(() => {
@@ -283,7 +283,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTournamentData(null);
     setGameType('regular');
     neoErrorToast(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
-      icon: '❌',
+      icon: TOAST_ICONS.xCircle,
       duration: 3000,
     });
   }, [socket, tournamentData, t, setShowCancelTournamentDialog, setTournamentData, setGameType]);
@@ -332,12 +332,12 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         });
 
         neoSuccessToast(t('common.gameStarted'), {
-          icon: '🎮',
+          icon: TOAST_ICONS.gamepad,
           duration: 3000,
         });
       } else {
         neoErrorToast(t('hostView.resetFailed') || 'Failed to reset game', {
-          icon: '❌',
+          icon: TOAST_ICONS.xCircle,
           duration: 3000,
         });
         logger.error('[HOST] Game reset failed:', response?.error);

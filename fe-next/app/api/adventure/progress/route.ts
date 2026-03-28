@@ -8,76 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import type { PlayerProgression, LevelCompletion } from '@/types/adventure';
 import { captureApiError } from '@/utils/sentry';
-
-/**
- * Transform database row to PlayerProgression type
- */
-function transformProgression(
-  dbRow: Record<string, unknown> | null,
-  completions: LevelCompletion[]
-): PlayerProgression {
-  if (!dbRow) {
-    return {
-      userId: '',
-      playerLevel: 1,
-      xp: 0,
-      currentWorld: 1,
-      currentLevel: 1,
-      totalStars: 0,
-      completions: [],
-      gold: 0,
-      upgrades: {},
-      skillPoints: 0,
-      skillTree: {},
-      runeFragments: 0,
-      runes: [],
-      endlessHighFloor: 0,
-      chapterQuestProgress: {},
-      wordAlbum: [],
-      wordAlbumClaimedMilestones: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  return {
-    userId: dbRow.user_id as string,
-    playerLevel: dbRow.player_level as number,
-    xp: dbRow.xp as number,
-    currentWorld: dbRow.current_world as number,
-    currentLevel: dbRow.current_level as number,
-    totalStars: dbRow.total_stars as number,
-    completions,
-    gold: (dbRow.gold as number) ?? 0,
-    upgrades: (dbRow.upgrades as Record<string, number>) ?? {},
-    skillPoints: (dbRow.skill_points as number) ?? 0,
-    skillTree: (dbRow.skill_tree as Record<string, number>) ?? {},
-    runeFragments: (dbRow.rune_fragments as number) ?? 0,
-    runes: (dbRow.runes as Array<{ runeId: string; equipped: boolean }>) ?? [],
-    chapterQuestProgress: (dbRow.chapter_quest_progress as Record<string, number>) ?? {},
-    wordAlbum: (dbRow.word_album as string[]) ?? [],
-    wordAlbumClaimedMilestones: (dbRow.word_album_claimed_milestones as number[]) ?? [],
-    endlessHighFloor: (dbRow.endless_high_floor as number) ?? 0,
-    createdAt: dbRow.created_at as string,
-    updatedAt: dbRow.updated_at as string,
-  };
-}
-
-/**
- * Transform database row to LevelCompletion type
- */
-function transformCompletion(dbRow: Record<string, unknown>): LevelCompletion {
-  return {
-    world: dbRow.world as number,
-    level: dbRow.level as number,
-    stars: dbRow.stars as 0 | 1 | 2 | 3,
-    bestScore: dbRow.best_score as number,
-    bestWords: dbRow.best_words as number,
-    completedAt: dbRow.completed_at as string,
-  };
-}
+import { transformProgression, transformCompletion } from '../transforms';
 
 /**
  * GET /api/adventure/progress

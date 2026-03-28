@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { io, Socket } from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Monitor, Users, Clock, Trophy, Wifi, WifiOff, Maximize, Minimize, QrCode } from 'lucide-react';
+import { Monitor, Users, Clock, Trophy, Wifi, WifiOff, Maximize, Minimize, QrCode, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 
@@ -369,7 +369,7 @@ export default function PartyScreen() {
                       index < 3 ? 'text-neo-black' : 'text-neo-cream'
                     )}>
                       {player.username}
-                      {player.isHost && <span className="ms-1 text-xs">👑</span>}
+                      {player.isHost && <Crown className="ms-1 w-3 h-3 inline-block" />}
                     </p>
                     <p className={cn(
                       'text-xs',

@@ -145,7 +145,7 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'Mind Master', emoji: '🎭', color: '#a855f7' },
         { name: 'Brain Blitz', emoji: '💥', color: '#38bdf8' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     he: {
       easy: [
@@ -181,10 +181,10 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'נינג׳ה', emoji: '🥷', color: '#1f2937' },
         { name: 'סמוראי', emoji: '⚔️', color: '#dc2626' },
         { name: 'אליפון', emoji: '🏆', color: '#facc15' },
-        { name: 'מכונה', emoji: '🤖', color: '#60a5fa' },
+        { name: 'מכונה', emoji: '⚙️', color: '#60a5fa' },
         { name: 'ויקינג', emoji: '🛡️', color: '#78716c' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     sv: {
       easy: [
@@ -223,7 +223,7 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'Falkenansen', emoji: '🦅', color: '#64748b' },
         { name: 'Trollkarlansen', emoji: '🧙', color: '#c4b5fd' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     ja: {
       easy: [
@@ -262,7 +262,7 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'アマテラス', emoji: '☀️', color: '#fcd34d' },
         { name: 'ツクヨミ', emoji: '🌙', color: '#a78bfa' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
   },
 

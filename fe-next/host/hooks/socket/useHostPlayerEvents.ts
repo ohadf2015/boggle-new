@@ -4,7 +4,7 @@
  */
 import { useEffect, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoInfoToast } from '../../../components/NeoToast';
+import { neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
@@ -121,7 +121,7 @@ export function useHostPlayerEvents({
 
     const handlePlayerJoinedLate = (data: any) => {
       neoInfoToast(`${data.username} ${t('hostView.playerJoinedLate')}`, {
-        icon: '🚀',
+        icon: TOAST_ICONS.rocket,
         duration: 4000,
       });
     };

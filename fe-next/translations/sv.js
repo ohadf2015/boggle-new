@@ -60,10 +60,10 @@ const sv = {
       "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
     },
     "daily": {
-      "title": "Daglig Ordutmaning - Samma Pussel Världen Över",
-      "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela dina emoji-resultat som Wordle. Tävla globalt och följ dina dagliga serier.",
-      "ogTitle": "Daglig Utmaning - Samma Pussel Världen Över",
-      "ogDescription": "Dagligt ordpussel - samma bräda för alla världen över. Dela dina resultat och tävla globalt!"
+      "title": "Dagens Ordpussel — Gratis Daglig Utmaning | LexiClash",
+      "description": "Spela dagens ordpussel gratis — samma bräde världen över. Hitta ord, dela emoji-resultat och klättra på topplistan. Ingen nedladdning, ingen registrering. Nytt pussel varje dag!",
+      "ogTitle": "Dagens Ordpussel — Kan Du Slå Världen?",
+      "ogDescription": "Samma pussel, hela världen. Hitta ord, dela resultat, tävla globalt. Gratis — ingen nedladdning!"
     },
     "multiplayer": {
       "title": "Multiplayer Ordstrid - Realtidstävling",

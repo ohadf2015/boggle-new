@@ -40,7 +40,6 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           icon: <Sparkles className="w-5 h-5" />,
           title: t('wordHunt.survival.clueRevealLetter'),
           cost: 3,
-          emoji: '💡',
           color: 'from-neo-cyan to-blue-400',
         };
       case 'reveal_category':
@@ -48,7 +47,6 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           icon: <Tag className="w-5 h-5" />,
           title: t('wordHunt.survival.clueRevealCategory'),
           cost: 9,
-          emoji: '🏷️',
           color: 'from-neo-pink to-purple-400',
         };
       case 'example_sentence':
@@ -56,7 +54,6 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           icon: <FileText className="w-5 h-5" />,
           title: t('wordHunt.survival.clueExampleSentence'),
           cost: 15,
-          emoji: '📝',
           color: 'from-neo-orange to-yellow-400',
         };
     }
@@ -110,9 +107,9 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             repeat: 2,
             repeatDelay: 0.3,
           }}
-          className="flex-shrink-0 text-3xl"
+          className="flex-shrink-0"
         >
-          {content.emoji}
+          {content.icon}
         </AdaptiveMotion.div>
 
         {/* Content Section */}

@@ -6,7 +6,7 @@
  */
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../../../components/NeoToast';
+import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
 import { useGameActions } from '@/hooks/gameState';
 
@@ -29,7 +29,7 @@ export function usePlayerTournamentEvents({
 
     const handleTournamentCreated = (data: any) => {
       setTournamentData(data.tournament);
-      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: '🏆', duration: 3000 });
+      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: TOAST_ICONS.trophy, duration: 3000 });
     };
 
     const handleTournamentRoundStarting = (data: any) => {
@@ -41,7 +41,7 @@ export function usePlayerTournamentEvents({
       }
       const roundNum = data.tournament?.currentRound || 1;
       const totalRounds = data.tournament?.totalRounds || 3;
-      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: '🎯', duration: 3000 });
+      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: TOAST_ICONS.target, duration: 3000 });
     };
 
     const handleTournamentRoundCompleted = (data: any) => {
@@ -65,7 +65,7 @@ export function usePlayerTournamentEvents({
       const winner = data.standings?.[0];
       if (winner) {
         triggerTournamentCompleteCelebration();
-        neoSuccessToast(`🏆 ${winner.username} ${t('hostView.wonTournament')}!`, { duration: 5000 });
+        neoSuccessToast(`${winner.username} ${t('hostView.wonTournament')}!`, { icon: TOAST_ICONS.trophy, duration: 5000 });
       }
     };
 
@@ -73,7 +73,7 @@ export function usePlayerTournamentEvents({
       setTournamentData(null);
       setTournamentStandings([]);
       setShowTournamentStandings(false);
-      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: '❌', duration: 3000 });
+      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: TOAST_ICONS.xCircle, duration: 3000 });
     };
 
     // Register listeners

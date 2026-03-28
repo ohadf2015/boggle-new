@@ -43,6 +43,15 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
   // Destructure effects for stable deps — the effects object itself is recreated every render
   const { currentPopup, handlePopupComplete: effectsHandlePopupComplete } = effects;
 
+  // Keep fresh refs for values used in handleDragEnd to avoid stale closures.
+  // The global mouseup/touchend listener in useGridGestures registers via useEffect
+  // (runs after paint), so between the last tile selection and finger release,
+  // the closure can hold stale state. Refs always read the latest value.
+  const currentWordRef = useRef(currentWord);
+  const selectedIndicesRef = useRef(selectedIndices);
+  currentWordRef.current = currentWord;
+  selectedIndicesRef.current = selectedIndices;
+
   const calculateTileCenter = useCallback((row: number, col: number) => {
     if (!gridRef.current) return { x: 0, y: 0 };
     const gridRect = gridRef.current.getBoundingClientRect();
@@ -103,14 +112,16 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
   );
 
   const handleDragEnd = useCallback(() => {
-    // If there's a valid word, submit it; otherwise just clear selection
-    // so the UI never hangs with a frozen highlight.
-    if (currentWord && selectedIndices.length > 0) {
-      handleWordSubmit(currentWord, selectedIndices);
+    // Read from refs to avoid stale closures — the global mouseup/touchend
+    // listener may fire before React re-renders with the latest state.
+    const word = currentWordRef.current;
+    const indices = selectedIndicesRef.current;
+    if (word && indices.length > 0) {
+      handleWordSubmit(word, indices);
     } else {
       clearSelection();
     }
-  }, [handleWordSubmit, currentWord, selectedIndices, clearSelection]);
+  }, [handleWordSubmit, clearSelection]);
 
   // Popup queue auto-dismiss
   const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

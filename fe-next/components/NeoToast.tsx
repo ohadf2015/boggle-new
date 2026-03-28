@@ -3,7 +3,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Bot, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
+import {
+  AlertTriangle, Ban, BookOpen, Bot, Check, CheckCircle, Crown, FileText,
+  Flag, Gamepad2, HelpCircle, Hourglass, Info, Lightbulb, Link,
+  Plug, RefreshCw, Rocket, Ruler, Shield, Smartphone, Sparkles,
+  Square, StopCircle, Tag, Target, Timer, Trophy, Users, XCircle,
+} from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Loader } from '@/components/ui/Loader';
@@ -78,16 +83,52 @@ export type WordRejectionReason =
   | 'timeout'
   | 'unknown';
 
-const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: string; messageKey: string }> = {
-  not_in_dictionary: { icon: '📖', messageKey: 'toast.rejection.notInDictionary' },
-  already_found: { icon: '🔄', messageKey: 'toast.rejection.alreadyFound' },
-  too_short: { icon: '📏', messageKey: 'toast.rejection.tooShort' },
-  invalid_path: { icon: '🚫', messageKey: 'toast.rejection.invalidPath' },
-  outside_board: { icon: '⬜', messageKey: 'toast.rejection.outsideBoard' },
-  not_connected: { icon: '🔗', messageKey: 'toast.rejection.notConnected' },
-  duplicate: { icon: '👥', messageKey: 'toast.rejection.duplicate' },
-  timeout: { icon: '⏱️', messageKey: 'toast.rejection.timeout' },
-  unknown: { icon: '❓', messageKey: 'toast.rejection.unknown' },
+const iconClass = 'w-5 h-5';
+
+/**
+ * Shared icon map for toast notifications.
+ * Exported so .ts hook files can reference icons without JSX.
+ */
+export const TOAST_ICONS = {
+  bookOpen: <BookOpen className={iconClass} />,
+  refresh: <RefreshCw className={iconClass} />,
+  ruler: <Ruler className={iconClass} />,
+  ban: <Ban className={iconClass} />,
+  square: <Square className={iconClass} />,
+  link: <Link className={iconClass} />,
+  users: <Users className={iconClass} />,
+  timer: <Timer className={iconClass} />,
+  helpCircle: <HelpCircle className={iconClass} />,
+  hourglass: <Hourglass className={iconClass} />,
+  crown: <Crown className={iconClass} />,
+  smartphone: <Smartphone className={iconClass} />,
+  check: <Check className={iconClass} />,
+  alertTriangle: <AlertTriangle className={iconClass} />,
+  gamepad: <Gamepad2 className={iconClass} />,
+  rocket: <Rocket className={iconClass} />,
+  target: <Target className={iconClass} />,
+  trophy: <Trophy className={iconClass} />,
+  xCircle: <XCircle className={iconClass} />,
+  flag: <Flag className={iconClass} />,
+  plug: <Plug className={iconClass} />,
+  stopCircle: <StopCircle className={iconClass} />,
+  shield: <Shield className={iconClass} />,
+  lightbulb: <Lightbulb className={iconClass} />,
+  tag: <Tag className={iconClass} />,
+  fileText: <FileText className={iconClass} />,
+  sparkles: <Sparkles className={iconClass} />,
+} as const;
+
+const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: React.ReactNode; messageKey: string }> = {
+  not_in_dictionary: { icon: TOAST_ICONS.bookOpen, messageKey: 'toast.rejection.notInDictionary' },
+  already_found: { icon: TOAST_ICONS.refresh, messageKey: 'toast.rejection.alreadyFound' },
+  too_short: { icon: TOAST_ICONS.ruler, messageKey: 'toast.rejection.tooShort' },
+  invalid_path: { icon: TOAST_ICONS.ban, messageKey: 'toast.rejection.invalidPath' },
+  outside_board: { icon: TOAST_ICONS.square, messageKey: 'toast.rejection.outsideBoard' },
+  not_connected: { icon: TOAST_ICONS.link, messageKey: 'toast.rejection.notConnected' },
+  duplicate: { icon: TOAST_ICONS.users, messageKey: 'toast.rejection.duplicate' },
+  timeout: { icon: TOAST_ICONS.timer, messageKey: 'toast.rejection.timeout' },
+  unknown: { icon: TOAST_ICONS.helpCircle, messageKey: 'toast.rejection.unknown' },
 };
 
 interface WordRejectedOptions {

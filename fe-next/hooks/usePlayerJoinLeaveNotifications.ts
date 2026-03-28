@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { neoInfoToast, neoWarningToast } from '@/components/NeoToast';
+import { neoInfoToast, neoWarningToast, TOAST_ICONS } from '@/components/NeoToast';
 
 interface Player {
   username: string;
@@ -68,7 +68,7 @@ export function usePlayerJoinLeaveNotifications({
     // Show a single consolidated toast for bots
     if (newBots.length > 0) {
       neoInfoToast(t('multiplayer.botsJoined', { count: newBots.length }), {
-        icon: '🤖',
+        icon: TOAST_ICONS.gamepad,
         duration: 3000,
       });
     }

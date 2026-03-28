@@ -4,7 +4,7 @@
  */
 import { useEffect, useCallback, useRef, useMemo, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast } from '../../../components/NeoToast';
+import { neoSuccessToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
 
 import {
@@ -285,7 +285,7 @@ export function useHostGameEvents({
         setWaitingForResults(true);
         triggerGameOverCelebration();
         neoSuccessToast(t('hostView.gameOverCheckScores'), {
-          icon: '🏁',
+          icon: TOAST_ICONS.flag,
           duration: 5000,
         });
       }
@@ -446,7 +446,7 @@ export function useHostGameEvents({
       const store = useGameStore.getState();
       store.setWordHuntTargetFound(true);
       store.setWordHuntTargetFoundBy(data.username);
-      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
+      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: TOAST_ICONS.target, duration: 3000 });
     };
 
     const handleWordHuntEliminated = (data: { username: string }) => {

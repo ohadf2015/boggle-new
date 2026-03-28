@@ -3,10 +3,14 @@ import { renderHook, act } from '@testing-library/react';
 import { usePlayerJoinLeaveNotifications } from '../usePlayerJoinLeaveNotifications';
 import { neoInfoToast, neoWarningToast } from '@/components/NeoToast';
 
-vi.mock('@/components/NeoToast', () => ({
-  neoInfoToast: vi.fn(),
-  neoWarningToast: vi.fn(),
-}));
+vi.mock('@/components/NeoToast', async () => {
+  const actual = await vi.importActual<typeof import('@/components/NeoToast')>('@/components/NeoToast');
+  return {
+    ...actual,
+    neoInfoToast: vi.fn(),
+    neoWarningToast: vi.fn(),
+  };
+});
 
 const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
@@ -156,7 +160,7 @@ describe('usePlayerJoinLeaveNotifications', () => {
     expect(neoInfoToast).toHaveBeenCalledTimes(1);
     expect(neoInfoToast).toHaveBeenCalledWith(
       expect.stringContaining('3 bots'),
-      expect.objectContaining({ icon: '🤖' })
+      expect.objectContaining({ icon: expect.anything() })
     );
   });
 
@@ -185,7 +189,7 @@ describe('usePlayerJoinLeaveNotifications', () => {
     );
     expect(neoInfoToast).toHaveBeenCalledWith(
       expect.stringContaining('2 bots'),
-      expect.objectContaining({ icon: '🤖' })
+      expect.objectContaining({ icon: expect.anything() })
     );
   });
 });

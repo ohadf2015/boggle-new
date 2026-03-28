@@ -41,7 +41,7 @@ function setupBotMocks() {
       id: `bot-${callCount}`,
       username: `TestBot-${difficulty}-${callCount}`,
       difficulty,
-      avatar: { avatarImage: 'pizza', emoji: '🤖', color: '#ff0000' },
+      avatar: { avatarImage: 'pizza', emoji: '⚙️', color: '#ff0000' },
     };
   });
 
@@ -51,7 +51,7 @@ function setupBotMocks() {
       id: `bot-adaptive-${callCount}`,
       username: `AdaptiveBot-${callCount}`,
       difficulty: 'medium',
-      avatar: { avatarImage: 'pizza', emoji: '🤖', color: '#ff0000' },
+      avatar: { avatarImage: 'pizza', emoji: '⚙️', color: '#ff0000' },
     };
   });
 }

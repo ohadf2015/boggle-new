@@ -1,5 +1,15 @@
 import type { MetadataRoute } from 'next';
 
+const BASE_URL = 'https://www.lexiclash.live';
+const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+
+// Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
+// Update these dates when actual content changes are deployed.
+const LAST_DEPLOYED = '2026-03-26T00:00:00.000Z';
+const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
+const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
+const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
+
 type SitemapOpts = {
   lastModified: string;
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
@@ -7,123 +17,112 @@ type SitemapOpts = {
   images?: string[];
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.lexiclash.live';
-  const locales = ['he', 'en', 'sv', 'ja', 'es'] as const;
+// Helper: generate hreflang alternates for a given path
+function langAlternates(path: string): Record<string, string> {
+  const alts: Record<string, string> = { 'x-default': `${BASE_URL}/en${path}` };
+  LOCALES.forEach((l) => { alts[l] = `${BASE_URL}/${l}${path}`; });
+  alts['en-IL'] = `${BASE_URL}/en${path}`;
+  alts['he-IL'] = `${BASE_URL}/he${path}`;
+  alts['en-US'] = `${BASE_URL}/en${path}`;
+  alts['es-US'] = `${BASE_URL}/es${path}`;
+  alts['en-GB'] = `${BASE_URL}/en${path}`;
+  alts['en-SE'] = `${BASE_URL}/en${path}`;
+  alts['sv-SE'] = `${BASE_URL}/sv${path}`;
+  alts['en-JP'] = `${BASE_URL}/en${path}`;
+  alts['ja-JP'] = `${BASE_URL}/ja${path}`;
+  alts['en-ES'] = `${BASE_URL}/en${path}`;
+  alts['es-ES'] = `${BASE_URL}/es${path}`;
+  alts['en-MX'] = `${BASE_URL}/en${path}`;
+  alts['es-MX'] = `${BASE_URL}/es${path}`;
+  alts['en-AU'] = `${BASE_URL}/en${path}`;
+  alts['es-AR'] = `${BASE_URL}/es${path}`;
+  alts['es-CO'] = `${BASE_URL}/es${path}`;
+  return alts;
+}
 
-  // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
-  // Update these dates when actual content changes are deployed.
-  const LAST_DEPLOYED = '2026-03-26T00:00:00.000Z';
-  const BLOG_UPDATED = '2026-03-16T00:00:00.000Z';
-  const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
-  const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
+// Helper: add a route for all locales
+function addForAllLocales(routes: MetadataRoute.Sitemap, path: string, opts: SitemapOpts) {
+  LOCALES.forEach((locale) => {
+    routes.push({
+      url: `${BASE_URL}/${locale}${path}`,
+      lastModified: opts.lastModified,
+      changeFrequency: opts.changeFrequency,
+      priority: opts.priority,
+      alternates: { languages: langAlternates(path) },
+      ...(opts.images ? { images: opts.images } : {}),
+    });
+  });
+}
 
+// Build ALL routes, then chunk them for generateSitemaps/sitemap
+function getAllRoutes(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = [];
 
-  // Helper: generate hreflang alternates for a given path
-  function langAlternates(path: string): Record<string, string> {
-    const alts: Record<string, string> = { 'x-default': `${baseUrl}/en${path}` };
-    locales.forEach((l) => { alts[l] = `${baseUrl}/${l}${path}`; });
-    // Region-specific: show both English and Hebrew for Israeli users
-    alts['en-IL'] = `${baseUrl}/en${path}`;
-    alts['he-IL'] = `${baseUrl}/he${path}`;
-    alts['en-US'] = `${baseUrl}/en${path}`;
-    alts['es-US'] = `${baseUrl}/es${path}`;
-    alts['en-GB'] = `${baseUrl}/en${path}`;
-    alts['en-SE'] = `${baseUrl}/en${path}`;
-    alts['sv-SE'] = `${baseUrl}/sv${path}`;
-    alts['en-JP'] = `${baseUrl}/en${path}`;
-    alts['ja-JP'] = `${baseUrl}/ja${path}`;
-    alts['en-ES'] = `${baseUrl}/en${path}`;
-    alts['es-ES'] = `${baseUrl}/es${path}`;
-    alts['en-MX'] = `${baseUrl}/en${path}`;
-    alts['es-MX'] = `${baseUrl}/es${path}`;
-    alts['en-AU'] = `${baseUrl}/en${path}`;
-    alts['es-AR'] = `${baseUrl}/es${path}`;
-    alts['es-CO'] = `${baseUrl}/es${path}`;
-    return alts;
-  }
-
-  // Helper: add a route for all locales
-  function addForAllLocales(path: string, opts: SitemapOpts) {
-    locales.forEach((locale) => {
-      routes.push({
-        url: `${baseUrl}/${locale}${path}`,
-        lastModified: opts.lastModified,
-        changeFrequency: opts.changeFrequency,
-        priority: opts.priority,
-        alternates: { languages: langAlternates(path) },
-        ...(opts.images ? { images: opts.images } : {}),
-      });
-    });
-  }
-
-  // Common images for home pages
   const commonImages = [
-    `${baseUrl}/og-image.jpg`,
-    `${baseUrl}/og-image-en.jpg`,
-    `${baseUrl}/og-image-he.jpg`,
-    `${baseUrl}/favicon.ico`,
-    `${baseUrl}/icon-192.png`,
-    `${baseUrl}/icon-512.png`,
-    `${baseUrl}/apple-touch-icon.png`,
+    `${BASE_URL}/og-image.jpg`,
+    `${BASE_URL}/og-image-en.jpg`,
+    `${BASE_URL}/og-image-he.jpg`,
+    `${BASE_URL}/favicon.ico`,
+    `${BASE_URL}/icon-192.png`,
+    `${BASE_URL}/icon-512.png`,
+    `${BASE_URL}/apple-touch-icon.png`,
   ];
 
   // ─── Home pages ───
-  locales.forEach((locale) => {
+  LOCALES.forEach((locale) => {
     const priority = (locale === 'he' || locale === 'en') ? 1 : 0.9;
     routes.push({
-      url: `${baseUrl}/${locale}`,
+      url: `${BASE_URL}/${locale}`,
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'weekly',
       priority,
       alternates: { languages: langAlternates('') },
-      images: [...commonImages, `${baseUrl}/og-image-${locale === 'he' ? 'he' : 'en'}.jpg`],
+      images: [...commonImages, `${BASE_URL}/og-image-${locale === 'he' ? 'he' : 'en'}.jpg`],
     });
   });
 
   // ─── Core game mode pages ───
-  addForAllLocales('/singleplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
-  addForAllLocales('/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
-  addForAllLocales('/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
-  addForAllLocales('/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
-  addForAllLocales('/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  addForAllLocales('/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
-  addForAllLocales('/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
+  addForAllLocales(routes, '/singleplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
+  addForAllLocales(routes, '/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
+  addForAllLocales(routes, '/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
+  addForAllLocales(routes, '/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
 
   // ─── Brain training ───
-  addForAllLocales('/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
+  addForAllLocales(routes, '/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
   const drills = ['combo-master', 'lightning-round', 'memory-hunt', 'pattern-switcher', 'rare-gems'];
   drills.forEach((drill) => {
-    addForAllLocales(`/brain/drills/${drill}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+    addForAllLocales(routes, `/brain/drills/${drill}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
   });
 
   // ─── Tools ───
-  addForAllLocales('/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
-  addForAllLocales('/tools/word-solver', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/tools/word-solver', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
 
   // ─── Community ───
-  addForAllLocales('/community', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+  addForAllLocales(routes, '/community', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
 
   // ─── Education ───
-  addForAllLocales('/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
+  addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
 
   // ─── Content pages ───
-  addForAllLocales('/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
-  addForAllLocales('/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
-  addForAllLocales('/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
-  addForAllLocales('/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
+  addForAllLocales(routes, '/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
+  addForAllLocales(routes, '/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
 
   // ─── Guides & Glossary ───
-  addForAllLocales('/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/guides', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
   const guideSlugs = ['classic-strategy', 'blast-strategy', 'word-hunt-strategy'];
   guideSlugs.forEach((slug) => {
-    addForAllLocales(`/guides/${slug}`, { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
+    addForAllLocales(routes, `/guides/${slug}`, { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
   });
-  addForAllLocales('/glossary', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
+  addForAllLocales(routes, '/glossary', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
 
   // ─── Blog ───
-  addForAllLocales('/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
+  addForAllLocales(routes, '/blog', { lastModified: BLOG_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
   const blogArticles = [
     '10-surprising-benefits-word-games',
     'science-behind-word-games',
@@ -142,23 +141,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'word-games-for-kids-education',
   ];
   blogArticles.forEach((slug) => {
-    addForAllLocales(`/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
+    addForAllLocales(routes, `/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
   });
 
   // ─── Info pages ───
-  addForAllLocales('/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
-  addForAllLocales('/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
-  addForAllLocales('/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
-  addForAllLocales('/profile', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.6 });
-  addForAllLocales('/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
-  addForAllLocales('/sitemap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.4 });
+  addForAllLocales(routes, '/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
+  addForAllLocales(routes, '/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
+  addForAllLocales(routes, '/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
+  addForAllLocales(routes, '/profile', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.6 });
+  addForAllLocales(routes, '/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
+  addForAllLocales(routes, '/sitemap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.4 });
 
   // ─── Legal pages ───
-  addForAllLocales('/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
-  addForAllLocales('/legal/terms', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
-  addForAllLocales('/legal/privacy', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
-  addForAllLocales('/legal/disclaimer', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
-  addForAllLocales('/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales(routes, '/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
+  addForAllLocales(routes, '/legal/terms', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales(routes, '/legal/privacy', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales(routes, '/legal/disclaimer', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForAllLocales(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
 
   // ─── SEO landing pages (market-specific, single locale) ───
   const seoLandings = [
@@ -179,46 +178,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ] as const;
   seoLandings.forEach(({ locale, path, img }) => {
     routes.push({
-      url: `${baseUrl}/${locale}${path}`,
+      url: `${BASE_URL}/${locale}${path}`,
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'weekly',
       priority: 0.95,
       alternates: {
         languages: {
-          'x-default': `${baseUrl}/${locale}${path}`,
-          [locale]: `${baseUrl}/${locale}${path}`,
-          'en-IL': `${baseUrl}/en/multiplayer-word-game-online`,
-          'he-IL': `${baseUrl}/he/hebrew-multiplayer-word-game`,
-          'en-US': `${baseUrl}/en/multiplayer-word-game-online`,
-          'es-US': `${baseUrl}/es/juego-de-palabras-multijugador`,
-          'en-GB': `${baseUrl}/en/multiplayer-word-game-online`,
-          'en-SE': `${baseUrl}/en/multiplayer-word-game-online`,
-          'sv-SE': `${baseUrl}/sv/swedish-multiplayer-word-game`,
-          'en-JP': `${baseUrl}/en/multiplayer-word-game-online`,
-          'ja-JP': `${baseUrl}/ja/japanese-word-game`,
-          'en-ES': `${baseUrl}/en/multiplayer-word-game-online`,
-          'es-ES': `${baseUrl}/es/juego-de-palabras-multijugador`,
-          'en-MX': `${baseUrl}/en/multiplayer-word-game-online`,
-          'es-MX': `${baseUrl}/es/juego-de-palabras-multijugador`,
-          'en-AU': `${baseUrl}/en/multiplayer-word-game-online`,
-          'es-AR': `${baseUrl}/es/juego-de-palabras-multijugador`,
-          'es-CO': `${baseUrl}/es/juego-de-palabras-multijugador`,
+          'x-default': `${BASE_URL}/${locale}${path}`,
+          [locale]: `${BASE_URL}/${locale}${path}`,
+          'en-IL': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'he-IL': `${BASE_URL}/he/hebrew-multiplayer-word-game`,
+          'en-US': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'es-US': `${BASE_URL}/es/juego-de-palabras-multijugador`,
+          'en-GB': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'en-SE': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'sv-SE': `${BASE_URL}/sv/swedish-multiplayer-word-game`,
+          'en-JP': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'ja-JP': `${BASE_URL}/ja/japanese-word-game`,
+          'en-ES': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'es-ES': `${BASE_URL}/es/juego-de-palabras-multijugador`,
+          'en-MX': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'es-MX': `${BASE_URL}/es/juego-de-palabras-multijugador`,
+          'en-AU': `${BASE_URL}/en/multiplayer-word-game-online`,
+          'es-AR': `${BASE_URL}/es/juego-de-palabras-multijugador`,
+          'es-CO': `${BASE_URL}/es/juego-de-palabras-multijugador`,
         },
       },
-      images: [`${baseUrl}/og-image-${img}.jpg`],
+      images: [`${BASE_URL}/og-image-${img}.jpg`],
     });
   });
 
   // ─── Author page ───
-  addForAllLocales('/about/the-word-nerd', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/about/the-word-nerd', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
   // ─── Words hub ───
-  addForAllLocales('/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  addForAllLocales(routes, '/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
   // ─── Programmatic SEO: N-letter word pages (30 URLs) ───
   const wordLengths = [3, 4, 5, 6, 7, 8];
   wordLengths.forEach((n) => {
-    addForAllLocales(`/words/${n}-letter-words`, {
+    addForAllLocales(routes, `/words/${n}-letter-words`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.7,
@@ -228,7 +227,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // ─── Programmatic SEO: Words starting with letter (130 URLs) ───
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
   alphabet.forEach((letter) => {
-    addForAllLocales(`/words/starting-with/${letter}`, {
+    addForAllLocales(routes, `/words/starting-with/${letter}`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'monthly',
       priority: 0.65,
@@ -236,4 +235,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   });
 
   return routes;
+}
+
+// Split into chunks of 50 URLs per sitemap file to stay well under XML size limits.
+// Each URL with ~20 hreflang alternates generates ~2KB of XML.
+const URLS_PER_SITEMAP = 50;
+
+export async function generateSitemaps() {
+  const allRoutes = getAllRoutes();
+  const count = Math.ceil(allRoutes.length / URLS_PER_SITEMAP);
+  return Array.from({ length: count }, (_, i) => ({ id: i }));
+}
+
+export default function sitemap({ id }: { id: number }): MetadataRoute.Sitemap {
+  const allRoutes = getAllRoutes();
+  const start = id * URLS_PER_SITEMAP;
+  return allRoutes.slice(start, start + URLS_PER_SITEMAP);
 }

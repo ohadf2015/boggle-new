@@ -4,7 +4,7 @@
  */
 import { useEffect, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../../../components/NeoToast';
+import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
 
 interface TournamentData {
@@ -47,7 +47,7 @@ export function useHostTournamentEvents({
       setTournamentCreating(false);
       setTournamentData(data.tournament);
       neoSuccessToast(`${t('hostView.tournamentMode')}: ${data.tournament.totalRounds} ${t('hostView.rounds')}`, {
-        icon: '🏆',
+        icon: TOAST_ICONS.trophy,
         duration: 4000,
       });
       setTimeout(() => {
@@ -62,7 +62,7 @@ export function useHostTournamentEvents({
         standings: data.standings,
       }));
       neoInfoToast(`${t('hostView.tournamentRound')} ${data.roundNumber}/${data.totalRounds}`, {
-        icon: '🏁',
+        icon: TOAST_ICONS.flag,
         duration: 3000,
       });
     };
@@ -77,7 +77,7 @@ export function useHostTournamentEvents({
       if (data.isComplete) {
         triggerTournamentCompleteCelebration();
         neoSuccessToast(t('hostView.tournamentComplete'), {
-          icon: '🏆',
+          icon: TOAST_ICONS.trophy,
           duration: 5000,
         });
       }
@@ -95,7 +95,7 @@ export function useHostTournamentEvents({
     const handleTournamentCancelled = () => {
       setTournamentData(null);
       neoErrorToast('Tournament cancelled', {
-        icon: '🚫',
+        icon: TOAST_ICONS.ban,
         duration: 3000,
       });
     };

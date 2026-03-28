@@ -69,7 +69,6 @@ const nextConfig = {
   reactCompiler: true,
 
   experimental: {
-    turbopackUseSystemTlsCerts: true,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -377,6 +376,7 @@ const nextConfig = {
   // Enable Turbopack configuration (required for Next.js 16+)
   turbopack: {
     root: __dirname,
+    useSystemTlsCerts: true,
     resolveAlias: {
       '@arvidbt/swedish-words': '@arvidbt/swedish-words/out/index.js',
     },

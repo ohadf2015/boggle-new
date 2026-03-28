@@ -312,6 +312,8 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
       // Eagerly save completion to DB — don't wait for Continue button click.
       // This ensures progress is persisted even if user navigates away (browser back, exit).
       if (gameState.stars > 0 && !completionSavedRef.current) {
+        // Mark in-flight immediately to prevent re-entry from effect re-fires,
+        // but track actual success separately so we can retry on failure.
         completionSavedRef.current = true;
         const longWords = gameState.wordsFound.filter(w => w.length >= 6).length;
         saveCompletionRef.current(
@@ -321,8 +323,12 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
           earnedGoldRef.current, longWords, gameState.wordsFound,
           props.flashChallengeGold
         ).then((success) => {
-          if (!success) completionSaveFailedRef.current = true;
+          saveResolvedRef.current = true;
+          if (!success) {
+            completionSaveFailedRef.current = true;
+          }
         }).catch(() => {
+          saveResolvedRef.current = true;
           // Mark as failed so Continue/Retry can retry — do NOT reset
           // completionSavedRef (that would let this effect re-fire and cause 429 cascades)
           completionSaveFailedRef.current = true;
@@ -343,6 +349,37 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     setLevelUpData(null);
   }, []);
 
+  // Track whether the DB save Promise has actually resolved (not just fired).
+  // completionSavedRef tracks "was the save initiated", this tracks "did it finish".
+  const saveResolvedRef = useRef(false);
+
+  // Guard against page unload / SPA navigation while save is in-flight.
+  // sendBeacon sends the completion payload to the server as a keep-alive request
+  // that survives page teardown. The endpoint handles duplicate saves via UPSERT.
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (completionSavedRef.current && !saveResolvedRef.current) {
+        // Save was initiated but hasn't resolved — fire sendBeacon as fallback
+        try {
+          const payload = {
+            world: levelConfig.world, level: levelConfig.level,
+            stars: gameState.stars, score: gameState.score,
+            words: gameState.wordsFound.length,
+            goldEarned: earnedGoldRef.current,
+            longWords: gameState.wordsFound.filter(w => w.length >= 6).length,
+          };
+          navigator.sendBeacon(
+            '/api/adventure/complete',
+            new Blob([JSON.stringify(payload)], { type: 'application/json' })
+          );
+        } catch { /* best effort */ }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [levelConfig.world, levelConfig.level, gameState.stars, gameState.score, gameState.wordsFound]);
+
   // Reset rewards flag (needed for retry)
   const resetRewards = useCallback(() => {
     setHasAwardedLevelRewards(false);
@@ -355,6 +392,7 @@ export function useAdventureLevelCompletion(props: UseAdventureLevelCompletionPr
     attemptRecordedRef.current = false;
     completionSavedRef.current = false;
     completionSaveFailedRef.current = false;
+    saveResolvedRef.current = false;
   }, []);
 
   return {

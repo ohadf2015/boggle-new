@@ -80,7 +80,7 @@ const PROFILE_A = {
 const PROFILE_B = {
   username: 'bob',
   displayName: 'Bob',
-  avatar: { emoji: '🤖', color: '#0000ff' },
+  avatar: { emoji: '⚙️', color: '#0000ff' },
   isOnline: false,
 };
 
@@ -459,7 +459,7 @@ describe('friendsHandler', () => {
 
     it('returns users with friendship status', async () => {
       const profiles = [
-        { id: 'user-b', username: 'bob', display_name: 'Bob', avatar_emoji: '🤖', avatar_color: '#00f', avatar_image: null },
+        { id: 'user-b', username: 'bob', display_name: 'Bob', avatar_emoji: '⚙️', avatar_color: '#00f', avatar_image: null },
       ];
       mockSupabase.limit.mockResolvedValue({ data: profiles });
       mockSupabase.or.mockResolvedValue({

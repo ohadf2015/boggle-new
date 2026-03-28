@@ -51,6 +51,7 @@ export async function loadEnglishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   // Node.js 22+ requires import attributes for JSON modules
+  // @ts-ignore TS1324: import attributes valid at runtime but ts-jest's module config rejects them
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const englishWords: string[] = ((await import('an-array-of-english-words', { with: { type: 'json' } })) as any).default;
   const dict = new Set(englishWords.map(w => w.toLowerCase()));
@@ -160,6 +161,7 @@ export async function loadJapaneseDictionary(
 export async function loadSpanishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
+  // @ts-ignore TS1324: import attributes valid at runtime but ts-jest's module config rejects them
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const spanishWords: string[] = ((await import('an-array-of-spanish-words', { with: { type: 'json' } })) as any).default;
   const dict = new Set(spanishWords.map(w => w.toLowerCase()));

@@ -7,7 +7,7 @@
  */
 import { useEffect, useRef, useMemo, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast } from '../../../components/NeoToast';
+import { neoSuccessToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtils';
 
 import {
@@ -267,7 +267,7 @@ export function usePlayerGameEvents({
       const toastMessage = (data as any).lateJoin
         ? (t('common.joinedGame') || 'Joined game!')
         : t('common.gameStarted');
-      neoSuccessToast(toastMessage, { id: 'game-started', icon: (data as any).lateJoin ? '🎮' : '🚀', duration: 3000 });
+      neoSuccessToast(toastMessage, { id: 'game-started', icon: (data as any).lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
     };
 
     const handleEndGame = () => {
@@ -464,7 +464,7 @@ export function usePlayerGameEvents({
       blastResetStore.setBlastComboSync(null);
       useGameStore.setState({ blastOpponentActivity: [] });
 
-      neoSuccessToast(data.message || t('common.newGameReady'), { icon: '🔄', duration: 3000 });
+      neoSuccessToast(data.message || t('common.newGameReady'), { icon: TOAST_ICONS.refresh, duration: 3000 });
     };
 
     // Handle blast word accepted (multiplayer blast mode)
@@ -564,7 +564,7 @@ export function usePlayerGameEvents({
       // Store WHO found it so the overlay can distinguish "I found it" vs "someone else found it"
       setWordHuntTargetFoundBy(data.username);
       // Show notification about who found it
-      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: '🎯', duration: 3000 });
+      neoSuccessToast(`${data.username} ${t('wordHunt.foundTarget')}!`, { icon: TOAST_ICONS.target, duration: 3000 });
     };
 
     const handleWordHuntEliminated = (data: { username: string }) => {

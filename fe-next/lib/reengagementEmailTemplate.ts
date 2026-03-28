@@ -196,50 +196,51 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
     * { box-sizing: border-box; }
     body {
       margin: 0; padding: 0;
-      background-color: #0d0d1f;
+      background-color: #0a0a1a;
       font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     a.cta-link:hover { transform: translate(2px, 2px) !important; box-shadow: ${shadowDir}3px 3px 0px ${colors.black} !important; }
     @media only screen and (max-width: 600px) {
       .container { padding: 16px !important; }
-      .main-card { padding: 32px 20px 36px !important; }
-      .word-tile { width: 48px !important; height: 48px !important; font-size: 22px !important; line-height: 42px !important; }
-      .mascot-img { width: 80px !important; height: 80px !important; }
-      .greeting-text { font-size: 24px !important; }
-      .teaser-text { font-size: 14px !important; }
-      .cta-link { padding: 16px 40px !important; font-size: 19px !important; }
-      .streak-badge { font-size: 12px !important; padding: 7px 16px !important; }
-      .urgency-text { font-size: 12px !important; }
+      .main-card { padding: 28px 18px 32px !important; }
+      .word-tile { width: 46px !important; height: 46px !important; font-size: 20px !important; line-height: 40px !important; }
+      .word-tile-first { width: 46px !important; height: 46px !important; font-size: 24px !important; line-height: 40px !important; }
+      .mascot-img { width: 72px !important; height: 72px !important; }
+      .greeting-text { font-size: 22px !important; }
+      .teaser-text { font-size: 13px !important; }
+      .cta-link { padding: 14px 36px !important; font-size: 18px !important; }
+      .streak-badge { font-size: 12px !important; padding: 6px 14px !important; }
+      .urgency-badge { font-size: 11px !important; padding: 6px 14px !important; }
     }
   </style>
 </head>
 <body>
   <!-- Preheader -->
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0d0d1f;">
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0a0a1a;">
     ${strings.teaser} ${firstLetter} — ${strings.question} &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0d0d1f;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0a0a1a;">
     <tr>
-      <td align="center" class="container" style="padding: 40px 20px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 480px;">
+      <td align="center" class="container" style="padding: 32px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 460px;">
 
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding-bottom: 28px;">
+            <td align="center" style="padding-bottom: 20px;">
               <a href="${playUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="140" style="display: block; max-width: 140px; height: auto;" />
+                <img src="${logoUrl}" alt="LexiClash" width="120" style="display: block; max-width: 120px; height: auto;" />
               </a>
             </td>
           </tr>
 
           <!-- Streak Lost Badge -->
           <tr>
-            <td align="center" style="padding-bottom: 24px;">
+            <td align="center" style="padding-bottom: 20px;">
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td class="streak-badge" style="background: #2a1028; border: 2px solid ${colors.pink}; border-radius: 24px; padding: 8px 22px; font-size: 14px; color: ${colors.pinkLight}; font-weight: 600; letter-spacing: 0.3px;">
+                  <td class="streak-badge" style="background: linear-gradient(135deg, #2a1028, #3d1040); border: 2px solid ${colors.pink}; border-radius: 24px; padding: 8px 20px; font-size: 13px; color: ${colors.pinkLight}; font-weight: 600; letter-spacing: 0.3px;">
                     &#x1F525; ${strings.streakLost}
                   </td>
                 </tr>
@@ -250,21 +251,21 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
           <!-- Main Card -->
           <tr>
             <td>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: #1a1a35; border: 3px solid ${colors.black}; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; overflow: hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: linear-gradient(180deg, #1e1e3a 0%, #161630 100%); border: 2px solid #2a2a50; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 40px rgba(191, 255, 0, 0.06); overflow: hidden;">
 
-                <!-- Accent bar — single color, clean -->
+                <!-- Accent bar — lime glow -->
                 <tr>
-                  <td style="background: ${colors.lime}; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td style="background: linear-gradient(90deg, ${colors.lime}, #90E000); height: 3px; font-size: 0; line-height: 0;">&nbsp;</td>
                 </tr>
 
                 <tr>
-                  <td class="main-card" style="padding: 40px 32px 44px;">
+                  <td class="main-card" style="padding: 36px 28px 40px;">
 
                     <!-- Mascot -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 20px;">
-                          <img src="${mascotUrl}" alt="Lexi" width="100" height="100" class="mascot-img" style="display: block; width: 100px; height: 100px;" />
+                        <td align="center" style="padding-bottom: 16px;">
+                          <img src="${mascotUrl}" alt="Lexi" width="88" height="88" class="mascot-img" style="display: block; width: 88px; height: 88px;" />
                         </td>
                       </tr>
                     </table>
@@ -272,8 +273,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Greeting -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 8px;">
-                          <h1 class="greeting-text" style="color: ${colors.white}; font-size: 28px; margin: 0; font-weight: 700; text-align: center; line-height: 1.3; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 6px;">
+                          <h1 class="greeting-text" style="color: ${colors.white}; font-size: 26px; margin: 0; font-weight: 700; text-align: center; line-height: 1.3; direction: ${dir};">
                             ${strings.greeting(recipientName)}
                           </h1>
                         </td>
@@ -283,8 +284,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Teaser -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
-                          <p class="teaser-text" style="color: #a0a0c0; font-size: 16px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 24px;">
+                          <p class="teaser-text" style="color: #9090b8; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
                             ${strings.teaser}
                           </p>
                         </td>
@@ -294,20 +295,20 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Tile Row -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 20px;">
+                        <td align="center" style="padding-bottom: 16px;">
                           <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
                             <tr>
                               ${Array.from({ length: WORD_TILE_COUNT }, (_, i) => {
                                 const isFirst = isRTL ? i === WORD_TILE_COUNT - 1 : i === 0;
                                 if (isFirst) {
-                                  return `<td style="padding: 0 4px;">
-                                    <div class="word-tile" style="width: 56px; height: 56px; background: ${colors.lime}; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 50px; font-size: 28px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                  return `<td style="padding: 0 3px;">
+                                    <div class="word-tile word-tile-first" style="width: 52px; height: 52px; background: ${colors.lime}; border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}, 0 0 12px rgba(191, 255, 0, 0.35); text-align: center; line-height: 46px; font-size: 26px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
                                       ${firstLetter}
                                     </div>
                                   </td>`;
                                 }
-                                return `<td style="padding: 0 4px;">
-                                  <div class="word-tile" style="width: 56px; height: 56px; background: #2a2a50; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; text-align: center; line-height: 50px; font-size: 22px; font-weight: 700; color: #555588; font-family: 'Fredoka', Arial, sans-serif;">
+                                return `<td style="padding: 0 3px;">
+                                  <div class="word-tile" style="width: 52px; height: 52px; background: #252548; border: 2px solid #3a3a60; border-radius: 10px; box-shadow: ${shadowDir}2px 2px 0px ${colors.black}; text-align: center; line-height: 48px; font-size: 20px; font-weight: 600; color: #6060a0; font-family: 'Fredoka', Arial, sans-serif;">
                                     ?
                                   </div>
                                 </td>`;
@@ -321,8 +322,8 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- Question -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 32px;">
-                          <p style="color: ${colors.cyan}; font-size: 16px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 28px;">
+                          <p style="color: ${colors.cyan}; font-size: 15px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
                             ${strings.question}
                           </p>
                         </td>
@@ -332,15 +333,15 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 24px;">
+                        <td align="center" style="padding-bottom: 20px;">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:56px;v-text-anchor:middle;width:280px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:54px;v-text-anchor:middle;width:260px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
                             <w:anchorlock/>
                             <center style="color:#000;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;">${playArrow} ${strings.cta}</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 60px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px;">
+                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: linear-gradient(180deg, #D4FF33 0%, ${colors.lime} 100%); color: ${colors.black}; font-size: 19px; font-weight: 700; text-decoration: none; padding: 16px 52px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px;">
                             ${playArrow}&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
@@ -348,13 +349,17 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       </tr>
                     </table>
 
-                    <!-- Urgency + Social Proof (inside card) -->
+                    <!-- Urgency badge -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 8px;">
-                          <p class="urgency-text" style="color: ${colors.pink}; font-size: 13px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
-                            &#x23F0; ${strings.urgency}
-                          </p>
+                        <td align="center" dir="${dir}">
+                          <table role="presentation" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td class="urgency-badge" style="background: rgba(255, 20, 147, 0.1); border: 1px solid rgba(255, 20, 147, 0.3); border-radius: 16px; padding: 6px 16px; font-size: 12px; color: ${colors.pinkLight}; font-weight: 600; text-align: center; direction: ${dir};">
+                                &#x23F0; ${strings.urgency}
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                       </tr>
                     </table>
@@ -367,23 +372,23 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
 
           <!-- Footer -->
           <tr>
-            <td align="center" dir="${dir}" style="padding: 28px 0 8px;">
-              <p style="color: #404060; font-size: 12px; margin: 0 0 10px 0; line-height: 1.6; direction: ${dir};">
+            <td align="center" dir="${dir}" style="padding: 24px 0 8px;">
+              <p style="color: #3a3a58; font-size: 11px; margin: 0 0 8px 0; line-height: 1.6; direction: ${dir};">
                 ${strings.footerReason}
               </p>
-              <p style="color: #404060; font-size: 12px; margin: 0; line-height: 1.6;">
-                <a href="${unsubscribeUrl}" target="_blank" style="color: #606080; text-decoration: underline;">${strings.unsubscribe}</a>
-                <span style="color: #2a2a45;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
-                <a href="${playUrl}" target="_blank" style="color: #606080; text-decoration: underline;">LexiClash</a>
-                <span style="color: #2a2a45;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
-                <a href="${privacyUrl}" target="_blank" style="color: #606080; text-decoration: underline;">${strings.privacy}</a>
+              <p style="color: #3a3a58; font-size: 11px; margin: 0; line-height: 1.6;">
+                <a href="${unsubscribeUrl}" target="_blank" style="color: #505070; text-decoration: underline;">${strings.unsubscribe}</a>
+                <span style="color: #2a2a40;">&nbsp;&middot;&nbsp;</span>
+                <a href="${playUrl}" target="_blank" style="color: #505070; text-decoration: underline;">LexiClash</a>
+                <span style="color: #2a2a40;">&nbsp;&middot;&nbsp;</span>
+                <a href="${privacyUrl}" target="_blank" style="color: #505070; text-decoration: underline;">${strings.privacy}</a>
               </p>
             </td>
           </tr>
 
           <tr>
-            <td align="center" style="padding: 8px 0 0;">
-              <span style="color: #2a2a45; font-size: 11px;">&copy; ${currentYear} LexiClash</span>
+            <td align="center" style="padding: 4px 0 0;">
+              <span style="color: #222238; font-size: 10px;">&copy; ${currentYear} LexiClash</span>
             </td>
           </tr>
 

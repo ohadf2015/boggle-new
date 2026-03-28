@@ -60,10 +60,10 @@ const en = {
       "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
     "daily": {
-      "title": "Daily Word Puzzle - Free Challenge Like Wordle",
-      "description": "Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your emoji results like Wordle. Compete globally and track your daily streaks.",
-      "ogTitle": "Daily Challenge - Same Puzzle Worldwide",
-      "ogDescription": "Daily word puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
+      "title": "Today's Word Puzzle — Free Daily Challenge | LexiClash",
+      "description": "Play today's free word puzzle — same board worldwide. Find words, share emoji results like Wordle, and climb the global leaderboard. No download, no signup. New puzzle every day!",
+      "ogTitle": "Today's Word Puzzle — Can You Beat the World?",
+      "ogDescription": "Same puzzle, everyone worldwide. Find words, share emoji results, climb the leaderboard. Play free — no download needed!"
     },
     "multiplayer": {
       "title": "Word Game With Friends - Free Online Multiplayer",

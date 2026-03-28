@@ -83,7 +83,7 @@ export async function withRetry<T>(
 
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.warn(
+      logger.debug(
         'AI_SERVICE',
         `${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms: ${errorMessage}`
       );

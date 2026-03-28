@@ -10,6 +10,7 @@ vi.mock('@/components/NeoToast', () => ({
   neoSuccessToast: vi.fn(),
   neoErrorToast: vi.fn(),
   neoInfoToast: vi.fn(),
+  TOAST_ICONS: {},
 }));
 vi.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: vi.fn(),

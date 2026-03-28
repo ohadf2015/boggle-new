@@ -60,10 +60,10 @@ const es = {
       "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
     },
     "daily": {
-      "title": "Desafío Diario - Mismo Puzzle Mundial",
-      "description": "¡Juega el Desafío Diario de LexiClash! Mismo puzzle para todos en el mundo cada día. Comparte tus resultados como Wordle. Compite globalmente.",
-      "ogTitle": "Desafío Diario - Mismo Puzzle Mundial",
-      "ogDescription": "Desafío de palabras diario - mismo tablero para todos. ¡Comparte tus resultados y compite globalmente!"
+      "title": "Puzzle de Palabras de Hoy — Desafío Diario Gratis | LexiClash",
+      "description": "Juega el puzzle de palabras de hoy gratis — mismo tablero en todo el mundo. Encuentra palabras, comparte resultados emoji y sube en el ranking global. Sin descarga ni registro. ¡Nuevo puzzle cada día!",
+      "ogTitle": "Puzzle de Hoy — ¿Puedes Vencer al Mundo?",
+      "ogDescription": "Mismo puzzle, todo el mundo. Encuentra palabras, comparte resultados, compite globalmente. ¡Gratis y sin descarga!"
     },
     "multiplayer": {
       "title": "Batalla de Palabras Multijugador - Tiempo Real",

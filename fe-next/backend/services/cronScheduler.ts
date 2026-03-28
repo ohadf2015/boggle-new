@@ -191,7 +191,7 @@ export function startBotDifficultyCalculatorCron() {
     logger.info('CRON', 'Starting bot difficulty calculation...');
     const startTime = Date.now();
 
-    const result = await callEdgeFunction('bot-difficulty-calculator', '🤖 [CRON]');
+    const result = await callEdgeFunction('bot-difficulty-calculator', '[BOT-CRON]');
 
     const duration = Date.now() - startTime;
     if (result.success) {
@@ -242,7 +242,7 @@ export async function triggerBotDifficultyCalculation(): Promise<{
   logger.info('MANUAL', 'Starting manual bot difficulty calculation...');
   const startTime = Date.now();
 
-  const result = await callEdgeFunction('bot-difficulty-calculator', '🤖 [MANUAL]');
+  const result = await callEdgeFunction('bot-difficulty-calculator', '[BOT-MANUAL]');
 
   const duration = Date.now() - startTime;
   logger.info('MANUAL', `Bot difficulty calculation complete in ${duration}ms`);

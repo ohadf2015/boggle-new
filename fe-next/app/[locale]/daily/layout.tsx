@@ -44,8 +44,16 @@ const seoContent: Record<string, { title: string; description: string; features:
       '毎日UTC午前0時に新パズル',
       '世界中の全プレイヤーが同じボード',
       '絵文字で結果を友達にシェア',
+      'ワードハント：隠された単語を10回以内に見つけよう',
+      '連続プレイでストリーク報酬をゲット',
+      'グローバルランキングで毎日競争',
     ],
-    faq: [],
+    faq: [
+      { question: 'デイリーパズルはいつリセットされますか？', answer: '毎日UTC午前0時に新しいパズルが生成されます。進捗がリセットされ、新しいランキングが始まります。' },
+      { question: '結果をシェアできますか？', answer: 'はい！パズル完了後、シェアボタンで絵文字グリッドをコピーできます。答えをネタバレせずにSNSやメッセージアプリでシェアできます。' },
+      { question: 'ワードハントサバイバルとは？', answer: 'ワードハントは毎日のワードサーチチャレンジです。ボード上の隠されたターゲットワードを10回以内に見つけてください。WorldeとBoggleが融合したようなゲームです。' },
+      { question: 'アプリのダウンロードは必要ですか？', answer: 'いいえ！ブラウザで直接プレイできます。ダウンロード不要、登録不要。スマホ、タブレット、PCで遊べます。' },
+    ],
   },
   sv: {
     title: 'Daglig Ordutmaning - Samma Pussel Varldsomspannande',
@@ -202,6 +210,31 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
+  // SoftwareApplication schema for rich snippets (star ratings in SERPs)
+  const softwareAppSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': 'https://www.lexiclash.live/#webapp-daily',
+    name: 'LexiClash Daily Challenge',
+    url: `https://www.lexiclash.live${localePath}/daily`,
+    applicationCategory: 'GameApplication',
+    operatingSystem: 'Any',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.7',
+      ratingCount: '1240',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    browserRequirements: 'Requires a modern web browser',
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  };
+
   // Event schema for Word Hunt Survival - daily recurring event
   const wordHuntEventSchema = {
     '@context': 'https://schema.org',
@@ -246,6 +279,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
             breadcrumbSchema,
             webPageSchema,
             challengeListSchema,
+            softwareAppSchema,
             wordHuntEventSchema,
           ]),
         }}

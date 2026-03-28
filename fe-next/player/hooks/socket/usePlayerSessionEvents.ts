@@ -6,7 +6,7 @@
  */
 import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoInfoToast, wordErrorToast } from '../../../components/NeoToast';
+import { neoSuccessToast, neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
@@ -100,7 +100,7 @@ export function usePlayerSessionEvents({
     const handleHostDisconnected = (data: any) => {
       logger.log('[PLAYER] Host disconnected, waiting for reconnection');
       neoInfoToast(data.message || t('playerView.hostDisconnected') || 'Host disconnected. Waiting for reconnection...', {
-        icon: '⏳',
+        icon: TOAST_ICONS.hourglass,
         duration: 5000
       });
     };
@@ -108,7 +108,7 @@ export function usePlayerSessionEvents({
     const handleHostTransferred = (data: any) => {
       logger.log('[PLAYER] Host transferred to:', data.newHost);
       neoSuccessToast(data.message || `${data.newHost} ${t('playerView.isNowHost') || 'is now the host'}`, {
-        icon: '👑',
+        icon: TOAST_ICONS.crown,
         duration: 4000
       });
     };
@@ -118,7 +118,7 @@ export function usePlayerSessionEvents({
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
       neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab') || 'Session moved to another tab', {
-        icon: '📱',
+        icon: TOAST_ICONS.smartphone,
         duration: 3000
       });
     };

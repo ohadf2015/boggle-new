@@ -77,21 +77,21 @@ export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
     name: 'Reveal Letter',
     description: 'Reveal a random letter in the target word (keeps 1 letter hidden)',
     cost: 3,
-    icon: '💡',
+    icon: 'Lightbulb',
   },
   {
     id: 'reveal_category',
     name: 'Reveal Category',
     description: 'Show the word category (e.g., "Animals > Mammals")',
     cost: 9,
-    icon: '🏷️',
+    icon: 'Tag',
   },
   {
     id: 'example_sentence',
     name: 'Example Sentence',
     description: 'See the word used in a sentence (word is blank)',
     cost: 15,
-    icon: '📝',
+    icon: 'FileText',
   },
 ];
 

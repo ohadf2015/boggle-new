@@ -314,7 +314,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 bg-inherit"
+              className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 bg-neo-navy flex-shrink-0"
               role="status"
               aria-label="Game status"
             >
@@ -491,7 +491,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-start lg:justify-center min-h-0 overflow-visible lg:overflow-hidden pt-1 md:pt-0 gap-2',
+              'flex-1 flex flex-col items-center justify-start lg:justify-center min-h-0 overflow-hidden pt-1 md:pt-0 gap-2',
               'transition-shadow duration-500',
               comboGlow
             )}

@@ -58,8 +58,8 @@ function clearCachedProgression(): void {
 // ==============================================
 
 /**
- * Fire-and-forget fetch with retry for background saves (quests, word album).
- * Retries up to `maxRetries` times on transient failures (429, 5xx, network errors).
+ * Fire-and-forget fetch with retry for background saves.
+ * Retries on 5xx and network errors (not 429 — retrying rate limits makes it worse).
  */
 function fetchWithRetry(
   url: string,
@@ -67,28 +67,47 @@ function fetchWithRetry(
   maxRetries = 2,
   baseDelay = 1000,
 ): void {
-  const attempt = (retryCount: number) => {
-    fetch(url, options)
-      .then((res) => {
-        if (res.ok) return;
-        // Retry on transient server errors only (not 429 — retrying rate limits makes it worse)
-        if (retryCount < maxRetries && res.status >= 500) {
-          const delay = baseDelay * Math.pow(2, retryCount);
-          setTimeout(() => attempt(retryCount + 1), delay);
-          return;
-        }
-        logger.warn(`[ProgressionContext] ${url} failed:`, res.status);
-      })
-      .catch((err) => {
-        if (retryCount < maxRetries) {
-          const delay = baseDelay * Math.pow(2, retryCount);
-          setTimeout(() => attempt(retryCount + 1), delay);
-          return;
-        }
-        logger.warn(`[ProgressionContext] ${url} error after ${maxRetries} retries:`, err instanceof Error ? err.message : err);
-      });
-  };
+  async function attempt(retryCount: number): Promise<void> {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok) return;
+      if (retryCount < maxRetries && res.status >= 500) {
+        await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, retryCount)));
+        return attempt(retryCount + 1);
+      }
+      logger.warn(`[ProgressionContext] ${url} failed:`, res.status);
+    } catch (err) {
+      if (retryCount < maxRetries) {
+        await new Promise(r => setTimeout(r, baseDelay * Math.pow(2, retryCount)));
+        return attempt(retryCount + 1);
+      }
+      logger.warn(`[ProgressionContext] ${url} error after ${maxRetries} retries:`, err instanceof Error ? err.message : err);
+    }
+  }
   attempt(0);
+}
+
+/** POST JSON with one transient-error retry. Returns the Response. */
+async function fetchWithTransientRetry(
+  url: string,
+  body: string,
+): Promise<Response> {
+  const options: RequestInit = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body,
+  };
+  let response = await fetch(url, options);
+  if (response.status === 429 || response.status >= 500) {
+    const retryAfter = response.status === 429
+      ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
+      : 1000;
+    logger.info(`[ProgressionContext] Retrying ${url} after`, response.status);
+    await new Promise(r => setTimeout(r, retryAfter));
+    response = await fetch(url, options);
+  }
+  return response;
 }
 
 // ==============================================
@@ -219,10 +238,19 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
 
         if (!response.ok) {
-          // 404 = route unreachable (stale cache, proxy issue) — fall back
-          // to initial state so the user can still play.
+          // Capture response body for debugging mobile failures
+          let body = '';
+          try { body = await response.text(); } catch { /* ignore */ }
+
+          // 404 = route unreachable (cold start, proxy issue) — retry before falling back
           if (response.status === 404) {
-            logger.debug('[ProgressionContext] /api/adventure/state returned 404 — using initial state');
+            if (attempt < MAX_RETRIES) {
+              logger.debug(`[ProgressionContext] /api/adventure/state returned 404, retrying (attempt ${attempt + 1}/${MAX_RETRIES})`);
+              await new Promise(r => setTimeout(r, BASE_DELAY * Math.pow(2, attempt)));
+              continue;
+            }
+            // All retries exhausted — fall back to initial state so user can still play
+            logger.warn('[ProgressionContext] /api/adventure/state returned 404 after all retries — using initial state');
             setProgression({
               userId: user!.id,
               playerLevel: 1, xp: 0,
@@ -238,14 +266,43 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             setIsLoading(false);
             return;
           }
-          // Capture response body for debugging mobile failures
-          let body = '';
-          try { body = await response.text(); } catch { /* ignore */ }
+
           throw new Error(`HTTP ${response.status}: ${body.slice(0, 200)}`);
         }
 
         const data = await response.json();
-        setProgression(data.progression);
+        // Merge server data with existing state to preserve in-flight completions.
+        // If completeLevel() already merged a new completion optimistically,
+        // a stale API response (from replication lag) must not overwrite it.
+        setProgression((prev) => {
+          if (!prev || !data.progression) return data.progression;
+
+          // Merge completions: keep the best stars for each level
+          const serverCompletions: LevelCompletion[] = data.progression.completions || [];
+          const mergedMap = new Map<string, LevelCompletion>();
+
+          // Start with server data
+          for (const c of serverCompletions) {
+            mergedMap.set(`${c.world}-${c.level}`, c);
+          }
+          // Overlay local completions — keep whichever has more stars
+          for (const c of prev.completions) {
+            const key = `${c.world}-${c.level}`;
+            const existing = mergedMap.get(key);
+            if (!existing || c.stars > existing.stars) {
+              mergedMap.set(key, c);
+            }
+          }
+
+          return {
+            ...data.progression,
+            completions: Array.from(mergedMap.values()),
+            // Keep the higher totalStars between server and local
+            totalStars: Math.max(data.progression.totalStars ?? 0, prev.totalStars ?? 0),
+            // Keep the higher gold value (server is authoritative after save)
+            gold: Math.max(data.progression.gold ?? 0, prev.gold ?? 0),
+          };
+        });
         setAttempts(data.attempts || []);
         setIsLoading(false);
         return; // Success — exit
@@ -385,75 +442,56 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           return false;
         }
 
-        // Merge progression data with existing completions
+        // Merge server response into local progression state
         setProgression((prev) => {
-          if (!prev) {
-            // No previous progression - create new one with the completion
-            return {
-              userId,
-              playerLevel: data.progression.playerLevel,
-              xp: data.progression.xp,
-              currentWorld: data.progression.currentWorld,
-              currentLevel: data.progression.currentLevel,
-              totalStars: data.progression.totalStars,
-                completions: [
-                  {
-                    world: data.completion.world,
-                    level: data.completion.level,
-                    stars: data.completion.stars,
-                    bestScore: data.completion.bestScore,
-                    bestWords: data.completion.bestWords,
-                    completedAt: data.completion.completedAt,
-                  },
-                ],
-                gold: data.progression.gold ?? 0,
-                upgrades: data.progression.upgrades ?? {},
-                skillPoints: data.progression.skillPoints ?? 0,
-                skillTree: data.progression.skillTree ?? {},
-                runeFragments: data.progression.runeFragments ?? 0,
-                runes: data.progression.runes ?? [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              };
-            }
+          const newCompletion = {
+            world: data.completion.world,
+            level: data.completion.level,
+            stars: data.completion.stars,
+            bestScore: data.completion.bestScore,
+            bestWords: data.completion.bestWords,
+            completedAt: data.completion.completedAt,
+          };
 
-            // Update existing completion or add new one
-            const existingCompletionIndex = prev.completions.findIndex(
-              (c) => c.world === world && c.level === level
-            );
+          const base: PlayerProgression = prev ?? {
+            userId,
+            playerLevel: 1,
+            xp: 0,
+            currentWorld: world,
+            currentLevel: level,
+            totalStars: 0,
+            gold: 0,
+            upgrades: {},
+            skillPoints: 0,
+            skillTree: {},
+            runeFragments: 0,
+            runes: [],
+            endlessHighFloor: 0,
+            completions: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
 
-            const updatedCompletion = {
-              world: data.completion.world,
-              level: data.completion.level,
-              stars: data.completion.stars,
-              bestScore: data.completion.bestScore,
-              bestWords: data.completion.bestWords,
-              completedAt: data.completion.completedAt,
-            };
+          const existingIndex = base.completions.findIndex(
+            (c) => c.world === world && c.level === level
+          );
+          const updatedCompletions = existingIndex >= 0
+            ? base.completions.map((c, i) => i === existingIndex ? newCompletion : c)
+            : [...base.completions, newCompletion];
 
-            let updatedCompletions: typeof prev.completions;
-            if (existingCompletionIndex >= 0) {
-              // Update existing completion
-              updatedCompletions = [...prev.completions];
-              updatedCompletions[existingCompletionIndex] = updatedCompletion;
-            } else {
-              // Add new completion
-              updatedCompletions = [...prev.completions, updatedCompletion];
-            }
-
-            return {
-              ...prev,
-              playerLevel: data.progression.playerLevel,
-              xp: data.progression.xp,
-              currentWorld: data.progression.currentWorld,
-              currentLevel: data.progression.currentLevel,
-              totalStars: data.progression.totalStars,
-              gold: data.progression.gold ?? prev.gold,
-              upgrades: data.progression.upgrades ?? prev.upgrades,
-              completions: updatedCompletions,
-              updatedAt: new Date().toISOString(),
-            };
-          });
+          return {
+            ...base,
+            playerLevel: data.progression.playerLevel,
+            xp: data.progression.xp,
+            currentWorld: data.progression.currentWorld,
+            currentLevel: data.progression.currentLevel,
+            totalStars: data.progression.totalStars,
+            gold: data.progression.gold ?? base.gold,
+            upgrades: data.progression.upgrades ?? base.upgrades,
+            completions: updatedCompletions,
+            updatedAt: new Date().toISOString(),
+          };
+        });
 
         return true;
       } catch (err) {
@@ -488,36 +526,10 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
       try {
         const requestBody = JSON.stringify({
-          world,
-          level,
-          words,
-          score,
-          timeRemaining,
-          objectiveProgress,
-          isCompletion,
+          world, level, words, score, timeRemaining, objectiveProgress, isCompletion,
         });
 
-        let response = await fetch('/api/adventure/attempt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: requestBody,
-        });
-
-        // Retry on 429 (rate limit) or 5xx (transient server errors)
-        if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
-          const retryAfter = response.status === 429
-            ? Math.max(2000, Number(response.headers.get('Retry-After') || '3') * 1000)
-            : 1000;
-          logger.info('[ProgressionContext] Retrying recordAttempt after', response.status);
-          await new Promise(r => setTimeout(r, retryAfter));
-          response = await fetch('/api/adventure/attempt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: requestBody,
-          });
-        }
+        const response = await fetchWithTransientRetry('/api/adventure/attempt', requestBody);
 
         if (!response.ok) {
           logger.info('[ProgressionContext] Record attempt failed:', response.status);
@@ -529,21 +541,14 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         if (data.success && data.attempt) {
           const newAttempt: LevelAttempt = data.attempt;
 
-          // Update local attempts state
           setAttempts((prev) => {
             const existingIndex = prev.findIndex(
               (a) => a.world === world && a.level === level
             );
-
             if (existingIndex >= 0) {
-              // Update existing attempt
-              const updated = [...prev];
-              updated[existingIndex] = newAttempt;
-              return updated;
-            } else {
-              // Add new attempt
-              return [...prev, newAttempt];
+              return prev.map((a, i) => i === existingIndex ? newAttempt : a);
             }
+            return [...prev, newAttempt];
           });
 
           return newAttempt;
@@ -736,9 +741,11 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       const cached = loadCachedProgression(currentUserId);
       if (cached && !progression) {
         setProgressionRaw(cached);
-        setIsLoading(false); // Show cached data immediately
+        // Don't set isLoading=false here — wait for API fetch to complete.
+        // Showing cached data prevents blank flash, but isLoading stays true
+        // so components know fresh data is still incoming.
       }
-      fetchProgression(); // Then refresh from server
+      fetchProgression(); // Fetch from server — sets isLoading=false on complete
     } else if (!authLoading && !currentUserId) {
       // No user — clear React state
       setProgressionRaw(null);

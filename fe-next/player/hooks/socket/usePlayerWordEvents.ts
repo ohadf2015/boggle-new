@@ -13,6 +13,7 @@ import {
   neoSuccessToast,
   neoInfoToast,
   neoWarningToast,
+  TOAST_ICONS,
 } from '../../../components/NeoToast';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
 import { useFoundWords, useGameActions, useGameStore } from '@/hooks/gameState';
@@ -289,20 +290,20 @@ export function usePlayerWordEvents({
   const handleVoteRecorded = useCallback((data: any) => {
     logger.log('[PLAYER] Vote recorded:', data);
     if (data.success) {
-      neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: '✓', duration: 2000 });
+      neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: TOAST_ICONS.check, duration: 2000 });
     }
   }, [t]);
 
   const handleWordBecameValid = useCallback((data: any) => {
     logger.log('[PLAYER] Word became valid:', data);
-    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: '📖', duration: 3000 });
+    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: TOAST_ICONS.bookOpen, duration: 3000 });
   }, [t]);
 
   // Spam detection handlers
   const handleSpamWarning = useCallback((data: SpamWarningPayload) => {
     logger.log('[SPAM] Warning received:', data);
     neoWarningToast(t('spam.warning') || 'Slow down! Too many invalid words', {
-      icon: '⚠️',
+      icon: TOAST_ICONS.alertTriangle,
       duration: 4000
     });
   }, [t]);
@@ -329,7 +330,7 @@ export function usePlayerWordEvents({
   const handleSpamCooldownEnd = useCallback((data: SpamCooldownEndPayload) => {
     logger.log('[SPAM] Cooldown ended:', data);
     neoInfoToast(t('spam.cooldownEnd') || 'You can submit words again', {
-      icon: '✓',
+      icon: TOAST_ICONS.check,
       duration: 2000
     });
   }, [t]);
