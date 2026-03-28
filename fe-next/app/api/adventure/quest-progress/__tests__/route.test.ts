@@ -67,15 +67,9 @@ function setupDbMocks({
           }),
         }),
         update: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              select: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({
-                  data: updateError ? null : { user_id: 'user-1' },
-                  error: updateError,
-                }),
-              }),
-            }),
+          eq: vi.fn().mockResolvedValue({
+            data: updateError ? null : { user_id: 'user-1' },
+            error: updateError,
           }),
         }),
       };

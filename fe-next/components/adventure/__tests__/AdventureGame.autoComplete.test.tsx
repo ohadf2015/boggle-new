@@ -98,11 +98,12 @@ describe('AdventureGame - Auto-Completion Bug', () => {
     });
 
     it('should calculate stars correctly when auto-completing', () => {
-      // GIVEN - Level with primary (2 words) + secondary (score >= 100)
+      // GIVEN - Level with primary (2 words) + 2 secondary objectives (need 3 completed for 3 stars)
       const levelConfig = createMockLevelConfig({
         objectives: [
           { type: 'wordCount', target: 2, isPrimary: true },
           { type: 'scoreTarget', target: 100, isPrimary: false },
+          { type: 'longWords', target: 0, isPrimary: false },
         ],
       });
 
@@ -223,10 +224,12 @@ describe('AdventureGame - Auto-Completion Bug', () => {
     });
 
     it('should get 3 stars when all objectives met at auto-complete', () => {
-      // GIVEN - Level with primary and all secondary objectives achievable
+      // GIVEN - Level with primary + 2 secondary objectives, all achievable
       const levelConfig = createMockLevelConfig({
         objectives: [
           { type: 'wordCount', target: 1, isPrimary: true },
+          { type: 'scoreTarget', target: 20, isPrimary: false },
+          { type: 'longWords', target: 1, isPrimary: false },
         ],
       });
 
@@ -238,12 +241,12 @@ describe('AdventureGame - Auto-Completion Bug', () => {
         result.current.startGame();
       });
 
-      // WHEN - Meet primary objective (no secondary objectives exist = all met by default)
+      // WHEN - Meet all objectives (5+ letter word for longWords, score >= 20)
       act(() => {
-        result.current.submitWord('CAT', 30);
+        result.current.submitWord('CLASH', 30);
       });
 
-      // THEN - Stars should be 3 (all objectives met - primary only, no secondary to fail)
+      // THEN - Stars should be 3 (all 3 objectives met)
       expect(result.current.gameState.isComplete).toBe(true);
       expect(result.current.gameState.stars).toBe(3);
     });

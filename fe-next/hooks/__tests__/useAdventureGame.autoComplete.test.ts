@@ -115,11 +115,12 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
     });
 
     it('should set stars to 3 when all objectives are met', () => {
-      // GIVEN - Level with all achievable objectives
+      // GIVEN - Level with 3+ achievable objectives (need 3 completed for 3 stars)
       const levelConfig = createMockLevelConfig({
         objectives: [
           { type: 'wordCount', target: 1, isPrimary: true },
           { type: 'scoreTarget', target: 100, isPrimary: false },
+          { type: 'longWords', target: 1, isPrimary: false },
         ],
       });
       const grid = createMockGrid();
@@ -127,9 +128,9 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
         useAdventureGame({ levelConfig, initialGrid: grid })
       );
 
-      // WHEN - Submit word that meets ALL objectives
+      // WHEN - Submit long word that meets ALL objectives (5+ letters for longWords)
       act(() => {
-        result.current.submitWord('CAT', 150); // Meets wordCount and scoreTarget
+        result.current.submitWord('TESTS', 150); // Meets wordCount, scoreTarget, and longWords
       });
 
       // THEN - Game should be complete with 3 stars
@@ -143,6 +144,7 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
         timerSeconds: 120,
         objectives: [
           { type: 'wordCount', target: 1, isPrimary: true },
+          { type: 'scoreTarget', target: 30, isPrimary: false }, // Met with score 50
           { type: 'timeBonus', target: 60, isPrimary: false }, // Need 60+ seconds remaining
         ],
       });
