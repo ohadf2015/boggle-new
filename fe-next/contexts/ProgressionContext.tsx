@@ -168,9 +168,39 @@ interface ProgressionContextType {
 }
 
 // ==============================================
-// CONTEXT
+// SPLIT CONTEXTS (perf optimization)
 // ==============================================
 
+// Data context: progression, attempts, loading/error state — changes frequently.
+// Only components that read data subscribe here.
+interface ProgressionDataContextType {
+  progression: PlayerProgression | null;
+  attempts: LevelAttempt[];
+  isLoading: boolean;
+  error: Error | null;
+  isAuthError: boolean;
+}
+
+// Actions context: stable function references — rarely (if ever) recreated.
+// Components that only call actions (e.g., completeLevel) don't re-render on data changes.
+interface ProgressionActionsContextType {
+  refreshProgression: () => Promise<void>;
+  completeLevel: ProgressionContextType['completeLevel'];
+  recordAttempt: ProgressionContextType['recordAttempt'];
+  isWorldUnlocked: (worldId: number) => boolean;
+  isLevelUnlocked: (worldId: number, levelId: number) => boolean;
+  getWorldStars: (worldId: number) => number;
+  getLevelCompletion: (worldId: number, levelId: number) => LevelCompletion | undefined;
+  getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
+  updateCurrency: ProgressionContextType['updateCurrency'];
+  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
+  updateWordAlbum: (newWords: string[]) => void;
+}
+
+const ProgressionDataContext = createContext<ProgressionDataContextType | null>(null);
+const ProgressionActionsContext = createContext<ProgressionActionsContextType | null>(null);
+
+// Legacy combined context — kept for backward compatibility with useProgression()
 const ProgressionContext = createContext<ProgressionContextType | null>(null);
 
 // ==============================================
@@ -250,7 +280,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
               continue;
             }
             // All retries exhausted — fall back to initial state so user can still play
-            logger.warn('[ProgressionContext] /api/adventure/state returned 404 after all retries — using initial state');
+            logger.debug('[ProgressionContext] /api/adventure/state returned 404 after all retries — using initial state');
             setProgression({
               userId: user!.id,
               playerLevel: 1, xp: 0,
@@ -619,14 +649,21 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     [completionsMap]
   );
 
-  // Helper: Get attempt for a specific level (includes failed attempts)
+  // Pre-compute attempts map for O(1) lookups instead of O(n) find
+  const attemptsMap = useMemo(() => {
+    const map = new Map<string, LevelAttempt>();
+    for (const a of attempts) {
+      map.set(`${a.world}:${a.level}`, a);
+    }
+    return map;
+  }, [attempts]);
+
+  // Helper: Get attempt for a specific level (O(1) lookup from pre-computed map)
   const getLevelAttempt = useCallback(
     (worldId: number, levelId: number): LevelAttempt | undefined => {
-      return attempts.find(
-        (a) => a.world === worldId && a.level === levelId
-      );
+      return attemptsMap.get(`${worldId}:${levelId}`);
     },
-    [attempts]
+    [attemptsMap]
   );
 
   // Debounced quest-progress persist — batches rapid updates into a single API call
@@ -766,14 +803,25 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user?.id]);
 
-  // Memoize context value
-  const contextValue = useMemo<ProgressionContextType>(
+  // Clean up quest progress timer on unmount
+  useEffect(() => {
+    return () => {
+      if (questProgressTimerRef.current) {
+        clearTimeout(questProgressTimerRef.current);
+        // Flush any pending quest progress on unmount
+        flushQuestProgress();
+      }
+    };
+  }, [flushQuestProgress]);
+
+  // Split context values for selective re-rendering
+  const dataValue = useMemo<ProgressionDataContextType>(
+    () => ({ progression, attempts, isLoading, error, isAuthError }),
+    [progression, attempts, isLoading, error, isAuthError]
+  );
+
+  const actionsValue = useMemo<ProgressionActionsContextType>(
     () => ({
-      progression,
-      attempts,
-      isLoading,
-      error,
-      isAuthError,
       refreshProgression,
       completeLevel,
       recordAttempt,
@@ -787,39 +835,38 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       updateWordAlbum,
     }),
     [
-      progression,
-      attempts,
-      isLoading,
-      error,
-      isAuthError,
-      refreshProgression,
-      completeLevel,
-      recordAttempt,
-      isWorldUnlocked,
-      isLevelUnlocked,
-      getWorldStars,
-      getLevelCompletion,
-      getLevelAttempt,
-      updateCurrency,
-      updateChapterQuestProgress,
-      updateWordAlbum,
+      refreshProgression, completeLevel, recordAttempt,
+      isWorldUnlocked, isLevelUnlocked,
+      getWorldStars, getLevelCompletion, getLevelAttempt,
+      updateCurrency, updateChapterQuestProgress, updateWordAlbum,
     ]
   );
 
+  // Legacy combined value — only consumed by useProgression() for backward compat
+  const contextValue = useMemo<ProgressionContextType>(
+    () => ({ ...dataValue, ...actionsValue }),
+    [dataValue, actionsValue]
+  );
+
   return (
-    <ProgressionContext.Provider value={contextValue}>
-      {children}
-    </ProgressionContext.Provider>
+    <ProgressionDataContext.Provider value={dataValue}>
+      <ProgressionActionsContext.Provider value={actionsValue}>
+        <ProgressionContext.Provider value={contextValue}>
+          {children}
+        </ProgressionContext.Provider>
+      </ProgressionActionsContext.Provider>
+    </ProgressionDataContext.Provider>
   );
 }
 
 // ==============================================
-// HOOK
+// HOOKS
 // ==============================================
 
 /**
- * Hook to access adventure progression context
- * Must be used within ProgressionProvider
+ * Hook to access adventure progression context (backward-compatible).
+ * Triggers re-render on ANY state change — prefer selective hooks below.
+ * Must be used within ProgressionProvider.
  */
 export function useProgression(): ProgressionContextType {
   const context = useContext(ProgressionContext);
@@ -829,9 +876,33 @@ export function useProgression(): ProgressionContextType {
   return context;
 }
 
+/**
+ * Selective hook: only re-renders when progression DATA changes.
+ * Use when you need progression/attempts/isLoading but don't call actions.
+ */
+export function useProgressionData(): ProgressionDataContextType {
+  const context = useContext(ProgressionDataContext);
+  if (!context) {
+    throw new Error('useProgressionData must be used within ProgressionProvider');
+  }
+  return context;
+}
+
+/**
+ * Selective hook: only re-renders when action refs change (rarely).
+ * Use when you only need to call completeLevel, recordAttempt, etc.
+ */
+export function useProgressionActions(): ProgressionActionsContextType {
+  const context = useContext(ProgressionActionsContext);
+  if (!context) {
+    throw new Error('useProgressionActions must be used within ProgressionProvider');
+  }
+  return context;
+}
+
 // ==============================================
 // EXPORTS
 // ==============================================
 
-export { ProgressionContext };
-export type { ProgressionContextType };
+export { ProgressionContext, ProgressionDataContext, ProgressionActionsContext };
+export type { ProgressionContextType, ProgressionDataContextType, ProgressionActionsContextType };

@@ -69,7 +69,7 @@ export async function withRetry<T>(
       if (!isRetryable || attempt === AI_CONFIG.RETRY.maxRetries - 1) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        logger.info(
+        logger.debug(
           'AI_SERVICE',
           `${operationName} failed after ${attempt + 1} attempts: ${errorMessage}`
         );

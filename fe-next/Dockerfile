@@ -49,8 +49,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs && \
-    mkdir -p .next/cache && chown nextjs:nodejs .next/cache
+    adduser --system --uid 1001 nextjs
 
 # Production node_modules for Express server externals (socket.io, ioredis, etc.)
 # Copied FIRST so standalone's traced node_modules overlay correctly
@@ -65,6 +64,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/backend/*.txt ./backend/
 COPY --from=builder /app/backend/data ./backend/data
+
+# Create cache dir AFTER all COPY steps so it isn't overwritten
+RUN mkdir -p .next/cache && chown nextjs:nodejs .next/cache
 
 USER nextjs
 

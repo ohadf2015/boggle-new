@@ -22,7 +22,7 @@ interface ResultsHeroSectionProps {
   wordHuntStatus?: 'survived' | 'eliminated';
   wordHuntTarget?: string;
   wordsFound?: number;
-  t: (key: string) => string | undefined;
+  t: (key: string, params?: Record<string, string | number>) => string | undefined;
 }
 
 // ============================================================
@@ -112,10 +112,10 @@ const AnimatedScore: React.FC<{
 
 function getRankLabel(
   rank: number,
-  t: (key: string) => string | undefined,
+  t: (key: string, params?: Record<string, string | number>) => string | undefined,
 ): string {
   // Ordinal translations already include "PLACE" / "מקום" / "PLATS" etc.
-  return formatRankOrdinal(rank, (key) => t(key) ?? key);
+  return formatRankOrdinal(rank, (key, params) => t(key, params) ?? key);
 }
 
 // ============================================================
