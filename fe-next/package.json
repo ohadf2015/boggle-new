@@ -57,7 +57,7 @@
     "assets:check": "tsx scripts/check-asset-sizes.ts",
     "assets:check:verbose": "tsx scripts/check-asset-sizes.ts --verbose",
     "bundle:check": "bundlewatch",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "mobile:sync": "bash scripts/mobile/sync-native.sh",
     "mobile:ios": "bash scripts/mobile/build-ios.sh",
     "mobile:ios:release": "bash scripts/mobile/build-ios.sh --release",
