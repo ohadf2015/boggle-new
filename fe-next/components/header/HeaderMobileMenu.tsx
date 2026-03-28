@@ -138,19 +138,19 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                     <button
                         onClick={onSignIn}
                         className={cn(
-                            "flex items-center gap-1.5 flex-shrink-0",
-                            "px-3 h-11 min-h-[44px]",
+                            "flex items-center gap-1 flex-shrink-0",
+                            "px-2.5 py-1.5 h-9 min-h-[36px]",
                             "bg-neo-cyan text-neo-black",
-                            "border-3 border-neo-black",
+                            "border-2 border-neo-black",
                             "rounded-neo shadow-hard-sm",
                             "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             "transition-all duration-100",
-                            "text-xs font-bold"
+                            "text-[11px] font-bold whitespace-nowrap"
                         )}
                         aria-label={t('auth.signIn')}
                     >
-                        <User size={14} aria-hidden="true" />
+                        <User size={12} aria-hidden="true" />
                         <span>{t('auth.signIn')}</span>
                     </button>
                 )}
