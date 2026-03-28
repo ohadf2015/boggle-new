@@ -5,7 +5,7 @@
 nixPkgs = ["nodejs_22"]
 
 [phases.install]
-cmds = ["npm ci --prefer-offline"]
+cmds = ["npm ci --prefer-offline --legacy-peer-deps"]
 cacheDirectories = ["node_modules"]
 
 [phases.build]
