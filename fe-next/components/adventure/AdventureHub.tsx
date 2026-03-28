@@ -1,16 +1,15 @@
 /**
  * AdventureHub — The first screen a returning player sees.
  *
- * Shows: streak counter + multiplier, today's 3 daily quests with progress,
- * continue button pointing to next unlocked level, and player stats.
- * This is the primary D1→D7 retention driver.
+ * Simplified landing: streak, compact daily progress, big Continue CTA,
+ * and a tidy row of secondary actions. Minimal stats to reduce clutter.
  */
 
 'use client';
 
 import { memo, useMemo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Flame, Target, Star, Zap, ChevronRight, Map, Coins, Trophy, BookOpen, Home, Swords, Package } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -19,7 +18,6 @@ import { getNextUnlockedLevel } from '@/lib/adventure/constants';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import type { DailyQuest } from '@/lib/adventure/dailyQuests';
 import type { LevelCompletion } from '@/types/adventure';
-import AdventureXpProgressBar from './meta/AdventureXpProgressBar';
 
 // ==============================================
 // TYPES
@@ -32,41 +30,23 @@ interface DailyQuestProgress {
 }
 
 interface AdventureHubProps {
-  /** Player's current streak days */
   streakDays: number;
-  /** Player's best streak */
   bestStreak: number;
-  /** Today's daily quests with progress */
   dailyQuests: DailyQuestProgress[];
-  /** Total stars collected */
   totalStars: number;
-  /** Player level */
   playerLevel: number;
-  /** Gold amount */
   gold: number;
-  /** Total XP for progress bar */
   xp?: number;
-  /** Level completions for determining next level */
   completions: LevelCompletion[];
-  /** Current world the player is on */
   currentWorld: number;
-  /** Navigate to world map */
   onOpenWorldMap: () => void;
-  /** Navigate directly to a level */
   onPlayLevel: (worldId: number, levelId: number) => void;
-  /** Open the Word Forge shop */
   onOpenShop: () => void;
-  /** Number of unique words in album */
   wordAlbumCount?: number;
-  /** Navigate to weekly challenge */
   onWeeklyChallenge?: () => void;
-  /** Start Boss Rush mode */
   onBossRush?: () => void;
-  /** Whether Boss Rush is available (player has defeated at least 1 boss) */
   canBossRush?: boolean;
-  /** Number of collectible items the player owns */
   collectionCount?: number;
-  /** Open the Collection panel */
   onOpenCollection?: () => void;
 }
 
@@ -76,232 +56,150 @@ interface AdventureHubProps {
 
 const AdventureHub = memo<AdventureHubProps>(({
   streakDays,
-  bestStreak,
   dailyQuests,
-  totalStars,
-  playerLevel,
-  gold,
   completions,
   currentWorld,
   onOpenWorldMap,
   onPlayLevel,
-  onOpenShop,
-  wordAlbumCount = 0,
-  onWeeklyChallenge,
   onBossRush,
   canBossRush = false,
-  collectionCount = 0,
-  onOpenCollection,
-  xp = 0,
+  onWeeklyChallenge,
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
 
-  // Find next unlocked level for the "Continue" button
   const nextLevel = useMemo(() => {
     return getNextUnlockedLevel(currentWorld, completions);
   }, [currentWorld, completions]);
 
   const nextWorldConfig = nextLevel ? getWorldConfig(nextLevel.world) : null;
-
   const completedQuestCount = dailyQuests.filter(q => q.isComplete).length;
+  const totalQuests = dailyQuests.length || 3;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-56px)] px-4 py-8 gap-6 max-w-lg mx-auto">
+    <div className="flex flex-col items-center min-h-[calc(100dvh-56px)] px-4 py-6 gap-5 max-w-md mx-auto">
 
-      {/* Home link */}
+      {/* Home link — compact */}
       <div className="w-full flex justify-start">
         <Link
           href="/"
-          className={cn(
-            'flex items-center gap-2 px-4 py-2',
-            'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
-            'text-neo-white font-bold hover:bg-neo-navy-light',
-            'transition-colors shadow-hard-sm'
-          )}
+          className="text-neo-white/60 font-bold text-sm hover:text-neo-white transition-colors"
+          aria-label={t('common.home')}
         >
-          <Home className="w-5 h-5" />
-          <span>{t('common.home')}</span>
+          ← {t('common.home')}
         </Link>
       </div>
 
-      {/* Streak Section */}
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className={cn(
-          'w-full p-4 rounded-neo border-3 border-neo-black shadow-hard',
-          streakDays > 0 ? 'bg-neo-orange/20' : 'bg-neo-white/5'
-        )}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black',
-              streakDays > 0 ? 'bg-neo-orange shadow-hard-sm' : 'bg-neo-white/10'
-            )}>
-              <Flame className={cn(
-                'w-7 h-7',
-                streakDays > 0 ? 'text-neo-black' : 'text-neo-white/40'
-              )} />
-            </div>
-            <div>
-              <p className={cn(
-                'text-2xl font-black tabular-nums',
-                streakDays > 0 ? 'text-neo-orange' : 'text-neo-white/40'
-              )}>
-                {streakDays} {t('adventure.hub.days')}
-              </p>
-              <p className="text-xs text-neo-white/50 font-bold">
-                {streakDays > 0
-                  ? t('adventure.hub.streakActive')
-                  : t('adventure.hub.playToStart')}
-              </p>
-            </div>
-          </div>
-
-          {/* Multiplier badge */}
-          {multiplier > 1 && (
-            <div className="px-3 py-1.5 bg-neo-orange rounded-neo border-2 border-neo-black">
-              <span className="text-neo-black font-black text-lg">
-                {multiplier.toFixed(1)}x
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Best streak */}
-        {bestStreak > 0 && (
-          <p className="text-xs text-neo-white/30 mt-2 font-bold">
-            {t('adventure.hub.bestStreak')}: {bestStreak} {t('adventure.hub.days')}
-          </p>
-        )}
-      </AdaptiveMotion.div>
-
-      {/* Daily Quests */}
+      {/* Streak — compact inline */}
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="w-full"
+        className={cn(
+          'w-full flex items-center gap-3 p-3 rounded-neo border-2',
+          streakDays > 0
+            ? 'border-neo-pink/40 bg-neo-pink/10'
+            : 'border-neo-white/10 bg-neo-white/5'
+        )}
       >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-neo-cyan" />
-            <h2 className="text-lg font-black text-neo-white uppercase tracking-tight">
-              {t('adventure.hub.dailyQuests')}
-            </h2>
-          </div>
-          <span className="text-sm font-bold text-neo-cyan">
-            {completedQuestCount}/3
+        <Flame className={cn(
+          'w-6 h-6 shrink-0',
+          streakDays > 0 ? 'text-neo-pink' : 'text-neo-white/30'
+        )} />
+        <div className="flex-1 min-w-0">
+          <span className={cn(
+            'text-lg font-black tabular-nums',
+            streakDays > 0 ? 'text-neo-pink' : 'text-neo-white/30'
+          )}>
+            {streakDays} {t('adventure.hub.days')}
+          </span>
+          <span className="text-xs text-neo-white/40 font-bold ms-2">
+            {streakDays > 0
+              ? t('adventure.hub.streakActive')
+              : t('adventure.hub.playToStart')}
           </span>
         </div>
-
-        <div className="space-y-2">
-          {dailyQuests.map((dq, i) => {
-            const progress = Math.min(dq.current / dq.quest.target, 1);
-            return (
-              <AdaptiveMotion.div
-                key={dq.quest.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.25 + i * 0.08 }}
-                className={cn(
-                  'p-3 rounded-neo border-2',
-                  dq.isComplete
-                    ? 'bg-neo-lime/15 border-neo-lime/40'
-                    : 'bg-neo-white/5 border-neo-white/10'
-                )}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className={cn(
-                    'text-sm font-bold',
-                    dq.isComplete ? 'text-neo-lime' : 'text-neo-white'
-                  )}>
-                    {t(dq.quest.titleKey)}
-                  </span>
-                  <span className="text-xs font-mono text-neo-white/50">
-                    {Math.min(dq.current, dq.quest.target)}/{dq.quest.target}
-                  </span>
-                </div>
-
-                {/* Progress bar */}
-                <div className="h-1.5 bg-neo-black/40 rounded-full overflow-hidden">
-                  <AdaptiveMotion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress * 100}%` }}
-                    transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
-                    className={cn(
-                      'h-full rounded-full',
-                      dq.isComplete ? 'bg-neo-lime' : 'bg-neo-cyan'
-                    )}
-                  />
-                </div>
-
-                {/* Reward preview */}
-                <div className="flex items-center gap-3 mt-1.5">
-                  <span className="text-xs text-neo-yellow/70 flex items-center gap-0.5">
-                    <Coins className="w-3 h-3" /> {dq.quest.rewardGold}
-                  </span>
-                  <span className="text-xs text-neo-purple/70 flex items-center gap-0.5">
-                    <Zap className="w-3 h-3" /> {dq.quest.rewardXp} XP
-                  </span>
-                </div>
-              </AdaptiveMotion.div>
-            );
-          })}
-        </div>
+        {multiplier > 1 && (
+          <span className="text-neo-pink font-black text-sm px-2 py-0.5 bg-neo-pink/20 rounded-neo border border-neo-pink/30">
+            {multiplier.toFixed(1)}x
+          </span>
+        )}
       </AdaptiveMotion.div>
 
-      {/* Player Stats Row */}
+      {/* Daily Quests — compact summary with mini progress dots */}
       <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="flex items-center gap-3 w-full"
+        transition={{ delay: 0.1 }}
+        className="w-full"
       >
-        <div className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-neo-yellow/10 border border-neo-yellow/30 rounded-neo">
-          <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
-          <span className="text-sm font-bold text-neo-yellow">{totalStars}</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Target className="w-4 h-4 text-neo-cyan" />
+            <span className="text-sm font-black text-neo-white uppercase tracking-tight">
+              {t('adventure.hub.dailyQuests')}
+            </span>
+          </div>
+          <span className="text-xs font-bold text-neo-cyan tabular-nums">
+            {completedQuestCount}/{totalQuests}
+          </span>
         </div>
-        <div className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-neo-purple/10 border border-neo-purple/30 rounded-neo">
-          <Zap className="w-4 h-4 text-neo-purple" />
-          <span className="text-sm font-bold text-neo-purple">{t('adventure.levelWithNumber', { level: playerLevel })}</span>
+
+        {/* Quest rows — name + progress only, no rewards clutter */}
+        <div className="space-y-1.5">
+          {dailyQuests.map((dq, i) => {
+            const progress = Math.min(dq.current / dq.quest.target, 1);
+            return (
+              <div
+                key={dq.quest.id}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-neo border',
+                  dq.isComplete
+                    ? 'border-neo-lime/30 bg-neo-lime/10'
+                    : 'border-neo-white/10 bg-neo-white/5'
+                )}
+              >
+                {dq.isComplete ? (
+                  <Check className="w-4 h-4 text-neo-lime shrink-0" />
+                ) : (
+                  <div className="w-4 h-4 rounded-full border-2 border-neo-white/20 shrink-0" />
+                )}
+                <span className={cn(
+                  'text-sm font-bold flex-1 min-w-0 truncate',
+                  dq.isComplete ? 'text-neo-lime' : 'text-neo-white'
+                )}>
+                  {t(dq.quest.titleKey)}
+                </span>
+                <div className="w-16 h-1.5 bg-neo-black/40 rounded-full overflow-hidden shrink-0">
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-all duration-500',
+                      dq.isComplete ? 'bg-neo-lime' : 'bg-neo-cyan'
+                    )}
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-mono text-neo-white/40 tabular-nums w-8 text-end shrink-0">
+                  {Math.min(dq.current, dq.quest.target)}/{dq.quest.target}
+                </span>
+              </div>
+            );
+          })}
         </div>
-        <button
-          onClick={onOpenShop}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-neo-orange/10 border border-neo-orange/30 rounded-neo hover:bg-neo-orange/20 transition-colors"
-        >
-          <Coins className="w-4 h-4 text-neo-orange" />
-          <span className="text-sm font-bold text-neo-orange">{gold}</span>
-        </button>
+
+        {/* All quests complete bonus */}
+        {completedQuestCount === totalQuests && totalQuests > 0 && (
+          <div className="mt-2 py-1.5 text-center text-neo-lime font-bold text-xs uppercase rounded-neo border border-neo-lime/30 bg-neo-lime/10">
+            {t('adventure.hub.allQuestsComplete')}
+          </div>
+        )}
       </AdaptiveMotion.div>
 
-      {/* XP Progress Bar */}
-      {xp > 0 && (
-        <AdventureXpProgressBar totalXp={xp} size="sm" className="w-full" />
-      )}
-
-      {/* Daily Quest Completion Bonus */}
-      {completedQuestCount === 3 && dailyQuests.length === 3 && (
-        <AdaptiveMotion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full p-3 rounded-neo border-2 border-neo-lime bg-neo-lime/15 text-center"
-        >
-          <span className="text-neo-lime font-black text-sm uppercase">
-            {t('adventure.hub.allQuestsComplete')}
-          </span>
-        </AdaptiveMotion.div>
-      )}
-
-      {/* Continue Button — primary CTA */}
+      {/* Continue Button — the hero CTA */}
       {nextLevel && nextWorldConfig && (
         <AdaptiveMotion.button
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           onClick={() => onPlayLevel(nextLevel.world, nextLevel.level)}
           className={cn(
             'w-full py-4 px-6',
@@ -324,102 +222,64 @@ const AdventureHub = memo<AdventureHubProps>(({
         </AdaptiveMotion.button>
       )}
 
-      {/* Boss Rush Button */}
-      {canBossRush && onBossRush && (
-        <AdaptiveMotion.button
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.55, type: 'spring', stiffness: 200 }}
-          onClick={onBossRush}
-          className={cn(
-            'w-full py-3 px-6',
-            'flex items-center justify-center gap-2',
-            'bg-neo-orange/15 text-neo-orange',
-            'font-black text-base uppercase tracking-tight',
-            'border-3 border-neo-orange/40 rounded-neo shadow-hard',
-            'hover:bg-neo-orange/25 hover:shadow-hard-sm',
-            'active:translate-y-0.5 active:shadow-hard-pressed',
-            'transition-all duration-150'
-          )}
-        >
-          <Swords className="w-5 h-5" />
-          {t('adventure.bossRush.startRush')}
-        </AdaptiveMotion.button>
-      )}
-
-      {/* Secondary CTAs Row */}
+      {/* Secondary actions — compact icon row */}
       <AdaptiveMotion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="flex gap-3 w-full"
+        transition={{ delay: 0.3 }}
+        className="flex gap-2 w-full"
       >
+        {/* World Map */}
+        <button
+          onClick={onOpenWorldMap}
+          className={cn(
+            'flex-1 py-2.5 px-3',
+            'flex items-center justify-center gap-1.5',
+            'bg-neo-white/5 text-neo-white/70',
+            'font-bold text-xs',
+            'border border-neo-white/15 rounded-neo',
+            'hover:bg-neo-white/10 transition-colors'
+          )}
+        >
+          <Map className="w-4 h-4" />
+          {t('adventure.hub.worldMap')}
+        </button>
+
         {/* Weekly Challenge */}
         {onWeeklyChallenge && (
           <button
             onClick={onWeeklyChallenge}
             className={cn(
-              'flex-1 py-3 px-4',
-              'flex flex-col items-center gap-1',
-              'bg-neo-yellow/10 text-neo-yellow',
-              'font-bold text-sm',
-              'border-2 border-neo-yellow/30 rounded-neo',
-              'hover:bg-neo-yellow/20',
-              'transition-all duration-150'
+              'flex-1 py-2.5 px-3',
+              'flex items-center justify-center gap-1.5',
+              'bg-neo-white/5 text-neo-white/70',
+              'font-bold text-xs',
+              'border border-neo-white/15 rounded-neo',
+              'hover:bg-neo-white/10 transition-colors'
             )}
           >
-            <Trophy className="w-5 h-5" />
+            <Trophy className="w-4 h-4" />
             {t('adventure.weeklyChallenge.title')}
           </button>
         )}
 
-        {/* Word Album */}
-        <div className={cn(
-          'flex-1 py-3 px-4',
-          'flex flex-col items-center gap-1',
-          'bg-neo-cyan/10 text-neo-cyan',
-          'font-bold text-sm',
-          'border-2 border-neo-cyan/30 rounded-neo'
-        )}>
-          <BookOpen className="w-5 h-5" />
-          <span>{wordAlbumCount} {t('adventure.album.uniqueWords')}</span>
-        </div>
-
-        {/* Collection */}
-        {onOpenCollection && (
+        {/* Boss Rush — only if unlocked */}
+        {canBossRush && onBossRush && (
           <button
-            onClick={onOpenCollection}
+            onClick={onBossRush}
             className={cn(
-              'flex-1 py-3 px-4',
-              'flex flex-col items-center gap-1',
-              'bg-neo-purple/10 text-neo-purple',
-              'font-bold text-sm',
-              'border-2 border-neo-purple/30 rounded-neo',
-              'hover:bg-neo-purple/20',
-              'transition-all duration-150'
+              'flex-1 py-2.5 px-3',
+              'flex items-center justify-center gap-1.5',
+              'bg-neo-pink/10 text-neo-pink',
+              'font-bold text-xs',
+              'border border-neo-pink/30 rounded-neo',
+              'hover:bg-neo-pink/20 transition-colors'
             )}
           >
-            <Package className="w-5 h-5" />
-            <span>{collectionCount} {t('adventure.collection.items')}</span>
+            <Swords className="w-4 h-4" />
+            {t('adventure.bossRush.title')}
           </button>
         )}
-
-        {/* World Map */}
-        <button
-          onClick={onOpenWorldMap}
-          className={cn(
-            'flex-1 py-3 px-4',
-            'flex flex-col items-center gap-1',
-            'bg-neo-white/5 text-neo-white/80',
-            'font-bold text-sm',
-            'border-2 border-neo-white/20 rounded-neo',
-            'hover:bg-neo-white/10',
-            'transition-all duration-150'
-          )}
-        >
-          <Map className="w-5 h-5" />
-          {t('adventure.hub.worldMap')}
-        </button>
       </AdaptiveMotion.div>
     </div>
   );
