@@ -4348,7 +4348,7 @@ const sv = {
     "howToPlay": "Hur man spelar",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
     "guestModeNotice": "Spelar som gäst",
-    "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
+    "guestModeBenefits": "Tryck för att spara din serie och tävla på topplistor — tar 10 sekunder",
     "createCustomChallenge": "Skapa din egen utmaning & dela med vänner",
     "createChallengeTitle": "Skapa utmaning",
     "chooseBoardSize": "Välj brädstorlek",

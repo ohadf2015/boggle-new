@@ -4346,7 +4346,7 @@ const es = {
     "howToPlay": "Cómo Jugar",
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",
     "guestModeNotice": "Jugando como invitado",
-    "guestModeBenefits": "Regístrate para seguir tu progreso, crear rachas y competir en clasificaciones",
+    "guestModeBenefits": "Toca para guardar tu racha y competir en clasificaciones — solo 10 segundos",
     "createCustomChallenge": "Crea tu Propio Desafío y Comparte con Amigos",
     "createChallengeTitle": "Crear Desafío",
     "chooseBoardSize": "Elige el Tamaño del Tablero",

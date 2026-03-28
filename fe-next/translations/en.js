@@ -4434,7 +4434,7 @@ const en = {
     "howToPlay": "How to Play",
     "canYouBeatMyScore": "Beat my score?",
     "guestModeNotice": "Playing as Guest",
-    "guestModeBenefits": "Sign up to track progress, build streaks, and compete on leaderboards",
+    "guestModeBenefits": "Tap to save your streak & compete on leaderboards — takes 10 seconds",
     "createCustomChallenge": "Create Your Own Challenge & Share with Friends",
     "createChallengeFeature": {
       "title": "Create Custom Word Hunt Challenges",

@@ -274,9 +274,13 @@ export function useAdventureWordValidation({
       }
 
       // 5. Client-side validation against pre-solved word set (INSTANT)
-      if (validWordsRef.current) {
+      // Check module-level cache as fallback in case ref hasn't synced yet after query resolved
+      const resolvedWords = validWordsRef.current ?? gridSolutionCache.get(`${language}:${gridCacheKey(grid)}`);
+      if (resolvedWords) {
+        // Keep ref in sync for subsequent calls
+        validWordsRef.current = resolvedWords;
         const normalizedWord = word.toLowerCase();
-        if (validWordsRef.current.has(normalizedWord)) {
+        if (resolvedWords.has(normalizedWord)) {
           const result: WordValidationResult = {
             isValid: true,
             score: calculateScore(word.length),

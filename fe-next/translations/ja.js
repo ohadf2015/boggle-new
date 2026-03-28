@@ -4400,7 +4400,7 @@ const ja = {
     "howToPlay": "遊び方",
     "canYouBeatMyScore": "私のスコアを超えられますか？",
     "guestModeNotice": "ゲストとしてプレイ中",
-    "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
+    "guestModeBenefits": "タップして連続記録を保存し、ランキングに参加 — 10秒で完了",
     "createCustomChallenge": "自分のチャレンジを作成して友達と共有",
     "createChallengeTitle": "チャレンジを作成",
     "chooseBoardSize": "ボードサイズを選択",

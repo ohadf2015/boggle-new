@@ -234,7 +234,11 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
-            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center"
+            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center cursor-pointer hover:border-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+            onClick={() => setShowAuthModal(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowAuthModal(true); }}
           >
             <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 text-sm font-bold">
               <UserCircle2 className="w-4 h-4" />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
+import { trackGameEnd } from '@/utils/growthTracking';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -175,6 +176,15 @@ export function useGameEnd({
         gameSessionId,
         language: settings.language,
       };
+
+      // Track game end analytics
+      trackGameEnd(
+        'singleplayer',
+        finalScore,
+        validWords.length,
+        true,
+        actualGameDuration
+      );
 
       // Mark training session as complete if in practice mode
       if (settings.mode === 'practice') {

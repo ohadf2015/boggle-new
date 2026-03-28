@@ -32,6 +32,7 @@ import {
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
 import { neoErrorToast } from '@/components/NeoToast';
+import { trackDailyPuzzle, trackFeatureFirstUse } from '@/utils/growthTracking';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { useRetryChallenge } from './useRetryChallenge';
 import type { LetterGrid, Language } from '@/types';
@@ -261,6 +262,8 @@ const DailyChallenge: React.FC = () => {
       console.warn('Failed to check server before game start:', error);
     }
 
+    trackDailyPuzzle('opened', 'word_hunt');
+    trackFeatureFirstUse('daily_word_hunt');
     setPhase('playing');
   }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef]);
 
@@ -289,6 +292,11 @@ const DailyChallenge: React.FC = () => {
 
     // Record to universal play streak (tracks consecutive days across all game modes)
     recordStreak();
+
+    trackDailyPuzzle('completed', 'word_hunt', {
+      solved: result.solved,
+      attempts: result.attemptsUsed,
+    });
 
     setGameResult(result);
     setStoredResult({

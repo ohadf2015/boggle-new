@@ -33,6 +33,7 @@ import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackAdventureLevel, trackFeatureFirstUse } from '@/utils/growthTracking';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
@@ -213,6 +214,18 @@ const AdventureGame = memo<AdventureGameProps>(
       wordsFound: gameState.wordsFound.length,
     });
 
+    // Analytics: track first adventure use (deduplicated in localStorage)
+    useEffect(() => { trackFeatureFirstUse('adventure'); }, []);
+
+    // Analytics: track level start when gameplay begins
+    const hasTrackedStartRef = useRef(false);
+    useEffect(() => {
+      if (isPlaying && entryPhase === 'playing' && !hasTrackedStartRef.current) {
+        hasTrackedStartRef.current = true;
+        trackAdventureLevel('start', levelConfig.world, levelConfig.level);
+      }
+    }, [isPlaying, entryPhase, levelConfig.world, levelConfig.level]);
+
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({
       ...init.skillEffects,
@@ -373,6 +386,27 @@ const AdventureGame = memo<AdventureGameProps>(
       }
     }, [levelCompletion.lootDrops, gameState.stars]);
 
+    // Analytics: track level pass/fail when completion is determined
+    const hasTrackedResultRef = useRef(false);
+    useEffect(() => {
+      if (hasTrackedResultRef.current) return;
+      // Non-boss: nonBossCompleted fires; Boss: cinematic triggers first
+      const completed = levelCompletion.nonBossCompleted || cinematics.showVictoryCinematic || cinematics.showDefeatCinematic;
+      if (!completed) return;
+      hasTrackedResultRef.current = true;
+      if (gameState.stars > 0) {
+        trackAdventureLevel('pass', levelConfig.world, levelConfig.level, {
+          score: gameState.score, stars: gameState.stars,
+        });
+      } else {
+        trackAdventureLevel('fail', levelConfig.world, levelConfig.level, {
+          score: gameState.score,
+          consecutiveFailures: (bestAttempt?.consecutiveFailures ?? 0) + 1,
+        });
+      }
+    }, [levelCompletion.nonBossCompleted, cinematics.showVictoryCinematic, cinematics.showDefeatCinematic,
+      gameState.stars, gameState.score, levelConfig.world, levelConfig.level, bestAttempt]);
+
     useEffect(() => {
       if (levelCompletion.nonBossCompleted) {
         showLootOrComplete();
@@ -423,6 +457,8 @@ const AdventureGame = memo<AdventureGameProps>(
     const handleRetry = useCallback(() => {
       hintsUsedRef.current = 0;
       hasAwardedFlashGoldRef.current = false;
+      hasTrackedStartRef.current = false;
+      hasTrackedResultRef.current = false;
       setLastWordTileTypes([]);
       handleRetryBase();
     }, [handleRetryBase]);

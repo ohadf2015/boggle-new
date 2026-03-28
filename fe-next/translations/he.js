@@ -4333,7 +4333,7 @@ const he = {
     "howToPlay": "איך לשחק",
     "canYouBeatMyScore": "תוכלו לנצח את הניקוד שלי?",
     "guestModeNotice": "משחק כאורח",
-    "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
+    "guestModeBenefits": "לחצו כדי לשמור את הרצף שלכם ולהתחרות בטבלאות — לוקח 10 שניות",
     "createCustomChallenge": "צור אתגר משלך ושתף עם חברים",
     "createChallengeTitle": "יצירת אתגר",
     "chooseBoardSize": "בחרו גודל לוח",
