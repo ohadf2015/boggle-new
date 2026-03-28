@@ -4,9 +4,7 @@
  * Uses a concurrency-limited fetch to prevent Varnish 503 "max_conn reached" errors.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import logger from '../../utils/logger';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
