@@ -6,7 +6,6 @@
 import type { GenerativeModel } from '@google-cloud/vertexai';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { captureAIServiceError } from '@/utils/sentry';
 import {
   WordValidationResponseSchema,
   MIN_CONFIDENCE_THRESHOLD,
@@ -276,12 +275,7 @@ Respond with ONLY valid JSON (no markdown):
     return validated;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.error('AI_SERVICE', ' AI response schema validation failed:', error.issues);
-      captureAIServiceError(new Error(`Schema validation failed: ${error.issues.map(i => i.message).join(', ')}`), {
-        operation: 'validateWithAI_schema',
-        word,
-        language,
-      });
+      logger.info('AI_SERVICE', ' AI response schema validation failed:', error.issues);
       return { isValid: false, reason: 'Invalid AI response format', confidence: 0 };
     }
     throw error;

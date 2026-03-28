@@ -61,7 +61,7 @@ export function createServiceClient(): SupabaseClient | null {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    logger.warn('AI_SERVICE', 'Supabase service role not configured. Word caching will be disabled.');
+    logger.info('AI_SERVICE', 'Supabase service role not configured. Word caching will be disabled.');
     return null;
   }
 

@@ -293,7 +293,7 @@ export function parseThemedBoardResponse(text: string, theme: string): string[] 
   const parsed = JSON.parse(jsonMatch[0]) as unknown[];
 
   if (!Array.isArray(parsed)) {
-    logger.error('AI_SERVICE', 'Themed words response is not an array');
+    logger.info('AI_SERVICE', 'Themed words response is not an array');
     return [];
   }
 

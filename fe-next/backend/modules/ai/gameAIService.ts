@@ -301,7 +301,7 @@ export class GameAIService {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.warn('AI_SERVICE', `Batch AI validation failed: ${errorMessage}`);
+      logger.info('AI_SERVICE', `Batch AI validation failed: ${errorMessage}`);
 
       // Fill remaining results with errors
       for (const word of wordsNeedingAI) {
@@ -333,7 +333,7 @@ export class GameAIService {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error('AI_SERVICE', `generateThemedBoard error: ${errorMessage}`);
+      logger.info('AI_SERVICE', `generateThemedBoard error: ${errorMessage}`);
       throw error;
     }
   }

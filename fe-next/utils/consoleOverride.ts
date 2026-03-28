@@ -57,6 +57,18 @@ const IGNORED_ERROR_PATTERNS = [
   /\[PWA\].*Service worker registration failed/i,
   // Duplicate completeLevel - defensive guard, not a bug (JAVASCRIPT-NEXTJS-PN)
   /\[ProgressionContext\].*Skipping duplicate completeLevel/i,
+  // Notification channel subscription - transient Supabase realtime error (JAVASCRIPT-NEXTJS-FB)
+  /Error subscribing to notifications channel/i,
+  // SPAM warnings - expected rate limiting behavior (JAVASCRIPT-NEXTJS-HN)
+  /\[SPAM\].*Warning received/i,
+  // Word submission rejected during game state transitions (JAVASCRIPT-NEXTJS-HE)
+  /\[WORD\].*Word submission rejected.*game state/i,
+  // Game state mismatch - auto-recovers by querying server (JAVASCRIPT-NEXTJS-HH)
+  /\[SOCKET\.IO\].*Game state mismatch/i,
+  // HintGenerator timeout - transient, graceful fallback exists (JAVASCRIPT-NEXTJS-K6)
+  /\[HintGenerator\].*Request timed out/i,
+  // Adventure state 404 - transient cold start, uses initial state fallback (JAVASCRIPT-NEXTJS-W9)
+  /\[ProgressionContext\].*\/api\/adventure\/state returned 404/i,
 ] as const;
 
 // Store original console methods

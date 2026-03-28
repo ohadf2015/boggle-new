@@ -219,7 +219,7 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('AI_SERVICE', `Batch AI validation failed after ${duration}ms: ${errorMessage}`);
+    logger.info('AI_SERVICE', `Batch AI validation failed after ${duration}ms: ${errorMessage}`);
     words.forEach(word => {
       results.set(word, { isValid: false, isAiVerified: false, reason: 'Validation error' });
     });

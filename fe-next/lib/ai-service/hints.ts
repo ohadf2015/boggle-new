@@ -4,7 +4,6 @@
  */
 
 import type { GenerativeModel } from '@google-cloud/vertexai';
-import { z } from 'zod';
 import {
   HintResponseSchema,
   AI_TIMEOUT_CONFIG,
@@ -103,7 +102,7 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
 
     return hintResult;
   } catch (error) {
-    logger.error('AI_SERVICE', ' generateHint error:', error);
+    logger.info('AI_SERVICE', ' generateHint error:', error);
 
     // Return graceful fallback
     return {

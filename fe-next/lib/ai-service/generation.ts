@@ -42,7 +42,7 @@ export async function generateThemedBoard(
     // Extract JSON array from response
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      logger.warn('AI_SERVICE', ' Could not extract JSON array from AI response');
+      logger.info('AI_SERVICE', ' Could not extract JSON array from AI response');
       return [];
     }
 
@@ -58,10 +58,10 @@ export async function generateThemedBoard(
     return filteredWords;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.error('AI_SERVICE', ' Themed words schema validation failed:', error.issues);
+      logger.info('AI_SERVICE', ' Themed words schema validation failed:', error.issues);
       return [];
     }
-    logger.error('AI_SERVICE', ' generateThemedBoard error:', error);
+    logger.info('AI_SERVICE', ' generateThemedBoard error:', error);
     throw error;
   }
 }
@@ -174,7 +174,7 @@ Output ONLY valid JSON:
       reason: entry.reason || 'AI selected',
     }));
   } catch (error) {
-    logger.error('AI_SERVICE', ' generateBulkWords error:', error);
+    logger.info('AI_SERVICE', ' generateBulkWords error:', error);
     throw error;
   }
 }
