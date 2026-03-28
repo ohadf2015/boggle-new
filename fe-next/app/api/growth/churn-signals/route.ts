@@ -8,10 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -110,7 +112,7 @@ export async function POST(req: NextRequest) {
     const riskLevel = getRiskLevel(riskScore);
 
     // Store the signal
-    const { error: insertErr } = await supabaseAdmin
+    const { error: insertErr } = await getSupabaseAdmin()
       .from('churn_signals')
       .upsert(
         {

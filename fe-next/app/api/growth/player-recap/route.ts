@@ -9,10 +9,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -77,7 +79,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check for pre-computed recap
-    const { data: cached } = await supabaseAdmin
+    const { data: cached } = await getSupabaseAdmin()
       .from('player_recaps')
       .select('*')
       .eq('player_id', user.id)
@@ -93,7 +95,7 @@ export async function GET(req: NextRequest) {
     // Compute on the fly from game_results
     const { start, end } = getDateRange(period);
 
-    const { data: results, error: resultsErr } = await supabaseAdmin
+    const { data: results, error: resultsErr } = await getSupabaseAdmin()
       .from('game_results')
       .select('score, words_found, game_mode, is_win, created_at')
       .eq('player_id', user.id)

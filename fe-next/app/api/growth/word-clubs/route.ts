@@ -8,10 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get club IDs user belongs to
-    const { data: memberships, error: memErr } = await supabaseAdmin
+    const { data: memberships, error: memErr } = await getSupabaseAdmin()
       .from('word_club_members')
       .select('club_id, role, joined_at')
       .eq('user_id', user.id);
@@ -63,7 +65,7 @@ export async function GET(req: NextRequest) {
     const clubIds = memberships.map((m) => m.club_id);
 
     // Fetch clubs with members
-    const { data: clubs, error: clubErr } = await supabaseAdmin
+    const { data: clubs, error: clubErr } = await getSupabaseAdmin()
       .from('word_clubs')
       .select('*, members:word_club_members(user_id, role, joined_at, user:user_id(id, display_name, avatar_image))')
       .in('id', clubIds)
@@ -119,7 +121,7 @@ export async function POST(req: NextRequest) {
 
     const inviteCode = generateInviteCode();
 
-    const { data: club, error: insertErr } = await supabaseAdmin
+    const { data: club, error: insertErr } = await getSupabaseAdmin()
       .from('word_clubs')
       .insert({
         name: name.trim(),
@@ -138,7 +140,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Add creator as owner member
-    const { error: memberErr } = await supabaseAdmin
+    const { error: memberErr } = await getSupabaseAdmin()
       .from('word_club_members')
       .insert({
         club_id: club.id,
@@ -150,7 +152,7 @@ export async function POST(req: NextRequest) {
     if (memberErr) {
       console.error('[API] word-clubs POST member error:', memberErr.message);
       // Club was created but member insert failed — try to clean up
-      await supabaseAdmin.from('word_clubs').delete().eq('id', club.id);
+      await getSupabaseAdmin().from('word_clubs').delete().eq('id', club.id);
       return NextResponse.json({ error: 'Failed to create club membership' }, { status: 500 });
     }
 

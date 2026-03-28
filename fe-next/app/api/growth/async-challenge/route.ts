@@ -9,10 +9,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -37,7 +39,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: sent, error: sentErr } = await supabaseAdmin
+    const { data: sent, error: sentErr } = await getSupabaseAdmin()
       .from('async_challenges')
       .select('*, opponent:opponent_id(id, display_name, avatar_image)')
       .eq('challenger_id', user.id)
@@ -49,7 +51,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch sent challenges' }, { status: 500 });
     }
 
-    const { data: received, error: recvErr } = await supabaseAdmin
+    const { data: received, error: recvErr } = await getSupabaseAdmin()
       .from('async_challenges')
       .select('*, challenger:challenger_id(id, display_name, avatar_image)')
       .eq('opponent_id', user.id)
@@ -99,7 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify opponent exists
-    const { data: opponent } = await supabaseAdmin
+    const { data: opponent } = await getSupabaseAdmin()
       .from('profiles')
       .select('id')
       .eq('id', opponentId)
@@ -109,7 +111,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Opponent not found' }, { status: 404 });
     }
 
-    const { data: challenge, error: insertErr } = await supabaseAdmin
+    const { data: challenge, error: insertErr } = await getSupabaseAdmin()
       .from('async_challenges')
       .insert({
         challenger_id: user.id,
@@ -168,7 +170,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Fetch the challenge
-    const { data: challenge, error: fetchErr } = await supabaseAdmin
+    const { data: challenge, error: fetchErr } = await getSupabaseAdmin()
       .from('async_challenges')
       .select('*')
       .eq('id', challengeId)
@@ -193,7 +195,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Challenge is not pending' }, { status: 400 });
       }
 
-      const { data: updated, error: updateErr } = await supabaseAdmin
+      const { data: updated, error: updateErr } = await getSupabaseAdmin()
         .from('async_challenges')
         .update({ status: 'accepted', accepted_at: new Date().toISOString() })
         .eq('id', challengeId)
@@ -214,7 +216,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Challenge is not pending' }, { status: 400 });
       }
 
-      const { data: updated, error: updateErr } = await supabaseAdmin
+      const { data: updated, error: updateErr } = await getSupabaseAdmin()
         .from('async_challenges')
         .update({ status: 'declined' })
         .eq('id', challengeId)
@@ -250,7 +252,7 @@ export async function PUT(req: NextRequest) {
         newStatus = 'completed';
       }
 
-      const { data: updated, error: updateErr } = await supabaseAdmin
+      const { data: updated, error: updateErr } = await getSupabaseAdmin()
         .from('async_challenges')
         .update({ ...updateField, status: newStatus, updated_at: new Date().toISOString() })
         .eq('id', challengeId)

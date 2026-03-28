@@ -7,10 +7,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Find the club
-    const { data: club, error: clubErr } = await supabaseAdmin
+    const { data: club, error: clubErr } = await getSupabaseAdmin()
       .from('word_clubs')
       .select('id, name, max_members')
       .eq('invite_code', inviteCode.toUpperCase().trim())
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if already a member
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from('word_club_members')
       .select('id')
       .eq('club_id', club.id)
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check member count
-    const { count } = await supabaseAdmin
+    const { count } = await getSupabaseAdmin()
       .from('word_club_members')
       .select('id', { count: 'exact', head: true })
       .eq('club_id', club.id);
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Add member
-    const { error: joinErr } = await supabaseAdmin
+    const { error: joinErr } = await getSupabaseAdmin()
       .from('word_club_members')
       .insert({
         club_id: club.id,
