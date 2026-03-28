@@ -12,7 +12,7 @@ import { getRedisClient, isRedisAvailable } from './connection';
 import { KEY_PATTERNS, KEYS } from './keys';
 import type { TournamentDataInput, TournamentStateData } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 export async function saveTournamentState(
   tournamentId: string,

@@ -5,7 +5,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /**
  * Backend-safe error capture that doesn't require @sentry/nextjs

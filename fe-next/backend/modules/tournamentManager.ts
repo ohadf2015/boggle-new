@@ -6,7 +6,7 @@
  
 const { saveTournamentState, deleteTournamentState } = require('../redisClient');
  
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Interfaces
 export interface TournamentSettings {

@@ -5,7 +5,7 @@
 
 import { getSupabase, GameResultInput } from './client';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Record a game result for a player

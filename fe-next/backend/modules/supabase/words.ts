@@ -5,7 +5,7 @@
 
 import { getSupabase } from './client';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 export interface WordApprovalInput {
   word: string;

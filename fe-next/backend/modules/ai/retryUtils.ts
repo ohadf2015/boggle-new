@@ -6,7 +6,7 @@
 
 import { AI_CONFIG } from './types.js';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Check if an error is retryable (network errors, rate limits, etc.)

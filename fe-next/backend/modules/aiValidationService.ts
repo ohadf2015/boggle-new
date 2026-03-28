@@ -7,7 +7,7 @@
  */
 
  
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
  
 const { gameAIService } = require('./gameAIService');
  

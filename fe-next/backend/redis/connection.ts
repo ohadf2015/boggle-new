@@ -11,7 +11,7 @@ import {
 } from './config';
 import type { RedisHealth, RedisMetrics } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // State Management
 let _redisClient: RedisClient | null = null;

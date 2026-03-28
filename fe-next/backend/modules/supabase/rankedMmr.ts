@@ -15,7 +15,7 @@ import {
   DEFAULT_RD,
 } from '@/shared/utils/eloRating';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 export interface RankedParticipant {
   playerId: string;

@@ -5,7 +5,7 @@
 
 const { getPopularPlayerWords, getSupabase } = require('./supabaseServer');
 const { CACHE_CONFIG } = require('./botConfig');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Cache entry interface
 interface CacheEntry<T> {

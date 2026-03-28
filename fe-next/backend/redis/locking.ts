@@ -5,7 +5,7 @@ import { DEFAULT_LOCK_TTL, LOCK_PREFIX, LOCK_RETRY_DELAY, MAX_LOCK_RETRIES } fro
 import { getRedisClient, isRedisAvailable } from './connection';
 import type { LockResult } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /**
  * Acquire a distributed lock for a game

@@ -18,7 +18,7 @@ import { getTokenUsage, resetTokenUsage } from './tokenTracker.js';
 import { VertexAIClient, parseGoogleCredentials } from './vertexClient.js';
 import { SupabaseWordStore, createServiceClient } from './supabaseWordStore.js';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Main GameAIService class - coordinates all AI validation components

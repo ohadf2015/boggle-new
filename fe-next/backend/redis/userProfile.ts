@@ -5,7 +5,7 @@ import { getTTLWithJitter, TTL_CONFIG } from './config';
 import { getRedisClient, isRedisAvailable } from './connection';
 import { KEYS } from './keys';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /**
  * Cached user profile data for display purposes.

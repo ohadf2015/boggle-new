@@ -12,7 +12,7 @@ import { getRedisClient, isRedisAvailable } from './connection';
 import { KEY_PATTERNS, KEYS } from './keys';
 import type { GameDataInput, GameStateData } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /** Safely parse JSON with a fallback — prevents a single corrupted field from crashing the entire game state */
 function safeJsonParse<T>(value: string | undefined, fallback: T, fieldName: string, gameCode?: string): T {

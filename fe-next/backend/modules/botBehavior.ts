@@ -11,7 +11,7 @@ const { findWordsForBots } = require('./boggleSolver');
 const { calculateWordScore } = require('./scoringEngine');
 const { BOT_CONFIG } = require('./botConfig');
 const { ensureLanguageLoaded } = require('../dictionary');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Re-export cache module
 export {

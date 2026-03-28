@@ -5,7 +5,7 @@
 
 import type { GameState, RedisClient } from './types';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 // Redis client (lazy loaded to avoid circular dependencies)
 let redisClient: RedisClient | null = null;

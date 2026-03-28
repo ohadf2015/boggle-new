@@ -32,7 +32,7 @@ const {
   getCacheStats,
   addWordToBlacklist,
 } = require('./botBehavior');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Re-export types
 export type { Bot, WordSubmissionData };

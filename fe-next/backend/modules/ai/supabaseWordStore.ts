@@ -7,7 +7,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Create a Supabase client with service role key to bypass RLS for writing

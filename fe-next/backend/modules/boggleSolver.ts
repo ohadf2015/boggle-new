@@ -13,7 +13,7 @@ const { isDictionaryWord, normalizeWord, dictionary } = require('../dictionary')
  
 const { normalizeHebrewLetter, normalizeSpanishLetter } = require('./wordValidator');
  
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Interfaces
 export interface TrieNode {

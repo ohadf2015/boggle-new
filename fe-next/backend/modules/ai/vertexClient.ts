@@ -26,7 +26,7 @@ import {
   buildThemedBoardPrompt,
 } from './promptBuilder.js';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Parse Google Cloud credentials from JSON string environment variable

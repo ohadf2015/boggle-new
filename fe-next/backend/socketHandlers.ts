@@ -25,7 +25,7 @@ const {
 const { loadCommunityWords } = require('./modules/communityWordManager');
 const { cleanupEmptyRooms } = require('./modules/gameStateManager');
 const { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } = require('./utils/rateLimiter');
-const logger = require('./utils/logger');
+import logger from './utils/logger';
 
 // Track cleanup timer for graceful shutdown
 let _emptyRoomCleanupTimer: ReturnType<typeof setInterval> | null = null;

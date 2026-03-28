@@ -2,7 +2,7 @@
 
 import type { CircuitBreakerState } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 export class CircuitBreaker {
   private failureCount: number;

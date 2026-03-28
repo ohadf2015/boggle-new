@@ -5,7 +5,7 @@
 
 import express, { Request, Response, Router } from 'express';
 const { getSupabase } = require('../modules/supabaseServer');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 const router: Router = express.Router();
 

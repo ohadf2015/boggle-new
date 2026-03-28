@@ -5,7 +5,7 @@
 
 import { getRedisClient, isRedisAvailable } from '../../redis/connection';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Cache wrapper: returns cached value if available, otherwise calls fetcher and caches result.

@@ -60,7 +60,7 @@ import type { HostGameBase, TransferHostResult } from './hostManager';
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
 
 // Re-exports for backwards compatibility

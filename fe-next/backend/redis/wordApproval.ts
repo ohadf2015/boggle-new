@@ -11,7 +11,7 @@ import {
 import { KEY_PATTERNS, KEYS } from './keys';
 import type { WordApprovalData } from './types';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 export async function getWordApprovalStatus(
   word: string,

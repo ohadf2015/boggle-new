@@ -5,7 +5,7 @@
 
 import type { Game, WordDetail } from '@/shared/types/game';
 const { translations } = require('../../translations/index.js');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Achievement icons (language-independent)
 export const ACHIEVEMENT_ICONS: Record<string, string> = {

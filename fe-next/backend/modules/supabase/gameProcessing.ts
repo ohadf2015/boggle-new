@@ -5,6 +5,7 @@
 
 import {
   isSupabaseConfigured,
+  getSupabase,
   GameStats,
   PlayerScore,
   GameInfo,
@@ -17,7 +18,7 @@ import { updatePlayerStats, ensureProfileExists } from './playerStats';
 import { updateLeaderboardEntry, updateRankedProgress } from './leaderboard';
 import { updateGuestStats } from './guestTokens';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 // Lazy import for gameSessionLogger
 let _logGameSession: ((sessionData: unknown) => Promise<string | null>) | null = null;
@@ -129,11 +130,35 @@ async function processPlayerResult(
       if (!statsRes.error && statsRes.updatedStats) {
         const checkLifetimeAchievements = getLifetimeAchievementChecker();
         if (checkLifetimeAchievements) {
-          const existingAchievements = playerScore.achievements || [];
-          const newLifetimeAchievements = checkLifetimeAchievements(statsRes.updatedStats, existingAchievements);
+          // Use ALL existing achievement keys from profile (not just in-game ones)
+          // statsRes.data is the updated profile row which includes achievement_counts
+          const profileData = statsRes.data as Record<string, unknown> | null;
+          const profileAchievementCounts = (profileData?.achievement_counts || {}) as Record<string, number>;
+          const existingAchievementKeys = [
+            ...Object.keys(profileAchievementCounts),
+            ...(playerScore.achievements || []),
+          ];
+          const newLifetimeAchievements = checkLifetimeAchievements(statsRes.updatedStats, existingAchievementKeys);
           if (newLifetimeAchievements.length > 0) {
             lifetimeAchievements = newLifetimeAchievements;
-            logger.info('ACHIEVEMENT', `${playerScore.username} earned lifetime achievements: ${newLifetimeAchievements.map(a => a.key).join(', ')}`);
+
+            // Persist lifetime achievements to achievement_counts in DB
+            const client = getSupabase();
+            if (client && authInfo.authUserId) {
+              const updatedCounts = { ...profileAchievementCounts };
+              for (const achievement of newLifetimeAchievements) {
+                updatedCounts[achievement.key] = (updatedCounts[achievement.key] || 0) + 1;
+              }
+              const { error: lifetimeError } = await client
+                .from('profiles')
+                .update({ achievement_counts: updatedCounts })
+                .eq('id', authInfo.authUserId);
+              if (lifetimeError) {
+                logger.error('ACHIEVEMENT', `Failed to persist lifetime achievements for ${playerScore.username}`, lifetimeError.message);
+              } else {
+                logger.info('ACHIEVEMENT', `Persisted lifetime achievements for ${playerScore.username}: ${newLifetimeAchievements.map(a => a.key).join(', ')}`);
+              }
+            }
           }
         }
       }

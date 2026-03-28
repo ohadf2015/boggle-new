@@ -7,7 +7,7 @@
 
 import { AI_CONFIG, type ValidationResult, type CacheEntry, type CacheStats } from './types';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * LRU (Least Recently Used) cache implementation for word validations.

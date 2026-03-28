@@ -8,7 +8,7 @@ import type { Bot } from './botBehavior';
 
 const botConfig = require('./botConfig');
 const BOT_CONFIG = botConfig.BOT_CONFIG;
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // ==========================================
 // Interfaces

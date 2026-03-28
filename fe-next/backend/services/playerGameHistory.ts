@@ -7,7 +7,7 @@
 import { getSupabase } from '../modules/supabase';
 import type { GameResult } from './adaptiveDifficulty';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 /**
  * Fetches user's recent game results from database

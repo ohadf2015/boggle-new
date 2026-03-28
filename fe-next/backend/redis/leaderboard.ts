@@ -5,7 +5,7 @@ import { getTTLWithJitter, MAX_SCAN_ITERATIONS, SCAN_COUNT, TTL_CONFIG } from '.
 import { getRedisClient, isRedisAvailable } from './connection';
 import { KEY_PATTERNS, KEYS } from './keys';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 export async function getCachedLeaderboardTop100(): Promise<unknown[] | null> {
   if (!isRedisAvailable() || !getRedisClient()) {

@@ -6,7 +6,7 @@
 
 import type { GameUser } from '@/shared/types/game';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Base game interface for hostManager
 export interface HostGameBase {

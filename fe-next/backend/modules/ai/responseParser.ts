@@ -11,7 +11,7 @@ import {
   type ValidationResult,
 } from './types';
 
-const logger = require('../../utils/logger');
+import logger from '../../utils/logger';
 
 /**
  * Parse and validate AI response for single word validation
