@@ -73,7 +73,7 @@ COPY --from=builder --chown=node:node /app/backend/*.txt ./
 COPY --from=builder --chown=node:node /app/supabase ./supabase
 
 # Copy scripts
-COPY --chown=node:node scripts/docker-migrate.sh scripts/docker-entrypoint.sh ./scripts/
+COPY --from=builder --chown=node:node /app/scripts/docker-migrate.sh /app/scripts/docker-entrypoint.sh ./scripts/
 RUN chmod +x ./scripts/*.sh
 
 # Run as non-root for security (node user exists in node:alpine)
