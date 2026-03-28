@@ -863,6 +863,7 @@ const he = {
       "invitePrompt": "התחל מסיבה על ידי שליחת קישור",
       "inviteFriends": "הזמן חברים",
       "noRoomsYet": "אין קרבות בתהליך",
+      "leftGame": "יצאתם מהמשחק",
       "beTheLegend": "תהיה האגדה שמתחילה את הקרב הראשון!",
       "hostAndPlay": "ארח ושחק — שתף את הקוד עם חברים",
       "startBattle": "התחל קרב",
@@ -5804,6 +5805,11 @@ const he = {
     "of": "מתוך"
   },
   "adventure": {
+    "welcome": {
+      "title": "!ברוכים הבאים למצב הרפתקה",
+      "description": "חקרו 10 עולמות נושאיים, הילחמו בבוסים ושדרגו את כישורי המילים שלכם. לחצו על עולם 1 כדי להתחיל!",
+      "startButton": "התחל עולם 1"
+    },
     "story": {
       "lexi": "לקסי",
       "w1": {
@@ -7068,6 +7074,17 @@ const he = {
       "zenMode": { "name": "מצב זן" }
     },
     "watchAdDoubleCoins": "צפו בפרסומת כדי להכפיל מטבעות",
+    "saveFailedWarning": "ההתקדמות לא נשמרה — בדקו את החיבור",
+    "retrySave": "נסו שוב",
+    "confirmSpendGold": "להשתמש ב-{amount} זהב עבור רמז?",
+    "confirmSpendGoldTitle": "שימוש ברמז",
+    "roomFull": "החדר מלא",
+    "roomFullSpectate": "החדר מלא. לצפות במשחק?",
+    "spectateButton": "צפייה",
+    "reconnectingOverlay": "מתחבר מחדש...",
+    "reconnectAttempt": "ניסיון {current} מתוך {max}",
+    "leaveGame": "עזיבת המשחק",
+    "scoreSafeReconnect": "הניקוד שלכם שמור",
     "daily": {
       "wordCount": {
         "title": "אספן מילים",

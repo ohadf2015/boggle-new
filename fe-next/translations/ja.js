@@ -863,6 +863,7 @@ const ja = {
       "invitePrompt": "招待リンクを送ってパーティーを始めよう",
       "inviteFriends": "友達を招待",
       "noRoomsYet": "進行中のバトルはありません",
+      "leftGame": "ゲームを退出しました",
       "beTheLegend": "最初にバトルを始めた伝説になろう！",
       "hostAndPlay": "ホスト＆プレイ — コードを友達とシェア",
       "startBattle": "バトルを始める",
@@ -5830,6 +5831,11 @@ const ja = {
     "of": "/"
   },
   "adventure": {
+    "welcome": {
+      "title": "アドベンチャーモードへようこそ！",
+      "description": "10のテーマワールドを探検し、ボスと戦い、ワードスキルをレベルアップしよう！ワールド1をタップして冒険を始めよう！",
+      "startButton": "ワールド1を開始"
+    },
     "story": {
       "lexi": "レキシ",
       "w1": {
@@ -7094,6 +7100,17 @@ const ja = {
       "zenMode": { "name": "禅モード" }
     },
     "watchAdDoubleCoins": "広告を見てコイン2倍",
+    "saveFailedWarning": "進行状況が保存されませんでした — 接続を確認してください",
+    "retrySave": "再試行",
+    "confirmSpendGold": "{amount}ゴールドでヒントを使いますか？",
+    "confirmSpendGoldTitle": "ヒントを使用",
+    "roomFull": "部屋が満員です",
+    "roomFullSpectate": "部屋が満員です。試合を観戦しますか？",
+    "spectateButton": "観戦",
+    "reconnectingOverlay": "再接続中...",
+    "reconnectAttempt": "試行 {current}/{max}",
+    "leaveGame": "ゲームを離れる",
+    "scoreSafeReconnect": "スコアは安全です",
     "daily": {
       "wordCount": {
         "title": "単語コレクター",

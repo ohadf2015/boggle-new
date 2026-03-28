@@ -66,6 +66,8 @@ interface GameSidebarProps {
   hintLevel: 'none' | 'length' | 'lengthAndStart' | 'fullReveal';
   /** Gold cost for the next hint (0 = free) */
   nextHintCost?: number;
+  /** Whether gold confirmation is pending (tap again to confirm) */
+  hintGoldPending?: boolean;
   /** Time Freeze upgrade: seconds available (0 = no upgrade) */
   freezeSeconds?: number;
   /** Whether freeze has been used this level */
@@ -105,6 +107,7 @@ export const GameSidebar = memo(function GameSidebar({
   currentHint,
   hintLevel,
   nextHintCost = 0,
+  hintGoldPending = false,
   freezeSeconds = 0,
   freezeUsed = false,
   isFrozen = false,
@@ -216,19 +219,25 @@ export const GameSidebar = memo(function GameSidebar({
             onClick={onHintClick}
             disabled={!hasHintsAvailable}
             className={cn(
-              'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+              'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 min-h-11',
               'rounded-neo border-2',
               'transition-all duration-500',
               hasHintsAvailable
-                ? showAutoHint
-                  ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
-                  : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
+                ? hintGoldPending
+                  ? 'bg-neo-orange text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,165,0,0.6)] animate-pulse motion-reduce:animate-none'
+                  : showAutoHint
+                    ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
+                    : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
                 : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
             )}
           >
             <Lightbulb className="w-4 h-4" />
             <span className="text-xs font-bold">
-              {nextHintCost > 0 ? t('adventure.game.hintCost', { cost: nextHintCost }) : t('adventure.game.hint')}
+              {hintGoldPending
+                ? t('adventure.confirmSpendGold', { amount: nextHintCost })
+                : nextHintCost > 0
+                  ? t('adventure.game.hintCost', { cost: nextHintCost })
+                  : t('adventure.game.hint')}
             </span>
           </button>
 
@@ -239,7 +248,7 @@ export const GameSidebar = memo(function GameSidebar({
               disabled={freezeUsed}
               aria-label={isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 min-h-11',
                 'rounded-neo border-2',
                 !freezeUsed
                   ? isFrozen
@@ -259,7 +268,7 @@ export const GameSidebar = memo(function GameSidebar({
               onClick={onShuffleClick}
               aria-label={t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 min-h-11',
                 'rounded-neo border-2',
                 'bg-neo-orange text-neo-black border-neo-black shadow-hard-sm'
               )}
@@ -275,7 +284,7 @@ export const GameSidebar = memo(function GameSidebar({
               onClick={onDetonateToggle}
               aria-label={t('adventure.game.detonate')}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5',
+                'flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 min-h-11',
                 'rounded-neo border-2',
                 detonateActive
                   ? 'bg-neo-red text-neo-white border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'

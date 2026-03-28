@@ -881,6 +881,7 @@ const es = {
       "invitePrompt": "Inicia una fiesta enviando un enlace",
       "inviteFriends": "Invitar amigos",
       "noRoomsYet": "No hay batallas en curso",
+      "leftGame": "Saliste del juego",
       "beTheLegend": "¡Sé la leyenda que inicia la primera batalla!",
       "hostAndPlay": "Crea y juega — Comparte el código con amigos",
       "startBattle": "Iniciar una batalla",
@@ -5801,6 +5802,11 @@ const es = {
     "of": "de"
   },
   "adventure": {
+    "welcome": {
+      "title": "¡Bienvenido al modo aventura!",
+      "description": "Explora 10 mundos temáticos, lucha contra jefes y mejora tus habilidades con las palabras. ¡Toca Mundo 1 para comenzar!",
+      "startButton": "Iniciar Mundo 1"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {
@@ -7109,6 +7115,17 @@ const es = {
       "zenMode": { "name": "Modo Zen" }
     },
     "watchAdDoubleCoins": "Ver anuncio para duplicar monedas",
+    "saveFailedWarning": "Progreso no guardado — verifica tu conexión",
+    "retrySave": "Reintentar",
+    "confirmSpendGold": "¿Gastar {amount} oro por una pista?",
+    "confirmSpendGoldTitle": "Usar pista",
+    "roomFull": "Sala llena",
+    "roomFullSpectate": "La sala está llena. ¿Ver la partida?",
+    "spectateButton": "Observar",
+    "reconnectingOverlay": "Reconectando...",
+    "reconnectAttempt": "Intento {current} de {max}",
+    "leaveGame": "Salir del juego",
+    "scoreSafeReconnect": "Tu puntuación está segura",
     "daily": {
       "wordCount": {
         "title": "Coleccionista de Palabras",

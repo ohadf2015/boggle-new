@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles, X } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -364,7 +364,11 @@ function AdventureView(): React.JSX.Element {
           )}
 
           {viewState === 'worldMap' && (
-            <motion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full">
+            <motion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
+              {/* First-time player welcome banner */}
+              {!hasCompletions && (
+                <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} />
+              )}
               <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} />
             </motion.div>
           )}
@@ -428,6 +432,46 @@ function AdventureView(): React.JSX.Element {
       )}
     </div>
     </AdventureThemeProvider>
+  );
+}
+
+// ==================== First-Time Welcome Banner ====================
+
+function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => string; onSelectWorld: () => void }) {
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="absolute top-2 inset-x-4 z-30 bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
+    >
+      <button
+        onClick={() => setDismissed(true)}
+        className="absolute top-2 end-2 p-1 text-neo-white/60 hover:text-neo-white"
+        aria-label={t('common.close')}
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div className="flex items-start gap-3">
+        <Sparkles className="w-6 h-6 text-neo-yellow flex-shrink-0 mt-0.5" />
+        <div>
+          <h3 className="font-neo-display font-bold text-neo-white text-sm uppercase">
+            {t('adventure.welcome.title')}
+          </h3>
+          <p className="text-xs text-neo-white/80 mt-1 font-medium">
+            {t('adventure.welcome.description')}
+          </p>
+          <button
+            onClick={onSelectWorld}
+            className="mt-2.5 px-4 py-2 bg-neo-lime text-neo-black font-bold text-xs uppercase rounded-neo border-2 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-0.5 transition-all"
+          >
+            {t('adventure.welcome.startButton')}
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

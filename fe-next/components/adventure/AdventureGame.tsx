@@ -92,7 +92,7 @@ const AdventureGame = memo<AdventureGameProps>(
       timerStore,
       isPlaying, submitWordWithPath, startGame, pauseGame, completeLevel,
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime,
-      activateFreeze, isFrozen, freezeUsed, useShuffle, shufflesRemaining, updateObjective,
+      activateFreeze, isFrozen, freezeUsed, useShuffle: shuffleTiles, shufflesRemaining, updateObjective,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -475,9 +475,23 @@ const AdventureGame = memo<AdventureGameProps>(
       handleRetryBase();
     }, [handleRetryBase]);
 
+    const [hintGoldPending, setHintGoldPending] = useState(false);
+    const executeHintAction = useCallback(() => {
+      getHint(); dismissAutoHint(); hintsUsedRef.current += 1;
+      setHintGoldPending(false);
+    }, [getHint, dismissAutoHint]);
+
     const handleHintClick = useCallback(() => {
-      if (hasHintsAvailable) { getHint(); dismissAutoHint(); hintsUsedRef.current += 1; }
-    }, [hasHintsAvailable, getHint, dismissAutoHint]);
+      if (!hasHintsAvailable) return;
+      // Confirm gold spend when hint isn't free
+      if (nextHintCost > 0 && !hintGoldPending) {
+        setHintGoldPending(true);
+        // Auto-dismiss after 5s
+        setTimeout(() => setHintGoldPending(false), 5000);
+        return;
+      }
+      executeHintAction();
+    }, [hasHintsAvailable, nextHintCost, hintGoldPending, executeHintAction]);
 
     const hintHighlightIndices = useMemo(() => {
       if (init.hintData.level !== 'none' && (init.hintData.highlightTiles?.length ?? 0) > 0) {
@@ -506,6 +520,37 @@ const AdventureGame = memo<AdventureGameProps>(
       if (showLevelComplete) { onExit(); return; }
       if (window.confirm(t('adventure.game.confirmExitDesc'))) onExit();
     }, [onExit, showLevelComplete, t]);
+
+    // Keyboard shortcuts for power-ups (H=Hint, F=Freeze, S=Shuffle, D=Detonate, P=Pause)
+    useEffect(() => {
+      if (entryPhase !== 'playing' || showLevelComplete) return;
+      const handleKeyDown = (e: KeyboardEvent) => {
+        // Ignore if user is typing in an input
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+        switch (e.key.toLowerCase()) {
+          case 'h':
+            if (hasHintsAvailable) handleHintClick();
+            break;
+          case 'f':
+            if (init.upgradeEffects.timeFreezeSeconds > 0 && !freezeUsed)
+              activateFreeze(init.upgradeEffects.timeFreezeSeconds);
+            break;
+          case 's':
+            if (shufflesRemaining > 0) shuffleTiles();
+            break;
+          case 'd':
+            if (init.upgradeEffects.canDetonateWords) setDetonateActive(prev => !prev);
+            break;
+          case 'p':
+          case ' ':
+            e.preventDefault();
+            gridInteraction.handlePauseToggle();
+            break;
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [entryPhase, showLevelComplete, hasHintsAvailable, handleHintClick, freezeUsed, activateFreeze, init.upgradeEffects.timeFreezeSeconds, init.upgradeEffects.canDetonateWords, shufflesRemaining, shuffleTiles, gridInteraction]);
 
     if (!isValidConfig) {
       return (
@@ -557,12 +602,13 @@ const AdventureGame = memo<AdventureGameProps>(
               showAutoHint={showAutoHint} currentHint={currentHint}
               hintLevel={init.hintData.level}
               nextHintCost={nextHintCost}
+              hintGoldPending={hintGoldPending}
               freezeSeconds={init.upgradeEffects.timeFreezeSeconds}
               freezeUsed={freezeUsed}
               isFrozen={isFrozen}
               onFreezeClick={() => activateFreeze(init.upgradeEffects.timeFreezeSeconds)}
               shufflesRemaining={shufflesRemaining}
-              onShuffleClick={useShuffle}
+              onShuffleClick={shuffleTiles}
               canDetonate={init.upgradeEffects.canDetonateWords}
               detonateActive={detonateActive}
               onDetonateToggle={() => setDetonateActive(prev => !prev)}

@@ -863,6 +863,7 @@ const sv = {
       "invitePrompt": "Starta en fest genom att skicka en inbjudan",
       "inviteFriends": "Bjud in vänner",
       "noRoomsYet": "Inga strider pågår",
+      "leftGame": "Lämnade spelet",
       "beTheLegend": "Var först att starta ett spel!",
       "hostAndPlay": "Var värd & spela — Dela koden med vänner",
       "startBattle": "Starta en strid",
@@ -5778,6 +5779,11 @@ const sv = {
     "of": "av"
   },
   "adventure": {
+    "welcome": {
+      "title": "Välkommen till äventyrsläget!",
+      "description": "Utforska 10 temavärldar, bekämpa bossar och förbättra dina ordkunskaper. Tryck på Värld 1 för att börja!",
+      "startButton": "Starta Värld 1"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {
@@ -7043,6 +7049,17 @@ const sv = {
       "zenMode": { "name": "Zenläge" }
     },
     "watchAdDoubleCoins": "Se reklam för att dubbla mynt",
+    "saveFailedWarning": "Framsteg ej sparat — kontrollera anslutningen",
+    "retrySave": "Försök igen",
+    "confirmSpendGold": "Använda {amount} guld för en ledtråd?",
+    "confirmSpendGoldTitle": "Använd ledtråd",
+    "roomFull": "Rummet är fullt",
+    "roomFullSpectate": "Rummet är fullt. Titta på matchen?",
+    "spectateButton": "Titta",
+    "reconnectingOverlay": "Återansluter...",
+    "reconnectAttempt": "Försök {current} av {max}",
+    "leaveGame": "Lämna spel",
+    "scoreSafeReconnect": "Din poäng är sparad",
     "daily": {
       "wordCount": {
         "title": "Ordsamlare",

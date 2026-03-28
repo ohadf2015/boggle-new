@@ -832,6 +832,7 @@ const en = {
       "noRooms": "No battles happening",
       "beFirst": "Start the party!",
       "noRoomsYet": "No battles in progress",
+      "leftGame": "Left the game",
       "beTheLegend": "Be the legend who starts the first battle!",
       "hostAndPlay": "Host & Play — Share the code with friends",
       "startBattle": "Start a Battle",
@@ -5858,6 +5859,11 @@ const en = {
     "of": "of"
   },
   "adventure": {
+    "welcome": {
+      "title": "Welcome to Adventure Mode!",
+      "description": "Explore 10 themed worlds, battle bosses, and level up your word skills. Tap World 1 to begin your journey!",
+      "startButton": "Start World 1"
+    },
     "story": {
       "lexi": "Lexi",
       "w1": {
@@ -7134,6 +7140,17 @@ const en = {
       "zenMode": { "name": "Zen Mode" }
     },
     "watchAdDoubleCoins": "Watch Ad to Double Coins",
+    "saveFailedWarning": "Progress not saved — check your connection",
+    "retrySave": "Retry",
+    "confirmSpendGold": "Spend {amount} gold for a hint?",
+    "confirmSpendGoldTitle": "Use Hint",
+    "roomFull": "Room Full",
+    "roomFullSpectate": "This room is full. Watch the match?",
+    "spectateButton": "Spectate",
+    "reconnectingOverlay": "Reconnecting...",
+    "reconnectAttempt": "Attempt {current} of {max}",
+    "leaveGame": "Leave Game",
+    "scoreSafeReconnect": "Your score is safe",
     "daily": {
       "wordCount": {
         "title": "Word Collector",
