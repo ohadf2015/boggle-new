@@ -468,7 +468,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       completeLevelPromiseRef.current = promise;
       return promise;
     },
-    [user?.id]
+    [user?.id, setProgression]
   );
 
   // Record a level attempt (including failed attempts)
@@ -657,7 +657,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return { ...prev, chapterQuestProgress: updated };
       });
     },
-    [flushQuestProgress]
+    [flushQuestProgress, setProgression]
   );
 
   // Add words to the word album — dedup + persist
@@ -682,7 +682,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         return { ...prev, wordAlbum: updatedAlbum };
       });
     },
-    []
+    [setProgression]
   );
 
   // Purchase upgrade by ID — server validates cost and deducts gold
@@ -720,7 +720,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         }
       }
     },
-    [user?.id]
+    [user?.id, setProgression]
   );
 
   // Track previous user ID to detect sign-out (user changes from ID → null)
