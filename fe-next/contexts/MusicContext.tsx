@@ -327,11 +327,10 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       audioUnlockedRef.current = true;
       setAudioUnlocked(true);
 
+      // Play pending track if unlockAudio() hasn't already consumed it
       if (pendingUnlockTrackRef.current) {
         const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
         pendingUnlockTrackRef.current = null;
-        const pendingHowl = getOrCreateHowl(trackKey);
-        if (pendingHowl.state() === 'unloaded') pendingHowl.load();
         fadeToTrack(trackKey, fadeOutMs, fadeInMs);
       }
 
@@ -356,14 +355,8 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     fadeToTrack(trackKey, 500, 500);
   }, [fadeToTrack]);
 
-  // Backup: process pending tracks on unlock
-  useEffect(() => {
-    if (audioUnlocked && pendingUnlockTrackRef.current) {
-      const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
-      pendingUnlockTrackRef.current = null;
-      setTimeout(() => { fadeToTrack(trackKey, fadeOutMs, fadeInMs); }, 50);
-    }
-  }, [audioUnlocked, fadeToTrack]);
+  // Note: pending tracks are already handled by unlockAudio() and the
+  // auto-unlock listener. A backup effect here caused double-play.
 
   const stopMusic = useCallback((fadeOutMs = 1000) => {
     Object.values(howlsRef.current).forEach(howl => {

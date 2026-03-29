@@ -52,7 +52,10 @@ const ShareReferralModal = dynamic(
   { ssr: false }
 );
 const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), { ssr: false });
-const OnboardingFlow = dynamic(() => import('@/components/onboarding/OnboardingFlow'), { ssr: false });
+const OnboardingFlow = dynamic(() => import('@/components/onboarding/OnboardingFlow'), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-neo-navy z-50" />,
+});
 const PlayfulBackground = dynamic(
   () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
   { ssr: false }
@@ -67,7 +70,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile } = useAuth();
+  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
@@ -113,6 +116,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   // who may have cleared localStorage or are on a new device.
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // Wait for auth to finish loading before deciding — avoids false FTUE flash
+    if (authLoading) return;
     if (hasCompletedOnboarding()) return;
 
     // Authenticated user with games played = returning player, skip FTUE
@@ -136,7 +141,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     if (!isAuthenticated) {
       setShowFTUE(true);
     }
-  }, [isAuthenticated, profile]);
+  }, [authLoading, isAuthenticated, profile]);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {

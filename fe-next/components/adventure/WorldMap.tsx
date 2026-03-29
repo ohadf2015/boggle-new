@@ -21,7 +21,6 @@ import {
   type WorldConfig,
 } from '@/lib/adventure';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { WorldMapBackground } from './WorldMapBackground';
 import { WorldOrbitingLetters, TrailPath } from './WorldMapDecorations';
 
@@ -37,13 +36,14 @@ const NOOP = () => {};
 const WORLD_HOVER_VARIANT = { scale: 1.08, y: -4, rotate: 2 };
 const WORLD_TAP_VARIANT = { scale: 0.95, rotate: -1 };
 
-// Base parallax options — ambient is conditionally disabled on low-end devices
-// to prevent a continuous 60fps RAF loop that drains battery.
-const WORLD_MAP_PARALLAX_BASE = {
+// Parallax options — ambient drift DISABLED to avoid a continuous 60fps RAF loop.
+// Gyroscope + gesture provide enough parallax movement on interaction.
+const WORLD_MAP_PARALLAX_OPTIONS = {
   intensity: 0.8,
   enableGyroscope: true,
   enableGesture: true,
-  ambientSpeed: 0.5,
+  enableAmbient: false,
+  ambientSpeed: 0,
 } as const;
 
 // World images mapping (WebP for 91% smaller file sizes)
@@ -136,9 +136,11 @@ const WorldNode = memo(function WorldNode({
     zIndex: 0,
   }), [glowColor]);
 
+  // box-shadow can't apply to SVG elements, so we use a subtle stroke-opacity
+  // instead of drop-shadow() which triggers a heavyweight paint pipeline per element.
   const progressFillStyle = useMemo<CSSProperties>(() => ({
-    filter: `drop-shadow(0 0 4px ${glowColor})`,
-  }), [glowColor]);
+    opacity: 0.9,
+  }), []);
 
   const numberBadgeStyle = useMemo<CSSProperties>(() => ({
     backgroundColor: isUnlocked ? glowColor : 'rgba(50,50,70,0.9)',
@@ -177,7 +179,9 @@ const WorldNode = memo(function WorldNode({
       {/* World orb with progress ring */}
       <div className="flex-shrink-0">
         <div className="relative">
-          {isNearViewport && (
+          {/* Only show orbiting letters on the NEXT world to play — not all 10.
+              This cuts concurrent orbit CSS animations from ~20 to ~2. */}
+          {isNearViewport && isNextWorld && (
             <WorldOrbitingLetters
               worldId={world.id}
               worldName={worldName}
@@ -299,17 +303,17 @@ const WorldNode = memo(function WorldNode({
               </div>
             )}
 
-            {/* Pulsing ring for incomplete unlocked worlds - only when near viewport */}
-            {isNearViewport && isUnlocked && !isComplete && !prefersReducedMotion && (
-              <AdaptiveMotion.div
-                className="absolute -inset-1 rounded-full border-[3px] pointer-events-none"
-                style={{ borderColor: glowColor }}
-                animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0, 0.6] }}
-                transition={{ duration: 2.5, repeat: Infinity }}
+            {/* Static subtle ring for incomplete unlocked worlds — replaced infinite
+                Framer Motion scale+opacity animation that ran per-world. CSS pulse
+                on only the next world is much cheaper than JS-driven animations on all. */}
+            {isUnlocked && !isComplete && (
+              <div
+                className={cn(
+                  'absolute -inset-1 rounded-full border-[3px] pointer-events-none',
+                  isNextWorld && !prefersReducedMotion && 'animate-pulse motion-reduce:animate-none'
+                )}
+                style={{ borderColor: glowColor, opacity: isNextWorld ? 0.6 : 0.25 }}
               />
-            )}
-            {isUnlocked && !isComplete && prefersReducedMotion && (
-              <div className="absolute -inset-1 rounded-full border-[3px] pointer-events-none" style={{ borderColor: glowColor, opacity: 0.4 }} />
             )}
           </AdaptiveMotion.button>
         </div>
@@ -429,7 +433,6 @@ const WorldMap = memo(function WorldMap({
 }: WorldMapProps): React.JSX.Element {
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
-  const { enableComplexAnimations } = useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
@@ -476,12 +479,7 @@ const WorldMap = memo(function WorldMap({
   const starsY = useTransform(scrollProgress, [0, 1], [0, -100]);
   const cloudsY = useTransform(scrollProgress, [0, 1], [0, -150]);
 
-  // Disable ambient drift on low-end devices — saves continuous 60fps RAF loop
-  const parallaxOptions = useMemo(() => ({
-    ...WORLD_MAP_PARALLAX_BASE,
-    enableAmbient: enableComplexAnimations,
-  }), [enableComplexAnimations]);
-  const { x: parallaxX, y: parallaxY } = useParallax(parallaxOptions);
+  const { x: parallaxX, y: parallaxY } = useParallax(WORLD_MAP_PARALLAX_OPTIONS);
 
   // Prepare worlds data (World 10 at top, World 1 at bottom)
   const worldsData = useMemo(() => {

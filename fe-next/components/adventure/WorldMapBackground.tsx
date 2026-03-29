@@ -24,25 +24,16 @@ export function WorldMapBackground({
   const { isLowEnd, prefersReducedMotion } = useDevicePerformance();
   const skipBlur = isLowEnd || prefersReducedMotion;
 
-  // Derive per-layer parallax from MotionValues (zero re-renders)
-  const bgX = useTransform(parallaxX, (v) => v * 0.05);
-  const bgY = useTransform(parallaxY, (v) => v * 0.05);
-  const milkyX = useTransform(parallaxX, (v) => v * 0.1);
-  const milkyY = useTransform(parallaxY, (v) => v * 0.1);
-  const dustX = useTransform(parallaxX, (v) => v * 0.15);
-  const dustY = useTransform(parallaxY, (v) => v * 0.15);
-  const nebulaX = useTransform(parallaxX, (v) => v * 0.25);
-  const nebulaY = useTransform(parallaxY, (v) => v * 0.25);
-  const shootingX = useTransform(parallaxX, (v) => v * 0.2);
-  const shootingY = useTransform(parallaxY, (v) => v * 0.2);
-  const starsParallaxX = useTransform(parallaxX, (v) => v * 0.4);
-  const starsParallaxY = useTransform(parallaxY, (v) => v * 0.4);
-  const cloudsParallaxX = useTransform(parallaxX, (v) => v * 0.6);
-  const cloudsParallaxY = useTransform(parallaxY, (v) => v * 0.6);
+  // Only 2 parallax layers instead of 7 — each useTransform creates a
+  // MotionValue subscription that fires on every gesture/gyro event.
+  const starsParallaxX = useTransform(parallaxX, (v) => v * 0.3);
+  const starsParallaxY = useTransform(parallaxY, (v) => v * 0.3);
+  const cloudsParallaxX = useTransform(parallaxX, (v) => v * 0.5);
+  const cloudsParallaxY = useTransform(parallaxY, (v) => v * 0.5);
 
-  // Pre-generate star positions for galaxy background
-  // Reduce count on low-end/mobile to cut DOM nodes and animated layers in half
-  const starCount = isLowEnd ? 12 : 25;
+  // Reduce star count across ALL tiers — each star is a DOM node with a CSS animation.
+  // 15→8 on capable/low-end is enough for the visual effect without jank.
+  const starCount = isLowEnd ? 6 : 12;
   const stars = useMemo(() => {
     const seededRandom = (seed: number) => {
       const x = Math.sin(seed * 9999) * 10000;
@@ -76,43 +67,20 @@ export function WorldMapBackground({
 
   return (
     <>
-      {/* Deep space background gradient */}
-      <AdaptiveMotion.div
-        className="fixed inset-0 bg-gradient-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none"
-        style={{ x: bgX, y: bgY }}
-      />
+      {/* Deep space background gradient — static, no parallax (saves a MotionValue layer) */}
+      <div className="fixed inset-0 bg-gradient-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none" />
 
-      {/* Milky Way band */}
-      <AdaptiveMotion.div
+      {/* Milky Way band + cosmic dust merged into one static layer */}
+      <div
         className="fixed inset-0 pointer-events-none opacity-30"
         style={{
           background: 'linear-gradient(135deg, transparent 20%, rgba(139,92,246,0.1) 35%, rgba(236,72,153,0.08) 50%, rgba(34,211,238,0.1) 65%, transparent 80%)',
-          x: milkyX,
-          y: milkyY,
         }}
       />
 
-      {/* Cosmic dust particles */}
-      <AdaptiveMotion.div
-        className="fixed inset-0 pointer-events-none opacity-40"
-        style={{
-          backgroundImage: `radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.3), transparent),
-                           radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.2), transparent),
-                           radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.3), transparent),
-                           radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.2), transparent),
-                           radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent),
-                           radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.15), transparent)`,
-          backgroundSize: '200px 200px',
-          x: dustX,
-          y: dustY,
-        }}
-      />
-
-      {/* Nebula clouds — radial-gradient only, blur capped at 40px (skip entirely on low-end) */}
-      {!skipBlur && <AdaptiveMotion.div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ x: nebulaX, y: nebulaY }}
-      >
+      {/* Nebula clouds — large pre-blurred radial gradients (NO filter:blur).
+          Static layer — no parallax needed for background nebulae. */}
+      {!skipBlur && <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {nebulaClouds.map((nebula, i) => (
           <div
             key={i}
@@ -120,22 +88,17 @@ export function WorldMapBackground({
             style={{
               left: nebula.left,
               top: nebula.top,
-              width: nebula.size,
-              height: nebula.size,
-              background: `radial-gradient(circle, ${nebula.color} 0%, transparent 60%)`,
-              filter: 'blur(40px)',
-              willChange: 'transform',
+              width: nebula.size * 2,
+              height: nebula.size * 2,
+              background: `radial-gradient(circle, ${nebula.color} 0%, ${nebula.color.replace(/[\d.]+\)$/, '0)')} 40%, transparent 60%)`,
               '--nebula-duration': `${12 + i * 2}s`,
             } as React.CSSProperties}
           />
         ))}
-      </AdaptiveMotion.div>}
+      </div>}
 
-      {/* Shooting stars — skip on low-end to reduce animated layers */}
-      {!isLowEnd && <AdaptiveMotion.div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ x: shootingX, y: shootingY }}
-      >
+      {/* Shooting stars — static container, CSS-animated children */}
+      {!isLowEnd && <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {shootingStars.map((star, i) => (
           <div
             key={i}
@@ -148,7 +111,7 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </AdaptiveMotion.div>}
+      </div>}
 
       {/* Starfield with parallax */}
       <AdaptiveMotion.div
@@ -174,7 +137,7 @@ export function WorldMapBackground({
               width: star.size,
               height: star.size,
               backgroundColor: star.color,
-              boxShadow: !isLowEnd && star.size > 2 ? `0 0 ${star.size * 2}px ${star.color}` : 'none',
+              boxShadow: !isLowEnd && star.size > 3 ? `0 0 ${star.size * 2}px ${star.color}` : 'none',
               '--star-opacity-min': star.opacity * 0.4,
               '--star-opacity-max': star.opacity,
               '--star-duration': `${star.duration}s`,

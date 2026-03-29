@@ -103,7 +103,9 @@ export function WorldOrbitingLetters({
       .map(char => char.toUpperCase());
 
     const uniqueChars = [...new Set(chars)];
-    const count = uniqueChars.length >= 4 ? 4 : Math.min(3, uniqueChars.length);
+    // Cap at 2 letters per world — 4 orbiting CSS animations per world × 10 worlds
+    // was 40 simultaneous animations causing jank. 2 per world = 20 max, much smoother.
+    const count = Math.min(2, uniqueChars.length);
     return uniqueChars.slice(0, count);
   }, [worldName]);
 
