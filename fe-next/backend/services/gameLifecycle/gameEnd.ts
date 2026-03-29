@@ -73,7 +73,41 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   logger.info('GAME', `Game ${gameCode} ending, calculating final scores`);
 
   // Calculate and broadcast final scores
-  await calculateAndBroadcastFinalScores(io, gameCode);
+  // CRITICAL: wrapped in try/catch — if scoring fails, broadcast fallback results
+  // so clients don't get stuck in the "waiting for results" loading screen forever.
+  try {
+    await calculateAndBroadcastFinalScores(io, gameCode);
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('GAME', `CRITICAL: Score calculation failed for ${gameCode}: ${err.message}`, { stack: err.stack });
+
+    // Build fallback results from raw playerScores so clients can still see the results page
+    const fallbackScores = Object.entries(game.users || {}).map(([username]) => ({
+      username,
+      totalScore: game.playerScores?.[username] || 0,
+      words: (game.playerWords?.[username] || []).map((word: string) => ({
+        word,
+        score: 0,
+        isValid: true,
+        isDuplicate: false,
+      })),
+      achievements: [],
+      titles: [],
+    }));
+
+    const fallbackPayload = {
+      scores: fallbackScores,
+      letterGrid: game.letterGrid,
+      duplicateRuleDisabled: false,
+      playerCount: Object.keys(game.users || {}).length,
+      gameMode: game.gameMode,
+    };
+
+    // Cache and broadcast fallback so reconnecting clients also get it
+    (game as any).cachedResultsPayload = fallbackPayload;
+    broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', fallbackPayload);
+    broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', fallbackPayload);
+  }
 
   // Collect non-dictionary words for feedback
    

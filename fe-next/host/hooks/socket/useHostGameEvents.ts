@@ -113,6 +113,7 @@ export function useHostGameEvents({
   const onShowResultsRef = useRef(onShowResults);
   const onGameStartRef = useRef(onGameStart);
   const gameStartedRef = useRef(gameStarted);
+  const hostPlayingRef = useRef(hostPlaying);
   const tableDataRef = useRef<any>(null);
 
   useEffect(() => {
@@ -124,6 +125,9 @@ export function useHostGameEvents({
   useEffect(() => {
     gameStartedRef.current = gameStarted;
   }, [gameStarted]);
+  useEffect(() => {
+    hostPlayingRef.current = hostPlaying;
+  }, [hostPlaying]);
 
   // Track when we entered waiting state to prevent flickering
   const waitingStartTimeRef = useRef<number | null>(null);
@@ -263,6 +267,35 @@ export function useHostGameEvents({
       onGameStartRef.current?.();
     };
 
+    // Fallback timeout: if we enter waitingForResults but never get validationComplete,
+    // request results from server after 15s. Prevents infinite loading screen.
+    let resultsTimeoutId: NodeJS.Timeout | null = null;
+
+    const startResultsTimeout = () => {
+      if (resultsTimeoutId) clearTimeout(resultsTimeoutId);
+      resultsTimeoutId = setTimeout(() => {
+        // Only fire if we still haven't processed results for this session
+        if (hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+          logger.log('[HOST] Results timeout — requesting results from server');
+          socket.emit('requestResults');
+          // Second fallback: if server also doesn't respond in 5 more seconds,
+          // force-transition to results with whatever we have
+          resultsTimeoutId = setTimeout(() => {
+            if (hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+              logger.log('[HOST] Results fallback — forcing transition with empty results');
+              hasProcessedResultsRef.current = gameSessionIdRef.current;
+              setWaitingForResults(false);
+              setFinalScores({ players: [], gameCode: '' });
+              const currentOnShowResults = onShowResultsRef.current;
+              if (hostPlayingRef.current && currentOnShowResults) {
+                currentOnShowResults({ scores: [], letterGrid: tableDataRef.current });
+              }
+            }
+          }, 5000);
+        }
+      }, 15000);
+    };
+
     const handleTimeUpdate = (data: any) => {
       // Ignore stale events from previous sessions
       if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
@@ -283,6 +316,7 @@ export function useHostGameEvents({
         setGameStarted(false);
         setShowStartAnimation(false);
         setWaitingForResults(true);
+        startResultsTimeout();
         triggerGameOverCelebration();
         neoSuccessToast(t('hostView.gameOverCheckScores'), {
           icon: TOAST_ICONS.flag,
@@ -298,6 +332,7 @@ export function useHostGameEvents({
         setRemainingTime(0);
         setShowStartAnimation(false);
         setWaitingForResults(true);
+        startResultsTimeout();
       }
     };
 
@@ -308,6 +343,9 @@ export function useHostGameEvents({
         return;
       }
       hasProcessedResultsRef.current = gameSessionIdRef.current;
+
+      // Clear the results fallback timeout — we got real results
+      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
 
       logger.log('[HOST] Received validationComplete event:', data);
 
@@ -349,7 +387,8 @@ export function useHostGameEvents({
       });
 
       // Only call onShowResults if host is playing (not in broadcast mode)
-      if (hostPlaying && currentOnShowResults) {
+      // Use ref to avoid stale closure — hostPlaying is not in useEffect deps
+      if (hostPlayingRef.current && currentOnShowResults) {
         currentOnShowResults({
           scores: data.scores,
           letterGrid: currentTableData,
@@ -489,6 +528,8 @@ export function useHostGameEvents({
     socket.on('connect', handleReconnectRecovery);
 
     return () => {
+      // Clear results fallback timeout
+      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
       // Clear fire round interval explicitly
       if (fireRoundIntervalRef.current) {
         clearInterval(fireRoundIntervalRef.current);

@@ -270,6 +270,32 @@ export function usePlayerGameEvents({
       neoSuccessToast(toastMessage, { id: 'game-started', icon: (data as any).lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
     };
 
+    // Fallback timeout: if we enter waitingForResults but never get validatedScores,
+    // request results from server after 15s. Prevents infinite loading screen.
+    let resultsTimeoutId: NodeJS.Timeout | null = null;
+
+    const startResultsTimeout = () => {
+      if (resultsTimeoutId) clearTimeout(resultsTimeoutId);
+      resultsTimeoutId = setTimeout(() => {
+        if (hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+          logger.log('[PLAYER] Results timeout — requesting results from server');
+          socket.emit('requestResults');
+          // Second fallback: force-transition after 5 more seconds
+          resultsTimeoutId = setTimeout(() => {
+            if (hasProcessedResultsRef.current !== gameSessionIdRef.current) {
+              logger.log('[PLAYER] Results fallback — forcing transition with empty results');
+              hasProcessedResultsRef.current = gameSessionIdRef.current;
+              setWaitingForResults(false);
+              const currentOnShowResults = onShowResultsRef.current;
+              if (currentOnShowResults) {
+                currentOnShowResults({ scores: [], letterGrid: null });
+              }
+            }
+          }, 5000);
+        }
+      }, 15000);
+    };
+
     const handleEndGame = () => {
       const wasActive = wasInActiveGameRef.current;
       logger.log('[PLAYER] Received endGame event, wasInActiveGame:', wasActive);
@@ -279,6 +305,7 @@ export function usePlayerGameEvents({
       setShowStartAnimation(false);
       // Mark waiting so UI knows game ended (but no validation modal is shown)
       setWaitingForResults(true);
+      startResultsTimeout();
     };
 
     const handleTimeUpdate = (data: any) => {
@@ -324,6 +351,7 @@ export function usePlayerGameEvents({
         gameActiveRef.current = false;
         setShowStartAnimation(false);
         setWaitingForResults(true);
+        startResultsTimeout();
       }
     };
 
@@ -336,6 +364,10 @@ export function usePlayerGameEvents({
         return;
       }
       hasProcessedResultsRef.current = gameSessionIdRef.current;
+
+      // Clear the results fallback timeout — we got real results
+      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
+
       logger.log('[PLAYER] Received validatedScores event:', data);
 
       // Sync blast stats from server — overrides locally accumulated values
@@ -613,6 +645,8 @@ export function usePlayerGameEvents({
     socket.on('connect', handleReconnectRecovery);
 
     return () => {
+      // Clear results fallback timeout
+      if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
       // Clear fire round interval explicitly
       if (fireRoundIntervalRef.current) {
         clearInterval(fireRoundIntervalRef.current);
