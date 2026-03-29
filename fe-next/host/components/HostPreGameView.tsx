@@ -2,12 +2,11 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, BookOpen, LogOut, Bot, Plus, Minus, Sparkles, Brain, Zap } from 'lucide-react';
+import { BookOpen, LogOut } from 'lucide-react';
 import RoomChat from '../../components/RoomChat';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
@@ -243,39 +242,6 @@ function HostPreGameView({
     setBotCountdown(null);
   }, []);
 
-  // Bot add/remove controls
-  const [showBotDiffPicker, setShowBotDiffPicker] = useState(false);
-  const botPickerRef = useRef<HTMLDivElement>(null);
-
-  const botCount = useMemo(() =>
-    filteredPlayersForDisplay.filter(p => typeof p === 'object' && p.isBot).length,
-    [filteredPlayersForDisplay]
-  );
-
-  useEffect(() => {
-    if (!showBotDiffPicker) return;
-    const handleClick = (e: MouseEvent) => {
-      if (botPickerRef.current && !botPickerRef.current.contains(e.target as Node)) {
-        setShowBotDiffPicker(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showBotDiffPicker]);
-
-  const handleAddBot = useCallback((difficulty: 'easy' | 'medium' | 'hard') => {
-    socket?.emit('addBot', { difficulty, gameCode });
-    setShowBotDiffPicker(false);
-  }, [socket, gameCode]);
-
-  const handleRemoveLastBot = useCallback(() => {
-    const bots = filteredPlayersForDisplay.filter(p => typeof p === 'object' && p.isBot);
-    const lastBot = bots[bots.length - 1];
-    if (lastBot && typeof lastBot === 'object') {
-      socket?.emit('removeBot', { username: lastBot.username, gameCode });
-    }
-  }, [socket, gameCode, filteredPlayersForDisplay]);
-
   const hostLabel = `${t('hostView.hostIs')} ${username}`;
 
   // Bot countdown banner (shared between mobile and desktop)
@@ -322,120 +288,25 @@ function HostPreGameView({
         </div>
       )}
 
-      {/* Header */}
-      <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+      {/* Header — compact */}
+      <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <DJMascotWithEntrance size="sm" delay={0.3} />
-            <div className="flex flex-col">
-              <span className="text-lg font-neo-display font-bold text-neo-cream leading-none"
-                style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
-              >
-                {username}
-              </span>
-            </div>
+            <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
+              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+            >
+              {username}
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-neo-cyan" />
-              <span className="text-xs font-black text-neo-cream">
-                {filteredPlayersForDisplay.length}/{maxPlayers}
-              </span>
-            </div>
-
-            {/* Bot controls */}
-            <div ref={botPickerRef} className="relative flex items-center gap-1">
-              <button
-                onClick={handleRemoveLastBot}
-                disabled={botCount === 0}
-                className={cn(
-                  'w-9 h-9 flex items-center justify-center border-2 border-neo-black rounded shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all',
-                  botCount > 0
-                    ? 'bg-neo-orange hover:bg-neo-orange/80'
-                    : 'bg-slate-700 opacity-40 cursor-not-allowed'
-                )}
-                aria-label={t('hostView.removeBot')}
-              >
-                <div className="relative">
-                  <Bot className="w-4 h-4 text-neo-black" />
-                  <Minus className="w-2.5 h-2.5 text-neo-black absolute -bottom-0.5 -end-1 stroke-[3]" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setShowBotDiffPicker(prev => !prev)}
-                disabled={filteredPlayersForDisplay.length >= maxPlayers}
-                className={cn(
-                  'w-9 h-9 flex items-center justify-center border-2 border-neo-black rounded shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all',
-                  filteredPlayersForDisplay.length >= maxPlayers
-                    ? 'bg-slate-700 opacity-40 cursor-not-allowed'
-                    : showBotDiffPicker
-                      ? 'bg-neo-cyan'
-                      : 'bg-neo-cyan hover:bg-neo-cyan/80'
-                )}
-                aria-label={t('hostView.addBot')}
-              >
-                <div className="relative">
-                  <Bot className="w-4 h-4 text-neo-black" />
-                  <Plus className="w-2.5 h-2.5 text-neo-black absolute -bottom-0.5 -end-1 stroke-[3]" />
-                </div>
-              </button>
-
-              {botCount > 0 && (
-                <span className="text-[10px] font-black text-neo-cyan/70 min-w-[1ch]">
-                  {botCount}
-                </span>
-              )}
-
-              {/* Difficulty picker dropdown */}
-              <AnimatePresence>
-                {showBotDiffPicker && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85, y: -5 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.85, y: -5 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                    className="absolute top-full end-0 mt-2 z-50 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-2 flex flex-col gap-1 min-w-[150px]"
-                  >
-                    {([
-                      { key: 'easy' as const, icon: Sparkles, color: 'text-neo-lime', bg: 'bg-neo-lime', emoji: '🌱' },
-                      { key: 'medium' as const, icon: Brain, color: 'text-neo-yellow', bg: 'bg-neo-yellow', emoji: '🧠' },
-                      { key: 'hard' as const, icon: Zap, color: 'text-neo-orange', bg: 'bg-neo-orange', emoji: '🔥' },
-                    ]).map((diff, i) => (
-                      <motion.button
-                        key={diff.key}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.06, type: 'spring', stiffness: 500, damping: 25 }}
-                        whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.1)' }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => handleAddBot(diff.key)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-start transition-colors"
-                      >
-                        <div className={cn('w-7 h-7 rounded-full flex items-center justify-center border-2 border-neo-black shadow-hard-sm', diff.bg)}>
-                          <diff.icon className="w-4 h-4 text-neo-black" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className={cn('text-xs font-bold uppercase leading-tight', diff.color)}>
-                            {t(`hostView.bot${diff.key.charAt(0).toUpperCase() + diff.key.slice(1)}`)}
-                          </span>
-                          <span className="text-[9px] text-slate-500 leading-tight">
-                            {diff.emoji}
-                          </span>
-                        </div>
-                      </motion.button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
             <button
               onClick={onExitRoom}
-              className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
+              className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
               aria-label={t('common.exit')}
             >
-              <LogOut className="w-4 h-4 text-neo-black" />
+              <LogOut className="w-3.5 h-3.5 text-neo-black" />
             </button>
           </div>
         </div>
@@ -465,24 +336,23 @@ function HostPreGameView({
           />
         </div>
 
-        {/* Mobile Layout — no-scroll, chat fills remaining space */}
+        {/* Mobile Layout — scrollable content + sticky CTA at bottom */}
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
-          {/* Top: compact start button */}
-          <div className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b border-neo-white/5">
-            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} compact />
-          </div>
-
-          {/* Compact sections */}
-          <div className="flex-shrink-0 px-3 py-2 space-y-2">
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-3 py-2 space-y-2">
             <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-            <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} compact />
-            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} compact />
-            <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+            <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
+            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
+
+            {/* Chat */}
+            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
+              <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+            </div>
           </div>
 
-          {/* Chat fills remaining space */}
-          <div className="flex-1 min-h-0 mx-3 mb-3 bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden">
-            <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+          {/* Sticky CTA at bottom */}
+          <div className="flex-shrink-0 px-3 py-2 bg-neo-navy border-t-2 border-neo-black" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}>
+            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} compact />
           </div>
         </div>
       </main>

@@ -26,7 +26,6 @@ interface LandingChallengeCardsProps {
   playerAllTimeBest: { score: number } | null;
   t: (key: string) => string;
   dailyChallengeStats: DailyChallengePreloadedStats;
-  solveRate: number | null;
   /** Pre-computed card order from server — static per ISR/deploy */
   cardOrder?: LandingGameMode[];
 }
@@ -47,7 +46,6 @@ export function LandingChallengeCards({
   playerAllTimeBest,
   t,
   dailyChallengeStats,
-  solveRate,
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
   const [isFirstTimer, setIsFirstTimer] = useState(false);
@@ -103,11 +101,6 @@ export function LandingChallengeCards({
         return (
           <div key="daily" className="w-full h-full flex flex-col animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
-            {solveRate !== null && (
-              <p className="text-center text-neo-white/50 text-xs mt-1.5 pb-1 font-medium">
-                {t('landing.solvedPercent').replace('{percent}', String(solveRate))}
-              </p>
-            )}
           </div>
         );
 

@@ -41,7 +41,6 @@ const baseProps = {
   playerAllTimeBest: null,
   t: (key: string) => key,
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
-  solveRate: null,
 };
 
 describe('LandingChallengeCards reordering', () => {

@@ -84,7 +84,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
           className={`
             flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
             border-2 border-black ${colorClass}
-            text-xl shadow-hard-sm
+            text-xl text-black shadow-hard-sm
           `}
         >
           {icon}

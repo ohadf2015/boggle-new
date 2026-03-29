@@ -46,7 +46,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
         className={`
           flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center
           border-2 border-black ${colorClass}
-          text-lg shadow-hard-sm
+          text-lg text-black shadow-hard-sm
         `}
       >
         {icon}

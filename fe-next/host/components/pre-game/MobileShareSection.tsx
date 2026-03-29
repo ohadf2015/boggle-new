@@ -2,10 +2,17 @@
 
 import { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Link2, Users } from 'lucide-react';
+import { Check, Link2, Share2 } from 'lucide-react';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTelegram } from '../../../utils/share';
 import { WhatsAppIcon, TelegramIcon } from '../../../components/icons/SocialIcons';
 import { cn } from '../../../lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../components/ui/dialog';
 
 // ==================== Types ====================
 
@@ -22,8 +29,8 @@ interface MobileShareSectionProps {
 // ==================== Component ====================
 
 /**
- * MobileShareSection - Share strip with invite CTA + share buttons
- * When showHint is true, displays a prominent invite call-to-action for empty rooms
+ * MobileShareSection - Single share button that opens a modal with all share options.
+ * Replaces the previous row of 3 buttons to save vertical screen space.
  */
 export const MobileShareSection = memo<MobileShareSectionProps>(function MobileShareSection({
   gameCode,
@@ -33,6 +40,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   compact = false,
 }) {
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
   const joinUrl = getJoinUrl(gameCode, 'mobile-lobby');
 
   const handleCopyLink = useCallback(async () => {
@@ -52,122 +60,114 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
     shareViaTelegram(message, joinUrl);
   }, [gameCode, joinUrl, t]);
 
-  // Compact: just a row of share buttons, no hints
-  if (compact) {
-    return (
-      <div data-testid="mobile-share-section" className={cn('flex gap-2', className)}>
-        <motion.button
-          data-testid="mobile-copy-link-button"
-          onClick={handleCopyLink}
-          whileTap={{ scale: 0.95 }}
-          aria-label={t('roomCode.copyLink')}
-          className={cn(
-            'h-9 px-3 flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard-sm transition-all text-xs font-bold',
-            copied ? 'bg-neo-lime text-neo-black' : 'bg-white text-neo-black'
-          )}
-        >
-          {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
-          <span>{copied ? t('common.copied') : t('share.copyLink')}</span>
-        </motion.button>
-        <motion.button
-          data-testid="mobile-whatsapp-button"
-          onClick={handleWhatsAppShare}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Share via WhatsApp"
-          className="h-9 px-3 flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-brand-whatsapp shadow-hard-sm text-xs font-bold text-white"
-        >
-          <WhatsAppIcon size={14} />
-          <span>WhatsApp</span>
-        </motion.button>
-        <motion.button
-          data-testid="mobile-telegram-button"
-          onClick={handleTelegramShare}
-          whileTap={{ scale: 0.95 }}
-          aria-label={`Share via ${t('share.telegram')}`}
-          className="h-9 px-2.5 flex items-center justify-center rounded-full border-2 border-neo-black bg-brand-telegram text-white shadow-hard-sm"
-        >
-          <TelegramIcon size={14} />
-        </motion.button>
-        {showHint && (
-          <span className="text-[10px] text-neo-cyan/60 font-bold self-center ml-1">
-            {t('hostView.sendLinkToFriends')}
-          </span>
+  const handleNativeShare = useCallback(async () => {
+    if (!navigator.share) return;
+    try {
+      await navigator.share({
+        title: t('share.inviteTitle'),
+        text: `${t('share.inviteMessage')}\n${t('share.code')}: ${gameCode}`,
+        url: joinUrl,
+      });
+    } catch {
+      // User cancelled
+    }
+  }, [gameCode, joinUrl, t]);
+
+  // Trigger button — single compact button
+  const triggerButton = (
+    <DialogTrigger asChild>
+      <motion.button
+        data-testid="mobile-share-trigger"
+        whileTap={{ scale: 0.95 }}
+        className={cn(
+          'flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard-sm transition-all font-bold text-neo-black bg-white',
+          compact ? 'h-8 px-3 text-xs' : 'h-9 px-3.5 text-xs',
+          showHint && 'animate-neo-wobble',
         )}
-      </div>
-    );
-  }
+      >
+        <Share2 className="w-3.5 h-3.5" />
+        <span>{t('share.invite')}</span>
+      </motion.button>
+    </DialogTrigger>
+  );
 
   return (
-    <div
-      data-testid="mobile-share-section"
-      className={cn('space-y-3', className)}
-    >
-      {/* Invite call-to-action for empty rooms */}
-      {showHint && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-neo px-4 py-4 text-center"
-        >
-          <Users className="w-6 h-6 mx-auto text-neo-cyan mb-1.5" />
-          <p className="text-sm font-bold text-neo-cyan">
-            {t('hostView.waitingForFriendsHint')}
-          </p>
-          <p className="text-xs text-neo-cream/50 mt-1">
-            {t('hostView.sendLinkToFriends')}
-          </p>
-        </motion.div>
-      )}
+    <div data-testid="mobile-share-section" className={cn('inline-flex', className)}>
+      <Dialog open={open} onOpenChange={setOpen}>
+        {triggerButton}
+        <DialogContent className="bg-neo-navy-light border-3 border-neo-black shadow-hard max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-neo-cream font-black uppercase text-lg flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-neo-cyan" />
+              {t('hostView.inviteFriends')}
+            </DialogTitle>
+          </DialogHeader>
 
-      {/* Instruction text when players already present */}
-      {!showHint && (
-        <p className="text-xs text-slate-400 px-1">
-          {t('hostView.sendLinkToFriends')}
-        </p>
-      )}
+          {/* Room code display */}
+          <div className="text-center py-3 bg-neo-navy rounded-neo border-2 border-neo-white/10">
+            <p className="text-[10px] font-bold uppercase text-neo-cream/50 tracking-widest mb-1">
+              {t('roomCode.title')}
+            </p>
+            <p className="text-3xl font-black tracking-wider text-neo-lime">{gameCode}</p>
+          </div>
 
-      {/* Share buttons */}
-      <div className="flex gap-2">
-        {/* Copy Link — primary action */}
-        <motion.button
-          data-testid="mobile-copy-link-button"
-          onClick={handleCopyLink}
-          whileTap={{ scale: 0.95 }}
-          aria-label={t('roomCode.copyLink')}
-          className={cn(
-            'h-11 px-4 flex items-center gap-2 rounded-full border-2 border-neo-black shadow-hard-sm transition-all text-xs font-bold',
-            copied
-              ? 'bg-neo-lime text-neo-black'
-              : 'bg-white text-neo-black'
-          )}
-        >
-          {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
-          <span>{copied ? (t('common.copied')) : (t('share.copyLink'))}</span>
-        </motion.button>
+          {/* Share options grid */}
+          <div className="space-y-2">
+            {/* Copy link — primary */}
+            <motion.button
+              data-testid="mobile-copy-link-button"
+              onClick={handleCopyLink}
+              whileTap={{ scale: 0.97 }}
+              className={cn(
+                'w-full h-12 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all',
+                copied
+                  ? 'bg-neo-lime text-neo-black'
+                  : 'bg-white text-neo-black shadow-hard-sm active:shadow-none active:translate-y-0.5'
+              )}
+            >
+              {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+              <span>{copied ? t('common.copied') : t('share.copyLink')}</span>
+            </motion.button>
 
-        {/* WhatsApp */}
-        <motion.button
-          data-testid="mobile-whatsapp-button"
-          onClick={handleWhatsAppShare}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Share via WhatsApp"
-          className="h-11 px-4 flex items-center gap-2 rounded-full border-2 border-neo-black bg-brand-whatsapp shadow-hard-sm transition-all text-xs font-bold text-white"
-        >
-          <WhatsAppIcon size={16} />
-          <span>WhatsApp</span>
-        </motion.button>
+            {/* Social row */}
+            <div className="flex gap-2">
+              <motion.button
+                data-testid="mobile-whatsapp-button"
+                onClick={handleWhatsAppShare}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Share via WhatsApp"
+                className="flex-1 h-11 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-brand-whatsapp shadow-hard-sm text-sm font-bold text-white active:shadow-none active:translate-y-0.5"
+              >
+                <WhatsAppIcon size={16} />
+                <span>WhatsApp</span>
+              </motion.button>
 
-        {/* Telegram */}
-        <motion.button
-          data-testid="mobile-telegram-button"
-          onClick={handleTelegramShare}
-          whileTap={{ scale: 0.95 }}
-          aria-label={`Share via ${t('share.telegram')}`}
-          className="h-11 px-3 flex items-center justify-center rounded-full border-2 border-neo-black bg-brand-telegram text-white shadow-hard-sm transition-all"
-        >
-          <TelegramIcon size={16} />
-        </motion.button>
-      </div>
+              <motion.button
+                data-testid="mobile-telegram-button"
+                onClick={handleTelegramShare}
+                whileTap={{ scale: 0.95 }}
+                aria-label={`Share via ${t('share.telegram')}`}
+                className="flex-1 h-11 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-brand-telegram text-white shadow-hard-sm text-sm font-bold active:shadow-none active:translate-y-0.5"
+              >
+                <TelegramIcon size={16} />
+                <span>Telegram</span>
+              </motion.button>
+            </div>
+
+            {/* Native share (if available) */}
+            {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+              <motion.button
+                onClick={handleNativeShare}
+                whileTap={{ scale: 0.97 }}
+                className="w-full h-11 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm font-bold text-sm active:shadow-none active:translate-y-0.5"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>{t('share.button')}</span>
+              </motion.button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 });

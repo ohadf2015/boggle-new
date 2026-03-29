@@ -15,7 +15,6 @@ import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { trackModeSelected } from '@/utils/growthTracking';
 import { useLandingStats } from '@/hooks/useLandingStats';
-import { useDailySolveRate } from '@/hooks/useDailySolveRate';
 import { useHallOfFame } from '@/hooks/useHallOfFame';
 import { AdPlaceholder } from '@/components/ads';
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
@@ -94,9 +93,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
   const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats({
     initialGamesToday: initialData?.gamesToday,
-  });
-  const { solveRate } = useDailySolveRate(language, {
-    initialSolveRate: initialData?.solveRate,
   });
   const { champions, loading: hallLoading } = useHallOfFame(5, {
     initialData: initialData?.topPlayers,
@@ -240,7 +236,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           playerAllTimeBest={playerAllTimeBest}
           t={t}
           dailyChallengeStats={dailyChallengeStats}
-          solveRate={solveRate}
           cardOrder={initialData?.cardOrder}
         />
 

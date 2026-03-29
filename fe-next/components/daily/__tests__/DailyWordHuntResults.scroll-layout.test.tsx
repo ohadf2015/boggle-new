@@ -127,44 +127,30 @@ describe('DailyChallenge Container Layout', () => {
   describe('Root container constraints', () => {
     it('should have proper height constraints for child scroll containers', () => {
       // The DailyChallenge wrapper must constrain height so child scroll works.
-      // CRITICAL: Using `min-h-full` alone does NOT constrain height - content can
-      // grow beyond viewport and break child scroll containers.
+      // CRITICAL: body.screen-fit uses min-height: 100dvh, which does NOT create
+      // a definite height for flex children. flex-1 + min-h-0 alone is insufficient
+      // when no ancestor has a definite height.
       //
-      // CORRECT PATTERNS (constrain height):
-      // - `h-full flex flex-col` (fixed to parent height)
-      // - `flex-1 flex flex-col min-h-0` (flex-constrained)
+      // CORRECT PATTERN: Apply h-dvh for phases with inner scroll containers
+      // (completed, already-played, playing). This creates a definite height context
+      // that makes the flex chain work properly.
       //
-      // INCORRECT PATTERNS (allow unbounded growth):
-      // - `min-h-full flex flex-col` (can grow beyond parent, breaks child scroll)
-      // - `flex flex-col` without height constraint
-      //
-      // When a container uses min-h-full, it says "be at least as tall as parent"
-      // but allows the container to grow taller. This means child elements with
-      // overflow-y-auto can't scroll because the parent grows to fit all content.
+      // For other phases (loading, ready), overflow-y-auto on the wrapper is fine.
 
       // Find the root container div in DailyChallenge render
-      // Match both double-quoted className="..." and template literal className={`...`}
       const rootContainerPattern = /return\s*\(\s*<div\s+[\s\S]*?className=(?:"([^"]+)"|{`([^`]+)`})/;
       const match = source.match(rootContainerPattern);
 
       expect(match).toBeTruthy();
       if (match) {
         const className = match[1] || match[2] || '';
-        // Should NOT use min-h-full alone (breaks child scroll)
-        const hasMinHFull = /\bmin-h-full\b/.test(className);
-        // Must either use h-full OR flex-1 with min-h-0 to properly constrain height
-        const hasHFull = /\bh-full\b/.test(className);
+        // Must have flex-1 + min-h-0 as base layout
         const hasFlex1WithMinH0 = /\bflex-1\b/.test(className) && /\bmin-h-0\b/.test(className);
-
-        // ASSERTION: Must have proper height constraint (not just min-h-full)
-        // Should have flex-1 + min-h-0 OR h-full (but NOT min-h-full alone)
-        expect(hasHFull || hasFlex1WithMinH0).toBe(true);
-
-        // If min-h-full is present, it must be accompanied by proper constraints
-        if (hasMinHFull) {
-          expect(hasHFull || hasFlex1WithMinH0).toBe(true);
-        }
+        expect(hasFlex1WithMinH0).toBe(true);
       }
+
+      // Must conditionally apply h-dvh for scroll-isolated phases
+      expect(source).toMatch(/h-dvh/);
     });
 
     it('should NOT use min-h-full without height constraints', () => {
@@ -186,29 +172,24 @@ describe('DailyChallenge Container Layout', () => {
       }
     });
 
-    it('should NOT apply overflow-y-auto unconditionally for all non-playing phases', () => {
-      // CRITICAL BUG REGRESSION TEST:
-      // Commit 0cb9ba22 added overflow-y-auto to ALL non-playing phases, including
-      // 'completed' and 'already-played'. These phases render DailyWordHuntResults
-      // which has its own isolate-scroll-daily scroll container.
+    it('should use h-dvh overflow-hidden for results/playing phases to create definite height context', () => {
+      // CRITICAL: body.screen-fit uses min-height: 100dvh (not height), which means
+      // flex-1 children are NOT height-constrained — content grows to natural size
+      // and inner overflow-y-auto never activates.
       //
-      // Having overflow-y-auto on BOTH:
-      //   1. DailyChallenge wrapper (intermediate container) ← the bug
-      //   2. DailyWordHuntResults inner div (isolate-scroll-daily) ← intentional
-      // ... creates competing scroll containers that prevent mobile scrolling.
+      // FIX: For phases that need inner scroll (completed, already-played, playing),
+      // the DailyChallenge wrapper must use h-dvh to create a definite height context.
+      // This makes the flex chain work: h-dvh → flex-col → flex-1 min-h-0 overflow-y-auto.
       //
-      // INCORRECT pattern (bug):
-      //   phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'
-      //   ↑ applies overflow-y-auto to completed/already-played phases too
-      //
-      // CORRECT pattern (fix): results phases must be excluded from overflow-y-auto
-      //   phase === 'playing' ? 'overflow-hidden' : isResultsPhase ? '' : 'overflow-y-auto'
-      //   ↑ completed/already-played get no overflow class, letting their child manage scroll
+      // For other phases (loading, ready), overflow-y-auto on the wrapper itself is fine
+      // since those don't have inner scroll containers.
 
-      // The bug: simple ternary with only 'playing' as the guard for overflow-y-auto
+      // The container should apply h-dvh + overflow-hidden for scroll-isolated phases
+      const hasHDvh = /h-dvh/.test(source);
+      expect(hasHDvh).toBe(true);
+
+      // Should NOT use the old broken pattern of no height constraint for results phases
       const bugPattern = /phase\s*===\s*'playing'\s*\?\s*'overflow-hidden'\s*:\s*'overflow-y-auto'/;
-
-      // This assertion FAILS currently (bug present), PASSES after fix
       expect(source).not.toMatch(bugPattern);
     });
   });

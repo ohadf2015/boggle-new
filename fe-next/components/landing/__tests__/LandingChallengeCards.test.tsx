@@ -40,7 +40,6 @@ const baseProps = {
   playerAllTimeBest: null,
   t: (key: string) => key,
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
-  solveRate: null,
 };
 
 describe('LandingChallengeCards', () => {
@@ -73,8 +72,4 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
   });
 
-  it('shows solve rate when provided', () => {
-    render(<LandingChallengeCards {...baseProps} solveRate={42} />);
-    expect(screen.getByText('landing.solvedPercent')).toBeInTheDocument();
-  });
 });

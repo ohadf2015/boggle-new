@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, LogOut, Pencil, Check, X } from 'lucide-react';
+import { LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../RoomChat';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
@@ -150,29 +150,24 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
   // ==================== Shared Header ====================
   const renderHeader = () => (
-    <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}>
+    <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0px))' }}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isHost && <DJMascotWithEntrance size="sm" delay={0.3} />}
-          <span className="text-lg font-neo-display font-bold text-neo-cream leading-none truncate"
+          <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
             style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
           >
             {username}
           </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-            <Users className="w-4 h-4 text-neo-cyan" />
-            <span className="text-xs font-black text-neo-cream">
-              {displayPlayers.length}/{maxPlayers}
-            </span>
-          </div>
+          <MobileShareSection gameCode={gameCode} t={t} compact />
           <button
             onClick={onExitRoom}
-            className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
+            className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
             aria-label={t('common.exit')}
           >
-            <LogOut className="w-4 h-4 text-neo-black rtl:scale-x-[-1]" />
+            <LogOut className="w-3.5 h-3.5 text-neo-black rtl:scale-x-[-1]" />
           </button>
         </div>
       </div>
@@ -312,17 +307,13 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   const renderMobileContent = () => {
     if (isHost && hostControls) {
       return (
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-2 space-y-3 min-h-0">
           <AnimatePresence>{hostControls.botCountdownSlot}</AnimatePresence>
           <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
-            {/* Host controls rendered via slot — includes StartButton, PlayerRoster, BattleModeCard */}
             {hostControls.controlsSlot}
           </motion.div>
-          <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
-            <MobileShareSection gameCode={gameCode} t={t} />
-          </motion.div>
-          <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={4}>
-            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-48 sm:h-64 lg:h-80">
+          <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
+            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
               <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
             </div>
           </motion.div>
@@ -332,7 +323,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
     // Player mobile content
     return (
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-2 space-y-3 min-h-0">
         <section>{renderPlayerWaitingSection()}</section>
         <PlayerRoster
           players={displayPlayers}
@@ -341,12 +332,8 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           maxPlayers={maxPlayers}
           t={t}
         />
-        <MobileShareSection gameCode={gameCode} t={t} />
-        <section className="pb-4 flex-1 flex flex-col min-h-0">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-            {t('hostView.roomChat')}
-          </h3>
-          <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden flex-1 min-h-[20rem] sm:min-h-[24rem]">
+        <section className="pb-4">
+          <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden h-64">
             <RoomChat
               username={username}
               isHost={false}
