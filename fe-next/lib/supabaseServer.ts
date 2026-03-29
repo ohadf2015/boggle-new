@@ -6,8 +6,25 @@
  * For client components, continue using `lib/supabase.ts`.
  */
 
+import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+
+/**
+ * Cookie-free Supabase client for public data queries (leaderboards, stats, etc.).
+ * Does NOT call cookies() — safe to use in ISR/static pages without opting into dynamic rendering.
+ * Only use for unauthenticated, read-only queries with the anon key.
+ */
+export function createSupabasePublicClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
 
 export async function createSupabaseServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

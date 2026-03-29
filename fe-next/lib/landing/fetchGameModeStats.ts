@@ -10,7 +10,7 @@
  *   - single_player_leaderboard → singleplayer (aggregate games_played)
  */
 
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { createSupabasePublicClient } from '@/lib/supabaseServer';
 
 export type LandingGameMode = 'singleplayer' | 'multiplayer' | 'daily' | 'adventure' | 'blast';
 
@@ -21,7 +21,7 @@ export interface GameModeStats {
 
 /** Returns play counts per landing-page mode for the last N days, sorted by popularity desc */
 export async function fetchGameModeStats(days: number = 30): Promise<GameModeStats[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
 
   if (!supabase) {
     return getDefaultStats();

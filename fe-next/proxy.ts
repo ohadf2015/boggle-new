@@ -101,15 +101,12 @@ export async function proxy(request: NextRequest) {
     });
 
     try {
-      // IMPORTANT: Use getUser() not getSession(). getSession() only reads
-      // the local JWT without validating it server-side. getUser() contacts
-      // the Supabase auth server and refreshes the token if needed.
-      // Without this, tokens expire after ~1h and all API calls get 401.
-      // Timeout at 3s to prevent slow Supabase from blocking page navigation.
-      await Promise.race([
-        supabase.auth.getUser(),
-        new Promise<void>((resolve) => setTimeout(resolve, 3000)),
-      ]);
+      // Use getSession() for proxy — it reads the JWT locally and triggers
+      // automatic PKCE token refresh when the access token is expired.
+      // getUser() was making a network round-trip to Supabase Auth on EVERY
+      // page navigation (200-500ms+, up to 30s when Supabase is slow).
+      // getSession() achieves the same refresh behavior without the latency.
+      await supabase.auth.getSession();
     } catch {
       // Silently handle auth errors in proxy
     }

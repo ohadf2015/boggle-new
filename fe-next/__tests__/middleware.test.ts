@@ -77,11 +77,11 @@ describe('Proxy — Supabase Auth Refresh', () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
   });
 
-  it('should call getUser() (NOT getSession()) to properly refresh the token', async () => {
+  it('should call getSession() for fast local JWT refresh (not getUser() which hits network)', async () => {
     await proxy(makeRequest('/en/adventure'));
-    expect(mockGetUser).toHaveBeenCalledTimes(1);
-    // getSession() should NOT be called — it doesn't validate server-side
-    expect(mockGetSession).not.toHaveBeenCalled();
+    expect(mockGetSession).toHaveBeenCalledTimes(1);
+    // getUser() makes a network round-trip to Supabase Auth (200-500ms) — too slow for proxy
+    expect(mockGetUser).not.toHaveBeenCalled();
   });
 
   it('should skip auth refresh on API routes (they handle their own auth)', async () => {

@@ -16,7 +16,7 @@
  *   - useDailyChallengeStatus — requires auth cookie + localStorage
  */
 
-import { createSupabaseServerClient } from '@/lib/supabaseServer';
+import { createSupabasePublicClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import { fetchGameModeStats, getCardOrder, type GameModeStats, type LandingGameMode } from './fetchGameModeStats';
 
@@ -32,9 +32,14 @@ export interface LandingInitialData {
 }
 
 const TOP_PLAYERS_LIMIT = 5;
+const VALID_LANGUAGES = new Set(['en', 'he', 'sv', 'ja', 'es']);
 
 export async function fetchLandingData(language: string): Promise<LandingInitialData> {
-  const supabase = await createSupabaseServerClient();
+  // Guard against invalid locales (e.g. crawlers hitting /sitemap.xml parsed as locale)
+  if (!VALID_LANGUAGES.has(language)) {
+    language = 'en';
+  }
+  const supabase = createSupabasePublicClient();
 
   if (!supabase) {
     return { topPlayers: [], gamesToday: 0, solveRate: null, gameModeStats: [], cardOrder: getCardOrder() };
