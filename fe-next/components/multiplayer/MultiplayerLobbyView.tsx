@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Copy, LogOut, Pencil, Check, X } from 'lucide-react';
+import { Users, LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../RoomChat';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
@@ -122,15 +122,6 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   // Display all players (including host) to everyone
   const displayPlayers = filteredPlayers ?? playersReady;
 
-  // Copy feedback
-  const [codeCopied, setCodeCopied] = useState(false);
-  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const handleCopyCode = useCallback(() => {
-    navigator.clipboard.writeText(gameCode);
-    setCodeCopied(true);
-    clearTimeout(copyTimeoutRef.current);
-    copyTimeoutRef.current = setTimeout(() => setCodeCopied(false), 2000);
-  }, [gameCode]);
 
   // Avatar builder (player-only)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -163,38 +154,11 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isHost && <DJMascotWithEntrance size="sm" delay={0.3} />}
-          <div className="flex flex-col">
-            {isHost && (
-              <span className="text-xs uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
-                {t('roomCode.label')}
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <span
-                className={cn(
-                  'font-neo-display font-bold text-neo-cyan uppercase leading-none',
-                  isHost ? 'text-2xl' : 'text-lg tracking-wider',
-                )}
-                style={{ textShadow: `0 0 ${isHost ? 12 : 10}px rgba(0, 255, 255, ${isHost ? 0.6 : 0.5})` }}
-              >
-                {gameCode}
-              </span>
-              {isHost && (
-                <button
-                  onClick={handleCopyCode}
-                  className={cn(
-                    'p-1.5 rounded transition-colors',
-                    codeCopied
-                      ? 'text-neo-lime'
-                      : 'text-slate-400 hover:text-neo-white',
-                  )}
-                  aria-label={codeCopied ? t('roomCode.copied') : t('roomCode.copy')}
-                >
-                  {codeCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </button>
-              )}
-            </div>
-          </div>
+          <span className="text-lg font-neo-display font-bold text-neo-cream leading-none truncate"
+            style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+          >
+            {username}
+          </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">

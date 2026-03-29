@@ -253,7 +253,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe pt-3 sm:pt-2"
+      className="flex-1 flex flex-col p-2 sm:p-4 [overflow-x:clip] overflow-y-auto pb-safe pt-3 sm:pt-2"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
       } as React.CSSProperties}
@@ -340,8 +340,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* Game Grid — flex-1 lets it shrink to fit remaining space */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      {/* Game Grid — flex-1 lets it fill remaining space; min-h-0 allows flex shrinking */}
+      <div className="flex-1 min-h-0">
         <SurvivalGridSection
           grid={grid}
           isGameOver={state.isGameOver}

@@ -2,7 +2,7 @@
 
 import React, { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Link2 } from 'lucide-react';
+import { Check, Link2, Copy } from 'lucide-react';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTelegram } from '../../../utils/share';
 import { WhatsAppIcon, TelegramIcon } from '../../../components/icons/SocialIcons';
 import { cn } from '../../../lib/utils';
@@ -13,21 +13,24 @@ interface MobileShareSectionProps {
   gameCode: string;
   t: (path: string, params?: Record<string, string | number>) => string;
   className?: string;
+  /** Show prominent hint banner for empty rooms */
+  showHint?: boolean;
 }
 
 // ==================== Component ====================
 
 /**
- * MobileShareSection - Compact horizontal pill share strip
- * Layout: Copy Link | WhatsApp | Telegram (inline pills)
- * QR code is desktop-only (shown in InviteCard)
+ * MobileShareSection - Share strip with room code + share buttons
+ * When showHint is true, displays a prominent invite banner for empty rooms
  */
 export const MobileShareSection = memo<MobileShareSectionProps>(function MobileShareSection({
   gameCode,
   t,
   className,
+  showHint = false,
 }) {
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const joinUrl = getJoinUrl(gameCode, 'mobile-lobby');
 
   const handleCopyLink = useCallback(async () => {
@@ -37,6 +40,12 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
       setTimeout(() => setCopied(false), 2000);
     }
   }, [gameCode, t]);
+
+  const handleCopyCode = useCallback(() => {
+    navigator.clipboard.writeText(gameCode);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  }, [gameCode]);
 
   const handleWhatsAppShare = useCallback(() => {
     shareViaWhatsApp(gameCode, '', t);
@@ -50,13 +59,51 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   return (
     <div
       data-testid="mobile-share-section"
-      className={cn('space-y-2', className)}
+      className={cn('space-y-3', className)}
     >
-      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">
-        {t('hostView.inviteFriends')}
-      </h3>
+      {/* Hint banner for empty rooms */}
+      {showHint && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-neo px-4 py-3 text-center"
+        >
+          <p className="text-sm font-bold text-neo-cyan">
+            {t('hostView.waitingForFriendsHint')}
+          </p>
+        </motion.div>
+      )}
 
-      {/* Compact Horizontal Pill Strip */}
+      {/* Room Code Display */}
+      <div className="flex items-center justify-between bg-neo-navy-light/80 border-2 border-neo-black rounded-neo px-4 py-3">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            {t('hostView.roomCode')}
+          </span>
+          <span className="text-2xl font-neo-display font-black text-neo-lime tracking-wider">
+            {gameCode}
+          </span>
+        </div>
+        <button
+          onClick={handleCopyCode}
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black text-xs font-bold transition-all',
+            codeCopied
+              ? 'bg-neo-lime text-neo-black'
+              : 'bg-white/10 text-neo-cream hover:bg-white/20'
+          )}
+        >
+          {codeCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          <span>{codeCopied ? t('common.copied') : t('roomCode.copy')}</span>
+        </button>
+      </div>
+
+      {/* Instruction text */}
+      <p className="text-xs text-slate-400 px-1">
+        {t('hostView.sendLinkToFriends')}
+      </p>
+
+      {/* Share buttons */}
       <div className="flex gap-2">
         {/* Copy Link */}
         <motion.button

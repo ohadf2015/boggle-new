@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback, memo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, memo, useState, CSSProperties } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
@@ -119,6 +119,48 @@ const WorldNode = memo(function WorldNode({
   const ringC = 2 * Math.PI * ringR;
   const ringOffset = ringC - progressPct * ringC;
 
+  // Memoize expensive inline styles to avoid object allocation churn on re-renders.
+  // box-shadow is used instead of filter: drop-shadow() — box-shadow is compositor-friendly
+  // while drop-shadow triggers a separate paint + compositing pipeline per element.
+  const orbButtonStyle = useMemo<CSSProperties>(() => {
+    if (!isUnlocked) return { filter: 'grayscale(1) brightness(0.5)' };
+    return {
+      boxShadow: `0 0 16px ${glowColor}, 0 0 32px ${glowColor}`,
+    };
+  }, [isUnlocked, glowColor]);
+
+  const glowBgStyle = useMemo<CSSProperties>(() => ({
+    background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
+    transform: 'scale(1.6)',
+    filter: 'blur(16px)',
+    zIndex: 0,
+  }), [glowColor]);
+
+  const progressFillStyle = useMemo<CSSProperties>(() => ({
+    filter: `drop-shadow(0 0 4px ${glowColor})`,
+  }), [glowColor]);
+
+  const numberBadgeStyle = useMemo<CSSProperties>(() => ({
+    backgroundColor: isUnlocked ? glowColor : 'rgba(50,50,70,0.9)',
+    color: isUnlocked ? '#000' : 'rgba(255,255,255,0.5)',
+  }), [isUnlocked, glowColor]);
+
+  const progressBarStyle = useMemo<CSSProperties>(() => ({
+    width: `${(currentStars / totalWorldStars) * 100}%`,
+    background: isUnlocked
+      ? `linear-gradient(90deg, ${glowColor}, ${glowColor.replace(/[\d.]+\)$/, '0.6)')})`
+      : 'rgba(255,255,255,0.1)',
+    boxShadow: isUnlocked && currentStars > 0 ? `0 0 8px ${glowColor}` : 'none',
+  }), [isUnlocked, glowColor, currentStars, totalWorldStars]);
+
+  const cardBottomGradientStyle = useMemo<CSSProperties>(() => ({
+    background: `linear-gradient(to top, ${glowColor.replace(/[\d.]+\)$/, '0.06)')}, transparent)`,
+  }), [glowColor]);
+
+  const accentBarStyle = useMemo<CSSProperties>(() => ({
+    background: isUnlocked ? `linear-gradient(90deg, ${glowColor}, transparent)` : 'rgba(255,255,255,0.05)',
+  }), [isUnlocked, glowColor]);
+
   return (
     <AdaptiveMotion.div
       ref={nodeRef}
@@ -159,24 +201,13 @@ const WorldNode = memo(function WorldNode({
               'focus:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime rounded-full',
               isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'
             )}
-            style={{
-              filter: isUnlocked
-                ? isNearViewport
-                  ? `drop-shadow(0 0 16px ${glowColor}) drop-shadow(0 0 32px ${glowColor})`
-                  : `drop-shadow(0 0 16px ${glowColor})`
-                : 'grayscale(1) brightness(0.5)',
-            }}
+            style={orbButtonStyle}
           >
             {/* Ambient glow behind the orb */}
             {isUnlocked && (
               <div
                 className="absolute inset-0 rounded-full pointer-events-none"
-                style={{
-                  background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
-                  transform: 'scale(1.6)',
-                  filter: 'blur(16px)',
-                  zIndex: 0,
-                }}
+                style={glowBgStyle}
               />
             )}
 
@@ -198,7 +229,7 @@ const WorldNode = memo(function WorldNode({
                   strokeDasharray={ringC}
                   strokeDashoffset={ringOffset}
                   className="transition-all duration-700"
-                  style={{ filter: `drop-shadow(0 0 4px ${glowColor})` }}
+                  style={progressFillStyle}
                 />
               </svg>
             )}
@@ -214,6 +245,8 @@ const WorldNode = memo(function WorldNode({
                 src={worldImage}
                 alt={worldName}
                 fill
+                sizes="(min-width: 1024px) 136px, (min-width: 640px) 104px, 88px"
+                loading="lazy"
                 className={cn(
                   'object-cover scale-110',
                   !isUnlocked && 'opacity-40'
@@ -239,10 +272,7 @@ const WorldNode = memo(function WorldNode({
             {/* World number badge — overlaid at bottom-center of orb */}
             <div
               className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 px-2.5 py-0.5 rounded-neo border-3 border-neo-black shadow-hard-sm font-neo-display font-black text-sm"
-              style={{
-                backgroundColor: isUnlocked ? glowColor : 'rgba(50,50,70,0.9)',
-                color: isUnlocked ? '#000' : 'rgba(255,255,255,0.5)',
-              }}
+              style={numberBadgeStyle}
             >
               {world.id}
             </div>
@@ -304,7 +334,7 @@ const WorldNode = memo(function WorldNode({
           {/* Colored accent bar at top */}
           <div
             className="h-1.5"
-            style={{ background: isUnlocked ? `linear-gradient(90deg, ${glowColor}, transparent)` : 'rgba(255,255,255,0.05)' }}
+            style={accentBarStyle}
           />
 
           <div className="p-3 sm:p-3.5">
@@ -342,13 +372,7 @@ const WorldNode = memo(function WorldNode({
               <div className="h-2 rounded-full bg-neo-black/50 overflow-hidden border border-neo-black/30">
                 <div
                   className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${(currentStars / totalWorldStars) * 100}%`,
-                    background: isUnlocked
-                      ? `linear-gradient(90deg, ${glowColor}, ${glowColor.replace(/[\d.]+\)$/, '0.6)')})`
-                      : 'rgba(255,255,255,0.1)',
-                    boxShadow: isUnlocked && currentStars > 0 ? `0 0 8px ${glowColor}` : 'none',
-                  }}
+                  style={progressBarStyle}
                 />
               </div>
             </div>
@@ -384,7 +408,7 @@ const WorldNode = memo(function WorldNode({
           {isUnlocked && (
             <div
               className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-              style={{ background: `linear-gradient(to top, ${glowColor.replace(/[\d.]+\)$/, '0.06)')}, transparent)` }}
+              style={cardBottomGradientStyle}
             />
           )}
         </div>
@@ -529,6 +553,7 @@ const WorldMap = memo(function WorldMap({
 
           return (
             <React.Fragment key={data.world.id}>
+              <div className="world-node-container">
               <WorldNode
                 world={data.world}
                 isUnlocked={data.isUnlocked}
@@ -550,6 +575,7 @@ const WorldMap = memo(function WorldMap({
                       : 'heavy'
                 }
               />
+              </div>
 
               {index < worldsData.length - 1 && (
                 <TrailPath

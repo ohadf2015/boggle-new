@@ -28,6 +28,8 @@ export function Cloud({
         src="/images/adventure/cloud.webp"
         alt=""
         fill
+        sizes="128px"
+        loading="lazy"
         className="object-contain"
       />
     </div>

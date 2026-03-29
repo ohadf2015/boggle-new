@@ -972,6 +972,9 @@ const ja = {
     "youWereKickedInactive": "非アクティブのため退出されました",
     "afkWarning": "{{seconds}}秒後に非アクティブのため退出されます — タップして滞在！",
     "shareCodeHint": "上のルームコードを共有して友達を招待しよう！",
+    "sendLinkToFriends": "このリンクを友達に送って一緒にプレイしよう",
+    "waitingForFriendsHint": "まだ誰もいません — 下のリンクを共有してプレイヤーを招待しよう！",
+    "inviteMoreFriends": "もっとプレイヤーを招待しよう",
     "battleMode": "バトルモード",
     "preset": "プリセット",
     "ofMaxWarriors": "{{max}}人中準備完了",
@@ -1447,11 +1450,14 @@ const ja = {
       "practiceModeDesc": "プレッシャーなし — 自分のペースで新しい単語を発見。",
       "joinFriendsGame": "フレンドのゲームに参加",
       "joinFriendsGameDesc": "フレンドとライブマッチに飛び込もう！",
+      "friendIsWaiting": "フレンドが待ってるよ！",
+      "pickNameAndJoin": "名前を決めてすぐ参加しよう",
       "homePage": "すべてのモードを見る",
       "homePageDesc": "アドベンチャー、マルチプレイヤーなど。",
       "moreModesUnlock": "プレイするほど新しいモードが解放！",
       "skip": "スキップ",
-      "letsGo": "はじめよう！"
+      "letsGo": "はじめよう！",
+      "chooseLanguage": "言語を選択"
     }
   },
   "preGameTutorial": {
@@ -1633,6 +1639,14 @@ const ja = {
       "clutch": "クラッチプレイヤー",
       "tank": "タンク"
     },
+    "crownDesc": {
+      "sniper": "1単語あたりの平均スコアが最高",
+      "speedDemon": "最も多くの単語を発見",
+      "explorer": "最もユニークな単語を発見",
+      "scholar": "平均単語長が最長",
+      "clutch": "1単語の最高スコア",
+      "tank": "最も安定したスコア"
+    },
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
     "ready": "準備完了！",
@@ -1767,6 +1781,14 @@ const ja = {
       "scholar": "スカラー",
       "clutch": "クラッチプレイヤー",
       "tank": "タンク"
+    },
+    "crownDesc": {
+      "sniper": "1単語あたりの平均スコアが最高",
+      "speedDemon": "最も多くの単語を発見",
+      "explorer": "最もユニークな単語を発見",
+      "scholar": "平均単語長が最長",
+      "clutch": "1単語の最高スコア",
+      "tank": "最も安定したスコア"
     },
     "potentialScore": "+{points}点の可能性",
     "comparativeInsights": {

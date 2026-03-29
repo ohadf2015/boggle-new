@@ -483,17 +483,21 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     </motion.div>
 
                                     {/* ─ Account (Login/Logout) ─ */}
-                                    <motion.div variants={itemVariants}>
-                                        <SectionLabel>{t('common.account')}</SectionLabel>
-                                    </motion.div>
-                                    <motion.div variants={itemVariants}>
-                                        <AuthButton
-                                            inline
-                                            onClose={closeMenu}
-                                            onSignInClick={handleSignIn}
-                                            onSignUpClick={handleSignUp}
-                                        />
-                                    </motion.div>
+                                    {isAuthenticated && (
+                                        <>
+                                            <motion.div variants={itemVariants}>
+                                                <SectionLabel>{t('common.account')}</SectionLabel>
+                                            </motion.div>
+                                            <motion.div variants={itemVariants}>
+                                                <AuthButton
+                                                    inline
+                                                    onClose={closeMenu}
+                                                    onSignInClick={handleSignIn}
+                                                    onSignUpClick={handleSignUp}
+                                                />
+                                            </motion.div>
+                                        </>
+                                    )}
 
                                     {/* Swipe hint */}
                                     <motion.div variants={itemVariants} className="flex justify-center pt-2 pb-1">

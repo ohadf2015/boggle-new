@@ -972,6 +972,9 @@ const sv = {
     "youWereKickedInactive": "Du togs bort på grund av inaktivitet",
     "afkWarning": "Du tas bort om {{seconds}}s på grund av inaktivitet — tryck var som helst för att stanna!",
     "shareCodeHint": "Dela rumskoden ovan så att vänner kan gå med!",
+    "sendLinkToFriends": "Skicka den här länken till vänner så de kan gå med i ditt spel",
+    "waitingForFriendsHint": "Ingen här ännu — dela länken nedan för att bjuda in spelare!",
+    "inviteMoreFriends": "Bjud in fler spelare att gå med",
     "battleMode": "Stridsläge",
     "preset": "Förinställning",
     "ofMaxWarriors": "av {{max}} krigare redo",
@@ -1447,11 +1450,14 @@ const sv = {
       "practiceModeDesc": "Ingen press — spela i din takt och lär dig nya ord.",
       "joinFriendsGame": "Gå med i väns spel",
       "joinFriendsGameDesc": "Hoppa in i en livematch med vänner!",
+      "friendIsWaiting": "Din vän väntar!",
+      "pickNameAndJoin": "Välj ett namn och hoppa in direkt",
       "homePage": "Utforska Alla Lägen",
       "homePageDesc": "Äventyr, multiplayer och mer.",
       "moreModesUnlock": "Fler lägen låses upp när du spelar!",
       "skip": "Hoppa över",
-      "letsGo": "Nu kör vi!"
+      "letsGo": "Nu kör vi!",
+      "chooseLanguage": "Välj språk"
     }
   },
   "preGameTutorial": {
@@ -1632,6 +1638,14 @@ const sv = {
       "clutch": "Avgörande spelaren",
       "tank": "Stridsvagnen"
     },
+    "crownDesc": {
+      "sniper": "Högst medelpoäng per ord",
+      "speedDemon": "Hittade flest ord",
+      "explorer": "Hittade flest unika ord",
+      "scholar": "Längst genomsnittlig ordlängd",
+      "clutch": "Högst poäng på ett enda ord",
+      "tank": "Mest jämn poängsättning"
+    },
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
     "ready": "Redo!",
@@ -1766,6 +1780,14 @@ const sv = {
       "scholar": "Akademikern",
       "clutch": "Clutchspelaren",
       "tank": "Pansarvagnen"
+    },
+    "crownDesc": {
+      "sniper": "Högst medelpoäng per ord",
+      "speedDemon": "Hittade flest ord",
+      "explorer": "Hittade flest unika ord",
+      "scholar": "Längst genomsnittlig ordlängd",
+      "clutch": "Högst poäng på ett enda ord",
+      "tank": "Mest jämn poängsättning"
     },
     "potentialScore": "+{points} möjliga poäng",
     "comparativeInsights": {

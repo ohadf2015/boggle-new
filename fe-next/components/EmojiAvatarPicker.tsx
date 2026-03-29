@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, User, Paintbrush } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -65,9 +64,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
     setMounted(true);
   }, []);
 
-  const { theme } = useTheme();
   const { t } = useLanguage();
-  const isDarkMode = theme === 'dark';
 
   // Check if profile picture is available (user has OAuth profile picture)
   const hasProfilePicture = false;
@@ -105,12 +102,6 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
   const handleSelectAvatar = (avatar: AvatarConfig) => {
     setSelectedAvatar(avatar);
     setUseProfileAvatar(false);
-  };
-
-  // Handle selecting profile picture
-  const handleSelectProfilePicture = () => {
-    setSelectedAvatar(null);
-    setUseProfileAvatar(true);
   };
 
   const handleSave = () => {
@@ -155,36 +146,19 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className={cn(
-            'w-full max-w-md rounded-2xl overflow-hidden',
-            isDarkMode
-              ? 'bg-slate-800 border border-slate-700'
-              : 'bg-white border border-gray-200 shadow-xl'
-          )}
+          className="w-full max-w-md rounded-neo overflow-hidden bg-neo-navy border-3 border-neo-black shadow-hard-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className={cn(
-            'px-6 py-4 border-b',
-            isDarkMode ? 'border-slate-700' : 'border-gray-200'
-          )}>
-            <h2 className={cn(
-              'text-lg font-bold text-center',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}>
+          <div className="px-6 py-3 bg-neo-cyan border-b-3 border-neo-black">
+            <h2 className="text-lg font-black text-neo-black text-center uppercase">
               {t('profile.chooseAvatar')}
             </h2>
           </div>
 
           {/* Preview */}
-          <div className={cn(
-            'flex flex-col items-center py-4',
-            isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
-          )}>
-            <div className={cn(
-              'w-20 h-20 rounded-full overflow-hidden border-4 mb-2 relative',
-              isDarkMode ? 'border-slate-600' : 'border-gray-300'
-            )}>
+          <div className="flex flex-col items-center py-4 bg-neo-navy/50">
+            <div className="w-20 h-20 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm mb-2 relative">
               {selectedAvatar ? (
                 <Image
                   src={getAvatarPath(selectedAvatar)}
@@ -195,18 +169,12 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                   priority
                 />
               ) : (
-                <div className={cn(
-                  'w-full h-full flex items-center justify-center',
-                  isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-                )}>
-                  <User className={cn('w-10 h-10', isDarkMode ? 'text-slate-500' : 'text-gray-400')} />
+                <div className="w-full h-full flex items-center justify-center bg-slate-700">
+                  <User className="w-10 h-10 text-slate-500" />
                 </div>
               )}
             </div>
-            <p className={cn(
-              'text-sm font-bold',
-              isDarkMode ? 'text-gray-300' : 'text-gray-700'
-            )}>
+            <p className="text-sm font-black text-white">
               {getPreviewName()}
             </p>
           </div>
@@ -229,7 +197,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
 
           {/* Avatar Gallery Grid */}
           <div className="p-4">
-            <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-5 gap-2.5 max-h-64 overflow-y-auto pr-1">
               {/* Profile Picture Option (if available) */}
               {/* Character Avatars */}
               {AVATARS.map((avatar) => {
@@ -241,11 +209,11 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                     aria-label={`${t('profile.selectAvatar')} ${avatar.name}`}
                     aria-pressed={isSelected}
                     className={cn(
-                      'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
+                      'relative aspect-square rounded-neo overflow-hidden transition-all duration-100',
+                      'border-2 border-neo-black/30',
                       isSelected
-                        ? 'ring-3 ring-neo-cyan ring-offset-2 scale-105'
-                        : 'hover:scale-105',
-                      isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
+                        ? 'ring-3 ring-neo-cyan ring-offset-1 ring-offset-neo-navy scale-105 border-neo-cyan'
+                        : 'hover:scale-105 hover:border-neo-white/50'
                     )}
                   >
                     <Image
@@ -258,7 +226,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                     />
                     {/* Selected checkmark */}
                     {isSelected && (
-                      <div className="absolute top-1 right-1 w-5 h-5 bg-neo-cyan text-neo-black rounded-full flex items-center justify-center">
+                      <div className="absolute top-0.5 right-0.5 w-5 h-5 bg-neo-cyan text-neo-black rounded-full flex items-center justify-center border-2 border-neo-black shadow-hard-sm">
                         <Check className="w-3 h-3" />
                       </div>
                     )}
@@ -269,19 +237,11 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className={cn(
-            'flex gap-3 p-4 border-t',
-            isDarkMode ? 'border-slate-700' : 'border-gray-200'
-          )}>
+          <div className="flex gap-3 p-4 border-t-3 border-neo-black/40">
             <button
               type="button"
               onClick={onClose}
-              className={cn(
-                'flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2',
-                isDarkMode
-                  ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              )}
+              className="flex-1 py-3 font-bold rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-white/10 text-neo-white border-2 border-neo-white/20 hover:bg-neo-white/20 active:translate-y-[1px]"
             >
               <X size={16} />
               {t('common.cancel')}
@@ -289,7 +249,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
+              className="flex-1 py-3 font-black rounded-neo transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-[1px] active:shadow-none"
             >
               <Check size={16} />
               {t('common.save')}

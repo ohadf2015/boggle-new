@@ -41,13 +41,15 @@ export function WorldMapBackground({
   const cloudsParallaxY = useTransform(parallaxY, (v) => v * 0.6);
 
   // Pre-generate star positions for galaxy background
+  // Reduce count on low-end/mobile to cut DOM nodes and animated layers in half
+  const starCount = isLowEnd ? 12 : 25;
   const stars = useMemo(() => {
     const seededRandom = (seed: number) => {
       const x = Math.sin(seed * 9999) * 10000;
       return x - Math.floor(x);
     };
 
-    return Array.from({ length: 40 }, (_, i) => ({
+    return Array.from({ length: starCount }, (_, i) => ({
       id: i,
       left: seededRandom(i * 1.1) * 100,
       top: seededRandom(i * 2.3) * 100,
@@ -57,7 +59,7 @@ export function WorldMapBackground({
       size: i % 5 === 0 ? 4 : i % 3 === 0 ? 3 : i % 2 === 0 ? 2 : 1,
       color: i % 7 === 0 ? '#a5f3fc' : i % 11 === 0 ? '#fcd34d' : i % 13 === 0 ? '#f9a8d4' : '#ffffff',
     }));
-  }, []);
+  }, [starCount]);
 
   // Nebula clouds — pre-blurred radial gradients replace blur(100-120px) filters
   const nebulaClouds = useMemo(() => [
@@ -106,8 +108,8 @@ export function WorldMapBackground({
         }}
       />
 
-      {/* Nebula clouds — radial-gradient only, blur capped at 40px (skip on low-end) */}
-      <AdaptiveMotion.div
+      {/* Nebula clouds — radial-gradient only, blur capped at 40px (skip entirely on low-end) */}
+      {!skipBlur && <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ x: nebulaX, y: nebulaY }}
       >
@@ -121,16 +123,16 @@ export function WorldMapBackground({
               width: nebula.size,
               height: nebula.size,
               background: `radial-gradient(circle, ${nebula.color} 0%, transparent 60%)`,
-              filter: skipBlur ? 'none' : 'blur(40px)',
-              willChange: skipBlur ? 'auto' : 'transform',
+              filter: 'blur(40px)',
+              willChange: 'transform',
               '--nebula-duration': `${12 + i * 2}s`,
             } as React.CSSProperties}
           />
         ))}
-      </AdaptiveMotion.div>
+      </AdaptiveMotion.div>}
 
-      {/* Shooting stars */}
-      <AdaptiveMotion.div
+      {/* Shooting stars — skip on low-end to reduce animated layers */}
+      {!isLowEnd && <AdaptiveMotion.div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ x: shootingX, y: shootingY }}
       >
@@ -146,7 +148,7 @@ export function WorldMapBackground({
             } as React.CSSProperties}
           />
         ))}
-      </AdaptiveMotion.div>
+      </AdaptiveMotion.div>}
 
       {/* Starfield with parallax */}
       <AdaptiveMotion.div
@@ -172,7 +174,7 @@ export function WorldMapBackground({
               width: star.size,
               height: star.size,
               backgroundColor: star.color,
-              boxShadow: star.size > 2 ? `0 0 ${star.size * 2}px ${star.color}` : 'none',
+              boxShadow: !isLowEnd && star.size > 2 ? `0 0 ${star.size * 2}px ${star.color}` : 'none',
               '--star-opacity-min': star.opacity * 0.4,
               '--star-opacity-max': star.opacity,
               '--star-duration': `${star.duration}s`,

@@ -37,9 +37,9 @@ const AUTO_SECONDS = 15;
  * Inline ready bar — renders as flex items inside a parent floating bar.
  * No fixed positioning or background — the parent ResultsPage handles that.
  *
- * All players (host + non-host) get a 15s auto-countdown.
- * - Host: auto-starts game after 15s
- * - Non-host: auto-marks ready after 15s
+ * All players (host + non-host) get a 21s auto-countdown.
+ * - Host: auto-starts game after 21s
+ * - Non-host: auto-marks ready after 21s
  * - Non-1st-place players see "Revenge {winner}"
  * - 1st-place sees "Defend Title"
  * - Bots are always counted as ready
@@ -77,10 +77,11 @@ export default function StickyReadyBar({
 
   const winnerAvatar = winnerUsername ? playerMap.get(winnerUsername)?.avatar : undefined;
 
-  // ---------- Unified 15s countdown for ALL players ----------
+  // ---------- Unified 21s countdown for ALL players ----------
   const [cancelled, setCancelled] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(AUTO_SECONDS);
   const completedRef = useRef(false);
+  const countdownStartedRef = useRef(false);
 
   // Determine if we should show auto-countdown
   // Host: always (auto-starts game)
@@ -100,8 +101,12 @@ export default function StickyReadyBar({
 
   useEffect(() => {
     if (!showCountdown) return;
-    completedRef.current = false;
-    setSecondsLeft(AUTO_SECONDS);
+    // Only reset countdown on first start — don't restart when players leave
+    if (!countdownStartedRef.current) {
+      completedRef.current = false;
+      setSecondsLeft(AUTO_SECONDS);
+      countdownStartedRef.current = true;
+    }
 
     const interval = setInterval(() => {
       setSecondsLeft(prev => {

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, BookOpen, Copy, LogOut, Bot, Plus, Minus, Sparkles, Brain, Zap } from 'lucide-react';
+import { Users, BookOpen, LogOut, Bot, Plus, Minus, Sparkles, Brain, Zap } from 'lucide-react';
 import RoomChat from '../../components/RoomChat';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useSocket } from '../../utils/SocketContext';
@@ -343,23 +343,11 @@ function HostPreGameView({
           <div className="flex items-center gap-2">
             <DJMascotWithEntrance size="sm" delay={0.3} />
             <div className="flex flex-col">
-              <span className="text-xs uppercase font-bold text-slate-400 tracking-widest leading-none mb-1">
-                {t('roomCode.label')}
+              <span className="text-lg font-neo-display font-bold text-neo-cream leading-none"
+                style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+              >
+                {username}
               </span>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-neo-display font-bold text-neo-cyan uppercase leading-none"
-                  style={{ textShadow: '0 0 12px rgba(0, 255, 255, 0.6)' }}
-                >
-                  {gameCode}
-                </span>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(gameCode); }}
-                  className="text-slate-400 hover:text-neo-white transition-colors p-1"
-                  aria-label={t('roomCode.copy')}
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -496,15 +484,24 @@ function HostPreGameView({
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0 pb-24">
             <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
+            {/* Share section first when no players — most important action */}
+            {actualPlayerCount === 0 && (
+              <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
+                <MobileShareSection gameCode={gameCode} t={t} showHint />
+              </motion.div>
+            )}
+            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={actualPlayerCount === 0 ? 1 : 0}>
               <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
+            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={actualPlayerCount === 0 ? 2 : 1}>
               <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
             </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
-              <MobileShareSection gameCode={gameCode} t={t} />
-            </motion.div>
+            {/* Share section in normal position when players exist */}
+            {actualPlayerCount > 0 && (
+              <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
+                <MobileShareSection gameCode={gameCode} t={t} />
+              </motion.div>
+            )}
             <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
               <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
                 <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />

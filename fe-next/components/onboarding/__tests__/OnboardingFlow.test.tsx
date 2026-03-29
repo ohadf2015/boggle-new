@@ -4,18 +4,18 @@ import '@testing-library/jest-dom';
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const React = require('react');
-  const MotionDiv = React.forwardRef(function MotionDiv(
-    { children, ...props }: any,
-    ref: any
-  ) {
-    return (
-      <div ref={ref} {...props}>
-        {children}
-      </div>
-    );
+  const createMotionComponent = (tag: string) =>
+    React.forwardRef(function MotionComponent(
+      { children, ...props }: any,
+      ref: any
+    ) {
+      return React.createElement(tag, { ref, ...props }, children);
+    });
+  const motion = new Proxy({} as Record<string, any>, {
+    get: (_target, prop: string) => createMotionComponent(prop),
   });
   return {
-    motion: { div: MotionDiv },
+    motion,
     AnimatePresence: function AnimatePresence({ children }: any) {
       return <>{children}</>;
     },
@@ -64,13 +64,28 @@ vi.mock('../TutorialGame', () => {
   };
 });
 
+vi.mock('@/utils/profileStorage', () => ({
+  setStoredCustomAvatar: vi.fn(),
+  getStoredCustomAvatar: vi.fn(() => null),
+}));
+
+vi.mock('../LanguageSelect', () => {
+  return {
+    __esModule: true,
+    default: ({ onSelect }: any) => (
+      <div data-testid="language-select">
+        <button onClick={onSelect}>Select Language</button>
+      </div>
+    ),
+  };
+});
+
 vi.mock('../QuickProfileSetup', () => {
   return {
     __esModule: true,
-    default: ({ onComplete, onSkip }: any) => (
+    default: ({ onComplete }: any) => (
       <div data-testid="quick-profile-setup">
         <button onClick={() => onComplete('Player1', {})}>Set Profile</button>
-        <button onClick={() => onSkip()}>Skip Profile</button>
       </div>
     ),
   };
@@ -112,45 +127,58 @@ describe('OnboardingFlow', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHasPendingRoom.mockReturnValue(false);
+    mockConsumePendingRoom.mockReturnValue(null);
   });
 
-  it('starts with the tutorial game step', () => {
+  const selectLanguage = () => fireEvent.click(screen.getByText('Select Language'));
+
+  it('starts with the language select step', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    expect(screen.getByTestId('language-select')).toBeInTheDocument();
+  });
+
+  it('transitions to tutorial after language select', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
   });
 
   it('transitions to profile setup after tutorial completes', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
   });
 
   it('transitions to score reveal after profile setup', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    // Complete tutorial
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
-    // Complete profile
     fireEvent.click(screen.getByText('Set Profile'));
     expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
   });
 
   it('transitions to mode fork after score reveal continue', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
     fireEvent.click(screen.getByText('Continue'));
     expect(screen.getByTestId('mode-fork')).toBeInTheDocument();
   });
 
-  it('skipping profile also advances to score reveal', () => {
+  it('advances to score reveal after profile setup', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Skip Profile'));
+    fireEvent.click(screen.getByText('Set Profile'));
     expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
   });
 
   it('calls onComplete when a mode is selected', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
     fireEvent.click(screen.getByText('Continue'));
@@ -160,6 +188,7 @@ describe('OnboardingFlow', () => {
 
   it('marks onboarding as complete when flow finishes', () => {
     render(<OnboardingFlow {...defaultProps} />);
+    selectLanguage();
     fireEvent.click(screen.getByText('Complete Tutorial'));
     fireEvent.click(screen.getByText('Set Profile'));
     fireEvent.click(screen.getByText('Continue'));
@@ -175,41 +204,35 @@ describe('OnboardingFlow', () => {
   });
 
   describe('pending room invite', () => {
-    const advanceToModeFork = () => {
+    const advanceToProfile = () => {
+      selectLanguage();
       fireEvent.click(screen.getByText('Complete Tutorial'));
+    };
+
+    const advanceToModeFork = () => {
+      advanceToProfile();
       fireEvent.click(screen.getByText('Set Profile'));
       fireEvent.click(screen.getByText('Continue'));
     };
 
-    it('redirects to multiplayer room when pending invite exists and daily selected', () => {
+    it('redirects to multiplayer room directly from profile when pending invite exists', () => {
+      mockHasPendingRoom.mockReturnValue(true);
       mockConsumePendingRoom.mockReturnValue('ABC123');
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToModeFork();
-      fireEvent.click(screen.getByText('Daily'));
+      advanceToProfile();
+      fireEvent.click(screen.getByText('Set Profile'));
       expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
-    });
-
-    it('redirects to multiplayer room when pending invite exists and practice selected', () => {
-      mockConsumePendingRoom.mockReturnValue('XYZ789');
-      render(<OnboardingFlow {...defaultProps} />);
-      advanceToModeFork();
-      fireEvent.click(screen.getByText('Practice'));
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=XYZ789');
-    });
-
-    it('redirects to multiplayer room when joinRoom selected', () => {
-      mockHasPendingRoom.mockReturnValue(true);
-      mockConsumePendingRoom.mockReturnValue('ROOM42');
-      render(<OnboardingFlow {...defaultProps} />);
-      advanceToModeFork();
-      fireEvent.click(screen.getByText('Join Room'));
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ROOM42');
     });
 
     it('redirects to daily when no pending invite and daily selected', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToModeFork();
+      advanceToProfile();
+      // Click Set Profile — should advance to scoreReveal
+      fireEvent.click(screen.getByText('Set Profile'));
+      // Now we should be on score-reveal
+      expect(screen.getByTestId('score-reveal')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Continue'));
       fireEvent.click(screen.getByText('Daily'));
       expect(mockPush).toHaveBeenCalledWith('/en/daily');
     });

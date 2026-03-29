@@ -52,6 +52,9 @@ const mockT = (key: string) => {
     'common.error': 'Failed to copy',
     'common.copied': 'Copied!',
     'hostView.inviteFriends': 'Invite Friends',
+    'hostView.sendLinkToFriends': 'Send link to friends',
+    'hostView.waitingForFriendsHint': 'Waiting for friends to join...',
+    'hostView.roomCode': 'Room Code',
   };
   return translations[key] || key;
 };
@@ -86,7 +89,7 @@ describe('MobileShareSection', () => {
 
     it('renders section title', () => {
       render(<MobileShareSection gameCode="TEST123" t={mockT} />);
-      expect(screen.getByText('Invite Friends')).toBeInTheDocument();
+      expect(screen.getByText('Send link to friends')).toBeInTheDocument();
     });
 
     it('renders all three share buttons', () => {

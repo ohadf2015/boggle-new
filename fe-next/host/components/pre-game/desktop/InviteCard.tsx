@@ -127,7 +127,7 @@ export function InviteCard({
                   </h2>
                 </div>
                 <p className="text-sm text-neo-cream/70 leading-relaxed">
-                  {t('hostView.scanOrShare')}
+                  {t('hostView.sendLinkToFriends')}
                 </p>
               </div>
 

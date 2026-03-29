@@ -989,6 +989,9 @@ const he = {
     "youWereKickedInactive": "הוסרת בגלל חוסר פעילות",
     "afkWarning": "תוסר/י בעוד {{seconds}} שניות בגלל חוסר פעילות — לחצ/י כדי להישאר!",
     "shareCodeHint": "שתפו את קוד החדר למעלה כדי שחברים יצטרפו!",
+    "sendLinkToFriends": "שלחו את הלינק הזה לחברים כדי שיצטרפו למשחק",
+    "waitingForFriendsHint": "עוד אף אחד פה — שתפו את הלינק למטה כדי להזמין שחקנים!",
+    "inviteMoreFriends": "הזמינו עוד שחקנים להצטרף",
     "battleMode": "מצב קרב",
     "preset": "הגדרה",
     "ofMaxWarriors": "מתוך {{max}} לוחמים מוכנים",
@@ -1464,11 +1467,14 @@ const he = {
       "practiceModeDesc": "בלי לחץ — שחקו בקצב שלכם וגלו מילים חדשות.",
       "joinFriendsGame": "הצטרפו למשחק של חבר",
       "joinFriendsGameDesc": "קפצו למשחק חי עם חברים!",
+      "friendIsWaiting": "החבר שלכם מחכה!",
+      "pickNameAndJoin": "בחרו שם והצטרפו למשחק",
       "homePage": "גלו את כל המצבים",
       "homePageDesc": "הרפתקה, מרובה משתתפים ועוד.",
       "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
       "skip": "דלג",
-      "letsGo": "יאללה, מתחילים!"
+      "letsGo": "יאללה, מתחילים!",
+      "chooseLanguage": "בחרו שפה"
     }
   },
 
@@ -1651,6 +1657,14 @@ const he = {
       "clutch": "שחקן הרגע",
       "tank": "הטנק"
     },
+    "crownDesc": {
+      "sniper": "ממוצע ניקוד גבוה למילה",
+      "speedDemon": "מצא הכי הרבה מילים",
+      "explorer": "מצא הכי הרבה מילים ייחודיות",
+      "scholar": "אורך מילה ממוצע הכי ארוך",
+      "clutch": "הניקוד הגבוה ביותר למילה אחת",
+      "tank": "הניקוד הכי עקבי"
+    },
     "everyoneReady": "כולם מוכנים!",
     "waitingForPlayers": "ממתין לשחקנים",
     "ready": "מוכן!",
@@ -1785,6 +1799,14 @@ const he = {
       "scholar": "המלומד",
       "clutch": "שחקן קלאצ'",
       "tank": "הטנק"
+    },
+    "crownDesc": {
+      "sniper": "ממוצע ניקוד גבוה למילה",
+      "speedDemon": "מצא הכי הרבה מילים",
+      "explorer": "מצא הכי הרבה מילים ייחודיות",
+      "scholar": "אורך מילה ממוצע הכי ארוך",
+      "clutch": "הניקוד הגבוה ביותר למילה אחת",
+      "tank": "הניקוד הכי עקבי"
     },
     "potentialScore": "+{points} נק' פוטנציאל",
     "comparativeInsights": {

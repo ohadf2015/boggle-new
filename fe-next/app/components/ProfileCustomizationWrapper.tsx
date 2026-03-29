@@ -60,9 +60,9 @@ export default function ProfileCustomizationWrapper() {
     setShowModal(false);
   }, [updateProfile]);
 
-  // Handle modal close (same as save with defaults)
+  // No-op close handler — user must save a name to dismiss
   const handleClose = useCallback(() => {
-    setShowModal(false);
+    // Intentionally empty: modal cannot be dismissed without saving
   }, []);
 
   // Don't render anything until mounted (hydration safety)

@@ -1,8 +1,8 @@
 /**
  * StickyReadyBar Auto-Ready Countdown Tests (Brawl Stars-inspired)
  *
- * Tests the unified 15s auto-countdown flow:
- * - All players (host + non-host) see a 15s countdown
+ * Tests the unified 21s auto-countdown flow:
+ * - All players (host + non-host) see a 21s countdown
  * - Non-host players are auto-readied when countdown hits 0
  * - Host auto-starts when countdown hits 0
  * - Players can manually ready/start before countdown expires
@@ -152,9 +152,9 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     expect(screen.getByText('Revenge on winner!')).toBeInTheDocument();
   });
 
-  // --- Host gets same 15s countdown ---
+  // --- Host gets same 21s countdown ---
 
-  it('host also gets 15s countdown (auto-starts game)', () => {
+  it('host also gets 21s countdown (auto-starts game)', () => {
     render(
       <StickyReadyBar
         {...baseProps}

@@ -105,7 +105,6 @@ import QuickProfileSetup from '../QuickProfileSetup';
 describe('QuickProfileSetup', () => {
   const defaultProps = {
     onComplete: vi.fn(),
-    onSkip: vi.fn(),
   };
 
   beforeEach(() => {
@@ -137,16 +136,11 @@ describe('QuickProfileSetup', () => {
     expect(screen.getByTestId('avatar-preview')).toBeInTheDocument();
   });
 
-  it('renders skip button', () => {
+  it('requires a name of at least 2 characters', () => {
     render(<QuickProfileSetup {...defaultProps} />);
-    const skipButton = screen.getByText('Skip');
-    expect(skipButton).toBeInTheDocument();
-  });
-
-  it('calls onSkip when skip is clicked', () => {
-    render(<QuickProfileSetup {...defaultProps} />);
-    fireEvent.click(screen.getByText('Skip'));
-    expect(defaultProps.onSkip).toHaveBeenCalledTimes(1);
+    // Clicking submit with empty name should not call onComplete
+    fireEvent.click(screen.getByText("Let's go!"));
+    expect(defaultProps.onComplete).not.toHaveBeenCalled();
   });
 
   it('calls onComplete with name when form submitted', () => {
@@ -191,6 +185,8 @@ describe('QuickProfileSetup', () => {
 
     it('uses saved avatar from builder in onComplete', () => {
       render(<QuickProfileSetup {...defaultProps} />);
+      // Enter a name first
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Player' } });
       // Open builder, save custom avatar
       fireEvent.click(screen.getByTestId('avatar-edit-button'));
       fireEvent.click(screen.getByTestId('builder-save'));

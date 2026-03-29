@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, X, Sparkles, ArrowRight } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
@@ -20,8 +19,8 @@ interface ProfileCustomizationModalProps {
 }
 
 /**
- * ProfileCustomizationModal - Compact modal for new users to customize their profile
- * Uses the AvatarBuilderModal (via AvatarSelectorButton) for avatar customization
+ * ProfileCustomizationModal - Required modal for new users to set their name and avatar.
+ * Name is mandatory (no skip). Avatar defaults to random if not customized.
  */
 const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   isOpen,
@@ -31,6 +30,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   onSave,
 }) => {
   const { t, dir } = useLanguage();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig>(
     () => initialAvatar ?? getRandomAvatarConfig()
@@ -38,6 +38,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   const [displayName, setDisplayName] = useState(defaultName);
   const [isSaving, setIsSaving] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
+  const [showShake, setShowShake] = useState(false);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -45,30 +46,41 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
       setDisplayName(defaultName);
       setSelectedAvatar(initialAvatar ?? getRandomAvatarConfig());
       setNameTouched(false);
+      // Auto-focus the name input after a brief delay
+      setTimeout(() => inputRef.current?.focus(), 400);
     }
   }, [isOpen, defaultName, initialAvatar]);
 
   // Name validation
   const minLength = 2;
   const maxLength = 20;
+  const trimmedName = displayName.trim();
   const isValidFormat = /^[\p{L}\p{N}\s._-]+$/u.test(displayName) || displayName === '';
-  const isValidLength = displayName.trim().length >= minLength && displayName.length <= maxLength;
+  const isValidLength = trimmedName.length >= minLength && displayName.length <= maxLength;
   const isNameValid = isValidFormat && isValidLength;
+  const isEmpty = trimmedName.length === 0;
   const showNameError = nameTouched && displayName.length > 0 && !isNameValid;
 
   const getErrorMessage = () => {
     if (!isValidFormat) return t('validation.invalidCharacters');
-    if (displayName.trim().length < minLength) return t('validation.usernameTooShort');
+    if (trimmedName.length < minLength) return t('validation.usernameTooShort');
     if (displayName.length > maxLength) return t('validation.usernameTooLong');
     return '';
   };
 
   const handleSave = async () => {
-    if (!isNameValid) return;
+    setNameTouched(true);
+    if (!isNameValid) {
+      // Shake the input to indicate error
+      setShowShake(true);
+      setTimeout(() => setShowShake(false), 500);
+      inputRef.current?.focus();
+      return;
+    }
 
     setIsSaving(true);
     try {
-      await onSave(displayName.trim(), selectedAvatar);
+      await onSave(trimmedName, selectedAvatar);
       onClose();
     } catch (error) {
       console.error('Failed to save profile:', error);
@@ -77,15 +89,9 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
     }
   };
 
-  const handleSkip = async () => {
-    setIsSaving(true);
-    try {
-      await onSave(defaultName, selectedAvatar);
-      onClose();
-    } catch (error) {
-      console.error('Failed to skip:', error);
-    } finally {
-      setIsSaving(false);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && isNameValid) {
+      handleSave();
     }
   };
 
@@ -98,125 +104,139 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="bg-neo-cyan text-neo-black p-3 sm:p-4">
-          <DialogTitle className="text-lg sm:text-xl font-black uppercase text-center">
+        {/* Header with gradient */}
+        <DialogHeader className="bg-gradient-to-r from-neo-cyan via-neo-cyan to-neo-lime text-neo-black p-4 sm:p-5 relative overflow-hidden">
+          <Sparkles className="absolute top-2 right-3 w-4 h-4 text-neo-black/20 animate-pulse" aria-hidden="true" />
+          <Sparkles className="absolute bottom-2 left-4 w-3 h-3 text-neo-black/15 animate-pulse" aria-hidden="true" />
+          <DialogTitle className="text-xl sm:text-2xl font-black uppercase text-center tracking-tight">
             {t('profileCustomization.title')}
           </DialogTitle>
-        </DialogHeader>
-
-        <DialogBody className="space-y-4 px-4 sm:px-5 py-3">
-          <p className="text-center text-sm text-neo-black/70 dark:text-gray-300">
+          <p className="text-sm text-neo-black/60 text-center mt-1 font-bold">
             {t('profileCustomization.subtitle')}
           </p>
+        </DialogHeader>
 
-          {/* Avatar + Name input */}
-          <div className="bg-neo-cream dark:bg-slate-700 border-3 border-neo-black dark:border-slate-600 rounded-neo p-3 shadow-hard-md">
-            <div className="flex items-start gap-3 sm:gap-4">
-              {/* Avatar builder button */}
-              <div className="flex flex-col items-center gap-2 shrink-0">
-                <AvatarSelectorButton
-                  selectedAvatar={selectedAvatar}
-                  onAvatarSelect={setSelectedAvatar}
-                  t={t}
-                  size="lg"
-                />
-                <div className="text-[10px] sm:text-xs text-neo-black/60 dark:text-gray-400 text-center">
-                  {t('onboarding.profile.tapToCustomize', 'Tap to customize')}
-                </div>
-              </div>
+        <DialogBody className="px-4 sm:px-5 py-5">
+          {/* Avatar section — centered, prominent */}
+          <div className="flex flex-col items-center mb-5">
+            <AvatarSelectorButton
+              selectedAvatar={selectedAvatar}
+              onAvatarSelect={setSelectedAvatar}
+              t={t}
+              size="lg"
+            />
+            <div className="text-xs text-neo-black/50 dark:text-gray-400 text-center mt-2 font-bold">
+              {t('onboarding.profile.tapToCustomize', 'Tap to customize')}
+            </div>
+          </div>
 
-              {/* Name input */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => {
-                      setNameTouched(true);
-                      setDisplayName(e.target.value);
-                    }}
-                    onBlur={() => setNameTouched(true)}
-                    placeholder={t('profileCustomization.namePlaceholder')}
-                    maxLength={maxLength}
-                    className={cn(
-                      'w-full px-3 py-2.5 bg-white dark:bg-slate-600 border-3 border-neo-black dark:border-slate-500 rounded-neo',
-                      'font-bold text-base text-neo-black dark:text-white placeholder:text-neo-black/40 dark:placeholder:text-gray-400',
-                      'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
-                      'shadow-hard-sm transition-all',
-                      'min-h-[44px]',
-                      showNameError && 'border-neo-red focus:ring-neo-red',
-                      isNameValid && displayName.length > 0 && 'border-neo-lime'
-                    )}
-                  />
-
-                  {/* Validation indicator */}
-                  {displayName.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className={cn(
-                        'w-8 h-8 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
-                        isNameValid
-                          ? 'bg-neo-lime border-neo-black'
-                          : 'bg-neo-red border-neo-black'
-                      )}
-                    >
-                      {isNameValid ? (
-                        <Check className="text-neo-black dark:text-neo-black w-4 h-4" />
-                      ) : (
-                        <X className="text-neo-black dark:text-neo-white w-4 h-4" />
-                      )}
-                    </motion.div>
+          {/* Name input — full width, prominent */}
+          <div className="bg-neo-cream dark:bg-slate-700 border-3 border-neo-black dark:border-slate-600 rounded-neo p-3 shadow-hard-sm">
+            <label className="block text-xs font-black text-neo-black/70 dark:text-gray-300 uppercase tracking-wide mb-1.5">
+              {t('validation.usernameRequired')}
+            </label>
+            <div className="flex items-center gap-2">
+              <motion.div
+                className="flex-1"
+                animate={showShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+                transition={{ duration: 0.4 }}
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => {
+                    setNameTouched(true);
+                    setDisplayName(e.target.value);
+                  }}
+                  onBlur={() => setNameTouched(true)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('profileCustomization.namePlaceholder')}
+                  maxLength={maxLength}
+                  autoComplete="off"
+                  className={cn(
+                    'w-full px-3 py-3 bg-white dark:bg-slate-600 border-3 border-neo-black dark:border-slate-500 rounded-neo',
+                    'font-bold text-lg text-neo-black dark:text-white placeholder:text-neo-black/30 dark:placeholder:text-gray-400',
+                    'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
+                    'shadow-hard-sm transition-all',
+                    'min-h-[48px]',
+                    showNameError && 'border-neo-red focus:ring-neo-red',
+                    isNameValid && !isEmpty && 'border-neo-lime'
                   )}
-                </div>
+                />
+              </motion.div>
 
-                {/* Character counter / Error */}
-                <div className="flex justify-between items-center text-[10px] mt-1.5">
-                  <div
+              {/* Validation indicator */}
+              <AnimatePresence>
+                {displayName.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
                     className={cn(
-                      'font-medium',
-                      showNameError ? 'text-neo-red' : 'text-neo-black/60 dark:text-gray-400'
+                      'w-9 h-9 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
+                      isNameValid
+                        ? 'bg-neo-lime border-neo-black'
+                        : 'bg-neo-red border-neo-black'
                     )}
                   >
-                    {showNameError ? getErrorMessage() : `${minLength}-${maxLength} ${t('onboarding.name.characterCount', 'chars')}`}
-                  </div>
-                  <div
-                    className={cn(
-                      'font-bold',
-                      displayName.length > maxLength ? 'text-neo-red' : 'text-neo-black/60 dark:text-gray-400'
+                    {isNameValid ? (
+                      <Check className="text-neo-black w-4 h-4" />
+                    ) : (
+                      <X className="text-neo-white w-4 h-4" />
                     )}
-                  >
-                    {displayName.length}/{maxLength}
-                  </div>
-                </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Character counter / Error */}
+            <div className="flex justify-between items-center text-[10px] mt-1.5 px-0.5">
+              <div
+                className={cn(
+                  'font-bold',
+                  showNameError ? 'text-neo-red' : 'text-neo-black/50 dark:text-gray-400'
+                )}
+              >
+                {showNameError
+                  ? getErrorMessage()
+                  : isEmpty && nameTouched
+                    ? t('validation.usernameRequired')
+                    : `${minLength}-${maxLength} ${t('onboarding.name.characterCount', 'chars')}`}
+              </div>
+              <div
+                className={cn(
+                  'font-bold',
+                  displayName.length > maxLength ? 'text-neo-red' : 'text-neo-black/50 dark:text-gray-400'
+                )}
+              >
+                {displayName.length}/{maxLength}
               </div>
             </div>
           </div>
         </DialogBody>
 
-        <DialogFooter className="px-4 sm:px-5 pb-4 flex gap-2">
-          <Button
-            onClick={handleSkip}
-            variant="outline"
-            disabled={isSaving}
-            className="flex-1 border-2 border-neo-black dark:border-slate-500 font-bold"
-          >
-            {t('profileCustomization.skipButton')}
-          </Button>
-          <Button
+        <DialogFooter className="px-4 sm:px-5 pb-4">
+          <button
             onClick={handleSave}
-            disabled={!isNameValid || isSaving}
-            className="flex-1 bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard"
+            disabled={isSaving}
+            className={cn(
+              'w-full py-3.5 font-black text-lg uppercase rounded-neo border-3 border-neo-black transition-all',
+              isNameValid && !isEmpty
+                ? 'bg-neo-lime text-neo-black shadow-hard hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-[1px] active:shadow-hard-sm'
+                : 'bg-neo-black/20 text-neo-black/40 dark:bg-slate-600 dark:text-gray-500 cursor-not-allowed shadow-none',
+              'flex items-center justify-center gap-2'
+            )}
           >
             {isSaving ? (
               <Loader size="sm" />
             ) : (
               <>
-                <Check className="w-5 h-5 me-2" />
                 {t('profileCustomization.saveButton')}
+                <ArrowRight className="w-5 h-5" />
               </>
             )}
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

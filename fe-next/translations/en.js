@@ -1012,6 +1012,9 @@ const en = {
     "broadcastModeDesc": "Host watches, not plays",
     "broadcastModeHint": "Got 4+ players? Throw the game on a TV!",
     "scanOrShare": "Scan QR code or share link",
+    "sendLinkToFriends": "Send this link to friends so they can join your game",
+    "waitingForFriendsHint": "No one here yet — share the link below to invite players!",
+    "inviteMoreFriends": "Invite more players to join",
     "broadcastSuggestion": "Got 4+ players? Try TV Mode to display the game on a big screen!",
     "advancedSettings": "Advanced Settings",
     "roomClosedInactivity": "Room timed out — everyone went quiet!",
@@ -1550,11 +1553,14 @@ const en = {
       "practiceModeDesc": "No pressure — play at your own pace and learn new words.",
       "joinFriendsGame": "Join Friend's Game",
       "joinFriendsGameDesc": "Jump into a live match with friends!",
+      "friendIsWaiting": "Your friend is waiting!",
+      "pickNameAndJoin": "Pick a name and jump right in",
       "homePage": "Explore All Modes",
       "homePageDesc": "Browse adventure, multiplayer, and more.",
       "moreModesUnlock": "More modes unlock as you play!",
       "skip": "Skip",
-      "letsGo": "Let's Start!"
+      "letsGo": "Let's Start!",
+      "chooseLanguage": "Choose your language"
     }
   },
   "preGameTutorial": {
@@ -1735,6 +1741,14 @@ const en = {
       "clutch": "Clutch Player",
       "tank": "The Tank"
     },
+    "crownDesc": {
+      "sniper": "Highest avg score per word",
+      "speedDemon": "Found the most words",
+      "explorer": "Found the most unique words",
+      "scholar": "Longest average word length",
+      "clutch": "Highest single-word score",
+      "tank": "Most consistent scoring"
+    },
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting...",
     "ready": "Ready!",
@@ -1869,6 +1883,14 @@ const en = {
       "scholar": "The Scholar",
       "clutch": "Clutch Player",
       "tank": "The Tank"
+    },
+    "crownDesc": {
+      "sniper": "Highest avg score per word",
+      "speedDemon": "Found the most words",
+      "explorer": "Found the most unique words",
+      "scholar": "Longest average word length",
+      "clutch": "Highest single-word score",
+      "tank": "Most consistent scoring"
     },
     "potentialScore": "+{points} pts potential",
     "comparativeInsights": {

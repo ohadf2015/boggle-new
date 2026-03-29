@@ -7,12 +7,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { markOnboardingComplete, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import LanguageSelect from './LanguageSelect';
 import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
 import ScoreReveal from './ScoreReveal';
 import ModeFork from './ModeFork';
 
-type FlowStep = 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
+type FlowStep = 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -30,11 +31,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { language, dir } = useLanguage();
   const router = useRouter();
 
-  const [step, setStep] = useState<FlowStep>('tutorial');
+  const [step, setStep] = useState<FlowStep>('language');
   const [tutorialScore, setTutorialScore] = useState(0);
-  const [tutorialWords, setTutorialWords] = useState<string[]>([]);
+  const [, setTutorialWords] = useState<string[]>([]);
   const [playerName, setPlayerName] = useState('');
-  const [playerAvatar, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
+  const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
 
   // Step 1: Tutorial complete
   const handleTutorialComplete = useCallback(
@@ -52,15 +53,25 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setPlayerName(name);
       setPlayerAvatar(avatar);
       setStoredCustomAvatar(avatar);
+
+      // If player arrived via room invite, skip scoreReveal + fork — go straight to the room
+      if (hasPendingRoomInvite()) {
+        markOnboardingComplete({
+          avatarId: 'custom',
+          displayName: name,
+          selectedMode: 'multi',
+        });
+        const roomCode = consumePendingRoomInvite();
+        router.push(`/${language}/multiplayer?room=${roomCode}`);
+        onComplete();
+        return;
+      }
+
       setStep('scoreReveal');
     },
-    []
+    [language, router, onComplete]
   );
 
-  // Step 2 alt: Profile skipped
-  const handleProfileSkip = useCallback(() => {
-    setStep('scoreReveal');
-  }, []);
 
   // Step 3: Try again (restart tutorial)
   const handleTryAgain = useCallback(() => {
@@ -104,15 +115,22 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [language, router, onComplete, playerName]
   );
 
+  // Step 0: Language selected — proceed to tutorial
+  const handleLanguageSelect = useCallback(() => {
+    setStep('tutorial');
+  }, []);
+
   const renderStep = () => {
     switch (step) {
+      case 'language':
+        return <LanguageSelect onSelect={handleLanguageSelect} />;
       case 'tutorial':
         return <TutorialGame onComplete={handleTutorialComplete} />;
       case 'profile':
         return (
           <QuickProfileSetup
             onComplete={handleProfileComplete}
-            onSkip={handleProfileSkip}
+            hasPendingInvite={hasPendingRoomInvite()}
           />
         );
       case 'scoreReveal':

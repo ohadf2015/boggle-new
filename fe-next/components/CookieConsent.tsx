@@ -86,10 +86,26 @@ export default function CookieConsent() {
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
+      {/* Close (X) button — declines all cookies */}
+      <button
+        onClick={handleDeclineAll}
+        aria-label={t('cookieConsent.decline')}
+        className={cn(
+          'absolute top-2 end-2 p-1.5 min-h-[44px] min-w-[44px]',
+          'flex items-center justify-center',
+          'text-neo-cream/60 hover:text-neo-white',
+          'transition-colors duration-100'
+        )}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
       <div className="max-w-4xl mx-auto">
         {/* Main message */}
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-          <p className="text-sm text-neo-cream/90 font-medium flex-1 text-center sm:text-start">
+          <p className="text-sm text-neo-cream/90 font-medium flex-1 text-center sm:text-start pe-8 sm:pe-0">
             {t('cookieConsent.message')}{' '}
             <a
               href={`/${language}/legal/cookies`}

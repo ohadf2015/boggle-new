@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
   onComplete: (name: string, avatar: CustomAvatarConfig) => void;
-  onSkip: () => void;
+  onSkip?: () => void;
+  hasPendingInvite?: boolean;
 }
 
 /**
@@ -21,13 +22,18 @@ interface QuickProfileSetupProps {
  */
 const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   onComplete,
-  onSkip,
+  hasPendingInvite,
 }) => {
   const { t, dir } = useLanguage();
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState<CustomAvatarConfig>(getRandomAvatarConfig);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
+  const [showShake, setShowShake] = useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const trimmedName = name.trim();
+  const isNameValid = trimmedName.length >= 2 && trimmedName.length <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(name);
 
   const handleRandomize = useCallback(() => {
     setAvatar(getRandomAvatarConfig());
@@ -40,8 +46,14 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   }, []);
 
   const handleSubmit = useCallback(() => {
-    onComplete(name.trim() || 'Player', avatar);
-  }, [name, avatar, onComplete]);
+    if (!isNameValid) {
+      setShowShake(true);
+      setTimeout(() => setShowShake(false), 500);
+      inputRef.current?.focus();
+      return;
+    }
+    onComplete(trimmedName, avatar);
+  }, [trimmedName, isNameValid, avatar, onComplete]);
 
   const staggerChild = {
     hidden: { opacity: 0, y: 20 },
@@ -70,7 +82,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           animate="visible"
           className="text-xl font-black text-neo-black text-center mb-1"
         >
-          {t('onboarding.ftue.niceWork')}
+          {hasPendingInvite ? t('onboarding.ftue.friendIsWaiting') : t('onboarding.ftue.niceWork')}
         </motion.h2>
         <motion.p
           custom={1}
@@ -79,7 +91,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           animate="visible"
           className="text-sm text-neo-black/70 text-center mb-4"
         >
-          {t('onboarding.ftue.whatsYourName')}
+          {hasPendingInvite ? t('onboarding.ftue.pickNameAndJoin') : t('onboarding.ftue.whatsYourName')}
         </motion.p>
 
         {/* Avatar (clickable to open builder) + randomize */}
@@ -107,39 +119,43 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               </motion.button>
               <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.ftue.randomize', 'Randomize')}</span>
             </div>
-            <motion.button
-              data-testid="avatar-edit-button"
-              onClick={() => setIsBuilderOpen(true)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                'relative group w-20 h-20 rounded-full border-3 border-neo-black',
-                'overflow-hidden bg-neo-white shadow-hard-sm',
-                'transition-shadow duration-100'
-              )}
-              aria-label={t('onboarding.ftue.editAvatar', 'Customize avatar')}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={avatarKey}
-                  initial={{ scale: 0, rotate: -90 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  exit={{ scale: 0, rotate: 90 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  className="w-full h-full"
-                >
-                  <Avatar customAvatar={avatar} size="xl" />
-                </motion.div>
-              </AnimatePresence>
-              <div className={cn(
-                'absolute bottom-0 end-0 w-5 h-5',
-                'bg-neo-lime border-2 border-neo-black rounded-full',
-                'flex items-center justify-center shadow-hard-sm',
-                'group-hover:scale-110 transition-transform'
-              )}>
-                <Pencil className="w-2.5 h-2.5 text-neo-black" />
-              </div>
-            </motion.button>
+            <div className="flex flex-col items-center gap-1">
+              <motion.button
+                data-testid="avatar-edit-button"
+                onClick={() => setIsBuilderOpen(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative group"
+                aria-label={t('onboarding.ftue.editAvatar', 'Customize avatar')}
+              >
+                <div className={cn(
+                  'w-20 h-20 rounded-full border-3 border-neo-black',
+                  'overflow-hidden bg-neo-white shadow-hard-sm'
+                )}>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={avatarKey}
+                      initial={{ scale: 0, rotate: -90 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0, rotate: 90 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                      className="w-full h-full"
+                    >
+                      <Avatar customAvatar={avatar} size="xl" />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                <div className={cn(
+                  'absolute -bottom-1 -end-1 w-7 h-7',
+                  'bg-neo-lime border-2 border-neo-black rounded-full',
+                  'flex items-center justify-center shadow-hard-sm',
+                  'group-hover:scale-110 transition-transform'
+                )}>
+                  <Pencil className="w-3.5 h-3.5 text-neo-black" />
+                </div>
+              </motion.button>
+              <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.profile.tapToCustomize', 'Tap to customize')}</span>
+            </div>
           </div>
         </motion.div>
 
@@ -157,20 +173,37 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           initial="hidden"
           animate="visible"
         >
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t('onboarding.name.placeholder')}
-            autoFocus
-            maxLength={20}
-            className={cn(
-              'w-full px-3 py-2.5 bg-white border-3 border-neo-black rounded-neo',
-              'font-bold text-base text-neo-black placeholder:text-neo-black/40',
-              'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
-              'shadow-hard-sm mb-4 min-h-[44px]'
-            )}
-          />
+          <label className="block text-[10px] font-black text-neo-black/60 uppercase tracking-wide mb-1">
+            {t('validation.usernameRequired')}
+          </label>
+          <motion.div
+            animate={showShake ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+            transition={{ duration: 0.4 }}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && isNameValid) handleSubmit(); }}
+              placeholder={t('onboarding.name.placeholder')}
+              autoFocus
+              maxLength={20}
+              autoComplete="off"
+              className={cn(
+                'w-full px-3 py-3 bg-white border-3 border-neo-black rounded-neo',
+                'font-bold text-lg text-neo-black placeholder:text-neo-black/30',
+                'focus:outline-none focus:ring-3 focus:ring-neo-cyan',
+                'shadow-hard-sm mb-1 min-h-[48px]',
+                isNameValid && trimmedName.length > 0 && 'border-neo-lime',
+                !isNameValid && name.length > 0 && 'border-neo-red'
+              )}
+            />
+          </motion.div>
+          <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
+            <span>{trimmedName.length < 2 && name.length > 0 ? t('validation.usernameTooShort') : '2-20 chars'}</span>
+            <span>{name.length}/20</span>
+          </div>
         </motion.div>
 
         {/* Submit button */}
@@ -180,28 +213,18 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           initial="hidden"
           animate="visible"
           onClick={handleSubmit}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98, y: 2 }}
+          whileHover={isNameValid ? { scale: 1.02, y: -2 } : {}}
+          whileTap={isNameValid ? { scale: 0.98, y: 2 } : {}}
           className={cn(
-            'w-full py-3 bg-neo-pink border-3 border-neo-black rounded-neo',
-            'font-black text-neo-white text-lg uppercase',
-            'shadow-hard-sm',
-            'transition-shadow'
+            'w-full py-3 border-3 border-neo-black rounded-neo',
+            'font-black text-lg uppercase',
+            'shadow-hard-sm transition-all',
+            isNameValid
+              ? 'bg-neo-pink text-neo-white hover:shadow-hard'
+              : 'bg-neo-black/15 text-neo-black/35 cursor-not-allowed shadow-none'
           )}
         >
-          {t('onboarding.ftue.letsGo')}
-        </motion.button>
-
-        {/* Skip option — subtle */}
-        <motion.button
-          custom={5}
-          variants={staggerChild}
-          initial="hidden"
-          animate="visible"
-          onClick={onSkip}
-          className="w-full text-center mt-3 text-xs text-neo-black/50 underline hover:text-neo-black/70 transition-colors"
-        >
-          {t('onboarding.ftue.skip')}
+          {hasPendingInvite ? t('onboarding.ftue.joinFriendsGame') : t('onboarding.ftue.letsGo')}
         </motion.button>
       </div>
     </motion.div>

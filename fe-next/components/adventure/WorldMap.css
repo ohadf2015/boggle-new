@@ -326,6 +326,13 @@
   animation: shimmer-sweep 3s ease-in-out infinite;
 }
 
+/* Content-visibility optimization — lets the browser skip layout/paint for off-screen world nodes.
+ * contain-intrinsic-size prevents layout shift when nodes enter the viewport. */
+.world-node-container {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .world-map-star,

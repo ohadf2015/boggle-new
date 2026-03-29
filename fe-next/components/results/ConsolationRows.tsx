@@ -116,14 +116,19 @@ export default function ConsolationRows({
                   {player.username}
                 </p>
                 {crown && (
-                  <span
-                    className={cn(
-                      'text-[9px] font-black uppercase tracking-widest',
-                      crown.color
-                    )}
-                  >
-                    {t(`results.crowns.${crown.id}`) || crown.name}
-                  </span>
+                  <div className="flex flex-col">
+                    <span
+                      className={cn(
+                        'text-[9px] font-black uppercase tracking-widest',
+                        crown.color
+                      )}
+                    >
+                      {t(`results.crowns.${crown.id}`) || crown.name}
+                    </span>
+                    <span className="text-[8px] text-white/40 leading-tight">
+                      {t(crown.descriptionKey)}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

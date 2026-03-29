@@ -990,6 +990,9 @@ const es = {
     "youWereKickedInactive": "Fuiste removido por inactividad",
     "afkWarning": "Serás removido en {{seconds}}s por inactividad — ¡toca en cualquier lugar para quedarte!",
     "shareCodeHint": "¡Comparte el código de sala de arriba para que tus amigos se unan!",
+    "sendLinkToFriends": "Envía este enlace a tus amigos para que se unan a tu partida",
+    "waitingForFriendsHint": "¡Nadie aquí aún — comparte el enlace abajo para invitar jugadores!",
+    "inviteMoreFriends": "Invita a más jugadores a unirse",
     "battleMode": "Modo de batalla",
     "preset": "Configuración",
     "ofMaxWarriors": "de {{max}} guerreros listos",
@@ -1654,6 +1657,14 @@ const es = {
       "clutch": "Jugador Decisivo",
       "tank": "El Tanque"
     },
+    "crownDesc": {
+      "sniper": "Mayor puntuación promedio por palabra",
+      "speedDemon": "Encontró más palabras",
+      "explorer": "Encontró más palabras únicas",
+      "scholar": "Mayor longitud promedio de palabra",
+      "clutch": "Mayor puntuación en una sola palabra",
+      "tank": "Puntuación más consistente"
+    },
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
     "ready": "¡Listo!",
@@ -1788,6 +1799,14 @@ const es = {
       "scholar": "El Erudito",
       "clutch": "Jugador Clutch",
       "tank": "El Tanque"
+    },
+    "crownDesc": {
+      "sniper": "Mayor puntuación promedio por palabra",
+      "speedDemon": "Encontró más palabras",
+      "explorer": "Encontró más palabras únicas",
+      "scholar": "Mayor longitud promedio de palabra",
+      "clutch": "Mayor puntuación en una sola palabra",
+      "tank": "Puntuación más consistente"
     },
     "potentialScore": "+{points} pts potencial",
     "comparativeInsights": {
@@ -3347,11 +3366,14 @@ const es = {
       "practiceModeDesc": "Sin presión — juega a tu ritmo y aprende palabras nuevas.",
       "joinFriendsGame": "Unirse al juego de un amigo",
       "joinFriendsGameDesc": "¡Únete a una partida en vivo con amigos!",
+      "friendIsWaiting": "¡Tu amigo te espera!",
+      "pickNameAndJoin": "Elige un nombre y únete al instante",
       "homePage": "Explorar Todos los Modos",
       "homePageDesc": "Aventura, multijugador y más.",
       "moreModesUnlock": "¡Más modos se desbloquean mientras juegas!",
       "skip": "Omitir",
-      "letsGo": "¡Empecemos!"
+      "letsGo": "¡Empecemos!",
+      "chooseLanguage": "Elige tu idioma"
     }
   },
   "preGameTutorial": {

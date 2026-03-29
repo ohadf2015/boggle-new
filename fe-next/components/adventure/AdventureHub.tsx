@@ -11,7 +11,7 @@
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star, BookOpen, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -38,7 +38,6 @@ interface AdventureHubProps {
   totalStars: number;
   playerLevel: number;
   gold: number;
-  xp?: number;
   completions: LevelCompletion[];
   currentWorld: number;
   onOpenWorldMap: () => void;
@@ -77,6 +76,7 @@ const spring = { type: 'spring' as const, stiffness: 300, damping: 24 };
 
 const AdventureHub = memo<AdventureHubProps>(({
   streakDays,
+  bestStreak,
   dailyQuests,
   totalStars,
   playerLevel,
@@ -85,9 +85,12 @@ const AdventureHub = memo<AdventureHubProps>(({
   currentWorld,
   onOpenWorldMap,
   onPlayLevel,
+  onOpenShop,
   onBossRush,
   canBossRush = false,
   onWeeklyChallenge,
+  wordAlbumCount = 0,
+  onOpenWordAlbum,
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
@@ -182,6 +185,11 @@ const AdventureHub = memo<AdventureHubProps>(({
             {multiplier > 1 && (
               <span className="text-neo-pink font-black text-[10px] px-1 py-0.5 bg-neo-pink/20 rounded">
                 {multiplier.toFixed(1)}x
+              </span>
+            )}
+            {bestStreak > 0 && (
+              <span className="text-neo-white/40 font-bold text-[10px] ms-0.5">
+                {t('adventure.hub.bestStreak')}: {bestStreak}
               </span>
             )}
           </div>
@@ -375,6 +383,55 @@ const AdventureHub = memo<AdventureHubProps>(({
             >
               <Swords className="w-4 h-4" />
               {t('adventure.bossRush.title')}
+            </motion.button>
+          )}
+        </motion.div>
+
+        {/* Tertiary actions — shop + word album */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...spring, delay: 0.5 }}
+          className="flex gap-2 w-full pb-2"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onOpenShop}
+            className={cn(
+              'flex-1 py-2.5 px-3',
+              'flex items-center justify-center gap-1.5',
+              'bg-neo-white/5 text-neo-white/70',
+              'font-bold text-xs',
+              'border border-neo-white/15 rounded-neo',
+              'hover:bg-neo-white/10 transition-colors'
+            )}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            {t('adventure.shop.title')}
+          </motion.button>
+
+          {onOpenWordAlbum && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onOpenWordAlbum}
+              className={cn(
+                'flex-1 py-2.5 px-3',
+                'flex items-center justify-center gap-1.5',
+                'bg-neo-white/5 text-neo-white/70',
+                'font-bold text-xs',
+                'border border-neo-white/15 rounded-neo',
+                'hover:bg-neo-white/10 transition-colors'
+              )}
+            >
+              <BookOpen className="w-4 h-4" />
+              {t('adventure.hub.wordAlbum')}
+              {wordAlbumCount > 0 && (
+                <span className="text-[10px] font-mono text-neo-cyan tabular-nums">
+                  {wordAlbumCount}
+                </span>
+              )}
             </motion.button>
           )}
         </motion.div>

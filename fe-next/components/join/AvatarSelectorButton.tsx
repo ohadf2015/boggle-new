@@ -70,6 +70,12 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
           className="w-full h-full"
         />
 
+        {/* Hover/tap overlay */}
+        <div className="absolute inset-0 rounded-full bg-neo-black/0 group-hover:bg-neo-black/40 group-focus-visible:bg-neo-black/40 transition-colors flex items-center justify-center">
+          <Pencil className="w-4 h-4 text-neo-white opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity drop-shadow-md" />
+        </div>
+
+        {/* Edit badge */}
         <div className={`
           absolute bottom-0 right-0
           ${iconSizeClasses[size]}

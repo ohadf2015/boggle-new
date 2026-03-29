@@ -26,6 +26,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
+import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -97,6 +98,8 @@ const initLogRocket = () => {
         LogRocket.init('ioiov9/lexiclash');
         // Link LogRocket session to Sentry for error replay correlation
         linkLogRocketSession();
+        // Notify identify hook that LogRocket is ready
+        window.dispatchEvent(new Event('logrocket-ready'));
     });
 };
 
@@ -162,6 +165,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
                     <AuthProvider>
+                        <LogRocketIdentify />
                         <CoinProvider>
                             <AccessibilityProvider>
                             <MotionConfigProvider>
