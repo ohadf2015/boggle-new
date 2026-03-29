@@ -284,6 +284,7 @@ const en = {
     "brain": "Brain",
     "leaderboard": "Ranks",
     "profile": "Profile",
+    "friends": "Friends",
     "play": "Multiplayer",
     "quests": "Quests",
     "howToPlay": "How to Play",

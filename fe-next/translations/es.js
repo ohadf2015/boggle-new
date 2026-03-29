@@ -284,6 +284,7 @@ const es = {
     "brain": "Cerebro",
     "leaderboard": "Ranking",
     "profile": "Perfil",
+    "friends": "Amigos",
     "play": "Multijugador",
     "quests": "Misiones",
     "howToPlay": "Cómo jugar",

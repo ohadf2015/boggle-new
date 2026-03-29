@@ -36,6 +36,11 @@ vi.mock('../../hooks/useDailyMissions', () => ({
     useDailyMissions: () => mockUseDailyMissions(),
 }));
 
+const mockUseFriends = vi.fn();
+vi.mock('../../hooks/useFriends', () => ({
+    useFriends: () => mockUseFriends(),
+}));
+
 vi.mock('../../utils/ThemeContext', () => ({
     useTheme: vi.fn(() => ({ theme: 'dark' })),
 }));
@@ -57,6 +62,7 @@ describe('GlobalBottomNav', () => {
             'nav.quests': 'Quests',
             'nav.leaderboard': 'Leaderboard',
             'nav.profile': 'Profile',
+            'nav.friends': 'Friends',
             'quests.progress': `${params?.completed ?? 0}/${params?.total ?? 0}`,
         };
         return translations[key] || key;
@@ -84,6 +90,14 @@ describe('GlobalBottomNav', () => {
             left: 0,
             right: 0,
         });
+        mockUseFriends.mockReturnValue({
+            pendingRequests: [],
+            friends: [],
+            outgoingRequests: [],
+            pendingChallenges: [],
+            isLoading: false,
+            error: null,
+        });
         mockUseDailyMissions.mockReturnValue({
             missions: [
                 { type: 'wordHunt', completed: false, href: '/daily' },
@@ -105,7 +119,7 @@ describe('GlobalBottomNav', () => {
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /friends/i })).toBeInTheDocument();
         });
 
         it('should render with proper ARIA labels', () => {
@@ -116,11 +130,11 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should highlight active tab based on current path', () => {
-            (usePathname as Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/friends');
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            expect(profileButton).toHaveAttribute('aria-current', 'page');
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
+            expect(friendsButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should apply safe area padding when present', () => {
@@ -147,26 +161,25 @@ describe('GlobalBottomNav', () => {
             expect(mockPush).toHaveBeenCalledWith('/en');
         });
 
-        it('should navigate to profile when profile tab is clicked (authenticated)', () => {
+        it('should navigate to friends when friends tab is clicked (authenticated)', () => {
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            fireEvent.click(profileButton);
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
+            fireEvent.click(friendsButton);
 
-            expect(mockPush).toHaveBeenCalledWith('/en/profile');
+            expect(mockPush).toHaveBeenCalledWith('/en/friends');
         });
 
-        it('should not navigate when profile is clicked but user is not authenticated (disabled)', () => {
+        it('should not navigate when friends is clicked but user is not authenticated', () => {
             (useAuth as Mock).mockReturnValue({
                 isAuthenticated: false,
             });
 
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            fireEvent.click(profileButton);
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
+            fireEvent.click(friendsButton);
 
-            // Button is disabled, so no navigation should occur
             expect(mockPush).not.toHaveBeenCalled();
         });
     });
@@ -180,12 +193,12 @@ describe('GlobalBottomNav', () => {
             expect(homeButton).toHaveAttribute('aria-current', 'page');
         });
 
-        it('should mark profile as active on profile path', () => {
-            (usePathname as Mock).mockReturnValue('/en/profile');
+        it('should mark friends as active on friends path', () => {
+            (usePathname as Mock).mockReturnValue('/en/friends');
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            expect(profileButton).toHaveAttribute('aria-current', 'page');
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
+            expect(friendsButton).toHaveAttribute('aria-current', 'page');
         });
 
         it('should default to home when path does not match any tab', () => {
@@ -235,20 +248,12 @@ describe('GlobalBottomNav', () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it('should remain visible on profile path (consistent navigation)', () => {
-            (usePathname as Mock).mockReturnValue('/en/profile');
+        it('should remain visible on friends path (consistent navigation)', () => {
+            (usePathname as Mock).mockReturnValue('/en/friends');
 
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
-            expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
-        });
-
-        it('should remain visible on profile sub-paths (consistent navigation)', () => {
-            (usePathname as Mock).mockReturnValue('/en/profile/settings');
-
-            render(<GlobalBottomNav />);
-            expect(screen.getByRole('navigation')).toBeInTheDocument();
-            expect(screen.getByLabelText(/profile/i)).toHaveAttribute('aria-current', 'page');
+            expect(screen.getByLabelText(/friends/i)).toHaveAttribute('aria-current', 'page');
         });
 
         it('should show on regular pages (settings, rules, etc.)', () => {
@@ -295,17 +300,17 @@ describe('GlobalBottomNav', () => {
     });
 
     describe('Authentication State', () => {
-        it('should show AuthModal when profile button clicked while not authenticated', async () => {
+        it('should show AuthModal when friends button clicked while not authenticated', async () => {
             (useAuth as Mock).mockReturnValue({
                 isAuthenticated: false,
             });
 
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
-            expect(profileButton).not.toBeDisabled();
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
+            expect(friendsButton).not.toBeDisabled();
 
-            fireEvent.click(profileButton);
+            fireEvent.click(friendsButton);
 
             await waitFor(() => {
                 expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
@@ -316,10 +321,10 @@ describe('GlobalBottomNav', () => {
             render(<GlobalBottomNav />);
 
             const homeButton = screen.getByRole('button', { name: /home/i });
-            const profileButton = screen.getByRole('button', { name: /profile/i });
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
 
             expect(homeButton).not.toBeDisabled();
-            expect(profileButton).not.toBeDisabled();
+            expect(friendsButton).not.toBeDisabled();
         });
     });
 
@@ -330,7 +335,7 @@ describe('GlobalBottomNav', () => {
                     'nav.home': 'בית',
                     'nav.play': 'שחק',
                     'nav.leaderboard': 'טבלת מובילים',
-                    'nav.profile': 'פרופיל',
+                    'nav.friends': 'חברים',
                 };
                 return translations[key] || key;
             });
@@ -345,7 +350,7 @@ describe('GlobalBottomNav', () => {
 
             expect(screen.getByText('בית')).toBeInTheDocument();
             expect(screen.getByText('שחק')).toBeInTheDocument();
-            expect(screen.getByText('פרופיל')).toBeInTheDocument();
+            expect(screen.getByText('חברים')).toBeInTheDocument();
         });
 
         it('should navigate with correct language prefix', () => {
@@ -376,13 +381,13 @@ describe('GlobalBottomNav', () => {
         });
 
         it('should indicate active state for screen readers', () => {
-            (usePathname as Mock).mockReturnValue('/en/profile');
+            (usePathname as Mock).mockReturnValue('/en/friends');
             render(<GlobalBottomNav />);
 
-            const profileButton = screen.getByRole('button', { name: /profile/i });
+            const friendsButton = screen.getByRole('button', { name: /friends/i });
             const homeButton = screen.getByRole('button', { name: /home/i });
 
-            expect(profileButton).toHaveAttribute('aria-current', 'page');
+            expect(friendsButton).toHaveAttribute('aria-current', 'page');
             expect(homeButton).not.toHaveAttribute('aria-current');
         });
 
@@ -391,7 +396,7 @@ describe('GlobalBottomNav', () => {
 
             expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /friends/i })).toBeInTheDocument();
         });
     });
 

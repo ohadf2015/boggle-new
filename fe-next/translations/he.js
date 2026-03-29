@@ -284,6 +284,7 @@ const he = {
     "brain": "מוח",
     "leaderboard": "דירוג",
     "profile": "פרופיל",
+    "friends": "חברים",
     "play": "מרובה משתתפים",
     "quests": "משימות",
     "howToPlay": "איך לשחק",

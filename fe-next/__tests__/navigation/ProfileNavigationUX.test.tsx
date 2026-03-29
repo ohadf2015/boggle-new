@@ -53,9 +53,31 @@ vi.mock('@/hooks/useSafeArea', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useDailyMissions', () => ({
+  useDailyMissions: () => ({
+    missions: [],
+    completedCount: 0,
+    isGrandSlam: false,
+    grandSlamClaimed: false,
+    loading: false,
+    refresh: vi.fn(),
+  }),
+}));
+
 vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'dark',
+  }),
+}));
+
+vi.mock('@/hooks/useFriends', () => ({
+  useFriends: () => ({
+    pendingRequests: [],
+    friends: [],
+    outgoingRequests: [],
+    pendingChallenges: [],
+    isLoading: false,
+    error: null,
   }),
 }));
 
@@ -64,9 +86,9 @@ describe('Profile Navigation UX - Tab Consistency', () => {
     vi.clearAllMocks();
   });
 
-  it('should remain visible on /profile path (fixed behavior)', () => {
-    // GIVEN user is on profile page
-    (usePathname as Mock).mockReturnValue('/en/profile');
+  it('should remain visible on /friends path', () => {
+    // GIVEN user is on friends page
+    (usePathname as Mock).mockReturnValue('/en/friends');
 
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
@@ -74,7 +96,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
     // THEN it should remain visible to maintain consistent navigation
     expect(screen.getByLabelText(/home/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/play/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/profile/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/friends/i)).toBeInTheDocument();
   });
 
   it('should remain visible on landing page (existing behavior)', () => {
@@ -84,26 +106,23 @@ describe('Profile Navigation UX - Tab Consistency', () => {
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
 
-    // THEN all three main tabs should be visible
+    // THEN all main tabs should be visible
     expect(screen.getByLabelText(/home/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/play/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/profile/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/friends/i)).toBeInTheDocument();
   });
 
-  it('should show Profile tab as active when on /profile path', () => {
-    // This test will only pass after the fix is implemented
-    // Currently it will fail because GlobalBottomNav is hidden on /profile
-
-    // GIVEN user is on profile page
-    (usePathname as Mock).mockReturnValue('/en/profile');
+  it('should show Friends tab as active when on /friends path', () => {
+    // GIVEN user is on friends page
+    (usePathname as Mock).mockReturnValue('/en/friends');
 
     // WHEN GlobalBottomNav is rendered
     render(<GlobalBottomNav />);
 
-    // THEN Profile tab should be visible and marked as active
-    const profileTab = screen.getByLabelText(/profile/i);
-    expect(profileTab).toBeInTheDocument();
-    expect(profileTab).toHaveAttribute('aria-current', 'page');
+    // THEN Friends tab should be visible and marked as active
+    const friendsTab = screen.getByLabelText(/friends/i);
+    expect(friendsTab).toBeInTheDocument();
+    expect(friendsTab).toHaveAttribute('aria-current', 'page');
   });
 
   describe('UX Requirements', () => {
@@ -112,7 +131,7 @@ describe('Profile Navigation UX - Tab Consistency', () => {
       const paths = [
         '/en',           // Landing
         '/en/leaderboard', // Leaderboard
-        '/en/profile',   // Profile (currently hidden, needs fix)
+        '/en/friends',   // Friends
       ];
 
       paths.forEach(path => {

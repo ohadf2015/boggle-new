@@ -145,7 +145,7 @@ describe('GlobalBottomNav Clickability on Landing Page', () => {
       expect(globalBottomNavSource).toContain('shouldHideOnCurrentPath');
       expect(globalBottomNavSource).toContain('pathsWithOwnNav');
       expect(globalBottomNavSource).toContain('/multiplayer');
-      expect(globalBottomNavSource).toContain('/profile');
+      expect(globalBottomNavSource).toContain('/friends');
     });
 
     it('should hide on desktop (sm+ breakpoint)', () => {

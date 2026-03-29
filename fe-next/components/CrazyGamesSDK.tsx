@@ -228,6 +228,36 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
  * it's running inside a CrazyGames iframe and reports environment
  * accordingly ('crazygames' | 'disabled').
  */
+/**
+ * Initialize the SDK as soon as the script loads — regardless of which page
+ * the player lands on. CrazyGames QA requires init() to be called early;
+ * deferring it until CrazyGamesProvider mounts (game routes only) causes
+ * "SDK not detected" failures when entering via the landing page.
+ */
+async function initSDKOnLoad() {
+  const sdk = window.CrazyGames?.SDK;
+  if (!sdk) return;
+
+  try {
+    await sdk.init();
+    const env = await sdk.getEnvironment();
+    window.__crazyGamesEnvironment = env;
+
+    if (env === 'crazygames') {
+      document.body.classList.add('crazygames-embed');
+      sdk.game.sdkGameLoadingStart();
+      const signalReady = () => sdk.game?.sdkGameLoadingStop();
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(signalReady, { timeout: 3000 });
+      } else {
+        setTimeout(signalReady, 1000);
+      }
+    }
+  } catch {
+    // SDK init failed — game continues without SDK features
+  }
+}
+
 export function CrazyGamesScript() {
   if (CRAZYGAMES_FORCE_DISABLED) {
     return null;
@@ -238,6 +268,7 @@ export function CrazyGamesScript() {
       src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
       strategy="afterInteractive"
       id="crazygames-sdk"
+      onLoad={() => { initSDKOnLoad(); }}
     />
   );
 }
@@ -267,11 +298,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Add CrazyGames-specific CSS class to body for mobile optimizations
-    document.body.classList.add('crazygames-embed');
+    // CSS class added by initSDKOnLoad — no need to duplicate here
 
     const checkSDK = async () => {
-      // Wait for SDK to load
+      // Wait for SDK to load (init() is called by CrazyGamesScript onLoad)
       let attempts = 0;
       const maxAttempts = 50; // 5 seconds max
 
@@ -282,13 +312,15 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
       if (window.CrazyGames?.SDK) {
         try {
-          // SDK.init() must be called before any other SDK methods.
-          // Without this, CrazyGames QA tool reports "SDK not detected".
-          await window.CrazyGames.SDK.init();
+          // init() may already have been called by CrazyGamesScript onLoad.
+          // If not (e.g., provider mounted before script loaded), call it now.
+          if (!window.__crazyGamesEnvironment) {
+            await window.CrazyGames.SDK.init();
+            const env = await window.CrazyGames.SDK.getEnvironment();
+            window.__crazyGamesEnvironment = env;
+          }
 
-          const env = await window.CrazyGames.SDK.getEnvironment();
-          // Cache environment on window for utility function access
-          window.__crazyGamesEnvironment = env;
+          const env = window.__crazyGamesEnvironment!;
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
 
@@ -303,17 +335,6 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
               sessionStorage.setItem('cg_invite_params', JSON.stringify(params));
             } catch { /* sessionStorage unavailable */ }
           }
-
-          // Signal loading lifecycle to CrazyGames
-          if (env === 'crazygames') {
-            // sdkGameLoadingStart signals the game is loading assets/hydrating.
-            // sdkGameLoadingStop is deferred until after hydration settles (~500ms)
-            // so CrazyGames gets a meaningful "time to playable" metric.
-            window.CrazyGames.SDK.game.sdkGameLoadingStart();
-            requestAnimationFrame(() => {
-              window.CrazyGames?.SDK?.game?.sdkGameLoadingStop();
-            });
-          }
         } catch {
           setIsAvailable(false);
         }
@@ -324,7 +345,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     checkSDK();
 
     return () => {
-      document.body.classList.remove('crazygames-embed');
+      // crazygames-embed class is managed by initSDKOnLoad, not this provider
     };
   }, []);
 

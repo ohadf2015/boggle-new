@@ -123,7 +123,7 @@ vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import LandingView from '../landing/LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -181,8 +181,20 @@ describe('LandingView', () => {
     expect(hasSinglePlayer || hasMultiplayer).toBe(true);
   });
 
-  it('plays lobby music on mount', () => {
+  it('plays lobby music on mount', async () => {
+    // LandingView gates music on hydrated state which uses requestAnimationFrame
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      rafCallbacks.push(cb);
+      return 1;
+    });
+
     render(<LandingView />, { wrapper: createWrapper() });
+
+    // Flush the rAF to trigger hydration
+    act(() => {
+      rafCallbacks.forEach(cb => cb(0));
+    });
 
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
   });

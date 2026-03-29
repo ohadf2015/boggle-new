@@ -3,7 +3,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Home, Swords, ScrollText, User } from 'lucide-react';
+import { Home, Swords, ScrollText, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,6 +11,7 @@ import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
 import { useDailyMissions } from '../hooks/useDailyMissions';
+import { useFriends } from '../hooks/useFriends';
 
 // 3 daily missions shown in the Quests tab (no brain drill)
 const QUEST_MISSION_TYPES = ['wordHunt', 'adventure', 'community'] as const;
@@ -19,7 +20,7 @@ const QUEST_TOTAL = QUEST_MISSION_TYPES.length;
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
-type TabId = 'home' | 'play' | 'quests' | 'profile';
+type TabId = 'home' | 'play' | 'quests' | 'friends';
 
 interface TabConfig {
     id: TabId;
@@ -33,7 +34,7 @@ const TABS: TabConfig[] = [
     { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-yellow', glowColor: 'bg-neo-yellow/15' },
     { id: 'play',    labelKey: 'nav.play',    icon: Swords,     color: 'text-neo-orange', glowColor: 'bg-neo-orange/15' },
     { id: 'quests',  labelKey: 'nav.quests',  icon: ScrollText, color: 'text-neo-lime',   glowColor: 'bg-neo-lime/15' },
-    { id: 'profile', labelKey: 'nav.profile', icon: User,       color: 'text-neo-cyan',   glowColor: 'bg-neo-cyan/15' },
+    { id: 'friends', labelKey: 'nav.friends', icon: Users,      color: 'text-neo-pink',   glowColor: 'bg-neo-pink/15' },
 ];
 
 // Color map for the sliding indicator pill
@@ -41,7 +42,7 @@ const INDICATOR_COLORS: Record<TabId, string> = {
     home: 'bg-neo-yellow',
     play: 'bg-neo-orange',
     quests: 'bg-neo-lime',
-    profile: 'bg-neo-cyan',
+    friends: 'bg-neo-pink',
 };
 
 /**
@@ -72,6 +73,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const safeArea = useSafeArea();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { missions } = useDailyMissions();
+    const { pendingRequests } = useFriends();
+    const pendingCount = pendingRequests.length;
 
     // Count completed quests (3 shown: wordHunt, adventure, community — no brain drill)
     const questsCompleted = useMemo(() =>
@@ -83,12 +86,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         if (cleanPath === '' || cleanPath === '/') return 'home';
         if (cleanPath.startsWith('/multiplayer')) return 'play';
         if (cleanPath.startsWith('/quests')) return 'quests';
-        if (cleanPath.startsWith('/profile')) return 'profile';
+        if (cleanPath.startsWith('/friends')) return 'friends';
         return 'home';
     }, [pathname, language]);
 
     const navigate = useCallback((tab: TabId) => {
-        if (tab === 'profile' && !isAuthenticated) {
+        if (tab === 'friends' && !isAuthenticated) {
             setShowAuthModal(true);
             return;
         }
@@ -96,7 +99,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             home: `/${language}`,
             play: `/${language}/multiplayer`,
             quests: `/${language}/quests`,
-            profile: `/${language}/profile`,
+            friends: `/${language}/friends`,
         };
         router.push(routes[tab]);
     }, [router, language, isAuthenticated]);
@@ -219,6 +222,17 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                         )}>
                                             {questsCompleted}
                                         </span>
+                                    </span>
+                                )}
+
+                                {/* Friend request badge — dot with count on Friends tab */}
+                                {tab.id === 'friends' && pendingCount > 0 && (
+                                    <span
+                                        className="absolute -top-1 -end-2 flex items-center justify-center w-4 h-4 rounded-full bg-neo-pink border-2 border-neo-navy text-[8px] font-black text-neo-white leading-none"
+                                        aria-label={`${pendingCount} pending`}
+                                        data-testid="friend-request-badge"
+                                    >
+                                        {pendingCount > 9 ? '9+' : pendingCount}
                                     </span>
                                 )}
                             </motion.div>

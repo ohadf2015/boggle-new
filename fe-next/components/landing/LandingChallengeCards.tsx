@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
@@ -35,10 +34,8 @@ interface LandingChallengeCardsProps {
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'multiplayer', 'singleplayer', 'adventure'];
 
-/** Scroll-triggered entrance — only animates when cards enter viewport */
-const cardInitial = { opacity: 0, y: 20, scale: 0.96 };
-const cardVisible = { opacity: 1, y: 0, scale: 1 };
-const cardViewport = { once: true, margin: '-40px' };
+/** CSS stagger delay for each card index */
+const cardDelay = (index: number) => `${index * 0.07}s`;
 
 export function LandingChallengeCards({
   language,
@@ -60,14 +57,14 @@ export function LandingChallengeCards({
 
   const cardOrder = cardOrderProp ?? DEFAULT_ORDER;
 
-  /** Renders a card by mode key with staggered animation delay */
+  /** Renders a card by mode key with staggered CSS animation */
   const renderCard = (mode: LandingGameMode, index: number) => {
-    const delay = index * 0.07;
+    const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
 
     switch (mode) {
       case 'singleplayer':
         return (
-          <motion.div key="singleplayer" initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay }} className="w-full h-full">
+          <div key="singleplayer" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
               title={t('landing.singlePlayer')}
               description={t('landing.singlePlayerDesc')}
@@ -81,12 +78,12 @@ export function LandingChallengeCards({
               difficulty={1}
               difficultyLabel={t('landing.difficultyEasy')}
             />
-          </motion.div>
+          </div>
         );
 
       case 'multiplayer':
         return (
-          <motion.div key="multiplayer" initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay }} className="w-full h-full">
+          <div key="multiplayer" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
               title={t('landing.multiplayer')}
               description={t('landing.multiplayerDesc')}
@@ -99,24 +96,24 @@ export function LandingChallengeCards({
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
             />
-          </motion.div>
+          </div>
         );
 
       case 'daily':
         return (
-          <motion.div key="daily" initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay }} className="w-full h-full flex flex-col">
+          <div key="daily" className="w-full h-full flex flex-col animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
             {solveRate !== null && (
               <p className="text-center text-neo-white/50 text-xs mt-1.5 pb-1 font-medium">
                 {t('landing.solvedPercent').replace('{percent}', String(solveRate))}
               </p>
             )}
-          </motion.div>
+          </div>
         );
 
       case 'adventure':
         return (
-          <motion.div key="adventure" initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay }} className="w-full h-full">
+          <div key="adventure" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
               title={t('landing.adventureMode')}
               description={t('landing.adventureModeDesc')}
@@ -127,7 +124,7 @@ export function LandingChallengeCards({
               difficulty={2}
               difficultyLabel={t('landing.difficultyMedium')}
             />
-          </motion.div>
+          </div>
         );
 
       default:
@@ -142,7 +139,7 @@ export function LandingChallengeCards({
 
         {/* Blast Mode (admin only) — always last */}
         {(isAdmin || hasBlastAccess) && (
-          <motion.div initial={cardInitial} whileInView={cardVisible} viewport={cardViewport} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: cardOrder.length * 0.07 }} className="w-full h-full">
+          <div className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={{ animationDelay: cardDelay(cardOrder.length) }}>
             <ModeCard
               title={t('landing.blastMode')}
               description={t('landing.blastModeDesc')}
@@ -152,7 +149,7 @@ export function LandingChallengeCards({
               secondary
               badge="ADMIN"
             />
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

@@ -99,9 +99,9 @@ describe('CrazyGames Integration Wiring', () => {
   });
 
   describe('SDK loading lifecycle is deferred', () => {
-    it('sdkGameLoadingStop uses requestAnimationFrame', () => {
+    it('sdkGameLoadingStop uses requestIdleCallback with timeout fallback', () => {
       const source = readSource('components/CrazyGamesSDK.tsx');
-      expect(source).toContain('requestAnimationFrame');
+      expect(source).toContain('requestIdleCallback');
       expect(source).toContain('sdkGameLoadingStop');
     });
   });

@@ -56,7 +56,7 @@ const staggerItemRtl = {
 
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, isAdmin, profile, user } = useAuth();
+    const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -134,7 +134,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 {isAuthenticated && <NotificationBell />}
 
                 {/* Sign In button for guests */}
-                {!isAuthenticated && (
+                {!isAuthenticated && !loading && (
                     <button
                         onClick={onSignIn}
                         className={cn(

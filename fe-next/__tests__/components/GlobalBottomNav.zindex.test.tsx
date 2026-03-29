@@ -66,6 +66,15 @@ vi.mock('@/hooks/useSafeArea', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useFriends', () => ({
+  useFriends: () => ({
+    friends: [],
+    onlineFriends: [],
+    pendingRequests: [],
+    loading: false,
+  }),
+}));
+
 describe('GlobalBottomNav z-index', () => {
   test('should have z-index higher than all other fixed elements', () => {
     const { container } = render(<GlobalBottomNav />);

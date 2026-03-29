@@ -284,6 +284,7 @@ const sv = {
     "brain": "Hjärna",
     "leaderboard": "Rankning",
     "profile": "Profil",
+    "friends": "Vänner",
     "play": "Multiplayer",
     "quests": "Uppdrag",
     "howToPlay": "Hur man spelar",

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Link2, Copy } from 'lucide-react';
+import { Check, Link2, Users } from 'lucide-react';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTelegram } from '../../../utils/share';
 import { WhatsAppIcon, TelegramIcon } from '../../../components/icons/SocialIcons';
 import { cn } from '../../../lib/utils';
@@ -20,8 +20,8 @@ interface MobileShareSectionProps {
 // ==================== Component ====================
 
 /**
- * MobileShareSection - Share strip with room code + share buttons
- * When showHint is true, displays a prominent invite banner for empty rooms
+ * MobileShareSection - Share strip with invite CTA + share buttons
+ * When showHint is true, displays a prominent invite call-to-action for empty rooms
  */
 export const MobileShareSection = memo<MobileShareSectionProps>(function MobileShareSection({
   gameCode,
@@ -30,7 +30,6 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   showHint = false,
 }) {
   const [copied, setCopied] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
   const joinUrl = getJoinUrl(gameCode, 'mobile-lobby');
 
   const handleCopyLink = useCallback(async () => {
@@ -40,12 +39,6 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
       setTimeout(() => setCopied(false), 2000);
     }
   }, [gameCode, t]);
-
-  const handleCopyCode = useCallback(() => {
-    navigator.clipboard.writeText(gameCode);
-    setCodeCopied(true);
-    setTimeout(() => setCodeCopied(false), 2000);
-  }, [gameCode]);
 
   const handleWhatsAppShare = useCallback(() => {
     shareViaWhatsApp(gameCode, '', t);
@@ -61,51 +54,33 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
       data-testid="mobile-share-section"
       className={cn('space-y-3', className)}
     >
-      {/* Hint banner for empty rooms */}
+      {/* Invite call-to-action for empty rooms */}
       {showHint && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-neo px-4 py-3 text-center"
+          className="bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-neo px-4 py-4 text-center"
         >
+          <Users className="w-6 h-6 mx-auto text-neo-cyan mb-1.5" />
           <p className="text-sm font-bold text-neo-cyan">
             {t('hostView.waitingForFriendsHint')}
+          </p>
+          <p className="text-xs text-neo-cream/50 mt-1">
+            {t('hostView.sendLinkToFriends')}
           </p>
         </motion.div>
       )}
 
-      {/* Room Code Display */}
-      <div className="flex items-center justify-between bg-neo-navy-light/80 border-2 border-neo-black rounded-neo px-4 py-3">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            {t('hostView.roomCode')}
-          </span>
-          <span className="text-2xl font-neo-display font-black text-neo-lime tracking-wider">
-            {gameCode}
-          </span>
-        </div>
-        <button
-          onClick={handleCopyCode}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black text-xs font-bold transition-all',
-            codeCopied
-              ? 'bg-neo-lime text-neo-black'
-              : 'bg-white/10 text-neo-cream hover:bg-white/20'
-          )}
-        >
-          {codeCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-          <span>{codeCopied ? t('common.copied') : t('roomCode.copy')}</span>
-        </button>
-      </div>
-
-      {/* Instruction text */}
-      <p className="text-xs text-slate-400 px-1">
-        {t('hostView.sendLinkToFriends')}
-      </p>
+      {/* Instruction text when players already present */}
+      {!showHint && (
+        <p className="text-xs text-slate-400 px-1">
+          {t('hostView.sendLinkToFriends')}
+        </p>
+      )}
 
       {/* Share buttons */}
       <div className="flex gap-2">
-        {/* Copy Link */}
+        {/* Copy Link — primary action */}
         <motion.button
           data-testid="mobile-copy-link-button"
           onClick={handleCopyLink}

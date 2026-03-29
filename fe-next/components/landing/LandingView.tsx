@@ -21,7 +21,10 @@ import { AdPlaceholder } from '@/components/ads';
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
-import { LandingSocialProofBar } from './LandingSocialProofBar';
+const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
+  ssr: false,
+  loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
+});
 const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), { ssr: false });
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { LandingMobileCards } from './LandingMobileCards';
@@ -147,7 +150,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  useEffect(() => { playTrack(TRACKS.BOSSA); }, [playTrack, TRACKS]);
+  // Defer music until after first paint — keeps main thread free during FCP
+  useEffect(() => { if (hydrated) playTrack(TRACKS.BOSSA); }, [hydrated, playTrack, TRACKS]);
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,

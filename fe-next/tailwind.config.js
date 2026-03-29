@@ -377,6 +377,19 @@ module.exports = {
           "0%, 100%": { opacity: "0.3", transform: "scale(0.8)" },
           "50%": { opacity: "1", transform: "scale(1.2)" },
         },
+        // Hero entrance animations (CSS-only, no Framer Motion needed)
+        "fadeInUp": {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fadeInLeft": {
+          "0%": { opacity: "0", transform: "translateX(-10px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "fadeInRight": {
+          "0%": { opacity: "0", transform: "translateX(30px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
         "neo-wobble": {
           "0%, 100%": { transform: "rotate(-2deg)" },
           "50%": { transform: "rotate(2deg)" },

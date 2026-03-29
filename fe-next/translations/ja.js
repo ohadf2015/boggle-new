@@ -284,6 +284,7 @@ const ja = {
     "brain": "脳トレ",
     "leaderboard": "ランキング",
     "profile": "プロフィール",
+    "friends": "フレンド",
     "play": "マルチプレイ",
     "quests": "クエスト",
     "howToPlay": "遊び方",

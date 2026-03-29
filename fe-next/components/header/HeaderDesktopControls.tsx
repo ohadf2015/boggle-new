@@ -23,7 +23,7 @@ interface HeaderDesktopControlsProps {
 
 const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, profile, user } = useAuth();
+    const { isAuthenticated, profile, user, loading } = useAuth();
 
     const guestAvatar = !isAuthenticated ? getStoredCustomAvatar() : null;
     const avatarConfig = profile?.avatar_config ?? guestAvatar;
@@ -105,7 +105,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                 <Users size={18} />
             </Link>
 
-            {!isAuthenticated && (
+            {!isAuthenticated && !loading && (
                 <AuthButton
                     onSignInClick={onSignIn}
                     onSignUpClick={onSignUp}
