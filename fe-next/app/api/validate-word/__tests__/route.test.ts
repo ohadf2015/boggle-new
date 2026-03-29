@@ -61,10 +61,10 @@ vi.mock('@/utils/sentry', () => ({
 }));
 
 // Mock english words — include a known word
-vi.mock('an-array-of-english-words', () => ['hello', 'world', 'cat', 'dog', 'test']);
+vi.mock('an-array-of-english-words', () => ({ default: ['hello', 'world', 'cat', 'dog', 'test'] }));
 
 // Mock spanish words
-vi.mock('an-array-of-spanish-words', () => ['hola', 'mundo', 'gato']);
+vi.mock('an-array-of-spanish-words', () => ({ default: ['hola', 'mundo', 'gato'] }));
 
 // Mock fs for lazy-loaded dictionaries
 vi.mock('fs', () => ({

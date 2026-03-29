@@ -44,7 +44,7 @@ export async function addWordToHebrewDictionary(
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('DICT_ENRICH', `Failed to add word to dictionary: ${word} - ${errorMessage}`);
+    logger.debug('DICT_ENRICH', `Failed to add word to dictionary: ${word} - ${errorMessage}`);
     return false;
   }
 }
@@ -121,7 +121,7 @@ export async function promoteVerifiedWordsToDictionary(
           logger.info('DICT_ENRICH', `✓ Promoted: ${wordRecord.word}`);
         } else {
           result.failed++;
-          logger.warn('DICT_ENRICH', `✗ Failed to promote: ${wordRecord.word}`);
+          logger.debug('DICT_ENRICH', `✗ Failed to promote: ${wordRecord.word}`);
         }
       } catch (wordError) {
         result.failed++;

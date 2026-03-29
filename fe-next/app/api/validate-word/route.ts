@@ -20,16 +20,16 @@ let hebrewDictionary: Set<string> | null = null;
 let swedishDictionary: Set<string> | null = null;
 let japaneseDictionary: Set<string> | null = null;
 
-function loadEnglishDictionary(): Set<string> {
+async function loadEnglishDictionary(): Promise<Set<string>> {
   if (englishDictionary) return englishDictionary;
-  const englishWords: string[] = require('an-array-of-english-words');
+  const englishWords = (await import('an-array-of-english-words', { with: { type: 'json' } })).default as string[];
   englishDictionary = new Set(englishWords.map((w) => w.toLowerCase()));
   return englishDictionary;
 }
 
-function loadSpanishDictionary(): Set<string> {
+async function loadSpanishDictionary(): Promise<Set<string>> {
   if (spanishDictionary) return spanishDictionary;
-  const spanishWords: string[] = require('an-array-of-spanish-words');
+  const spanishWords = (await import('an-array-of-spanish-words', { with: { type: 'json' } })).default as string[];
   spanishDictionary = new Set(spanishWords.map((w) => w.toLowerCase()));
   return spanishDictionary;
 }
@@ -235,10 +235,10 @@ export async function POST(request: NextRequest) {
     let isInDictionary = false;
     switch (language) {
       case 'en':
-        isInDictionary = loadEnglishDictionary().has(normalizedWord);
+        isInDictionary = (await loadEnglishDictionary()).has(normalizedWord);
         break;
       case 'es':
-        isInDictionary = loadSpanishDictionary().has(normalizedWord);
+        isInDictionary = (await loadSpanishDictionary()).has(normalizedWord);
         break;
       case 'he':
         isInDictionary = loadHebrewDictionary().has(normalizedWord);

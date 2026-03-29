@@ -74,6 +74,8 @@ export function useSafeArea(): SafeAreaInsets {
       updateCSSProperties(newInsets);
     }).then((handle) => {
       listenerHandle = handle;
+    }).catch((error) => {
+      console.warn('Failed to register safe area listener:', error);
     });
 
     return () => {
