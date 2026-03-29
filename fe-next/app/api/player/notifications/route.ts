@@ -50,8 +50,7 @@ export async function GET(request: NextRequest) {
         sender:profiles!user_notifications_sender_profile_fkey(
           username,
           display_name,
-          avatar_emoji,
-          avatar_color
+          avatar_config
         )
       `, { count: 'exact' })
       .eq('user_id', user.id)
