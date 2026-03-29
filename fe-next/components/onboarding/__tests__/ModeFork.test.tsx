@@ -48,6 +48,7 @@ vi.mock('lucide-react', () => ({
   Target: () => <div data-testid="target-icon" />,
   Users: () => <div data-testid="users-icon" />,
   Home: () => <div data-testid="home-icon" />,
+  Sparkles: () => <div data-testid="sparkles-icon" />,
 }));
 
 // Mock LanguageContext
