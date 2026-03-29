@@ -9873,7 +9873,13 @@ const es = {
     "whoToEliminate": "¿A quién eliminar?",
     "skipVote": "Saltar",
     "youWereEliminated": "¡Fuiste eliminado!",
-    "watchFromBeyond": "Observa desde el más allá..."
+    "watchFromBeyond": "Observa desde el más allá...",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "clear": "Borrar",
+    "draw": "Dibuja",
+    "lookCarefully": "¡Mira bien!",
+    "everyoneVoting": "Todos están votando..."
   }
 };
 

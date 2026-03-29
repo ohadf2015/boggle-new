@@ -9806,7 +9806,13 @@ const ja = {
     "whoToEliminate": "誰を脱落させる？",
     "skipVote": "スキップ",
     "youWereEliminated": "脱落しました！",
-    "watchFromBeyond": "あの世から見守ろう..."
+    "watchFromBeyond": "あの世から見守ろう...",
+    "undo": "元に戻す",
+    "redo": "やり直し",
+    "clear": "クリア",
+    "draw": "描こう",
+    "lookCarefully": "よく見て！",
+    "everyoneVoting": "みんなが投票中..."
   }
 };
 

@@ -9840,7 +9840,13 @@ const en = {
     "whoToEliminate": "Who to eliminate?",
     "skipVote": "Skip",
     "youWereEliminated": "You were eliminated!",
-    "watchFromBeyond": "Watch from beyond..."
+    "watchFromBeyond": "Watch from beyond...",
+    "undo": "Undo",
+    "redo": "Redo",
+    "clear": "Clear",
+    "draw": "Draw",
+    "lookCarefully": "Look carefully!",
+    "everyoneVoting": "Everyone is voting..."
   }
 };
 

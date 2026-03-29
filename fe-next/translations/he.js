@@ -9840,7 +9840,13 @@ const he = {
     "whoToEliminate": "את מי להדיח?",
     "skipVote": "דלג",
     "youWereEliminated": "הודחת!",
-    "watchFromBeyond": "צפו מהעולם הבא..."
+    "watchFromBeyond": "צפו מהעולם הבא...",
+    "undo": "ביטול",
+    "redo": "שחזור",
+    "clear": "נקה",
+    "draw": "צייר",
+    "lookCarefully": "הסתכלו טוב!",
+    "everyoneVoting": "כולם מצביעים..."
   }
 };
 

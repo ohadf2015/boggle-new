@@ -23,8 +23,9 @@ import {
   submitTelephoneStep,
   submitShowdownCanvas,
   submitShowdownVote,
-  submitRelayArtistCanvas,
-  submitRelayBuilderCanvas,
+  handleRelayLiveStroke,
+  submitRelayArtistDrawing,
+  submitRelayBuilderDrawing,
   cleanupPixelClash,
 } from '../modules/party/pixelClashEngine.js';
 import {
@@ -179,9 +180,10 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       const parsed = createSchema.parse(data);
       const gameDef = PARTY_GAME_CONFIG[parsed.gameId];
 
-      // Feature flag gate
+      // Feature flag gate (bypass in development)
       const authUserId = (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
-      const hasAccess = await canAccessFeature(authUserId || null, 'party_games_alpha');
+      const isDev = process.env.NODE_ENV === 'development';
+      const hasAccess = isDev || await canAccessFeature(authUserId || null, 'party_games_alpha');
       if (!hasAccess) {
         socket.emit('party:error', { error: 'NO_ACCESS', message: 'Party games not available' });
         return;
@@ -249,7 +251,8 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       }
 
       const authUserId = (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
-      const hasAccess = await canAccessFeature(authUserId || null, 'party_games_alpha');
+      const isDev = process.env.NODE_ENV === 'development';
+      const hasAccess = isDev || await canAccessFeature(authUserId || null, 'party_games_alpha');
       if (!hasAccess) {
         socket.emit('party:error', { error: 'NO_ACCESS', message: 'Party games not available' });
         return;
@@ -310,7 +313,9 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
 
     const playerCount = Object.keys(room.players).length;
     const gameDef = PARTY_GAME_CONFIG[room.gameId];
-    if (playerCount < gameDef.minPlayers) {
+    const isDev = process.env.NODE_ENV === 'development';
+    const minRequired = isDev ? 1 : gameDef.minPlayers;
+    if (playerCount < minRequired) {
       socket.emit('party:error', {
         error: 'NOT_ENOUGH_PLAYERS',
         message: `Need at least ${gameDef.minPlayers} players`,
@@ -335,8 +340,7 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       for (const p of Object.values(room.players)) {
         players.set(p.socketId, p.username);
       }
-      // Default to relay mode for alpha — mode selection can be added later
-      initPixelClash(room.roomCode, players, 'relay', room.totalRounds, 10);
+      initPixelClash(room.roomCode, players, 'telephone', room.totalRounds);
       startPixelRound(io, room.roomCode);
     } else if (room.gameId === 'shadow-clash') {
       const players = new Map<string, string>();
@@ -370,18 +374,21 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
         const action = parsed.action as string;
         if (action === 'submit-prompt' && 'text' in parsed) {
           submitTelephonePrompt(io, room.roomCode, socket.id, parsed.text as string);
-        } else if (action === 'draw' && 'canvas' in parsed) {
+        } else if (action === 'draw' && 'strokes' in parsed) {
+          const strokes = parsed.strokes as any[];
           if ('chainId' in parsed) {
-            submitTelephoneStep(io, room.roomCode, socket.id, parsed.chainId as string, parsed.canvas as number[][]);
+            submitTelephoneStep(io, room.roomCode, socket.id, parsed.chainId as string, strokes);
           } else if ('isRelay' in parsed && parsed.isRelay) {
             if ('isBuilder' in parsed && parsed.isBuilder) {
-              submitRelayBuilderCanvas(io, room.roomCode, socket.id, parsed.canvas as number[][]);
+              submitRelayBuilderDrawing(io, room.roomCode, socket.id, strokes);
             } else {
-              submitRelayArtistCanvas(io, room.roomCode, socket.id, parsed.canvas as number[][]);
+              submitRelayArtistDrawing(io, room.roomCode, socket.id, strokes);
             }
           } else {
-            submitShowdownCanvas(io, room.roomCode, socket.id, parsed.canvas as number[][]);
+            submitShowdownCanvas(io, room.roomCode, socket.id, strokes);
           }
+        } else if (action === 'live-stroke' && 'paths' in parsed) {
+          handleRelayLiveStroke(io, room.roomCode, socket.id, parsed.paths as any[]);
         } else if (action === 'guess' && 'text' in parsed && 'chainId' in parsed) {
           submitTelephoneStep(io, room.roomCode, socket.id, parsed.chainId as string, parsed.text as string);
         } else if (action === 'vote' && 'best' in parsed && 'funniest' in parsed) {

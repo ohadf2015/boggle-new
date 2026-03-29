@@ -26,7 +26,8 @@ export default function PartyPlayClient() {
   const roomCode = searchParams?.get('code') || '';
   const { user, profile } = useAuth();
   const { t } = useLanguage();
-  const { enabled: hasAccess, loading: flagLoading } = useFeatureFlag('party_games_alpha', user?.id);
+  const { enabled: flagEnabled, loading: flagLoading } = useFeatureFlag('party_games_alpha', user?.id);
+  const hasAccess = flagEnabled || process.env.NODE_ENV === 'development';
 
   const {
     room,
@@ -44,15 +45,19 @@ export default function PartyPlayClient() {
   const [joined, setJoined] = useState(false);
   const gameDef = PARTY_GAMES[gameId];
 
+  // Stable guest name for anonymous players (generated once)
+  const [guestName] = useState(() => `Player-${Math.random().toString(36).slice(2, 6).toUpperCase()}`);
+  const playerName = profile?.username || guestName;
+
   // Auto-join room on mount
   useEffect(() => {
-    if (!joined && connected && hasAccess && roomCode && profile?.username) {
-      joinRoom(roomCode, profile.username, {
-        avatarImage: profile.avatar_image || undefined,
+    if (!joined && connected && hasAccess && roomCode) {
+      joinRoom(roomCode, playerName, {
+        avatarImage: profile?.avatar_image || undefined,
       });
       setJoined(true);
     }
-  }, [joined, connected, hasAccess, roomCode, profile, joinRoom]);
+  }, [joined, connected, hasAccess, roomCode, playerName, joinRoom, profile?.avatar_image]);
 
   if (flagLoading) {
     return (

@@ -1,37 +1,32 @@
 'use client';
 
 /**
- * Pixel Clash — Phone Controller View
- * Shows: prompt input, pixel canvas for drawing, text input for guessing,
- * vote buttons. Adapts to current game mode and phase.
+ * Pixel Clash — Phone Controller View (Scribble Mode)
+ * Freehand drawing canvas for Gartic Phone / Skribbl.io style gameplay.
+ * Shows: prompt input, drawing canvas, text input for guessing, vote buttons.
  */
 
 import { memo, useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { PixelCanvas, type PixelGrid } from './PixelCanvas';
+import { DrawingCanvas, type DrawingData, type DrawingCanvasHandle } from './DrawingCanvas';
 
 // ==================== Types ====================
 
 interface AssignmentData {
   phase: string;
-  content: string | PixelGrid;
+  content: string | DrawingData;
   chainId: string;
   timeSeconds: number;
-  gridSize: number;
 }
 
 interface RelayArtistStartData {
   prompt: string;
-  gridSize: number;
   timeSeconds: number;
 }
 
 interface RelayBuildStartData {
-  bandFragment: PixelGrid;
-  startRow: number;
-  endRow: number;
-  gridSize: number;
+  referenceStrokes: DrawingData;
   timeSeconds: number;
 }
 
@@ -40,10 +35,15 @@ interface PhaseUpdateData {
   phase: string;
   prompt?: string;
   timeSeconds: number;
-  gridSize?: number;
 }
 
-type PhonePhase = 'waiting' | 'write-prompt' | 'drawing' | 'guessing' | 'relay-draw' | 'relay-build' | 'submitted' | 'watching';
+interface ShowdownCanvasesData {
+  canvases: Array<{ id: string; strokes: DrawingData; number: number }>;
+  prompt: string;
+  timeSeconds: number;
+}
+
+type PhonePhase = 'waiting' | 'write-prompt' | 'drawing' | 'guessing' | 'relay-draw' | 'relay-build' | 'showdown-vote' | 'submitted' | 'watching';
 
 // ==================== Props ====================
 
@@ -61,13 +61,14 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   const [phase, setPhase] = useState<PhonePhase>('waiting');
   const [promptText, setPromptText] = useState('');
   const [guessText, setGuessText] = useState('');
-  const [currentCanvas, setCurrentCanvas] = useState<PixelGrid | null>(null);
   const [assignment, setAssignment] = useState<AssignmentData | null>(null);
   const [relayPrompt, setRelayPrompt] = useState('');
-  const [editableRange, setEditableRange] = useState<{ startRow: number; endRow: number } | null>(null);
-  const [gridSize, setGridSize] = useState(10);
+  const [relayReference, setRelayReference] = useState<DrawingData | null>(null);
+  const [showdownCanvases, setShowdownCanvases] = useState<ShowdownCanvasesData | null>(null);
+  const [showdownVote, setShowdownVote] = useState<{ best: string; funniest: string }>({ best: '', funniest: '' });
   const [timeRemaining, setTimeRemaining] = useState(0);
-  const canvasRef = useRef<PixelGrid | null>(null);
+  const canvasHandleRef = useRef<DrawingCanvasHandle>(null);
+  const strokesRef = useRef<DrawingData>([]);
 
   // Timer
   useEffect(() => {
@@ -81,34 +82,37 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     if (!socket) return;
 
     const onPhaseUpdate = (data: PhaseUpdateData) => {
-      if (data.gridSize) setGridSize(data.gridSize);
       setTimeRemaining(data.timeSeconds);
 
       if (data.phase === 'write-prompt') {
+        // Legacy — prompts now auto-assigned, but keep for safety
         setPhase('write-prompt');
         setPromptText('');
+        strokesRef.current = [];
+      } else if (data.phase === 'drawing') {
+        // Telephone mode: assignment comes separately via party:pixel:assignment
+        // Just set the timer, assignment handler sets the actual phase
+        strokesRef.current = [];
+      } else if (data.phase === 'guessing') {
+        strokesRef.current = [];
       } else if (data.phase === 'showdown-draw') {
         setPhase('drawing');
         setRelayPrompt(data.prompt || '');
-        setCurrentCanvas(null);
-        setEditableRange(null);
+        strokesRef.current = [];
       } else if (data.phase === 'relay-artist') {
-        // Only the artist gets the relay start event separately
         setPhase('watching');
-      } else if (data.phase === 'gallery-reveal' || data.phase === 'relay-merge') {
+      } else if (data.phase === 'gallery-reveal' || data.phase === 'relay-merge' || data.phase === 'crown') {
         setPhase('watching');
       }
     };
 
     const onAssignment = (data: AssignmentData) => {
       setAssignment(data);
-      setGridSize(data.gridSize);
       setTimeRemaining(data.timeSeconds);
-      setEditableRange(null);
+      strokesRef.current = [];
 
       if (data.phase === 'drawing') {
         setPhase('drawing');
-        setCurrentCanvas(null);
       } else {
         setPhase('guessing');
         setGuessText('');
@@ -118,39 +122,49 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     const onRelayArtistStart = (data: RelayArtistStartData) => {
       setPhase('relay-draw');
       setRelayPrompt(data.prompt);
-      setGridSize(data.gridSize);
       setTimeRemaining(data.timeSeconds);
-      setCurrentCanvas(null);
-      setEditableRange(null);
+      strokesRef.current = [];
     };
 
     const onRelayBuildStart = (data: RelayBuildStartData) => {
       setPhase('relay-build');
-      setGridSize(data.gridSize);
       setTimeRemaining(data.timeSeconds);
-      setCurrentCanvas(data.bandFragment);
-      setEditableRange({ startRow: data.startRow, endRow: data.endRow });
+      setRelayReference(data.referenceStrokes);
+      strokesRef.current = [];
+    };
+
+    const onShowdownCanvases = (data: ShowdownCanvasesData) => {
+      setPhase('showdown-vote');
+      setShowdownCanvases(data);
+      setTimeRemaining(data.timeSeconds);
+      setShowdownVote({ best: '', funniest: '' });
     };
 
     socket.on('party:pixel:phaseUpdate', onPhaseUpdate);
     socket.on('party:pixel:assignment', onAssignment);
     socket.on('party:pixel:relayArtistStart', onRelayArtistStart);
     socket.on('party:pixel:relayBuildStart', onRelayBuildStart);
+    socket.on('party:pixel:showdownCanvases', onShowdownCanvases);
 
     return () => {
       socket.off('party:pixel:phaseUpdate', onPhaseUpdate);
       socket.off('party:pixel:assignment', onAssignment);
       socket.off('party:pixel:relayArtistStart', onRelayArtistStart);
       socket.off('party:pixel:relayBuildStart', onRelayBuildStart);
+      socket.off('party:pixel:showdownCanvases', onShowdownCanvases);
     };
   }, [socket]);
 
-  // Canvas change handler — also sends live updates for relay artist
-  const handleCanvasChange = useCallback((grid: PixelGrid) => {
-    canvasRef.current = grid;
+  // Track strokes on stroke end
+  const handleStrokeEnd = useCallback((paths: DrawingData) => {
+    strokesRef.current = paths;
+  }, []);
+
+  // Live path streaming for relay artist
+  const handleLiveUpdate = useCallback((paths: DrawingData) => {
+    strokesRef.current = paths;
     if (phase === 'relay-draw') {
-      // Live update for progressive pixelation
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', canvas: grid, isRelay: true });
+      onSendInput({ gameId: 'pixel-clash', action: 'live-stroke', paths });
     }
   }, [phase, onSendInput]);
 
@@ -161,17 +175,18 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   }, [promptText, onSendInput]);
 
   const handleSubmitDrawing = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const strokes = strokesRef.current;
+    if (strokes.length === 0) return;
 
     if (assignment?.chainId) {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', canvas, chainId: assignment.chainId });
+      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, chainId: assignment.chainId });
     } else if (phase === 'relay-draw') {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', canvas, isRelay: true });
+      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true });
     } else if (phase === 'relay-build') {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', canvas, isRelay: true, isBuilder: true });
+      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true, isBuilder: true });
     } else {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', canvas });
+      // Showdown
+      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes });
     }
     setPhase('submitted');
   }, [assignment, phase, onSendInput]);
@@ -182,34 +197,44 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     setPhase('submitted');
   }, [guessText, assignment, onSendInput]);
 
-  // ==================== Render ====================
+  const handleSubmitVote = useCallback(() => {
+    if (!showdownVote.best) return;
+    onSendInput({ gameId: 'pixel-clash', action: 'vote', best: showdownVote.best, funniest: showdownVote.funniest });
+    setPhase('submitted');
+  }, [showdownVote, onSendInput]);
 
-  // Write prompt (telephone mode)
+  const canvasSize = Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 32 : 320);
+
+  // Timer display - inline to avoid component-during-render lint error
+  const timerBadge = (
+    <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+      {timeRemaining}s
+    </span>
+  );
+
+  // ==================== Write Prompt (Telephone) ====================
   if (phase === 'write-prompt') {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-neo-cream/50 font-neo-body text-xs uppercase">
-            {t('party.writePrompt') || 'Write something to draw'}
+            {t('party.writePrompt')}
           </span>
-          <span className={`font-neo-display ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-cream'}`}>
-            {timeRemaining}s
-          </span>
+          {timerBadge}
         </div>
 
         <input
           type="text"
           value={promptText}
           onChange={e => setPromptText(e.target.value.slice(0, 50))}
-          placeholder={t('party.promptPlaceholder') || 'cat on a skateboard...'}
+          placeholder={t('party.promptPlaceholder')}
           maxLength={50}
           autoFocus
           className="
             bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
             px-4 py-3 text-neo-cream font-neo-body text-lg
             placeholder:text-neo-cream/20
-            focus:outline-none focus:border-neo-cyan
-            mb-4
+            focus:outline-none focus:border-neo-cyan mb-4
           "
         />
 
@@ -225,16 +250,19 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             disabled:opacity-30 disabled:cursor-not-allowed
           "
         >
-          {t('party.submit') || 'Submit'}
+          {t('party.submit')}
         </button>
       </div>
     );
   }
 
-  // Drawing phase (telephone, showdown, or relay artist)
+  // ==================== Drawing Phase ====================
   if (phase === 'drawing' || phase === 'relay-draw' || phase === 'relay-build') {
-    const showPrompt = phase === 'relay-draw' ? relayPrompt :
-                       assignment?.phase === 'drawing' && typeof assignment.content === 'string' ? assignment.content as string : '';
+    const showPrompt = phase === 'relay-draw'
+      ? relayPrompt
+      : assignment?.phase === 'drawing' && typeof assignment.content === 'string'
+        ? assignment.content as string
+        : relayPrompt;
 
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center p-3">
@@ -244,26 +272,25 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
               {showPrompt}
             </span>
           )}
-          <span className={`font-neo-display ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
-            {timeRemaining}s
-          </span>
+          {timerBadge}
         </div>
 
-        {/* Drawing reference (telephone: show the previous guess text) */}
+        {/* Drawing reference for telephone: show the text prompt */}
         {assignment?.phase === 'drawing' && typeof assignment.content === 'string' && (
           <div className="bg-neo-navy-elevated border-2 border-neo-cyan/30 rounded-neo px-3 py-2 mb-2 w-full">
             <p className="font-neo-body text-neo-cream text-sm text-center">
-              Draw: &ldquo;{assignment.content}&rdquo;
+              {t('party.draw')}: &ldquo;{assignment.content}&rdquo;
             </p>
           </div>
         )}
 
-        <PixelCanvas
-          gridSize={gridSize}
-          initialGrid={currentCanvas || undefined}
-          editableRange={editableRange}
-          onChange={handleCanvasChange}
-          maxSize={Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 32 : 320)}
+        <DrawingCanvas
+          ref={canvasHandleRef}
+          width={canvasSize}
+          height={canvasSize}
+          initialPaths={relayReference || undefined}
+          onStrokeEnd={handleStrokeEnd}
+          onStrokeUpdate={phase === 'relay-draw' ? handleLiveUpdate : undefined}
         />
 
         <button
@@ -275,33 +302,31 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
           "
         >
-          {t('party.done') || 'Done'}
+          {t('party.done')}
         </button>
       </div>
     );
   }
 
-  // Guessing phase (telephone: see drawing, write guess)
+  // ==================== Guessing Phase (Telephone) ====================
   if (phase === 'guessing' && assignment) {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center p-4">
         <div className="flex items-center justify-between w-full mb-3">
           <span className="text-neo-cream/50 font-neo-body text-xs uppercase">
-            {t('party.whatIsThis') || 'What is this?'}
+            {t('party.whatIsThis')}
           </span>
-          <span className={`font-neo-display ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-cream'}`}>
-            {timeRemaining}s
-          </span>
+          {timerBadge}
         </div>
 
         {/* Show the drawing to guess */}
         {Array.isArray(assignment.content) && (
           <div className="mb-4">
-            <PixelCanvas
-              gridSize={gridSize}
-              initialGrid={assignment.content as PixelGrid}
+            <DrawingCanvas
+              width={280}
+              height={280}
+              initialPaths={assignment.content as DrawingData}
               readOnly
-              maxSize={280}
             />
           </div>
         )}
@@ -310,15 +335,14 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
           type="text"
           value={guessText}
           onChange={e => setGuessText(e.target.value.slice(0, 50))}
-          placeholder={t('party.typeGuess') || 'Type your guess...'}
+          placeholder={t('party.typeGuess')}
           maxLength={50}
           autoFocus
           className="
             w-full bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
             px-4 py-3 text-neo-cream font-neo-body text-lg
             placeholder:text-neo-cream/20
-            focus:outline-none focus:border-neo-cyan
-            mb-3
+            focus:outline-none focus:border-neo-cyan mb-3
           "
         />
 
@@ -332,13 +356,80 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             disabled:opacity-30 disabled:cursor-not-allowed
           "
         >
-          {t('party.submit') || 'Submit'}
+          {t('party.submit')}
         </button>
       </div>
     );
   }
 
-  // Submitted / Watching
+  // ==================== Showdown Vote ====================
+  if (phase === 'showdown-vote' && showdownCanvases) {
+    return (
+      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="font-neo-display text-neo-cyan text-sm uppercase">
+            {t('party.pickFavorite')}
+          </span>
+          {timerBadge}
+        </div>
+
+        <p className="text-neo-cream/50 font-neo-body text-xs mb-3">
+          &ldquo;{showdownCanvases.prompt}&rdquo;
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {showdownCanvases.canvases.map((entry) => {
+            const isBest = showdownVote.best === entry.id;
+            const isFunniest = showdownVote.funniest === entry.id;
+            const isSelf = entry.id === playerId;
+            return (
+              <button
+                key={entry.id}
+                disabled={isSelf}
+                onClick={() => {
+                  if (!showdownVote.best) {
+                    setShowdownVote(prev => ({ ...prev, best: entry.id }));
+                  } else if (!showdownVote.funniest && entry.id !== showdownVote.best) {
+                    setShowdownVote(prev => ({ ...prev, funniest: entry.id }));
+                  }
+                }}
+                className={`
+                  p-2 rounded-neo border-3 transition-all
+                  ${isBest ? 'border-neo-lime bg-neo-lime/10' : isFunniest ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/20'}
+                  ${isSelf ? 'opacity-40 cursor-not-allowed' : 'hover:border-neo-cream/50'}
+                `}
+              >
+                <DrawingCanvas
+                  width={Math.floor((canvasSize - 40) / 2)}
+                  height={Math.floor((canvasSize - 40) / 2)}
+                  initialPaths={entry.strokes}
+                  readOnly
+                />
+                <span className="text-neo-cream/40 text-xs font-neo-body mt-1 block">#{entry.number}</span>
+                {isBest && <span className="text-neo-lime text-xs font-bold">Best</span>}
+                {isFunniest && <span className="text-neo-pink text-xs font-bold">Funniest</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        {showdownVote.best && (
+          <button
+            onClick={handleSubmitVote}
+            className="
+              bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard
+              px-6 py-3 font-neo-display text-neo-black uppercase font-bold
+              active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
+            "
+          >
+            {t('party.vote')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ==================== Submitted / Watching ====================
   if (phase === 'submitted' || phase === 'watching') {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
@@ -346,8 +437,8 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
           <div className="text-4xl mb-3">{phase === 'submitted' ? '✅' : '👀'}</div>
           <p className="font-neo-display text-neo-cyan uppercase">
             {phase === 'submitted'
-              ? (t('party.submitted') || 'Submitted!')
-              : (t('party.watchTheTv') || 'Watch the TV!')}
+              ? t('party.submitted')
+              : t('party.watchTheTv')}
           </p>
         </div>
       </div>
@@ -358,7 +449,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center">
       <div className="animate-pulse text-neo-cream/50 font-neo-display">
-        {t('party.starting') || 'Starting...'}
+        {t('party.starting')}
       </div>
     </div>
   );

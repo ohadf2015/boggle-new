@@ -38,7 +38,11 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
   const joinUrl = useMemo(() => {
     if (!room) return '';
     const base = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
-    return `${base}/join?code=${room.roomCode}`;
+    // Extract locale from current URL path
+    const pathLocale = typeof window !== 'undefined'
+      ? window.location.pathname.split('/')[1] || 'en'
+      : 'en';
+    return `${base}/${pathLocale}/party/join?code=${room.roomCode}`;
   }, [room]);
 
   const players = room ? Object.values(room.players) : [];

@@ -1,6 +1,7 @@
 /**
- * Pixel Clash Game Engine
+ * Pixel Clash Game Engine (Scribble Mode)
  * Manages 3 modes: Telephone, Showdown, Pixel Relay
+ * Uses freehand stroke data (CanvasPath[]) instead of pixel grids.
  */
 
 import type { Server } from 'socket.io';
@@ -8,15 +9,24 @@ import logger from '../../utils/logger.js';
 
 // ==================== Types ====================
 
-type PixelColor = number; // 0-7, 0 = empty
-type PixelGrid = PixelColor[][];
+/** CanvasPath from react-sketch-canvas — serialized over the wire */
+interface CanvasPath {
+  paths: Array<{ x: number; y: number }>;
+  strokeWidth: number;
+  strokeColor: string;
+  drawMode: boolean;
+  startTimestamp?: number;
+  endTimestamp?: number;
+}
+
+type DrawingData = CanvasPath[];
 type PixelMode = 'telephone' | 'showdown' | 'relay';
 
 interface TelephoneStep {
   playerId: string;
   username: string;
   type: 'write' | 'draw';
-  content: string | PixelGrid;
+  content: string | DrawingData;
   timestamp: number;
 }
 
@@ -26,39 +36,27 @@ interface TelephoneChain {
   steps: TelephoneStep[];
 }
 
-interface RelayBand {
-  builderId: string;
-  builderUsername: string;
-  startRow: number;
-  endRow: number;
-  canvas: PixelGrid;
+interface PixelRound {
+  mode: PixelMode;
+  phase: string;
+  prompt: string;
+  // Telephone
+  chains?: TelephoneChain[];
+  currentStepIndex?: number;
+  // Showdown
+  canvases?: Map<string, DrawingData>;
+  votes?: Map<string, { best: string; funniest: string }>;
+  // Relay
+  relay?: RelayState;
+  timer: ReturnType<typeof setTimeout> | null;
 }
 
 interface RelayState {
   artistId: string;
   artistUsername: string;
-  originalCanvas: PixelGrid;
+  originalDrawing: DrawingData;
   prompt: string;
-  bands: RelayBand[];
-  pixelationLevel: number; // 0=max blur, 3=clear
-  mergedCanvas: PixelGrid | null;
-  similarityScore: number;
-}
-
-interface PixelRound {
-  mode: PixelMode;
-  phase: string;
-  prompt: string;
-  gridSize: number;
-  // Telephone
-  chains?: TelephoneChain[];
-  currentStepIndex?: number;
-  // Showdown
-  canvases?: Map<string, PixelGrid>;
-  votes?: Map<string, { best: string; funniest: string }>;
-  // Relay
-  relay?: RelayState;
-  timer: ReturnType<typeof setTimeout> | null;
+  builderDrawings: Map<string, DrawingData>;
 }
 
 interface PixelGameState {
@@ -68,8 +66,7 @@ interface PixelGameState {
   mode: PixelMode;
   scores: Map<string, number>;
   playerUsernames: Map<string, string>;
-  playerOrder: string[]; // socket IDs in order
-  gridSize: number;
+  playerOrder: string[];
 }
 
 // ==================== Prompt Database ====================
@@ -93,72 +90,10 @@ const activeGames = new Map<string, PixelGameState>();
 
 // ==================== Helpers ====================
 
-function createEmptyGrid(size: number): PixelGrid {
-  return Array.from({ length: size }, () => Array(size).fill(0));
-}
-
 function pickPrompt(usedPrompts: string[]): string {
   const available = DRAW_PROMPTS.filter(p => !usedPrompts.includes(p));
   const pool = available.length > 0 ? available : DRAW_PROMPTS;
   return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function calculateSimilarity(original: PixelGrid, rebuilt: PixelGrid): number {
-  let matching = 0;
-  let total = 0;
-  for (let r = 0; r < original.length; r++) {
-    for (let c = 0; c < (original[r]?.length || 0); c++) {
-      total++;
-      if (original[r][c] === rebuilt[r]?.[c]) matching++;
-    }
-  }
-  return total > 0 ? Math.round((matching / total) * 100) : 0;
-}
-
-function mergeRelayBands(bands: RelayBand[], gridSize: number): PixelGrid {
-  const merged = createEmptyGrid(gridSize);
-  for (const band of bands) {
-    for (let r = band.startRow; r < band.endRow && r < gridSize; r++) {
-      for (let c = 0; c < gridSize; c++) {
-        merged[r][c] = band.canvas[r]?.[c] || 0;
-      }
-    }
-  }
-  return merged;
-}
-
-function pixelateGrid(grid: PixelGrid, level: number): PixelGrid {
-  const size = grid.length;
-  if (level >= 3) return grid; // Full resolution
-
-  // Level 0: 4x4 blocks, Level 1: 8x8, Level 2: 16x16 (or smaller if grid is small)
-  const blockSizes = [Math.max(4, Math.floor(size / 2)), Math.max(2, Math.floor(size / 4)), 1];
-  const blockSize = blockSizes[level] || 1;
-
-  const result = createEmptyGrid(size);
-  for (let r = 0; r < size; r += blockSize) {
-    for (let c = 0; c < size; c += blockSize) {
-      // Find most common color in block
-      const colorCounts = new Map<number, number>();
-      for (let br = r; br < r + blockSize && br < size; br++) {
-        for (let bc = c; bc < c + blockSize && bc < size; bc++) {
-          const color = grid[br]?.[bc] || 0;
-          colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
-        }
-      }
-      let maxColor = 0, maxCount = 0;
-      for (const [color, count] of colorCounts) {
-        if (count > maxCount) { maxColor = color; maxCount = count; }
-      }
-      // Fill block with dominant color
-      for (let br = r; br < r + blockSize && br < size; br++) {
-        for (let bc = c; bc < c + blockSize && bc < size; bc++) {
-          result[br][bc] = maxColor;
-        }
-      }
-    }
-  }
-  return result;
 }
 
 // ==================== Public API ====================
@@ -168,7 +103,6 @@ export function initPixelClash(
   players: Map<string, string>,
   mode: PixelMode,
   totalRounds: number,
-  gridSize: number = 10
 ): void {
   const state: PixelGameState = {
     rounds: [],
@@ -178,7 +112,6 @@ export function initPixelClash(
     scores: new Map(),
     playerUsernames: players,
     playerOrder: Array.from(players.keys()),
-    gridSize,
   };
   for (const id of players.keys()) state.scores.set(id, 0);
   activeGames.set(roomCode, state);
@@ -203,91 +136,110 @@ export function startPixelRound(io: Server, roomCode: string): void {
 }
 
 // ==================== Telephone Mode ====================
+// Flow: random prompt → draw → guess → draw → guess → ... → gallery reveal
+// Each player starts a chain with a random word from DRAW_PROMPTS.
+// Chains rotate between players each step.
 
 function startTelephoneRound(io: Server, roomCode: string, game: PixelGameState, _prompt: string): void {
+  const usedPrompts = game.rounds.flatMap(r => (r.chains || []).map(c => c.steps[0]?.content as string)).filter(Boolean);
+
+  // Create one chain per player, each with a random prompt
+  const chains: TelephoneChain[] = game.playerOrder.map((playerId) => {
+    const prompt = pickPrompt(usedPrompts);
+    usedPrompts.push(prompt); // avoid dupes within the round
+    const username = game.playerUsernames.get(playerId) || 'Unknown';
+    return {
+      id: `chain_${playerId}`,
+      originPlayer: playerId,
+      steps: [{ playerId, username, type: 'write' as const, content: prompt, timestamp: Date.now() }],
+    };
+  });
+
   const round: PixelRound = {
     mode: 'telephone',
-    phase: 'write-prompt',
+    phase: 'drawing', // Skip write-prompt, go straight to drawing
     prompt: '',
-    gridSize: game.gridSize,
-    chains: [],
-    currentStepIndex: 0,
+    chains,
+    currentStepIndex: 1, // Step 0 was the auto-assigned prompt, step 1 = first draw
     timer: null,
   };
 
-  // Each player writes a prompt
   game.rounds.push(round);
+
+  // Assign each player their own chain's prompt to draw
+  for (let i = 0; i < game.playerOrder.length; i++) {
+    const playerId = game.playerOrder[i];
+    const chain = chains[i];
+    io.to(playerId).emit('party:pixel:assignment', {
+      phase: 'drawing',
+      content: chain.steps[0].content, // The text prompt
+      chainId: chain.id,
+      timeSeconds: 60,
+    });
+  }
+
   io.to(`party:${roomCode}`).emit('party:pixel:phaseUpdate', {
     mode: 'telephone',
-    phase: 'write-prompt',
+    phase: 'drawing',
     round: game.currentRound,
     totalRounds: game.totalRounds,
-    timeSeconds: 30,
+    timeSeconds: 60,
   });
 
   round.timer = setTimeout(() => {
     advanceTelephoneStep(io, roomCode);
-  }, 30000);
+  }, 60000);
 }
 
-export function submitTelephonePrompt(io: Server, roomCode: string, socketId: string, text: string): void {
-  const game = activeGames.get(roomCode);
-  if (!game) return;
-  const round = game.rounds[game.rounds.length - 1];
-  if (!round || round.phase !== 'write-prompt') return;
-
-  if (!round.chains) round.chains = [];
-  const username = game.playerUsernames.get(socketId) || 'Unknown';
-
-  // Create a new chain starting with this player's prompt
-  round.chains.push({
-    id: `chain_${socketId}`,
-    originPlayer: socketId,
-    steps: [{ playerId: socketId, username, type: 'write', content: text.trim().slice(0, 50), timestamp: Date.now() }],
-  });
-
-  if (round.chains.length >= game.playerOrder.length) {
-    if (round.timer) clearTimeout(round.timer);
-    advanceTelephoneStep(io, roomCode);
-  }
+// Legacy: still accept manual prompts if someone sends one
+export function submitTelephonePrompt(_io: Server, _roomCode: string, _socketId: string, _text: string): void {
+  // No-op — prompts are now auto-assigned from DRAW_PROMPTS
 }
 
 function advanceTelephoneStep(io: Server, roomCode: string): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
-  if (!round || !round.chains) return;
+  if (!round || !round.chains || round.chains.length === 0) {
+    // Safety: if somehow no chains, advance to next round
+    if (game.currentRound >= game.totalRounds) {
+      endPixelClash(io, roomCode);
+    } else {
+      startPixelRound(io, roomCode);
+    }
+    return;
+  }
 
   round.currentStepIndex = (round.currentStepIndex || 0) + 1;
 
-  // Alternate between draw and write, total steps = player count
+  // Total steps = number of players (each player contributes once per chain)
+  // With N players we get N steps: prompt, draw, guess, draw, guess...
   if (round.currentStepIndex >= game.playerOrder.length) {
-    // Chain complete → gallery reveal
     startTelephoneReveal(io, roomCode, game, round);
     return;
   }
 
+  // Odd steps = drawing (from text), even steps = guessing (from drawing)
   const isDraw = round.currentStepIndex % 2 === 1;
   round.phase = isDraw ? 'drawing' : 'guessing';
 
-  // Assign each player to a different chain (round-robin shift)
-  const assignments: Array<{ playerId: string; chainId: string; content: string | PixelGrid }> = [];
+  // Rotate chain assignments so each player sees a different chain
+  const assignments: Array<{ playerId: string; chainId: string; content: string | DrawingData }> = [];
   for (let i = 0; i < game.playerOrder.length; i++) {
     const playerId = game.playerOrder[i];
-    const chainIdx = (i + (round.currentStepIndex || 0)) % round.chains.length;
+    const chainIdx = (i + round.currentStepIndex) % round.chains.length;
     const chain = round.chains[chainIdx];
+    if (!chain) continue;
     const lastStep = chain.steps[chain.steps.length - 1];
     assignments.push({ playerId, chainId: chain.id, content: lastStep.content });
   }
 
-  // Send each player their assignment privately
   for (const assignment of assignments) {
     io.to(assignment.playerId).emit('party:pixel:assignment', {
       phase: round.phase,
       content: assignment.content,
       chainId: assignment.chainId,
       timeSeconds: isDraw ? 60 : 30,
-      gridSize: game.gridSize,
     });
   }
 
@@ -304,7 +256,7 @@ function advanceTelephoneStep(io: Server, roomCode: string): void {
   }, isDraw ? 60000 : 30000);
 }
 
-export function submitTelephoneStep(io: Server, roomCode: string, socketId: string, chainId: string, content: string | PixelGrid): void {
+export function submitTelephoneStep(io: Server, roomCode: string, socketId: string, chainId: string, content: string | DrawingData): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
@@ -323,7 +275,6 @@ export function submitTelephoneStep(io: Server, roomCode: string, socketId: stri
     timestamp: Date.now(),
   });
 
-  // Check if all players submitted for this step
   const expectedSubmissions = game.playerOrder.length;
   const totalStepsThisRound = round.chains.reduce((sum, c) => {
     return sum + (c.steps.length > (round.currentStepIndex || 0) ? 1 : 0);
@@ -339,7 +290,6 @@ function startTelephoneReveal(io: Server, roomCode: string, game: PixelGameState
   round.phase = 'gallery-reveal';
   if (round.timer) clearTimeout(round.timer);
 
-  // Reveal chains one by one
   const chains = round.chains || [];
   chains.forEach((chain, index) => {
     setTimeout(() => {
@@ -348,10 +298,9 @@ function startTelephoneReveal(io: Server, roomCode: string, game: PixelGameState
         index,
         total: chains.length,
       });
-    }, index * 8000); // 8 seconds per chain
+    }, index * 8000);
   });
 
-  // After all revealed, advance
   round.timer = setTimeout(() => {
     if (game.currentRound >= game.totalRounds) {
       endPixelClash(io, roomCode);
@@ -368,7 +317,6 @@ function startShowdownRound(io: Server, roomCode: string, game: PixelGameState, 
     mode: 'showdown',
     phase: 'showdown-draw',
     prompt,
-    gridSize: game.gridSize,
     canvases: new Map(),
     votes: new Map(),
     timer: null,
@@ -383,7 +331,6 @@ function startShowdownRound(io: Server, roomCode: string, game: PixelGameState, 
     round: game.currentRound,
     totalRounds: game.totalRounds,
     timeSeconds: 60,
-    gridSize: game.gridSize,
   });
 
   round.timer = setTimeout(() => {
@@ -391,13 +338,13 @@ function startShowdownRound(io: Server, roomCode: string, game: PixelGameState, 
   }, 60000);
 }
 
-export function submitShowdownCanvas(io: Server, roomCode: string, socketId: string, canvas: PixelGrid): void {
+export function submitShowdownCanvas(io: Server, roomCode: string, socketId: string, strokes: DrawingData): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
   if (!round || round.phase !== 'showdown-draw' || !round.canvases) return;
 
-  round.canvases.set(socketId, canvas);
+  round.canvases.set(socketId, strokes);
 
   if (round.canvases.size >= game.playerOrder.length) {
     if (round.timer) clearTimeout(round.timer);
@@ -413,17 +360,16 @@ function advanceShowdownToVote(io: Server, roomCode: string): void {
 
   round.phase = 'showdown-vote';
 
-  // Send all canvases anonymized (numbered)
   const entries = Array.from(round.canvases.entries())
     .sort(() => Math.random() - 0.5)
-    .map(([socketId, canvas], index) => ({
+    .map(([socketId, strokes], index) => ({
       id: socketId,
-      canvas,
+      strokes,
       number: index + 1,
     }));
 
   io.to(`party:${roomCode}`).emit('party:pixel:showdownCanvases', {
-    canvases: entries.map(e => ({ id: e.id, canvas: e.canvas, number: e.number })),
+    canvases: entries,
     prompt: round.prompt,
     timeSeconds: 20,
   });
@@ -438,7 +384,7 @@ export function submitShowdownVote(roomCode: string, socketId: string, best: str
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
   if (!round || round.phase !== 'showdown-vote' || !round.votes) return;
-  if (best === socketId || funniest === socketId) return; // Can't vote for self
+  if (best === socketId || funniest === socketId) return;
 
   round.votes.set(socketId, { best, funniest });
 }
@@ -452,7 +398,6 @@ function advanceShowdownToCrown(io: Server, roomCode: string): void {
   round.phase = 'crown';
   if (round.timer) clearTimeout(round.timer);
 
-  // Tally votes
   const bestCounts = new Map<string, number>();
   const funniestCounts = new Map<string, number>();
   for (const vote of round.votes.values()) {
@@ -470,17 +415,16 @@ function advanceShowdownToCrown(io: Server, roomCode: string): void {
     if (count > funniestMax) { funniestWinner = id; funniestMax = count; }
   }
 
-  // Award points
   if (bestWinner) game.scores.set(bestWinner, (game.scores.get(bestWinner) || 0) + 500);
   if (funniestWinner) game.scores.set(funniestWinner, (game.scores.get(funniestWinner) || 0) + 300);
 
   io.to(`party:${roomCode}`).emit('party:pixel:showdownResults', {
     bestWinner: { id: bestWinner, username: game.playerUsernames.get(bestWinner) || 'Unknown', votes: bestMax },
     funniestWinner: { id: funniestWinner, username: game.playerUsernames.get(funniestWinner) || 'Unknown', votes: funniestMax },
-    canvases: Array.from(round.canvases.entries()).map(([id, canvas]) => ({
+    canvases: Array.from(round.canvases.entries()).map(([id, strokes]) => ({
       id,
       username: game.playerUsernames.get(id) || 'Unknown',
-      canvas,
+      strokes,
     })),
     prompt: round.prompt,
   });
@@ -497,7 +441,6 @@ function advanceShowdownToCrown(io: Server, roomCode: string): void {
 // ==================== Relay Mode ====================
 
 function startRelayRound(io: Server, roomCode: string, game: PixelGameState, prompt: string): void {
-  // Pick artist (rotate each round)
   const artistIdx = (game.currentRound - 1) % game.playerOrder.length;
   const artistId = game.playerOrder[artistIdx];
   const artistUsername = game.playerUsernames.get(artistId) || 'Unknown';
@@ -506,30 +449,23 @@ function startRelayRound(io: Server, roomCode: string, game: PixelGameState, pro
     mode: 'relay',
     phase: 'relay-artist',
     prompt,
-    gridSize: game.gridSize,
     relay: {
       artistId,
       artistUsername,
-      originalCanvas: createEmptyGrid(game.gridSize),
+      originalDrawing: [],
       prompt,
-      bands: [],
-      pixelationLevel: 0,
-      mergedCanvas: null,
-      similarityScore: 0,
+      builderDrawings: new Map(),
     },
     timer: null,
   };
 
   game.rounds.push(round);
 
-  // Tell artist the prompt (private)
   io.to(artistId).emit('party:pixel:relayArtistStart', {
     prompt,
-    gridSize: game.gridSize,
     timeSeconds: 60,
   });
 
-  // Tell everyone else to watch
   io.to(`party:${roomCode}`).emit('party:pixel:phaseUpdate', {
     mode: 'relay',
     phase: 'relay-artist',
@@ -537,54 +473,33 @@ function startRelayRound(io: Server, roomCode: string, game: PixelGameState, pro
     round: game.currentRound,
     totalRounds: game.totalRounds,
     timeSeconds: 60,
-    gridSize: game.gridSize,
   });
 
-  // Progressive de-pixelation: update every 15 seconds
-  const pixelationSteps = [0, 1, 2]; // At 15s, 30s, 45s
-  pixelationSteps.forEach((level, i) => {
-    setTimeout(() => {
-      const currentRound = game.rounds[game.rounds.length - 1];
-      if (!currentRound?.relay) return;
-      currentRound.relay.pixelationLevel = level;
-      const pixelated = pixelateGrid(currentRound.relay.originalCanvas, level);
-      io.to(`party:${roomCode}`).emit('party:pixel:pixelationLevel', {
-        level,
-        canvas: pixelated,
-      });
-    }, (i + 1) * 15000);
-  });
-
-  // At 57s, show clear for 3 seconds
-  setTimeout(() => {
-    const currentRound = game.rounds[game.rounds.length - 1];
-    if (!currentRound?.relay) return;
-    io.to(`party:${roomCode}`).emit('party:pixel:pixelationLevel', {
-      level: 3,
-      canvas: currentRound.relay.originalCanvas,
-    });
-  }, 57000);
-
-  // After 60s, split and start build phase
   round.timer = setTimeout(() => {
     startRelayBuild(io, roomCode);
   }, 60000);
 }
 
-export function submitRelayArtistCanvas(io: Server, roomCode: string, socketId: string, canvas: PixelGrid): void {
+/** Live stroke updates from artist — forward to TV */
+export function handleRelayLiveStroke(io: Server, roomCode: string, socketId: string, paths: DrawingData): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
   if (!round?.relay || round.relay.artistId !== socketId) return;
 
-  round.relay.originalCanvas = canvas;
+  round.relay.originalDrawing = paths;
 
-  // Send pixelated version to spectators in real-time
-  const pixelated = pixelateGrid(canvas, round.relay.pixelationLevel);
-  io.to(`party:${roomCode}`).emit('party:pixel:pixelationLevel', {
-    level: round.relay.pixelationLevel,
-    canvas: pixelated,
-  });
+  // Forward to TV for live display
+  io.to(`party:${roomCode}`).emit('party:pixel:liveStroke', { paths });
+}
+
+export function submitRelayArtistDrawing(io: Server, roomCode: string, socketId: string, strokes: DrawingData): void {
+  const game = activeGames.get(roomCode);
+  if (!game) return;
+  const round = game.rounds[game.rounds.length - 1];
+  if (!round?.relay || round.relay.artistId !== socketId) return;
+
+  round.relay.originalDrawing = strokes;
 }
 
 function startRelayBuild(io: Server, roomCode: string): void {
@@ -596,80 +511,45 @@ function startRelayBuild(io: Server, roomCode: string): void {
   round.phase = 'relay-build';
   if (round.timer) clearTimeout(round.timer);
 
-  // Assign builders (everyone except artist)
   const builders = game.playerOrder.filter(id => id !== round.relay!.artistId);
-  const gridSize = game.gridSize;
-  const bandCount = Math.min(builders.length, 3); // Max 3 bands
-  const rowsPerBand = Math.floor(gridSize / bandCount);
 
-  const bands: RelayBand[] = [];
-  for (let i = 0; i < bandCount && i < builders.length; i++) {
-    const startRow = i * rowsPerBand;
-    const endRow = i === bandCount - 1 ? gridSize : (i + 1) * rowsPerBand;
-    bands.push({
-      builderId: builders[i],
-      builderUsername: game.playerUsernames.get(builders[i]) || 'Unknown',
-      startRow,
-      endRow,
-      canvas: createEmptyGrid(gridSize),
-    });
-  }
-
-  round.relay.bands = bands;
-
-  // Send each builder their band fragment
-  for (const band of bands) {
-    // Extract their band from original
-    const fragment = createEmptyGrid(gridSize);
-    for (let r = band.startRow; r < band.endRow; r++) {
-      for (let c = 0; c < gridSize; c++) {
-        fragment[r][c] = round.relay.originalCanvas[r]?.[c] || 0;
-      }
-    }
-
-    io.to(band.builderId).emit('party:pixel:relayBuildStart', {
-      bandFragment: fragment,
-      startRow: band.startRow,
-      endRow: band.endRow,
-      gridSize,
+  // Send each builder the original drawing as reference (they'll try to replicate it)
+  for (const builderId of builders) {
+    io.to(builderId).emit('party:pixel:relayBuildStart', {
+      referenceStrokes: round.relay.originalDrawing,
       timeSeconds: 30,
     });
   }
 
-  // Tell TV to show live builder canvases
-  io.to(`party:${roomCode}`).emit('party:pixel:relayBands', {
-    bands: bands.map(b => ({
-      builderId: b.builderId,
-      builderUsername: b.builderUsername,
-      startRow: b.startRow,
-      endRow: b.endRow,
-    })),
+  io.to(`party:${roomCode}`).emit('party:pixel:phaseUpdate', {
+    mode: 'relay',
+    phase: 'relay-build',
+    round: game.currentRound,
+    totalRounds: game.totalRounds,
     timeSeconds: 30,
   });
 
   round.timer = setTimeout(() => {
-    startRelayMerge(io, roomCode);
+    startRelayReveal(io, roomCode);
   }, 30000);
 }
 
-export function submitRelayBuilderCanvas(io: Server, roomCode: string, socketId: string, canvas: PixelGrid): void {
+export function submitRelayBuilderDrawing(io: Server, roomCode: string, socketId: string, strokes: DrawingData): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
   if (!round?.relay) return;
 
-  const band = round.relay.bands.find(b => b.builderId === socketId);
-  if (!band) return;
-  band.canvas = canvas;
+  round.relay.builderDrawings.set(socketId, strokes);
 
   // Broadcast live update to TV
   io.to(`party:${roomCode}`).emit('party:pixel:canvasUpdate', {
     playerId: socketId,
-    canvas,
+    strokes,
   });
 }
 
-function startRelayMerge(io: Server, roomCode: string): void {
+function startRelayReveal(io: Server, roomCode: string): void {
   const game = activeGames.get(roomCode);
   if (!game) return;
   const round = game.rounds[game.rounds.length - 1];
@@ -678,36 +558,36 @@ function startRelayMerge(io: Server, roomCode: string): void {
   round.phase = 'relay-merge';
   if (round.timer) clearTimeout(round.timer);
 
-  // Merge all bands
-  const merged = mergeRelayBands(round.relay.bands, game.gridSize);
-  const similarity = calculateSimilarity(round.relay.originalCanvas, merged);
-
-  round.relay.mergedCanvas = merged;
-  round.relay.similarityScore = similarity;
-
-  // Award points based on similarity
-  const points = Math.round(similarity * 10); // Max 1000
-  for (const band of round.relay.bands) {
-    game.scores.set(band.builderId, (game.scores.get(band.builderId) || 0) + points);
+  // Pick the builder drawing with the most strokes as the "best attempt"
+  let bestDrawing: DrawingData = [];
+  let bestStrokeCount = 0;
+  for (const drawing of round.relay.builderDrawings.values()) {
+    if (drawing.length > bestStrokeCount) {
+      bestDrawing = drawing;
+      bestStrokeCount = drawing.length;
+    }
   }
-  // Artist gets points too (for creating a good reference)
-  game.scores.set(round.relay.artistId, (game.scores.get(round.relay.artistId) || 0) + Math.round(points * 0.5));
 
-  // Broadcast merge reveal
+  // Simple scoring: builders get points for participating, bonus for more strokes
+  const basePoints = 200;
+  for (const [builderId, drawing] of round.relay.builderDrawings) {
+    const bonus = Math.min(drawing.length * 20, 300);
+    game.scores.set(builderId, (game.scores.get(builderId) || 0) + basePoints + bonus);
+  }
+  // Artist gets base points
+  game.scores.set(round.relay.artistId, (game.scores.get(round.relay.artistId) || 0) + basePoints);
+
   io.to(`party:${roomCode}`).emit('party:pixel:mergeReveal', {
-    merged,
-    original: round.relay.originalCanvas,
+    merged: bestDrawing,
+    original: round.relay.originalDrawing,
     prompt: round.relay.prompt,
-    score: similarity,
+    score: Math.min(100, Math.round((bestStrokeCount / Math.max(round.relay.originalDrawing.length, 1)) * 100)),
     artistUsername: round.relay.artistUsername,
-    bands: round.relay.bands.map(b => ({
-      builderUsername: b.builderUsername,
-      startRow: b.startRow,
-      endRow: b.endRow,
+    bands: Array.from(round.relay.builderDrawings.entries()).map(([id]) => ({
+      builderUsername: game.playerUsernames.get(id) || 'Unknown',
     })),
   });
 
-  // Advance after reveal
   round.timer = setTimeout(() => {
     if (game.currentRound >= game.totalRounds) {
       endPixelClash(io, roomCode);

@@ -25,35 +25,35 @@ export default function PartyHostClient() {
   const gameId = params?.gameId as PartyGameId;
   const { user, profile } = useAuth();
   const { t } = useLanguage();
-  const { enabled: hasAccess, loading: flagLoading } = useFeatureFlag('party_games_alpha', user?.id);
+  const { enabled: flagEnabled, loading: flagLoading } = useFeatureFlag('party_games_alpha', user?.id);
+  const hasAccess = flagEnabled || process.env.NODE_ENV === 'development';
 
   const {
     room,
-    gameState,
-    playerId,
     isHost,
     connected,
     error,
-    roundResults,
-    gameResults,
     createRoom,
     startGame,
-    sendInput,
     socket,
   } = usePartySocket(user?.id, hasAccess);
 
   const [roomCreated, setRoomCreated] = useState(false);
   const gameDef = PARTY_GAMES[gameId];
 
+  // Stable guest name for anonymous hosts (generated once)
+  const [guestName] = useState(() => `Host-${Math.random().toString(36).slice(2, 6).toUpperCase()}`);
+  const hostName = profile?.username || guestName;
+
   // Auto-create room on mount
   useEffect(() => {
-    if (!roomCreated && connected && hasAccess && gameDef && profile?.username) {
-      createRoom(gameId, `${profile.username}'s game`, profile.username, {
-        avatarImage: profile.avatar_image || undefined,
+    if (!roomCreated && connected && hasAccess && gameDef) {
+      createRoom(gameId, `${hostName}'s game`, hostName, {
+        avatarImage: profile?.avatar_image || undefined,
       });
       setRoomCreated(true);
     }
-  }, [roomCreated, connected, hasAccess, gameDef, profile, gameId, createRoom]);
+  }, [roomCreated, connected, hasAccess, gameDef, hostName, gameId, createRoom, profile?.avatar_image]);
 
   if (flagLoading) {
     return (
@@ -77,14 +77,31 @@ export default function PartyHostClient() {
 
   // Lobby phase — show QR code and player list
   if (!room || room.phase === 'lobby') {
+    // Debug overlay in dev
+    const debugInfo = process.env.NODE_ENV === 'development' ? (
+      <div className="fixed top-2 left-2 z-50 bg-black/80 text-xs text-neo-cream font-mono p-2 rounded max-w-xs">
+        <div>connected: {String(connected)}</div>
+        <div>hasAccess: {String(hasAccess)}</div>
+        <div>username: {profile?.username || 'null'}</div>
+        <div>user: {user?.id ? user.id.slice(0, 8) + '...' : 'null'}</div>
+        <div>roomCreated: {String(roomCreated)}</div>
+        <div>room: {room ? room.roomCode : 'null'}</div>
+        <div>error: {error || 'none'}</div>
+        <div>gameId: {gameId}</div>
+      </div>
+    ) : null;
+
     return (
-      <PartyTvLobby
-        room={room}
-        gameDef={gameDef}
-        isHost={isHost}
-        onStartGame={startGame}
-        error={error}
-      />
+      <>
+        {debugInfo}
+        <PartyTvLobby
+          room={room}
+          gameDef={gameDef}
+          isHost={isHost}
+          onStartGame={startGame}
+          error={error}
+        />
+      </>
     );
   }
 

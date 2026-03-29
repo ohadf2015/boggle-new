@@ -349,7 +349,7 @@ const DailyChallenge: React.FC = () => {
 
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : 'overflow-y-auto'}`}
+      className={`flex-1 flex flex-col min-h-0 bg-gray-100 dark:bg-neo-navy relative [overflow-x:clip] ${phase === 'playing' ? 'overflow-hidden' : phase === 'completed' || phase === 'already-played' ? '' : 'overflow-y-auto'}`}
     >
       <AutoHideHeader />
 

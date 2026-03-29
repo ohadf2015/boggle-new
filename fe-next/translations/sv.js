@@ -9825,7 +9825,13 @@ const sv = {
     "whoToEliminate": "Vem ska elimineras?",
     "skipVote": "Hoppa över",
     "youWereEliminated": "Du eliminerades!",
-    "watchFromBeyond": "Titta från andra sidan..."
+    "watchFromBeyond": "Titta från andra sidan...",
+    "undo": "Ångra",
+    "redo": "Gör om",
+    "clear": "Rensa",
+    "draw": "Rita",
+    "lookCarefully": "Titta noga!",
+    "everyoneVoting": "Alla röstar..."
   }
 };
 

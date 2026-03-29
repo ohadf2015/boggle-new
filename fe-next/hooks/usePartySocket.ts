@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import { getSocketURL } from '@/utils/SocketContext';
 import type {
   PartyGameId,
   PartyPlayer,
@@ -77,7 +78,8 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
   useEffect(() => {
     if (!enabled) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
+    const socketUrl = getSocketURL();
+    console.log('[PARTY] Connecting to socket:', socketUrl, 'authUserId:', authUserId);
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       auth: { userId: authUserId || undefined },
@@ -87,16 +89,24 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     socketRef.current = newSocket;
 
     newSocket.on('connect', () => {
+      console.log('[PARTY] Socket connected, id:', newSocket.id);
       setConnected(true);
       setError(null);
     });
 
-    newSocket.on('disconnect', () => {
+    newSocket.on('connect_error', (err) => {
+      console.error('[PARTY] Socket connect error:', err.message);
+      setError(err.message);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('[PARTY] Socket disconnected:', reason);
       setConnected(false);
     });
 
     // Party events
     newSocket.on('party:joined', (data: { room: Record<string, unknown>; playerId: string }) => {
+      console.log('[PARTY] Joined room:', (data.room as any)?.roomCode, 'playerId:', data.playerId);
       setRoom(data.room as unknown as PartyRoomState);
       setGameState((data.room as Record<string, unknown>).gameState as PartyGameStatePublic);
       setPlayerId(data.playerId);
@@ -145,6 +155,7 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     });
 
     newSocket.on('party:error', (data: { error: string; message: string }) => {
+      console.error('[PARTY] Error:', data.error, data.message);
       setError(data.message);
     });
 

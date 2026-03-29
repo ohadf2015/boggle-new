@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx server.ts",
+    "dev": "cross-env NODE_ENV=development tsx server.ts",
     "dev:windows": "if exist .next rd /s /q .next && npx tsx server.ts",
     "lsp": "typescript-language-server --stdio",
     "clean": "npx rimraf .next",
@@ -162,6 +162,7 @@
     "react-dom": "19.2.0",
     "react-hot-toast": "^2.6.0",
     "react-is": "^19.2.4",
+    "react-sketch-canvas": "^6.2.0",
     "recharts": "^3.6.0",
     "remotion": "^4.0.414",
     "resend": "^6.6.0",

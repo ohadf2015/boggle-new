@@ -91,19 +91,25 @@ export default function AdventureViewModals({
       )}
 
       {/* Word Album Panel */}
-      <WordAlbumPanel
-        isOpen={showWordAlbum}
-        onClose={onCloseWordAlbum}
-        words={wordAlbum}
-        claimedMilestones={wordAlbumClaimedMilestones}
-      />
+      {showWordAlbum && (
+        <WordAlbumPanel
+          key="word-album"
+          isOpen={showWordAlbum}
+          onClose={onCloseWordAlbum}
+          words={wordAlbum}
+          claimedMilestones={wordAlbumClaimedMilestones}
+        />
+      )}
 
       {/* Weekly Challenge Panel */}
-      <WeeklyChallengePanel
-        isOpen={showWeeklyChallenge}
-        onClose={onCloseWeeklyChallenge}
-        onPlay={onPlayWeeklyChallenge}
-      />
+      {showWeeklyChallenge && (
+        <WeeklyChallengePanel
+          key="weekly-challenge"
+          isOpen={showWeeklyChallenge}
+          onClose={onCloseWeeklyChallenge}
+          onPlay={onPlayWeeklyChallenge}
+        />
+      )}
     </AnimatePresence>
   );
 }

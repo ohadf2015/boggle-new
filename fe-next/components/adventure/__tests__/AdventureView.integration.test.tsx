@@ -71,18 +71,44 @@ vi.mock('framer-motion', () => {
   };
 });
 
-// Mock next/dynamic — ignore the importFn and just return a passthrough
-// The actual AdventureGame is mocked separately via vi.mock('../AdventureGame')
-vi.mock('next/dynamic', async () => {
-  const adventureMod = await import('../AdventureGame');
+// Mock next/dynamic — resolve each import to its mocked module
+vi.mock('next/dynamic', () => {
+  const React = require('react');
+  const loadedModules = new Map<string, React.ComponentType>();
+
   return {
-    default: (_importFn: () => Promise<any>, _opts?: unknown) => {
-      const Comp = (adventureMod as any).default || adventureMod;
-      const Dynamic = (props: Record<string, unknown>) => React.createElement(Comp, props);
+    default: (importFn: () => Promise<any>, _opts?: unknown) => {
+      // Resolve the import to detect which component is being loaded
+      const importStr = importFn.toString();
+
+      const Dynamic = (props: Record<string, unknown>) => {
+        const [Comp, setComp] = React.useState<React.ComponentType | null>(
+          () => loadedModules.get(importStr) || null
+        );
+
+        React.useEffect(() => {
+          if (!Comp) {
+            importFn().then((mod: any) => {
+              const resolved = mod.default || mod;
+              loadedModules.set(importStr, resolved);
+              setComp(() => resolved);
+            });
+          }
+        }, [Comp]);
+
+        if (!Comp) return null;
+        return React.createElement(Comp, props);
+      };
       Dynamic.displayName = 'NextDynamic';
       return Dynamic;
     },
   };
+});
+
+vi.mock('@/components/auth/AuthModal', () => {
+  const MockAuthModal = () => null;
+  MockAuthModal.displayName = 'MockAuthModal';
+  return { default: MockAuthModal };
 });
 
 vi.mock('next/link', () => {

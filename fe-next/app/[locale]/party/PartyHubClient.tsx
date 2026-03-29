@@ -43,7 +43,8 @@ export default function PartyHubClient() {
   const params = useParams();
   const locale = params?.locale as string || 'en';
 
-  const { enabled: hasAccess, loading } = useFeatureFlag('party_games_alpha', user?.id);
+  const { enabled: flagEnabled, loading } = useFeatureFlag('party_games_alpha', user?.id);
+  const hasAccess = flagEnabled || process.env.NODE_ENV === 'development';
   const [joining, setJoining] = useState(false);
   const [joinCode, setJoinCode] = useState('');
 
