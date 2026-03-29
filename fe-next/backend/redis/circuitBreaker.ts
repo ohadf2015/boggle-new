@@ -11,7 +11,7 @@ export class CircuitBreaker {
   private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
   private nextAttempt: number;
 
-  constructor(threshold: number = 5, timeout: number = 30000) {
+  constructor(threshold: number = 5, timeout: number = 10000) {
     this.failureCount = 0;
     this.threshold = threshold;
     this.timeout = timeout;

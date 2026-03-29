@@ -113,6 +113,14 @@ export function purgeStaleSocketEntries(activeSocketIds: Set<string>): number {
     }
   }
 
+  // Clean authUserConnections entries pointing to dead sockets
+  for (const [userId, conn] of authUserConnections) {
+    if (!activeSocketIds.has(conn.socketId)) {
+      authUserConnections.delete(userId);
+      purged++;
+    }
+  }
+
   return purged;
 }
 

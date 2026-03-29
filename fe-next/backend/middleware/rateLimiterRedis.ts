@@ -62,12 +62,24 @@ export function httpRateLimitMiddleware() {
   return async (req: any, res: any, next: any) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     try {
-      const result = await getHttpRateLimiter().consume(ip);
+      // Timeout rate limit check to prevent slow Redis from blocking all HTTP requests
+      const result = await Promise.race([
+        getHttpRateLimiter().consume(ip),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Rate limit check timed out')), 2000)
+        ),
+      ]);
       res.setHeader('RateLimit-Limit', RATE_LIMITS.http.points);
       res.setHeader('RateLimit-Remaining', result.remainingPoints);
       res.setHeader('RateLimit-Reset', Math.ceil(result.msBeforeNext / 1000));
       next();
     } catch (rejRes: any) {
+      // On timeout, allow the request through (fail-open) to prevent blocking the app
+      if (rejRes?.message === 'Rate limit check timed out') {
+        logger.warn('RATE_LIMIT', `Rate limit check timed out for ${ip}, allowing request`);
+        next();
+        return;
+      }
       const retryAfter = Math.ceil((rejRes.msBeforeNext || 1000) / 1000);
       res.setHeader('Retry-After', retryAfter);
       res.status(429).json({ error: 'TOO_MANY_REQUESTS', message: 'Rate limit exceeded. Please slow down.' });

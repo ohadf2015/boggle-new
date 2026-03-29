@@ -148,7 +148,8 @@ async function start(): Promise<void> {
   // Register process-level error handlers (must be early)
   registerProcessErrorHandlers();
 
-  // Initialize server components
+  // Initialize server components BEFORE listening — ensures Redis, dictionaries,
+  // and Socket.IO adapter are ready before Railway routes traffic to this container.
   await initializeServer(io);
 
   // Set up event loop monitoring
@@ -158,9 +159,12 @@ async function start(): Promise<void> {
   const shutdownHandler = createShutdownHandler(httpServer, io);
   registerShutdownHandlers(shutdownHandler);
 
-  // Start listening
-  httpServer.listen(PORT, HOST, () => {
-    httpLogger.info({ host: HOST, port: PORT, env: dev ? 'development' : 'production' }, 'Server ready');
+  // Start listening AFTER initialization is complete
+  await new Promise<void>((resolve) => {
+    httpServer.listen(PORT, HOST, () => {
+      httpLogger.info({ host: HOST, port: PORT, env: dev ? 'development' : 'production' }, 'Server ready');
+      resolve();
+    });
   });
 }
 

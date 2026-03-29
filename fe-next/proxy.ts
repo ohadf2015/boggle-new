@@ -54,10 +54,11 @@ export async function proxy(request: NextRequest) {
 
   const isBot = isBotRequest(request);
 
-  // Routes that need Supabase session refresh (game pages, API, auth)
-  // Public routes (landing, SEO, static pages) skip auth for faster navigation
+  // Routes that need Supabase session refresh (game pages, auth)
+  // API routes handle their own auth — skip proxy refresh to avoid 200-500ms overhead.
+  // Public routes (landing, SEO, static pages) skip auth for faster navigation.
   const AUTH_ROUTES = [
-    '/api', '/multiplayer', '/singleplayer', '/adventure', '/daily',
+    '/multiplayer', '/singleplayer', '/adventure', '/daily',
     '/challenge', '/join', '/brain', '/custom', '/party-screen',
     '/teacher', '/student', '/auth', '/settings', '/profile',
   ];
@@ -104,7 +105,11 @@ export async function proxy(request: NextRequest) {
       // the local JWT without validating it server-side. getUser() contacts
       // the Supabase auth server and refreshes the token if needed.
       // Without this, tokens expire after ~1h and all API calls get 401.
-      await supabase.auth.getUser();
+      // Timeout at 3s to prevent slow Supabase from blocking page navigation.
+      await Promise.race([
+        supabase.auth.getUser(),
+        new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+      ]);
     } catch {
       // Silently handle auth errors in proxy
     }

@@ -24,7 +24,10 @@ export function normalizeHebrewWordForDictionary(word: string): string {
  * Get the path to the Hebrew approved words file
  */
 function getHebrewApprovedPath(): string {
-  return path.resolve(__dirname, '../hebrew_words_approved.txt');
+  // Try __dirname first (Docker: dist/), then parent (dev: backend/modules/ → backend/)
+  const direct = path.resolve(__dirname, 'hebrew_words_approved.txt');
+  try { require('fs').accessSync(direct); return direct; } catch { /* fallback */ }
+  return path.resolve(__dirname, '..', 'hebrew_words_approved.txt');
 }
 
 /**

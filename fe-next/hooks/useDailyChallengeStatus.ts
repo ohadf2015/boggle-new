@@ -98,12 +98,16 @@ export function useDailyChallengeStatus(language: Language): UseDailyChallengeSt
     };
   }, [language, playerId, fetchStatus]);
 
-  // Auto-refresh on visibility change
+  // Auto-refresh on visibility change (covers both tab switch and window focus).
+  // Removed separate 'focus' listener to prevent double-fetching — visibilitychange
+  // fires reliably on all modern browsers for both tab switches and alt-tab.
   useEffect(() => {
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        // Debounce to avoid rapid refreshes
-        const timer = setTimeout(() => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
           if (isMounted.current) {
             // Quick update from localStorage first
             const quickStatus = getQuickDailyStatus(language);
@@ -119,47 +123,14 @@ export function useDailyChallengeStatus(language: Language): UseDailyChallengeSt
             }
           }
         }, 500);
-
-        return () => clearTimeout(timer);
       }
-      return undefined;
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [language, playerId, fetchStatus]);
-
-  // Auto-refresh on window focus
-  useEffect(() => {
-    const handleFocus = () => {
-      // Debounce to avoid rapid refreshes
-      const timer = setTimeout(() => {
-        if (isMounted.current) {
-          // Quick update from localStorage first
-          const quickStatus = getQuickDailyStatus(language);
-          setStatus((prev) => ({
-            ...prev,
-            ...quickStatus,
-            loading: !!playerId,
-          }));
-
-          // Then fetch from server if authenticated
-          if (playerId) {
-            fetchStatus();
-          }
-        }
-      }, 500);
-
-      return () => clearTimeout(timer);
-    };
-
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      window.removeEventListener('focus', handleFocus);
+      clearTimeout(debounceTimer);
     };
   }, [language, playerId, fetchStatus]);
 

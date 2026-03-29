@@ -89,7 +89,7 @@ await build({
   entryPoints: [join(root, 'server.ts')],
   bundle: true,
   platform: 'node',
-  target: 'node20',
+  target: 'node22',
   format: 'cjs',
   outfile: join(root, 'dist', 'server.cjs'),
   alias: {

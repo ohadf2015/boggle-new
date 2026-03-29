@@ -66,9 +66,9 @@ export function useLiveRoomStats(): LiveRoomStats {
     // Request active rooms on mount
     socket.emit('getActiveRooms');
 
-    // Poll every 30 seconds to keep stats fresh
+    // Poll every 30 seconds to keep stats fresh — skip when tab is hidden
     const interval = setInterval(() => {
-      if (socket.connected) {
+      if (socket.connected && typeof document !== 'undefined' && document.visibilityState === 'visible') {
         socket.emit('getActiveRooms');
       }
     }, 30000);

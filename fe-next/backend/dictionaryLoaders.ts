@@ -86,7 +86,9 @@ export async function loadSwedishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   const [swedishFileContent, swedishApprovedContent] = await Promise.all([
-    safeReadFile(path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js')),
+    safeReadFile(path.join(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js')).then(content =>
+      content || safeReadFile(path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js'))
+    ),
     safeReadFile(path.join(__dirname, 'swedish_words_approved.txt')),
   ]);
 

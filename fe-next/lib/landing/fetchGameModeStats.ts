@@ -63,16 +63,14 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
         .select('id', { count: 'exact', head: true })
         .gte('created_at', sinceISO),
 
-      // Singleplayer — sum of games_played (no created_at filter, it's a leaderboard)
+      // Singleplayer — count of leaderboard entries as proxy for popularity
+      // (avoids full-table scan that fetched ALL rows to sum client-side)
       supabase
         .from('single_player_leaderboard')
-        .select('games_played'),
+        .select('id', { count: 'exact', head: true }),
     ]);
 
-    const spTotal = (spResult.data ?? []).reduce(
-      (sum: number, row: { games_played: number }) => sum + (row.games_played || 0),
-      0
-    );
+    const spTotal = spResult.count ?? 0;
 
     const dailyTotal = (dailyWordHuntResult.count ?? 0) + (dailyPuzzleResult.count ?? 0);
 

@@ -84,9 +84,10 @@ describe('Proxy — Supabase Auth Refresh', () => {
     expect(mockGetSession).not.toHaveBeenCalled();
   });
 
-  it('should refresh auth on API routes (not skip them)', async () => {
+  it('should skip auth refresh on API routes (they handle their own auth)', async () => {
     await proxy(makeRequest('/api/adventure/complete'));
-    expect(mockGetUser).toHaveBeenCalledTimes(1);
+    // API routes skip proxy auth to avoid 200-500ms overhead — each route validates auth independently
+    expect(mockGetUser).not.toHaveBeenCalled();
   });
 
   it('should NOT locale-redirect API routes', async () => {

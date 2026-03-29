@@ -15,6 +15,7 @@ import { setEventLoopLag } from '../backend/utils/metrics';
 import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
 import { clearCleanupTimers } from './socketSetup';
 import { stopConnectionHealthCheck } from '../backend/handlers/presenceHandler';
+import { stopEmptyRoomCleanup } from '../backend/socketHandlers';
 import * as gameStateManager from '../backend/modules/gameStateManager';
 import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
 import type { ScheduledTask } from 'node-cron';
@@ -34,8 +35,21 @@ let cronTasks: ScheduledTask[] = [];
  * @param io - Socket.IO server instance
  */
 export async function initializeServer(io: Server): Promise<void> {
-  // Set up Redis adapter for horizontal scaling
-  await setupRedisAdapter(io as ExtendedSocketServer);
+  // Set up Redis adapter for horizontal scaling — timeout to prevent blocking startup
+  const REDIS_INIT_TIMEOUT_MS = 15000;
+  try {
+    await Promise.race([
+      setupRedisAdapter(io as ExtendedSocketServer),
+      new Promise<boolean>((resolve) =>
+        setTimeout(() => {
+          lifecycleLogger.warn('Redis adapter setup timed out — continuing without Redis adapter');
+          resolve(false);
+        }, REDIS_INIT_TIMEOUT_MS)
+      ),
+    ]);
+  } catch (error) {
+    lifecycleLogger.error({ err: error }, 'Redis adapter setup failed — running in degraded mode');
+  }
 
   // Restore tournaments from Redis
   try {
@@ -130,6 +144,7 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     // Clear all cleanup timers and health checks
     clearCleanupTimers();
     stopConnectionHealthCheck();
+    stopEmptyRoomCleanup();
 
     // Persist all active games to Redis before shutdown
     // This ensures running games survive deployments

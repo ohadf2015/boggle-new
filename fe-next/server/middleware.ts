@@ -14,6 +14,10 @@ import { httpLogger } from './logger';
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
 
+// Pre-compiled regexes — avoids recompilation on every HTTP request
+const STATIC_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif|mp3|mp4|ogg|wav|gif|webm)$/;
+const NON_HTML_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/;
+
 /**
  * Middleware configuration options
  */
@@ -102,7 +106,7 @@ function cacheHeaders(): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     const path = req.path;
     
-    if (path.startsWith('/_next/static/') || path.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/)) {
+    if (path.startsWith('/_next/static/') || STATIC_ASSET_RE.test(path)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     } else if (path.startsWith('/_next/') || EXPRESS_API_ROUTES.some((route) => path.startsWith(route))) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -128,6 +132,7 @@ function requestTimeout(): RequestHandler {
   const timeout = parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10);
 
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
+  // guest-session is non-critical analytics — let the client's 5s AbortController handle it
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
     '/api/cron/',
   ];
@@ -181,7 +186,7 @@ function perfVariantCookie(isDev: boolean): RequestHandler {
     }
 
     const path = req.path;
-    if (path.startsWith('/_next/') || path.startsWith('/api/') || path.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/)) {
+    if (path.startsWith('/_next/') || path.startsWith('/api/') || NON_HTML_ASSET_RE.test(path)) {
       next();
       return;
     }

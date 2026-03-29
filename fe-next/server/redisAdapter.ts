@@ -29,10 +29,10 @@ export async function setupRedisAdapter(io: ExtendedSocketServer): Promise<boole
 
   if (!redisConnected) {
     if (isProduction) {
-      redisLogger.error('Redis adapter REQUIRED in production for horizontal scaling — refusing to start in single-instance mode');
-      throw new Error('Redis adapter is required in production. Set REDIS_URL or REDIS_HOST to enable horizontal scaling.');
+      redisLogger.error('Redis unavailable in production — running in degraded single-instance mode. Horizontal scaling disabled.');
+    } else {
+      redisLogger.info('Running in single instance mode (no Redis adapter) — OK for development');
     }
-    redisLogger.info('Running in single instance mode (no Redis adapter) — OK for development');
     return false;
   }
 
@@ -48,7 +48,15 @@ export async function setupRedisAdapter(io: ExtendedSocketServer): Promise<boole
     }
 
     const { pubClient, subClient } = clients;
-    await Promise.all([pubClient.connect(), subClient.connect()]);
+
+    // Timeout pub/sub connection to prevent blocking startup indefinitely
+    const PUBSUB_TIMEOUT_MS = 10000;
+    await Promise.race([
+      Promise.all([pubClient.connect(), subClient.connect()]),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Redis pub/sub connection timed out after ${PUBSUB_TIMEOUT_MS}ms`)), PUBSUB_TIMEOUT_MS)
+      ),
+    ]);
 
     io.adapter(createAdapter(pubClient, subClient));
 
