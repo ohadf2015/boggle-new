@@ -441,7 +441,7 @@ describe('friendsHandler', () => {
 
       expect(harness.socket.emit).toHaveBeenCalledWith('friends:error', {
         code: 'VALIDATION_FAILED',
-        message: 'Search query must be at least 2 characters',
+        message: 'Search query must be 2-50 characters',
       });
     });
 
@@ -496,38 +496,45 @@ describe('friendsHandler', () => {
 
   describe('friends:getPendingRequests', () => {
     it('returns sent and received requests with profiles', async () => {
-      // Both queries return the same row shape; the handler distinguishes by eq('user_id') vs eq('friend_id')
+      // Handler does Promise.all with two from('friends') queries (parallel),
+      // then a batch from('profiles').in() for all needed profiles.
       const sentRow = { id: 'req-1', user_id: 'user-a', friend_id: 'user-b', created_at: '2026-01-01T00:00:00Z' };
       const receivedRow = { id: 'req-2', user_id: 'user-c', friend_id: 'user-a', created_at: '2026-01-02T00:00:00Z' };
 
-      // Track which eq column is called to return correct data
-      let queryIndex = 0;
-      const makeEqChain = (resolveData: any) => {
-        const chain: any = {
-          eq: jest.fn().mockReturnValue({ data: resolveData }),
-        };
-        return chain;
-      };
+      const makeEqChain = (resolveData: any) => ({
+        eq: jest.fn().mockReturnValue({ data: resolveData }),
+      });
 
+      // Track from() calls: first two are friends queries, third is profiles batch
+      let fromCallIndex = 0;
       const mockSupabase: any = {
-        from: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockImplementation((_col: string) => {
-              queryIndex++;
-              // First call chain -> sent, second -> received
-              if (queryIndex <= 1) {
-                return makeEqChain([sentRow]);
-              }
-              return makeEqChain([receivedRow]);
+        from: jest.fn().mockImplementation((table: string) => {
+          fromCallIndex++;
+          if (table === 'profiles') {
+            return {
+              select: jest.fn().mockReturnValue({
+                in: jest.fn().mockResolvedValue({
+                  data: [
+                    { id: 'user-b', username: 'bob', display_name: 'Bob', avatar_emoji: '😎', avatar_color: '#ff0', avatar_image: null },
+                    { id: 'user-c', username: 'charlie', display_name: 'Charlie', avatar_emoji: '🎩', avatar_color: '#0f0', avatar_image: null },
+                  ],
+                }),
+              }),
+            };
+          }
+          // friends table: distinguish sent vs received by eq column
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockImplementation((col: string) => {
+                if (col === 'user_id') return makeEqChain([sentRow]);
+                return makeEqChain([receivedRow]);
+              }),
             }),
-          }),
+          };
         }),
       };
 
       mockGetSupabase.mockReturnValue(mockSupabase);
-      mockGetUserProfile
-        .mockResolvedValueOnce(PROFILE_B) // sent req: lookup friend_id=user-b
-        .mockResolvedValueOnce({ username: 'charlie', displayName: 'Charlie', avatar: { emoji: '🎩', color: '#0f0' }, isOnline: false });
 
       await harness.trigger('friends:getPendingRequests');
 

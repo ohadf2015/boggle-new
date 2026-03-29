@@ -93,8 +93,8 @@ describe('updatePlayerStats', () => {
         error: null,
       });
 
-      // WHEN: Database update FAILS (simulating RLS policy violation, connection error, etc.)
-      mockClient.single.mockResolvedValueOnce({
+      // WHEN: Atomic stats+XP RPC FAILS (simulating RLS policy violation, connection error, etc.)
+      mockClient.rpc.mockResolvedValueOnce({
         data: null,
         error: { message: 'Failed to update profile' }, // Database error
       });

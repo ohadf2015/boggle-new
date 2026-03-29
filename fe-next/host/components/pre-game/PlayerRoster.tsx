@@ -29,6 +29,8 @@ interface PlayerRosterProps {
   maxPlayers: number;
   hostLabel?: string;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Compact layout with smaller avatars for mobile */
+  compact?: boolean;
 }
 
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
@@ -69,7 +71,7 @@ const playerEntranceVariants = {
   },
 };
 
-export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t }: PlayerRosterProps): React.ReactElement {
+export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
   const { tryNativeShare } = useNativeShare();
   const [showBotPicker, setShowBotPicker] = useState(false);
@@ -109,7 +111,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
   }, [socket, gameCode, bots]);
 
   return (
-    <section className="space-y-3">
+    <section className={compact ? 'space-y-1' : 'space-y-3'}>
       {/* Header row */}
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
@@ -123,7 +125,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
       </div>
 
       {/* Player avatars row */}
-      <div className="flex gap-3 flex-wrap pb-2 items-end">
+      <div className={cn('flex flex-wrap items-end', compact ? 'gap-2 pb-1' : 'gap-3 pb-2')}>
         <AnimatePresence mode="popLayout">
           {players.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -159,29 +161,22 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                     </motion.div>
                   )}
 
-                  {/* Avatar with floating animation */}
-                  <motion.div
-                    animate={{
-                      y: [0, -4, 0],
-                    }}
-                    transition={{
-                      y: { duration: isBot ? 2.5 : 3, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 },
-                      scale: { duration: 0.4 },
-                    }}
-                    className="relative"
+                  {/* Avatar — CSS animation replaces JS-driven infinite motion */}
+                  <div
+                    className="relative animate-avatar-float"
+                    style={{ animationDelay: `${index * 200}ms` }}
                   >
                     {/* Difficulty glow ring for bots */}
                     {isBot && diffConfig && (
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        animate={{ opacity: [0.4, 0.8, 0.4] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                      <div
+                        className="absolute inset-0 rounded-full animate-[pulse_2s_ease-in-out_infinite]"
                         style={{ boxShadow: `0 0 12px 3px ${diffConfig.glowColor}` }}
                       />
                     )}
 
                     <div className={cn(
-                      'w-14 h-14 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
+                      'rounded-full border-neo-black flex items-center justify-center overflow-hidden',
+                      compact ? 'w-12 h-12 border-2' : 'w-14 h-14 border-3',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                       isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                     )}>
@@ -190,15 +185,15 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                           customAvatar={avatar?.customAvatar ?? undefined}
 
                           avatarImage={avatar?.avatarImage}
-                          size="lg"
+                          size={compact ? 'md' : 'lg'}
                         />
                       ) : (
-                        <span className="text-2xl font-black text-neo-black">
+                        <span className={cn('font-black text-neo-black', compact ? 'text-xl' : 'text-2xl')}>
                           {name.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Kick button — visible on hover for non-self players */}
                   {!isMe && (
@@ -223,7 +218,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 </div>
 
                 {/* Name */}
-                <span className="text-[11px] font-bold truncate w-14 text-center text-neo-cream">
+                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[10px] w-12' : 'text-[11px] w-14')}>
                   {name}
                 </span>
               </motion.div>

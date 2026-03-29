@@ -20,12 +20,18 @@ interface AppealWordResponse {
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_MAX_ENTRIES = 5000;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetTime) {
+    if (rateLimitMap.size > RATE_LIMIT_MAX_ENTRIES) {
+      for (const [key, val] of rateLimitMap) {
+        if (now > val.resetTime) rateLimitMap.delete(key);
+      }
+    }
     rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return true;
   }
@@ -34,14 +40,6 @@ function checkRateLimit(ip: string): boolean {
   record.count++;
   return true;
 }
-
-// Cleanup old entries
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of rateLimitMap.entries()) {
-    if (now > record.resetTime) rateLimitMap.delete(ip);
-  }
-}, 60000);
 
 export async function POST(request: NextRequest): Promise<NextResponse<AppealWordResponse>> {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||

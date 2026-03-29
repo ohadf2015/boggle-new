@@ -23,6 +23,8 @@ interface BattleModeCardProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** When false, blast mode is hidden from the mode selector */
   isAdmin?: boolean;
+  /** Compact layout with tighter padding for mobile */
+  compact?: boolean;
 }
 
 // ==================== Mode Visual Configs ====================
@@ -213,6 +215,7 @@ export function BattleModeCard({
   setSelectedGameMode,
   t,
   isAdmin = false,
+  compact = false,
 }: BattleModeCardProps): React.ReactElement {
   const [sparkMode, setSparkMode] = useState<GameModeOption | null>(null);
 
@@ -230,12 +233,12 @@ export function BattleModeCard({
   return (
     <section className="space-y-3">
       {/* Game Mode Cards */}
-      <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden">
+      <div className={cn('bg-neo-navy-light text-neo-cream rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden', compact ? 'p-2.5' : 'p-4')}>
         {/* Ambient background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-neo-purple/10 via-transparent to-neo-cyan/5 pointer-events-none" />
 
         {/* Section label with sparkle */}
-        <div className="relative flex items-center gap-1.5 mb-3">
+        <div className={cn('relative flex items-center gap-1.5', compact ? 'mb-1.5' : 'mb-3')}>
           <Sparkles className="w-3 h-3 text-neo-cream/40 animate-twinkle" />
           <p className="text-xs font-black uppercase text-neo-cream/50 tracking-widest">
             {t('gameModes.nextMode')}
@@ -244,7 +247,7 @@ export function BattleModeCard({
 
         {/* Mode card grid with staggered entrance */}
         <motion.div
-          className="relative grid grid-cols-2 gap-2.5"
+          className={cn('relative grid grid-cols-2', compact ? 'gap-1.5' : 'gap-2.5')}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -270,7 +273,8 @@ export function BattleModeCard({
                 }}
                 data-testid={`game-mode-${mode}`}
                 className={cn(
-                  'relative flex items-center gap-3 p-3 rounded-neo border-2 text-start overflow-hidden',
+                  'relative flex items-center rounded-neo border-2 text-start overflow-hidden',
+                  compact ? 'gap-2 p-2' : 'gap-3 p-3',
                   'transition-[border-color,box-shadow] duration-300',
                   isActive
                     ? `${color.activeBg} ${color.border} ${color.glow}`

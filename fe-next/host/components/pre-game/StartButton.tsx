@@ -15,6 +15,8 @@ interface StartButtonProps {
   maxPlayers?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
   className?: string;
+  /** Compact single-line layout for mobile */
+  compact?: boolean;
 }
 
 // ==================== Component ====================
@@ -27,8 +29,41 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   maxPlayers = 8,
   t,
   className = '',
+  compact = false,
 }) {
   const isReady = playerCount >= 1 && !disabled;
+
+  // Compact: single-line start button + status inline
+  if (compact) {
+    return (
+      <div className={cn('flex items-center gap-3', className)}>
+        <motion.button
+          onClick={onStartGame}
+          disabled={disabled}
+          className={cn(
+            'flex-1 h-11 flex items-center justify-center gap-2',
+            'font-neo-display font-black text-lg uppercase tracking-tight',
+            'border-3 border-neo-black transition-all rounded-neo',
+            'active:translate-y-0.5 active:shadow-hard-pressed',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            'bg-neo-lime text-neo-black shadow-hard-sm'
+          )}
+        >
+          {tournamentCreating ? (
+            <span className="text-sm">{t('hostView.creatingTournament')}</span>
+          ) : (
+            <>
+              <Swords className="w-5 h-5" />
+              <span>{t('hostView.startBattle')}</span>
+            </>
+          )}
+        </motion.button>
+        <span className="text-[10px] font-bold text-slate-500 uppercase whitespace-nowrap">
+          {playerCount}/{maxPlayers}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={cn('space-y-2', className)}>

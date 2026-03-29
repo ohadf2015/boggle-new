@@ -48,11 +48,11 @@ export default async function HomePage({ params }: PageProps) {
   const legal = t?.legal;
 
   // Fetch non-realtime landing data server-side to eliminate client waterfall.
-  // Capped at 4s to prevent slow Supabase from blocking SSR indefinitely.
-  // Errors/timeouts are swallowed — hooks fall back to client fetches when initialData is absent.
+  // Capped at 2s — client hooks provide fallback when initialData is absent.
+  // Reduced from 4s: if Supabase is slow, faster to let client fetch than block SSR.
   const initialData = await Promise.race([
     fetchLandingData(locale),
-    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 4000)),
+    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 2000)),
   ]).catch(() => undefined);
 
   return (

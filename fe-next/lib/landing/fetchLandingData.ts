@@ -69,7 +69,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
         .eq('language', language)
         .single(),
     ]),
-    fetchGameModeStats(30),
+    fetchGameModeStats(7),
   ]);
 
   const [topPlayersResult, gamesTodayResult, solveRateResult] = supabaseResults;

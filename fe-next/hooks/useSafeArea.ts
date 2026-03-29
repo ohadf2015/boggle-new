@@ -69,10 +69,10 @@ export function useSafeArea(): SafeAreaInsets {
       });
 
     // Listen for changes (e.g., orientation change)
-    SafeArea.addListener('safeAreaChanged', ({ insets: newInsets }) => {
+    Promise.resolve(SafeArea.addListener('safeAreaChanged', ({ insets: newInsets }) => {
       setInsets(newInsets);
       updateCSSProperties(newInsets);
-    }).then((handle) => {
+    })).then((handle) => {
       listenerHandle = handle;
     }).catch((error) => {
       console.warn('Failed to register safe area listener:', error);

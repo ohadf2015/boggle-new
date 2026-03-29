@@ -278,21 +278,6 @@ function HostPreGameView({
 
   const hostLabel = `${t('hostView.hostIs')} ${username}`;
 
-  // Staggered entrance animation
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        type: 'spring' as const,
-        stiffness: 300,
-        damping: 24,
-      },
-    }),
-  };
-
   // Bot countdown banner (shared between mobile and desktop)
   const renderBotCountdown = (): React.ReactElement | null => {
     if (botCountdown === null) return null;
@@ -480,38 +465,24 @@ function HostPreGameView({
           />
         </div>
 
-        {/* Mobile Layout */}
+        {/* Mobile Layout — no-scroll, chat fills remaining space */}
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0 pb-24">
-            <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-            {/* Share section first when no players — most important action */}
-            {actualPlayerCount === 0 && (
-              <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
-                <MobileShareSection gameCode={gameCode} t={t} showHint />
-              </motion.div>
-            )}
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={actualPlayerCount === 0 ? 1 : 0}>
-              <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
-            </motion.div>
-            <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={actualPlayerCount === 0 ? 2 : 1}>
-              <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
-            </motion.div>
-            {/* Share section in normal position when players exist */}
-            {actualPlayerCount > 0 && (
-              <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
-                <MobileShareSection gameCode={gameCode} t={t} />
-              </motion.div>
-            )}
-            <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
-              <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64 sm:h-80">
-                <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
-              </div>
-            </motion.div>
+          {/* Top: compact start button */}
+          <div className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b border-neo-white/5">
+            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} compact />
           </div>
 
-          {/* Sticky Start Button at bottom */}
-          <div className="sticky bottom-0 z-20 px-4 py-3 bg-neo-navy/95 border-t-3 border-neo-black backdrop-blur-sm">
-            <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} maxPlayers={maxPlayers} t={t} />
+          {/* Compact sections */}
+          <div className="flex-shrink-0 px-3 py-2 space-y-2">
+            <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+            <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} compact />
+            <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} compact />
+            <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+          </div>
+
+          {/* Chat fills remaining space */}
+          <div className="flex-1 min-h-0 mx-3 mb-3 bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden">
+            <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
           </div>
         </div>
       </main>

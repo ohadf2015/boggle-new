@@ -69,7 +69,7 @@ export default function DeepLinkHandler() {
       }
     };
 
-    AppPlugin.addListener('appUrlOpen', handleAppUrlOpen)
+    Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
       .then((listener: { remove: () => void }) => {
         cleanup = () => listener.remove();
       })

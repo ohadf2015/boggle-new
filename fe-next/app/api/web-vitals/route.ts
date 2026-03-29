@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, getSessionUser } from '@/utils/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     // Get Supabase client
     const supabase = await createClient();
 
-    // Get current user if authenticated (optional)
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get current user from session JWT (no network call — proxy already refreshed)
+    const { user } = await getSessionUser(supabase);
 
     // Extract country code from headers if available
     const countryCode = request.headers.get('cf-ipcountry') ||

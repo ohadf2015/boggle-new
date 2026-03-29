@@ -94,11 +94,12 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     ? createSupabaseClient(supabaseUrl, supabaseServiceKey)
     : null;
 
+  const AUTH_TIMEOUT_MS = 5000;
+
   io.use(async (socket, next) => {
     const token = socket.handshake.auth?.token as string | undefined;
 
     if (!token) {
-      // Guest connection — allowed but unverified
       socket.data.verifiedUserId = null;
       return next();
     }
@@ -110,12 +111,18 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     }
 
     try {
-      const { data: { user }, error } = await supabase.auth.getUser(token);
+      const authResult = await Promise.race([
+        supabase.auth.getUser(token),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Auth verification timed out')), AUTH_TIMEOUT_MS)
+        ),
+      ]);
+
+      const { data: { user }, error } = authResult;
 
       if (error || !user) {
         socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Invalid auth token');
         socket.data.verifiedUserId = null;
-        // Don't reject — allow as guest, but log the failed auth attempt
         return next();
       }
 
@@ -156,7 +163,13 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     }
 
     try {
-      const { data: { user }, error } = await supabase.auth.getUser(token);
+      const authResult = await Promise.race([
+        supabase.auth.getUser(token),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Duel auth timed out')), AUTH_TIMEOUT_MS)
+        ),
+      ]);
+      const { data: { user }, error } = authResult;
 
       if (error || !user) {
         socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Duel invalid auth token');

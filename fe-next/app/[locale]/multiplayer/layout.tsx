@@ -1,4 +1,4 @@
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -12,9 +12,9 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
   const t = await loadTranslation(validLocale) as Record<string, any>;
-  const enT = await loadTranslation('en') as Record<string, any>;
-  const seo = t?.seo?.multiplayer || enT.seo.multiplayer;
-  const baseSeo = t?.seo || enT.seo;
+  // Only load English fallback if current locale is missing SEO data
+  const seo = t?.seo?.multiplayer ?? (await loadTranslation('en') as Record<string, any>).seo.multiplayer;
+  const baseSeo = t?.seo ?? (await loadTranslation('en') as Record<string, any>).seo;
 
   const localePath = `/${locale}`;
   const ogImage = locale === 'he'

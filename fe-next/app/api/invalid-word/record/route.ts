@@ -34,12 +34,19 @@ interface RecordInvalidWordResponse {
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute per IP
+const RATE_LIMIT_MAX_ENTRIES = 10000; // Cap map size to prevent OOM
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetTime) {
+    // Evict expired entries inline when map is large instead of a separate interval
+    if (rateLimitMap.size > RATE_LIMIT_MAX_ENTRIES) {
+      for (const [key, val] of rateLimitMap) {
+        if (now > val.resetTime) rateLimitMap.delete(key);
+      }
+    }
     rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return true;
   }
@@ -51,16 +58,6 @@ function checkRateLimit(ip: string): boolean {
   record.count++;
   return true;
 }
-
-// Cleanup old rate limit entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of rateLimitMap.entries()) {
-    if (now > record.resetTime) {
-      rateLimitMap.delete(ip);
-    }
-  }
-}, 60000);
 
 /**
  * POST handler for recording invalid words

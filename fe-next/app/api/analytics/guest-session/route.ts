@@ -9,6 +9,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 
+// Cap at 5s — prevents orphaned requests when Supabase is slow
+export const maxDuration = 5;
+
 // Import backend services (dynamic to avoid server/client issues)
 let getOrCreateGuestSession: any;
 let updateGuestSession: any;

@@ -36,7 +36,7 @@ export function useAppLifecycle({
     let listenerHandle: { remove: () => void } | null = null;
     let removed = false;
 
-    AppPlugin.addListener('appStateChange', (state: { isActive: boolean }) => {
+    Promise.resolve(AppPlugin.addListener('appStateChange', (state: { isActive: boolean }) => {
       try {
         if (state.isActive) {
           onForegroundRef.current?.();
@@ -46,7 +46,7 @@ export function useAppLifecycle({
       } catch (error) {
         console.error('App lifecycle callback error:', error);
       }
-    }).then((handle: { remove: () => void }) => {
+    })).then((handle: { remove: () => void }) => {
       if (removed) {
         handle.remove();
       } else {

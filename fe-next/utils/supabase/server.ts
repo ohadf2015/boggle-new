@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies()
@@ -36,4 +36,21 @@ export async function createClient(): Promise<SupabaseClient> {
       },
     },
   })
+}
+
+/**
+ * Get authenticated user from session JWT (no network call).
+ * Proxy already refreshes tokens via getSession(), so API routes
+ * don't need to call getUser() (which makes a round-trip to Supabase Auth).
+ * Saves 200-500ms per API request.
+ *
+ * Use getUser() only when you need to verify the user hasn't been
+ * deleted/banned (rare — admin actions, security-sensitive mutations).
+ */
+export async function getSessionUser(supabase: SupabaseClient): Promise<{ user: User | null; error: Error | null }> {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session?.user) {
+    return { user: null, error: error ?? new Error('No session') };
+  }
+  return { user: session.user, error: null };
 }

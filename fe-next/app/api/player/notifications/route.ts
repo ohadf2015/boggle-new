@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, getSessionUser } from '@/utils/supabase/server';
 
 /**
  * GET /api/player/notifications
@@ -18,7 +18,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { user, error: authError } = await getSessionUser(supabase);
 
     if (authError || !user) {
       return NextResponse.json(
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)));
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0', 10));
 
-    // Build query
+    // Fetch notifications and unread count in parallel (was sequential — 2 round-trips)
     let query = supabase
       .from('user_notifications')
       .select(`
@@ -63,31 +63,31 @@ export async function GET(request: NextRequest) {
 
     query = query.range(offset, offset + limit - 1);
 
-    const { data: notifications, error, count } = await query;
+    const [notifResult, unreadResult] = await Promise.all([
+      query,
+      supabase
+        .from('user_notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false),
+    ]);
 
-    if (error) {
-      console.error('Failed to fetch notifications:', error);
+    if (notifResult.error) {
+      console.error('Failed to fetch notifications:', notifResult.error);
       return NextResponse.json(
         { error: 'Failed to fetch notifications' },
         { status: 500 }
       );
     }
 
-    // Get unread count separately (for badge display)
-    const { count: unreadCount } = await supabase
-      .from('user_notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('read', false);
-
     return NextResponse.json({
-      notifications: notifications || [],
-      unreadCount: unreadCount || 0,
+      notifications: notifResult.data || [],
+      unreadCount: unreadResult.count || 0,
       pagination: {
         limit,
         offset,
-        total: count || 0,
-        hasMore: (count || 0) > offset + limit,
+        total: notifResult.count || 0,
+        hasMore: (notifResult.count || 0) > offset + limit,
       },
     });
   } catch (error) {

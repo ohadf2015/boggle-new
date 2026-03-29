@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { LandingView } from '@/components/landing';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
@@ -30,7 +30,13 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // Synchronous check — runs during first render, not in an effect
   const [showFTUE, setShowFTUE] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return !hasCompletedOnboarding();
+    const needsOnboarding = !hasCompletedOnboarding();
+    // Save room invite before onboarding replaces the view
+    if (needsOnboarding) {
+      const roomCode = new URLSearchParams(window.location.search).get('room');
+      if (roomCode) savePendingRoomInvite(roomCode);
+    }
+    return needsOnboarding;
   });
 
   const handleFTUEComplete = useCallback(() => {

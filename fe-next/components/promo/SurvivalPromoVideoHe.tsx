@@ -1,14 +1,8 @@
 /**
- * SurvivalPromoVideo — Instagram Reel (1080×1920, 9:16, 30fps, ~18s)
+ * SurvivalPromoVideoHe — Hebrew Instagram Reel (1080×1920, 9:16, 30fps, ~18s)
  *
- * Conversion video targeting Wordle players → LexiClash Survival mode.
- * Scene flow:
- *   1. Wordle row typing → boring, one guess
- *   2. "What if..." — row transforms, grid appears below
- *   3. Gameplay — words found on grid, clues light up, health draining
- *   4. Danger — health critical, red pulse, dramatic guess
- *   5. Victory — word solved, health bar refill celebration
- *   6. CTA — avatar + "Survive if you can"
+ * Hebrew RTL version of the Survival promo video.
+ * Same structure, Hebrew text, RTL slide directions.
  */
 
 import React from 'react';
@@ -30,21 +24,16 @@ import { slide } from '@remotion/transitions/slide';
 import { fade } from '@remotion/transitions/fade';
 import { Audio } from '@remotion/media';
 import { loadFont as loadBangers } from '@remotion/google-fonts/Bangers';
-import { loadFont as loadSora } from '@remotion/google-fonts/Sora';
-import { loadFont as loadFredoka } from '@remotion/google-fonts/Fredoka';
+import { loadFont as loadHeebo } from '@remotion/google-fonts/Heebo';
 import { createSeededRandom } from '../../lib/remotion/utils/seededRandom';
 
 const { fontFamily: bangers } = loadBangers('normal', {
   weights: ['400'],
   subsets: ['latin'],
 });
-const { fontFamily: sora } = loadSora('normal', {
-  weights: ['400', '500', '600', '700', '800'],
-  subsets: ['latin'],
-});
-const { fontFamily: fredoka } = loadFredoka('normal', {
-  weights: ['400', '500', '600', '700'],
-  subsets: ['latin'],
+const { fontFamily: heebo } = loadHeebo('normal', {
+  weights: ['400', '500', '600', '700', '800', '900'],
+  subsets: ['hebrew'],
 });
 
 /* ─── Colors ─── */
@@ -179,7 +168,7 @@ const ClueTile: React.FC<{
     >
       <span
         style={{
-          fontFamily: sora,
+          fontFamily: heebo,
           fontSize: size * 0.55,
           fontWeight: 700,
           color: C.white,
@@ -253,22 +242,22 @@ const WordleBoringScene: React.FC = () => {
         {/* Daily puzzle header */}
         <div
           style={{
-            fontFamily: sora,
+            fontFamily: heebo,
             fontSize: 26,
             fontWeight: 500,
             color: `${C.white}77`,
             letterSpacing: '0.2em',
-            textTransform: 'uppercase',
             opacity: titleO,
             marginBottom: 12,
+            direction: 'rtl',
           }}
         >
-          Daily Puzzle
+          חידה יומית
         </div>
 
         <div
           style={{
-            fontFamily: sora,
+            fontFamily: heebo,
             fontSize: 58,
             fontWeight: 800,
             color: C.white,
@@ -345,17 +334,18 @@ const WordleBoringScene: React.FC = () => {
             opacity: yawnO,
             transform: `scale(${yawnScale})`,
             textAlign: 'center',
+            direction: 'rtl',
           }}
         >
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 36,
               fontWeight: 700,
               color: `${C.white}AA`,
             }}
           >
-            One guess... then wait 24 hours? 😴
+            😴 ?ניחוש אחד... ואז מחכים 24 שעות
           </div>
         </div>
       </div>
@@ -438,7 +428,7 @@ const TransformScene: React.FC = () => {
         {/* "What if..." — big, centered, readable */}
         <div
           style={{
-            fontFamily: fredoka,
+            fontFamily: heebo,
             fontSize: 46,
             fontWeight: 600,
             color: `${C.white}DD`,
@@ -448,13 +438,14 @@ const TransformScene: React.FC = () => {
             marginBottom: 50,
             lineHeight: 1.4,
             zIndex: 10,
+            direction: 'rtl',
           }}
         >
-          What if your guess
+          מה אם הניחוש
           <br />
-          was just{' '}
+          הוא רק{' '}
           <span style={{ color: C.orange, fontSize: 54, fontWeight: 700 }}>
-            the start?
+            ?ההתחלה
           </span>
         </div>
 
@@ -468,16 +459,17 @@ const TransformScene: React.FC = () => {
         >
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 18,
               fontWeight: 600,
               color: `${C.white}66`,
               letterSpacing: '0.15em',
               marginBottom: 10,
               textAlign: 'center',
+              direction: 'rtl',
             }}
           >
-            TARGET WORD
+            מילת המטרה
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             {['S', 'H', '?', '?', '?'].map((letter, i) => (
@@ -492,23 +484,25 @@ const TransformScene: React.FC = () => {
           </div>
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 22,
               fontWeight: 500,
               color: `${C.white}88`,
               textAlign: 'center',
               marginTop: 16,
+              direction: 'rtl',
             }}
           >
-            Find words on the grid to earn clues.
+            .מצאו מילים בלוח כדי לקבל רמזים
           </div>
         </div>
 
         {/* SURVIVAL MODE title — the big reveal */}
         <div
           style={{
-            fontFamily: bangers,
+            fontFamily: heebo,
             fontSize: 80,
+            fontWeight: 900,
             color: C.orange,
             letterSpacing: '0.1em',
             textShadow: `0 0 30px ${C.orange}66, 0 0 60px ${C.orange}22`,
@@ -516,9 +510,10 @@ const TransformScene: React.FC = () => {
             opacity: survivalIn,
             transform: `scale(${survivalScale})`,
             zIndex: 15,
+            direction: 'rtl',
           }}
         >
-          SURVIVAL MODE
+          מצב הישרדות
         </div>
 
         {/* Mascot — mindblown */}
@@ -626,7 +621,7 @@ const GameplayScene: React.FC = () => {
           <HealthBar percent={health} width={500} height={26} />
           <span
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 22,
               fontWeight: 700,
               color: health > 60 ? C.healthGreen : C.healthYellow,
@@ -641,16 +636,17 @@ const GameplayScene: React.FC = () => {
         <div style={{ marginBottom: 24 }}>
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 16,
               fontWeight: 600,
               color: `${C.white}55`,
               letterSpacing: '0.15em',
               marginBottom: 8,
               textAlign: 'center',
+              direction: 'rtl',
             }}
           >
-            TARGET WORD
+            מילת המטרה
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {clueLetters.map((cl, i) => {
@@ -723,7 +719,7 @@ const GameplayScene: React.FC = () => {
                     >
                       <span
                         style={{
-                          fontFamily: sora,
+                          fontFamily: heebo,
                           fontSize: 40,
                           fontWeight: 700,
                           color: isHL ? C.lime : C.white,
@@ -747,7 +743,7 @@ const GameplayScene: React.FC = () => {
               fps,
               config: { damping: 14, stiffness: 140 },
             });
-            const x = interpolate(wIn, [0, 1], [400, 0]);
+            const x = interpolate(wIn, [0, 1], [-400, 0]);
             const o = interpolate(frame - w.delay, [0, 8], [0, 1], {
               extrapolateRight: 'clamp',
             });
@@ -767,11 +763,12 @@ const GameplayScene: React.FC = () => {
                   borderRadius: 8,
                   transform: `translateX(${x}px)`,
                   opacity: o,
+                  direction: 'rtl',
                 }}
               >
                 <span
                   style={{
-                    fontFamily: sora,
+                    fontFamily: heebo,
                     fontSize: 26,
                     fontWeight: 700,
                     color: w.color,
@@ -781,7 +778,7 @@ const GameplayScene: React.FC = () => {
                 </span>
                 <span
                   style={{
-                    fontFamily: sora,
+                    fontFamily: heebo,
                     fontSize: 24,
                     fontWeight: 700,
                     color: C.white,
@@ -909,16 +906,18 @@ const DangerScene: React.FC = () => {
         {/* Urgency text */}
         <div
           style={{
-            fontFamily: bangers,
+            fontFamily: heebo,
             fontSize: 52,
+            fontWeight: 900,
             color: C.red,
             letterSpacing: '0.06em',
             textShadow: `0 0 20px ${C.red}66`,
             opacity: urgencyO * urgencyPulse,
             marginBottom: 20,
+            direction: 'rtl',
           }}
         >
-          ⚠️ LIFE DRAINING...
+          ...⚠️ החיים נגמרים
         </div>
 
         {/* Health bar — critical */}
@@ -947,7 +946,7 @@ const DangerScene: React.FC = () => {
           />
           <span
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 24,
               fontWeight: 800,
               color: C.healthRed,
@@ -987,16 +986,17 @@ const DangerScene: React.FC = () => {
         <div style={{ marginBottom: 16 }}>
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 16,
               fontWeight: 600,
               color: `${C.white}55`,
               letterSpacing: '0.12em',
               textAlign: 'center',
               marginBottom: 6,
+              direction: 'rtl',
             }}
           >
-            YOU KNOW 4/5 LETTERS...
+            ...אתם יודעים 4/5 אותיות
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {clues.map((cl, i) => (
@@ -1020,16 +1020,17 @@ const DangerScene: React.FC = () => {
         >
           <div
             style={{
-              fontFamily: sora,
+              fontFamily: heebo,
               fontSize: 16,
               fontWeight: 600,
               color: C.orange,
               letterSpacing: '0.12em',
               textAlign: 'center',
               marginBottom: 6,
+              direction: 'rtl',
             }}
           >
-            YOUR GUESS
+            הניחוש שלכם
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {[0, 1, 2, 3, 4].map((i) => {
@@ -1070,8 +1071,9 @@ const DangerScene: React.FC = () => {
               border: `3px solid ${C.black}`,
               borderRadius: 10,
               boxShadow: `4px 4px 0px ${C.black}`,
-              fontFamily: bangers,
+              fontFamily: heebo,
               fontSize: 34,
+              fontWeight: 800,
               color: C.white,
               letterSpacing: '0.06em',
               opacity: spring({
@@ -1080,9 +1082,10 @@ const DangerScene: React.FC = () => {
                 config: { damping: 8, stiffness: 100 },
               }),
               transform: `scale(${1 + Math.sin(frame * 0.4) * 0.02})`,
+              direction: 'rtl',
             }}
           >
-            SUBMIT GUESS ⏎
+            ⏎ שלחו ניחוש
           </div>
         )}
       </div>
@@ -1250,26 +1253,28 @@ const VictoryScene: React.FC = () => {
           <HealthBar percent={healthRefill} width={500} height={26} />
         </div>
 
-        {/* SURVIVED! */}
+        {/* !שרדתם */}
         <div
           style={{
-            fontFamily: bangers,
+            fontFamily: heebo,
             fontSize: 100,
+            fontWeight: 900,
             color: C.lime,
             letterSpacing: '0.1em',
             textShadow: `0 0 40px ${C.lime}66, 0 0 80px ${C.lime}22`,
             transform: `scale(${interpolate(survivedIn, [0, 1], [2.5, 1])})`,
             opacity: survivedIn,
             lineHeight: 1,
+            direction: 'rtl',
           }}
         >
-          SURVIVED!
+          !שרדתם
         </div>
 
         {/* Score */}
         <div
           style={{
-            fontFamily: sora,
+            fontFamily: heebo,
             fontSize: 42,
             fontWeight: 800,
             color: C.white,
@@ -1277,9 +1282,10 @@ const VictoryScene: React.FC = () => {
             opacity: interpolate(frame, [25, 35], [0, 1], {
               extrapolateRight: 'clamp',
             }),
+            direction: 'rtl',
           }}
         >
-          Score: {score.toLocaleString()}
+          ניקוד: {score.toLocaleString()}
         </div>
 
         {/* Mascot celebration */}
@@ -1385,7 +1391,7 @@ const SurvivalCTAScene: React.FC = () => {
         {/* Tagline */}
         <div
           style={{
-            fontFamily: fredoka,
+            fontFamily: heebo,
             fontSize: 38,
             fontWeight: 600,
             color: `${C.white}DD`,
@@ -1394,23 +1400,26 @@ const SurvivalCTAScene: React.FC = () => {
             transform: `translateY(${interpolate(tagIn, [0, 1], [12, 0])}px)`,
             marginBottom: 8,
             lineHeight: 1.3,
+            direction: 'rtl',
           }}
         >
-          Wordle ends after one guess.
+          .וורדל נגמר אחרי ניחוש אחד
         </div>
         <div
           style={{
-            fontFamily: bangers,
+            fontFamily: heebo,
             fontSize: 56,
+            fontWeight: 900,
             color: C.orange,
             textAlign: 'center',
             opacity: tagIn,
             letterSpacing: '0.06em',
             textShadow: `0 0 20px ${C.orange}44`,
             marginBottom: 24,
+            direction: 'rtl',
           }}
         >
-          Can you survive?
+          ?תוכלו לשרוד
         </div>
 
         {/* Logo */}
@@ -1441,12 +1450,14 @@ const SurvivalCTAScene: React.FC = () => {
             border: `3px solid ${C.black}`,
             borderRadius: 12,
             boxShadow: `5px 5px 0px ${C.black}`,
-            fontFamily: bangers,
+            fontFamily: heebo,
             fontSize: 46,
+            fontWeight: 800,
             color: C.white,
             letterSpacing: '0.06em',
             position: 'relative',
             overflow: 'hidden',
+            direction: 'rtl',
           }}
         >
           <div
@@ -1462,13 +1473,13 @@ const SurvivalCTAScene: React.FC = () => {
               pointerEvents: 'none',
             }}
           />
-          SURVIVE NOW — FREE
+          שרדו עכשיו — חינם
         </div>
 
         {/* URL */}
         <div
           style={{
-            fontFamily: sora,
+            fontFamily: heebo,
             fontSize: 28,
             fontWeight: 600,
             color: C.lime,
@@ -1504,7 +1515,7 @@ const TOTAL_FRAMES =
   Object.values(SCENE_DURATIONS).reduce((a, b) => a + b, 0) - T * 5;
 // 625 - 60 = 565 frames ≈ 18.8s
 
-export const SurvivalPromoVideo: React.FC = () => {
+export const SurvivalPromoVideoHe: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: C.bgWarm }}>
       <Audio
@@ -1569,7 +1580,7 @@ export const SurvivalPromoVideo: React.FC = () => {
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
-          presentation={slide({ direction: 'from-right' })}
+          presentation={slide({ direction: 'from-left' })}
           timing={linearTiming({ durationInFrames: T })}
         />
 
@@ -1581,4 +1592,4 @@ export const SurvivalPromoVideo: React.FC = () => {
   );
 };
 
-SurvivalPromoVideo.displayName = 'SurvivalPromoVideo';
+SurvivalPromoVideoHe.displayName = 'SurvivalPromoVideoHe';

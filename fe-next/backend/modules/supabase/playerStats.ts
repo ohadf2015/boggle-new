@@ -304,22 +304,27 @@ export async function updatePlayerStats(
                          result.error.code === '40P01';
       if (!isDeadlock || attempt === MAX_RETRIES - 1) return result;
       const backoff = Math.pow(2, attempt) * 100 + Math.random() * 100;
-      logger.warn('SUPABASE', `Deadlock on ${label} for ${playerId}, retry ${attempt + 1}/${MAX_RETRIES} in ${Math.round(backoff)}ms`);
+      logger.debug('SUPABASE', `Deadlock on ${label} for ${playerId}, retry ${attempt + 1}/${MAX_RETRIES} in ${Math.round(backoff)}ms`);
       await new Promise(resolve => setTimeout(resolve, backoff));
     }
     return { data: null as T, error: { message: 'Max retries exceeded' } };
   };
 
   try {
-    // First: update non-XP stats (with deadlock retry)
-    const { data, error } = await retryOnDeadlock(
+    // Atomic stats + XP update in a single RPC to prevent deadlocks
+    // The RPC acquires a FOR UPDATE lock once, then does both writes
+    let newTotalXp = (profile.total_xp || 0) + xpResult.totalXp;
+    let newLevel = getLevelFromXp(newTotalXp);
+    let actualXpGranted = xpResult.totalXp;
+
+    const { data: rpcData, error } = await retryOnDeadlock(
       () => client
-        .from('profiles')
-        .update(updates)
-        .eq('id', playerId)
-        .select()
-        .single(),
-      'profile stats update'
+        .rpc('update_player_stats_and_xp', {
+          p_player_id: playerId,
+          p_stats: updates,
+          p_xp_amount: xpResult.totalXp,
+        }),
+      'atomic stats+XP update'
     );
 
     if (error) {
@@ -329,32 +334,18 @@ export async function updatePlayerStats(
       return { data: null, error };
     }
 
-    // Then: use increment_player_xp RPC for XP update (with deadlock retry)
-    // This ensures prestige multiplier is applied and lifetime_xp is tracked
-    let newTotalXp = (profile.total_xp || 0) + xpResult.totalXp;
-    let newLevel = getLevelFromXp(newTotalXp);
-    let actualXpGranted = xpResult.totalXp;
+    if (rpcData && (rpcData as unknown[]).length > 0) {
+      const xpRow = (rpcData as Record<string, unknown>[])[0];
+      newTotalXp = Number(xpRow.new_total_xp);
+      newLevel = xpRow.new_level as number;
+      actualXpGranted = xpRow.xp_granted as number;
+    }
+
+    // Build return data from what we already have — avoids an extra DB round-trip.
+    // The RPC gave us XP/level; merge with the updates we just wrote.
+    const data = { ...profile, ...updates, total_xp: newTotalXp, current_level: newLevel };
 
     if (xpResult.totalXp > 0) {
-      const { data: xpData, error: xpError } = await retryOnDeadlock(
-        () => client
-          .rpc('increment_player_xp', {
-            p_player_id: playerId,
-            p_xp_amount: xpResult.totalXp,
-          }),
-        'XP increment'
-      );
-
-      if (xpError) {
-        logger.error('SUPABASE', `Failed to increment XP for ${playerId}`, xpError.message);
-        // Stats were saved but XP wasn't — log but don't fail the whole operation
-      } else if (xpData && (xpData as unknown[]).length > 0) {
-        const xpRow = (xpData as Record<string, unknown>[])[0];
-        newTotalXp = Number(xpRow.new_total_xp);
-        newLevel = xpRow.new_level as number;
-        actualXpGranted = xpRow.xp_granted as number;
-      }
-
       // Feed XP into the player's weekly league (fire-and-forget)
       addXpToLeague(playerId, actualXpGranted).catch((err) => {
         logger.warn('LEAGUE', `Failed to add league XP for ${playerId}`, err?.message);

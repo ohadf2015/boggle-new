@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, getSessionUser } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -15,35 +15,38 @@ export async function GET() {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const { user, error: authError } = await getSessionUser(supabase);
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's profile to check gift_modal_dismissed_at
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('gift_modal_dismissed_at')
-      .eq('id', user.id)
-      .single();
+    // Fetch profile + gift count in parallel (was sequential — 2 round-trips)
+    const [profileResult, giftCountResult] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('gift_modal_dismissed_at')
+        .eq('id', user.id)
+        .single(),
+      supabase
+        .from('admin_gift_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', user.id)
+        .eq('claimed', false),
+    ]);
 
-    // Build the query - filter by claimed status and dismissal timestamp
-    let query = supabase
-      .from('admin_gift_messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .eq('claimed', false);
-
-    // If user has dismissed the modal, only count gifts created AFTER that time
-    if (profile?.gift_modal_dismissed_at) {
-      query = query.gt('created_at', profile.gift_modal_dismissed_at);
+    // If user has dismissed the modal, re-query with timestamp filter
+    let count = giftCountResult.count;
+    const countError = giftCountResult.error;
+    if (profileResult.data?.gift_modal_dismissed_at && !countError) {
+      const { count: filteredCount } = await supabase
+        .from('admin_gift_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', user.id)
+        .eq('claimed', false)
+        .gt('created_at', profileResult.data.gift_modal_dismissed_at);
+      count = filteredCount;
     }
-
-    const { count, error: countError } = await query;
 
     if (countError) {
       console.error('Error fetching unclaimed count:', countError);

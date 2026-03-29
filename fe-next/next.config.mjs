@@ -250,6 +250,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/music/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       // Static asset caching (mascot images, icons, etc.)
       {
         source: '/mascot/:path*',

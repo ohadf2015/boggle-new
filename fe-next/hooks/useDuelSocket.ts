@@ -143,9 +143,9 @@ export function useDuelSocket(): UseDuelSocketReturn {
       socket.disconnect();
       socketRef.current = null;
     };
-    // Re-connect when the user id changes (e.g. user logs in after mount)
+    // Re-connect when the user id or display name changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, profile?.display_name]);
 
   // ==========================================
   // Action Methods

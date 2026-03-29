@@ -3078,4 +3078,17 @@ html.reduce-motion *::after {
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .animate-avatar-float {
+    animation: none !important;
+  }
+}
+
+/* Lightweight CSS float for lobby avatars — replaces JS-driven Framer Motion infinite loops */
+@keyframes avatar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-avatar-float {
+  animation: avatar-float 3s ease-in-out infinite;
 }

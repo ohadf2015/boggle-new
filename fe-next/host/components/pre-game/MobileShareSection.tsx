@@ -15,6 +15,8 @@ interface MobileShareSectionProps {
   className?: string;
   /** Show prominent hint banner for empty rooms */
   showHint?: boolean;
+  /** Compact single-row layout */
+  compact?: boolean;
 }
 
 // ==================== Component ====================
@@ -28,6 +30,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
   t,
   className,
   showHint = false,
+  compact = false,
 }) {
   const [copied, setCopied] = useState(false);
   const joinUrl = getJoinUrl(gameCode, 'mobile-lobby');
@@ -48,6 +51,51 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
     const message = `${t('share.inviteMessage')}\n${t('share.code')}: ${gameCode}`;
     shareViaTelegram(message, joinUrl);
   }, [gameCode, joinUrl, t]);
+
+  // Compact: just a row of share buttons, no hints
+  if (compact) {
+    return (
+      <div data-testid="mobile-share-section" className={cn('flex gap-2', className)}>
+        <motion.button
+          data-testid="mobile-copy-link-button"
+          onClick={handleCopyLink}
+          whileTap={{ scale: 0.95 }}
+          aria-label={t('roomCode.copyLink')}
+          className={cn(
+            'h-9 px-3 flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard-sm transition-all text-xs font-bold',
+            copied ? 'bg-neo-lime text-neo-black' : 'bg-white text-neo-black'
+          )}
+        >
+          {copied ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+          <span>{copied ? t('common.copied') : t('share.copyLink')}</span>
+        </motion.button>
+        <motion.button
+          data-testid="mobile-whatsapp-button"
+          onClick={handleWhatsAppShare}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Share via WhatsApp"
+          className="h-9 px-3 flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-brand-whatsapp shadow-hard-sm text-xs font-bold text-white"
+        >
+          <WhatsAppIcon size={14} />
+          <span>WhatsApp</span>
+        </motion.button>
+        <motion.button
+          data-testid="mobile-telegram-button"
+          onClick={handleTelegramShare}
+          whileTap={{ scale: 0.95 }}
+          aria-label={`Share via ${t('share.telegram')}`}
+          className="h-9 px-2.5 flex items-center justify-center rounded-full border-2 border-neo-black bg-brand-telegram text-white shadow-hard-sm"
+        >
+          <TelegramIcon size={14} />
+        </motion.button>
+        {showHint && (
+          <span className="text-[10px] text-neo-cyan/60 font-bold self-center ml-1">
+            {t('hostView.sendLinkToFriends')}
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

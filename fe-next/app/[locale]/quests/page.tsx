@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
 import QuestsPageClient from './PageClient';

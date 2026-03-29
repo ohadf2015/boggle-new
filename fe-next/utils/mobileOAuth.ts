@@ -116,12 +116,12 @@ export async function listenForOAuthCallback(
   const AppPlugin = getCapacitor()?.Plugins?.App;
   if (!AppPlugin) return () => {};
 
-  const listener = await AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {
+  const listener = await Promise.resolve(AppPlugin.addListener('appUrlOpen', (event: { url: string }) => {
     if (event.url.includes('auth/callback')) {
       logger.log('[MobileOAuth] Received OAuth callback:', event.url);
       onCallback(event.url);
     }
-  });
+  }));
 
   return () => {
     listener.remove();

@@ -345,10 +345,10 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    if (!data?.query || data.query.length < 2) {
+    if (!data?.query || data.query.length < 2 || data.query.length > 50) {
       socket.emit('friends:error', {
         code: 'VALIDATION_FAILED',
-        message: 'Search query must be at least 2 characters',
+        message: 'Search query must be 2-50 characters',
       });
       return;
     }
@@ -454,55 +454,68 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Get sent requests (user_id = authUserId)
-      const { data: sent } = await supabase
-        .from('friends')
-        .select('id, user_id, friend_id, created_at')
-        .eq('user_id', authUserId)
-        .eq('status', 'pending');
+      // Fetch sent + received in parallel (2 queries instead of sequential)
+      const [{ data: sent }, { data: received }] = await Promise.all([
+        supabase
+          .from('friends')
+          .select('id, user_id, friend_id, created_at')
+          .eq('user_id', authUserId)
+          .eq('status', 'pending'),
+        supabase
+          .from('friends')
+          .select('id, user_id, friend_id, created_at')
+          .eq('friend_id', authUserId)
+          .eq('status', 'pending'),
+      ]);
 
-      // Get received requests (friend_id = authUserId)
-      const { data: received } = await supabase
-        .from('friends')
-        .select('id, user_id, friend_id, created_at')
-        .eq('friend_id', authUserId)
-        .eq('status', 'pending');
+      // Batch-fetch all needed profiles in ONE query instead of N+1
+      const profileIds = new Set<string>();
+      (sent || []).forEach((req) => profileIds.add(req.friend_id));
+      (received || []).forEach((req) => profileIds.add(req.user_id));
 
-      // Populate with profile data
-      const sentRequests = await Promise.all(
-        (sent || []).map(async (req) => {
-          const profile = await getUserProfile(req.friend_id);
-          return {
-            requestId: req.id,
-            fromUserId: req.user_id,
-            fromUsername: '',
-            fromAvatar: { emoji: '👤', color: '#808080' },
-            toUserId: req.friend_id,
-            toUsername: profile?.username || '',
-            status: 'pending' as const,
-            createdAt: new Date(req.created_at).getTime(),
-            expiresAt: new Date(req.created_at).getTime() + 30 * 24 * 60 * 60 * 1000,
-          };
-        })
-      );
+      const profileMap = new Map<string, { username: string; display_name: string; avatar_emoji: string; avatar_color: string; avatar_image: string | null }>();
+      if (profileIds.size > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username, display_name, avatar_emoji, avatar_color, avatar_image')
+          .in('id', Array.from(profileIds));
+        for (const p of profiles || []) {
+          profileMap.set(p.id, p);
+        }
+      }
 
-      const receivedRequests = await Promise.all(
-        (received || []).map(async (req) => {
-          const profile = await getUserProfile(req.user_id);
-          return {
-            requestId: req.id,
-            fromUserId: req.user_id,
-            fromUsername: profile?.username || '',
-            fromDisplayName: profile?.displayName,
-            fromAvatar: profile?.avatar || { emoji: '👤', color: '#808080' },
-            toUserId: req.friend_id,
-            toUsername: '',
-            status: 'pending' as const,
-            createdAt: new Date(req.created_at).getTime(),
-            expiresAt: new Date(req.created_at).getTime() + 30 * 24 * 60 * 60 * 1000,
-          };
-        })
-      );
+      const sentRequests = (sent || []).map((req) => {
+        const profile = profileMap.get(req.friend_id);
+        return {
+          requestId: req.id,
+          fromUserId: req.user_id,
+          fromUsername: '',
+          fromAvatar: { emoji: '👤', color: '#808080' },
+          toUserId: req.friend_id,
+          toUsername: profile?.username || '',
+          status: 'pending' as const,
+          createdAt: new Date(req.created_at).getTime(),
+          expiresAt: new Date(req.created_at).getTime() + 30 * 24 * 60 * 60 * 1000,
+        };
+      });
+
+      const receivedRequests = (received || []).map((req) => {
+        const profile = profileMap.get(req.user_id);
+        return {
+          requestId: req.id,
+          fromUserId: req.user_id,
+          fromUsername: profile?.username || '',
+          fromDisplayName: profile?.display_name,
+          fromAvatar: profile
+            ? { emoji: profile.avatar_emoji || '👤', color: profile.avatar_color || '#808080', image: profile.avatar_image }
+            : { emoji: '👤', color: '#808080' },
+          toUserId: req.friend_id,
+          toUsername: '',
+          status: 'pending' as const,
+          createdAt: new Date(req.created_at).getTime(),
+          expiresAt: new Date(req.created_at).getTime() + 30 * 24 * 60 * 60 * 1000,
+        };
+      });
 
       socket.emit('friends:pendingRequests', {
         sent: sentRequests,
