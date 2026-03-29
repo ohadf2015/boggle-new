@@ -18,7 +18,7 @@ import { useLandingStats } from '@/hooks/useLandingStats';
 import { useDailySolveRate } from '@/hooks/useDailySolveRate';
 import { useHallOfFame } from '@/hooks/useHallOfFame';
 import { AdPlaceholder } from '@/components/ads';
-import { hasCompletedOnboarding, markOnboardingComplete, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingHero } from './LandingHero';
 import { LandingSocialProofBar } from './LandingSocialProofBar';
@@ -52,10 +52,6 @@ const ShareReferralModal = dynamic(
   { ssr: false }
 );
 const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), { ssr: false });
-const OnboardingFlow = dynamic(() => import('@/components/onboarding/OnboardingFlow'), {
-  ssr: false,
-  loading: () => <div className="fixed inset-0 bg-neo-navy z-50" />,
-});
 const PlayfulBackground = dynamic(
   () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
   { ssr: false }
@@ -70,7 +66,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, profile } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
@@ -106,42 +102,22 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showFTUE, setShowFTUE] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [, setIsAvatarBuilderOpen] = useState(false);
 
-  // Check if user is a first-timer who should see the FTUE flow.
-  // Skip for authenticated users with games played — they're returning players
-  // who may have cleared localStorage or are on a new device.
+  // Mark returning players (cleared localStorage) as onboarded
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    // Wait for auth to finish loading before deciding — avoids false FTUE flash
-    if (authLoading) return;
     if (hasCompletedOnboarding()) return;
-
-    // Authenticated user with games played = returning player, skip FTUE
     if (isAuthenticated && profile?.total_games && profile.total_games > 0) {
       markOnboardingComplete({
         avatarId: profile.avatar_image || 'default',
         displayName: profile.display_name || profile.username || 'Player',
         selectedMode: null,
       });
-      return;
     }
-
-    // Preserve room invite code so post-onboarding redirect can pick it up
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomCode = urlParams.get('room');
-    if (roomCode) {
-      savePendingRoomInvite(roomCode);
-    }
-
-    // Only show FTUE for truly new, unauthenticated users
-    if (!isAuthenticated) {
-      setShowFTUE(true);
-    }
-  }, [authLoading, isAuthenticated, profile]);
+  }, [isAuthenticated, profile]);
 
   // Check for room parameter and redirect to multiplayer page
   useEffect(() => {
@@ -181,11 +157,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
     loading: dailyChallengeStatus.loading,
   };
 
-  // FTUE: Full-screen onboarding for mobile first-time users only.
-  // Desktop users see the full landing page with a tutorial banner instead.
-  if (showFTUE && !isDesktopWidth) {
-    return <OnboardingFlow onComplete={() => setShowFTUE(false)} />;
-  }
+  // FTUE is now handled by PageClient — LandingView only renders for returning users
 
   // Mobile landscape uses the compact card layout
   if (isLandscape && !isDesktopWidth) {
@@ -265,7 +237,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           t={t}
           dailyChallengeStats={dailyChallengeStats}
           solveRate={solveRate}
-          gameModeStats={initialData?.gameModeStats}
+          cardOrder={initialData?.cardOrder}
         />
 
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}

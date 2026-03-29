@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LandingChallengeCards } from '../LandingChallengeCards';
-import type { GameModeStats } from '@/lib/landing/fetchGameModeStats';
+import { getCardOrder, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
 
 vi.mock('framer-motion', () => {
   const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
@@ -63,7 +63,9 @@ describe('LandingChallengeCards reordering', () => {
       { mode: 'multiplayer', playCount: 100 },
       { mode: 'blast', playCount: 50 },
     ];
-    render(<LandingChallengeCards {...baseProps} gameModeStats={stats} />);
+    // Pre-compute order server-side (like production does)
+    const cardOrder = getCardOrder(stats);
+    render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
     // Daily (banner, not ModeCard) + multiplayer pinned, then adventure > singleplayer by popularity
     expect(cards[0]).toHaveTextContent('landing.multiplayer');
@@ -79,7 +81,8 @@ describe('LandingChallengeCards reordering', () => {
       { mode: 'daily', playCount: 3 },
       { mode: 'adventure', playCount: 1 },
     ];
-    render(<LandingChallengeCards {...baseProps} isAdmin={true} gameModeStats={stats} />);
+    const cardOrder = getCardOrder(stats);
+    render(<LandingChallengeCards {...baseProps} isAdmin={true} cardOrder={cardOrder} />);
     // Blast should be last (separate section)
     const cards = screen.getAllByTestId('mode-card');
     const lastCard = cards[cards.length - 1];

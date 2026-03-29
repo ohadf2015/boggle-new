@@ -18,7 +18,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
-import { fetchGameModeStats, type GameModeStats } from './fetchGameModeStats';
+import { fetchGameModeStats, getCardOrder, type GameModeStats, type LandingGameMode } from './fetchGameModeStats';
 
 export interface LandingInitialData {
   topPlayers: TopPlayer[];
@@ -27,6 +27,8 @@ export interface LandingInitialData {
   solveRate: number | null;
   /** Per-mode play counts for popularity-based card ordering */
   gameModeStats: GameModeStats[];
+  /** Pre-computed card order — derived from gameModeStats at build/ISR time */
+  cardOrder: LandingGameMode[];
 }
 
 const TOP_PLAYERS_LIMIT = 5;
@@ -35,7 +37,7 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return { topPlayers: [], gamesToday: 0, solveRate: null, gameModeStats: [] };
+    return { topPlayers: [], gamesToday: 0, solveRate: null, gameModeStats: [], cardOrder: getCardOrder() };
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -82,5 +84,5 @@ export async function fetchLandingData(language: string): Promise<LandingInitial
   // Use the precomputed solve_rate from the daily_word_hunt_stats view
   const solveRate: number | null = solveRateResult.data?.solve_rate ?? null;
 
-  return { topPlayers, gamesToday, solveRate, gameModeStats };
+  return { topPlayers, gamesToday, solveRate, gameModeStats, cardOrder: getCardOrder(gameModeStats) };
 }

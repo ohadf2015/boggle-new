@@ -1,5 +1,4 @@
-import { getCardOrder } from '../LandingChallengeCards';
-import type { GameModeStats } from '@/lib/landing/fetchGameModeStats';
+import { getCardOrder, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
 
 describe('getCardOrder', () => {
   it('returns default order when no stats provided', () => {

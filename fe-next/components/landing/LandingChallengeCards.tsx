@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
-import type { GameModeStats, LandingGameMode } from '@/lib/landing/fetchGameModeStats';
+import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -28,47 +28,17 @@ interface LandingChallengeCardsProps {
   t: (key: string) => string;
   dailyChallengeStats: DailyChallengePreloadedStats;
   solveRate: number | null;
-  /** Per-mode play counts — cards reorder based on popularity when provided */
-  gameModeStats?: GameModeStats[];
+  /** Pre-computed card order from server — static per ISR/deploy */
+  cardOrder?: LandingGameMode[];
 }
 
-/** Default card order when no stats available */
+/** Default card order when no server data available */
 const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'multiplayer', 'singleplayer', 'adventure'];
-
-/** Modes that are pinned to the front in this order, regardless of popularity */
-const PINNED_FIRST: LandingGameMode[] = ['daily', 'multiplayer'];
 
 /** Scroll-triggered entrance — only animates when cards enter viewport */
 const cardInitial = { opacity: 0, y: 20, scale: 0.96 };
 const cardVisible = { opacity: 1, y: 0, scale: 1 };
 const cardViewport = { once: true, margin: '-40px' };
-
-/** Compute card order from popularity stats. Blast is excluded (shown separately). */
-export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
-  if (!stats || stats.length === 0) return DEFAULT_ORDER;
-
-  // Filter to main 4 modes (blast handled separately), keep popularity order
-  const mainModes: LandingGameMode[] = stats
-    .filter(s => s.mode !== 'blast')
-    .map(s => s.mode);
-
-  // If all counts are 0 (no data yet), keep default order
-  const hasData = stats.some(s => s.playCount > 0 && s.mode !== 'blast');
-  if (!hasData) return DEFAULT_ORDER;
-
-  // Ensure all 4 modes are present (in case DB is missing some)
-  for (const mode of DEFAULT_ORDER) {
-    if (!mainModes.includes(mode)) {
-      mainModes.push(mode);
-    }
-  }
-
-  // Pin certain modes to the front (e.g., daily challenge always first)
-  const pinned = PINNED_FIRST.filter(m => mainModes.includes(m));
-  const unpinned = mainModes.filter(m => !PINNED_FIRST.includes(m));
-
-  return [...pinned, ...unpinned];
-}
 
 export function LandingChallengeCards({
   language,
@@ -81,14 +51,14 @@ export function LandingChallengeCards({
   t,
   dailyChallengeStats,
   solveRate,
-  gameModeStats,
+  cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
   const [isFirstTimer, setIsFirstTimer] = useState(false);
   useEffect(() => {
     setIsFirstTimer(shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding());
   }, []);
 
-  const cardOrder = useMemo(() => getCardOrder(gameModeStats), [gameModeStats]);
+  const cardOrder = cardOrderProp ?? DEFAULT_ORDER;
 
   /** Renders a card by mode key with staggered animation delay */
   const renderCard = (mode: LandingGameMode, index: number) => {

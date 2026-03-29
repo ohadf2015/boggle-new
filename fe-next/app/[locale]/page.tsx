@@ -8,9 +8,10 @@ import { fetchLandingData } from '@/lib/landing/fetchLandingData';
  * Users choose between Single Player and Multiplayer modes
  */
 
-// ISR: Revalidate landing page every 60 seconds to avoid SSR on every request.
-// The Supabase queries in fetchLandingData run at most once per minute per locale.
-export const revalidate = 60;
+// ISR: Revalidate landing data every 5 minutes.
+// Mode card order is computed from gameModeStats at build/revalidation time,
+// so no per-request DB calls for card ordering.
+export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string }>;

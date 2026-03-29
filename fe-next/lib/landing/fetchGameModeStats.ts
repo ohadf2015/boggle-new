@@ -93,6 +93,32 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
   }
 }
 
+/** Default card order when no stats available */
+const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'multiplayer', 'singleplayer', 'adventure'];
+
+/** Modes pinned to the front regardless of popularity */
+const PINNED_FIRST: LandingGameMode[] = ['daily', 'multiplayer'];
+
+/** Compute card display order from popularity stats. Blast excluded (shown separately). */
+export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
+  if (!stats || stats.length === 0) return DEFAULT_ORDER;
+
+  const mainModes: LandingGameMode[] = stats
+    .filter(s => s.mode !== 'blast')
+    .map(s => s.mode);
+
+  const hasData = stats.some(s => s.playCount > 0 && s.mode !== 'blast');
+  if (!hasData) return DEFAULT_ORDER;
+
+  for (const mode of DEFAULT_ORDER) {
+    if (!mainModes.includes(mode)) mainModes.push(mode);
+  }
+
+  const pinned = PINNED_FIRST.filter(m => mainModes.includes(m));
+  const unpinned = mainModes.filter(m => !PINNED_FIRST.includes(m));
+  return [...pinned, ...unpinned];
+}
+
 /** Fallback when Supabase is unavailable — preserves default card order */
 function getDefaultStats(): GameModeStats[] {
   return [
