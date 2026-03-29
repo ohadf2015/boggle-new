@@ -103,8 +103,14 @@ export default function PartPreviewGrid<T extends string>({
     setConfirmPurchase(null);
   };
 
+  // When no premium context exists (e.g. onboarding), hide premium parts entirely
+  // so guests can only pick free parts. When premium exists, show all and gate with locks.
+  const visibleOptions = premium
+    ? options
+    : options.filter(o => o === 'none' || !isPremiumPart(cat, o));
+
   // Sort: premium/epic/legendary first, then free parts
-  const sortedOptions = [...options].sort((a, b) => {
+  const sortedOptions = [...visibleOptions].sort((a, b) => {
     const aPrem = isPremiumPart(cat, a);
     const bPrem = isPremiumPart(cat, b);
     if (a === 'none') return -1;

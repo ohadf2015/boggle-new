@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useProgression } from '@/contexts/ProgressionContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
@@ -39,6 +40,7 @@ import { useBossRush } from './hooks/useBossRush';
 import BossRushResults from './BossRushResults';
 
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 interface GameTimerState {
   timeRemaining: number;
@@ -51,11 +53,14 @@ function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
   const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, refreshProgression } = useProgression();
+  const { user } = useAuth();
+  const isGuest = !user?.id;
 
   const gold = progression?.gold ?? 0;
   const upgrades = (progression?.upgrades ?? {}) as Record<string, number>;
 
   const [showShop, setShowShop] = useState(false);
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [showWordAlbum, setShowWordAlbum] = useState(false);
   const [showWeeklyChallenge, setShowWeeklyChallenge] = useState(false);
 
@@ -218,7 +223,11 @@ function AdventureView(): React.JSX.Element {
         // so this is safe to call even if the eager save already succeeded.
         const saved = await completeLevel(selectedWorld, selectedLevel, stars as 0 | 1 | 2 | 3, score, wordsFound, goldEarned, longWords) as boolean | void;
         if (saved === false) {
-          toast.error(t('adventure.progressNotSaved'));
+          if (isGuest) {
+            setShowSignupPrompt(true);
+          } else {
+            toast.error(t('adventure.progressNotSaved'));
+          }
         }
       }
       if (typeof window !== 'undefined') {
@@ -228,7 +237,7 @@ function AdventureView(): React.JSX.Element {
         setSelectedLevel(null);
       }
     },
-    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t]
+    [selectedWorld, selectedLevel, completeLevel, setViewState, setSelectedLevel, t, isGuest]
   );
 
   const handleGameExit = useCallback(() => {
@@ -446,6 +455,13 @@ function AdventureView(): React.JSX.Element {
       {(viewState === 'worldMap' || viewState === 'levelGrid') && (
         <AdventureShopFAB isRTL={isRTL} gold={gold} onOpenShop={openShop} t={t} />
       )}
+
+      <AuthModal
+        isOpen={showSignupPrompt}
+        onClose={() => setShowSignupPrompt(false)}
+        initialMode="signup"
+        showGuestStats
+      />
     </div>
     </AdventureThemeProvider>
   );

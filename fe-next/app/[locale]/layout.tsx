@@ -169,6 +169,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+            // Geo-targeting: signal to search engines this site is based in Israel
+            'geo.region': 'IL',
+            'geo.placename': 'Israel',
+            // Content-Language hints for search engines (supplements html lang attr)
+            'content-language': validLocale === 'he' ? 'he-IL' : validLocale,
         },
     };
 }
@@ -281,6 +286,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 'Mobile',
                 'iOS',
                 'Android',
+            ],
+            // Signal to Google that this app serves Israel (primary market) + global
+            areaServed: [
+                { '@type': 'Country', name: 'Israel' },
+                { '@type': 'Country', name: 'United States' },
+                { '@type': 'Country', name: 'Sweden' },
+                { '@type': 'Country', name: 'Japan' },
             ],
             author: {
                 '@type': 'Organization',

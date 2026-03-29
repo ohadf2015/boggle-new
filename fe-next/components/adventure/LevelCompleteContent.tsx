@@ -22,6 +22,10 @@ const LOOT_DROP_IMAGES: Record<string, string> = {
   bossTrophy: '/images/adventure/loot/loot-boss-trophy.webp',
   runeFragment: '/images/runes/rune-goldvein.webp',
   loreScroll: '/images/adventure/floating-scroll.webp',
+  goldenQuill: '/images/adventure/loot/loot-golden-quill.webp',
+  worldEssence: '/images/adventure/loot/loot-world-essence.webp',
+  ancientRelic: '/images/adventure/loot/loot-ancient-relic.webp',
+  cosmicShard: '/images/adventure/loot/loot-cosmic-shard.webp',
 };
 
 export interface LevelCompleteContentProps {

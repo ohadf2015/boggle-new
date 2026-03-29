@@ -26,11 +26,15 @@ export interface ColorStripProps<T extends string> {
 
 export function ColorStrip<T extends string>({ label, colors, selected, onSelect, large, premiumCategory, premium }: ColorStripProps<T>) {
   const size = large ? 'w-9 h-9 sm:w-11 sm:h-11' : 'w-7 h-7 sm:w-8 sm:h-8';
+  // Hide premium colors when no premium context (e.g. onboarding)
+  const visibleColors = premiumCategory && !premium
+    ? colors.filter(c => !isPremiumPart(premiumCategory, c))
+    : colors;
   return (
     <div>
       <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{label}</p>
       <div className="flex flex-wrap gap-2">
-        {colors.map(color => {
+        {visibleColors.map(color => {
           const isLocked = premiumCategory && premium
             && isPremiumPart(premiumCategory, color)
             && !premium.isPartUnlocked(premiumCategory, color);
