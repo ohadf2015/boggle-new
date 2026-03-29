@@ -66,7 +66,7 @@ vi.mock('@/components/Avatar', () => ({
 
 import StickyReadyBar from '../StickyReadyBar';
 
-const AUTO_SECONDS = 15;
+const AUTO_SECONDS = 21;
 
 describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   const baseProps = {

@@ -382,6 +382,22 @@ export function useGridGestures({
     return () => element.removeEventListener('touchmove', nativeTouchMoveHandler);
   }, [gridRef, disabled, interactive, performanceConfig.isLowEnd, processTouchMove, handleDragEnd]);
 
+  // Invalidate grid measurement cache on resize/orientation change
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+    const invalidateCache = () => { gridMeasurementsRef.current = null; };
+    const resizeObserver = new ResizeObserver(invalidateCache);
+    resizeObserver.observe(element);
+    window.addEventListener('orientationchange', invalidateCache);
+    window.addEventListener('resize', invalidateCache);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('orientationchange', invalidateCache);
+      window.removeEventListener('resize', invalidateCache);
+    };
+  }, [gridRef]);
+
   // Clean up RAF on unmount
   useEffect(() => {
     return () => {

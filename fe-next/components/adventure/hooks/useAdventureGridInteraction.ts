@@ -116,12 +116,32 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
     // listener may fire before React re-renders with the latest state.
     const word = currentWordRef.current;
     const indices = selectedIndicesRef.current;
-    if (word && indices.length > 0) {
+    // Require at least 2 tiles before attempting submission (matches regular mode).
+    // Single-tile taps are handled by the click path, not drag-end.
+    if (word && indices.length >= 2) {
       handleWordSubmit(word, indices);
     } else {
       clearSelection();
     }
   }, [handleWordSubmit, clearSelection]);
+
+  // Clear selection when clicking outside the grid or pressing Escape (matches regular mode)
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (gridRef.current && !gridRef.current.contains(e.target as Node)) {
+        clearSelection();
+      }
+    };
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') clearSelection();
+    };
+    window.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [gridRef, clearSelection]);
 
   // Popup queue auto-dismiss
   const popupQueueTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

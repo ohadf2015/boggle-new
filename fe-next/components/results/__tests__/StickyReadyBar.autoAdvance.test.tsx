@@ -60,7 +60,7 @@ vi.mock('@/components/GameModeSelector', () => ({
 
 import StickyReadyBar from '../StickyReadyBar';
 
-const AUTO_SECONDS = 15;
+const AUTO_SECONDS = 21;
 
 describe('StickyReadyBar auto-advance (host)', () => {
   const baseProps = {

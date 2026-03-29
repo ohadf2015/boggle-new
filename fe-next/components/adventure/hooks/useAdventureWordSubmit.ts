@@ -136,7 +136,14 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
       const word = submittedWord || currentWord;
       const indices = submittedIndices.length > 0 ? submittedIndices : selectedIndices;
 
-      if (!isPlaying || isPaused || isCascading || word.length < minWordLength || isValidating || isSubmittingRef.current) return;
+      if (!isPlaying || isPaused || isCascading || isValidating || isSubmittingRef.current) {
+        clearSelection();
+        return;
+      }
+      if (word.length < minWordLength) {
+        clearSelection();
+        return;
+      }
       isSubmittingRef.current = true;
 
       tap();

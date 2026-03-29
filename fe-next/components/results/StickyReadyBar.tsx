@@ -31,7 +31,7 @@ interface StickyReadyBarProps {
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
-const AUTO_SECONDS = 15;
+const AUTO_SECONDS = 21;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
