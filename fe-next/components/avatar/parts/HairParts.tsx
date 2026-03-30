@@ -29,12 +29,12 @@ function Spiky({ fill }: HairPartProps) {
     <g>
       {/* Cap hugging the head */}
       <path d="M20 36 Q20 22 50 18 Q80 22 80 36" fill={fill} stroke="#000" strokeWidth={S} />
-      {/* Spikes — taller, more dramatic, wilder angles */}
-      <path d="M22 34 L26 -2 L34 24 L40 -8 L50 18 L60 -10 L66 16 L74 -4 L80 34"
+      {/* Spikes — dramatic but within viewBox */}
+      <path d="M22 34 L26 6 L34 24 L40 2 L50 18 L60 0 L66 16 L74 4 L80 34"
         fill={fill} stroke="#000" strokeWidth={3} strokeLinejoin="round" />
       {/* Inner spike detail lines */}
-      <path d="M34 20 L36 4 M50 14 L52 -2 M66 14 L68 2" stroke="#000" strokeWidth={1} opacity="0.18" />
-      <path d="M36 18 L38 2 M52 12 L54 -4 M68 12 L70 0" stroke="#fff" strokeWidth={1.5} opacity="0.2" />
+      <path d="M34 20 L36 8 M50 14 L52 4 M66 14 L68 6" stroke="#000" strokeWidth={1} opacity="0.18" />
+      <path d="M36 18 L38 6 M52 12 L54 2 M68 12 L70 4" stroke="#fff" strokeWidth={1.5} opacity="0.2" />
       <path d="M28 26 Q30 16 32 8 M74 26 Q72 16 70 6" stroke="#000" strokeWidth={0.8} opacity="0.14" />
     </g>
   );
@@ -93,8 +93,8 @@ function Mohawk({ fill }: HairPartProps) {
       {[{x:24,y:32},{x:28,y:28},{x:32,y:26},{x:72,y:28},{x:76,y:32},{x:68,y:26}].map((p,i) => (
         <circle key={i} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
       ))}
-      {/* Mohawk strip */}
-      <path d="M38 30 L38 0 Q50 -8 62 0 L62 30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Mohawk strip — clamped within viewBox */}
+      <path d="M38 30 L38 4 Q50 0 62 4 L62 30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <path d="M44 26 L44 6 M50 24 L50 2 M56 26 L56 6" stroke="#000" strokeWidth={0.7} opacity="0.12" />
       <path d="M48 24 L48 4 M52 22 L52 2" stroke="#fff" strokeWidth={1} opacity="0.15" />
     </g>
@@ -124,13 +124,13 @@ function Ponytail({ fill }: HairPartProps) {
       {/* Visible pulled-back texture on cap */}
       <path d="M30 28 Q40 18 50 14 Q60 18 70 28" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.12" />
       <path d="M34 26 Q42 16 50 12 Q58 16 66 26" fill="none" stroke="#fff" strokeWidth={1} opacity="0.14" />
-      {/* Big ponytail swooping right — thick and bouncy */}
-      <path d="M70 26 Q86 16 94 30 Q100 50 92 72 Q88 82 82 76 Q90 58 88 40 Q86 28 78 26"
+      {/* Big ponytail swooping right — thick and bouncy, within viewBox */}
+      <path d="M70 26 Q84 16 90 30 Q96 50 88 72 Q84 80 80 74 Q86 58 86 40 Q84 28 78 26"
         fill={fill} stroke="#000" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
       {/* Ponytail volume highlight */}
-      <path d="M82 30 Q90 44 88 60" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
+      <path d="M80 30 Q86 44 84 60" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
       {/* Strand lines in ponytail */}
-      <path d="M78 32 Q84 44 82 58 M86 34 Q90 48 88 64" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      <path d="M76 32 Q82 44 80 58 M84 34 Q86 48 84 64" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
       {/* Bold hair tie — chunky scrunchie */}
       <ellipse cx="72" cy="26" rx="6" ry="4" fill={fill} stroke="#000" strokeWidth={2.5} />
       <path d="M68 25 Q72 22 76 25" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.25" />
@@ -173,10 +173,10 @@ function Elvis({ fill }: HairPartProps) {
       <path d="M36 10 Q44 0 52 6" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.2" />
       <path d="M34 18 Q42 10 50 14" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.15" />
       <path d="M38 14 Q44 6 50 10 M36 20 Q42 14 48 18" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
-      {/* Sideburns — organic tapered shapes */}
-      <path d="M20 36 Q18 36 17 40 Q16 50 18 58 Q20 62 22 58 Q24 50 23 40 Q22 36 20 36Z"
+      {/* Sideburns — connected to cap, tapered downward */}
+      <path d="M20 34 L18 40 Q16 50 18 58 Q20 62 22 58 Q24 50 22 40 L20 34Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M80 36 Q82 36 83 40 Q84 50 82 58 Q80 62 78 58 Q76 50 77 40 Q78 36 80 36Z"
+      <path d="M80 34 L82 40 Q84 50 82 58 Q80 62 78 58 Q76 50 78 40 L80 34Z"
         fill={fill} stroke="#000" strokeWidth={1.5} strokeLinejoin="round" />
       <path d="M19 42 Q18 48 19 54 M81 42 Q82 48 81 54" stroke="#000" strokeWidth={0.5} opacity="0.15" />
     </g>
@@ -284,18 +284,18 @@ function Pigtails({ fill }: HairPartProps) {
       <path d="M18 34 Q18 14 50 10 Q82 14 82 34" fill={fill} stroke="#000" strokeWidth={S} />
       {/* Part line */}
       <line x1="50" y1="10" x2="50" y2="28" stroke="#000" strokeWidth={1} opacity="0.25" />
-      {/* Left pigtail — flowing tapered shape */}
-      <path d="M18 34 C4 36 0 44 2 54 C4 64 6 72 10 78 C14 84 18 80 16 74 C14 66 10 58 8 50 C6 42 10 36 18 34Z"
+      {/* Left pigtail — within viewBox */}
+      <path d="M18 34 C8 36 4 44 6 54 C8 64 10 72 14 76 C18 80 20 76 18 70 C16 62 12 54 10 48 C8 42 12 36 18 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Right pigtail — flowing tapered shape */}
-      <path d="M82 34 C96 36 100 44 98 54 C96 64 94 72 90 78 C86 84 82 80 84 74 C86 66 90 58 92 50 C94 42 90 36 82 34Z"
+      {/* Right pigtail — within viewBox */}
+      <path d="M82 34 C92 36 96 44 94 54 C92 64 90 72 86 76 C82 80 80 76 82 70 C84 62 88 54 90 48 C92 42 88 36 82 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Strand details */}
-      <path d="M8 42 Q6 52 8 62 M12 44 Q10 54 12 68" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      <path d="M92 42 Q94 52 92 62 M88 44 Q90 54 88 68" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      <path d="M10 42 Q8 52 10 62 M14 44 Q12 54 14 66" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      <path d="M90 42 Q92 52 90 62 M86 44 Q88 54 86 66" stroke="#000" strokeWidth={0.7} opacity="0.1" />
       {/* Highlights */}
-      <path d="M10 40 Q8 50 10 60" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <path d="M90 40 Q92 50 90 60" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M12 40 Q10 50 12 58" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M88 40 Q90 50 88 58" stroke="#fff" strokeWidth={1} opacity="0.12" />
       {/* Hair ties — wrapped band look */}
       <ellipse cx="18" cy="34" rx="5" ry="3.5" fill={fill} stroke="#000" strokeWidth={2} />
       <path d="M15 33 Q18 31 21 33" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.25" />
@@ -308,31 +308,34 @@ function Pigtails({ fill }: HairPartProps) {
 function Sideshave({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Shaved side hints */}
-      <path d="M20 38 Q20 28 30 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.35" />
-      {[{x:22,y:32},{x:25,y:28},{x:29,y:25},{x:24,y:36},{x:28,y:32}].map((p,i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={1.5} fill={fill} opacity={0.3} />
+      {/* Shaved left side — visible buzzed stubble pattern */}
+      <path d="M20 36 Q20 24 32 22" fill="none" stroke={fill} strokeWidth={1.5} opacity="0.3" />
+      {[{x:22,y:34},{x:25,y:30},{x:28,y:27},{x:24,y:37},{x:27,y:33},{x:30,y:29},{x:22,y:28},{x:26,y:24}].map((p,i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.25-(i%3)*0.04} />
       ))}
-      {/* Swept-over volume */}
-      <path d="M34 22 Q60 10 90 30 L92 62 Q90 72 84 68 L84 40 Q66 16 38 26Z"
+      {/* Shave demarcation line */}
+      <path d="M34 22 Q36 28 34 34" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
+      {/* Cap on right side + swept-over volume */}
+      <path d="M34 22 Q50 10 82 18 Q86 22 86 36 L86 58 Q84 66 78 62 L78 38 Q66 20 38 28Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M60 18 Q72 16 82 24" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M56 14 Q68 14 78 22" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M40 24 Q50 16 62 16" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
     </g>
   );
 }
 
 function Dreads({ fill }: HairPartProps) {
-  /* Each dread: [startX, startY, endX, endY, midBulge, width] — varied organically */
+  /* Each dread: [startX, startY, endX, endY, midBulge, width] — within viewBox */
   const dreads: [number,number,number,number,number,number][] = [
-    [10,32, 6,76, -4, 8],
-    [20,30, 16,74, -2, 7],
-    [30,28, 28,72, 2, 6],
-    [40,26, 36,68, -1, 7],
-    [50,25, 50,66, 0, 6],
-    [60,26, 62,70, 2, 7],
-    [70,28, 74,72, -2, 6],
-    [80,30, 84,74, 2, 7],
-    [90,32, 92,70, 4, 8],
+    [16,32, 14,72, -2, 7],
+    [24,30, 20,70, -2, 6],
+    [32,28, 30,68, 2, 6],
+    [40,26, 38,66, -1, 6],
+    [50,25, 50,64, 0, 6],
+    [60,26, 62,66, 2, 6],
+    [68,28, 70,68, -2, 6],
+    [76,30, 80,70, 2, 6],
+    [84,32, 86,72, 2, 7],
   ];
   return (
     <g>
@@ -389,21 +392,21 @@ function Braids({ fill }: HairPartProps) {
       <path d="M10 34 Q10 12 50 8 Q90 12 90 34" fill={fill} stroke="#000" strokeWidth={S} />
       {/* Part line */}
       <line x1="50" y1="8" x2="50" y2="28" stroke="#000" strokeWidth={1} opacity="0.2" />
-      {/* Left braid — woven overlapping segments */}
-      <g>{braidSegments(14, 40, 1)}</g>
+      {/* Left braid — pulled inward */}
+      <g>{braidSegments(18, 40, 1)}</g>
       {/* Left braid center line */}
-      <path d="M14 40 Q12 54 14 68 Q12 78 14 86" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
-      <path d="M16 44 Q14 56 16 70" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
-      {/* Right braid — woven overlapping segments */}
-      <g>{braidSegments(86, 40, -1)}</g>
+      <path d="M18 40 Q16 54 18 68 Q16 76 18 82" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
+      <path d="M20 44 Q18 56 20 68" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+      {/* Right braid — pulled inward */}
+      <g>{braidSegments(82, 40, -1)}</g>
       {/* Right braid center line */}
-      <path d="M86 40 Q88 54 86 68 Q88 78 86 86" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
-      <path d="M84 44 Q86 56 84 70" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
-      {/* Beads at ends */}
-      <ellipse cx="14" cy="88" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
-      <ellipse cx="13" cy="87" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
-      <ellipse cx="86" cy="88" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
-      <ellipse cx="85" cy="87" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
+      <path d="M82 40 Q84 54 82 68 Q84 76 82 82" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
+      <path d="M80 44 Q82 56 80 68" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+      {/* Beads at ends — within viewBox */}
+      <ellipse cx="18" cy="84" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
+      <ellipse cx="17" cy="83" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
+      <ellipse cx="82" cy="84" rx={4} ry={3.5} fill={fill} stroke="#000" strokeWidth={1.8} />
+      <ellipse cx="81" cy="83" rx={1.2} ry={0.8} fill="#fff" opacity="0.25" />
     </g>
   );
 }
@@ -449,13 +452,13 @@ function Twintails({ fill }: HairPartProps) {
       <path d="M14 34 Q14 12 50 8 Q86 12 86 34" fill={fill} stroke="#000" strokeWidth={S} />
       {/* Part */}
       <line x1="50" y1="8" x2="50" y2="26" stroke="#000" strokeWidth={1} opacity="0.3" />
-      {/* Left tail */}
-      <path d="M16 38 Q6 46 4 60 Q2 78 8 90 Q14 98 20 86 Q12 70 16 56 Q18 48 24 42"
+      {/* Left tail — within viewBox */}
+      <path d="M16 38 Q8 46 6 58 Q4 72 10 82 Q16 90 20 80 Q14 66 16 54 Q18 48 24 42"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Right tail */}
-      <path d="M84 38 Q94 46 96 60 Q98 78 92 90 Q86 98 80 86 Q88 70 84 56 Q82 48 76 42"
+      {/* Right tail — within viewBox */}
+      <path d="M84 38 Q92 46 94 58 Q96 72 90 82 Q84 90 80 80 Q86 66 84 54 Q82 48 76 42"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M10 52 Q8 64 10 74 M90 52 Q92 64 90 74" stroke="#fff" strokeWidth={1} opacity="0.12" />
+      <path d="M10 52 Q8 62 10 70 M90 52 Q92 62 90 70" stroke="#fff" strokeWidth={1} opacity="0.12" />
       {/* Hair ties */}
       <circle cx="18" cy="34" r="5" fill={fill} stroke="#000" strokeWidth={2} />
       <circle cx="18" cy="34" r="2.5" fill="#fff" opacity="0.2" />
@@ -493,8 +496,8 @@ function FlameHair({ fill }: HairPartProps) {
           <stop offset="100%" stopColor="#FFD600" />
         </linearGradient>
       </defs>
-      {/* Flame tongues emerging from head — static shape, no jitter */}
-      <path d="M16 40 C14 28 20 18 30 8 C26 20 32 12 38 2 C36 18 44 8 50 -4 C56 8 64 18 62 2 C66 12 74 20 70 8 C80 18 86 28 84 40"
+      {/* Flame tongues emerging from head — within viewBox */}
+      <path d="M16 40 C14 28 20 18 30 8 C26 20 32 12 38 2 C36 18 44 8 50 0 C56 8 64 18 62 2 C66 12 74 20 70 8 C80 18 86 28 84 40"
         fill="url(#flameHairGrad)" stroke="#000" strokeWidth={S} />
       {/* Inner flame glow lines — slow gentle pulse */}
       <path d="M28 36 C30 24 36 16 40 8 C38 22 44 14 48 4" fill="none" stroke="#FFD600" strokeWidth={1.5}>
@@ -566,8 +569,8 @@ function NeonHair(_props: HairPartProps) {
       </defs>
       {/* Cap */}
       <path d="M20 36 Q20 22 50 18 Q80 22 80 36" fill="url(#neonHairGrad)" stroke="#000" strokeWidth={S} />
-      {/* Neon spikes */}
-      <path d="M22 32 L26 4 L34 26 L40 -2 L50 22 L58 -4 L64 20 L72 2 L78 32"
+      {/* Neon spikes — within viewBox */}
+      <path d="M22 32 L26 6 L34 26 L40 2 L50 22 L58 0 L64 20 L72 4 L78 32"
         fill="url(#neonHairGrad)" stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Glow streaks — slow soft pulse */}
       {[{x1:28,y1:24,x2:28,y2:10,b:0},{x1:50,y1:20,x2:50,y2:6,b:1.5},{x1:70,y1:24,x2:68,y2:8,b:3}].map((l,i) => (
@@ -615,18 +618,18 @@ function Undercut({ fill }: HairPartProps) {
         {x:70,y:28},{x:73,y:31},{x:76,y:34},{x:74,y:36},{x:67,y:30}].map((p,i) => (
         <circle key={i} cx={p.x} cy={p.y} r={1.3} fill={fill} opacity={0.22-(i%3)*0.03} />
       ))}
-      {/* Dramatic slicked-back top — wider and taller than before */}
-      <path d="M28 28 Q26 6 50 0 Q74 6 72 28Z"
+      {/* Dramatic slicked-back top — overlaps face circle */}
+      <path d="M28 34 Q26 6 50 0 Q74 6 72 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Inner solid fill */}
-      <path d="M32 26 Q30 10 50 4 Q70 10 68 26Z" fill={fill} stroke="none" />
+      <path d="M32 32 Q30 10 50 4 Q70 10 68 32Z" fill={fill} stroke="none" />
       {/* Slick-back comb lines — strong directional texture */}
       <path d="M38 22 Q42 10 50 4 M62 22 Q58 10 50 4" fill="none" stroke="#000" strokeWidth={1.2} opacity="0.16" />
       <path d="M34 24 Q38 14 46 6 M66 24 Q62 14 54 6" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
       <path d="M42 20 Q46 10 50 2" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.18" />
       <path d="M58 20 Q54 10 50 2" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.12" />
       {/* Sharp undercut line separating top from shaved sides */}
-      <path d="M28 28 Q40 24 50 22 Q60 24 72 28" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
+      <path d="M28 34 Q40 28 50 26 Q60 28 72 34" fill="none" stroke="#000" strokeWidth={1} opacity="0.2" />
     </g>
   );
 }
@@ -688,11 +691,11 @@ function Fade({ fill }: HairPartProps) {
       {[{x:25,y:31},{x:28,y:29},{x:31,y:27},{x:75,y:31},{x:72,y:29},{x:69,y:27}].map((p,i) => (
         <circle key={`m${i}`} cx={p.x} cy={p.y} r={1.1} fill={fill} opacity={0.3} />
       ))}
-      {/* Tall swept-back top volume — anchored at y=28 sides */}
-      <path d="M30 28 Q28 6 50 0 Q72 6 70 28Z"
+      {/* Tall swept-back top volume — overlaps face circle */}
+      <path d="M30 34 Q28 6 50 0 Q72 6 70 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Inner volume fill for solid look */}
-      <path d="M34 26 Q34 10 50 4 Q66 10 66 26Z" fill={fill} stroke="none" />
+      <path d="M34 32 Q34 10 50 4 Q66 10 66 32Z" fill={fill} stroke="none" />
       {/* Swept-back texture lines radiating from crown */}
       <path d="M40 22 Q44 10 50 4 M60 22 Q56 10 50 4" fill="none" stroke="#000" strokeWidth={1} opacity="0.14" />
       <path d="M36 24 Q40 12 48 6 M64 24 Q60 12 52 6" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
@@ -700,7 +703,7 @@ function Fade({ fill }: HairPartProps) {
       <path d="M42 6 Q50 0 58 6" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.2" />
       <path d="M44 14 Q50 8 56 14" fill="none" stroke="#fff" strokeWidth={1} opacity="0.15" />
       {/* Fade demarcation line */}
-      <path d="M30 28 Q40 24 50 22 Q60 24 70 28" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M30 34 Q40 28 50 26 Q60 28 70 34" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
     </g>
   );
 }
@@ -846,13 +849,13 @@ function FrenchBob({ fill }: HairPartProps) {
       {/* Short blunt bob — chin-length with heavy straight-across bangs */}
       <path d="M14 36 Q14 14 50 10 Q86 14 86 36 L86 52 Q84 58 78 54 L78 40 Q50 26 22 40 L22 54 Q16 58 14 52Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Heavy blunt bangs — thick fringe across forehead */}
-      <path d="M18 36 Q18 14 50 10 Q82 14 82 36 L82 40 L18 40Z"
+      {/* Heavy blunt bangs — thick fringe above eye line */}
+      <path d="M18 36 Q18 14 50 10 Q82 14 82 36 L82 38 L18 38Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Bang cut line */}
-      <line x1="18" y1="40" x2="82" y2="40" stroke="#000" strokeWidth={1.2} opacity="0.25" />
+      <line x1="18" y1="38" x2="82" y2="38" stroke="#000" strokeWidth={1.2} opacity="0.25" />
       {/* Strand details */}
-      <path d="M32 14 L32 38 M44 12 L44 38 M56 12 L56 38 M68 14 L68 38" stroke="#000" strokeWidth={0.4} opacity="0.06" />
+      <path d="M32 14 L32 36 M44 12 L44 36 M56 12 L56 36 M68 14 L68 36" stroke="#000" strokeWidth={0.4} opacity="0.06" />
       {/* Highlights */}
       <path d="M34 14 Q46 8 50 10 Q54 8 66 14" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
       <path d="M18 42 Q18 48 20 52 M82 42 Q82 48 80 52" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
@@ -891,11 +894,11 @@ function Shag({ fill }: HairPartProps) {
 function FlatTop({ fill }: HairPartProps) {
   return (
     <g>
-      {/* Tall flat-top block — perfectly flat on top, tapered sides anchored at y=28 */}
-      <path d="M22 28 L20 12 Q20 4 26 4 L74 4 Q80 4 80 12 L78 28Z"
+      {/* Tall flat-top block — sides overlap face circle at y=34 */}
+      <path d="M22 34 L20 12 Q20 4 26 4 L74 4 Q80 4 80 12 L78 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Inner fill to ensure solidity */}
-      <path d="M24 26 L22 14 Q22 6 28 6 L72 6 Q78 6 78 14 L76 26Z" fill={fill} stroke="none" />
+      <path d="M24 32 L22 14 Q22 6 28 6 L72 6 Q78 6 78 14 L76 32Z" fill={fill} stroke="none" />
       {/* Flat top edge — bold emphasis */}
       <line x1="26" y1="4" x2="74" y2="4" stroke="#000" strokeWidth={2} opacity="0.35" />
       {/* Angular side edges */}
@@ -985,7 +988,7 @@ function Quiff({ fill }: HairPartProps) {
         <circle key={i} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
       ))}
       {/* Big volume at front — the signature quiff */}
-      <path d="M30 26 Q28 8 42 0 Q50 -2 58 0 Q72 8 70 26 Q62 14 50 12 Q38 14 30 26Z"
+      <path d="M30 26 Q28 8 42 1 Q50 0 58 1 Q72 8 70 26 Q62 14 50 12 Q38 14 30 26Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Back taper */}
       <path d="M34 24 Q36 16 50 12 Q64 16 66 24"
@@ -1010,11 +1013,11 @@ function FadeCurly({ fill }: HairPartProps) {
       {[{x:25,y:31},{x:29,y:29},{x:32,y:27},{x:75,y:31},{x:71,y:29},{x:68,y:27}].map((p,i) => (
         <circle key={`m${i}`} cx={p.x} cy={p.y} r={1.1} fill={fill} opacity={0.3} />
       ))}
-      {/* Tall curly dome — solid fill, no inner cutout */}
-      <path d="M28 28 Q28 6 40 1 Q46 0 50 0 Q54 0 60 1 Q72 6 72 28Z"
+      {/* Tall curly dome — overlaps face circle */}
+      <path d="M28 34 Q28 6 40 1 Q46 0 50 0 Q54 0 60 1 Q72 6 72 34Z"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Inner solid fill */}
-      <path d="M30 26 Q32 8 50 2 Q68 8 70 26Z" fill={fill} stroke="none" />
+      <path d="M30 32 Q32 8 50 2 Q68 8 70 32Z" fill={fill} stroke="none" />
       {/* Curly bumps row 1 — top crown, bold */}
       <path d="M34 6 Q37 1 42 0 Q44 0 46 2" fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
       <path d="M44 1 Q48 0 50 0 Q52 0 56 1" fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
@@ -1028,7 +1031,7 @@ function FadeCurly({ fill }: HairPartProps) {
       <path d="M44 11 Q48 8 51 9 Q54 8 56 11" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
       <path d="M56 11 Q58 8 61 10 Q64 14 66 20" fill={fill} stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
       {/* Fade demarcation line */}
-      <path d="M28 28 Q40 24 50 22 Q60 24 72 28" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M28 34 Q40 28 50 26 Q60 28 72 34" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
       {/* Highlights */}
       <path d="M42 1 Q48 0 54 1" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.2" />
       <path d="M36 8 Q42 4 48 6" fill="none" stroke="#fff" strokeWidth={1} opacity="0.16" />
@@ -1359,6 +1362,49 @@ function HimecutFront({ fill }: HairPartProps) {
   );
 }
 
+function LobFront({ fill }: HairPartProps) {
+  return (<g>
+    {/* Side curtain strands framing face */}
+    <path d="M14 34 L12 58 Q12 64 18 62 L22 62 Q26 64 26 58 L26 42 Q20 32 14 34Z"
+      fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+    <path d="M86 34 L88 58 Q88 64 82 62 L78 62 Q74 64 74 58 L74 42 Q80 32 86 34Z"
+      fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+    <path d="M16 38 L14 54 M84 38 L86 54" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+  </g>);
+}
+
+function ShagFront({ fill }: HairPartProps) {
+  return (<g>
+    {/* Choppy fringe chunks across forehead */}
+    <path d="M18 34 Q22 22 36 18 L40 26 L46 18 L50 24 L54 18 L60 26 L64 18 Q78 22 82 34 L74 38 L64 32 L56 36 L50 30 L44 36 L36 32 L26 38Z"
+      fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+    <path d="M42 22 Q48 18 54 22" fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.14" />
+  </g>);
+}
+
+function CurlyBangsFront({ fill }: HairPartProps) {
+  return (
+    <g>
+      {/* Bouncy curly fringe across forehead */}
+      <path d="M20 36 C18 30 22 24 30 26 C34 22 40 22 44 26 C48 22 54 20 58 24 C62 20 68 22 72 26 C78 24 82 30 80 36 L74 38 Q68 32 60 34 Q50 30 40 34 Q32 32 26 38Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M32 26 C34 24 38 24 40 26 M56 24 C58 22 62 22 64 24" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M38 26 Q44 22 50 24" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+    </g>
+  );
+}
+
+function SideSweptFront({ fill }: HairPartProps) {
+  return (<g>
+    {/* Swept fringe falling to the left */}
+    <path d="M16 30 Q22 18 40 20 Q52 18 60 24 L54 32 L46 26 L38 30 L30 26 L22 32Z"
+      fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+    <path d="M28 22 Q38 18 48 20" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+    {/* Left side volume overlay */}
+    <path d="M8 36 Q6 44 8 52 Q10 56 12 50 L12 38Z" fill={fill} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
+  </g>);
+}
+
 /** Front-layer hair parts — rendered ON TOP of face */
 export const HAIR_FRONT_PARTS: Partial<Record<keyof typeof HAIR_PARTS, FC<HairPartProps>>> = {
   curly: CurlyFront,
@@ -1382,4 +1428,8 @@ export const HAIR_FRONT_PARTS: Partial<Record<keyof typeof HAIR_PARTS, FC<HairPa
   curtainBangs: CurtainBangsFront,
   halfUp: HalfUpFront,
   himecut: HimecutFront,
+  lob: LobFront,
+  shag: ShagFront,
+  curlyBangs: CurlyBangsFront,
+  sideSwept: SideSweptFront,
 };

@@ -251,8 +251,8 @@ export interface Game {
 
 export interface RoomPlayerAvatar {
   avatarImage?: string;
-  emoji?: string;
-  color?: string;
+  customAvatar?: CustomAvatarConfig;
+  username?: string;
 }
 
 export interface ActiveRoom {

@@ -527,6 +527,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
+                {/* CrazyGames SDK must load in <head> with beforeInteractive
+                    so it's detected by their QA tool before hydration */}
+                <CrazyGamesScript />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Skip to main content link for keyboard/screen reader users */}
@@ -542,7 +545,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <GoogleAdSense />
-                <CrazyGamesScript />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}

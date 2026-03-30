@@ -18,7 +18,7 @@ export function IndexNowPanel() {
   const [routesLoading, setRoutesLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/routes')
+    fetch('/api/indexnow-routes')
       .then(res => res.json())
       .then(data => setRoutes(data.routes || []))
       .catch(() => setRoutes([]))

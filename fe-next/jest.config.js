@@ -147,5 +147,21 @@ const customJestConfig = {
   ],
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig);
+// Chain the vitest→jest preprocessor before Next.js SWC transform.
+// This ensures vi.mock() calls get hoisted correctly by Jest.
+const baseConfig = createJestConfig(customJestConfig);
+
+module.exports = async () => {
+  const config = await baseConfig();
+
+  // Replace the SWC transformer with our wrapper that preprocesses vitest syntax
+  const transform = config.transform || {};
+  for (const [pattern, transformer] of Object.entries(transform)) {
+    if (Array.isArray(transformer) && transformer[0].includes('jest-transformer')) {
+      // Replace Next.js SWC transformer with our wrapper (which delegates to it)
+      transform[pattern] = ['<rootDir>/jest-vitest-transform.js', transformer[1]];
+    }
+  }
+  config.transform = transform;
+  return config;
+};

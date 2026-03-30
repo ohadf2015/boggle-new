@@ -11,6 +11,35 @@
 import '@testing-library/jest-dom';
 
 // ==========================================
+// Vitest globals compatibility
+// ==========================================
+// Some test files use `vi.fn()` etc. without importing from 'vitest'.
+// Provide a global `vi` that delegates to jest for those files.
+// (Files that DO import from 'vitest' are handled by jest-vitest-transform.js)
+if (typeof globalThis.vi === 'undefined') {
+  globalThis.vi = {
+    fn: (...args) => jest.fn(...args),
+    mock: (...args) => jest.mock(...args),
+    unmock: (...args) => jest.unmock(...args),
+    spyOn: (...args) => jest.spyOn(...args),
+    mocked: (fn) => fn,
+    resetAllMocks: () => jest.resetAllMocks(),
+    clearAllMocks: () => jest.clearAllMocks(),
+    restoreAllMocks: () => jest.restoreAllMocks(),
+    useFakeTimers: (...args) => jest.useFakeTimers(...args),
+    useRealTimers: () => jest.useRealTimers(),
+    advanceTimersByTime: (ms) => jest.advanceTimersByTime(ms),
+    runAllTimers: () => jest.runAllTimers(),
+    runOnlyPendingTimers: () => jest.runOnlyPendingTimers(),
+    setSystemTime: (date) => jest.setSystemTime(date),
+    resetModules: () => jest.resetModules(),
+    hoisted: (factory) => factory(),
+    stubGlobal: (name, value) => { globalThis[name] = value; },
+    dynamicImportSettled: () => Promise.resolve(),
+  };
+}
+
+// ==========================================
 // Mock Sentry
 // ==========================================
 

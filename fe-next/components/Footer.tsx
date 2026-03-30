@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const KofiIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
@@ -22,6 +23,7 @@ interface FooterProps {
 
 export default function Footer({ className }: FooterProps): React.ReactElement {
   const { t, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   return (
     <footer
@@ -75,7 +77,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </ul>
           </nav>
 
-          {/* Connect */}
+          {/* Connect — hidden on CrazyGames (external links prohibited) */}
+          {!isOnCrazyGamesPlatform && (
           <div>
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
               {t('footer.connect', 'Connect')}
@@ -108,6 +111,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               </li>
             </ul>
           </div>
+          )}
         </div>
 
         {/* Bottom bar */}

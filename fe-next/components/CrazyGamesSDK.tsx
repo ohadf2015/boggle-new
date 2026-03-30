@@ -228,48 +228,57 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
  * it's running inside a CrazyGames iframe and reports environment
  * accordingly ('crazygames' | 'disabled').
  */
-/**
- * Initialize the SDK as soon as the script loads — regardless of which page
- * the player lands on. CrazyGames QA requires init() to be called early;
- * deferring it until CrazyGamesProvider mounts (game routes only) causes
- * "SDK not detected" failures when entering via the landing page.
- */
-async function initSDKOnLoad() {
-  const sdk = window.CrazyGames?.SDK;
-  if (!sdk) return;
-
-  try {
-    await sdk.init();
-    const env = await sdk.getEnvironment();
-    window.__crazyGamesEnvironment = env;
-
-    if (env === 'crazygames') {
-      document.body.classList.add('crazygames-embed');
-      sdk.game.sdkGameLoadingStart();
-      const signalReady = () => sdk.game?.sdkGameLoadingStop();
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(signalReady, { timeout: 3000 });
-      } else {
-        setTimeout(signalReady, 1000);
-      }
-    }
-  } catch {
-    // SDK init failed — game continues without SDK features
-  }
-}
-
 export function CrazyGamesScript() {
   if (CRAZYGAMES_FORCE_DISABLED) {
     return null;
   }
 
+  // Use beforeInteractive so the SDK loads in <head> before hydration.
+  // CrazyGames QA tool checks for SDK presence very early — afterInteractive
+  // is too late and causes "SDK not currently detected" failures.
+  // Note: beforeInteractive doesn't support onLoad, so we use an inline
+  // bootstrap script to call init() as soon as the SDK is available.
+  // Safe: content is a static string, no user input involved.
   return (
-    <Script
-      src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
-      strategy="afterInteractive"
-      id="crazygames-sdk"
-      onLoad={() => { initSDKOnLoad(); }}
-    />
+    <>
+      <Script
+        src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
+        strategy="beforeInteractive"
+        id="crazygames-sdk"
+      />
+      <Script
+        id="crazygames-sdk-init"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+(function() {
+  function tryInit() {
+    if (window.CrazyGames && window.CrazyGames.SDK) {
+      window.CrazyGames.SDK.init().then(function() {
+        return window.CrazyGames.SDK.getEnvironment();
+      }).then(function(env) {
+        window.__crazyGamesEnvironment = env;
+        if (env === 'crazygames') {
+          document.body && document.body.classList.add('crazygames-embed');
+          window.CrazyGames.SDK.game.sdkGameLoadingStart();
+          var signalReady = function() { window.CrazyGames.SDK.game.sdkGameLoadingStop(); };
+          if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(signalReady, { timeout: 3000 });
+          } else {
+            setTimeout(signalReady, 1000);
+          }
+        }
+      }).catch(function() {});
+    } else {
+      setTimeout(tryInit, 50);
+    }
+  }
+  tryInit();
+})();
+          `,
+        }}
+      />
+    </>
   );
 }
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, ChevronRight, Eye } from 'lucide-react';
+import { ArrowLeft, Zap, Ghost, RefreshCw, HelpCircle, Sword, Bomb, Search, ChevronRight, Eye, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -17,6 +17,7 @@ import HowToPlay from '@/components/HowToPlay';
 import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeCard';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
+import AvatarStack from '@/components/multiplayer/AvatarStack';
 import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 
 // ==================== Animation Variants ====================
@@ -368,67 +369,68 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                         whileTap={{ scale: 0.98 }}
                         className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
                       >
-                        {/* Mode icon box */}
-                        <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0 shadow-hard-sm`}>
-                          <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
-                        </div>
-
-                        {/* Player avatar stack */}
-                        {room.playerAvatars && room.playerAvatars.length > 0 && (
-                          <div className="flex -space-x-3 rtl:space-x-reverse flex-shrink-0">
-                            {room.playerAvatars.slice(0, 4).map((av, i) => (
-                              <div
-                                key={i}
-                                className="w-6 h-6 rounded-full border-2 border-neo-black flex items-center justify-center text-[8px] overflow-hidden"
-                                style={{ backgroundColor: av.color || 'var(--neo-navy)' }}
-                              >
-                                {av.emoji || '👤'}
-                              </div>
-                            ))}
-                            {(room.playerCount || 0) > 4 && (
-                              <div className="w-6 h-6 rounded-full border-2 border-neo-black bg-neo-navy flex items-center justify-center text-[6px] font-black text-white">
-                                +{(room.playerCount || 0) - 4}
-                              </div>
-                            )}
+                        {/* Left: Mode icon + info */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* Mode icon box */}
+                          <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center flex-shrink-0 shadow-hard-sm`}>
+                            <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
                           </div>
-                        )}
 
-                        {/* Room info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <h4 className="font-neo-display font-black text-neo-white text-sm uppercase truncate leading-none">
-                              {room.roomName || room.gameCode}
-                            </h4>
-                            {room.gameState === 'in-progress' && (
-                              <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse flex-shrink-0" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[7px] font-bold text-white/40 uppercase">
-                              {LANGUAGE_FLAGS[room.language] || '🎮'} {mode.label}
-                            </span>
-                            <span className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className={cn(
-                              'text-[7px] font-bold uppercase',
-                              room.maxPlayers && room.playerCount >= room.maxPlayers
-                                ? 'text-neo-red/70'
-                                : 'text-white/40'
-                            )}>
-                              {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
-                            </span>
-                            {room.gameState === 'in-progress' && (
-                              <>
-                                <span className="w-1 h-1 rounded-full bg-white/20" />
-                                <span className={`text-[7px] font-bold ${mode.textColor} uppercase italic`}>
+                          {/* Room info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-neo-display font-black text-neo-white text-sm uppercase truncate leading-none">
+                                {room.roomName || room.gameCode}
+                              </h4>
+                              {room.gameState === 'in-progress' && (
+                                <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse flex-shrink-0" />
+                              )}
+                            </div>
+
+                            {/* Mode badge + language + player count row */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={cn(
+                                'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wide border',
+                                `${mode.iconBg}/20 ${mode.textColor} border-current/20`,
+                              )}>
+                                <ModeIcon className="w-2.5 h-2.5" />
+                                {mode.label}
+                              </span>
+                              <span className="text-[8px] font-bold text-white/40">
+                                {LANGUAGE_FLAGS[room.language] || '🎮'}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="w-2.5 h-2.5 text-white/30" />
+                                <span className={cn(
+                                  'text-[8px] font-black',
+                                  room.maxPlayers && room.playerCount >= room.maxPlayers
+                                    ? 'text-neo-red/70'
+                                    : 'text-white/50'
+                                )}>
+                                  {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''}
+                                </span>
+                              </span>
+                              {room.gameState === 'in-progress' && (
+                                <span className={`text-[7px] font-black ${mode.textColor} uppercase italic`}>
                                   {t('multiplayerFlow.roomList.inProgress')}
                                 </span>
-                              </>
-                            )}
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        {/* Chevron */}
-                        <ChevronRight className="w-4 h-4 text-white/20 flex-shrink-0 rtl:rotate-180" />
+                        {/* Right: Avatar stack + chevron */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {room.playerAvatars && room.playerAvatars.length > 0 && (
+                            <AvatarStack
+                              avatars={room.playerAvatars}
+                              totalCount={room.playerCount || 0}
+                              maxVisible={3}
+                              size="sm"
+                            />
+                          )}
+                          <ChevronRight className="w-4 h-4 text-white/20 flex-shrink-0 rtl:rotate-180 group-hover:text-white/40 transition-colors" />
+                        </div>
                       </motion.button>
                     );
                   })}

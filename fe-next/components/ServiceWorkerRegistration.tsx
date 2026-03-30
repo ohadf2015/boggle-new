@@ -10,6 +10,10 @@ import { useEffect } from 'react';
  */
 export function ServiceWorkerRegistration() {
   useEffect(() => {
+    // Skip SW registration on CrazyGames — iframe context conflicts with SW
+    if (typeof window !== 'undefined' && window.__crazyGamesEnvironment === 'crazygames') {
+      return undefined;
+    }
     if (
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
