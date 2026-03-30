@@ -91,6 +91,7 @@ const WorldNode = memo(function WorldNode({
   masteryTier?: MasteryTier;
 }): React.JSX.Element {
   const { t } = useLanguage();
+  const [showStarGate, setShowStarGate] = useState(false);
   const isFinalWorld = world.id === 10;
   const isComplete = completedLevels === LEVELS_PER_WORLD;
   const worldName = t(`adventure.worlds.${world.name}`) || world.name;
@@ -191,8 +192,7 @@ const WorldNode = memo(function WorldNode({
           )}
 
           <AdaptiveMotion.button
-            onClick={onClick}
-            disabled={!isUnlocked}
+            onClick={isUnlocked ? onClick : () => setShowStarGate(true)}
             data-testid={`world-${world.id}`}
             aria-label={isUnlocked
               ? `${t('adventure.playWorld')} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars')}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted')}`
@@ -261,8 +261,16 @@ const WorldNode = memo(function WorldNode({
                 <div className="absolute inset-0 rounded-full" style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.4)' }} />
               )}
               {!isUnlocked && (
-                <div className="absolute inset-0 flex items-center justify-center bg-neo-black/50">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-neo-black/50">
                   <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white/60" />
+                  {showStarGate && (() => {
+                    const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
+                    return starsNeeded > 0 ? (
+                      <span className="text-[9px] font-bold text-neo-yellow mt-1 text-center px-1 leading-tight">
+                        {t('adventure.starsNeeded', { count: starsNeeded })}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
               )}
               {fogState === 'heavy' && (

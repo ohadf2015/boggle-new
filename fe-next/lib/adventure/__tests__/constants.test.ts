@@ -141,9 +141,9 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(1)).toBe(0);
     });
 
-    it('should require 11 stars per world (with 7 levels = 21 max stars)', () => {
-      // World 2 requires 11 stars (~52% of world 1 max)
-      expect(getWorldUnlockRequirement(2)).toBe(11);
+    it('should require stars per world (W2 lowered to 7, others use 11 per world)', () => {
+      // World 2 requires 7 stars (lowered so 1-star-avg players can progress)
+      expect(getWorldUnlockRequirement(2)).toBe(7);
       // World 3 requires 22 stars
       expect(getWorldUnlockRequirement(3)).toBe(22);
       // World 4 requires 33 stars
@@ -155,9 +155,9 @@ describe('World Unlock Functions', () => {
       expect(getWorldUnlockRequirement(10)).toBe(99);
     });
 
-    it('should use formula (N-1)*11 for all worlds, preventing skip-ahead', () => {
-      // Regression: W10 previously required only 45 stars, letting players skip W3-W9
-      for (let world = 2; world <= WORLDS_COUNT; world++) {
+    it('should use formula (N-1)*11 for worlds 3-10, W2 special-cased to 7', () => {
+      expect(getWorldUnlockRequirement(2)).toBe(7);
+      for (let world = 3; world <= WORLDS_COUNT; world++) {
         expect(getWorldUnlockRequirement(world)).toBe((world - 1) * STARS_TO_UNLOCK_NEXT_WORLD);
       }
     });
@@ -174,9 +174,9 @@ describe('World Unlock Functions', () => {
       expect(isWorldUnlocked(1, 0)).toBe(true);
     });
 
-    it('should unlock world 2 with 11+ stars', () => {
-      expect(isWorldUnlocked(2, 10)).toBe(false);
-      expect(isWorldUnlocked(2, 11)).toBe(true);
+    it('should unlock world 2 with 7+ stars', () => {
+      expect(isWorldUnlocked(2, 6)).toBe(false);
+      expect(isWorldUnlocked(2, 7)).toBe(true);
       expect(isWorldUnlocked(2, 21)).toBe(true);
     });
 

@@ -75,14 +75,19 @@ function validateRequestBody(body: Record<string, unknown>): {
     return { valid: false, error: 'Invalid stars: must be between 0 and 3' };
   }
 
-  // Validate score (non-negative)
+  // Validate score (non-negative, capped per world to prevent cheating)
   if (score < 0) {
     return { valid: false, error: 'Invalid score: must be non-negative' };
   }
+  // Score cap: max ~50,000 prevents leaderboard pollution from cheaters
+  const MAX_SCORE = 50000;
+  if (score > MAX_SCORE) {
+    return { valid: false, error: `Invalid score: exceeds maximum of ${MAX_SCORE}` };
+  }
 
-  // Validate words (non-negative)
-  if (words < 0) {
-    return { valid: false, error: 'Invalid words: must be non-negative' };
+  // Validate words (non-negative, reasonable cap)
+  if (words < 0 || words > 500) {
+    return { valid: false, error: 'Invalid words: must be between 0 and 500' };
   }
 
   return {

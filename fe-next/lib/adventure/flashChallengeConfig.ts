@@ -78,7 +78,11 @@ export function getFlashChallengeForWorld(worldId: number, locale: string = 'en'
   else if (worldId <= 8) pool = WORLD_POOLS.harder;
   else pool = WORLD_POOLS.expert;
 
-  if (locale === 'en') return pool;
+  const filteredPool = locale === 'en' ? pool : pool.filter(c => !ENGLISH_ONLY_TYPES.has(c.type));
 
-  return pool.filter(c => !ENGLISH_ONLY_TYPES.has(c.type));
+  return filteredPool.map(c => ({
+    ...c,
+    rewardCoins: Math.round(c.rewardCoins * (1 + (worldId - 1) * 0.15)),
+    rewardScore: Math.round(c.rewardScore * (1 + (worldId - 1) * 0.15)),
+  }));
 }

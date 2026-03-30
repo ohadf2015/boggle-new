@@ -175,6 +175,52 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </AdaptiveMotion.div>
       )}
 
+      {/* Defeat Explanation — shows WHY the player failed (stars === 0) */}
+      {isFailed && stars === 0 && objectives.length > 0 && (() => {
+        // Find the objective furthest from completion for the contextual tip
+        const incompleteObjectives = objectives.filter((o) => !o.isComplete);
+        const worstObjective = incompleteObjectives.reduce((worst, obj) => {
+          const worstRatio = (worst.current ?? 0) / worst.target;
+          const objRatio = (obj.current ?? 0) / obj.target;
+          return objRatio < worstRatio ? obj : worst;
+        }, incompleteObjectives[0]);
+
+        return (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-4 border-3 border-neo-red rounded-neo bg-neo-red/10 p-4"
+            data-testid="defeat-explainer"
+          >
+            <p className="text-neo-red font-bold text-sm uppercase tracking-wide mb-3">
+              {t('adventure.defeatExplainer.title')}
+            </p>
+            <ul className="space-y-2 mb-3">
+              {objectives.map((obj) => (
+                <li key={obj.type} className="flex items-center justify-between text-sm font-bold">
+                  <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white/60'}>
+                    {obj.isComplete ? <Check className="w-3 h-3 inline me-1" /> : <X className="w-3 h-3 inline me-1" />}
+                    {t(OBJECTIVE_TRANSLATION_KEYS[obj.type], { target: obj.target })}
+                  </span>
+                  <span className={cn(
+                    'font-mono text-xs',
+                    obj.isComplete ? 'text-neo-lime' : 'text-neo-red'
+                  )}>
+                    {obj.current ?? 0} / {obj.target}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {worstObjective && (
+              <p className="text-neo-white/70 text-xs italic border-t border-neo-red/30 pt-2">
+                💡 {t(`adventure.defeatExplainer.tip.${worstObjective.type}`)}
+              </p>
+            )}
+          </AdaptiveMotion.div>
+        );
+      })()}
+
       {/* Near-miss feedback — encouraging messages when close to passing */}
       {isFailed && (() => {
         const nearMisses = getNearMissMessages(objectives);

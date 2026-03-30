@@ -2,7 +2,7 @@
  * useAdventureBossNew — Simplified Boss Battle Hook
  *
  * Single unified hook managing the entire boss fight:
- * - HP system: baseHP = worldId * 100
+ * - HP system: baseHP from BOSS_HP lookup (gentler curve)
  * - 3 phases: Normal (100-50%), Angry (50-25%), Desperate (<25%)
  * - Simple attacks: lockTiles, scramble, timePenalty
  * - Attack frequency scales with phase
@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { getBossConfig, getBossTaunt } from '@/lib/adventure/bossConfig';
+import { getBossConfig, getBossTaunt, BOSS_HP } from '@/lib/adventure/bossConfig';
 import type { BossConfig, BossTauntEvent } from '@/types/boss';
 
 // ==============================================
@@ -108,8 +108,8 @@ const PHASE_DAMAGE: Record<BossPhaseNew, number> = {
 function derivePhase(hp: number, maxHP: number, phaseThresholds?: { angry: number; desperate: number }): BossPhaseNew {
   if (maxHP <= 0) return 'normal';
   const pct = (hp / maxHP) * 100;
-  const desperateAt = phaseThresholds?.desperate ?? 33;
-  const angryAt = phaseThresholds?.angry ?? 66;
+  const desperateAt = phaseThresholds?.desperate ?? 25;
+  const angryAt = phaseThresholds?.angry ?? 50;
   if (pct < desperateAt) return 'desperate';
   if (pct < angryAt) return 'angry';
   return 'normal';
@@ -268,7 +268,7 @@ export function useAdventureBossNew({
   const startBattle = useCallback(() => {
     if (worldId === null || !boss) return;
 
-    const bossMaxHP = worldId * 100;
+    const bossMaxHP = BOSS_HP[worldId] ?? worldId * 100;
     setHp(bossMaxHP);
     setMaxHP(bossMaxHP);
     setPhase('normal');

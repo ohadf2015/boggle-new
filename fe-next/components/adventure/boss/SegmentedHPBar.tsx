@@ -74,21 +74,21 @@ const SEGMENTS = [
     minThreshold: 0,
     maxThreshold: THRESHOLDS.ENRAGED,
     color: 'bg-neo-red',
-    label: 'Enraged zone',
+    labelKey: 'adventure.hpBar.enragedZone',
   },
   {
     id: 2 as const,
     minThreshold: THRESHOLDS.ENRAGED,
     maxThreshold: THRESHOLDS.PHASE2,
     color: 'bg-neo-lime',
-    label: 'Phase 2 zone',
+    labelKey: 'adventure.hpBar.phase2Zone',
   },
   {
     id: 3 as const,
     minThreshold: THRESHOLDS.PHASE2,
     maxThreshold: THRESHOLDS.FULL,
     color: 'bg-lime-500',
-    label: 'Phase 1 zone',
+    labelKey: 'adventure.hpBar.phase1Zone',
   },
 ];
 
@@ -126,21 +126,22 @@ interface SegmentProps {
   id: 1 | 2 | 3;
   fill: number;
   color: string;
-  label: string;
+  labelKey: string;
   isLowHP: boolean;
 }
 
 /**
  * Individual HP segment with animated fill and RPG-style chunked look.
  */
-const Segment = memo<SegmentProps>(({ id, fill, color, label, isLowHP }) => {
+const Segment = memo<SegmentProps>(({ id, fill, color, labelKey, isLowHP }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { t } = useLanguage();
   return (
     <div
       data-segment={id}
       data-fill={fill}
       className="relative flex-1 h-full bg-neo-navy-light overflow-hidden"
-      aria-label={label}
+      aria-label={t(labelKey)}
     >
       <AdaptiveMotion.div
         data-fill-bar
@@ -359,7 +360,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={hpPercentage}
-        aria-label={`${t(bossName) || bossName} health: ${hpPercentage}%`}
+        aria-label={t('adventure.hpBar.healthLabel', { bossName: t(bossName) || bossName, percentage: hpPercentage })}
         data-testid="segmented-hp-bar"
         className={`
           relative w-full h-5 sm:h-6
@@ -389,7 +390,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
             id={segment.id}
             fill={segment.fill}
             color={segment.color}
-            label={segment.label}
+            labelKey={segment.labelKey}
             isLowHP={isLowHP}
           />
         ))}

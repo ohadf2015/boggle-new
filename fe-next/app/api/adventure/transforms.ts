@@ -24,7 +24,7 @@ export function transformProgression(
       runeFragments: 0,
       runes: [],
       endlessHighFloor: 0,
-      completions: [],
+      completions,
       chapterQuestProgress: {},
       wordAlbum: [],
       wordAlbumClaimedMilestones: [],

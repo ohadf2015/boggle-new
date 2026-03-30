@@ -258,8 +258,9 @@ export function getTimerDuration(world: number): number {
  */
 export function getWorldUnlockRequirement(world: number): number {
   if (world <= 1) return 0; // World 1 always unlocked
+  if (world === 2) return 7; // Lowered: 1-star avg player can unlock W2
 
-  // All worlds (2-10) use the same formula: 11 stars per previous world
+  // All worlds (3-10) use the same formula: 11 stars per previous world
   // World 10 requires 11 * 9 = 99 stars, ensuring players have progressed through most worlds
   const clamped = Math.min(world, WORLDS_COUNT);
   return STARS_TO_UNLOCK_NEXT_WORLD * (clamped - 1);

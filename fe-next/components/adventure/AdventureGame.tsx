@@ -519,7 +519,8 @@ const AdventureGame = memo<AdventureGameProps>(
               score={gameState.score} timerStore={timerStore} isPaused={isPaused}
               onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100}
-              isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined} />
+              isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined}
+              comboCount={gameState.comboCount} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}

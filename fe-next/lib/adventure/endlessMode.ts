@@ -66,6 +66,28 @@ export function getEndlessMiniEvent(floor: number): EndlessMiniEvent | null {
 }
 
 // ==============================================
+// MILESTONE REWARDS (every 5 floors)
+// ==============================================
+
+export interface EndlessMilestone {
+  floor: number;
+  rewardGold: number;
+  rewardXp: number;
+  nameKey: string;
+}
+
+export function getEndlessMilestone(floor: number): EndlessMilestone | null {
+  if (floor < 5 || floor % 5 !== 0) return null;
+  const tier = Math.floor(floor / 5);
+  return {
+    floor,
+    rewardGold: tier * 50,
+    rewardXp: tier * 30,
+    nameKey: `adventure.endlessMode.milestone.floor${floor}`,
+  };
+}
+
+// ==============================================
 // DIFFICULTY CONFIG
 // ==============================================
 
@@ -93,6 +115,8 @@ export interface EndlessDifficulty {
   specialTileCount: number;
   scoreTarget: number;
   mechanic: string | null;
+  /** Second mechanic active simultaneously (post-floor 30) */
+  secondMechanic: string | null;
 }
 
 /** Calculate difficulty parameters for a given floor */
@@ -118,7 +142,12 @@ export function getEndlessDifficulty(floor: number): EndlessDifficulty {
   // Cycle world mechanics
   const mechanic = floor <= 1 ? null : MECHANIC_CYCLE[(floor - 2) % MECHANIC_CYCLE.length];
 
-  return { gridSize, timerSeconds, specialTileCount, scoreTarget, mechanic };
+  // Post-floor 30: two mechanics active simultaneously
+  const secondMechanic = floor > 30
+    ? MECHANIC_CYCLE[(floor - 2 + 4) % MECHANIC_CYCLE.length]
+    : null;
+
+  return { gridSize, timerSeconds, specialTileCount, scoreTarget, mechanic, secondMechanic };
 }
 
 /** Generate a level config for an endless floor (with mini-event modifiers) */

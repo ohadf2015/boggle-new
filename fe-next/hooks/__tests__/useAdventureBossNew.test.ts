@@ -14,6 +14,7 @@ import { getBossConfig, getBossTaunt } from '@/lib/adventure/bossConfig';
 vi.mock('@/lib/adventure/bossConfig', () => ({
   getBossConfig: vi.fn(),
   getBossTaunt: vi.fn(),
+  BOSS_HP: { 1: 30, 2: 50, 3: 75, 4: 100, 5: 130, 6: 165, 7: 200, 8: 240, 9: 280, 10: 350 },
 }));
 
 const mockGetBossConfig = getBossConfig as any;
@@ -91,7 +92,7 @@ describe('useAdventureBossNew', () => {
   // ==============================================
 
   describe('HP system', () => {
-    it('should set HP based on worldId: baseHP = worldId * 100', () => {
+    it('should set HP based on BOSS_HP lookup for worldId', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 3 })
       );
@@ -100,11 +101,11 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(300);
-      expect(result.current.hp).toBe(300);
+      expect(result.current.maxHP).toBe(75);
+      expect(result.current.hp).toBe(75);
     });
 
-    it('should compute HP for world 1 as 100', () => {
+    it('should compute HP for world 1 as 30', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -113,10 +114,10 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(100);
+      expect(result.current.maxHP).toBe(30);
     });
 
-    it('should compute HP for world 10 as 1000', () => {
+    it('should compute HP for world 10 as 350', () => {
       mockGetBossConfig.mockReturnValue({ ...MOCK_BOSS_CONFIG, worldId: 10 } as any);
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 10 })
@@ -126,7 +127,7 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      expect(result.current.maxHP).toBe(1000);
+      expect(result.current.maxHP).toBe(350);
     });
   });
 
@@ -148,7 +149,7 @@ describe('useAdventureBossNew', () => {
         result.current.dealDamage(25);
       });
 
-      expect(result.current.hp).toBe(75);
+      expect(result.current.hp).toBe(5);
     });
 
     it('should not reduce HP below 0', () => {
@@ -191,7 +192,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(100);
+        result.current.dealDamage(30);
       });
 
       expect(result.current.hp).toBe(0);
@@ -226,7 +227,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(90);
+        result.current.dealDamage(25);
       });
 
       let damage: number = 0;
@@ -234,8 +235,8 @@ describe('useAdventureBossNew', () => {
         damage = result.current.dealDamage(50);
       });
 
-      // Only 10 HP left, so damage should be capped at 10
-      expect(damage).toBe(10);
+      // Only 5 HP left, so damage should be capped at 5
+      expect(damage).toBe(5);
     });
   });
 
@@ -265,15 +266,15 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      // Deal 51 damage (HP drops to 49 out of 100 = 49%)
+      // Deal 16 damage (HP drops to 14 out of 30 = 46.7% < 50%)
       act(() => {
-        result.current.dealDamage(51);
+        result.current.dealDamage(16);
       });
 
       expect(result.current.phase).toBe('angry');
     });
 
-    it('should stay normal at 66% HP (threshold boundary)', () => {
+    it('should stay normal above 50% HP (threshold boundary)', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -283,13 +284,13 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(34); // 66 HP remaining = exactly 66%
+        result.current.dealDamage(14); // 16 HP remaining out of 30 = 53.3%
       });
 
       expect(result.current.phase).toBe('normal');
     });
 
-    it('should transition to desperate at below 33% HP', () => {
+    it('should transition to desperate at below 25% HP', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -299,13 +300,13 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(68); // 32 HP remaining = 32% < 33%
+        result.current.dealDamage(23); // 7 HP remaining out of 30 = 23.3% < 25%
       });
 
       expect(result.current.phase).toBe('desperate');
     });
 
-    it('should stay angry at exactly 33% HP', () => {
+    it('should stay angry at exactly 25% HP', () => {
       const { result } = renderHook(() =>
         useAdventureBossNew({ worldId: 1 })
       );
@@ -315,7 +316,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(67); // 33 HP remaining = exactly 33%
+        result.current.dealDamage(22); // 8 HP remaining out of 30 = 26.7% > 25%
       });
 
       expect(result.current.phase).toBe('angry');
@@ -331,7 +332,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(35); // 65 HP = 65% < 66% → angry
+        result.current.dealDamage(16); // 14 HP out of 30 = 46.7% < 50% → angry
       });
 
       // Should have a taunt from phase change
@@ -348,7 +349,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(76);
+        result.current.dealDamage(23); // 7 HP out of 30 = 23.3% < 25% → desperate
       });
 
       expect(result.current.currentTaunt).not.toBeNull();
@@ -370,8 +371,8 @@ describe('useAdventureBossNew', () => {
       });
 
       expect(result.current.isActive).toBe(true);
-      expect(result.current.hp).toBe(100);
-      expect(result.current.maxHP).toBe(100);
+      expect(result.current.hp).toBe(30);
+      expect(result.current.maxHP).toBe(30);
     });
 
     it('should trigger onStart taunt', () => {
@@ -490,7 +491,7 @@ describe('useAdventureBossNew', () => {
 
       // Move to angry phase
       act(() => {
-        result.current.dealDamage(51);
+        result.current.dealDamage(16);
       });
 
       onAttack.mockClear();
@@ -514,7 +515,7 @@ describe('useAdventureBossNew', () => {
 
       // Move to desperate phase
       act(() => {
-        result.current.dealDamage(76);
+        result.current.dealDamage(23);
       });
 
       onAttack.mockClear();
@@ -706,11 +707,11 @@ describe('useAdventureBossNew', () => {
         result.current.startBattle();
       });
 
-      // World 2 = 200 HP
+      // World 2 = 50 HP
       expect(result.current.hpPercentage).toBe(100);
 
       act(() => {
-        result.current.dealDamage(100);
+        result.current.dealDamage(25);
       });
 
       expect(result.current.hpPercentage).toBe(50);
@@ -771,7 +772,7 @@ describe('useAdventureBossNew', () => {
       });
 
       act(() => {
-        result.current.dealDamage(60);
+        result.current.dealDamage(16);
       });
 
       expect(result.current.phase).toBe('angry');

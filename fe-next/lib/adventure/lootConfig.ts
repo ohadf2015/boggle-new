@@ -25,7 +25,7 @@ export function generateLootChest(
   worldId: number,
   levelNumber: number,
   stars: number,
-  score: number,
+  _score: number,
   goldMultiplier: number
 ): LootChest {
   const drops: LootDrop[] = [];
@@ -33,6 +33,7 @@ export function generateLootChest(
   // Gold (always) — scales with world to prevent late-game gold drought
   const baseGold = (10 + worldId * 3) * stars;
   const perfectBonus = stars === 3 ? 50 : 0;
+  // Gold multiplier only applies to base gold, not bonus/trophy (prevents runaway inflation)
   const gold = Math.floor((baseGold + perfectBonus) * goldMultiplier);
   drops.push({ type: 'gold', amount: gold, nameKey: 'adventure.loot.gold', rarity: 'common' });
 
@@ -40,16 +41,16 @@ export function generateLootChest(
   const xp = 25 + stars * 15;
   drops.push({ type: 'xp', amount: xp, nameKey: 'adventure.loot.xp', rarity: 'common' });
 
-  // Bonus Gold (guaranteed on 3-star, 40% on 2-star) — scales with world
+  // Bonus Gold (guaranteed on 3-star, 40% on 2-star) — scales with world, NOT affected by goldMultiplier
   if (stars === 3 || (stars === 2 && seededRandom(worldId * 100 + levelNumber) > 0.6)) {
-    const bonusGold = Math.floor(15 * worldId * goldMultiplier);
+    const bonusGold = 15 * worldId;
     drops.push({ type: 'bonusGold', amount: bonusGold, nameKey: 'adventure.loot.bonusGold', rarity: 'rare' });
   }
 
-  // Extra Bonus Gold (boss levels with 3 stars — boss trophy reward)
+  // Extra Bonus Gold (boss levels with 3 stars — boss trophy reward, NOT affected by goldMultiplier)
   const isBossLevel = levelNumber === 7;
   if (isBossLevel && stars === 3) {
-    const trophyGold = Math.floor(30 * worldId * goldMultiplier);
+    const trophyGold = 30 * worldId;
     drops.push({ type: 'bonusGold', amount: trophyGold, nameKey: 'adventure.loot.bossTrophy', rarity: 'epic' });
   }
 

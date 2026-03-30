@@ -182,8 +182,8 @@ const BossOverlay = memo<BossOverlayProps>(
       const prev = prevPhaseRef.current;
       prevPhaseRef.current = derivedPhase;
       if (prev !== derivedPhase && effectiveIsActive) {
-        if (derivedPhase === 'phase2') setPhaseBanner(t('adventure.bosses.phases.phase2Banner') || 'PHASE 2!');
-        else if (derivedPhase === 'enraged') setPhaseBanner(t('adventure.bosses.enragedBanner') || 'ENRAGED!');
+        if (derivedPhase === 'phase2') setPhaseBanner(t('adventure.bosses.phases.phase2Banner'));
+        else if (derivedPhase === 'enraged') setPhaseBanner(t('adventure.bosses.enragedBanner'));
         if (phaseBannerTimerRef.current) clearTimeout(phaseBannerTimerRef.current);
         phaseBannerTimerRef.current = setTimeout(() => setPhaseBanner(null), 1500);
       }

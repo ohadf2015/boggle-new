@@ -80,7 +80,7 @@ function AdventureView(): React.JSX.Element {
     selectedWorld, selectedLevel, setSelectedLevel,
     navigateToWorldMap, selectWorld, selectLevel,
     openWorldMapFromHub, historyBack,
-  } = useAdventureHistory(hasCompletions ? 'hub' : 'worldMap');
+  } = useAdventureHistory(hasCompletions ? 'hub' : 'levelGrid', hasCompletions ? null : 1);
 
   const [gameTimerState, setGameTimerState] = useState<GameTimerState>({
     timeRemaining: 0, totalTime: 0, isPlaying: false, isPaused: false,
@@ -277,8 +277,7 @@ function AdventureView(): React.JSX.Element {
           <p className="text-neo-white font-bold">
             {isAuthError ? t('adventure.sessionExpired') : t('adventure.loadError')}
           </p>
-          {/* TODO: Remove debug info after diagnosing mobile load failure */}
-          {error && !isAuthError && (
+          {process.env.NODE_ENV === 'development' && error && !isAuthError && (
             <p className="text-neo-white/40 text-xs max-w-xs font-mono break-all">
               {error.message}
             </p>

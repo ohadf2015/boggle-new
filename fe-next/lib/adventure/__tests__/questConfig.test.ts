@@ -30,9 +30,9 @@ describe('questConfig', () => {
 
   it('World 1 chapter 1 quests have no boss quests (boss is in chapter 3)', () => {
     const w1c1 = getQuestsForChapter(1, 1);
-    expect(w1c1[0]).toMatchObject({ id: 'w1c1-words', type: 'wordCountChapter', target: 20, reward: { coins: 100, xp: 50 } });
-    expect(w1c1[1]).toMatchObject({ id: 'w1c1-long', type: 'longWordCount', target: 5, reward: { coins: 80, xp: 40 } });
-    expect(w1c1[2]).toMatchObject({ id: 'w1c1-perfect', type: 'perfectLevels', target: 1, reward: { coins: 120, xp: 60 } });
+    expect(w1c1[0]).toMatchObject({ id: 'w1c1-words', type: 'wordCountChapter', target: 20, reward: { coins: 70, xp: 35 } });
+    expect(w1c1[1]).toMatchObject({ id: 'w1c1-long', type: 'longWordCount', target: 5, reward: { coins: 60, xp: 30 } });
+    expect(w1c1[2]).toMatchObject({ id: 'w1c1-perfect', type: 'perfectLevels', target: 1, reward: { coins: 80, xp: 40 } });
     // defeatBossNoHint moved to chapter 3 where the boss actually is
     const w1c1Types = w1c1.map(q => q.type);
     expect(w1c1Types).not.toContain('defeatBossNoHint');
@@ -40,9 +40,9 @@ describe('questConfig', () => {
 
   it('World 1 chapter 2 quests are unchanged', () => {
     const w1c2 = getQuestsForChapter(1, 2);
-    expect(w1c2[0]).toMatchObject({ id: 'w1c2-words', type: 'wordCountChapter', target: 30, reward: { coins: 120, xp: 60 } });
-    expect(w1c2[1]).toMatchObject({ id: 'w1c2-perfect', type: 'perfectLevels', target: 2, reward: { coins: 180, xp: 90 } });
-    expect(w1c2[2]).toMatchObject({ id: 'w1c2-long', type: 'longWordCount', target: 8, reward: { coins: 100, xp: 50 } });
+    expect(w1c2[0]).toMatchObject({ id: 'w1c2-words', type: 'wordCountChapter', target: 30, reward: { coins: 80, xp: 40 } });
+    expect(w1c2[1]).toMatchObject({ id: 'w1c2-perfect', type: 'perfectLevels', target: 2, reward: { coins: 130, xp: 65 } });
+    expect(w1c2[2]).toMatchObject({ id: 'w1c2-long', type: 'longWordCount', target: 8, reward: { coins: 70, xp: 35 } });
   });
 
   it('rewards scale up from world 1 to world 10', () => {
@@ -87,13 +87,12 @@ describe('questConfig', () => {
     }
   });
 
-  it('flashChallengeMaster target is achievable (max 2 per level × chapter levels)', () => {
-    const CHAPTER_LEVELS = [0, 2, 2, 3];
-    const MAX_FLASH_PER_LEVEL = 2;
+  it('flashChallengeMaster target is achievable (max 1 per non-boss level, boss level excluded)', () => {
+    // Ch1: levels 1-2 (2 non-boss), Ch2: levels 3-4 (2 non-boss), Ch3: levels 5-6 non-boss + level 7 boss = 2 non-boss
+    const MAX_FLASH_PER_CHAPTER = 2;
     for (const quest of CHAPTER_QUESTS) {
       if (quest.type === 'flashChallengeMaster') {
-        const maxFlash = CHAPTER_LEVELS[quest.chapterNumber] * MAX_FLASH_PER_LEVEL;
-        expect(quest.target).toBeLessThanOrEqual(maxFlash);
+        expect(quest.target).toBeLessThanOrEqual(MAX_FLASH_PER_CHAPTER);
       }
     }
   });

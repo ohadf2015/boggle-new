@@ -13,9 +13,9 @@ interface AdventureHistoryState {
 /**
  * Manages adventure view navigation with browser history (back button) support.
  */
-export function useAdventureHistory(initialView: ViewState) {
+export function useAdventureHistory(initialView: ViewState, initialWorldId: number | null = null) {
   const [viewState, setViewState] = useState<ViewState>(initialView);
-  const [selectedWorld, setSelectedWorld] = useState<number | null>(null);
+  const [selectedWorld, setSelectedWorld] = useState<number | null>(initialWorldId);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
   // Track if we're handling a popstate event to avoid pushing state during back nav

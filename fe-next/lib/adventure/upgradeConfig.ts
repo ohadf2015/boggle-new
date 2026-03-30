@@ -102,24 +102,24 @@ export const UPGRADES: UpgradeDefinition[] = [
     icon: 'upgrade-fuel-tank.png',
     unlockWorld: 1,
     tiers: [
-      { level: 1, cost: 50, effectKey: 'adventure.upgrades.fuelTank.t1', value: 10 },
-      { level: 2, cost: 100, effectKey: 'adventure.upgrades.fuelTank.t2', value: 20 },
-      { level: 3, cost: 200, effectKey: 'adventure.upgrades.fuelTank.t3', value: 30 },
-      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 40 },
+      { level: 1, cost: 50, effectKey: 'adventure.upgrades.fuelTank.t1', value: 8 },
+      { level: 2, cost: 100, effectKey: 'adventure.upgrades.fuelTank.t2', value: 15 },
+      { level: 3, cost: 200, effectKey: 'adventure.upgrades.fuelTank.t3', value: 20 },
+      { level: 4, cost: 400, effectKey: 'adventure.upgrades.fuelTank.t4', value: 25 },
     ],
   },
   {
     id: 'armorPlating',
     category: 'survival',
     nameKey: 'adventure.upgrades.armorPlating.name',
-    descriptionKey: 'adventure.upgrades.armorPlating.desc',
+    descriptionKey: 'adventure.upgrades.armorPlating.descGeneral',
     icon: 'upgrade-armor-plating.png',
     unlockWorld: 3,
     tiers: [
-      { level: 1, cost: 80, effectKey: 'adventure.upgrades.armorPlating.t1', value: 0.1 },
-      { level: 2, cost: 160, effectKey: 'adventure.upgrades.armorPlating.t2', value: 0.2 },
-      { level: 3, cost: 300, effectKey: 'adventure.upgrades.armorPlating.t3', value: 0.35 },
-      { level: 4, cost: 500, effectKey: 'adventure.upgrades.armorPlating.t4', value: 0.5 },
+      { level: 1, cost: 60, effectKey: 'adventure.upgrades.armorPlating.t1', value: 0.1 },
+      { level: 2, cost: 120, effectKey: 'adventure.upgrades.armorPlating.t2', value: 0.2 },
+      { level: 3, cost: 220, effectKey: 'adventure.upgrades.armorPlating.t3', value: 0.35 },
+      { level: 4, cost: 350, effectKey: 'adventure.upgrades.armorPlating.t4', value: 0.5 },
     ],
   },
   {
@@ -148,8 +148,8 @@ export const UPGRADES: UpgradeDefinition[] = [
     tiers: [
       { level: 1, cost: 40, effectKey: 'adventure.upgrades.luckyPickaxe.t1', value: 0.1 },
       { level: 2, cost: 100, effectKey: 'adventure.upgrades.luckyPickaxe.t2', value: 0.25 },
-      { level: 3, cost: 200, effectKey: 'adventure.upgrades.luckyPickaxe.t3', value: 0.5 },
-      { level: 4, cost: 350, effectKey: 'adventure.upgrades.luckyPickaxe.t4', value: 0.75 },
+      { level: 3, cost: 300, effectKey: 'adventure.upgrades.luckyPickaxe.t3', value: 0.5 },
+      { level: 4, cost: 500, effectKey: 'adventure.upgrades.luckyPickaxe.t4', value: 0.75 },
     ],
   },
   {
@@ -202,8 +202,8 @@ export const UPGRADES: UpgradeDefinition[] = [
     icon: 'upgrade-time-freeze.png',
     unlockWorld: 5,
     tiers: [
-      { level: 1, cost: 200, effectKey: 'adventure.upgrades.timeFreeze.t1', value: 5 },
-      { level: 2, cost: 450, effectKey: 'adventure.upgrades.timeFreeze.t2', value: 10 },
+      { level: 1, cost: 120, effectKey: 'adventure.upgrades.timeFreeze.t1', value: 5 },
+      { level: 2, cost: 280, effectKey: 'adventure.upgrades.timeFreeze.t2', value: 10 },
     ],
   },
 ];

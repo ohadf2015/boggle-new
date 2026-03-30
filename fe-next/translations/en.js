@@ -7291,7 +7291,30 @@ const en = {
         "title": "Wordsmith",
         "description": "Find {target} long words (5+ letters)"
       }
-    }
+    },
+    "defeatExplainer": {
+      "title": "What Went Wrong",
+      "tip": {
+        "wordCount": "Try finding shorter words faster to build your count.",
+        "scoreTarget": "Focus on longer words — they score exponentially more points.",
+        "longWords": "Look for 5+ letter words by scanning edges and diagonals.",
+        "clearIce": "Prioritize words that pass through ice tiles first.",
+        "timeBonus": "Submit words quickly — speed is key for this objective.",
+        "collectGems": "Route your words through gem tiles whenever possible.",
+        "defeatBoss": "Keep a steady combo to maximize damage output.",
+        "surviveBattle": "Find words quickly to heal and avoid boss attacks.",
+        "mechanicTrigger": "Focus on triggering the level mechanic before other objectives.",
+        "noDamage": "Prioritize short, fast words to keep your combo shield up."
+      }
+    },
+    "starsNeeded": "{{count}} more stars needed",
+    "hpBar": {
+      "enragedZone": "Enraged zone",
+      "phase2Zone": "Phase 2 zone",
+      "phase1Zone": "Phase 1 zone",
+      "healthLabel": "{{bossName}} health: {{percentage}}%"
+    },
+    "comboExplainer": "Find words quickly in a row to build combos. Each combo increases your score multiplier!"
   },
   "blast": {
     "chain": {

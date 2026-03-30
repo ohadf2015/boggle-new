@@ -8,9 +8,9 @@
 
 'use client';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, MapPin, Coins, Flame, Swords } from 'lucide-react';
+import { Pause, Play, X, MapPin, Coins, Flame, Swords, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -51,6 +51,8 @@ interface GameHeaderProps {
   isBossLevel?: boolean;
   /** Elapsed time in seconds for boss fights (counts up from 0) */
   elapsedTime?: number;
+  /** Current combo count */
+  comboCount?: number;
   className?: string;
 }
 
@@ -73,10 +75,12 @@ export const GameHeader = memo(function GameHeader({
   streakMultiplier = 1,
   isBossLevel = false,
   elapsedTime = 0,
+  comboCount = 0,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
   const hudTheme = useHUDTheme();
+  const [showComboTip, setShowComboTip] = useState(false);
 
   return (
     <div className="flex-shrink-0">
@@ -126,6 +130,26 @@ export const GameHeader = memo(function GameHeader({
           <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-yellow/15 rounded-full border border-neo-yellow/20">
             <Coins className="w-3 h-3 text-neo-yellow" />
             <span className="text-[10px] font-bold text-neo-yellow tabular-nums">{gold}</span>
+          </div>
+        )}
+
+        {/* Combo Badge with explainer tooltip */}
+        {comboCount > 0 && (
+          <div className="relative flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-purple/15 rounded-full border border-neo-purple/20">
+            <Flame className="w-3 h-3 text-neo-purple" />
+            <span className="text-[10px] font-black text-neo-purple tabular-nums">{comboCount}x</span>
+            <button
+              onClick={() => setShowComboTip(prev => !prev)}
+              className="p-0 ml-0.5"
+              aria-label={t('adventure.comboExplainer')}
+            >
+              <HelpCircle className="w-3 h-3 text-neo-purple/60" />
+            </button>
+            {showComboTip && (
+              <div className="absolute top-full mt-1 start-0 z-50 w-48 p-2 bg-neo-navy border-2 border-neo-purple/40 rounded-neo shadow-hard text-[10px] text-neo-white/80 font-bold">
+                {t('adventure.comboExplainer')}
+              </div>
+            )}
           </div>
         )}
       </div>
