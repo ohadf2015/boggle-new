@@ -1,6 +1,5 @@
 'use client';
 
-import Script from 'next/script';
 import { createContext, useContext, useCallback, useState, useEffect, ReactNode } from 'react';
 import { useCrazyGamesViewport, type CrazyGamesDeviceType } from '@/hooks/useCrazyGamesViewport';
 import { useCrazyGamesScrollPrevention } from '@/hooks/useCrazyGamesScrollPrevention';
@@ -13,6 +12,8 @@ declare global {
     };
     /** Cached CrazyGames environment for utility function access */
     __crazyGamesEnvironment?: CrazyGamesEnvironment;
+    /** Set to true once SDK init completes (or fails after retries) */
+    __crazyGamesReady?: boolean;
   }
 }
 
@@ -228,38 +229,36 @@ const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED ===
  * it's running inside a CrazyGames iframe and reports environment
  * accordingly ('crazygames' | 'disabled').
  */
+/**
+ * CrazyGames SDK Script — rendered as raw <script> tags so they appear
+ * in the server-rendered HTML *before* React hydration.
+ *
+ * Using Next.js <Script strategy="beforeInteractive"> from a 'use client'
+ * component is unreliable in App Router — the script may not be injected
+ * into <head> in time for the CrazyGames QA tool to detect it.
+ *
+ * Raw <script> tags in the layout are synchronous and guaranteed to be
+ * in the initial HTML payload.
+ *
+ * IMPORTANT: Called from the root layout.tsx (Server Component) so these
+ * tags end up in the HTML <head> before any client JS runs.
+ */
 export function CrazyGamesScript() {
   if (CRAZYGAMES_FORCE_DISABLED) {
     return null;
   }
 
-  // Use beforeInteractive so the SDK loads in <head> before hydration.
-  // CrazyGames QA tool checks for SDK presence very early — afterInteractive
-  // is too late and causes "SDK not currently detected" failures.
-  // Note: beforeInteractive doesn't support onLoad, so we use an inline
-  // bootstrap script to call init() as soon as the SDK is available.
-  // Safe: content is a static string, no user input involved.
-  return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document -- App Router root layout, not Pages Router */}
-      <Script
-        src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
-        strategy="beforeInteractive"
-        id="crazygames-sdk"
-      />
-      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document -- App Router root layout, not Pages Router */}
-      <Script
-        id="crazygames-sdk-init"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
+  // Static bootstrap script — no user input, safe for dangerouslySetInnerHTML
+  const bootstrapScript = `
 (function() {
+  var attempts = 0;
   function tryInit() {
     if (window.CrazyGames && window.CrazyGames.SDK) {
       window.CrazyGames.SDK.init().then(function() {
         return window.CrazyGames.SDK.getEnvironment();
       }).then(function(env) {
         window.__crazyGamesEnvironment = env;
+        window.__crazyGamesReady = true;
         if (env === 'crazygames') {
           document.body && document.body.classList.add('crazygames-embed');
           window.CrazyGames.SDK.game.sdkGameLoadingStart();
@@ -270,16 +269,28 @@ export function CrazyGamesScript() {
             setTimeout(signalReady, 1000);
           }
         }
-      }).catch(function() {});
-    } else {
+      }).catch(function(e) {
+        window.__crazyGamesEnvironment = 'disabled';
+        window.__crazyGamesReady = true;
+      });
+    } else if (attempts < 100) {
+      attempts++;
       setTimeout(tryInit, 50);
+    } else {
+      window.__crazyGamesEnvironment = 'disabled';
+      window.__crazyGamesReady = true;
     }
   }
   tryInit();
-})();
-          `,
-        }}
-      />
+})();`;
+
+  return (
+    <>
+      {/* Synchronous SDK load in <head> — guaranteed before hydration */}
+      {/* eslint-disable-next-line @next/next/no-sync-scripts -- Must load synchronously for CrazyGames QA detection */}
+      <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" />
+      {/* Bootstrap: init SDK as soon as available, max 5s retry then give up */}
+      <script dangerouslySetInnerHTML={{ __html: bootstrapScript }} />
     </>
   );
 }
