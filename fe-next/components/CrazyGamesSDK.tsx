@@ -222,78 +222,10 @@ const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
 const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
 
 /**
- * CrazyGames SDK Script Component
- *
- * Always loads the SDK script unless explicitly disabled via
- * NEXT_PUBLIC_CRAZYGAMES_ENABLED=false. The SDK self-detects whether
- * it's running inside a CrazyGames iframe and reports environment
- * accordingly ('crazygames' | 'disabled').
+ * NOTE: CrazyGamesScript has been moved to CrazyGamesScriptServer.tsx
+ * as a Server Component so the <script> tags appear in the initial HTML.
+ * The 'use client' directive on this file prevented SSR of script tags.
  */
-/**
- * CrazyGames SDK Script — rendered as raw <script> tags so they appear
- * in the server-rendered HTML *before* React hydration.
- *
- * Using Next.js <Script strategy="beforeInteractive"> from a 'use client'
- * component is unreliable in App Router — the script may not be injected
- * into <head> in time for the CrazyGames QA tool to detect it.
- *
- * Raw <script> tags in the layout are synchronous and guaranteed to be
- * in the initial HTML payload.
- *
- * IMPORTANT: Called from the root layout.tsx (Server Component) so these
- * tags end up in the HTML <head> before any client JS runs.
- */
-export function CrazyGamesScript() {
-  if (CRAZYGAMES_FORCE_DISABLED) {
-    return null;
-  }
-
-  // Static bootstrap script — no user input, safe for dangerouslySetInnerHTML
-  const bootstrapScript = `
-(function() {
-  var attempts = 0;
-  function tryInit() {
-    if (window.CrazyGames && window.CrazyGames.SDK) {
-      window.CrazyGames.SDK.init().then(function() {
-        return window.CrazyGames.SDK.getEnvironment();
-      }).then(function(env) {
-        window.__crazyGamesEnvironment = env;
-        window.__crazyGamesReady = true;
-        if (env === 'crazygames') {
-          document.body && document.body.classList.add('crazygames-embed');
-          window.CrazyGames.SDK.game.sdkGameLoadingStart();
-          var signalReady = function() { window.CrazyGames.SDK.game.sdkGameLoadingStop(); };
-          if (typeof requestIdleCallback === 'function') {
-            requestIdleCallback(signalReady, { timeout: 3000 });
-          } else {
-            setTimeout(signalReady, 1000);
-          }
-        }
-      }).catch(function(e) {
-        window.__crazyGamesEnvironment = 'disabled';
-        window.__crazyGamesReady = true;
-      });
-    } else if (attempts < 100) {
-      attempts++;
-      setTimeout(tryInit, 50);
-    } else {
-      window.__crazyGamesEnvironment = 'disabled';
-      window.__crazyGamesReady = true;
-    }
-  }
-  tryInit();
-})();`;
-
-  return (
-    <>
-      {/* Synchronous SDK load in <head> — guaranteed before hydration */}
-      {/* eslint-disable-next-line @next/next/no-sync-scripts -- Must load synchronously for CrazyGames QA detection */}
-      <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" />
-      {/* Bootstrap: init SDK as soon as available, max 5s retry then give up */}
-      <script dangerouslySetInnerHTML={{ __html: bootstrapScript }} />
-    </>
-  );
-}
 
 /**
  * CrazyGames SDK Provider
@@ -807,4 +739,4 @@ export function shouldHideExternalLogin(): boolean {
   return isCrazyGamesEnvironment();
 }
 
-export default CrazyGamesScript;
+export default CrazyGamesProvider;

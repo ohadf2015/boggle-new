@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Crown, Check, X } from 'lucide-react';
+import { Play, Crown, Check, X, Trophy } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, type GameModeOption } from '@/components/GameModeSelector';
@@ -28,10 +28,16 @@ interface StickyReadyBarProps {
   onMarkReady: () => void;
   selectedGameMode?: GameModeOption;
   onSelectGameMode?: (mode: GameModeOption) => void;
+  /** Whether the series (best-of-3) is complete */
+  isSeriesComplete?: boolean;
+  /** Series winner username */
+  seriesWinnerUsername?: string;
+  /** Callback to reset the series and start fresh */
+  onNewSeries?: () => void;
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
-const AUTO_SECONDS = 21;
+const AUTO_SECONDS = 30;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
@@ -57,6 +63,9 @@ export default function StickyReadyBar({
   onMarkReady,
   selectedGameMode,
   onSelectGameMode,
+  isSeriesComplete,
+  seriesWinnerUsername,
+  onNewSeries,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
 
@@ -237,6 +246,49 @@ export default function StickyReadyBar({
         <Crown className="w-5 h-5 shrink-0" />
         <span className="truncate">{t('results.defendTitle')}</span>
       </motion.button>
+    );
+  }
+
+  // --- Series Complete: show winner + New Series button ---
+  if (isSeriesComplete && seriesWinnerUsername) {
+    const seriesWinnerAvatar = playerMap.get(seriesWinnerUsername)?.avatar;
+    const btnBase = 'w-full h-14 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
+
+    return (
+      <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
+        {/* Series Winner Banner */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          className="flex items-center justify-center gap-3 py-2"
+        >
+          <Trophy className="w-6 h-6 text-neo-yellow" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full border-2 border-neo-yellow overflow-hidden shadow-hard-sm bg-neo-navy">
+              <Avatar userId={seriesWinnerUsername} customAvatar={seriesWinnerAvatar?.customAvatar} size="sm" className="w-full h-full" />
+            </div>
+            <span className="text-neo-yellow font-black text-sm">{seriesWinnerUsername}</span>
+          </div>
+          <span className="text-neo-cream/60 text-xs font-bold uppercase">{t('results.series.winner')}</span>
+        </motion.div>
+
+        {/* New Series button (host only starts, non-host just sees the winner) */}
+        {isHost && onNewSeries ? (
+          <motion.button
+            onClick={onNewSeries}
+            whileTap={{ scale: 0.95 }}
+            className={cn(btnBase, 'bg-neo-lime text-neo-black')}
+          >
+            <Play className="w-5 h-5 shrink-0" />
+            <span>{t('results.series.newSeries')}</span>
+          </motion.button>
+        ) : !isHost ? (
+          <div className={cn(btnBase, 'bg-neo-white/10 text-neo-cream/60 pointer-events-none')}>
+            <span>{t('results.series.waitingNewSeries')}</span>
+          </div>
+        ) : null}
+      </div>
     );
   }
 

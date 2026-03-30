@@ -1828,7 +1828,10 @@ const he = {
     "series": {
       "title": "דירוג מצטבר",
       "gameCount": "משחק {count}",
-      "round": "ס{num}"
+      "round": "ס{num}",
+      "winner": "מנצח הסדרה!",
+      "newSeries": "סדרה חדשה",
+      "waitingNewSeries": "ממתין למארח..."
     },
     "wordsFound": "מילים שנמצאו",
     "shareVictoryPrompt": "שתפו את הניצחון!",
@@ -2573,6 +2576,9 @@ const he = {
     "scoreBonus": "בונוס ניקוד",
     "winBonus": "בונוס ניצחון",
     "achievementBonus": "בונוס הישג",
+    "diminishingReturns": "קצב XP",
+    "xpRate": "קצב",
+    "dailyCapNote": "{{fullRate}} XP ראשונים ביום בקצב מלא, אח\"כ מופחת",
     "titles": {
       "wordSeeker": "מחפש מילים",
       "letterHunter": "צייד אותיות",

@@ -1,8 +1,8 @@
 /**
  * StickyReadyBar Auto-Ready Countdown Tests (Brawl Stars-inspired)
  *
- * Tests the unified 21s auto-countdown flow:
- * - All players (host + non-host) see a 21s countdown
+ * Tests the unified 30s auto-countdown flow:
+ * - All players (host + non-host) see a 30s countdown
  * - Non-host players are auto-readied when countdown hits 0
  * - Host auto-starts when countdown hits 0
  * - Players can manually ready/start before countdown expires
@@ -66,7 +66,7 @@ vi.mock('@/components/Avatar', () => ({
 
 import StickyReadyBar from '../StickyReadyBar';
 
-const AUTO_SECONDS = 21;
+const AUTO_SECONDS = 30;
 
 describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
   const baseProps = {
@@ -152,9 +152,9 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     expect(screen.getByText('Revenge on winner!')).toBeInTheDocument();
   });
 
-  // --- Host gets same 21s countdown ---
+  // --- Host gets same 30s countdown ---
 
-  it('host also gets 21s countdown (auto-starts game)', () => {
+  it('host also gets 30s countdown (auto-starts game)', () => {
     render(
       <StickyReadyBar
         {...baseProps}
@@ -232,6 +232,6 @@ describe('StickyReadyBar auto-ready countdown (Brawl Stars flow)', () => {
     );
 
     // readyCount=1 + 2 bots = 3, totalPlayers=3 → "3 / 3 Ready"
-    expect(screen.getByText(/3/)).toBeInTheDocument();
+    expect(screen.getByText(/3 \/ 3/)).toBeInTheDocument();
   });
 });

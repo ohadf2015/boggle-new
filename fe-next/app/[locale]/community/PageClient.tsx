@@ -176,7 +176,7 @@ export default function CommunityPageClient() {
         }}
       />
 
-      <div className="relative z-10 p-4 pt-20 pb-28 max-w-5xl mx-auto">
+      <div className="relative z-10 p-4 pb-28 max-w-5xl mx-auto">
         {/* ── Back button ── */}
         <AdaptiveMotion.button
           onClick={() => router.back()}

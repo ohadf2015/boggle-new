@@ -311,6 +311,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             gridSize={Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
             gameDuration={gameDuration} seriesStandings={seriesTracker.standings}
             seriesRoundNumber={seriesTracker.roundNumber}
+            onResetSeries={seriesTracker.reset}
             wordHuntSummary={resultsData?.wordHuntSummary}
             blastSummary={resultsData?.blastSummary}
           />

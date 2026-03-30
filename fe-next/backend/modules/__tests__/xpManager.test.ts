@@ -13,6 +13,8 @@ import {
   getLevelFromXp,
   getXpProgress,
   calculateGameXp,
+  getDiminishingReturnsFactor,
+  getDailyXpCap,
   PRESTIGE_CONFIG,
   XP_CONFIG,
 } from '../xpManager';
@@ -203,6 +205,98 @@ describe('calculateGameXp', () => {
     const sp = calculateGameXp({ isWinner: true, playerCount: 1 });
     expect(mp.breakdown.winBonus).toBe(XP_CONFIG.WIN_BONUS);
     expect(sp.breakdown.winBonus).toBe(0);
+  });
+
+  it('uses reduced score multiplier (0.15)', () => {
+    const result = calculateGameXp({ score: 1000 });
+    // 1000 * 0.15 = 150 score XP
+    expect(result.breakdown.scoreXp).toBe(150);
+  });
+
+  it('caps singleplayer XP at SINGLEPLAYER_CAP (300)', () => {
+    // High score + achievements should still cap at 300
+    const result = calculateGameXp({ score: 10000, achievementCount: 20, playerCount: 1 });
+    expect(result.totalXp).toBeLessThanOrEqual(XP_CONFIG.SINGLEPLAYER_CAP);
+    expect(result.totalXp).toBe(XP_CONFIG.SINGLEPLAYER_CAP);
+  });
+
+  it('caps multiplayer XP at MULTIPLAYER_CAP (400)', () => {
+    const result = calculateGameXp({ score: 10000, isWinner: true, achievementCount: 20, playerCount: 4 });
+    expect(result.totalXp).toBeLessThanOrEqual(XP_CONFIG.MULTIPLAYER_CAP);
+    expect(result.totalXp).toBe(XP_CONFIG.MULTIPLAYER_CAP);
+  });
+
+  it('caps achievement XP at ACHIEVEMENT_CAP (200)', () => {
+    const result = calculateGameXp({ achievementCount: 10, playerCount: 1 });
+    // 10 * 100 = 1000, but capped at 200
+    expect(result.breakdown.achievementXp).toBeLessThanOrEqual(XP_CONFIG.ACHIEVEMENT_CAP);
+    expect(result.breakdown.achievementXp).toBe(XP_CONFIG.ACHIEVEMENT_CAP);
+  });
+
+  it('does not cap low XP games', () => {
+    const result = calculateGameXp({ score: 200, playerCount: 1 });
+    // 50 base + 200*0.15 = 50 + 30 = 80, well under cap
+    expect(result.totalXp).toBe(80);
+  });
+});
+
+// ===== getDiminishingReturnsFactor =====
+describe('getDiminishingReturnsFactor', () => {
+  it('returns 1.0 for levels 1-25', () => {
+    expect(getDiminishingReturnsFactor(1)).toBe(1.0);
+    expect(getDiminishingReturnsFactor(25)).toBe(1.0);
+  });
+
+  it('returns 0.85 for levels 26-50', () => {
+    expect(getDiminishingReturnsFactor(26)).toBe(0.85);
+    expect(getDiminishingReturnsFactor(50)).toBe(0.85);
+  });
+
+  it('returns 0.70 for levels 51-75', () => {
+    expect(getDiminishingReturnsFactor(51)).toBe(0.70);
+    expect(getDiminishingReturnsFactor(75)).toBe(0.70);
+  });
+
+  it('returns 0.55 for levels 76-100', () => {
+    expect(getDiminishingReturnsFactor(76)).toBe(0.55);
+    expect(getDiminishingReturnsFactor(100)).toBe(0.55);
+  });
+});
+
+// ===== getDailyXpCap =====
+describe('getDailyXpCap', () => {
+  it('returns full XP when under first threshold', () => {
+    const result = getDailyXpCap(100, 0);
+    expect(result).toBe(100);
+  });
+
+  it('returns full XP up to FULL_RATE threshold', () => {
+    const result = getDailyXpCap(100, 1400);
+    // dailyXpSoFar=1400, earning 100 more → 1500 total, all in FULL_RATE zone
+    expect(result).toBe(100);
+  });
+
+  it('halves XP in the HALF_RATE zone (1500-3000)', () => {
+    const result = getDailyXpCap(200, 1500);
+    // All 200 XP falls in the half-rate zone → 100
+    expect(result).toBe(100);
+  });
+
+  it('quarters XP above QUARTER_RATE threshold (3000+)', () => {
+    const result = getDailyXpCap(400, 3000);
+    // All 400 XP falls in the quarter-rate zone → 100
+    expect(result).toBe(100);
+  });
+
+  it('handles XP that spans multiple zones', () => {
+    // dailyXpSoFar=1400, earning 200 → 100 at full rate, 100 at half rate = 100+50 = 150
+    const result = getDailyXpCap(200, 1400);
+    expect(result).toBe(150);
+  });
+
+  it('returns at least 1 XP when earning positive amount', () => {
+    const result = getDailyXpCap(1, 99999);
+    expect(result).toBeGreaterThanOrEqual(1);
   });
 });
 

@@ -41,7 +41,6 @@ import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDril
 import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
 import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
 import AuthModal from '@/components/auth/AuthModal';
-import AutoHideHeader from '@/components/AutoHideHeader';
 import PageLoader from '@/components/ui/PageLoader';
 
 /**
@@ -180,7 +179,6 @@ export default function BrainTrainingPageClient() {
         'flex-1 flex flex-col min-h-0 page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -233,7 +231,6 @@ export default function BrainTrainingPageClient() {
         'flex-1 flex flex-col min-h-0 page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -293,7 +290,6 @@ export default function BrainTrainingPageClient() {
         'flex-1 flex flex-col min-h-0 page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -348,7 +344,6 @@ export default function BrainTrainingPageClient() {
       'flex-1 flex flex-col min-h-0 page-content-safe', // Extra padding for bottom nav
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
-      <AutoHideHeader />
       <Header
         isDarkMode={isDarkMode}
         onBack={handleBack}

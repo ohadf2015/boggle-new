@@ -1,9 +1,10 @@
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { getXpProgress } from '@/shared/utils/adventureXpUtils';
+import { getDiminishingReturnsFactor, XP_CONFIG } from '@/backend/modules/xpManager';
 
 interface XpBreakdown {
   gameCompletion: number;
@@ -149,6 +150,30 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             {t('xp.totalXpEarned')}: {newTotalXp.toLocaleString()}
           </span>
         </div>
+      </div>
+
+      {/* Diminishing returns indicator */}
+      {newLevel > 25 && (
+        <div className="mt-2 px-2 py-1.5 rounded-neo bg-neo-black/10 dark:bg-neo-black/30 relative z-10">
+          <div className="flex items-center justify-between text-[10px] font-bold text-neo-black/60 dark:text-neo-cream/60">
+            <span className="flex items-center gap-1">
+              📉 {t('xp.diminishingReturns')}
+            </span>
+            <span>{Math.round(getDiminishingReturnsFactor(newLevel) * 100)}% {t('xp.xpRate')}</span>
+          </div>
+          {/* Visual rate bar */}
+          <div className="mt-1 h-1.5 bg-neo-black/10 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-neo-lime to-neo-cyan transition-all"
+              style={{ width: `${getDiminishingReturnsFactor(newLevel) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Daily cap note */}
+      <div className="mt-1 text-[9px] text-neo-black/40 dark:text-neo-cream/40 text-center relative z-10">
+        {t('xp.dailyCapNote', { fullRate: XP_CONFIG.DAILY_FULL_RATE })}
       </div>
 
       {/* Level Up celebration */}

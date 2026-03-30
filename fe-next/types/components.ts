@@ -108,6 +108,8 @@ export interface ResultsPageProps {
   seriesStandings?: Array<{ username: string; avatar?: { emoji?: string; color?: string }; totalScore: number; roundScores: number[]; currentRank: number; rankChange: number }>;
   /** Current series round number */
   seriesRoundNumber?: number;
+  /** Callback to reset the series tracker (start new series) */
+  onResetSeries?: () => void;
   /** Word Hunt summary from server (target word, lives, eliminated) */
   wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number };
   /** Blast mode summary from server */

@@ -1828,7 +1828,10 @@ const es = {
     "series": {
       "title": "Tabla de la Sesión",
       "gameCount": "Juego {count}",
-      "round": "R{num}"
+      "round": "R{num}",
+      "winner": "¡Ganador de la serie!",
+      "newSeries": "Nueva serie",
+      "waitingNewSeries": "Esperando al anfitrión..."
     },
     "wordsFound": "Palabras encontradas",
     "shareVictoryPrompt": "¡Comparte tu victoria!",
@@ -2415,6 +2418,9 @@ const es = {
     "scoreBonus": "Bonus de Puntuación",
     "winBonus": "Bonus de Victoria",
     "achievementBonus": "Bonus de Logro",
+    "diminishingReturns": "Tasa de XP",
+    "xpRate": "tasa",
+    "dailyCapNote": "Primeros {{fullRate}} XP/día a tasa completa, luego reducida",
     "titles": {
       "wordSeeker": "Buscador de Palabras",
       "letterHunter": "Cazador de Letras",

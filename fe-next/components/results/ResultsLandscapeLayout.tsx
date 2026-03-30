@@ -74,6 +74,11 @@ export interface ResultsLandscapeLayoutProps {
   // Game mode override (host only)
   selectedGameMode?: GameModeOption;
   onSelectGameMode?: (mode: GameModeOption) => void;
+
+  // Series (best-of-3) state
+  isSeriesComplete?: boolean;
+  seriesWinnerUsername?: string;
+  onNewSeries?: () => void;
 }
 
 /**
@@ -106,6 +111,9 @@ export function ResultsLandscapeLayout({
   t,
   selectedGameMode,
   onSelectGameMode,
+  isSeriesComplete,
+  seriesWinnerUsername,
+  onNewSeries,
 }: ResultsLandscapeLayoutProps) {
   return (
     <>
@@ -143,11 +151,11 @@ export function ResultsLandscapeLayout({
                     </div>
                   )}
                   <button
-                    onClick={onStartGame}
+                    onClick={isSeriesComplete && onNewSeries ? onNewSeries : onStartGame}
                     className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
                   >
                     <Play className="w-5 h-5" />
-                    {t('hostView.startGame')}
+                    {isSeriesComplete ? t('results.series.newSeries') : t('hostView.startGame')}
                   </button>
                   <button
                     onClick={onExitRoom}

@@ -360,7 +360,7 @@ function AdventureView(): React.JSX.Element {
         t={t}
       />
 
-      {(viewState === 'worldMap' || viewState === 'levelGrid') && <div className="h-14 flex-shrink-0" />}
+      {(viewState === 'worldMap' || viewState === 'levelGrid' || viewState === 'hub') && <div className="h-14 flex-shrink-0" />}
 
       <div className="relative z-10 flex-1 min-h-0">
         <AnimatePresence mode="wait">

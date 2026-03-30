@@ -1912,7 +1912,10 @@ const en = {
     "series": {
       "title": "Session Standings",
       "gameCount": "Game {count}",
-      "round": "R{num}"
+      "round": "R{num}",
+      "winner": "Series Winner!",
+      "newSeries": "New Series",
+      "waitingNewSeries": "Waiting for host..."
     },
     "wordsFound": "Words found",
     "shareVictoryPrompt": "Share your victory!",
@@ -2657,6 +2660,9 @@ const en = {
     "scoreBonus": "Score Bonus",
     "winBonus": "Win Bonus",
     "achievementBonus": "Achievement Bonus",
+    "diminishingReturns": "XP Rate",
+    "xpRate": "rate",
+    "dailyCapNote": "First {{fullRate}} XP/day at full rate, then reduced",
     "titles": {
       "wordSeeker": "Word Seeker",
       "letterHunter": "Letter Hunter",

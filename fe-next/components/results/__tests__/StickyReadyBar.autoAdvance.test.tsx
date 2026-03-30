@@ -1,7 +1,7 @@
 /**
  * StickyReadyBar Auto-Advance Tests
  *
- * Tests for the unified 21s countdown for all players (host and non-host).
+ * Tests for the unified 30s countdown for all players (host and non-host).
  * Host: auto-starts game. Non-host: auto-readies.
  */
 
@@ -60,7 +60,7 @@ vi.mock('@/components/GameModeSelector', () => ({
 
 import StickyReadyBar from '../StickyReadyBar';
 
-const AUTO_SECONDS = 21;
+const AUTO_SECONDS = 30;
 
 describe('StickyReadyBar auto-advance (host)', () => {
   const baseProps = {
@@ -82,7 +82,7 @@ describe('StickyReadyBar auto-advance (host)', () => {
     vi.useRealTimers();
   });
 
-  it('shows 21s countdown for host (defend title as rank 1)', () => {
+  it('shows 30s countdown for host (defend title as rank 1)', () => {
     render(<StickyReadyBar {...baseProps} />);
 
     expect(screen.getByTestId('auto-countdown')).toBeInTheDocument();

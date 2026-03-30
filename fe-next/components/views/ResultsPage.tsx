@@ -43,7 +43,9 @@ import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useB
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, wordHuntSummary }) => {
+const SERIES_TOTAL_GAMES = 3;
+
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, onResetSeries, wordHuntSummary }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
@@ -300,6 +302,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     });
   }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid]);
 
+  // Series (best-of-3) completion detection
+  const isSeriesComplete = (seriesRoundNumber ?? 0) >= SERIES_TOTAL_GAMES;
+  const seriesWinnerUsername = isSeriesComplete && seriesStandings?.[0]?.username
+    ? seriesStandings[0].username : undefined;
+
+  // Start a new series: reset tracker then start a fresh game
+  const handleNewSeries = useCallback(() => {
+    onResetSeries?.();
+    handleStartGame();
+  }, [onResetSeries, handleStartGame]);
+
   // Overlay modals that should render regardless of orientation
   // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
   // This fixes the bug where modals would only appear after switching from landscape to portrait
@@ -363,6 +376,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         t={t}
         selectedGameMode={selectedGameMode}
         onSelectGameMode={setSelectedGameMode}
+        isSeriesComplete={isSeriesComplete}
+        seriesWinnerUsername={seriesWinnerUsername}
+        onNewSeries={handleNewSeries}
       />
     );
   }
@@ -594,6 +610,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   onMarkReady={handleMarkReady}
                   selectedGameMode={selectedGameMode}
                   onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+                  isSeriesComplete={isSeriesComplete}
+                  seriesWinnerUsername={seriesWinnerUsername}
+                  onNewSeries={handleNewSeries}
                 />
               </div>
             </motion.div>
@@ -647,7 +666,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
       {gameCode && onReturnToRoom && (
-        <div className="hidden md:block fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black">
+        <div className="hidden md:block fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}
@@ -662,6 +681,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}
               onSelectGameMode={isHost ? setSelectedGameMode : undefined}
+              isSeriesComplete={isSeriesComplete}
+              seriesWinnerUsername={seriesWinnerUsername}
+              onNewSeries={handleNewSeries}
             />
           </div>
         </div>

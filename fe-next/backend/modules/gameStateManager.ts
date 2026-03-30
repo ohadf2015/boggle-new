@@ -230,6 +230,7 @@ function resetGameForNewRound(gameCode: string): boolean {
   }
 
   scoreManager.resetScoresForNewRound(asBase<ScoreGameBase>(game));
+  scoreManager.clearLeaderboardThrottle(gameCode);
   peerValidationManager.resetPeerValidation(asBase<PeerValidationGameBase>(game));
   readyStateManager.clearPlayersReadyForNextGame(asBase<ReadyStateGameBase>(game));
 

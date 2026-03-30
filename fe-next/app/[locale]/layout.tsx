@@ -10,7 +10,7 @@ import DesktopGameNav from '@/components/DesktopGameNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import GoogleAdSense from '@/components/GoogleAdSense';
-import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
+import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
@@ -529,7 +529,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
                 {/* CrazyGames SDK must load in <head> with beforeInteractive
                     so it's detected by their QA tool before hydration */}
-                <CrazyGamesScript />
+                <CrazyGamesScriptServer />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Skip to main content link for keyboard/screen reader users */}

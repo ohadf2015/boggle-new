@@ -31,8 +31,9 @@ vi.mock('@/components/GoogleAnalytics', () => ({
     default: () => null,
 }));
 
-vi.mock('@/components/CrazyGamesSDK', () => ({
-    CrazyGamesScript: () => null,
+vi.mock('@/components/CrazyGamesScriptServer', () => ({
+    __esModule: true,
+    default: () => null,
 }));
 
 vi.mock('@/components/SocialMediaPixels', () => ({

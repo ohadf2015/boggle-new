@@ -1809,7 +1809,10 @@ const sv = {
     "series": {
       "title": "Sammanlagd ställning",
       "gameCount": "Spel {count}",
-      "round": "R{num}"
+      "round": "R{num}",
+      "winner": "Serievinnare!",
+      "newSeries": "Ny serie",
+      "waitingNewSeries": "Väntar på värd..."
     },
     "wordsFound": "Ord hittade",
     "shareVictoryPrompt": "Dela din seger!",
@@ -2554,6 +2557,9 @@ const sv = {
     "scoreBonus": "Poängbonus",
     "winBonus": "Vinstbonus",
     "achievementBonus": "Prestationsbonus",
+    "diminishingReturns": "XP-takt",
+    "xpRate": "takt",
+    "dailyCapNote": "Första {{fullRate}} XP/dag med full takt, sedan reducerat",
     "titles": {
       "wordSeeker": "Ordsökare",
       "letterHunter": "Bokstavsjägare",

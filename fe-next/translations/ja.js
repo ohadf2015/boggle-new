@@ -1810,7 +1810,10 @@ const ja = {
     "series": {
       "title": "セッション順位",
       "gameCount": "ゲーム{count}",
-      "round": "R{num}"
+      "round": "R{num}",
+      "winner": "シリーズ優勝！",
+      "newSeries": "新しいシリーズ",
+      "waitingNewSeries": "ホストを待っています..."
     },
     "wordsFound": "見つけた単語",
     "shareVictoryPrompt": "勝利をシェアしよう！",
@@ -2555,6 +2558,9 @@ const ja = {
     "scoreBonus": "スコアボーナス",
     "winBonus": "勝利ボーナス",
     "achievementBonus": "実績ボーナス",
+    "diminishingReturns": "XPレート",
+    "xpRate": "レート",
+    "dailyCapNote": "毎日最初の{{fullRate}}XPはフルレート、その後減少",
     "titles": {
       "wordSeeker": "ワードシーカー",
       "letterHunter": "レターハンター",

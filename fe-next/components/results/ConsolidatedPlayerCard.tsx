@@ -51,7 +51,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
   // Expanded states for collapsible sections
   const [showDetails, setShowDetails] = useState(false);
-  const [showXp, setShowXp] = useState(false);
+  const [showXp, setShowXp] = useState(!!xpGainedData);
   // Default-expand achievements when player earned some this game
   const [showAchievements, setShowAchievements] = useState(
     () => (player.achievements?.length ?? 0) > 0

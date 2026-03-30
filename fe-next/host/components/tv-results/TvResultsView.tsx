@@ -270,7 +270,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-hidden px-6 pb-24">
+        <div className="flex-1 overflow-hidden px-6 pb-32">
           {showTournamentStandings ? (
             // Tournament Standings View
             <motion.div
