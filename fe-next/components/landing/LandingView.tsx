@@ -34,13 +34,11 @@ const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCar
 // Engagement widgets — only high-value conditional ones on landing
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
-const LandingTopWords = dynamic(() => import('./LandingTopWords').then(m => m.LandingTopWords), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
-const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), { ssr: false });
-const LandingHallOfFame = dynamic(() => import('./LandingHallOfFame').then(m => m.LandingHallOfFame), { ssr: false });
 const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
-const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), { ssr: false });
 const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
+const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), { ssr: false });
+const LandingHallOfFame = dynamic(() => import('./LandingHallOfFame').then(m => m.LandingHallOfFame), { ssr: false });
 // LeaguePositionBadge, WotdTeaser, WordPact, FriendsActivity moved to dedicated pages
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -94,8 +92,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats({
     initialGamesToday: initialData?.gamesToday,
   });
-  const { champions, loading: hallLoading } = useHallOfFame(5, {
-    initialData: initialData?.topPlayers,
+  const { champions, loading: hallLoading } = useHallOfFame(3, {
+    initialData: initialData?.topPlayers?.slice(0, 3),
   });
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
@@ -251,8 +249,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         {/* Below-fold sections — deferred until after first paint */}
         {hydrated && (
           <>
-            <LandingTopWords />
-
             <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
               <div className="lg:flex-1">
                 <LandingYourRank />
@@ -270,7 +266,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
             </div>
 
             <LandingBlogSection />
-            <LandingBottomCTA onPlayClick={handlePlayClick} />
           </>
         )}
       </section>
