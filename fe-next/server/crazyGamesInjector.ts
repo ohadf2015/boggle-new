@@ -79,16 +79,17 @@ export function crazyGamesScriptInjector(): RequestHandler {
 
     rawRes.write = function (chunk: unknown, ...args: unknown[]): boolean {
       const modified = processChunk(chunk);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       return (originalWrite as any)(modified, ...args);
     } as typeof rawRes.write;
 
     rawRes.end = function (chunk?: unknown, ...args: unknown[]): http.ServerResponse {
       const modified = processChunk(chunk);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       return (originalEnd as any)(modified, ...args);
     } as typeof rawRes.end;
 
     next();
   };
 }
+
