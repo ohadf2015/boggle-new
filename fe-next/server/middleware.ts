@@ -56,14 +56,14 @@ export function createCorsOptions(corsOrigin: string, isDev: boolean): CorsOptio
 export function securityHeaders(isDev: boolean): RequestHandler {
   // CSP is identical for dev and prod — kept as single string
   const csp = "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://*.adtrafficquality.google https://*.doubleclick.net; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://imasdk.googleapis.com https://*.googleadservices.com https://*.adtrafficquality.google https://*.doubleclick.net; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https://fonts.gstatic.com; " +
-    "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google ws: wss:; " +
+    "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google ws: wss:; " +
     "worker-src 'self' blob:; " +
     "frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net; " +
-    "frame-ancestors 'none';";
+    "frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;";
 
   // Permissions-Policy: Restrict browser features not needed by the game
   // Allows: fullscreen (for immersive gameplay), autoplay (for game sounds)
@@ -85,7 +85,8 @@ export function securityHeaders(isDev: boolean): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     res.setHeader('Content-Security-Policy', csp);
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
+    // X-Frame-Options removed — using CSP frame-ancestors instead
+    // Allows CrazyGames and other game portals to embed the game
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', permissionsPolicy);

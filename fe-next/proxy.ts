@@ -141,7 +141,8 @@ export async function proxy(request: NextRequest) {
   response.headers.set('X-DNS-Prefetch-Control', 'on');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  // X-Frame-Options removed — using CSP frame-ancestors instead (modern approach)
+  // This allows CrazyGames and other game portals to embed our game in iframes
 
   return response;
 }
