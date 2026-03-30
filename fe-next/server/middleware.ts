@@ -10,6 +10,7 @@ import express, { Application, Request, Response, NextFunction, RequestHandler }
 import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
 import { httpLogger } from './logger';
+import { crazyGamesScriptInjector } from './crazyGamesInjector';
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
@@ -259,6 +260,11 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // WWW redirect (must be first - before other middleware)
   app.use(wwwRedirect());
+
+  // CrazyGames SDK script injection — MUST be before compression
+  // so we intercept uncompressed HTML. next/script beforeInteractive
+  // doesn't work with custom Express servers.
+  app.use(crazyGamesScriptInjector());
 
   // Compression middleware (gzip/brotli)
   // Skip compression for Socket.IO paths to prevent chunked encoding errors
