@@ -241,11 +241,13 @@ export function CrazyGamesScript() {
   // Safe: content is a static string, no user input involved.
   return (
     <>
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document -- App Router root layout, not Pages Router */}
       <Script
         src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
         strategy="beforeInteractive"
         id="crazygames-sdk"
       />
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document -- App Router root layout, not Pages Router */}
       <Script
         id="crazygames-sdk-init"
         strategy="beforeInteractive"
