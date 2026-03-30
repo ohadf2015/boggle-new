@@ -280,7 +280,7 @@ export async function getFriends(): Promise<Friend[]> {
     .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
 
   if (error || !friendships) {
-    logger.error('Error fetching friends:', error);
+    logger.debug('Error fetching friends:', error);
     return [];
   }
 

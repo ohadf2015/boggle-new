@@ -148,6 +148,12 @@ Sentry.init({
     // Supabase auth lock timeout — known React Strict Mode issue, auto-recovers
     // See: https://github.com/supabase/gotrue-js/issues/806
     /lock.*was not released within.*forcefully acquiring/i,
+    // Supabase auth lock stolen by concurrent request — known SSR race condition, auto-recovers
+    /Lock.*was released because another request stole it/i,
+    // Friends fetch fails downstream of Supabase lock contention — non-actionable
+    /Error fetching friends/i,
+    // Capacitor addListener().then() — WebView compatibility issue on specific Android devices
+    /addListener\(.*\)\.then is not a function/i,
     // Next.js router state header parse — transient internal error, not actionable
     /router state header was sent but could not be parsed/i,
     // Progression quest-progress 429 — rate limited, non-critical background save

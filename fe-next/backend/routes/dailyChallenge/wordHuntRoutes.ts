@@ -344,7 +344,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .eq('language', language);
 
     if (totalPlayersError) {
-      logger.warn('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`, { code: totalPlayersError.code, details: totalPlayersError.details });
+      logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
     }
 
     const { count: totalSolvedCount, error: totalSolvedError } = await supabase

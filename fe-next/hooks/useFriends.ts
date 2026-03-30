@@ -123,7 +123,7 @@ export function useFriends(): UseFriendsReturn {
         });
       }
     } catch (err) {
-      logger.error('Error fetching friends:', err);
+      logger.debug('Error fetching friends:', err);
       if (isMounted.current) {
         setState(prev => ({
           ...prev,

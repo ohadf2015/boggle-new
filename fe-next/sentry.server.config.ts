@@ -39,5 +39,9 @@ Sentry.init({
     // Supabase updatePlayerStats transient errors — retried by client
     /\[SUPABASE\].*updatePlayerStats error/i,
     /\[SUPABASE\].*Failed to update profile stats/i,
+    // Supabase deadlock retries — handled by retryOnDeadlock helper, auto-recovers
+    /\[SUPABASE\].*Deadlock on.*retry/i,
+    // Word Hunt player count transient query failure — non-critical stat
+    /\[API\].*Word Hunt total players count error/i,
   ],
 });
