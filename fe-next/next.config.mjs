@@ -32,9 +32,11 @@ const nextConfig = {
   // so standalone's server.js is unused — we only want the minimal node_modules.
   output: 'standalone',
 
-  // Enable gzip compression — Railway edge does NOT compress responses,
-  // so the app must do it. Without this, 1.5MB+ JS chunks are sent raw.
-  compress: true,
+  // Disable Next.js built-in compression — Express compression middleware handles it.
+  // This allows the CrazyGames SDK injector (server/crazyGamesInjector.ts) to intercept
+  // uncompressed HTML before Express compresses it. Without this, Next.js compresses
+  // the response internally and the injector can't find <head> to inject into.
+  compress: false,
 
   // Force-include server-side packages that Next.js trace can miss
   // (native addons, dynamic requires, data files, etc.)

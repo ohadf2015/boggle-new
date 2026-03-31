@@ -261,11 +261,6 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // WWW redirect (must be first - before other middleware)
   app.use(wwwRedirect());
 
-  // CrazyGames SDK script injection — MUST be before compression
-  // so we intercept uncompressed HTML. next/script beforeInteractive
-  // doesn't work with custom Express servers.
-  app.use(crazyGamesScriptInjector());
-
   // Compression middleware (gzip/brotli)
   // Skip compression for Socket.IO paths to prevent chunked encoding errors
   app.use(compression({
@@ -308,6 +303,12 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // Security headers
   app.use(securityHeaders(isDev));
+
+  // CrazyGames SDK injection — MUST be AFTER compression middleware.
+  // Express middleware wraps res.write in stack order: later = outer wrapper.
+  // Next.js write → compression (inner, registered first) → injector (outer, registered after).
+  // So our injector sees uncompressed HTML, injects the SDK, then compression compresses everything.
+  app.use(crazyGamesScriptInjector());
 
   // IP Geolocation
   app.use(geolocationMiddleware({
