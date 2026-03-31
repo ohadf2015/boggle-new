@@ -217,7 +217,7 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                 </div>
 
                 {/* Name */}
-                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[10px] w-12' : 'text-[11px] w-14')}>
+                <span className={cn('font-bold truncate text-center text-neo-cream', compact ? 'text-[11px] w-14' : 'text-xs w-16')}>
                   {name}
                 </span>
               </motion.div>

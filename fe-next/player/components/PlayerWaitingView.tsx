@@ -1,20 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X } from 'lucide-react';
+import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import RoomChat from '../../components/RoomChat';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
-import { IdleMascot } from '@/components/ui/IdleMascot';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useGameMode } from '@/hooks/gameState';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -40,16 +42,12 @@ interface PlayerWaitingViewProps {
   setShowExitConfirm: (show: boolean) => void;
   onExitRoom: () => void;
   onConfirmExit: () => void;
-  /** Called when guest changes their display name */
   onNameChange?: (newName: string) => void;
-  /** Called when player changes their avatar */
   onAvatarChange?: (config: CustomAvatarConfig) => void;
 }
 
-// Avatar color palette (matches host view)
 const AVATAR_COLORS = ['bg-neo-cyan', 'bg-neo-pink', 'bg-purple-400', 'bg-neo-lime', 'bg-neo-yellow', 'bg-orange-400', 'bg-teal-400', 'bg-rose-400'];
 const MAX_PLAYERS = 8;
-
 
 // ==================== Component ====================
 
@@ -66,46 +64,142 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onAvatarChange,
 }): React.ReactElement => {
   const { isAuthenticated, updateProfile } = useAuth();
+  const gameMode = useGameMode();
 
-  // Avatar builder state
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const currentAvatar = getOrCreateStoredCustomAvatar();
 
-  const handleAvatarSave = async (config: CustomAvatarConfig) => {
+  const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
-    // Persist to DB for authenticated users so header/menu avatar updates
     await updateProfile({ avatar_config: config }).catch(() => {});
-  };
+  }, [onAvatarChange, updateProfile]);
 
-
-  // Show all players including host in the roster
   const nonHostPlayers = playersReady;
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
 
-  // Guest name editing state
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState(username);
 
-  const handleSaveName = () => {
+  const handleSaveName = useCallback(() => {
     const trimmed = editNameValue.trim();
     if (trimmed && trimmed !== username) {
       onNameChange?.(trimmed);
     }
     setIsEditingName(false);
-  };
+  }, [editNameValue, username, onNameChange]);
 
-  // Player roster - horizontal scroll with circular avatars (matches host style)
+  // ==================== Hero Card ====================
+  const renderHeroCard = (): React.ReactElement => (
+    <motion.div
+      data-testid="waiting-status"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={SPRING_PRESETS.balanced}
+      className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
+    >
+      <div className="h-1.5 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime" />
+
+      <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
+        {/* Large clickable avatar */}
+        <button
+          data-testid="edit-avatar-button"
+          onClick={() => setIsAvatarBuilderOpen(true)}
+          className="relative flex-shrink-0 group"
+        >
+          <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
+            <Avatar
+              customAvatar={currentAvatar}
+              size="2xl"
+              className="w-full h-full"
+            />
+          </div>
+          <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="w-6 h-6 text-neo-cream" />
+          </div>
+          <div className="absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+            <Pencil className="w-3.5 h-3.5 text-neo-black" />
+          </div>
+        </button>
+
+        {/* Name + status */}
+        <div className="flex-1 min-w-0">
+          {isEditingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                data-testid="name-edit-input"
+                type="text"
+                value={editNameValue}
+                onChange={(e) => setEditNameValue(e.target.value)}
+                maxLength={20}
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName();
+                  if (e.key === 'Escape') setIsEditingName(false);
+                }}
+              />
+              <button
+                data-testid="name-save-button"
+                onClick={handleSaveName}
+                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+              >
+                <Check className="w-4 h-4 text-neo-black" />
+              </button>
+              <button
+                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-neo-cream" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-black text-neo-cream truncate">
+                {username}
+              </h2>
+              {!isAuthenticated && (
+                <button
+                  data-testid="edit-name-button"
+                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                  className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label={t('playerView.editName')}
+                >
+                  <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 mt-1.5">
+            <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse" />
+            <p className="text-sm text-slate-400">
+              {t('playerView.hostWillStart')}
+            </p>
+          </div>
+
+          <div className="mt-3">
+            <RewardedAdGoldButton goldAmount={20} />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  // ==================== Player Roster ====================
   const renderPlayerRoster = (): React.ReactElement => (
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
           {t('hostView.playersInRoom')}
         </h3>
+        <span className="text-xs font-bold text-slate-500">
+          {nonHostPlayers.length}/{MAX_PLAYERS}
+        </span>
       </div>
-      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         <AnimatePresence>
           {nonHostPlayers.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -118,20 +212,25 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               <motion.div
                 key={name}
                 initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1, y: [0, -4, 0] }}
+                animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{
-                  scale: { type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06 },
-                  opacity: { type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06 },
-                  y: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: index * 0.2 },
+                  type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06,
                 }}
-                className="flex-shrink-0 flex flex-col items-center gap-2"
+                className="flex-shrink-0 flex flex-col items-center gap-1.5"
               >
-                <div className="relative">
+                <div
+                  className="relative animate-avatar-float"
+                  style={{ animationDelay: `${index * 200}ms` }}
+                >
                   {isHostPlayer && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <motion.div
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
+                    >
                       <Crown className="w-4 h-4 text-neo-yellow" />
-                    </div>
+                    </motion.div>
                   )}
                   <div className={cn(
                     'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden',
@@ -141,9 +240,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     {avatar?.customAvatar || avatar?.avatarImage ? (
                       <Avatar
                         customAvatar={avatar?.customAvatar ?? undefined}
-
                         avatarImage={avatar?.avatarImage}
-                        size="md"
+                        size="xl"
                       />
                     ) : (
                       <span className="text-2xl font-black text-neo-black">
@@ -167,11 +265,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
         {/* Empty Slots */}
         {Array.from({ length: emptySlots }).map((_, i) => (
-          <div key={`empty-${i}`} className="flex-shrink-0 flex flex-col items-center gap-2 pt-2">
+          <div key={`empty-${i}`} className="flex-shrink-0 flex flex-col items-center gap-1.5">
             <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
               <Plus className="w-5 h-5 text-neo-cyan/50" />
             </div>
-            <span className="text-xs font-bold text-slate-600 uppercase">
+            <span className="text-[10px] font-bold text-slate-600 uppercase">
               {t('common.join')}
             </span>
           </div>
@@ -180,106 +278,92 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </section>
   );
 
-  // Ready button + waiting status
-  const renderReadySection = (): React.ReactElement => (
-    <motion.div
-      data-testid="waiting-status"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="space-y-3"
-    >
-      {/* Welcoming mascot */}
-      <div className="flex justify-center">
-        <IdleMascot baseVariant="waving" size="sm" />
-      </div>
+  // ==================== Game Mode Tips ====================
+  const MODE_TIPS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; tips: string[] }> = {
+    classic: {
+      icon: <Grid3X3 className="w-5 h-5" />,
+      barClass: 'bg-neo-cyan',
+      iconBgClass: 'bg-neo-cyan',
+      dotClass: 'bg-neo-cyan',
+      tips: [
+        t('game.swipeLetters'),
+        t('game.diagonalWorks'),
+        t('game.comboExplanation'),
+      ],
+    },
+    blast: {
+      icon: <Zap className="w-5 h-5" />,
+      barClass: 'bg-neo-pink',
+      iconBgClass: 'bg-neo-pink',
+      dotClass: 'bg-neo-pink',
+      tips: [
+        t('blast.blastModeDesc'),
+        t('game.swipeLetters'),
+        t('game.comboExplanation'),
+      ],
+    },
+    'word-hunt': {
+      icon: <Crosshair className="w-5 h-5" />,
+      barClass: 'bg-neo-lime',
+      iconBgClass: 'bg-neo-lime',
+      dotClass: 'bg-neo-lime',
+      tips: [
+        t('tutorial.wordHunt.welcome.description'),
+        t('tutorial.wordHunt.lifeSystem.description'),
+        t('game.swipeLetters'),
+      ],
+    },
+  };
 
-      {/* Ready button removed from lobby - players only mark ready on the results page */}
+  const renderModeTips = (): React.ReactElement | null => {
+    if (!gameMode || !MODE_TIPS[gameMode]) return null;
+    const { icon, barClass, iconBgClass, dotClass, tips } = MODE_TIPS[gameMode];
 
-      {/* Waiting hint */}
-      <p className="text-sm text-center text-slate-400">
-        {t('playerView.hostWillStart')}
-      </p>
-
-
-      {/* Edit avatar + name */}
-      <div className="flex items-center justify-center gap-3">
-        {/* Avatar edit button — always available */}
-        <button
-          data-testid="edit-avatar-button"
-          onClick={() => setIsAvatarBuilderOpen(true)}
-          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-          <span>{t('playerView.editAvatar')}</span>
-        </button>
-
-        {/* Guest name editing */}
-        {!isAuthenticated && (
-          <>
-            <span className="text-slate-600">|</span>
-            {isEditingName ? (
-              <div className="flex items-center gap-2">
-                <input
-                  data-testid="name-edit-input"
-                  type="text"
-                  value={editNameValue}
-                  onChange={(e) => setEditNameValue(e.target.value)}
-                  maxLength={20}
-                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neo-cyan"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveName();
-                    if (e.key === 'Escape') setIsEditingName(false);
-                  }}
-                />
-                <button
-                  data-testid="name-save-button"
-                  onClick={handleSaveName}
-                  className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm"
-                >
-                  <Check className="w-4 h-4 text-neo-black" />
-                </button>
-                <button
-                  onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                  className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo"
-                >
-                  <X className="w-4 h-4 text-neo-cream" />
-                </button>
-              </div>
-            ) : (
-              <button
-                data-testid="edit-name-button"
-                onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
+        className="rounded-neo-lg border-3 border-neo-black bg-slate-800/60 shadow-hard overflow-hidden"
+      >
+        <div className={cn('h-1', barClass)} />
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
+              {icon}
+            </div>
+            <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
+              {t('game.howToPlay')}
+            </h3>
+          </div>
+          <ul className="space-y-2">
+            {tips.map((tip, i) => (
+              <motion.li
+                key={i}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                className="flex items-start gap-2 text-sm text-slate-300"
               >
-                <Pencil className="w-3.5 h-3.5" />
-                <span>{t('playerView.editName')}</span>
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    </motion.div>
-  );
+                <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0', dotClass)} />
+                <span>{tip}</span>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+      </motion.div>
+    );
+  };
 
-  // Mobile scrollable content (mirrors host's renderLobbyContent)
+  // ==================== Mobile Content ====================
   const renderMobileContent = (): React.ReactElement => (
-    <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 min-h-0">
-      {/* 1. Ready Section - replaces old waiting status */}
-      <section>{renderReadySection()}</section>
-
-      {/* 2. Player Roster */}
+    <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-4 min-h-0">
+      <section>{renderHeroCard()}</section>
       {renderPlayerRoster()}
-
-      {/* 3. Share/Invite Strip */}
+      {renderModeTips()}
       <MobileShareSection gameCode={gameCode} t={t} />
-
-      {/* 4. Chat */}
       <section className="pb-4">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 mb-2">
-          {t('hostView.roomChat')}
-        </h3>
         <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
           <RoomChat
             username={username}
@@ -296,19 +380,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
-      {/* Header - Command Center style (matches host) */}
-      <header className="flex-shrink-0 px-4 py-3 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
+      {/* Header */}
+      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center justify-between gap-2">
-          {/* Left side: Room code display */}
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-lg font-neo-display font-bold text-neo-cyan uppercase leading-none tracking-wider"
-              style={{ textShadow: '0 0 10px rgba(0, 255, 255, 0.5)' }}
-            >
-              {gameCode}
-            </span>
+            <MobileShareSection gameCode={gameCode} t={t} compact />
           </div>
-
-          {/* Right side: Player count + Exit */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
@@ -329,13 +406,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Main Content */}
       <main className="flex-1 min-h-0 overflow-hidden flex flex-col bg-neo-navy/95">
-        {/* Desktop Layout: Two-column via DesktopLobbyLayout */}
+        {/* Desktop Layout */}
         <div className="hidden lg:block h-full">
           <DesktopLobbyLayout
             leftContent={
               <>
-                {renderReadySection()}
+                {renderHeroCard()}
                 {renderPlayerRoster()}
+                {renderModeTips()}
               </>
             }
             rightContent={
@@ -343,7 +421,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <InviteCard gameCode={gameCode} t={t} desktop />
                 <div
                   data-testid="desktop-chat-area"
-                  className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-4 border-neo-black shadow-hard overflow-hidden"
+                  className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
                 >
                   <RoomChat
                     username={username}
@@ -359,7 +437,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           />
         </div>
 
-        {/* Mobile Layout: Single-scroll Command Center */}
+        {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col flex-1 min-h-0">
           {renderMobileContent()}
         </div>

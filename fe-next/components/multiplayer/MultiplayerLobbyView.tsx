@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Pencil, Check, X, Camera } from 'lucide-react';
+import { LogOut, Pencil, Check, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb } from 'lucide-react';
 import RoomChat from '../RoomChat';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
@@ -81,6 +81,9 @@ export interface MultiplayerLobbyViewProps {
 
   // Max players
   maxPlayers?: number;
+
+  // Game mode for tips display
+  gameMode?: 'classic' | 'blast' | 'word-hunt';
 }
 
 const MAX_PLAYERS_DEFAULT = 8;
@@ -117,6 +120,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   onNameChange,
   onAvatarChange,
   maxPlayers = MAX_PLAYERS_DEFAULT,
+  gameMode,
 }) => {
   const { isAuthenticated, updateProfile } = useAuth();
   const { isCrazyGames } = useCrazyGamesAuth();
@@ -279,6 +283,78 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
     </motion.div>
   );
 
+  // ==================== Game Mode Tips ====================
+  const MODE_TIPS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; tips: string[] }> = {
+    classic: {
+      icon: <Grid3X3 className="w-5 h-5" />,
+      barClass: 'bg-neo-cyan',
+      iconBgClass: 'bg-neo-cyan',
+      dotClass: 'bg-neo-cyan',
+      tips: [
+        t('game.swipeLetters'),
+        t('game.diagonalWorks'),
+        t('game.comboExplanation'),
+      ],
+    },
+    blast: {
+      icon: <Zap className="w-5 h-5" />,
+      barClass: 'bg-neo-pink',
+      iconBgClass: 'bg-neo-pink',
+      dotClass: 'bg-neo-pink',
+      tips: [
+        t('blast.blastModeDesc'),
+        t('game.swipeLetters'),
+        t('game.comboExplanation'),
+      ],
+    },
+    'word-hunt': {
+      icon: <Crosshair className="w-5 h-5" />,
+      barClass: 'bg-neo-lime',
+      iconBgClass: 'bg-neo-lime',
+      dotClass: 'bg-neo-lime',
+      tips: [
+        t('tutorial.wordHunt.welcome.description'),
+        t('tutorial.wordHunt.lifeSystem.description'),
+        t('game.swipeLetters'),
+      ],
+    },
+  };
+
+  const renderModeTips = () => {
+    if (!gameMode || !MODE_TIPS[gameMode]) return null;
+    const { icon, barClass, iconBgClass, dotClass, tips } = MODE_TIPS[gameMode];
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
+        className="rounded-neo-lg border-3 border-neo-black bg-slate-800/60 shadow-hard overflow-hidden"
+      >
+        <div className={cn('h-1', barClass)} />
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
+              {icon}
+            </div>
+            <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
+              {t('game.howToPlay')}
+            </h3>
+          </div>
+          <ul className="space-y-2">
+            {tips.map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
+                <span className={cn('mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0', dotClass)} />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.div>
+    );
+  };
+
   // ==================== Left Column Content ====================
   const renderLeftContent = () => {
     if (isHost && hostControls) {
@@ -300,6 +376,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           maxPlayers={maxPlayers}
           t={t}
         />
+        {renderModeTips()}
       </>
     );
   };
@@ -362,6 +439,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           maxPlayers={maxPlayers}
           t={t}
         />
+        {renderModeTips()}
         {!isCrazyGames && (
           <section className="pb-4">
             <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden h-64">
