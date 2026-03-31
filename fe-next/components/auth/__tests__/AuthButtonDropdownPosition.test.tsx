@@ -54,6 +54,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/hooks/useCrazyGamesAuth', () => ({
   useCrazyGamesAuth: () => ({
     isCrazyGames: false,
+    isReady: true,
     user: null,
     isLoggedIn: false,
     isLoggingIn: false,
