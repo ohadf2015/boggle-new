@@ -10023,3 +10023,5 @@ const es = {
     }
   }
 };
+
+export { es };

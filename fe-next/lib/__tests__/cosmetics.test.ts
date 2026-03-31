@@ -1,0 +1,119 @@
+import { describe, it, expect } from 'vitest';
+import {
+  COSMETICS,
+  getUnlockedCosmetics,
+  isUnlocked,
+  getEquippedCosmetics,
+  type CosmeticCategory,
+  type PlayerCosmeticState,
+} from '../cosmetics';
+
+const makePlayerState = (overrides?: Partial<PlayerCosmeticState>): PlayerCosmeticState => ({
+  rankTier: 'Unranked',
+  streakDays: 0,
+  coins: 0,
+  seasonRewards: [],
+  purchasedIds: [],
+  equippedIds: {},
+  ...overrides,
+});
+
+describe('cosmetics registry', () => {
+  it('has at least 16 cosmetics', () => {
+    expect(COSMETICS.length).toBeGreaterThanOrEqual(16);
+  });
+
+  it('covers all 4 categories', () => {
+    const categories = new Set(COSMETICS.map((c) => c.category));
+    expect(categories).toEqual(
+      new Set<CosmeticCategory>(['tileSkin', 'boardTheme', 'victoryEffect', 'profileFrame'])
+    );
+  });
+
+  it('each cosmetic has required fields', () => {
+    for (const c of COSMETICS) {
+      expect(c.id).toBeTruthy();
+      expect(c.name).toBeTruthy();
+      expect(c.description).toBeTruthy();
+      expect(c.rarity).toBeTruthy();
+      expect(c.unlockCondition).toBeTruthy();
+      expect(c.preview).toBeTruthy();
+    }
+  });
+});
+
+describe('isUnlocked', () => {
+  it('returns true for default cosmetics', () => {
+    const defaults = COSMETICS.filter((c) => c.unlockCondition.type === 'default');
+    expect(defaults.length).toBeGreaterThan(0);
+    const state = makePlayerState();
+    for (const c of defaults) {
+      expect(isUnlocked(c.id, state)).toBe(true);
+    }
+  });
+
+  it('returns true for rank-based when player has sufficient rank', () => {
+    const silverItem = COSMETICS.find(
+      (c) => c.unlockCondition.type === 'rank' && c.unlockCondition.tier === 'Silver'
+    );
+    expect(silverItem).toBeDefined();
+    expect(isUnlocked(silverItem!.id, makePlayerState({ rankTier: 'Silver' }))).toBe(true);
+    expect(isUnlocked(silverItem!.id, makePlayerState({ rankTier: 'Gold' }))).toBe(true);
+    expect(isUnlocked(silverItem!.id, makePlayerState({ rankTier: 'Bronze' }))).toBe(false);
+  });
+
+  it('returns true for streak-based when player has enough days', () => {
+    const streakItem = COSMETICS.find(
+      (c) => c.unlockCondition.type === 'streak' && c.unlockCondition.days === 7
+    );
+    expect(streakItem).toBeDefined();
+    expect(isUnlocked(streakItem!.id, makePlayerState({ streakDays: 7 }))).toBe(true);
+    expect(isUnlocked(streakItem!.id, makePlayerState({ streakDays: 10 }))).toBe(true);
+    expect(isUnlocked(streakItem!.id, makePlayerState({ streakDays: 6 }))).toBe(false);
+  });
+
+  it('returns true for purchased cosmetics', () => {
+    const purchaseItem = COSMETICS.find((c) => c.unlockCondition.type === 'purchase');
+    expect(purchaseItem).toBeDefined();
+    expect(isUnlocked(purchaseItem!.id, makePlayerState({ purchasedIds: [purchaseItem!.id] }))).toBe(true);
+    expect(isUnlocked(purchaseItem!.id, makePlayerState({ purchasedIds: [] }))).toBe(false);
+  });
+
+  it('returns false for unknown cosmetic id', () => {
+    expect(isUnlocked('nonexistent', makePlayerState())).toBe(false);
+  });
+});
+
+describe('getUnlockedCosmetics', () => {
+  it('returns only defaults for new player', () => {
+    const unlocked = getUnlockedCosmetics(makePlayerState());
+    const defaults = COSMETICS.filter((c) => c.unlockCondition.type === 'default');
+    expect(unlocked).toEqual(defaults);
+  });
+
+  it('includes rank-unlocked items for ranked player', () => {
+    const unlocked = getUnlockedCosmetics(makePlayerState({ rankTier: 'Gold' }));
+    const goldItem = COSMETICS.find(
+      (c) => c.unlockCondition.type === 'rank' && c.unlockCondition.tier === 'Gold'
+    );
+    expect(unlocked).toContainEqual(goldItem);
+  });
+});
+
+describe('getEquippedCosmetics', () => {
+  it('returns equipped items per category', () => {
+    const defaultTile = COSMETICS.find(
+      (c) => c.category === 'tileSkin' && c.unlockCondition.type === 'default'
+    );
+    const state = makePlayerState({
+      equippedIds: { tileSkin: defaultTile!.id },
+    });
+    const equipped = getEquippedCosmetics(state);
+    expect(equipped.tileSkin).toEqual(defaultTile);
+  });
+
+  it('returns undefined for unequipped categories', () => {
+    const equipped = getEquippedCosmetics(makePlayerState());
+    expect(equipped.tileSkin).toBeUndefined();
+  });
+});
