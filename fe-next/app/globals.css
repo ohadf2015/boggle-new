@@ -724,17 +724,17 @@ body {
     text-shadow: 2px 2px 0px rgb(var(--neo-black));
   }
 
-  /* Hebrew titles: use Rubik (better Hebrew glyph support), no stroke for solid fill */
+  /* Hebrew titles: use Rubik (better Hebrew glyph support) and reduce stroke */
   [dir="rtl"] .neo-title {
     font-family: var(--font-rubik), Rubik, sans-serif;
-    -webkit-text-stroke: 0;
+    -webkit-text-stroke: 1px rgb(var(--neo-black));
     text-shadow: 3px 3px 0px rgb(var(--neo-black));
     letter-spacing: 0;
   }
 
   [dir="rtl"] .neo-title-sm {
     font-family: var(--font-rubik), Rubik, sans-serif;
-    -webkit-text-stroke: 0;
+    -webkit-text-stroke: 0.5px rgb(var(--neo-black));
     letter-spacing: 0;
   }
 
@@ -929,6 +929,19 @@ body {
   }
   .blast-heartbeat {
     animation: blast-heartbeat 0.8s ease-in-out infinite;
+  }
+
+  /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
+  .blast-board [role="grid"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+  }
+  .blast-board [role="gridcell"] {
+    color: transparent !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
   /* Blast tile depth — specular highlight + inset shadow for 3D appearance */
@@ -2211,57 +2224,6 @@ body.crazygames-embed .game-view-container,
 }
 
 /* ====================================
-   BLAST SHOCKWAVE EFFECT
-   ==================================== */
-@keyframes blast-shockwave {
-  0% {
-    transform: translate(-50%, -50%) scale(0);
-    border: 3px solid rgba(255, 255, 255, 0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(3);
-    border: 3px solid rgba(255, 255, 255, 0);
-    opacity: 0;
-  }
-}
-
-.blast-shockwave {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  pointer-events: none;
-  animation: blast-shockwave 400ms ease-out forwards;
-}
-
-/* ====================================
-   BLAST IDLE BREATHING (standard tiles)
-   ==================================== */
-@keyframes blast-idle-breathe {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.03); }
-}
-
-.blast-idle-breathe {
-  animation: blast-idle-breathe 3s ease-in-out infinite;
-}
-
-/* ====================================
-   BLAST AMBIENT DOT (reactive background)
-   ==================================== */
-@keyframes blast-ambient-float {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-  50% { transform: translateY(-12px) scale(1.3); opacity: 0.7; }
-}
-
-.blast-ambient-dot {
-  animation: blast-ambient-float 4s ease-in-out infinite;
-}
-
-/* ====================================
    GLOBAL REDUCED MOTION SAFETY NET
    Catches any animation not individually handled.
    Individual components can override with more specific selectors.
@@ -2275,4 +2237,16 @@ body.crazygames-embed .game-view-container,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Low HP vignette pulse for Word Hunt */
+@keyframes low-hp-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-low-hp-pulse {
+  animation-name: low-hp-pulse;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
