@@ -98,39 +98,46 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
 
   io.use(async (socket, next) => {
     const token = socket.handshake.auth?.token as string | undefined;
+    const crazyGamesToken = socket.handshake.auth?.crazyGamesToken as string | undefined;
 
+    // Verify Supabase auth token
     if (!token) {
       socket.data.verifiedUserId = null;
-      return next();
-    }
-
-    if (!supabase) {
+    } else if (!supabase) {
       socketLogger.warn('Auth middleware: Supabase not configured, skipping verification');
       socket.data.verifiedUserId = null;
-      return next();
+    } else {
+      try {
+        const authResult = await Promise.race([
+          supabase.auth.getUser(token),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Auth verification timed out')), AUTH_TIMEOUT_MS)
+          ),
+        ]);
+
+        const { data: { user }, error } = authResult;
+
+        if (error || !user) {
+          socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Invalid auth token');
+          socket.data.verifiedUserId = null;
+        } else {
+          socket.data.verifiedUserId = user.id;
+          socket.data.verifiedEmail = user.email;
+        }
+      } catch (err) {
+        socketLogger.error({ err }, 'Auth verification error');
+        socket.data.verifiedUserId = null;
+      }
     }
 
-    try {
-      const authResult = await Promise.race([
-        supabase.auth.getUser(token),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Auth verification timed out')), AUTH_TIMEOUT_MS)
-        ),
-      ]);
-
-      const { data: { user }, error } = authResult;
-
-      if (error || !user) {
-        socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Invalid auth token');
-        socket.data.verifiedUserId = null;
-        return next();
-      }
-
-      socket.data.verifiedUserId = user.id;
-      socket.data.verifiedEmail = user.email;
-    } catch (err) {
-      socketLogger.error({ err }, 'Auth verification error');
-      socket.data.verifiedUserId = null;
+    // Store CrazyGames token for downstream handlers (verified lazily on demand).
+    // Full JWT verification requires jose + JWKS fetch — handlers that need
+    // verified CG identity should call the /api/auth/verify-crazygames endpoint.
+    if (crazyGamesToken) {
+      socket.data.crazyGamesToken = crazyGamesToken;
+      socket.data.isCrazyGames = true;
+    } else {
+      socket.data.isCrazyGames = false;
     }
 
     next();

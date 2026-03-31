@@ -20,6 +20,7 @@ import {
 } from 'react';
 import logger from '@/utils/logger';
 import { useAuth } from '@/contexts/AuthContext';
+import { saveToCloud } from '@/utils/crazygames/cloudSave';
 import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import {
   isWorldUnlocked as checkWorldUnlocked,
@@ -378,6 +379,16 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
     await fetchProgression();
   }, [fetchProgression]);
 
+  // Sync adventure progress to CrazyGames cloud save (fire-and-forget)
+  const syncCloudSave = useCallback((world: number, level: number, stars: number) => {
+    saveToCloud({
+      version: 1,
+      adventureProgress: { worldId: world, levelId: level, stars, completedLevels: [] },
+      educationProgress: { totalXp: 0, level: 0, streak: 0, achievements: [] },
+      preferences: { musicVolume: 1, soundVolume: 1, language: 'en' },
+    }).catch(() => { /* non-critical — DB is source of truth */ });
+  }, []);
+
   // In-flight dedup: store the key AND the promise so subsequent callers
   // await the same result instead of being rejected with `false`.
   const completeLevelInFlightRef = useRef<string | null>(null);
@@ -528,6 +539,9 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
           };
         });
 
+        // Sync to CrazyGames cloud save (fire-and-forget, non-blocking)
+        syncCloudSave(world, level, stars);
+
         return true;
       } catch (err) {
         logger.warn('[ProgressionContext] Complete level error:', err instanceof Error ? err.message : err);
@@ -541,7 +555,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
       completeLevelPromiseRef.current = promise;
       return promise;
     },
-    [user?.id, setProgression]
+    [user?.id, setProgression, syncCloudSave]
   );
 
   // Record a level attempt (including failed attempts)
