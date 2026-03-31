@@ -26,7 +26,7 @@ export interface BlastTileProps {
 
 /** Visual config per tile type: [gradient/bg classes, indicator emoji, text color override] */
 const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text?: string }> = {
-  standard:  { bg: 'bg-neo-cream',                                                          text: 'text-neo-navy' },
+  standard:  { bg: 'bg-gradient-to-br from-amber-50 via-neo-cream to-orange-50',              text: 'text-neo-navy' },
   gold:      { bg: 'bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-500',         indicator: '✦', text: 'text-neo-navy' },
   bomb:      { bg: 'bg-gradient-to-br from-red-500 via-red-600 to-orange-600',              indicator: '💣', text: 'text-white' },
   lightning: { bg: 'bg-gradient-to-br from-yellow-300 via-yellow-400 to-cyan-400',           indicator: '⚡', text: 'text-neo-navy' },
@@ -123,8 +123,8 @@ export const BlastTile = memo(function BlastTile({
       onClick={onClick}
       className={[
         'relative aspect-square flex items-center justify-center',
-        'border-neo rounded-lg shadow-hard-sm',
-        'font-neo-display text-[clamp(1rem,4cqw,1.75rem)] font-bold uppercase',
+        'border-2 border-black/30 rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.3)]',
+        'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-bold uppercase',
         'transition-transform duration-100 select-none active:scale-[0.92] active:brightness-110',
         visual.bg,
         visual.text ?? 'text-neo-navy',

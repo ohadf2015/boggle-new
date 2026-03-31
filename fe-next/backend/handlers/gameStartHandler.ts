@@ -92,6 +92,7 @@ function buildStartGamePayload(
 
   if (resolvedMode === 'word-hunt') {
     payload.wordHuntTargetLength = (game as any)?.wordHuntState?.targetWordLength ?? 0;
+    payload.wordHuntTargetCategory = (game as any)?.wordHuntState?.targetCategory ?? null;
   }
 
   if (isRetry) {

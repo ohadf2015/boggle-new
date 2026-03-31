@@ -53,6 +53,7 @@ export {
   useBoardTheme,
   useGameMode,
   useWordHuntTargetLength,
+  useWordHuntTargetCategory,
   useWordHuntMyLife,
   useWordHuntPlayerLives,
   useWordHuntTargetAttempts,

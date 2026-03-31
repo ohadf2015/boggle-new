@@ -187,7 +187,7 @@ export function BlastStage({
 
       {/* 2. Objective progress bar */}
       {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 py-1 max-w-md mx-auto w-full flex-shrink-0">
+        <div className="px-4 py-0.5 max-w-md mx-auto w-full flex-shrink-0">
           <div className="flex gap-2">
             {objectiveProgress.map((obj, i) => {
               const target = obj.objective.target;
@@ -213,25 +213,25 @@ export function BlastStage({
         </div>
       )}
 
-      {/* 3. Word forming area */}
+      {/* 3. Word forming area — collapses when empty */}
       <div className={cn(
-        'flex items-center justify-center flex-shrink-0 relative z-30 px-4 mb-2',
-        'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
-        'min-h-[40px] rounded-neo',
-        formedWord ? 'bg-white/5 border border-white/10' : '',
+        'flex items-center justify-center flex-shrink-0 relative z-30 px-4 mx-auto w-full max-w-md overflow-visible transition-all duration-150',
+        formedWord ? 'min-h-[36px] mb-1 bg-white/5 border border-white/10 rounded-neo' : 'min-h-0 mb-0',
       )}>
-        <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
         {formedWord && (
-          <span className="absolute end-3 text-[10px] font-bold text-white/60 tabular-nums">
-            {formedWord.length}
-          </span>
+          <>
+            <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
+            <span className="absolute end-3 text-[10px] font-bold text-white/60 tabular-nums">
+              {formedWord.length}
+            </span>
+          </>
         )}
       </div>
 
       {/* 4. Board */}
       <div
         className={cn(
-          'flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0',
+          'flex-1 flex flex-col items-center justify-center px-3 relative z-30 min-h-0',
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
           sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
@@ -243,7 +243,7 @@ export function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        <div ref={boardContainerRef} className="relative w-full max-w-[360px] md:max-w-[420px] lg:max-w-[min(480px,50vh)]">
+        <div ref={boardContainerRef} className="relative w-full max-w-[min(95vw,480px)] md:max-w-[min(85vw,520px)]">
           {/* PixiJS effects layer — behind DOM tiles, mounted after measurement */}
           {boardSize.width > 0 && (
             <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">

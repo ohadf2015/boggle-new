@@ -23,6 +23,9 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
+import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
+import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
+import type { RankTier } from '@/shared/utils/eloRating';
 
 
 // ==============================================
@@ -77,6 +80,8 @@ export interface ResultsMainContentProps {
   /** Callback for podium emoji reactions */
   onPodiumReaction?: (reactionId: string, targetUsername: string) => void;
   /** All player words for crown + MVP computation */
+  /** Near rank teaser data */
+  nearRankData?: { nextTier: RankTier; eloNeeded: number } | null;
   /** Word Hunt summary */
   wordHuntSummary?: {
     targetWord: string;
@@ -109,6 +114,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   t,
   allPlayerWords,
   gameDuration: _gameDuration,
+  winStreakData,
+  nearRankData,
   wordHuntSummary,
   onPodiumReaction,
   emojiReactions,
@@ -184,6 +191,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
     <div className="space-y-6">
       {/* Cinematic results in YOU-FIRST order */}
 
+      {/* Win Streak Badge */}
+      {winStreakData && winStreakData.currentStreak >= 2 && (
+        <WinStreakBadge streak={winStreakData.currentStreak} t={t} />
+      )}
+
       {/* 1. YOUR RESULT HERO */}
       {currentPlayerData && (
         <ResultsHeroSection
@@ -220,6 +232,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           currentUsername={username}
           t={t}
         />
+      )}
+
+      {/* Near Rank Teaser */}
+      {nearRankData && (
+        <NearRankTeaser nextTier={nearRankData.nextTier} eloNeeded={nearRankData.eloNeeded} />
       )}
 
       {/* 4. HIGHLIGHTS BAR */}

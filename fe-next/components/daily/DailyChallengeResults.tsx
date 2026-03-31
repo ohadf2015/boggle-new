@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -17,6 +18,8 @@ import {
   type DailyStreak,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
+import { DailyRewardClaim } from './DailyRewardClaim';
+import { getRewardCoins } from '@/lib/dailyRewards';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -68,9 +71,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
 
+  const hasMarkedQuestRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
     requestMidgameAd();
+    if (!hasMarkedQuestRef.current) {
+      markModePlayedLogic('daily');
+      hasMarkedQuestRef.current = true;
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const {
@@ -229,6 +237,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
           ]}
         />
+
+        {/* Daily Reward Claim */}
+        {isNewCompletion && streak && (
+          <DailyRewardClaim
+            coinsEarned={getRewardCoins(streak.currentStreak)}
+            currentStreakDay={streak.currentStreak}
+            t={t}
+          />
+        )}
 
         {/* Share Section - Streamlined */}
         <motion.div
