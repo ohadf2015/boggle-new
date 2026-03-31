@@ -10,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeArea } from '../hooks/useSafeArea';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
 import { useFriends } from '../hooks/useFriends';
 
@@ -68,6 +69,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { t, language } = useLanguage();
     const { isInGame } = useNavigation();
     const { isAuthenticated } = useAuth();
+    const { isOnCrazyGamesPlatform } = useCrazyGames();
     const router = useRouter();
     const pathname = usePathname();
     const safeArea = useSafeArea();
@@ -111,7 +113,8 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
     }, [pathname, language]);
 
-    if (isInGame || shouldHideOnCurrentPath) return null;
+    // Hide entire bottom nav on CrazyGames — external links and social features prohibited
+    if (isInGame || shouldHideOnCurrentPath || isOnCrazyGamesPlatform) return null;
 
     return (
         <nav

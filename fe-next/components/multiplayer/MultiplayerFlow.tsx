@@ -45,6 +45,9 @@ interface MultiplayerFlowProps {
   // Profile avatar for authenticated users
   profileAvatar?: CustomAvatarConfig | null;
 
+  // CrazyGames login callback
+  onCrazyGamesLogin?: (() => void) | undefined;
+
   // Form state setters (for compatibility)
   setGameCode: (code: string) => void;
   setUsername: (name: string) => void;

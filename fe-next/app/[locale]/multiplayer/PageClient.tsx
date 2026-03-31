@@ -100,7 +100,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
   // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
-  const { user: cgUser, isCrazyGames } = useCrazyGamesAuth();
+  const { user: cgUser, isCrazyGames, login: loginCrazyGames } = useCrazyGamesAuth();
   const { playTrack, TRACKS } = useMusic();
 
   const {
@@ -327,6 +327,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             activeRooms={activeRooms} roomsLoading={roomsLoading}
             isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate}
             displayName={(isCrazyGames && cgUser?.username) || profile?.display_name || ''} profileAvatar={profile?.avatar_config}
+            onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}

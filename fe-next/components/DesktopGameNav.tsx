@@ -6,6 +6,7 @@ import { Home, Swords, Zap, Calendar, Mountain, Trophy, Users } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 interface NavItem {
   id: string;
@@ -33,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
 export const DesktopGameNav = memo(function DesktopGameNav() {
   const { t, language } = useLanguage();
   const { isInGame } = useNavigation();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -45,7 +47,8 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
     return 'home';
   }, [pathname, language]);
 
-  if (isInGame) return null;
+  // Hide desktop nav on CrazyGames — external links and social features prohibited
+  if (isInGame || isOnCrazyGamesPlatform) return null;
 
   return (
     <nav

@@ -4,16 +4,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSeason } from '@/hooks/useSeason';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getRankTier } from '@/shared/utils/eloRating';
 
 export const SeasonBanner: React.FC = () => {
   const { currentSeason, timeRemaining, peakTier } = useSeason();
   const { t } = useLanguage();
 
   const isEndingSoon = timeRemaining.days < 7;
-  const tier = getRankTier(
-    peakTier === 'Unranked' ? 0 : 800 // fallback for display
-  );
+
+  // Don't show banner for unranked users — it pushes main content down with no value
+  if (peakTier === 'Unranked') return null;
 
   return (
     <motion.div

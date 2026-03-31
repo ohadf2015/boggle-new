@@ -3945,6 +3945,12 @@ const ja = {
       }
     }
   },
+  "season": {
+    "name": "シーズン{{number}}: {{theme}}",
+    "endingSoon": "シーズンまもなく終了！",
+    "endsIn": "残り{{days}}日",
+    "peakTier": "最高: {{tier}}"
+  },
   "growth": {
     "dayStreak": "日連続",
     "daysAway": "日後",

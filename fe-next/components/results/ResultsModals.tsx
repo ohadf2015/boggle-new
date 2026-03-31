@@ -16,7 +16,7 @@
 
 import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useModalQueue } from '@/hooks/useModalQueue';
 import type { WordToVote } from '@/types/components';
 
@@ -108,7 +108,8 @@ export function ResultsModals({
   authModal,
   firstWinModal,
 }: ResultsModalsProps) {
-  const hideExternal = shouldHideExternalLogin();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const hideExternal = isOnCrazyGamesPlatform;
 
   const modals = useMemo(
     () => [

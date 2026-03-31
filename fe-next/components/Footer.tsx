@@ -34,6 +34,15 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
       )}
     >
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* On CrazyGames: hide entire footer content (external links prohibited) */}
+        {isOnCrazyGamesPlatform ? (
+          <div className="text-center">
+            <p className="text-xs text-neo-cream/50">
+              {t('legal.copyright', { year: new Date().getFullYear() })}
+            </p>
+          </div>
+        ) : (
+        <>
         {/* Link columns */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Explore */}
@@ -77,8 +86,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             </ul>
           </nav>
 
-          {/* Connect — hidden on CrazyGames (external links prohibited) */}
-          {!isOnCrazyGamesPlatform && (
+          {/* Connect */}
           <div>
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-yellow mb-3">
               {t('footer.connect', 'Connect')}
@@ -111,7 +119,6 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               </li>
             </ul>
           </div>
-          )}
         </div>
 
         {/* Bottom bar */}
@@ -120,6 +127,8 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             {t('legal.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
+        </>
+        )}
       </div>
     </footer>
   );

@@ -4050,6 +4050,12 @@ const en = {
     "nextTier": "Next Tier",
     "season": "Season"
   },
+  "season": {
+    "name": "Season {{number}}: {{theme}}",
+    "endingSoon": "Season ending soon!",
+    "endsIn": "Ends in {{days}} days",
+    "peakTier": "Peak: {{tier}}"
+  },
   "growth": {
     "dayStreak": "day streak",
     "daysAway": "days away",

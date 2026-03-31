@@ -3964,6 +3964,12 @@ const he = {
     "nextTier": "הדרגה הבאה",
     "season": "עונה"
   },
+  "season": {
+    "name": "עונה {{number}}: {{theme}}",
+    "endingSoon": "העונה מסתיימת בקרוב!",
+    "endsIn": "מסתיימת בעוד {{days}} ימים",
+    "peakTier": "שיא: {{tier}}"
+  },
   "growth": {
     "dayStreak": "ימי רצף",
     "daysAway": "ימים נותרו",

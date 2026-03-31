@@ -3978,6 +3978,12 @@ const es = {
     "nextTier": "Siguiente rango",
     "season": "Temporada"
   },
+  "season": {
+    "name": "Temporada {{number}}: {{theme}}",
+    "endingSoon": "¡La temporada termina pronto!",
+    "endsIn": "Termina en {{days}} días",
+    "peakTier": "Máximo: {{tier}}"
+  },
   "growth": {
     "dayStreak": "racha de días",
     "daysAway": "días para",

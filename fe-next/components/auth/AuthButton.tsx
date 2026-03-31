@@ -50,6 +50,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
   const {
     isCrazyGames,
+    isReady,
     user: crazyGamesUser,
     isLoggedIn: isCrazyGamesLoggedIn,
     isLoggingIn: isCrazyGamesLoggingIn,
@@ -155,7 +156,9 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
   if (!isSupabaseEnabled) return null;
 
-  if (loading) {
+  // While Supabase auth or CrazyGames SDK is still resolving, show skeleton.
+  // Without this guard, standard auth buttons flash for ~5s before SDK detects CrazyGames.
+  if (loading || !isReady) {
     return (
       <div className={cn('w-24 h-9 rounded-full animate-pulse', isDarkMode ? 'bg-slate-700' : 'bg-gray-200')} />
     );

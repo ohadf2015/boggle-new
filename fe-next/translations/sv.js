@@ -3945,6 +3945,12 @@ const sv = {
       }
     }
   },
+  "season": {
+    "name": "Säsong {{number}}: {{theme}}",
+    "endingSoon": "Säsongen slutar snart!",
+    "endsIn": "Slutar om {{days}} dagar",
+    "peakTier": "Topp: {{tier}}"
+  },
   "growth": {
     "dayStreak": "dagars svit",
     "daysAway": "dagar kvar",
