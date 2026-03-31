@@ -301,7 +301,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         logger.warn('[RESULTS] Game reset failed:', response?.error);
       }
     });
-  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid]);
+  }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode]);
 
   // Series (best-of-3) completion detection
   const isSeriesComplete = (seriesRoundNumber ?? 0) >= SERIES_TOTAL_GAMES;

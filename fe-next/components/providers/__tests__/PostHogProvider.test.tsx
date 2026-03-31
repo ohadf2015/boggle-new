@@ -6,28 +6,38 @@
 
 import React from 'react';
 import { render, act } from '@testing-library/react';
+import posthog from 'posthog-js';
 
-// Shared mock refs
-const mocks = {
-  init: jest.fn(),
-  capture: jest.fn(),
-  identify: jest.fn(),
-  reset: jest.fn(),
-  opt_in_capturing: jest.fn(),
-  opt_out_capturing: jest.fn(),
-  has_opted_out_capturing: jest.fn().mockReturnValue(true),
-};
+// Must use jest.mocked after mock
+jest.mock('posthog-js', () => ({
+  __esModule: true,
+  default: {
+    init: jest.fn(),
+    capture: jest.fn(),
+    identify: jest.fn(),
+    reset: jest.fn(),
+    opt_in_capturing: jest.fn(),
+    opt_out_capturing: jest.fn(),
+    has_opted_out_capturing: jest.fn().mockReturnValue(true),
+  },
+}));
 
-jest.mock('posthog-js', () => ({ __esModule: true, default: mocks }));
 jest.mock('posthog-js/react', () => ({
   PostHogProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+const mockOnConsentChangeCallbacks: Array<(s: { analytics: boolean }) => void> = [];
 let mockHasConsentValue = false;
-const mockOnConsentChange = jest.fn().mockReturnValue(() => {});
+
 jest.mock('@/utils/cookieConsent', () => ({
   hasConsent: () => mockHasConsentValue,
-  onConsentChange: (...args: unknown[]) => mockOnConsentChange(...args),
+  onConsentChange: (cb: (s: { analytics: boolean }) => void) => {
+    mockOnConsentChangeCallbacks.push(cb);
+    return () => {
+      const idx = mockOnConsentChangeCallbacks.indexOf(cb);
+      if (idx >= 0) mockOnConsentChangeCallbacks.splice(idx, 1);
+    };
+  },
 }));
 
 jest.mock('next/navigation', () => ({
@@ -35,22 +45,17 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-// We need to reset the module-level `posthogInitialized` flag.
-// Since jest.mock persists across resetModules, we can re-require safely.
-function loadFreshProvider() {
-  let PostHogProvider: React.FC<{ children: React.ReactNode }>;
-  jest.isolateModules(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    PostHogProvider = require('../PostHogProvider').PostHogProvider;
-  });
-  return PostHogProvider!;
-}
+import { PostHogProvider, _resetPostHogInit } from '../PostHogProvider';
+
+const ph = posthog as jest.Mocked<typeof posthog>;
 
 describe('PostHogProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockHasConsentValue = false;
-    mocks.has_opted_out_capturing.mockReturnValue(true);
+    mockOnConsentChangeCallbacks.length = 0;
+    ph.has_opted_out_capturing.mockReturnValue(true);
+    _resetPostHogInit();
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'test-key';
     process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://us.i.posthog.com';
   });
@@ -61,10 +66,9 @@ describe('PostHogProvider', () => {
   });
 
   it('initializes PostHog with opt_out_capturing_by_default', () => {
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    expect(mocks.init).toHaveBeenCalledWith('test-key', expect.objectContaining({
+    expect(ph.init).toHaveBeenCalledWith('test-key', expect.objectContaining({
       api_host: 'https://us.i.posthog.com',
       opt_out_capturing_by_default: true,
       capture_pageview: false,
@@ -74,65 +78,52 @@ describe('PostHogProvider', () => {
 
   it('opts in when analytics consent is already granted', () => {
     mockHasConsentValue = true;
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    expect(mocks.opt_in_capturing).toHaveBeenCalled();
+    expect(ph.opt_in_capturing).toHaveBeenCalled();
   });
 
   it('stays opted out when analytics consent is denied', () => {
     mockHasConsentValue = false;
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    expect(mocks.opt_in_capturing).not.toHaveBeenCalled();
+    expect(ph.opt_in_capturing).not.toHaveBeenCalled();
   });
 
   it('subscribes to consent changes', () => {
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    expect(mockOnConsentChange).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockOnConsentChangeCallbacks).toHaveLength(1);
   });
 
   it('opts in when consent changes to granted', () => {
-    let consentCb: ((s: { analytics: boolean }) => void) | null = null;
-    mockOnConsentChange.mockImplementation((cb: (s: { analytics: boolean }) => void) => {
-      consentCb = cb;
-      return () => {};
-    });
-
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    act(() => { consentCb?.({ analytics: true }); });
-    expect(mocks.opt_in_capturing).toHaveBeenCalled();
+    act(() => {
+      mockOnConsentChangeCallbacks[0]?.({ analytics: true });
+    });
+
+    expect(ph.opt_in_capturing).toHaveBeenCalled();
   });
 
   it('opts out when consent is revoked', () => {
-    let consentCb: ((s: { analytics: boolean }) => void) | null = null;
-    mockOnConsentChange.mockImplementation((cb: (s: { analytics: boolean }) => void) => {
-      consentCb = cb;
-      return () => {};
-    });
-
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    act(() => { consentCb?.({ analytics: false }); });
-    expect(mocks.opt_out_capturing).toHaveBeenCalled();
+    act(() => {
+      mockOnConsentChangeCallbacks[0]?.({ analytics: false });
+    });
+
+    expect(ph.opt_out_capturing).toHaveBeenCalled();
   });
 
   it('does not initialize when NEXT_PUBLIC_POSTHOG_KEY is missing', () => {
     delete process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    const PostHogProvider = loadFreshProvider();
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
-    expect(mocks.init).not.toHaveBeenCalled();
+    expect(ph.init).not.toHaveBeenCalled();
   });
 
   it('renders children', () => {
-    const PostHogProvider = loadFreshProvider();
     const { getByText } = render(
       <PostHogProvider><div>test child</div></PostHogProvider>
     );

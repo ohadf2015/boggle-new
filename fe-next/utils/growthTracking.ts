@@ -11,6 +11,7 @@ import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
+import posthog from 'posthog-js';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -164,6 +165,13 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
     } catch {
       // Silently fail if LogRocket not properly initialized
     }
+  }
+
+  // Send to PostHog (no-ops when opted out or not initialized)
+  try {
+    posthog.capture(`growth:${event}`, enrichedData);
+  } catch {
+    // Silently fail if PostHog not initialized
   }
 
   // Send to GA4 for unified analytics

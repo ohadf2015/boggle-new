@@ -345,7 +345,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     });
   }, [
     socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
-    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode,
+    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode, gameCode,
     setTableData, setRemainingTime, setShowStartAnimation,
     setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
   ]);

@@ -27,6 +27,7 @@ import { initConsoleOverride } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
+import { PostHogProvider } from '@/components/providers/PostHogProvider';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -166,6 +167,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                 <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
                     <AuthProvider>
                         <LogRocketIdentify />
+                        <PostHogProvider>
                         <CoinProvider>
                             <AccessibilityProvider>
                             <MotionConfigProvider>
@@ -198,6 +200,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                             </MotionConfigProvider>
                         </AccessibilityProvider>
                     </CoinProvider>
+                    </PostHogProvider>
                     </AuthProvider>                </LanguageProvider>
             </ThemeProvider>
             </>
