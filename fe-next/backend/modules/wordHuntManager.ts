@@ -11,9 +11,11 @@ import {
   HUNT_FIRST_FINDER_BONUS,
   HUNT_WRONG_GUESS_PENALTY,
   getHuntLifeBonus,
+  getDrainRate,
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
 import { isWordHuntQuality } from '@/shared/utils/wordQuality';
+import { getCategoryForWord } from '@/shared/data/wordCategories';
 import { promises as fsAsync, readFileSync } from 'fs';
 import * as path from 'path';
 
@@ -181,6 +183,7 @@ export function initWordHuntState(
 
   return {
     targetWord,
+    targetCategory: getCategoryForWord(targetWord),
     targetWordLength: targetWord.length,
     playerLives,
     eliminatedPlayers: [],
@@ -193,17 +196,18 @@ export function initWordHuntState(
  * Pure function: drain life from all non-eliminated players.
  * Returns updated lives and list of newly eliminated players.
  */
-export function drainLife(state: WordHuntModeState): {
+export function drainLife(state: WordHuntModeState, elapsedSeconds?: number): {
   updatedLives: Record<string, number>;
   newlyEliminated: string[];
 } {
+  const rate = elapsedSeconds != null ? getDrainRate(elapsedSeconds) : HUNT_LIFE_DRAIN_RATE;
   const updatedLives: Record<string, number> = { ...state.playerLives };
   const newlyEliminated: string[] = [];
 
   for (const player of Object.keys(updatedLives)) {
     if (state.eliminatedPlayers.includes(player)) continue;
 
-    updatedLives[player] -= HUNT_LIFE_DRAIN_RATE;
+    updatedLives[player] -= rate;
     if (updatedLives[player] <= 0) {
       updatedLives[player] = 0;
       newlyEliminated.push(player);

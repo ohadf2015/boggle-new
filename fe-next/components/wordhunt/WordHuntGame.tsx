@@ -6,6 +6,8 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
 import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
 import { WordHuntGameLayout } from './WordHuntGameLayout';
+import { WordHuntDangerToast } from './WordHuntDangerToast';
+import { useWordHuntDangerAlerts } from '@/hooks/useWordHuntDangerAlerts';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -49,6 +51,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   // Bridge: convert Zustand MP state → SP-compatible props
   const bridge = useWordHuntMultiplayerBridge();
+
+  // Danger alert toasts (opponent danger / eliminated / last standing)
+  const { toasts: dangerToasts, dismissToast } = useWordHuntDangerAlerts();
 
   // Local swipe/word state
   const [formedWord, setFormedWord] = useState('');
@@ -152,6 +157,8 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   }, []);
 
   return (
+    <>
+    <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
     <WordHuntGameLayout
       // Header (no timer)
       score={score}
@@ -197,6 +204,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       t={t}
       gameDir={dir}
     />
+    </>
   );
 });
 

@@ -4,6 +4,24 @@
  */
 
 export const HUNT_LIFE_DRAIN_RATE = 1.2;
+
+/** Accelerating drain phases */
+export const HUNT_DRAIN_PHASE_1_RATE = 0.8;
+export const HUNT_DRAIN_PHASE_1_DURATION = 30;
+export const HUNT_DRAIN_PHASE_2_RATE = 1.2;
+export const HUNT_DRAIN_PHASE_2_DURATION = 30;
+export const HUNT_DRAIN_PHASE_3_RATE = 2.0;
+
+/** Get drain rate based on elapsed seconds since game start */
+export function getDrainRate(elapsedSeconds: number): number {
+  if (elapsedSeconds < HUNT_DRAIN_PHASE_1_DURATION) {
+    return HUNT_DRAIN_PHASE_1_RATE;
+  }
+  if (elapsedSeconds < HUNT_DRAIN_PHASE_1_DURATION + HUNT_DRAIN_PHASE_2_DURATION) {
+    return HUNT_DRAIN_PHASE_2_RATE;
+  }
+  return HUNT_DRAIN_PHASE_3_RATE;
+}
 export const HUNT_INITIAL_LIFE = 100;
 export const HUNT_FIRST_FINDER_BONUS = 20;
 export const HUNT_WRONG_GUESS_PENALTY = 15;

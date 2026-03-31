@@ -79,7 +79,8 @@ export function startGameTimer(
     const currentGame = getGame(gameCode);
     if (currentGame?.gameMode === 'word-hunt' && (currentGame as any).wordHuntState) {
       const huntState = (currentGame as any).wordHuntState;
-      const { updatedLives, newlyEliminated } = drainLife(huntState);
+      const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
+      const { updatedLives, newlyEliminated } = drainLife(huntState, elapsedSeconds);
 
       // Update game state with drained lives
       huntState.playerLives = updatedLives;
