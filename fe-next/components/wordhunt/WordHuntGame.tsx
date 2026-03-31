@@ -161,8 +161,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   return (
     <>
     <LowHPOverlay hp={bridge.lifePoints} />
-    {/* TODO: targetCategory not yet in bridge/store — pass null until backend wires it */}
-    <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={null} />
+    <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={bridge.targetCategory} />
     <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
     <WordHuntGameLayout
       // Header (no timer)

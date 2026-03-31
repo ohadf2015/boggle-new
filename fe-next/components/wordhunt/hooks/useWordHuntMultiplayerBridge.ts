@@ -11,6 +11,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   useWordHuntTargetLength,
+  useWordHuntTargetCategory,
   useWordHuntMyLife,
   useWordHuntTargetAttempts,
   useWordHuntTargetFound,
@@ -63,6 +64,7 @@ export interface WordHuntMultiplayerBridgeResult {
   /** Username of who found the target (null if not yet found) */
   targetFoundBy: string | null;
   targetLength: number;
+  targetCategory: string | null;
   playerLives: Record<string, number>;
   eliminatedPlayers: string[];
   attempts: TargetAttempt[];
@@ -78,6 +80,7 @@ export interface WordHuntMultiplayerBridgeResult {
 
 export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult {
   const targetLength = useWordHuntTargetLength();
+  const targetCategory = useWordHuntTargetCategory();
   const myLife = useWordHuntMyLife();
   const targetAttempts = useWordHuntTargetAttempts();
   const targetFound = useWordHuntTargetFound();
@@ -194,6 +197,7 @@ export function useWordHuntMultiplayerBridge(): WordHuntMultiplayerBridgeResult 
     targetFound,
     targetFoundBy: targetFoundBy ?? null,
     targetLength,
+    targetCategory,
     playerLives,
     eliminatedPlayers,
     attempts,

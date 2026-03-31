@@ -61,6 +61,7 @@ const initialState: GameState = {
   blastOpponentActivity: [],
   blastPlayerStats: {},
   wordHuntTargetLength: 0,
+  wordHuntTargetCategory: null as string | null,
   wordHuntMyLife: 100,
   wordHuntPlayerLives: {},
   wordHuntTargetAttempts: [],
@@ -342,6 +343,9 @@ export const useGameStore = create<GameStore>()(
     setWordHuntTargetLength: (value) => set((state) => ({
       wordHuntTargetLength: applySetState(value, state.wordHuntTargetLength)
     })),
+    setWordHuntTargetCategory: (value: string | null) => set(() => ({
+      wordHuntTargetCategory: value
+    })),
 
     setWordHuntMyLife: (value) => set((state) => ({
       wordHuntMyLife: applySetState(value, state.wordHuntMyLife)
@@ -504,6 +508,7 @@ export {
   useBlastOpponentActivity,
   useBlastPlayerStats,
   useWordHuntTargetLength,
+  useWordHuntTargetCategory,
   useWordHuntMyLife,
   useWordHuntPlayerLives,
   useWordHuntTargetAttempts,

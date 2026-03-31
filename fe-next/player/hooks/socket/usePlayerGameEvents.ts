@@ -232,6 +232,7 @@ export function usePlayerGameEvents({
       }
       if ((data as any).wordHuntTargetLength != null && (data as any).wordHuntTargetLength > 0) {
         storeUpdates.wordHuntTargetLength = (data as any).wordHuntTargetLength;
+        storeUpdates.wordHuntTargetCategory = (data as any).wordHuntTargetCategory ?? null;
         storeUpdates.wordHuntMyLife = 100;
         storeUpdates.wordHuntPlayerLives = (data as any).wordHuntPlayerLives || {};
         storeUpdates.wordHuntTargetAttempts = [];

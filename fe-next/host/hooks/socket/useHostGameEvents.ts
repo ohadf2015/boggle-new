@@ -228,6 +228,7 @@ export function useHostGameEvents({
       if (extData.wordHuntTargetLength != null && extData.wordHuntTargetLength > 0) {
         const store = useGameStore.getState();
         store.setWordHuntTargetLength(extData.wordHuntTargetLength);
+        store.setWordHuntTargetCategory((extData as any).wordHuntTargetCategory ?? null);
         store.setWordHuntMyLife(100);
         store.setWordHuntPlayerLives(extData.wordHuntPlayerLives || {});
         store.setWordHuntTargetAttempts([]);
