@@ -2843,6 +2843,14 @@ const ja = {
       "title": "上達しています！",
       "subtitle": "登録して進捗を保存し、実績を追跡しましょう！"
     },
+    "mpSignup": {
+      "title": "進捗を保存しよう",
+      "statsAtRisk": "{games}試合で{words}語 — 失わないで",
+      "statsSubtext": "10秒で登録してすべてを保存",
+      "benefitLeaderboard": "ランキング",
+      "benefitProgress": "進捗追跡",
+      "toastStreakWarning": "{games}試合の連勝記録は保存されません"
+    },
     "dailyChallenge": {
       "streakAtRisk": {
         "title": "{days}日連続記録を守ろう！",

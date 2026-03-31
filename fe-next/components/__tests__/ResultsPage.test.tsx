@@ -121,8 +121,13 @@ vi.mock('@/utils/session', () => ({
 vi.mock('@/utils/guestManager', () => ({
   shouldShowUpgradePrompt: vi.fn(() => false),
   getGuestStatsSummary: vi.fn(() => ({})),
+  getGuestStats: vi.fn(() => ({ games: 0, words: 0, score: 0 })),
   updateGuestStatsAfterGame: vi.fn(),
   isFirstWin: vi.fn(() => false),
+}));
+
+vi.mock('@/hooks/usePostHogFlag', () => ({
+  usePostHogFlag: vi.fn(() => 'after-2nd-game'),
 }));
 
 vi.mock('@/utils/growthTracking', () => ({

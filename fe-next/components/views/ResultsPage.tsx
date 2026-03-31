@@ -17,10 +17,13 @@ import { useResultsSocketEvents } from '@/components/results/useResultsSocketEve
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
+const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
+const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 // MobileTabBar replaced by inline floating pill for results page
 
 // Shared result components
@@ -314,6 +317,24 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isGameOver: true,
     isWinner: isCurrentUserWinner,
   });
+
+  // MP signup nudge — non-intrusive bottom sheet + toast for guests
+  const {
+    activeNudge,
+    stats: mpNudgeStats,
+    dismissNudge,
+    recordMpGame,
+    // shouldPulseCoins — wire into CoinRewardDisplay as follow-up
+  } = useMultiplayerSignupNudge({
+    isAuthenticated,
+    isResultsVisible: true,
+  });
+
+  // Record MP game completion on mount (recordMpGame is stable via useCallback)
+  useEffect(() => {
+    if (gameCode) recordMpGame();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Get games played for first win detection
   const guestStats = useMemo(() => getGuestStatsSummary(), []);
@@ -650,6 +671,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   return (
     <>
       {overlayModals}
+
+      {/* MP signup nudges — non-intrusive, hidden on CrazyGames */}
+      <MultiplayerSignupSheet
+        isOpen={activeNudge === 'sheet'}
+        onClose={dismissNudge}
+        stats={mpNudgeStats}
+      />
+      <SignupToast
+        isVisible={activeNudge === 'toast'}
+        onDismiss={dismissNudge}
+        mpGamesThisSession={mpNudgeStats.mpGamesThisSession}
+      />
+
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"
         style={{ background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)' }}

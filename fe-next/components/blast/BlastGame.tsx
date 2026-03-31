@@ -110,8 +110,8 @@ export function BlastGame({
   // Spam detection
   const spamDetection = useSpamDetection();
 
-  // Dictionary cache for cascade word detection
-  const { checkWord } = useDictionaryCache(config.language);
+  // Dictionary cache for cascade word detection + validation gate
+  const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
 
   // Effects state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
@@ -416,8 +416,8 @@ export function BlastGame({
     sounds,
   ]);
 
-  // Loading state
-  if (!engine.grid) {
+  // Loading state — wait for both grid generation AND dictionary cache
+  if (!engine.grid || !isDictionaryReady) {
     return (
       <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
         <div className="flex flex-col items-center gap-3">

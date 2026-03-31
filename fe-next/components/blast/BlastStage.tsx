@@ -232,7 +232,7 @@ export function BlastStage({
       >
         {/* Ornate board frame — golden trim with recessed interior */}
         <div
-          className="relative w-full max-w-[92vw] sm:max-w-[420px] md:max-w-[460px] lg:max-w-[min(500px,55vh)]"
+          className="relative w-full max-w-[min(96vw,96dvh-180px)] sm:max-w-[min(460px,90dvh-180px)] lg:max-w-[min(500px,55vh)]"
           style={{
             padding: '6px',
             borderRadius: '20px',

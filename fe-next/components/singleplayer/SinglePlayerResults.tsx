@@ -29,6 +29,7 @@ import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
+import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
@@ -139,6 +140,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   useGameSessionLogging({ results, language: language as string, userId: user?.id, playerRank });
 
   const { currentStreak } = useWinStreak();
+
+  // A/B test: show share prompt immediately after hero vs in normal results-page position
+  const sharePromptTiming = usePostHogFlag<string>('share-prompt-timing', 'results-page');
+  const showShareImmediate = sharePromptTiming === 'immediate';
 
   const { coinReward } = useCoinRewards({
     results, playerRank, totalParticipants: allParticipants.length,
@@ -355,11 +360,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         {isDesktop ? (
           <>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
-              <div className="space-y-4">{heroBlock}{leaderboardBlock}</div>
+              <div className="space-y-4">{heroBlock}{showShareImmediate && shareBlock}{leaderboardBlock}</div>
               <div className="space-y-4">
                 {statsBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
-                {shareBlock}
+                {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
                 {ctaBlock}
@@ -372,9 +377,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         ) : (
           <div className="space-y-4">
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</motion.div>
+            {showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</motion.div>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>
+            {!showShareImmediate && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</motion.div>}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</motion.div>
             {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
             {/* CrazyGames banner ad — mobile size */}

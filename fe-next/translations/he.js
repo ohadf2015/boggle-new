@@ -2861,6 +2861,14 @@ const he = {
       "title": "אתה משתפר!",
       "subtitle": "הירשם כדי לשמור את ההתקדמות שלך ולעקוב אחר ההישגים!"
     },
+    "mpSignup": {
+      "title": "שמור על ההתקדמות שלך",
+      "statsAtRisk": "{words} מילים ב-{games} משחקים — אל תאבד אותן",
+      "statsSubtext": "הירשם ב-10 שניות כדי לשמור הכל",
+      "benefitLeaderboard": "טבלת מובילים",
+      "benefitProgress": "מעקב התקדמות",
+      "toastStreakWarning": "רצף של {games} משחקים לא יישמר"
+    },
     "dailyChallenge": {
       "streakAtRisk": {
         "title": "הגן על רצף {days} הימים שלך!",

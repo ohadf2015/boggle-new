@@ -2689,6 +2689,14 @@ const es = {
       "title": "¡Estás mejorando!",
       "subtitle": "¡Regístrate para guardar tu progreso y seguir tus logros!"
     },
+    "mpSignup": {
+      "title": "Guarda tu progreso",
+      "statsAtRisk": "{words} palabras en {games} partidas — no las pierdas",
+      "statsSubtext": "Regístrate en 10 segundos para guardarlo todo",
+      "benefitLeaderboard": "Clasificaciones",
+      "benefitProgress": "Seguir progreso",
+      "toastStreakWarning": "Tu racha de {games} partidas no se guardará"
+    },
     "dailyChallenge": {
       "streakAtRisk": {
         "title": "¡Protege tu racha de {days} días!",

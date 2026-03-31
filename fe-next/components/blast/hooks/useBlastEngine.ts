@@ -295,6 +295,7 @@ export function useBlastEngine(
     const gravityResult = computeGravityResult(
       grid, tiles, gridSize, language, specialTileChance,
       customDistribution, ddaModifier, rng,
+      /* refill */ false,
     );
 
     // Update refs immediately so subsequent engine calls see latest state,

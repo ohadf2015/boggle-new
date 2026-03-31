@@ -2842,6 +2842,14 @@ const sv = {
       "title": "Du blir bättre!",
       "subtitle": "Registrera dig för att spara din framsteg och följa dina prestationer!"
     },
+    "mpSignup": {
+      "title": "Behåll dina framsteg",
+      "statsAtRisk": "{words} ord i {games} spel — förlora dem inte",
+      "statsSubtext": "Registrera dig på 10 sekunder för att spara allt",
+      "benefitLeaderboard": "Topplistor",
+      "benefitProgress": "Följ framsteg",
+      "toastStreakWarning": "Din {games}-spelssvit sparas inte"
+    },
     "dailyChallenge": {
       "streakAtRisk": {
         "title": "Skydda din {days}-dagars svit!",

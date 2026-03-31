@@ -91,6 +91,12 @@ export function computeGravityResult(
    *       but does not guarantee lockstep (different words clear different cells).
    */
   rng?: () => number,
+  /**
+   * When false, empty top rows are NOT filled with new tiles after gravity.
+   * The board shrinks as the player clears words — a puzzle/board-clear mechanic.
+   * Defaults to true (original behavior: always refill from top).
+   */
+  refill = true,
 ): GravityResult {
   const newGrid: LetterGrid = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => '')
@@ -161,37 +167,53 @@ export function computeGravityResult(
       bottomRow--;
     }
 
-    // Fill empty top rows with new letters
+    // Fill empty top rows with new letters (or leave empty if refill=false)
     const emptyCount = bottomRow + 1;
-    for (let i = 0; i < emptyCount; i++) {
-      const row = bottomRow - i; // top-most first
-      const letter = generateNonDuplicateLetter(
-        language,
-        rng ?? Math.random,
-        // Check the tile below (previously placed refill or surviving tile)
-        newGrid[row + 1]?.[col] ?? '',
-        3,
-      );
-      const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier, rng);
+    if (refill) {
+      for (let i = 0; i < emptyCount; i++) {
+        const row = bottomRow - i; // top-most first
+        const letter = generateNonDuplicateLetter(
+          language,
+          rng ?? Math.random,
+          // Check the tile below (previously placed refill or surviving tile)
+          newGrid[row + 1]?.[col] ?? '',
+          3,
+        );
+        const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier, rng);
 
-      newGrid[row][col] = letter;
-      newTileStates[row][col] = {
-        uid: nextTileUid(),
-        row,
-        col,
-        type,
-        isCleared: false,
-        activationEffect: type !== 'standard' ? 'tile-earned' : null,
-        hitsRemaining: getInitialHitsRemaining(type),
-      };
+        newGrid[row][col] = letter;
+        newTileStates[row][col] = {
+          uid: nextTileUid(),
+          row,
+          col,
+          type,
+          isCleared: false,
+          activationEffect: type !== 'standard' ? 'tile-earned' : null,
+          hitsRemaining: getInitialHitsRemaining(type),
+        };
 
-      newTiles.push({
-        row,
-        col,
-        letter,
-        type,
-        spawnOffset: emptyCount - i, // furthest from top gets highest offset
-      });
+        newTiles.push({
+          row,
+          col,
+          letter,
+          type,
+          spawnOffset: emptyCount - i, // furthest from top gets highest offset
+        });
+      }
+    } else {
+      // No refill — mark empty top cells as cleared (invisible)
+      for (let row = 0; row <= bottomRow; row++) {
+        newGrid[row][col] = '';
+        newTileStates[row][col] = {
+          uid: nextTileUid(),
+          row,
+          col,
+          type: 'standard',
+          isCleared: true,
+          activationEffect: null,
+          hitsRemaining: 0,
+        };
+      }
     }
   }
 

@@ -61,7 +61,22 @@ const GridCell = memo<GridCellProps>(({
   isSelecting, isDragging, isTypingMode, hintAnimationPhase,
   currentTier, selectedCellsLength,
   onTouchStart, onMouseDown, onDoubleClick,
-}) => (
+}) => {
+  // Empty cell — render invisible placeholder to maintain grid layout
+  if (!cell) {
+    return (
+      <div
+        data-row={row}
+        data-col={col}
+        role="gridcell"
+        aria-hidden="true"
+        className="aspect-square rounded-neo"
+        style={{ visibility: 'hidden' }}
+      />
+    );
+  }
+
+  return (
   <motion.div
     key={`${row}-${col}`}
     data-row={row}
@@ -237,7 +252,8 @@ const GridCell = memo<GridCellProps>(({
       visible={isLastSelected && isSelecting && !isDragging && selectedCellsLength >= 2}
     />
   </motion.div>
-));
+  );
+});
 
 GridCell.displayName = 'GridCell';
 

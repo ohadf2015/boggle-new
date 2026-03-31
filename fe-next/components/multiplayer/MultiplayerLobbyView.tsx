@@ -28,6 +28,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
+import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -118,6 +119,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   maxPlayers = MAX_PLAYERS_DEFAULT,
 }) => {
   const { isAuthenticated, updateProfile } = useAuth();
+  const { isCrazyGames } = useCrazyGamesAuth();
 
   // Display all players (including host) to everyone
   const displayPlayers = filteredPlayers ?? playersReady;
@@ -282,24 +284,26 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
   const renderRightContent = () => (
     <>
       <InviteCard gameCode={gameCode} t={t} desktop />
-      <div
-        data-testid="desktop-chat-area"
-        className={cn(
-          'flex-1 min-h-0 rounded-neo-lg overflow-hidden',
-          isHost
-            ? 'bg-neo-navy-light/50 border-3 border-neo-white/10'
-            : 'bg-neo-navy/30 border-3 border-neo-cyan/20 shadow-hard',
-        )}
-      >
-        <RoomChat
-          username={isHost ? t('multiplayerFlow.host') : username}
-          isHost={isHost}
-          gameCode={gameCode}
-          className="h-full"
-          onNewMessage={() => {}}
-          variant="embedded"
-        />
-      </div>
+      {!isCrazyGames && (
+        <div
+          data-testid="desktop-chat-area"
+          className={cn(
+            'flex-1 min-h-0 rounded-neo-lg overflow-hidden',
+            isHost
+              ? 'bg-neo-navy-light/50 border-3 border-neo-white/10'
+              : 'bg-neo-navy/30 border-3 border-neo-cyan/20 shadow-hard',
+          )}
+        >
+          <RoomChat
+            username={isHost ? t('multiplayerFlow.host') : username}
+            isHost={isHost}
+            gameCode={gameCode}
+            className="h-full"
+            onNewMessage={() => {}}
+            variant="embedded"
+          />
+        </div>
+      )}
     </>
   );
 
@@ -312,11 +316,13 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={0}>
             {hostControls.controlsSlot}
           </motion.div>
-          <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
-            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
-              <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
-            </div>
-          </motion.div>
+          {!isCrazyGames && (
+            <motion.div className="pb-4" variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
+              <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
+                <RoomChat username={t('multiplayerFlow.host')} isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+              </div>
+            </motion.div>
+          )}
         </div>
       );
     }
@@ -332,18 +338,20 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           maxPlayers={maxPlayers}
           t={t}
         />
-        <section className="pb-4">
-          <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden h-64">
-            <RoomChat
-              username={username}
-              isHost={false}
-              gameCode={gameCode}
-              className="h-full"
-              onNewMessage={() => {}}
-              variant="embedded"
-            />
-          </div>
-        </section>
+        {!isCrazyGames && (
+          <section className="pb-4">
+            <div className="bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden h-64">
+              <RoomChat
+                username={username}
+                isHost={false}
+                gameCode={gameCode}
+                className="h-full"
+                onNewMessage={() => {}}
+                variant="embedded"
+              />
+            </div>
+          </section>
+        )}
       </div>
     );
   };

@@ -116,7 +116,7 @@ export const BlastBoard = memo(function BlastBoard({
   return (
     <div
       ref={containerRef}
-      className="blast-board relative w-full aspect-square max-w-[92vw] sm:max-w-[420px] md:max-w-[460px] lg:max-w-[min(500px,55vh)] overflow-hidden"
+      className="blast-board relative w-full aspect-square max-w-[min(96vw,96dvh-180px)] sm:max-w-[min(460px,90dvh-180px)] lg:max-w-[min(500px,55vh)] overflow-hidden"
       style={{ contain: 'layout paint' }}
     >
       {/* Layer 1: GridComponent — word selection via touch/drag */}
@@ -152,6 +152,19 @@ export const BlastBoard = memo(function BlastBoard({
             // Map sequencer AnimPhase to BlastTile TilePhase (chain_pause maps to idle)
             const rawPhase = animState?.phase;
             const tilePhase = rawPhase && rawPhase !== 'chain_pause' ? rawPhase : (isSelected ? 'selected' : 'idle');
+
+            // Empty/cleared cell — invisible placeholder to keep grid alignment
+            if (tile.isCleared && !animState) {
+              return (
+                <div
+                  key={key}
+                  role="gridcell"
+                  aria-hidden="true"
+                  className="aspect-square rounded-neo"
+                  style={{ visibility: 'hidden' }}
+                />
+              );
+            }
 
             // Skip rendering overlay for standard unselected tiles only when no animation active
             if (!animLookup && tile.type === 'standard' && !isSelected && !tile.isCleared) {

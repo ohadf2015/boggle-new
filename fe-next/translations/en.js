@@ -2945,6 +2945,14 @@ const en = {
       "title": "You're On a Roll!",
       "subtitle": "Save your progress and track achievements!"
     },
+    "mpSignup": {
+      "title": "Keep Your Progress",
+      "statsAtRisk": "{words} words across {games} games — don't lose them",
+      "statsSubtext": "Sign up in 10 seconds to save everything",
+      "benefitLeaderboard": "Leaderboards",
+      "benefitProgress": "Track progress",
+      "toastStreakWarning": "Your {games}-game streak won't be saved"
+    },
     "dailyChallenge": {
       "streakAtRisk": {
         "title": "Protect Your {days}-Day Streak!",
