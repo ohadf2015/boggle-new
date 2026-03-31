@@ -119,7 +119,7 @@ describe('useCrazyGamesLifecycle', () => {
       expect(mockHappyTime).toHaveBeenCalledTimes(1);
     });
 
-    it('should trigger happyTime when score reaches default threshold (500)', () => {
+    it('should trigger happyTime when score reaches default threshold (200)', () => {
       // GIVEN the game is active with low score
       const { rerender } = renderHook(
         ({ score }) =>
@@ -128,19 +128,19 @@ describe('useCrazyGamesLifecycle', () => {
             isGameOver: false,
             score,
           }),
-        { initialProps: { score: 200 } }
+        { initialProps: { score: 100 } }
       );
 
       expect(mockHappyTime).not.toHaveBeenCalled();
 
       // WHEN the score reaches threshold
-      rerender({ score: 500 });
+      rerender({ score: 200 });
 
       // THEN happyTime should be called
       expect(mockHappyTime).toHaveBeenCalledTimes(1);
     });
 
-    it('should trigger happyTime when combo reaches default threshold (10)', () => {
+    it('should trigger happyTime when combo reaches default threshold (5)', () => {
       // GIVEN the game is active with low combo
       const { rerender } = renderHook(
         ({ maxCombo }) =>
@@ -149,19 +149,19 @@ describe('useCrazyGamesLifecycle', () => {
             isGameOver: false,
             maxCombo,
           }),
-        { initialProps: { maxCombo: 5 } }
+        { initialProps: { maxCombo: 2 } }
       );
 
       expect(mockHappyTime).not.toHaveBeenCalled();
 
       // WHEN the combo reaches threshold
-      rerender({ maxCombo: 10 });
+      rerender({ maxCombo: 5 });
 
       // THEN happyTime should be called
       expect(mockHappyTime).toHaveBeenCalledTimes(1);
     });
 
-    it('should trigger happyTime when words found reaches default threshold (25)', () => {
+    it('should trigger happyTime when words found reaches default threshold (12)', () => {
       // GIVEN the game is active with few words
       const { rerender } = renderHook(
         ({ wordsFound }) =>
@@ -170,13 +170,13 @@ describe('useCrazyGamesLifecycle', () => {
             isGameOver: false,
             wordsFound,
           }),
-        { initialProps: { wordsFound: 10 } }
+        { initialProps: { wordsFound: 5 } }
       );
 
       expect(mockHappyTime).not.toHaveBeenCalled();
 
       // WHEN the words found reaches threshold
-      rerender({ wordsFound: 25 });
+      rerender({ wordsFound: 12 });
 
       // THEN happyTime should be called
       expect(mockHappyTime).toHaveBeenCalledTimes(1);

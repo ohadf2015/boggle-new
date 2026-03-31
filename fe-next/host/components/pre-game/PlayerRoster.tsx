@@ -176,19 +176,18 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
 
                     <div className={cn(
                       'rounded-full border-neo-black flex items-center justify-center overflow-hidden',
-                      compact ? 'w-12 h-12 border-2' : 'w-14 h-14 border-3',
+                      compact ? 'w-14 h-14 border-2' : 'w-16 h-16 border-3',
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                       isMe && 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                     )}>
                       {avatar?.customAvatar || avatar?.avatarImage ? (
                         <Avatar
                           customAvatar={avatar?.customAvatar ?? undefined}
-
                           avatarImage={avatar?.avatarImage}
-                          size={compact ? 'md' : 'lg'}
+                          size={compact ? 'lg' : 'xl'}
                         />
                       ) : (
-                        <span className={cn('font-black text-neo-black', compact ? 'text-xl' : 'text-2xl')}>
+                        <span className={cn('font-black text-neo-black', compact ? 'text-2xl' : 'text-3xl')}>
                           {name.charAt(0).toUpperCase()}
                         </span>
                       )}

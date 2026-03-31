@@ -2,10 +2,11 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Pencil, Check, X } from 'lucide-react';
+import { LogOut, Pencil, Check, X, Camera } from 'lucide-react';
 import RoomChat from '../RoomChat';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 
+import Avatar from '../Avatar';
 import AvatarBuilderModal from '../avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
@@ -23,7 +24,6 @@ import {
   AlertDialogTitle,
 } from '../ui/alert-dialog';
 import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
-import { IdleMascot } from '@/components/ui/IdleMascot';
 import { useAuth } from '@/contexts/AuthContext';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -176,81 +176,105 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
     </header>
   );
 
-  // ==================== Player Waiting Section ====================
-  const renderPlayerWaitingSection = () => (
+  // ==================== Player Hero Card ====================
+  const renderPlayerHeroCard = () => (
     <motion.div
       data-testid="waiting-status"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING_PRESETS.balanced}
-      className="space-y-3"
+      className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
     >
-      <div className="flex justify-center">
-        <IdleMascot baseVariant="waving" size="md" />
-      </div>
-      <p className="text-sm text-center text-slate-400">
-        {t('playerView.hostWillStart')}
-      </p>
+      {/* Accent bar */}
+      <div className="h-1.5 bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime" />
 
-      {/* Bonus Gold Ad while waiting */}
-      <div className="flex justify-center">
-        <RewardedAdGoldButton goldAmount={20} />
-      </div>
-
-      {/* Edit avatar + name */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="p-5 flex items-center gap-5">
+        {/* Large clickable avatar */}
         <button
           data-testid="edit-avatar-button"
           onClick={() => setIsAvatarBuilderOpen(true)}
-          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
+          className="relative flex-shrink-0 group"
         >
-          <Pencil className="w-3.5 h-3.5" />
-          <span>{t('playerView.editAvatar')}</span>
+          <div className="w-20 h-20 rounded-full border-3 border-neo-black bg-neo-cyan/20 overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
+            <Avatar
+              customAvatar={currentAvatar}
+              size="xl"
+              className="w-full h-full"
+            />
+          </div>
+          {/* Camera overlay on hover */}
+          <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="w-6 h-6 text-neo-cream" />
+          </div>
+          {/* Edit badge */}
+          <div className="absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+            <Pencil className="w-3.5 h-3.5 text-neo-black" />
+          </div>
         </button>
-        {!isAuthenticated && (
-          <>
-            <span className="text-slate-600">|</span>
-            {isEditingName ? (
-              <div className="flex items-center gap-2">
-                <input
-                  data-testid="name-edit-input"
-                  type="text"
-                  value={editNameValue}
-                  onChange={(e) => setEditNameValue(e.target.value)}
-                  maxLength={20}
-                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neo-cyan"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveName();
-                    if (e.key === 'Escape') setIsEditingName(false);
-                  }}
-                />
-                <button
-                  data-testid="name-save-button"
-                  onClick={handleSaveName}
-                  className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm"
-                >
-                  <Check className="w-4 h-4 text-neo-black" />
-                </button>
-                <button
-                  onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                  className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo"
-                >
-                  <X className="w-4 h-4 text-neo-cream" />
-                </button>
-              </div>
-            ) : (
+
+        {/* Name + status */}
+        <div className="flex-1 min-w-0">
+          {/* Editable name */}
+          {isEditingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                data-testid="name-edit-input"
+                type="text"
+                value={editNameValue}
+                onChange={(e) => setEditNameValue(e.target.value)}
+                maxLength={20}
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName();
+                  if (e.key === 'Escape') setIsEditingName(false);
+                }}
+              />
               <button
-                data-testid="edit-name-button"
-                onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-neo-cyan transition-colors"
+                data-testid="name-save-button"
+                onClick={handleSaveName}
+                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
               >
-                <Pencil className="w-3.5 h-3.5" />
-                <span>{t('playerView.editName')}</span>
+                <Check className="w-4 h-4 text-neo-black" />
               </button>
-            )}
-          </>
-        )}
+              <button
+                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-neo-cream" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-black text-neo-cream truncate">
+                {username}
+              </h2>
+              {!isAuthenticated && (
+                <button
+                  data-testid="edit-name-button"
+                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                  className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label={t('playerView.editName')}
+                >
+                  <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Waiting status */}
+          <div className="flex items-center gap-2 mt-1.5">
+            <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse" />
+            <p className="text-sm text-slate-400">
+              {t('playerView.hostWillStart')}
+            </p>
+          </div>
+
+          {/* Bonus Gold Ad */}
+          <div className="mt-3">
+            <RewardedAdGoldButton goldAmount={20} />
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -268,7 +292,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
     // Player left content
     return (
       <>
-        {renderPlayerWaitingSection()}
+        {renderPlayerHeroCard()}
         <PlayerRoster
           players={displayPlayers}
           username={username}
@@ -330,7 +354,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
     // Player mobile content
     return (
       <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-2 space-y-3 min-h-0">
-        <section>{renderPlayerWaitingSection()}</section>
+        <section>{renderPlayerHeroCard()}</section>
         <PlayerRoster
           players={displayPlayers}
           username={username}
