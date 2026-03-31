@@ -23,6 +23,13 @@ vi.mock('../../utils/SocketContext', () => ({
   }),
 }));
 
+vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn() }) }));
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({ __esModule: true, default: () => null }));
+vi.mock('@/lib/animation/presets', () => ({ SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } } }));
+vi.mock('@/utils/profileStorage', () => ({ getOrCreateStoredCustomAvatar: () => null, setStoredCustomAvatar: vi.fn() }));
+vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => ({ isPremium: false }) }));
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({ __esModule: true, default: () => null }));
+
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const motionObj = {
@@ -34,6 +41,9 @@ vi.mock('framer-motion', () => {
     ),
     span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
       <span className={className} {...props}>{children}</span>
+    ),
+    li: ({ children, className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+      <li className={className} {...props}>{children}</li>
     ),
   };
   return {

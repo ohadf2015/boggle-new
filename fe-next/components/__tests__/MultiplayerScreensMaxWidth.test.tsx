@@ -11,6 +11,13 @@ vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
 }));
 
+vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn() }) }));
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({ __esModule: true, default: () => null }));
+vi.mock('@/lib/animation/presets', () => ({ SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } } }));
+vi.mock('@/utils/profileStorage', () => ({ getOrCreateStoredCustomAvatar: () => null, setStoredCustomAvatar: vi.fn() }));
+vi.mock('@/hooks/useAvatarPremium', () => ({ useAvatarPremium: () => ({ isPremium: false }) }));
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({ __esModule: true, default: () => null }));
+
 vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,

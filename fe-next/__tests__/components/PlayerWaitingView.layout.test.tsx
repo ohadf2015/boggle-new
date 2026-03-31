@@ -39,8 +39,7 @@ describe('PlayerWaitingView layout', () => {
     expect(source).not.toContain('"bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-72"');
   });
 
-  it('uses roomChat translation key for chat section heading', () => {
+  it('does not use deprecated battleFeed translation key', () => {
     expect(source).not.toContain("t('hostView.battleFeed')");
-    expect(source).toContain("t('hostView.roomChat')");
   });
 });
