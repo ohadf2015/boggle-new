@@ -14,6 +14,9 @@ vi.mock('framer-motion', () => ({
     button: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLButtonElement>) => (
       <button ref={ref} {...filterDomProps(props)}>{children}</button>
     )),
+    li: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLLIElement>) => (
+      <li ref={ref} {...filterDomProps(props)}>{children}</li>
+    )),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
@@ -64,7 +67,40 @@ vi.mock('../../../utils/SocketContext', () => ({
 // Mock AuthContext
 let mockIsAuthenticated = false;
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: mockIsAuthenticated }),
+  useAuth: () => ({ isAuthenticated: mockIsAuthenticated, updateProfile: vi.fn() }),
+}));
+
+// Mock gameState hooks
+vi.mock('@/hooks/gameState', () => ({
+  useGameMode: () => 'classic',
+}));
+
+// Mock RewardedAdGoldButton
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => <div data-testid="rewarded-ad" />,
+}));
+
+// Mock animation presets
+vi.mock('@/lib/animation/presets', () => ({
+  SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } },
+}));
+
+// Mock profileStorage
+vi.mock('@/utils/profileStorage', () => ({
+  getOrCreateStoredCustomAvatar: () => null,
+  setStoredCustomAvatar: vi.fn(),
+}));
+
+// Mock useAvatarPremium
+vi.mock('@/hooks/useAvatarPremium', () => ({
+  useAvatarPremium: () => ({ isPremium: false }),
+}));
+
+// Mock AvatarBuilderModal
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
+  __esModule: true,
+  default: () => null,
 }));
 
 const defaultProps = {

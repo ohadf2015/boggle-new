@@ -22,6 +22,9 @@ vi.mock('framer-motion', () => ({
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement>) => (
       <button className={className} onClick={onClick} {...props}>{children}</button>
     ),
+    li: ({ children, className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+      <li className={className} {...props}>{children}</li>
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -61,17 +64,43 @@ vi.mock('../../../components/ui/alert-dialog', () => ({
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: false }),
+  useAuth: () => ({ isAuthenticated: false, updateProfile: vi.fn() }),
 }));
 
-// Mock IdleMascot — what we're testing for
-vi.mock('@/components/ui/IdleMascot', () => ({
-  IdleMascot: ({ baseVariant, size }: { baseVariant?: string; size?: string }) => (
-    <div data-testid="idle-mascot" data-variant={baseVariant} data-size={size}>Idle Mascot</div>
-  ),
+// Mock gameState hooks
+vi.mock('@/hooks/gameState', () => ({
+  useGameMode: () => 'classic',
 }));
 
-describe('PlayerWaitingView IdleMascot', () => {
+// Mock RewardedAdGoldButton
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => <div data-testid="rewarded-ad" />,
+}));
+
+// Mock animation presets
+vi.mock('@/lib/animation/presets', () => ({
+  SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } },
+}));
+
+// Mock profileStorage
+vi.mock('@/utils/profileStorage', () => ({
+  getOrCreateStoredCustomAvatar: () => null,
+  setStoredCustomAvatar: vi.fn(),
+}));
+
+// Mock useAvatarPremium
+vi.mock('@/hooks/useAvatarPremium', () => ({
+  useAvatarPremium: () => ({ isPremium: false }),
+}));
+
+// Mock AvatarBuilderModal
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+describe('PlayerWaitingView Hero Card', () => {
   const defaultProps = {
     gameCode: 'ABCD',
     gameLanguage: 'en' as const,
@@ -88,31 +117,29 @@ describe('PlayerWaitingView IdleMascot', () => {
 
   // GIVEN the player waiting view
   // WHEN it renders
-  // THEN IdleMascot(s) should be visible (renders in both mobile + desktop layouts)
-  it('should render IdleMascot in the waiting view', () => {
+  // THEN the hero card with avatar should be visible
+  it('should render hero card with clickable avatar', () => {
     render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
-    const mascots = screen.getAllByTestId('idle-mascot');
-    expect(mascots.length).toBeGreaterThanOrEqual(1);
+    const avatarButtons = screen.getAllByTestId('edit-avatar-button');
+    expect(avatarButtons.length).toBeGreaterThanOrEqual(1);
   });
 
-  // GIVEN the IdleMascot in the waiting view
+  // GIVEN the hero card
   // WHEN it renders
-  // THEN it should use 'waving' as the base variant (welcoming)
-  it('should render IdleMascot with waving base variant', () => {
+  // THEN the player name should be displayed prominently
+  it('should display player name in hero card', () => {
     render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
-    const mascots = screen.getAllByTestId('idle-mascot');
-    expect(mascots[0]).toHaveAttribute('data-variant', 'waving');
+    expect(screen.getAllByText('Player1').length).toBeGreaterThanOrEqual(1);
   });
 
-  // GIVEN the IdleMascot
+  // GIVEN the hero card
   // WHEN it renders
-  // THEN it should use size 'sm'
-  it('should render IdleMascot with sm size', () => {
+  // THEN the waiting status should be visible
+  it('should show waiting status', () => {
     render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
 
-    const mascots = screen.getAllByTestId('idle-mascot');
-    expect(mascots[0]).toHaveAttribute('data-size', 'sm');
+    expect(screen.getAllByTestId('waiting-status').length).toBeGreaterThanOrEqual(1);
   });
 });

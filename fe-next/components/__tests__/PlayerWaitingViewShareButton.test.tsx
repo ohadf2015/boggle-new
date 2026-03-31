@@ -36,6 +36,9 @@ vi.mock('framer-motion', () => {
     span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
       <span className={className} {...props}>{children}</span>
     ),
+    li: ({ children, className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+      <li className={className} {...props}>{children}</li>
+    ),
   };
   return {
     motion: motionObj,
@@ -85,12 +88,45 @@ vi.mock('../../utils/share', () => ({
 
 // Mock AuthContext
 vi.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: false }),
+  useAuth: () => ({ isAuthenticated: false, updateProfile: vi.fn() }),
 }));
 
 // Mock SocketContext
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }),
+}));
+
+// Mock gameState hooks
+vi.mock('@/hooks/gameState', () => ({
+  useGameMode: () => 'classic',
+}));
+
+// Mock RewardedAdGoldButton
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
+  __esModule: true,
+  default: () => <div data-testid="rewarded-ad" />,
+}));
+
+// Mock animation presets
+vi.mock('@/lib/animation/presets', () => ({
+  SPRING_PRESETS: { balanced: { type: 'spring', stiffness: 300, damping: 26 } },
+}));
+
+// Mock profileStorage
+vi.mock('@/utils/profileStorage', () => ({
+  getOrCreateStoredCustomAvatar: () => null,
+  setStoredCustomAvatar: vi.fn(),
+}));
+
+// Mock useAvatarPremium
+vi.mock('@/hooks/useAvatarPremium', () => ({
+  useAvatarPremium: () => ({ isPremium: false }),
+}));
+
+// Mock AvatarBuilderModal
+vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
+  __esModule: true,
+  default: () => null,
 }));
 
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
@@ -132,8 +168,9 @@ describe('PlayerWaitingView - Command Center Style', () => {
 
     it('should display player count badge', () => {
       render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
-      // All players including host are shown in the roster
-      expect(screen.getByText('2/8')).toBeInTheDocument();
+      // Player count appears in header badge and roster header
+      const counts = screen.getAllByText('2/8');
+      expect(counts.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should have an exit button', () => {
@@ -203,7 +240,9 @@ describe('PlayerWaitingView - Command Center Style', () => {
   describe('Mobile Layout', () => {
     it('should render MobileShareSection', () => {
       render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
-      expect(screen.getByTestId('mobile-share-section')).toBeInTheDocument();
+      // MobileShareSection renders in both header (compact) and mobile content
+      const sections = screen.getAllByTestId('mobile-share-section');
+      expect(sections.length).toBeGreaterThanOrEqual(1);
     });
   });
 
