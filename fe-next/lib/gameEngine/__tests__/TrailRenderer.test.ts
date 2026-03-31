@@ -3,24 +3,24 @@
 import { TrailRenderer } from '../TrailRenderer';
 import { Container } from 'pixi.js';
 
-jest.mock('pixi.js', () => {
-  const mockGraphics = {
-    clear: jest.fn().mockReturnThis(),
-    moveTo: jest.fn().mockReturnThis(),
-    lineTo: jest.fn().mockReturnThis(),
-    circle: jest.fn().mockReturnThis(),
-    stroke: jest.fn().mockReturnThis(),
-    fill: jest.fn().mockReturnThis(),
-    destroy: jest.fn(),
-  };
-  const mockContainer = {
-    addChild: jest.fn(),
-    removeChild: jest.fn(),
-    destroy: jest.fn(),
-  };
+vi.mock('pixi.js', () => {
+  class MockGraphics {
+    clear = vi.fn().mockReturnThis();
+    moveTo = vi.fn().mockReturnThis();
+    lineTo = vi.fn().mockReturnThis();
+    circle = vi.fn().mockReturnThis();
+    stroke = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
+    destroy = vi.fn();
+  }
+  class MockContainer {
+    addChild = vi.fn();
+    removeChild = vi.fn();
+    destroy = vi.fn();
+  }
   return {
-    Container: jest.fn(() => mockContainer),
-    Graphics: jest.fn(() => mockGraphics),
+    Container: MockContainer,
+    Graphics: MockGraphics,
   };
 });
 

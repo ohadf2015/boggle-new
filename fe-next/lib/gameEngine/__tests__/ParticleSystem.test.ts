@@ -5,28 +5,28 @@ import { ParticleEmitter, ParticlePool } from '../ParticleSystem';
 import type { ParticleConfig } from '../types';
 import { Container } from 'pixi.js';
 
-// Mock PixiJS
-jest.mock('pixi.js', () => {
-  const mockGraphics = {
-    clear: jest.fn().mockReturnThis(),
-    circle: jest.fn().mockReturnThis(),
-    rect: jest.fn().mockReturnThis(),
-    moveTo: jest.fn().mockReturnThis(),
-    lineTo: jest.fn().mockReturnThis(),
-    closePath: jest.fn().mockReturnThis(),
-    fill: jest.fn().mockReturnThis(),
-    stroke: jest.fn().mockReturnThis(),
-    destroy: jest.fn(),
-    blendMode: 'normal',
-  };
-  const mockContainer = {
-    addChild: jest.fn(),
-    removeChild: jest.fn(),
-    destroy: jest.fn(),
-  };
+// Mock PixiJS — use class-based mocks so `new Container()` / `new Graphics()` work
+vi.mock('pixi.js', () => {
+  class MockGraphics {
+    clear = vi.fn().mockReturnThis();
+    circle = vi.fn().mockReturnThis();
+    rect = vi.fn().mockReturnThis();
+    moveTo = vi.fn().mockReturnThis();
+    lineTo = vi.fn().mockReturnThis();
+    closePath = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
+    stroke = vi.fn().mockReturnThis();
+    destroy = vi.fn();
+    blendMode = 'normal';
+  }
+  class MockContainer {
+    addChild = vi.fn();
+    removeChild = vi.fn();
+    destroy = vi.fn();
+  }
   return {
-    Container: jest.fn(() => mockContainer),
-    Graphics: jest.fn(() => mockGraphics),
+    Container: MockContainer,
+    Graphics: MockGraphics,
   };
 });
 
