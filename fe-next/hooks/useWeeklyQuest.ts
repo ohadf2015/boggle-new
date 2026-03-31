@@ -20,6 +20,7 @@ interface UseWeeklyQuestReturn {
   progress: number;
   isComplete: boolean;
   loading: boolean;
+  selectingQuestId: string | null;
   selectQuest: (questId: string) => Promise<void>;
   refetch: () => Promise<void>;
 }
@@ -57,6 +58,7 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
   const { user } = useAuth();
   const [activeQuest, setActiveQuest] = useState<ActiveQuest | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectingQuestId, setSelectingQuestId] = useState<string | null>(null);
   const available = getAvailableQuests();
 
   const fetchQuest = useCallback(async () => {
@@ -96,6 +98,7 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     const template = available.find(q => q.id === questId);
     if (!template) return;
 
+    setSelectingQuestId(questId);
     const weekStart = getWeekStart();
     const { data, error } = await supabase
       .from('weekly_quests')
@@ -116,6 +119,7 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     if (!error && data) {
       setActiveQuest(parseRow(data as Record<string, unknown>));
     }
+    setSelectingQuestId(null);
   }, [user?.id, available]);
 
   return {
@@ -124,6 +128,7 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     progress: activeQuest?.current ?? 0,
     isComplete: activeQuest?.completed ?? false,
     loading,
+    selectingQuestId,
     selectQuest: handleSelectQuest,
     refetch: fetchQuest,
   };

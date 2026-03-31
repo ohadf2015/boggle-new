@@ -21,7 +21,7 @@ export function WordHuntCategoryHint({
   targetLength,
   targetCategory,
 }: WordHuntCategoryHintProps) {
-  const { t, locale } = useLanguage();
+  const { t, language: locale } = useLanguage();
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {

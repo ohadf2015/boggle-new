@@ -43,6 +43,8 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
 
 /** Per-cell state tracked alongside the LetterGrid */
 export interface BlastTileState {
+  /** Stable unique ID that persists through gravity shifts */
+  uid: string;
   row: number;
   col: number;
   type: BlastTileType;

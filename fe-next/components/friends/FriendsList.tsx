@@ -22,6 +22,7 @@ import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { cn } from '@/lib/utils';
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import Avatar from '@/components/Avatar';
@@ -85,6 +86,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
   const [giftFriend, setGiftFriend] = useState<Friend | null>(null);
   const [showPactSelector, setShowPactSelector] = useState(false);
+  const setIsInGame = useHideNavigation();
 
   const socketContext = useSocketOptional();
   const giftSocket = socketContext?.socket ?? null;
@@ -130,8 +132,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   const handleThreadClick = useCallback((thread: MessageThreadType) => {
     setSelectedThread(thread);
+    setIsInGame(true);
     loadMessages(thread.friendUserId);
-  }, [loadMessages]);
+  }, [loadMessages, setIsInGame]);
 
   // Open a message thread for a friend (creates temporary thread if none exists)
   const handleOpenMessageForFriend = useCallback((friend: Friend) => {
@@ -158,6 +161,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         isOnline: friend.isOnline,
       };
       setSelectedThread(tempThread);
+      setIsInGame(true);
       loadMessages(friend.odUserId);
     }
     // Switch to messages tab
@@ -174,7 +178,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   const handleMarkAsRead = useCallback(() => {
     if (selectedThread && messages.length > 0) {
-      markAsRead(selectedThread.friendUserId, messages[0].messageId);
+      markAsRead(selectedThread.friendUserId, messages[messages.length - 1].messageId);
     }
   }, [selectedThread, messages, markAsRead]);
 
@@ -579,13 +583,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
         isLoading={false}
         isOpen={!!selectedThread}
         typingUsername={typingUsername ?? undefined}
-        onClose={() => setSelectedThread(null)}
+        onClose={() => { setSelectedThread(null); setIsInGame(false); }}
         onSendMessage={handleSendMessage}
         onTyping={selectedThread ? (isTyping: boolean) => setTyping(selectedThread.friendUserId, isTyping) : undefined}
         onDeleteMessage={deleteMessage}
         onChallenge={selectedThread ? () => {
           const friend = friends.find(f => f.odUserId === selectedThread.friendUserId);
-          if (friend) { setChallengeFriend(friend); setSelectedThread(null); }
+          if (friend) { setChallengeFriend(friend); setSelectedThread(null); setIsInGame(false); }
         } : undefined}
         onMarkAsRead={handleMarkAsRead}
         currentUserId={profile?.id || ''}

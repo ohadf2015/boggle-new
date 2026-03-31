@@ -189,10 +189,11 @@ function normalizeWord(word: string, language: string): string {
   }
 }
 
-// Rate limit config: 300 requests per minute per IP
-// Higher limit to accommodate multiple users on same network (family, office, cafe)
+// Rate limit config: 600 requests per minute per IP
+// Higher limit for gameplay — Blast mode submits words rapidly during cascades
+// Also accommodates multiple users on same network (family, office, cafe)
 const RATE_LIMIT_CONFIG = {
-  maxRequests: 300,
+  maxRequests: 600,
   windowMs: 60000,
   blockDurationMs: 300000, // 5 min block if abused
 };

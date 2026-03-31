@@ -20,8 +20,8 @@ import {
 // ==================== Wave Config movesAllowed ====================
 
 describe('WaveConfig movesAllowed', () => {
-  it('wave 1 allows 20 moves', () => {
-    expect(getWaveConfig(1).movesAllowed).toBe(20);
+  it('wave 1 allows 25 moves (generous tutorial)', () => {
+    expect(getWaveConfig(1).movesAllowed).toBe(25);
   });
 
   it('wave 2 allows 18 moves', () => {

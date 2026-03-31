@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 
@@ -42,7 +42,7 @@ const TOAST_ICONS: Record<DangerToast['type'], string> = {
 
 function ToastItem({ toast, onDismiss }: { toast: DangerToast; onDismiss: (id: string) => void }) {
   const { t } = useLanguage();
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     timerRef.current = setTimeout(() => onDismiss(toast.id), AUTO_DISMISS_MS);
@@ -83,7 +83,7 @@ export function WordHuntDangerToast({ toasts, onDismiss }: WordHuntDangerToastPr
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-2 pointer-events-none">
       <AdaptiveAnimatePresence>
         {visible.map((toast) => (
-          <AdaptiveMotion
+          <AdaptiveMotion.div
             key={toast.id}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -91,7 +91,7 @@ export function WordHuntDangerToast({ toasts, onDismiss }: WordHuntDangerToastPr
             transition={{ duration: 0.2 }}
           >
             <ToastItem toast={toast} onDismiss={onDismiss} />
-          </AdaptiveMotion>
+          </AdaptiveMotion.div>
         ))}
       </AdaptiveAnimatePresence>
     </div>

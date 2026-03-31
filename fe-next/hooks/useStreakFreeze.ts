@@ -38,8 +38,7 @@ function syncFreezeToSupabase(userId: string, count: number): void {
     .from('profiles')
     .update({ streak_freeze_count: count })
     .eq('id', userId)
-    .then(() => {})
-    .catch(() => {});
+    .then(() => {}, () => {});
 }
 
 export function useStreakFreeze() {
@@ -67,8 +66,7 @@ export function useStreakFreeze() {
         saveFreezeData({ count: serverCount });
         setFreezeCount(serverCount);
         countRef.current = serverCount;
-      })
-      .catch(() => {});
+      }, () => {});
   }, [isAuthenticated, user?.id]);
 
   const earnFreeze = useCallback(() => {

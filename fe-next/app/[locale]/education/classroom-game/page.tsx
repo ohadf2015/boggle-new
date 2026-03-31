@@ -1,11 +1,13 @@
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { Suspense } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import PageClient from './PageClient';
 
-export const metadata = {
-  title: 'Classroom Game | LexiClash Education',
-  description: 'Play vocabulary games with your classroom',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'education', path: '/education/classroom-game', locale });
+}
 
 export default function ClassroomGamePage() {
   return (

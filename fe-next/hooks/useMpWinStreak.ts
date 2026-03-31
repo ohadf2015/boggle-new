@@ -68,8 +68,7 @@ function syncToSupabase(userId: string, state: MpWinStreakState): void {
       mp_best_streak_wordhunt: state.wordHunt.best,
     })
     .eq('id', userId)
-    .then(() => { /* best-effort */ })
-    .catch(() => { /* best-effort */ });
+    .then(() => { /* best-effort */ }, () => { /* best-effort */ });
 }
 
 export function useMpWinStreak() {
@@ -106,8 +105,7 @@ export function useMpWinStreak() {
         };
         saveState(serverState);
         setState(serverState);
-      })
-      .catch(() => { /* fallback to localStorage */ });
+      }, () => { /* fallback to localStorage */ });
   }, [isAuthenticated, user?.id]);
 
   const recordWin = useCallback((mode: MpMode): RecordWinResult => {

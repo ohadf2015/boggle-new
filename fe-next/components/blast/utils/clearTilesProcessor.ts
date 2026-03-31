@@ -35,6 +35,7 @@ import {
   spawnGemSpecials,
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
+import { earnTileUpgrade } from './blastEarnedTiles';
 
 export interface TileProcessingInput {
   prev: BlastTileState[][];
@@ -240,6 +241,18 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
   // Treasure Gem spawns
   spawnGemSpecials(gemsCompletedThisWord, currentWave, next, gridSize, path, rollSpecialFromDistribution);
+
+  // Earned tile creation — 5+ letter words upgrade a standard tile to a special
+  const earnedTile = earnTileUpgrade(next, path, word.length, currentWave);
+  if (earnedTile) {
+    const upgradedType = next[earnedTile.row][earnedTile.col].type;
+    newExplosions.push({
+      id: `earned-${now}-${earnedTile.row}-${earnedTile.col}`,
+      row: earnedTile.row, col: earnedTile.col,
+      type: upgradedType === 'bomb' ? 'bomb' : upgradedType === 'lightning' ? 'lightning' : 'word',
+      intensity: 2, timestamp: now,
+    });
+  }
 
   // Process bomb BFS chain
   const bombResult = processBombBFS(ctx);

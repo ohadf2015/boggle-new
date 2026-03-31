@@ -182,7 +182,7 @@ function GrandSlamBanner({ t }: { t: (key: string) => string }) {
 
 function WeeklyQuestSection() {
   const { t } = useLanguage();
-  const { activeQuest, availableQuests, isComplete, loading, selectQuest } = useWeeklyQuest();
+  const { activeQuest, availableQuests, isComplete, loading, selectQuest, selectingQuestId } = useWeeklyQuest();
 
   if (loading) return null;
 
@@ -298,18 +298,29 @@ function WeeklyQuestSection() {
             <div className="grid gap-2">
               {availableQuests.map((quest) => {
                 const style = DIFFICULTY_STYLES[quest.difficulty] || DIFFICULTY_STYLES.easy;
+                const isSelecting = selectingQuestId === quest.id;
                 return (
                   <button
                     key={quest.id}
                     onClick={() => selectQuest(quest.id)}
+                    disabled={!!selectingQuestId}
                     className={cn(
                       'flex items-center justify-between p-3',
-                      'rounded-neo border-2 border-neo-black',
-                      'bg-neo-navy/60',
+                      'rounded-neo border-2',
                       'shadow-hard-sm',
-                      'hover:-translate-y-0.5 hover:shadow-hard',
-                      'active:translate-y-[1px] active:shadow-hard-pressed',
-                      'transition-all duration-100',
+                      'transition-all duration-200',
+                      isSelecting
+                        ? [
+                            'border-neo-cyan bg-neo-cyan/15',
+                            'ring-2 ring-neo-cyan/60',
+                            'shadow-hard scale-[1.02]',
+                          ]
+                        : [
+                            'border-neo-black bg-neo-navy/60',
+                            'hover:-translate-y-0.5 hover:shadow-hard',
+                            'active:translate-y-[1px] active:shadow-hard-pressed',
+                          ],
+                      selectingQuestId && !isSelecting && 'opacity-40',
                     )}
                   >
                     <div className="flex flex-col items-start gap-1">

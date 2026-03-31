@@ -100,6 +100,180 @@ const es = {
       "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
       "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
       "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!"
+    },
+    "blast": {
+      "title": "Modo Blast - Encadena Palabras en Combos Explosivos | LexiClash",
+      "description": "Juega Modo Blast en LexiClash! Encadena palabras para combos explosivos, elimina fichas y persigue puntuaciones altas. Juego de palabras rapido — gratis, sin descarga.",
+      "ogTitle": "Modo Blast - Encadena Palabras en Combos",
+      "ogDescription": "Encadena palabras en combos explosivos! Elimina fichas y persigue puntuaciones altas."
+    },
+    "brain": {
+      "title": "Gimnasio Mental - Entrenamiento Cerebral con Juegos de Palabras",
+      "description": "Entrena tu cerebro con ejercicios de palabras en LexiClash! Rondas relampago, caza de memoria, cambio de patrones y gemas raras. Sigue tu Puntuacion Cerebral.",
+      "ogTitle": "Gimnasio Mental - Entrenamiento con Palabras",
+      "ogDescription": "Agudiza tu mente con ejercicios cognitivos de palabras. Sigue tu progreso!"
+    },
+    "brainComboMaster": {
+      "title": "Maestro de Combos - Mantén Rachas de Palabras | Gimnasio Mental",
+      "description": "Pon a prueba tus habilidades de combo! Mantén rachas de palabras sin interrupciones en este ejercicio cerebral rapido.",
+      "ogTitle": "Maestro de Combos - Gimnasio Mental",
+      "ogDescription": "Mantén rachas de palabras sin interrupciones. Construye combos y entrena velocidad!"
+    },
+    "brainLightningRound": {
+      "title": "Ronda Relampago - Busqueda Rapida de Palabras | Gimnasio Mental",
+      "description": "Encuentra palabras lo mas rapido posible! Compite contra el reloj y agudiza tus reflejos.",
+      "ogTitle": "Ronda Relampago - Ejercicio de Velocidad",
+      "ogDescription": "Compite contra el reloj y encuentra palabras a la velocidad del rayo!"
+    },
+    "brainMemoryHunt": {
+      "title": "Caza de Memoria - Recuerda y Encuentra Palabras | Gimnasio Mental",
+      "description": "Memoriza palabras y encuentralas en el tablero desde la memoria! Entrena memoria visual y recuerdo de palabras.",
+      "ogTitle": "Caza de Memoria - Ejercicio de Memoria",
+      "ogDescription": "Memoriza palabras y encuentralas de memoria. Entrena tu recuerdo visual!"
+    },
+    "brainPatternSwitcher": {
+      "title": "Cambio de Patrones - Longitudes de Palabras Variables | Gimnasio Mental",
+      "description": "Alterna entre patrones de longitud requeridos! Encuentra palabras que coincidan con la secuencia objetivo.",
+      "ogTitle": "Cambio de Patrones - Ejercicio de Longitudes",
+      "ogDescription": "Alterna entre patrones de longitud y entrena flexibilidad mental!"
+    },
+    "brainRareGems": {
+      "title": "Gemas Raras - Descubre Palabras Inusuales | Gimnasio Mental",
+      "description": "Busca palabras raras e inusuales que otros pasan por alto! Amplia tu vocabulario y gana puntos bonus.",
+      "ogTitle": "Gemas Raras - Descubrimiento de Palabras",
+      "ogDescription": "Descubre palabras raras que otros pasan por alto. Amplia tu vocabulario!"
+    },
+    "community": {
+      "title": "Puzzles de Palabras Comunitarios - Tableros Creados por Jugadores | LexiClash",
+      "description": "Explora y juega puzzles de palabras creados por la comunidad! Crea tableros personalizados y comparte con amigos.",
+      "ogTitle": "Tableros Comunitarios - Puzzles de Jugadores",
+      "ogDescription": "Juega y crea puzzles de palabras comunitarios. Comparte tableros y compite!"
+    },
+    "education": {
+      "title": "LexiClash Educacion - Juegos de Palabras para Aulas y Profesores",
+      "description": "Lleva juegos de palabras al aula! LexiClash Educacion ayuda a profesores a crear lecciones de vocabulario y seguir el progreso de los alumnos.",
+      "ogTitle": "LexiClash Educacion - Juegos para Aulas",
+      "ogDescription": "Juegos de palabras para aulas! Crea lecciones, sigue el progreso y haz divertido el aprendizaje."
+    },
+    "friends": {
+      "title": "Amigos y Social - Juega con Amigos | LexiClash",
+      "description": "Conecta con amigos en LexiClash! Envia desafios, sigue la actividad de amigos y compite cara a cara.",
+      "ogTitle": "Amigos - Juega Juegos de Palabras Juntos",
+      "ogDescription": "Conecta con amigos, envia desafios y compite cara a cara en batallas de palabras!"
+    },
+    "settings": {
+      "title": "Configuracion del Juego y Preferencias | LexiClash",
+      "description": "Personaliza tu experiencia LexiClash. Ajusta accesibilidad, movimiento, sonido y opciones de visualizacion.",
+      "ogTitle": "Configuracion - LexiClash",
+      "ogDescription": "Personaliza tu experiencia con opciones de accesibilidad y visualizacion."
+    },
+    "referrals": {
+      "title": "Invita Amigos y Gana Recompensas | LexiClash",
+      "description": "Invita amigos a LexiClash y gana recompensas de XP! Comparte tu enlace y desbloquea bonos exclusivos.",
+      "ogTitle": "Referencias - Invita Amigos, Gana Recompensas",
+      "ogDescription": "Invita amigos y gana XP. Comparte tu enlace y desbloquea bonos exclusivos!"
+    },
+    "quests": {
+      "title": "Misiones Diarias y Desafios Semanales | LexiClash",
+      "description": "Completa misiones diarias y desafios semanales para ganar monedas, XP y recompensas exclusivas. Nuevas misiones cada dia!",
+      "ogTitle": "Misiones y Desafios - LexiClash",
+      "ogDescription": "Completa misiones diarias y desafios semanales por monedas, XP y recompensas!"
+    },
+    "accessibility": {
+      "title": "Declaracion de Accesibilidad | LexiClash",
+      "description": "Compromiso de accesibilidad de LexiClash. WCAG 2.1 AA, movimiento reducido, lectores de pantalla y diseno inclusivo.",
+      "ogTitle": "Accesibilidad - LexiClash",
+      "ogDescription": "Nuestro compromiso de hacer LexiClash accesible para todos."
+    },
+    "rules": {
+      "title": "Como Jugar LexiClash - Reglas del Juego y Guia de Estrategia",
+      "description": "Aprende a jugar LexiClash, el juego de palabras multijugador en tiempo real. Guia completa con reglas y estrategias.",
+      "ogTitle": "Reglas y Guia de Estrategia - LexiClash",
+      "ogDescription": "Aprende a jugar LexiClash con nuestra guia completa de reglas y estrategias."
+    },
+    "howToPlay": {
+      "title": "Como Jugar LexiClash - Guia para Principiantes",
+      "description": "Nuevo en LexiClash? Aprende lo basico de busqueda de palabras, puntuacion, combos y multijugador. Guia paso a paso.",
+      "ogTitle": "Como Jugar - Guia para Principiantes",
+      "ogDescription": "Nuevo en LexiClash? Aprende lo basico con nuestra guia paso a paso."
+    },
+    "custom": {
+      "title": "Puzzles de Palabras Personalizados - Crea y Comparte | LexiClash",
+      "description": "Crea puzzles personalizados con tu propia disposicion de letras! Comparte codigos con amigos y desafialos.",
+      "ogTitle": "Puzzles Personalizados - Crea y Comparte",
+      "ogDescription": "Crea puzzles de palabras personalizados y desafia a tus amigos!"
+    },
+    "wordOfTheDay": {
+      "title": "Palabra del Dia - Constructor de Vocabulario Diario | LexiClash",
+      "description": "Descubre una nueva palabra cada dia! Aprende definiciones, etimologia y ejemplos de uso.",
+      "ogTitle": "Palabra del Dia - Vocabulario Diario",
+      "ogDescription": "Aprende una nueva palabra cada dia. Amplia tu vocabulario!"
+    },
+    "glossary": {
+      "title": "Glosario de Juegos de Palabras - Terminos y Definiciones | LexiClash",
+      "description": "Glosario completo de terminos de juegos de palabras en LexiClash. Combos, rachas, power-ups y mecanicas.",
+      "ogTitle": "Glosario de Juegos de Palabras - LexiClash",
+      "ogDescription": "Glosario completo de terminos, mecanicas y reglas de puntuacion."
+    },
+    "guides": {
+      "title": "Guias de Estrategia y Consejos - Domina Todos los Modos | LexiClash",
+      "description": "Guias de estrategia experta para todos los modos de LexiClash. Domina clasico, Word Hunt, Blast y mas.",
+      "ogTitle": "Guias de Estrategia - Domina LexiClash",
+      "ogDescription": "Guias expertas y consejos profesionales para cada modo de LexiClash."
+    },
+    "words": {
+      "title": "Explorador de Palabras - Navega y Descubre | LexiClash",
+      "description": "Explora palabras por longitud, letra inicial y mas. Descubre vocabulario nuevo y patrones de palabras.",
+      "ogTitle": "Explorador de Palabras - LexiClash",
+      "ogDescription": "Navega por palabras segun longitud y letra inicial."
+    },
+    "party": {
+      "title": "Juegos de Fiesta - Diversion Multijugador en Pantalla Grande | LexiClash",
+      "description": "Pon LexiClash en la pantalla grande para batallas de palabras estilo fiesta! Caption Clash, Pixel Clash y Shadow Clash.",
+      "ogTitle": "Juegos de Fiesta - Batallas en Pantalla Grande",
+      "ogDescription": "Juegos de palabras estilo fiesta en pantalla grande! Perfecto para noches de juegos."
+    },
+    "wordForge": {
+      "title": "Forja de Palabras - Forja Palabras y Construye Poder | LexiClash",
+      "description": "Forja palabras poderosas en este modo estrategico! Mejora habilidades y domina la construccion de palabras.",
+      "ogTitle": "Forja de Palabras - Construccion Estrategica",
+      "ogDescription": "Forja palabras, mejora habilidades y domina la construccion estrategica!"
+    },
+    "disclaimer": {
+      "title": "Descargo de Responsabilidad - Aviso Legal Importante | LexiClash",
+      "description": "Lea el descargo de responsabilidad de LexiClash. Informacion importante sobre el uso de nuestra plataforma.",
+      "ogTitle": "Descargo de Responsabilidad - LexiClash",
+      "ogDescription": "Descargo de responsabilidad legal importante sobre la plataforma LexiClash."
+    },
+    "cookies": {
+      "title": "Politica de Cookies - Como Usamos las Cookies | LexiClash",
+      "description": "Conozca como LexiClash usa cookies para analitica, publicidad y funcionalidad. Gestione sus preferencias.",
+      "ogTitle": "Politica de Cookies - LexiClash",
+      "ogDescription": "Conozca como LexiClash usa cookies y gestione sus preferencias."
+    },
+    "sitemap": {
+      "title": "Mapa del Sitio - Todas las Paginas y Contenido | LexiClash",
+      "description": "Explore todas las paginas de LexiClash, modos de juego, guias, blog y recursos.",
+      "ogTitle": "Mapa del Sitio - LexiClash",
+      "ogDescription": "Explore todas las paginas y contenido en LexiClash."
+    },
+    "tools": {
+      "title": "Herramientas de Juegos de Palabras - Solucionador y Ayudas | LexiClash",
+      "description": "Herramientas gratuitas incluyendo solucionador, buscador de anagramas y constructor de vocabulario.",
+      "ogTitle": "Herramientas de Palabras - LexiClash",
+      "ogDescription": "Herramientas gratuitas — solucionador, buscador de anagramas y vocabulario."
+    },
+    "dailyWordWheel": {
+      "title": "Rueda de Palabras Diaria - Puzzle Diario Gratis | LexiClash",
+      "description": "Gira la rueda de palabras diaria! Encuentra todas las palabras posibles. Nuevo puzzle cada dia!",
+      "ogTitle": "Rueda de Palabras Diaria - Puzzle Gratis",
+      "ogDescription": "Gira la rueda de palabras y encuentra todas las palabras. Nuevo puzzle diario!"
+    },
+    "playerProfile": {
+      "title": "Perfil de Jugador y Estadisticas | LexiClash",
+      "description": "Ver perfiles de jugadores, estadisticas, logros e historial de partidas en LexiClash.",
+      "ogTitle": "Perfil de Jugador - LexiClash",
+      "ogDescription": "Ver estadisticas, logros e historial de partidas."
     }
   },
   "cookieConsent": {
@@ -7183,20 +7357,6 @@ const es = {
     "reconnectAttempt": "Intento {current} de {max}",
     "leaveGame": "Salir del juego",
     "scoreSafeReconnect": "Tu puntuación está segura",
-    "daily": {
-      "wordCount": {
-        "title": "Coleccionista de Palabras",
-        "description": "Encuentra {target} palabras"
-      },
-      "perfect": {
-        "title": "Estrella Perfecta",
-        "description": "Consigue {target} niveles perfectos de 3 estrellas"
-      },
-      "longWord": {
-        "title": "Maestro de Palabras",
-        "description": "Encuentra {target} palabras largas (5+ letras)"
-      }
-    }
   },
   "blast": {
     "chain": {
@@ -9989,12 +10149,17 @@ const es = {
     "ready": {
       "title": "MODO BLAST",
       "subtitle": "Limpia el tablero, encadena combos, sobrevive las oleadas",
-      "play": "JUGAR"
+      "play": "JUGAR",
+      "rule1": "Arrastra sobre las fichas para deletrear palabras (3+ letras)",
+      "rule2": "Palabras más largas dan más puntos y limpian más fichas",
+      "rule3": "Fichas especiales (💣⚡🔷) provocan reacciones en cadena",
+      "rule4": "Limpia 50%+ de fichas para avanzar a la siguiente oleada"
     },
     "waveComplete": "¡Oleada ${wave} completada!",
+    "score": "Puntos",
     "wordsFound": "palabras",
     "cleared": "limpiado",
-    "nextWave": "SIGUIENTE OLEADA",
+    "nextWave": "Oleada ${wave}",
     "gameOver": "FIN DEL JUEGO",
     "waves": "oleadas",
     "bestWord": "Mejor",

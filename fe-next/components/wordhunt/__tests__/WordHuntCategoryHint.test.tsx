@@ -14,7 +14,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
       }
       return key;
     },
-    locale: 'en',
+    language: 'en',
   }),
 }));
 
@@ -29,9 +29,9 @@ describe('WordHuntCategoryHint', () => {
     expect(screen.getByText('\uD83D\uDC3E')).toBeTruthy(); // 🐾
   });
 
-  it('renders generic hint when no category', () => {
-    render(<WordHuntCategoryHint targetLength={4} targetCategory={null} />);
-    expect(screen.getByText(/Find a 4-letter word/)).toBeTruthy();
+  it('renders nothing when no category', () => {
+    const { container } = render(<WordHuntCategoryHint targetLength={4} targetCategory={null} />);
+    expect(container.querySelector('[data-testid="category-hint"]')).toBeNull();
   });
 
   it('renders food category with correct emoji', () => {

@@ -408,6 +408,7 @@ export const useGameStore = create<GameStore>()(
         ...(data.showStartAnimation !== undefined && { showStartAnimation: data.showStartAnimation }),
         ...(data.gameActive !== undefined && { gameActive: data.gameActive }),
         // Always reset word hunt state to avoid stale data from previous WH games
+        wordHuntTargetCategory: null,
         wordHuntPlayerLives: {},
         wordHuntTargetAttempts: [],
         wordHuntTargetFound: false,
@@ -453,6 +454,7 @@ export const useGameStore = create<GameStore>()(
         blastOpponentActivity: [],
         blastPlayerStats: {},
         wordHuntTargetLength: 0,
+        wordHuntTargetCategory: null,
         wordHuntMyLife: 100,
         wordHuntPlayerLives: {},
         wordHuntTargetAttempts: [],

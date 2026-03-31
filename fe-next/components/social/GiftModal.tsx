@@ -98,11 +98,11 @@ const GiftModal: React.FC<GiftModalProps> = ({
                       : 'bg-slate-900 opacity-50 cursor-not-allowed'
                 )}
               >
-                <Icon className="w-6 h-6 mb-1 text-white" />
-                <span className="text-xs font-bold text-white capitalize">
+                <Icon className={cn('w-6 h-6 mb-1', isSelected ? 'text-neo-black' : 'text-white')} />
+                <span className={cn('text-xs font-bold capitalize', isSelected ? 'text-neo-black' : 'text-white')}>
                   {t(`socialGift.type.${type}`, type.replace('_', ' '))}
                 </span>
-                <span className="text-[10px] text-gray-400 mt-0.5">
+                <span className={cn('text-[10px] mt-0.5', isSelected ? 'text-neo-black/70' : 'text-gray-400')}>
                   {type === 'coins' ? `${GIFT_TYPES.coins.minAmount}-${GIFT_TYPES.coins.maxAmount}` : `${config.cost}`} {t('socialGift.coins', 'coins')}
                 </span>
               </button>

@@ -65,14 +65,14 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
   },
-  // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (20 moves — generous intro)
-  // Lower special tile chance (0.10) so new players aren't overwhelmed by special tiles
+  // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (25 moves — generous tutorial)
+  // Higher vowel modifier + lower special chance so new players find words easily
   {
     minWordLength: 2, specialTileChance: 0.10, iceDistribution: 0.17, goldDistribution: 0.22,
-    vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
+    vowelModifier: 1.1, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 25,
   },
   // Wave 2 — treasure gem unlocks (18 moves)
   // Slightly lower special tile chance (0.13) to ramp gradually
@@ -138,14 +138,19 @@ export function getWaveConfig(wave: number): WaveConfig {
 
 import type { BlastObjective } from '../types';
 
-/** Objectives per wave (1-indexed). Wave 6+ uses a scaling formula. */
+/**
+ * Objectives per wave — designed with progressive disclosure:
+ * Each wave teaches ONE new concept, building on what the player already knows.
+ * Wave 1: core mechanic (find words). Wave 2: longer = better.
+ * Wave 3: special tiles matter. Wave 4+: compound goals.
+ */
 const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
-  1: [{ type: 'score_target', target: 20 }],
-  2: [{ type: 'collect_type', tileType: 'gem', target: 3 }],
-  3: [{ type: 'clear_all_type', tileType: 'ice', target: 0 }, { type: 'score_target', target: 40 }],
-  4: [{ type: 'collect_type', tileType: 'bomb', target: 4 }, { type: 'word_length', target: 2, minWordLength: 5 }],
-  5: [{ type: 'clear_all_type', tileType: 'frozen', target: 0 }, { type: 'collect_type', tileType: 'lightning', target: 3 }],
-  6: [{ type: 'score_target', target: 120 }, { type: 'collect_type', tileType: 'prism', target: 2 }],
+  1: [{ type: 'word_length', target: 3, minWordLength: 3 }],
+  2: [{ type: 'word_length', target: 2, minWordLength: 4 }, { type: 'score_target', target: 50 }],
+  3: [{ type: 'collect_type', tileType: 'bomb', target: 2 }, { type: 'score_target', target: 80 }],
+  4: [{ type: 'collect_type', tileType: 'lightning', target: 2 }, { type: 'word_length', target: 1, minWordLength: 5 }],
+  5: [{ type: 'clear_all_type', tileType: 'frozen', target: 0 }, { type: 'score_target', target: 150 }],
+  6: [{ type: 'collect_type', tileType: 'prism', target: 2 }, { type: 'word_length', target: 2, minWordLength: 5 }],
 };
 
 /**

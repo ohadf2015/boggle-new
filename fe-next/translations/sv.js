@@ -100,6 +100,180 @@ const sv = {
         "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
         "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
         "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
+    },
+    "blast": {
+      "title": "Blast-läge - Kedja Ord Till Explosiva Kombos | LexiClash",
+      "description": "Spela Blast-läge i LexiClash! Kedja ord till explosiva kombos, rensa brickor och jaga toppresultat. Snabbt ordpussel — gratis, ingen nedladdning.",
+      "ogTitle": "Blast-läge - Kedja Ord Till Kombos",
+      "ogDescription": "Kedja ord till explosiva kombos! Rensa brickor, bygg multiplikatorer och jaga toppresultat."
+    },
+    "brain": {
+      "title": "Hjärngym - Ordspelsträning & Kognitiva Övningar",
+      "description": "Träna hjärnan med LexiClash ordövningar! Blixtomgångar, minnesjakt, mönsterbyten och sällsynta ädelstenar. Följ ditt hjärnpoäng.",
+      "ogTitle": "Hjärngym - Ordspelsträning",
+      "ogDescription": "Skärp sinnet med kognitiva ordövningar. Följ din framsteg!"
+    },
+    "brainComboMaster": {
+      "title": "Kombo-mästare - Håll Ordserier Igång | Hjärngym",
+      "description": "Testa dina kombofärdigheter! Håll ordserier igång utan avbrott i denna snabba hjärnövning.",
+      "ogTitle": "Kombo-mästare - Hjärngym",
+      "ogDescription": "Håll ordserier igång utan avbrott. Bygg kombos och träna reaktionstid!"
+    },
+    "brainLightningRound": {
+      "title": "Blixtomgång - Hitta Ord Snabbt | Hjärngym",
+      "description": "Hitta ord så snabbt som möjligt! Tävla mot klockan och skärp dina ordreflexer.",
+      "ogTitle": "Blixtomgång - Snabb Ordövning",
+      "ogDescription": "Tävla mot klockan och hitta ord blixtsnabbt!"
+    },
+    "brainMemoryHunt": {
+      "title": "Minnesjakt - Kom Ihåg & Hitta Ord | Hjärngym",
+      "description": "Memorera ord och hitta dem på brädet ur minnet! Träna visuellt minne och ordåterkallning.",
+      "ogTitle": "Minnesjakt - Ordminnesövning",
+      "ogDescription": "Memorera ord och hitta dem ur minnet. Träna visuell återkallning!"
+    },
+    "brainPatternSwitcher": {
+      "title": "Mönsterbytare - Varierande Ordlängder | Hjärngym",
+      "description": "Växla mellan olika ordlängdsmönster! Hitta ord som matchar mållängden för att träna mental flexibilitet.",
+      "ogTitle": "Mönsterbytare - Övning med Varierande Längder",
+      "ogDescription": "Växla mellan ordlängdsmönster och träna mental flexibilitet!"
+    },
+    "brainRareGems": {
+      "title": "Sällsynta Ädelstenar - Upptäck Ovanliga Ord | Hjärngym",
+      "description": "Jaga ovanliga och sällsynta ord som andra missar! Utöka ditt ordförråd och tjäna bonuspoäng.",
+      "ogTitle": "Sällsynta Ädelstenar - Ovanliga Ord",
+      "ogDescription": "Upptäck sällsynta ord andra missar. Utöka ditt ordförråd!"
+    },
+    "community": {
+      "title": "Ordpussel Från Gemenskapen - Spelarskapade Brädspel | LexiClash",
+      "description": "Bläddra och spela gemenskapsskapade ordpussel! Skapa egna brädspel, dela med vänner och tävla.",
+      "ogTitle": "Gemenskapsbrädspel - Spelarskapade Pussel",
+      "ogDescription": "Spela och skapa gemenskapsordpussel. Dela brädspel och tävla!"
+    },
+    "education": {
+      "title": "LexiClash Utbildning - Ordspel för Klassrum & Lärare",
+      "description": "Använd ordspel i klassrummet! LexiClash Utbildning hjälper lärare skapa ordförrådslektioner och följa elevernas framsteg.",
+      "ogTitle": "LexiClash Utbildning - Ordspel för Klassrum",
+      "ogDescription": "Ordspel för klassrum! Skapa lektioner, följ framsteg och gör ordlärande roligt."
+    },
+    "friends": {
+      "title": "Vänner & Socialt - Spela Ordspel med Vänner | LexiClash",
+      "description": "Anslut med vänner på LexiClash! Skicka utmaningar, följ vänners aktivitet och tävla mot varandra.",
+      "ogTitle": "Vänner - Spela Ordspel Tillsammans",
+      "ogDescription": "Anslut med vänner, skicka utmaningar och tävla mot varandra!"
+    },
+    "settings": {
+      "title": "Spelinställningar & Preferenser | LexiClash",
+      "description": "Anpassa din LexiClash-upplevelse. Justera tillgänglighet, rörelsepreferenser, ljud och visningsalternativ.",
+      "ogTitle": "Inställningar - LexiClash",
+      "ogDescription": "Anpassa din LexiClash-upplevelse med tillgänglighets- och visningsalternativ."
+    },
+    "referrals": {
+      "title": "Bjud In Vänner & Tjäna Belöningar | LexiClash",
+      "description": "Bjud in vänner till LexiClash och tjäna XP-belöningar! Dela din länk och lås upp exklusiva bonusar.",
+      "ogTitle": "Värvningar - Bjud In Vänner, Tjäna Belöningar",
+      "ogDescription": "Bjud in vänner och tjäna XP. Dela din länk och lås upp exklusiva bonusar!"
+    },
+    "quests": {
+      "title": "Dagliga Uppdrag & Veckoliga Utmaningar | LexiClash",
+      "description": "Slutför dagliga uppdrag och veckoliga utmaningar för mynt, XP och exklusiva belöningar. Nya uppdrag varje dag!",
+      "ogTitle": "Uppdrag & Utmaningar - LexiClash",
+      "ogDescription": "Slutför dagliga uppdrag och veckoliga utmaningar för mynt, XP och belöningar!"
+    },
+    "accessibility": {
+      "title": "Tillgänglighetsförklaring | LexiClash",
+      "description": "LexiClash tillgänglighetsåtagande. Lär dig om WCAG 2.1 AA, reducerad rörelse, skärmläsare och inkluderande design.",
+      "ogTitle": "Tillgänglighet - LexiClash",
+      "ogDescription": "Vårt åtagande att göra LexiClash tillgängligt för alla spelare."
+    },
+    "rules": {
+      "title": "Hur Man Spelar LexiClash - Spelregler & Strategiguide",
+      "description": "Lär dig spela LexiClash, ordspelet för flera spelare i realtid. Komplett guide med spelregler, poängsystem och strategier.",
+      "ogTitle": "Spelregler & Strategiguide - LexiClash",
+      "ogDescription": "Lär dig spela LexiClash med vår kompletta regler- och strategiguide."
+    },
+    "howToPlay": {
+      "title": "Hur Man Spelar LexiClash - Nybörjarguide",
+      "description": "Ny på LexiClash? Lär dig grunderna i ordsökning, poäng, kombos och flerspelarsläge. Steg-för-steg-guide.",
+      "ogTitle": "Hur Man Spelar - Nybörjarguide",
+      "ogDescription": "Ny på LexiClash? Lär dig grunderna med vår steg-för-steg-guide."
+    },
+    "custom": {
+      "title": "Anpassade Ordpussel - Skapa & Dela | LexiClash",
+      "description": "Skapa anpassade ordpussel med egna bokstavsarrangemang! Dela koder med vänner och utmana dem.",
+      "ogTitle": "Anpassade Pussel - Skapa & Dela",
+      "ogDescription": "Skapa anpassade ordpussel och utmana vänner att slå ditt bräde!"
+    },
+    "wordOfTheDay": {
+      "title": "Dagens Ord - Daglig Ordförrådsbyggare | LexiClash",
+      "description": "Upptäck ett nytt ord varje dag! Lär dig definitioner, etymologi och användning.",
+      "ogTitle": "Dagens Ord - Dagligt Ordförråd",
+      "ogDescription": "Lär dig ett nytt ord varje dag. Utöka ditt ordförråd!"
+    },
+    "glossary": {
+      "title": "Ordspelsordlista - Termer & Definitioner | LexiClash",
+      "description": "Komplett ordlista med ordspelstermer i LexiClash. Lär dig om kombos, serier, power-ups och poängmekanik.",
+      "ogTitle": "Ordspelsordlista - LexiClash",
+      "ogDescription": "Komplett ordlista med ordspelstermer, mekanik och poängregler."
+    },
+    "guides": {
+      "title": "Strategiguider & Tips - Bemästra Alla Spellägen | LexiClash",
+      "description": "Expertstrategiguider för alla LexiClash-spellägen. Bemästra klassiskt läge, Word Hunt, Blast och mer.",
+      "ogTitle": "Strategiguider - Bemästra LexiClash",
+      "ogDescription": "Expertguider och proffsiga tips för varje LexiClash-spelläge."
+    },
+    "words": {
+      "title": "Ordutforskare - Bläddra & Upptäck Ord | LexiClash",
+      "description": "Utforska ord efter längd, begynnelsebokstav och mer. Upptäck nytt ordförråd och ordmönster.",
+      "ogTitle": "Ordutforskare - LexiClash",
+      "ogDescription": "Bläddra bland ord efter längd och begynnelsebokstav."
+    },
+    "party": {
+      "title": "Partyspel - Flerspelarskoj på Storskärm | LexiClash",
+      "description": "Visa LexiClash på storskärmen för ordstrider i partystil! Caption Clash, Pixel Clash och Shadow Clash.",
+      "ogTitle": "Partyspel - Ordstrider på Storskärm",
+      "ogDescription": "Ordspel i partystil på storskärmen! Perfekt för spelkvällar."
+    },
+    "wordForge": {
+      "title": "Ordsmide - Smid Ord & Bygg Kraft | LexiClash",
+      "description": "Smid kraftfulla ord i detta strategiska läge! Uppgradera förmågor och bemästra ordbyggande.",
+      "ogTitle": "Ordsmide - Strategiskt Ordbyggande",
+      "ogDescription": "Smid ord, uppgradera förmågor och bemästra strategiskt ordbyggande!"
+    },
+    "disclaimer": {
+      "title": "Ansvarsfriskrivning - Viktig Juridisk Information | LexiClash",
+      "description": "Läs LexiClash ansvarsfriskrivning. Viktig information om användning av vår plattform och ansvarsbegränsningar.",
+      "ogTitle": "Ansvarsfriskrivning - LexiClash",
+      "ogDescription": "Viktig juridisk ansvarsfriskrivning gällande LexiClash-plattformen."
+    },
+    "cookies": {
+      "title": "Cookiepolicy - Hur Vi Använder Cookies | LexiClash",
+      "description": "Lär dig hur LexiClash använder cookies för analys, reklam och grundläggande funktionalitet. Hantera dina inställningar.",
+      "ogTitle": "Cookiepolicy - LexiClash",
+      "ogDescription": "Lär dig hur LexiClash använder cookies och hantera dina inställningar."
+    },
+    "sitemap": {
+      "title": "Webbplatskarta - Alla Sidor & Innehåll | LexiClash",
+      "description": "Bläddra bland alla LexiClash-sidor, spellägen, guider, blogginlägg och resurser.",
+      "ogTitle": "Webbplatskarta - LexiClash",
+      "ogDescription": "Bläddra bland alla sidor och innehåll på LexiClash."
+    },
+    "tools": {
+      "title": "Ordspelsverktyg - Lösare & Hjälpmedel | LexiClash",
+      "description": "Gratis ordspelsverktyg inklusive ordlösare, anagramsökare och ordförrådsbyggare.",
+      "ogTitle": "Ordspelsverktyg - LexiClash",
+      "ogDescription": "Gratis ordverktyg — lösare, anagramsökare och ordförrådsbyggare."
+    },
+    "dailyWordWheel": {
+      "title": "Dagliga Ordhjulet - Gratis Dagligt Pussel | LexiClash",
+      "description": "Snurra det dagliga ordhjulet! Hitta alla möjliga ord från en uppsättning bokstäver. Nytt pussel varje dag!",
+      "ogTitle": "Dagliga Ordhjulet - Gratis Pussel",
+      "ogDescription": "Snurra ordhjulet och hitta alla möjliga ord. Nytt pussel dagligen!"
+    },
+    "playerProfile": {
+      "title": "Spelarprofil & Spelstatistik | LexiClash",
+      "description": "Visa spelarprofiler, spelstatistik, prestationer och matchhistorik på LexiClash.",
+      "ogTitle": "Spelarprofil - LexiClash",
+      "ogDescription": "Visa spelarstatistik, prestationer och matchhistorik."
     }
   },
   "cookieConsent": {
@@ -7117,20 +7291,6 @@ const sv = {
     "reconnectAttempt": "Försök {current} av {max}",
     "leaveGame": "Lämna spel",
     "scoreSafeReconnect": "Din poäng är sparad",
-    "daily": {
-      "wordCount": {
-        "title": "Ordsamlare",
-        "description": "Hitta {target} ord"
-      },
-      "perfect": {
-        "title": "Perfekt Stjärna",
-        "description": "Få {target} perfekta nivåer med 3 stjärnor"
-      },
-      "longWord": {
-        "title": "Ordsmed",
-        "description": "Hitta {target} långa ord (5+ bokstäver)"
-      }
-    }
   },
   "blast": {
     "chain": {
@@ -9941,12 +10101,17 @@ const sv = {
     "ready": {
       "title": "BLAST-LÄGE",
       "subtitle": "Rensa brädet, kedja kombos, överlev vågorna",
-      "play": "SPELA"
+      "play": "SPELA",
+      "rule1": "Dra över brickor för att stava ord (3+ bokstäver)",
+      "rule2": "Längre ord ger mer poäng och rensar fler brickor",
+      "rule3": "Specialbrickor (💣⚡🔷) utlöser explosiva kedjereaktioner",
+      "rule4": "Rensa 50%+ av brickorna för att gå vidare till nästa våg"
     },
     "waveComplete": "Våg ${wave} klar!",
+    "score": "Poäng",
     "wordsFound": "ord",
     "cleared": "rensat",
-    "nextWave": "NÄSTA VÅG",
+    "nextWave": "Våg ${wave}",
     "gameOver": "SPELET SLUT",
     "waves": "vågor",
     "bestWord": "Bästa",

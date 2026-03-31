@@ -17,6 +17,8 @@ import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormin
 import { BlastHUD } from './BlastHUD';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
+import BlastWaveClearText from './BlastWaveClearText';
+import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
@@ -187,7 +189,7 @@ export function BlastStage({
 
       {/* 2. Objective progress bar */}
       {objectiveProgress && objectiveProgress.length > 0 && (
-        <div className="px-4 py-0.5 max-w-md mx-auto w-full flex-shrink-0">
+        <div className="px-4 py-1 max-w-md mx-auto w-full flex-shrink-0">
           <div className="flex gap-2">
             {objectiveProgress.map((obj, i) => {
               const target = obj.objective.target;
@@ -213,25 +215,10 @@ export function BlastStage({
         </div>
       )}
 
-      {/* 3. Word forming area — collapses when empty */}
-      <div className={cn(
-        'flex items-center justify-center flex-shrink-0 relative z-30 px-4 mx-auto w-full max-w-md overflow-visible transition-all duration-150',
-        formedWord ? 'min-h-[36px] mb-1 bg-white/5 border border-white/10 rounded-neo' : 'min-h-0 mb-0',
-      )}>
-        {formedWord && (
-          <>
-            <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
-            <span className="absolute end-3 text-[10px] font-bold text-white/60 tabular-nums">
-              {formedWord.length}
-            </span>
-          </>
-        )}
-      </div>
-
-      {/* 4. Board */}
+      {/* 3. Board — AAA Royal Blast ornate frame, fills most of screen */}
       <div
         className={cn(
-          'flex-1 flex flex-col items-center justify-center px-3 relative z-30 min-h-0',
+          'flex-1 flex flex-col items-center justify-center px-2 pt-1 relative z-30 min-h-0',
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
           sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
@@ -243,39 +230,94 @@ export function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        <div ref={boardContainerRef} className="relative w-full max-w-[min(95vw,480px)] md:max-w-[min(85vw,520px)]">
-          {/* PixiJS effects layer — behind DOM tiles, mounted after measurement */}
-          {boardSize.width > 0 && (
-            <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
-              <BlastEffectsCanvas
-                width={boardSize.width}
-                height={boardSize.height || boardSize.width}
+        {/* Ornate board frame — golden trim with recessed interior */}
+        <div
+          className="relative w-full max-w-[92vw] sm:max-w-[420px] md:max-w-[460px] lg:max-w-[min(500px,55vh)]"
+          style={{
+            padding: '6px',
+            borderRadius: '20px',
+            background: 'linear-gradient(180deg, #B8860B 0%, #8B6914 40%, #6B4F10 100%)',
+            boxShadow: 'inset 0 1px 2px rgba(255,230,150,0.5), 0 8px 24px rgba(0,0,0,0.5), 0 2px 0 #4a3508',
+          }}
+        >
+          {/* Inner recessed board surface */}
+          <div
+            ref={boardContainerRef}
+            className="relative w-full overflow-hidden"
+            style={{
+              borderRadius: '14px',
+              background: 'linear-gradient(180deg, #0d0b20 0%, #0a0818 100%)',
+              boxShadow: 'inset 0 3px 12px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.4)',
+            }}
+          >
+            {/* PixiJS effects layer */}
+            {boardSize.width > 0 && (
+              <div className="absolute inset-0 z-0 overflow-hidden" style={{ borderRadius: '14px' }}>
+                <BlastEffectsCanvas
+                  width={boardSize.width}
+                  height={boardSize.height || boardSize.width}
+                  gridSize={gridSize}
+                  clearedTiles={clearedTilesForEffects}
+                  chainLevel={sequencerState?.chainLevel ?? 0}
+                  comboTier={comboFlashTier}
+                  waveCleared={waveCleared}
+                />
+              </div>
+            )}
+            {/* DOM board */}
+            <div className="relative z-10">
+              <BlastBoard
+                grid={grid}
+                tileStates={tileStates}
                 gridSize={gridSize}
-                clearedTiles={clearedTilesForEffects}
-                chainLevel={sequencerState?.chainLevel ?? 0}
-                comboTier={comboFlashTier}
-                waveCleared={waveCleared}
+                language={language}
+                interactive={interactive && !isComplete}
+                onWordSubmit={onWordSubmit}
+                onPathSubmit={onPathSubmit}
+                onWordChange={onWordChange}
+                sequencerState={sequencerState}
+                nearMissCells={nearMissCells}
               />
             </div>
-          )}
-          {/* DOM board — always rendered, stable for hydration */}
-          <div className="relative z-10">
-            <BlastBoard
-              grid={grid}
-              tileStates={tileStates}
-              gridSize={gridSize}
-              language={language}
-              interactive={interactive && !isComplete}
-              onWordSubmit={onWordSubmit}
-              onPathSubmit={onPathSubmit}
-              onWordChange={onWordChange}
-              sequencerState={sequencerState}
-              nearMissCells={nearMissCells}
-            />
           </div>
+          {/* Golden corner accents */}
+          <div className="absolute top-1 left-1 w-3 h-3 rounded-tl-lg border-t-2 border-l-2 border-amber-400/40 pointer-events-none" />
+          <div className="absolute top-1 right-1 w-3 h-3 rounded-tr-lg border-t-2 border-r-2 border-amber-400/40 pointer-events-none" />
+          <div className="absolute bottom-1 left-1 w-3 h-3 rounded-bl-lg border-b-2 border-l-2 border-amber-400/40 pointer-events-none" />
+          <div className="absolute bottom-1 right-1 w-3 h-3 rounded-br-lg border-b-2 border-r-2 border-amber-400/40 pointer-events-none" />
         </div>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} />
+        <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} />
+      </div>
+
+      {/* 4. Word forming area — golden ribbon style */}
+      <div className={cn(
+        'flex items-center justify-center flex-shrink-0 relative z-30 px-4 py-2',
+        'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
+        'min-h-[44px]',
+      )}>
+        <div
+          className={cn(
+            'flex items-center justify-center gap-2 px-5 py-2 w-full',
+            formedWord ? 'opacity-100' : 'opacity-40',
+          )}
+          style={{
+            background: formedWord
+              ? 'linear-gradient(90deg, rgba(184,134,11,0.15) 0%, rgba(255,215,0,0.12) 50%, rgba(184,134,11,0.15) 100%)'
+              : 'transparent',
+            borderRadius: '12px',
+            border: formedWord ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.05)',
+          }}
+        >
+          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
+          <BlastWordRewardPreview wordLength={formedWord.length} />
+          {formedWord && (
+            <span className="text-[10px] font-bold text-amber-400/60 tabular-nums">
+              {formedWord.length}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* 5. Dead-end notification */}

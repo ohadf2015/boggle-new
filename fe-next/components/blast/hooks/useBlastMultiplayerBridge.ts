@@ -58,6 +58,7 @@ function overlayToTileStates(
           : undefined;
 
       states[row][col] = {
+        uid: `mp-${row}-${col}`,
         row,
         col,
         type,

@@ -17,9 +17,14 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const baseSeo = t?.seo ?? (await loadTranslation('en') as Record<string, any>).seo;
 
   const localePath = `/${locale}`;
-  const ogImage = locale === 'he'
-    ? 'https://www.lexiclash.live/og-image-he.jpg'
-    : 'https://www.lexiclash.live/og-image-en.jpg';
+  const ogImageMap: Record<string, string> = {
+    he: 'https://www.lexiclash.live/og-image-he.webp',
+    en: 'https://www.lexiclash.live/og-image-en.webp',
+    sv: 'https://www.lexiclash.live/og-image-sv.webp',
+    ja: 'https://www.lexiclash.live/og-image-ja.webp',
+    es: 'https://www.lexiclash.live/og-image-es.webp',
+  };
+  const ogImage = ogImageMap[locale] || ogImageMap.en;
 
   return {
     title: seo.title,

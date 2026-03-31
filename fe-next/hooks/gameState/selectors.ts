@@ -62,6 +62,7 @@ export const useBlastPlayerStats = () => useGameStore((state) => state.blastPlay
 
 // Word Hunt multiplayer selectors
 export const useWordHuntTargetLength = (): number => useGameStore((state) => state.wordHuntTargetLength);
+export const useWordHuntTargetCategory = (): string | null => useGameStore((state) => state.wordHuntTargetCategory);
 export const useWordHuntMyLife = (): number => useGameStore((state) => state.wordHuntMyLife);
 export const useWordHuntPlayerLives = () => useGameStore((state) => state.wordHuntPlayerLives);
 export const useWordHuntTargetAttempts = () => useGameStore((state) => state.wordHuntTargetAttempts);

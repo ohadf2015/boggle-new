@@ -120,7 +120,7 @@ describe('useDailyMissions', () => {
     });
 
     const hrefs = result.current.missions.map(m => m.href);
-    expect(hrefs).toEqual(['/daily', '/drill', '/adventure', '/community']);
+    expect(hrefs).toEqual(['/daily', '/drill', '/adventure', '/community/create']);
   });
 
   it('sets grandSlamClaimed from DB data', async () => {

@@ -12,7 +12,7 @@ function makeTileState(
   type: BlastTileType = 'standard',
   hitsRemaining = 0,
 ): BlastTileState {
-  return { row, col, type, isCleared: false, activationEffect: null, hitsRemaining };
+  return { row, col, type, isCleared: false, activationEffect: null, hitsRemaining, uid: `t-${row}-${col}` };
 }
 
 function make6x6Grid(): BlastTileState[][] {

@@ -2,6 +2,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from '../types';
 import { generateBlastLetter, rollSpecialType } from './blastLetterGenerator';
 import { getInitialHitsRemaining } from './blastTileUtils';
+import { nextTileUid } from './blastTileGeneration';
 
 /** Tile with computed fall distance for animation */
 export interface FallingTile {
@@ -96,7 +97,7 @@ export function computeGravityResult(
   );
   const newTileStates: BlastTileState[][] = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => ({
-      row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null, hitsRemaining: 0,
+      uid: '', row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null, hitsRemaining: 0,
     }))
   );
   const clearedTiles: ClearedTile[] = [];
@@ -119,10 +120,11 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    const survivors: Array<{ letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number }> = [];
+    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number }> = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       if (!tileStates[row][col].isCleared) {
         survivors.push({
+          uid: tileStates[row][col].uid,
           letter: grid[row][col],
           type: tileStates[row][col].type,
           originalRow: row,
@@ -136,6 +138,7 @@ export function computeGravityResult(
     for (const survivor of survivors) {
       newGrid[bottomRow][col] = survivor.letter;
       newTileStates[bottomRow][col] = {
+        uid: survivor.uid,
         row: bottomRow,
         col,
         type: survivor.type,
@@ -173,11 +176,12 @@ export function computeGravityResult(
 
       newGrid[row][col] = letter;
       newTileStates[row][col] = {
+        uid: nextTileUid(),
         row,
         col,
         type,
         isCleared: false,
-        activationEffect: null,
+        activationEffect: type !== 'standard' ? 'tile-earned' : null,
         hitsRemaining: getInitialHitsRemaining(type),
       };
 

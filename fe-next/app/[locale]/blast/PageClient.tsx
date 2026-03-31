@@ -16,15 +16,15 @@ function LoadingFallback(): React.JSX.Element {
   );
 }
 
-const BlastView = nextDynamic(() => import('@/components/blast/BlastView'), {
-  loading: LoadingFallback,
-  ssr: false,
-});
+const BlastEngineView = nextDynamic(
+  () => import('@/components/blastEngine/BlastEngineView').then((m) => ({ default: m.BlastEngineView })),
+  { loading: LoadingFallback, ssr: false },
+);
 
 export default function BlastPageClient(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <BlastView />
+      <BlastEngineView />
     </Suspense>
   );
 }

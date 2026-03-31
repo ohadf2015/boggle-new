@@ -7,7 +7,14 @@
  * The actual lesson practice is at /student/lessons/[id].
  */
 
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { redirect } from 'next/navigation';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'education', path: '/student/lessons', locale, noIndex: true });
+}
 
 interface PageProps {
   params: Promise<{ locale: string }>;

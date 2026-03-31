@@ -21,10 +21,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-vi.mock('@/components/motion/AdaptiveMotion', () => ({
-  AdaptiveMotion: ({ children, ...props }: any) => <div data-testid="adaptive-motion" {...props}>{children}</div>,
-  AdaptiveAnimatePresence: ({ children }: any) => <div>{children}</div>,
-}));
+vi.mock('@/components/motion/AdaptiveMotion', () => {
+  const Wrapper = ({ children, ...props }: any) => <div data-testid="adaptive-motion" {...props}>{children}</div>;
+  return {
+    AdaptiveMotion: { div: Wrapper, span: Wrapper, button: Wrapper, li: Wrapper },
+    AdaptiveAnimatePresence: ({ children }: any) => <div>{children}</div>,
+  };
+});
 
 describe('WordHuntDangerToast', () => {
   beforeEach(() => {

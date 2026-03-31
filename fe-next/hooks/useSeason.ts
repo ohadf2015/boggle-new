@@ -67,8 +67,7 @@ export function useSeason(): UseSeasonReturn {
           localStorage.setItem(peakKey, serverTier);
           setPeakTier(serverTier);
         }
-      })
-      .catch(() => {});
+      }, () => {});
   }, [isAuthenticated, user?.id, currentSeason.id, peakKey]);
 
   // Update countdown every minute
@@ -94,10 +93,8 @@ export function useSeason(): UseSeasonReturn {
           .from('profiles')
           .update({ season_peak_tier: updated })
           .eq('id', user!.id)
-          .then(() => {})
-          .catch(() => {});
-      })
-      .catch(() => {});
+          .then(() => {}, () => {});
+      }, () => {});
   }, [isAuthenticated, user?.id, currentSeason.id]);
 
   const updatePeakTier = useCallback((elo: number) => {

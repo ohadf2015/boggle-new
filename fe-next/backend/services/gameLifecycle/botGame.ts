@@ -13,14 +13,17 @@ import {
   trackBotWord,
   getLeaderboard,
   getGame,
+  recordFirstFinder,
 } from '../../modules/gameStateManager';
 import { volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../modules/blastModeManager';
+import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
 import type { BotSubmission } from './types';
 import type { Bot } from '../../modules/botBehavior';
 import { startBotsForWordHunt } from './botWordHunt';
+import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
 
 /** Score buffer when no human has scored yet — creates initial pressure */
 const BOT_SCORE_BUFFER = 20;
@@ -77,12 +80,8 @@ export function startBotsForGame(
   const bots: Bot[] = botManager.getGameBots(gameCode);
   if (bots.length === 0) return;
 
-  // Word-hunt mode: bots need a different strategy (target guessing)
   const game = getGame(gameCode);
-  if (game?.gameMode === 'word-hunt' && (game as any).wordHuntState) {
-    startBotsForWordHunt(io, gameCode, bots, (game as any).wordHuntState, language, timerSeconds);
-    return;
-  }
+  const isWordHunt = game?.gameMode === 'word-hunt' && (game as any).wordHuntState;
 
   // Safety check: ensure letterGrid is valid before starting bots
   if (!letterGrid || !Array.isArray(letterGrid) || letterGrid.length === 0) {
@@ -132,7 +131,12 @@ export function startBotsForGame(
           }
         }
 
-        const totalScore = score + blastTileBonus;
+        // Word Hunt board bonus: extra score per letter for finding grid words
+        const wordHuntBoardBonus = (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState)
+          ? word.length * BOARD_WORD_SCORE_PER_LETTER
+          : 0;
+
+        const totalScore = score + blastTileBonus + wordHuntBoardBonus;
 
         // Score cap: don't let bot outscore best human
         if (!shouldBotScore(gameCode, username, bot.score, totalScore)) {
@@ -154,8 +158,26 @@ export function startBotsForGame(
           isBot: true,
         });
 
+        // Record bot as first finder so humans get "found by other" feedback
+        recordFirstFinder(gameCode, word, username, bot.avatar);
+
+        // Restore bot life in Word Hunt mode (same as humans)
+        if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
+          try {
+            const lifeBonus = getLifeBonus(word.length);
+            restoreLife(currentGame.wordHuntState, username, lifeBonus);
+          } catch { /* non-critical */ }
+        }
+
         trackBotWord(gameCode, word, username, totalScore);
         updatePlayerScore(gameCode, username, totalScore, true);
+
+        // Broadcast bot word activity so players see bots are playing
+        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'botWordFound', {
+          username,
+          word,
+          score: totalScore,
+        });
 
         const leaderboard = getLeaderboard(gameCode);
         volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
@@ -165,5 +187,17 @@ export function startBotsForGame(
       timerSeconds,
       gameStartTime
     );
+  }
+
+  // Word Hunt: also start target-guessing loop AFTER classic word-finding init.
+  // Must be after startBot() since startBot calls stopBot() which clears activeTimers.
+  // Use setTimeout(0) to ensure startBot's sync initialization completes first.
+  if (isWordHunt) {
+    setTimeout(() => {
+      const freshBots = botManager.getGameBots(gameCode);
+      if (freshBots.length > 0) {
+        startBotsForWordHunt(io, gameCode, freshBots, (game as any).wordHuntState, language, timerSeconds);
+      }
+    }, 100);
   }
 }

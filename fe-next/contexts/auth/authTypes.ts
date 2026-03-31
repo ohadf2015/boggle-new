@@ -54,6 +54,9 @@ export interface ProfileData {
   prestige_multiplier?: number;
   prestige_unlocks?: Array<{ prestigeLevel: number; type: string; value: string; unlockedAt: string }>;
   lifetime_xp?: number;
+  // Ranked & Streaks
+  rank_tier?: string;
+  streak_days?: number;
   // Feature Access (admin-granted)
   blast_access?: boolean;
   // Role-based access control

@@ -10,7 +10,7 @@ import express, { Application, Request, Response, NextFunction, RequestHandler }
 import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
 import { httpLogger } from './logger';
-import { crazyGamesScriptInjector } from './crazyGamesInjector';
+// crazyGamesScriptInjector removed — now rendered via CrazyGamesScriptServer React component
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
 const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
@@ -304,11 +304,10 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // Security headers
   app.use(securityHeaders(isDev));
 
-  // CrazyGames SDK injection — MUST be AFTER compression middleware.
-  // Express middleware wraps res.write in stack order: later = outer wrapper.
-  // Next.js write → compression (inner, registered first) → injector (outer, registered after).
-  // So our injector sees uncompressed HTML, injects the SDK, then compression compresses everything.
-  app.use(crazyGamesScriptInjector());
+  // CrazyGames SDK injection — now handled by CrazyGamesScriptServer React component
+  // in app/[locale]/layout.tsx to avoid hydration mismatches. The Express middleware
+  // injected DOM nodes outside React's tree, causing server/client attribute diffs.
+  // Keeping the import for reference; middleware is no longer mounted.
 
   // IP Geolocation
   app.use(geolocationMiddleware({

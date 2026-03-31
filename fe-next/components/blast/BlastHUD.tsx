@@ -85,67 +85,94 @@ export function BlastHUD({
 
   return (
     <div
-      className="flex items-center justify-between gap-2 px-3 py-1.5 bg-neo-navy-light border-b border-white/10"
+      className="flex items-center justify-between gap-2 px-3 py-2"
+      style={{
+        background: 'linear-gradient(180deg, rgba(15,12,41,0.85) 0%, rgba(15,12,41,0.6) 100%)',
+        backdropFilter: 'blur(8px)',
+      }}
       data-testid="blast-hud"
     >
-      {/* Left: wave badge + score */}
-      <div className="flex items-center gap-2 min-w-0">
+      {/* Left: wave shield + score */}
+      <div className="flex items-center gap-2.5 min-w-0">
         <span
-          className="shrink-0 text-[10px] font-black uppercase tracking-wider bg-white/10 text-neo-white px-1.5 py-0.5 rounded"
+          className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan"
+          style={{ textShadow: '0 0 6px rgba(0,255,255,0.4)' }}
           aria-label={`${t('blast.wave')} ${waveNumber}`}
         >
           W{waveNumber}
         </span>
-        <span
-          className={cn(
-            'text-lg font-black bg-gradient-to-r from-neo-lime to-lime-300 bg-clip-text text-transparent tabular-nums truncate transition-transform duration-150',
-            scorePulse && 'scale-[1.15]',
-          )}
-        >
-          {animatedScore.toLocaleString()}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-amber-400 text-sm">★</span>
+          <span
+            className={cn(
+              'text-xl font-black tabular-nums truncate transition-transform duration-150',
+              scorePulse && 'scale-[1.15]',
+            )}
+            style={{
+              background: 'linear-gradient(180deg, #FFE566 0%, #FFD700 50%, #B8860B 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: 'none',
+              filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+            }}
+          >
+            {animatedScore.toLocaleString()}
+          </span>
+        </div>
         {comboLevel >= 2 && (
-          <span className="text-[10px] font-bold text-neo-cyan tabular-nums">
+          <span
+            className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-neo-lime text-neo-black border-2 border-neo-black animate-neo-pop"
+          >
             x{comboLevel}
           </span>
         )}
       </div>
 
-      {/* Center: move counter */}
+      {/* Center: move counter in circle */}
       <div className="flex flex-col items-center" aria-live="polite">
         {isFiniteMoves ? (
-          <>
+          <div
+            className={cn(
+              'w-10 h-10 rounded-full flex flex-col items-center justify-center border-2',
+              movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/20 bg-white/5',
+            )}
+          >
             <span className={cn('text-lg font-black tabular-nums leading-none', moveColorClass)}>
               {movesRemaining}
             </span>
-            <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider">
-              {t('blast.moves') ?? 'moves'}
-            </span>
-          </>
+          </div>
         ) : (
-          <span className="text-xs font-bold text-white/40">
+          <span className="text-xs font-bold text-white/50 tabular-nums">
             {wordsFoundCount} {t('blast.words') ?? 'words'}
           </span>
         )}
       </div>
 
-      {/* Right: tiles progress + controls */}
+      {/* Right: progress + controls */}
       <div className="flex items-center gap-2">
         <div className="flex flex-col items-end">
           <span className="text-[10px] font-bold text-white/60 tabular-nums">
             {clearPct}%
           </span>
-          <div className="w-12 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="w-14 h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-neo-lime rounded-full transition-all duration-300"
-              style={{ width: `${clearPct}%` }}
+              className="h-full rounded-full transition-all duration-300"
+              style={{
+                width: `${clearPct}%`,
+                background: clearPct >= 50
+                  ? 'linear-gradient(90deg, #BFFF00, #D9FF66)'
+                  : 'linear-gradient(90deg, #00FFFF, #66FFFF)',
+                boxShadow: clearPct >= 50
+                  ? '0 0 6px rgba(191,255,0,0.5)'
+                  : '0 0 6px rgba(0,255,255,0.5)',
+              }}
             />
           </div>
         </div>
         {onShowHelp && (
           <button
             onClick={onShowHelp}
-            className="text-white/40 hover:text-white/70 transition-colors"
+            className="text-white/30 hover:text-white/60 transition-colors"
             aria-label={t('blast.help') ?? 'Help'}
           >
             <HelpCircle className="h-4 w-4" />
@@ -153,11 +180,11 @@ export function BlastHUD({
         )}
         <button
           onClick={onQuit}
-          className="text-white/40 hover:text-neo-red transition-colors"
+          className="text-white/30 hover:text-neo-red transition-colors"
           aria-label={t('common.quit') ?? 'Quit'}
           data-testid="blast-quit-btn"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>

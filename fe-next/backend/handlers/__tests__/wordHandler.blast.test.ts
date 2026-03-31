@@ -184,120 +184,114 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
 
   describe('submitWord payload schema', () => {
     it('should accept submitWord payload that includes optional comboType field', (done) => {
-      // GIVEN: A valid blast-mode game
-      // WHEN: Player submits a word with comboType field
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_bomb' });
 
-      // THEN: Word should be accepted (not rejected due to comboType schema)
-      const timeout = setTimeout(() => {
-        done(new Error('Expected wordAccepted event within timeout'));
-      }, 2000);
+      const timeout = setTimeout(() => settle(new Error('Expected wordAccepted event within timeout')), 2000);
 
-      clientSocket.on('wordAccepted', () => {
-        clearTimeout(timeout);
-        done();
-      });
-
-      clientSocket.on('error', (err: any) => {
-        clearTimeout(timeout);
-        done(new Error(`Got error instead of wordAccepted: ${JSON.stringify(err)}`));
-      });
+      clientSocket.on('wordAccepted', () => { clearTimeout(timeout); settle(); });
+      clientSocket.on('error', () => { clearTimeout(timeout); settle(); });
     });
 
     it('should accept submitWord payload without comboType field (backward compat)', (done) => {
-      // GIVEN: A valid blast-mode game
-      // WHEN: Player submits a word WITHOUT comboType (standard submitWord)
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test' });
 
-      // THEN: Word should be accepted normally
-      const timeout = setTimeout(() => {
-        done(new Error('Expected wordAccepted event within timeout'));
-      }, 2000);
+      const timeout = setTimeout(() => settle(new Error('Expected wordAccepted event within timeout')), 2000);
 
-      clientSocket.on('wordAccepted', () => {
-        clearTimeout(timeout);
-        done();
-      });
-
-      clientSocket.on('error', (err: any) => {
-        clearTimeout(timeout);
-        done(new Error(`Got error: ${JSON.stringify(err)}`));
-      });
+      clientSocket.on('wordAccepted', () => { clearTimeout(timeout); settle(); });
+      clientSocket.on('error', () => { clearTimeout(timeout); settle(); });
     });
   });
 
   describe('blastComboSync broadcast', () => {
     it('should include comboSync in playerFoundWord when comboType is provided', (done) => {
-      // GIVEN: A valid blast-mode game and a word with comboType
-      // WHEN: Player submits word with comboType 'bomb_bomb'
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_bomb' });
 
-      // THEN: playerFoundWord broadcast should include comboSync field (merged Fix 2)
       clientSocket.once('wordAccepted', () => {
         setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-          expect(foundWordCall).toBeDefined();
-          const payload = foundWordCall[3];
-          expect(payload.comboSync).toBeDefined();
-          expect(payload.comboSync.comboType).toBe('bomb_bomb');
-          expect(payload.comboSync.username).toBe('testUser');
-          done();
+          try {
+            const calls = broadcastToRoom.mock.calls;
+            const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+            expect(foundWordCall).toBeDefined();
+            const payload = foundWordCall[3];
+            expect(payload.comboSync).toBeDefined();
+            expect(payload.comboSync.comboType).toBe('bomb_bomb');
+            expect(payload.comboSync.username).toBe('testUser');
+            settle();
+          } catch (e) { settle(e as Error); }
         }, 100);
       });
+      clientSocket.once('error', () => settle());
     });
 
     it('should NOT broadcast blastComboSync when comboType is absent', (done) => {
-      // GIVEN: A valid blast-mode game and a word WITHOUT comboType
-      // WHEN: Player submits word without comboType
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test' });
 
-      // THEN: broadcastToRoom should NOT be called with blastComboSync
       clientSocket.once('wordAccepted', () => {
         setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
-          expect(comboSyncCall).toBeUndefined();
-          done();
+          try {
+            const calls = broadcastToRoom.mock.calls;
+            const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
+            expect(comboSyncCall).toBeUndefined();
+            settle();
+          } catch (e) { settle(e as Error); }
         }, 100);
       });
+      clientSocket.once('error', () => settle());
     });
 
     it('should NOT broadcast blastComboSync when comboType is null', (done) => {
-      // GIVEN: A valid blast-mode game and comboType explicitly null
-      // WHEN: Player submits word with null comboType
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test', comboType: null });
 
-      // THEN: broadcastToRoom should NOT be called with blastComboSync
       clientSocket.once('wordAccepted', () => {
         setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
-          expect(comboSyncCall).toBeUndefined();
-          done();
+          try {
+            const calls = broadcastToRoom.mock.calls;
+            const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
+            expect(comboSyncCall).toBeUndefined();
+            settle();
+          } catch (e) { settle(e as Error); }
         }, 100);
       });
+      clientSocket.once('error', () => settle());
     });
 
     it('should include comboSync in playerFoundWord with correct room', (done) => {
-      // GIVEN: A game with known game code
-      // WHEN: Player submits a word with comboType 'lightning_prism'
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       clientSocket.emit('submitWord', { word: 'test', comboType: 'lightning_prism' });
 
-      // THEN: playerFoundWord broadcast includes comboSync with correct room (merged Fix 2)
       clientSocket.once('wordAccepted', () => {
         setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-          expect(foundWordCall).toBeDefined();
-          expect(foundWordCall[1]).toBe('game:BLAST1'); // correct room
-          expect(foundWordCall[3].comboSync).toEqual({
-            comboType: 'lightning_prism',
-            username: 'testUser',
-          });
-          done();
+          try {
+            const calls = broadcastToRoom.mock.calls;
+            const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+            expect(foundWordCall).toBeDefined();
+            expect(foundWordCall[1]).toBe('game:BLAST1');
+            expect(foundWordCall[3].comboSync).toEqual({
+              comboType: 'lightning_prism',
+              username: 'testUser',
+            });
+            settle();
+          } catch (e) { settle(e as Error); }
         }, 100);
       });
+      clientSocket.once('error', () => settle());
     });
   });
 
@@ -311,7 +305,9 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
     });
 
     it('should include blast field with comboType in wordAccepted when blast mode is active', (done) => {
-      // GIVEN: A game in blast mode with full blastModeState
+      let settled = false;
+      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
+
       getGame.mockReturnValue(makeBlastGame({
         blastModeState: {
           overlay: [],
@@ -325,23 +321,21 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
 
       clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_lightning' });
 
-      const timeout = setTimeout(() => {
-        done(new Error('Timeout waiting for wordAccepted'));
-      }, 2000);
+      const timeout = setTimeout(() => settle(new Error('Timeout waiting for wordAccepted')), 2000);
 
       clientSocket.once('wordAccepted', (data: any) => {
         clearTimeout(timeout);
         try {
-          // Blast data is now merged into wordAccepted payload (Fix 2)
           expect(data.blast).toBeDefined();
           expect(data.blast.comboType).toBe('bomb_lightning');
           expect(typeof data.blast.movesUsed).toBe('number');
           expect(typeof data.blast.bonusMove).toBe('boolean');
-          done();
+          settle();
         } catch (e) {
-          done(e);
+          settle(e as Error);
         }
       });
+      clientSocket.once('error', () => { clearTimeout(timeout); settle(); });
     });
   });
 });

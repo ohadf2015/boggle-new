@@ -10,7 +10,7 @@ import { detectVerticalWords } from '../utils/blastVerticalScanner';
 function makeTileState(
   row: number, col: number, type: BlastTileType = 'standard', hitsRemaining = 0,
 ): BlastTileState {
-  return { row, col, type, isCleared: false, activationEffect: null, hitsRemaining };
+  return { row, col, type, isCleared: false, activationEffect: null, hitsRemaining, uid: `t-${row}-${col}` };
 }
 
 function make6x6Grid(): BlastTileState[][] {
@@ -88,6 +88,7 @@ describe('Frozen tile cascade blocking', () => {
       row.map((_, ci) => ({
         row: ri, col: ci, type: (ri === 3 && ci === 0 ? 'frozen' : 'standard') as BlastTileType,
         isCleared: false, activationEffect: null, hitsRemaining: ri === 3 && ci === 0 ? 2 : 0,
+        uid: `t-${ri}-${ci}`,
       }))
     );
 
@@ -115,6 +116,7 @@ describe('Frozen tile cascade blocking', () => {
       row.map((_, ci) => ({
         row: ri, col: ci, type: 'standard' as BlastTileType,
         isCleared: false, activationEffect: null, hitsRemaining: 0,
+        uid: `t-${ri}-${ci}`,
       }))
     );
 

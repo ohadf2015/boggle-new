@@ -8,7 +8,7 @@ describe('getWaveConfig', () => {
     const config = getWaveConfig(1);
     expect(config.minWordLength).toBe(2);
     expect(config.specialTileChance).toBe(0.10);
-    expect(config.vowelModifier).toBe(1.0);
+    expect(config.vowelModifier).toBe(1.1);
     expect(config.maxCascadeChain).toBe(2);
     expect(config.lightningEnabled).toBe(false);
     expect(config.magnetEnabled).toBe(false);

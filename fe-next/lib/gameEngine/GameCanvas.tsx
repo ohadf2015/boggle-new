@@ -17,6 +17,8 @@ import { Application, Container } from 'pixi.js';
 import { PhysicsWorld } from './PhysicsWorld';
 import { ParticlePool } from './ParticleSystem';
 import { ScreenShake } from './ScreenShake';
+import { ScreenFlash } from './ScreenFlash';
+import { TimeDilation } from './TimeDilation';
 import type { GameCanvasConfig, PhysicsConfig } from './types';
 
 // ─── Context ──────────────────────────────────────────────────────────
@@ -29,6 +31,8 @@ export interface GameEngineContext {
   physics: PhysicsWorld;
   particles: ParticlePool;
   shake: ScreenShake;
+  flash: ScreenFlash;
+  timeDilation: TimeDilation;
   /** Canvas dimensions */
   width: number;
   height: number;
@@ -47,6 +51,8 @@ export function useGameEngine(): GameEngineContext {
 interface GameCanvasProps {
   config: GameCanvasConfig;
   physicsConfig?: PhysicsConfig;
+  /** Set to false to skip Matter.js initialization (saves memory) */
+  usePhysics?: boolean;
   children?: ReactNode;
   className?: string;
   /** Called each frame with delta in seconds */
@@ -56,6 +62,7 @@ interface GameCanvasProps {
 export function GameCanvas({
   config,
   physicsConfig,
+  usePhysics: enablePhysics = true,
   children,
   className,
   onTick,
@@ -64,7 +71,9 @@ export function GameCanvas({
   const [engine, setEngine] = useState<GameEngineContext | null>(null);
   const onTickRef = useRef(onTick);
   onTickRef.current = onTick;
+  const engineRef = useRef<GameEngineContext | null>(null);
 
+  // Initialize PixiJS Application once (not on every resize)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -87,56 +96,45 @@ export function GameCanvas({
         return;
       }
 
-      // Mount canvas
       container.appendChild(app.canvas);
 
-      // Camera container for screen shake
       const camera = new Container();
       app.stage.addChild(camera);
 
-      // Particle layer on top of camera
       const particleLayer = new Container();
       camera.addChild(particleLayer);
 
-      // Physics
-      const physics = new PhysicsWorld(
-        physicsConfig ?? { gravity: { x: 0, y: 1 } },
-      );
+      const physics = enablePhysics
+        ? new PhysicsWorld(physicsConfig ?? { gravity: { x: 0, y: 1 } })
+        : (null as unknown as PhysicsWorld);
 
-      // Particles
       const particles = new ParticlePool(particleLayer);
-
-      // Screen shake
       const shake = new ScreenShake();
 
-      // Game loop
+      // ScreenFlash layer — on top of everything in the stage
+      const flash = new ScreenFlash(app.stage, config.width, config.height);
+      const timeDilation = new TimeDilation();
+
       app.ticker.add((ticker) => {
-        const deltaSec = ticker.deltaMS / 1000;
-
-        // Update systems
-        physics.update(ticker.deltaMS);
+        const rawDelta = ticker.deltaMS / 1000;
+        // Apply time dilation to all game systems (not real-time UI)
+        timeDilation.update(rawDelta);
+        const deltaSec = timeDilation.apply(rawDelta);
+        if (enablePhysics && physics) physics.update(deltaSec * 1000);
         particles.update(deltaSec);
-        shake.update(deltaSec);
-
-        // Apply screen shake to camera
+        shake.update(rawDelta); // Shake uses real time for consistent feel
+        flash.update(rawDelta); // Flash uses real time
         camera.x = shake.offset.x;
         camera.y = shake.offset.y;
-
-        // User tick callback
         onTickRef.current?.(deltaSec);
       });
 
       const ctx: GameEngineContext = {
-        app,
-        stage: app.stage,
-        camera,
-        physics,
-        particles,
-        shake,
-        width: config.width,
-        height: config.height,
+        app, stage: app.stage, camera, physics, particles, shake, flash, timeDilation,
+        width: config.width, height: config.height,
       };
 
+      engineRef.current = ctx;
       setEngine(ctx);
     };
 
@@ -144,26 +142,33 @@ export function GameCanvas({
 
     return () => {
       destroyed = true;
-      if (engine) {
-        engine.particles.destroy();
-        engine.physics.destroy();
-        engine.shake.reset();
+      const eng = engineRef.current;
+      if (eng) {
+        try { eng.particles.destroy(); } catch { /* */ }
+        if (enablePhysics && eng.physics) try { eng.physics.destroy(); } catch { /* */ }
+        eng.shake.reset();
+        try { eng.flash.destroy(); } catch { /* */ }
+        eng.timeDilation.reset();
       }
-      // Guard against PixiJS v8 _cancelResize race condition —
-      // app.destroy() throws if init() hasn't completed yet.
-      try {
-        app.destroy(true, { children: true });
-      } catch {
-        // Silently handle — app was likely not fully initialized
-      }
-      // Remove canvas from DOM
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
+      try { app.destroy(true, { children: true }); } catch { /* */ }
+      while (container.firstChild) container.removeChild(container.firstChild);
+      engineRef.current = null;
       setEngine(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.width, config.height, config.background]);
+  }, [config.background]);
+
+  // Resize the PixiJS renderer when dimensions change (no destroy/recreate)
+  useEffect(() => {
+    const eng = engineRef.current;
+    if (!eng) return;
+    try {
+      eng.app.renderer.resize(config.width, config.height);
+      eng.width = config.width;
+      eng.height = config.height;
+      eng.flash.resize(config.width, config.height);
+    } catch { /* renderer may not be ready yet */ }
+  }, [config.width, config.height]);
 
   return (
     <div

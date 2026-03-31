@@ -1072,6 +1072,74 @@ body {
     animation: blast-frozen-glow 4s ease-in-out infinite;
   }
 
+  /* ── Mirror: reflective shimmer sweep ── */
+  .blast-tile-mirror {
+    animation: blast-mirror-reflect 3s ease-in-out infinite;
+    background-size: 200% 200% !important;
+  }
+
+  @keyframes blast-mirror-reflect {
+    0%, 100% {
+      background-position: 0% 50%;
+      box-shadow: inset 0 0 16px rgba(200,200,255,0.3), 0 0 10px rgba(136,136,255,0.25);
+      filter: brightness(1);
+    }
+    30% {
+      filter: brightness(1.4);
+      box-shadow: inset 0 0 24px rgba(220,220,255,0.5), 0 0 18px rgba(136,136,255,0.4);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: brightness(1);
+      box-shadow: inset 0 0 16px rgba(200,200,255,0.3), 0 0 10px rgba(136,136,255,0.25);
+    }
+    80% {
+      filter: brightness(1.3);
+      box-shadow: inset 0 0 20px rgba(200,200,255,0.4), 0 0 14px rgba(136,136,255,0.35);
+    }
+  }
+
+  /* ── Silver: metallic pulse with soft sheen ── */
+  .blast-tile-silver {
+    animation: blast-silver-sheen 3s ease-in-out infinite;
+    background-size: 200% 200% !important;
+  }
+
+  @keyframes blast-silver-sheen {
+    0%, 100% {
+      background-position: 0% 50%;
+      box-shadow: inset 0 0 14px rgba(220,220,220,0.3), 0 0 8px rgba(192,192,192,0.2);
+    }
+    50% {
+      background-position: 100% 50%;
+      box-shadow: inset 0 0 22px rgba(240,240,240,0.5), 0 0 14px rgba(200,200,200,0.35);
+    }
+  }
+
+  /* ── Diamond: prismatic flash with bright sparkle ── */
+  .blast-tile-diamond {
+    animation: blast-diamond-flash 2s ease-in-out infinite;
+  }
+
+  @keyframes blast-diamond-flash {
+    0%, 100% {
+      box-shadow: inset 0 0 20px rgba(0,206,209,0.35), 0 0 14px rgba(185,242,255,0.3), 0 0 28px rgba(0,206,209,0.15);
+      filter: brightness(1);
+    }
+    25% {
+      filter: brightness(1.3);
+      box-shadow: inset 0 0 28px rgba(0,206,209,0.55), 0 0 22px rgba(185,242,255,0.5), 0 0 36px rgba(0,255,255,0.25);
+    }
+    50% {
+      filter: brightness(1);
+      box-shadow: inset 0 0 20px rgba(0,206,209,0.35), 0 0 14px rgba(185,242,255,0.3), 0 0 28px rgba(0,206,209,0.15);
+    }
+    75% {
+      filter: brightness(1.2);
+      box-shadow: inset 0 0 24px rgba(0,230,230,0.45), 0 0 18px rgba(185,242,255,0.4), 0 0 32px rgba(0,255,200,0.2);
+    }
+  }
+
   @keyframes blast-prism-spectrum {
     0% { filter: hue-rotate(0deg); box-shadow: inset 0 0 18px rgba(255,255,255,0.3), 0 0 14px rgba(168,85,247,0.3), 0 0 28px rgba(255,100,200,0.15); }
     33% { box-shadow: inset 0 0 22px rgba(255,255,255,0.4), 0 0 18px rgba(100,200,255,0.35), 0 0 32px rgba(0,255,150,0.2); }
@@ -1141,7 +1209,10 @@ body {
     .blast-tile-ice,
     .blast-tile-wildcard,
     .blast-tile-magnet,
-    .blast-tile-frozen {
+    .blast-tile-frozen,
+    .blast-tile-mirror,
+    .blast-tile-silver,
+    .blast-tile-diamond {
       animation: none;
     }
     .blast-tile-weakened {
@@ -1157,6 +1228,109 @@ body {
   @keyframes blast-weakened-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.85; }
+  }
+
+  /* ── Combo preview — pulsing glow when 2+ combo tiles are in the current word ── */
+  .blast-combo-preview {
+    animation: blast-combo-glow 0.8s ease-in-out infinite !important;
+  }
+
+  @keyframes blast-combo-glow {
+    0%, 100% {
+      outline: 2px solid rgba(255,20,147,0.4);
+      outline-offset: 1px;
+      filter: brightness(1.1);
+    }
+    50% {
+      outline: 3px solid rgba(255,20,147,0.8);
+      outline-offset: 2px;
+      filter: brightness(1.25);
+    }
+  }
+
+  /* ── Tile press — reduce 3D shadow on active press for tactile push-in feel ── */
+  .blast-board button:active {
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.1), 0 1px 0 rgba(0,0,0,0.3) !important;
+    transition: box-shadow 50ms ease-out, transform 50ms ease-out;
+  }
+
+  /* ── Rare letter glow — Q, Z, X, J shimmer to highlight high-value letters ── */
+  .blast-rare-letter {
+    text-shadow: 0 0 8px rgba(255,215,0,0.6), 0 0 16px rgba(255,200,0,0.3);
+  }
+  .blast-rare-letter .relative.z-10 {
+    animation: blast-rare-shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes blast-rare-shimmer {
+    0%, 100% { text-shadow: 0 0 6px rgba(255,215,0,0.5), 0 0 12px rgba(255,200,0,0.2); }
+    50% { text-shadow: 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,200,0,0.4), 0 0 36px rgba(255,180,0,0.2); }
+  }
+
+  /* ── Frost shatter reveal — ice cracks apart to show inner special ── */
+  .blast-tile-frost-shatter {
+    animation: blast-frost-shatter 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
+  @keyframes blast-frost-shatter {
+    0% {
+      filter: brightness(1.8) saturate(0.3);
+      box-shadow: 0 0 30px rgba(180,230,255,0.9), inset 0 0 20px rgba(200,240,255,0.6);
+      transform: scale(1.05);
+    }
+    30% {
+      filter: brightness(2.5) saturate(0);
+      box-shadow: 0 0 40px rgba(255,255,255,0.95);
+      transform: scale(1.1) rotate(3deg);
+    }
+    60% {
+      filter: brightness(1.2) saturate(1.2);
+      box-shadow: 0 0 20px rgba(191,255,0,0.6);
+      transform: scale(0.95) rotate(-2deg);
+    }
+    100% {
+      filter: brightness(1) saturate(1);
+      box-shadow: none;
+      transform: scale(1);
+    }
+  }
+
+  /* ── Earned tile birth — pop+shimmer when a word creates a new special ── */
+  .blast-tile-earned {
+    animation: blast-tile-birth 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes blast-tile-birth {
+    0% { transform: scale(0.5); filter: brightness(2); box-shadow: 0 0 30px rgba(191,255,0,0.8); }
+    50% { transform: scale(1.15); filter: brightness(1.5); box-shadow: 0 0 20px rgba(191,255,0,0.5); }
+    100% { transform: scale(1); filter: brightness(1); box-shadow: none; }
+  }
+
+  /* ── Multi-hit crack progression — visual damage states ── */
+
+  /* Cracked: tile has taken damage, shows hairline fractures + faster animation */
+  .blast-tile-cracked {
+    animation-duration: 1.2s !important;
+    filter: contrast(1.1) brightness(0.92);
+  }
+  .blast-tile-cracked::before {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 40%),
+      linear-gradient(45deg, transparent 30%, rgba(0,0,0,0.15) 31%, transparent 32%),
+      linear-gradient(-30deg, transparent 55%, rgba(0,0,0,0.12) 56%, transparent 57%) !important;
+  }
+
+  /* Critical: one hit from breaking — intense pulsing glow + visible fracture lines */
+  .blast-tile-critical {
+    animation-duration: 0.8s !important;
+    filter: contrast(1.15) brightness(0.85) saturate(1.2);
+  }
+  .blast-tile-critical::before {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 35%),
+      linear-gradient(60deg, transparent 20%, rgba(0,0,0,0.2) 21%, transparent 22%),
+      linear-gradient(-45deg, transparent 35%, rgba(0,0,0,0.18) 36%, transparent 37%),
+      linear-gradient(120deg, transparent 60%, rgba(0,0,0,0.15) 61%, transparent 62%) !important;
   }
 
   /* Pause idle tile animations during cascade to reduce GPU thrash.

@@ -95,7 +95,9 @@ export const PUBLIC_ROUTES: string[] = [
   "/tools",
   "/tools/word-solver",
   "/unsubscribe",
+  "/word-forge",
   "/word-games-online-free",
   "/word-of-the-day",
-  "/words"
+  "/words",
+  "/words-with-friends-alternative"
 ];

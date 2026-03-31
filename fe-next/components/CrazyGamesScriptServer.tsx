@@ -1,17 +1,31 @@
 /**
- * CrazyGames SDK Script — Placeholder Component
+ * CrazyGames SDK Script — Server Component
  *
- * The actual SDK script injection happens at the Express middleware layer
- * (server/crazyGamesInjector.ts) because:
- * - Raw <script> tags in Next.js Server Components are stripped from HTML
- * - next/script beforeInteractive doesn't work with custom Express servers
- * - CrazyGames QA tool requires the SDK script in the initial HTML source
+ * Renders the CrazyGames SDK <script> tags inside the React tree so that
+ * hydration sees them. Previously injected via Express middleware
+ * (crazyGamesInjector.ts), which caused hydration mismatches because React
+ * didn't know about the extra DOM nodes.
  *
- * This component is kept as a no-op to avoid breaking layout imports.
- * The bootstrap logic (iframe detection, SDK init, gameLoadingStart/Stop)
- * lives in the injector middleware.
+ * SECURITY: All content is static string literals — no user input.
  */
 
+const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
+
+const BOOTSTRAP_CODE = `(function(){var inIframe=false;try{inIframe=window.self!==window.top}catch(e){inIframe=true}if(!inIframe){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true;return}var attempts=0;function tryInit(){if(window.CrazyGames&&window.CrazyGames.SDK){window.CrazyGames.SDK.init().then(function(){return window.CrazyGames.SDK.getEnvironment()}).then(function(env){window.__crazyGamesEnvironment=env;window.__crazyGamesReady=true;if(env==='crazygames'){document.body&&document.body.classList.add('crazygames-embed');window.CrazyGames.SDK.game.sdkGameLoadingStart();var signalReady=function(){window.CrazyGames.SDK.game.sdkGameLoadingStop()};if(typeof requestIdleCallback==='function'){requestIdleCallback(signalReady,{timeout:3000})}else{setTimeout(signalReady,1000)}}}).catch(function(){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true})}else if(attempts<100){attempts++;setTimeout(tryInit,50)}else{window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true}}tryInit()})()`;
+
 export default function CrazyGamesScriptServer() {
-  return null;
+  if (CRAZYGAMES_FORCE_DISABLED) {
+    return null;
+  }
+
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" />
+      <script
+        id="crazygames-bootstrap"
+        dangerouslySetInnerHTML={{ __html: BOOTSTRAP_CODE }}
+      />
+    </>
+  );
 }

@@ -23,6 +23,7 @@ const mockWordHuntState = {
 
 vi.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetLength: () => mockWordHuntState.targetLength,
+  useWordHuntTargetCategory: () => null,
   useWordHuntMyLife: () => mockWordHuntState.myLife,
   useWordHuntTargetAttempts: () => mockWordHuntState.targetAttempts,
   useWordHuntTargetFound: () => mockWordHuntState.targetFound,

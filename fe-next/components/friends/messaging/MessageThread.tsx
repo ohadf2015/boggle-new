@@ -378,7 +378,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
 
           {/* Message composer */}
           <div className={cn(
-            'border-t-2 border-neo-black',
+            'border-t-2 border-neo-black pb-[env(safe-area-inset-bottom)]',
             isDark ? 'bg-slate-800' : 'bg-gray-50'
           )}>
             <MessageComposer

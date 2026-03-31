@@ -31,7 +31,7 @@ const MISSION_HREFS: Record<MissionType, string> = {
   wordHunt: '/daily',
   brainDrill: '/drill',
   adventure: '/adventure',
-  community: '/community',
+  community: '/community/create',
 };
 
 function buildMissions(data: {

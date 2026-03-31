@@ -1,0 +1,261 @@
+/**
+ * BlastTile visual identity tests — TDD for tile personality improvements.
+ * Covers: idle animation classes, multi-hit crack states, multiplier badges.
+ */
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { BlastTile } from '../BlastTile';
+import type { BlastTileType } from '@/shared/types/blast';
+
+// Mock reduced motion to always return false for consistent tests
+jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => false,
+}));
+
+const baseProps = {
+  letter: 'A',
+  phase: 'idle' as const,
+  isSelected: false,
+  isCleared: false,
+  onClick: jest.fn(),
+};
+
+describe('BlastTile', () => {
+  describe('idle animation classes', () => {
+    const tileTypes: BlastTileType[] = [
+      'gold', 'bomb', 'rainbow', 'ice', 'lightning', 'magnet',
+      'prism', 'gem', 'frozen', 'mirror', 'silver', 'diamond',
+    ];
+
+    it.each(tileTypes)('renders blast-tile-%s class for %s type', (type) => {
+      render(<BlastTile {...baseProps} type={type} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain(`blast-tile-${type}`);
+    });
+
+    it('does NOT render blast-tile-standard class for standard type', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-tile-standard');
+    });
+  });
+
+  describe('multi-hit crack progression', () => {
+    it('renders blast-tile-cracked class when hitsRemaining = 1 on ice tile', () => {
+      render(<BlastTile {...baseProps} type="ice" hitsRemaining={1} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-cracked');
+    });
+
+    it('does NOT render blast-tile-cracked when hitsRemaining = 2 (full health)', () => {
+      render(<BlastTile {...baseProps} type="ice" hitsRemaining={2} />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-tile-cracked');
+    });
+
+    it('renders blast-tile-cracked on prism with hitsRemaining = 1', () => {
+      render(<BlastTile {...baseProps} type="prism" hitsRemaining={1} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-cracked');
+    });
+
+    it('renders blast-tile-critical class on gem with hitsRemaining = 1 (about to break)', () => {
+      render(<BlastTile {...baseProps} type="gem" hitsRemaining={1} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-critical');
+    });
+
+    it('renders blast-tile-cracked on gem with hitsRemaining = 2 (mid damage)', () => {
+      render(<BlastTile {...baseProps} type="gem" hitsRemaining={2} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-cracked');
+    });
+
+    it('does NOT render crack classes on gem with hitsRemaining = 3 (full)', () => {
+      render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-tile-cracked');
+      expect(button.className).not.toContain('blast-tile-critical');
+    });
+  });
+
+  describe('multiplier badges', () => {
+    it('renders ×1.5 badge for silver tiles', () => {
+      render(<BlastTile {...baseProps} type="silver" />);
+      expect(screen.getByText('×1.5')).toBeInTheDocument();
+    });
+
+    it('renders ×3 badge for gold tiles', () => {
+      render(<BlastTile {...baseProps} type="gold" />);
+      expect(screen.getByText('×3')).toBeInTheDocument();
+    });
+
+    it('renders ×5 badge for diamond tiles', () => {
+      render(<BlastTile {...baseProps} type="diamond" />);
+      expect(screen.getByText('×5')).toBeInTheDocument();
+    });
+
+    it('does NOT render multiplier badge for standard tiles', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      expect(screen.queryByText(/×/)).not.toBeInTheDocument();
+    });
+
+    it('does NOT render multiplier badge for non-multiplier specials like bomb', () => {
+      render(<BlastTile {...baseProps} type="bomb" />);
+      expect(screen.queryByText(/×/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('type-specific clearing animations', () => {
+    it('bomb clearing scales larger than standard (1.8 vs 1.3)', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="bomb" phase="clearing" clearRotate={5} />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scale(1.8)');
+    });
+
+    it('lightning clearing stretches vertically', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="lightning" phase="clearing" />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scaleY(2.5)');
+      expect(button?.style.transform).toContain('scaleX(0.3)');
+    });
+
+    it('standard clearing uses default spin+scale', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" phase="clearing" clearRotate={10} />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scale(1.3)');
+      expect(button?.style.transform).toContain('rotate(10deg)');
+    });
+
+    it('magnet clearing implodes (shrinks + spins)', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="magnet" phase="clearing" />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scale(0.2)');
+      expect(button?.style.transform).toContain('rotate(720deg)');
+    });
+  });
+
+  describe('gem shard progress indicator', () => {
+    it('renders 3 shard dots for gem tile', () => {
+      render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
+      const shards = screen.getByTestId('gem-shards');
+      expect(shards).toBeInTheDocument();
+      expect(shards.children).toHaveLength(3);
+    });
+
+    it('fills shards as gem takes damage (3 hits = 0 filled, 2 = 1 filled, 1 = 2 filled)', () => {
+      const { rerender } = render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
+      let shards = screen.getByTestId('gem-shards');
+      // All 3 unfilled at full health
+      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(0);
+      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(3);
+
+      rerender(<BlastTile {...baseProps} type="gem" hitsRemaining={2} />);
+      shards = screen.getByTestId('gem-shards');
+      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(1);
+      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(2);
+
+      rerender(<BlastTile {...baseProps} type="gem" hitsRemaining={1} />);
+      shards = screen.getByTestId('gem-shards');
+      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(2);
+      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(1);
+    });
+
+    it('does NOT render shard dots for non-gem tiles', () => {
+      render(<BlastTile {...baseProps} type="ice" hitsRemaining={2} />);
+      expect(screen.queryByTestId('gem-shards')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('rare letter glow', () => {
+    it.each(['Q', 'Z', 'X', 'J'])('renders blast-rare-letter class for %s', (letter) => {
+      render(<BlastTile {...baseProps} type="standard" letter={letter} />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-rare-letter');
+    });
+
+    it('does NOT render blast-rare-letter for common letters', () => {
+      render(<BlastTile {...baseProps} type="standard" letter="E" />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-rare-letter');
+    });
+
+    it('renders blast-rare-letter even on special tiles', () => {
+      render(<BlastTile {...baseProps} type="gold" letter="Q" />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-rare-letter');
+    });
+  });
+
+  describe('combo preview glow', () => {
+    it('renders blast-combo-preview class when isComboPreview is true', () => {
+      render(<BlastTile {...baseProps} type="bomb" isComboPreview />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-combo-preview');
+    });
+
+    it('does NOT render blast-combo-preview when false', () => {
+      render(<BlastTile {...baseProps} type="bomb" isComboPreview={false} />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-combo-preview');
+    });
+  });
+
+  describe('activation effects', () => {
+    it('renders frost-shatter class when activationEffect is frost-free', () => {
+      render(<BlastTile {...baseProps} type="frozen" activationEffect="frost-free" />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-frost-shatter');
+    });
+
+    it('renders earned class when activationEffect is tile-earned', () => {
+      render(<BlastTile {...baseProps} type="gold" activationEffect="tile-earned" />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-earned');
+    });
+
+    it('does NOT render effect classes without activationEffect', () => {
+      render(<BlastTile {...baseProps} type="frozen" />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-tile-frost-shatter');
+      expect(button.className).not.toContain('blast-tile-earned');
+    });
+  });
+
+  describe('cleared tiles', () => {
+    it('renders invisible placeholder when cleared', () => {
+      render(<BlastTile {...baseProps} type="gold" isCleared />);
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('accessibility', () => {
+    it('includes tile type in aria-label for special tiles', () => {
+      render(<BlastTile {...baseProps} type="bomb" />);
+      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'A bomb tile');
+    });
+
+    it('does not include type in aria-label for standard tiles', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'A');
+    });
+
+    it('shows tooltip title for special tiles', () => {
+      render(<BlastTile {...baseProps} type="bomb" />);
+      expect(screen.getByRole('button')).toHaveAttribute('title', expect.stringContaining('Bomb'));
+    });
+
+    it('does not show tooltip title for standard tiles', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      expect(screen.getByRole('button')).not.toHaveAttribute('title');
+    });
+  });
+});

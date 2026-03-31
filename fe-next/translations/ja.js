@@ -100,6 +100,180 @@ const ja = {
         "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
         "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
         "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
+    },
+    "blast": {
+      "title": "ブラストモード - 言葉を連鎖して爆発コンボ | LexiClash",
+      "description": "LexiClashのブラストモードをプレイ！言葉を連鎖させて爆発コンボ、タイルをクリアしてハイスコアを目指そう。無料、ダウンロード不要。",
+      "ogTitle": "ブラストモード - 言葉を連鎖してコンボ",
+      "ogDescription": "言葉を連鎖させて爆発コンボ！タイルをクリアしてハイスコアを目指そう。"
+    },
+    "brain": {
+      "title": "ブレインジム - ワードゲーム脳トレ＆認知ドリル",
+      "description": "LexiClashのワードドリルで脳を鍛えよう！ライトニングラウンド、メモリーハント、パターンスイッチャー。ブレインスコアを追跡。",
+      "ogTitle": "ブレインジム - ワードゲーム脳トレ",
+      "ogDescription": "認知ワードドリルで頭を鍛えよう。上達を追跡！"
+    },
+    "brainComboMaster": {
+      "title": "コンボマスタードリル - ワードストリーク維持 | ブレインジム",
+      "description": "コンボスキルをテスト！途切れなくワードストリークを維持するスピードドリル。",
+      "ogTitle": "コンボマスタードリル - ブレインジム",
+      "ogDescription": "途切れなくワードストリークを維持。コンボを構築して反応速度を鍛えよう！"
+    },
+    "brainLightningRound": {
+      "title": "ライトニングラウンド - 高速ワード探し | ブレインジム",
+      "description": "できるだけ速く言葉を見つけよう！時計と競争してワード探しの反射神経を鍛えよう。",
+      "ogTitle": "ライトニングラウンド - スピードワードドリル",
+      "ogDescription": "時計と競争して超高速で言葉を見つけよう！"
+    },
+    "brainMemoryHunt": {
+      "title": "メモリーハント - 記憶して言葉を探せ | ブレインジム",
+      "description": "言葉を記憶してボード上で見つけよう！視覚記憶とワードリコールを鍛えるドリル。",
+      "ogTitle": "メモリーハント - ワードメモリードリル",
+      "ogDescription": "言葉を記憶して見つけよう。視覚的記憶力を鍛えよう！"
+    },
+    "brainPatternSwitcher": {
+      "title": "パターンスイッチャー - 可変ワード長 | ブレインジム",
+      "description": "異なるワード長パターンを切り替え！ターゲット長に合う言葉を見つけて思考の柔軟性を鍛えよう。",
+      "ogTitle": "パターンスイッチャー - 可変長ドリル",
+      "ogDescription": "ワード長パターンを切り替えて思考の柔軟性を鍛えよう！"
+    },
+    "brainRareGems": {
+      "title": "レアジェム - 珍しい言葉を発見 | ブレインジム",
+      "description": "他の人が見逃す珍しい言葉を探そう！語彙を広げてボーナスポイントを獲得。",
+      "ogTitle": "レアジェム - 珍しいワード発見",
+      "ogDescription": "他の人が見逃すレアワードを発見。語彙を広げよう！"
+    },
+    "community": {
+      "title": "コミュニティワードパズル - プレイヤー作成ボード | LexiClash",
+      "description": "コミュニティ作成のワードパズルをプレイ！カスタムボードを作成、友達と共有、チャレンジで競争。",
+      "ogTitle": "コミュニティボード - プレイヤー作成パズル",
+      "ogDescription": "コミュニティワードパズルをプレイ＆作成。ボードを共有して競争！"
+    },
+    "education": {
+      "title": "LexiClash教育 - 教室＆教師向けワードゲーム",
+      "description": "教室にワードゲームを！LexiClash教育で語彙レッスン作成、生徒の進捗追跡、学習を楽しくしよう。",
+      "ogTitle": "LexiClash教育 - 教室向けワードゲーム",
+      "ogDescription": "教室向けワードゲーム！レッスン作成、進捗追跡、楽しい語彙学習。"
+    },
+    "friends": {
+      "title": "フレンド＆ソーシャル - 友達とワードゲーム | LexiClash",
+      "description": "LexiClashで友達とつながろう！チャレンジ送信、フレンド活動追跡、対戦、リーダーボードで競争。",
+      "ogTitle": "フレンド - 一緒にワードゲーム",
+      "ogDescription": "友達とつながり、チャレンジを送り、ワードバトルで対戦！"
+    },
+    "settings": {
+      "title": "ゲーム設定＆環境設定 | LexiClash",
+      "description": "LexiClash体験をカスタマイズ。アクセシビリティ、モーション、サウンド、表示設定を調整。",
+      "ogTitle": "設定 - LexiClash",
+      "ogDescription": "アクセシビリティと表示設定でLexiClash体験をカスタマイズ。"
+    },
+    "referrals": {
+      "title": "友達を招待してリワード獲得 | LexiClash紹介",
+      "description": "友達をLexiClashに招待してXPリワードを獲得！紹介リンクを共有して限定ボーナスをアンロック。",
+      "ogTitle": "紹介 - 友達を招待、リワード獲得",
+      "ogDescription": "友達を招待してXPリワードを獲得。リンクを共有して限定ボーナスをアンロック！"
+    },
+    "quests": {
+      "title": "デイリークエスト＆ウィークリーチャレンジ | LexiClash",
+      "description": "デイリークエストとウィークリーチャレンジをクリアしてコイン、XP、限定リワードを獲得。毎日新しいミッション！",
+      "ogTitle": "クエスト＆チャレンジ - LexiClash",
+      "ogDescription": "デイリークエストとウィークリーチャレンジでコイン、XP、限定リワードを獲得！"
+    },
+    "accessibility": {
+      "title": "アクセシビリティ宣言 | LexiClash",
+      "description": "LexiClashのアクセシビリティへの取り組み。WCAG 2.1 AA準拠、モーション軽減、スクリーンリーダー対応。",
+      "ogTitle": "アクセシビリティ - LexiClash",
+      "ogDescription": "すべてのプレイヤーにLexiClashをアクセシブルにする取り組み。"
+    },
+    "rules": {
+      "title": "LexiClashの遊び方 - ゲームルール＆戦略ガイド",
+      "description": "リアルタイムマルチプレイヤーワードゲーム、LexiClashの遊び方。ルール、スコアリング、戦略の完全ガイド。",
+      "ogTitle": "ゲームルール＆戦略ガイド - LexiClash",
+      "ogDescription": "LexiClashの完全ルール＆戦略ガイドで遊び方を学ぼう。"
+    },
+    "howToPlay": {
+      "title": "LexiClashの遊び方 - 初心者ガイド＆チュートリアル",
+      "description": "LexiClash初心者？ワード探し、スコアリング、コンボ、マルチプレイヤーの基本を学ぼう。",
+      "ogTitle": "遊び方 - 初心者ガイド",
+      "ogDescription": "LexiClash初心者？ステップバイステップの初心者ガイドで基本を学ぼう。"
+    },
+    "custom": {
+      "title": "カスタムワードパズル - 作成＆共有 | LexiClash",
+      "description": "オリジナルの文字配置でカスタムワードパズルを作成！パズルコードを友達と共有してチャレンジ。",
+      "ogTitle": "カスタムパズル - 作成＆共有",
+      "ogDescription": "カスタムワードパズルを作成して友達にチャレンジ！"
+    },
+    "wordOfTheDay": {
+      "title": "今日の言葉 - 毎日の語彙ビルダー | LexiClash",
+      "description": "毎日新しい言葉を発見！定義、語源、使用例を学ぼう。一日一語で語彙を広げよう。",
+      "ogTitle": "今日の言葉 - 毎日の語彙",
+      "ogDescription": "毎日新しい言葉を学ぼう。一日一語で語彙を広げよう！"
+    },
+    "glossary": {
+      "title": "ワードゲーム用語集 - 用語＆定義 | LexiClash",
+      "description": "LexiClashのワードゲーム用語の完全な用語集。コンボ、ストリーク、パワーアップ、ゲームモード。",
+      "ogTitle": "ワードゲーム用語集 - LexiClash",
+      "ogDescription": "ワードゲーム用語、メカニクス、スコアリングルールの完全な用語集。"
+    },
+    "guides": {
+      "title": "戦略ガイド＆ヒント - 全モードをマスター | LexiClash",
+      "description": "LexiClash全ゲームモードのエキスパート戦略ガイド。クラシック、ワードハント、ブラストをプロのヒントでマスター。",
+      "ogTitle": "戦略ガイド - LexiClashをマスター",
+      "ogDescription": "LexiClash全モードのエキスパートガイドとプロのヒント。"
+    },
+    "words": {
+      "title": "ワードエクスプローラー - 言葉を閲覧＆発見 | LexiClash",
+      "description": "長さ、頭文字などで言葉を探索。新しい語彙を発見し、ワードパターンを見つけよう。",
+      "ogTitle": "ワードエクスプローラー - LexiClash",
+      "ogDescription": "長さや頭文字で言葉を閲覧し、新しい語彙を発見。"
+    },
+    "party": {
+      "title": "パーティーゲーム - 大画面マルチプレイヤー | LexiClash",
+      "description": "LexiClashを大画面に映してパーティースタイルのワードバトル！ゲームナイトに最適。",
+      "ogTitle": "パーティーゲーム - 大画面ワードバトル",
+      "ogDescription": "大画面パーティースタイルのワードゲーム！ゲームナイトに最適。"
+    },
+    "wordForge": {
+      "title": "ワードフォージ - 言葉を鍛えてパワーアップ | LexiClash",
+      "description": "戦略的ワードクラフトモードで強力な言葉を鍛えよう！能力をアップグレードして言葉の達人に。",
+      "ogTitle": "ワードフォージ - 戦略的ワードクラフト",
+      "ogDescription": "言葉を鍛え、能力をアップグレードして戦略的ワードビルディングをマスター！"
+    },
+    "disclaimer": {
+      "title": "免責事項 - 重要な法的通知 | LexiClash",
+      "description": "LexiClashの免責事項をお読みください。プラットフォーム利用に関する重要情報。",
+      "ogTitle": "免責事項 - LexiClash",
+      "ogDescription": "LexiClashプラットフォーム利用に関する重要な法的免責事項。"
+    },
+    "cookies": {
+      "title": "クッキーポリシー - クッキーの使用について | LexiClash",
+      "description": "LexiClashがアナリティクス、広告、基本機能にクッキーをどう使用するかをご確認ください。",
+      "ogTitle": "クッキーポリシー - LexiClash",
+      "ogDescription": "LexiClashのクッキー使用とプリファレンス管理について。"
+    },
+    "sitemap": {
+      "title": "サイトマップ - 全ページ＆コンテンツ | LexiClash",
+      "description": "LexiClashの全ページ、ゲームモード、ガイド、ブログ記事、リソースを閲覧。",
+      "ogTitle": "サイトマップ - LexiClash",
+      "ogDescription": "LexiClashの全ページとコンテンツを閲覧。"
+    },
+    "tools": {
+      "title": "ワードゲームツール - ソルバー＆ヘルパー | LexiClash",
+      "description": "無料ワードゲームツール。ワードソルバー、アナグラムファインダー、語彙ビルダー。",
+      "ogTitle": "ワードゲームツール - LexiClash",
+      "ogDescription": "無料ワードツール — ソルバー、アナグラムファインダー、語彙ビルダー。"
+    },
+    "dailyWordWheel": {
+      "title": "デイリーワードホイール - 毎日の無料パズル | LexiClash",
+      "description": "デイリーワードホイールを回そう！文字セットから全ての言葉を見つけよう。毎日新しいパズル！",
+      "ogTitle": "デイリーワードホイール - 無料パズル",
+      "ogDescription": "ワードホイールを回して全ての言葉を見つけよう。毎日新しいパズル！"
+    },
+    "playerProfile": {
+      "title": "プレイヤープロフィール＆ゲーム統計 | LexiClash",
+      "description": "LexiClashのプレイヤープロフィール、ゲーム統計、実績、マッチ履歴を閲覧。",
+      "ogTitle": "プレイヤープロフィール - LexiClash",
+      "ogDescription": "プレイヤー統計、実績、マッチ履歴を閲覧。"
     }
   },
   "cookieConsent": {
@@ -7168,20 +7342,6 @@ const ja = {
     "reconnectAttempt": "試行 {current}/{max}",
     "leaveGame": "ゲームを離れる",
     "scoreSafeReconnect": "スコアは安全です",
-    "daily": {
-      "wordCount": {
-        "title": "単語コレクター",
-        "description": "{target}個の単語を見つけよう"
-      },
-      "perfect": {
-        "title": "パーフェクトスター",
-        "description": "{target}個の完璧な3つ星レベルを達成しよう"
-      },
-      "longWord": {
-        "title": "ワードスミス",
-        "description": "{target}個の長い単語（5文字以上）を見つけよう"
-      }
-    },
     "gestureTutorial": "スワイプで文字をつなげて単語を作ろう！"
   },
   "blast": {
@@ -9922,12 +10082,17 @@ const ja = {
     "ready": {
       "title": "ブラストモード",
       "subtitle": "ボードをクリアし、コンボをつなげ、ウェーブを生き延びよう",
-      "play": "プレイ"
+      "play": "プレイ",
+      "rule1": "タイルをドラッグして単語を綴ろう（3文字以上）",
+      "rule2": "長い単語ほど高得点＆多くのタイルをクリア",
+      "rule3": "特殊タイル（💣⚡🔷）が爆発的な連鎖反応を起こす",
+      "rule4": "タイルの50%以上をクリアして次のウェーブへ"
     },
     "waveComplete": "ウェーブ${wave}クリア！",
+    "score": "スコア",
     "wordsFound": "単語",
     "cleared": "クリア",
-    "nextWave": "次のウェーブ",
+    "nextWave": "ウェーブ${wave}",
     "gameOver": "ゲームオーバー",
     "waves": "ウェーブ",
     "bestWord": "ベスト",

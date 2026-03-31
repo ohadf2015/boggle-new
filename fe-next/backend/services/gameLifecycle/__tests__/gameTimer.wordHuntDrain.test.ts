@@ -93,7 +93,7 @@ describe('gameTimer word hunt life drain', () => {
     // Advance one tick
     jest.advanceTimersByTime(1000);
 
-    expect(mockDrainLife).toHaveBeenCalledWith(huntState);
+    expect(mockDrainLife).toHaveBeenCalledWith(huntState, expect.any(Number));
   });
 
   it('should broadcast wordHuntLifeUpdate after drain', () => {

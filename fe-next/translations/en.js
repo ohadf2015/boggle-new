@@ -100,6 +100,180 @@ const en = {
         "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
         "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
         "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
+    },
+    "blast": {
+      "title": "Blast Mode - Chain Words Into Explosive Combos | LexiClash",
+      "description": "Play Blast Mode in LexiClash! Chain words to trigger explosive combos, clear tiles, and chase high scores. Fast-paced puzzle action — free, no download needed.",
+      "ogTitle": "Blast Mode - Chain Words Into Combos",
+      "ogDescription": "Chain words into explosive combos! Clear tiles, build multipliers, and chase high scores in this fast-paced word puzzle."
+    },
+    "brain": {
+      "title": "Brain Gym - Word Game Brain Training & Cognitive Drills",
+      "description": "Train your brain with LexiClash word drills! Lightning rounds, memory hunts, pattern switching, combo masters, and rare gem challenges. Track your Brain Score and improve daily.",
+      "ogTitle": "Brain Gym - Word Game Brain Training",
+      "ogDescription": "Sharpen your mind with cognitive word drills. Track your Brain Score and watch yourself improve!"
+    },
+    "brainComboMaster": {
+      "title": "Combo Master Drill - Maintain Word Streaks | Brain Gym",
+      "description": "Test your combo skills! Maintain word streaks without breaks in this fast-paced brain drill. Build your combo multiplier and train reaction speed.",
+      "ogTitle": "Combo Master Drill - Brain Gym",
+      "ogDescription": "Maintain word streaks without breaks. Build combos and train your reaction speed!"
+    },
+    "brainLightningRound": {
+      "title": "Lightning Round Drill - Speed Word Finding | Brain Gym",
+      "description": "Find words as fast as possible in this speed drill! Race the clock, sharpen your word-finding reflexes, and climb the speed leaderboard.",
+      "ogTitle": "Lightning Round - Speed Word Drill",
+      "ogDescription": "Race the clock and find words at lightning speed. How fast can you go?"
+    },
+    "brainMemoryHunt": {
+      "title": "Memory Hunt Drill - Remember & Find Words | Brain Gym",
+      "description": "Memorize words, then find them on the board from memory! This drill trains visual memory and word recall for sharper gameplay.",
+      "ogTitle": "Memory Hunt - Word Memory Drill",
+      "ogDescription": "Memorize words and find them from memory. Train your visual recall!"
+    },
+    "brainPatternSwitcher": {
+      "title": "Pattern Switcher Drill - Adaptive Word Lengths | Brain Gym",
+      "description": "Switch between required word length patterns! Find words matching the target length sequence to train mental flexibility.",
+      "ogTitle": "Pattern Switcher - Adaptive Length Drill",
+      "ogDescription": "Switch between word length patterns and train your mental flexibility!"
+    },
+    "brainRareGems": {
+      "title": "Rare Gems Drill - Discover Uncommon Words | Brain Gym",
+      "description": "Hunt for uncommon and rare words that other players miss! Expand your vocabulary and earn bonus points for discovering hidden gems.",
+      "ogTitle": "Rare Gems - Uncommon Word Discovery",
+      "ogDescription": "Discover rare words others miss. Expand your vocabulary with this unique drill!"
+    },
+    "community": {
+      "title": "Community Word Puzzles - Player-Created Boards | LexiClash",
+      "description": "Browse and play community-created word puzzles! Create your own custom boards, share with friends, and compete on player-made challenges.",
+      "ogTitle": "Community Boards - Player-Created Puzzles",
+      "ogDescription": "Play and create community word puzzles. Share custom boards and compete on player-made challenges!"
+    },
+    "education": {
+      "title": "LexiClash Education - Word Games for Classrooms & Teachers",
+      "description": "Bring word games into the classroom! LexiClash Education helps teachers create vocabulary lessons, track student progress, and make learning engaging with multiplayer word battles.",
+      "ogTitle": "LexiClash Education - Classroom Word Games",
+      "ogDescription": "Word games for classrooms! Create lessons, track progress, and make vocabulary learning fun."
+    },
+    "friends": {
+      "title": "Friends & Social - Play Word Games With Friends | LexiClash",
+      "description": "Connect with friends on LexiClash! Send challenges, track friend activity, compete head-to-head, and climb together on the leaderboard.",
+      "ogTitle": "Friends - Play Word Games Together",
+      "ogDescription": "Connect with friends, send challenges, and compete head-to-head in word battles!"
+    },
+    "settings": {
+      "title": "Game Settings & Preferences | LexiClash",
+      "description": "Customize your LexiClash experience. Adjust accessibility options, motion preferences, sound settings, and display preferences.",
+      "ogTitle": "Settings - LexiClash",
+      "ogDescription": "Customize your LexiClash experience with accessibility and display preferences."
+    },
+    "referrals": {
+      "title": "Invite Friends & Earn Rewards | LexiClash Referrals",
+      "description": "Invite friends to LexiClash and earn XP rewards! Share your referral link, track invites, and unlock exclusive bonuses.",
+      "ogTitle": "Referrals - Invite Friends, Earn Rewards",
+      "ogDescription": "Invite friends and earn XP rewards. Share your link and unlock exclusive bonuses!"
+    },
+    "quests": {
+      "title": "Daily Quests & Weekly Challenges | LexiClash",
+      "description": "Complete daily quests and weekly challenges to earn coins, XP, and exclusive rewards. New missions every day to keep you engaged!",
+      "ogTitle": "Quests & Challenges - LexiClash",
+      "ogDescription": "Complete daily quests and weekly challenges for coins, XP, and exclusive rewards!"
+    },
+    "accessibility": {
+      "title": "Accessibility Statement | LexiClash",
+      "description": "LexiClash accessibility commitment. Learn about our WCAG 2.1 AA compliance, reduced motion support, screen reader compatibility, and inclusive design practices.",
+      "ogTitle": "Accessibility - LexiClash",
+      "ogDescription": "Our commitment to making LexiClash accessible to all players."
+    },
+    "rules": {
+      "title": "How to Play LexiClash - Game Rules & Strategy Guide",
+      "description": "Learn how to play LexiClash, the real-time multiplayer word game. Complete guide covering game rules, scoring system, winning strategies, and tips for beginners.",
+      "ogTitle": "Game Rules & Strategy Guide - LexiClash",
+      "ogDescription": "Learn how to play LexiClash with our complete rules and strategy guide."
+    },
+    "howToPlay": {
+      "title": "How to Play LexiClash - Beginner's Guide & Tutorial",
+      "description": "New to LexiClash? Learn the basics of word finding, scoring, combos, and multiplayer. Step-by-step tutorial for beginners.",
+      "ogTitle": "How to Play - Beginner's Guide",
+      "ogDescription": "New to LexiClash? Learn the basics with our step-by-step beginner's guide."
+    },
+    "custom": {
+      "title": "Custom Word Puzzles - Create & Share Boards | LexiClash",
+      "description": "Create custom word puzzles with your own letter arrangements! Share puzzle codes with friends and challenge them to beat your board.",
+      "ogTitle": "Custom Puzzles - Create & Share",
+      "ogDescription": "Create custom word puzzles and challenge friends to beat your board!"
+    },
+    "wordOfTheDay": {
+      "title": "Word of the Day - Daily Vocabulary Builder | LexiClash",
+      "description": "Discover a new word every day! Learn definitions, etymology, and usage examples. Expand your vocabulary one word at a time.",
+      "ogTitle": "Word of the Day - Daily Vocabulary",
+      "ogDescription": "Learn a new word every day. Expand your vocabulary one word at a time!"
+    },
+    "glossary": {
+      "title": "Word Game Glossary - Terms & Definitions | LexiClash",
+      "description": "Complete glossary of word game terms used in LexiClash. Learn about combos, streaks, power-ups, game modes, and scoring mechanics.",
+      "ogTitle": "Word Game Glossary - LexiClash",
+      "ogDescription": "Complete glossary of word game terms, mechanics, and scoring rules."
+    },
+    "guides": {
+      "title": "Strategy Guides & Tips - Master Every Game Mode | LexiClash",
+      "description": "Expert strategy guides for all LexiClash game modes. Master classic mode, Word Hunt, Blast, and more with pro tips and winning strategies.",
+      "ogTitle": "Strategy Guides - Master LexiClash",
+      "ogDescription": "Expert guides and pro tips for every LexiClash game mode."
+    },
+    "words": {
+      "title": "Word Explorer - Browse & Discover Words | LexiClash",
+      "description": "Explore words by length, starting letter, and more. Discover new vocabulary, find word patterns, and expand your word game knowledge.",
+      "ogTitle": "Word Explorer - LexiClash",
+      "ogDescription": "Browse words by length, starting letter, and discover new vocabulary."
+    },
+    "party": {
+      "title": "Party Games - Multiplayer Fun on the Big Screen | LexiClash",
+      "description": "Throw LexiClash on the big screen for party-style word battles! Caption Clash, Pixel Clash, and Shadow Clash — perfect for game nights and gatherings.",
+      "ogTitle": "Party Games - Big Screen Word Battles",
+      "ogDescription": "Party-style word games on the big screen! Perfect for game nights and gatherings."
+    },
+    "wordForge": {
+      "title": "Word Forge - Craft Words & Build Power | LexiClash",
+      "description": "Forge powerful words in this strategic word-crafting mode! Upgrade your abilities, unlock new powers, and master the art of word building.",
+      "ogTitle": "Word Forge - Strategic Word Crafting",
+      "ogDescription": "Forge words, upgrade abilities, and master strategic word building!"
+    },
+    "disclaimer": {
+      "title": "Disclaimer - Important Legal Notice | LexiClash",
+      "description": "Read the LexiClash disclaimer. Important information about the use of our word game platform, limitations of liability, and third-party content.",
+      "ogTitle": "Disclaimer - LexiClash",
+      "ogDescription": "Important legal disclaimer regarding use of the LexiClash platform."
+    },
+    "cookies": {
+      "title": "Cookie Policy - How We Use Cookies | LexiClash",
+      "description": "Learn about how LexiClash uses cookies for analytics, advertising, and essential functionality. Manage your cookie preferences.",
+      "ogTitle": "Cookie Policy - LexiClash",
+      "ogDescription": "Learn how LexiClash uses cookies and manage your preferences."
+    },
+    "sitemap": {
+      "title": "Sitemap - All Pages & Content | LexiClash",
+      "description": "Browse all LexiClash pages, game modes, guides, blog posts, and resources. Find everything on our word game platform.",
+      "ogTitle": "Sitemap - LexiClash",
+      "ogDescription": "Browse all pages and content on the LexiClash word game platform."
+    },
+    "tools": {
+      "title": "Word Game Tools - Solver & Helpers | LexiClash",
+      "description": "Free word game tools including a word solver, anagram finder, and vocabulary builder. Improve your word game skills with our helpful utilities.",
+      "ogTitle": "Word Game Tools - LexiClash",
+      "ogDescription": "Free word tools — solver, anagram finder, and vocabulary builder."
+    },
+    "dailyWordWheel": {
+      "title": "Daily Word Wheel - Free Daily Puzzle | LexiClash",
+      "description": "Spin the daily word wheel! Find all possible words from a set of letters. New puzzle every day — share your results with friends.",
+      "ogTitle": "Daily Word Wheel - Free Puzzle",
+      "ogDescription": "Spin the word wheel and find all possible words. New puzzle daily!"
+    },
+    "playerProfile": {
+      "title": "Player Profile & Game Stats | LexiClash",
+      "description": "View player profiles, game statistics, achievements, and match history on LexiClash. See how any player stacks up on the leaderboard.",
+      "ogTitle": "Player Profile - LexiClash",
+      "ogDescription": "View player stats, achievements, and match history."
     }
   },
   "cookieConsent": {
@@ -7287,20 +7461,6 @@ const en = {
     "reconnectAttempt": "Attempt {current} of {max}",
     "leaveGame": "Leave Game",
     "scoreSafeReconnect": "Your score is safe",
-    "daily": {
-      "wordCount": {
-        "title": "Word Collector",
-        "description": "Find {target} words"
-      },
-      "perfect": {
-        "title": "Perfect Star",
-        "description": "Get {target} perfect 3-star levels"
-      },
-      "longWord": {
-        "title": "Wordsmith",
-        "description": "Find {target} long words (5+ letters)"
-      }
-    },
     "defeatExplainer": {
       "title": "What Went Wrong",
       "tip": {
@@ -9979,12 +10139,17 @@ const en = {
     "ready": {
       "title": "BLAST MODE",
       "subtitle": "Clear the board, chain combos, survive the waves",
-      "play": "PLAY"
+      "play": "PLAY",
+      "rule1": "Drag across tiles to spell words (3+ letters)",
+      "rule2": "Longer words score more and clear more tiles",
+      "rule3": "Special tiles (💣⚡🔷) trigger explosive chain reactions",
+      "rule4": "Clear 50%+ of tiles to advance to the next wave"
     },
     "waveComplete": "Wave ${wave} Complete!",
+    "score": "Score",
     "wordsFound": "words",
     "cleared": "cleared",
-    "nextWave": "NEXT WAVE",
+    "nextWave": "Wave ${wave}",
     "gameOver": "GAME OVER",
     "waves": "waves",
     "bestWord": "Best",

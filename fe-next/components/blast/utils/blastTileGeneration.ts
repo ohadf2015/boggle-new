@@ -6,6 +6,16 @@ import {
 import { getInitialHitsRemaining } from './blastTileUtils';
 import { getWaveConfig, getWaveDistribution } from './blastWaveConfig';
 
+let _tileUidCounter = 0;
+/** Generate a unique tile ID that persists through gravity shifts */
+export function nextTileUid(): string {
+  return `t${++_tileUidCounter}`;
+}
+/** Reset counter (for testing) */
+export function resetTileUidCounter(): void {
+  _tileUidCounter = 0;
+}
+
 /** Seeded random for consistent tile placement per grid */
 export function seededRandom(seed: number): () => number {
   let s = seed;
@@ -83,6 +93,7 @@ export function generateTileStates(
           : undefined;
 
       tiles[row][col] = {
+        uid: nextTileUid(),
         row,
         col,
         type,

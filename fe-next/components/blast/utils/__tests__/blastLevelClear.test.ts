@@ -25,7 +25,7 @@ import {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeTile(row: number, col: number, type: BlastTileType, isCleared = false): BlastTileState {
-  return { row, col, type, isCleared, activationEffect: null, hitsRemaining: 0 };
+  return { row, col, type, isCleared, activationEffect: null, hitsRemaining: 0, uid: `t-${row}-${col}` };
 }
 
 function makeGrid(tiles: BlastTileState[]): BlastTileState[][] {

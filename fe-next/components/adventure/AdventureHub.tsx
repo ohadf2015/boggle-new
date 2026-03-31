@@ -11,7 +11,7 @@
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star, BookOpen, ShoppingBag } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star, BookOpen, ShoppingBag, Home } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -128,10 +128,11 @@ const AdventureHub = memo<AdventureHubProps>(({
         {/* Home link — top-left */}
         <Link
           href="/"
-          className="absolute top-3 start-3 text-neo-white/70 font-bold text-xs hover:text-neo-white transition-colors z-10 bg-neo-black/30 backdrop-blur-sm px-2 py-1 rounded-neo"
+          className="absolute top-3 start-3 flex items-center gap-1 text-neo-white font-bold text-xs hover:text-neo-lime transition-colors z-10 bg-neo-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded-neo border border-neo-white/20"
           aria-label={t('common.home')}
         >
-          ← {t('common.home')}
+          <Home className="w-3.5 h-3.5" />
+          {t('common.home')}
         </Link>
 
         {/* Player stats — overlaid bottom */}

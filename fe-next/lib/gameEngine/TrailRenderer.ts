@@ -1,0 +1,123 @@
+// ─── Trail Renderer ───────────────────────────────────────────────────
+// Smooth fading ribbon trail for drag paths (e.g. word selection).
+// Maintains a point history with per-point age, drawing segments
+// with decreasing width and alpha for a polished "swipe" effect.
+
+import { Container, Graphics } from 'pixi.js';
+
+export interface TrailConfig {
+  /** Trail color (hex number) */
+  color: number;
+  /** How long each point lives in seconds */
+  maxAge: number;
+  /** Maximum stroke width at the newest point */
+  maxWidth: number;
+  /** Glow color (defaults to same as color) */
+  glowColor?: number;
+  /** Maximum number of points stored */
+  maxPoints?: number;
+}
+
+interface TrailPoint {
+  x: number;
+  y: number;
+  age: number;
+}
+
+export class TrailRenderer {
+  private graphics: Graphics;
+  private points: TrailPoint[] = [];
+  private config: TrailConfig;
+  private maxPts: number;
+
+  constructor(parent: Container, config: TrailConfig) {
+    this.config = config;
+    this.maxPts = config.maxPoints ?? 64;
+    this.graphics = new Graphics();
+    parent.addChild(this.graphics);
+  }
+
+  get pointCount(): number {
+    return this.points.length;
+  }
+
+  /** Add a new trail point at (x, y) */
+  addPoint(x: number, y: number): void {
+    this.points.push({ x, y, age: 0 });
+    // Cap to maxPoints — remove oldest
+    while (this.points.length > this.maxPts) {
+      this.points.shift();
+    }
+  }
+
+  /** Clear all points */
+  clear(): void {
+    this.points = [];
+    this.graphics.clear();
+  }
+
+  /** Call each frame with delta in seconds */
+  update(deltaSec: number): void {
+    // Age all points and remove expired ones
+    for (let i = this.points.length - 1; i >= 0; i--) {
+      this.points[i].age += deltaSec;
+      if (this.points[i].age >= this.config.maxAge) {
+        this.points.splice(i, 1);
+      }
+    }
+
+    this.draw();
+  }
+
+  destroy(): void {
+    this.points = [];
+    this.graphics.destroy();
+  }
+
+  // ─── Internal ───────────────────────────────────────────────────
+
+  private draw(): void {
+    this.graphics.clear();
+
+    if (this.points.length < 2) {
+      // Draw a glow dot at single point
+      if (this.points.length === 1) {
+        const p = this.points[0];
+        const alpha = 1 - p.age / this.config.maxAge;
+        this.graphics
+          .circle(p.x, p.y, this.config.maxWidth * 0.5)
+          .fill({ color: this.config.color, alpha: alpha * 0.6 });
+      }
+      return;
+    }
+
+    const { color, glowColor, maxAge, maxWidth } = this.config;
+    const glow = glowColor ?? color;
+
+    // Draw outer glow pass (wider, transparent)
+    this.drawSegments(glow, maxWidth * 2.5, 0.12, maxAge);
+    // Draw main trail pass
+    this.drawSegments(color, maxWidth, 0.8, maxAge);
+    // Draw bright core
+    this.drawSegments(0xffffff, maxWidth * 0.3, 0.5, maxAge);
+  }
+
+  private drawSegments(color: number, width: number, baseAlpha: number, maxAge: number): void {
+    for (let i = 1; i < this.points.length; i++) {
+      const prev = this.points[i - 1];
+      const curr = this.points[i];
+      // Alpha based on age of the current point (newer = brighter)
+      const t = curr.age / maxAge;
+      const alpha = baseAlpha * (1 - t);
+      // Width tapers with age
+      const w = width * (1 - t * 0.7);
+
+      if (alpha < 0.01 || w < 0.5) continue;
+
+      this.graphics
+        .moveTo(prev.x, prev.y)
+        .lineTo(curr.x, curr.y)
+        .stroke({ color, width: w, alpha, cap: 'round' });
+    }
+  }
+}

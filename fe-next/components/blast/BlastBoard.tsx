@@ -73,10 +73,32 @@ export const BlastBoard = memo(function BlastBoard({
     [selectedCells],
   );
 
+  // Selection index map — position of each cell in the word path
+  const selectionIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (let i = 0; i < selectedCells.length; i++) {
+      map.set(`${selectedCells[i].row}-${selectedCells[i].col}`, i);
+    }
+    return map;
+  }, [selectedCells]);
+
   const nearMissSet = useMemo(
     () => new Set(nearMissCells.map(c => `${c.row}-${c.col}`)),
     [nearMissCells],
   );
+
+  // Combo preview: detect if 2+ combo-eligible tiles are in the current selection
+  const comboPreviewSet = useMemo(() => {
+    if (selectedCells.length < 2) return null;
+    const eligibleKeys: string[] = [];
+    for (const cell of selectedCells) {
+      const tile = tileStates[cell.row]?.[cell.col];
+      if (tile && !tile.isCleared && COMBO_ELIGIBLE_TILES.has(tile.type)) {
+        eligibleKeys.push(`${cell.row}-${cell.col}`);
+      }
+    }
+    return eligibleKeys.length >= 2 ? new Set(eligibleKeys) : null;
+  }, [selectedCells, tileStates]);
 
   // Build a lookup map from sequencer active tiles
   const animLookup = useMemo(() => {
@@ -94,7 +116,7 @@ export const BlastBoard = memo(function BlastBoard({
   return (
     <div
       ref={containerRef}
-      className="blast-board relative w-full aspect-square overflow-hidden"
+      className="blast-board relative w-full aspect-square max-w-[92vw] sm:max-w-[420px] md:max-w-[460px] lg:max-w-[min(500px,55vh)] overflow-hidden"
       style={{ contain: 'layout paint' }}
     >
       {/* Layer 1: GridComponent — word selection via touch/drag */}
@@ -154,6 +176,10 @@ export const BlastBoard = memo(function BlastBoard({
                 isCleared={tile.isCleared}
                 hitsRemaining={tile.hitsRemaining}
                 isNearMiss={nearMissSet.has(key)}
+                activationEffect={tile.activationEffect}
+                isComboPreview={comboPreviewSet?.has(key) ?? false}
+                selectionIndex={selectionIndexMap.get(key)}
+                selectionTotal={selectedCells.length}
                 clearRotate={animState?.clearRotate}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}

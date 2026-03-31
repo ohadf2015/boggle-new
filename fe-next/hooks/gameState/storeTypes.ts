@@ -66,6 +66,7 @@ export interface GameState {
 
   // Word Hunt multiplayer state
   wordHuntTargetLength: number;
+  wordHuntTargetCategory: string | null;
   wordHuntMyLife: number;
   wordHuntPlayerLives: Record<string, number>;
   wordHuntTargetAttempts: Array<{ guess: string; feedback: LetterFeedback[]; isDiscovery?: boolean }>;
@@ -142,6 +143,7 @@ export interface GameActions {
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;
+  setWordHuntTargetCategory: (value: string | null) => void;
   setWordHuntMyLife: (value: number | ((prev: number) => number)) => void;
   setWordHuntPlayerLives: (value: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
   setWordHuntTargetAttempts: (value: Array<{ guess: string; feedback: LetterFeedback[] }> | ((prev: Array<{ guess: string; feedback: LetterFeedback[] }>) => Array<{ guess: string; feedback: LetterFeedback[] }>)) => void;

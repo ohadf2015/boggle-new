@@ -88,12 +88,15 @@ export function useFriendMessages(friendId?: string): UseFriendMessagesReturn {
         before
       );
 
+      // Messages come newest-first from DB — reverse to show oldest at top
+      const chronological = [...fetchedMessages].reverse();
+
       if (before) {
-        // Append older messages
-        setMessages((prev) => [...prev, ...fetchedMessages]);
+        // Prepend older messages (they go before existing ones)
+        setMessages((prev) => [...chronological, ...prev]);
       } else {
         // Replace with fresh messages
-        setMessages(fetchedMessages);
+        setMessages(chronological);
       }
     } catch (err) {
       logger.error('USE_FRIEND_MESSAGES', `Error loading messages: ${(err as Error).message}`);

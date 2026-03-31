@@ -36,12 +36,11 @@ function syncCosmeticsToSupabase(
   purchased: string[],
 ): void {
   if (!supabase) return;
-  supabase
+  void supabase
     .from('profiles')
     .update({ equipped_cosmetics: equipped, purchased_cosmetics: purchased })
     .eq('id', userId)
-    .then(() => {})
-    .catch(() => {});
+    .then(() => {}, () => {});
 }
 
 export function useCosmetics(input: UseCosmeticsInput) {
@@ -77,8 +76,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
           setPurchasedIds(pc);
           saveJsonToLocalStorage(PURCHASED_KEY, pc);
         }
-      })
-      .catch(() => {});
+      }, () => {});
   }, [isAuthenticated, user?.id]);
 
   const playerState: PlayerCosmeticState = useMemo(
