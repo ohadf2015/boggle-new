@@ -67,6 +67,21 @@ async function getAuthToken(): Promise<string | undefined> {
 }
 
 /**
+ * Get CrazyGames user token for server-side identity verification.
+ * Returns null when not on CrazyGames platform.
+ */
+async function getCrazyGamesToken(): Promise<string | null> {
+  try {
+    if (typeof window === 'undefined' || window.__crazyGamesEnvironment !== 'crazygames') return null;
+    if (!window.CrazyGames?.SDK) return null;
+    const token = await window.CrazyGames.SDK.user.getUserToken();
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get or create the shared socket instance
  * Uses reference counting to manage cleanup.
  * Passes Supabase JWT in handshake auth for server-side verification.
@@ -87,10 +102,13 @@ export function getSharedSocket(): Socket {
       forceNew: false,
     });
 
-    // Attach auth token before connecting (async but non-blocking)
-    getAuthToken().then(token => {
-      if (token && sharedSocketInstance) {
-        sharedSocketInstance.auth = { token };
+    // Attach auth tokens before connecting (async but non-blocking)
+    Promise.all([getAuthToken(), getCrazyGamesToken()]).then(([token, cgToken]) => {
+      if (sharedSocketInstance) {
+        sharedSocketInstance.auth = {
+          ...(token ? { token } : {}),
+          ...(cgToken ? { crazyGamesToken: cgToken } : {}),
+        };
       }
       sharedSocketInstance?.connect();
     }).catch(() => {

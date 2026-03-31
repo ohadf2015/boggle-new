@@ -3,12 +3,12 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
-// Default thresholds for happyTime trigger — CrazyGames requires these to be
-// "major achievements only" (boss defeated, high score). Keep thresholds high
-// to avoid QA rejection for over-triggering.
-const DEFAULT_SCORE_THRESHOLD = 500;
-const DEFAULT_COMBO_THRESHOLD = 10;
-const DEFAULT_WORDS_THRESHOLD = 25;
+// Default thresholds for happyTime trigger — CrazyGames requires these for
+// "major achievements only" (boss defeated, high score). Keep meaningful but
+// achievable in short sessions (60-90s daily challenge, word hunt).
+const DEFAULT_SCORE_THRESHOLD = 200;
+const DEFAULT_COMBO_THRESHOLD = 5;
+const DEFAULT_WORDS_THRESHOLD = 12;
 
 /**
  * Configurable thresholds for triggering CrazyGames happyTime
