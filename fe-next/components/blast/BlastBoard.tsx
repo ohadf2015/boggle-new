@@ -19,6 +19,7 @@ export interface BlastBoardProps {
   onPathSubmit: (cells: Array<{ row: number; col: number }>) => void;
   onWordChange: (word: string, count: number) => void;
   sequencerState?: SequencerState;
+  nearMissCells?: Array<{ row: number; col: number }>;
 }
 
 /**
@@ -38,6 +39,7 @@ export const BlastBoard = memo(function BlastBoard({
   onPathSubmit,
   onWordChange,
   sequencerState,
+  nearMissCells = [],
 }: BlastBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -68,6 +70,11 @@ export const BlastBoard = memo(function BlastBoard({
   const selectedPositions = useMemo(
     () => new Set(selectedCells.map((c) => `${c.row}-${c.col}`)),
     [selectedCells],
+  );
+
+  const nearMissSet = useMemo(
+    () => new Set(nearMissCells.map(c => `${c.row}-${c.col}`)),
+    [nearMissCells],
   );
 
   // Build a lookup map from sequencer active tiles
@@ -145,6 +152,8 @@ export const BlastBoard = memo(function BlastBoard({
                 isSelected={isSelected}
                 isCleared={tile.isCleared}
                 hitsRemaining={tile.hitsRemaining}
+                isNearMiss={nearMissSet.has(key)}
+                clearRotate={animState?.clearRotate}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}
               />

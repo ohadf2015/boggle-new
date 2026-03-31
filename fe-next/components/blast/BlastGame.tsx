@@ -14,11 +14,14 @@ import { BlastStage } from './BlastStage';
 import { detectSpecialCombos, type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
 import { getComboMultiplier } from '@/shared/utils/scoring';
-import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, type BlastGameConfig, type BlastResultsData, type BlastTileState } from './types';
+import { MAX_CASCADE_CHAIN, CASCADE_MIN_WORD_LENGTH, MAX_CASCADE_WORDS_PER_LEVEL, CASCADE_CHAIN_BONUS_MULTIPLIER, type BlastGameConfig, type BlastResultsData, type BlastTileState, type BlastTileType } from './types';
 import { detectVerticalWords, detectHorizontalWords } from './utils/blastVerticalScanner';
 import { detectMatch3Clusters } from './utils/blastMatch3Detector';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism, vibrateBlastCascade } from '@/components/grid/hapticFeedback';
+import { detectNearMiss } from './utils/blastNearMiss';
 import type { ScoreFlyEvent } from './BlastScoreFly';
+import type { ClearedTileEvent } from './BlastEffectsCanvas';
 
 interface BlastGameProps {
   config: BlastGameConfig;
@@ -111,10 +114,13 @@ export function BlastGame({
   // Effects state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
   const [comboFlash, setComboFlash] = useState<{ id: string; tier: 1 | 2 | 3 } | null>(null);
+  const [clearedTilesForEffects, setClearedTilesForEffects] = useState<ClearedTileEvent[]>([]);
   const flyIdRef = useRef(0);
 
   // Word forming state
   const [formedWord, setFormedWord] = useState('');
+  // Near-miss shimmer state
+  const [nearMissCells, setNearMissCells] = useState<Array<{ row: number; col: number }>>([]);
 
   // Track last submitted path
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
@@ -151,6 +157,11 @@ export function BlastGame({
     }));
     await sequencer.animateWordClear(clearedInfo);
 
+    // 1b. Fire cleared tile events for PixiJS particle effects
+    setClearedTilesForEffects(clearedInfo.map(c => ({
+      row: c.row, col: c.col, type: c.type as BlastTileType,
+    })));
+
     // 2. Submit to engine (instant state update)
     const result = engine.submitWord(path, data.word, data.score);
 
@@ -170,7 +181,20 @@ export function BlastGame({
       setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
     }
 
-    // 5. Run cascade + animate with multi-chain support
+    // 5. Haptic feedback based on tile types in path
+    const clearedTypes = new Set(clearedInfo.map(c => c.type));
+    if (clearedTypes.has('bomb')) vibrateBlastBomb();
+    else if (clearedTypes.has('lightning')) vibrateBlastLightning();
+    else if (clearedTypes.has('prism')) vibrateBlastPrism();
+
+    // 6. Near-miss detection — shimmer tiles the player almost included
+    const nearMiss = detectNearMiss(path, engine.grid!, engine.tileStates, config.gridSize, hadCombo);
+    if (nearMiss) {
+      setNearMissCells(nearMiss.cells);
+      setTimeout(() => setNearMissCells([]), 1200);
+    }
+
+    // 7. Run cascade + animate with multi-chain support
     let chainLevel = 0;
     let cascadeResult = engine.startCascade();
     await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
@@ -245,17 +269,16 @@ export function BlastGame({
         tier: chainTier,
       }]);
 
-      // Chain combo flash
+      // Chain combo flash + haptic
       if (chainLevel >= 2) {
         setComboFlash({ id: `chain-flash-${flyIdRef.current}`, tier: chainTier });
+        vibrateBlastCascade();
       }
 
       // Cascade again with chain acceleration
       cascadeResult = engine.startCascade();
       await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
       cascadeResult.commit?.();
-
-      playWordAcceptedSound();
     }
 
     // Track combo streak
@@ -401,6 +424,9 @@ export function BlastGame({
         onScoreFlyComplete={handleScoreFlyComplete}
         comboFlash={comboFlash}
         onComboFlashComplete={handleComboFlashComplete}
+        nearMissCells={nearMissCells}
+        clearedTilesForEffects={clearedTilesForEffects}
+        waveCleared={objectives.allObjectivesComplete}
         t={(key: string) => t(key) || undefined}
       />
     </div>

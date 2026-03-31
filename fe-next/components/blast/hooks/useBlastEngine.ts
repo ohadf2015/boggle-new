@@ -288,7 +288,8 @@ export function useBlastEngine(
       };
     }
 
-    const ddaModifier = getDDASpawnModifier(ddaStateRef.current);
+    // Disable DDA in multiplayer to maintain competitive integrity
+    const ddaModifier = options?.isMultiplayer ? 0 : getDDASpawnModifier(ddaStateRef.current);
     const rng = effectiveBlastSeed != null ? createSeededRandom(effectiveBlastSeed + gameStateRef.current.movesUsed) : undefined;
 
     const gravityResult = computeGravityResult(
@@ -313,7 +314,7 @@ export function useBlastEngine(
         setTileStates(gravityResult.newTileStates);
       },
     };
-  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed]);
+  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer]);
 
   // ── shuffleGrid ──
   const shuffleGrid = useCallback(() => {

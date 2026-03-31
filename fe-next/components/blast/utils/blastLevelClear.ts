@@ -97,16 +97,4 @@ export function calculateMoveConversionBonus(movesRemaining: number): number {
   return movesRemaining * MOVE_CONVERSION_SCORE;
 }
 
-/**
- * Calculate star rating (1-3) based on remaining moves vs total moves.
- * - 3 stars: 50%+ moves remaining (efficient clear)
- * - 2 stars: 25%+ moves remaining
- * - 1 star: less than 25% remaining
- */
-export function calculateStarRating(movesRemaining: number, totalMoves: number): 1 | 2 | 3 {
-  if (totalMoves <= 0) return 1;
-  const ratio = movesRemaining / totalMoves;
-  if (ratio >= 0.5) return 3;
-  if (ratio >= 0.25) return 2;
-  return 1;
-}
+// Star rating: use calculateEarnedStars from blastStarCalculator.ts (canonical source)

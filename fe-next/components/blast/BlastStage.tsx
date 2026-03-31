@@ -1,8 +1,15 @@
 'use client';
 
+import { useRef, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Shuffle } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
+
+const BlastEffectsCanvas = dynamic(
+  () => import('./BlastEffectsCanvas'),
+  { ssr: false },
+);
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { BlastHUD } from './BlastHUD';
 import { BlastBoard } from './BlastBoard';
@@ -13,6 +20,7 @@ import { cn } from '@/lib/utils';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
+import type { ClearedTileEvent } from './BlastEffectsCanvas';
 
 interface BlastStageProps {
   // From engine
@@ -48,6 +56,11 @@ interface BlastStageProps {
   onScoreFlyComplete?: (id: string) => void;
   comboFlash?: { id: string; tier: 1 | 2 | 3 } | null;
   onComboFlashComplete?: () => void;
+  // Near-miss shimmer
+  nearMissCells?: Array<{ row: number; col: number }>;
+  // PixiJS effects layer events
+  clearedTilesForEffects?: ClearedTileEvent[];
+  waveCleared?: boolean;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -80,9 +93,29 @@ export function BlastStage({
   onScoreFlyComplete,
   comboFlash = null,
   onComboFlashComplete,
+  nearMissCells = [],
+  clearedTilesForEffects = [],
+  waveCleared = false,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete } = gameState;
+
+  // Measure board container for PixiJS effects canvas
+  const boardContainerRef = useRef<HTMLDivElement>(null);
+  const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = boardContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setBoardSize({ width: entry.contentRect.width, height: entry.contentRect.height });
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const comboFlashTier = comboFlash?.tier ?? 0;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-neo-navy overflow-hidden" data-testid="blast-stage">
@@ -153,26 +186,62 @@ export function BlastStage({
         )}
       </div>
 
-      {/* Chain escalation text */}
-      <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} />
-
       {/* 4. Board */}
-      <div className={cn(
-        'flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0',
-        sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
-        sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' : '',
-      )}>
-        <BlastBoard
-          grid={grid}
-          tileStates={tileStates}
-          gridSize={gridSize}
-          language={language}
-          interactive={interactive && !isComplete}
-          onWordSubmit={onWordSubmit}
-          onPathSubmit={onPathSubmit}
-          onWordChange={onWordChange}
-          sequencerState={sequencerState}
-        />
+      <div
+        className={cn(
+          'flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0',
+          sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
+          sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
+          sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
+        )}
+        style={{
+          transform: sequencerState?.chainLevel
+            ? `scale(${1 + Math.min(sequencerState.chainLevel, 5) * 0.008})`
+            : undefined,
+          transition: 'transform 200ms ease-out',
+        }}
+      >
+        <div ref={boardContainerRef} className="w-full max-w-[360px] md:max-w-[420px] lg:max-w-[min(480px,50vh)]">
+          {boardSize.width > 0 ? (
+            <BlastEffectsCanvas
+              width={boardSize.width}
+              height={boardSize.height || boardSize.width}
+              gridSize={gridSize}
+              clearedTiles={clearedTilesForEffects}
+              chainLevel={sequencerState?.chainLevel ?? 0}
+              comboTier={comboFlashTier}
+              waveCleared={waveCleared}
+            >
+              <BlastBoard
+                grid={grid}
+                tileStates={tileStates}
+                gridSize={gridSize}
+                language={language}
+                interactive={interactive && !isComplete}
+                onWordSubmit={onWordSubmit}
+                onPathSubmit={onPathSubmit}
+                onWordChange={onWordChange}
+                sequencerState={sequencerState}
+                nearMissCells={nearMissCells}
+              />
+            </BlastEffectsCanvas>
+          ) : (
+            <BlastBoard
+              grid={grid}
+              tileStates={tileStates}
+              gridSize={gridSize}
+              language={language}
+              interactive={interactive && !isComplete}
+              onWordSubmit={onWordSubmit}
+              onPathSubmit={onPathSubmit}
+              onWordChange={onWordChange}
+              sequencerState={sequencerState}
+              nearMissCells={nearMissCells}
+            />
+          )}
+        </div>
+        {/* Chain escalation text — scoped within board area */}
+        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} />
       </div>
 
       {/* 5. Dead-end notification */}

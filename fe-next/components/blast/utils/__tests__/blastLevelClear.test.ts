@@ -18,7 +18,6 @@ import {
   buildAutoTriggerSequence,
   type AutoTriggerStep,
   calculateMoveConversionBonus,
-  calculateStarRating,
   MOVE_CONVERSION_SCORE,
   AUTO_TRIGGER_STAGGER_MS,
 } from '../blastLevelClear';
@@ -200,42 +199,6 @@ describe('calculateMoveConversionBonus', () => {
 
   it('handles large values', () => {
     expect(calculateMoveConversionBonus(100)).toBe(MOVE_CONVERSION_SCORE * 100);
-  });
-});
-
-// ─── calculateStarRating ────────────────────────────────────────────────────
-
-describe('calculateStarRating', () => {
-  it('returns 1 star for 0 moves remaining', () => {
-    expect(calculateStarRating(0, 10)).toBe(1);
-  });
-
-  it('returns 1 star for low remaining moves ratio', () => {
-    expect(calculateStarRating(1, 20)).toBe(1);
-  });
-
-  it('returns 2 stars when 25%+ moves remain', () => {
-    expect(calculateStarRating(5, 20)).toBe(2);
-  });
-
-  it('returns 3 stars when 50%+ moves remain', () => {
-    expect(calculateStarRating(10, 20)).toBe(3);
-  });
-
-  it('returns 3 stars when all moves remain', () => {
-    expect(calculateStarRating(20, 20)).toBe(3);
-  });
-
-  it('returns 1 star when totalMoves is 0 (edge case)', () => {
-    expect(calculateStarRating(0, 0)).toBe(1);
-  });
-
-  it('always returns 1, 2, or 3', () => {
-    for (let remaining = 0; remaining <= 30; remaining++) {
-      const result = calculateStarRating(remaining, 30);
-      expect(result).toBeGreaterThanOrEqual(1);
-      expect(result).toBeLessThanOrEqual(3);
-    }
   });
 });
 

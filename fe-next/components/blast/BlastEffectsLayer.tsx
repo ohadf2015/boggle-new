@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { BlastScoreFly, type ScoreFlyEvent } from './BlastScoreFly';
 import { BlastComboFlash } from './BlastComboFlash';
+import { CHAIN_GLOW_COLORS } from './blastColorTokens';
 
 interface BlastEffectsLayerProps {
   scoreFlyEvents: ScoreFlyEvent[];
@@ -15,16 +16,13 @@ interface BlastEffectsLayerProps {
 function getGlowStyle(intensity: number): React.CSSProperties | undefined {
   if (intensity <= 0) return undefined;
   const spread = intensity * 6;
-  let color: string;
-  if (intensity <= 2) {
-    color = `rgba(0, 255, 255, ${0.15 + intensity * 0.1})`;
-  } else if (intensity <= 4) {
-    color = `rgba(255, 230, 0, ${0.2 + (intensity - 2) * 0.1})`;
-  } else {
-    color = `rgba(255, 20, 147, 0.5)`;
-  }
+  // Use CHAIN_GLOW_COLORS tokens — clamp to available levels
+  const level = Math.min(intensity, 3);
+  const baseColor = CHAIN_GLOW_COLORS[level] ?? CHAIN_GLOW_COLORS[3];
+  if (baseColor === 'none') return undefined;
+  const alpha = Math.min(0.15 + intensity * 0.1, 0.6);
   return {
-    boxShadow: `0 0 ${spread}px ${color}, inset 0 0 ${spread / 2}px ${color}`,
+    boxShadow: `0 0 ${spread}px ${baseColor}${Math.round(alpha * 255).toString(16).padStart(2, '0')}, inset 0 0 ${spread / 2}px ${baseColor}${Math.round(alpha * 0.5 * 255).toString(16).padStart(2, '0')}`,
     transition: 'box-shadow 0.3s ease',
   };
 }

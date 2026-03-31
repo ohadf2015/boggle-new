@@ -51,12 +51,12 @@ export default function BlastChainText({ chainLevel, wordLength }: BlastChainTex
     if (!tier) { setVisible(false); return; }
     setVisible(true);
     setKey(k => k + 1);
-    const id = setTimeout(dismiss, 1200);
+    const id = setTimeout(dismiss, 800);
     return () => clearTimeout(id);
   }, [chainLevel, wordLength, tier, dismiss]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
+    <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center">
       <AdaptiveAnimatePresence mode="wait">
         {visible && tier && (
           <AdaptiveMotion.div

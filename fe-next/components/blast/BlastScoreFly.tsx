@@ -37,8 +37,10 @@ export function BlastScoreFly({ flies, onComplete }: BlastScoreFlyProps) {
           className="absolute pointer-events-none z-50 font-neo-display font-black tabular-nums"
           style={{
             color: TIER_COLORS[fly.tier],
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            fontSize: fly.tier === 3 ? 28 : fly.tier === 2 ? 24 : 20,
+            textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 0 12px ' + TIER_COLORS[fly.tier] + '80',
+            fontSize: fly.tier === 3 ? 36 : fly.tier === 2 ? 28 : 22,
+            WebkitTextStroke: '1.5px rgba(0,0,0,0.7)',
+            paintOrder: 'stroke fill',
           }}
           initial={{
             x: fly.startX,

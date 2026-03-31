@@ -17,6 +17,8 @@ export interface TileAnimState {
   column?: number;
   /** Spawn offset for appearing tiles (rows above grid) */
   spawnOffset?: number;
+  /** Random rotation for clearing phase (-12 to 12 degrees) */
+  clearRotate?: number;
 }
 
 export interface SequencerState {
@@ -98,8 +100,12 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
     safeSet(() => ({ phase: 'anticipation', activeTiles: tiles, isAnimating: true, chainLevel: 0 }));
     await wait(ANIM_TIMING.anticipation, timersRef.current);
 
-    // Phase 2: Clearing
-    const clearTiles = tiles.map((t) => ({ ...t, phase: 'clearing' as AnimPhase }));
+    // Phase 2: Clearing (with random rotation per tile)
+    const clearTiles = tiles.map((t) => ({
+      ...t,
+      phase: 'clearing' as AnimPhase,
+      clearRotate: Math.round((Math.random() - 0.5) * 24), // -12 to 12 degrees
+    }));
     safeSet((s) => ({ ...s, phase: 'clearing', activeTiles: clearTiles }));
     const clearDur = ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * clearedTiles.length;
     await wait(clearDur, timersRef.current);

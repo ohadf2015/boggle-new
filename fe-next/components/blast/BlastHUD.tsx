@@ -1,7 +1,44 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { X, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+/** Smoothly lerps a number for display with a CSS transition on scale */
+function useAnimatedScore(target: number) {
+  const [display, setDisplay] = useState(target);
+  const [pulse, setPulse] = useState(false);
+  const prevRef = useRef(target);
+  const rafRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (target === prevRef.current) return;
+    const start = prevRef.current;
+    const delta = target - start;
+    const duration = Math.min(400, Math.abs(delta) * 10);
+    const startTime = performance.now();
+    prevRef.current = target;
+
+    setPulse(true);
+    const pulseTimer = setTimeout(() => setPulse(false), 200);
+
+    function tick(now: number) {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - (1 - t) * (1 - t); // ease-out quad
+      setDisplay(Math.round(start + delta * eased));
+      if (t < 1) rafRef.current = requestAnimationFrame(tick);
+    }
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(pulseTimer);
+    };
+  }, [target]);
+
+  return { display, pulse };
+}
 
 interface BlastHUDProps {
   score: number;
@@ -36,9 +73,12 @@ export function BlastHUD({
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
+  const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(score);
 
   const moveColorClass = movesRemaining <= 2
-    ? 'text-neo-red animate-pulse'
+    ? 'text-neo-red blast-heartbeat'
+    : movesRemaining <= 3
+    ? 'text-neo-red'
     : movesRemaining <= 5
     ? 'text-neo-yellow'
     : 'text-neo-white';
@@ -56,8 +96,13 @@ export function BlastHUD({
         >
           W{waveNumber}
         </span>
-        <span className="text-lg font-black bg-gradient-to-r from-neo-lime to-lime-300 bg-clip-text text-transparent tabular-nums truncate">
-          {score.toLocaleString()}
+        <span
+          className={cn(
+            'text-lg font-black bg-gradient-to-r from-neo-lime to-lime-300 bg-clip-text text-transparent tabular-nums truncate transition-transform duration-150',
+            scorePulse && 'scale-[1.15]',
+          )}
+        >
+          {animatedScore.toLocaleString()}
         </span>
         {comboLevel >= 2 && (
           <span className="text-[10px] font-bold text-neo-cyan tabular-nums">

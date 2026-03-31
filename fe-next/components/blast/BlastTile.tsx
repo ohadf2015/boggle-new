@@ -19,6 +19,8 @@ export interface BlastTileProps {
   clearRotate?: number;
   /** Spawn offset in pixels for appearing phase */
   spawnOffset?: number;
+  /** Near-miss shimmer — tile was adjacent to path and could have formed a combo */
+  isNearMiss?: boolean;
   onClick?: () => void;
 }
 
@@ -100,7 +102,7 @@ function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
 
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
-  fallOffset, clearRotate, spawnOffset, onClick,
+  fallOffset, clearRotate, spawnOffset, isNearMiss, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
 
@@ -123,9 +125,11 @@ export const BlastTile = memo(function BlastTile({
         'relative aspect-square flex items-center justify-center',
         'border-neo rounded-lg shadow-hard-sm',
         'font-neo-display text-[clamp(1rem,4cqw,1.75rem)] font-bold uppercase',
-        'transition-transform duration-150 select-none',
+        'transition-transform duration-100 select-none active:scale-[0.92] active:brightness-110',
         visual.bg,
         visual.text ?? 'text-neo-navy',
+        type !== 'standard' ? `blast-tile-${type}` : '',
+        isNearMiss ? 'ring-2 ring-yellow-400/80 animate-pulse shadow-[0_0_12px_rgba(255,215,0,0.6)]' : '',
         getPhaseClasses(effectivePhase, isSelected),
       ].filter(Boolean).join(' ')}
       style={{
@@ -160,6 +164,7 @@ export const BlastTile = memo(function BlastTile({
   prev.fallOffset === next.fallOffset &&
   prev.clearRotate === next.clearRotate &&
   prev.spawnOffset === next.spawnOffset &&
+  prev.isNearMiss === next.isNearMiss &&
   prev.onClick === next.onClick
 );
 
