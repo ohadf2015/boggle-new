@@ -19,6 +19,7 @@ import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
+import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
@@ -491,6 +492,55 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             },
         },
+        // FAQPage schema on homepage — enables expandable FAQ rich snippets in SERPs
+        // Targets high-impression 0%-CTR queries from Bing data
+        {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            '@id': `https://www.lexiclash.live${localePath}#faq`,
+            mainEntity: [
+                {
+                    '@type': 'Question',
+                    name: languageCode === 'he' ? 'האם אפשר לשחק בוגל אונליין בחינם?' : 'Can I play boggle online free with no download?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: languageCode === 'he'
+                            ? 'כן! לקסיקלאש מאפשר לשחק בוגל אונליין בחינם ללא הורדה וללא הרשמה. פשוט גלשו ל-lexiclash.live והתחילו לשחק מיד בכל מכשיר.'
+                            : 'Yes! LexiClash lets you play boggle online completely free with no download and no signup. Just visit lexiclash.live and start playing instantly on any device.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: languageCode === 'he' ? 'האם זה כמו Words With Friends?' : 'Is this like Words With Friends but multiplayer?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: languageCode === 'he'
+                            ? 'לקסיקלאש שונה מ-Words With Friends כי כולם משחקים בו-זמנית בזמן אמת במקום בתורות. 2-20+ שחקנים יכולים להתחרות על אותו לוח. מהיר יותר, מרגש יותר ומושלם לקבוצות.'
+                            : 'LexiClash is different from Words With Friends because everyone plays simultaneously in real-time instead of taking turns. 2-20+ players can compete on the same grid. Faster, more exciting, and perfect for groups.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: languageCode === 'he' ? 'האם המשחק חינם?' : 'Is LexiClash free to play?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: languageCode === 'he'
+                            ? 'כן, לקסיקלאש חינם לחלוטין. ללא מנוי, ללא רכישות בתוך האפליקציה. פשוט גלשו ל-lexiclash.live והתחילו לשחק.'
+                            : 'Yes, LexiClash is completely free. No subscription, no in-app purchases. Just visit lexiclash.live and start playing.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: languageCode === 'he' ? 'איך משחקים עם חברים?' : 'How do I play word games with friends online?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: languageCode === 'he'
+                            ? 'צרו חדר, שתפו את הלינק עם חברים דרך וואטסאפ, דיסקורד או כל מסנג\'ר. חברים לוחצים על הלינק ומצטרפים מיד — ללא הרשמה או הורדה. עד 20+ שחקנים בחדר אחד.'
+                            : 'Create a room, share the link with friends via WhatsApp, Discord, or any messenger. Friends click the link and join instantly — no signup or download needed. Up to 20+ players per room.',
+                    },
+                },
+            ],
+        },
     ];
 
     return (
@@ -590,6 +640,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />
+                    <ChurnSignalTracker />
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
                 </ConditionalProviders>

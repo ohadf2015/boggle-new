@@ -173,6 +173,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     { locale: 'en', path: '/lexiclash-vs-wordle', img: 'en' },
     { locale: 'en', path: '/lexiclash-vs-scrabble', img: 'en' },
     { locale: 'en', path: '/best-online-word-games', img: 'en' },
+    { locale: 'en', path: '/words-with-friends-alternative', img: 'en' },
     { locale: 'he', path: '/lexiclash-neged-wordle', img: 'he' },
     { locale: 'es', path: '/lexiclash-contra-wordle', img: 'es' },
   ] as const;
