@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
@@ -68,9 +69,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
 
+  const hasMarkedQuestRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
     requestMidgameAd();
+    if (!hasMarkedQuestRef.current) {
+      markModePlayedLogic('daily');
+      hasMarkedQuestRef.current = true;
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const {

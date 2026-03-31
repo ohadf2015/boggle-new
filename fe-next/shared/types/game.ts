@@ -277,6 +277,8 @@ export type LetterFeedback = 'correct' | 'present' | 'absent';
 export interface WordHuntModeState {
   targetWord: string;
   targetWordLength: number;
+  /** Semantic category of the target word (e.g. 'animals'), or null if uncategorized */
+  targetCategory?: string | null;
   playerLives: Record<string, number>;
   eliminatedPlayers: string[];
   targetFoundBy: string | null;

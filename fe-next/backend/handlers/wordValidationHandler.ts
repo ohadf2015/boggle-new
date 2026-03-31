@@ -16,7 +16,7 @@ import {
   removePeerRejectedWordScore,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
@@ -203,6 +203,17 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     comboLevel: safeComboLevel,
     // Merged combo sync (Fix 2): combo type embedded in playerFoundWord instead of separate event
     ...(comboType ? { comboSync: { comboType, username } } : {}),
+  });
+
+  // Broadcast opponent word feed to all OTHER players (not the word finder)
+  // Only reveals word length/first/last letter, not the full word
+  broadcastToRoomExceptSender(socket, getGameRoom(gameCode), 'opponentWordFound', {
+    playerId: username,
+    playerName: username,
+    wordLength: normalizedWord.length,
+    firstLetter: normalizedWord[0]?.toUpperCase() ?? '',
+    lastLetter: normalizedWord[normalizedWord.length - 1]?.toUpperCase() ?? '',
+    score: wordScore + blastTileBonus,
   });
 
   // Check achievements

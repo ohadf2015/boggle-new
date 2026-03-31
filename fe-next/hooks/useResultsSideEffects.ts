@@ -30,6 +30,8 @@ import { syncCoinsToDatabase } from '@/lib/supabase';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import type { WordObject } from '@/components/results/types';
+import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
+import { useMpWinStreak, type MpMode } from '@/hooks/useMpWinStreak';
 
 // ==============================================
 // TYPES
@@ -61,6 +63,8 @@ export interface UseResultsSideEffectsConfig {
   achievements?: any[];
   /** Whether word feedback modal is showing */
   showWordFeedback: boolean;
+  /** Game mode for daily quest tracking ('classic' | 'wordHunt') */
+  mpGameMode?: 'classic' | 'wordHunt';
   /** Username normalization function */
   normalizeUsername: (name: string | undefined | null) => string;
 }
@@ -139,6 +143,7 @@ export function useResultsSideEffects({
   achievements,
   showWordFeedback,
   normalizeUsername,
+  mpGameMode,
 }: UseResultsSideEffectsConfig): UseResultsSideEffectsReturn {
   // ==============================================
   // AUTH & CONTEXT
@@ -148,6 +153,7 @@ export function useResultsSideEffects({
   const { refreshCoins } = useCoinContext();
   const { currentStreak, bestStreak, lastWinDate, recordWin } = useWinStreak();
   const { saveCognitiveScore } = useSaveCognitiveScore();
+  const mpWinStreak = useMpWinStreak();
 
   // ==============================================
   // STATE
@@ -352,8 +358,29 @@ export function useResultsSideEffects({
       });
     }
 
+    // Track daily quest mode completion
+    if (mpGameMode === 'wordHunt') {
+      markModePlayedLogic('wordHuntMp');
+    } else if (mpGameMode === 'classic') {
+      markModePlayedLogic('classicMp');
+    }
+
+    // Track MP win streak
+    if (gameCode && mpGameMode) {
+      const mpMode: MpMode | null =
+        mpGameMode === 'wordHunt' ? 'wordHunt' :
+        mpGameMode === 'classic' ? 'classic' : null;
+      if (mpMode) {
+        if (isCurrentUserWinner) {
+          mpWinStreak.recordWin(mpMode);
+        } else {
+          mpWinStreak.recordLoss(mpMode);
+        }
+      }
+    }
+
     hasTrackedGameRef.current = true;
-  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin]);
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin, mpGameMode]);
 
   // ==============================================
   // EFFECT 5: Add Game to History
