@@ -17,6 +17,7 @@ import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeC
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
+import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
 import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 
 // ==================== Animation Variants ====================
@@ -285,6 +286,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </motion.button>
             </motion.section>
           )}
+
+          {/* CrazyGames Friends — only shown on platform */}
+          <CrazyGamesFriendsStrip />
 
           {/* Open Arenas Section */}
           <motion.section
