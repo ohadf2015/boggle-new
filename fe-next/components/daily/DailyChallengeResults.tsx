@@ -18,6 +18,8 @@ import {
   type DailyStreak,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
+import { DailyRewardClaim } from './DailyRewardClaim';
+import { getRewardCoins } from '@/lib/dailyRewards';
 import { useAuth } from '@/contexts/AuthContext';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
@@ -235,6 +237,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
           ]}
         />
+
+        {/* Daily Reward Claim */}
+        {isNewCompletion && streak && (
+          <DailyRewardClaim
+            coinsEarned={getRewardCoins(streak.currentStreak)}
+            currentStreakDay={streak.currentStreak}
+            t={t}
+          />
+        )}
 
         {/* Share Section - Streamlined */}
         <motion.div

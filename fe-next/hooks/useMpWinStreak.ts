@@ -5,7 +5,9 @@
  * Separate from the daily play streak in useWinStreak.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 export type MpMode = 'classic' | 'wordHunt';
 
@@ -54,13 +56,59 @@ function saveState(state: MpWinStreakState): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+/** Persist current state to Supabase profiles (fire-and-forget) */
+function syncToSupabase(userId: string, state: MpWinStreakState): void {
+  if (!supabase) return;
+  supabase
+    .from('profiles')
+    .update({
+      mp_win_streak_classic: state.classic.current,
+      mp_win_streak_wordhunt: state.wordHunt.current,
+      mp_best_streak_classic: state.classic.best,
+      mp_best_streak_wordhunt: state.wordHunt.best,
+    })
+    .eq('id', userId)
+    .then(() => { /* best-effort */ })
+    .catch(() => { /* best-effort */ });
+}
+
 export function useMpWinStreak() {
   const [state, setState] = useState<MpWinStreakState>(loadState);
+  const { user, isAuthenticated } = useAuth();
+  const hasSyncedRef = useRef(false);
 
   // Reload from localStorage on mount (for SSR safety)
   useEffect(() => {
     setState(loadState());
   }, []);
+
+  // Fetch from Supabase on mount when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || hasSyncedRef.current || !supabase) return;
+    hasSyncedRef.current = true;
+
+    supabase
+      .from('profiles')
+      .select('mp_win_streak_classic, mp_win_streak_wordhunt, mp_best_streak_classic, mp_best_streak_wordhunt')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data) return; // fallback to localStorage
+        const serverState: MpWinStreakState = {
+          classic: {
+            current: data.mp_win_streak_classic ?? 0,
+            best: data.mp_best_streak_classic ?? 0,
+          },
+          wordHunt: {
+            current: data.mp_win_streak_wordhunt ?? 0,
+            best: data.mp_best_streak_wordhunt ?? 0,
+          },
+        };
+        saveState(serverState);
+        setState(serverState);
+      })
+      .catch(() => { /* fallback to localStorage */ });
+  }, [isAuthenticated, user?.id]);
 
   const recordWin = useCallback((mode: MpMode): RecordWinResult => {
     // Compute from latest localStorage to avoid stale closure
@@ -72,15 +120,17 @@ export function useMpWinStreak() {
     const next = { ...current, [mode]: { current: newCurrent, best: newBest } };
     saveState(next);
     setState(next);
+    if (isAuthenticated && user?.id) syncToSupabase(user.id, next);
     return { newStreak: newCurrent, milestone };
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   const recordLoss = useCallback((mode: MpMode): void => {
     const current = loadState();
     const next = { ...current, [mode]: { ...current[mode], current: 0 } };
     saveState(next);
     setState(next);
-  }, []);
+    if (isAuthenticated && user?.id) syncToSupabase(user.id, next);
+  }, [isAuthenticated, user?.id]);
 
   const getStreak = useCallback((mode: MpMode): ModeStreak => {
     return state[mode] ?? DEFAULT_MODE;

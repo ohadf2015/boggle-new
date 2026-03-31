@@ -37,6 +37,8 @@ import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { OpponentWordFeed } from '@/components/multiplayer/OpponentWordFeed';
+import { useOpponentWordFeed } from '@/hooks/useOpponentWordFeed';
 import {
   useGameMode,
   useBlastTileOverlay,
@@ -241,6 +243,9 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   const wordHuntPlayerLives = useWordHuntPlayerLives();
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
 
+  // Opponent word feed for classic mode
+  const { feedItems: opponentFeedItems } = useOpponentWordFeed({ socket, currentPlayerName: username });
+
   // Effective grid (player may have shufflingGrid fallback)
   const effectiveGrid = letterGrid || shufflingGrid || null;
 
@@ -343,6 +348,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       )}
     >
       <div className="relative flex-1 flex flex-col min-h-0">
+        <OpponentWordFeed feedItems={opponentFeedItems} t={t} />
         <InGameScreen
           // Core identity
           username={username}

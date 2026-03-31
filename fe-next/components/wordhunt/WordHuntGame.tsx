@@ -7,6 +7,8 @@ import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator
 import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
 import { WordHuntGameLayout } from './WordHuntGameLayout';
 import { WordHuntDangerToast } from './WordHuntDangerToast';
+import { LowHPOverlay } from './LowHPOverlay';
+import { WordHuntCategoryHint } from './WordHuntCategoryHint';
 import { useWordHuntDangerAlerts } from '@/hooks/useWordHuntDangerAlerts';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
@@ -158,6 +160,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   return (
     <>
+    <LowHPOverlay hp={bridge.lifePoints} />
+    {/* TODO: targetCategory not yet in bridge/store — pass null until backend wires it */}
+    <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={null} />
     <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
     <WordHuntGameLayout
       // Header (no timer)

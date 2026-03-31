@@ -14,6 +14,7 @@ import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -282,6 +283,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
+      <div className="px-4 pt-3">
+        <SeasonBanner />
+        {/* TODO: Wire "Ranked Match" button + MatchmakingOverlay once player ELO is available in lobby context */}
+      </div>
       <RoomListView
         activeRooms={activeRooms}
         roomsLoading={roomsLoading}

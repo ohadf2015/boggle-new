@@ -12,6 +12,8 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
+import { DailyRewardPreview } from './DailyRewardPreview';
+import { StreakFreezeIndicator } from './StreakFreezeIndicator';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
 import { StreakCounter } from './landing/StreakCounter';
@@ -58,6 +60,7 @@ export function DailyChallengeLanding({
     wordHunt: true,
   });
   const [streak, setStreak] = useState(0);
+  const [freezeCount, setFreezeCount] = useState(0);
 
   // Word Hunt status check - synchronous local storage check
   const checkWordHunt = () => {
@@ -88,6 +91,7 @@ export function DailyChallengeLanding({
         if (res.ok) {
           const data = await res.json();
           setStreak(data.streak || 0);
+          setFreezeCount(data.freezeCount || 0);
         }
       }
     } catch {
@@ -242,8 +246,10 @@ export function DailyChallengeLanding({
             <div className="flex-1 h-px bg-slate-700" />
           </motion.div>
 
-          {/* Streak counter */}
+          {/* Streak counter + freeze */}
           <StreakCounter streak={streak} />
+          <StreakFreezeIndicator freezeCount={freezeCount} t={t} className="mt-1" />
+          <DailyRewardPreview currentStreakDay={streak} t={t} />
         </>
       ) : (
         <>
@@ -266,8 +272,10 @@ export function DailyChallengeLanding({
             delay={0.15}
           />
 
-          {/* Streak counter */}
+          {/* Streak counter + freeze */}
           <StreakCounter streak={streak} />
+          <StreakFreezeIndicator freezeCount={freezeCount} t={t} className="mt-1" />
+          <DailyRewardPreview currentStreakDay={streak} t={t} />
         </>
       )}
 

@@ -35,6 +35,7 @@ import {
   ProfileCollection,
   ProfileBackButtons,
 } from '@/components/profile';
+import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
 
 interface GameSession {
   gameCode?: string;
@@ -338,6 +339,13 @@ export default function ProfilePageClient(): React.JSX.Element {
               >
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-4"><ReferralCard /></motion.div>}
                 <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.37 }} className="mt-4">
+                  <CosmeticCollection
+                    rankTier={profile?.rank_tier || 'Bronze'}
+                    streakDays={profile?.streak_days || 0}
+                    coins={profile?.total_coins || 0}
+                  />
+                </motion.div>
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><EmailPreferences isDarkMode={isDarkMode} /></motion.div>}
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
               </motion.div>
@@ -398,6 +406,11 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 7. Collection */}
           <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} delay={0.35} />
+          <CosmeticCollection
+            rankTier={profile?.rank_tier || 'Bronze'}
+            streakDays={profile?.streak_days || 0}
+            coins={profile?.total_coins || 0}
+          />
 
           {/* 8. Settings & Navigation */}
           {user && (
