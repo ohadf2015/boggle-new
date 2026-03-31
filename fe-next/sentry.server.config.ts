@@ -41,7 +41,16 @@ Sentry.init({
     /\[SUPABASE\].*Failed to update profile stats/i,
     // Supabase deadlock retries — handled by retryOnDeadlock helper, auto-recovers
     /\[SUPABASE\].*Deadlock on.*retry/i,
+    // Supabase leaderboard upsert errors — retried internally, non-critical (JAVASCRIPT-NEXTJS-XT)
+    /\[SUPABASE\].*updateLeaderboardEntry error/i,
     // Word Hunt player count transient query failure — non-critical stat
     /\[API\].*Word Hunt total players count error/i,
+    // AI word validation retries and failures — handled gracefully with fallback
+    // These are transient Vertex AI errors during word validation (JAVASCRIPT-NEXTJS-QC + ~80 retry issues)
+    /\[AI_SERVICE\].*validateWord/i,
+    /\[AI_SERVICE\].*validateAndSaveWord/i,
+    /\[AI_SERVICE\].*AI validation failed/i,
+    /\[AI_SERVICE\].*attempt.*failed.*retrying/i,
+    /\[AI_SERVICE\].*failed after.*attempts/i,
   ],
 });

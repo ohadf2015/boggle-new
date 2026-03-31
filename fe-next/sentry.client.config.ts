@@ -158,6 +158,19 @@ Sentry.init({
     /router state header was sent but could not be parsed/i,
     // Progression quest-progress 429 — rate limited, non-critical background save
     /\[ProgressionContext\].*quest-progress failed.*429/i,
+    // Expected game behavior — Word Hunt elimination, host kicking, game lifecycle
+    "You have been eliminated",
+    "You have been kicked from this room",
+    "Game is not in progress",
+    "Game not found",
+    // Matter.js delta warning — physics engine perf hint, not a bug (JAVASCRIPT-NEXTJS-Y1)
+    /Matter\.Engine\.update.*delta argument/i,
+    // CrazyGames SDK errors — expected when not running on CrazyGames platform (JAVASCRIPT-NEXTJS-XV)
+    /CrazySDK is not initialized/i,
+    /Failed to check adblock/i,
+    /Error checking CrazyGames user/i,
+    /Failed to load CrazyGames friends/i,
+    /Failed to get Xsolla token/i,
   ],
 
   denyUrls: [

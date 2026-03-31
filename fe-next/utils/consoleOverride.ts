@@ -34,6 +34,10 @@ const IGNORED_ERROR_PATTERNS = [
   /Game code already in use/i,
   /already in use/i,
   /Game not found/i,
+  // Expected game behavior — Word Hunt elimination, host kicking, game lifecycle
+  /You have been eliminated/i,
+  /You have been kicked from this room/i,
+  /Game is not in progress/i,
   // Speech synthesis - non-critical TTS feature failure on some devices (JAVASCRIPT-NEXTJS-G2)
   /Speech synthesis error/i,
   // Share API failures - expected when Web Share API unavailable (JAVASCRIPT-NEXTJS-1Y)
@@ -69,6 +73,14 @@ const IGNORED_ERROR_PATTERNS = [
   /\[HintGenerator\].*Request timed out/i,
   // Adventure state 404 - transient cold start, uses initial state fallback (JAVASCRIPT-NEXTJS-W9)
   /\[ProgressionContext\].*\/api\/adventure\/state returned 404/i,
+  // Matter.js delta warning — physics engine perf hint, not a bug (JAVASCRIPT-NEXTJS-Y1)
+  /Matter\.Engine\.update.*delta argument/i,
+  // CrazyGames SDK errors — expected when not running on CrazyGames platform (JAVASCRIPT-NEXTJS-XV)
+  /CrazySDK is not initialized/i,
+  /Failed to check adblock/i,
+  /Error checking CrazyGames user/i,
+  /Failed to load CrazyGames friends/i,
+  /Failed to get Xsolla token/i,
 ] as const;
 
 // Store original console methods

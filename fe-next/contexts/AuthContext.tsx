@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
+import posthog from 'posthog-js';
 
 // Import types and hooks from auth module
 import {
@@ -92,14 +93,28 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     needsProfileCustomization,
   } = useComputedAuthValues(user, profile, rankedProgress);
 
-  // Sync user context with Sentry for error tracking
+  // Sync user context with Sentry and PostHog
   useEffect(() => {
     if (user && profile) {
       setSentryUser(user, profile);
+      posthog.identify(user.id, {
+        display_name: profile.display_name,
+        is_admin: isAdmin,
+        is_teacher: isTeacher,
+      });
+      posthog.capture('user_identified', {
+        user_id: user.id,
+        display_name: profile.display_name,
+        is_guest: false,
+        is_admin: isAdmin,
+        is_teacher: isTeacher,
+      });
     } else {
       clearSentryUser();
+      posthog.reset();
+      posthog.capture('user_logged_out');
     }
-  }, [user, profile]);
+  }, [user, profile, isAdmin, isTeacher]);
 
   // Memoize the context value to prevent unnecessary re-renders of all consumers
   const value: AuthContextValue = useMemo(

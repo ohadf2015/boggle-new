@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 
 /**
  * Xsolla webhook verification endpoint.
@@ -87,6 +88,11 @@ export async function POST(request: NextRequest) {
         const transaction = payload.transaction as Record<string, unknown> | undefined;
         const orderId = transaction?.id;
         console.log(`[Xsolla] Payment received: order=${orderId}`);
+        getPostHogServer()?.capture({
+          distinctId: String(orderId),
+          event: 'purchase_completed',
+          properties: { order_id: String(orderId), provider: 'xsolla' },
+        });
         // TODO: Grant purchased item to user via Supabase
         // TODO: Call CrazyGames trackOrder() analytics
         break;
@@ -96,6 +102,11 @@ export async function POST(request: NextRequest) {
         const transaction = payload.transaction as Record<string, unknown> | undefined;
         const orderId = transaction?.id;
         console.log(`[Xsolla] Refund received: order=${orderId}`);
+        getPostHogServer()?.capture({
+          distinctId: String(orderId),
+          event: 'purchase_refunded',
+          properties: { order_id: String(orderId), provider: 'xsolla' },
+        });
         // TODO: Revoke purchased item
         break;
       }
