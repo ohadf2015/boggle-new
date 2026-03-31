@@ -95,7 +95,7 @@ export function useSeason(): UseSeasonReturn {
           .eq('id', user!.id)
           .then(() => {}, () => {});
       }, () => {});
-  }, [isAuthenticated, user?.id, currentSeason.id]);
+  }, [isAuthenticated, user, currentSeason.id]);
 
   const updatePeakTier = useCallback((elo: number) => {
     const tier = getRankTier(elo);

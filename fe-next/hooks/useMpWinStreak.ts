@@ -120,7 +120,7 @@ export function useMpWinStreak() {
     setState(next);
     if (isAuthenticated && user?.id) syncToSupabase(user.id, next);
     return { newStreak: newCurrent, milestone };
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user]);
 
   const recordLoss = useCallback((mode: MpMode): void => {
     const current = loadState();
@@ -128,7 +128,7 @@ export function useMpWinStreak() {
     saveState(next);
     setState(next);
     if (isAuthenticated && user?.id) syncToSupabase(user.id, next);
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user]);
 
   const getStreak = useCallback((mode: MpMode): ModeStreak => {
     return state[mode] ?? DEFAULT_MODE;

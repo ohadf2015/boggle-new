@@ -5,12 +5,12 @@ import { DailyRewardPreview } from '../DailyRewardPreview';
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    span: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
+    div: React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
+      return <div ref={ref} {...props}>{children}</div>;
+    }),
+    span: React.forwardRef(function MockMotionSpan({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) {
+      return <span ref={ref} {...props}>{children}</span>;
+    }),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));

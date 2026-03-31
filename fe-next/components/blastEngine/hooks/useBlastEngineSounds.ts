@@ -84,5 +84,5 @@ export function useBlastEngineSounds(events: BlastSoundEvents): void {
     if (events.gameOver) {
       sfx.playComboBreakSound?.(events.comboLevel);
     }
-  }, [events.gameOver, sfx]);
+  }, [events.gameOver, events.comboLevel, sfx]);
 }

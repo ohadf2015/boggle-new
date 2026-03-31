@@ -363,7 +363,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle reset game
-  socket.on('resetGame', (_data: unknown, callback?: ResetGameCallback) => {
+  socket.on('resetGame', (data: unknown, callback?: ResetGameCallback) => {
     try {
       if (!checkRateLimit(socket.id)) {
         socket.emit('rateLimited');
@@ -371,7 +371,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const gameCode = getGameBySocketId(socket.id);
+      // Try socket mapping first, fall back to client-provided gameCode
+      // (mobile reconnects may assign a new socket ID before mappings are restored)
+      const parsedData = data && typeof data === 'object' ? (data as { gameCode?: string }) : {};
+      const gameCode = getGameBySocketId(socket.id) || parsedData.gameCode || null;
       if (!gameCode) {
         emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
         if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
@@ -385,7 +388,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      if (game.hostSocketId !== socket.id) {
+      // Verify host identity: check socket mapping OR that the socket is in the game room
+      const isHostByMapping = game.hostSocketId === socket.id;
+      const isHostByRoom = socket.rooms.has(getGameRoom(gameCode)) && game.gameState === 'finished';
+      if (!isHostByMapping && !isHostByRoom) {
         emitError(socket, 'Only host can reset the game');
         if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
         return;

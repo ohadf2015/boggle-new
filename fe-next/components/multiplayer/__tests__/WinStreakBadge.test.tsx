@@ -6,12 +6,12 @@ import { WinStreakBadge } from '../WinStreakBadge';
 // Mock AdaptiveMotion to render plain divs
 vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
-    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
+    span: React.forwardRef(function MockMotionSpan({ children, ...props }: any, ref: any) {
+      return <span ref={ref} {...props}>{children}</span>;
+    }),
+    div: React.forwardRef(function MockMotionDiv({ children, ...props }: any, ref: any) {
+      return <div ref={ref} {...props}>{children}</div>;
+    }),
   },
 }));
 

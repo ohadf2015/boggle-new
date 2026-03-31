@@ -297,7 +297,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     startGameLockRef.current = true;
     setTimeout(() => { startGameLockRef.current = false; }, 3000);
 
-    socket?.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+    socket?.emit('resetGame', { gameCode }, (response: { success: boolean; error?: string; gameState?: string }) => {
       if (response?.success) {
         setFinalScores(null);
         setGameType('regular');
@@ -340,7 +340,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           icon: TOAST_ICONS.xCircle,
           duration: 3000,
         });
-        logger.error('[HOST] Game reset failed:', response?.error);
+        logger.warn('[HOST] Game reset failed:', response?.error);
       }
     });
   }, [

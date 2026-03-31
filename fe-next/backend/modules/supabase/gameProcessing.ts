@@ -175,7 +175,7 @@ async function processPlayerResult(
       const secondaryResults = await Promise.all(secondaryOps);
 
       if (secondaryResults[0]?.error) {
-        logger.error('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, secondaryResults[0].error.message);
+        logger.warn('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, secondaryResults[0].error.message);
       }
       if (secondaryResults[1]?.error) {
         logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, secondaryResults[1].error.message);

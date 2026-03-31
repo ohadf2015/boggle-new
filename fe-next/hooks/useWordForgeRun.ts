@@ -91,43 +91,16 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
   const [lastWordScore, setLastWordScore] = useState<WordScoreResult | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const comboRef = useRef(0);
-  const lastWordTimeRef = useRef(Date.now());
-  const roundStartTimeRef = useRef(Date.now());
+  const lastWordTimeRef = useRef(0);
+  const roundStartTimeRef = useRef(0);
 
-  // ─── Timer ─────────────────────────────────────────────
-
-  const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  const startTimer = useCallback(() => {
-    stopTimer();
-    timerRef.current = setInterval(() => {
-      setState(prev => {
-        if (prev.phase !== 'playing') return prev;
-        const next = prev.timeRemaining - 1;
-        if (next <= 0) {
-          // Time's up — stop timer FIRST, then resolve round
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-          return handleRoundEnd(prev);
-        }
-        return { ...prev, timeRemaining: next };
-      });
-    }, 1000);
-  }, [stopTimer]);
-
-  // Cleanup timer on unmount
-  useEffect(() => stopTimer, [stopTimer]);
+  // Ref for saveRunResults so handleRoundEnd can call it without forward-reference
+  const saveRunResultsRef = useRef<(finalState: WordForgeRunState) => void>(() => {});
 
   // ─── Round End Logic ───────────────────────────────────
+  // Declared before startTimer to avoid forward-reference lint error
 
-  function handleRoundEnd(prev: WordForgeRunState): WordForgeRunState {
+  const handleRoundEnd = useCallback((prev: WordForgeRunState): WordForgeRunState => {
     const passed = prev.roundScore >= prev.roundTarget;
 
     const roundResult = {
@@ -166,7 +139,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
         roundHistory: [...prev.roundHistory, roundResult],
       };
       // Save async (don't block state update)
-      setTimeout(() => saveRunResults(finalState), 0);
+      setTimeout(() => saveRunResultsRef.current(finalState), 0);
       return finalState;
     }
 
@@ -178,7 +151,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
         timeRemaining: 0,
         roundHistory: [...prev.roundHistory, roundResult],
       };
-      setTimeout(() => saveRunResults(finalState), 0);
+      setTimeout(() => saveRunResultsRef.current(finalState), 0);
       return finalState;
     }
 
@@ -189,7 +162,38 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
       timeRemaining: 0,
       roundHistory: [...prev.roundHistory, roundResult],
     };
-  }
+  }, []);
+
+  // ─── Timer ─────────────────────────────────────────────
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const startTimer = useCallback(() => {
+    stopTimer();
+    timerRef.current = setInterval(() => {
+      setState(prev => {
+        if (prev.phase !== 'playing') return prev;
+        const next = prev.timeRemaining - 1;
+        if (next <= 0) {
+          // Time's up — stop timer FIRST, then resolve round
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          return handleRoundEnd(prev);
+        }
+        return { ...prev, timeRemaining: next };
+      });
+    }, 1000);
+  }, [stopTimer, handleRoundEnd]);
+
+  // Cleanup timer on unmount
+  useEffect(() => stopTimer, [stopTimer]);
 
   // ─── Start Run ─────────────────────────────────────────
 
@@ -353,7 +357,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
 
       return updated;
     });
-  }, []);
+  }, [handleRoundEnd]);
 
   // ─── Continue from Round Result to Rune Pick ───────────
 
@@ -371,47 +375,10 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
     });
   }, [progress]);
 
-  // ─── Pick Rune ─────────────────────────────────────────
-
-  const pickRune = useCallback((runeDef: RuneCardDef, replaceIndex?: number) => {
-    stopTimer();
-    setState(prev => {
-      const newRune: RuneCard = {
-        def: runeDef,
-        instanceId: `run-${Date.now()}-${runeDef.id}`,
-      };
-
-      let newRunes: RuneCard[];
-      if (replaceIndex !== undefined && replaceIndex >= 0 && replaceIndex < prev.runes.length) {
-        // Replace existing rune
-        newRunes = [...prev.runes];
-        newRunes[replaceIndex] = newRune;
-      } else if (prev.runes.length < prev.maxRuneSlots) {
-        // Add to empty slot
-        newRunes = [...prev.runes, newRune];
-      } else {
-        // Slots full and no replacement specified — shouldn't happen in UI
-        return prev;
-      }
-
-      return advanceToNextRound({
-        ...prev,
-        runes: newRunes,
-        runeOffering: null,
-      });
-    });
-  }, [stopTimer]);
-
-  // ─── Skip Rune ─────────────────────────────────────────
-
-  const skipRune = useCallback(() => {
-    stopTimer();
-    setState(prev => advanceToNextRound({ ...prev, runeOffering: null, skipBonus: 5 }));
-  }, [stopTimer]);
-
   // ─── Advance to Next Round ─────────────────────────────
+  // Declared before pickRune/skipRune to avoid forward-reference lint error
 
-  function advanceToNextRound(prev: WordForgeRunState): WordForgeRunState {
+  const advanceToNextRound = useCallback((prev: WordForgeRunState): WordForgeRunState => {
     const nextRound = prev.round + 1;
     const boss = isBossRound(nextRound);
 
@@ -449,10 +416,49 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
       timerDuration: 60,
       timeRemaining: 60,
     };
-  }
+  }, []);
+
+  // ─── Pick Rune ─────────────────────────────────────────
+
+  const pickRune = useCallback((runeDef: RuneCardDef, replaceIndex?: number) => {
+    stopTimer();
+    setState(prev => {
+      const newRune: RuneCard = {
+        def: runeDef,
+        instanceId: `run-${Date.now()}-${runeDef.id}`,
+      };
+
+      let newRunes: RuneCard[];
+      if (replaceIndex !== undefined && replaceIndex >= 0 && replaceIndex < prev.runes.length) {
+        // Replace existing rune
+        newRunes = [...prev.runes];
+        newRunes[replaceIndex] = newRune;
+      } else if (prev.runes.length < prev.maxRuneSlots) {
+        // Add to empty slot
+        newRunes = [...prev.runes, newRune];
+      } else {
+        // Slots full and no replacement specified — shouldn't happen in UI
+        return prev;
+      }
+
+      return advanceToNextRound({
+        ...prev,
+        runes: newRunes,
+        runeOffering: null,
+      });
+    });
+  }, [stopTimer, advanceToNextRound]);
+
+  // ─── Skip Rune ─────────────────────────────────────────
+
+  const skipRune = useCallback(() => {
+    stopTimer();
+    setState(prev => advanceToNextRound({ ...prev, runeOffering: null, skipBonus: 5 }));
+  }, [stopTimer, advanceToNextRound]);
 
   // ─── Save Run Results ───────────────────────────────────
 
+  // Wire ref so handleRoundEnd can call saveRunResults without forward-reference
   const saveRunResults = useCallback(async (finalState: WordForgeRunState) => {
     const won = finalState.round >= finalState.maxRounds &&
       finalState.roundHistory.every(r => r.passed);
@@ -489,6 +495,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
       // Silent fail — run results are nice-to-have, not critical
     }
   }, []);
+  saveRunResultsRef.current = saveRunResults;
 
   // ─── Exit to Menu ──────────────────────────────────────
 

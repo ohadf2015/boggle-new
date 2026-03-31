@@ -4,15 +4,15 @@ import { DailyRewardClaim } from '../DailyRewardClaim';
 
 jest.mock('framer-motion', () => ({
   motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    span: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
-    p: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLParagraphElement>) => (
-      <p ref={ref} {...props}>{children}</p>
-    )),
+    div: React.forwardRef(function MockMotionDiv({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) {
+      return <div ref={ref} {...props}>{children}</div>;
+    }),
+    span: React.forwardRef(function MockMotionSpan({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLSpanElement>) {
+      return <span ref={ref} {...props}>{children}</span>;
+    }),
+    p: React.forwardRef(function MockMotionP({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLParagraphElement>) {
+      return <p ref={ref} {...props}>{children}</p>;
+    }),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));

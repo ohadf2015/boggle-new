@@ -110,8 +110,8 @@ vi.mock('framer-motion', async () => {
     ...actual,
     AnimatePresence: ({ children }: any) => <>{children}</>,
     motion: {
-      div: React.forwardRef((props: any, ref: any) => <div ref={ref} {...props} />),
-      button: React.forwardRef((props: any, ref: any) => <button ref={ref} {...props} />),
+      div: React.forwardRef(function MockMotionDiv(props: any, ref: any) { return <div ref={ref} {...props} />; }),
+      button: React.forwardRef(function MockMotionButton(props: any, ref: any) { return <button ref={ref} {...props} />; }),
     },
   };
 });

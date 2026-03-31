@@ -112,7 +112,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
       saveJsonToLocalStorage(EQUIPPED_KEY, next);
       if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, next, purchasedIds);
     },
-    [equippedIds, playerState, isAuthenticated, user?.id, purchasedIds]
+    [equippedIds, playerState, isAuthenticated, user, purchasedIds]
   );
 
   const purchaseCosmetic = useCallback(
@@ -129,7 +129,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
       if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, equippedIds, next);
       return true;
     },
-    [input.coins, purchasedIds, isAuthenticated, user?.id, equippedIds]
+    [input.coins, purchasedIds, isAuthenticated, user, equippedIds]
   );
 
   const getCosmeticsByCategory = useCallback(

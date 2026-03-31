@@ -265,7 +265,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     let callbackFired = false;
     const timeout = setTimeout(() => {
       if (!callbackFired) {
-        logger.error('[RESULTS] resetGame callback timed out — attempting startGame anyway');
+        logger.warn('[RESULTS] resetGame callback timed out — attempting startGame anyway');
         socket.emit('startGame', {
           letterGrid: preGeneratedGrid,
           timerSeconds: 120,
@@ -280,7 +280,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }, 3000);
 
     // Reset game state first, then start new game in callback
-    socket.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+    // Pass gameCode as fallback for mobile reconnects where socket mapping may be stale
+    socket.emit('resetGame', { gameCode }, (response: { success: boolean; error?: string; gameState?: string }) => {
       callbackFired = true;
       clearTimeout(timeout);
       if (response?.success) {
@@ -297,7 +298,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           gameMode: selectedGameMode,
         });
       } else {
-        logger.error('[RESULTS] Game reset failed:', response?.error);
+        logger.warn('[RESULTS] Game reset failed:', response?.error);
       }
     });
   }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid]);

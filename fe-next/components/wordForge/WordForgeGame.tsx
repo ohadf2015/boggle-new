@@ -52,7 +52,7 @@ export default function WordForgeGame(): React.JSX.Element {
         triggeredTimerRef.current = setTimeout(() => setTriggeredRuneIds([]), 800);
       }
     }
-  }, [run.lastWordScore]);
+  }, [run.lastWordScore, run.state.runes]);
 
   // ─── Idle: Start Screen ────────────────────────────────
   if (run.state.phase === 'idle') {

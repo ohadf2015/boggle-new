@@ -19,7 +19,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   const R = require('react');
   const createMotionComponent = (tag: string) =>
     R.forwardRef(({ children, initial, animate, exit, transition, whileHover, whileTap, ...rest }: any, ref: any) =>

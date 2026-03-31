@@ -51,9 +51,9 @@ export function WordForgeGrid({
     return path.some(p => p.row === row && p.col === col);
   };
 
-  const getCurrentWord = (): string => {
+  const getCurrentWord = useCallback((): string => {
     return path.map(p => grid[p.row]?.[p.col] ?? '').join('');
-  };
+  }, [path, grid]);
 
   const handleTileStart = (row: number, col: number) => {
     setIsDragging(true);
@@ -98,7 +98,7 @@ export function WordForgeGrid({
     }
     setPath([]);
     setIsDragging(false);
-  }, [path, grid, onWordFound, checkWord, showFeedback, prefersReducedMotion]);
+  }, [path, onWordFound, checkWord, showFeedback, prefersReducedMotion, getCurrentWord]);
 
   // Touch handlers for mobile
   const getTileFromTouch = (touch: React.Touch): TilePos | null => {

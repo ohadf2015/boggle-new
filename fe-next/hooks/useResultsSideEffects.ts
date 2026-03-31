@@ -380,7 +380,7 @@ export function useResultsSideEffects({
     }
 
     hasTrackedGameRef.current = true;
-  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin, mpGameMode]);
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin, mpGameMode, gameCode, mpWinStreak]);
 
   // ==============================================
   // EFFECT 5: Add Game to History

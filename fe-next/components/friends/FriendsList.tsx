@@ -166,7 +166,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
     }
     // Switch to messages tab
     setActiveTab('messages');
-  }, [threads, handleThreadClick, loadMessages]);
+  }, [threads, handleThreadClick, loadMessages, setIsInGame]);
 
   const handleSendMessage = useCallback(async (text: string) => {
     if (selectedThread) {

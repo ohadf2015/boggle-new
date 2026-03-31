@@ -43,7 +43,7 @@ export function useBlastEngineMultiplayer(config: BlastMPConfig): BlastMPState {
     if (!config.enabled || !overlay || overlay.length === 0) return null;
 
     const gridSize = config.gridSize;
-    const seed = blastSeed ?? Date.now();
+    const seed = blastSeed ?? 0;
     seedRef.current = seed;
 
     const states: BlastTileState[][] = [];
