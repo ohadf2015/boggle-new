@@ -10,8 +10,10 @@
  * Dynamically imported (ssr: false) to keep PixiJS out of SSR bundle.
  */
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { Graphics, Container } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
+import { SHATTER_COLORS } from './blastColorTokens';
 import {
   TILE_EXPLOSION,
   BOMB_EXPLOSION,
@@ -43,7 +45,6 @@ interface BlastEffectsCanvasProps {
   chainLevel: number;
   comboTier: number;
   waveCleared: boolean;
-  children: ReactNode;
 }
 
 // ─── Tile-type → particle preset map ────────────────────────────────────
@@ -66,36 +67,28 @@ export function BlastEffectsCanvas({
   chainLevel,
   comboTier,
   waveCleared,
-  children,
 }: BlastEffectsCanvasProps) {
-  if (width <= 0 || height <= 0) return <>{children}</>;
+  if (width <= 0 || height <= 0) return null;
 
   return (
-    <div className="relative" style={{ width, height }}>
-      <GameCanvas
-        config={{
-          width: Math.round(width),
-          height: Math.round(height),
-          background: 0x1a1a2e, // match bg-neo-navy
-          antialias: true,
-        }}
-        className="!absolute inset-0 rounded-lg"
-      >
-        <EffectsWorker
-          width={width}
-          height={height}
-          gridSize={gridSize}
-          clearedTiles={clearedTiles}
-          chainLevel={chainLevel}
-          comboTier={comboTier}
-          waveCleared={waveCleared}
-        />
-      </GameCanvas>
-      {/* DOM children (BlastBoard) rendered above the canvas */}
-      <div className="absolute inset-0 z-10" style={{ pointerEvents: 'auto' }}>
-        {children}
-      </div>
-    </div>
+    <GameCanvas
+      config={{
+        width: Math.round(width),
+        height: Math.round(height),
+        background: 0x1a1a2e, // match bg-neo-navy
+        antialias: true,
+      }}
+    >
+      <EffectsWorker
+        width={width}
+        height={height}
+        gridSize={gridSize}
+        clearedTiles={clearedTiles}
+        chainLevel={chainLevel}
+        comboTier={comboTier}
+        waveCleared={waveCleared}
+      />
+    </GameCanvas>
   );
 }
 
@@ -111,6 +104,20 @@ interface EffectsWorkerProps {
   waveCleared: boolean;
 }
 
+// ─── Debris fragment tracked per-body ────────────────────────────────
+
+interface DebrisFragment {
+  bodyId: number;
+  graphic: Graphics;
+  color: number;
+  size: number;
+  createdAt: number;
+}
+
+const DEBRIS_LIFETIME = 2; // seconds
+const DEBRIS_PER_TILE = 3;
+const MAX_DEBRIS = 60;
+
 function EffectsWorker({
   width,
   height,
@@ -120,14 +127,131 @@ function EffectsWorker({
   comboTier,
   waveCleared,
 }: EffectsWorkerProps) {
-  const { particles, shake } = useGameEngine();
+  const { particles, shake, physics, camera } = useGameEngine();
 
   const prevClearedKeyRef = useRef('');
   const prevChainRef = useRef(0);
   const prevComboRef = useRef(0);
   const prevWaveRef = useRef(false);
+  const debrisRef = useRef<DebrisFragment[]>([]);
+  const debrisContainerRef = useRef<Container | null>(null);
 
   const cellSize = width / gridSize;
+
+  // Create debris container on mount
+  useEffect(() => {
+    const container = new Container();
+    camera.addChild(container);
+    debrisContainerRef.current = container;
+    return () => {
+      // Clean up all debris
+      for (const d of debrisRef.current) {
+        physics.removeBody(d.bodyId);
+        d.graphic.destroy();
+      }
+      debrisRef.current = [];
+      camera.removeChild(container);
+      container.destroy();
+    };
+  }, [camera, physics]);
+
+  // Spawn debris fragments for cleared tiles
+  const spawnDebris = useCallback((tiles: ClearedTileEvent[]) => {
+    const container = debrisContainerRef.current;
+    if (!container) return;
+
+    // Limit total debris
+    const budget = MAX_DEBRIS - debrisRef.current.length;
+    const perTile = Math.min(DEBRIS_PER_TILE, Math.floor(budget / Math.max(tiles.length, 1)));
+    if (perTile <= 0) return;
+
+    const now = performance.now() / 1000;
+    let hasBomb = false;
+    let bombPos = { x: 0, y: 0 };
+
+    for (const tile of tiles) {
+      const cx = tile.col * cellSize + cellSize / 2;
+      const cy = tile.row * cellSize + cellSize / 2;
+      const colors = SHATTER_COLORS[tile.type] ?? SHATTER_COLORS.standard;
+
+      if (tile.type === 'bomb') {
+        hasBomb = true;
+        bombPos = { x: cx, y: cy };
+      }
+
+      for (let i = 0; i < perTile; i++) {
+        const size = 3 + Math.random() * 5;
+        const colorHex = colors[Math.floor(Math.random() * colors.length)];
+        const colorNum = parseInt(colorHex.replace('#', ''), 16);
+
+        // Create PixiJS graphic
+        const g = new Graphics();
+        g.rect(-size / 2, -size / 2, size, size).fill({ color: colorNum });
+        g.x = cx;
+        g.y = cy;
+        container.addChild(g);
+
+        // Create Matter.js body
+        const bodyId = physics.createRect(cx, cy, size, size, {
+          restitution: 0.5,
+          frictionAir: 0.01,
+          density: 0.002,
+        });
+
+        // Random initial impulse
+        const angle = Math.random() * Math.PI * 2;
+        const force = 0.0005 + Math.random() * 0.001;
+        physics.applyForce(bodyId, {
+          x: Math.cos(angle) * force,
+          y: Math.sin(angle) * force - 0.0008,
+        });
+
+        debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
+      }
+    }
+
+    // Bomb explosion: push all debris outward from bomb position
+    if (hasBomb) {
+      physics.applyExplosion(bombPos, 0.003, cellSize * 3);
+    }
+  }, [cellSize, physics]);
+
+  // Debris sync: update PixiJS Graphics positions from Matter.js bodies each frame
+  useEffect(() => {
+    let rafId: number;
+    const tick = () => {
+      const now = performance.now() / 1000;
+      const debris = debrisRef.current;
+      for (let i = debris.length - 1; i >= 0; i--) {
+        const d = debris[i];
+        const age = now - d.createdAt;
+
+        // Remove expired or off-screen debris
+        if (age > DEBRIS_LIFETIME) {
+          physics.removeBody(d.bodyId);
+          d.graphic.destroy();
+          debris.splice(i, 1);
+          continue;
+        }
+
+        // Sync position from physics
+        const state = physics.getBodyState(d.bodyId);
+        if (state) {
+          d.graphic.x = state.position.x;
+          d.graphic.y = state.position.y;
+          d.graphic.rotation = state.angle;
+          // Fade out in last 30% of lifetime
+          const fadeStart = DEBRIS_LIFETIME * 0.7;
+          d.graphic.alpha = age > fadeStart
+            ? 1 - (age - fadeStart) / (DEBRIS_LIFETIME - fadeStart)
+            : 1;
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [physics]);
 
   // Start ambient bokeh on mount
   useEffect(() => {
@@ -150,12 +274,15 @@ function EffectsWorker({
       particles.burst(preset, x, y);
     }
 
+    // Spawn physics debris fragments
+    spawnDebris(clearedTiles);
+
     // Screen shake scaled to clear count
     const count = clearedTiles.length;
     if (count >= 6) shake.heavy();
     else if (count >= 3) shake.medium();
     else shake.light();
-  }, [clearedTiles, particles, shake, cellSize]);
+  }, [clearedTiles, particles, shake, cellSize, spawnDebris]);
 
   // Chain cascade sparkle
   useEffect(() => {

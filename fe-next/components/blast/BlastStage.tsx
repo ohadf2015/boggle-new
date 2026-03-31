@@ -201,31 +201,23 @@ export function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
-        <div ref={boardContainerRef} className="w-full max-w-[360px] md:max-w-[420px] lg:max-w-[min(480px,50vh)]">
-          {boardSize.width > 0 ? (
-            <BlastEffectsCanvas
-              width={boardSize.width}
-              height={boardSize.height || boardSize.width}
-              gridSize={gridSize}
-              clearedTiles={clearedTilesForEffects}
-              chainLevel={sequencerState?.chainLevel ?? 0}
-              comboTier={comboFlashTier}
-              waveCleared={waveCleared}
-            >
-              <BlastBoard
-                grid={grid}
-                tileStates={tileStates}
+        <div ref={boardContainerRef} className="relative w-full max-w-[360px] md:max-w-[420px] lg:max-w-[min(480px,50vh)]">
+          {/* PixiJS effects layer — behind DOM tiles, mounted after measurement */}
+          {boardSize.width > 0 && (
+            <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
+              <BlastEffectsCanvas
+                width={boardSize.width}
+                height={boardSize.height || boardSize.width}
                 gridSize={gridSize}
-                language={language}
-                interactive={interactive && !isComplete}
-                onWordSubmit={onWordSubmit}
-                onPathSubmit={onPathSubmit}
-                onWordChange={onWordChange}
-                sequencerState={sequencerState}
-                nearMissCells={nearMissCells}
+                clearedTiles={clearedTilesForEffects}
+                chainLevel={sequencerState?.chainLevel ?? 0}
+                comboTier={comboFlashTier}
+                waveCleared={waveCleared}
               />
-            </BlastEffectsCanvas>
-          ) : (
+            </div>
+          )}
+          {/* DOM board — always rendered, stable for hydration */}
+          <div className="relative z-10">
             <BlastBoard
               grid={grid}
               tileStates={tileStates}
@@ -238,7 +230,7 @@ export function BlastStage({
               sequencerState={sequencerState}
               nearMissCells={nearMissCells}
             />
-          )}
+          </div>
         </div>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} />
