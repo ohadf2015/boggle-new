@@ -8,28 +8,28 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import posthog from 'posthog-js';
 
-// Must use jest.mocked after mock
-jest.mock('posthog-js', () => ({
+// Must use vi.mocked after mock
+vi.mock('posthog-js', () => ({
   __esModule: true,
   default: {
-    init: jest.fn(),
-    capture: jest.fn(),
-    identify: jest.fn(),
-    reset: jest.fn(),
-    opt_in_capturing: jest.fn(),
-    opt_out_capturing: jest.fn(),
-    has_opted_out_capturing: jest.fn().mockReturnValue(true),
+    init: vi.fn(),
+    capture: vi.fn(),
+    identify: vi.fn(),
+    reset: vi.fn(),
+    opt_in_capturing: vi.fn(),
+    opt_out_capturing: vi.fn(),
+    has_opted_out_capturing: vi.fn().mockReturnValue(true),
   },
 }));
 
-jest.mock('posthog-js/react', () => ({
+vi.mock('posthog-js/react', () => ({
   PostHogProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 const mockOnConsentChangeCallbacks: Array<(s: { analytics: boolean }) => void> = [];
 let mockHasConsentValue = false;
 
-jest.mock('@/utils/cookieConsent', () => ({
+vi.mock('@/utils/cookieConsent', () => ({
   hasConsent: () => mockHasConsentValue,
   onConsentChange: (cb: (s: { analytics: boolean }) => void) => {
     mockOnConsentChangeCallbacks.push(cb);
@@ -40,18 +40,18 @@ jest.mock('@/utils/cookieConsent', () => ({
   },
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   usePathname: () => '/en/play',
   useSearchParams: () => new URLSearchParams(),
 }));
 
 import { PostHogProvider, _resetPostHogInit } from '../PostHogProvider';
 
-const ph = posthog as jest.Mocked<typeof posthog>;
+const ph = posthog as unknown as Record<string, ReturnType<typeof vi.fn>>;
 
 describe('PostHogProvider', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockHasConsentValue = false;
     mockOnConsentChangeCallbacks.length = 0;
     ph.has_opted_out_capturing.mockReturnValue(true);
