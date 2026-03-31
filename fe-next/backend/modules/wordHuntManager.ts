@@ -15,7 +15,7 @@ import {
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
 import { isWordHuntQuality } from '@/shared/utils/wordQuality';
-import { getCategoryForWord } from '@/shared/data/wordCategories';
+import { classifyWordSync } from '../services/wordCategorizer';
 import { promises as fsAsync, readFileSync } from 'fs';
 import * as path from 'path';
 
@@ -175,6 +175,7 @@ export function selectTargetWordWithFallback(
 export function initWordHuntState(
   targetWord: string,
   players: string[],
+  lang = 'en',
 ): WordHuntModeState {
   const playerLives: Record<string, number> = {};
   for (const player of players) {
@@ -183,7 +184,7 @@ export function initWordHuntState(
 
   return {
     targetWord,
-    targetCategory: getCategoryForWord(targetWord),
+    targetCategory: classifyWordSync(targetWord, lang),
     targetWordLength: targetWord.length,
     playerLives,
     eliminatedPlayers: [],

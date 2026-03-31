@@ -29,13 +29,14 @@ export function WordHuntCategoryHint({
     return () => clearTimeout(timer);
   }, []);
 
-  const emoji = targetCategory ? CATEGORY_EMOJIS[targetCategory] ?? null : null;
-  const label = targetCategory
-    ? t('wordHunt.categoryHint', {
-        length: targetLength,
-        category: getCategoryLabel(targetCategory, locale),
-      })
-    : t('wordHunt.categoryHintGeneric', { length: targetLength });
+  // Don't show hint if we aren't sure about the category
+  if (!targetCategory) return null;
+
+  const emoji = CATEGORY_EMOJIS[targetCategory] ?? null;
+  const label = t('wordHunt.categoryHint', {
+    length: targetLength,
+    category: getCategoryLabel(targetCategory, locale),
+  });
 
   if (!expanded) {
     // Collapsed: show emoji-only, expand on hover/tap
