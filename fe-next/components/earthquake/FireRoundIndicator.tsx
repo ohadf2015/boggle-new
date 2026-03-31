@@ -3,7 +3,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDisableFireRoundLights, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 interface FireRoundIndicatorProps {
@@ -25,7 +24,6 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   remainingSeconds,
 }) => {
   const { t } = useLanguage();
-  const isLandscape = useMobileLandscape();
   const disableFireLights = useDisableFireRoundLights();
   const reduceMotion = useShouldReduceMotion();
 
@@ -52,9 +50,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   // Determine position based on layout
   // Position below header to avoid overlapping with header controls
   // Use logical 'end' property for RTL support (flips to left in Hebrew)
-  const positionClasses = isLandscape
-    ? 'top-2 left-1/2 -translate-x-1/2' // Center top in landscape
-    : 'top-20 sm:top-24 ltr:right-4 rtl:left-4'; // Below header in portrait/desktop, RTL-aware
+  const positionClasses = 'top-20 sm:top-24 ltr:right-4 rtl:left-4';
 
   return (
     <AnimatePresence>

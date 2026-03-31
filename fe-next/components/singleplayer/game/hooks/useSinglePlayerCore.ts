@@ -11,7 +11,6 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordPace } from '@/hooks/useWordPace';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useGiftModalPause } from '@/hooks/useGiftModalPause';
@@ -74,7 +73,6 @@ export function useSinglePlayerCore({
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
   const { isLowEnd } = useDevicePerformance();
-  const isLandscape = useMobileLandscape();
   const { isDesktop, isTv } = useDesktopLayout();
   const isGiftModalOpen = useGiftModalPause();
 
@@ -191,12 +189,12 @@ export function useSinglePlayerCore({
   });
 
   const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
-  useAutoScrollOnGameStart(gameStatsRef, { gameActive, isLandscape });
+  useAutoScrollOnGameStart(gameStatsRef, { gameActive, isLandscape: false });
   useCrazyGamesLifecycle({ isGameActive: gameActive, isGameOver, score, maxCombo: combo.maxCombo });
 
   const effects = useSinglePlayerEffects({
     grid, isPaused, isGameOver, score, language: settings.language, mode: settings.mode,
-    isLandscape, isDesktop, isTv, remainingTime: timer.remainingTime, gameActive,
+    isLandscape: false, isDesktop, isTv, remainingTime: timer.remainingTime, gameActive,
     foundWords, timerSeconds: settings.timerSeconds,
     trainingCompletedSkillsRef, trainingUpdateProgress, announceTimer, setGameActive,
     onQuit, t, isTypingModeRef, showHintPromptRef, setShowHintPrompt, setShowQuitConfirm, setIsPaused,
@@ -484,7 +482,7 @@ export function useSinglePlayerCore({
   };
 
   return {
-    isLandscape, isDesktop, isTv,
+    isLandscape: false, isDesktop, isTv,
     grid, foundWords, score, isPaused, isGameOver, isValidatingWords,
     timer, combo, comboCoinReward, handleCoinAnimationComplete,
     formedWord, letterCount, currentFeedback,

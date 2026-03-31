@@ -87,6 +87,7 @@ export interface LeaderboardPlayer {
   avatar?: Avatar;
   isHost: boolean;
   isBot: boolean;
+  comboLevel?: number;
 }
 
 /**
@@ -237,7 +238,8 @@ export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): L
       wordCount: game.playerWords[username]?.length || 0,
       avatar: game.users[username]?.avatar,
       isHost: game.users[username]?.isHost || false,
-      isBot: game.users[username]?.isBot || false
+      isBot: game.users[username]?.isBot || false,
+      comboLevel: game.playerCombos?.[username] || 0,
     }))
     // Host is always visible as a player — no broadcast mode filtering
     .sort((a, b) => b.score - a.score);

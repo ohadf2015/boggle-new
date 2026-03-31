@@ -3,7 +3,7 @@
  * Creates helpful hints without giving away the answer
  */
 
-import type { GenerativeModel } from '@google-cloud/vertexai';
+import { type GenAIModel, trackTokenUsage } from './client';
 import {
   HintResponseSchema,
   AI_TIMEOUT_CONFIG,
@@ -11,7 +11,6 @@ import {
   type HintResult,
   type TokenUsageStats,
 } from './types';
-import { trackTokenUsage } from './client';
 import { withRetry } from './validation';
 import logger from '@/backend/utils/logger';
 
@@ -21,7 +20,7 @@ const HINT_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Generate a hint for a word using AI
  */
 export async function generateHint(
-  model: GenerativeModel,
+  model: GenAIModel,
   targetWord: string,
   language: string = 'en',
   hintLevel: 1 | 2 | 3 = 2,
@@ -161,7 +160,7 @@ export async function getHintForUnfoundWord(
   foundWords: string[],
   language: string = 'en',
   preferLonger: boolean = true,
-  model: GenerativeModel | null,
+  model: GenAIModel | null,
   withTimeout: <T>(promise: Promise<T>, timeoutMs: number, operationName: string) => Promise<T>,
   hintCache: Map<string, { hint: HintResult; timestamp: number }>,
   tokenUsage: TokenUsageStats

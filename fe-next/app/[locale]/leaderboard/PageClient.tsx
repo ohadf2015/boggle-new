@@ -19,7 +19,6 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
@@ -49,7 +48,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   const { t, language } = useLanguage();
   const { user, profile, isSupabaseEnabled } = useAuth();
   const router = useRouter();
-  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
 
@@ -121,7 +119,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
   return (
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
-      <div className={cn(isLandscape ? 'py-2' : 'py-4')}>
+      <div className={cn('py-4')}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

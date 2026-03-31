@@ -88,7 +88,7 @@ export interface ResultsDetailsContentProps {
   /** Blast mode results data */
   blastResults?: { movesUsed: number; tilesCleared: number; tileBonus: number; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
   /** Word Hunt mode results data */
-  wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number; playerResults?: Array<{ username: string; score: number; survived: boolean; lifeRemaining: number }>; currentUsername?: string };
+  wordHuntResults?: { targetWord: string; foundTarget: boolean; isFirstFinder: boolean; survivalTime: number; discoveryWords: number; playerResults?: Array<{ username: string; score: number; survived: boolean; lifeRemaining: number; avatar?: { customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null } }>; currentUsername?: string };
   /** Whether the current player has marked ready (multiplayer) */
   isCurrentPlayerReady?: boolean;
   /** Handler to mark ready from details tab */
@@ -118,7 +118,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
   missedWords,
   isHost,
   t,
-  hideRankAndScore: _hideRankAndScore = false,
+  hideRankAndScore = false,
   gameMode,
   blastResults,
   wordHuntResults,
@@ -158,7 +158,7 @@ export const ResultsDetailsContent: React.FC<ResultsDetailsContentProps> = ({
           icon={<Users className="w-4 h-4" />}
           badge={otherPlayers.length === 1 ? undefined : otherPlayers.length}
           summary={otherPlayers.slice(0, 3).map(p => p.username).join(', ') + (otherPlayers.length > 3 ? ` +${otherPlayers.length - 3}` : '')}
-          defaultExpanded={false}
+          defaultExpanded={hideRankAndScore}
           variant="tertiary"
           className="shadow-hard"
         >

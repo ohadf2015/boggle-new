@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 
 /**
  * Validate attempt request body
@@ -147,6 +148,22 @@ export async function POST(request: NextRequest) {
       }
       return NextResponse.json({ error: 'Failed to record attempt' }, { status: 500 });
     }
+
+    const posthog = getPostHogServer();
+    const eventName = isCompletion ? 'adventure_level_completed' : 'adventure_level_attempted';
+    posthog?.capture({
+      distinctId: userId,
+      event: eventName,
+      properties: {
+        world,
+        level,
+        words_found: words,
+        score,
+        time_remaining: timeRemaining,
+        attempt_count: attempt.attempt_count,
+        consecutive_failures_before: isCompletion ? attempt.consecutive_failures : undefined,
+      },
+    });
 
     return NextResponse.json({
       success: true,

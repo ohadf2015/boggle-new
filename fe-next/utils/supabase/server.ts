@@ -39,18 +39,14 @@ export async function createClient(): Promise<SupabaseClient> {
 }
 
 /**
- * Get authenticated user from session JWT (no network call).
- * Proxy already refreshes tokens via getSession(), so API routes
- * don't need to call getUser() (which makes a round-trip to Supabase Auth).
- * Saves 200-500ms per API request.
- *
- * Use getUser() only when you need to verify the user hasn't been
- * deleted/banned (rare — admin actions, security-sensitive mutations).
+ * Get authenticated user by verifying the JWT with Supabase Auth.
+ * This makes a network round-trip (~50-200ms) but guarantees the
+ * user object is authentic and not tampered with via cookies.
  */
 export async function getSessionUser(supabase: SupabaseClient): Promise<{ user: User | null; error: Error | null }> {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.user) {
-    return { user: null, error: error ?? new Error('No session') };
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    return { user: null, error: error ?? new Error('No authenticated user') };
   }
-  return { user: session.user, error: null };
+  return { user, error: null };
 }

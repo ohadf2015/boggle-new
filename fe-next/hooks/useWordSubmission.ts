@@ -363,8 +363,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     }]);
 
     // Step 5a: Try client-side dictionary cache (instant, no network)
-    if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
-      handleValidWord(normalizedWord, now, currentCombo);
+    if (isDictionaryCacheLoaded) {
+      if (checkWordInCache(normalizedWord)) {
+        handleValidWord(normalizedWord, now, currentCombo);
+      } else {
+        handleInvalidWord(normalizedWord, now);
+      }
       return;
     }
 

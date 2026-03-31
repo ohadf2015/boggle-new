@@ -92,7 +92,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@google-cloud/vertexai": "^1.10.0",
+    "@google/genai": "^1.47.0",
     "@next/swc-darwin-arm64": "^16.2.1",
     "@next/third-parties": "^16.1.6",
     "@pixi/react": "^8.0.5",

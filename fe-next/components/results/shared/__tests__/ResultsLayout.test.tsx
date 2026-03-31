@@ -13,21 +13,9 @@ vi.mock('framer-motion', () => ({
   useReducedMotion: vi.fn(() => false),
 }));
 
-// Mock hooks
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: vi.fn(() => false),
-}));
-
 import { ResultsLayout } from '../ResultsLayout';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-
-const mockUseLandscape = useMobileLandscape as vi.Mock;
 
 describe('ResultsLayout', () => {
-  beforeEach(() => {
-    mockUseLandscape.mockReturnValue(false);
-  });
-
   it('renders hero slot', () => {
     render(
       <ResultsLayout
@@ -68,20 +56,6 @@ describe('ResultsLayout', () => {
       />
     );
     expect(screen.getByTestId('sidebar')).toBeInTheDocument();
-  });
-
-  it('renders landscape layout when in landscape mode', () => {
-    mockUseLandscape.mockReturnValue(true);
-    const { container } = render(
-      <ResultsLayout
-        hero={<div>Hero</div>}
-        actions={<div data-testid="landscape-actions">Actions</div>}
-      />
-    );
-    expect(screen.getByTestId('landscape-actions')).toBeInTheDocument();
-    // Landscape uses a 2-column grid
-    const grid = container.querySelector('[data-testid="landscape-grid"]');
-    expect(grid).toBeInTheDocument();
   });
 
   it('renders without optional slots', () => {

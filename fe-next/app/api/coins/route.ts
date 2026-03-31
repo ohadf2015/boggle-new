@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 
 // Server-side coin amount limits to prevent abuse
 const MAX_COIN_AWARD = 500;
@@ -95,6 +96,17 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const eventName = amount > 0 ? 'coins_awarded' : 'coins_spent';
+    getPostHogServer()?.capture({
+      distinctId: user.id,
+      event: eventName,
+      properties: {
+        amount: Math.abs(amount),
+        reason,
+        new_balance: result.new_balance,
+      },
+    });
 
     return NextResponse.json({
       success: true,

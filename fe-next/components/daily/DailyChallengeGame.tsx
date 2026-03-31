@@ -28,7 +28,6 @@ import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { cn } from '@/lib/utils';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { PANIC_TIMER_THRESHOLD, ONFIRE_COMBO_THRESHOLD } from '@/utils/mascotConfig';
@@ -61,7 +60,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const { playWordAcceptedSound, playComboSound, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const { awardComboMilestone } = useCoinContext();
-  const isLandscape = useMobileLandscape();
   const { isLowEnd } = useDevicePerformance();
 
   // Game state
@@ -334,13 +332,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       exit={{ opacity: 0 }}
       className={cn(
         "flex-1 flex flex-col p-2 sm:p-4 overflow-hidden",
-        isLandscape && "flex-row"
+        false &&"flex-row"
       )}
     >
       {/* Top bar with quit button - matches multiplayer layout */}
       <div className={cn(
         "flex items-center justify-between mb-2 px-2",
-        isLandscape && "hidden"
+        false &&"hidden"
       )}>
         <Button
           variant="destructive"
@@ -360,7 +358,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       {/* Stats row - Combo | Timer | Score - matches multiplayer InGameScreen */}
       <div className={cn(
         "flex items-center justify-center gap-3 md:gap-4 mb-2",
-        isLandscape && "flex-col h-full me-4 mb-0"
+        false &&"flex-col h-full me-4 mb-0"
       )} role="status" aria-label="Game status">
         {/* Combo (left - placeholder for layout balance) */}
         <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
@@ -444,7 +442,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       />
 
       {/* Word Forming Area with feedback - centered below timer */}
-      <div className={cn("flex items-center justify-center mb-1", isLandscape && "hidden")}>
+      <div className={cn("flex items-center justify-center mb-1", false &&"hidden")}>
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
@@ -456,7 +454,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       {/* Game Grid */}
       <div className={cn(
         "flex-1 flex items-center justify-center",
-        isLandscape && "items-start"
+        false &&"items-start"
       )}>
         <GridComponent
           grid={grid}

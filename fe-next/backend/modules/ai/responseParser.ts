@@ -25,7 +25,7 @@ export function parseValidationResponse(
     text.trimStart().startsWith('<!DOCTYPE') ||
     text.trimStart().startsWith('<html')
   ) {
-    logger.warn(
+    logger.debug(
       'AI_SERVICE',
       `Received HTML error page instead of JSON for "${word}". This indicates a network issue, authentication failure, or service unavailability.`
     );
@@ -50,13 +50,13 @@ export function parseValidationResponse(
     const partialMatch = cleanText.match(/\{\s*"isValid"\s*:\s*(true|false)/);
     if (partialMatch) {
       const isValid = partialMatch[1] === 'true';
-      logger.warn(
+      logger.debug(
         'AI_SERVICE',
         `Extracted partial response for "${word}": isValid=${isValid}`
       );
       return { isValid, reason: 'Partial AI response', confidence: 50 };
     }
-    logger.warn(
+    logger.debug(
       'AI_SERVICE',
       `Could not extract JSON for "${word}": ${text.substring(0, 200)}`
     );
@@ -79,7 +79,7 @@ export function parseValidationResponse(
       typeof parsed.isValid !== 'boolean' ||
       typeof parsed.reason !== 'string'
     ) {
-      logger.error(
+      logger.debug(
         'AI_SERVICE',
         `Invalid response schema for "${word}": ${JSON.stringify(parsed)}`
       );
@@ -111,7 +111,7 @@ export function parseValidationResponse(
   } catch (parseError) {
     const errorMessage =
       parseError instanceof Error ? parseError.message : String(parseError);
-    logger.warn(
+    logger.debug(
       'AI_SERVICE',
       `JSON parse error for "${word}": ${errorMessage}`
     );
@@ -218,14 +218,14 @@ export function parseBatchResponse(
     if (partialMatch) {
       const partialResults = extractPartialJsonResults(partialMatch[1], words);
       if (partialResults.length > 0) {
-        logger.warn(
+        logger.debug(
           'AI_SERVICE',
           `Extracted ${partialResults.length}/${words.length} from truncated response`
         );
         return mapResultsToWords(partialResults, words);
       }
     }
-    logger.error(
+    logger.debug(
       'AI_SERVICE',
       `Could not extract JSON array. Full response: ${text}`
     );
@@ -253,7 +253,7 @@ export function parseBatchResponse(
     // Try partial extraction
     const partialResults = extractPartialJsonResults(jsonMatch[0], words);
     if (partialResults.length > 0) {
-      logger.warn(
+      logger.debug(
         'AI_SERVICE',
         `Extracted ${partialResults.length}/${words.length} from malformed JSON`
       );
@@ -283,7 +283,7 @@ export function parseThemedBoardResponse(text: string, theme: string): string[] 
 
   const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
   if (!jsonMatch) {
-    logger.warn(
+    logger.debug(
       'AI_SERVICE',
       `Could not extract JSON array for theme "${theme}"`
     );

@@ -139,7 +139,7 @@ export class SupabaseWordStore {
           .eq('word', word)
           .eq('language', language);
       } else if (insertError) {
-        logger.error(
+        logger.debug(
           'AI_SERVICE',
           `Failed to insert community_words: ${insertError.message}`
         );
@@ -187,7 +187,7 @@ export class SupabaseWordStore {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      logger.error(
+      logger.debug(
         'AI_SERVICE',
         `batchSaveToCommunityWords error: ${errorMessage}`
       );

@@ -13,7 +13,7 @@ interface ScoreDisplayProps {
   minWordLength: number;
   t: TranslationFn;
   /** Size variant */
-  variant?: 'mobile' | 'desktop' | 'landscape';
+  variant?: 'mobile' | 'desktop';
 }
 
 /**
@@ -29,7 +29,6 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   variant = 'mobile',
 }) {
   const isDesktop = variant === 'desktop';
-  const isLandscape = variant === 'landscape';
 
   // Track score changes for pulse effect
   const prevScoreRef = useRef(score);
@@ -42,27 +41,6 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
   }, [score]);
 
   const scoreLabel = `${t('common.score')}: ${displayScore(score)}${rank ? `, #${rank}` : ''}`;
-
-  // Landscape variant (simpler display)
-  if (isLandscape) {
-    return (
-      <div className="flex flex-col items-center relative" role="status" aria-live="polite" aria-label={scoreLabel}>
-        <AdaptiveMotion.div
-          key={score}
-          initial={{ scale: 1.4, color: '#BFFF00' }}
-          animate={{ scale: 1, color: '#1a1a2e' }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-          className="landscape-stat-primary text-neo-black"
-        >
-          {displayScore(score)}
-        </AdaptiveMotion.div>
-        <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
-          {t('common.score')}
-          <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
-        </div>
-      </div>
-    );
-  }
 
   // Desktop variant (larger, hover effect)
   if (isDesktop) {

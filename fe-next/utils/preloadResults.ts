@@ -14,7 +14,6 @@ export function preloadResultsChunks(): void {
 
   // Core results layout and content
   void import('@/components/results/ResultsMainContent');
-  void import('@/components/results/ResultsLandscapeLayout');
   void import('@/components/results/ResultsModals');
 
   // High-visibility results components

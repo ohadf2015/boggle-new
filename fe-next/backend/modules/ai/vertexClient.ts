@@ -1,10 +1,11 @@
 /**
- * Vertex AI Client
+ * Google Gen AI Client (Vertex AI backend)
  *
  * Handles communication with Google Vertex AI for word validation.
+ * Migrated from deprecated @google-cloud/vertexai to @google/genai.
  */
 
-import { VertexAI, type GenerativeModel, type GenerateContentResult } from '@google-cloud/vertexai';
+import { GoogleGenAI } from '@google/genai';
 import type {
   GoogleCredentials,
   ParsedValidation,
@@ -76,21 +77,19 @@ export function parseGoogleCredentials(): GoogleCredentials {
 }
 
 /**
- * Vertex AI client wrapper
+ * Vertex AI client wrapper using @google/genai SDK
  */
 export class VertexAIClient {
-  private vertexAI: VertexAI | null = null;
-  private model: GenerativeModel | null = null;
-  private batchModel: GenerativeModel | null = null;
-  private credentials: GoogleCredentials | null = null;
-
+  private ai: GoogleGenAI | null = null;
+  private modelName: string = '';
   /**
-   * Initialize the Vertex AI client with credentials
+   * Initialize the Google Gen AI client with Vertex AI backend
    */
   initialize(credentials: GoogleCredentials): void {
-    this.credentials = credentials;
+    this.modelName = process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002';
 
-    this.vertexAI = new VertexAI({
+    this.ai = new GoogleGenAI({
+      vertexai: true,
       project: credentials.project_id,
       location: process.env.VERTEX_AI_LOCATION || 'us-central1',
       googleAuthOptions: {
@@ -101,28 +100,10 @@ export class VertexAIClient {
         projectId: credentials.project_id,
       },
     });
-
-    // Model for single word validation
-    this.model = this.vertexAI.getGenerativeModel({
-      model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.1,
-      },
-    });
-
-    // Model for batch validation with higher token limit
-    this.batchModel = this.vertexAI.getGenerativeModel({
-      model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
-      generationConfig: {
-        maxOutputTokens: 4096,
-        temperature: 0.1,
-      },
-    });
   }
 
   isInitialized(): boolean {
-    return this.vertexAI !== null;
+    return this.ai !== null;
   }
 
   /**
@@ -153,26 +134,46 @@ export class VertexAIClient {
   }
 
   /**
+   * Generate content using the Google Gen AI SDK
+   */
+  private async generate(
+    prompt: string,
+    maxOutputTokens: number
+  ): Promise<{ text: string; finishReason: string | undefined }> {
+    if (!this.ai) {
+      throw new Error('Google Gen AI client not initialized');
+    }
+
+    const response = await this.ai.models.generateContent({
+      model: this.modelName,
+      contents: prompt,
+      config: {
+        maxOutputTokens,
+        temperature: 0.1,
+      },
+    });
+
+    const candidate = response.candidates?.[0];
+    const text = candidate?.content?.parts?.[0]?.text || response.text || '';
+    const finishReason = candidate?.finishReason;
+
+    return { text, finishReason };
+  }
+
+  /**
    * Validate a single word using Vertex AI
    */
   async validateWord(word: string, language: string): Promise<ParsedValidation> {
-    if (!this.model) {
-      throw new Error('Vertex AI model not initialized');
-    }
-
     const prompt = buildSingleWordPrompt(word, language);
 
     const result = await withRetry(async () => {
-      const response = await this.model!.generateContent(prompt);
-      const candidate = response.response?.candidates?.[0];
-      const finishReason = candidate?.finishReason;
-      const partialText = candidate?.content?.parts?.[0]?.text || '';
+      const { text, finishReason } = await this.generate(prompt, 1024);
 
       // Handle non-successful finish reasons
       if (finishReason && finishReason !== 'STOP') {
-        logger.warn(
+        logger.debug(
           'AI_SERVICE',
-          `Non-standard finish reason for "${word}": ${finishReason}, partial: ${partialText.substring(0, 100)}`
+          `Non-standard finish reason for "${word}": ${finishReason}, partial: ${text.substring(0, 100)}`
         );
 
         if (finishReason === 'MAX_TOKENS') {
@@ -183,73 +184,39 @@ export class VertexAIClient {
 
         // Try to recover from SAFETY/RECITATION/OTHER
         if (['SAFETY', 'RECITATION', 'OTHER'].includes(finishReason)) {
-          return this.handleNonStopFinish(response, word, partialText, finishReason);
+          return this.handleNonStopFinish(word, text, finishReason);
         }
       }
 
-      return response;
+      return text;
     }, `validateWithAI("${word}")`);
 
-    const text =
-      result.response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
     // Track token usage
-    trackTokenUsage(estimateTokens(prompt), estimateTokens(text));
+    trackTokenUsage(estimateTokens(prompt), estimateTokens(result));
 
-    return parseValidationResponse(text, word);
+    return parseValidationResponse(result, word);
   }
 
   /**
    * Handle non-STOP finish reasons by attempting recovery
    */
   private handleNonStopFinish(
-    response: GenerateContentResult,
     word: string,
     partialText: string,
     finishReason: string
-  ): GenerateContentResult {
+  ): string {
     if (partialText) {
       const partialMatch = partialText.match(/"isValid"\s*:\s*(true|false)/i);
       if (partialMatch) {
         logger.info('AI_SERVICE', `Recovered from ${finishReason} for "${word}"`);
-        return {
-          response: {
-            candidates: [
-              {
-                content: {
-                  parts: [
-                    {
-                      text: `{"isValid": ${partialMatch[1]}, "reason": "Partial response", "confidence": 65}`,
-                    },
-                  ],
-                },
-                finishReason: 'STOP',
-              },
-            ],
-          },
-        } as unknown as GenerateContentResult;
+        return `{"isValid": ${partialMatch[1]}, "reason": "Partial response", "confidence": 65}`;
       }
     }
-    logger.warn(
+    logger.debug(
       'AI_SERVICE',
       `Cannot recover from ${finishReason} for "${word}", returning rejection`
     );
-    return {
-      response: {
-        candidates: [
-          {
-            content: {
-              parts: [
-                {
-                  text: '{"isValid": false, "reason": "AI validation inconclusive", "confidence": 0}',
-                },
-              ],
-            },
-            finishReason: 'STOP',
-          },
-        ],
-      },
-    } as unknown as GenerateContentResult;
+    return '{"isValid": false, "reason": "AI validation inconclusive", "confidence": 0}';
   }
 
   /**
@@ -259,16 +226,13 @@ export class VertexAIClient {
     words: string[],
     language: string
   ): Promise<ValidationResult[]> {
-    if (!this.batchModel) {
-      throw new Error('Vertex AI batch model not initialized');
-    }
-
     const prompt = buildBatchPrompt(words, language);
 
     const result = await withRetry(async () => {
-      let response;
+      let text: string;
+      let finishReason: string | undefined;
       try {
-        response = await this.batchModel!.generateContent(prompt);
+        ({ text, finishReason } = await this.generate(prompt, 4096));
       } catch (sdkError) {
         // Catch SyntaxError when SDK receives HTML instead of JSON (rate limit/auth error)
         if (sdkError instanceof SyntaxError) {
@@ -281,14 +245,10 @@ export class VertexAIClient {
         throw sdkError;
       }
 
-      const candidate = response.response?.candidates?.[0];
-      const finishReason = candidate?.finishReason;
-      const partialText = candidate?.content?.parts?.[0]?.text || '';
-
       if (finishReason && finishReason !== 'STOP') {
-        logger.warn(
+        logger.debug(
           'AI_SERVICE',
-          `Batch validation non-standard finish: ${finishReason}, partial: ${partialText.substring(0, 100)}`
+          `Batch validation non-standard finish: ${finishReason}, partial: ${text.substring(0, 100)}`
         );
 
         if (finishReason === 'MAX_TOKENS') {
@@ -298,21 +258,18 @@ export class VertexAIClient {
         }
       }
 
-      return response;
+      return text;
     }, `batchValidateWithAI(${words.length} words)`);
 
-    const text =
-      result.response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
     // Track token usage
-    trackTokenUsage(estimateTokens(prompt), estimateTokens(text));
+    trackTokenUsage(estimateTokens(prompt), estimateTokens(result));
 
     logger.debug(
       'AI_SERVICE',
-      `Batch response (${text.length} chars): ${text.substring(0, 300)}...`
+      `Batch response (${result.length} chars): ${result.substring(0, 300)}...`
     );
 
-    return parseBatchResponse(text, words);
+    return parseBatchResponse(result, words);
   }
 
   /**
@@ -323,22 +280,16 @@ export class VertexAIClient {
     count: number,
     language: string
   ): Promise<string[]> {
-    if (!this.model) {
-      throw new Error('Vertex AI model not initialized');
-    }
-
     const prompt = buildThemedBoardPrompt(theme, count, language);
 
     const result = await withRetry(async () => {
-      return await this.model!.generateContent(prompt);
+      const { text } = await this.generate(prompt, 1024);
+      return text;
     }, `generateThemedBoard("${theme}")`);
 
-    const text =
-      result.response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
     // Track tokens
-    trackTokenUsage(estimateTokens(prompt), estimateTokens(text));
+    trackTokenUsage(estimateTokens(prompt), estimateTokens(result));
 
-    return parseThemedBoardResponse(text, theme);
+    return parseThemedBoardResponse(result, theme);
   }
 }

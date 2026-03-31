@@ -22,7 +22,6 @@ interface DailyChallengePreloadedStats {
 
 interface LandingMobileCardsProps {
   language: string;
-  isLandscape: boolean;
   isMobilePortrait: boolean;
   isAdmin: boolean;
   hasBlastAccess: boolean;
@@ -35,7 +34,6 @@ interface LandingMobileCardsProps {
 
 export function LandingMobileCards({
   language,
-  isLandscape,
   isMobilePortrait,
   isAdmin,
   hasBlastAccess,
@@ -52,18 +50,6 @@ export function LandingMobileCards({
 
   return (
     <div className='flex flex-col w-full'>
-      {/* Landscape-only: Show compact welcome text */}
-      {isLandscape && (
-        <div className="text-center mb-2 animate-fade-in-fast">
-          <p className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white" role="heading" aria-level={1}>
-            <span className="sr-only">LexiClash — </span>{t('landing.welcomeTitle')}
-          </p>
-          <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/90">
-            {t('landing.welcomeSubtitle')}
-          </p>
-        </div>
-      )}
-
       {/* 2-column grid layout */}
       <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-auto content-center">
         {/* Single Player Card */}

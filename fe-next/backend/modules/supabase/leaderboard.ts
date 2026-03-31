@@ -8,7 +8,7 @@ import { getSupabase } from './client';
 /**
  * Update leaderboard entry for a player
  */
-export async function updateLeaderboardEntry(playerId: string): Promise<{ data: unknown; error: { message: string } | null }> {
+export async function updateLeaderboardEntry(playerId: string, retries = 1): Promise<{ data: unknown; error: { message: string } | null }> {
   const client = getSupabase();
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
@@ -40,6 +40,12 @@ export async function updateLeaderboardEntry(playerId: string): Promise<{ data: 
     })
     .select()
     .single();
+
+  // Retry on deadlock (concurrent upserts for same player)
+  if (error && error.message.includes('deadlock') && retries > 0) {
+    await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
+    return updateLeaderboardEntry(playerId, retries - 1);
+  }
 
   return { data, error };
 }

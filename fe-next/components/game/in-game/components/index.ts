@@ -9,5 +9,4 @@ export { GameHeader } from './GameHeader';
 export { GameLeaderboard } from './GameLeaderboard';
 export { GameWordList } from './GameWordList';
 export { ScoreDisplay } from './ScoreDisplay';
-export { LandscapeLayout } from './LandscapeLayout';
 export { PortraitLayout } from './PortraitLayout';

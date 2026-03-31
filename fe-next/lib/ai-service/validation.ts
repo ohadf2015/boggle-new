@@ -3,7 +3,7 @@
  * Handles word validation using Vertex AI and database caching
  */
 
-import type { GenerativeModel } from '@google-cloud/vertexai';
+import type { GenAIModel, GenAIContentResult } from './client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
@@ -116,7 +116,7 @@ export async function saveToCommunityWords(
  * Validate word using Vertex AI (Gemini 1.5 Flash).
  */
 export async function validateWithAI(
-  model: GenerativeModel,
+  model: GenAIModel,
   word: string,
   language: string,
   withTimeout: <T>(promise: Promise<T>, timeoutMs: number, operationName: string) => Promise<T>
@@ -166,7 +166,7 @@ Respond with ONLY valid JSON (no markdown):
 {"isValid": boolean, "reason": "brief ${languageName} explanation", "confidence": number}`;
 
   try {
-    let result: Awaited<ReturnType<typeof model.generateContent>>;
+    let result: GenAIContentResult;
     try {
       const aiPromise = model.generateContent(prompt);
       result = await withTimeout(aiPromise, AI_TIMEOUT_CONFIG.singleValidation, 'Word validation');

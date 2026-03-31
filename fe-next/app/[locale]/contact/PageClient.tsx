@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
@@ -20,7 +19,6 @@ export default function ContactPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const router = useRouter();
-  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
 
   const [formData, setFormData] = useState({
@@ -66,7 +64,6 @@ export default function ContactPageClient(): React.JSX.Element {
   return (
     <div className={cn(
       'flex-1 flex flex-col',
-      isLandscape && 'h-screen overflow-y-auto',
       isDarkMode
         ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
@@ -76,7 +73,7 @@ export default function ContactPageClient(): React.JSX.Element {
       <div className={cn(
         "max-w-2xl mx-auto px-4 page-content-safe",
         // Reduced padding: mobile 12px, desktop 16px (was 24px)
-        isLandscape ? "py-2" : "py-3 sm:py-4"
+        "py-3 sm:py-4"
       )}>
         {/* Header */}
         <motion.div

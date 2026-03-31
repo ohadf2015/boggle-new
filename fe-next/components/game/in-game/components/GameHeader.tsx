@@ -14,7 +14,7 @@ interface GameHeaderProps {
   gameActive: boolean;
   t: TranslationFn;
   /** Size variant for the header */
-  variant?: 'mobile' | 'desktop' | 'landscape';
+  variant?: 'mobile' | 'desktop';
 }
 
 /**
@@ -29,10 +29,8 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
   variant = 'mobile',
 }) {
   const isMobile = variant === 'mobile';
-  const isLandscape = variant === 'landscape';
-  const isDesktop = variant === 'desktop';
 
-  // Mobile header (horizontal bar at top)
+  // Mobile header
   if (isMobile) {
     return (
       <div className="lg:hidden w-full flex items-center justify-between px-1 py-0.5 flex-shrink-0">
@@ -78,63 +76,42 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
     );
   }
 
-  // Desktop header (absolutely positioned)
-  if (isDesktop) {
-    return (
-      <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
-        {onExitRoom && (
-          <ExitRoomButton
-            onClick={onExitRoom}
-            label={t('playerView.exit')}
-            className="w-10 h-10 md:w-12 md:h-12"
-          />
-        )}
-        {onShowTutorial && (
-          <AdaptiveMotion.button
-            onClick={onShowTutorial}
-            whileTap={{ scale: 0.95 }}
-            className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
-            aria-label={t('help.viewTutorial')}
-          >
-            <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-cream" />
-          </AdaptiveMotion.button>
-        )}
-        {hints && hints.isSinglePlayer && (
-          <HintButton
-            hint={hints.hint}
-            hintType={hints.hintType}
-            hintsRemaining={hints.hintsRemaining}
-            wordLength={hints.wordLength}
-            firstLetter={hints.firstLetter}
-            isLoading={hints.isLoading}
-            error={hints.error}
-            isAvailable={hints.isAvailable}
-            isSinglePlayer={hints.isSinglePlayer}
-            gameActive={gameActive}
-            onRequestHint={hints.requestHint}
-            onClearHint={hints.clearHint}
-            t={t}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // Landscape header (bottom action bar with exit and tutorial)
+  // Desktop header
   return (
-    <div className="flex items-center gap-2">
+    <div className="hidden lg:flex items-center gap-2 z-30 shrink-0 me-auto">
       {onExitRoom && (
-        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="w-12 h-12" />
+        <ExitRoomButton
+          onClick={onExitRoom}
+          label={t('playerView.exit')}
+          className="w-10 h-10 md:w-12 md:h-12"
+        />
       )}
       {onShowTutorial && (
         <AdaptiveMotion.button
           onClick={onShowTutorial}
           whileTap={{ scale: 0.95 }}
-          className="w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
+          className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
           aria-label={t('help.viewTutorial')}
         >
-          <HelpCircle className="w-5 h-5 text-neo-cream" />
+          <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-cream" />
         </AdaptiveMotion.button>
+      )}
+      {hints && hints.isSinglePlayer && (
+        <HintButton
+          hint={hints.hint}
+          hintType={hints.hintType}
+          hintsRemaining={hints.hintsRemaining}
+          wordLength={hints.wordLength}
+          firstLetter={hints.firstLetter}
+          isLoading={hints.isLoading}
+          error={hints.error}
+          isAvailable={hints.isAvailable}
+          isSinglePlayer={hints.isSinglePlayer}
+          gameActive={gameActive}
+          onRequestHint={hints.requestHint}
+          onClearHint={hints.clearHint}
+          t={t}
+        />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 
 // Timeout for external email service calls (prevents indefinite hangs)
 const EMAIL_SERVICE_TIMEOUT_MS = 15_000; // 15 seconds
@@ -187,6 +188,17 @@ export async function POST(request: NextRequest) {
     } else {
       console.warn('[Email Subscription] No Supabase admin client available');
     }
+
+    getPostHogServer()?.capture({
+      distinctId: email,
+      event: 'email_subscribed',
+      properties: {
+        source: source || 'unknown',
+        utm_source: body.utm_source || null,
+        utm_medium: body.utm_medium || null,
+        utm_campaign: body.utm_campaign || null,
+      },
+    });
 
     return NextResponse.json({
       success: true,

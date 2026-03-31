@@ -27,7 +27,6 @@ import { useWinStreak } from '@/hooks/useWinStreak';
 import { useIsDesktop } from '@/hooks/useDesktopLayout';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
@@ -100,7 +99,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
-  const isLandscape = useMobileLandscape();
   const isDesktop = useIsDesktop();
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
@@ -210,59 +208,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     totalPlayers: mode === 'solo-bots' ? allParticipants.length : undefined,
     isNewHighScore: results.isNewHighScore,
   }), [results.playerScore, results.playerWords, results.maxCombo, results.isNewHighScore, mode, playerRank, allParticipants.length]);
-
-  // --- LANDSCAPE MODE ---
-  if (isLandscape) {
-    const bannerLabels = {
-      tryAgain: t('singlePlayer.tryAgain'),
-      keepPracticing: t('singlePlayer.keepPracticing'),
-      newHighScore: t('singlePlayer.newHighScore'),
-      victory: t('singlePlayer.victory'),
-      gameOver: t('singlePlayer.gameOver'),
-    };
-
-    return (
-      <div className="flex h-dvh w-full overflow-hidden bg-slate-900 text-white p-1.5 sm:p-2 gap-1.5 sm:gap-2">
-        <div className="w-1/2 flex flex-col items-center gap-1.5 sm:gap-2 overflow-y-auto scrollable-area">
-          <LandscapeBanner
-            playerScore={results.playerScore} validWordCount={validWordCount}
-            isWinner={isWinner} isNewHighScore={results.isNewHighScore}
-            playerRank={playerRank} labels={bannerLabels}
-          />
-          <ScoreDisplay
-            score={displayScore(results.playerScore)} wordCount={validWordCount}
-            scoreLabel={t('common.score')} wordsLabel={t('common.words')}
-          />
-          {mode === 'solo-bots' && playerArchetype && (
-            <PlayerArchetypeBadge archetype={playerArchetype} size="sm" />
-          )}
-          {results.achievements && results.achievements.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center max-w-full px-2">
-              {results.achievements.slice(0, 3).map((achievement, i) => (
-                <AchievementBadge key={achievement.key || `ach-${i}`} achievement={achievement} index={i} />
-              ))}
-            </div>
-          )}
-          <CoinRewardDisplay reward={coinReward} variant="inline" mode={isAuthenticated ? 'earned' : 'teasing'} />
-        </div>
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto scrollable-area">
-          <LandscapeWordsSection
-            wordsByPoints={wordsByPoints} sortedPointGroups={sortedPointGroups}
-            title={t('results.yourWords')}
-          />
-          {mode === 'solo-bots' && allParticipants.length > 1 && (
-            <RankingsSection participants={allParticipants} maxDisplay={4} title={t('results.rankings')} />
-          )}
-          {!autoPlayCancelled ? (
-            <AutoPlayCountdown onComplete={onPlayAgain} onCancel={() => setAutoPlayCancelled(true)} duration={5} className="mt-auto" />
-          ) : (
-            <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" className="mt-auto" />
-          )}
-        </div>
-        <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
-      </div>
-    );
-  }
 
   // --- PORTRAIT / DESKTOP ---
   // Same components, different layout: desktop uses two-column grid via isDesktop hook.

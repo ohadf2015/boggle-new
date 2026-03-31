@@ -15,7 +15,6 @@ import {
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import EarthquakeEffects from './grid/EarthquakeEffects';
 import { getSelectionEscalation } from './grid/selectionEscalation';
-import InputModeIndicator, { type InputMode } from './grid/InputModeIndicator';
 import DragReleaseHint from './grid/DragReleaseHint';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
@@ -148,13 +147,6 @@ const GridComponent = memo<GridComponentProps>(({
     const col = Number(el.dataset.col);
     handleDoubleClick(row, col);
   }, [handleDoubleClick]);
-
-  const inputMode: InputMode = useMemo(() => {
-    if (isTypingMode) return 'keyboard';
-    if (isDragging) return 'drag';
-    if (isSelecting) return 'click';
-    return 'idle';
-  }, [isTypingMode, isDragging, isSelecting]);
 
   const formedWord = useMemo(() => selectedCells.map(c => c.letter).join(''), [selectedCells]);
   const selectedCellsLength = useMemo(() => selectedCells.length, [selectedCells]);
@@ -518,7 +510,7 @@ const GridComponent = memo<GridComponentProps>(({
               selectedCellCount={selectedCells.length}
               wordSubmitted={dragSubmitCount > 0}
             />
-            <InputModeIndicator activeMode={inputMode} />
+            {/* InputModeIndicator removed — overlaps grid tiles and confuses players */}
           </>
         )}
       </motion.div>

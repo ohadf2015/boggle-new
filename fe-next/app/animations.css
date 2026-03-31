@@ -1542,7 +1542,7 @@ body.crazygames-embed {
    MOBILE LANDSCAPE OPTIMIZATION
    ==================================== */
 
-/* Landscape orientation on mobile devices */
+/* Landscape orientation on mobile devices — DEPRECATED: landscape layouts removed, CSS kept for reference */
 @media (orientation: landscape) and (max-height: 600px) {
 
   /* Prevent horizontal scrolling */

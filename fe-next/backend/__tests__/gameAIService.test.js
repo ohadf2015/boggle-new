@@ -4,11 +4,11 @@
  */
 
 // Mock the dependencies before importing the module
-jest.mock('@google-cloud/vertexai', () => ({
-  VertexAI: jest.fn().mockImplementation(() => ({
-    getGenerativeModel: jest.fn().mockReturnValue({
+jest.mock('@google/genai', () => ({
+  GoogleGenAI: jest.fn().mockImplementation(() => ({
+    models: {
       generateContent: jest.fn(),
-    }),
+    },
   })),
 }));
 

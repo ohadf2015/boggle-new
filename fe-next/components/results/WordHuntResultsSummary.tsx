@@ -6,6 +6,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { ScoreCountUp } from '@/components/results/shared';
 import WordHuntTipBadge from './WordHuntTipBadge';
+import Avatar from '../Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface WordHuntPlayerResult {
   username: string;
@@ -16,6 +18,7 @@ export interface WordHuntPlayerResult {
   invalidWordCount?: number;
   avgWordLength?: number;
   longestWordLength?: number;
+  avatar?: { customAvatar?: CustomAvatarConfig | null };
 }
 
 interface WordHuntResultsSummaryProps {
@@ -235,11 +238,18 @@ export default function WordHuntResultsSummary({
                 }`}
                 data-testid={`match-summary-${player.username}`}
               >
-                <div className={`w-2 h-2 rounded-full shrink-0 ${
-                  isWinner
-                    ? 'bg-neo-lime shadow-[0_0_8px_rgba(191,255,0,0.6)]'
-                    : 'bg-neo-lime/60'
-                }`} />
+                <div className="relative shrink-0">
+                  <Avatar
+                    customAvatar={player.avatar?.customAvatar}
+                    userId={player.username}
+                    size="sm"
+                  />
+                  {isWinner && (
+                    <div className="absolute -top-1 -end-1 text-[8px] font-black bg-neo-lime text-neo-black rounded-full w-3.5 h-3.5 flex items-center justify-center shadow-hard-sm">
+                      👑
+                    </div>
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-black uppercase tracking-tight truncate ${
                     isCurrentUser ? 'text-neo-lime' : 'text-white'
@@ -256,7 +266,7 @@ export default function WordHuntResultsSummary({
                   </p>
                 </div>
                 <span className="text-[10px] font-black text-white/40 uppercase shrink-0">
-                  {isWinner ? (t('results.winner') || 'Winner') : `${player.lifeRemaining}%`}
+                  {isWinner ? (t('results.winner') || 'Winner') : `${Math.round(player.lifeRemaining)}%`}
                 </span>
               </motion.div>
             );
@@ -279,7 +289,18 @@ export default function WordHuntResultsSummary({
                 }`}
                 data-testid={`match-summary-${player.username}`}
               >
-                <div className="w-2 h-2 rounded-full bg-neo-red/40 shrink-0" />
+                <div className="relative shrink-0">
+                  <div className="opacity-50 grayscale">
+                    <Avatar
+                      customAvatar={player.avatar?.customAvatar}
+                      userId={player.username}
+                      size="sm"
+                    />
+                  </div>
+                  <div className="absolute -bottom-0.5 -end-0.5 flex items-center justify-center">
+                    <Skull className="w-3 h-3 text-neo-red" />
+                  </div>
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-black uppercase tracking-tight truncate ${
                     isCurrentUser ? 'text-white' : 'text-white/60'

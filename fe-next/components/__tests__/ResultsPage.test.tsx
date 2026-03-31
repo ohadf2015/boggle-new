@@ -270,54 +270,18 @@ describe('ResultsPage - WordFeedbackModal', () => {
     // The ResultsModals should be rendered BEFORE the landscape early return
     // so it appears in both landscape and portrait modes.
 
-    // Read the source file and verify ResultsModals position
+    // Landscape mode was removed — there is no longer a landscape early return.
+    // ResultsModals renders unconditionally in the single return path,
+    // so this bug class (modals missing in landscape) can no longer occur.
     const fs = require('fs');
     const path = require('path');
     const sourceFile = path.join(__dirname, '../views/ResultsPage.tsx');
     const source = fs.readFileSync(sourceFile, 'utf-8');
 
-    // Find the line number of the landscape early return
-    const lines = source.split('\n');
-    let landscapeReturnLine = -1;
-    let wordFeedbackModalLine = -1;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      // Find the landscape return: "if (isLandscape) {" followed by "return ("
-      if (line.includes('if (isLandscape)') && lines[i + 1]?.includes('return (')) {
-        landscapeReturnLine = i + 1; // The return line
-      }
-      // Find the ResultsModals render (which contains WordFeedbackModal)
-      if (line.includes('<ResultsModals') && !line.includes('mock') && !line.includes('import')) {
-        wordFeedbackModalLine = i;
-      }
-    }
-
-    // The modal should be rendered BEFORE the landscape early return
-    // OR after the landscape block closes but before the main return (which is also acceptable)
-    // Key insight: if modal is AFTER the landscape return, it won't render in landscape mode
-
-    // For the fix to be correct, the modal should be in a position where it renders
-    // regardless of the landscape conditional. This means:
-    // 1. Before the landscape check, OR
-    // 2. In both the landscape return AND the portrait return
-
-    // Current bug: modal is only in portrait return (after landscapeReturnLine)
-    // Fix: move modal before landscapeReturnLine
-
-    // Note: This test documents the expected behavior but doesn't enforce it yet
-    // because modifying mocks for a full render test is complex.
-    // The fix is verified by code review and manual testing.
-
-    expect(landscapeReturnLine).toBeGreaterThan(0);
-    expect(wordFeedbackModalLine).toBeGreaterThan(0);
-
-    // After the fix, ResultsModals should be BEFORE landscapeReturnLine
-    // This ensures WordFeedbackModal and all other modals render in both landscape and portrait modes
-
-    // FIX APPLIED: Modals component should be BEFORE landscape return so it renders in both modes
-    // If this test fails, the modals were moved after the landscape return (regression)
-    expect(wordFeedbackModalLine).toBeLessThan(landscapeReturnLine);
+    // Verify: no landscape early return exists
+    expect(source).not.toContain('if (isLandscape)');
+    // Verify: ResultsModals is still rendered
+    expect(source).toContain('<ResultsModals');
   });
 });
 

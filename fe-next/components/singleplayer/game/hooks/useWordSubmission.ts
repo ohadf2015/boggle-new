@@ -331,8 +331,10 @@ export function useWordSubmission({
     };
 
     // Step 4.5: Try client-side dictionary cache for INSTANT validation
+    // Only short-circuit on cache HIT (word found = valid). A cache miss
+    // falls through to prevalidation / API because the local cache may be
+    // incomplete.
     if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
-      // Word found in local cache - instant validation, no API call needed!
       handleValidWord();
       return;
     }

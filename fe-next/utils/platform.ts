@@ -64,6 +64,17 @@ export function isWeb(): boolean {
 }
 
 /**
+ * Check if running on a mobile device (native or mobile web browser)
+ * Uses User-Agent heuristic for mobile web detection.
+ * @returns true if mobile (native or mobile browser), false otherwise
+ */
+export function isMobile(): boolean {
+  if (isNative()) return true;
+  if (typeof navigator === 'undefined') return false;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+/**
  * Get current platform identifier
  * @returns 'ios' | 'android' | 'web'
  */

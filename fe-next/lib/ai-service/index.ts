@@ -3,9 +3,8 @@
  * Vertex AI + Supabase Integration for word validation and generation
  */
 
-import type { GenerativeModel, VertexAI } from '@google-cloud/vertexai';
+import type { GoogleGenAI } from '@google/genai';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
 
 // Import all modules
 import type {
@@ -17,6 +16,7 @@ import type {
 } from './types';
 import { validationCache } from './cache';
 import {
+  type GenAIModel,
   parseGoogleCredentials,
   createServiceClient,
   initializeVertexAI,
@@ -48,8 +48,8 @@ import logger from '@/backend/utils/logger';
  * Provides word validation, hint generation, and themed board creation
  */
 class GameAIService {
-  private vertexAI: VertexAI | null = null;
-  private model: GenerativeModel | null = null;
+  private vertexAI: GoogleGenAI | null = null;
+  private model: GenAIModel | null = null;
   private supabaseAdmin: SupabaseClient | null = null;
   private credentials: GoogleCredentials | null = null;
   private initialized = false;
@@ -78,8 +78,8 @@ class GameAIService {
       this.credentials = parseGoogleCredentials();
 
       // Initialize Vertex AI
-      const { vertexAI, model } = await initializeVertexAI(this.credentials);
-      this.vertexAI = vertexAI;
+      const { ai, model } = await initializeVertexAI(this.credentials);
+      this.vertexAI = ai;
       this.model = model;
 
       // Initialize Supabase admin client

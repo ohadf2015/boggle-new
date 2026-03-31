@@ -851,14 +851,12 @@ body {
   }
 
   /* On desktop screens, size grid to fill available space between sidebars */
-  /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
-  /* Vertical chrome: timer + stats + word area + gaps. Use clamp to handle short viewports */
+  /* Sidebars are ~224-288px each, gaps ~24px, so subtract ~500-600px for both + gaps */
+  /* Vertical: timer(64px) + word-forming(40px) + input(50px) + gaps ≈ 200px */
   @media (min-width: 769px) {
     .game-board-frame {
-      /* Desktop: larger grid that fills available space between sidebars */
-      /* Chrome = header(80px) + timer(80px) + word-forming(40px) + input(50px) + hints(30px) + gaps(~40px) ≈ 320px */
-      --game-chrome-desktop: clamp(300px, 42dvh, 400px);
-      --board-size: min(45vmin, calc(100vw - 550px), calc(100dvh - var(--game-chrome-desktop)), 500px);
+      --game-chrome-desktop: clamp(180px, 28dvh, 260px);
+      --board-size: min(55vmin, calc(100vw - 500px), calc(100dvh - var(--game-chrome-desktop)), 560px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: min(var(--board-size), 100%);
@@ -869,8 +867,8 @@ body {
   /* Large desktop screens - more room, larger grid */
   @media (min-width: 1280px) {
     .game-board-frame {
-      --game-chrome-desktop: clamp(300px, 40dvh, 380px);
-      --board-size: min(48vmin, calc(100vw - 620px), calc(100dvh - var(--game-chrome-desktop)), 500px);
+      --game-chrome-desktop: clamp(180px, 26dvh, 240px);
+      --board-size: min(58vmin, calc(100vw - 560px), calc(100dvh - var(--game-chrome-desktop)), 580px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: min(var(--board-size), 100%);
@@ -880,8 +878,8 @@ body {
   /* Extra large desktop screens - maximize grid utilization */
   @media (min-width: 1536px) {
     .game-board-frame {
-      --game-chrome-desktop: clamp(300px, 38dvh, 370px);
-      --board-size: min(52vmin, calc(100vw - 700px), calc(100dvh - var(--game-chrome-desktop)), 500px);
+      --game-chrome-desktop: clamp(180px, 24dvh, 230px);
+      --board-size: min(62vmin, calc(100vw - 620px), calc(100dvh - var(--game-chrome-desktop)), 620px);
       width: var(--board-size);
       height: var(--board-size);
       max-height: min(var(--board-size), 100%);
@@ -894,7 +892,7 @@ body {
       padding: 8px;
       /* Single variable for BOTH width AND height — guarantees square grid on mobile */
       /* Pick the smaller of: available width, or available height minus UI chrome */
-      --board-size: min(calc(100dvw - 32px), calc(100dvh - var(--game-chrome-height, 280px) - env(safe-area-inset-bottom, 0px)));
+      --board-size: min(calc(100dvw - 32px), calc(100dvh - var(--game-chrome-height, 280px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
       width: var(--board-size);
       height: var(--board-size);
       max-width: min(var(--board-size), 100%);

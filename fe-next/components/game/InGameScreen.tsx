@@ -3,7 +3,6 @@
 import React, { useRef, useEffect, useCallback, useMemo, memo, useState, useDeferredValue } from 'react';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
@@ -20,12 +19,11 @@ import type { SelectedCell } from '@/components/grid';
 import {
   useWordSubmission,
   useEarthquakeEffects,
-  useViewportTracking,
   useSocketFeedback,
 } from './in-game/hooks';
 
 // Extracted sub-components
-import { LandscapeLayout, PortraitLayout } from './in-game/components';
+import { PortraitLayout } from './in-game/components';
 
 // Types
 import type { InGameScreenProps, EarthquakeState } from './in-game/types';
@@ -122,8 +120,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   } = useSoundEffects();
 
   const { announceWordResult, announceTimer } = useAnnouncer();
-  const isLandscape = useMobileLandscape();
-
   // Enable sound effects when in-game
   useEffect(() => {
     setSoundGameActive(true);
@@ -199,15 +195,12 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Auto-scroll to game area on game start
   useAutoScrollOnGameStart(gameStatsRef, {
     gameActive,
-    isLandscape,
+    isLandscape: false,
     showStartAnimation,
   });
 
   // Tap-to-drag guidance
   const tapDragGuidance = useTapToDragGuidance();
-
-  // Viewport tracking for landscape height adjustments
-  const { isExtremelyShortLandscape } = useViewportTracking(isLandscape);
 
   // Earthquake/fire round effects
   useEarthquakeEffects({
@@ -391,15 +384,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     wordHuntEliminatedPlayers,
     onWordHuntGuess,
   } as const;
-
-  // Landscape layout
-  if (isLandscape) {
-    return (
-      <LandscapeLayout {...sharedLayoutProps} isExtremelyShortLandscape={isExtremelyShortLandscape}>
-        {children}
-      </LandscapeLayout>
-    );
-  }
 
   // Portrait/Desktop Layout
   return (

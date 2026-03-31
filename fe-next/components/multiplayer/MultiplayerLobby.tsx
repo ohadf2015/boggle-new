@@ -13,8 +13,6 @@ import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } f
 import { useValidation } from '@/hooks/useValidation';
 import { generateRoomCode as generateCode } from '@/utils/utils';
 import type { Language, ActiveRoom } from '@/shared/types/game';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import LandscapeIndicator from '@/components/LandscapeIndicator';
 import {
   RoomList,
   LanguageSelector,
@@ -74,7 +72,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   isProfileLoading = false,
 }) => {
   const { t, language, dir } = useLanguage();
-  const isLandscape = useMobileLandscape();
   const [mode, setMode] = useState<JoinMode>('join');
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
@@ -214,136 +211,8 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
     }
   }, [gameCode, username, setGameCode, handleJoin]);
 
-  // Landscape mode layout - optimized 2-column: form left, room list right
-  if (isLandscape) {
-    return (
-      <>
-        {/* Landscape mode suggestion banner */}
-        <LandscapeIndicator />
-
-        <div dir={dir} className="flex h-dvh w-full overflow-hidden bg-neo-navy text-white p-3 gap-4 landscape-full-height">
-        {/* Left column: Form */}
-        <div className="w-[45%] rtl:order-2 flex flex-col gap-3 overflow-y-auto overscroll-contain scrollable-area">
-          {/* Header with back + title */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime transition-all"
-              aria-label={t('common.back')}
-            >
-              <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
-            </Link>
-            <h1 className="text-xl font-black uppercase text-neo-white flex-1">
-              {t('landing.multiplayer')}
-            </h1>
-          </div>
-
-          {/* Mode Selector - compact */}
-          <ModeSelector mode={mode} onModeChange={handleModeChange} />
-
-          {/* Error */}
-          {error && (
-            <Alert variant="destructive" className="py-2">
-              <AlertDescription className="text-sm">{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* Form fields */}
-          <form onSubmit={handleSubmit} className="flex flex-col space-y-3 flex-1 min-h-0">
-            <div className="flex-1 overflow-y-auto space-y-3">
-              {mode === 'host' ? (
-                <div className="space-y-3 text-sm">
-                  <HostModeFields
-                    gameCode={gameCode}
-                    setGameCode={setGameCode}
-                    gameCodeError={gameCodeError}
-                    setGameCodeError={setGameCodeError}
-                    gameCodeErrorKey={gameCodeErrorKey}
-                    roomName={roomName}
-                    setRoomName={setRoomName}
-                    roomNameError={roomNameError}
-                    setRoomNameError={setRoomNameError}
-                    roomNameErrorKey={roomNameErrorKey}
-                    hostUsername={hostUsername}
-                    setHostUsername={setHostUsername}
-                    hostUsernameError={hostUsernameError}
-                    setHostUsernameError={setHostUsernameError}
-                    hostUsernameErrorKey={hostUsernameErrorKey}
-                    generateRoomCode={generateRoomCode}
-                    isAuthenticated={isAuthenticated}
-                    displayName={displayName}
-                    isProfileLoading={isProfileLoading}
-                    t={t}
-                  />
-                  <div>
-                    <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
-                      {t('joinView.language')}
-                    </Label>
-                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} hideLabel />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3 text-sm">
-                  <JoinModeFields
-                    gameCode={gameCode}
-                    setGameCode={setGameCode}
-                    gameCodeError={gameCodeError}
-                    setGameCodeError={setGameCodeError}
-                    gameCodeErrorKey={gameCodeErrorKey}
-                    username={username}
-                    setUsername={setUsername}
-                    usernameError={usernameError}
-                    setUsernameError={setUsernameError}
-                    usernameErrorKey={usernameErrorKey}
-                    isAuthenticated={isAuthenticated}
-                    displayName={displayName}
-                    t={t}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Submit Button - fixed at bottom */}
-            <Button
-              type="submit"
-              disabled={isJoining}
-              className="w-full h-12 font-black uppercase text-base bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
-            >
-              {mode === 'host' ? <Crown className="me-2 w-5 h-5" /> : <User className="me-2 w-5 h-5" />}
-              {isJoining ? (t('common.loading')) : mode === 'host' ? (t('joinView.createRoom')) : (t('joinView.joinRoom'))}
-            </Button>
-          </form>
-        </div>
-
-        {/* Right column: Room List */}
-        <div className="w-[55%] rtl:order-1 flex flex-col gap-3 overflow-hidden">
-          <h2 className="text-base font-black uppercase text-neo-white text-center">
-            {t('joinView.activeRooms')}
-          </h2>
-          <div className="flex-1 overflow-y-auto overscroll-contain scrollable-area bg-neo-navy text-white rounded-neo border-3 border-neo-black p-3 shadow-hard">
-            <RoomList
-              activeRooms={activeRooms}
-              onRoomSelect={handleRoomSelect}
-              selectedGameCode={gameCode}
-              roomsLoading={roomsLoading}
-              onRefresh={refreshRooms}
-              onSwitchToHostMode={() => setMode('host')}
-              isJoinMode={mode === 'join'}
-              mobileExpanded={true}
-              onToggleMobileExpand={() => {}}
-            />
-          </div>
-        </div>
-      </div>
-      </>
-    );
-  }
-
   return (
     <>
-      {/* Landscape mode suggestion banner */}
-      <LandscapeIndicator />
-
       <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col overflow-y-auto scrollable-area">
       <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0 pb-[--mobile-bottom-safe]">
         {/* Compact Header: back button + title inline with premium gradient accent */}

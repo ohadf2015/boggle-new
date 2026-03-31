@@ -1,13 +1,30 @@
 /**
- * Vertex AI Client Setup and Initialization
- * Handles Google Cloud credentials and Vertex AI model initialization
+ * Google Gen AI Client Setup and Initialization
+ * Handles Google Cloud credentials and model initialization via @google/genai
  */
 
-import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
+import { GoogleGenAI } from '@google/genai';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { captureAIServiceError } from '@/utils/sentry';
 import { TOKEN_COSTS, type GoogleCredentials, type TokenUsageStats } from './types';
 import logger from '@/backend/utils/logger';
+
+/**
+ * Thin wrapper that provides the same model.generateContent(prompt) interface
+ * used by validation.ts, hints.ts, and generation.ts — backed by @google/genai.
+ */
+export interface GenAIModel {
+  generateContent(prompt: string): Promise<GenAIContentResult>;
+}
+
+export interface GenAIContentResult {
+  response: {
+    candidates?: Array<{
+      content?: { parts?: Array<{ text?: string }> };
+      finishReason?: string;
+    }>;
+  };
+}
 
 /**
  * Parse Google Cloud credentials from JSON string environment variable.
@@ -74,14 +91,16 @@ export function createServiceClient(): SupabaseClient | null {
 }
 
 /**
- * Initialize Vertex AI with parsed credentials
+ * Initialize Google Gen AI with Vertex AI backend
  */
 export async function initializeVertexAI(
   credentials: GoogleCredentials
-): Promise<{ vertexAI: VertexAI; model: GenerativeModel }> {
+): Promise<{ ai: GoogleGenAI; model: GenAIModel }> {
   try {
-    // Initialize Vertex AI with credentials object (not file path)
-    const vertexAI = new VertexAI({
+    const modelName = process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002';
+
+    const ai = new GoogleGenAI({
+      vertexai: true,
       project: credentials.project_id,
       location: process.env.VERTEX_AI_LOCATION || 'us-central1',
       googleAuthOptions: {
@@ -93,18 +112,35 @@ export async function initializeVertexAI(
       },
     });
 
-    // Get the Gemini 1.5 Flash model
-    const model = vertexAI.getGenerativeModel({
-      model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.1, // Low temperature for consistent validation
-        responseMimeType: 'application/json',
+    // Wrap in the GenAIModel interface for backwards compatibility
+    const model: GenAIModel = {
+      async generateContent(prompt: string): Promise<GenAIContentResult> {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+          config: {
+            maxOutputTokens: 1024,
+            temperature: 0.1,
+            responseMimeType: 'application/json',
+          },
+        });
+
+        // Adapt response to the old format expected by consumers
+        return {
+          response: {
+            candidates: response.candidates?.map(c => ({
+              content: {
+                parts: c.content?.parts?.map(p => ({ text: p.text })),
+              },
+              finishReason: c.finishReason,
+            })),
+          },
+        };
       },
-    });
+    };
 
     logger.info('AI_SERVICE', ' Initialized successfully');
-    return { vertexAI, model };
+    return { ai, model };
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown initialization error';
     logger.error('AI_SERVICE', ' Initialization failed:', msg);

@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { validateBlastResult, calculatePersonalBests, type PersonalBests } from '../utils';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 
 // Lazy-init to avoid crash on missing env vars
 function getSupabaseConfig() {
@@ -196,6 +197,18 @@ export async function POST(request: NextRequest) {
         xpAwarded = xpToAward;
       }
     }
+
+    getPostHogServer()?.capture({
+      distinctId: userId,
+      event: 'blast_completed',
+      properties: {
+        difficulty: data.difficulty,
+        score: data.score,
+        stars: data.stars,
+        is_new_best_score: isNewBestScore,
+        xp_awarded: xpAwarded,
+      },
+    });
 
     return NextResponse.json({
       success: true,

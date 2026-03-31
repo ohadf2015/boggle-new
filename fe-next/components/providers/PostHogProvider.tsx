@@ -30,10 +30,11 @@ function initPostHog() {
   posthogInitialized = true;
 
   posthog.init(key, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
     opt_out_capturing_by_default: true,
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
+    capture_exceptions: true, // Capture unhandled JS errors and promise rejections
     persistence: 'localStorage+cookie',
     loaded: (ph) => {
       // Opt in immediately if consent already granted

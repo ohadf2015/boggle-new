@@ -161,7 +161,7 @@ export function PortraitGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
+    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       {/* Dynamic Energy Background */}
       <DynamicEnergyBackground />
 
@@ -388,7 +388,7 @@ export function PortraitGameLayout({
       )}
 
       {/* Game grid - Takes remaining space */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-1 relative z-30 min-h-0">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 relative z-30 min-h-0">
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (

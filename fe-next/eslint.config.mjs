@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     // Test coverage reports
     "coverage/**",
     "backend/coverage/**",
+    // Production build output
+    "dist/**",
   ]),
   {
     rules: {

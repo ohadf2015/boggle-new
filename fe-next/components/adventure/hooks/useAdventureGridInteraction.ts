@@ -8,7 +8,8 @@ import type { GridTileState } from '@/types/adventure';
 interface UseAdventureGridInteractionParams {
   isPlaying: boolean;
   isPaused: boolean;
-  isValidating: boolean;
+  /** @deprecated no longer used to block interaction — kept for interface compat */
+  isValidating?: boolean;
   selectTile: (index: number) => void;
   clearSelection: () => void;
   resetOnGameAction: () => void;
@@ -34,7 +35,7 @@ interface UseAdventureGridInteractionParams {
 
 export function useAdventureGridInteraction(params: UseAdventureGridInteractionParams) {
   const {
-    isPlaying, isPaused, isValidating, selectTile, clearSelection,
+    isPlaying, isPaused, selectTile, clearSelection,
     resetOnGameAction, startGame, pauseGame, setIsPaused,
     selectedIndices, currentWord, handleWordSubmit,
     tiles, cascadePhase, lastSubmittedWordRef, gridRef, gridSize, effects,
@@ -92,23 +93,23 @@ export function useAdventureGridInteraction(params: UseAdventureGridInteractionP
 
   const handleTileSelect = useCallback(
     (index: number, _tile: GridTileState) => {
-      if (!isPlaying || isPaused || isValidating) return;
+      if (!isPlaying || isPaused) return;
       selectTile(index); resetOnGameAction();
-    }, [isPlaying, isPaused, isValidating, selectTile, resetOnGameAction]
+    }, [isPlaying, isPaused, selectTile, resetOnGameAction]
   );
 
   const handleDragStart = useCallback(
     (index: number, _tile: GridTileState) => {
-      if (!isPlaying || isPaused || isValidating) return;
+      if (!isPlaying || isPaused) return;
       clearSelection(); selectTile(index);
-    }, [isPlaying, isPaused, isValidating, clearSelection, selectTile]
+    }, [isPlaying, isPaused, clearSelection, selectTile]
   );
 
   const handleDragEnter = useCallback(
     (index: number, _tile: GridTileState) => {
-      if (!isPlaying || isPaused || isValidating) return;
+      if (!isPlaying || isPaused) return;
       selectTile(index);
-    }, [isPlaying, isPaused, isValidating, selectTile]
+    }, [isPlaying, isPaused, selectTile]
   );
 
   const handleDragEnd = useCallback(() => {

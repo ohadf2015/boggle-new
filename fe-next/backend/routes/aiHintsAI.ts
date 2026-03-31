@@ -3,10 +3,11 @@
  * AI-powered hint generation with retry logic and response parsing
  */
 
-import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
+import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import logger from '../utils/logger';
 import { LANGUAGE_CONFIG, type HintGenerationResponse } from './aiHintsCore';
+import type { GenAIModel, GenAIContentResult } from '@/lib/ai-service/client';
 
 interface GoogleCredentials {
   project_id: string;
@@ -49,12 +50,14 @@ function parseGoogleCredentials(): GoogleCredentials | null {
   }
 }
 
-let geminiModel: GenerativeModel | null = null;
+let geminiModel: GenAIModel | null = null;
 
 const credentials = parseGoogleCredentials();
 if (credentials) {
   try {
-    const vertexAI = new VertexAI({
+    const modelName = process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002';
+    const ai = new GoogleGenAI({
+      vertexai: true,
       project: credentials.project_id,
       location: process.env.VERTEX_AI_LOCATION || 'us-central1',
       googleAuthOptions: {
@@ -62,17 +65,30 @@ if (credentials) {
         projectId: credentials.project_id,
       },
     });
-    geminiModel = vertexAI.getGenerativeModel({
-      model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
-      generationConfig: { maxOutputTokens: 400, temperature: 0.3 },
-    });
-    logger.info('API', 'Vertex AI initialized for hint generation');
+    geminiModel = {
+      async generateContent(prompt: string): Promise<GenAIContentResult> {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+          config: { maxOutputTokens: 400, temperature: 0.3 },
+        });
+        return {
+          response: {
+            candidates: response.candidates?.map(c => ({
+              content: { parts: c.content?.parts?.map(p => ({ text: p.text })) },
+              finishReason: c.finishReason,
+            })),
+          },
+        };
+      },
+    };
+    logger.info('API', 'Google Gen AI initialized for hint generation');
   } catch (error) {
-    logger.error('API', `Failed to initialize Vertex AI: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    logger.error('API', `Failed to initialize Google Gen AI: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
-export function getGeminiModel(): GenerativeModel | null {
+export function getGeminiModel(): GenAIModel | null {
   return geminiModel;
 }
 

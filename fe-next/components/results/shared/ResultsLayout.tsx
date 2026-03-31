@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 interface ResultsLayoutProps {
   /** Zone 1: Hero section (score, outcome, stats) — always full width */
@@ -19,9 +18,8 @@ interface ResultsLayoutProps {
 /**
  * ResultsLayout — Unified responsive layout for all results pages.
  *
- * - Portrait mobile: single column scroll (hero → actions → analysis)
+ * - Mobile: single column scroll (hero → actions → analysis → sidebar)
  * - Desktop (lg+): hero full-width, then 2-col (actions+analysis left, sidebar right)
- * - Landscape mobile: simplified 2-col (actions left, sidebar right)
  */
 export function ResultsLayout({
   hero,
@@ -30,36 +28,6 @@ export function ResultsLayout({
   sidebar,
   className,
 }: ResultsLayoutProps) {
-  const isLandscape = useMobileLandscape();
-
-  if (isLandscape) {
-    return (
-      <div className={cn(
-        'flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain scrollable-area',
-        className,
-      )}>
-        {/* Compact hero in landscape */}
-        <div className="px-3 pt-2 pb-1">{hero}</div>
-
-        {/* 2-column: actions left, sidebar right */}
-        <div
-          data-testid="landscape-grid"
-          className="flex-1 grid grid-cols-2 gap-3 px-3 pb-3 min-h-0"
-        >
-          <div className="overflow-y-auto overscroll-contain space-y-3">
-            {actions}
-            {analysis}
-          </div>
-          {sidebar && (
-            <div className="overflow-y-auto overscroll-contain">
-              {sidebar}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={cn(
       'flex-1 min-h-0 flex flex-col items-center overflow-y-auto overscroll-contain scrollable-area',

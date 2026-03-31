@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
+import { getPostHogServer } from '@/lib/posthog';
 import { DRILL_DOMAINS, type DrillType, type CognitiveDomain } from '@/shared/types/cognitive';
 import {
   calculateRollingAverage,
@@ -355,6 +356,19 @@ export async function POST(request: NextRequest) {
         xpAwarded = xpToAward;
       }
     }
+
+    getPostHogServer()?.capture({
+      distinctId: user.id,
+      event: 'drill_completed',
+      properties: {
+        drill_type: drillType,
+        level,
+        score,
+        words_found: wordsFound,
+        xp_awarded: xpAwarded,
+        cognitive_domain: targetDomain,
+      },
+    });
 
     return NextResponse.json({
       success: true,

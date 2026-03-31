@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
@@ -68,7 +67,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const router = useRouter();
   const { playTrack, unlockAudio, TRACKS } = useMusic();
   const { isAuthenticated, isAdmin, profile } = useAuth();
-  const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
 
   // Defer below-fold content until after first paint to speed up FCP.
@@ -158,29 +156,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   // FTUE is now handled by PageClient — LandingView only renders for returning users
 
-  // Mobile landscape uses the compact card layout
-  if (isLandscape && !isDesktopWidth) {
-    return (
-      <div className="flex-1 flex flex-col bg-gray-100 dark:bg-neo-navy relative page-content-safe landscape-full-height">
-        <Header />
-        <section className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2">
-          <LandingMobileCards
-            language={language}
-            isLandscape={isLandscape}
-            isMobilePortrait={isMobilePortrait}
-            isAdmin={isAdmin}
-            hasBlastAccess={!!profile?.blast_access}
-            activePlayers={liveRoomStats.activePlayers}
-            t={t}
-            onSinglePlayerClick={handlePlayClick}
-            onShareClick={() => setShowShareModal(true)}
-            dailyChallengeStats={dailyChallengeStats}
-          />
-        </section>
-        <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
-      </div>
-    );
-  }
 
   return (
     <div
@@ -272,9 +247,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         )}
       </section>
 
-      {!isLandscape && <ScrollIndicator />}
+      <ScrollIndicator />
 
-      {!isLandscape && !isMobilePortrait && (
+      {!isMobilePortrait && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdPlaceholder zone="menu" className="my-4" />
         </div>

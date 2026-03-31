@@ -227,7 +227,7 @@ const AdventureGame = memo<AdventureGameProps>(
       clickSubmitRef.current?.(word, indices);
     }, []);
     const { selectedIndices, currentWord, selectTile, clearSelection, pathPoints, adjacentIndices } = useAdventureSelection({
-      tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused || isValidating, gridRef,
+      tiles, gridSize: levelConfig.gridSize, disabled: !isPlaying || isPaused, gridRef,
       onClickSubmit: handleClickSubmit,
     });
 
@@ -528,8 +528,8 @@ const AdventureGame = memo<AdventureGameProps>(
               onWordSubmit={wordSubmit.handleWordSubmit}
               onDragStart={gridInteraction.handleDragStart} onDragEnter={gridInteraction.handleDragEnter} onDragEnd={gridInteraction.handleDragEnd}
               gridRef={gridRef}
-              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused && !isValidating}
-              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused || isValidating}
+              isInteractive={entryPhase === 'playing' && isPlaying && !isPaused}
+              isDisabled={entryPhase !== 'playing' || !isPlaying || isPaused}
               entryPhase={entryPhase} showCascade={entryPhase === 'cascade'}
               onCascadeComplete={handleCascadeComplete}
               hintHighlightIndices={hintHighlightIndices} adjacentIndices={adjacentIndices} pathPoints={pathPoints}

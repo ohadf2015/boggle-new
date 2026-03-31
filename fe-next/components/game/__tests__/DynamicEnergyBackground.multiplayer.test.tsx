@@ -13,11 +13,6 @@ const portraitSource = fs.readFileSync(
   'utf-8'
 );
 
-const landscapeSource = fs.readFileSync(
-  path.resolve(__dirname, '../in-game/components/LandscapeLayout.tsx'),
-  'utf-8'
-);
-
 describe('DynamicEnergyBackground in multiplayer layouts', () => {
   describe('PortraitLayout', () => {
     it('should import DynamicEnergyBackground', () => {
@@ -26,16 +21,6 @@ describe('DynamicEnergyBackground in multiplayer layouts', () => {
 
     it('should render DynamicEnergyBackground', () => {
       expect(portraitSource).toContain('<DynamicEnergyBackground');
-    });
-  });
-
-  describe('LandscapeLayout', () => {
-    it('should import DynamicEnergyBackground', () => {
-      expect(landscapeSource).toContain('DynamicEnergyBackground');
-    });
-
-    it('should render DynamicEnergyBackground', () => {
-      expect(landscapeSource).toContain('<DynamicEnergyBackground');
     });
   });
 });

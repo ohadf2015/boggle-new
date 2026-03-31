@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useState, useCallback, useDeferredValue } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, useDeferredValue, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
@@ -13,7 +13,6 @@ import { getGuestStatsSummary } from '@/utils/guestManager';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import logger from '@/utils/logger';
 import type { ResultsPageProps } from '@/types/components';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
@@ -21,8 +20,6 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
 
-// Dynamic import for landscape layout
-const ResultsLandscapeLayout = dynamic(() => import('@/components/results/ResultsLandscapeLayout'), { ssr: false });
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
 // MobileTabBar replaced by inline floating pill for results page
 
@@ -45,10 +42,154 @@ const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResu
 
 const SERIES_TOTAL_GAMES = 3;
 
+// ==============================================
+// DESKTOP RESULTS LAYOUT
+// ==============================================
+// Full-width hero area (podium + consolation) on top,
+// then two-column grid for words/stats and other players below.
+
+interface DesktopResultsLayoutProps {
+  handleExitRoom: () => void;
+  exitLabel?: string;
+  mainContentProps: any;
+  detailsContentProps: any;
+  resolvedGameMode: string | undefined;
+  wordHuntResultsData: any;
+  blastMovesUsed: number;
+  blastTotalTilesCleared: number;
+  blastTotalTileBonus: number;
+  gameCode?: string;
+  sortedScores: any[];
+  otherPlayers: any[];
+  isBotsOnlyGame: boolean;
+}
+
+function DesktopResultsLayout({
+  handleExitRoom,
+  exitLabel,
+  mainContentProps,
+  detailsContentProps,
+  resolvedGameMode,
+  wordHuntResultsData,
+  blastMovesUsed,
+  blastTotalTilesCleared,
+  blastTotalTileBonus,
+  gameCode,
+  sortedScores,
+  otherPlayers,
+  isBotsOnlyGame,
+}: DesktopResultsLayoutProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const checkScroll = () => {
+      const hasMoreContent = el.scrollHeight > el.clientHeight + 40;
+      const isNearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+      setShowScrollIndicator(hasMoreContent && !isNearBottom);
+    };
+
+    checkScroll();
+    // Recheck after animations settle
+    const timer = setTimeout(checkScroll, 800);
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  return (
+    <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 relative">
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area p-4 xl:p-6 pb-32"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {/* Top Bar with Exit Button */}
+        <div className="w-full max-w-5xl mx-auto flex items-center justify-end mb-4">
+          <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />
+        </div>
+
+        {/* Full-width cinematic area: Hero + Podium + Consolation */}
+        <div className="w-full max-w-5xl mx-auto">
+          <ResultsMainContent
+            {...mainContentProps}
+            hideInlineCta={!!gameCode && !isBotsOnlyGame}
+          />
+        </div>
+
+        {/* Two-column area below the cinematic hero */}
+        <div className="w-full max-w-5xl mx-auto mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT: Game mode summary + social + engagement */}
+          <div className="space-y-4">
+            {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
+              <WordHuntResultsSummary {...wordHuntResultsData} />
+            )}
+            {resolvedGameMode === 'blast' && (
+              <BlastResultsSummary
+                movesUsed={blastMovesUsed}
+                tilesCleared={blastTotalTilesCleared}
+                tileBonus={blastTotalTileBonus}
+              />
+            )}
+            {gameCode && sortedScores.length > 1 && (
+              <PostGameSocialActions
+                opponents={otherPlayers}
+                reducedMotion={null}
+              />
+            )}
+            <PostGameEngagement />
+          </div>
+
+          {/* RIGHT: Other players expanded + achievements */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
+            className="space-y-4"
+          >
+            <ResultsDetailsContent
+              {...detailsContentProps}
+              hideRankAndScore={true}
+            />
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Scroll indicator — subtle bouncing chevron at bottom */}
+      <AnimatePresence>
+        {showScrollIndicator && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+          >
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+              className="flex flex-col items-center gap-0.5"
+            >
+              <div className="w-6 h-6 rounded-full bg-neo-white/10 backdrop-blur-sm flex items-center justify-center border border-neo-white/20">
+                <svg className="w-3 h-3 text-neo-white/60" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, onResetSeries, wordHuntSummary }) => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
-  const isLandscape = useMobileLandscape();
   const setIsInGame = useHideNavigation();
 
   // Hide global bottom nav on mobile while viewing results
@@ -348,43 +489,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     />
   );
 
-  // Landscape mode layout - 2-column: winner/actions left, player cards right
-  if (isLandscape) {
-    return (
-      <ResultsLandscapeLayout
-        sortedScores={sortedScores}
-        username={username || ''}
-        currentUsername={username || ''}
-        gameCode={gameCode}
-        isHost={isHost}
-        isBotsOnlyGame={isBotsOnlyGame}
-        isCurrentPlayerReady={isCurrentPlayerReady}
-        readyUsernames={readyUsernames}
-        onReturnToRoom={onReturnToRoom}
-        onExitRoom={handleExitRoom}
-        onStartGame={handleStartGame}
-        onMarkReady={handleMarkReady}
-        showExitConfirm={showExitConfirm}
-        setShowExitConfirm={setShowExitConfirm}
-        onConfirmExit={confirmExitRoom}
-        allPlayerWords={allPlayerWords}
-        playerArchetypes={playerArchetypes}
-        xpGainedData={xpGainedData}
-        levelUpData={levelUpData}
-        duplicateRuleDisabled={duplicateRuleDisabled}
-        normalizeUsername={normalizeUsername}
-        overlayModals={overlayModals}
-        t={t}
-        selectedGameMode={selectedGameMode}
-        onSelectGameMode={setSelectedGameMode}
-        isSeriesComplete={isSeriesComplete}
-        seriesWinnerUsername={seriesWinnerUsername}
-        onNewSeries={handleNewSeries}
-      />
-    );
-  }
-
-  // Shared props for main content component
+  // Shared props for main content component (built before landscape check so landscape can use them)
   const mainContentProps = {
     sortedScores,
     nearMisses,
@@ -451,6 +556,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         invalidWordCount: invalidWords.length,
         avgWordLength: avgLen,
         longestWordLength: longestLen,
+        avatar: p.avatar,
       };
     }),
     currentUsername: username,
@@ -621,49 +727,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         )}
       </div>
 
-      {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
-      <div className="hidden md:flex md:flex-col md:flex-1 md:min-h-0 md:overflow-y-auto md:overscroll-contain scrollable-area p-4 xl:p-6 pb-32" style={{ WebkitOverflowScrolling: 'touch' }}>
-        {/* Top Bar with Exit Button and Reactions */}
-        <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
-          <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
-        </div>
-
-        {/* Two-Column Layout */}
-        <div className="flex-1 w-full max-w-6xl mx-auto flex flex-row gap-6">
-          {/* LEFT COLUMN: Results */}
-          <div className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4">
-            <ResultsMainContent
-              {...mainContentProps}
-              hideInlineCta={!!gameCode && !isBotsOnlyGame}
-            />
-            {/* Social actions: Add Friend for non-friend opponents (E-10, E-14) */}
-            {gameCode && sortedScores.length > 1 && (
-              <PostGameSocialActions
-                opponents={otherPlayers}
-                reducedMotion={null}
-              />
-            )}
-            {/* Post-game engagement: league rivals, WOTD, word collection */}
-            <PostGameEngagement />
-          </div>
-
-          {/* Vertical divider */}
-          <div className="w-px bg-neo-white/10 self-stretch shrink-0" />
-
-          {/* RIGHT COLUMN: Details — slightly delayed entrance on desktop */}
-          <motion.div
-            className="flex-1 min-w-0 max-w-xl lg:max-w-2xl xl:max-w-3xl space-y-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
-          >
-            <ResultsDetailsContent
-              {...detailsContentProps}
-              hideRankAndScore={true}
-            />
-          </motion.div>
-        </div>
-      </div>
+      {/* DESKTOP/TABLET VIEW - Full-width hero then two-column details */}
+      <DesktopResultsLayout
+        handleExitRoom={handleExitRoom}
+        exitLabel={t('results.exitRoom')}
+        mainContentProps={mainContentProps}
+        detailsContentProps={detailsContentProps}
+        resolvedGameMode={resolvedGameMode}
+        wordHuntResultsData={wordHuntResultsData}
+        blastMovesUsed={blastMovesUsed}
+        blastTotalTilesCleared={blastTotalTilesCleared}
+        blastTotalTileBonus={blastTotalTileBonus}
+        gameCode={gameCode}
+        sortedScores={sortedScores}
+        otherPlayers={otherPlayers}
+        isBotsOnlyGame={isBotsOnlyGame}
+      />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}
       {gameCode && onReturnToRoom && (

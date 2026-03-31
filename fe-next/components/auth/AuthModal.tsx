@@ -13,7 +13,7 @@ const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
 import { trackEvent } from '@/components/GoogleAnalytics';
-import { isNative } from '../../utils/platform';
+import { isMobile } from '../../utils/platform';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -320,7 +320,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   };
 
   const isAnyLoading = isLoading !== null;
-  const showOtpFlow = isNative();
+  const showOtpFlow = isMobile();
 
   const providers: Provider[] = [
     {

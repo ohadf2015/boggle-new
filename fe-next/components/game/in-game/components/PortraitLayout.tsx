@@ -205,6 +205,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 }) {
   // Combo event for leaderboard badges (from Zustand blastComboSync)
   const blastComboSync = useBlastComboSync();
+
+  // Derive avatar map from leaderboard for WordHunt player lives
+  const playerAvatars = useMemo(() => {
+    const map: Record<string, typeof leaderboard[0]['avatar']> = {};
+    for (const p of leaderboard) {
+      map[p.username] = p.avatar;
+    }
+    return map;
+  }, [leaderboard]);
   const hapticsEnabled = useHapticsEnabled();
 
   // Track floating score animation
@@ -290,7 +299,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-0 md:gap-2 lg:gap-4 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-0">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-0 lg:px-3 xl:px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -303,13 +312,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Left Column: Found Words (Desktop only) */}
         {isPlaying && !gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 min-h-0 flex-shrink-0">
+          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 flex-shrink-0 overflow-y-auto">
             <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
           </div>
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-hidden lg:max-w-[800px] lg:mx-auto">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -335,7 +344,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-between lg:justify-center relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[80px] short:lg:min-h-[56px] lg:px-[140px]"
+                className="flex w-full items-center justify-between relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[64px] short:lg:min-h-[56px] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -384,10 +393,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   </div>
                 )}
 
-                {/* Desktop: Combo + Score */}
+                {/* Desktop: Combo + Score — positioned at end of flex row, not absolute */}
                 {isPlaying && (
                   <div
-                    className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:end-4 lg:top-1/2 lg:-translate-y-1/2 z-30"
+                    className="hidden lg:flex lg:flex-col lg:items-end lg:gap-1 lg:ms-auto shrink-0 z-30"
                     data-testid="combo-desktop"
                   >
                     <div className="h-[32px] flex items-center justify-end">
@@ -476,6 +485,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   playerLives={wordHuntPlayerLives}
                   eliminatedPlayers={wordHuntEliminatedPlayers ?? []}
                   currentPlayer={username}
+                  playerAvatars={playerAvatars}
                 />
               )}
               <WordHuntTargetArea
@@ -492,12 +502,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-start lg:justify-center min-h-0 overflow-hidden pt-1 md:pt-0 gap-2',
+              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2',
               'transition-shadow duration-500',
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[min(480px,50vh)] mx-auto">
+            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[min(520px,55vh)] mx-auto">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -585,7 +595,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Right Column: Leaderboard + Chat (Desktop) */}
         {!gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 flex-shrink-0">
+          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 flex-shrink-0 min-h-0 max-h-[calc(100vh-2rem)]">
             <GameLeaderboard
               leaderboard={deferredLeaderboard}
               username={username}
@@ -605,7 +615,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 username={isHost ? 'Host' : username}
                 isHost={isHost}
                 gameCode={gameCode}
-                className="max-h-[150px]"
+                className="max-h-[200px] min-h-[120px]"
               />
             </AdaptiveMotion.div>
           </div>

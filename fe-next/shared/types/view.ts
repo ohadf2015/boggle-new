@@ -46,6 +46,7 @@ export interface LiveLeaderboardEntry {
   avatar?: Avatar;
   isHost?: boolean;
   isBot?: boolean;
+  comboLevel?: number;
 }
 
 /**

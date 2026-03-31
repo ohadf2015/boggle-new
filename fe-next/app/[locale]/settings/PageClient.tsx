@@ -13,7 +13,6 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { cn } from '@/lib/utils';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // Language options
 const LANGUAGES = [
@@ -153,7 +152,6 @@ export default function SettingsPageClient(): React.JSX.Element {
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
   const { settings, toggleFireRoundLights, toggleEarthquakeEffects, cycleReduceMotion } = useAccessibility();
   const router = useRouter();
-  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
 
   // Get reduce motion display text
@@ -175,7 +173,7 @@ export default function SettingsPageClient(): React.JSX.Element {
       <div className={cn(
         "max-w-2xl mx-auto px-4 page-content-safe lg:max-w-4xl xl:max-w-5xl",
         // Reduced padding: mobile 12px, desktop 16px (was 24px)
-        isLandscape ? "py-2" : "py-3 sm:py-4 lg:py-6"
+        "py-3 sm:py-4 lg:py-6"
       )}>
         {/* Header */}
         <motion.div

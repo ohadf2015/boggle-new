@@ -3,7 +3,7 @@
  * Handles themed board and bulk daily word generation
  */
 
-import type { GenerativeModel } from '@google-cloud/vertexai';
+import { type GenAIModel, trackTokenUsage } from './client';
 import { z } from 'zod';
 import {
   ThemedWordsResponseSchema,
@@ -11,7 +11,6 @@ import {
   LANGUAGE_NAMES,
   type TokenUsageStats,
 } from './types';
-import { trackTokenUsage } from './client';
 import { withRetry } from './validation';
 import logger from '@/backend/utils/logger';
 
@@ -19,7 +18,7 @@ import logger from '@/backend/utils/logger';
  * Generate a themed word board using AI
  */
 export async function generateThemedBoard(
-  model: GenerativeModel,
+  model: GenAIModel,
   theme: string,
   count: number,
   language: string = 'en',
@@ -70,7 +69,7 @@ export async function generateThemedBoard(
  * Generate bulk words for daily challenges using AI
  */
 export async function generateBulkWords(
-  model: GenerativeModel,
+  model: GenAIModel,
   language: string,
   count: number,
   excludedWords: Set<string>,

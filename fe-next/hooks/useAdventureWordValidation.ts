@@ -46,6 +46,8 @@ export interface UseAdventureWordValidationProps {
 export interface UseAdventureWordValidationReturn {
   /** Whether validation is in progress (only true during fallback API call) */
   isValidating: boolean;
+  /** Whether the solve-grid pre-solve is still loading (first load) */
+  isSolveGridLoading: boolean;
   /** Last validation result */
   lastValidationResult: WordValidationResult | null;
   /** Validate a word with its path */
@@ -195,7 +197,7 @@ export function useAdventureWordValidation({
   // Pre-solve grid on mount / grid change via TanStack Query
   const gridKey = useMemo(() => gridCacheKey(grid), [grid]);
 
-  const { data: solvedWords } = useQuery<Set<string>>({
+  const { data: solvedWords, isLoading: isSolveGridLoading } = useQuery<Set<string>>({
     queryKey: queryKeys.adventure.solveGrid(language, gridKey),
     queryFn: async ({ signal }): Promise<Set<string>> => {
       // Check module-level cache first
@@ -218,8 +220,8 @@ export function useAdventureWordValidation({
       return new Set<string>();
     },
     staleTime: Infinity,
-    retry: 1,
-    retryDelay: 2000,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
   });
 
   // Keep ref in sync with query data for use in validateWord callback
@@ -299,13 +301,14 @@ export function useAdventureWordValidation({
       }
 
       // 6. Fallback: per-word API validation (only if pre-solve hasn't loaded yet)
+      // Abort any previous in-flight fallback request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       setIsValidating(true);
 
@@ -337,8 +340,15 @@ export function useAdventureWordValidation({
         clearTimeout(timeoutId);
         setIsValidating(false);
 
+        // Aborted by a newer submission — return empty result so caller can ignore
         if (error instanceof Error && error.name === 'AbortError') {
-          return { isValid: false, errorKey: 'adventure.errors.validationTimeout' };
+          // Check if aborted by timeout (same controller) vs newer request (different controller)
+          if (abortControllerRef.current === controller) {
+            // Timed out — return timeout error
+            return { isValid: false, errorKey: 'adventure.errors.validationTimeout' };
+          }
+          // Superseded by newer submission — return no-op result
+          return { isValid: false };
         }
 
         const result: WordValidationResult = {
@@ -354,6 +364,7 @@ export function useAdventureWordValidation({
 
   return {
     isValidating,
+    isSolveGridLoading,
     lastValidationResult,
     validateWord,
   };

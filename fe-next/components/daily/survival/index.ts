@@ -66,9 +66,6 @@ export type { SurvivalClueBoxesProps } from './SurvivalClueBoxes';
 export { SurvivalGridSection } from './SurvivalGridSection';
 export type { SurvivalGridSectionProps } from './SurvivalGridSection';
 
-export { SurvivalLandscapeLayout } from './SurvivalLandscapeLayout';
-export type { SurvivalLandscapeLayoutProps } from './SurvivalLandscapeLayout';
-
 export { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 export type { AccumulatedScoreDisplayProps } from './AccumulatedScoreDisplay';
 

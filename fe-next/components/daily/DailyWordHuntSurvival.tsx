@@ -3,7 +3,6 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
@@ -22,7 +21,6 @@ import {
   SurvivalLifeBar,
   SurvivalClueBoxes,
   SurvivalGridSection,
-  SurvivalLandscapeLayout,
   AutoClueNotification,
 } from './survival';
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
@@ -64,7 +62,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   currentGuestFingerprint,
 }) => {
   const { t } = useLanguage();
-  const isLandscape = useMobileLandscape();
   const { isDesktop, isTv } = useDesktopLayout();
   const setIsInGame = useHideNavigation();
 
@@ -204,49 +201,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     );
   }
 
-  // Landscape layout
-  if (isLandscape) {
-    return (
-      <SurvivalLandscapeLayout
-        grid={grid}
-        isGameOver={state.isGameOver}
-        eliminatedLetters={state.eliminatedLetters}
-        onWordSubmit={actions.handleWordSubmit}
-        onWordChange={actions.handleWordChange}
-        highlightedPath={keyboardInput.highlightedCells}
-        lifePoints={state.lifePoints}
-        isLifeGaining={state.isLifeGaining}
-        attempts={state.attempts}
-        liveScore={state.liveScore}
-        lastScoreIncrement={state.lastScoreIncrement}
-        isScoreAnimating={state.isScoreAnimating}
-        currentHint={state.currentHint}
-        targetWord={targetWord}
-        accumulatedClues={state.accumulatedClues}
-        revealedLetters={state.revealedLetters}
-        gameDir={actions.gameDir}
-        latestAttemptFeedback={state.latestAttemptFeedback}
-        showFeedbackOverlay={state.showFeedbackOverlay}
-        knownLetters={state.knownLetters}
-        skipAnimations={skipAnimations}
-        showQuitConfirm={state.showQuitConfirm}
-        onQuitClick={() => actions.setShowQuitConfirm(true)}
-        onQuitConfirm={handleQuitConfirm}
-        onQuitCancel={() => actions.setShowQuitConfirm(false)}
-        feedbackType={state.feedbackType}
-        feedbackMessage={state.feedbackMessage}
-        onCloseToast={actions.closeToast}
-        wordFeedback={state.wordFeedback}
-        formedWord={state.formedWord}
-        letterCount={state.letterCount}
-        activeNotifications={state.activeNotifications}
-        onDismissNotification={actions.dismissNotification}
-        t={t}
-      />
-    );
-  }
-
-  // Portrait layout
+  // Portrait/responsive layout
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
     <motion.div

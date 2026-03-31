@@ -12,7 +12,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
-import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
 import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeCard';
 import { Loader } from '@/components/ui/Loader';
@@ -166,7 +165,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
   return (
     <>
-      <LandscapeIndicator />
 
       <div
         dir={dir}

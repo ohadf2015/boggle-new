@@ -22,7 +22,6 @@ import { getCreatorStats } from '@/utils/creatorRewards';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
 import { cn } from '@/lib/utils';
 import { getSession } from '@/utils/session';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // Profile components
 import {
@@ -49,7 +48,6 @@ export default function ProfilePageClient(): React.JSX.Element {
   const { user, profile, isAuthenticated, loading, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
 
   // Read initial tab from URL query parameter (e.g., ?tab=collection)
@@ -369,7 +367,7 @@ export default function ProfilePageClient(): React.JSX.Element {
         <AutoHideHeader />
 
         {/* Single column stacked layout */}
-        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full flex flex-col gap-6', isLandscape ? 'py-2' : 'py-6 lg:py-8')}>
+        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full flex flex-col gap-6', 'py-6 lg:py-8')}>
           {/* 1. Hero Banner */}
           <ProfileHeader {...profileHeaderProps} />
 
