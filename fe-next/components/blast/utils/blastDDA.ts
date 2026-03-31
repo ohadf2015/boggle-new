@@ -2,8 +2,8 @@
  * Invisible Assist DDA (Dynamic Difficulty Adjustment) — PSYC-04
  *
  * Silently adjusts special tile spawn probability based on player performance:
- * - After 3+ consecutive failed words: boost spawn chance (+15%)
- * - After 80%+ success rate over last 5 words: normalize spawn chance (-10%)
+ * - After 2+ consecutive failed words: boost spawn chance (+15%)
+ * - Success-rate penalty removed in singleplayer (always returns 0)
  * - Otherwise: no modification
  *
  * The player is never shown any indication of DDA activity.
@@ -52,23 +52,13 @@ export function updateDDA(state: BlastDDAState, result: DDAResult): BlastDDAStat
  * Compute spawn probability modifier based on current DDA state.
  *
  * Returns:
- *   +0.15  if consecutiveFails >= 3  (boost for struggling players)
- *   -0.10  if successRate > 0.8 over last 5 results  (normalize for dominant players)
- *   0      otherwise
+ *   +0.15  if consecutiveFails >= 2  (boost for struggling players)
+ *   0      otherwise (success-rate penalty removed)
  */
 export function getDDASpawnModifier(state: BlastDDAState): number {
-  // Boost takes priority — struggling player needs immediate help
-  if (state.consecutiveFails >= 3) {
+  // Boost — trigger sooner so struggling players get help faster
+  if (state.consecutiveFails >= 2) {
     return DDA_BOOST_PERCENT;
-  }
-
-  // Only evaluate success-rate normalization once we have 5 results
-  if (state.recentResults.length >= 5) {
-    const successCount = state.recentResults.filter(r => r === 'success').length;
-    const successRate = successCount / state.recentResults.length;
-    if (successRate > 0.8) {
-      return DDA_REDUCE_PERCENT;
-    }
   }
 
   return 0;

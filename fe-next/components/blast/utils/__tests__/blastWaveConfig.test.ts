@@ -73,9 +73,9 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(3).prismEnabled).toBe(true);
   });
 
-  it('enables frozen at wave 4', () => {
-    expect(getWaveConfig(3).frozenEnabled).toBe(false);
-    expect(getWaveConfig(4).frozenEnabled).toBe(true);
+  it('enables frozen at wave 5', () => {
+    expect(getWaveConfig(4).frozenEnabled).toBe(false);
+    expect(getWaveConfig(5).frozenEnabled).toBe(true);
   });
 
   it('has scoreThreshold starting at wave 4 (wave 3 is threshold-free for learning)', () => {
@@ -150,11 +150,12 @@ describe('getWaveDistribution', () => {
     expect(dist.magnet).toBe(0);
   });
 
-  it('includes all new tiles at wave 4', () => {
+  it('includes lightning + diamond at wave 4', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.gem).toBeGreaterThan(0);
     expect(dist.prism).toBeGreaterThan(0);
-    expect(dist.frozen).toBeGreaterThan(0);
+    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.diamond).toBeGreaterThan(0);
   });
 
   it('includes both lightning and magnet at wave 6', () => {
@@ -224,21 +225,22 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 3: unlocks prism + mirror (both > 0), still no lightning/frost/vortex/diamond', () => {
+  it('wave 3: unlocks prism (> 0), still no mirror/lightning/frost/vortex/diamond', () => {
     const dist = getWaveDistribution(getWaveConfig(3));
     expect(dist.prism).toBeGreaterThan(0);
-    expect(dist.mirror).toBeGreaterThan(0);
+    expect(dist.mirror ?? 0).toBe(0);
     expect(dist.lightning ?? 0).toBe(0);
     expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
     expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 4: unlocks frost + lightning + diamond (all > 0), still no vortex/magnet', () => {
+  it('wave 4: unlocks lightning + diamond (> 0), still no frost/mirror/vortex', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.frost ?? dist.frozen ?? 0).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.mirror ?? 0).toBe(0);
     expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
   });
 
@@ -297,7 +299,9 @@ describe('getWaveDistribution — new tile unlock progression', () => {
   it('mirrorEnabled=false for wave 1-2, true for wave 3+', () => {
     expect(getWaveConfig(1).mirrorEnabled).toBe(false);
     expect(getWaveConfig(2).mirrorEnabled).toBe(false);
-    expect(getWaveConfig(3).mirrorEnabled).toBe(true);
+    expect(getWaveConfig(3).mirrorEnabled).toBe(false);
+    expect(getWaveConfig(4).mirrorEnabled).toBe(false);
+    expect(getWaveConfig(5).mirrorEnabled).toBe(true);
   });
 
   it('diamondEnabled=false for wave 1-3, true for wave 4+', () => {

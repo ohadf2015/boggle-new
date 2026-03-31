@@ -96,13 +96,12 @@ describe('getWaveObjectives', () => {
     });
   });
 
-  it('always includes prism collection for wave 7+', () => {
-    const w8 = getWaveObjectives(8);
-    expect(w8[1]).toEqual<BlastObjective>({
-      type: 'collect_type',
-      tileType: 'prism',
-      target: 2,
-    });
+  it('rotates objective templates for wave 7+', () => {
+    // Wave 7 = template 0 (bombs), wave 8 = template 1 (word_length), wave 9 = template 2 (prism)
+    const w7 = getWaveObjectives(7);
+    expect(w7[1]).toEqual<BlastObjective>({ type: 'collect_type', tileType: 'bomb', target: 3 });
+    const w9 = getWaveObjectives(9);
+    expect(w9[1]).toEqual<BlastObjective>({ type: 'collect_type', tileType: 'prism', target: 2 });
   });
 
   it('clamps wave numbers below 1 to wave 1', () => {

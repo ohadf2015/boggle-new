@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
@@ -67,12 +68,13 @@ export function BlastGame({
   blastSeed,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
-  leaderboard: _leaderboard,
-  username: _username,
+  leaderboard,
+  username,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const sounds = useBlastSounds();
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
 
@@ -114,6 +116,7 @@ export function BlastGame({
   // Effects state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
   const [comboFlash, setComboFlash] = useState<{ id: string; tier: 1 | 2 | 3 } | null>(null);
+  const [comboTypeName, setComboTypeName] = useState<string | undefined>();
   const [clearedTilesForEffects, setClearedTilesForEffects] = useState<ClearedTileEvent[]>([]);
   const flyIdRef = useRef(0);
 
@@ -179,6 +182,8 @@ export function BlastGame({
       const mult = detectedCombos[0].scoreMultiplier;
       const flashTier: 1 | 2 | 3 = mult >= 6 ? 3 : mult >= 4 ? 2 : 1;
       setComboFlash({ id: `flash-${flyIdRef.current}`, tier: flashTier });
+      setComboTypeName(`${detectedCombos[0].type.toUpperCase()}!`);
+      sounds.playComboActivation(flashTier);
     }
 
     // 5. Haptic feedback based on tile types in path
@@ -259,6 +264,9 @@ export function BlastGame({
 
       if (!hadClears) break;
 
+      // Cascade chain sound
+      sounds.playCascadeChain(chainLevel);
+
       // Chain score fly — show chain multiplier at grid center
       const chainFlyId = `chain-${++flyIdRef.current}`;
       const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
@@ -284,8 +292,8 @@ export function BlastGame({
     // Track combo streak
     comboStreak.onWordSubmitted();
 
-    playWordAcceptedSound();
-  }, [engine, comboStreak, onComboDetected, playWordAcceptedSound, sequencer, checkWord, config.gridSize]);
+    sounds.playTileClear(clearedInfo.length);
+  }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize]);
 
   // Score fly + combo flash handlers
   const handleScoreFlyComplete = useCallback((id: string) => {
@@ -293,6 +301,7 @@ export function BlastGame({
   }, []);
   const handleComboFlashComplete = useCallback(() => {
     setComboFlash(null);
+    setComboTypeName(undefined);
   }, []);
 
   // Word submission pipeline
@@ -338,12 +347,33 @@ export function BlastGame({
     wordsFound: engine.gameState.wordsFound,
   });
 
+  // Combo timeout sound when streak drops to 0
+  const prevStreakLevelRef = useRef<number>(0);
+  useEffect(() => {
+    const currentLevel = comboStreak.streak.level;
+    if (prevStreakLevelRef.current > 0 && currentLevel === 0) {
+      sounds.playComboTimeout();
+    }
+    prevStreakLevelRef.current = currentLevel;
+  }, [comboStreak.streak.level, sounds]);
+
+  // Move warning sound at 3, 2, 1 moves remaining
+  const prevMovesRef = useRef<number>(Infinity);
+  useEffect(() => {
+    const movesRemaining = engine.gameState.movesRemaining;
+    if (movesRemaining < prevMovesRef.current && movesRemaining >= 1 && movesRemaining <= 3) {
+      sounds.playMoveWarning(movesRemaining);
+    }
+    prevMovesRef.current = movesRemaining;
+  }, [engine.gameState.movesRemaining, sounds]);
+
   // Game end detection (SP only — MP uses server timer)
   useEffect(() => {
     if (isMultiplayer) return undefined;
 
     // All objectives met
     if (objectives.allObjectivesComplete) {
+      sounds.playWaveClear();
       const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
@@ -365,10 +395,10 @@ export function BlastGame({
       return () => clearTimeout(timer);
     }
 
-    // Dead end
+    // Dead end — give player 5s grace to shuffle before auto-ending
     if (engine.gameState.isDeadEnd) {
       const results = engine.getResults(combo.maxCombo);
-      const timer = setTimeout(() => onGameEnd(results), 500);
+      const timer = setTimeout(() => onGameEnd(results), 5000);
       return () => clearTimeout(timer);
     }
 
@@ -383,6 +413,7 @@ export function BlastGame({
     onWaveComplete,
     waveConfig,
     isMultiplayer,
+    sounds,
   ]);
 
   // Loading state
@@ -424,9 +455,12 @@ export function BlastGame({
         onScoreFlyComplete={handleScoreFlyComplete}
         comboFlash={comboFlash}
         onComboFlashComplete={handleComboFlashComplete}
+        comboTypeName={comboTypeName}
         nearMissCells={nearMissCells}
         clearedTilesForEffects={clearedTilesForEffects}
         waveCleared={objectives.allObjectivesComplete}
+        leaderboard={leaderboard}
+        username={username}
         t={(key: string) => t(key) || undefined}
       />
     </div>

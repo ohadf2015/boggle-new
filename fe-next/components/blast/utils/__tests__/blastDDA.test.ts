@@ -82,84 +82,73 @@ describe('blastDDA — pure DDA state machine', () => {
       expect(getDDASpawnModifier(createDDAState())).toBe(0);
     });
 
-    it('returns DDA_BOOST_PERCENT (+0.15) after 3 consecutive fails', () => {
+    it('returns DDA_BOOST_PERCENT (+0.15) after 2 consecutive fails', () => {
       let state = createDDAState();
-      state = updateDDA(state, 'fail');
       state = updateDDA(state, 'fail');
       state = updateDDA(state, 'fail');
       expect(getDDASpawnModifier(state)).toBe(DDA_BOOST_PERCENT);
     });
 
-    it('returns DDA_BOOST_PERCENT after more than 3 consecutive fails', () => {
+    it('returns DDA_BOOST_PERCENT after more than 2 consecutive fails', () => {
       let state = createDDAState();
       for (let i = 0; i < 5; i++) state = updateDDA(state, 'fail');
       expect(getDDASpawnModifier(state)).toBe(DDA_BOOST_PERCENT);
     });
 
-    it('does not boost after only 2 consecutive fails', () => {
+    it('does not boost after only 1 consecutive fail', () => {
       let state = createDDAState();
-      state = updateDDA(state, 'fail');
       state = updateDDA(state, 'fail');
       expect(getDDASpawnModifier(state)).toBe(0);
     });
 
-    it('returns DDA_REDUCE_PERCENT (-0.10) after 80%+ success rate over 5 results', () => {
+    it('does not reduce even at high success rate (penalty removed)', () => {
       let state = createDDAState();
-      // 5 successes = 100% success rate
+      // 5 successes = 100% success rate — should still return 0
       for (let i = 0; i < 5; i++) state = updateDDA(state, 'success');
-      expect(getDDASpawnModifier(state)).toBe(DDA_REDUCE_PERCENT);
+      expect(getDDASpawnModifier(state)).toBe(0);
     });
 
-    it('returns DDA_REDUCE_PERCENT when exactly 4/5 results are success (80%)', () => {
+    it('returns 0 when exactly 4/5 results are success (no penalty)', () => {
       let state = createDDAState();
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'fail');
-      // successRate = 4/5 = 0.8 — exactly at threshold (>0.8 is false, so no reduce)
       expect(getDDASpawnModifier(state)).toBe(0);
     });
 
-    it('returns DDA_REDUCE_PERCENT when >80% success (5/5 = 100%)', () => {
+    it('returns 0 for all-success window (penalty removed)', () => {
       let state = createDDAState();
       for (let i = 0; i < 5; i++) state = updateDDA(state, 'success');
-      expect(getDDASpawnModifier(state)).toBe(DDA_REDUCE_PERCENT);
-    });
-
-    it('does NOT reduce when fewer than 5 results even at high success rate', () => {
-      let state = createDDAState();
-      state = updateDDA(state, 'success');
-      state = updateDDA(state, 'success');
-      state = updateDDA(state, 'success');
-      // only 3 results, can't evaluate window yet
       expect(getDDASpawnModifier(state)).toBe(0);
     });
 
-    it('boosts take priority — after 3+ fails even if success rate would also be high', () => {
-      // Edge case: consecutiveFails >= 3 always returns boost
+    it('returns 0 for fewer than 5 results at high success rate', () => {
       let state = createDDAState();
-      // First 2 successes, then 3 fails (consecutiveFails = 3)
+      state = updateDDA(state, 'success');
+      state = updateDDA(state, 'success');
+      state = updateDDA(state, 'success');
+      expect(getDDASpawnModifier(state)).toBe(0);
+    });
+
+    it('boosts after 2+ fails regardless of recent success rate', () => {
+      let state = createDDAState();
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'fail');
       state = updateDDA(state, 'fail');
-      state = updateDDA(state, 'fail');
-      // consecutiveFails = 3, recentResults = [success, success, fail, fail, fail]
-      // successRate = 2/5 = 0.4 → not high enough for reduce
-      // consecutiveFails = 3 → boost applies
       expect(getDDASpawnModifier(state)).toBe(DDA_BOOST_PERCENT);
     });
 
-    it('returns 0 when success rate resets after a fail interrupts streak', () => {
+    it('returns 0 after a single fail following successes', () => {
       let state = createDDAState();
-      // 4 successes, 1 fail — success rate drops to 80% (not >80%)
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'success');
       state = updateDDA(state, 'fail');
-      // consecutiveFails = 1 (not >= 3), successRate = 0.8 (not > 0.8)
+      // consecutiveFails = 1 (not >= 2)
       expect(getDDASpawnModifier(state)).toBe(0);
     });
 

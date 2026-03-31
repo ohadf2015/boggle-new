@@ -8,6 +8,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 
 export interface BlastBoardProps {
   grid: LetterGrid;

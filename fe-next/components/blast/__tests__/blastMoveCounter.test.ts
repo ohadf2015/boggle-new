@@ -5,9 +5,13 @@
 import { getWaveConfig } from '../utils/blastWaveConfig';
 import {
   BONUS_MOVE_THRESHOLD_SMALL,
+  BONUS_MOVE_THRESHOLD_MEDIUM,
   BONUS_MOVE_THRESHOLD_LARGE,
+  BONUS_MOVE_THRESHOLD_EPIC,
   BONUS_MOVE_SMALL,
+  BONUS_MOVE_MEDIUM,
   BONUS_MOVE_LARGE,
+  BONUS_MOVE_EPIC,
   LEFTOVER_MOVE_BONUS_POINTS,
   calculateBonusMoves,
   calculateLeftoverMoveBonus,
@@ -58,24 +62,32 @@ describe('calculateBonusMoves', () => {
     expect(calculateBonusMoves(6)).toBe(BONUS_MOVE_SMALL);
   });
 
-  it('returns +1 for 7-letter words', () => {
-    expect(calculateBonusMoves(7)).toBe(BONUS_MOVE_SMALL);
+  it('returns +2 for 7-letter words', () => {
+    expect(calculateBonusMoves(7)).toBe(BONUS_MOVE_MEDIUM);
   });
 
-  it('returns +2 for 8-letter words', () => {
+  it('returns +3 for 8-letter words', () => {
     expect(calculateBonusMoves(8)).toBe(BONUS_MOVE_LARGE);
   });
 
-  it('returns +2 for words longer than 8 letters', () => {
+  it('returns +3 for 9-letter words', () => {
     expect(calculateBonusMoves(9)).toBe(BONUS_MOVE_LARGE);
-    expect(calculateBonusMoves(12)).toBe(BONUS_MOVE_LARGE);
+  });
+
+  it('returns +4 for 10+ letter words', () => {
+    expect(calculateBonusMoves(10)).toBe(BONUS_MOVE_EPIC);
+    expect(calculateBonusMoves(12)).toBe(BONUS_MOVE_EPIC);
   });
 
   it('has correct threshold constants', () => {
     expect(BONUS_MOVE_THRESHOLD_SMALL).toBe(6);
+    expect(BONUS_MOVE_THRESHOLD_MEDIUM).toBe(7);
     expect(BONUS_MOVE_THRESHOLD_LARGE).toBe(8);
+    expect(BONUS_MOVE_THRESHOLD_EPIC).toBe(10);
     expect(BONUS_MOVE_SMALL).toBe(1);
-    expect(BONUS_MOVE_LARGE).toBe(2);
+    expect(BONUS_MOVE_MEDIUM).toBe(2);
+    expect(BONUS_MOVE_LARGE).toBe(3);
+    expect(BONUS_MOVE_EPIC).toBe(4);
   });
 });
 

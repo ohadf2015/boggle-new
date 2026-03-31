@@ -8,9 +8,9 @@
  * Tile unlock progression:
  * Wave 1: bomb, ice, gold, silver, rainbow (basics)
  * Wave 2: + treasure gem
- * Wave 3: + prism, mirror
- * Wave 4: + frost, lightning, diamond
- * Wave 5: + (all except vortex)
+ * Wave 3: + prism
+ * Wave 4: + lightning, diamond
+ * Wave 5: + frost, mirror (new toys to master)
  * Wave 6+: + vortex (everything)
  */
 
@@ -83,23 +83,23 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 18,
   },
-  // Wave 3 — prism + mirror unlock (17 moves, no score threshold — learn new mechanics freely)
+  // Wave 3 — prism unlock (17 moves, no score threshold — learn new mechanic freely)
   {
     minWordLength: 3, specialTileChance: 0.19, iceDistribution: 0.23, goldDistribution: 0.18,
     vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: false, movesAllowed: 17,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 17,
   },
-  // Wave 4 — frost + lightning + diamond unlock (15 moves)
+  // Wave 4 — lightning + diamond unlock (15 moves)
   {
     minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 150,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
-    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
+    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
   },
-  // Wave 5 — all minus vortex (14 moves)
+  // Wave 5 — frost + mirror unlock (14 moves)
   {
     minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14,
     vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 250,
@@ -160,11 +160,24 @@ export function getWaveObjectives(wave: number): BlastObjective[] {
     return WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
   }
 
-  // Wave 7+: score_target scales + collect prism
-  return [
-    { type: 'score_target', target: 120 + (clamped - 6) * 40 },
-    { type: 'collect_type', tileType: 'prism', target: 2 },
+  // Wave 7+: rotating objective templates for variety
+  const baseScore = 120 + (clamped - 6) * 40;
+  const templateIndex = (clamped - 7) % 5;
+
+  const WAVE7_TEMPLATES: BlastObjective[][] = [
+    // Template 0: score + collect bombs
+    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'bomb', target: 3 }],
+    // Template 1: score + long words
+    [{ type: 'score_target', target: baseScore }, { type: 'word_length', target: 2, minWordLength: 5 }],
+    // Template 2: score + collect prisms (legacy default)
+    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'prism', target: 2 }],
+    // Template 3: score + clear ice
+    [{ type: 'score_target', target: baseScore }, { type: 'clear_all_type', tileType: 'ice', target: 0 }],
+    // Template 4: score + collect gems
+    [{ type: 'score_target', target: baseScore }, { type: 'collect_type', tileType: 'gem', target: 3 }],
   ];
+
+  return WAVE7_TEMPLATES[templateIndex].map(obj => ({ ...obj }));
 }
 
 /** Lightning share when enabled (taken from gold + rainbow) */
@@ -188,9 +201,9 @@ const DIAMOND_SHARE = 0.04;
  * Candy Crush staircase unlock order:
  * Wave 1: bomb, ice, gold, silver, rainbow (no wildcard)
  * Wave 2: + gem (treasure)
- * Wave 3: + prism, mirror
- * Wave 4: + frost, lightning, diamond
- * Wave 5: (same — all except vortex)
+ * Wave 3: + prism
+ * Wave 4: + lightning, diamond
+ * Wave 5: + frost, mirror
  * Wave 6+: + vortex
  *
  * New tile shares are carved from gold + rainbow proportionally via takeShare().

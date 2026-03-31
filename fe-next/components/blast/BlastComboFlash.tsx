@@ -7,6 +7,8 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 export interface BlastComboFlashProps {
   flash: { id: string; tier: 1 | 2 | 3 } | null;
   onComplete: () => void;
+  /** Optional combo type label e.g. "BOMB!", "LIGHTNING!" */
+  comboTypeName?: string;
 }
 
 const TIER_CONFIG: Record<1 | 2 | 3, { color: string; duration: number; opacity: number }> = {
@@ -15,7 +17,7 @@ const TIER_CONFIG: Record<1 | 2 | 3, { color: string; duration: number; opacity:
   3: { color: 'linear-gradient(135deg, #FF1493, #FFE135, #00FFFF, #FF6B35)', duration: 0.45, opacity: 0.35 },
 };
 
-export function BlastComboFlash({ flash, onComplete }: BlastComboFlashProps) {
+export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastComboFlashProps) {
   const shouldReduceMotion = useReducedMotion();
 
   if (!flash) return null;
@@ -65,6 +67,24 @@ export function BlastComboFlash({ flash, onComplete }: BlastComboFlashProps) {
             animate={{ scaleX: 1, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
           />
+        )}
+        {comboTypeName && (
+          <AdaptiveMotion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
+            initial={{ scale: 0.5, opacity: 1 }}
+            animate={{ scale: 1.2, opacity: 0 }}
+            transition={{ duration: cfg.duration * 0.8, ease: 'easeOut' }}
+          >
+            <span
+              className="font-neo-display uppercase text-2xl sm:text-3xl font-bold"
+              style={{
+                color: isGradient ? '#FFFFFF' : cfg.color,
+                textShadow: `0 0 12px ${isGradient ? '#FF1493' : cfg.color}, 0 2px 4px rgba(0,0,0,0.5)`,
+              }}
+            >
+              {comboTypeName}
+            </span>
+          </AdaptiveMotion.div>
         )}
       </AdaptiveMotion.div>
     </AdaptiveAnimatePresence>

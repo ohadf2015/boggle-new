@@ -10,6 +10,7 @@ interface BlastEffectsLayerProps {
   onScoreFlyComplete: (id: string) => void;
   comboFlash: { id: string; tier: 1 | 2 | 3 } | null;
   onComboFlashComplete: () => void;
+  comboTypeName?: string;
   intensity: number;
 }
 
@@ -32,6 +33,7 @@ export function BlastEffectsLayer({
   onScoreFlyComplete,
   comboFlash,
   onComboFlashComplete,
+  comboTypeName,
   intensity,
 }: BlastEffectsLayerProps) {
   const glowStyle = useMemo(() => getGlowStyle(intensity), [intensity]);
@@ -43,7 +45,7 @@ export function BlastEffectsLayer({
       className={`absolute inset-0 pointer-events-none z-30 rounded-neo ${pulseClass}`}
       style={glowStyle}
     >
-      <BlastComboFlash flash={comboFlash} onComplete={onComboFlashComplete} />
+      <BlastComboFlash flash={comboFlash} onComplete={onComboFlashComplete} comboTypeName={comboTypeName} />
       <BlastScoreFly flies={scoreFlyEvents} onComplete={onScoreFlyComplete} />
     </div>
   );

@@ -3,6 +3,9 @@
 import { useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle } from 'lucide-react';
+import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
+
+const BlastTileGuide = dynamic(() => import('./BlastTileGuide'), { ssr: false });
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
 
@@ -16,6 +19,7 @@ import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import type { ScoreFlyEvent } from './BlastScoreFly';
+import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
@@ -56,11 +60,15 @@ interface BlastStageProps {
   onScoreFlyComplete?: (id: string) => void;
   comboFlash?: { id: string; tier: 1 | 2 | 3 } | null;
   onComboFlashComplete?: () => void;
+  comboTypeName?: string;
   // Near-miss shimmer
   nearMissCells?: Array<{ row: number; col: number }>;
   // PixiJS effects layer events
   clearedTilesForEffects?: ClearedTileEvent[];
   waveCleared?: boolean;
+  // Multiplayer leaderboard
+  leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
+  username?: string;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -93,12 +101,17 @@ export function BlastStage({
   onScoreFlyComplete,
   comboFlash = null,
   onComboFlashComplete,
+  comboTypeName,
   nearMissCells = [],
   clearedTilesForEffects = [],
   waveCleared = false,
+  leaderboard,
+  username,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete } = gameState;
+
+  const [showTileGuide, setShowTileGuide] = useState(false);
 
   // Measure board container for PixiJS effects canvas
   const boardContainerRef = useRef<HTMLDivElement>(null);
@@ -118,13 +131,16 @@ export function BlastStage({
   const comboFlashTier = comboFlash?.tier ?? 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-neo-navy overflow-hidden" data-testid="blast-stage">
+    <div className="flex-1 flex flex-col h-full overflow-hidden relative" data-testid="blast-stage">
+      {/* Reactive background */}
+      <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
       {/* Effects overlay */}
       <BlastEffectsLayer
         scoreFlyEvents={scoreFlyEvents}
         onScoreFlyComplete={onScoreFlyComplete ?? (() => {})}
         comboFlash={comboFlash}
         onComboFlashComplete={onComboFlashComplete ?? (() => {})}
+        comboTypeName={comboTypeName}
         intensity={sequencerState?.chainLevel ?? 0}
       />
 
@@ -139,9 +155,35 @@ export function BlastStage({
         tilesCleared={tilesCleared}
         totalTiles={totalTiles}
         onQuit={onQuit}
-        onShowHelp={onShowHelp}
+        onShowHelp={onShowHelp ?? (() => setShowTileGuide(true))}
         t={t}
       />
+
+      {/* 1b. Live leaderboard ticker (MP only) */}
+      {leaderboard && leaderboard.length > 0 && (
+        <div className="absolute top-14 end-2 z-40 flex flex-col gap-0.5 pointer-events-none" data-testid="blast-leaderboard">
+          {leaderboard
+            .slice()
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 4)
+            .map((entry, i) => (
+              <div
+                key={entry.username}
+                className={cn(
+                  'flex items-center gap-1.5 px-2 py-0.5 rounded-neo text-[10px] font-bold tabular-nums',
+                  'border border-neo-black/40 shadow-hard-sm',
+                  entry.username === username
+                    ? 'bg-neo-lime/80 text-neo-navy'
+                    : 'bg-neo-navy/70 text-neo-white/80',
+                )}
+              >
+                <span className="text-white/50 w-3">{i + 1}.</span>
+                <span className="truncate max-w-[60px]">{entry.username}</span>
+                <span className="ms-auto">{entry.score}</span>
+              </div>
+            ))}
+        </div>
+      )}
 
       {/* 2. Objective progress bar */}
       {objectiveProgress && objectiveProgress.length > 0 && (
@@ -152,7 +194,7 @@ export function BlastStage({
               return (
                 <div key={i} className="flex-1">
                   <div className="flex justify-between text-[9px] font-bold text-white/50 mb-0.5">
-                    <span>{obj.objective.type}</span>
+                    <span>{formatObjectiveLabel(obj.objective, t)}</span>
                     <span className="tabular-nums">{obj.current}/{target}</span>
                   </div>
                   <div className="h-1 bg-white/10 rounded-full overflow-hidden">
@@ -266,6 +308,9 @@ export function BlastStage({
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
+
+      {/* Tile Guide modal */}
+      <BlastTileGuide isOpen={showTileGuide} onClose={() => setShowTileGuide(false)} t={t} />
     </div>
   );
 }

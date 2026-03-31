@@ -2,12 +2,12 @@ export const layoutTranslations: Record<string, any> = {
   "en": {
     "direction": "ltr",
     "seo": {
-      "title": "LexiClash – Play Word Games Online Free | Multiplayer Boggle Alternative",
-      "description": "Play word games online free — no download needed! LexiClash is a fast multiplayer word game like Boggle where you find words in real-time against friends. Daily challenges, adventure mode, brain training drills, and word hunts. Best free alternative to Boggle, Wordle, Words With Friends & Scrabble. Play instantly in 5 languages including Hebrew and English. Made in Israel — perfect for parties, classrooms, and game nights!",
+      "title": "Free Boggle Online — No Download | LexiClash Multiplayer Word Game",
+      "description": "Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 5 languages.",
       "keywords": "play boggle online free no download, word games online free, online multiplayer word game, word game with friends, daily word wheel, word multiplayer, play boggle online free with other players, online multiplayer word games like hanging with friends, boggle online free, free word game no download, word battle game, word hunt game online, daily word challenge, brain training word game, word puzzle game free, word game for groups, word games for parties, wordle alternative multiplayer, scrabble alternative free, words with friends alternative, competitive word game, word race online, boggle alternatives 2026, word game you type in words, games like boggle online free, word making games, word RPG adventure game, vocabulary builder game, ESL word game classroom, family word game night, real-time word battle, online web based multiplayer words games, word combo game, word game for kids, spelling game multiplayer, daily word puzzle free, word solver tool, lexiclash, lexi clash, word game israel, israeli word game, word game made in israel, boggle hebrew english, multilingual word game",
-      "ogTitle": "LexiClash – Free Multiplayer Word Game | No Download, Play Instantly",
+      "ogTitle": "Free Boggle Online — No Download | LexiClash Word Game",
       "ogDescription": "🎮 Play boggle online free with friends — no download! Real-time word battles, daily challenges, adventure mode ⚡ Like Boggle meets Wordle but multiplayer 🔥",
-      "twitterTitle": "LexiClash – Play Word Games Online Free With Friends",
+      "twitterTitle": "Free Boggle Online — Multiplayer Word Game | LexiClash",
       "twitterDescription": "Find words fast, build combos, climb leaderboards 🎮 Free multiplayer word game — no download. Daily challenges + adventure mode 🔥",
       "locale": "en_US",
       "language": "English",

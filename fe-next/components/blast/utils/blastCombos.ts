@@ -54,6 +54,11 @@ const EFFECT_TILES: ReadonlySet<BlastTileType> = new Set([
   'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'mirror', 'gem', 'frozen',
 ]);
 
+/** All tile types that can participate in a combo (used for combo hint glow) */
+export const COMBO_ELIGIBLE_TILES: ReadonlySet<BlastTileType> = new Set([
+  'bomb', 'lightning', 'prism', 'magnet', 'rainbow', 'mirror', 'gem', 'frozen', 'gold',
+]);
+
 /** Combo definitions: [typeA, typeB] → combo config (ordered highest priority first) */
 const PAIR_COMBOS: Array<{
   a: BlastTileType;
