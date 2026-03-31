@@ -11,7 +11,10 @@
 
 const CRAZYGAMES_FORCE_DISABLED = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
 
-const BOOTSTRAP_CODE = `(function(){var inIframe=false;try{inIframe=window.self!==window.top}catch(e){inIframe=true}if(!inIframe){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true;return}var attempts=0;function tryInit(){if(window.CrazyGames&&window.CrazyGames.SDK){window.CrazyGames.SDK.init().then(function(){return window.CrazyGames.SDK.getEnvironment()}).then(function(env){window.__crazyGamesEnvironment=env;window.__crazyGamesReady=true;if(env==='crazygames'){document.body&&document.body.classList.add('crazygames-embed');window.CrazyGames.SDK.game.sdkGameLoadingStart();var signalReady=function(){window.CrazyGames.SDK.game.sdkGameLoadingStop()};if(typeof requestIdleCallback==='function'){requestIdleCallback(signalReady,{timeout:3000})}else{setTimeout(signalReady,1000)}}}).catch(function(){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true})}else if(attempts<100){attempts++;setTimeout(tryInit,50)}else{window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true}}tryInit()})()`;
+// Bootstrap calls sdkGameLoadingStart() immediately but does NOT call sdkGameLoadingStop().
+// The React CrazyGamesProvider calls loadingStop() once the app is interactive,
+// giving CrazyGames an accurate "time to interactive" measurement.
+const BOOTSTRAP_CODE = `(function(){var inIframe=false;try{inIframe=window.self!==window.top}catch(e){inIframe=true}if(!inIframe){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true;return}var attempts=0;function tryInit(){if(window.CrazyGames&&window.CrazyGames.SDK){window.CrazyGames.SDK.init().then(function(){return window.CrazyGames.SDK.getEnvironment()}).then(function(env){window.__crazyGamesEnvironment=env;window.__crazyGamesReady=true;if(env==='crazygames'){document.body&&document.body.classList.add('crazygames-embed');window.CrazyGames.SDK.game.sdkGameLoadingStart()}}).catch(function(){window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true})}else if(attempts<100){attempts++;setTimeout(tryInit,50)}else{window.__crazyGamesEnvironment='disabled';window.__crazyGamesReady=true}}tryInit()})()`;
 
 export default function CrazyGamesScriptServer() {
   if (CRAZYGAMES_FORCE_DISABLED) {

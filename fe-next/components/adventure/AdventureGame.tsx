@@ -32,6 +32,7 @@ import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShortcuts';
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
@@ -210,6 +211,15 @@ const AdventureGame = memo<AdventureGameProps>(
       maxCombo: gameState.comboCount,
       wordsFound: gameState.wordsFound.length,
     });
+    // Show midgame ad between adventure levels (natural break point)
+    const { requestMidgameAd: cgRequestMidgameAd } = useCrazyGamesAds();
+    const prevIsCompleteRef = useRef(false);
+    useEffect(() => {
+      if (gameState.isComplete && !prevIsCompleteRef.current) {
+        cgRequestMidgameAd();
+      }
+      prevIsCompleteRef.current = gameState.isComplete;
+    }, [gameState.isComplete, cgRequestMidgameAd]);
 
     const getScoreMultiplier = useCallback(() => 1, []);
     const augmentedSkillEffects = useMemo(() => ({

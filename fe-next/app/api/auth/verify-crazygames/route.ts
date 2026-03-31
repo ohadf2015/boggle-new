@@ -20,8 +20,11 @@ import { captureApiError } from '@/utils/sentry';
 const CRAZYGAMES_JWKS_URL = new URL('https://sdk.crazygames.com/.well-known/jwks.json');
 const jwks = createRemoteJWKSet(CRAZYGAMES_JWKS_URL);
 
-// Expected issuer and audience for CrazyGames tokens
+// Expected issuer for CrazyGames tokens
 const EXPECTED_ISSUER = 'crazygames.com';
+// Audience claim — prevents tokens issued for other CrazyGames titles from being accepted.
+// Set CRAZYGAMES_GAME_DOMAIN env var to your game's domain on CrazyGames (e.g. "lexiclash").
+const EXPECTED_AUDIENCE = process.env.CRAZYGAMES_GAME_DOMAIN || undefined;
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +41,8 @@ export async function POST(request: NextRequest) {
     // Verify the JWT against CrazyGames public keys
     const { payload } = await jwtVerify(token, jwks, {
       issuer: EXPECTED_ISSUER,
+      // Validate audience when configured — prevents cross-game token reuse
+      ...(EXPECTED_AUDIENCE ? { audience: EXPECTED_AUDIENCE } : {}),
       // CrazyGames tokens use RS256
       algorithms: ['RS256'],
     });

@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { hasCompletedOnboarding, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { LandingView } from '@/components/landing';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 const OnboardingFlow = dynamic(
@@ -27,6 +30,17 @@ interface HomePageClientProps {
  * handled inside LandingView for the edge case of cleared localStorage.
  */
 export default function HomePageClient({ initialData }: HomePageClientProps): React.JSX.Element {
+  const { isOnCrazyGamesPlatform, isLoading: isCrazyGamesLoading } = useCrazyGames();
+  const router = useRouter();
+  const { language } = useLanguage();
+
+  // On CrazyGames, skip the landing page and go straight to multiplayer
+  useEffect(() => {
+    if (!isCrazyGamesLoading && isOnCrazyGamesPlatform) {
+      router.replace(`/${language}/multiplayer`);
+    }
+  }, [isCrazyGamesLoading, isOnCrazyGamesPlatform, router, language]);
+
   // Synchronous check — runs during first render, not in an effect
   const [showFTUE, setShowFTUE] = useState(() => {
     if (typeof window === 'undefined') return false;

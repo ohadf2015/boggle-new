@@ -294,6 +294,13 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         }
       }
       setIsLoading(false);
+
+      // Signal loading complete now that the React app + provider are interactive.
+      // The bootstrap script calls sdkGameLoadingStart() early; we call stop here
+      // so CrazyGames gets an accurate time-to-interactive measurement.
+      if (window.CrazyGames?.SDK && window.__crazyGamesEnvironment === 'crazygames') {
+        try { window.CrazyGames.SDK.game.sdkGameLoadingStop(); } catch { /* noop */ }
+      }
     };
 
     checkSDK();

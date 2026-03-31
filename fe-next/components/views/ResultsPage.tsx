@@ -39,6 +39,7 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastMovesUsed, useBlastTotalTileBonus, useBlastTotalTilesCleared, useBlastPlayerStats } from '@/hooks/gameState/store';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
 const SERIES_TOTAL_GAMES = 3;
 
@@ -157,6 +158,11 @@ function DesktopResultsLayout({
               hideRankAndScore={true}
             />
           </motion.div>
+        </div>
+
+        {/* CrazyGames banner ad — shown after results content */}
+        <div className="w-full max-w-5xl mx-auto mt-6">
+          <CrazyGamesBanner size="728x90" />
         </div>
       </div>
 
@@ -689,6 +695,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         >
           <div className="max-w-lg mx-auto space-y-6">
             {renderResultsTab()}
+            {/* CrazyGames banner ad — mobile size between results and details */}
+            <CrazyGamesBanner size="320x50" />
             {/* Other players' details (inline, no tab switch needed) */}
             {renderDetailsTab()}
           </div>
