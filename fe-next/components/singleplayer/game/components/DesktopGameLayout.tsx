@@ -164,7 +164,7 @@ export function DesktopGameLayout({
         : highlightedPath;
 
   return (
-    <div className="game-view-container relative flex h-full w-full bg-neo-navy">
+    <div className="game-view-container relative flex h-full w-full bg-neo-navy overflow-hidden">
       {/* Dynamic Energy Background */}
       <DynamicEnergyBackground />
 
@@ -220,9 +220,9 @@ export function DesktopGameLayout({
         </div>
 
         {/* Center - Game Area */}
-        <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-3 relative z-10">
+        <div className="flex flex-col items-center justify-between h-full min-w-0 min-h-0 gap-2 relative z-10 overflow-hidden">
           {/* Header: Quit + Coins + Pause */}
-          <div className="flex items-center justify-between w-full px-2">
+          <div className="flex items-center justify-between w-full px-2 shrink-0">
             {/* Quit - btn-neo red */}
             <button
               onClick={onQuitRequest}
@@ -270,7 +270,7 @@ export function DesktopGameLayout({
 
           {/* Training Progress Bar - practice mode */}
           {isPracticeMode && training && (
-            <div className="w-full max-w-2xl px-4">
+            <div className="w-full max-w-2xl px-4 shrink-0">
               <TrainingProgressBar
                 completedSkills={training.completedSkills}
                 score={score}
@@ -286,12 +286,12 @@ export function DesktopGameLayout({
           )}
 
           {/* Word Forming Area */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center shrink-0">
             <WordFormingArea word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord} letterCount={(keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord).length} feedback={currentFeedback} compact />
           </div>
 
           {/* Game Grid - centered with aspect ratio maintained */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full relative" style={{ containerType: 'size' }}>
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 overflow-hidden relative" style={{ containerType: 'size' }}>
             {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
             <AdaptiveAnimatePresence>
               {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
@@ -311,7 +311,7 @@ export function DesktopGameLayout({
               )}
             </AdaptiveAnimatePresence>
 
-            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
+            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 90cqh)', height: 'min(100cqw, 90cqh)', maxWidth: '600px', maxHeight: '600px' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}
