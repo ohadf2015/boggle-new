@@ -29,17 +29,21 @@ vi.mock('@/hooks/useActiveClassroomGame', () => ({
   useActiveClassroomGame: (...args: unknown[]) => mockUseActiveClassroomGame(...args),
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLDivElement>) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    button: React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<HTMLButtonElement>) => (
-      <button ref={ref} {...props}>{children}</button>
-    )),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+vi.mock('framer-motion', () => {
+  const React = require('react');
+  const MockDiv = React.forwardRef(function MockDiv(props: Record<string, unknown>, ref: unknown) {
+    const { children, ...rest } = props as React.PropsWithChildren<Record<string, unknown>>;
+    return React.createElement('div', { ...rest, ref }, children);
+  });
+  const MockButton = React.forwardRef(function MockButton(props: Record<string, unknown>, ref: unknown) {
+    const { children, ...rest } = props as React.PropsWithChildren<Record<string, unknown>>;
+    return React.createElement('button', { ...rest, ref }, children);
+  });
+  return {
+    motion: { div: MockDiv, button: MockButton },
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
 
 import { PlayWithClassButton } from '../PlayWithClassButton';
 
