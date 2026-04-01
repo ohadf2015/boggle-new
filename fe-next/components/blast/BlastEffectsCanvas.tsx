@@ -117,6 +117,8 @@ interface DebrisFragment {
 const DEBRIS_LIFETIME = 2; // seconds
 const DEBRIS_PER_TILE = 3;
 const MAX_DEBRIS = 60;
+const LIGHTNING_DEBRIS_PER_CELL = 2;
+const LIGHTNING_FLASH_DURATION = 200; // ms
 
 function EffectsWorker({
   width,
@@ -154,6 +156,112 @@ function EffectsWorker({
       container.destroy();
     };
   }, [camera, physics]);
+
+  // Draw jagged lightning bolt down a column with rapid flash
+  const spawnLightningBolt = useCallback((col: number, gridRows: number) => {
+    const container = debrisContainerRef.current;
+    if (!container) return;
+
+    const x = col * cellSize + cellSize / 2;
+    const colHeight = gridRows * cellSize;
+
+    // Column flash overlay — white rectangle fading out
+    const flash = new Graphics();
+    flash.rect(col * cellSize, 0, cellSize, colHeight).fill({ color: 0xffffff });
+    flash.alpha = 0.8;
+    container.addChild(flash);
+
+    const flashStart = performance.now();
+    const fadeFlash = () => {
+      const elapsed = performance.now() - flashStart;
+      if (elapsed >= LIGHTNING_FLASH_DURATION) {
+        flash.destroy();
+        return;
+      }
+      flash.alpha = 0.8 * (1 - elapsed / LIGHTNING_FLASH_DURATION);
+      requestAnimationFrame(fadeFlash);
+    };
+    requestAnimationFrame(fadeFlash);
+
+    // Jagged bolt — zigzag line segments down the column
+    const drawBolt = (offsetX: number) => {
+      const bolt = new Graphics();
+      bolt.setStrokeStyle({ width: 2 + Math.random() * 2, color: 0x00ffff });
+      bolt.moveTo(x + offsetX, 0);
+      const segments = gridRows * 3;
+      const segHeight = colHeight / segments;
+      for (let i = 1; i <= segments; i++) {
+        const jitter = (Math.random() - 0.5) * cellSize * 0.6;
+        bolt.lineTo(x + offsetX + jitter, i * segHeight);
+      }
+      bolt.stroke();
+      bolt.alpha = 1;
+      container.addChild(bolt);
+      return bolt;
+    };
+
+    // Flash bolt 3 times rapidly
+    let flashCount = 0;
+    const boltA = drawBolt(0);
+    const boltB = drawBolt(3);
+    const boltFlashInterval = setInterval(() => {
+      flashCount++;
+      if (flashCount >= 6) {
+        clearInterval(boltFlashInterval);
+        boltA.destroy();
+        boltB.destroy();
+        return;
+      }
+      boltA.visible = flashCount % 2 === 0;
+      boltB.visible = flashCount % 2 === 1;
+    }, 50);
+  }, [cellSize]);
+
+  // Spawn thin elongated debris flung horizontally from lightning-cleared cells
+  const spawnLightningDebris = useCallback((tiles: ClearedTileEvent[]) => {
+    const container = debrisContainerRef.current;
+    if (!container) return;
+
+    const budget = MAX_DEBRIS - debrisRef.current.length;
+    const perTile = Math.min(LIGHTNING_DEBRIS_PER_CELL, Math.floor(budget / Math.max(tiles.length, 1)));
+    if (perTile <= 0) return;
+
+    const now = performance.now() / 1000;
+    const sparkColors = [0x00ffff, 0xffffff, 0x88eeff, 0xccffff];
+
+    for (const tile of tiles) {
+      const cx = tile.col * cellSize + cellSize / 2;
+      const cy = tile.row * cellSize + cellSize / 2;
+
+      for (let i = 0; i < perTile; i++) {
+        // Thin elongated spark: wider than tall
+        const w = 6 + Math.random() * 8;
+        const h = 1.5 + Math.random() * 2;
+        const color = sparkColors[Math.floor(Math.random() * sparkColors.length)];
+
+        const g = new Graphics();
+        g.rect(-w / 2, -h / 2, w, h).fill({ color });
+        g.x = cx;
+        g.y = cy;
+        container.addChild(g);
+
+        const bodyId = physics.createRect(cx, cy, w, h, {
+          restitution: 0.3,
+          frictionAir: 0.02,
+          density: 0.001,
+        });
+
+        // Fling horizontally
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        physics.applyForce(bodyId, {
+          x: dir * (0.001 + Math.random() * 0.002),
+          y: (Math.random() - 0.5) * 0.0005,
+        });
+
+        debrisRef.current.push({ bodyId, graphic: g, color, size: w, createdAt: now });
+      }
+    }
+  }, [cellSize, physics]);
 
   // Spawn debris fragments for cleared tiles
   const spawnDebris = useCallback((tiles: ClearedTileEvent[]) => {
@@ -267,22 +375,41 @@ function EffectsWorker({
     if (key === prevClearedKeyRef.current) return;
     prevClearedKeyRef.current = key;
 
+    const lightningTiles: ClearedTileEvent[] = [];
+    const lightningCols = new Set<number>();
+
     for (const tile of clearedTiles) {
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
       const preset = CLEAR_PRESET_MAP[tile.type] ?? TILE_EXPLOSION;
       particles.burst(preset, x, y);
+
+      if (tile.type === 'lightning') {
+        lightningTiles.push(tile);
+        lightningCols.add(tile.col);
+      }
+    }
+
+    // Lightning-specific effects: bolt trail, column flash, elongated debris
+    if (lightningCols.size > 0) {
+      for (const col of lightningCols) {
+        spawnLightningBolt(col, gridSize);
+      }
+      spawnLightningDebris(lightningTiles);
+      shake.shake({ intensity: 6, duration: 0.3, decay: 'exponential' });
     }
 
     // Spawn physics debris fragments
     spawnDebris(clearedTiles);
 
-    // Screen shake scaled to clear count
-    const count = clearedTiles.length;
-    if (count >= 6) shake.heavy();
-    else if (count >= 3) shake.medium();
-    else shake.light();
-  }, [clearedTiles, particles, shake, cellSize, spawnDebris]);
+    // Screen shake scaled to clear count (lightning already shook above)
+    if (lightningCols.size === 0) {
+      const count = clearedTiles.length;
+      if (count >= 6) shake.heavy();
+      else if (count >= 3) shake.medium();
+      else shake.light();
+    }
+  }, [clearedTiles, particles, shake, cellSize, gridSize, spawnDebris, spawnLightningBolt, spawnLightningDebris]);
 
   // Chain cascade sparkle
   useEffect(() => {

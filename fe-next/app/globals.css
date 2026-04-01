@@ -1196,6 +1196,12 @@ body {
     100% { opacity: 1; transform: scale(1); }
   }
 
+  @keyframes blastLightningFlash {
+    0% { opacity: 1; transform: scale(1.15); background: white; }
+    30% { opacity: 1; transform: scaleY(1.8) scaleX(0.5); }
+    100% { opacity: 0; transform: scaleY(2.5) scaleX(0.3); }
+  }
+
   /* Accessibility: disable all blast tile idle animations for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .blast-tile-gold,

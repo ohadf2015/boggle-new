@@ -143,18 +143,19 @@ export const BOMB_EXPLOSION: ParticleConfig = {
 // Vertical column of electric sparks for lightning tile.
 
 export const LIGHTNING_SPARK: ParticleConfig = {
-  maxParticles: 30,
+  maxParticles: 45,
   frequency: 0.001,
-  emitterLifetime: 0.1,
-  particlesPerWave: 30,
-  lifetime: { min: 0.1, max: 0.4 },
-  speed: { min: 50, max: 200 },
+  emitterLifetime: 0.15,
+  particlesPerWave: 45,
+  lifetime: { min: 0.15, max: 0.5 },
+  speed: { min: 80, max: 350 },
   gravity: { x: 0, y: 0 },
-  scale: { start: 0.8, end: 0 },
+  scale: { start: 1.2, end: 0 },
   alpha: { start: 1, end: 0 },
-  colors: ['88ccff', 'ffffff', 'aaddff'],
+  rotationSpeed: { min: -400, max: 400 },
+  colors: ['00ffff', 'ffffff', '88eeff', 'aaddff', 'ccffff'],
   spawnShape: 'rect',
-  spawnConfig: { width: 10, height: 300 },
+  spawnConfig: { width: 14, height: 400 },
   blendMode: 'add',
 };
 

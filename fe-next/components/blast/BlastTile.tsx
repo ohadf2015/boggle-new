@@ -180,7 +180,10 @@ const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; borde
 /** Type-specific clearing transform overrides — gives each tile a unique death animation */
 const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; transition: string }>> = {
   bomb:      { transform: 'scale(1.8)', transition: 'all 220ms cubic-bezier(0.17, 0.67, 0.83, 0.67)' },
-  lightning: { transform: 'scaleY(2.5) scaleX(0.3)', transition: 'all 160ms ease-in' },
+  lightning: {
+    transform: 'scaleY(2.5) scaleX(0.3)',
+    transition: 'all 160ms ease-in',
+  },
   prism:     { transform: 'scale(1.6) rotate(180deg)', transition: 'all 250ms ease-out' },
   ice:       { transform: 'scale(0.6) rotate(8deg)', transition: 'all 200ms ease-in' },
   frozen:    { transform: 'scale(0.5) rotate(-12deg)', transition: 'all 220ms cubic-bezier(0.55, 0.06, 0.68, 0.19)' },
@@ -203,11 +206,18 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
     case 'clearing': {
       const clearingAnim = CLEARING_ANIMS[type];
+      const isLightning = type === 'lightning';
       return {
         transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
         opacity: 0,
         transition: clearingAnim?.transition ?? 'all 180ms ease-in',
         ...(clearing && { background: clearing.background, border: clearing.border }),
+        // Lightning: bright white flash before stretch animation
+        ...(isLightning && {
+          background: 'white',
+          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
+          animation: 'blastLightningFlash 160ms ease-in forwards',
+        }),
       };
     }
     case 'falling':
