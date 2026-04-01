@@ -237,6 +237,68 @@ describe('BlastTile', () => {
     });
   });
 
+  describe('progressive selection scale', () => {
+    it('scales first tile at 1.05x (selectionIndex=0)', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={0} selectionTotal={5} />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scale(1.05)');
+    });
+
+    it('scales last tile at 1.12x (selectionIndex=total-1)', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={4} selectionTotal={5} />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scale(1.12)');
+    });
+
+    it('interpolates scale for middle tiles', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={2} selectionTotal={5} />
+      );
+      const button = container.querySelector('button');
+      // midpoint: 1.05 + (2/4) * 0.07 = 1.085
+      expect(button?.style.transform).toContain('scale(1.085)');
+    });
+  });
+
+  describe('landing bounce spring curve', () => {
+    it('uses spring cubic-bezier for landing phase', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" phase="landing" />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transition).toContain('cubic-bezier(0.34, 1.56, 0.64, 1)');
+    });
+
+    it('uses enhanced bounce amplitude for landing', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" phase="landing" />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.transform).toContain('scaleY(1.15)');
+      expect(button?.style.transform).toContain('scaleX(0.88)');
+    });
+  });
+
+  describe('selection pop animation', () => {
+    it('applies blast-tile-select-pop class when selected', () => {
+      render(
+        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={0} selectionTotal={1} />
+      );
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-select-pop');
+    });
+
+    it('does NOT apply blast-tile-select-pop when not selected', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      const button = screen.getByRole('button');
+      expect(button.className).not.toContain('blast-tile-select-pop');
+    });
+  });
+
   describe('accessibility', () => {
     it('includes tile type in aria-label for special tiles', () => {
       render(<BlastTile {...baseProps} type="bomb" />);

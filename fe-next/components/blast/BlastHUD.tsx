@@ -85,7 +85,7 @@ export function BlastHUD({
 
   return (
     <div
-      className="flex items-center justify-between gap-2 px-3 py-2"
+      className="flex items-center justify-between gap-2 px-3 py-2 pt-safe"
       style={{
         background: 'linear-gradient(180deg, rgba(15,12,41,0.85) 0%, rgba(15,12,41,0.6) 100%)',
         backdropFilter: 'blur(8px)',

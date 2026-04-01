@@ -61,6 +61,23 @@ function getCrackClass(type: BlastTileType, hitsRemaining?: number): string {
   return '';
 }
 
+/** Type-specific visual effect classes for gem/frozen/ice tiles */
+function getSpecialEffectClasses(type: BlastTileType, phase: TilePhase, hitsRemaining?: number): string {
+  const classes: string[] = [];
+
+  if (type === 'gem') {
+    if (hitsRemaining != null && hitsRemaining > 0) classes.push(`blast-tile-gem-glow-${hitsRemaining}`);
+    if (phase === 'clearing') classes.push('blast-tile-gem-golden-flash');
+  } else if (type === 'frozen') {
+    if (hitsRemaining != null && hitsRemaining < (MULTI_HIT_MAX.frozen ?? 2)) classes.push('blast-tile-frozen-cracked');
+    if (phase === 'clearing') classes.push('blast-tile-frozen-emerge');
+  } else if (type === 'ice') {
+    classes.push('blast-tile-ice-shimmer');
+  }
+
+  return classes.join(' ');
+}
+
 /**
  * AAA Royal Blast tile visuals — 3D candy-button treatment.
  * Each tile gets a top-to-bottom gradient for depth, specular inset highlight,
@@ -203,11 +220,17 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
     case 'clearing': {
       const clearingAnim = CLEARING_ANIMS[type];
+      const isLightning = type === 'lightning';
       return {
         transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
         opacity: 0,
         transition: clearingAnim?.transition ?? 'all 180ms ease-in',
         ...(clearing && { background: clearing.background, border: clearing.border }),
+        ...(isLightning && {
+          background: 'white',
+          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
+          animation: 'blastLightningFlash 160ms ease-in forwards',
+        }),
       };
     }
     case 'falling':
@@ -223,13 +246,23 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       };
     case 'landing':
       return {
-        transform: 'scaleY(1.1) scaleX(0.92)',
-        transition: 'transform 80ms ease-out',
+        transform: 'scaleY(1.15) scaleX(0.88)',
+        transition: 'transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         animationFillMode: 'forwards',
       };
     default:
       return {};
   }
+}
+
+/**
+ * Compute progressive selection scale: first tile 1.05x, last tile 1.12x.
+ */
+function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
+  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.05;
+  const t = selectionIndex / (selectionTotal - 1);
+  // Round to 3 decimals to avoid floating point noise
+  return Math.round((1.05 + t * 0.07) * 1000) / 1000;
 }
 
 function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?: number, selectionTotal?: number): string {
@@ -239,9 +272,16 @@ function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?:
       ? Math.min(0.4 + (selectionIndex / (selectionTotal - 1)) * 0.6, 1.0)
       : 0.6;
     const glowSize = Math.round(8 + intensity * 12);
-    return `scale-105 ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity})]`;
+    return `ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity})] blast-tile-select-pop`;
   }
   return '';
+}
+
+/** Inline styles for selected tiles: progressive scale */
+function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
+  if (!isSelected) return {};
+  const scale = getSelectionScale(selectionIndex, selectionTotal);
+  return { transform: `scale(${scale})` };
 }
 
 export const BlastTile = memo(function BlastTile({
@@ -261,7 +301,8 @@ export const BlastTile = memo(function BlastTile({
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
-  const needsWillChange = ANIMATED_PHASES.has(effectivePhase);
+  const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
+  const needsWillChange = ANIMATED_PHASES.has(effectivePhase) || isSelected;
 
   return (
     <button
@@ -277,6 +318,7 @@ export const BlastTile = memo(function BlastTile({
         visual.text ?? 'text-neo-navy',
         type !== 'standard' ? `blast-tile-${type}` : '',
         getCrackClass(type, hitsRemaining),
+        getSpecialEffectClasses(type, phase, hitsRemaining),
         activationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
         activationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
@@ -287,20 +329,22 @@ export const BlastTile = memo(function BlastTile({
       style={{
         ...(visual.style ?? {}),
         ...phaseStyle,
+        ...selectionStyle,
         ...(needsWillChange && { willChange: 'transform, opacity' }),
+        containerType: 'inline-size',
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
       <span className="relative z-10" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{letter}</span>
       {visual.indicator && (
-        <span className="absolute top-0.5 end-0.5 text-[0.55rem] leading-none pointer-events-none" aria-hidden="true">
+        <span className="absolute top-0.5 end-0.5 text-[clamp(0.45rem,1.8cqw,0.65rem)] leading-none pointer-events-none" aria-hidden="true">
           {visual.indicator}
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
         <span
-          className="absolute bottom-0.5 start-0.5 text-[0.5rem] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 start-0.5 text-[clamp(0.4rem,1.5cqw,0.55rem)] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
           aria-label={`${hitsRemaining} hits remaining`}
         >
           {hitsRemaining}
@@ -308,7 +352,7 @@ export const BlastTile = memo(function BlastTile({
       )}
       {MULTIPLIER_BADGES[type] && (
         <span
-          className="absolute bottom-0.5 end-0.5 text-[0.45rem] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 end-0.5 text-[clamp(0.35rem,1.3cqw,0.5rem)] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
           aria-hidden="true"
         >
           {MULTIPLIER_BADGES[type]}

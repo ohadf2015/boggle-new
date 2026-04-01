@@ -292,10 +292,11 @@ export function useBlastEngine(
     const ddaModifier = options?.isMultiplayer ? 0 : getDDASpawnModifier(ddaStateRef.current);
     const rng = effectiveBlastSeed != null ? createSeededRandom(effectiveBlastSeed + gameStateRef.current.movesUsed) : undefined;
 
+    const shouldRefill = config.boardClearMode !== 'shrink';
     const gravityResult = computeGravityResult(
       grid, tiles, gridSize, language, specialTileChance,
       customDistribution, ddaModifier, rng,
-      /* refill */ false,
+      shouldRefill,
     );
 
     // Update refs immediately so subsequent engine calls see latest state,
@@ -315,7 +316,7 @@ export function useBlastEngine(
         setTileStates(gravityResult.newTileStates);
       },
     };
-  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer]);
+  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer, config.boardClearMode]);
 
   // ── shuffleGrid ──
   const shuffleGrid = useCallback(() => {

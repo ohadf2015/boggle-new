@@ -973,11 +973,11 @@ body {
   }
 
   .blast-tile-bomb {
-    animation: blast-pulse 1.8s ease-in-out infinite;
+    animation: blast-pulse 2s ease-in-out infinite;
   }
 
   .blast-tile-rainbow {
-    animation: blast-rainbow 4s linear infinite;
+    animation: blast-rainbow 5s linear infinite;
     background-size: 300% 300% !important;
   }
 
@@ -1004,16 +1004,16 @@ body {
     }
     50% {
       box-shadow: inset 0 0 26px rgba(255,30,0,0.5), 0 0 20px rgba(255,50,20,0.4), 0 0 32px rgba(255,0,0,0.25);
-      transform: scale(1.04);
+      transform: scale(1.02);
     }
   }
 
   @keyframes blast-rainbow {
-    0% { background-position: 0% 50%; filter: brightness(1); }
-    25% { filter: brightness(1.1); }
-    50% { background-position: 100% 50%; filter: brightness(1); }
-    75% { filter: brightness(1.1); }
-    100% { background-position: 0% 50%; filter: brightness(1); }
+    0% { background-position: 0% 50%; filter: hue-rotate(0deg) brightness(1); }
+    25% { filter: hue-rotate(90deg) brightness(1.1); }
+    50% { background-position: 100% 50%; filter: hue-rotate(180deg) brightness(1); }
+    75% { filter: hue-rotate(270deg) brightness(1.1); }
+    100% { background-position: 0% 50%; filter: hue-rotate(360deg) brightness(1); }
   }
 
   .blast-tile-ice {
@@ -1155,6 +1155,43 @@ body {
     50% { box-shadow: inset 0 0 30px rgba(180,220,255,0.5), 0 0 20px rgba(200,230,255,0.4), 0 0 36px rgba(150,200,255,0.2); }
   }
 
+  /* Selection pop — brief 100ms bounce when tile is first selected */
+  .blast-tile-select-pop {
+    animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes blast-select-pop {
+    0% { transform: scale(0.92); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── Lightning flash — white burst before vertical stretch ── */
+  @keyframes blastLightningFlash {
+    0% { opacity: 1; transform: scale(1.15); background: white; }
+    30% { opacity: 1; transform: scaleY(1.8) scaleX(0.5); }
+    100% { opacity: 0; transform: scaleY(2.5) scaleX(0.3); }
+  }
+
+  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
+  .blast-tile-prism-flash {
+    animation: blast-prism-flash 250ms linear forwards;
+  }
+
+  @keyframes blast-prism-flash {
+    0%   { filter: hue-rotate(0deg) brightness(1.4); }
+    25%  { filter: hue-rotate(90deg) brightness(1.6); }
+    50%  { filter: hue-rotate(180deg) brightness(1.8); }
+    75%  { filter: hue-rotate(270deg) brightness(1.6); }
+    100% { filter: hue-rotate(360deg) brightness(2.0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blast-tile-prism-flash {
+      animation: none;
+    }
+  }
+
   /* Selection glow when dragging across special tiles — single pop, not infinite pulse */
   .blast-tile-selected {
     box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(0,255,255,0.25);
@@ -1210,7 +1247,8 @@ body {
     .blast-tile-frozen,
     .blast-tile-mirror,
     .blast-tile-silver,
-    .blast-tile-diamond {
+    .blast-tile-diamond,
+    .blast-tile-select-pop {
       animation: none;
     }
     .blast-tile-weakened {
@@ -1347,7 +1385,8 @@ body {
   .blast-game[data-cascade="active"] .blast-tile-mirror,
   .blast-game[data-cascade="active"] .blast-tile-silver,
   .blast-game[data-cascade="active"] .blast-tile-diamond,
-  .blast-game[data-cascade="active"] .blast-tile-weakened {
+  .blast-game[data-cascade="active"] .blast-tile-weakened,
+  .blast-game[data-cascade="active"] .blast-tile-select-pop {
     animation-play-state: paused;
   }
 

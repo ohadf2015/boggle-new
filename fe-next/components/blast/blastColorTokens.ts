@@ -9,6 +9,11 @@
 /*  Shatter / Particle Colors (per tile type)                          */
 /* ------------------------------------------------------------------ */
 
+/** Rainbow debris colors for prism cross effect (7 distinct rainbow hues) */
+export const RAINBOW_DEBRIS_COLORS: string[] = [
+  '#FF0000', '#FF8800', '#FFFF00', '#00FF00', '#0088FF', '#8800FF', '#FF00FF',
+];
+
 /** Particle colors used by BlastShatterEffect for each tile type */
 export const SHATTER_COLORS: Record<string, string[]> = {
   gold: ['#FFD700', '#FFA500', '#FFEC8B'],
