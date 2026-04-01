@@ -339,6 +339,104 @@ export const GOLD_STARS: ParticleConfig = {
   shape: 'star',
 };
 
+// ─── Gem Shard Burst ─────────────────────────────────────────────────
+// Small emerald shard burst on each gem hit (not final). Few particles.
+
+export const GEM_SHARD_BURST: ParticleConfig = {
+  maxParticles: 8,
+  frequency: 0.001,
+  emitterLifetime: 0.08,
+  particlesPerWave: 8,
+  lifetime: { min: 0.2, max: 0.5 },
+  speed: { min: 80, max: 200 },
+  gravity: { x: 0, y: 180 },
+  scale: { start: 0.8, end: 0 },
+  alpha: { start: 1, end: 0.2 },
+  rotationSpeed: { min: -200, max: 200 },
+  colors: ['50c878', '34d399', '7dffb3', 'a7f3d0'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 8 },
+  shape: 'diamond',
+};
+
+// ─── Gem Golden Explosion ────────────────────────────────────────────
+// Dramatic golden sparkle explosion on gem final hit.
+
+export const GEM_GOLDEN_EXPLOSION: ParticleConfig = {
+  maxParticles: 35,
+  frequency: 0.001,
+  emitterLifetime: 0.12,
+  particlesPerWave: 35,
+  lifetime: { min: 0.4, max: 1.0 },
+  speed: { min: 120, max: 400 },
+  gravity: { x: 0, y: 200 },
+  scale: { start: 1.8, end: 0.2 },
+  alpha: { start: 1, end: 0 },
+  rotationSpeed: { min: -300, max: 300 },
+  colors: ['ffd700', 'ffee44', 'ffffff', 'ffe088', 'ffcc00'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 16 },
+  blendMode: 'add',
+  shape: 'star',
+};
+
+// ─── Frost Mist ──────────────────────────────────────────────────────
+// Subtle slow-drifting white particles for ice tile hit feedback.
+
+export const FROST_MIST: ParticleConfig = {
+  maxParticles: 12,
+  frequency: 0.04,
+  emitterLifetime: 0.6,
+  particlesPerWave: 2,
+  lifetime: { min: 0.5, max: 1.2 },
+  speed: { min: 10, max: 40 },
+  gravity: { x: 0, y: -25 },
+  scale: { start: 0.6, end: 1.2 },
+  alpha: { start: 0.4, end: 0 },
+  colors: ['ffffff', 'e0ffff', 'ccf0ff'],
+  spawnShape: 'circle',
+  spawnConfig: { radius: 15 },
+};
+
+// ─── Ice Shatter ─────────────────────────────────────────────────────
+// Sharp angular crystalline fragments for ice tile clear.
+
+export const ICE_SHATTER: ParticleConfig = {
+  maxParticles: 25,
+  frequency: 0.001,
+  emitterLifetime: 0.1,
+  particlesPerWave: 25,
+  lifetime: { min: 0.3, max: 0.8 },
+  speed: { min: 100, max: 350 },
+  gravity: { x: 0, y: 220 },
+  scale: { start: 1.3, end: 0.2 },
+  alpha: { start: 0.9, end: 0 },
+  rotationSpeed: { min: -400, max: 400 },
+  colors: ['b4e6ff', 'ffffff', '88eeff', 'ccf0ff', 'e0ffff'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 14 },
+  shape: 'diamond',
+};
+
+// ─── Frost Crack ─────────────────────────────────────────────────────
+// White crack lines radiating from center on frozen tile first hit.
+
+export const FROST_CRACK: ParticleConfig = {
+  maxParticles: 12,
+  frequency: 0.001,
+  emitterLifetime: 0.08,
+  particlesPerWave: 12,
+  lifetime: { min: 0.3, max: 0.6 },
+  speed: { min: 60, max: 180 },
+  gravity: { x: 0, y: 0 },
+  scale: { start: 0.6, end: 0.1 },
+  alpha: { start: 0.9, end: 0 },
+  colors: ['ffffff', 'e8f4ff', 'ccddff'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 8 },
+  blendMode: 'add',
+};
+
 // ─── Diamond Shards ──────────────────────────────────────────────────
 // Prismatic diamond shards for diamond tile shatter.
 

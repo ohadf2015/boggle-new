@@ -20,6 +20,11 @@ import {
   LIGHTNING_SPARK,
   PRISM_CROSS,
   GEM_SHATTER,
+  GEM_SHARD_BURST,
+  GEM_GOLDEN_EXPLOSION,
+  FROST_MIST,
+  ICE_SHATTER,
+  FROST_CRACK,
   VORTEX_PULL,
   COMBO_FLASH,
   CASCADE_SPARKLE,
@@ -35,6 +40,8 @@ export interface ClearedTileEvent {
   row: number;
   col: number;
   type: BlastTileType;
+  /** Hits remaining before this clear (0 = final hit, >0 = intermediate hit) */
+  hitsRemaining?: number;
 }
 
 interface BlastEffectsCanvasProps {
@@ -270,8 +277,33 @@ function EffectsWorker({
     for (const tile of clearedTiles) {
       const x = tile.col * cellSize + cellSize / 2;
       const y = tile.row * cellSize + cellSize / 2;
-      const preset = CLEAR_PRESET_MAP[tile.type] ?? TILE_EXPLOSION;
-      particles.burst(preset, x, y);
+      const isFinalHit = !tile.hitsRemaining || tile.hitsRemaining <= 0;
+
+      // Gem: shard burst on intermediate hits, golden explosion on final
+      if (tile.type === 'gem') {
+        if (isFinalHit) {
+          particles.burst(GEM_GOLDEN_EXPLOSION, x, y);
+          particles.burst(GEM_SHATTER, x, y);
+        } else {
+          particles.burst(GEM_SHARD_BURST, x, y);
+        }
+      // Frozen: crack lines on intermediate hit, ice shatter on final
+      } else if (tile.type === 'frozen') {
+        if (isFinalHit) {
+          particles.burst(ICE_SHATTER, x, y);
+        } else {
+          particles.burst(FROST_CRACK, x, y);
+        }
+      // Ice: frost mist on hit, crystalline shatter on final
+      } else if (tile.type === 'ice') {
+        if (isFinalHit) {
+          particles.burst(ICE_SHATTER, x, y);
+        }
+        particles.burst(FROST_MIST, x, y);
+      } else {
+        const preset = CLEAR_PRESET_MAP[tile.type] ?? TILE_EXPLOSION;
+        particles.burst(preset, x, y);
+      }
     }
 
     // Spawn physics debris fragments

@@ -61,6 +61,23 @@ function getCrackClass(type: BlastTileType, hitsRemaining?: number): string {
   return '';
 }
 
+/** Type-specific visual effect classes for gem/frozen/ice tiles */
+function getSpecialEffectClasses(type: BlastTileType, phase: TilePhase, hitsRemaining?: number): string {
+  const classes: string[] = [];
+
+  if (type === 'gem') {
+    if (hitsRemaining != null && hitsRemaining > 0) classes.push(`blast-tile-gem-glow-${hitsRemaining}`);
+    if (phase === 'clearing') classes.push('blast-tile-gem-golden-flash');
+  } else if (type === 'frozen') {
+    if (hitsRemaining != null && hitsRemaining < (MULTI_HIT_MAX.frozen ?? 2)) classes.push('blast-tile-frozen-cracked');
+    if (phase === 'clearing') classes.push('blast-tile-frozen-emerge');
+  } else if (type === 'ice') {
+    classes.push('blast-tile-ice-shimmer');
+  }
+
+  return classes.join(' ');
+}
+
 /**
  * AAA Royal Blast tile visuals — 3D candy-button treatment.
  * Each tile gets a top-to-bottom gradient for depth, specular inset highlight,
@@ -277,6 +294,7 @@ export const BlastTile = memo(function BlastTile({
         visual.text ?? 'text-neo-navy',
         type !== 'standard' ? `blast-tile-${type}` : '',
         getCrackClass(type, hitsRemaining),
+        getSpecialEffectClasses(type, phase, hitsRemaining),
         activationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
         activationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
