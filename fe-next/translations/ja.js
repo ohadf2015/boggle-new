@@ -8818,7 +8818,10 @@ const ja = {
       "history": "履歴",
       "classmates": "クラスメート",
       "findingClassmates": "クラスメートを探しています...",
-      "joinClassroomToDuel": "デュエルするにはクラスに参加してください"
+      "joinClassroomToDuel": "デュエルするにはクラスに参加してください",
+      "noClassmatesOnline": "現在オンラインのクラスメートはいません",
+      "challengeSomeone": "誰かに挑戦しよう！",
+      "rematch": "再戦"
     },
     "achievements": {
       "completion": "{{percent}}%達成",

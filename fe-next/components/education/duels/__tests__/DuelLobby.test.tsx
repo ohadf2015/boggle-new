@@ -25,6 +25,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         decline: 'Decline',
         noPendingChallenges: 'No pending challenges',
         noOpponentsOnline: 'No opponents online',
+        'education.duels.noClassmatesOnline': 'No classmates are online right now',
+        'education.duels.challengeSomeone': 'Challenge someone!',
         challengeFrom: 'Challenge from {name}',
       };
       let result = translations[key] || key;
@@ -215,10 +217,10 @@ describe('DuelLobby', () => {
       });
     });
 
-    it('shows "no opponents online" when empty', () => {
+    it('shows empty state message when no opponents', () => {
       render(<DuelLobby {...defaultProps} />);
 
-      expect(screen.getByText('No opponents online')).toBeInTheDocument();
+      expect(screen.getByText('No classmates are online right now')).toBeInTheDocument();
     });
 
     it('opens challenge modal when opponent card clicked', async () => {

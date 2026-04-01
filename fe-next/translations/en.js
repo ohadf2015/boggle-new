@@ -9580,7 +9580,10 @@ const en = {
       "history": "History",
       "classmates": "Classmates",
       "findingClassmates": "Finding classmates...",
-      "joinClassroomToDuel": "Join a classroom to duel"
+      "joinClassroomToDuel": "Join a classroom to duel",
+      "noClassmatesOnline": "No classmates are online right now",
+      "challengeSomeone": "Challenge someone!",
+      "rematch": "Rematch"
     },
     "achievements": {
       "completion": "{{percent}}% complete",

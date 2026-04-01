@@ -8815,7 +8815,10 @@ const es = {
       "history": "Historial",
       "classmates": "Compañeros",
       "findingClassmates": "Buscando compañeros...",
-      "joinClassroomToDuel": "Únete a una clase para competir"
+      "joinClassroomToDuel": "Únete a una clase para competir",
+      "noClassmatesOnline": "No hay compañeros conectados ahora",
+      "challengeSomeone": "¡Reta a alguien!",
+      "rematch": "Revancha"
     },
     "achievements": {
       "completion": "{{percent}}% completado",
