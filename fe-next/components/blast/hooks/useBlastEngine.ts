@@ -292,10 +292,11 @@ export function useBlastEngine(
     const ddaModifier = options?.isMultiplayer ? 0 : getDDASpawnModifier(ddaStateRef.current);
     const rng = effectiveBlastSeed != null ? createSeededRandom(effectiveBlastSeed + gameStateRef.current.movesUsed) : undefined;
 
+    const shouldRefill = config.boardClearMode !== 'shrink';
     const gravityResult = computeGravityResult(
       grid, tiles, gridSize, language, specialTileChance,
       customDistribution, ddaModifier, rng,
-      /* refill */ false,
+      shouldRefill,
     );
 
     // Update refs immediately so subsequent engine calls see latest state,

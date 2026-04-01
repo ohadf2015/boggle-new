@@ -49,6 +49,10 @@ export interface BlastGameConfig {
   difficulty?: BlastDifficulty;
   /** Custom special tile distribution (overrides default). Used by wave system. */
   customDistribution?: Record<string, number>;
+  /** Board clearing behavior after words are submitted.
+   * - 'refill' (default): empty cells are filled with new tiles from above.
+   * - 'shrink': board progressively shrinks — cleared cells stay empty. */
+  boardClearMode?: 'refill' | 'shrink';
 }
 
 export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
