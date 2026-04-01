@@ -7509,6 +7509,10 @@ const he = {
     "chainCounter": "רצף x{{count}}"
   },
   "student": {
+    "hub": {
+      "playZone": "שחק",
+      "learnZone": "למד"
+    },
     "nav": {
       "profile": "הפרופיל שלי",
       "achievements": "הישגים"
