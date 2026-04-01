@@ -223,13 +223,23 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       };
     case 'landing':
       return {
-        transform: 'scaleY(1.1) scaleX(0.92)',
-        transition: 'transform 80ms ease-out',
+        transform: 'scaleY(1.15) scaleX(0.88)',
+        transition: 'transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         animationFillMode: 'forwards',
       };
     default:
       return {};
   }
+}
+
+/**
+ * Compute progressive selection scale: first tile 1.05x, last tile 1.12x.
+ */
+function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
+  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.05;
+  const t = selectionIndex / (selectionTotal - 1);
+  // Round to 3 decimals to avoid floating point noise
+  return Math.round((1.05 + t * 0.07) * 1000) / 1000;
 }
 
 function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?: number, selectionTotal?: number): string {
@@ -239,9 +249,16 @@ function getPhaseClasses(phase: TilePhase, isSelected: boolean, selectionIndex?:
       ? Math.min(0.4 + (selectionIndex / (selectionTotal - 1)) * 0.6, 1.0)
       : 0.6;
     const glowSize = Math.round(8 + intensity * 12);
-    return `scale-105 ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity})]`;
+    return `ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy shadow-[0_0_${glowSize}px_rgba(191,255,0,${intensity})] blast-tile-select-pop`;
   }
   return '';
+}
+
+/** Inline styles for selected tiles: progressive scale */
+function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
+  if (!isSelected) return {};
+  const scale = getSelectionScale(selectionIndex, selectionTotal);
+  return { transform: `scale(${scale})` };
 }
 
 export const BlastTile = memo(function BlastTile({
@@ -261,7 +278,8 @@ export const BlastTile = memo(function BlastTile({
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset)
     : {};
-  const needsWillChange = ANIMATED_PHASES.has(effectivePhase);
+  const selectionStyle = getSelectionStyles(isSelected, selectionIndex, selectionTotal);
+  const needsWillChange = ANIMATED_PHASES.has(effectivePhase) || isSelected;
 
   return (
     <button
@@ -287,6 +305,7 @@ export const BlastTile = memo(function BlastTile({
       style={{
         ...(visual.style ?? {}),
         ...phaseStyle,
+        ...selectionStyle,
         ...(needsWillChange && { willChange: 'transform, opacity' }),
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
