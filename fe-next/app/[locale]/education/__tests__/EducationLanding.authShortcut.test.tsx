@@ -8,9 +8,10 @@ import { render, screen } from '@testing-library/react';
 import EducationPageClient from '../PageClient';
 
 const mockPush = vi.fn();
+const mockReplace = vi.fn();
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: mockReplace }),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -73,25 +74,15 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
-  it('shows shortcut when user is authenticated', () => {
+  it('redirects authenticated students instead of showing shortcut', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
       profile: { display_name: 'Alice', user_role: 'student' },
     });
     render(<EducationPageClient />);
-    expect(screen.getByTestId('auth-dashboard-shortcut')).toBeInTheDocument();
-  });
-
-  it('shows student dashboard link for student role', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      loading: false,
-      profile: { display_name: 'Alice', user_role: 'student', is_admin: false },
-    });
-    render(<EducationPageClient />);
-    const link = screen.getByTestId('go-to-dashboard-link');
-    expect(link).toHaveAttribute('href', '/en/student');
+    expect(mockReplace).toHaveBeenCalledWith('/en/student');
+    expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
   it('shows teacher dashboard link for teacher role', () => {
@@ -120,7 +111,7 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
-      profile: { display_name: 'Alice Learner', user_role: 'student', is_admin: false },
+      profile: { display_name: 'Alice Learner', user_role: 'teacher', is_admin: true },
     });
     render(<EducationPageClient />);
     expect(screen.getByText('Alice Learner')).toBeInTheDocument();
