@@ -7540,6 +7540,10 @@ const es = {
     "chainCounter": "CADENA x{{count}}"
   },
   "student": {
+    "hub": {
+      "playZone": "Jugar",
+      "learnZone": "Aprender"
+    },
     "nav": {
       "profile": "Mi perfil",
       "achievements": "Logros"

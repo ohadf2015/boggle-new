@@ -7474,6 +7474,10 @@ const sv = {
     "chainCounter": "KEDJA x{{count}}"
   },
   "student": {
+    "hub": {
+      "playZone": "Spela",
+      "learnZone": "Lär dig"
+    },
     "nav": {
       "profile": "Min profil",
       "achievements": "Prestationer"

@@ -7526,6 +7526,10 @@ const ja = {
     "chainCounter": "チェーン x{{count}}"
   },
   "student": {
+    "hub": {
+      "playZone": "プレイ",
+      "learnZone": "学ぶ"
+    },
     "nav": {
       "profile": "マイプロフィール",
       "achievements": "実績"

@@ -7667,6 +7667,10 @@ const en = {
     "chainCounter": "CHAIN x{{count}}"
   },
   "student": {
+        "hub": {
+          "playZone": "Play",
+          "learnZone": "Learn"
+        },
         "nav": {
           "profile": "My Profile",
           "achievements": "Achievements"
