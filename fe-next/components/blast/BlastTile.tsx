@@ -288,19 +288,20 @@ export const BlastTile = memo(function BlastTile({
         ...(visual.style ?? {}),
         ...phaseStyle,
         ...(needsWillChange && { willChange: 'transform, opacity' }),
+        containerType: 'inline-size',
       }}
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
       <span className="relative z-10" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{letter}</span>
       {visual.indicator && (
-        <span className="absolute top-0.5 end-0.5 text-[0.55rem] leading-none pointer-events-none" aria-hidden="true">
+        <span className="absolute top-0.5 end-0.5 text-[clamp(0.45rem,1.8cqw,0.65rem)] leading-none pointer-events-none" aria-hidden="true">
           {visual.indicator}
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
         <span
-          className="absolute bottom-0.5 start-0.5 text-[0.5rem] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 start-0.5 text-[clamp(0.4rem,1.5cqw,0.55rem)] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
           aria-label={`${hitsRemaining} hits remaining`}
         >
           {hitsRemaining}
@@ -308,7 +309,7 @@ export const BlastTile = memo(function BlastTile({
       )}
       {MULTIPLIER_BADGES[type] && (
         <span
-          className="absolute bottom-0.5 end-0.5 text-[0.45rem] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 end-0.5 text-[clamp(0.35rem,1.3cqw,0.5rem)] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
           aria-hidden="true"
         >
           {MULTIPLIER_BADGES[type]}

@@ -133,7 +133,7 @@ export function BlastStage({
   const comboFlashTier = comboFlash?.tier ?? 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden relative" data-testid="blast-stage">
+    <div className="flex-1 flex flex-col h-full overflow-hidden relative pb-safe" data-testid="blast-stage">
       {/* Reactive background */}
       <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
       {/* Effects overlay */}
