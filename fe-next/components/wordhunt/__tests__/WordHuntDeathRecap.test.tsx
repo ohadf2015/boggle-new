@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { WordHuntDeathRecap, getDeathLesson } from '../WordHuntDeathRecap';
-import type { DeathRecapStats } from '../WordHuntDeathRecap';
+import { WordHuntDeathRecap, getDeathLesson, type DeathRecapStats } from '../WordHuntDeathRecap';
 
 // Mock AdaptiveMotion to render plain divs
 jest.mock('@/components/motion/AdaptiveMotion', () => ({

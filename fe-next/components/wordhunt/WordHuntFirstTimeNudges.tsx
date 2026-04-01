@@ -82,7 +82,7 @@ const WordHuntFirstTimeNudges = memo<WordHuntFirstTimeNudgesProps>(({
 }) => {
   const [activeNudge, setActiveNudge] = useState<NudgeConfig | null>(null);
   const seenRef = useRef(getSeenNudges());
-  const dismissTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const activeNudgeRef = useRef(activeNudge);
   activeNudgeRef.current = activeNudge;
