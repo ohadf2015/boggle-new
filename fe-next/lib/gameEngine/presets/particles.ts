@@ -218,19 +218,42 @@ export const AMBIENT_BOKEH: ParticleConfig = {
 // Inward spiral for vortex tile activation.
 
 export const VORTEX_PULL: ParticleConfig = {
-  maxParticles: 25,
-  frequency: 0.02,
-  emitterLifetime: 0.5,
-  particlesPerWave: 3,
-  lifetime: { min: 0.3, max: 0.6 },
+  maxParticles: 30,
+  frequency: 0.015,
+  emitterLifetime: 0.6,
+  particlesPerWave: 4,
+  lifetime: { min: 0.3, max: 0.7 },
   speed: { min: 80, max: 200 },
   gravity: { x: 0, y: 0 },
-  scale: { start: 0.8, end: 0 },
+  scale: { start: 1.0, end: 0 },
   alpha: { start: 0.9, end: 0 },
-  colors: ['9944ff', 'ff44aa', 'ffffff'],
+  rotationSpeed: { min: -360, max: 360 },
+  colors: ['a855f6', '8b5cf6', 'c084fc', 'e879f9', 'ffffff'],
   spawnShape: 'circle',
-  spawnConfig: { radius: 80 },
+  spawnConfig: { radius: 90 },
   blendMode: 'add',
+  shape: 'ring',
+};
+
+// ─── Vortex Explosion ────────────────────────────────────────────────
+// Radial burst after magnet pull completes. Higher force than bomb.
+
+export const VORTEX_EXPLOSION: ParticleConfig = {
+  maxParticles: 40,
+  frequency: 0.001,
+  emitterLifetime: 0.12,
+  particlesPerWave: 40,
+  lifetime: { min: 0.3, max: 0.8 },
+  speed: { min: 300, max: 700 },
+  gravity: { x: 0, y: 200 },
+  scale: { start: 2.0, end: 0 },
+  alpha: { start: 1, end: 0 },
+  rotationSpeed: { min: -400, max: 400 },
+  colors: ['a855f6', '8b5cf6', 'e879f9', 'ffffff', 'f0abfc'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 20 },
+  blendMode: 'add',
+  shape: 'star',
 };
 
 // ═══════════════════════════════════════════════════════════════════════

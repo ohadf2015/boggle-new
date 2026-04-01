@@ -21,6 +21,7 @@ import {
   PRISM_CROSS,
   GEM_SHATTER,
   VORTEX_PULL,
+  VORTEX_EXPLOSION,
   COMBO_FLASH,
   CASCADE_SPARKLE,
   BOARD_CLEAR,
@@ -135,6 +136,7 @@ function EffectsWorker({
   const prevWaveRef = useRef(false);
   const debrisRef = useRef<DebrisFragment[]>([]);
   const debrisContainerRef = useRef<Container | null>(null);
+  const magnetTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const cellSize = width / gridSize;
 
@@ -150,6 +152,8 @@ function EffectsWorker({
         d.graphic.destroy();
       }
       debrisRef.current = [];
+      for (const tid of magnetTimersRef.current) clearTimeout(tid);
+      magnetTimersRef.current = [];
       camera.removeChild(container);
       container.destroy();
     };
@@ -272,6 +276,15 @@ function EffectsWorker({
       const y = tile.row * cellSize + cellSize / 2;
       const preset = CLEAR_PRESET_MAP[tile.type] ?? TILE_EXPLOSION;
       particles.burst(preset, x, y);
+
+      // Magnet: delayed explosion burst after pull phase completes
+      if (tile.type === 'magnet') {
+        const tid = setTimeout(() => {
+          particles.burst(VORTEX_EXPLOSION, x, y);
+          physics.applyExplosion({ x, y }, 0.005, cellSize * 3.5);
+        }, 280);
+        magnetTimersRef.current.push(tid);
+      }
     }
 
     // Spawn physics debris fragments
