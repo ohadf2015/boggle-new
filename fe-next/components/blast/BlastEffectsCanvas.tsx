@@ -295,7 +295,7 @@ function EffectsWorker({
     if (count >= 6) shake.heavy();
     else if (count >= 3) shake.medium();
     else shake.light();
-  }, [clearedTiles, particles, shake, cellSize, spawnDebris]);
+  }, [clearedTiles, particles, shake, cellSize, spawnDebris, physics]);
 
   // Chain cascade sparkle
   useEffect(() => {
