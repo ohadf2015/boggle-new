@@ -7961,6 +7961,12 @@ const sv = {
     }
   },
   "education": {
+    "badges": {
+      "wordExplorer": "Ordutforskare",
+      "vocabMaster": "Ordmästare",
+      "speedScholar": "Snabblärd",
+      "locked": "Låst"
+    },
     "wordOfTheDay": {
       "title": "Dagens Ord",
       "learnMore": "Läs Mer"

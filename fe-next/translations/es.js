@@ -8027,6 +8027,12 @@ const es = {
     }
   },
   "education": {
+    "badges": {
+      "wordExplorer": "Explorador de Palabras",
+      "vocabMaster": "Maestro del Vocabulario",
+      "speedScholar": "Erudito Veloz",
+      "locked": "Bloqueado"
+    },
     "wordOfTheDay": {
       "title": "Palabra del Dia",
       "learnMore": "Saber Mas"

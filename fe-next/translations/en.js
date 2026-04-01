@@ -8170,6 +8170,12 @@ const en = {
     }
   },
   "education": {
+    "badges": {
+      "wordExplorer": "Word Explorer",
+      "vocabMaster": "Vocab Master",
+      "speedScholar": "Speed Scholar",
+      "locked": "Locked"
+    },
     "wordOfTheDay": {
       "title": "Word of the Day",
       "learnMore": "Learn More"
