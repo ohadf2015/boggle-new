@@ -43,6 +43,8 @@ export interface RealTimeDuelGameProps {
   duelId: string;
   studentId: string;
   opponentName: string;
+  opponentId?: string;
+  lessonId?: string;
   onBackToLobby?: () => void;
 }
 
@@ -63,10 +65,13 @@ export function RealTimeDuelGame({
   duelId,
   studentId,
   opponentName,
+  opponentId,
+  lessonId,
   onBackToLobby,
 }: RealTimeDuelGameProps) {
   const { t } = useLanguage();
   const {
+    socket: duelSocket,
     submitWord,
     forfeitDuel,
     onDuelStarted,
@@ -214,6 +219,12 @@ export function RealTimeDuelGame({
     setShowForfeitDialog(false);
   }, [duelId, forfeitDuel]);
 
+  const handleRematch = useCallback(() => {
+    if (duelSocket && opponentId && lessonId) {
+      duelSocket.emit('duel:rematch', { opponentId, lessonId });
+    }
+  }, [duelSocket, opponentId, lessonId]);
+
   // ============================================
   // RENDER HELPERS
   // ============================================
@@ -303,13 +314,23 @@ export function RealTimeDuelGame({
           </span>
         </div>
 
-        {/* Back Button */}
-        <button
-          onClick={onBackToLobby}
-          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
-        >
-          {t('duels.backToLobby')}
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          {opponentId && lessonId && (
+            <button
+              onClick={handleRematch}
+              className="px-6 py-3 bg-neo-pink text-white font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            >
+              {t('education.duels.rematch')}
+            </button>
+          )}
+          <button
+            onClick={onBackToLobby}
+            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          >
+            {t('duels.backToLobby')}
+          </button>
+        </div>
       </motion.div>
     );
   }

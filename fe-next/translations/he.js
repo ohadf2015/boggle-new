@@ -8855,7 +8855,10 @@ const he = {
       "history": "היסטוריה",
       "classmates": "חברים לכיתה",
       "findingClassmates": "מחפש חברים לכיתה...",
-      "joinClassroomToDuel": "הצטרף לכיתה כדי להתחרות"
+      "joinClassroomToDuel": "הצטרף לכיתה כדי להתחרות",
+      "noClassmatesOnline": "אין חברים לכיתה מחוברים כרגע",
+      "challengeSomeone": "אתגר מישהו!",
+      "rematch": "משחק חוזר"
     },
     "achievements": {
       "completion": "{{percent}}% הושלם",

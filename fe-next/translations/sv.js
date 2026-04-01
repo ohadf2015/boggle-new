@@ -8784,7 +8784,10 @@ const sv = {
       "history": "Historik",
       "classmates": "Klasskompisar",
       "findingClassmates": "Söker klasskompisar...",
-      "joinClassroomToDuel": "Gå med i ett klassrum för att duellera"
+      "joinClassroomToDuel": "Gå med i ett klassrum för att duellera",
+      "noClassmatesOnline": "Inga klasskompisar är online just nu",
+      "challengeSomeone": "Utmana någon!",
+      "rematch": "Returmatch"
     },
     "achievements": {
       "completion": "{{percent}}% klart",

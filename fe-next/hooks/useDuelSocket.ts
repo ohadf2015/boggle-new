@@ -65,10 +65,18 @@ export type {
 // Hook Implementation
 // ==========================================
 
-export function useDuelSocket(): UseDuelSocketReturn {
+export type ConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
+
+export interface UseDuelSocketOptions {
+  onReconnect?: () => void;
+}
+
+export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketReturn & { connectionStatus: ConnectionStatus } {
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Map<string, Function>>(new Map());
+  const wasConnectedRef = useRef(false);
   const { user, profile } = useAuth();
 
   // ==========================================
@@ -117,18 +125,29 @@ export function useDuelSocket(): UseDuelSocketReturn {
     // Connection handlers
     const handleConnect = () => {
       setIsConnected(true);
+      setConnectionStatus('connected');
+      if (wasConnectedRef.current) {
+        options?.onReconnect?.();
+      }
+      wasConnectedRef.current = true;
     };
     const handleDisconnect = () => {
       setIsConnected(false);
+      setConnectionStatus('disconnected');
+    };
+    const handleReconnectAttempt = () => {
+      setConnectionStatus('reconnecting');
     };
 
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
+    socket.on('reconnect_attempt', handleReconnectAttempt);
 
     // Cleanup on unmount
     return () => {
       socket.off('connect', handleConnect);
       socket.off('disconnect', handleDisconnect);
+      socket.off('reconnect_attempt', handleReconnectAttempt);
       // Capture listeners map for cleanup
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const listeners = listenersRef.current;
@@ -418,6 +437,7 @@ export function useDuelSocket(): UseDuelSocketReturn {
   return {
     socket: socketRef.current,
     isConnected,
+    connectionStatus,
     // Lobby
     joinLobby,
     leaveLobby,

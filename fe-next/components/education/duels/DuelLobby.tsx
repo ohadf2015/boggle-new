@@ -34,13 +34,15 @@ export interface DuelLobbyProps {
   studentId: string;
   /** Available lessons for challenges */
   lessons: Array<{ id: string; name: string }>;
+  /** Callback to switch to another tab (e.g. 'classmates') */
+  onTabChange?: (tab: string) => void;
 }
 
 // ============================================
 // COMPONENT
 // ============================================
 
-export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobbyProps) {
+export default function DuelLobby({ classroomId, studentId, lessons, onTabChange }: DuelLobbyProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const {
@@ -258,7 +260,25 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
         </h3>
 
         {opponents.length === 0 ? (
-          <p className="text-neo-white/50 text-center py-4">{t('noOpponentsOnline')}</p>
+          <div className="text-center py-6">
+            <Users className="w-10 h-10 mx-auto mb-3 text-neo-white/30" />
+            <p className="text-neo-white/50 mb-3">{t('education.duels.noClassmatesOnline')}</p>
+            {onTabChange && (
+              <button
+                onClick={() => onTabChange('classmates')}
+                className={cn(
+                  'px-4 py-2 font-black rounded-neo',
+                  'bg-neo-pink text-white',
+                  'border-3 border-black shadow-hard-sm',
+                  'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                  'transition-all duration-100',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                )}
+              >
+                {t('education.duels.challengeSomeone')}
+              </button>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {opponents.map((opponent) => (
