@@ -8850,6 +8850,14 @@ const he = {
   "duelComplete": "הדו-קרב הסתיים!",
   "education": {
     "reviewDue": "{count} מילים לחזרה",
+    "postGame": {
+      "wordsYouLearned": "מילים שלמדת",
+      "found": "נמצאו",
+      "wordsToLearn": "מילים ללמוד",
+      "studyTheseNext": "!למדו את אלה בפעם הבאה",
+      "practiceTheseWords": "תרגלו את המילים האלה",
+      "vocabScore": "מצאת {{found}} מתוך {{total}} מילות אוצר מילים!"
+    },
     "duels": {
       "lobby": "לובי",
       "history": "היסטוריה",
@@ -9803,6 +9811,17 @@ const he = {
     "reachCombo": "הגיעו לקומבו {{target}}x",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} מטבעות"
+  },
+  "dailyQuest": {
+    "title": "משימה יומית",
+    "claimReward": "קבלו!",
+    "questComplete": "המשימה הושלמה!",
+    "rewardEarned": "+{{coins}} מטבעות!",
+    "modesPlayed": "{{count}}/3",
+    "daily": "אתגר יומי",
+    "classicMp": "מרובה משתתפים קלאסי",
+    "wordHuntMp": "ציד מילים מרובה משתתפים",
+    "playAllModes": "שחקו בכל 3 המצבים כדי להשלים את המשימה"
   },
   "asyncChallenge": {
     "title": "אתגרי לוח",

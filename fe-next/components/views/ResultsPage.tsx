@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState, useCallback, useDeferredValue, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
@@ -43,6 +44,7 @@ import { useGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useB
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsSummary = dynamic(() => import('@/components/results/BlastResultsSummary'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 
 const SERIES_TOTAL_GAMES = 3;
 
@@ -66,6 +68,7 @@ interface DesktopResultsLayoutProps {
   sortedScores: any[];
   otherPlayers: any[];
   isBotsOnlyGame: boolean;
+  postGameWordReview?: React.ReactNode;
 }
 
 function DesktopResultsLayout({
@@ -82,6 +85,7 @@ function DesktopResultsLayout({
   sortedScores,
   otherPlayers,
   isBotsOnlyGame,
+  postGameWordReview,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -147,6 +151,7 @@ function DesktopResultsLayout({
               />
             )}
             <PostGameEngagement />
+            {postGameWordReview}
           </div>
 
           {/* RIGHT: Other players expanded + achievements */}
@@ -206,6 +211,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  const router = useRouter();
+
+  // Classroom lesson data from sessionStorage (set by ClassroomGameLobby)
+  const lessonGameData = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = sessionStorage.getItem('lessonGameData');
+      if (!raw) return null;
+      return JSON.parse(raw) as {
+        lessonId: string;
+        vocabularyWords: string[];
+      };
+    } catch {
+      return null;
+    }
+  }, []);
 
   const { showInterstitial } = useAdPlacement();
   const { requestMidgameAd } = useCrazyGamesAds();
@@ -286,6 +308,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  // Word review card for classroom games (shared between mobile + desktop)
+  const postGameWordReviewNode = lessonGameData ? (
+    <PostGameWordReview
+      vocabularyWords={lessonGameData.vocabularyWords}
+      wordsFound={currentPlayerValidWords.map((w: { word: string }) => w.word)}
+      lessonId={lessonGameData.lessonId}
+      onPractice={() => router.push(`/student/practice?lessonId=${lessonGameData.lessonId}&mode=review`)}
+    />
+  ) : null;
 
   // Extract all side effects into a custom hook
   const {
@@ -733,6 +765,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             <CrazyGamesBanner size="320x50" />
             {/* Other players' details (inline, no tab switch needed) */}
             {renderDetailsTab()}
+            {postGameWordReviewNode}
           </div>
         </div>
 
@@ -784,6 +817,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         sortedScores={sortedScores}
         otherPlayers={otherPlayers}
         isBotsOnlyGame={isBotsOnlyGame}
+        postGameWordReview={postGameWordReviewNode}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens */}

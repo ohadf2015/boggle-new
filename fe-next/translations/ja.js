@@ -8813,6 +8813,14 @@ const ja = {
   "notParticipant": "このデュエルの参加者ではありません",
   "education": {
     "reviewDue": "復習する単語が{count}個あります",
+    "postGame": {
+      "wordsYouLearned": "学んだ単語",
+      "found": "見つけた",
+      "wordsToLearn": "学ぶべき単語",
+      "studyTheseNext": "次はこれを勉強しよう！",
+      "practiceTheseWords": "これらの単語を練習する",
+      "vocabScore": "{{total}}個の語彙のうち{{found}}個を見つけました！"
+    },
     "duels": {
       "lobby": "ロビー",
       "history": "履歴",
@@ -9769,6 +9777,17 @@ const ja = {
     "reachCombo": "{{target}}xコンボを達成",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} コイン"
+  },
+  "dailyQuest": {
+    "title": "デイリークエスト",
+    "claimReward": "受け取る！",
+    "questComplete": "クエスト完了！",
+    "rewardEarned": "+{{coins}} コイン獲得！",
+    "modesPlayed": "{{count}}/3",
+    "daily": "デイリーチャレンジ",
+    "classicMp": "クラシックマルチプレイヤー",
+    "wordHuntMp": "ワードハントマルチプレイヤー",
+    "playAllModes": "3つのモードすべてをプレイしてクエストを完了しよう"
   },
   "asyncChallenge": {
     "title": "ボードチャレンジ",

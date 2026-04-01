@@ -8810,6 +8810,14 @@ const es = {
   },
   "education": {
     "reviewDue": "{count} palabras por repasar",
+    "postGame": {
+      "wordsYouLearned": "Palabras que aprendiste",
+      "found": "Encontradas",
+      "wordsToLearn": "Palabras por aprender",
+      "studyTheseNext": "¡Estudia estas a continuación!",
+      "practiceTheseWords": "Practica estas palabras",
+      "vocabScore": "¡Encontraste {{found}} de {{total}} palabras de vocabulario!"
+    },
     "duels": {
       "lobby": "Sala",
       "history": "Historial",
@@ -9836,6 +9844,17 @@ const es = {
     "reachCombo": "Alcanza {{target}}x combo",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} monedas"
+  },
+  "dailyQuest": {
+    "title": "Misión diaria",
+    "claimReward": "¡Reclamar!",
+    "questComplete": "¡Misión completada!",
+    "rewardEarned": "+{{coins}} monedas!",
+    "modesPlayed": "{{count}}/3",
+    "daily": "Desafío diario",
+    "classicMp": "Multijugador clásico",
+    "wordHuntMp": "Caza de palabras multijugador",
+    "playAllModes": "Juega los 3 modos para completar la misión"
   },
   "asyncChallenge": {
     "title": "Desafíos de tablero",

@@ -8934,7 +8934,15 @@ const en = {
     "updatingToNewVersion": "Updating to new version..."
   },
   "education": {
-    "reviewDue": "{count} words due for review"
+    "reviewDue": "{count} words due for review",
+    "postGame": {
+      "wordsYouLearned": "Words You Learned",
+      "found": "Found",
+      "wordsToLearn": "Words to Learn",
+      "studyTheseNext": "Study these next!",
+      "practiceTheseWords": "Practice These Words",
+      "vocabScore": "You found {{found}} of {{total}} vocabulary words!"
+    }
   },
   "duels": {
     "addWord": "Add Word",
@@ -9573,6 +9581,17 @@ const en = {
     "reachCombo": "Reach {{target}}x Combo",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} Coins"
+  },
+  "dailyQuest": {
+    "title": "Daily Quest",
+    "claimReward": "Claim!",
+    "questComplete": "Quest Complete!",
+    "rewardEarned": "+{{coins}} coins earned!",
+    "modesPlayed": "{{count}}/3",
+    "daily": "Daily Challenge",
+    "classicMp": "Classic Multiplayer",
+    "wordHuntMp": "Word Hunt Multiplayer",
+    "playAllModes": "Play all 3 modes to complete the quest"
   },
   "education": {
     "duels": {

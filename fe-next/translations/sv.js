@@ -8779,6 +8779,14 @@ const sv = {
   },
   "education": {
     "reviewDue": "{count} ord att repetera",
+    "postGame": {
+      "wordsYouLearned": "Ord du lärt dig",
+      "found": "Hittade",
+      "wordsToLearn": "Ord att lära sig",
+      "studyTheseNext": "Studera dessa härnäst!",
+      "practiceTheseWords": "Öva på dessa ord",
+      "vocabScore": "Du hittade {{found}} av {{total}} glosor!"
+    },
     "duels": {
       "lobby": "Lobby",
       "history": "Historik",
@@ -9788,6 +9796,17 @@ const sv = {
     "reachCombo": "Nå {{target}}x kombo",
     "totalXp": "+{{xp}} XP",
     "totalCoins": "{{coins}} mynt"
+  },
+  "dailyQuest": {
+    "title": "Dagligt uppdrag",
+    "claimReward": "Hämta!",
+    "questComplete": "Uppdraget klart!",
+    "rewardEarned": "+{{coins}} mynt!",
+    "modesPlayed": "{{count}}/3",
+    "daily": "Daglig utmaning",
+    "classicMp": "Klassiskt flerspelare",
+    "wordHuntMp": "Ordjakt flerspelare",
+    "playAllModes": "Spela alla 3 lägen för att slutföra uppdraget"
   },
   "asyncChallenge": {
     "title": "Brädutmaningar",
