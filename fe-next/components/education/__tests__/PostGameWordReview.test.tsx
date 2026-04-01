@@ -20,21 +20,23 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <div ref={ref} {...props}>{children}</div>
-    )),
-    button: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <button ref={ref} {...props}>{children}</button>
-    )),
-    span: React.forwardRef(({ children, ...props }: any, ref: any) => (
-      <span ref={ref} {...props}>{children}</span>
-    )),
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+// Mock framer-motion — must use inline functions (vi.mock is hoisted)
+vi.mock('framer-motion', async () => {
+  const React = await import('react');
+  const MockDiv = React.forwardRef(function MockDiv({ children, ...props }: any, ref: any) {
+    return React.createElement('div', { ...props, ref }, children);
+  });
+  const MockButton = React.forwardRef(function MockButton({ children, ...props }: any, ref: any) {
+    return React.createElement('button', { ...props, ref }, children);
+  });
+  const MockSpan = React.forwardRef(function MockSpan({ children, ...props }: any, ref: any) {
+    return React.createElement('span', { ...props, ref }, children);
+  });
+  return {
+    motion: { div: MockDiv, button: MockButton, span: MockSpan },
+    AnimatePresence: ({ children }: any) => children,
+  };
+});
 
 const defaultProps = {
   vocabularyWords: ['apple', 'banana', 'cherry', 'date', 'elderberry'],
