@@ -7996,6 +7996,12 @@ const he = {
     }
   },
   "education": {
+    "badges": {
+      "wordExplorer": "חוקר מילים",
+      "vocabMaster": "אלוף אוצר המילים",
+      "speedScholar": "תלמיד מהיר",
+      "locked": "נעול"
+    },
     "wordOfTheDay": {
       "title": "המילה היומית",
       "learnMore": "למד עוד"

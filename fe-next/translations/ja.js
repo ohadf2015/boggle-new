@@ -8013,6 +8013,12 @@ const ja = {
     }
   },
   "education": {
+    "badges": {
+      "wordExplorer": "ワードエクスプローラー",
+      "vocabMaster": "語彙マスター",
+      "speedScholar": "スピードスカラー",
+      "locked": "ロック中"
+    },
     "wordOfTheDay": {
       "title": "今日の単語",
       "learnMore": "もっと見る"
