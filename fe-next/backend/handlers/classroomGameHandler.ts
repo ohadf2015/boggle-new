@@ -145,6 +145,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // Broadcast to classroom that a game has been created
       io.to(`classroom:${payload.classroomId}`).emit('classroomGameCreated', {
         gameCode: payload.gameCode,
+        classroomId: payload.classroomId,
         teacherName: payload.teacherName,
         lessonNames: payload.lessonNames,
       });
@@ -348,6 +349,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         gameMode: game.settings.gameMode || 'classic',
         settings: game.settings,
         playerCount: game.players.length,
+        vocabularyWords: game.vocabularyWords,
       });
 
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} started game ${payload.gameCode}`);

@@ -106,6 +106,20 @@ export async function getClassroomGame(gameCode: string): Promise<ClassroomGame 
 }
 
 /**
+ * Get classroom metadata by game code (classroomId, lessonIds, teacherName)
+ */
+export async function getClassroomGameByCode(gameCode: string): Promise<{ classroomId: string; lessonIds: string[]; teacherName: string } | null> {
+  const game = await getClassroomGame(gameCode);
+  if (!game) return null;
+
+  return {
+    classroomId: game.classroomId,
+    lessonIds: game.lessonIds,
+    teacherName: game.teacherName,
+  };
+}
+
+/**
  * Get all active classroom games for a classroom
  */
 export async function getActiveClassroomGames(classroomId: string): Promise<ClassroomGame[]> {

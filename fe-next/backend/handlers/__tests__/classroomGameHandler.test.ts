@@ -120,6 +120,7 @@ describe('ClassroomGameHandler', () => {
       expect(mockIo.to).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);
       expect(mockIo.emit).toHaveBeenCalledWith('classroomGameCreated', {
         gameCode: gameData.gameCode,
+        classroomId: gameData.classroomId,
         teacherName: gameData.teacherName,
         lessonNames: gameData.lessonNames,
       });
@@ -233,6 +234,47 @@ describe('ClassroomGameHandler', () => {
       expect(mockSocket.emit).toHaveBeenCalledWith('joinedClassroomGame', {
         success: true,
         gameCode: data.gameCode,
+      });
+    });
+  });
+
+  describe('startClassroomGame handler', () => {
+    it('should include vocabularyWords in classroomGameStarted event', async () => {
+      // GIVEN
+      const gameCode = 'ABC123';
+      const teacherId = '00000000-0000-4000-8000-000000000001';
+      const game = {
+        gameCode,
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId,
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
+        vocabularyWords: ['cat', 'dog', 'bird'],
+        settings: { gameMode: 'classic' },
+        players: [{ userId: 'student-1', username: 'Alice', socketId: 's1' }],
+        status: 'waiting' as const,
+        createdAt: '2026-01-01T00:00:00.000Z',
+      };
+
+      (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue(game);
+      (classroomGameManager.updateClassroomGameStatus as jest.Mock).mockResolvedValue(undefined);
+
+      registerClassroomGameHandlers(mockIo, mockSocket);
+
+      const startHandler = mockSocket.on.mock.calls.find(
+        (call: any[]) => call[0] === 'startClassroomGame'
+      )[1];
+
+      // WHEN
+      await startHandler({ gameCode });
+
+      // THEN
+      expect(mockIo.emit).toHaveBeenCalledWith('classroomGameStarted', {
+        gameCode,
+        gameMode: 'classic',
+        settings: game.settings,
+        playerCount: 1,
+        vocabularyWords: ['cat', 'dog', 'bird'],
       });
     });
   });

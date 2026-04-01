@@ -6,6 +6,7 @@
 import {
   createClassroomGame,
   getClassroomGame,
+  getClassroomGameByCode,
   getActiveClassroomGames,
   deleteClassroomGame,
   addPlayerToClassroomGame,
@@ -67,6 +68,32 @@ describe('ClassroomGameManager', () => {
         `classroom_games:${gameData.classroomId}`,
         gameData.gameCode
       );
+    });
+
+    it('should persist classroomId and lessonIds in Redis', async () => {
+      // GIVEN
+      const gameData = {
+        gameCode: 'XYZ789',
+        classroomId: 'classroom-99',
+        teacherId: 'teacher-1',
+        teacherName: 'Ms. Jones',
+        lessonIds: ['lesson-A', 'lesson-B'],
+        lessonNames: ['Fruits', 'Veggies'],
+        vocabularyWords: ['apple', 'carrot'],
+        settings: {},
+      };
+
+      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.sadd.mockResolvedValue(1);
+
+      // WHEN
+      await createClassroomGame(gameData);
+
+      // THEN
+      const savedJson = (mockRedis.setex as jest.Mock).mock.calls[0][2];
+      const saved = JSON.parse(savedJson);
+      expect(saved.classroomId).toBe('classroom-99');
+      expect(saved.lessonIds).toEqual(['lesson-A', 'lesson-B']);
     });
 
     it('should throw error if Redis fails', async () => {
@@ -251,6 +278,47 @@ describe('ClassroomGameManager', () => {
         (mockRedis.setex as jest.Mock).mock.calls[0][2]
       );
       expect(savedData.players).toHaveLength(1);
+    });
+  });
+
+  describe('getClassroomGameByCode', () => {
+    it('should return classroom metadata for a game code', async () => {
+      // GIVEN
+      const gameData = {
+        gameCode: 'ABC123',
+        classroomId: 'classroom-1',
+        teacherId: 'teacher-1',
+        teacherName: 'Mr. Smith',
+        lessonIds: ['lesson-1', 'lesson-2'],
+        lessonNames: ['Animals', 'Colors'],
+        vocabularyWords: ['cat', 'dog'],
+        players: [],
+        status: 'waiting',
+        createdAt: '2026-01-01T00:00:00.000Z',
+      };
+
+      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
+
+      // WHEN
+      const result = await getClassroomGameByCode('ABC123');
+
+      // THEN
+      expect(result).toEqual({
+        classroomId: 'classroom-1',
+        lessonIds: ['lesson-1', 'lesson-2'],
+        teacherName: 'Mr. Smith',
+      });
+    });
+
+    it('should return null if game does not exist', async () => {
+      // GIVEN
+      (mockRedis.get as jest.Mock).mockResolvedValue(null);
+
+      // WHEN
+      const result = await getClassroomGameByCode('NONEXISTENT');
+
+      // THEN
+      expect(result).toBeNull();
     });
   });
 
