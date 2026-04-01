@@ -101,7 +101,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
               onClick={handleBackToLobby}
               className={cn(
                 'px-6 py-3 font-bold rounded-neo',
-                'bg-neo-yellow text-neo-black',
+                'bg-neo-lime text-neo-black',
                 'border-3 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard transition-all'
               )}

@@ -44,8 +44,8 @@ export default function TeacherPageClient() {
   if (!user || !isTeacher) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
-        <div className="text-center p-8 bg-white border-3 border-black rounded-neo shadow-hard max-w-sm w-full mx-4">
-          <div className="w-16 h-16 rounded-neo bg-neo-yellow border-3 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
+        <div className="text-center p-8 bg-neo-cream border-3 border-black rounded-neo shadow-hard max-w-sm w-full mx-4">
+          <div className="w-16 h-16 rounded-neo bg-neo-lime border-3 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
             <Shield className="w-9 h-9 text-black" />
           </div>
           <h1 className="text-2xl font-neo-display font-black text-black mb-2">

@@ -48,7 +48,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
         {/* Header: Current Level -> Next Milestone */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-neo-yellow font-black text-lg">
+            <span className="text-neo-lime font-black text-lg">
               {currentLevel}
             </span>
             <span className="text-neo-white/50">→</span>
@@ -61,7 +61,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
           </div>
           {nextMilestone && (
             <div className="text-sm text-neo-white/70">
-              {t('education.milestones.xpRemaining')}: <span className="font-bold text-neo-yellow">{xpToNextMilestone}</span>
+              {t('education.milestones.xpRemaining')}: <span className="font-bold text-neo-lime">{xpToNextMilestone}</span>
             </div>
           )}
         </div>
@@ -85,7 +85,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             <div
               className={cn(
                 'h-full rounded-full',
-                'bg-gradient-to-r from-neo-yellow to-neo-orange',
+                'bg-gradient-to-r from-neo-lime to-neo-orange',
                 'transition-all duration-500 ease-out'
               )}
               style={{ width: `${progressPercent}%` }}
@@ -117,7 +117,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
                       // Size: major = larger
                       milestone.isMajor ? 'w-4 h-8' : 'w-2 h-6',
                       // Color: major = yellow, minor = gray
-                      milestone.isMajor ? 'bg-neo-yellow' : 'bg-neo-white/60',
+                      milestone.isMajor ? 'bg-neo-lime' : 'bg-neo-white/60',
                       // Dim upcoming milestones
                       !isPassed && 'opacity-30'
                     )}

@@ -133,7 +133,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
   // Skeleton loader
   if (leaderboardLoading || !streakLoaded) {
     return (
-      <div className="p-6 rounded-neo border-3 border-black bg-white shadow-hard animate-pulse">
+      <div className="p-6 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard animate-pulse">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 rounded-neo bg-black/10" />
           <div className="flex-1">
@@ -165,7 +165,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
         className="relative rounded-neo border-3 border-black shadow-hard overflow-hidden"
       >
       {/* Colorful header band */}
-      <div className="bg-neo-yellow px-6 pt-5 pb-4">
+      <div className="bg-neo-lime px-6 pt-5 pb-4">
         {/* Mascot - floating in top-right corner */}
         <motion.div
           className="absolute top-2 end-2 z-10"
@@ -194,7 +194,7 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
               whileTap={{ scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              <span className="text-2xl font-neo-display font-black text-neo-yellow tabular-nums">
+              <span className="text-2xl font-neo-display font-black text-neo-lime tabular-nums">
                 {xpProgress.currentLevel}
               </span>
             </motion.div>
@@ -219,30 +219,30 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
         </motion.div>
       </div>
 
-      {/* White body with stats */}
-      <div className="bg-white px-6 py-4">
+      {/* Dark body with stats */}
+      <div className="bg-neo-navy-light px-6 py-4">
         {/* 3-column stats with stagger */}
         <motion.div
           variants={statsContainer}
           className="grid grid-cols-3 gap-3"
         >
           {/* Rank */}
-          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-yellow/20 shadow-hard-sm text-center">
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-lime shadow-hard-sm text-center">
             <motion.div
-              className="w-9 h-9 rounded-neo bg-neo-yellow border-2 border-black flex items-center justify-center shadow-hard-sm"
+              className="w-9 h-9 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm"
               whileHover={{ scale: 1.2, rotate: -8 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
               <Trophy className="w-5 h-5 text-black" />
             </motion.div>
-            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.rank')}</p>
-            <p className="text-xl font-black text-black tabular-nums">
+            <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.rank')}</p>
+            <p className="text-xl font-black text-neo-white tabular-nums">
               {typeof rank === 'number' ? `#${rank}` : rank}
             </p>
           </motion.div>
 
           {/* Total XP */}
-          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-cyan/20 shadow-hard-sm text-center">
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-cyan shadow-hard-sm text-center">
             <motion.div
               className="w-9 h-9 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center shadow-hard-sm"
               whileHover={{ scale: 1.2, rotate: 8 }}
@@ -250,12 +250,12 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
             >
               <Zap className="w-5 h-5 text-black" />
             </motion.div>
-            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.totalXP')}</p>
-            <p className="text-xl font-black text-black tabular-nums">{totalXP.toLocaleString()}</p>
+            <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.totalXP')}</p>
+            <p className="text-xl font-black text-neo-white tabular-nums">{totalXP.toLocaleString()}</p>
           </motion.div>
 
           {/* Streak */}
-          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-2 border-black bg-neo-pink/20 shadow-hard-sm text-center">
+          <motion.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-pink shadow-hard-sm text-center">
             <motion.div
               className="w-9 h-9 rounded-neo bg-neo-pink border-2 border-black flex items-center justify-center shadow-hard-sm"
               whileHover={{ scale: 1.2, rotate: -8 }}
@@ -263,8 +263,8 @@ function StudentProgress({ classroomId, userId }: { classroomId: string; userId:
             >
               <Flame className="w-5 h-5 text-white" />
             </motion.div>
-            <p className="text-xs text-black/60 font-bold">{t('education.leaderboard.streak')}</p>
-            <p className="text-xl font-black text-black tabular-nums">
+            <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.streak')}</p>
+            <p className="text-xl font-black text-neo-white tabular-nums">
               {currentStreak} {t('common.days')}
             </p>
           </motion.div>
@@ -404,7 +404,7 @@ export default function StudentPageClient() {
         {/* Join Classroom CTA (when no classroom) */}
         {!classroomId && (
           <motion.div
-            className="mb-6 bg-neo-yellow text-neo-black border-3 border-black rounded-neo shadow-hard p-6"
+            className="mb-6 bg-neo-lime text-neo-black border-3 border-black rounded-neo shadow-hard p-6"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 24 }}
@@ -420,7 +420,7 @@ export default function StudentPageClient() {
             </p>
             <Link
               href={`/${language}/student/join`}
-              className="inline-block px-6 py-3 bg-neo-black text-neo-yellow font-neo-display font-bold rounded-neo border-3 border-black shadow-hard-sm hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="inline-block px-6 py-3 bg-neo-black text-neo-lime font-neo-display font-bold rounded-neo border-3 border-black shadow-hard-sm hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
               {t('student.joinClassroom')}
             </Link>

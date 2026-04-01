@@ -233,7 +233,7 @@ export default function LessonBuilder() {
                         defCount === totalWords && totalWords > 0
                           ? 'text-neo-cyan bg-neo-cyan/10'
                           : defCount > 0
-                            ? 'text-neo-yellow bg-neo-yellow/10'
+                            ? 'text-neo-lime bg-neo-lime/10'
                             : 'text-neo-white/40 bg-neo-navy/10'
                       )}
                     >
@@ -259,7 +259,7 @@ export default function LessonBuilder() {
                         {word.canIntegrate ? (
                           <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
                         ) : (
-                          <AlertCircle className="w-4 h-4 text-neo-yellow shrink-0" />
+                          <AlertCircle className="w-4 h-4 text-neo-lime shrink-0" />
                         )}
                         <span className="text-neo-white font-neo-body">{word.word}</span>
                         {word.definition && (

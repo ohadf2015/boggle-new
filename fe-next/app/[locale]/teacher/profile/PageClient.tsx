@@ -149,11 +149,11 @@ export default function TeacherProfilePageClient() {
         {/* Contact Admin Section */}
         <div
           data-testid="contact-admin-section"
-          className="p-6 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard mb-8"
+          className="p-6 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard mb-8"
         >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-neo bg-neo-black border-2 border-neo-black flex items-center justify-center flex-shrink-0 shadow-hard-sm">
-              <Mail className="w-6 h-6 text-neo-yellow" />
+              <Mail className="w-6 h-6 text-neo-lime" />
             </div>
             <div>
               <h2 className="text-xl font-neo-display font-black text-neo-black mb-1">

@@ -99,7 +99,7 @@ export function ChallengeButton({
           onClick={handleClick}
           className={cn(
             'p-2 rounded-neo transition-all',
-            'text-neo-orange hover:text-neo-yellow',
+            'text-neo-orange hover:text-neo-lime',
             'hover:bg-neo-navy/30',
             className
           )}

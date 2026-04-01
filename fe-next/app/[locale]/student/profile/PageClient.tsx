@@ -237,7 +237,7 @@ export default function StudentProfilePageClient() {
                 {profile?.display_name || profile?.username || t('common.guest')}
               </h1>
               <div className="flex items-center gap-3 mt-2">
-                <div className="px-3 py-1 bg-neo-yellow text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
+                <div className="px-3 py-1 bg-neo-lime text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                   {t('education.xp.level')} {currentLevel}
                 </div>
                 <div className="px-3 py-1 bg-neo-orange text-neo-white font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
@@ -310,7 +310,7 @@ export default function StudentProfilePageClient() {
                 <div className="text-neo-white/60 font-neo-body text-sm mb-1">
                   {t('education.practice.wordsFound')}
                 </div>
-                <div className="text-3xl font-neo-display font-black text-neo-yellow">
+                <div className="text-3xl font-neo-display font-black text-neo-lime">
                   {studentProgress?.words_mastered?.length || 0}
                 </div>
               </div>

@@ -153,7 +153,7 @@ export default function LessonTemplateEditor({
             {/* Timer */}
             <div className="space-y-3">
               <Label className="text-sm font-neo-body text-neo-white flex items-center gap-2">
-                <Clock className="w-4 h-4 text-neo-yellow" />
+                <Clock className="w-4 h-4 text-neo-lime" />
                 {t('education.template.timer')}
               </Label>
               <div className="flex gap-2 flex-wrap">
@@ -166,7 +166,7 @@ export default function LessonTemplateEditor({
                     className={cn(
                       'border-neo border-neo-black transition-all',
                       timerSeconds === option.value
-                        ? 'bg-neo-yellow text-neo-black shadow-hard-pressed'
+                        ? 'bg-neo-lime text-neo-black shadow-hard-pressed'
                         : 'bg-neo-navy/50 text-neo-white shadow-hard hover:shadow-hard-pressed'
                     )}
                   >

@@ -109,7 +109,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
       {/* Header: Streak count */}
       <div className="flex items-center gap-3 mb-5">
         <motion.div
-          className="w-10 h-10 rounded-neo bg-neo-yellow border-3 border-black shadow-hard-sm flex items-center justify-center flex-shrink-0"
+          className="w-10 h-10 rounded-neo bg-neo-lime border-3 border-black shadow-hard-sm flex items-center justify-center flex-shrink-0"
           whileHover={{ scale: 1.15, rotate: -8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
@@ -120,7 +120,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
         </p>
         <motion.div
           variants={streakBadgePop}
-          className="ms-auto flex items-center gap-2 bg-neo-yellow border-3 border-black rounded-neo px-3 py-1 shadow-hard-sm"
+          className="ms-auto flex items-center gap-2 bg-neo-lime border-3 border-black rounded-neo px-3 py-1 shadow-hard-sm"
         >
           <span className="text-xl font-neo-display font-black text-black tabular-nums">
             {currentStreak}
@@ -144,7 +144,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
             className={cn(
               'flex flex-col items-center gap-1.5 p-2 rounded-neo border-3 cursor-default',
               day.isActive
-                ? 'bg-neo-yellow border-black shadow-hard-sm text-black'
+                ? 'bg-neo-lime border-black shadow-hard-sm text-black'
                 : 'bg-neo-navy border-black/40 text-neo-white/40',
               day.isToday && !day.isActive && 'border-neo-cyan bg-neo-cyan/10 text-neo-white',
               day.isToday && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy'

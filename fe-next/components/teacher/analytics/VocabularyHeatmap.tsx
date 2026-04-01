@@ -71,7 +71,7 @@ export function VocabularyHeatmap({
       case 'mastered':
         return 'bg-neo-cyan';
       case 'practicing':
-        return 'bg-neo-yellow';
+        return 'bg-neo-lime';
       case 'struggling':
         return 'bg-neo-orange';
       case 'not-started':
@@ -98,7 +98,7 @@ export function VocabularyHeatmap({
         <div className="flex gap-3">
           {[
             { key: 'mastered', color: 'bg-neo-cyan' },
-            { key: 'practicing', color: 'bg-neo-yellow' },
+            { key: 'practicing', color: 'bg-neo-lime' },
             { key: 'struggling', color: 'bg-neo-orange' },
             { key: 'notStarted', color: 'bg-neo-navy/50' },
           ].map(level => (

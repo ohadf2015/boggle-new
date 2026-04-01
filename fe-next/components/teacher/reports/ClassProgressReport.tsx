@@ -174,7 +174,7 @@ export function ClassProgressReport({
         <button
           onClick={handleExportPDF}
           disabled={exporting}
-          className="px-4 py-2 bg-neo-yellow text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
+          className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
         >
           {exporting
             ? t('teacher.reports.export.downloading')
@@ -240,15 +240,15 @@ export function ClassProgressReport({
             {data.topPerformers.map((performer, index) => (
               <div
                 key={performer.studentId}
-                className="flex items-center gap-4 p-3 bg-neo-yellow/10 border-neo border-black rounded-neo"
+                className="flex items-center gap-4 p-3 bg-neo-lime/10 border-neo border-black rounded-neo"
               >
-                <span className="text-xl font-bold text-neo-yellow w-8">
+                <span className="text-xl font-bold text-neo-lime w-8">
                   #{index + 1}
                 </span>
                 {handleStudentClick ? (
                   <button
                     onClick={() => handleStudentClick(performer.studentId)}
-                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-yellow transition-colors"
+                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${performer.studentName}'s profile`}
                   >
                     {performer.studentName}
@@ -282,7 +282,7 @@ export function ClassProgressReport({
                 {handleStudentClick ? (
                   <button
                     onClick={() => handleStudentClick(student.studentId)}
-                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-yellow transition-colors"
+                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${student.studentName}'s profile`}
                   >
                     {student.studentName}
@@ -333,7 +333,7 @@ export function ClassProgressReport({
                     {handleStudentClick ? (
                       <button
                         onClick={() => handleStudentClick(student.studentId)}
-                        className="text-neo-white font-medium hover:text-neo-yellow transition-colors"
+                        className="text-neo-white font-medium hover:text-neo-lime transition-colors"
                         aria-label={`View ${student.studentName}'s profile`}
                       >
                         {student.studentName}

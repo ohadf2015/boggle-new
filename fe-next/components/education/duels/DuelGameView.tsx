@@ -258,7 +258,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className={cn(
             'mb-6 p-6 rounded-neo border-neo-thick shadow-hard',
-            isDraw ? 'bg-yellow-500 border-neo-black' : isWinner ? 'bg-neo-yellow border-neo-black' : 'bg-red-500 border-neo-black'
+            isDraw ? 'bg-yellow-500 border-neo-black' : isWinner ? 'bg-neo-lime border-neo-black' : 'bg-red-500 border-neo-black'
           )}
         >
           {isWinner ? (
@@ -294,7 +294,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
           <Flame className="w-6 h-6 text-neo-orange" />
           <span className="text-neo-white font-neo-body">
-            {t('duels.xpEarned')}: <span className="font-bold text-neo-yellow">{xp}</span>
+            {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
           </span>
         </div>
 
@@ -345,7 +345,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               <Check className="w-5 h-5 text-green-500" />
               <span className="text-neo-white">{t('duels.wordsAccepted')}</span>
             </div>
-            <span className="text-neo-yellow font-bold">{validatedScore.wordsValidated}</span>
+            <span className="text-neo-lime font-bold">{validatedScore.wordsValidated}</span>
           </div>
 
           <div className="flex items-center justify-between">
@@ -386,7 +386,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             'flex items-center gap-1 px-3 py-1 rounded-neo border-neo font-neo-display font-bold',
             timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
             timeRemaining <= 60 ? 'bg-neo-orange text-neo-black' :
-            'bg-neo-yellow text-neo-black'
+            'bg-neo-lime text-neo-black'
           )}>
             <Clock className="w-4 h-4" />
             <span>{Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}</span>
@@ -412,7 +412,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             {duelData.boardState.flat().map((letter, idx) => (
               <div
                 key={idx}
-                className="aspect-square flex items-center justify-center bg-neo-yellow text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
+                className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
                 data-testid={`board-letter-${idx}`}
               >
                 {letter}
@@ -440,7 +440,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             <button
               onClick={handleAddWord}
               disabled={!currentWord.trim()}
-              className="px-4 py-2 bg-neo-yellow text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('duels.addWord')}
             </button>

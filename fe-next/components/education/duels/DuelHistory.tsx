@@ -118,7 +118,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     <div className={cn('max-w-4xl mx-auto p-6', className)}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Trophy className="w-6 h-6 text-neo-yellow" />
+        <Trophy className="w-6 h-6 text-neo-lime" />
         <h1 className="text-2xl font-neo-display font-bold text-neo-white">
           {t('duels.duelHistory')}
         </h1>

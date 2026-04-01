@@ -113,7 +113,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
               {t('education.xp.level')}
             </span>
             <span className={cn(
-              'font-neo-display font-black text-neo-yellow',
+              'font-neo-display font-black text-neo-lime',
               sizeConfig.levelText
             )}>
               {progress.currentLevel}
@@ -186,7 +186,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           transition={progressTransition}
           className={cn(
             'absolute inset-y-0 w-full',
-            'bg-neo-yellow',
+            'bg-neo-lime',
             // RTL: transform origin on right side
             isRTL ? 'origin-right' : 'origin-left'
           )}

@@ -177,7 +177,7 @@ export default function BulkWordImporter({
                           'flex items-center gap-1 px-2 py-1 rounded text-sm font-neo-body',
                           word.canIntegrate
                             ? 'bg-neo-cyan/20 text-neo-cyan border border-neo-cyan/30'
-                            : 'bg-neo-yellow/20 text-neo-yellow border border-neo-yellow/30'
+                            : 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
                         )}
                       >
                         {word.canIntegrate ? (
