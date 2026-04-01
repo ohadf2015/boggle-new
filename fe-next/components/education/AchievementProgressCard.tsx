@@ -157,7 +157,7 @@ export default function AchievementProgressCard({
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
                   border-neo border-neo-black transition-all
-                  ${isPinned ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-white/30'}
+                  ${isPinned ? 'bg-neo-lime shadow-hard-sm' : 'bg-neo-white/30'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
               >
@@ -199,7 +199,7 @@ export default function AchievementProgressCard({
           {/* Max Tier Badge */}
           {isEarned && achievement.isMaxTier && (
             <div className="mt-3">
-              <span className="inline-block px-3 py-1 bg-neo-yellow text-neo-black font-neo-display font-bold text-sm border-neo border-neo-black rounded-neo shadow-hard-sm">
+              <span className="inline-block px-3 py-1 bg-neo-lime text-neo-black font-neo-display font-bold text-sm border-neo border-neo-black rounded-neo shadow-hard-sm">
                 {t('education.achievements.maxTier')}
               </span>
             </div>

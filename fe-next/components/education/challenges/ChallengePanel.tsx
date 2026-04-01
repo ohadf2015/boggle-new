@@ -125,7 +125,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
           )}
         >
           <motion.div
-            className="w-14 h-14 rounded-neo bg-neo-yellow border-3 border-black flex items-center justify-center shadow-hard-sm"
+            className="w-14 h-14 rounded-neo bg-neo-lime border-3 border-black flex items-center justify-center shadow-hard-sm"
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -141,7 +141,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
         <motion.div variants={sectionReveal}>
           <div className="flex items-center gap-3 mb-4">
             <motion.div
-              className="w-8 h-8 rounded-neo bg-neo-yellow border-3 border-black flex items-center justify-center shadow-hard-sm"
+              className="w-8 h-8 rounded-neo bg-neo-lime border-3 border-black flex items-center justify-center shadow-hard-sm"
               whileHover={{ scale: 1.15, rotate: -8 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
@@ -154,7 +154,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.3 }}
-              className="px-2 py-0.5 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-yellow text-black"
+              className="px-2 py-0.5 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-lime text-black"
             >
               {dailyChallenges.length}
             </motion.span>

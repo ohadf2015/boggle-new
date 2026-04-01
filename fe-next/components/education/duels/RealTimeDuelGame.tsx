@@ -266,7 +266,7 @@ export function RealTimeDuelGame({
             isDraw
               ? 'bg-yellow-500 border-neo-black'
               : isWinner
-                ? 'bg-neo-yellow border-neo-black'
+                ? 'bg-neo-lime border-neo-black'
                 : 'bg-red-500 border-neo-black'
           )}
         >
@@ -299,7 +299,7 @@ export function RealTimeDuelGame({
         <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
           <Flame className="w-6 h-6 text-neo-orange" />
           <span className="text-neo-white font-neo-body">
-            {t('duels.xpEarned')}: <span className="font-bold text-neo-yellow">{xp}</span>
+            {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
           </span>
         </div>
 
@@ -374,7 +374,7 @@ export function RealTimeDuelGame({
             {boardState.flat().map((letter, idx) => (
               <div
                 key={idx}
-                className="aspect-square flex items-center justify-center bg-neo-yellow text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
+                className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
               >
                 {letter}
               </div>
@@ -403,7 +403,7 @@ export function RealTimeDuelGame({
               onClick={handleSubmitWord}
               disabled={!currentWord.trim()}
               data-testid="submit-word-btn"
-              className="px-4 py-2 bg-neo-yellow text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('duels.addWord')}
             </button>

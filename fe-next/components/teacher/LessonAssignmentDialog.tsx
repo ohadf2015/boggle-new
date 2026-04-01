@@ -87,9 +87,9 @@ export default function LessonAssignmentDialog({
                   <Loader size="sm" />
                 </div>
               ) : classrooms.length === 0 ? (
-                <div className="bg-neo-black/30 border-neo border-neo-yellow p-4 rounded-neo">
+                <div className="bg-neo-black/30 border-neo border-neo-lime p-4 rounded-neo">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-neo-yellow shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-neo-lime shrink-0 mt-0.5" />
                     <p className="text-sm text-neo-white">
                       {t('teacher.lessons.assign.noClassrooms')}
                     </p>

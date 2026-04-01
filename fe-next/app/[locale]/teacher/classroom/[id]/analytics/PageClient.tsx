@@ -120,7 +120,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
               onClick={handleBackToClassroom}
               className={cn(
                 'inline-flex items-center gap-2 mb-3',
-                'text-neo-cyan hover:text-neo-yellow',
+                'text-neo-cyan hover:text-neo-lime',
                 'transition-colors duration-200'
               )}
             >
@@ -195,7 +195,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
               value="vocabulary"
               className={cn(
                 'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-yellow data-[state=active]:text-neo-black',
+                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
                 'data-[state=inactive]:text-neo-white/70',
                 'transition-all duration-200'
               )}
@@ -206,7 +206,7 @@ export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClient
               value="assignments"
               className={cn(
                 'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-yellow data-[state=active]:text-neo-black',
+                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
                 'data-[state=inactive]:text-neo-white/70',
                 'transition-all duration-200'
               )}

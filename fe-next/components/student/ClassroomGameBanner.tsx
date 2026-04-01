@@ -154,7 +154,7 @@ export function ClassroomGameBanner({
         'flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-black shadow-hard-sm',
         isConnected
           ? 'bg-neo-cyan/20'
-          : 'bg-neo-yellow/20'
+          : 'bg-neo-lime/20'
       )}>
         <Radio className={cn(
           'w-4 h-4 flex-shrink-0',
@@ -203,9 +203,9 @@ export function ClassroomGameBanner({
           </div>
         </div>
 
-        {/* White body */}
-        <div className="bg-white px-6 py-4">
-          <p className="text-black/80 font-neo-body font-bold mb-3">
+        {/* Dark body */}
+        <div className="bg-neo-navy-light px-6 py-4">
+          <p className="text-neo-cream/80 font-neo-body font-bold mb-3">
             {t('student.activeGame.teacherStarted', { teacher: activeGame.teacherName })}
           </p>
 
@@ -233,7 +233,7 @@ export function ClassroomGameBanner({
             disabled={isJoining}
             className={cn(
               'w-full px-6 py-4 font-black text-lg rounded-neo',
-              'bg-neo-yellow text-black',
+              'bg-neo-lime text-black',
               'border-3 border-black shadow-hard',
               'hover:shadow-hard-lg hover:-translate-y-0.5',
               'active:shadow-hard-sm active:translate-y-0.5',

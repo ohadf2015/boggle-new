@@ -31,7 +31,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
+          'p-6 rounded-neo border-3 border-black bg-neo-cream shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
@@ -64,7 +64,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
+          'p-6 rounded-neo border-3 border-black bg-neo-cream shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
@@ -84,7 +84,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
     return (
       <div
         className={cn(
-          'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
+          'p-6 rounded-neo border-3 border-black bg-neo-cream shadow-hard-sm',
           isRTL && 'rtl'
         )}
       >
@@ -103,7 +103,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
   return (
     <motion.div
       className={cn(
-        'p-6 rounded-neo border-3 border-black bg-white shadow-hard-sm',
+        'p-6 rounded-neo border-3 border-black bg-neo-cream shadow-hard-sm',
         isRTL && 'rtl'
       )}
       initial="hidden"
@@ -169,7 +169,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
               <motion.div
                 className={cn(
                   'flex-shrink-0 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center text-lg shadow-hard-sm',
-                  isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-yellow'
+                  isCurrentUser ? 'bg-neo-cyan' : 'bg-neo-lime'
                 )}
                 whileHover={{ scale: 1.15, rotate: -8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -195,7 +195,7 @@ export default function ActivityFeed({ classroomId, userId }: ActivityFeedProps)
                 data-testid={`activity-icon-${activity.type}`}
                 className={cn(
                   'flex-shrink-0 w-9 h-9 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm',
-                  isDuel ? 'bg-neo-yellow' : 'bg-neo-cyan'
+                  isDuel ? 'bg-neo-lime' : 'bg-neo-cyan'
                 )}
                 whileHover={{ scale: 1.2, rotate: 8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}

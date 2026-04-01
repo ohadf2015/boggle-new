@@ -219,7 +219,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-2 bg-neo-black/20 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-neo-yellow transition-all"
+                        className="h-full bg-neo-lime transition-all"
                         style={{ width: `${student.vocabularyMastery}%` }}
                       />
                     </div>

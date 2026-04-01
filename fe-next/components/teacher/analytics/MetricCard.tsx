@@ -69,7 +69,7 @@ export function MetricCard({
   // Card bg + icon bg based on severity
   const cardBg = {
     info: 'bg-neo-cyan',
-    warning: 'bg-neo-yellow',
+    warning: 'bg-neo-lime',
     urgent: 'bg-neo-pink',
   }[severity || 'info'] || 'bg-neo-cyan';
 
@@ -81,7 +81,7 @@ export function MetricCard({
 
   const iconFg = {
     info: 'text-neo-cyan',
-    warning: 'text-neo-yellow',
+    warning: 'text-neo-lime',
     urgent: 'text-neo-pink',
   }[severity || 'info'] || 'text-neo-cyan';
 
@@ -123,7 +123,7 @@ export function MetricCard({
       </div>
 
       {/* White body */}
-      <div className="bg-white px-4 py-3 flex flex-col gap-2 flex-1 border-t-3 border-black">
+      <div className="bg-neo-cream px-4 py-3 flex flex-col gap-2 flex-1 border-t-3 border-black">
         {/* Title */}
         <div className="text-sm font-neo-body font-bold text-black">{title}</div>
 
@@ -147,11 +147,11 @@ export function MetricCard({
           <button
             onClick={actionable.onClick}
             className={cn(
-              'mt-1 px-3 py-2 bg-black text-neo-yellow',
+              'mt-1 px-3 py-2 bg-black text-neo-lime',
               'font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
               'transition-all duration-100',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
             )}
           >
             {actionable.label}

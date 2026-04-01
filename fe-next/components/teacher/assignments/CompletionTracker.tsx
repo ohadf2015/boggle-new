@@ -226,7 +226,7 @@ export default function CompletionTracker({
                             'h-full transition-all',
                             item.errorRate > 66 ? 'bg-red-500' :
                             item.errorRate > 33 ? 'bg-neo-orange' :
-                            'bg-neo-yellow'
+                            'bg-neo-lime'
                           )}
                           style={{ width: `${item.errorRate}%` }}
                         />

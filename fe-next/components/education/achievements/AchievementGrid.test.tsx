@@ -296,6 +296,6 @@ describe('AchievementGrid', () => {
 
     // All tab should be active (different styling)
     const allTab = screen.getByText('education.achievements.all');
-    expect(allTab).toHaveClass('bg-neo-yellow');
+    expect(allTab).toHaveClass('bg-neo-lime');
   });
 });

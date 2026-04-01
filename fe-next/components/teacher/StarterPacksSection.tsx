@@ -20,7 +20,7 @@ const categoryIcons = {
 const categoryColors = {
   general: { bg: 'bg-neo-cyan', border: 'border-l-neo-cyan' },
   academic: { bg: 'bg-neo-pink', border: 'border-l-neo-pink' },
-  language: { bg: 'bg-neo-yellow', border: 'border-l-neo-yellow' },
+  language: { bg: 'bg-neo-lime', border: 'border-l-neo-lime' },
 };
 
 function PackCard({
@@ -71,7 +71,7 @@ function PackCard({
           onClick={onSelect}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3',
-            'bg-neo-yellow text-black border-3 border-black',
+            'bg-neo-lime text-black border-3 border-black',
             'font-black font-neo-body text-sm rounded-neo shadow-hard-sm',
             'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
             'transition-all duration-100'

@@ -39,7 +39,7 @@ function getBoardSizeLabel(size: string) {
 
 const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
   { key: 'classic', icon: LayoutGrid, color: 'neo-cyan' },
-  { key: 'wordHunt', icon: Search, color: 'neo-yellow' },
+  { key: 'wordHunt', icon: Search, color: 'neo-lime' },
   { key: 'blast', icon: Zap, color: 'neo-pink' },
 ];
 
@@ -132,7 +132,7 @@ export function ClassroomReviewStep({
               <p className="text-xs text-neo-white/60 font-neo-body">
                 {t('education.classroomGame.scanToJoin')}
               </p>
-              <div className="p-2 bg-white rounded-neo border-neo border-neo-black shadow-hard-sm">
+              <div className="p-2 bg-neo-cream rounded-neo border-neo border-neo-black shadow-hard-sm">
                 <QRCodeCanvas value={joinUrl} size={180} bgColor="#ffffff" fgColor="#000000" level="M" />
               </div>
             </div>

@@ -213,7 +213,7 @@ describe('VocabularyHeatmap', () => {
     const notStartedCell = container.querySelector('[data-mastery="not-started"]');
 
     expect(masteredCell).toHaveClass('bg-neo-cyan');
-    expect(practicingCell).toHaveClass('bg-neo-yellow');
+    expect(practicingCell).toHaveClass('bg-neo-lime');
     expect(strugglingCell).toHaveClass('bg-neo-orange');
     expect(notStartedCell).toHaveClass('bg-neo-navy/50');
   });

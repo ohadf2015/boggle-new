@@ -204,7 +204,7 @@ export function StudentProgressReport({
         <button
           onClick={handleExportPDF}
           disabled={exporting}
-          className="px-4 py-2 bg-neo-yellow text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
+          className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
         >
           {exporting
             ? t('teacher.reports.export.downloading')
@@ -314,7 +314,7 @@ export function StudentProgressReport({
                 key={index}
                 className="flex items-start gap-2 p-3 bg-neo-navy/50 border-neo border-black rounded-neo"
               >
-                <span className="text-neo-yellow font-bold">-</span>
+                <span className="text-neo-lime font-bold">-</span>
                 <span className="text-neo-white">{recommendation}</span>
               </li>
             ))}

@@ -167,7 +167,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
 
       {/* Pending Challenges Section */}
       <section className="mb-8">
-        <h3 className="text-lg font-neo-display font-black text-neo-yellow uppercase tracking-wide mb-4">
+        <h3 className="text-lg font-neo-display font-black text-neo-lime uppercase tracking-wide mb-4">
           {t('pendingChallenges')}
         </h3>
 
@@ -184,7 +184,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                 key={challenge.id}
                 className={cn(
                   'p-4 rounded-neo border-3 border-black',
-                  'bg-white shadow-hard-sm',
+                  'bg-neo-cream shadow-hard-sm',
                   'flex items-center justify-between gap-4'
                 )}
               >
@@ -206,7 +206,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                       'border-3 border-black shadow-hard-sm',
                       'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                       'transition-all duration-100',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
                     )}
                   >
                     {t('accept')}
@@ -219,7 +219,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                       'border-3 border-black shadow-hard-sm',
                       'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                       'transition-all duration-100',
-                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow'
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
                     )}
                   >
                     {t('decline')}
@@ -238,7 +238,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
           disabled={opponents.length === 0}
           className={cn(
             'w-full px-6 py-4 font-black text-lg rounded-neo font-neo-display uppercase tracking-tight',
-            'bg-neo-yellow text-black',
+            'bg-neo-lime text-black',
             'border-3 border-black shadow-hard',
             'hover:-translate-y-1 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
             'animate-neo-press transition-all duration-100',
@@ -267,7 +267,7 @@ export default function DuelLobby({ classroomId, studentId, lessons }: DuelLobby
                 onClick={() => handleSelectOpponent(opponent)}
                 className={cn(
                   'p-4 rounded-neo border-3 border-black',
-                  'bg-white shadow-hard-sm',
+                  'bg-neo-cream shadow-hard-sm',
                   'hover:-translate-y-1 hover:shadow-hard',
                   'active:translate-y-0.5 active:shadow-hard-pressed',
                   'transition-all duration-100 cursor-pointer',

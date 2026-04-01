@@ -115,7 +115,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               id={titleId}
               className={cn(
                 'text-3xl md:text-4xl font-black',
-                'text-neo-yellow',
+                'text-neo-lime',
                 'drop-shadow-[0_0_15px_rgb(255_225_53/0.6)]',
                 'mb-4'
               )}
@@ -189,7 +189,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-yellow hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-orange',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

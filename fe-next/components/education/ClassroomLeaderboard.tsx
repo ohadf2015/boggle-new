@@ -100,7 +100,7 @@ const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChange }) =>
           className={cn(
             'px-4 py-2 rounded-neo border-neo font-neo-body font-bold text-sm transition-all',
             timeScope === tab.key
-              ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
+              ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
               : 'bg-neo-navy text-neo-white/60 border-neo-black/30 hover:text-neo-white/80'
           )}
         >
@@ -196,7 +196,7 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   if (!tier) return null;
 
   const tierConfig = {
-    top10: { bg: 'bg-neo-yellow', label: t('education.leaderboard.top10') },
+    top10: { bg: 'bg-neo-lime', label: t('education.leaderboard.top10') },
     top25: { bg: 'bg-neo-white/60', label: t('education.leaderboard.top25') },
     top50: { bg: 'bg-neo-orange', label: t('education.leaderboard.top50') },
   };
@@ -298,7 +298,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
 
           <div className="flex items-center gap-3">
             {/* XP */}
-            <span className="font-neo-body font-bold text-neo-yellow text-sm tabular-nums">
+            <span className="font-neo-body font-bold text-neo-lime text-sm tabular-nums">
               {t('education.leaderboard.xp', { xp: animatedXp })}
             </span>
 

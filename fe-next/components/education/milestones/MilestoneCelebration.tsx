@@ -113,7 +113,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               id={titleId}
               className={cn(
                 'text-3xl md:text-4xl font-black',
-                'text-neo-yellow',
+                'text-neo-lime',
                 'drop-shadow-[0_0_15px_rgb(255_225_53/0.6)]',
                 'mb-4'
               )}
@@ -173,13 +173,13 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <motion.div
                 className={cn(
                   'p-3 rounded-neo',
-                  'bg-neo-yellow/10 border-neo border-neo-yellow'
+                  'bg-neo-lime/10 border-neo border-neo-lime'
                 )}
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 }}
               >
-                <p className="text-neo-yellow font-bold text-sm">
+                <p className="text-neo-lime font-bold text-sm">
                   {t('education.milestones.coinBonus')}
                 </p>
                 <p className="text-2xl font-black text-neo-white">
@@ -213,7 +213,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-yellow hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-orange',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

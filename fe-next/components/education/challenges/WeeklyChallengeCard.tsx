@@ -51,7 +51,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       </div>
 
       <div className="flex items-center gap-3 mb-3 text-sm">
-        <span className="text-neo-yellow">+{quest.xp_reward} XP</span>
+        <span className="text-neo-lime">+{quest.xp_reward} XP</span>
         {quest.bonus_rewards?.coins && (
           <span className="text-neo-orange">+{quest.bonus_rewards.coins} coins</span>
         )}
@@ -60,7 +60,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       {canClaim && (
         <button
           onClick={() => onClaim(quest.id)}
-          className="w-full bg-neo-yellow text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
+          className="w-full bg-neo-lime text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
           data-testid="claim-button"
         >
           {t('challenges.claim')}

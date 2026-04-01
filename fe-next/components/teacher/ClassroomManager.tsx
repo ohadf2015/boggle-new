@@ -130,7 +130,7 @@ export default function ClassroomManager() {
 
       {/* Classroom Grid */}
       {classrooms.length === 0 ? (
-        <div className="border-3 border-black rounded-neo bg-white shadow-hard py-12 text-center">
+        <div className="border-3 border-black rounded-neo bg-neo-cream shadow-hard py-12 text-center">
           <div className="w-16 h-16 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
             <Users className="w-9 h-9 text-black" />
           </div>
@@ -153,13 +153,13 @@ export default function ClassroomManager() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {classrooms.map((classroom, idx) => {
             // Alternate card accent colors
-            const headerColors = ['bg-neo-cyan', 'bg-neo-yellow', 'bg-neo-pink'];
+            const headerColors = ['bg-neo-cyan', 'bg-neo-lime', 'bg-neo-pink'];
             const headerBg = headerColors[idx % headerColors.length];
 
             return (
               <div
                 key={classroom.id}
-                className="border-3 border-black rounded-neo shadow-hard bg-white overflow-hidden hover:-translate-y-0.5 hover:shadow-hard-lg transition-all"
+                className="border-3 border-black rounded-neo shadow-hard bg-neo-cream overflow-hidden hover:-translate-y-0.5 hover:shadow-hard-lg transition-all"
               >
                 {/* Colored header */}
                 <div className={cn('px-5 py-4', headerBg)}>
@@ -181,7 +181,7 @@ export default function ClassroomManager() {
                 {/* Card body */}
                 <div className="p-4 space-y-3">
                   {/* Join Code */}
-                  <div className="bg-neo-yellow/20 border-2 border-black p-3 rounded-neo">
+                  <div className="bg-neo-lime/20 border-2 border-black p-3 rounded-neo">
                     <p className="text-xs text-black/60 font-bold mb-1">{t('teacher.classroom.joinCode')}</p>
                     <div className="flex items-center justify-between">
                       <code className="text-2xl font-neo-display font-black text-black tracking-wider">
@@ -217,7 +217,7 @@ export default function ClassroomManager() {
                       'w-full flex items-center justify-between px-3 py-2 rounded-neo border-2 border-black font-bold text-sm transition-all shadow-hard-sm',
                       expandedClassroomId === classroom.id
                         ? 'bg-black text-white'
-                        : 'bg-white text-black hover:bg-black/5'
+                        : 'bg-neo-cream text-black hover:bg-black/5'
                     )}
                   >
                     <span className="flex items-center gap-2">
@@ -284,7 +284,7 @@ export default function ClassroomManager() {
           <Dialog.Content
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-md bg-white border-3 border-black shadow-hard-lg z-50',
+              'w-full max-w-md bg-neo-cream border-3 border-black shadow-hard-lg z-50',
               'rounded-neo overflow-hidden'
             )}
           >
@@ -320,7 +320,7 @@ export default function ClassroomManager() {
                   value={formData.language}
                   onChange={(e) => setFormData({ ...formData, language: e.target.value as Language })}
                   className={cn(
-                    'w-full px-4 py-2 bg-white border-2 border-black',
+                    'w-full px-4 py-2 bg-neo-cream border-2 border-black',
                     'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
                     'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
                   )}
@@ -346,7 +346,7 @@ export default function ClassroomManager() {
                     setIsEditDialogOpen(false);
                     setSelectedClassroomId(null);
                   }}
-                  className="bg-white text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all"
+                  className="bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all"
                 >
                   {t('common.cancel')}
                 </Button>
@@ -355,7 +355,7 @@ export default function ClassroomManager() {
 
             <Dialog.Close asChild>
               <button
-                className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
+                className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-black bg-neo-cream text-black hover:bg-black hover:text-white transition-all shadow-hard-sm"
                 aria-label={t('common.close')}
               >
                 <X className="w-4 h-4" />
@@ -372,7 +372,7 @@ export default function ClassroomManager() {
           <AlertDialog.Content
             className={cn(
               'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'w-full max-w-md bg-white border-3 border-black shadow-hard-lg z-50',
+              'w-full max-w-md bg-neo-cream border-3 border-black shadow-hard-lg z-50',
               'rounded-neo overflow-hidden'
             )}
           >
@@ -397,7 +397,7 @@ export default function ClassroomManager() {
                   </Button>
                 </AlertDialog.Action>
                 <AlertDialog.Cancel asChild>
-                  <Button className="bg-white text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all">
+                  <Button className="bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all">
                     {t('common.cancel')}
                   </Button>
                 </AlertDialog.Cancel>

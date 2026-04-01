@@ -161,7 +161,7 @@ describe('ChallengeButton', () => {
 
       const button = screen.getByTestId('challenge-button-icon');
       expect(button).toHaveClass('text-neo-orange');
-      expect(button).toHaveClass('hover:text-neo-yellow');
+      expect(button).toHaveClass('hover:text-neo-lime');
     });
   });
 

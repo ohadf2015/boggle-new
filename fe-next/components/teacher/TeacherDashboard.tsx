@@ -74,15 +74,15 @@ const accordionBody = {
 function SectionDivider() {
   return (
     <div className="flex items-center gap-4 mb-10" aria-hidden="true">
-      <div className="flex-1 h-1 bg-neo-yellow/20 rounded-neo" />
-      <div className="flex items-center gap-2 px-4 py-1.5 bg-black border-3 border-neo-yellow/40 rounded-neo shadow-hard-sm">
-        <Hammer className="w-4 h-4 text-neo-yellow" />
-        <span className="font-neo-body font-black text-[10px] uppercase tracking-widest text-neo-yellow whitespace-nowrap">
+      <div className="flex-1 h-1 bg-neo-lime/20 rounded-neo" />
+      <div className="flex items-center gap-2 px-4 py-1.5 bg-black border-3 border-neo-lime/40 rounded-neo shadow-hard-sm">
+        <Hammer className="w-4 h-4 text-neo-lime" />
+        <span className="font-neo-body font-black text-[10px] uppercase tracking-widest text-neo-lime whitespace-nowrap">
           {/* No hardcoded text — purely decorative divider */}
           ▸ ▸ ▸
         </span>
       </div>
-      <div className="flex-1 h-1 bg-neo-yellow/20 rounded-neo" />
+      <div className="flex-1 h-1 bg-neo-lime/20 rounded-neo" />
     </div>
   );
 }
@@ -101,19 +101,19 @@ interface HudSectionProps {
 }
 
 const badgePalette = {
-  yellow: 'bg-neo-yellow text-black border-black',
+  yellow: 'bg-neo-lime text-black border-black',
   pink: 'bg-neo-pink text-white border-black',
   cyan: 'bg-neo-cyan text-black border-black',
 };
 
 const headerActiveBg = {
-  yellow: 'bg-neo-yellow text-black border-b-black',
+  yellow: 'bg-neo-lime text-black border-b-black',
   pink: 'bg-neo-pink text-black',
   cyan: 'bg-neo-cyan text-black',
 };
 
 const headerCollapsedHover = {
-  yellow: 'hover:bg-neo-yellow',
+  yellow: 'hover:bg-neo-lime',
   pink: 'hover:bg-neo-pink',
   cyan: 'hover:bg-neo-cyan',
 };
@@ -125,7 +125,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
         'rounded-neo-xl border-4 border-black bg-neo-navy overflow-hidden shadow-hard-lg',
         // Party mode: thick left accent when collapsed
         !isOpen && cn('border-s-[10px]', {
-          yellow: 'border-s-neo-yellow',
+          yellow: 'border-s-neo-lime',
           pink: 'border-s-neo-pink',
           cyan: 'border-s-neo-cyan',
         }[badgeColor])
@@ -136,10 +136,10 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
         aria-expanded={isOpen}
         className={cn(
           'w-full flex items-center justify-between p-6 border-b-4 border-black transition-colors',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           isOpen
             ? headerActiveBg[badgeColor]
-            : cn('bg-white text-black', headerCollapsedHover[badgeColor])
+            : cn('bg-neo-cream text-black', headerCollapsedHover[badgeColor])
         )}
       >
         <div className="flex items-center gap-4">
@@ -158,7 +158,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
               isOpen ? 'bg-black rotate-[-2deg]' : 'bg-black rotate-[2deg]'
             )}
           >
-            <span className={isOpen ? 'text-neo-yellow' : 'text-white'}>{icon}</span>
+            <span className={isOpen ? 'text-neo-lime' : 'text-white'}>{icon}</span>
           </div>
           <h2 className="text-3xl font-neo-display font-black uppercase tracking-tighter italic text-black">
             {label}
@@ -167,7 +167,7 @@ function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, c
           <span
             className={cn(
               'px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest',
-              isOpen ? 'bg-black text-neo-yellow' : badgePalette[badgeColor],
+              isOpen ? 'bg-black text-neo-lime' : badgePalette[badgeColor],
               isOpen ? '' : 'rotate-2'
             )}
           >
@@ -232,7 +232,7 @@ export default function TeacherDashboard() {
     <select
       value={selectedClassroomId}
       onChange={(e) => setSelectedClassroomId(e.target.value)}
-      className="px-4 py-2 bg-white border-2 border-black text-black font-neo-body font-bold shadow-hard-sm rounded-neo focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+      className="px-4 py-2 bg-neo-cream border-2 border-black text-black font-neo-body font-bold shadow-hard-sm rounded-neo focus:outline-none focus:ring-2 focus:ring-neo-cyan"
     >
       {classrooms.map((c) => (
         <option key={c.id} value={c.id}>{c.name}</option>
@@ -293,7 +293,7 @@ export default function TeacherDashboard() {
             className={cn(
               'group relative overflow-hidden p-10 rounded-neo-xl border-4 border-black',
               'bg-neo-cyan shadow-hard-xl text-left',
-              'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
+              'focus:outline-none focus:ring-2 focus:ring-neo-lime'
             )}
           >
             {/* Ghost background icon */}
@@ -324,7 +324,7 @@ export default function TeacherDashboard() {
             className={cn(
               'group relative overflow-hidden p-10 rounded-neo-xl border-4 border-black',
               'bg-neo-pink shadow-hard-xl text-left',
-              'focus:outline-none focus:ring-2 focus:ring-neo-yellow'
+              'focus:outline-none focus:ring-2 focus:ring-neo-lime'
             )}
           >
             {/* Ghost background icon */}
@@ -494,7 +494,7 @@ export default function TeacherDashboard() {
               href={`/${language}/teacher/reports`}
               className={cn(
                 'flex items-center gap-4 p-5 rounded-neo-xl border-4 border-black',
-                'bg-white shadow-hard-lg hover:shadow-hard-xl transition-shadow',
+                'bg-neo-cream shadow-hard-lg hover:shadow-hard-xl transition-shadow',
                 'text-black font-neo-body font-bold'
               )}
             >
@@ -513,7 +513,7 @@ export default function TeacherDashboard() {
         <motion.div
           variants={slideInUp}
           whileHover={{ y: -3, boxShadow: '8px 8px 0px black' }}
-          className="mt-12 p-6 rounded-neo-xl border-4 border-black bg-neo-yellow shadow-hard text-black relative overflow-hidden"
+          className="mt-12 p-6 rounded-neo-xl border-4 border-black bg-neo-lime shadow-hard text-black relative overflow-hidden"
         >
           {/* Decorative circle */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rotate-12 -me-16 -mt-16 rounded-full pointer-events-none" />
@@ -530,7 +530,7 @@ export default function TeacherDashboard() {
                 <h3 className="text-xl font-neo-display font-black uppercase tracking-tight italic">
                   {t('teacher.dashboard.quickTip')}
                 </h3>
-                <span className="text-[10px] font-black bg-black text-neo-yellow px-2 py-0.5 rounded uppercase tracking-widest">
+                <span className="text-[10px] font-black bg-black text-neo-lime px-2 py-0.5 rounded uppercase tracking-widest">
                   PRO
                 </span>
               </div>

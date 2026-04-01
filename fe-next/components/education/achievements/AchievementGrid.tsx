@@ -71,7 +71,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 'px-4 py-2 rounded-neo border-neo border-neo-black',
                 'font-bold text-sm transition-all duration-200',
                 activeCategory === key
-                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                  ? 'bg-neo-lime text-neo-black shadow-hard'
                   : 'bg-neo-navy/50 text-neo-white/60 hover:bg-neo-navy/70'
               )}
             >

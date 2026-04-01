@@ -85,7 +85,7 @@ export default function DuelsPageClient() {
               className={cn(
                 'flex items-center gap-2 px-6 py-3 font-bold transition-all',
                 activeTab === tab.id
-                  ? 'text-neo-yellow border-b-4 border-neo-yellow -mb-[2px]'
+                  ? 'text-neo-lime border-b-4 border-neo-lime -mb-[2px]'
                   : 'text-neo-white/50 hover:text-neo-white/80'
               )}
             >
