@@ -54,9 +54,9 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
           exit={{ y: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           className={cn(
-            'fixed bottom-0 inset-x-0 z-50 safe-area-bottom',
+            'fixed bottom-0 md:bottom-[140px] inset-x-0 z-50 safe-area-bottom',
             'rounded-t-2xl border-t-3 border-x-3 border-black',
-            'shadow-hard-lg',
+            'shadow-hard-lg md:max-w-lg md:mx-auto md:rounded-2xl md:border-3',
             isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
           )}
           role="dialog"

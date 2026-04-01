@@ -299,7 +299,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-0 lg:px-3 xl:px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-4 lg:px-3 xl:px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
