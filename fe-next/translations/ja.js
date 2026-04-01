@@ -7538,6 +7538,13 @@ const ja = {
       "listening": "クラスルームゲームを待機中...",
       "connecting": "クラスルームに接続中..."
     },
+    "playWithClass": {
+      "title": "クラスと遊ぶ",
+      "joinNow": "今すぐ参加!",
+      "noActiveGame": "クラスメートとゲームを始めよう",
+      "playerCount": "{{count}}人がプレイ中",
+      "teacherStarted": "{{teacher}}がゲームを開始しました"
+    },
     "dashboard": {
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう",

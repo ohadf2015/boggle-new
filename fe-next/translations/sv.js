@@ -7486,6 +7486,13 @@ const sv = {
       "listening": "Lyssnar efter klassrumsspel...",
       "connecting": "Ansluter till klassrummet..."
     },
+    "playWithClass": {
+      "title": "Spela med klassen",
+      "joinNow": "Gå med nu!",
+      "noActiveGame": "Starta ett spel med dina klasskompisar",
+      "playerCount": "{{count}} spelare i spelet",
+      "teacherStarted": "{{teacher}} startade ett spel"
+    },
     "dashboard": {
       "title": "Mina lektioner",
       "subtitle": "Öva glosor och följ dina framsteg",
