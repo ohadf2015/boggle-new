@@ -7681,6 +7681,13 @@ const en = {
       "listening": "Listening for classroom games...",
       "connecting": "Connecting to classroom..."
     },
+    "playWithClass": {
+      "title": "Play with Class",
+      "joinNow": "Join Now!",
+      "noActiveGame": "Start a game with your classmates",
+      "playerCount": "{{count}} players in game",
+      "teacherStarted": "{{teacher}} started a game"
+    },
     "dashboard": {
       "title": "My Lessons",
       "subtitle": "Practice vocabulary and track your progress",

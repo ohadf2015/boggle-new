@@ -7598,6 +7598,13 @@ const es = {
       "listening": "Esperando juegos de clase...",
       "connecting": "Conectando al aula..."
     },
+    "playWithClass": {
+      "title": "Jugar con la clase",
+      "joinNow": "Unirse ahora!",
+      "noActiveGame": "Inicia un juego con tus compañeros",
+      "playerCount": "{{count}} jugadores en el juego",
+      "teacherStarted": "{{teacher}} inició un juego"
+    },
     "practice": {
       "title": "Modo Práctica",
       "definition": "Definición",

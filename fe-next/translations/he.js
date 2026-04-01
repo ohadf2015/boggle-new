@@ -7521,6 +7521,13 @@ const he = {
       "listening": "ממתין למשחקי כיתה...",
       "connecting": "מתחבר לכיתה..."
     },
+    "playWithClass": {
+      "title": "שחק עם הכיתה",
+      "joinNow": "הצטרף עכשיו!",
+      "noActiveGame": "התחל משחק עם חברים לכיתה",
+      "playerCount": "{{count}} שחקנים במשחק",
+      "teacherStarted": "{{teacher}} התחיל משחק"
+    },
     "dashboard": {
       "title": "השיעורים שלי",
       "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות",
