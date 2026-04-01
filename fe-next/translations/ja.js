@@ -8013,6 +8013,10 @@ const ja = {
     }
   },
   "education": {
+    "wordOfTheDay": {
+      "title": "今日の単語",
+      "learnMore": "もっと見る"
+    },
     "landing": {
       "title": "教育モード",
       "teacher": "私は教師です",

@@ -8027,6 +8027,10 @@ const es = {
     }
   },
   "education": {
+    "wordOfTheDay": {
+      "title": "Palabra del Dia",
+      "learnMore": "Saber Mas"
+    },
     "landing": {
       "title": "Modo Educativo",
       "teacher": "Soy Profesor",
