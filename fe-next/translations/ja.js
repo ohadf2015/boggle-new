@@ -8044,7 +8044,8 @@ const ja = {
       "roleTeacher": "教師",
       "roleStudent": "学生",
       "roleGuest": "ログイン済み",
-      "goToDashboard": "ダッシュボードへ"
+      "goToDashboard": "ダッシュボードへ",
+      "startGame": "ゲームを始める"
     },
     "template": {
       "settings": "設定",

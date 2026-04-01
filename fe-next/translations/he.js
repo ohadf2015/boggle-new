@@ -8027,7 +8027,8 @@ const he = {
       "roleTeacher": "מורה",
       "roleStudent": "תלמיד",
       "roleGuest": "מחובר",
-      "goToDashboard": "עבור ללוח הבקרה"
+      "goToDashboard": "עבור ללוח הבקרה",
+      "startGame": "התחל משחק"
     },
     "template": {
       "settings": "הגדרות",

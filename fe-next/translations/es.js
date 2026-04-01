@@ -8058,7 +8058,8 @@ const es = {
       "roleTeacher": "Profesor",
       "roleStudent": "Estudiante",
       "roleGuest": "Conectado",
-      "goToDashboard": "Ir al Panel"
+      "goToDashboard": "Ir al Panel",
+      "startGame": "Iniciar Juego"
     },
     "template": {
       "settings": "Ajustes",

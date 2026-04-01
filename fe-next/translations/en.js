@@ -8201,7 +8201,8 @@ const en = {
       "roleTeacher": "Teacher",
       "roleStudent": "Student",
       "roleGuest": "Signed In",
-      "goToDashboard": "Go to Dashboard"
+      "goToDashboard": "Go to Dashboard",
+      "startGame": "Start a Game"
     },
     "template": {
       "settings": "Settings",

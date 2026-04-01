@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { GraduationCap, BookOpen, CheckCircle, Globe, Lock, Star, Puzzle, Swords, ArrowRight } from 'lucide-react';
+import { GraduationCap, BookOpen, Globe, Lock, Star, Puzzle, ArrowRight, Gamepad2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -12,14 +12,13 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { cn } from '@/lib/utils';
 import { ClickSpark } from '@/components/education/animations/ClickSpark';
-import { WobbleJellyCard } from '@/components/education/animations/WobbleJellyCard';
 
 /**
- * Education Landing Page - Clean Hero Edition
+ * Education Landing Page
  *
- * Hero section with mascot, enhanced role cards with feature checklists,
- * social proof banner, and halftone background.
- * Teacher access requires authentication, Student access is public.
+ * - Authenticated students: auto-redirect to /student dashboard
+ * - Authenticated teachers: dashboard shortcut + start game button (no role cards)
+ * - Unauthenticated: simplified role cards (no feature checklists, no duel teaser)
  */
 
 const cardEntrance = {
@@ -41,11 +40,10 @@ const heroEntrance = {
   },
 };
 
-interface RoleCardProps {
+interface SimpleRoleCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
-  features: string[];
   ctaLabel: string;
   badge: string;
   stripeColor: string;
@@ -58,11 +56,10 @@ interface RoleCardProps {
   index: number;
 }
 
-function RoleCard({
+function SimpleRoleCard({
   title,
   description,
   icon,
-  features,
   ctaLabel,
   badge,
   stripeColor,
@@ -73,7 +70,7 @@ function RoleCard({
   loading,
   onClick,
   index,
-}: RoleCardProps) {
+}: SimpleRoleCardProps) {
   return (
     <motion.button
       custom={index}
@@ -118,16 +115,6 @@ function RoleCard({
         <h2 className="text-xl font-black uppercase text-neo-black mb-1">{title}</h2>
         <p className="text-sm text-neo-black/70 mb-4">{description}</p>
 
-        {/* Feature checklist */}
-        <ul className="space-y-2 mb-5">
-          {features.map((feature) => (
-            <li key={feature} className="flex items-center gap-2 text-sm text-neo-black/80">
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-              {feature}
-            </li>
-          ))}
-        </ul>
-
         {/* CTA button */}
         <div className={cn(
           'w-full py-2.5 rounded-neo border-2 border-neo-black text-center font-bold uppercase text-sm',
@@ -144,74 +131,25 @@ function RoleCard({
   );
 }
 
-interface DuelTeaserCardProps {
-  onDuelClick: () => void;
-}
-
-function DuelTeaserCard({ onDuelClick }: DuelTeaserCardProps) {
-  const { t } = useLanguage();
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 24, delay: 0.55 }}
-      className={cn(
-        'relative rounded-neo-lg border-neo-thick border-neo-black overflow-hidden mt-6',
-        'bg-neo-orange shadow-hard-lg',
-      )}
-    >
-      {/* Top stripe */}
-      <div className="h-2 bg-neo-pink" />
-
-      <div className="p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        {/* Icon */}
-        <div className="w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-pink/30 flex items-center justify-center flex-shrink-0">
-          <Swords className="w-6 h-6 text-neo-black" />
-        </div>
-
-        {/* Text */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg sm:text-xl font-black uppercase text-neo-black mb-0.5">
-            {t('education.landing.duelTeaser.headline')}
-          </h3>
-          <p className="text-sm text-neo-black/75">
-            {t('education.landing.duelTeaser.subtext')}
-          </p>
-        </div>
-
-        {/* CTA */}
-        <WobbleJellyCard className="flex-shrink-0">
-          <button
-            onClick={onDuelClick}
-            className={cn(
-              'px-5 py-2.5 rounded-neo border-2 border-neo-black',
-              'bg-neo-black text-neo-white font-bold uppercase text-sm',
-              'shadow-hard-sm hover:shadow-hard transition-shadow',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-            )}
-          >
-            {t('education.landing.duelTeaser.cta')}
-          </button>
-        </WobbleJellyCard>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function EducationPageClient() {
   const { t, language } = useLanguage();
   const { isAuthenticated, loading: authLoading, profile } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const router = useRouter();
 
-  // Determine the user's role for dashboard shortcut
   const userRole = profile?.user_role;
   const isTeacherRole = profile?.is_admin === true || userRole === 'teacher' || userRole === 'admin';
   const isStudentRole = userRole === 'student';
   const dashboardHref = isTeacherRole
     ? `/${language}/teacher`
     : `/${language}/student`;
+
+  // Auto-redirect authenticated students
+  useEffect(() => {
+    if (isAuthenticated && isStudentRole && !authLoading) {
+      router.replace(`/${language}/student`);
+    }
+  }, [isAuthenticated, isStudentRole, authLoading, router, language]);
 
   const handleTeacherClick = () => {
     if (authLoading) return;
@@ -226,9 +164,10 @@ export default function EducationPageClient() {
     router.push(`/${language}/student`);
   };
 
-  const handleDuelClick = () => {
-    router.push(`/${language}/education/duels`);
-  };
+  // If student is authenticated, show nothing while redirecting
+  if (isAuthenticated && isStudentRole && !authLoading) {
+    return null;
+  }
 
   return (
     <div className="min-h-dvh bg-neo-navy relative">
@@ -257,7 +196,6 @@ export default function EducationPageClient() {
               'shadow-hard-lg p-6 sm:p-8',
             )}
           >
-            {/* Decorative corner elements */}
             <Star className="absolute top-4 start-4 w-5 h-5 text-neo-lime/20" />
             <Puzzle className="absolute bottom-4 end-4 w-6 h-6 text-neo-cyan/15 rotate-12" />
 
@@ -271,7 +209,6 @@ export default function EducationPageClient() {
                 </p>
               </div>
 
-              {/* Mascot */}
               <motion.div
                 className="flex-shrink-0 hidden sm:block"
                 initial={{ scale: 0, rotate: 20 }}
@@ -306,7 +243,7 @@ export default function EducationPageClient() {
             </p>
           </motion.div>
 
-          {/* Authenticated User Dashboard Shortcut */}
+          {/* Authenticated user dashboard shortcut (students already redirected above) */}
           {isAuthenticated && !authLoading && (
             <motion.div
               data-testid="auth-dashboard-shortcut"
@@ -332,85 +269,82 @@ export default function EducationPageClient() {
                       {profile?.display_name || profile?.username || t('common.guest')}
                     </p>
                     <p className="text-xs text-neo-black/70 font-bold">
-                      {isTeacherRole
-                        ? t('education.landing.roleTeacher')
-                        : isStudentRole
-                          ? t('education.landing.roleStudent')
-                          : t('education.landing.roleGuest')}
+                      {isTeacherRole ? t('education.landing.roleTeacher') : t('education.landing.roleGuest')}
                     </p>
                   </div>
                 </div>
-                <Link
-                  href={dashboardHref}
-                  data-testid="go-to-dashboard-link"
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
-                    'bg-neo-black text-neo-lime font-bold uppercase text-sm flex-shrink-0',
-                    'shadow-hard-sm hover:shadow-hard transition-shadow',
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {isTeacherRole && (
+                    <Link
+                      href={`/${language}/education/classroom-game`}
+                      className={cn(
+                        'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
+                        'bg-neo-cyan text-neo-black font-bold uppercase text-sm',
+                        'shadow-hard-sm hover:shadow-hard transition-shadow',
+                      )}
+                    >
+                      <Gamepad2 className="w-4 h-4" />
+                      {t('education.landing.startGame')}
+                    </Link>
                   )}
-                >
-                  {t('education.landing.goToDashboard')}
-                  <ArrowRight className="w-4 h-4 rtl:scale-x-[-1]" />
-                </Link>
+                  <Link
+                    href={dashboardHref}
+                    data-testid="go-to-dashboard-link"
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
+                      'bg-neo-black text-neo-lime font-bold uppercase text-sm',
+                      'shadow-hard-sm hover:shadow-hard transition-shadow',
+                    )}
+                  >
+                    {t('education.landing.goToDashboard')}
+                    <ArrowRight className="w-4 h-4 rtl:scale-x-[-1]" />
+                  </Link>
+                </div>
               </div>
             </motion.div>
           )}
 
-          {/* Role Selection Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {/* Teacher Card */}
-            <ClickSpark colors={['#00FFFF', '#FFE135', '#FF6B35']}>
-              <RoleCard
-                title={t('education.landing.teacher')}
-                description={t('education.landing.teacherDesc')}
-                icon={<GraduationCap className="w-6 h-6 text-neo-black" />}
-                features={[
-                  t('education.landing.teacherFeature1'),
-                  t('education.landing.teacherFeature2'),
-                  t('education.landing.teacherFeature3'),
-                ]}
-                ctaLabel={isAuthenticated ? t('education.landing.teacher') : t('education.landing.teacherCta')}
-                badge={t('education.landing.premium')}
-                stripeColor="bg-neo-cyan"
-                badgeBg="bg-neo-cyan text-neo-black"
-                iconBg="bg-neo-cyan/20"
-                ctaBg="bg-neo-cyan text-neo-black"
-                locked={!isAuthenticated}
-                loading={authLoading}
-                onClick={handleTeacherClick}
-                index={0}
-              />
-            </ClickSpark>
+          {/* Role Selection Cards — only for unauthenticated or guest users */}
+          {(!isAuthenticated || (!isTeacherRole && !isStudentRole)) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <ClickSpark colors={['#00FFFF', '#FFE135', '#FF6B35']}>
+                <SimpleRoleCard
+                  title={t('education.landing.teacher')}
+                  description={t('education.landing.teacherDesc')}
+                  icon={<GraduationCap className="w-6 h-6 text-neo-black" />}
+                  ctaLabel={isAuthenticated ? t('education.landing.teacher') : t('education.landing.teacherCta')}
+                  badge={t('education.landing.premium')}
+                  stripeColor="bg-neo-cyan"
+                  badgeBg="bg-neo-cyan text-neo-black"
+                  iconBg="bg-neo-cyan/20"
+                  ctaBg="bg-neo-cyan text-neo-black"
+                  locked={!isAuthenticated}
+                  loading={authLoading}
+                  onClick={handleTeacherClick}
+                  index={0}
+                />
+              </ClickSpark>
 
-            {/* Student Card */}
-            <ClickSpark colors={['#FF1493', '#FFE135', '#FF6B35']}>
-              <RoleCard
-                title={t('education.landing.student')}
-                description={t('education.landing.studentDesc')}
-                icon={<BookOpen className="w-6 h-6 text-neo-black" />}
-                features={[
-                  t('education.landing.studentFeature1'),
-                  t('education.landing.studentFeature2'),
-                  t('education.landing.studentFeature3'),
-                ]}
-                ctaLabel={t('education.landing.studentCta')}
-                badge={t('education.landing.freeAccess')}
-                stripeColor="bg-neo-pink"
-                badgeBg="bg-neo-pink text-neo-black"
-                iconBg="bg-neo-pink/20"
-                ctaBg="bg-neo-pink text-neo-black"
-                onClick={handleStudentClick}
-                index={1}
-              />
-            </ClickSpark>
-          </div>
-
-          {/* Duel Teaser — surface duels feature for students */}
-          <DuelTeaserCard onDuelClick={handleDuelClick} />
+              <ClickSpark colors={['#FF1493', '#FFE135', '#FF6B35']}>
+                <SimpleRoleCard
+                  title={t('education.landing.student')}
+                  description={t('education.landing.studentDesc')}
+                  icon={<BookOpen className="w-6 h-6 text-neo-black" />}
+                  ctaLabel={t('education.landing.studentCta')}
+                  badge={t('education.landing.freeAccess')}
+                  stripeColor="bg-neo-pink"
+                  badgeBg="bg-neo-pink text-neo-black"
+                  iconBg="bg-neo-pink/20"
+                  ctaBg="bg-neo-pink text-neo-black"
+                  onClick={handleStudentClick}
+                  index={1}
+                />
+              </ClickSpark>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Authentication Modal */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}

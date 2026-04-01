@@ -7992,7 +7992,8 @@ const sv = {
       "roleTeacher": "Lärare",
       "roleStudent": "Elev",
       "roleGuest": "Inloggad",
-      "goToDashboard": "Gå till instrumentpanel"
+      "goToDashboard": "Gå till instrumentpanel",
+      "startGame": "Starta ett spel"
     },
     "template": {
       "settings": "Inställningar",
