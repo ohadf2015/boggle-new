@@ -6,7 +6,7 @@ import {
 } from '../WordHuntFirstTimeNudges';
 
 // Mock AdaptiveMotion
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, transition, ...rest } = props;
@@ -20,11 +20,11 @@ const mockT = (key: string) => key;
 
 describe('WordHuntFirstTimeNudges', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     localStorage.clear();
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('renders the nudge container', () => {
@@ -83,7 +83,7 @@ describe('WordHuntFirstTimeNudges', () => {
     );
     expect(screen.getByTestId('nudge-lifeDrop')).toBeInTheDocument();
 
-    act(() => { jest.advanceTimersByTime(4000); });
+    act(() => { vi.advanceTimersByTime(4000); });
     expect(screen.queryByTestId('nudge-lifeDrop')).not.toBeInTheDocument();
   });
 

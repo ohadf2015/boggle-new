@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { WordHuntDeathRecap, getDeathLesson, type DeathRecapStats } from '../WordHuntDeathRecap';
 
 // Mock AdaptiveMotion to render plain divs
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, transition, ...rest } = props;
