@@ -13,12 +13,16 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Graphics, Container } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
-import { SHATTER_COLORS } from './blastColorTokens';
+import { SHATTER_COLORS, RAINBOW_DEBRIS_COLORS } from './blastColorTokens';
 import {
   TILE_EXPLOSION,
   BOMB_EXPLOSION,
   LIGHTNING_SPARK,
   PRISM_CROSS,
+  PRISM_BEAM_UP,
+  PRISM_BEAM_DOWN,
+  PRISM_BEAM_LEFT,
+  PRISM_BEAM_RIGHT,
   GEM_SHATTER,
   VORTEX_PULL,
   COMBO_FLASH,
@@ -118,6 +122,14 @@ const DEBRIS_LIFETIME = 2; // seconds
 const DEBRIS_PER_TILE = 3;
 const MAX_DEBRIS = 60;
 
+/** Cross axis directions for prism debris */
+const CROSS_DIRECTIONS = [
+  { x: 0, y: -1 }, // up
+  { x: 0, y: 1 },  // down
+  { x: -1, y: 0 }, // left
+  { x: 1, y: 0 },  // right
+] as const;
+
 function EffectsWorker({
   width,
   height,
@@ -137,6 +149,81 @@ function EffectsWorker({
   const debrisContainerRef = useRef<Container | null>(null);
 
   const cellSize = width / gridSize;
+  const crossFlashRef = useRef<Graphics | null>(null);
+  const crossFlashRafRef = useRef<number>(0);
+
+  // ─── Prism cross beam effect ──────────────────────────────────────
+  const firePrismBeams = useCallback((cx: number, cy: number) => {
+    const beamOffsets = Math.floor(gridSize / 2) * cellSize;
+    particles.burst(PRISM_BEAM_UP, cx, cy - beamOffsets / 2);
+    particles.burst(PRISM_BEAM_DOWN, cx, cy + beamOffsets / 2);
+    particles.burst(PRISM_BEAM_LEFT, cx - beamOffsets / 2, cy);
+    particles.burst(PRISM_BEAM_RIGHT, cx + beamOffsets / 2, cy);
+  }, [particles, gridSize, cellSize]);
+
+  // ─── Prism rainbow debris (directional along cross axes) ─────────
+  const spawnPrismDebris = useCallback((cx: number, cy: number) => {
+    const container = debrisContainerRef.current;
+    if (!container) return;
+    const budget = MAX_DEBRIS - debrisRef.current.length;
+    const count = Math.min(12, budget);
+    if (count <= 0) return;
+    const now = performance.now() / 1000;
+
+    for (let i = 0; i < count; i++) {
+      const dir = CROSS_DIRECTIONS[i % 4];
+      const colorHex = RAINBOW_DEBRIS_COLORS[i % RAINBOW_DEBRIS_COLORS.length];
+      const colorNum = parseInt(colorHex.replace('#', ''), 16);
+      const size = 4 + Math.random() * 4;
+
+      const g = new Graphics();
+      g.rect(-size / 2, -size / 2, size, size).fill({ color: colorNum });
+      g.x = cx;
+      g.y = cy;
+      container.addChild(g);
+
+      const bodyId = physics.createRect(cx, cy, size, size, {
+        restitution: 0.4,
+        frictionAir: 0.015,
+        density: 0.002,
+      });
+
+      const force = 0.001 + Math.random() * 0.0015;
+      physics.applyForce(bodyId, {
+        x: dir.x * force + (Math.random() - 0.5) * 0.0003,
+        y: dir.y * force + (Math.random() - 0.5) * 0.0003,
+      });
+
+      debrisRef.current.push({ bodyId, graphic: g, color: colorNum, size, createdAt: now });
+    }
+  }, [physics]);
+
+  // ─── Cross flash (white lines fading to transparent over 300ms) ──
+  const flashCross = useCallback((cx: number, cy: number) => {
+    const g = new Graphics();
+    const lineLen = gridSize * cellSize;
+    g.rect(0, cy - 2, lineLen, 4).fill({ color: 0xffffff });
+    g.rect(cx - 2, 0, 4, lineLen).fill({ color: 0xffffff });
+    g.alpha = 0.9;
+    camera.addChild(g);
+    crossFlashRef.current = g;
+
+    const start = performance.now();
+    const duration = 300;
+    const fade = () => {
+      const elapsed = performance.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      g.alpha = 0.9 * (1 - t);
+      if (t < 1) {
+        crossFlashRafRef.current = requestAnimationFrame(fade);
+      } else {
+        camera.removeChild(g);
+        g.destroy();
+        if (crossFlashRef.current === g) crossFlashRef.current = null;
+      }
+    };
+    crossFlashRafRef.current = requestAnimationFrame(fade);
+  }, [camera, gridSize, cellSize]);
 
   // Create debris container on mount
   useEffect(() => {
@@ -150,6 +237,11 @@ function EffectsWorker({
         d.graphic.destroy();
       }
       debrisRef.current = [];
+      cancelAnimationFrame(crossFlashRafRef.current);
+      if (crossFlashRef.current) {
+        crossFlashRef.current.destroy();
+        crossFlashRef.current = null;
+      }
       camera.removeChild(container);
       container.destroy();
     };
@@ -272,6 +364,13 @@ function EffectsWorker({
       const y = tile.row * cellSize + cellSize / 2;
       const preset = CLEAR_PRESET_MAP[tile.type] ?? TILE_EXPLOSION;
       particles.burst(preset, x, y);
+
+      // Prism-specific: cross beams, rainbow debris, cross flash
+      if (tile.type === 'prism') {
+        firePrismBeams(x, y);
+        spawnPrismDebris(x, y);
+        flashCross(x, y);
+      }
     }
 
     // Spawn physics debris fragments
@@ -282,7 +381,7 @@ function EffectsWorker({
     if (count >= 6) shake.heavy();
     else if (count >= 3) shake.medium();
     else shake.light();
-  }, [clearedTiles, particles, shake, cellSize, spawnDebris]);
+  }, [clearedTiles, particles, shake, cellSize, spawnDebris, firePrismBeams, spawnPrismDebris, flashCross]);
 
   // Chain cascade sparkle
   useEffect(() => {

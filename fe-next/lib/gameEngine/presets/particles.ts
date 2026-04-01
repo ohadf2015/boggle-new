@@ -177,6 +177,42 @@ export const PRISM_CROSS: ParticleConfig = {
   blendMode: 'add',
 };
 
+const PRISM_RAINBOW = PRISM_CROSS.colors;
+
+// ─── Prism Directional Beams ─────────────────────────────────────────
+// 4 directional rainbow beams fired from the prism tile position.
+
+export const PRISM_BEAM_UP: ParticleConfig = {
+  maxParticles: 20,
+  frequency: 0.001,
+  emitterLifetime: 0.12,
+  particlesPerWave: 20,
+  lifetime: { min: 0.2, max: 0.5 },
+  speed: { min: 200, max: 500 },
+  gravity: { x: 0, y: 0 },
+  scale: { start: 1.2, end: 0 },
+  alpha: { start: 1, end: 0 },
+  colors: PRISM_RAINBOW,
+  spawnShape: 'rect',
+  spawnConfig: { width: 6, height: 60 },
+  blendMode: 'add',
+};
+
+export const PRISM_BEAM_DOWN: ParticleConfig = {
+  ...PRISM_BEAM_UP,
+  spawnConfig: { width: 6, height: 60 },
+};
+
+export const PRISM_BEAM_LEFT: ParticleConfig = {
+  ...PRISM_BEAM_UP,
+  spawnConfig: { width: 60, height: 6 },
+};
+
+export const PRISM_BEAM_RIGHT: ParticleConfig = {
+  ...PRISM_BEAM_UP,
+  spawnConfig: { width: 60, height: 6 },
+};
+
 // ─── Gem Shatter ──────────────────────────────────────────────────────
 // Crystalline shatter when gem tile completes 3 hits.
 
