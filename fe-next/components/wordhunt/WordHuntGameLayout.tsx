@@ -8,6 +8,7 @@ import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormin
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
 import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
+import type { DeathRecapStats } from './WordHuntDeathRecap';
 import type { LetterGrid } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
@@ -58,8 +59,11 @@ export interface WordHuntGameLayoutProps {
   currentUsername: string;
   wrongGuessShake?: boolean;
 
+  // Death recap
+  deathRecapStats?: DeathRecapStats | null;
+
   // Common
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   gameDir: 'ltr' | 'rtl';
 }
 
@@ -105,6 +109,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   leaderboard,
   currentUsername,
   wrongGuessShake,
+
+  // Death recap
+  deathRecapStats,
 
   // Common
   t,
@@ -180,6 +187,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           <WordHuntGameOverOverlay
             reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
             t={t}
+            deathRecapStats={deathRecapStats}
           />
         </div>
 

@@ -4,15 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Skull, Eye, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WordHuntDeathRecap, type DeathRecapStats } from './WordHuntDeathRecap';
 
 export type GameOverReason = 'eliminated' | 'found' | 'otherFound' | null;
 
 export interface WordHuntGameOverOverlayProps {
   reason: GameOverReason;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  /** Death recap stats — only needed when reason is 'eliminated' */
+  deathRecapStats?: DeathRecapStats | null;
 }
 
 const SPECTATOR_DELAY = 2800;
+const RECAP_DELAY = 1200; // Show recap card 1.2s after impact
+const RECAP_DURATION = 6000; // Recap stays for 6s before spectator
 
 /**
  * Dramatic game-over overlay for Word Hunt multiplayer.
@@ -27,17 +32,36 @@ const SPECTATOR_DELAY = 2800;
 export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = ({
   reason,
   t,
+  deathRecapStats,
 }) => {
-  const [phase, setPhase] = useState<'impact' | 'spectator'>('impact');
+  const [phase, setPhase] = useState<'impact' | 'recap' | 'spectator'>('impact');
 
   useEffect(() => {
     if (!reason) {
       setPhase('impact');
       return;
     }
+
+    const isElim = reason === 'eliminated';
+    const hasRecap = isElim && deathRecapStats;
+
+    if (hasRecap) {
+      // Eliminated with recap: impact → recap → spectator
+      const recapTimer = setTimeout(() => setPhase('recap'), RECAP_DELAY);
+      const spectatorTimer = setTimeout(
+        () => setPhase('spectator'),
+        RECAP_DELAY + RECAP_DURATION,
+      );
+      return () => {
+        clearTimeout(recapTimer);
+        clearTimeout(spectatorTimer);
+      };
+    }
+
+    // Victory or no recap: impact → spectator
     const timer = setTimeout(() => setPhase('spectator'), SPECTATOR_DELAY);
     return () => clearTimeout(timer);
-  }, [reason]);
+  }, [reason, deathRecapStats]);
 
   if (!reason) return null;
 
@@ -83,6 +107,8 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
         <AdaptiveAnimatePresence mode="wait">
           {phase === 'impact' ? (
             <ImpactContent key="impact" isEliminated={isEliminated} isOtherFound={isOtherFound} t={t} />
+          ) : phase === 'recap' && isEliminated && deathRecapStats ? (
+            <WordHuntDeathRecap key="recap" stats={deathRecapStats} t={t} />
           ) : (
             <SpectatorContent key="spectator" t={t} />
           )}

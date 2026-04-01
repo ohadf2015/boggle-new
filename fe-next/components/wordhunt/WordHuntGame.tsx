@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useCallback, useRef } from 'react';
+import { memo, useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
@@ -9,10 +9,15 @@ import { WordHuntGameLayout } from './WordHuntGameLayout';
 import { WordHuntDangerToast } from './WordHuntDangerToast';
 import { LowHPOverlay } from './LowHPOverlay';
 import { WordHuntCategoryHint } from './WordHuntCategoryHint';
+import { WordHuntFirstTimeNudges } from './WordHuntFirstTimeNudges';
+import { WordHuntQuickRules } from './WordHuntQuickRules';
 import { useWordHuntDangerAlerts } from '@/hooks/useWordHuntDangerAlerts';
+import type { DeathRecapStats, DeathCause } from './WordHuntDeathRecap';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
+
+const QUICK_RULES_STORAGE_KEY = 'lexiclash_wh_rules_seen';
 
 export interface LeaderboardEntry {
   username: string;
@@ -56,6 +61,20 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   // Danger alert toasts (opponent danger / eliminated / last standing)
   const { toasts: dangerToasts, dismissToast } = useWordHuntDangerAlerts();
+
+  // Quick rules overlay (first time only)
+  const [showQuickRules, setShowQuickRules] = useState(() => {
+    try { return !localStorage.getItem(QUICK_RULES_STORAGE_KEY); } catch { return true; }
+  });
+  const handleDismissRules = useCallback(() => {
+    setShowQuickRules(false);
+    try { localStorage.setItem(QUICK_RULES_STORAGE_KEY, '1'); } catch { /* SSR */ }
+  }, []);
+
+  // Track survival duration for death recap
+  const [survivalSeconds, setSurvivalSeconds] = useState(0);
+  const gameStartTimeRef = useRef(0);
+  useEffect(() => { gameStartTimeRef.current = Date.now(); }, []);
 
   // Local swipe/word state
   const [formedWord, setFormedWord] = useState('');
@@ -158,6 +177,54 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     handleWordSubmitRef.current(word);
   }, []);
 
+  // Capture survival time when game ends
+  useEffect(() => {
+    if (bridge.isGameOver && survivalSeconds === 0 && gameStartTimeRef.current > 0) {
+      setSurvivalSeconds(Math.round((Date.now() - gameStartTimeRef.current) / 1000));
+    }
+  }, [bridge.isGameOver, survivalSeconds]);
+
+  // Count wrong guesses from attempts (same-length guesses that weren't the target)
+  const wrongGuessCount = useMemo(() => {
+    return bridge.attempts.filter(
+      (a) => a.word.length === bridge.targetLength && a.feedback.some((f) => f.feedback !== 'green')
+    ).length;
+  }, [bridge.attempts, bridge.targetLength]);
+
+  // Determine death cause: was the last thing that happened a wrong guess?
+  const lastAttemptWasWrong = useMemo(() => {
+    if (bridge.attempts.length === 0) return false;
+    const last = bridge.attempts[bridge.attempts.length - 1];
+    return last.word.length === bridge.targetLength && last.feedback.some((f) => f.feedback !== 'green');
+  }, [bridge.attempts, bridge.targetLength]);
+
+  // Build death recap stats when eliminated
+  const deathRecapStats = useMemo<DeathRecapStats | null>(() => {
+    if (!bridge.isGameOver || bridge.targetFound) return null;
+    const validWords = foundWords.filter((w) => w.isValid !== false && !w.duplicate).length;
+    const avgLen = validWords > 0
+      ? foundWords.filter((w) => w.isValid !== false && !w.duplicate)
+          .reduce((sum, w) => sum + w.word.length, 0) / validWords
+      : 0;
+    const cause: DeathCause = (lastAttemptWasWrong && bridge.lifePoints <= 0) ? 'wrongGuess' : 'lifeDrain';
+
+    return {
+      cause,
+      wordsFound: validWords,
+      wrongGuesses: wrongGuessCount,
+      survivalSeconds: survivalSeconds,
+      totalPlayers: leaderboard.length,
+      eliminationOrder: bridge.eliminatedPlayers.indexOf(username) + 1 || bridge.eliminatedPlayers.length,
+      avgWordLength: Math.round(avgLen * 10) / 10,
+    };
+  }, [bridge.isGameOver, bridge.targetFound, bridge.lifePoints, bridge.eliminatedPlayers,
+      foundWords, wrongGuessCount, lastAttemptWasWrong, leaderboard.length, username, survivalSeconds]);
+
+  // Show quick rules before game
+  if (showQuickRules) {
+    return <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />;
+  }
+
   return (
     <>
     <LowHPOverlay hp={bridge.lifePoints} />
@@ -204,9 +271,18 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       currentUsername={username}
       wrongGuessShake={bridge.wrongGuessShake}
 
+      // Death recap
+      deathRecapStats={deathRecapStats}
+
       // Common
       t={t}
       gameDir={dir}
+    />
+    <WordHuntFirstTimeNudges
+      lifePoints={bridge.lifePoints}
+      discoveryClueCount={bridge.accumulatedClues.size}
+      wrongGuessCount={wrongGuessCount}
+      t={t}
     />
     </>
   );
