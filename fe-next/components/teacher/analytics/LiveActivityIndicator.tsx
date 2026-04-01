@@ -69,8 +69,8 @@ export function LiveActivityIndicator({
 
     case 'connecting':
       statusText = t('education.analytics.connecting');
-      statusColor = 'text-neo-yellow';
-      dotColor = 'bg-neo-yellow';
+      statusColor = 'text-neo-lime';
+      dotColor = 'bg-neo-lime';
       shouldPulse = false;
       break;
 

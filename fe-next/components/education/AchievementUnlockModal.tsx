@@ -38,7 +38,7 @@ export interface AchievementUnlockModalProps {
 const TIER_COLORS = {
   bronze: '#CD7F32',
   silver: '#C0C0C0',
-  gold: '#FFE135', // neo-yellow
+  gold: '#BFFF00', // neo-lime
   platinum: '#E5E4E2',
 } as const;
 
@@ -259,7 +259,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-yellow hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-orange',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

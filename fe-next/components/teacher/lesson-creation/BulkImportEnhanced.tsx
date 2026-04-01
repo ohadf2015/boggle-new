@@ -241,7 +241,7 @@ export default function BulkImportEnhanced({
                       </div>
                     )}
                     {stats.errors > 0 && (
-                      <div className="flex items-center gap-1 text-neo-yellow">
+                      <div className="flex items-center gap-1 text-neo-lime">
                         <AlertCircle className="w-4 h-4" />
                         <span className="tabular-nums">{stats.errors} errors</span>
                       </div>
@@ -251,8 +251,8 @@ export default function BulkImportEnhanced({
 
                 {/* Niqqud warning */}
                 {stats.niqqudWarnings > 0 && (
-                  <div className="p-3 bg-neo-yellow/20 border-neo border-neo-yellow/50 rounded-neo">
-                    <div className="flex items-center gap-2 text-sm font-neo-body text-neo-yellow">
+                  <div className="p-3 bg-neo-lime/20 border-neo border-neo-lime/50 rounded-neo">
+                    <div className="flex items-center gap-2 text-sm font-neo-body text-neo-lime">
                       <AlertCircle className="w-4 h-4" />
                       <span>
                         {stats.niqqudWarnings} words contain niqqud (vowel points will be removed)
@@ -271,7 +271,7 @@ export default function BulkImportEnhanced({
                           'flex items-center gap-1 px-2 py-1 rounded text-sm font-neo-body',
                           result.canIntegrate
                             ? 'bg-neo-cyan/20 text-neo-cyan border border-neo-cyan/30'
-                            : 'bg-neo-yellow/20 text-neo-yellow border border-neo-yellow/30'
+                            : 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
                         )}
                       >
                         {result.canIntegrate ? (

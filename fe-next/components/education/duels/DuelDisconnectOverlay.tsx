@@ -65,7 +65,7 @@ export function DuelDisconnectOverlay({
 
         {/* Countdown */}
         <div className="mb-6">
-          <div className="text-6xl font-neo-display font-bold text-neo-yellow mb-2">
+          <div className="text-6xl font-neo-display font-bold text-neo-lime mb-2">
             {secondsRemaining}
           </div>
           <p className="text-neo-white/70 text-sm">

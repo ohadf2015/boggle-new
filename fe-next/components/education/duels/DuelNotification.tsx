@@ -99,7 +99,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
           >
             {/* Icon */}
             <div className="flex-shrink-0">
-              <Swords className="w-8 h-8 text-neo-yellow" />
+              <Swords className="w-8 h-8 text-neo-lime" />
             </div>
 
             {/* Content */}

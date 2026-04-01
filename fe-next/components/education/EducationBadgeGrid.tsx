@@ -160,7 +160,7 @@ export default function EducationBadgeGrid({
             aria-valuemax={100}
           >
             <div
-              className="h-full bg-neo-yellow transition-all duration-500"
+              className="h-full bg-neo-lime transition-all duration-500"
               style={{ width: `${completionPercent}%` }}
             />
           </div>
@@ -309,7 +309,7 @@ export default function EducationBadgeGrid({
       <div className="text-center">
         <p className={cn(
           'text-sm font-neo-body',
-          canPinMore ? 'text-neo-white/60' : 'text-neo-yellow'
+          canPinMore ? 'text-neo-white/60' : 'text-neo-lime'
         )}>
           {t('education.achievements.pinLimit', {
             current: pinCount,

@@ -66,7 +66,7 @@ export default function QuickStartButton({
         'bg-neo-lime/90 hover:bg-neo-lime',
         'shadow-hard hover:shadow-hard-lg transition-all',
         'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
-        'focus:outline-none focus:ring-2 focus:ring-neo-yellow',
+        'focus:outline-none focus:ring-2 focus:ring-neo-lime',
         isRTL && 'rtl text-right',
         className
       )}

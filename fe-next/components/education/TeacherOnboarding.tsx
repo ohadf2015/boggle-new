@@ -58,8 +58,8 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     icon: <Send className="w-12 h-12" />,
     titleKey: 'education.onboarding.invite.title',
     descriptionKey: 'education.onboarding.invite.description',
-    color: 'text-neo-yellow',
-    bgColor: 'bg-neo-yellow/20',
+    color: 'text-neo-lime',
+    bgColor: 'bg-neo-lime/20',
   },
 ];
 
@@ -281,7 +281,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           </div>
 
           {/* Decorative sparkles */}
-          <div className="absolute top-8 start-8 text-neo-yellow/30">
+          <div className="absolute top-8 start-8 text-neo-lime/30">
             <Sparkles className="w-6 h-6" />
           </div>
           <div className="absolute bottom-12 end-12 text-neo-pink/30">

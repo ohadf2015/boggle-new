@@ -258,7 +258,7 @@ export default function EducationPageClient() {
             )}
           >
             {/* Decorative corner elements */}
-            <Star className="absolute top-4 start-4 w-5 h-5 text-neo-yellow/20" />
+            <Star className="absolute top-4 start-4 w-5 h-5 text-neo-lime/20" />
             <Puzzle className="absolute bottom-4 end-4 w-6 h-6 text-neo-cyan/15 rotate-12" />
 
             <div className="flex items-center justify-between gap-4">
@@ -301,7 +301,7 @@ export default function EducationPageClient() {
             )}
           >
             <p className="text-sm sm:text-base font-bold text-neo-white flex items-center justify-center gap-2 flex-wrap">
-              <Globe className="w-4 h-4 text-neo-yellow flex-shrink-0" />
+              <Globe className="w-4 h-4 text-neo-lime flex-shrink-0" />
               {t('education.landing.socialProof')}
             </p>
           </motion.div>
@@ -315,16 +315,16 @@ export default function EducationPageClient() {
               transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.2 }}
               className={cn(
                 'rounded-neo border-neo-thick border-neo-black overflow-hidden mb-8',
-                'bg-neo-yellow shadow-hard',
+                'bg-neo-lime shadow-hard',
               )}
             >
               <div className="px-5 py-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-neo border-2 border-neo-black bg-neo-black flex items-center justify-center flex-shrink-0">
                     {isTeacherRole ? (
-                      <GraduationCap className="w-5 h-5 text-neo-yellow" />
+                      <GraduationCap className="w-5 h-5 text-neo-lime" />
                     ) : (
-                      <BookOpen className="w-5 h-5 text-neo-yellow" />
+                      <BookOpen className="w-5 h-5 text-neo-lime" />
                     )}
                   </div>
                   <div className="min-w-0">
@@ -345,7 +345,7 @@ export default function EducationPageClient() {
                   data-testid="go-to-dashboard-link"
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
-                    'bg-neo-black text-neo-yellow font-bold uppercase text-sm flex-shrink-0',
+                    'bg-neo-black text-neo-lime font-bold uppercase text-sm flex-shrink-0',
                     'shadow-hard-sm hover:shadow-hard transition-shadow',
                   )}
                 >

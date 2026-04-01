@@ -114,7 +114,7 @@ export default function WordListEditor({
                         <span className="text-xs">{t('teacher.lesson.canIntegrate')}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 text-neo-yellow">
+                      <div className="flex items-center gap-1 text-neo-lime">
                         <AlertCircle className="w-4 h-4" />
                         <span className="text-xs">{t('teacher.lesson.cannotIntegrate')}</span>
                       </div>

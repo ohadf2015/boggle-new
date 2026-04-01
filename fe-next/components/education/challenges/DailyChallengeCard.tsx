@@ -65,7 +65,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
       {/* Rewards */}
       <div className="flex items-center gap-3 mb-3 text-sm">
-        <span className="text-neo-yellow">+{challenge.xp_reward} XP</span>
+        <span className="text-neo-lime">+{challenge.xp_reward} XP</span>
         {challenge.bonus_reward?.coins && (
           <span className="text-neo-orange">+{challenge.bonus_reward.coins} coins</span>
         )}
@@ -75,7 +75,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       {canClaim && (
         <button
           onClick={() => onClaim(challenge.id)}
-          className="w-full bg-neo-yellow text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
+          className="w-full bg-neo-lime text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
           data-testid="claim-button"
         >
           {t('challenges.claim')}

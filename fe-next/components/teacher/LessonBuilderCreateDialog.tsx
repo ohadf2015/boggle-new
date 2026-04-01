@@ -88,7 +88,7 @@ export default function LessonBuilderCreateDialog({
                 type="button"
               >
                 <div className="flex items-center gap-2">
-                  <BookTemplate className="w-5 h-5 text-neo-yellow" />
+                  <BookTemplate className="w-5 h-5 text-neo-lime" />
                   <span className="font-neo-body font-bold text-neo-white">
                     {t('teacher.lesson.startFromTemplate')}
                   </span>

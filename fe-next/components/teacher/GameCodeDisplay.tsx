@@ -110,7 +110,7 @@ export default function GameCodeDisplay({
 
       {/* QR Code Section */}
       {showQR && (
-        <div className="flex flex-col items-center mb-4 p-4 bg-white rounded-neo">
+        <div className="flex flex-col items-center mb-4 p-4 bg-neo-cream rounded-neo">
           <QRCodeSVG
             value={joinUrl}
             size={180}

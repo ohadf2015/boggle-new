@@ -207,11 +207,11 @@ describe('XpProgressBar', () => {
       expect(container).toHaveClass('shadow-hard');
     });
 
-    it('uses neo-yellow for progress fill', () => {
+    it('uses neo-lime for progress fill', () => {
       render(<XpProgressBar totalXp={150} />);
 
       const progressFill = screen.getByTestId('xp-progress-fill');
-      expect(progressFill).toHaveClass('bg-neo-yellow');
+      expect(progressFill).toHaveClass('bg-neo-lime');
     });
   });
 });

@@ -164,7 +164,7 @@ describe('MetricCard - Severity Styling', () => {
 
     const card = screen.getByTestId('metric-card');
     const header = card.firstElementChild;
-    expect(header).toHaveClass('bg-neo-yellow');
+    expect(header).toHaveClass('bg-neo-lime');
   });
 
   it('applies urgent severity styling', () => {

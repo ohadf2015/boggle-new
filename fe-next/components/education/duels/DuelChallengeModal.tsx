@@ -99,7 +99,7 @@ export default function DuelChallengeModal({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Swords className="w-6 h-6 text-neo-yellow" />
+            <Swords className="w-6 h-6 text-neo-lime" />
             <h3 id={titleId} className="text-xl font-neo-display font-black text-neo-white">
               {t('challengePlayer', { name: opponent.displayName ?? '?' })}
             </h3>
@@ -146,7 +146,7 @@ export default function DuelChallengeModal({
                 'shadow-hard-sm transition-all',
                 'text-start',
                 duelType === 'async'
-                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                  ? 'bg-neo-lime text-neo-black shadow-hard'
                   : 'bg-neo-navy text-neo-white hover:shadow-hard'
               )}
             >
@@ -165,7 +165,7 @@ export default function DuelChallengeModal({
                 'shadow-hard-sm transition-all',
                 'text-start',
                 duelType === 'realtime'
-                  ? 'bg-neo-yellow text-neo-black shadow-hard'
+                  ? 'bg-neo-lime text-neo-black shadow-hard'
                   : 'bg-neo-navy text-neo-white hover:shadow-hard'
               )}
             >
@@ -221,7 +221,7 @@ export default function DuelChallengeModal({
             disabled={!selectedLessonId || isCreating}
             className={cn(
               'flex-1 px-6 py-3 font-bold rounded-neo',
-              'bg-neo-yellow text-neo-black',
+              'bg-neo-lime text-neo-black',
               'border-neo border-neo-black shadow-hard',
               'hover:shadow-hard-lg transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed'

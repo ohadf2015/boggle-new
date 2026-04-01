@@ -84,7 +84,7 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-white border-3 border-black shadow-hard rounded-neo p-6',
+          'bg-neo-cream border-3 border-black shadow-hard rounded-neo p-6',
           'flex flex-col items-center gap-4 text-center'
         )}
       >
@@ -118,7 +118,7 @@ export function AnalyticsDashboard({
     return (
       <div
         className={cn(
-          'bg-white border-3 border-black shadow-hard rounded-neo p-6',
+          'bg-neo-cream border-3 border-black shadow-hard rounded-neo p-6',
           'flex flex-col items-center gap-4 text-center'
         )}
       >

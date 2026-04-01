@@ -169,10 +169,10 @@ export default function StudentLessonView() {
 
         // Card colors per status
         const cardBg =
-          status === 'assigned' ? 'bg-white' : status === 'completed' ? 'bg-neo-yellow/10' : 'bg-white';
+          status === 'assigned' ? 'bg-neo-navy' : status === 'completed' ? 'bg-neo-lime/10' : 'bg-neo-navy';
         const accentBar =
-          status === 'assigned' ? 'bg-neo-cyan' : status === 'completed' ? 'bg-neo-yellow' : 'bg-black/20';
-        const fillColor = status === 'completed' ? 'bg-neo-yellow' : 'bg-neo-cyan';
+          status === 'assigned' ? 'bg-neo-cyan' : status === 'completed' ? 'bg-neo-lime' : 'bg-black/20';
+        const fillColor = status === 'completed' ? 'bg-neo-lime' : 'bg-neo-cyan';
 
         // Alternating slight tilt for visual rhythm
         const cardTilt = index % 2 === 0 ? -0.4 : 0.4;
@@ -237,7 +237,7 @@ export default function StudentLessonView() {
                         variants={doneBadge}
                         initial="hidden"
                         animate="visible"
-                        className="flex-shrink-0 px-2 py-0.5 bg-neo-yellow border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
+                        className="flex-shrink-0 px-2 py-0.5 bg-neo-lime border-2 border-black text-black text-xs font-black rounded-neo shadow-hard-sm"
                       >
                         ✓ DONE
                       </AdaptiveMotion.span>
@@ -262,7 +262,7 @@ export default function StudentLessonView() {
                           animate={masteryPercent === 100 ? { scale: [1, 1.15, 1] } : {}}
                           transition={{ duration: 0.6, delay: 0.8 }}
                         >
-                          <Activity className="w-4 h-4 text-neo-yellow" />
+                          <Activity className="w-4 h-4 text-neo-lime" />
                           {masteryPercent}%
                         </AdaptiveMotion.span>
                       </>

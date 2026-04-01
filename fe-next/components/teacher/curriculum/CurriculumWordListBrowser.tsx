@@ -157,7 +157,7 @@ export function CurriculumWordListBrowser({
       {/* Filters */}
       <div className="bg-neo-navy/50 border-neo border-black rounded-neo p-4">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-neo-yellow" />
+          <Filter className="w-5 h-5 text-neo-lime" />
           <h2 className="text-lg font-semibold text-neo-white">
             {t('teacher.curriculum.filters.title')}
           </h2>
@@ -177,7 +177,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.grade')}
               value={filters.gradeLevel || ''}
               onChange={handleGradeChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-yellow focus:outline-none"
+              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-none"
             >
               <option value="">{t('teacher.curriculum.allGrades')}</option>
               {GRADE_LEVELS.map((grade) => (
@@ -201,7 +201,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.subject')}
               value={filters.subject || ''}
               onChange={handleSubjectChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-yellow focus:outline-none"
+              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-none"
             >
               <option value="">{t('teacher.curriculum.allSubjects')}</option>
               {SUBJECTS.map((subject) => (
@@ -267,7 +267,7 @@ export function CurriculumWordListBrowser({
                       <p className="text-sm text-neo-gray mt-1">{list.description}</p>
                     )}
                     <div className="flex flex-wrap gap-2 mt-2">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-yellow/20 text-neo-yellow rounded">
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-lime/20 text-neo-lime rounded">
                         {getGradeGroup(list.grade_level)} - {t(`teacher.curriculum.grades.${list.grade_level}`)}
                       </span>
                       <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-cyan/20 text-neo-cyan rounded">
@@ -306,7 +306,7 @@ export function CurriculumWordListBrowser({
                     <button
                       onClick={() => handleImport(list)}
                       disabled={!teacherId || importingListId === list.id}
-                      className="flex items-center gap-2 px-3 py-2 bg-neo-yellow text-black border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-3 py-2 bg-neo-lime text-black border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label={t('teacher.curriculum.import')}
                     >
                       <Download className="w-4 h-4" />
