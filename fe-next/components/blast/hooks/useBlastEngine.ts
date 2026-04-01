@@ -316,7 +316,7 @@ export function useBlastEngine(
         setTileStates(gravityResult.newTileStates);
       },
     };
-  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer]);
+  }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer, config.boardClearMode]);
 
   // ── shuffleGrid ──
   const shuffleGrid = useCallback(() => {

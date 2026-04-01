@@ -8,8 +8,7 @@
  * - Victory condition when board is fully cleared
  */
 
-import type { BlastTileState, BlastTileType, BlastGameConfig } from '../types';
-import { resolveBlastConfig } from '../types';
+import { resolveBlastConfig, type BlastTileState, type BlastTileType, type BlastGameConfig } from '../types';
 import { computeGravityResult } from '../utils/blastGravity';
 import { getBoardClearPercentage, isBoardFullyCleared } from '../utils/blastBoardClear';
 
