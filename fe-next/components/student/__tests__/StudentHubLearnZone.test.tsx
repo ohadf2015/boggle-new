@@ -32,8 +32,7 @@ vi.mock('@/components/education/ReviewDueBadge', () => ({
 }));
 
 vi.mock('@/components/education/animations/WordOfTheDay', () => ({
-  __esModule: true,
-  default: ({ word }: { word: string }) => <div data-testid="wotd">{word}</div>,
+  WordOfTheDay: ({ word }: { word: string }) => <div data-testid="wotd">{word}</div>,
 }));
 
 vi.mock('@/components/education/challenges/ChallengePanel', () => ({
