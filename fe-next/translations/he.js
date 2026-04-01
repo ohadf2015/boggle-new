@@ -7996,6 +7996,10 @@ const he = {
     }
   },
   "education": {
+    "wordOfTheDay": {
+      "title": "המילה היומית",
+      "learnMore": "למד עוד"
+    },
     "landing": {
       "title": "מצב חינוכי",
       "teacher": "אני מורה",

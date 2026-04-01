@@ -7961,6 +7961,10 @@ const sv = {
     }
   },
   "education": {
+    "wordOfTheDay": {
+      "title": "Dagens Ord",
+      "learnMore": "Läs Mer"
+    },
     "landing": {
       "title": "Utbildningsläge",
       "teacher": "Jag är lärare",

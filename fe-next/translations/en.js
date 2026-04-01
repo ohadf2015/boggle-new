@@ -8170,6 +8170,10 @@ const en = {
     }
   },
   "education": {
+    "wordOfTheDay": {
+      "title": "Word of the Day",
+      "learnMore": "Learn More"
+    },
     "landing": {
       "title": "Education Mode",
       "teacher": "I'm a Teacher",
