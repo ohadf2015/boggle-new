@@ -93,6 +93,12 @@ describe('WordHuntGame wiring', () => {
     mockBridgeReturn.lifePoints = 75;
     mockBridgeReturn.targetCategory = 'animals';
     mockBridgeReturn.targetLength = 5;
+    // Mark quick rules as seen so the game renders directly
+    localStorage.setItem('lexiclash_wh_rules_seen', '1');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('renders LowHPOverlay when HP is low', () => {

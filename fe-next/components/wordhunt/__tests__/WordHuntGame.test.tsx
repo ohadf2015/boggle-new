@@ -105,6 +105,12 @@ describe('WordHuntGame', () => {
     mockBridgeReturn.eliminatedPlayers = [];
     (validateWordLocally as jest.Mock).mockReturnValue({ isValid: true, shouldSubmitToServer: true });
     (couldBeOnBoard as jest.Mock).mockReturnValue(true);
+    // Mark quick rules as seen so the game renders directly
+    localStorage.setItem('lexiclash_wh_rules_seen', '1');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('should render WordHuntGameLayout', () => {
