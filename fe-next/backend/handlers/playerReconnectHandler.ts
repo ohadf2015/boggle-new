@@ -247,7 +247,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     const leaderboard = getLeaderboard(gameCode);
     socket.emit('updateLeaderboard', { leaderboard });
 
-    const playerAchievementKeys: string[] = (game.playerAchievements?.[username] || []).map((a) => a.id);
+    const playerAchievementKeys = (game.playerAchievements?.[username] || []) as unknown as string[];
     if (playerAchievementKeys.length > 0) {
       const achievements = playerAchievementKeys
         .map((key: string) => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
@@ -304,7 +304,7 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
   const leaderboard = getLeaderboard(gameCode);
   socket.emit('updateLeaderboard', { leaderboard });
 
-  const playerAchievementKeys: string[] = (game.playerAchievements?.[username] || []).map((a) => a.id);
+  const playerAchievementKeys = (game.playerAchievements?.[username] || []) as unknown as string[];
   if (playerAchievementKeys.length > 0) {
     const achievements = playerAchievementKeys
       .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))

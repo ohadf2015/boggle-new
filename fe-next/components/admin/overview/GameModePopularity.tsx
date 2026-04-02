@@ -7,16 +7,16 @@ import { User, Users, Calendar, Map, Bomb } from 'lucide-react';
 import type { GameModeStats, LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 const MODE_CONFIG: Record<LandingGameMode, { icon: React.ElementType; color: string; barColor: string }> = {
-  singleplayer: { icon: User, color: 'text-neo-cyan', barColor: 'bg-neo-cyan' },
-  multiplayer: { icon: Users, color: 'text-neo-pink', barColor: 'bg-neo-pink' },
-  daily: { icon: Calendar, color: 'text-neo-yellow', barColor: 'bg-neo-yellow' },
+  practice: { icon: User, color: 'text-neo-cyan', barColor: 'bg-neo-cyan' },
+  arena: { icon: Users, color: 'text-neo-pink', barColor: 'bg-neo-pink' },
+  daily: { icon: Calendar, color: 'text-neo-lime', barColor: 'bg-neo-lime' },
   adventure: { icon: Map, color: 'text-neo-lime', barColor: 'bg-neo-lime' },
-  blast: { icon: Bomb, color: 'text-neo-orange', barColor: 'bg-neo-orange' },
+  blast: { icon: Bomb, color: 'text-neo-cyan', barColor: 'bg-neo-cyan' },
 };
 
 const MODE_LABEL_KEYS: Record<LandingGameMode, string> = {
-  singleplayer: 'landing.singlePlayer',
-  multiplayer: 'landing.multiplayer',
+  practice: 'landing.singlePlayer',
+  arena: 'landing.multiplayer',
   daily: 'landing.dailyChallenge',
   adventure: 'landing.adventureMode',
   blast: 'landing.blastMode',

@@ -137,7 +137,7 @@ interface ChallengeStatsType {
 /**
  * Transform a database challenge record to the client DailyChallenge format.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function transformDbChallenge(c: any): DailyChallenge {
   return {
     id: (c.id as string) || '',

@@ -316,10 +316,10 @@ describe('blastModeManager', () => {
       }
     });
 
-    it('wave 4 overlay CAN contain diamond tiles (diamond enabled at wave 4)', () => {
+    it('wave 5 overlay CAN contain diamond tiles (diamond enabled at wave 5)', () => {
       const diamondSeen = new Set<string>();
       for (let i = 0; i < 200; i++) {
-        const overlay = generateBlastOverlay(largeGrid, 1.0, 4);
+        const overlay = generateBlastOverlay(largeGrid, 1.0, 5);
         for (const tile of overlay) {
           diamondSeen.add(tile.type);
         }

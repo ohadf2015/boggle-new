@@ -175,14 +175,14 @@ describe('Duel Disconnection Handlers', () => {
               }),
             };
           } else {
-            // Atomic forfeit update
+            // Atomic forfeit update: .eq(id).eq(status).eq(xp_awarded).select()
             return {
               update: jest.fn().mockReturnValue({
                 eq: jest.fn().mockReturnValue({
                   eq: jest.fn().mockReturnValue({
-                    select: jest.fn().mockReturnValue({
-                      single: jest.fn().mockResolvedValue({
-                        data: { ...activeDuel, status: 'forfeited' },
+                    eq: jest.fn().mockReturnValue({
+                      select: jest.fn().mockResolvedValue({
+                        data: [{ ...activeDuel, status: 'forfeited' }],
                         error: null,
                       }),
                     }),
@@ -434,14 +434,14 @@ describe('Duel Disconnection Handlers', () => {
               }),
             };
           } else {
-            // Second call: update to forfeited (needs double .eq() chain)
+            // Second call: update to forfeited (needs triple .eq() chain: id, status, xp_awarded)
             return {
               update: jest.fn().mockReturnValue({
                 eq: jest.fn().mockReturnValue({
                   eq: jest.fn().mockReturnValue({
-                    select: jest.fn().mockReturnValue({
-                      single: jest.fn().mockResolvedValue({
-                        data: { ...activeDuel, status: 'forfeited' },
+                    eq: jest.fn().mockReturnValue({
+                      select: jest.fn().mockResolvedValue({
+                        data: [{ ...activeDuel, status: 'forfeited' }],
                         error: null,
                       }),
                     }),

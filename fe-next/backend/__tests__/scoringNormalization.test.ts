@@ -177,7 +177,7 @@ describe('Scoring Normalization - Blast Rarity Disabled', () => {
 
     const player1 = result.find(r => r.username === 'Player1')!;
 
-    // THEN: Score should be 8 (round(5 * 1.5) = 8)
-    expect(player1.totalScore).toBe(8);
+    // THEN: Score should be 7 (round(5 * 1.3) = 7, rare multiplier is 1.3 per GD-023)
+    expect(player1.totalScore).toBe(7);
   });
 });

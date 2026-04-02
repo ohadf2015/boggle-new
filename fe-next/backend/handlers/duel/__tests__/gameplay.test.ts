@@ -224,8 +224,8 @@ describe('Duel Gameplay Handlers', () => {
       // Verify duel score was updated
       expect(duelUpdateMock).toHaveBeenCalledWith({ challenger_score: 6 });
 
-      // Verify event emitted
-      const scoreSubmittedEvent = roomEmittedEvents.find(
+      // Verify event emitted (sent only to submitting player via socket.emit, not broadcast)
+      const scoreSubmittedEvent = emittedEvents.find(
         (e) => e.event === 'duel:score-submitted'
       );
       expect(scoreSubmittedEvent).toBeDefined();
@@ -401,7 +401,7 @@ describe('Duel Gameplay Handlers', () => {
 
       await submitScoreHandler(payload);
 
-      const scoreSubmittedEvent = roomEmittedEvents.find(
+      const scoreSubmittedEvent = emittedEvents.find(
         (e) => e.event === 'duel:score-submitted'
       );
       expect(scoreSubmittedEvent?.data.score).toBe(0);
@@ -709,7 +709,7 @@ describe('Duel Gameplay Handlers', () => {
       expect(mockSupabaseClient.rpc).not.toHaveBeenCalled();
 
       // Verify score-submitted event still fires
-      const scoreSubmittedEvent = roomEmittedEvents.find(
+      const scoreSubmittedEvent = emittedEvents.find(
         (e) => e.event === 'duel:score-submitted'
       );
       expect(scoreSubmittedEvent).toBeDefined();
@@ -755,7 +755,7 @@ describe('Duel Gameplay Handlers', () => {
       expect(completedEvent).toBeUndefined();
 
       // Verify score-submitted event fires
-      const scoreSubmittedEvent = roomEmittedEvents.find(
+      const scoreSubmittedEvent = emittedEvents.find(
         (e) => e.event === 'duel:score-submitted'
       );
       expect(scoreSubmittedEvent).toBeDefined();

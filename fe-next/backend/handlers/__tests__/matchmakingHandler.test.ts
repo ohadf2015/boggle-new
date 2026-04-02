@@ -10,6 +10,7 @@ jest.mock('../../utils/logger', () => ({
 
 function createMockSocket(id = 'socket-1') {
   const handlers: Record<string, Function> = {};
+  const userId = `user-${id}`;
   return {
     id,
     on: jest.fn((event: string, handler: Function) => {
@@ -17,6 +18,8 @@ function createMockSocket(id = 'socket-1') {
     }),
     emit: jest.fn(),
     _handlers: handlers,
+    data: { verifiedUserId: userId },
+    handshake: { auth: { authUserId: userId } },
   };
 }
 

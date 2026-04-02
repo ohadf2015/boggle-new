@@ -20,6 +20,7 @@ const mockInitBlastModeState = jest.fn().mockReturnValue({
 });
 jest.mock('../../../backend/modules/blastModeManager', () => ({
   initBlastModeState: (...args: any[]) => mockInitBlastModeState(...args),
+  hashStringToSeed: jest.fn().mockReturnValue(12345),
 }));
 
 jest.mock('../../../backend/modules/gameStateManager', () => ({
@@ -221,6 +222,7 @@ describe('gameLifecycleHandler - gameMode', () => {
       language: 'en',
       modeHistory: [],
       gameSessionId: 1,
+      users: {},
     };
 
     beforeEach(() => {
@@ -302,7 +304,9 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should regenerate 6x6 grid when random resolves to blast and grid is not 6x6', async () => {
       // GIVEN: host sends small grid with random mode, server resolves to blast
+      // Need 2+ players so server regenerates grid (single player uses client grid)
       mockSelectNextGameMode.mockReturnValue('blast');
+      (getGame as jest.Mock).mockReturnValue({ ...baseGame, users: { alice: {}, bob: {} } });
 
       const handler = getHandler('startGame');
 
@@ -515,11 +519,12 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'blast',
       });
 
-      // THEN: initBlastModeState was called with the regenerated 6x6 grid and wave=3
+      // THEN: initBlastModeState was called with the regenerated 6x6 grid, wave=3, and a seed
       expect(mockInitBlastModeState).toHaveBeenCalledWith(
         mockGenerateRandomTable(),
         ['alice', 'bob'],
-        3
+        3,
+        expect.any(Number)
       );
     });
   });
@@ -543,6 +548,7 @@ describe('gameLifecycleHandler - gameMode', () => {
         language: 'en',
         modeHistory: [],
         gameSessionId: 1,
+        users: {},
       };
 
       (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
@@ -594,6 +600,7 @@ describe('gameLifecycleHandler - gameMode', () => {
         modeHistory: [],
         gameSessionId: 1,
         gameMode: 'classic',
+        users: {},
       });
       (getSocketIdByUsername as jest.Mock).mockReturnValue('socket-2');
       const targetSocket = { id: 'socket-2', emit: jest.fn() };
