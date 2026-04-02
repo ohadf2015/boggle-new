@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
-import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
 import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
