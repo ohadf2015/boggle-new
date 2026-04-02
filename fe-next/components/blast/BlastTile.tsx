@@ -305,6 +305,7 @@ function stripGlowShadows(boxShadow: string): string {
     .join(', ');
 }
 
+
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,

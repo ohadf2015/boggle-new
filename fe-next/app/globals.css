@@ -1251,6 +1251,17 @@ body {
     }
   }
 
+  /* Selection pop — brief 100ms bounce when tile is first selected */
+  .blast-tile-select-pop {
+    animation: blast-select-pop 100ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes blast-select-pop {
+    0% { transform: scale(0.92); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
   /* Selection glow when dragging across special tiles — single pop, not infinite pulse */
   .blast-tile-selected {
     box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(0,255,255,0.25);
