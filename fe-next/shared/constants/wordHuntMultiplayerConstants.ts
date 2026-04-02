@@ -10,7 +10,7 @@ export const HUNT_DRAIN_PHASE_1_RATE = 0.8;
 export const HUNT_DRAIN_PHASE_1_DURATION = 30;
 export const HUNT_DRAIN_PHASE_2_RATE = 1.2;
 export const HUNT_DRAIN_PHASE_2_DURATION = 30;
-export const HUNT_DRAIN_PHASE_3_RATE = 1.5;
+export const HUNT_DRAIN_PHASE_3_RATE = 2.0;
 
 /** Get drain rate based on elapsed seconds since game start */
 export function getDrainRate(elapsedSeconds: number): number {

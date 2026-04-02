@@ -15,9 +15,9 @@ vi.mock('next/server', () => ({
 }));
 
 // Mock rate limiter — always allow by default
-const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
 vi.mock('@/lib/apiRateLimit', () => ({
-  checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
+  checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
+  rateLimitResponse: vi.fn(),
 }));
 
 // Mock supabase server client (auth + data queries on the same client)
@@ -39,6 +39,8 @@ vi.mock('@/utils/sentry', () => ({
 
 import { NextRequest } from 'next/server';
 import { POST, GET } from '../route';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+const mockCheckApiRateLimit = vi.mocked(checkApiRateLimit);
 
 // ---------- Helpers ----------
 
@@ -255,6 +257,7 @@ describe('POST /api/adventure/attempt', () => {
 describe('GET /api/adventure/attempt', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCheckApiRateLimit.mockReturnValue({ success: true });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
@@ -265,7 +268,7 @@ describe('GET /api/adventure/attempt', () => {
   describe('Authentication', () => {
     it('rejects unauthenticated requests with 401', async () => {
       mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'No session' } });
-      const res = await GET();
+      const res = await GET(makeGetRequest());
       expect(res.status).toBe(401);
     });
   });
@@ -313,7 +316,7 @@ describe('GET /api/adventure/attempt', () => {
         }),
       });
 
-      const res = await GET();
+      const res = await GET(makeGetRequest());
       expect(res.status).toBe(200);
       expect(res.data.success).toBe(true);
       expect(res.data.attempts).toHaveLength(2);
@@ -357,7 +360,7 @@ describe('GET /api/adventure/attempt', () => {
         }),
       });
 
-      const res = await GET();
+      const res = await GET(makeGetRequest());
       expect(res.status).toBe(200);
       expect(res.data.attempts).toEqual([]);
     });
@@ -379,7 +382,7 @@ describe('GET /api/adventure/attempt', () => {
         }),
       });
 
-      const res = await GET();
+      const res = await GET(makeGetRequest());
       expect(res.status).toBe(500);
       expect(res.data.error).toBe('Failed to fetch attempts');
     });

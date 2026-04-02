@@ -8,11 +8,11 @@ import { render, screen } from '@testing-library/react';
 import BlastResultsSummary from '../BlastResultsSummary';
 
 // Mock translations
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-jest.mock('framer-motion', () => {
+vi.mock('framer-motion', () => {
   const React = require('react');
   // eslint-disable-next-line react/display-name
   const MotionDiv = React.forwardRef(
@@ -36,7 +36,7 @@ jest.mock('framer-motion', () => {
 });
 
 // Mock ScoreCountUp to render the number directly
-jest.mock('@/components/results/shared', () => ({
+vi.mock('@/components/results/shared', () => ({
   ScoreCountUp: ({ to }: { to: number }) => React.createElement('span', null, String(to)),
 }));
 

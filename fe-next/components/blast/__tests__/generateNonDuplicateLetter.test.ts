@@ -1,16 +1,16 @@
 import { generateNonDuplicateLetter } from '../utils/blastGravity';
 
 // Mock the letter generator so we can control return values
-jest.mock('../utils/blastLetterGenerator', () => ({
-  generateBlastLetter: jest.fn(),
-  rollSpecialType: jest.fn(() => 'standard' as const),
+vi.mock('../utils/blastLetterGenerator', () => ({
+  generateBlastLetter: vi.fn(),
+  rollSpecialType: vi.fn(() => 'standard' as const),
 }));
 
 import { generateBlastLetter } from '../utils/blastLetterGenerator';
-const mockGenerate = generateBlastLetter as jest.MockedFunction<typeof generateBlastLetter>;
+const mockGenerate = generateBlastLetter as ReturnType<typeof vi.fn>;
 
 describe('generateNonDuplicateLetter', () => {
-  afterEach(() => jest.clearAllMocks());
+  afterEach(() => vi.clearAllMocks());
 
   it('should return first letter when it differs from neighbor', () => {
     mockGenerate.mockReturnValue('B');
@@ -38,7 +38,7 @@ describe('generateNonDuplicateLetter', () => {
   });
 
   it('should use provided rng function', () => {
-    const rng = jest.fn(() => 0.5);
+    const rng = vi.fn(() => 0.5);
     mockGenerate.mockReturnValue('C');
     generateNonDuplicateLetter('he', rng, 'X', 2);
     expect(mockGenerate).toHaveBeenCalledWith('he', 1.0, rng);

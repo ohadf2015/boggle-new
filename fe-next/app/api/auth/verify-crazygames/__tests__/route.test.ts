@@ -24,10 +24,18 @@ vi.mock('@/utils/sentry', () => ({
   captureApiError: vi.fn(),
 }));
 
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: vi.fn(() => ({ success: true })),
+  rateLimitResponse: vi.fn(),
+}));
+
 import { POST } from '../route';
 
 function makeRequest(body: Record<string, unknown>) {
-  return { json: async () => body } as any;
+  return {
+    json: async () => body,
+    headers: { get: vi.fn().mockReturnValue(null) },
+  } as any;
 }
 
 describe('POST /api/auth/verify-crazygames', () => {

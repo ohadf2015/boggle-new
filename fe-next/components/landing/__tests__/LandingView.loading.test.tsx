@@ -258,8 +258,8 @@ describe('LandingView Loading State', () => {
     render(<LandingView />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByTestId('mode-card-landing.multiplayer')).toBeInTheDocument();
-      expect(screen.getByTestId('mode-card-landing.singlePlayer')).toBeInTheDocument();
+      expect(screen.getByTestId('mode-card-landing.arena')).toBeInTheDocument();
+      expect(screen.getByTestId('mode-card-landing.practice')).toBeInTheDocument();
     });
   });
 

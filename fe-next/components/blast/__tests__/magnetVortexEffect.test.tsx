@@ -114,7 +114,7 @@ describe('Magnet/Vortex Effect', () => {
       const button = container.querySelector('button');
       // jsdom strips radial-gradient() from style — verify purple via border color
       const styleAttr = button?.getAttribute('style') ?? '';
-      expect(styleAttr).toContain('139,0,255'); // #8B00FF in rgb
+      expect(styleAttr).toContain('139, 0, 255'); // #8B00FF in rgb (jsdom preserves spaces in rgba)
     });
   });
 });

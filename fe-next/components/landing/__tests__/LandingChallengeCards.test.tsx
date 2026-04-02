@@ -24,6 +24,9 @@ vi.mock('../ModeCard', () => {
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
+vi.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: () => true,
+}));
 vi.mock('@/components/daily/DailyChallengeBanner', () => {
   const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
@@ -43,10 +46,10 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards', () => {
-  it('renders multiplayer and single player cards', () => {
+  it('renders arena and practice cards', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByText('landing.multiplayer')).toBeInTheDocument();
-    expect(screen.getByText('landing.singlePlayer')).toBeInTheDocument();
+    expect(screen.getByText('landing.arena')).toBeInTheDocument();
+    expect(screen.getByText('landing.practice')).toBeInTheDocument();
   });
 
   it('renders adventure mode card', () => {

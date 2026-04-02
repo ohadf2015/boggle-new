@@ -8,9 +8,9 @@ import type { BlastTileState, BlastTileType } from '../types';
 import { computeGravityResult, countCleared } from '../utils/blastGravity';
 
 // Mock letter generator for deterministic tests
-jest.mock('../utils/blastLetterGenerator', () => ({
-  generateBlastLetter: jest.fn(() => 'X'),
-  rollSpecialType: jest.fn(() => 'standard' as const),
+vi.mock('../utils/blastLetterGenerator', () => ({
+  generateBlastLetter: vi.fn(() => 'X'),
+  rollSpecialType: vi.fn(() => 'standard' as const),
 }));
 
 function makeTileStates(

@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { BlastMoveCounter } from '../BlastMoveCounter';
 
 // Mock translation hook
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {

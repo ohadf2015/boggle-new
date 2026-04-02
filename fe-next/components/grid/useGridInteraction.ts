@@ -250,10 +250,12 @@ export function useGridInteraction({
     // Init drag ref + DOM class (no React re-render during drag)
     const cell = { row: rowIndex, col: colIndex, letter };
     dragSelectionRef.current = [cell];
+    // Sync to React state so submitWord/undoLastCell see the initial selection
+    setSelectedCells([cell]);
     clearAllDragClasses();
     toggleDragClass(rowIndex, colIndex, true);
     vibrateCellTap(fireRoundActive);
-  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass]);
+  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass, setSelectedCells]);
 
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);
@@ -290,7 +292,9 @@ export function useGridInteraction({
       const prevTier = getSelectionEscalation(0, dragCells.length, comboLevel).tier;
       const newTier = getSelectionEscalation(0, newCount, comboLevel).tier;
       const newCell = { row: currentCell.row, col: currentCell.col, letter: currentCell.letter };
-      dragSelectionRef.current = [...dragCells, newCell];
+      const newDragCells = [...dragCells, newCell];
+      dragSelectionRef.current = newDragCells;
+      setSelectedCells(newDragCells);
       toggleDragClass(currentCell.row, currentCell.col, true);
       if (newTier > prevTier) {
         vibrateTierTransition(newTier);
@@ -298,7 +302,7 @@ export function useGridInteraction({
         vibrateCellDrag(fireRoundActive, newTier);
       }
     }
-  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass]);
+  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
