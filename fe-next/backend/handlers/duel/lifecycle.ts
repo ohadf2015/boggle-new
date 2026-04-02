@@ -22,6 +22,7 @@ import { generateRandomTable } from '@/backend/utils/gameUtils';
 import { getSupabase } from '@/backend/modules/supabase/client';
 import { startRealtimeDuel } from './realtime';
 import logger from '@/backend/utils/logger';
+import { checkRateLimit } from '../../utils/rateLimiter';
 
 /**
  * Register duel lifecycle event handlers
@@ -36,6 +37,10 @@ export function registerLifecycleHandlers(
   // duel:create - Create a new duel challenge
   // ==========================================
   socket.on('duel:create', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = createDuelSchema.safeParse(data);
@@ -143,6 +148,10 @@ export function registerLifecycleHandlers(
   // duel:accept - Accept a duel challenge
   // ==========================================
   socket.on('duel:accept', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = acceptDuelSchema.safeParse(data);
@@ -255,6 +264,10 @@ export function registerLifecycleHandlers(
   // duel:decline - Decline a duel challenge
   // ==========================================
   socket.on('duel:decline', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = declineDuelSchema.safeParse(data);
@@ -347,6 +360,10 @@ export function registerLifecycleHandlers(
   // duel:cancel - Cancel a pending duel
   // ==========================================
   socket.on('duel:cancel', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = cancelDuelSchema.safeParse(data);

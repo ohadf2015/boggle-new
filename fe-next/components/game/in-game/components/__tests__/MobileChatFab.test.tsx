@@ -51,7 +51,7 @@ function renderWithSocket(ui: React.ReactElement, socket = createMockSocket()) {
     isConnected: true,
     connectionError: null,
     isReconnecting: false,
-    reconnectAttempt: 0,
+    getReconnectAttempt: () => 0,
     maxReconnectAttempts: 20,
     manualReconnect: vi.fn(),
   };

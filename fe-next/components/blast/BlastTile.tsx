@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
@@ -284,12 +285,33 @@ function getSelectionStyles(isSelected: boolean, selectionIndex?: number, select
   return { transform: `scale(${scale})` };
 }
 
+/**
+ * Strip glow/spread shadows (0 0 Xpx ...) from boxShadow for low-end devices.
+ * Keeps structural shadows: inset highlights, bottom-edge depth (Y offset > 0).
+ */
+function stripGlowShadows(boxShadow: string): string {
+  return boxShadow
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => {
+      // Keep inset shadows (structural highlights)
+      if (s.startsWith('inset')) return true;
+      // Parse: "Xpx Ypx ..." — keep if Y offset > 0 (bottom edge shadow)
+      const nums = s.match(/-?\d+/g);
+      if (nums && nums.length >= 2 && parseInt(nums[1]) > 0) return true;
+      // Drop glow shadows (0 0 Xpx rgba(...))
+      return false;
+    })
+    .join(', ');
+}
+
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
+  const { enableGlowEffects } = useDevicePerformance();
 
   if (isCleared) {
     return <div className="aspect-square opacity-0 pointer-events-none" aria-hidden="true" />;
@@ -313,7 +335,7 @@ export const BlastTile = memo(function BlastTile({
         'border-3 border-neo-black rounded-xl',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
         'transition-transform duration-100 select-none',
-        'active:translate-y-[2px] active:brightness-110',
+        'active:scale-95 active:translate-y-[2px] active:brightness-110',
         visual.bg,
         visual.text ?? 'text-neo-navy',
         type !== 'standard' ? `blast-tile-${type}` : '',
@@ -328,6 +350,9 @@ export const BlastTile = memo(function BlastTile({
       ].filter(Boolean).join(' ')}
       style={{
         ...(visual.style ?? {}),
+        ...(!enableGlowEffects && visual.style?.boxShadow && {
+          boxShadow: stripGlowShadows(visual.style.boxShadow as string),
+        }),
         ...phaseStyle,
         ...selectionStyle,
         ...(needsWillChange && { willChange: 'transform, opacity' }),

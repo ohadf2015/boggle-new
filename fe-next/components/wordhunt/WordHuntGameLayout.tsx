@@ -19,6 +19,7 @@ export interface WordHuntGameLayoutProps {
   // Header
   score: number;
   onQuit: () => void;
+  onShowHelp?: () => void;
 
   // Clue boxes
   targetLength: number;
@@ -71,6 +72,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   // Header
   score,
   onQuit,
+  onShowHelp,
 
   // Clue boxes
   targetLength,
@@ -125,6 +127,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         <WordHuntMPHeader
           score={score}
           onQuit={onQuit}
+          onShowHelp={onShowHelp}
           t={t}
         />
 
@@ -159,7 +162,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* Grid — fills remaining space, auto-scales to fit */}
-        <div className="flex-1 min-h-[40dvh] px-1 relative overflow-hidden">
+        <div className="flex-1 min-h-[40dvh] px-1 relative overflow-y-auto overflow-x-hidden">
           <SurvivalGridSection
             grid={grid}
             isGameOver={isGameOver}

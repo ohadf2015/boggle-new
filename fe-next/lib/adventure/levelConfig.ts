@@ -297,10 +297,10 @@ export function getLevelConfig(
 
   // Add boss twist mechanic for boss levels
   if (isBossLevel) {
+    config.showBossIntro = true;
     const bossConfig = getBossConfig(world);
     if (bossConfig) {
       config.bossTwist = bossConfig.twistMechanic.type;
-      config.showBossIntro = true;
     }
   }
 
@@ -549,6 +549,17 @@ export function generateObjectives(
     });
   }
 
+  // Collect gems objective (world 2+, even levels) — use gold tiles strategically
+  if (world >= 2 && level % 2 === 0 && level >= 4) {
+    // Gold tile count scales: 1-4 per level, ask player to collect 2-3
+    const target = Math.min(2 + Math.floor((world - 2) / 3), 3);
+    objectives.push({
+      type: OBJECTIVE_TYPES.COLLECT_GEMS as ObjectiveType,
+      target,
+      isPrimary: false,
+    });
+  }
+
   return objectives;
 }
 
@@ -659,6 +670,21 @@ export function generateSpecialTiles(
   if (world >= 5 && level >= 5) {
     // 1 rainbow tile, rare
     addTile(TILE_TYPES.RAINBOW as TileType);
+  }
+
+  // Time tiles: World 3+, level 2+ — strategic lifeline (+5s each)
+  if (world >= 3 && level >= 2) {
+    // 1 time tile, +1 for level 5+
+    const timeCount = level >= 5 ? 2 : 1;
+    for (let i = 0; i < timeCount; i++) {
+      addTile(TILE_TYPES.TIME as TileType);
+    }
+  }
+
+  // Chain tiles: World 4+, level 3+ — rewards combo play
+  if (world >= 4 && level >= 3) {
+    // 1 chain tile
+    addTile(TILE_TYPES.CHAIN as TileType);
   }
 
   return tiles;

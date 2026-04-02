@@ -43,7 +43,7 @@ export function SpectatorBanner({
       exit={{ y: -100, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className={cn(
-        'fixed top-0 inset-x-0 z-[60]',
+        'sticky top-0 inset-x-0 z-[60]',
         'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500',
         'text-white',
         'border-b-4 border-neo-black',

@@ -25,7 +25,7 @@ import {
   getGameRoom,
 } from '../utils/socketHelpers.js';
 
-import { clearGameTimer } from '../utils/timerManager.js';
+import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { resetRateLimit } from '../utils/rateLimiter.js';
 import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import { cleanupGameBots } from '../modules/botManager.js';
@@ -100,10 +100,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
 
   // Clear any existing host reconnection timeout to prevent double-fire
-  if (game.hostReconnectionTimeout) {
-    clearTimeout(game.hostReconnectionTimeout);
-    game.hostReconnectionTimeout = null;
-  }
+  timerManager.clearTimer(`hostReconnect:${gameCode}`);
 
   // Notify game start coordinator so ack sequence adjusts for the missing player
   const hostCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
@@ -129,34 +126,37 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   }
 
   // Try to find a new host from remaining connected players
-  const nextHost = getNextEligibleHost(gameCode, username);
+  // Retry up to 3 times in case candidates disconnect between selection and transfer
+  let hostTransferred = false;
+  const triedCandidates = new Set<string>();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const nextHost = getNextEligibleHost(gameCode, username);
+    if (!nextHost || triedCandidates.has(nextHost)) break;
+    triedCandidates.add(nextHost);
 
-  if (nextHost) {
-    // Transfer host to the next eligible player
     const transferResult = transferHost(gameCode, nextHost);
-
     if (transferResult.success) {
       logger.info('SOCKET', `Host transferred in game ${gameCode}: ${username} -> ${nextHost}`);
 
-      // Notify all players about the host transfer
       broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
         previousHost: username,
         newHost: nextHost,
         message: `${username} left. ${nextHost} is now the host.`
       });
 
-      // Update users list for all clients
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode) as GameUser[]
       });
 
-      // Update active rooms
       broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
-      return;
+      hostTransferred = true;
+      break;
     } else {
-      logger.warn('SOCKET', `Failed to transfer host in game ${gameCode}: ${transferResult.error}`);
+      logger.warn('SOCKET', `Failed to transfer host in game ${gameCode} to ${nextHost}: ${transferResult.error}, retrying...`);
     }
   }
+
+  if (hostTransferred) return;
 
   // No eligible player found for host transfer - use grace period before closing
   logger.info('SOCKET', `No eligible host found for game ${gameCode}, starting grace period`);
@@ -168,7 +168,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   });
 
   // Start grace period for host reconnection
-  game.hostReconnectionTimeout = setTimeout(() => {
+  timerManager.setTimeout(`hostReconnect:${gameCode}`, () => {
     try {
       const currentGame = getGame(gameCode);
       if (!currentGame) return;
@@ -274,7 +274,7 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
     });
 
     // Start player reconnection grace period
-    const reconnectionTimeout = setTimeout(() => {
+    timerManager.setTimeout(`reconnect:${gameCode}:${username}`, () => {
       try {
         const currentGame = getGame(gameCode);
         if (!currentGame) return;
@@ -314,9 +314,6 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
         logger.error('SOCKET', `Error in player reconnection timeout for ${username} in ${gameCode}: ${err.message}`);
       }
     }, PLAYER_RECONNECTION_GRACE_PERIOD);
-
-    // Store timeout reference for cancellation on reconnect
-    (game.users[username] as GameUserWithTimeout).reconnectionTimeout = reconnectionTimeout;
 
     logger.debug('SOCKET', `Started ${PLAYER_RECONNECTION_GRACE_PERIOD}ms reconnection timer for ${username} in game ${gameCode}`);
   }

@@ -32,8 +32,8 @@ import {
 // CONSTANTS
 // ==============================================
 
-/** Total duration in frames (6 seconds) */
-export const VICTORY_DURATION_FRAMES = 180;
+/** Total duration in frames (6 seconds) — canonical value in ./constants */
+export { VICTORY_DURATION_FRAMES } from './constants';
 
 /** Phase timing in frames */
 const PHASE_FRAMES = {

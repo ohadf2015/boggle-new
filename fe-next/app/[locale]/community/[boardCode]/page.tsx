@@ -1,13 +1,19 @@
-
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import BoardPlayPageClient from './PageClient';
 
-interface Props {
-  params: { boardCode: string; locale: string };
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; boardCode: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'communityBoard', path: '/community', locale });
 }
 
-export default function BoardPlayPage({ params }: Props) {
-  const { boardCode } = params;
+interface Props {
+  params: Promise<{ boardCode: string; locale: string }>;
+}
+
+export default async function BoardPlayPage({ params }: Props) {
+  const { boardCode } = await params;
   if (!boardCode) notFound();
   return <BoardPlayPageClient boardCode={boardCode} />;
 }

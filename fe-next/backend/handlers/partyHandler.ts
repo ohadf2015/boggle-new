@@ -27,6 +27,7 @@ import {
   submitRelayArtistDrawing,
   submitRelayBuilderDrawing,
   cleanupPixelClash,
+  type DrawingData,
 } from '../modules/party/pixelClashEngine.js';
 import {
   initShadowClash,
@@ -181,7 +182,8 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       const gameDef = PARTY_GAME_CONFIG[parsed.gameId];
 
       // Feature flag gate (bypass in development)
-      const authUserId = (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
+      const authUserId = (socket.data?.verifiedUserId as string) ||
+        (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
       const isDev = process.env.NODE_ENV === 'development';
       const hasAccess = isDev || await canAccessFeature(authUserId || null, 'party_games_alpha');
       if (!hasAccess) {
@@ -250,7 +252,8 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const authUserId = (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
+      const authUserId = (socket.data?.verifiedUserId as string) ||
+        (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
       const isDev = process.env.NODE_ENV === 'development';
       const hasAccess = isDev || await canAccessFeature(authUserId || null, 'party_games_alpha');
       if (!hasAccess) {
@@ -375,7 +378,7 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
         if (action === 'submit-prompt' && 'text' in parsed) {
           submitTelephonePrompt(io, room.roomCode, socket.id, parsed.text as string);
         } else if (action === 'draw' && 'strokes' in parsed) {
-          const strokes = parsed.strokes as any[];
+          const strokes = parsed.strokes as DrawingData;
           if ('chainId' in parsed) {
             submitTelephoneStep(io, room.roomCode, socket.id, parsed.chainId as string, strokes);
           } else if ('isRelay' in parsed && parsed.isRelay) {
@@ -388,7 +391,7 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
             submitShowdownCanvas(io, room.roomCode, socket.id, strokes);
           }
         } else if (action === 'live-stroke' && 'paths' in parsed) {
-          handleRelayLiveStroke(io, room.roomCode, socket.id, parsed.paths as any[]);
+          handleRelayLiveStroke(io, room.roomCode, socket.id, parsed.paths as DrawingData);
         } else if (action === 'guess' && 'text' in parsed && 'chainId' in parsed) {
           submitTelephoneStep(io, room.roomCode, socket.id, parsed.chainId as string, parsed.text as string);
         } else if (action === 'vote' && 'best' in parsed && 'funniest' in parsed) {

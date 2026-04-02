@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Tests for useAdventureXp hook
  *
@@ -247,6 +248,70 @@ describe('useAdventureXp', () => {
       // Should cap at max level
       expect(result.current.currentLevel).toBe(50);
       expect(result.current.xpProgress.isMaxLevel).toBe(true);
+    });
+  });
+
+  describe('beforeunload XP flush', () => {
+    const STORAGE_KEY = 'adventure_xp_pending';
+
+    beforeEach(() => {
+      sessionStorage.clear();
+    });
+
+    afterEach(() => {
+      sessionStorage.clear();
+    });
+
+    it('registers a beforeunload listener on mount', () => {
+      const spy = jest.spyOn(window, 'addEventListener');
+      renderHook(() => useAdventureXp({ userId: 'user-flush-1' }));
+      expect(spy).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+      spy.mockRestore();
+    });
+
+    it('removes the beforeunload listener on unmount', () => {
+      const spy = jest.spyOn(window, 'removeEventListener');
+      const { unmount } = renderHook(() =>
+        useAdventureXp({ userId: 'user-flush-2' })
+      );
+      unmount();
+      expect(spy).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+      spy.mockRestore();
+    });
+
+    it('writes pending XP update to sessionStorage on beforeunload', () => {
+      const { result } = renderHook(() =>
+        useAdventureXp({ userId: 'user-flush-3', initialXp: 0 })
+      );
+
+      act(() => {
+        result.current.awardXp(150);
+      });
+
+      // Verify pendingUpdate state is set (prerequisite)
+      expect(result.current.pendingUpdate).not.toBeNull();
+      expect(result.current.pendingUpdate?.totalXp).toBe(150);
+
+      // Dispatch the actual beforeunload event so the registered handler fires
+      window.dispatchEvent(new Event('beforeunload'));
+
+      const stored = sessionStorage.getItem(STORAGE_KEY);
+      // stored must be a JSON string (non-null, non-undefined, non-empty)
+      expect(stored).toBeTruthy();
+      const parsed = JSON.parse(stored as string);
+      expect(parsed.userId).toBe('user-flush-3');
+      expect(parsed.totalXp).toBe(150);
+    });
+
+    it('does not write to sessionStorage on beforeunload when no pending update', () => {
+      renderHook(() => useAdventureXp({ userId: 'user-flush-4', initialXp: 0 }));
+
+      // Dispatch the event — no pending update, so nothing should be written
+      window.dispatchEvent(new Event('beforeunload'));
+
+      // Use toBeFalsy to handle both null (jsdom spec-compliant) and
+      // undefined (happy-dom) — both indicate no data was written
+      expect(sessionStorage.getItem(STORAGE_KEY)).toBeFalsy();
     });
   });
 });

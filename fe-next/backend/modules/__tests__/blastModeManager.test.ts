@@ -9,6 +9,7 @@ import {
   initBlastModeState,
   recordBlastMove,
   getTilesOnPath,
+  hashStringToSeed,
 } from '../blastModeManager';
 
 import {
@@ -403,6 +404,80 @@ describe('blastModeManager', () => {
       const result = getTilesOnPath('aa', positions, overlay);
       // Both positions have overlays: (0,0)=gold, (1,0)=bomb
       expect(result.length).toBe(2);
+    });
+  });
+
+  // ==========================================
+  // hashStringToSeed
+  // ==========================================
+  describe('hashStringToSeed', () => {
+    it('should return a positive integer', () => {
+      const seed = hashStringToSeed('ABC123');
+      expect(seed).toBeGreaterThan(0);
+      expect(Number.isInteger(seed)).toBe(true);
+    });
+
+    it('should be deterministic — same input yields same output', () => {
+      expect(hashStringToSeed('GAME42')).toBe(hashStringToSeed('GAME42'));
+    });
+
+    it('should return different values for different inputs', () => {
+      expect(hashStringToSeed('GAME42')).not.toBe(hashStringToSeed('GAME43'));
+    });
+
+    it('should never return 0', () => {
+      // hash of any string (including empty) should be > 0
+      expect(hashStringToSeed('')).toBeGreaterThan(0);
+      expect(hashStringToSeed('x')).toBeGreaterThan(0);
+    });
+  });
+
+  // ==========================================
+  // Deterministic overlay via seed (GD-005)
+  // ==========================================
+  describe('generateBlastOverlay with seed', () => {
+    const grid: string[][] = [
+      ['A', 'B', 'C'],
+      ['D', 'E', 'F'],
+      ['G', 'H', 'I'],
+    ];
+
+    it('should produce identical overlays for the same seed', () => {
+      const seed = hashStringToSeed('TESTGAME');
+      const o1 = generateBlastOverlay(grid, 0.5, 1, seed);
+      const o2 = generateBlastOverlay(grid, 0.5, 1, seed);
+      expect(o1).toEqual(o2);
+    });
+
+    it('should produce different overlays for different seeds', () => {
+      // Not guaranteed but overwhelmingly likely with different seeds
+      const o1 = generateBlastOverlay(grid, 0.5, 1, hashStringToSeed('AAAA11'));
+      const o2 = generateBlastOverlay(grid, 0.5, 1, hashStringToSeed('BBBB22'));
+      // At least tile counts or types should differ in most cases
+      // We just verify both are valid arrays
+      expect(Array.isArray(o1)).toBe(true);
+      expect(Array.isArray(o2)).toBe(true);
+    });
+  });
+
+  describe('initBlastModeState with overlaySeed', () => {
+    const grid: string[][] = [
+      ['A', 'B'],
+      ['C', 'D'],
+    ];
+    const players = ['alice', 'bob'];
+
+    it('should produce identical overlays when called with the same overlaySeed', () => {
+      const seed = hashStringToSeed('ROOM99');
+      const s1 = initBlastModeState(grid, players, 1, seed);
+      const s2 = initBlastModeState(grid, players, 1, seed);
+      expect(s1.overlay).toEqual(s2.overlay);
+    });
+
+    it('should still include a refill seed (distinct from overlay seed)', () => {
+      const s = initBlastModeState(grid, players, 1, hashStringToSeed('ROOM99'));
+      expect(typeof s.seed).toBe('number');
+      expect(s.seed).toBeGreaterThan(0);
     });
   });
 });

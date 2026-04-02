@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // Default thresholds for happyTime trigger — CrazyGames requires these for
@@ -142,15 +142,21 @@ export function useCrazyGamesLifecycle({
   const comboThreshold = thresholds.combo ?? DEFAULT_COMBO_THRESHOLD;
   const wordsThreshold = thresholds.wordsFound ?? DEFAULT_WORDS_THRESHOLD;
 
-  // Track if we've triggered events to prevent duplicates
+  // Track if we've triggered events to prevent duplicates.
+  // Refs are used for synchronous reads within effects; state mirrors drive re-renders.
   const hasStartedRef = useRef(false);
   const hasEndedRef = useRef(false);
   const hasTriggeredHappyTimeRef = useRef(false);
-  const lastHappyTimeRef = useRef(0); // Timestamp of last happyTime trigger
+  const lastHappyTimeRef = useRef(0);
   const lastScoreRef = useRef(0);
   const lastMaxComboRef = useRef(0);
   const lastWordsFoundRef = useRef(0);
-  const isPlayingRef = useRef(false); // Track if gameplay is active (not paused by visibility)
+  const isPlayingRef = useRef(false);
+
+  // State mirrors so consumers get re-renders
+  const [hasStarted, setHasStarted] = useState(false);
+  const [hasEnded, setHasEnded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Throttled happyTime trigger (max once per 30 seconds per CrazyGames recommendation)
   const triggerHappyTimeInternal = useCallback(() => {
@@ -217,6 +223,9 @@ export function useCrazyGamesLifecycle({
       hasEndedRef.current = false;
       hasTriggeredHappyTimeRef.current = false;
       isPlayingRef.current = true;
+      setHasStarted(true);
+      setHasEnded(false);
+      setIsPlaying(true);
       // Snapshot current values so only future changes trigger happyTime
       lastScoreRef.current = score;
       lastMaxComboRef.current = maxCombo;
@@ -236,6 +245,8 @@ export function useCrazyGamesLifecycle({
     if (isGameOver && hasStartedRef.current && !hasEndedRef.current) {
       hasEndedRef.current = true;
       isPlayingRef.current = false;
+      setHasEnded(true);
+      setIsPlaying(false);
       gameplayStop();
       onGameplayStop?.();
 
@@ -313,6 +324,7 @@ export function useCrazyGamesLifecycle({
     return () => {
       if (hasStartedRef.current && !hasEndedRef.current) {
         isPlayingRef.current = false;
+        // Note: setState in cleanup won't cause re-render (component is unmounting)
         gameplayStop();
         onGameplayStop?.();
 
@@ -326,9 +338,9 @@ export function useCrazyGamesLifecycle({
   return {
     isAvailable,
     isOnCrazyGamesPlatform,
-    hasStarted: hasStartedRef.current,
-    hasEnded: hasEndedRef.current,
-    isPlaying: isPlayingRef.current,
+    hasStarted,
+    hasEnded,
+    isPlaying,
     triggerHappyTime,
     showMidgameAd,
   };

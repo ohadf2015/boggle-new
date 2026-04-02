@@ -32,19 +32,20 @@ describe('WaveConfig movesAllowed', () => {
     expect(getWaveConfig(3).movesAllowed).toBe(17);
   });
 
-  it('wave 4 allows 15 moves', () => {
-    expect(getWaveConfig(4).movesAllowed).toBe(15);
+  it('wave 4 allows 16 moves', () => {
+    expect(getWaveConfig(4).movesAllowed).toBe(16);
   });
 
-  it('wave 5 allows 14 moves', () => {
-    expect(getWaveConfig(5).movesAllowed).toBe(14);
+  it('wave 5 allows 15 moves', () => {
+    expect(getWaveConfig(5).movesAllowed).toBe(15);
   });
 
-  it('wave 6+ allows 12 moves', () => {
-    expect(getWaveConfig(6).movesAllowed).toBe(12);
+  it('wave 6 allows 14 moves', () => {
+    expect(getWaveConfig(6).movesAllowed).toBe(14);
   });
 
-  it('wave 10 (beyond 6) still uses 12 moves', () => {
+  it('wave 7+ allows 12 moves', () => {
+    expect(getWaveConfig(7).movesAllowed).toBe(12);
     expect(getWaveConfig(10).movesAllowed).toBe(12);
   });
 });

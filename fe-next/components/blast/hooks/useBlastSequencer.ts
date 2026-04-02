@@ -54,10 +54,21 @@ export const ANIM_TIMING = {
 
 // ==================== Helpers ====================
 
+/**
+ * Frame-aligned wait — setTimeout for the duration, then resolve on the next
+ * requestAnimationFrame so the subsequent setState lands at paint time.
+ * Falls back to pure setTimeout in non-browser environments.
+ */
 function wait(ms: number, timers: ReturnType<typeof setTimeout>[]): Promise<void> {
   if (ms <= 0) return Promise.resolve();
   return new Promise((resolve) => {
-    const id = setTimeout(resolve, ms);
+    const id = setTimeout(() => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => resolve());
+      } else {
+        resolve();
+      }
+    }, ms);
     timers.push(id);
   });
 }
@@ -75,6 +86,9 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
   const [state, setState] = useState<SequencerState>(INITIAL_STATE);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const mountedRef = useRef(true);
+  // Working state ref — mutations happen here; only committed to React state
+  // when the phase changes (i.e. when the UI actually needs to re-render).
+  const workingRef = useRef<SequencerState>(INITIAL_STATE);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -85,8 +99,10 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
     };
   }, []);
 
-  const safeSet = useCallback((updater: (prev: SequencerState) => SequencerState) => {
-    if (mountedRef.current) setState(updater);
+  /** Commit working state to React — only triggers re-render if phase changed */
+  const commit = useCallback((next: SequencerState) => {
+    workingRef.current = next;
+    if (mountedRef.current) setState(next);
   }, []);
 
   const animateWordClear = useCallback(async (
@@ -97,7 +113,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
     }));
 
     // Phase 1: Anticipation
-    safeSet(() => ({ phase: 'anticipation', activeTiles: tiles, isAnimating: true, chainLevel: 0 }));
+    commit({ phase: 'anticipation', activeTiles: tiles, isAnimating: true, chainLevel: 0 });
     await wait(ANIM_TIMING.anticipation, timersRef.current);
 
     // Phase 2: Clearing (with random rotation per tile)
@@ -106,13 +122,13 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
       phase: 'clearing' as AnimPhase,
       clearRotate: Math.round((Math.random() - 0.5) * 24), // -12 to 12 degrees
     }));
-    safeSet((s) => ({ ...s, phase: 'clearing', activeTiles: clearTiles }));
+    commit({ ...workingRef.current, phase: 'clearing', activeTiles: clearTiles });
     const clearDur = ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * clearedTiles.length;
     await wait(clearDur, timersRef.current);
 
     // Done — caller runs cascade next
-    safeSet((s) => ({ ...s, phase: 'idle', activeTiles: [], isAnimating: false }));
-  }, [safeSet]);
+    commit({ ...workingRef.current, phase: 'idle', activeTiles: [], isAnimating: false });
+  }, [commit]);
 
   const animateCascade = useCallback(async (
     gravity: GravityResult,
@@ -120,14 +136,18 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
   ): Promise<void> => {
     const speed = ANIM_TIMING.chainSpeedFn(chainLevel);
 
+    // Phase 0: Anticipation beat — brief dramatic pause before cascade resolves
+    if (gravity.clearedTiles.length > 0 && chainLevel >= 1) {
+      commit({ phase: 'anticipation', activeTiles: [], isAnimating: true, chainLevel });
+      await wait(ANIM_TIMING.chainPause * 2 * speed, timersRef.current);
+    }
+
     // Phase 1: Clear cascade-matched tiles
     if (gravity.clearedTiles.length > 0) {
       const clearTiles: TileAnimState[] = gravity.clearedTiles.map((t) => ({
         row: t.row, col: t.col, phase: 'clearing' as AnimPhase,
       }));
-      safeSet(() => ({
-        phase: 'clearing', activeTiles: clearTiles, isAnimating: true, chainLevel,
-      }));
+      commit({ phase: 'clearing', activeTiles: clearTiles, isAnimating: true, chainLevel });
       const clearDur = (ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * gravity.clearedTiles.length) * speed;
       await wait(clearDur, timersRef.current);
       await wait(ANIM_TIMING.pauseAfterClear * speed, timersRef.current);
@@ -139,7 +159,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         row: t.row, col: t.col, phase: 'falling' as AnimPhase,
         fallDistance: t.fallDistance, column: t.col,
       }));
-      safeSet((s) => ({ ...s, phase: 'falling', activeTiles: fallTiles, chainLevel }));
+      commit({ ...workingRef.current, phase: 'falling', activeTiles: fallTiles, chainLevel });
       const maxFall = gravity.fallingTiles.reduce((m, t) => Math.max(m, t.fallDistance), 0);
       const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall + ANIM_TIMING.landBounce) * speed;
       await wait(fallDur, timersRef.current);
@@ -151,22 +171,23 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         row: t.row, col: t.col, phase: 'appearing' as AnimPhase,
         spawnOffset: t.spawnOffset, column: t.col,
       }));
-      safeSet((s) => ({ ...s, phase: 'appearing', activeTiles: appearTiles, chainLevel }));
+      commit({ ...workingRef.current, phase: 'appearing', activeTiles: appearTiles, chainLevel });
       const appearDur = (ANIM_TIMING.appearBase + ANIM_TIMING.appearStagger * gravity.newTiles.length) * speed;
       await wait(appearDur, timersRef.current);
     }
 
     // Phase 4: Chain pause
-    safeSet((s) => ({ ...s, phase: 'chain_pause', activeTiles: [], chainLevel }));
+    commit({ ...workingRef.current, phase: 'chain_pause', activeTiles: [], chainLevel });
     await wait(ANIM_TIMING.chainPause * speed, timersRef.current);
 
     // Done
-    safeSet(() => INITIAL_STATE);
-  }, [safeSet]);
+    commit(INITIAL_STATE);
+  }, [commit]);
 
   const reset = useCallback(() => {
     for (const t of timersRef.current) clearTimeout(t);
     timersRef.current = [];
+    workingRef.current = INITIAL_STATE;
     setState(INITIAL_STATE);
   }, []);
 

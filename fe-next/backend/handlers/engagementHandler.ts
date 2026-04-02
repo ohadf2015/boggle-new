@@ -19,7 +19,6 @@ import type {
 } from '@/shared/types';
 
 import {
-  generateDailyChallenges,
   updateChallengeProgress,
   claimChallengeReward,
   getTodaysChallenges,
@@ -28,7 +27,6 @@ import {
 
 import {
   recordLogin,
-  getStreakXpMultiplier,
   getCalendarStatus,
   claimCalendarReward,
   checkComebackBonus,
@@ -137,6 +135,25 @@ interface ChallengeStatsType {
 }
 
 /**
+ * Transform a database challenge record to the client DailyChallenge format.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformDbChallenge(c: any): DailyChallenge {
+  return {
+    id: (c.id as string) || '',
+    type: c.challenge_type as DailyChallenge['type'],
+    title: c.title as string,
+    description: c.description as string,
+    target: c.target_value as number,
+    current: c.current_value as number,
+    tier: c.challenge_tier as DailyChallenge['tier'],
+    xpReward: c.xp_reward as number,
+    completed: c.completed as boolean,
+    claimed: c.claimed as boolean,
+  };
+}
+
+/**
  * Register engagement socket event handlers
  * @param io - Socket.IO server instance
  * @param socket - Socket.IO socket instance
@@ -162,19 +179,7 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
 
     try {
       const dbChallenges = await getTodaysChallenges(playerId);
-      // Transform database format to client format
-      const challenges: DailyChallenge[] = dbChallenges.map(c => ({
-        id: c.id || '',
-        type: c.challenge_type,
-        title: c.title,
-        description: c.description,
-        target: c.target_value,
-        current: c.current_value,
-        tier: c.challenge_tier,
-        xpReward: c.xp_reward,
-        completed: c.completed,
-        claimed: c.claimed,
-      }));
+      const challenges = dbChallenges.map(transformDbChallenge);
       safeEmit(socket, 'engagement:dailyChallenges', { challenges });
       logger.debug('ENGAGEMENT', `Sent daily challenges to ${playerId}`);
     } catch (error: unknown) {
@@ -453,19 +458,7 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
       const dbChallenges = await getTodaysChallenges(playerId);
       const stats = await getChallengeStats(playerId);
 
-      // Transform database format to client format
-      const dailyChallenges: DailyChallenge[] = dbChallenges.map(c => ({
-        id: c.id || '',
-        type: c.challenge_type,
-        title: c.title,
-        description: c.description,
-        target: c.target_value,
-        current: c.current_value,
-        tier: c.challenge_tier,
-        xpReward: c.xp_reward,
-        completed: c.completed,
-        claimed: c.claimed,
-      }));
+      const dailyChallenges = dbChallenges.map(transformDbChallenge);
 
       safeEmit(socket, 'engagement:status', {
         ...status,

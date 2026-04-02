@@ -5,13 +5,14 @@
  * Accessible from adventure mode navigation.
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { SkillTreePageClient } from './SkillTreePageClient';
 
-export const metadata: Metadata = {
-  title: 'Skill Tree | LexiClash Adventure',
-  description: 'Unlock skills to enhance your adventure gameplay',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'adventureSkills', path: '/adventure/skills', locale });
+}
 
 export default function SkillTreePage() {
   return <SkillTreePageClient />;

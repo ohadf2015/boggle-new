@@ -274,6 +274,66 @@ const es = {
       "description": "Ver perfiles de jugadores, estadisticas, logros e historial de partidas en LexiClash.",
       "ogTitle": "Perfil de Jugador - LexiClash",
       "ogDescription": "Ver estadisticas, logros e historial de partidas."
+    },
+    "partyJoin": {
+      "title": "Únete a un juego de fiesta — Ingresa el código y juega al instante",
+      "description": "Únete a un juego de fiesta LexiClash con un código de sala. Toma tu teléfono, ingresa el código en pantalla y salta a batallas de palabras con amigos.",
+      "ogTitle": "Únete al juego de fiesta LexiClash",
+      "ogDescription": "¡Ingresa un código de sala y únete a la batalla de palabras!"
+    },
+    "partyHost": {
+      "title": "Organiza un juego de fiesta — Batallas de palabras en pantalla grande",
+      "description": "Organiza un juego de fiesta LexiClash en la pantalla grande. Muestra el juego en la TV, los amigos se unen desde sus teléfonos.",
+      "ogTitle": "Organiza un juego de fiesta LexiClash",
+      "ogDescription": "¡Batallas de palabras en pantalla grande — los amigos se unen desde sus teléfonos!"
+    },
+    "partyPlay": {
+      "title": "Juego de fiesta — Juega desde tu teléfono",
+      "description": "Juega juegos de fiesta LexiClash desde tu teléfono. Envía palabras, vota por subtítulos y compite en tiempo real.",
+      "ogTitle": "Juega juego de fiesta LexiClash",
+      "ogDescription": "¡Juega juegos de palabras de fiesta desde tu teléfono en tiempo real!"
+    },
+    "educationHub": {
+      "title": "Centro educativo — Juegos de palabras para aulas y profesores",
+      "description": "¡Usa LexiClash en tu aula! Crea lecciones de juegos de palabras, rastrea el vocabulario de los estudiantes y haz que el aprendizaje sea divertido.",
+      "ogTitle": "Centro educativo LexiClash",
+      "ogDescription": "¡Juegos de palabras para aulas — crea lecciones, rastrea progreso!"
+    },
+    "educationDuels": {
+      "title": "Duelos de vocabulario — Estudiante contra estudiante",
+      "description": "¡Desafía a tus compañeros a duelos de vocabulario! Batallas de palabras 1v1 en tiempo real que prueban ortografía y pensamiento rápido.",
+      "ogTitle": "Duelos de vocabulario - LexiClash educación",
+      "ogDescription": "¡Batallas de palabras 1v1 para practicar vocabulario!"
+    },
+    "communityBoard": {
+      "title": "Puzzle comunitario — Tablero de palabras creado por jugadores",
+      "description": "Juega un puzzle de palabras creado por la comunidad en LexiClash. Resuelve tableros creados por jugadores y compite por la puntuación más alta.",
+      "ogTitle": "Puzzle comunitario - LexiClash",
+      "ogDescription": "¡Juega y compite en puzzles de palabras creados por jugadores!"
+    },
+    "adventureBossRush": {
+      "title": "Boss Rush — Lucha contra 5 jefes seguidos",
+      "description": "Enfréntate a 5 jefes de palabras seguidos con la salud que se mantiene entre combates. Derrota a todos para oro extra y recompensas exclusivas.",
+      "ogTitle": "Boss Rush - LexiClash aventura",
+      "ogDescription": "¡Lucha contra 5 jefes de palabras seguidos — la salud se mantiene. ¿Puedes con todos?"
+    },
+    "adventureEndless": {
+      "title": "Modo infinito — Pisos de palabras procedurales con dificultad creciente",
+      "description": "¿Hasta dónde puedes llegar? Puzzles de palabras generados proceduralmente con dificultad creciente. Cada piso más difícil que el anterior.",
+      "ogTitle": "Modo infinito - LexiClash aventura",
+      "ogDescription": "¡Pisos de palabras infinitos — qué tan profundo puedes llegar?"
+    },
+    "adventureSkills": {
+      "title": "Árbol de habilidades — Desbloquea poderes de palabras de aventura",
+      "description": "Desbloquea y mejora habilidades para tu aventura en LexiClash. Elige tu build y personaliza tu estrategia.",
+      "ogTitle": "Árbol de habilidades - LexiClash aventura",
+      "ogDescription": "¡Desbloquea habilidades y personaliza tu build de aventura!"
+    },
+    "adventureAchievements": {
+      "title": "Logros de aventura — Rastrea tu progreso y hitos",
+      "description": "Ve todos tus logros de aventura LexiClash, hitos y progreso. Consulta desafíos completados y victorias contra jefes.",
+      "ogTitle": "Logros de aventura - LexiClash",
+      "ogDescription": "Rastrea hitos, victorias contra jefes y progreso de logros."
     }
   },
   "cookieConsent": {
@@ -1066,14 +1126,19 @@ const es = {
       "joinRoomAction": "Unirse a {{roomName}}",
       "availableRooms": "Salas disponibles",
       "roomsListLabel": "Lista de salas disponibles",
-      "linkCopied": "Enlace de invitación copiado — ¡envíalo a tus amigos!"
+      "linkCopied": "Enlace de invitación copiado — ¡envíalo a tus amigos!",
+      "fetchTimeout": "No se pudieron cargar las salas. Comprueba tu conexión.",
+      "retry": "Reintentar"
     },
     "joinModal": {
       "title": "Únete al combate",
       "yourName": "Me dicen...",
       "namePlaceholder": "Tu nombre de batalla",
       "joinButton": "¡Vamos!",
-      "joining": "Entrando..."
+      "joining": "Entrando...",
+      "roomFull": "La sala está llena",
+      "roomFullSpectate": "La sala está llena. Puedes ser espectador.",
+      "spectateButton": "Espectador"
     },
     "createModal": {
       "title": "Arma tu batalla",
@@ -4102,6 +4167,10 @@ const es = {
     "multiPlayer": "Multijugador",
     "multiplayer": "Multijugador",
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
+    "arena": "Arena de Palabras",
+    "arenaDesc": "¡Juega solo o desafía amigos!",
+    "practice": "Práctica",
+    "practiceDesc": "Sin presión, solo palabras",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
@@ -9636,6 +9705,7 @@ const es = {
     goToPanel: "Ir a regla {{panel}}",
     gotIt: "¡Entendido!",
     skip: "Saltar",
+    quickTipsTitle: "Consejos rápidos",
   },
   wordHuntNudge: {
     lifeDrop: "¡Desliza palabras en el tablero para curarte! Cada palabra restaura vida.",

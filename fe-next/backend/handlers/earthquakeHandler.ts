@@ -13,7 +13,8 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, LetterGrid, Language, DifficultyLevel, GridPosition } from '@/shared/types';
+import type { LetterGrid, Language, DifficultyLevel, GridPosition } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
 import {
   getGame,
@@ -125,8 +126,7 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
     logger.info('EARTHQUAKE', `Host triggered earthquake for game ${gameCode} (triggerTime: ${triggerTime}s remaining)`);
 
     // Execute earthquake sequence
-    // Type assertion needed: GameState and Game have slightly different type definitions
-    executeEarthquakeSequence(io, gameCode, game as unknown as Game);
+    executeEarthquakeSequence(io, gameCode, game);
   });
 }
 
@@ -136,14 +136,14 @@ function registerEarthquakeHandlers(io: Server, socket: Socket): void {
  * @param gameCode - Game code
  * @param game - Game object
  */
-function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): void {
+function executeEarthquakeSequence(io: Server, gameCode: string, game: GameState): void {
   const room = getGameRoom(gameCode);
 
   logger.info('EARTHQUAKE', `Starting earthquake sequence for game ${gameCode}`);
 
   // Phase 1: WARNING (immediate broadcast)
   broadcastToRoom(io, room, 'earthquakeWarning', {
-    gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
+    gameSessionId: game.gameSessionId,
     timestamp: Date.now(),
   });
 
@@ -151,8 +151,14 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
   // Phase 2: SHAKE (after 2 seconds)
   timerManager.setTimeout(`earthquake:${gameCode}:shake`, () => {
+    const currentGame = getGame(gameCode);
+    if (!currentGame || currentGame.gameState !== 'in-progress') {
+      clearEarthquakeTimers(gameCode);
+      return;
+    }
+
     broadcastToRoom(io, room, 'earthquakeShake', {
-      gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
+      gameSessionId: currentGame.gameSessionId,
     });
 
     logger.debug('EARTHQUAKE', `Game ${gameCode}: SHAKE phase`);
@@ -160,11 +166,17 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
   // Phase 3: FIRE ROUND START (after 3 seconds = 2s warning + 1s shake)
   timerManager.setTimeout(`earthquake:${gameCode}:fireStart`, () => {
+    const currentGame = getGame(gameCode);
+    if (!currentGame || currentGame.gameState !== 'in-progress') {
+      clearEarthquakeTimers(gameCode);
+      return;
+    }
+
     try {
-      // Generate new grid based on game settings
-      const difficulty = game.difficulty || 'MEDIUM';
+      // Generate new grid based on fresh game settings
+      const difficulty = currentGame.difficulty || 'MEDIUM';
       const difficultyConfig: DifficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
-      const language = game.language || 'en';
+      const language = currentGame.language || 'en';
 
       // Generate new grid with embedded words
       const newGrid: LetterGrid = generateRandomTable(
@@ -187,7 +199,7 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
       // Broadcast fire round start with new grid
       broadcastToRoom(io, room, 'fireRoundStart', {
-        gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
+        gameSessionId: currentGame.gameSessionId,
         grid: newGrid,
         duration: EARTHQUAKE_CONFIG.fireRoundDurationSeconds,
       });
@@ -201,11 +213,17 @@ function executeEarthquakeSequence(io: Server, gameCode: string, game: Game): vo
 
   // Phase 4: FIRE ROUND END (after 18 seconds = 3s + 15s fire round)
   timerManager.setTimeout(`earthquake:${gameCode}:fireEnd`, () => {
+    const currentGame = getGame(gameCode);
+    if (!currentGame || currentGame.gameState !== 'in-progress') {
+      clearEarthquakeTimers(gameCode);
+      return;
+    }
+
     // Mark fire round inactive in server game state
     updateGame(gameCode, { fireRoundActive: false });
 
     broadcastToRoom(io, room, 'fireRoundEnd', {
-      gameSessionId: (game as Game & { gameSessionId?: string }).gameSessionId,
+      gameSessionId: currentGame.gameSessionId,
     });
 
     logger.info('EARTHQUAKE', `Game ${gameCode}: FIRE ROUND ended`);

@@ -36,6 +36,7 @@ import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAdventureKeyboardShortcuts } from './hooks/useAdventureKeyboardShortcuts';
 import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXAndAnalytics';
+import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig, TileState, GridTileState } from '@/types/adventure';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
@@ -202,6 +203,16 @@ const AdventureGame = memo<AdventureGameProps>(
       isPlaying, timeRemaining, wordsFoundLength: gameState.wordsFound.length,
       prevWordsFoundLen, comboCount: gameState.comboCount,
       sfx: { setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound },
+    });
+    // In-game music: AdventureGame owns this so timer-driven track switches
+    // never cause AdventureView to re-render.
+    useAdventureMusic({
+      worldNumber: levelConfig.world,
+      isPlaying: isPlaying && entryPhase === 'playing' && !isPaused,
+      isPaused,
+      timeRemaining,
+      totalTime: init.adjustedLevelConfig.timerSeconds,
+      enabled: true,
     });
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,
@@ -604,7 +615,7 @@ const AdventureGame = memo<AdventureGameProps>(
               worldUnlockProps={cinematics.worldUnlockProps}
               timeRemaining={timeRemaining} t={t}
               showLootChest={showLootChest} lootDrops={levelCompletion.lootDrops}
-              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt} previousBestStars={previousBestStars}
+              objectives={objectives} totalStars={totalStars} bestAttempt={bestAttempt ?? null} previousBestStars={previousBestStars}
               earnedXp={levelCompletion.earnedXp} earnedGold={levelCompletion.earnedGold}
               isLastLevelOfWorld={levelConfig.level === LEVELS_PER_WORLD} onNextWorld={onNextWorld}
               saveFailed={levelCompletion.completionSaveFailedRef?.current && showLevelComplete}

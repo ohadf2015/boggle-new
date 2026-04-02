@@ -56,6 +56,12 @@ export async function generatePageMetadata({
   const baseSeo = t?.seo || enT.seo;
   const fullPath = `/${locale}${path}`;
 
+  const ogImageMap: Record<string, string> = {
+    en: 'og-image-en.webp', he: 'og-image-he.webp',
+    sv: 'og-image-sv.webp', ja: 'og-image-ja.webp', es: 'og-image-es.webp',
+  };
+  const ogImage = `https://www.lexiclash.live/${ogImageMap[validLocale] || 'og-image-en.webp'}`;
+
   const alternateLanguages: Record<string, string> = {
     'x-default': `${BASE_URL}/en${path}`,
   };
@@ -85,7 +91,7 @@ export async function generatePageMetadata({
       siteName: 'LexiClash',
       images: [
         {
-          url: 'https://www.lexiclash.live/lexiclash.jpg',
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Multiplayer Word Game',
@@ -96,7 +102,7 @@ export async function generatePageMetadata({
       card: 'summary_large_image',
       title: seo.ogTitle || seo.title,
       description: seo.ogDescription || seo.description,
-      images: ['https://www.lexiclash.live/lexiclash.jpg'],
+      images: [ogImage],
     },
     alternates: {
       canonical: `${BASE_URL}${fullPath}`,

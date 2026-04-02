@@ -3,6 +3,7 @@
  * Socket handler for social gifting (send/receive gifts between players).
  */
 
+import { z } from 'zod';
 import type { Server, Socket } from 'socket.io';
 import {
   canSendGift,
@@ -17,10 +18,16 @@ import { areFriends, isBlocked } from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { notifyGiftReceived } from '../modules/pushNotificationTriggers';
 import logger from '../utils/logger';
+import { validatePayload } from '../utils/socketValidation.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
 
 // In-memory dedup: prevent double-click double-spend within 5s window
 const recentGifts = new Map<string, number>();
 const GIFT_DEDUP_WINDOW_MS = 5000;
+
+// Per-sender in-flight lock: prevents TOCTOU on daily limit check
+// by ensuring only one gift operation per sender at a time
+const sendersInFlight = new Set<string>();
 
 function isDuplicateGift(senderId: string, recipientId: string, giftType: string): boolean {
   const key = `${senderId}:${recipientId}:${giftType}`;
@@ -50,6 +57,12 @@ interface GiftSendParams {
   amount?: number;
 }
 
+const giftSendSchema = z.object({
+  recipientId: z.string().min(1),
+  giftType: z.enum(['hints', 'streak_freeze', 'coins']),
+  amount: z.number().int().positive().optional(),
+});
+
 interface GiftResult {
   success: boolean;
   error?: string;
@@ -68,6 +81,25 @@ export async function handleGiftSend(
     return { success: false, error: 'Must be authenticated to send gifts' };
   }
 
+  // Per-sender lock: only one gift operation at a time to prevent TOCTOU on daily limit
+  if (sendersInFlight.has(senderId)) {
+    return { success: false, error: 'Gift already processing, please wait' };
+  }
+  sendersInFlight.add(senderId);
+
+  try {
+    return await handleGiftSendInner(senderId, params, socket, io);
+  } finally {
+    sendersInFlight.delete(senderId);
+  }
+}
+
+async function handleGiftSendInner(
+  senderId: string,
+  params: GiftSendParams,
+  socket: Socket,
+  io: Server
+): Promise<GiftResult> {
   // Dedup: reject rapid duplicate gifts (same sender→recipient→type within 5s)
   if (isDuplicateGift(senderId, params.recipientId, params.giftType)) {
     return { success: false, error: 'Gift already processing, please wait' };
@@ -188,7 +220,17 @@ export async function handleGiftSend(
 export function registerGiftHandlers(io: Server, socket: Socket): void {
   socket.on('gift:send', async (data: GiftSendParams) => {
     try {
-      const result = await handleGiftSend(socket, io, data);
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('gift:sendResult', { success: false, error: 'Too many requests' });
+        return;
+      }
+      const validation = validatePayload(giftSendSchema, data);
+      if (!validation.success) {
+        socket.emit('gift:sendResult', { success: false, error: `Invalid request: ${validation.error}` });
+        return;
+      }
+      const validatedData = validation.data as GiftSendParams;
+      const result = await handleGiftSend(socket, io, validatedData);
       socket.emit('gift:sendResult', result);
     } catch (error: unknown) {
       const err = error as Error;

@@ -164,6 +164,14 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     }
   }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime, bossMechanics]);
 
+  // Player death → defeat: when player HP reaches 0 during an active boss fight,
+  // trigger defeat. Without this, the player could continue playing at 0 HP.
+  useEffect(() => {
+    if (bossIsActive && playerHealth.healthState.currentHP === 0) {
+      bossEndBattle('defeat');
+    }
+  }, [bossIsActive, playerHealth.healthState.currentHP, bossEndBattle]);
+
   // Low health taunt (replaces low-time taunt since boss fights are untimed)
   const lowHealthTriggedRef = useRef(false);
   useEffect(() => {

@@ -74,45 +74,50 @@ const emptyStateVariants = {
 
 const MODE_CONFIG: Record<string, {
   icon: typeof Sword;
-  label: string;
   borderColor: string;
   iconBg: string;
   iconColor: string;
   textColor: string;
+  labelKey: string;
+  descKey: string;
 }> = {
   classic: {
     icon: Sword,
-    label: 'Classic',
     borderColor: 'border-s-neo-cyan',
     iconBg: 'bg-neo-cyan',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-cyan',
+    labelKey: 'classroom.gameModes.classic',
+    descKey: 'gameModes.classic.description',
   },
   blast: {
     icon: Bomb,
-    label: 'Blast',
     borderColor: 'border-s-neo-pink',
     iconBg: 'bg-neo-pink',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-pink',
+    labelKey: 'classroom.gameModes.blast',
+    descKey: 'gameModes.blast.description',
   },
   'word-hunt': {
     icon: Search,
-    label: 'Word Hunt',
     borderColor: 'border-s-neo-purple',
     iconBg: 'bg-neo-purple',
     iconColor: 'text-neo-black',
     textColor: 'text-neo-purple',
+    labelKey: 'classroom.gameModes.wordHunt',
+    descKey: 'gameModes.wordHunt.description',
   },
 };
 
 const DEFAULT_MODE_CONFIG = {
   icon: Sword,
-  label: 'Classic',
   borderColor: 'border-s-neo-cyan',
   iconBg: 'bg-neo-cyan',
   iconColor: 'text-neo-black',
   textColor: 'text-neo-cyan',
+  labelKey: 'classroom.gameModes.classic',
+  descKey: 'gameModes.classic.description',
 };
 
 // ==================== Types ====================
@@ -299,7 +304,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+              <h2 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">
                 {t('multiplayerFlow.roomList.openArenas')}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan ms-2">
@@ -391,20 +396,22 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
                             {/* Mode badge + language + player count row */}
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className={cn(
-                                'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wide border',
+                              <span
+                                title={t(mode.descKey)}
+                                className={cn(
+                                'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wide border',
                                 `${mode.iconBg}/20 ${mode.textColor} border-current/20`,
                               )}>
                                 <ModeIcon className="w-2.5 h-2.5" />
-                                {mode.label}
+                                {t(mode.labelKey)}
                               </span>
-                              <span className="text-[8px] font-bold text-white/40">
+                              <span className="text-[10px] font-bold text-white/60">
                                 {LANGUAGE_FLAGS[room.language] || '🎮'}
                               </span>
                               <span className="flex items-center gap-1">
-                                <Users className="w-2.5 h-2.5 text-white/30" />
+                                <Users className="w-2.5 h-2.5 text-white/50" />
                                 <span className={cn(
-                                  'text-[8px] font-black',
+                                  'text-[10px] font-black',
                                   room.maxPlayers && room.playerCount >= room.maxPlayers
                                     ? 'text-neo-red/70'
                                     : 'text-white/50'
@@ -413,7 +420,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                                 </span>
                               </span>
                               {room.gameState === 'in-progress' && (
-                                <span className={`text-[7px] font-black ${mode.textColor} uppercase italic`}>
+                                <span className={`text-[10px] font-black ${mode.textColor} uppercase italic`}>
                                   {t('multiplayerFlow.roomList.inProgress')}
                                 </span>
                               )}
@@ -431,7 +438,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               size="sm"
                             />
                           )}
-                          <ChevronRight className="w-4 h-4 text-white/20 flex-shrink-0 rtl:rotate-180 group-hover:text-white/40 transition-colors" />
+                          <ChevronRight className="w-4 h-4 text-white/40 flex-shrink-0 rtl:rotate-180 group-hover:text-white/60 transition-colors" />
                         </div>
                       </motion.button>
                     );

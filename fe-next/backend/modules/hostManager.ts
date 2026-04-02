@@ -7,6 +7,7 @@
 import type { GameUser } from '@/shared/types/game';
 
 import logger from '../utils/logger';
+import timerManager from '../utils/timerManager';
 
 // Base game interface for hostManager
 export interface HostGameBase {
@@ -85,13 +86,9 @@ export function transferHost(
   game.hostSocketId = newHostUser.socketId;
   newHostUser.isHost = true;
 
-  // Clear any host reconnection timeout since we transferred host instead
-  if ((game as any).hostReconnectionTimeout) {
-    clearTimeout((game as any).hostReconnectionTimeout);
-    (game as any).hostReconnectionTimeout = null;
-  }
-
   const gameCode = game.gameCode || 'unknown';
+  // Clear any host reconnection timeout since we transferred host instead
+  timerManager.clearTimer(`hostReconnect:${gameCode}`);
   logger.info('HOST', `Host transferred in game ${gameCode}: ${previousHost ?? 'unknown'} -> ${newHostUsername}`);
 
   if (game.lastActivity !== undefined) {

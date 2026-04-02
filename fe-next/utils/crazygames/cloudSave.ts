@@ -1,5 +1,3 @@
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
-
 /** Current schema version — increment when SaveData shape changes */
 const CURRENT_VERSION = 1;
 
@@ -70,81 +68,24 @@ function migrateSaveData(data: Record<string, unknown>): SaveData | null {
   return data as unknown as SaveData;
 }
 
-// Cache SDK context for utility functions
-let cachedContext: ReturnType<typeof useCrazyGames> | null = null;
-
 /**
- * Internal helper to get SDK context.
- * Uses cached context if available, otherwise returns no-op implementation.
+ * Access the CrazyGames SDK data module directly from window.
+ * This avoids stale React context references and eliminates
+ * the need for a cached context pattern.
  */
-function getSDKContext() {
-  if (!cachedContext) {
-    // Initialize with no-op implementation
-    // Type assertion is safe because we only use saveData/loadData/removeData in this file
-    cachedContext = {
-      isAvailable: false,
-      isOnCrazyGamesPlatform: false,
-      environment: null,
-      isLoading: false,
-      deviceType: 'desktop',
-      isLandscape: true,
-      viewportSize: { width: 0, height: 0 },
-      gameplayStart: () => {},
-      gameplayStop: () => {},
-      loadingStart: () => {},
-      loadingStop: () => {},
-      happyTime: () => {},
-      showMidgameAd: () => {},
-      showRewardedAd: () => {},
-      hasAdblock: async () => false,
-      requestBanner: () => {},
-      requestResponsiveBanner: () => {},
-      clearBanner: () => {},
-      clearAllBanners: () => {},
-      saveData: async () => {},
-      loadData: async () => null,
-      removeData: async () => {},
-      getUser: async () => null,
-      showAuthPrompt: async () => null,
-      isUserAccountAvailable: async () => false,
-      getSystemInfo: async () => null,
-      inviteLink: () => null,
-      showInviteButton: () => {},
-      hideInviteButton: () => {},
-      getInviteParam: () => null,
-      getInviteParams: () => null,
-      isInstantMultiplayer: false,
-      addJoinRoomListener: () => {},
-      removeJoinRoomListener: () => {},
-      getSettings: () => null,
-      addSettingsChangeListener: () => {},
-      removeSettingsChangeListener: () => {},
-      addAuthListener: () => {},
-      removeAuthListener: () => {},
-      getUserToken: async () => null,
-      listFriends: async () => ({ friends: [], hasMore: false }),
-      showAccountLinkPrompt: async () => {},
-      getXsollaUserToken: async () => null,
-      trackOrder: async () => {},
-    } as ReturnType<typeof useCrazyGames>;
-  }
-  return cachedContext;
+function getSDKData() {
+  if (typeof window === 'undefined') return null;
+  const sdk = window.CrazyGames?.SDK;
+  if (!sdk || window.__crazyGamesEnvironment === 'disabled') return null;
+  return sdk.data;
 }
 
 /**
- * Set the SDK context for utility functions.
- * Call this from a React component that has access to useCrazyGames().
+ * Check if CrazyGames SDK is available and initialized.
  */
-export function setSDKContext(context: ReturnType<typeof useCrazyGames>) {
-  cachedContext = context;
-}
-
-/**
- * Reset the SDK context cache. Call on logout/sign-out to prevent
- * stale context references from persisting across sessions.
- */
-export function resetSDKContext() {
-  cachedContext = null;
+function isSDKAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!window.CrazyGames?.SDK && window.__crazyGamesEnvironment !== 'disabled';
 }
 
 /**
@@ -155,8 +96,8 @@ export function resetSDKContext() {
  * @returns true if save succeeded, false otherwise
  */
 export async function saveToCloud(data: SaveData): Promise<boolean> {
-  const sdk = getSDKContext();
-  if (!sdk.isAvailable) return false;
+  const sdkData = getSDKData();
+  if (!sdkData) return false;
 
   try {
     // Always stamp current version before saving
@@ -170,7 +111,7 @@ export async function saveToCloud(data: SaveData): Promise<boolean> {
       return false;
     }
 
-    await sdk.saveData('save_data_v1', serialized);
+    await sdkData.setItem('save_data_v1', serialized);
     return true;
   } catch (error) {
     console.error('Cloud save error:', error);
@@ -185,11 +126,11 @@ export async function saveToCloud(data: SaveData): Promise<boolean> {
  * @returns Saved user data or null
  */
 export async function loadFromCloud(): Promise<SaveData | null> {
-  const sdk = getSDKContext();
-  if (!sdk.isAvailable) return null;
+  const sdkData = getSDKData();
+  if (!sdkData) return null;
 
   try {
-    const serialized = await sdk.loadData('save_data_v1');
+    const serialized = await sdkData.getItem('save_data_v1');
     if (!serialized) return null;
 
     const raw = JSON.parse(serialized);
@@ -213,14 +154,19 @@ export async function loadFromCloud(): Promise<SaveData | null> {
  * @returns true if clear succeeded, false otherwise
  */
 export async function clearCloudSave(): Promise<boolean> {
-  const sdk = getSDKContext();
-  if (!sdk.isAvailable) return false;
+  const sdkData = getSDKData();
+  if (!sdkData) return false;
 
   try {
-    await sdk.removeData('save_data_v1');
+    await sdkData.removeItem('save_data_v1');
     return true;
   } catch (error) {
     console.error('Cloud clear error:', error);
     return false;
   }
 }
+
+/**
+ * Check if CrazyGames cloud save is available.
+ */
+export { isSDKAvailable as isCloudSaveAvailable };

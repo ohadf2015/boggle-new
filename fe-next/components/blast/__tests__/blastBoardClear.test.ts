@@ -12,9 +12,9 @@ import { resolveBlastConfig, type BlastTileState, type BlastTileType, type Blast
 import { computeGravityResult } from '../utils/blastGravity';
 import { getBoardClearPercentage, isBoardFullyCleared } from '../utils/blastBoardClear';
 
-vi.mock('../utils/blastLetterGenerator', () => ({
-  generateBlastLetter: vi.fn(() => 'X'),
-  rollSpecialType: vi.fn(() => 'standard' as const),
+jest.mock('../utils/blastLetterGenerator', () => ({
+  generateBlastLetter: jest.fn(() => 'X'),
+  rollSpecialType: jest.fn(() => 'standard' as const),
 }));
 
 function makeTileStates(

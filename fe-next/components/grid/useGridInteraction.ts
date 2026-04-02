@@ -89,6 +89,9 @@ export function useGridInteraction({
   const hasMovedRef = useRef(false);
   const isScrollGestureRef = useRef(false);
   const startPosRef = useRef({ x: 0, y: 0 });
+  // Drag selection ref: tracks cells during drag without triggering React re-renders.
+  // DOM classes are toggled directly on GridCell elements for instant visual feedback.
+  const dragSelectionRef = useRef<SelectedCell[]>([]);
   const startCellRef = useRef<SelectedCell | null>(null);
   const isTouchDeviceRef = useRef(false);
   const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
@@ -117,6 +120,31 @@ export function useGridInteraction({
     if (!measurements) return null;
     return getCellAtPosition(touchX, touchY, grid, measurements);
   }, [grid, getGridMeasurements]);
+
+  // Toggle 'blast-drag-selected' CSS class directly on GridCell DOM elements
+  const toggleDragClass = useCallback((row: number, col: number, add: boolean) => {
+    const el = gridRef.current?.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
+    if (el) {
+      if (add) el.classList.add('blast-drag-selected');
+      else el.classList.remove('blast-drag-selected');
+    }
+  }, [gridRef]);
+
+  const clearAllDragClasses = useCallback(() => {
+    gridRef.current?.querySelectorAll('.blast-drag-selected').forEach(el => {
+      el.classList.remove('blast-drag-selected');
+    });
+  }, [gridRef]);
+
+  // Sync drag ref to React state (called on drag end)
+  const syncDragToState = useCallback(() => {
+    const cells = dragSelectionRef.current;
+    if (cells.length > 0) {
+      setSelectedCells([...cells]);
+    }
+    clearAllDragClasses();
+  }, [setSelectedCells, clearAllDragClasses]);
+
   useEffect(() => {
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && isTouchingRef.current) {
@@ -219,9 +247,13 @@ export function useGridInteraction({
     velocityTrackerRef.current.start(touch.clientX, touch.clientY);
     lastDirectionRef.current = null;
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
-    setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
+    // Init drag ref + DOM class (no React re-render during drag)
+    const cell = { row: rowIndex, col: colIndex, letter };
+    dragSelectionRef.current = [cell];
+    clearAllDragClasses();
+    toggleDragClass(rowIndex, colIndex, true);
     vibrateCellTap(fireRoundActive);
-  }, [interactive, setSelectedCells, fireRoundActive, cancelFadeOut]);
+  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass]);
 
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);
@@ -233,33 +265,40 @@ export function useGridInteraction({
     hasMovedRef.current = true;
     const currentCell = getCellAtPos(touchX, touchY);
     if (!currentCell) return;
-    const lastCell = selectedCells[selectedCells.length - 1];
+    // Read from drag ref (no React state dependency during drag)
+    const dragCells = dragSelectionRef.current;
+    const lastCell = dragCells[dragCells.length - 1];
     if (!lastCell) return;
     if (currentCell.row === lastCell.row && currentCell.col === lastCell.col) return;
     const isDiagonal = isDiagonalMove(lastCell, currentCell);
     if (!isWithinSelectionThreshold(currentCell, isDiagonal, velocity)) return;
     lastDirectionRef.current = { dx: currentCell.col - lastCell.col, dy: currentCell.row - lastCell.row };
-    const existingIndex = selectedCells.findIndex(c => c.row === currentCell.row && c.col === currentCell.col);
+    const existingIndex = dragCells.findIndex(c => c.row === currentCell.row && c.col === currentCell.col);
     if (existingIndex !== -1) {
-      const newSelection = selectedCells.slice(0, existingIndex + 1);
-      if (newSelection.length !== selectedCells.length) {
-        setSelectedCells(newSelection);
+      // Backtrack: remove cells after the existing index, toggle off their DOM classes
+      if (existingIndex + 1 < dragCells.length) {
+        for (let i = existingIndex + 1; i < dragCells.length; i++) {
+          toggleDragClass(dragCells[i].row, dragCells[i].col, false);
+        }
+        dragSelectionRef.current = dragCells.slice(0, existingIndex + 1);
         vibrateBacktrack(fireRoundActive);
       }
       return;
     }
     if (isAdjacentCell(lastCell, currentCell)) {
-      const newCount = selectedCells.length + 1;
-      const prevTier = getSelectionEscalation(0, selectedCells.length, comboLevel).tier;
+      const newCount = dragCells.length + 1;
+      const prevTier = getSelectionEscalation(0, dragCells.length, comboLevel).tier;
       const newTier = getSelectionEscalation(0, newCount, comboLevel).tier;
-      setSelectedCells([...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }]);
+      const newCell = { row: currentCell.row, col: currentCell.col, letter: currentCell.letter };
+      dragSelectionRef.current = [...dragCells, newCell];
+      toggleDragClass(currentCell.row, currentCell.col, true);
       if (newTier > prevTier) {
         vibrateTierTransition(newTier);
       } else {
         vibrateCellDrag(fireRoundActive, newTier);
       }
     }
-  }, [selectedCells, setSelectedCells, fireRoundActive, comboLevel, getCellAtPos]);
+  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
@@ -273,7 +312,7 @@ export function useGridInteraction({
       const deltaY = Math.abs(touchY - startPosRef.current.y);
       const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       if (totalMovement >= getDeadzoneThreshold()) {
-        if (deltaY > deltaX * 1.5 && selectedCells.length === 0) {
+        if (deltaY > deltaX * 1.5 && dragSelectionRef.current.length === 0) {
           isScrollGestureRef.current = true;
           return;
         }
@@ -295,7 +334,7 @@ export function useGridInteraction({
     } else {
       processTouchMove(touchX, touchY);
     }
-  }, [interactive, performanceConfig.isLowEnd, processTouchMove, selectedCells.length]);
+  }, [interactive, performanceConfig.isLowEnd, processTouchMove]);
 
   const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;
@@ -308,25 +347,30 @@ export function useGridInteraction({
     velocityTrackerRef.current.reset();
     lastDirectionRef.current = null;
     startCellRef.current = null;
-    if (selectedCells.length > 0 && (hasMovedRef.current || selectedCells.length >= 2)) {
-      const formedWord = selectedCells.map(c => c.letter).join('');
-      if (onPathSubmit) onPathSubmit([...selectedCells]);
+    // Read from drag ref and sync to React state
+    const dragCells = dragSelectionRef.current;
+    clearAllDragClasses();
+    if (dragCells.length > 0 && (hasMovedRef.current || dragCells.length >= 2)) {
+      setSelectedCells([...dragCells]);
+      const formedWord = dragCells.map(c => c.letter).join('');
+      if (onPathSubmit) onPathSubmit([...dragCells]);
       if (onWordSubmit) onWordSubmit(formedWord);
-      vibrateWordSubmit(selectedCells.length, comboLevel, fireRoundActive);
+      vibrateWordSubmit(dragCells.length, comboLevel, fireRoundActive);
       if (comboLevel > 0) {
         startSequentialFadeOut(true);
       } else {
         setTimeout(() => setSelectedCells([]), 150);
       }
     } else {
-      if (selectedCells.length === 1 && !hasMovedRef.current && isTouchDeviceRef.current && onSingleTapDetected) {
-        const cell = selectedCells[0];
+      if (dragCells.length === 1 && !hasMovedRef.current && isTouchDeviceRef.current && onSingleTapDetected) {
+        const cell = dragCells[0];
         onSingleTapDetected({ row: cell.row, col: cell.col, letter: cell.letter });
       }
       setSelectedCells([]);
     }
+    dragSelectionRef.current = [];
     hasMovedRef.current = false;
-  }, [interactive, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected]);
+  }, [interactive, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected, clearAllDragClasses]);
 
   // Click-to-select handler for desktop (extracted)
   const handleCellClick = useGridClickHandler({

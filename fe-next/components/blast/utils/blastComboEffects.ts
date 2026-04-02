@@ -7,7 +7,6 @@ import {
   VORTEX_PULL_BONUS,
   VORTEX_EXPLODE_BONUS,
   TREASURE_GEM_COMPLETION_BONUS,
-  RAINBOW_BOOST_MULTIPLIER,
 } from '../types';
 import type { SpecialCombo } from './blastCombos';
 import { executeTacticalCombo } from './blastComboEffectsTactical';
@@ -77,14 +76,14 @@ export function applyToTile(
 }
 
 /** Fire row+column cross-clear centered at (row, col) */
-function fireCrossClear(row: number, col: number, ctx: ComboEffectContext): void {
+export function fireCrossClear(row: number, col: number, ctx: ComboEffectContext): void {
   const { next, gridSize } = ctx;
   for (let c = 0; c < gridSize; c++) applyToTile(next[row][c], ctx);
   for (let r = 0; r < gridSize; r++) applyToTile(next[r][col], ctx);
 }
 
 /** Clear tiles in a square radius area centered at (row, col) */
-function fireAreaBlast(row: number, col: number, radius: number, ctx: ComboEffectContext): void {
+export function fireAreaBlast(row: number, col: number, radius: number, ctx: ComboEffectContext): void {
   const { next, gridSize } = ctx;
   for (let dr = -radius; dr <= radius; dr++) {
     for (let dc = -radius; dc <= radius; dc++) {
@@ -212,16 +211,10 @@ export function executeComboEffect(ctx: ComboEffectContext): ComboEffectResult {
     }
 
     case 'bomb_prism': {
+      // Cross-clear from bomb center + area blast (not 9 separate cross-clears)
       const bt = combo.tiles.find(t => t.tileType === 'bomb')!;
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          const cR = bt.row + dr;
-          const cC = bt.col + dc;
-          if (cR < 0 || cR >= gridSize || cC < 0 || cC >= gridSize) continue;
-          for (let r = 0; r < gridSize; r++) applyToTile(next[r][cC], ctx);
-          for (let c = 0; c < gridSize; c++) applyToTile(next[cR][c], ctx);
-        }
-      }
+      fireCrossClear(bt.row, bt.col, ctx);
+      fireAreaBlast(bt.row, bt.col, scaledRadius(BOMB_RADIUS, wordLengthScale), ctx);
       pushExplosion(`combo-bp-${now}`, bt.row, bt.col, result, now);
       result.processedBombKeys.push(`${bt.row},${bt.col}`);
       break;

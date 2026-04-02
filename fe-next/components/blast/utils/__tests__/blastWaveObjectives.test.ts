@@ -57,8 +57,22 @@ describe('getWaveObjectives', () => {
     });
   });
 
-  it('returns clear_all_type frozen + score_target for wave 5', () => {
+  it('returns collect_type diamond + score_target for wave 5', () => {
     const objectives = getWaveObjectives(5);
+    expect(objectives).toHaveLength(2);
+    expect(objectives[0]).toEqual({
+      type: 'collect_type',
+      tileType: 'diamond',
+      target: 1,
+    });
+    expect(objectives[1]).toEqual({
+      type: 'score_target',
+      target: 120,
+    });
+  });
+
+  it('returns clear_all_type frozen + score_target for wave 6', () => {
+    const objectives = getWaveObjectives(6);
     expect(objectives).toHaveLength(2);
     expect(objectives[0]).toEqual({
       type: 'clear_all_type',
@@ -71,8 +85,8 @@ describe('getWaveObjectives', () => {
     });
   });
 
-  it('returns collect_type prism + word_length for wave 6', () => {
-    const objectives = getWaveObjectives(6);
+  it('returns collect_type prism + word_length for wave 7', () => {
+    const objectives = getWaveObjectives(7);
     expect(objectives).toHaveLength(2);
     expect(objectives[0]).toEqual({
       type: 'collect_type',
@@ -86,28 +100,28 @@ describe('getWaveObjectives', () => {
     });
   });
 
-  it('scales score_target linearly for wave 7+', () => {
-    const w7 = getWaveObjectives(7);
-    // baseScore = 120 + (7-6)*40 = 160
-    expect(w7[0]).toEqual({
+  it('scales score_target linearly for wave 8+', () => {
+    const w8 = getWaveObjectives(8);
+    // baseScore = 150 + (8-7)*40 = 190
+    expect(w8[0]).toEqual({
       type: 'score_target',
-      target: 160,
+      target: 190,
     });
 
     const w10 = getWaveObjectives(10);
-    // baseScore = 120 + (10-6)*40 = 280
+    // baseScore = 150 + (10-7)*40 = 270
     expect(w10[0]).toEqual({
       type: 'score_target',
-      target: 280,
+      target: 270,
     });
   });
 
-  it('rotates objective templates for wave 7+', () => {
-    // Wave 7 = template 0 (bombs), wave 9 = template 2 (prism)
-    const w7 = getWaveObjectives(7);
-    expect(w7[1]).toEqual({ type: 'collect_type', tileType: 'bomb', target: 3 });
-    const w9 = getWaveObjectives(9);
-    expect(w9[1]).toEqual({ type: 'collect_type', tileType: 'prism', target: 2 });
+  it('rotates objective templates for wave 8+', () => {
+    // Wave 8 = template 0 (bombs), wave 10 = template 2 (prism)
+    const w8 = getWaveObjectives(8);
+    expect(w8[1]).toEqual({ type: 'collect_type', tileType: 'bomb', target: 3 });
+    const w10 = getWaveObjectives(10);
+    expect(w10[1]).toEqual({ type: 'collect_type', tileType: 'prism', target: 2 });
   });
 
   it('clamps wave numbers below 1 to wave 1', () => {

@@ -10,7 +10,7 @@ export const HUNT_DRAIN_PHASE_1_RATE = 0.8;
 export const HUNT_DRAIN_PHASE_1_DURATION = 30;
 export const HUNT_DRAIN_PHASE_2_RATE = 1.2;
 export const HUNT_DRAIN_PHASE_2_DURATION = 30;
-export const HUNT_DRAIN_PHASE_3_RATE = 2.0;
+export const HUNT_DRAIN_PHASE_3_RATE = 1.5;
 
 /** Get drain rate based on elapsed seconds since game start */
 export function getDrainRate(elapsedSeconds: number): number {
@@ -24,7 +24,9 @@ export function getDrainRate(elapsedSeconds: number): number {
 }
 export const HUNT_INITIAL_LIFE = 100;
 export const HUNT_FIRST_FINDER_BONUS = 20;
-export const HUNT_WRONG_GUESS_PENALTY = 15;
+/** Decreasing bonuses for 1st, 2nd, 3rd, and subsequent finders */
+export const HUNT_SUBSEQUENT_FINDER_BONUSES = [20, 12, 8, 5];
+export const HUNT_WRONG_GUESS_PENALTY = 10;
 /** Score awarded per letter when a non-target board word is found in word-hunt mode */
 export const BOARD_WORD_SCORE_PER_LETTER = 2;
 export const HUNT_TARGET_MIN_LENGTH = 4;
@@ -38,12 +40,12 @@ export const HUNT_CLUE_THROTTLE_MS = 5_000;
 
 /** Life restored per word length */
 export const HUNT_LIFE_RESTORE: Record<number, number> = {
-  3: 3,
-  4: 5,
-  5: 8,
-  6: 12,
-  7: 16,
-  8: 20,
+  3: 5,
+  4: 8,
+  5: 12,
+  6: 18,
+  7: 24,
+  8: 30,
 };
 
 /** Get life restored for a word of given length */

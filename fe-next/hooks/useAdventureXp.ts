@@ -11,7 +11,7 @@
  * - Pending update tracking for database sync
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   getLevelFromXp,
   getXpProgress,
@@ -43,6 +43,9 @@ export interface UseAdventureXpReturn {
   acknowledgePersistence: () => void;
 }
 
+/** sessionStorage key for pending XP update flush on page unload */
+const BEFOREUNLOAD_STORAGE_KEY = 'adventure_xp_pending';
+
 // ==================== Hook ====================
 
 export function useAdventureXp(
@@ -70,6 +73,27 @@ export function useAdventureXp(
     return getXpProgress(totalXp);
   }, [totalXp]);
 
+  // Refs mirror state values so awardXp can compute synchronously without stale closures.
+  // Both are updated synchronously inside awardXp and kept in sync via useEffect for
+  // any external state changes (e.g., if props change in future).
+  const totalXpRef = useRef(initialXp);
+  const currentLevelRef = useRef(getLevelFromXp(initialXp));
+  useEffect(() => {
+    totalXpRef.current = totalXp;
+  }, [totalXp]);
+  useEffect(() => {
+    currentLevelRef.current = currentLevel;
+  }, [currentLevel]);
+
+  // Ref mirrors pendingUpdate so the single beforeunload handler always sees
+  // the latest value without needing to be re-registered on every state change.
+  // Updated synchronously in awardXp and acknowledgePersistence.
+  const pendingUpdateRef = useRef<{
+    userId: string;
+    totalXp: number;
+    level: number;
+  } | null>(null);
+
   /**
    * Award XP to the user
    * Returns level up information if level increased
@@ -81,28 +105,24 @@ export function useAdventureXp(
         return { leveledUp: false };
       }
 
-      // Use functional updaters to avoid stale closure over totalXp/currentLevel.
-      // This prevents double-fire in React Strict Mode from silently dropping XP.
-      let levelUpResult: { leveledUp: boolean; newLevel?: number } = { leveledUp: false };
+      // Compute new values synchronously using refs so we can:
+      //   1. Return level-up result immediately (before React flushes state)
+      //   2. Build newPending and write it to pendingUpdateRef immediately
+      //   3. Still use functional setters for React Strict Mode safety
+      const newTotalXp = totalXpRef.current + amount;
+      const newLevel = getLevelFromXp(newTotalXp);
+      const levelUpResult = checkLevelUp(currentLevelRef.current, newLevel);
+      const newPending = { userId, totalXp: newTotalXp, level: newLevel };
 
-      setTotalXp(prevXp => {
-        const newTotalXp = prevXp + amount;
-        const newLevel = getLevelFromXp(newTotalXp);
+      // Update refs synchronously — the beforeunload handler reads pendingUpdateRef and
+      // must see the latest value even if useEffect hasn't flushed yet.
+      pendingUpdateRef.current = newPending;
+      currentLevelRef.current = newLevel;
+      totalXpRef.current = newTotalXp;
 
-        setCurrentLevel(prevLevel => {
-          levelUpResult = checkLevelUp(prevLevel, newLevel);
-          return newLevel;
-        });
-
-        // Create pending update for database persistence
-        setPendingUpdate({
-          userId,
-          totalXp: newTotalXp,
-          level: getLevelFromXp(newTotalXp),
-        });
-
-        return newTotalXp;
-      });
+      setTotalXp(prevXp => prevXp + amount);
+      setCurrentLevel(newLevel);
+      setPendingUpdate(newPending);
 
       return levelUpResult;
     },
@@ -114,8 +134,29 @@ export function useAdventureXp(
    * Clears the pending update flag
    */
   const acknowledgePersistence = useCallback(() => {
+    pendingUpdateRef.current = null;
     setPendingUpdate(null);
   }, []);
+
+  // Register beforeunload flush: if the user navigates away with unsaved XP,
+  // persist it to sessionStorage so the next session can recover it.
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const pending = pendingUpdateRef.current;
+      if (pending) {
+        try {
+          sessionStorage.setItem(BEFOREUNLOAD_STORAGE_KEY, JSON.stringify(pending));
+        } catch {
+          // sessionStorage unavailable (private mode quota exceeded etc.) — ignore
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []); // empty deps: single registration, ref keeps handler current
 
   return {
     totalXp,

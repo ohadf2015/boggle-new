@@ -788,4 +788,75 @@ describe('useAdventureBossNew', () => {
       expect(result.current.currentTaunt).toBeNull();
     });
   });
+
+  // ==============================================
+  // RACE CONDITION: double-fire guard
+  // ==============================================
+
+  describe('dealDamage double-fire guard', () => {
+    it('should call onVictory exactly once when two rapid dealDamage calls both see hp > 0', () => {
+      const onVictory = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 1, onVictory })
+      );
+
+      act(() => {
+        result.current.startBattle();
+      });
+
+      // World 1 = 30 HP. Two calls each dealing 30 would both see hp > 0
+      // if isActiveRef is not set false immediately in dealDamage.
+      act(() => {
+        result.current.dealDamage(30); // kills boss
+        result.current.dealDamage(30); // should be a no-op (guard)
+      });
+
+      expect(onVictory).toHaveBeenCalledTimes(1);
+    });
+
+    it('should NOT allow a second dealDamage call to pass isActiveRef guard after kill', () => {
+      const onVictory = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 1, onVictory })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      // First kill: drops HP to 0. isActiveRef must be set false in dealDamage itself.
+      act(() => { result.current.dealDamage(30); });
+      // React effects have run — isActive state is now false.
+      // A second call simulates a concurrent submission arriving slightly later.
+      let damage2: number = -1;
+      act(() => { damage2 = result.current.dealDamage(30); });
+
+      // The second call must return 0 (guarded) and must NOT fire onVictory again.
+      expect(damage2).toBe(0);
+      expect(onVictory).toHaveBeenCalledTimes(1);
+    });
+
+    it('dealDamage sets isActiveRef false synchronously when HP reaches 0 (prevents same-tick double-fire)', () => {
+      // This test verifies the fix: dealDamage must set isActiveRef.current=false
+      // immediately when newHP<=0, before effects run.
+      // Without the fix, two calls in the same synchronous batch would BOTH pass
+      // the isActiveRef guard and endBattle would be called twice.
+      const onVictory = vi.fn();
+      const { result } = renderHook(() =>
+        useAdventureBossNew({ worldId: 1, onVictory })
+      );
+
+      act(() => { result.current.startBattle(); });
+
+      // Capture dealDamage reference — call it twice in the same synchronous frame
+      // before React effects can run (inside act, but both calls before flush)
+      let damage1 = 0, damage2 = 0;
+      act(() => {
+        damage1 = result.current.dealDamage(30); // kills boss, must set isActiveRef=false
+        damage2 = result.current.dealDamage(30); // must return 0 if isActiveRef was set false above
+      });
+
+      expect(damage1).toBe(30); // full damage dealt
+      expect(damage2).toBe(0);  // guarded — isActiveRef was already false
+      expect(onVictory).toHaveBeenCalledTimes(1);
+    });
+  });
 });

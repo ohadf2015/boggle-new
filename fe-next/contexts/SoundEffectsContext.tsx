@@ -40,6 +40,26 @@ interface SoundEffectsContextType {
   playFireRoundStart: () => void;
   startFireCrackleLoop: () => void;
   stopFireCrackleLoop: () => void;
+  // New game event sounds
+  playWordRejectedSound: () => void;
+  playVictorySound: () => void;
+  playDefeatSound: () => void;
+  playLevelUpSound: () => void;
+  playLevelUpModalSound: () => void;
+  playPowerUpSound: () => void;
+  playBossHitSound: () => void;
+  playBossPhaseChangeSound: () => void;
+  playBossEntranceSound: () => void;
+  playBossDefeatSound: () => void;
+  playBlastBombSound: () => void;
+  playBlastLightningSound: () => void;
+  playBlastPrismSound: () => void;
+  playMatchFoundSound: () => void;
+  playStreakMilestoneSound: () => void;
+  playTierPromotionSound: () => void;
+  playTileSelectSound: () => void;
+  playRoundStartSound: () => void;
+  playTimesUpSound: () => void;
 }
 
 interface SfxSettings {
@@ -65,6 +85,38 @@ const SOUND_EFFECTS = {
   earthquakeShake: '/sounds/earthquake-shake.wav',
   fireRoundStart: '/sounds/fire-round-start.wav',
   fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
+  // New game event sounds
+  wordRejected: '/sounds/word-rejected.mp3',
+  victoryFanfare: '/sounds/victory-fanfare.mp3',
+  defeatSting: '/sounds/defeat-sting.mp3',
+  levelUp: '/sounds/level-up.mp3',
+  levelUpModal: '/sounds/level-up-modal.mp3',
+  powerUp: '/sounds/power-up.mp3',
+  bossHit: '/sounds/boss-hit.mp3',
+  bossPhaseChange: '/sounds/boss-phase-change.mp3',
+  bossEntrance: '/sounds/boss-entrance.mp3',
+  bossDefeat: '/sounds/boss-defeat.mp3',
+  blastBomb: '/sounds/blast-bomb.mp3',
+  blastLightning: '/sounds/blast-lightning.mp3',
+  blastPrism: '/sounds/blast-prism.mp3',
+  matchFound: '/sounds/match-found.mp3',
+  streakMilestone: '/sounds/streak-milestone.mp3',
+  tierPromotion: '/sounds/tier-promotion.mp3',
+  tileSelect: '/sounds/tile-select.mp3',
+  // TTS announcer voice lines
+  ttsVictory: '/sounds/tts-victory.mp3',
+  ttsDefeat: '/sounds/tts-defeat.mp3',
+  ttsLevelUp: '/sounds/tts-level-up.mp3',
+  ttsBossEntrance: '/sounds/tts-boss-entrance.mp3',
+  ttsBossDefeat: '/sounds/tts-boss-defeat.mp3',
+  ttsMatchFound: '/sounds/tts-match-found.mp3',
+  ttsComboMilestone: '/sounds/tts-combo-milestone.mp3',
+  ttsPowerUp: '/sounds/tts-power-up.mp3',
+  ttsBlastBomb: '/sounds/tts-blast-bomb.mp3',
+  ttsStreak: '/sounds/tts-streak.mp3',
+  ttsTierPromotion: '/sounds/tts-tier-promotion.mp3',
+  ttsRoundStart: '/sounds/tts-round-start.mp3',
+  ttsTimesUp: '/sounds/tts-times-up.mp3',
 } as const;
 
 // Sound effect priority levels for progressive loading
@@ -85,6 +137,38 @@ const SOUND_PRIORITIES: Record<keyof typeof SOUND_EFFECTS, AUDIO_LOAD_PRIORITY> 
   earthquakeShake: AUDIO_LOAD_PRIORITY.LOW,
   fireRoundStart: AUDIO_LOAD_PRIORITY.LOW,
   fireCrackleLoop: AUDIO_LOAD_PRIORITY.LOW,
+  // New game event sounds
+  wordRejected: AUDIO_LOAD_PRIORITY.HIGH,
+  victoryFanfare: AUDIO_LOAD_PRIORITY.NORMAL,
+  defeatSting: AUDIO_LOAD_PRIORITY.NORMAL,
+  levelUp: AUDIO_LOAD_PRIORITY.NORMAL,
+  levelUpModal: AUDIO_LOAD_PRIORITY.LOW,
+  powerUp: AUDIO_LOAD_PRIORITY.NORMAL,
+  bossHit: AUDIO_LOAD_PRIORITY.NORMAL,
+  bossPhaseChange: AUDIO_LOAD_PRIORITY.LOW,
+  bossEntrance: AUDIO_LOAD_PRIORITY.LOW,
+  bossDefeat: AUDIO_LOAD_PRIORITY.LOW,
+  blastBomb: AUDIO_LOAD_PRIORITY.NORMAL,
+  blastLightning: AUDIO_LOAD_PRIORITY.NORMAL,
+  blastPrism: AUDIO_LOAD_PRIORITY.NORMAL,
+  matchFound: AUDIO_LOAD_PRIORITY.NORMAL,
+  streakMilestone: AUDIO_LOAD_PRIORITY.LOW,
+  tierPromotion: AUDIO_LOAD_PRIORITY.LOW,
+  tileSelect: AUDIO_LOAD_PRIORITY.CRITICAL,
+  // TTS lines - all low priority (loaded on demand)
+  ttsVictory: AUDIO_LOAD_PRIORITY.LOW,
+  ttsDefeat: AUDIO_LOAD_PRIORITY.LOW,
+  ttsLevelUp: AUDIO_LOAD_PRIORITY.LOW,
+  ttsBossEntrance: AUDIO_LOAD_PRIORITY.LOW,
+  ttsBossDefeat: AUDIO_LOAD_PRIORITY.LOW,
+  ttsMatchFound: AUDIO_LOAD_PRIORITY.LOW,
+  ttsComboMilestone: AUDIO_LOAD_PRIORITY.LOW,
+  ttsPowerUp: AUDIO_LOAD_PRIORITY.LOW,
+  ttsBlastBomb: AUDIO_LOAD_PRIORITY.LOW,
+  ttsStreak: AUDIO_LOAD_PRIORITY.LOW,
+  ttsTierPromotion: AUDIO_LOAD_PRIORITY.LOW,
+  ttsRoundStart: AUDIO_LOAD_PRIORITY.LOW,
+  ttsTimesUp: AUDIO_LOAD_PRIORITY.LOW,
 };
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
@@ -483,6 +567,121 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }
   }, [sfxMuted]);
 
+  // ==================== New Game Event Sounds ====================
+
+  const playWordRejectedSound = useCallback(() => {
+    playSound('wordRejected', { volume: 0.5 });
+    haptics.error();
+  }, [playSound]);
+
+  // Victory: SFX fanfare + TTS "Victory!"
+  const playVictorySound = useCallback(() => {
+    playSound('victoryFanfare', { volume: 0.8, requiresGameActive: false });
+    setTimeout(() => playSound('ttsVictory', { volume: 0.9, requiresGameActive: false }), 300);
+    haptics.success();
+  }, [playSound]);
+
+  // Defeat: SFX sting + TTS "Defeated!"
+  const playDefeatSound = useCallback(() => {
+    playSound('defeatSting', { volume: 0.7, requiresGameActive: false });
+    setTimeout(() => playSound('ttsDefeat', { volume: 0.8, requiresGameActive: false }), 300);
+  }, [playSound]);
+
+  // Adventure level complete
+  const playLevelUpSound = useCallback(() => {
+    playSound('levelUp', { volume: 0.8 });
+    setTimeout(() => playSound('ttsLevelUp', { volume: 0.9 }), 200);
+    haptics.success();
+  }, [playSound]);
+
+  // XP level up modal
+  const playLevelUpModalSound = useCallback(() => {
+    playSound('levelUpModal', { volume: 0.8, requiresGameActive: false });
+    haptics.success();
+  }, [playSound]);
+
+  // Power-up activation + TTS
+  const playPowerUpSound = useCallback(() => {
+    playSound('powerUp', { volume: 0.7 });
+    playSound('ttsPowerUp', { volume: 0.6 });
+    haptics.tap();
+  }, [playSound]);
+
+  // Boss sounds
+  const playBossHitSound = useCallback(() => {
+    playSound('bossHit', { volume: 0.6 });
+    haptics.tap();
+  }, [playSound]);
+
+  const playBossPhaseChangeSound = useCallback(() => {
+    playSound('bossPhaseChange', { volume: 0.8 });
+    haptics.error();
+  }, [playSound]);
+
+  const playBossEntranceSound = useCallback(() => {
+    playSound('bossEntrance', { volume: 0.8, requiresGameActive: false });
+    setTimeout(() => playSound('ttsBossEntrance', { volume: 0.9, requiresGameActive: false }), 500);
+  }, [playSound]);
+
+  const playBossDefeatSound = useCallback(() => {
+    playSound('bossDefeat', { volume: 0.8 });
+    setTimeout(() => playSound('ttsBossDefeat', { volume: 0.9 }), 300);
+    haptics.success();
+  }, [playSound]);
+
+  // Blast special tile sounds
+  const playBlastBombSound = useCallback(() => {
+    playSound('blastBomb', { volume: 0.7 });
+    playSound('ttsBlastBomb', { volume: 0.5 });
+    haptics.tap();
+  }, [playSound]);
+
+  const playBlastLightningSound = useCallback(() => {
+    playSound('blastLightning', { volume: 0.7 });
+    haptics.tap();
+  }, [playSound]);
+
+  const playBlastPrismSound = useCallback(() => {
+    playSound('blastPrism', { volume: 0.7 });
+    haptics.tap();
+  }, [playSound]);
+
+  // Matchmaking
+  const playMatchFoundSound = useCallback(() => {
+    playSound('matchFound', { volume: 0.8, requiresGameActive: false });
+    setTimeout(() => playSound('ttsMatchFound', { volume: 0.9, requiresGameActive: false }), 200);
+    haptics.success();
+  }, [playSound]);
+
+  // Streak milestone + TTS
+  const playStreakMilestoneSound = useCallback(() => {
+    playSound('streakMilestone', { volume: 0.8, requiresGameActive: false });
+    setTimeout(() => playSound('ttsStreak', { volume: 0.7, requiresGameActive: false }), 200);
+    haptics.success();
+  }, [playSound]);
+
+  // Tier/rank promotion + TTS
+  const playTierPromotionSound = useCallback(() => {
+    playSound('tierPromotion', { volume: 0.8, requiresGameActive: false });
+    setTimeout(() => playSound('ttsTierPromotion', { volume: 0.9, requiresGameActive: false }), 400);
+    haptics.success();
+  }, [playSound]);
+
+  // Tile select - lightweight, no haptic (already handled by grid)
+  const playTileSelectSound = useCallback(() => {
+    playSound('tileSelect', { volume: 0.3 });
+  }, [playSound]);
+
+  // Round start + TTS
+  const playRoundStartSound = useCallback(() => {
+    playSound('ttsRoundStart', { volume: 0.8, requiresGameActive: false });
+  }, [playSound]);
+
+  // Time's up + TTS
+  const playTimesUpSound = useCallback(() => {
+    playSound('ttsTimesUp', { volume: 0.8 });
+  }, [playSound]);
+
   // Memoize context value to prevent unnecessary re-renders of all consumers
   const value = useMemo<SoundEffectsContextType>(() => ({
     // Volume state
@@ -511,6 +710,26 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    // New game event sounds
+    playWordRejectedSound,
+    playVictorySound,
+    playDefeatSound,
+    playLevelUpSound,
+    playLevelUpModalSound,
+    playPowerUpSound,
+    playBossHitSound,
+    playBossPhaseChangeSound,
+    playBossEntranceSound,
+    playBossDefeatSound,
+    playBlastBombSound,
+    playBlastLightningSound,
+    playBlastPrismSound,
+    playMatchFoundSound,
+    playStreakMilestoneSound,
+    playTierPromotionSound,
+    playTileSelectSound,
+    playRoundStartSound,
+    playTimesUpSound,
   }), [
     sfxVolume,
     sfxMuted,
@@ -533,6 +752,25 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    playWordRejectedSound,
+    playVictorySound,
+    playDefeatSound,
+    playLevelUpSound,
+    playLevelUpModalSound,
+    playPowerUpSound,
+    playBossHitSound,
+    playBossPhaseChangeSound,
+    playBossEntranceSound,
+    playBossDefeatSound,
+    playBlastBombSound,
+    playBlastLightningSound,
+    playBlastPrismSound,
+    playMatchFoundSound,
+    playStreakMilestoneSound,
+    playTierPromotionSound,
+    playTileSelectSound,
+    playRoundStartSound,
+    playTimesUpSound,
   ]);
 
   return (
@@ -544,6 +782,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
 // No-op stub returned when provider is unavailable (e.g., during SSR edge cases)
 const NOOP = () => {};
+const ASYNC_NOOP = async () => {};
 const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
   sfxVolume: 0.7,
   sfxMuted: true,
@@ -551,7 +790,7 @@ const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
   setSfxVolume: NOOP,
   toggleSfxMute: NOOP,
   setGameActive: NOOP,
-  playSound: NOOP,
+  playSound: ASYNC_NOOP,
   playComboSound: NOOP,
   playAchievementSound: NOOP,
   playWordAcceptedSound: NOOP,
@@ -566,6 +805,25 @@ const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
   playFireRoundStart: NOOP,
   startFireCrackleLoop: NOOP,
   stopFireCrackleLoop: NOOP,
+  playWordRejectedSound: NOOP,
+  playVictorySound: NOOP,
+  playDefeatSound: NOOP,
+  playLevelUpSound: NOOP,
+  playLevelUpModalSound: NOOP,
+  playPowerUpSound: NOOP,
+  playBossHitSound: NOOP,
+  playBossPhaseChangeSound: NOOP,
+  playBossEntranceSound: NOOP,
+  playBossDefeatSound: NOOP,
+  playBlastBombSound: NOOP,
+  playBlastLightningSound: NOOP,
+  playBlastPrismSound: NOOP,
+  playMatchFoundSound: NOOP,
+  playStreakMilestoneSound: NOOP,
+  playTierPromotionSound: NOOP,
+  playTileSelectSound: NOOP,
+  playRoundStartSound: NOOP,
+  playTimesUpSound: NOOP,
 };
 
 export function useSoundEffects(): SoundEffectsContextType {

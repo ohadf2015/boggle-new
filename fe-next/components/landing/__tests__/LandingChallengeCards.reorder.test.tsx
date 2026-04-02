@@ -44,39 +44,39 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering', () => {
-  it('renders daily then multiplayer first by default', () => {
+  it('renders daily then arena first by default', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    // Daily banner first (pinned), then multiplayer (pinned), then singleplayer, adventure
+    // Daily banner first (pinned), then arena (pinned), then practice, adventure
     expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
     const cards = screen.getAllByTestId('mode-card');
-    expect(cards[0]).toHaveTextContent('landing.multiplayer');
-    expect(cards[1]).toHaveTextContent('landing.singlePlayer');
+    expect(cards[0]).toHaveTextContent('landing.arena');
+    expect(cards[1]).toHaveTextContent('landing.practice');
     expect(cards[2]).toHaveTextContent('landing.adventureMode');
   });
 
-  it('pins daily+multiplayer first, reorders rest by popularity', () => {
+  it('pins daily+arena first, reorders rest by popularity', () => {
     const stats: GameModeStats[] = [
       { mode: 'adventure', playCount: 500 },
       { mode: 'daily', playCount: 300 },
-      { mode: 'singleplayer', playCount: 200 },
-      { mode: 'multiplayer', playCount: 100 },
+      { mode: 'practice', playCount: 200 },
+      { mode: 'arena', playCount: 100 },
       { mode: 'blast', playCount: 50 },
     ];
     // Pre-compute order server-side (like production does)
     const cardOrder = getCardOrder(stats);
     render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
     const cards = screen.getAllByTestId('mode-card');
-    // Daily (banner, not ModeCard) + multiplayer pinned, then adventure > singleplayer by popularity
-    expect(cards[0]).toHaveTextContent('landing.multiplayer');
+    // Daily (banner, not ModeCard) + arena pinned, then adventure > practice by popularity
+    expect(cards[0]).toHaveTextContent('landing.arena');
     expect(cards[1]).toHaveTextContent('landing.adventureMode');
-    expect(cards[2]).toHaveTextContent('landing.singlePlayer');
+    expect(cards[2]).toHaveTextContent('landing.practice');
   });
 
   it('still shows blast separately even when most popular', () => {
     const stats: GameModeStats[] = [
       { mode: 'blast', playCount: 9999 },
-      { mode: 'singleplayer', playCount: 10 },
-      { mode: 'multiplayer', playCount: 5 },
+      { mode: 'practice', playCount: 10 },
+      { mode: 'arena', playCount: 5 },
       { mode: 'daily', playCount: 3 },
       { mode: 'adventure', playCount: 1 },
     ];

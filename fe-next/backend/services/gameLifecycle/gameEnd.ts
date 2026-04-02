@@ -15,10 +15,12 @@ import {
   cleanupGameTracking,
 } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../../utils/socketHelpers';
-import { clearGameTimer } from '../../utils/timerManager';
+import timerManager, { clearGameTimer } from '../../utils/timerManager';
 import * as botManager from '../../modules/botManager';
 import { gameCleanupEmitter } from '../../events/gameCleanup';
 import { calculateAndBroadcastFinalScores } from './gameScores';
+import { recordGameResultsToSupabase } from './gameResults';
+import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { handlePeerValidation } from './peerValidation';
 import { handleTournamentCompletion } from './tournamentEnd';
 import logger from '../../utils/logger';
@@ -104,9 +106,19 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     };
 
     // Cache and broadcast fallback so reconnecting clients also get it
-    (game as any).cachedResultsPayload = fallbackPayload;
+    game.cachedResultsPayload = fallbackPayload;
     broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', fallbackPayload);
     broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', fallbackPayload);
+
+    // Persist fallback results to Supabase so XP, coins, and stats are not lost
+    if (isSupabaseConfigured()) {
+      try {
+        await recordGameResultsToSupabase(io, gameCode, fallbackScores as any, game);
+      } catch (persistError: unknown) {
+        const pErr = persistError as Error;
+        logger.error('GAME', `CRITICAL: Fallback persistence also failed for ${gameCode}: ${pErr.message}`, { stack: pErr.stack });
+      }
+    }
   }
 
   // Collect non-dictionary words for feedback
@@ -135,7 +147,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     }));
     const gameLang = game.language || 'en';
 
-    setTimeout(() => {
+    timerManager.setTimeout(`feedback:${gameCode}`, () => {
       try {
         for (const { username, socketId } of userSnapshot) {
           const wordsForPlayer = getWordsForPlayer(

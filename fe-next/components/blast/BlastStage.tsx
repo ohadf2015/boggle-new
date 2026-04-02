@@ -134,6 +134,30 @@ export function BlastStage({
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative pb-safe" data-testid="blast-stage">
+      {/* Urgency vignette at low moves */}
+      {movesRemaining <= 3 && !isComplete && (
+        <div
+          className="absolute inset-0 z-30 pointer-events-none transition-opacity duration-500"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(255,30,30,0.25) 100%)',
+            opacity: movesRemaining <= 1 ? 0.9 : movesRemaining <= 2 ? 0.6 : 0.35,
+          }}
+        />
+      )}
+      {/* Chain vignette — purple/gold escalation during cascades */}
+      {sequencerState?.chainLevel != null && sequencerState.chainLevel >= 1 && (
+        <div
+          className="absolute inset-0 z-30 pointer-events-none transition-opacity duration-300"
+          style={{
+            background: sequencerState.chainLevel >= 4
+              ? 'radial-gradient(ellipse at center, transparent 40%, rgba(255,200,0,0.3) 100%)'
+              : sequencerState.chainLevel >= 2
+              ? 'radial-gradient(ellipse at center, transparent 45%, rgba(139,92,246,0.25) 100%)'
+              : 'radial-gradient(ellipse at center, transparent 55%, rgba(139,92,246,0.12) 100%)',
+            opacity: Math.min(sequencerState.chainLevel * 0.25, 1),
+          }}
+        />
+      )}
       {/* Reactive background */}
       <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
       {/* Effects overlay */}

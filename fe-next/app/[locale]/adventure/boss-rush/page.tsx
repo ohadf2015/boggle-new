@@ -5,13 +5,14 @@
  * Requires defeating at least 1 boss in adventure mode to unlock.
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { BossRushPageClient } from './BossRushPageClient';
 
-export const metadata: Metadata = {
-  title: 'Boss Rush | LexiClash Adventure',
-  description: 'Fight 5 bosses in a row. Health carries over. Full clear for bonus rewards.',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'adventureBossRush', path: '/adventure/boss-rush', locale });
+}
 
 export default function BossRushPage() {
   return <BossRushPageClient />;

@@ -97,11 +97,11 @@ export const BOT_CONFIG: BotConfigType = {
       wrongWordChance: 0.08,  // 8% wrong word chance
     },
     hard: {
-      maxWordLength: 8,
-      wordsPerMinute: 4,      // Reduced from 5 - even experts take time
+      maxWordLength: 10,      // was 8 - experts find longer words
+      wordsPerMinute: 6,      // was 4 - experts play faster
       focusOnShort: false,
-      missChance: 0.10,       // Increased from 0.08 - more realistic
-      wrongWordChance: 0.05,  // 5% wrong word chance (experts make fewer mistakes)
+      missChance: 0.05,       // was 0.10 - experts miss less
+      wrongWordChance: 0.03,  // was 0.05 - experts make fewer mistakes
     }
   },
 

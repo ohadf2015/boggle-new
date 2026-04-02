@@ -31,9 +31,6 @@ import type { InGameScreenProps, EarthquakeState } from './in-game/types';
 // Re-export types for backward compatibility
 export type { HintsState, InGameScreenProps } from './in-game/types';
 
-/** Re-render interval for keyboard trails visibility check */
-const TRAILS_CHECK_INTERVAL_MS = 5000;
-
 /**
  * InGameScreen - Unified in-game screen component for both Host and Player views
  * Shows active game state with grid, timer, found words, and leaderboard
@@ -147,7 +144,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   const [letterCount, setLetterCount] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(() => (gameActive ? Date.now() : 0));
-  const [, setTrailsCheckTick] = useState(0);
 
   // Deferred values for smoother UI
   const deferredLeaderboard = useDeferredValue(leaderboard);
@@ -183,15 +179,6 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     }
   }, [gameActive]);
 
-  // Periodic check for trail visibility
-  useEffect(() => {
-    if (!gameActive || !isPlaying) return;
-    const interval = setInterval(() => {
-      setTrailsCheckTick((tick) => tick + 1);
-    }, TRAILS_CHECK_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [gameActive, isPlaying]);
-
   // Auto-scroll to game area on game start
   useAutoScrollOnGameStart(gameStatsRef, {
     gameActive,
@@ -219,15 +206,15 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     [deferredFoundWords]
   );
 
-  // Calculate player's score and rank
+  // Calculate player's score and rank (deferred to avoid double-render on leaderboard updates)
   const playerData = useMemo(() => {
-    const playerEntry = leaderboard.find((p) => p.username === username);
-    const playerRank = leaderboard.findIndex((p) => p.username === username) + 1;
+    const playerEntry = deferredLeaderboard.find((p) => p.username === username);
+    const playerRank = deferredLeaderboard.findIndex((p) => p.username === username) + 1;
     return {
       score: playerEntry?.score ?? 0,
       rank: playerRank > 0 ? playerRank : null,
     };
-  }, [leaderboard, username]);
+  }, [deferredLeaderboard, username]);
 
   // Lead change detection
   const leadChangeEvent = useLeadChangeDetection(leaderboard, username);

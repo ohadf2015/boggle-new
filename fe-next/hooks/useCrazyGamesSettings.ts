@@ -83,24 +83,4 @@ export function useCrazyGamesSettings(): UseCrazyGamesSettingsReturn {
   };
 }
 
-/**
- * Trigger a happytime event to CrazyGames SDK.
- * Call this on major player achievements:
- * - Boss defeats
- * - High scores
- * - Level 10+ completion
- * - First boss battle victory
- */
-export async function triggerHappytime() {
-  if (typeof window === 'undefined' || !window.CrazyGames?.SDK) {
-    return;
-  }
-
-  try {
-    window.CrazyGames.SDK.game.happyTime();
-  } catch {
-    // Silently fail if SDK not available
-  }
-}
-
 export default useCrazyGamesSettings;

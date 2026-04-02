@@ -22,10 +22,8 @@ export interface CrazyGamesViewportInfo {
 }
 
 // Breakpoints matching useDesktopLayout.ts
-const MOBILE_MAX_WIDTH = 767;
 const TABLET_MIN_WIDTH = 768;
 const TABLET_MAX_WIDTH = 1023;
-const DESKTOP_MIN_WIDTH = 1024;
 
 /**
  * Utility to get device type from viewport dimensions

@@ -62,6 +62,8 @@ interface LevelCompleteModalProps {
   } | null;
   saveFailed?: boolean;
   onRetrySave?: () => void;
+  /** Words on the board the player didn't find */
+  missedWords?: string[];
 }
 
 // ==============================================
@@ -112,6 +114,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     bossDefeatShare: _bossDefeatShare,
     saveFailed,
     onRetrySave,
+    missedWords,
   }) => {
     const { t } = useLanguage();
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -315,6 +318,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 nextLevelPreview={nextLevelPreview}
                 bossDefeatShare={null}
                 bestAttempt={bestAttempt}
+                missedWords={missedWords}
                 t={t}
               />
             </div>

@@ -112,11 +112,14 @@ export function detectSpecialCombos(
 ): SpecialCombo[] {
   if (path.length < 2) return [];
 
-  // Collect non-cleared special tiles from the path
+  // Collect non-cleared special tiles from the path.
+  // Skip multi-hit tiles that aren't on their final hit — their effect won't fire this turn.
+  const MULTI_HIT_TYPES: ReadonlySet<BlastTileType> = new Set(['ice', 'prism', 'frozen', 'gem']);
   const specialTiles: Array<{ row: number; col: number; tileType: BlastTileType }> = [];
   for (const cell of path) {
     const tile = tileStates[cell.row]?.[cell.col];
     if (!tile || tile.isCleared || tile.type === 'standard') continue;
+    if (MULTI_HIT_TYPES.has(tile.type) && tile.hitsRemaining > 1) continue;
     specialTiles.push({ row: cell.row, col: cell.col, tileType: tile.type });
   }
 
@@ -128,15 +131,16 @@ export function detectSpecialCombos(
   // (prevents generic rainbow_special/gold_special fallbacks for the same tile)
   const usedTileKeys = new Set<string>();
 
-  // Check pair combos: for each defined pair, see if path contains both types
+  // Check pair combos: for each defined pair, see if path contains both types.
+  // Each tile can only participate in one pair combo (checked via usedTileKeys).
   for (const def of PAIR_COMBOS) {
-    const tilesA = specialTiles.filter(t => t.tileType === def.a);
+    const tileKey = (t: { row: number; col: number }) => `${t.row},${t.col}`;
+    const tilesA = specialTiles.filter(t => t.tileType === def.a && !usedTileKeys.has(tileKey(t)));
     const tilesB = def.a === def.b
       ? tilesA.length >= 2 ? tilesA : []
-      : specialTiles.filter(t => t.tileType === def.b);
+      : specialTiles.filter(t => t.tileType === def.b && !usedTileKeys.has(tileKey(t)));
 
     if (def.a === def.b) {
-      // Same-type pair: need at least 2
       if (tilesA.length >= 2) {
         combos.push({
           type: def.comboType,
@@ -144,11 +148,10 @@ export function detectSpecialCombos(
           scoreMultiplier: def.scoreMultiplier,
           label: `blast.combo.${def.comboType}`,
         });
-        usedTileKeys.add(`${tilesA[0].row},${tilesA[0].col}`);
-        usedTileKeys.add(`${tilesA[1].row},${tilesA[1].col}`);
+        usedTileKeys.add(tileKey(tilesA[0]));
+        usedTileKeys.add(tileKey(tilesA[1]));
       }
     } else {
-      // Different-type pair: need at least 1 of each
       if (tilesA.length > 0 && tilesB.length > 0) {
         combos.push({
           type: def.comboType,
@@ -156,8 +159,8 @@ export function detectSpecialCombos(
           scoreMultiplier: def.scoreMultiplier,
           label: `blast.combo.${def.comboType}`,
         });
-        usedTileKeys.add(`${tilesA[0].row},${tilesA[0].col}`);
-        usedTileKeys.add(`${tilesB[0].row},${tilesB[0].col}`);
+        usedTileKeys.add(tileKey(tilesA[0]));
+        usedTileKeys.add(tileKey(tilesB[0]));
       }
     }
   }
@@ -190,11 +193,12 @@ export function detectSpecialCombos(
     });
   }
 
-  // Triple special: 3+ special tiles in one word
-  if (specialTiles.length >= 3) {
+  // Triple special: 3+ unclaimed special tiles in one word
+  const unclaimedSpecials = specialTiles.filter(t => !usedTileKeys.has(`${t.row},${t.col}`));
+  if (unclaimedSpecials.length >= 3) {
     combos.push({
       type: 'triple_special',
-      tiles: specialTiles.slice(0, 3),
+      tiles: unclaimedSpecials.slice(0, 3),
       scoreMultiplier: 4,
       label: 'blast.combo.triple_special',
     });

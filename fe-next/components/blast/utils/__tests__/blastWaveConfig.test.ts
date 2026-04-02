@@ -48,9 +48,9 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(3).minWordLength).toBe(3);
   });
 
-  it('increases minWordLength at wave 5', () => {
-    expect(getWaveConfig(4).minWordLength).toBe(3);
-    expect(getWaveConfig(5).minWordLength).toBe(4);
+  it('increases minWordLength at wave 6', () => {
+    expect(getWaveConfig(5).minWordLength).toBe(3);
+    expect(getWaveConfig(6).minWordLength).toBe(4);
   });
 
   it('enables lightning at wave 4', () => {
@@ -58,9 +58,9 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(4).lightningEnabled).toBe(true);
   });
 
-  it('enables magnet at wave 6', () => {
-    expect(getWaveConfig(5).magnetEnabled).toBe(false);
-    expect(getWaveConfig(6).magnetEnabled).toBe(true);
+  it('enables magnet at wave 7', () => {
+    expect(getWaveConfig(6).magnetEnabled).toBe(false);
+    expect(getWaveConfig(7).magnetEnabled).toBe(true);
   });
 
   it('enables gems at wave 2', () => {
@@ -73,9 +73,9 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(3).prismEnabled).toBe(true);
   });
 
-  it('enables frozen at wave 5', () => {
-    expect(getWaveConfig(4).frozenEnabled).toBe(false);
-    expect(getWaveConfig(5).frozenEnabled).toBe(true);
+  it('enables frozen at wave 6', () => {
+    expect(getWaveConfig(5).frozenEnabled).toBe(false);
+    expect(getWaveConfig(6).frozenEnabled).toBe(true);
   });
 
   it('has scoreThreshold starting at wave 4 (wave 3 is threshold-free for learning)', () => {
@@ -87,26 +87,27 @@ describe('getWaveConfig', () => {
 
   it('increases scoreThreshold for later waves', () => {
     expect(getWaveConfig(4).scoreThreshold).toBe(150);
-    expect(getWaveConfig(5).scoreThreshold).toBe(250);
-    expect(getWaveConfig(6).scoreThreshold).toBe(400);
+    expect(getWaveConfig(5).scoreThreshold).toBe(200);
+    expect(getWaveConfig(6).scoreThreshold).toBe(300);
+    expect(getWaveConfig(7).scoreThreshold).toBe(400);
   });
 
-  it('caps scaling at wave 6+ (no further changes)', () => {
-    const w6 = getWaveConfig(6);
+  it('caps scaling at wave 7+ (no further changes)', () => {
+    const w7 = getWaveConfig(7);
     const w10 = getWaveConfig(10);
 
-    expect(w10.minWordLength).toBe(w6.minWordLength);
-    expect(w10.maxCascadeChain).toBe(w6.maxCascadeChain);
-    expect(w10.vowelModifier).toBe(w6.vowelModifier);
-    expect(w10.lightningEnabled).toBe(w6.lightningEnabled);
-    expect(w10.magnetEnabled).toBe(w6.magnetEnabled);
+    expect(w10.minWordLength).toBe(w7.minWordLength);
+    expect(w10.maxCascadeChain).toBe(w7.maxCascadeChain);
+    expect(w10.vowelModifier).toBe(w7.vowelModifier);
+    expect(w10.lightningEnabled).toBe(w7.lightningEnabled);
+    expect(w10.magnetEnabled).toBe(w7.magnetEnabled);
   });
 
-  it('increases scoreThreshold linearly beyond wave 6', () => {
-    const w6 = getWaveConfig(6);
+  it('increases scoreThreshold linearly beyond wave 7', () => {
     const w7 = getWaveConfig(7);
-    // Beyond wave 6, threshold should continue increasing
-    expect(w7.scoreThreshold).toBeGreaterThan(w6.scoreThreshold!);
+    const w8 = getWaveConfig(8);
+    // Beyond wave 7, threshold should continue increasing
+    expect(w8.scoreThreshold).toBeGreaterThan(w7.scoreThreshold!);
   });
 
   it('increases cascadeChainBonus with wave', () => {
@@ -150,16 +151,16 @@ describe('getWaveDistribution', () => {
     expect(dist.magnet).toBe(0);
   });
 
-  it('includes lightning + diamond at wave 4', () => {
+  it('includes lightning but not diamond at wave 4', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.gem).toBeGreaterThan(0);
     expect(dist.prism).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.diamond).toBe(0);
   });
 
-  it('includes both lightning and magnet at wave 6', () => {
-    const dist = getWaveDistribution(getWaveConfig(6));
+  it('includes both lightning and magnet at wave 7', () => {
+    const dist = getWaveDistribution(getWaveConfig(7));
     expect(dist.lightning).toBeGreaterThan(0);
     expect(dist.magnet).toBeGreaterThan(0);
   });
@@ -235,33 +236,34 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 4: unlocks lightning + diamond (> 0), still no frost/mirror/vortex', () => {
+  it('wave 4: unlocks lightning only, still no diamond/frost/mirror/vortex', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.lightning).toBeGreaterThan(0);
-    expect(dist.diamond).toBeGreaterThan(0);
+    expect(dist.diamond ?? 0).toBe(0);
     expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
     expect(dist.mirror ?? 0).toBe(0);
     expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 5: all tiles except vortex/magnet are > 0', () => {
+  it('wave 5: unlocks diamond + mirror, still no frost/vortex', () => {
     const dist = getWaveDistribution(getWaveConfig(5));
-    expect(dist.bomb).toBeGreaterThan(0);
-    expect(dist.ice).toBeGreaterThan(0);
-    expect(dist.gold).toBeGreaterThan(0);
-    expect(dist.silver).toBeGreaterThan(0);
-    expect(dist.rainbow).toBeGreaterThan(0);
-    expect(dist.gem).toBeGreaterThan(0);
-    expect(dist.prism).toBeGreaterThan(0);
+    expect(dist.diamond).toBeGreaterThan(0);
     expect(dist.mirror).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.frost ?? dist.frozen ?? 0).toBe(0);
+    expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
+  });
+
+  it('wave 6: unlocks frost, still no vortex', () => {
+    const dist = getWaveDistribution(getWaveConfig(6));
     expect(dist.frost ?? dist.frozen ?? 0).toBeGreaterThan(0);
+    expect(dist.mirror).toBeGreaterThan(0);
     expect(dist.diamond).toBeGreaterThan(0);
     expect(dist.vortex ?? dist.magnet ?? 0).toBe(0);
   });
 
-  it('wave 6+: everything including vortex/magnet is > 0', () => {
-    const dist = getWaveDistribution(getWaveConfig(6));
+  it('wave 7+: everything including vortex/magnet is > 0', () => {
+    const dist = getWaveDistribution(getWaveConfig(7));
     expect(dist.vortex ?? dist.magnet ?? 0).toBeGreaterThan(0);
     expect(dist.mirror).toBeGreaterThan(0);
     expect(dist.diamond).toBeGreaterThan(0);
@@ -304,9 +306,9 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(getWaveConfig(5).mirrorEnabled).toBe(true);
   });
 
-  it('diamondEnabled=false for wave 1-3, true for wave 4+', () => {
-    expect(getWaveConfig(3).diamondEnabled).toBe(false);
-    expect(getWaveConfig(4).diamondEnabled).toBe(true);
+  it('diamondEnabled=false for wave 1-4, true for wave 5+', () => {
+    expect(getWaveConfig(4).diamondEnabled).toBe(false);
+    expect(getWaveConfig(5).diamondEnabled).toBe(true);
   });
 
   it('silverEnabled=true for all waves', () => {

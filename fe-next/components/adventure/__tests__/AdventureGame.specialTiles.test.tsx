@@ -140,6 +140,10 @@ vi.mock('@/hooks/useCascadeLoop', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAdventureMusic', () => ({
+  useAdventureMusic: () => ({ currentTrack: 1, stopMusic: vi.fn(), hasMusic: false }),
+}));
+
 // Helper to create test level config
 function createTestLevelConfig(specialTiles: any[] = []): LevelConfig {
   return {

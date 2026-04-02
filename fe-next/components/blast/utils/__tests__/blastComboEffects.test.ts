@@ -197,21 +197,17 @@ describe('executeComboEffect', () => {
     }
   });
 
-  // ── Unknown combo type (no-op) ─────────────────────────────────────────────
+  // ── gold_special now fires area blast around the effect tile ────────────────
 
-  it('should return empty result for unknown combo type (no-op)', () => {
+  it('gold_special: should fire area blast around the effect tile', () => {
     const grid = makeGrid();
-    // Use gold_special: handled at score layer, not in executeComboEffect
     const combo = makeCombo('gold_special', [
       { row: 0, col: 0, tileType: 'gold' },
       { row: 0, col: 1, tileType: 'bomb' },
     ], 4);
     const result = executeComboEffect(makeCtx(grid, combo));
-    expect(result.explosions).toEqual([]);
-    expect(result.processedBombKeys).toEqual([]);
-    expect(result.processedLightningKeys).toEqual([]);
-    expect(result.bonusScore).toBe(0);
-    expect(grid[0][0].isCleared).toBe(false);
+    // Effect tile (bomb at 0,1) gets area blast — nearby tiles should be hit
+    expect(result.explosions.length).toBeGreaterThan(0);
   });
 
   it('should not throw for any new combo type', () => {

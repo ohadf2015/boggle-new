@@ -306,6 +306,14 @@ export function useAdventureBossNew({
     const newHP = Math.max(0, currentHP - score);
 
     hpRef.current = newHP;
+
+    // Guard: if this hit kills the boss, immediately set isActiveRef=false so
+    // any concurrent dealDamage call in the same synchronous batch is blocked
+    // before React effects have a chance to run endBattle.
+    if (newHP <= 0) {
+      isActiveRef.current = false;
+    }
+
     setHp(newHP);
 
     return actualDamage;

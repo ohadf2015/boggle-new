@@ -73,7 +73,7 @@ export function BlastGame({
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const { playComboSound } = useSoundEffects();
   const sounds = useBlastSounds();
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
@@ -315,7 +315,7 @@ export function BlastGame({
     combo,
     spamDetection,
     t: (key: string) => t(key) || key,
-    playWordAcceptedSound,
+    playWordAcceptedSound: () => {}, // Blast uses useBlastSounds.playTileClear instead
     playComboSound,
     announceWordResult: () => {},
     announceCombo: () => {},
@@ -333,7 +333,8 @@ export function BlastGame({
 
   const handleWordChange = useCallback((word: string) => {
     setFormedWord(word);
-  }, []);
+    if (word.length > 0) sounds.playPathTone(word.length);
+  }, [sounds]);
 
   const handleQuit = useCallback(() => {
     onQuit();

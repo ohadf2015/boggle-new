@@ -126,7 +126,7 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number }> = [];
+    const survivors: Array<{ uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number; innerType?: BlastTileType }> = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       if (!tileStates[row][col].isCleared) {
         survivors.push({
@@ -135,6 +135,7 @@ export function computeGravityResult(
           type: tileStates[row][col].type,
           originalRow: row,
           hitsRemaining: tileStates[row][col].hitsRemaining,
+          ...(tileStates[row][col].innerType ? { innerType: tileStates[row][col].innerType } : {}),
         });
       }
     }
@@ -151,6 +152,7 @@ export function computeGravityResult(
         isCleared: false,
         activationEffect: null,
         hitsRemaining: survivor.hitsRemaining,
+        ...(survivor.innerType ? { innerType: survivor.innerType } : {}),
       };
 
       const fallDist = bottomRow - survivor.originalRow;
@@ -197,7 +199,7 @@ export function computeGravityResult(
           col,
           letter,
           type,
-          spawnOffset: emptyCount - i, // furthest from top gets highest offset
+          spawnOffset: i + 1, // topmost new tile (furthest travel) gets highest offset
         });
       }
     } else {

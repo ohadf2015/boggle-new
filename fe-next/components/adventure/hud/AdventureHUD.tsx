@@ -28,7 +28,6 @@ import { CooldownIndicator } from './CooldownIndicator';
 export interface AdventureHUDProps {
   // Timer
   remainingTime: number;
-  totalTime: number;
 
   // Score
   score: number;
@@ -62,7 +61,6 @@ export interface AdventureHUDProps {
 export const AdventureHUD = memo<AdventureHUDProps>(
   ({
     remainingTime,
-    totalTime,
     score,
     recentScoreGain,
     objectives,
@@ -109,8 +107,8 @@ export const AdventureHUD = memo<AdventureHUDProps>(
               {t('adventure.levelWithNumber', { level: playerLevel })}
             </div>
 
-            {/* XP Progress */}
-            <div className="hidden sm:block flex-1 min-w-0 max-w-xs">
+            {/* XP Progress — always visible, compact on mobile */}
+            <div className="flex-1 min-w-0 max-w-xs">
               <AdventureXpProgressBar
                 totalXp={totalXp}
                 recentXpGain={recentXpGain}

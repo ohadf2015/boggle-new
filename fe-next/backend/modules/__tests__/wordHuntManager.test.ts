@@ -326,7 +326,7 @@ describe('wordHuntManager', () => {
       expect(state.isFirstFinderClaimed).toBe(true);
     });
 
-    it('should not give first finder bonus to second finder', () => {
+    it('should give decreasing bonus to second finder', () => {
       const state: WordHuntModeState = {
         targetWord: 'hello',
         targetWordLength: 5,
@@ -334,11 +334,12 @@ describe('wordHuntManager', () => {
         eliminatedPlayers: [],
         targetFoundBy: 'alice',
         isFirstFinderClaimed: true,
+        finderCount: 1,
       };
 
       const result = recordTargetFound(state, 'bob');
       expect(result.isFirstFinder).toBe(false);
-      expect(result.bonus).toBe(0);
+      expect(result.bonus).toBe(12); // 2nd finder bonus
     });
   });
 
@@ -347,17 +348,17 @@ describe('wordHuntManager', () => {
   // ==========================================
   describe('getLifeBonus', () => {
     it('should return correct bonus for word lengths 3-8', () => {
-      expect(getLifeBonus(3)).toBe(3);
-      expect(getLifeBonus(4)).toBe(5);
-      expect(getLifeBonus(5)).toBe(8);
-      expect(getLifeBonus(6)).toBe(12);
-      expect(getLifeBonus(7)).toBe(16);
-      expect(getLifeBonus(8)).toBe(20);
+      expect(getLifeBonus(3)).toBe(5);
+      expect(getLifeBonus(4)).toBe(8);
+      expect(getLifeBonus(5)).toBe(12);
+      expect(getLifeBonus(6)).toBe(18);
+      expect(getLifeBonus(7)).toBe(24);
+      expect(getLifeBonus(8)).toBe(30);
     });
 
     it('should return max bonus for words longer than 8', () => {
-      expect(getLifeBonus(9)).toBe(20);
-      expect(getLifeBonus(12)).toBe(20);
+      expect(getLifeBonus(9)).toBe(30);
+      expect(getLifeBonus(12)).toBe(30);
     });
 
     it('should return fallback bonus for very short words', () => {

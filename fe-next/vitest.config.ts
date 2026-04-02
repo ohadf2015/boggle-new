@@ -31,6 +31,8 @@ export default defineConfig({
       ['shared/**/*.test.ts', 'node'],
       ['lib/**/*.test.ts', 'node'],
       ['types/**/*.test.ts', 'node'],
+      // Hooks tests use jsdom for accurate sessionStorage/window behaviour
+      ['hooks/**/*.test.{ts,tsx}', 'jsdom'],
     ],
     include: [
       'components/**/*.test.{ts,tsx}',

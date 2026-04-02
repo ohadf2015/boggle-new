@@ -8,7 +8,7 @@ import {
   FROST_REVEAL_BONUS,
 } from '../types';
  
-import { applyToTile, fireVortex, pushExplosion, type ComboEffectContext, type ComboEffectResult } from './blastComboEffects';
+import { fireAreaBlast, fireCrossClear, fireVortex, pushExplosion, type ComboEffectContext, type ComboEffectResult } from './blastComboEffects';
 import { scaledRadius } from './blastComboScaling';
 
 /**
@@ -120,6 +120,33 @@ export function executeTacticalCombo(
       }
       const gfRef = gfGemT ?? gfFrostT ?? combo.tiles[0];
       if (gfRef) pushExplosion(`combo-gf-${now}`, gfRef.row, gfRef.col, result, now);
+      return true;
+    }
+
+    case 'gold_special': {
+      // Gold + effect tile: area blast around the effect tile (gold amplifies)
+      const gsEffect = combo.tiles.find(t => t.tileType !== 'gold') ?? combo.tiles[1];
+      if (!gsEffect) break;
+      fireAreaBlast(gsEffect.row, gsEffect.col, scaledRadius(2, ctx.wordLengthScale), ctx);
+      pushExplosion(`combo-gs-${now}`, gsEffect.row, gsEffect.col, result, now);
+      return true;
+    }
+
+    case 'rainbow_special': {
+      // Rainbow + effect tile: re-fire the paired tile's native ability (cross-clear)
+      const rsEffect = combo.tiles.find(t => t.tileType !== 'rainbow') ?? combo.tiles[1];
+      if (!rsEffect) break;
+      fireCrossClear(rsEffect.row, rsEffect.col, ctx);
+      pushExplosion(`combo-rs-${now}`, rsEffect.row, rsEffect.col, result, now);
+      return true;
+    }
+
+    case 'triple_special': {
+      // 3+ specials: area blast at the middle tile of the trio
+      const triCenter = combo.tiles[1] ?? combo.tiles[0];
+      if (!triCenter) break;
+      fireAreaBlast(triCenter.row, triCenter.col, scaledRadius(2, ctx.wordLengthScale), ctx);
+      pushExplosion(`combo-ts-${now}`, triCenter.row, triCenter.col, result, now);
       return true;
     }
 

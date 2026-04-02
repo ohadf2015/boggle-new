@@ -12,6 +12,7 @@ import { getUpgradeEffect, getUpgradeTier, type UpgradeState } from '@/lib/adven
 import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
 import { captureApiError } from '@/utils/sentry';
 import { getWeekStart, getDifficultyFromType, getStatDelta, getWeekNumber, pickAvatarReward, type GameStats } from '@/shared/weeklyQuestTemplates';
+import { loadDictionaryWords } from '@/app/api/word-solver/dictionaryLoader';
 // Dynamic import to avoid Turbopack bundling backend logger transitively
 // dailyMissionsManager uses backend/utils/logger which has Node.js-only APIs
 const lazyCompleteMission = async (playerId: string, type: 'adventure') => {
@@ -41,13 +42,13 @@ function validateRequestBody(body: Record<string, unknown>): {
     stars: number;
     score: number;
     words: number;
-    longWords?: number;
     retainedScore?: number;
     wordsFound?: string[];
-    flashChallengeGold?: number;
+    flashChallengeCompleted?: boolean;
+    timePlayed?: number;
   };
 } {
-  const { world, level, stars, score, words, longWords, retainedScore, flashChallengeGold } = body;
+  const { world, level, stars, score, words, retainedScore } = body;
 
   // Check required fields
   if (
@@ -94,10 +95,11 @@ function validateRequestBody(body: Record<string, unknown>): {
     valid: true,
     data: {
       world, level, stars, score, words,
-      ...(typeof longWords === 'number' && longWords >= 0 && { longWords }),
       ...(typeof retainedScore === 'number' && { retainedScore }),
-      ...(typeof flashChallengeGold === 'number' && flashChallengeGold >= 0 && { flashChallengeGold: Math.min(flashChallengeGold, 100) }),
       ...(Array.isArray(body.wordsFound) && { wordsFound: body.wordsFound as string[] }),
+      // flashChallengeGold is intentionally NOT accepted from client — use flashChallengeCompleted boolean only
+      ...(body.flashChallengeCompleted === true && { flashChallengeCompleted: true }),
+      ...(typeof body.timePlayed === 'number' && { timePlayed: body.timePlayed }),
     },
   };
 }
@@ -148,7 +150,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { world, level, stars, score, words, longWords, retainedScore: _retainedScore } = validation.data;
+    const { world, level, stars, score, words, retainedScore: _retainedScore } = validation.data;
+
+    // Security: minimum time-in-level check (prevents W1L1 speed-replay gold farming)
+    const timePlayed = validation.data.timePlayed;
+    const MIN_TIME_PLAYED_SECONDS = 10;
+    if (typeof timePlayed === 'number' && timePlayed < MIN_TIME_PLAYED_SECONDS) {
+      return NextResponse.json(
+        { error: `Invalid timePlayed: must be at least ${MIN_TIME_PLAYED_SECONDS} seconds` },
+        { status: 400 }
+      );
+    }
 
     // TODO: persist retainedScore once retry scoring schema exists
     void _retainedScore;
@@ -277,12 +289,22 @@ export async function POST(request: NextRequest) {
       ? Math.floor((10 + world * 3) * failureGoldEffect)
       : (10 + world * 3) * stars;
     const perfectClearGoldBonus = stars === 3 ? 50 : 0;
-    // Cap longWords to a plausible maximum (max ~25 words in a level, not all can be long)
-    const clampedLongWords = Math.min(longWords ?? 0, 20);
+
+    // Task 3: Compute longWords server-side from validated wordsFound (6+ letter words)
+    // If no wordsFound provided we cannot verify, so default to 0 (security: no client trust)
+    const serverLongWords = Array.isArray(validation.data.wordsFound)
+      ? validation.data.wordsFound.filter(w => typeof w === 'string' && w.length >= 6).length
+      : 0;
+    // Cap to a plausible maximum
+    const clampedLongWords = Math.min(serverLongWords, 20);
     const cargoBayEffect = getUpgradeEffect(playerUpgrades, 'cargoBay') || 0;
     const longWordBonus = clampedLongWords * cargoBayEffect;
-    // Flash challenge gold (capped at 100 in validation, added before multipliers)
-    const flashGold = validation.data.flashChallengeGold ?? 0;
+
+    // Task 2: Fixed server-side flash challenge gold — never trust client-sent amount
+    // 25 gold is the fixed reward regardless of challenge type
+    const FLASH_CHALLENGE_GOLD = 25;
+    const flashGold = validation.data.flashChallengeCompleted === true ? FLASH_CHALLENGE_GOLD : 0;
+
     let goldEarned = baseGold + perfectClearGoldBonus + longWordBonus + flashGold;
 
     // Apply luckyPickaxe as ADDITIVE bonus (not multiplicative — prevents economy inflation)
@@ -309,6 +331,24 @@ export async function POST(request: NextRequest) {
     // Cap gold per level to prevent edge-case abuse
     const MAX_GOLD_PER_LEVEL = 500;
     goldEarned = Math.min(goldEarned, MAX_GOLD_PER_LEVEL);
+
+    // Task 6b: Daily gold cap — prevent W1L1 replay farming
+    // Query sum of gold_earned from level_completions today for this user
+    const DAILY_GOLD_CAP = 5000;
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { data: dailyGoldRow } = await supabase
+      .from('level_completions')
+      .select('gold_earned')
+      .eq('user_id', userId)
+      .gte('completed_at', todayStart.toISOString());
+    const dailyGoldEarned = Array.isArray(dailyGoldRow)
+      ? dailyGoldRow.reduce((sum: number, row: { gold_earned?: number }) => sum + (row.gold_earned ?? 0), 0)
+      : 0;
+    if (dailyGoldEarned >= DAILY_GOLD_CAP) {
+      goldEarned = 0;
+    }
+
     const currentGold = (existingProgression?.gold as number) ?? 0;
     const newGold = currentGold + goldEarned;
 
@@ -324,11 +364,15 @@ export async function POST(request: NextRequest) {
       nextLevel = 7;
     }
 
-    // Persist word album (words validated by game grid — safe to store)
-    // Merge new words into existing album, capped at 5000
+    // Persist word album — Task 1: validate each word against dictionary before storing
+    // This prevents clients from inflating the word album with fake words.
     const MAX_ALBUM_SIZE = 5000;
     let wordAlbumUpdate: string[] | undefined;
-    if (words > 0 && Array.isArray(validation.data.wordsFound)) {
+    if (words > 0 && Array.isArray(validation.data.wordsFound) && validation.data.wordsFound.length > 0) {
+      // Load dictionary for validation (cached in module scope by dictionaryLoader)
+      const dictWords = await loadDictionaryWords('en');
+      const dictSet = new Set(dictWords.map((w: string) => w.toLowerCase()));
+
       const { data: albumRow } = await supabase
         .from('player_progression')
         .select('word_album')
@@ -337,10 +381,13 @@ export async function POST(request: NextRequest) {
       const existingAlbum = new Set<string>(
         ((albumRow?.word_album as string[]) ?? []).map((w: string) => w.toUpperCase())
       );
-      for (const w of validation.data.wordsFound!) {
+      for (const w of validation.data.wordsFound) {
         if (existingAlbum.size >= MAX_ALBUM_SIZE) break;
         if (typeof w === 'string' && w.length >= 3 && w.length <= 15) {
-          existingAlbum.add(w.toUpperCase());
+          // Only store words that exist in the dictionary
+          if (dictSet.has(w.toLowerCase())) {
+            existingAlbum.add(w.toUpperCase());
+          }
         }
       }
       wordAlbumUpdate = Array.from(existingAlbum);
@@ -408,7 +455,7 @@ export async function POST(request: NextRequest) {
         const freshUpgrades = (freshProg.upgrades as UpgradeState) ?? {};
         const freshCargoBay = getUpgradeEffect(freshUpgrades, 'cargoBay') || 0;
         const freshLongWordBonus = clampedLongWords * freshCargoBay;
-        let freshGoldEarned = baseGold + perfectClearGoldBonus + freshLongWordBonus;
+        let freshGoldEarned = baseGold + perfectClearGoldBonus + freshLongWordBonus + flashGold;
         const freshPickaxe = getUpgradeEffect(freshUpgrades, 'luckyPickaxe') || 0;
         if (freshPickaxe > 0) {
           freshGoldEarned = Math.round(freshGoldEarned + baseGold * freshPickaxe);
@@ -539,7 +586,7 @@ export async function POST(request: NextRequest) {
     const questStats: GameStats = {
       gamesPlayed: 1,
       wordsFound: words,
-      longWordsFound: validation.data.longWords ?? 0,
+      longWordsFound: clampedLongWords,
       maxScore: score,
     };
     after(async () => {

@@ -70,6 +70,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     setShowQuickRules(false);
     try { localStorage.setItem(QUICK_RULES_STORAGE_KEY, '1'); } catch { /* SSR */ }
   }, []);
+  const handleShowHelp = useCallback(() => {
+    setShowQuickRules(true);
+  }, []);
 
   // Track survival duration for death recap
   const [survivalSeconds, setSurvivalSeconds] = useState(0);
@@ -220,13 +223,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   }, [bridge.isGameOver, bridge.targetFound, bridge.lifePoints, bridge.eliminatedPlayers,
       foundWords, wrongGuessCount, lastAttemptWasWrong, leaderboard.length, username, survivalSeconds]);
 
-  // Show quick rules before game
-  if (showQuickRules) {
-    return <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />;
-  }
-
   return (
     <>
+    {showQuickRules && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
     <LowHPOverlay hp={bridge.lifePoints} />
     <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={bridge.targetCategory} />
     <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
@@ -234,6 +233,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       // Header (no timer)
       score={score}
       onQuit={onQuit}
+      onShowHelp={handleShowHelp}
 
       // Clue boxes (from bridge)
       targetLength={bridge.targetLength}

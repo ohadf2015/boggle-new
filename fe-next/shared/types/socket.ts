@@ -235,6 +235,63 @@ export interface ServerToClientEvents {
   // Kick events
   kicked: (data: { reason: 'host' | 'inactive' }) => void;
   playerKicked: (data: { username: string; reason: 'host' | 'inactive' }) => void;
+
+  // Game lifecycle events
+  totalBoardWords: (data: { count: number }) => void;
+  gameStarting: (data: { gameMode: string }) => void;
+  validatedScores: (data: {
+    scores?: unknown[];
+    letterGrid?: unknown;
+    duplicateRuleDisabled?: boolean;
+    playerCount?: number;
+    gameMode?: string;
+    wordHuntSummary?: unknown;
+    blastSummary?: unknown;
+    reconnect?: boolean;
+  }) => void;
+  playing: (data: Record<string, never>) => void;
+  finished: (data: Record<string, never>) => void;
+
+  // Lobby / ready-up events
+  playerListUpdate: (data: { users: unknown[] }) => void;
+  playersReadyUpdate: (data: { readyCount: number; totalPlayers: number; readyUsernames: string[] }) => void;
+  allPlayersReady: (data: { readyCount: number; totalPlayers: number }) => void;
+  autoStartCountdown: (data: { remaining: number }) => void;
+  autoStartCancelled: (data: Record<string, never>) => void;
+
+  // Word / room broadcast events
+  playerFoundWord: (data: {
+    username: string;
+    word: string;
+    wordCount: number;
+    score: number;
+    comboLevel: number;
+    comboSync?: { comboType: string; username: string };
+  }) => void;
+  wordSubmit: (data: { word: string; username: string }) => void;
+  roomCreate: (data: { gameCode: string; roomName: string }) => void;
+  avatarUpdated: (data: { username: string; avatarImage?: unknown; customAvatar?: unknown }) => void;
+
+  // Earthquake / Fire Round events
+  fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
+  fireRoundEnd: (data: { gameSessionId?: string }) => void;
+  earthquakeShake: (data: { gameSessionId?: string }) => void;
+  earthquakeWarning: (data: { gameSessionId?: string; timestamp: number }) => void;
+
+  // Engagement — daily missions & grand slam
+  'engagement:dailyMissions': (data: { missions: unknown[] }) => void;
+  'engagement:grandSlamClaimed': (data: { claimed: boolean; [key: string]: unknown }) => void;
+
+  // Engagement — Word of the Day
+  'engagement:wotd': (data: { word: string; language: string; [key: string]: unknown }) => void;
+  'engagement:wotdRecorded': (data: { success?: boolean; found?: boolean; [key: string]: unknown }) => void;
+  'engagement:wotdStats': (data: { stats?: unknown; [key: string]: unknown }) => void;
+
+  // Party game events
+  'party:gameUpdate': (data: Record<string, unknown>) => void;
+  'party:phaseChange': (data: { phase: string; gameState?: unknown }) => void;
+  'party:playerJoined': (data: { player: unknown }) => void;
+  'party:playerLeft': (data: { socketId: string; username?: string }) => void;
 }
 
 // ==================== Payload Types ====================

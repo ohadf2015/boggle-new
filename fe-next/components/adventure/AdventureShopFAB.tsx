@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ShoppingBag, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +30,7 @@ export default function AdventureShopFAB({
       {/* Ember glow — radiates behind the button */}
       <div className="absolute inset-0 -inset-x-1 -inset-y-1 rounded-neo-lg bg-neo-orange/40 animate-[ember-pulse_3s_ease-in-out_infinite] motion-reduce:animate-none pointer-events-none" />
 
-      <motion.button
+      <AdaptiveMotion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: 'spring', damping: 12, stiffness: 200 }}
@@ -53,7 +53,7 @@ export default function AdventureShopFAB({
         )}
       >
         {/* Shop icon with idle bounce animation */}
-        <motion.span
+        <AdaptiveMotion.span
           animate={{ y: [0, -2, 0] }}
           transition={{
             duration: 0.6,
@@ -64,7 +64,7 @@ export default function AdventureShopFAB({
           className="inline-flex"
         >
           <ShoppingBag className="w-5 h-5 drop-shadow-[1px_1px_0px_rgba(0,0,0,0.3)]" />
-        </motion.span>
+        </AdaptiveMotion.span>
 
         {/* Title */}
         <span className="drop-shadow-[1px_1px_0px_rgba(0,0,0,0.15)]">
@@ -89,7 +89,7 @@ export default function AdventureShopFAB({
         {/* Spark dots — tiny decorative "sparks" */}
         <div className="absolute -top-1 -end-1 w-1.5 h-1.5 rounded-full bg-neo-yellow animate-[spark_2s_ease-in-out_infinite] motion-reduce:animate-none" />
         <div className="absolute -top-0.5 end-3 w-1 h-1 rounded-full bg-neo-yellow/60 animate-[spark_2s_ease-in-out_infinite_0.7s] motion-reduce:animate-none" />
-      </motion.button>
+      </AdaptiveMotion.button>
     </div>
   );
 }

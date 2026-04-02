@@ -9,9 +9,10 @@
  * Wave 1: bomb, ice, gold, silver, rainbow (basics)
  * Wave 2: + treasure gem
  * Wave 3: + prism
- * Wave 4: + lightning, diamond
- * Wave 5: + frost, mirror (new toys to master)
- * Wave 6+: + vortex (everything)
+ * Wave 4: + lightning
+ * Wave 5: + diamond, mirror
+ * Wave 6: + frost
+ * Wave 7+: + vortex (everything)
  */
 
 export interface WaveConfig {
@@ -91,23 +92,31 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 17,
   },
-  // Wave 4 — lightning + diamond unlock (15 moves)
+  // Wave 4 — lightning unlock only (16 moves, learn one new mechanic)
   {
     minWordLength: 3, specialTileChance: 0.21, iceDistribution: 0.25, goldDistribution: 0.16,
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 150,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 16,
   },
-  // Wave 5 — frost + mirror unlock (14 moves)
+  // Wave 5 — diamond + mirror unlock (15 moves, minWordLength stays 3)
   {
-    minWordLength: 4, specialTileChance: 0.23, iceDistribution: 0.28, goldDistribution: 0.14,
-    vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 250,
+    minWordLength: 3, specialTileChance: 0.23, iceDistribution: 0.27, goldDistribution: 0.14,
+    vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 200,
+    lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
+    gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
+  },
+  // Wave 6 — frost unlock (14 moves, minWordLength rises to 4)
+  {
+    minWordLength: 4, specialTileChance: 0.24, iceDistribution: 0.28, goldDistribution: 0.13,
+    vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.95, scoreThreshold: 300,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 14,
   },
-  // Wave 6+ — everything unlocked (12 moves — tight, requires strategy)
+  // Wave 7+ — vortex unlock, everything available (12 moves — tight, requires strategy)
   {
     minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
     vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 400,
@@ -123,12 +132,12 @@ const WAVE_TABLE: WaveConfig[] = [
  * with linearly increasing score threshold.
  */
 export function getWaveConfig(wave: number): WaveConfig {
-  const clamped = Math.min(Math.max(wave, 1), 6);
+  const clamped = Math.min(Math.max(wave, 1), 7);
   const config = { ...WAVE_TABLE[clamped] };
 
-  // Beyond wave 6: increase scoreThreshold linearly
-  if (wave > 6) {
-    config.scoreThreshold = 400 + (wave - 6) * 40;
+  // Beyond wave 7: increase scoreThreshold linearly
+  if (wave > 7) {
+    config.scoreThreshold = 400 + (wave - 7) * 40;
   }
 
   return config;
@@ -149,8 +158,9 @@ const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
   2: [{ type: 'word_length', target: 2, minWordLength: 4 }, { type: 'score_target', target: 50 }],
   3: [{ type: 'collect_type', tileType: 'bomb', target: 2 }, { type: 'score_target', target: 80 }],
   4: [{ type: 'collect_type', tileType: 'lightning', target: 2 }, { type: 'word_length', target: 1, minWordLength: 5 }],
-  5: [{ type: 'clear_all_type', tileType: 'frozen', target: 0 }, { type: 'score_target', target: 150 }],
-  6: [{ type: 'collect_type', tileType: 'prism', target: 2 }, { type: 'word_length', target: 2, minWordLength: 5 }],
+  5: [{ type: 'collect_type', tileType: 'diamond', target: 1 }, { type: 'score_target', target: 120 }],
+  6: [{ type: 'clear_all_type', tileType: 'frozen', target: 0 }, { type: 'score_target', target: 150 }],
+  7: [{ type: 'collect_type', tileType: 'prism', target: 2 }, { type: 'word_length', target: 2, minWordLength: 5 }],
 };
 
 /**
@@ -161,13 +171,13 @@ const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
 export function getWaveObjectives(wave: number): BlastObjective[] {
   const clamped = Math.max(wave, 1);
 
-  if (clamped <= 6) {
+  if (clamped <= 7) {
     return WAVE_OBJECTIVES[clamped].map(obj => ({ ...obj }));
   }
 
-  // Wave 7+: rotating objective templates for variety
-  const baseScore = 120 + (clamped - 6) * 40;
-  const templateIndex = (clamped - 7) % 5;
+  // Wave 8+: rotating objective templates for variety
+  const baseScore = 150 + (clamped - 7) * 40;
+  const templateIndex = (clamped - 8) % 5;
 
   const WAVE7_TEMPLATES: BlastObjective[][] = [
     // Template 0: score + collect bombs
@@ -207,9 +217,10 @@ const DIAMOND_SHARE = 0.04;
  * Wave 1: bomb, ice, gold, silver, rainbow (no wildcard)
  * Wave 2: + gem (treasure)
  * Wave 3: + prism
- * Wave 4: + lightning, diamond
- * Wave 5: + frost, mirror
- * Wave 6+: + vortex
+ * Wave 4: + lightning
+ * Wave 5: + diamond, mirror
+ * Wave 6: + frost
+ * Wave 7+: + vortex
  *
  * New tile shares are carved from gold + rainbow proportionally via takeShare().
  * Returns a record suitable for customDistribution in BlastGameConfig.

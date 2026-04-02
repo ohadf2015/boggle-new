@@ -4,7 +4,8 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, Avatar } from '@/shared/types';
+import type { GameUser, Avatar } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
 import {
   getGame,
@@ -33,7 +34,7 @@ import {
   LOBBY_ROOM
 } from '../utils/socketHelpers.js';
 
-import { clearGameTimer } from '../utils/timerManager.js';
+import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import { addPlayerMidTournament, getTournament, getTournamentStandings } from '../modules/tournamentManager.js';
 import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
@@ -166,20 +167,23 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
 /**
  * Handle player reconnection to an existing game
  */
-function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: string, username: string, authUserId?: string, guestTokenHash?: string): void {
+function handleReconnection(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, authUserId?: string, guestTokenHash?: string): void {
   const existingAuthUserId = game.users[username]?.authUserId;
   logger.info('SOCKET', `Reconnection detected for ${username}: existingAuthUserId=${existingAuthUserId || 'NONE'}, newAuthUserId=${authUserId || 'NONE'}`);
+
+  // Clear reconnection timer FIRST to prevent race where timer fires
+  // between reading user data and updating it
+  timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
 
   if (game.users[username]) {
     game.users[username].disconnected = false;
     delete game.users[username].disconnectedAt;
 
-    if ((game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout) {
-      clearTimeout((game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout);
-      delete (game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout;
-    }
-
     broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', { username });
+  } else {
+    // User entry missing (e.g., Redis restore didn't include user data)
+    // Log and continue — updateUserSocketId will re-register the socket mapping
+    logger.warn('SOCKET', `Reconnection for ${username} in ${gameCode} but user entry missing in game.users`);
   }
 
   // Pass auth context - use undefined (not null) to preserve existing values
@@ -191,10 +195,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
 
   if (game.hostUsername === username) {
     updateHostSocketId(gameCode, socket.id);
-    if (game.hostReconnectionTimeout) {
-      clearTimeout(game.hostReconnectionTimeout);
-      game.hostReconnectionTimeout = null;
-    }
+    timerManager.clearTimer(`hostReconnect:${gameCode}`);
   }
 
   joinRoom(socket, getGameRoom(gameCode));
@@ -221,7 +222,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
       messageId: 'reconnect-' + Date.now(),
       reconnect: true,
       skipAck: true,
-      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+      boardTheme: game.boardTheme || null,
       gameMode: game.gameMode || 'classic',
     };
 
@@ -229,6 +230,8 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
     if (game.gameMode === 'blast' && game.blastModeState) {
       reconnectPayload.blastTileOverlay = game.blastModeState.overlay || [];
       reconnectPayload.blastSeed = game.blastModeState.seed ?? null;
+      // Send player's moves-used count so client can restore correct state
+      reconnectPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
     }
 
     // Include word hunt state for reconnecting players
@@ -244,7 +247,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
     const leaderboard = getLeaderboard(gameCode);
     socket.emit('updateLeaderboard', { leaderboard });
 
-    const playerAchievementKeys: string[] = game.playerAchievements?.[username] || [];
+    const playerAchievementKeys: string[] = (game.playerAchievements?.[username] || []).map((a) => a.id);
     if (playerAchievementKeys.length > 0) {
       const achievements = playerAchievementKeys
         .map((key: string) => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
@@ -263,7 +266,7 @@ function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: st
 /**
  * Handle late join to an in-progress game
  */
-function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: string): void {
+function handleLateJoin(socket: Socket, game: GameState, gameCode: string, username: string): void {
   logger.info('SOCKET', `${username} joining game ${gameCode} in progress`);
 
   const lateJoinPayload: Record<string, any> = {
@@ -274,7 +277,7 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
     messageId: 'late-join-' + Date.now(),
     lateJoin: true,
     skipAck: true,
-    boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+    boardTheme: game.boardTheme || null,
     gameMode: game.gameMode || 'classic',
   };
 
@@ -282,6 +285,7 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
   if (game.gameMode === 'blast' && game.blastModeState) {
     lateJoinPayload.blastTileOverlay = game.blastModeState.overlay || [];
     lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
+    lateJoinPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
   }
 
   // Include word hunt state for late joiners — also initialize their lives
@@ -300,7 +304,7 @@ function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: 
   const leaderboard = getLeaderboard(gameCode);
   socket.emit('updateLeaderboard', { leaderboard });
 
-  const playerAchievementKeys: string[] = game.playerAchievements?.[username] || [];
+  const playerAchievementKeys: string[] = (game.playerAchievements?.[username] || []).map((a) => a.id);
   if (playerAchievementKeys.length > 0) {
     const achievements = playerAchievementKeys
       .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))

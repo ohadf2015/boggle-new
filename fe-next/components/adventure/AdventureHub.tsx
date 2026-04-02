@@ -11,7 +11,7 @@
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Flame, ChevronRight, Map, Swords, Target, Trophy, Check, Coins, Star, BookOpen, ShoppingBag, Home } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -44,7 +44,7 @@ interface AdventureHubProps {
   onPlayLevel: (worldId: number, levelId: number) => void;
   onOpenShop: () => void;
   wordAlbumCount?: number;
-  onWeeklyChallenge?: () => void;
+
   onBossRush?: () => void;
   canBossRush?: boolean;
   onOpenWordAlbum?: () => void;
@@ -88,7 +88,7 @@ const AdventureHub = memo<AdventureHubProps>(({
   onOpenShop,
   onBossRush,
   canBossRush = false,
-  onWeeklyChallenge,
+
   wordAlbumCount = 0,
   onOpenWordAlbum,
 }) => {
@@ -349,24 +349,6 @@ const AdventureHub = memo<AdventureHubProps>(({
             {t('adventure.hub.worldMap')}
           </motion.button>
 
-          {onWeeklyChallenge && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onWeeklyChallenge}
-              className={cn(
-                'flex-1 py-2.5 px-3',
-                'flex items-center justify-center gap-1.5',
-                'bg-neo-white/5 text-neo-white/70',
-                'font-bold text-xs',
-                'border border-neo-white/15 rounded-neo',
-                'hover:bg-neo-white/10 transition-colors'
-              )}
-            >
-              <Trophy className="w-4 h-4" />
-              {t('adventure.weeklyChallenge.title')}
-            </motion.button>
-          )}
 
           {canBossRush && onBossRush && (
             <motion.button

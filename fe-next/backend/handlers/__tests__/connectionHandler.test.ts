@@ -19,7 +19,7 @@ import {
   getSocketById,
   leaveAllGameRooms,
 } from '../../utils/socketHelpers';
-import { clearGameTimer } from '../../utils/timerManager';
+import timerManager, { clearGameTimer } from '../../utils/timerManager';
 import { resetRateLimit } from '../../utils/rateLimiter';
 import { cleanupPlayerData } from '../../utils/playerCleanup';
 import { cleanupGameBots } from '../../modules/botManager';
@@ -34,7 +34,26 @@ jest.mock('../../utils/logger', () => ({
 }));
 jest.mock('../../modules/gameStateManager');
 jest.mock('../../utils/socketHelpers');
-jest.mock('../../utils/timerManager');
+jest.mock('../../utils/timerManager', () => {
+  const callbacks: Map<string, () => void> = new Map();
+  const mockTimerManager = {
+    setTimeout: jest.fn((key: string, callback: () => void, _delay: number) => {
+      callbacks.set(key, callback);
+      // Use real setTimeout so jest.advanceTimersByTime works
+      setTimeout(callback, _delay);
+      return key;
+    }),
+    clearTimer: jest.fn((key: string) => {
+      callbacks.delete(key);
+    }),
+  };
+  return {
+    __esModule: true,
+    default: mockTimerManager,
+    clearGameTimer: jest.fn(),
+    setGameTimer: jest.fn(),
+  };
+});
 jest.mock('../../utils/rateLimiter');
 jest.mock('../../utils/playerCleanup');
 jest.mock('../../modules/botManager');
@@ -57,6 +76,7 @@ const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
 
 const mockGetGameRoom = getGameRoom as jest.Mock;
 const mockClearGameTimer = clearGameTimer as jest.Mock;
+const mockTimerManager = timerManager as jest.Mocked<typeof timerManager>;
 const mockResetRateLimit = resetRateLimit as jest.Mock;
 const mockCleanupPlayerData = cleanupPlayerData as jest.Mock;
 const mockCleanupGameBots = cleanupGameBots as jest.Mock;
@@ -225,7 +245,7 @@ describe('connectionHandler', () => {
       expect(mockDeleteGame).toHaveBeenCalledWith('GAME1');
     });
 
-    it('stores reconnection timeout on user for cancellation', () => {
+    it('registers reconnection timeout via timerManager', () => {
       const game = makeGame();
       const { socket, handlers } = createMockSocket('socket-p1');
       registerConnectionHandlers(mockIo, socket);
@@ -237,7 +257,11 @@ describe('connectionHandler', () => {
 
       handlers['disconnect']('transport close');
 
-      expect((game.users.Player1 as any).reconnectionTimeout).toBeDefined();
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
+        'reconnect:GAME1:Player1',
+        expect.any(Function),
+        expect.any(Number)
+      );
     });
   });
 
@@ -322,7 +346,11 @@ describe('connectionHandler', () => {
         mockIo, 'game:GAME1', 'hostDisconnected',
         expect.objectContaining({ gracePeriodMs: 30000 })
       );
-      expect((game as any).hostReconnectionTimeout).toBeDefined();
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
+        'hostReconnect:GAME1',
+        expect.any(Function),
+        expect.any(Number)
+      );
     });
 
     it('closes room after host grace period expires with no eligible host', () => {
@@ -374,8 +402,6 @@ describe('connectionHandler', () => {
 
     it('clears existing host reconnection timeout on new disconnect', () => {
       const game = makeGame();
-      const existingTimeout = setTimeout(() => {}, 99999);
-      (game as any).hostReconnectionTimeout = existingTimeout;
 
       const { socket, handlers } = createMockSocket('socket-host');
       registerConnectionHandlers(mockIo, socket);
@@ -385,12 +411,9 @@ describe('connectionHandler', () => {
       mockGetGame.mockReturnValue(game);
       mockIsRoomEmpty.mockReturnValue(true);
 
-      const clearSpy = jest.spyOn(global, 'clearTimeout');
-
       handlers['disconnect']('transport close');
 
-      expect(clearSpy).toHaveBeenCalledWith(existingTimeout);
-      clearSpy.mockRestore();
+      expect(mockTimerManager.clearTimer).toHaveBeenCalledWith('hostReconnect:GAME1');
     });
 
     it('does not close room if host reconnected before grace period expires', () => {
@@ -551,7 +574,7 @@ describe('connectionHandler', () => {
       expect(mockDeleteGame).not.toHaveBeenCalled();
     });
 
-    it('multiple rapid disconnects clear previous host timeout', () => {
+    it('multiple rapid disconnects clear previous host timeout and register new one', () => {
       const game = makeGame();
       const { socket, handlers } = createMockSocket('socket-host');
       registerConnectionHandlers(mockIo, socket);
@@ -564,7 +587,6 @@ describe('connectionHandler', () => {
 
       // First disconnect
       handlers['disconnect']('transport close');
-      const firstTimeout = (game as any).hostReconnectionTimeout;
 
       // Reset disconnected for second disconnect
       game.users.Host.disconnected = false;
@@ -572,11 +594,11 @@ describe('connectionHandler', () => {
 
       // Second disconnect
       handlers['disconnect']('transport close');
-      const secondTimeout = (game as any).hostReconnectionTimeout;
 
-      // Should have cleared first and set new
-      expect(secondTimeout).toBeDefined();
-      expect(secondTimeout).not.toBe(firstTimeout);
+      // clearTimer called twice (once per disconnect)
+      expect(mockTimerManager.clearTimer).toHaveBeenCalledWith('hostReconnect:GAME1');
+      // setTimeout called twice (once per disconnect)
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledTimes(2);
     });
   });
 });

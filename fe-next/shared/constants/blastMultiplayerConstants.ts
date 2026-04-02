@@ -33,8 +33,8 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   prism: 1.25,
   frozen: 1,
   mirror: 1.25,
-  silver: 2,
-  diamond: 2.5,
+  silver: 1.75,
+  diamond: 2.0,
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

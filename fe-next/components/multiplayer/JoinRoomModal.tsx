@@ -51,7 +51,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   displayName,
   profileAvatar,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
@@ -107,7 +107,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
+      <DialogContent noDescription dir={dir} className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('multiplayerFlow.joinModal.title')}</DialogTitle>
         </DialogHeader>
@@ -128,7 +128,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
                 {room.maxPlayers && room.playerCount >= room.maxPlayers && (
                   <span className="text-xs font-black uppercase ml-1">
-                    {t('adventure.roomFull')}
+                    {t('multiplayerFlow.joinModal.roomFull')}
                   </span>
                 )}
               </p>
@@ -186,7 +186,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
           {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
             <>
               <p className="text-xs text-center text-neo-white/60 font-bold">
-                {t('adventure.roomFullSpectate')}
+                {t('multiplayerFlow.joinModal.roomFullSpectate')}
               </p>
               <Button
                 variant="default"
@@ -195,7 +195,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 disabled={isJoining}
                 className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
-                {t('adventure.spectateButton')}
+                {t('multiplayerFlow.joinModal.spectateButton')}
               </Button>
             </>
           ) : (

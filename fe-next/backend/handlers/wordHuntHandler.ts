@@ -24,6 +24,17 @@ import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
+import timerManager from '../utils/timerManager.js';
+import { gameCleanupEmitter } from '../events/gameCleanup.js';
+
+// Clean up word hunt timers on game end/reset
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  timerManager.clearTimer(`wordHuntEnd:${gameCode}`);
+});
+
+gameCleanupEmitter.onGameReset(({ gameCode }) => {
+  timerManager.clearTimer(`wordHuntEnd:${gameCode}`);
+});
 
 const submitTargetWordSchema = z.object({
   guess: z.string().min(1, 'Guess is required').max(50, 'Guess is too long').transform(s => s.toLowerCase().trim()),
@@ -107,7 +118,7 @@ export function handleSubmitTargetWord(
     // Target found
     const result = recordTargetFound(huntState, username);
 
-    // Apply first-finder bonus to player's score
+    // Apply finder bonus (decreasing: 20/12/8/5 for 1st/2nd/3rd/4th+) to player's score
     if (result.bonus > 0) {
       updatePlayerScore(gameCode, username, result.bonus, true);
     }
@@ -131,7 +142,7 @@ export function handleSubmitTargetWord(
     logger.info('WORD_HUNT', `${username} found target word "${huntState.targetWord}" in ${gameCode} (first: ${result.isFirstFinder})`);
 
     // End game after a short delay to allow celebration UI
-    setTimeout(() => {
+    timerManager.setTimeout(`wordHuntEnd:${gameCode}`, () => {
       const currentGame = getGame(gameCode);
       if (currentGame && currentGame.gameState === 'in-progress') {
         logger.info('WORD_HUNT', `Ending game ${gameCode} after target word found`);

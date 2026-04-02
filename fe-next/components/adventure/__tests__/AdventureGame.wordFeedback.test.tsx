@@ -227,6 +227,10 @@ vi.mock('@/hooks/useAdventureHints', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAdventureMusic', () => ({
+  useAdventureMusic: () => ({ currentTrack: 1, stopMusic: vi.fn(), hasMusic: false }),
+}));
+
 vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
     stopMusic: vi.fn(),

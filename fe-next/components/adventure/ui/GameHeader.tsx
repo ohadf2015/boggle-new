@@ -8,9 +8,9 @@
 
 'use client';
 
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, MapPin, Coins, Flame, Swords, HelpCircle } from 'lucide-react';
+import { Pause, Play, X, MapPin, Flame, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -69,10 +69,7 @@ export const GameHeader = memo(function GameHeader({
   isPaused,
   onPauseToggle,
   onExit,
-  gold,
-  xpProgress,
-  streakDays = 0,
-  streakMultiplier = 1,
+  // gold, streakDays, streakMultiplier, xpProgress hidden during active play to reduce clutter
   isBossLevel = false,
   elapsedTime = 0,
   comboCount = 0,
@@ -80,7 +77,6 @@ export const GameHeader = memo(function GameHeader({
 }: GameHeaderProps) {
   const { t } = useLanguage();
   const hudTheme = useHUDTheme();
-  const [showComboTip, setShowComboTip] = useState(false);
 
   return (
     <div className="flex-shrink-0">
@@ -93,7 +89,7 @@ export const GameHeader = memo(function GameHeader({
         className
       )}
     >
-      {/* Left: Level Badge + Streak + Gold — grouped as info cluster */}
+      {/* Left: Level Badge — minimal during play */}
       <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
         {/* Level Badge */}
         <AdaptiveMotion.div
@@ -111,64 +107,26 @@ export const GameHeader = memo(function GameHeader({
             W{worldNumber}·L{levelNumber}
           </span>
         </AdaptiveMotion.div>
-
-        {/* Streak Badge — inline pill */}
-        {streakDays > 0 && (
-          <div
-            className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-orange/15 rounded-full border border-neo-orange/20"
-            aria-label={t('adventure.streakBadge', { days: streakDays, multiplier: streakMultiplier.toFixed(1) })}
-          >
-            <Flame className="w-3 h-3 text-neo-orange" />
-            <span className="text-[10px] font-black text-neo-orange tabular-nums">
-              {streakMultiplier > 1 ? `${streakMultiplier.toFixed(1)}×` : `${streakDays}d`}
-            </span>
-          </div>
-        )}
-
-        {/* Gold Badge — inline pill */}
-        {gold !== undefined && (
-          <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-yellow/15 rounded-full border border-neo-yellow/20">
-            <Coins className="w-3 h-3 text-neo-yellow" />
-            <span className="text-[10px] font-bold text-neo-yellow tabular-nums">{gold}</span>
-          </div>
-        )}
-
-        {/* Combo Badge with explainer tooltip */}
-        {comboCount > 0 && (
-          <div className="relative flex items-center gap-0.5 px-1.5 py-0.5 bg-neo-purple/15 rounded-full border border-neo-purple/20">
-            <Flame className="w-3 h-3 text-neo-purple" />
-            <span className="text-[10px] font-black text-neo-purple tabular-nums">{comboCount}x</span>
-            <button
-              onClick={() => setShowComboTip(prev => !prev)}
-              className="p-0 ml-0.5"
-              aria-label={t('adventure.comboExplainer')}
-            >
-              <HelpCircle className="w-3 h-3 text-neo-purple/60" />
-            </button>
-            {showComboTip && (
-              <div className="absolute top-full mt-1 start-0 z-50 w-48 p-2 bg-neo-navy border-2 border-neo-purple/40 rounded-neo shadow-hard text-[10px] text-neo-white/80 font-bold">
-                {t('adventure.comboExplainer')}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Center: Score — prominent floating display */}
+      {/* Center: Score + Combo — prominent floating display */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none max-w-[35%] sm:max-w-none"
+        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none max-w-[40%] sm:max-w-none"
         aria-live="polite"
         aria-atomic="true"
         data-testid="score-display"
       >
-        <span className="text-[9px] sm:text-[10px] font-mono text-neo-white/40 uppercase tracking-widest leading-none mb-0.5">
-          {t('common.score')}
-        </span>
         <RollingNumber
           value={displayScore(score)}
           variant="white"
           className="text-lg sm:text-xl font-black leading-none tabular-nums"
         />
+        {comboCount > 0 && (
+          <span className="text-[10px] font-black text-neo-purple tabular-nums mt-0.5">
+            <Flame className="w-3 h-3 inline-block -mt-0.5 me-0.5" />
+            {comboCount}x {t('adventure.combo')}
+          </span>
+        )}
       </div>
 
       {/* Right: Timer & Controls — tighter spacing */}
@@ -232,23 +190,7 @@ export const GameHeader = memo(function GameHeader({
         </div>
       </div>
     </header>
-    {/* XP progress bar — thinner, world-colored accent */}
-    {xpProgress !== undefined && (
-      <div className="h-0.5 bg-neo-black/20">
-        <div
-          className="h-full transition-all duration-500"
-          style={{
-            width: `${xpProgress * 100}%`,
-            background: 'linear-gradient(90deg, #8B5CF6, #A78BFA)',
-          }}
-          role="progressbar"
-          aria-valuenow={Math.round(xpProgress * 100)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={t('adventure.xp.progress')}
-        />
-      </div>
-    )}
+    {/* XP bar removed from in-game header to reduce clutter — shown on level complete */}
     </div>
   );
 });

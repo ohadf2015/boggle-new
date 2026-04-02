@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, Users, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Users, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -31,7 +31,7 @@ interface LandingChallengeCardsProps {
 }
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'multiplayer', 'singleplayer', 'adventure'];
+const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'adventure'];
 
 /** CSS stagger delay for each card index */
 const cardDelay = (index: number) => `${index * 0.07}s`;
@@ -60,39 +60,39 @@ export function LandingChallengeCards({
     const style = { animationDelay: cardDelay(index) } as React.CSSProperties;
 
     switch (mode) {
-      case 'singleplayer':
+      case 'arena':
         return (
-          <div key="singleplayer" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+          <div key="arena" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
-              title={t('landing.singlePlayer')}
-              description={t('landing.singlePlayerDesc')}
-              href={`/${language}/singleplayer`}
-              icon={<User className="w-6 h-6" />}
-              variant="cyan"
-              personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
+              title={t('landing.arena')}
+              description={t('landing.arenaDesc')}
+              href={`/${language}/multiplayer`}
+              icon={<Swords className="w-6 h-6" />}
+              variant="pink"
+              liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
+              playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
               highlighted={isFirstTimer}
               highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={1}
-              difficultyLabel={t('landing.difficultyEasy')}
+              difficulty={2}
+              difficultyLabel={t('landing.difficultyMedium')}
             />
           </div>
         );
 
-      case 'multiplayer':
+      case 'practice':
         return (
-          <div key="multiplayer" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+          <div key="practice" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
             <ModeCard
-              title={t('landing.multiplayer')}
-              description={t('landing.multiplayerDesc')}
-              href={`/${language}/multiplayer`}
-              icon={<Users className="w-6 h-6" />}
-              variant="pink"
-              liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
-              playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
+              title={t('landing.practice')}
+              description={t('landing.practiceDesc')}
+              href={`/${language}/singleplayer?mode=practice`}
+              icon={<BookOpen className="w-6 h-6" />}
+              variant="cyan"
+              personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
-              difficulty={2}
-              difficultyLabel={t('landing.difficultyMedium')}
+              difficulty={1}
+              difficultyLabel={t('landing.difficultyEasy')}
             />
           </div>
         );

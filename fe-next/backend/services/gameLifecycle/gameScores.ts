@@ -183,7 +183,7 @@ export async function calculateAndBroadcastFinalScores(
     blastSummary,
   };
   // Cache results on game state so reconnecting clients can retrieve them
-  (game as any).cachedResultsPayload = resultsPayload;
+  game.cachedResultsPayload = resultsPayload;
 
   broadcastToRoom(io, getGameRoom(gameCode), 'validatedScores', resultsPayload);
   broadcastToRoom(io, getGameRoom(gameCode), 'validationComplete', resultsPayload);

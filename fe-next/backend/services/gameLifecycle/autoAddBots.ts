@@ -8,21 +8,9 @@
 import { addUserToGame } from '../../modules/gameStateManager';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
+import type { GameState } from '../../modules/gameState/types';
 
-interface GameUser {
-  socketId: string;
-  isHost?: boolean;
-  isBot?: boolean;
-  disconnected?: boolean;
-  authUserId?: string | null;
-  botDifficulty?: string;
-  [key: string]: unknown;
-}
-
-interface GameLike {
-  users: Record<string, GameUser>;
-  language: string;
-}
+type GameLike = Pick<GameState, 'users' | 'language'> & { gameState?: string };
 
 interface AutoAddResult {
   botsAdded: number;
@@ -42,6 +30,11 @@ export async function autoAddBotsForSoloPlayer(
   game: GameLike
 ): Promise<AutoAddResult> {
   if (!game?.users) {
+    return { botsAdded: 0 };
+  }
+
+  // Only add bots during game start (in-progress state) — not mid-game or post-game
+  if (game.gameState && game.gameState !== 'in-progress') {
     return { botsAdded: 0 };
   }
 

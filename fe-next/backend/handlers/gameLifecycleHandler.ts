@@ -4,7 +4,8 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, Language, Avatar } from '@/shared/types';
+import type { Language, Avatar } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
 import {
   createGame,
@@ -338,7 +339,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         messageId: 'recovery-' + Date.now(),
         reconnect: true,
         skipAck: true,
-        boardTheme: (game as unknown as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null,
+        boardTheme: game.boardTheme || null,
         gameMode: recoveryGameMode,
         ...(recoveryGameMode === 'blast' && game.blastModeState ? {
           blastTileOverlay: game.blastModeState.overlay || [],
@@ -371,10 +372,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Try socket mapping first, fall back to client-provided gameCode
-      // (mobile reconnects may assign a new socket ID before mappings are restored)
-      const parsedData = data && typeof data === 'object' ? (data as { gameCode?: string }) : {};
-      const gameCode = getGameBySocketId(socket.id) || parsedData.gameCode || null;
+      // Only use server-side socket mapping — never trust client-supplied gameCode
+      const gameCode = getGameBySocketId(socket.id);
       if (!gameCode) {
         emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
         if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
@@ -388,10 +387,17 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Verify host identity: check socket mapping OR that the socket is in the game room
-      const isHostByMapping = game.hostSocketId === socket.id;
-      const isHostByRoom = socket.rooms.has(getGameRoom(gameCode)) && game.gameState === 'finished';
-      if (!isHostByMapping && !isHostByRoom) {
+      // Verify host identity: primary check via hostSocketId; secondary check via auth ID
+      // for the legitimate case where a host reconnected and hostSocketId was restored but
+      // the in-memory pointer hasn't been updated yet.
+      const isHostBySocketId = game.hostSocketId === socket.id;
+      const verifiedUserId = socket.data?.verifiedUserId as string | undefined;
+      const hostUser = Object.values(game.users).find((u) => u.isHost);
+      const isHostByAuthId =
+        !!verifiedUserId &&
+        !!hostUser?.authUserId &&
+        hostUser.authUserId === verifiedUserId;
+      if (!isHostBySocketId && !isHostByAuthId) {
         emitError(socket, 'Only host can reset the game');
         if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
         return;
@@ -471,7 +477,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game || game.gameState !== 'finished') return;
 
-    const cached = (game as any).cachedResultsPayload;
+    const cached = game.cachedResultsPayload;
     if (cached) {
       logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
       safeEmit(socket, 'validatedScores', cached);
@@ -530,7 +536,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     game.users[trimmedName] = { ...user, username: trimmedName };
     if (trimmedName !== username) {
-      delete game.users[username];
+      // Only delete the old key after confirming the new key was successfully set
+      if (game.users[trimmedName]) {
+        delete game.users[username];
+      }
       updateUsernameMapping(gameCode, username, trimmedName, socket.id);
       // Migrate ready state under the new name
       if (game.playersReadyForNextGame[username]) {
@@ -624,7 +633,28 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
 /**
  * Initialize player data structures for a new game
  */
-function initializePlayerData(_game: Game, gameCode: string): void {
+/**
+ * Ensure all per-player tracking structures exist for a single player.
+ * Safe to call multiple times (idempotent). Use for late-join, reconnect,
+ * and any code path that accesses player data outside of game start.
+ */
+function ensurePlayerState(game: GameState, username: string): void {
+  if (!game.playerScores) game.playerScores = {};
+  if (!game.playerWords) game.playerWords = {};
+  if (!game.playerWordDetails) game.playerWordDetails = {};
+  if (!game.playerAchievements) game.playerAchievements = {};
+  if (!game.playerWordsSet) game.playerWordsSet = {};
+  if (!game.playerCombos) game.playerCombos = {};
+
+  if (game.playerScores[username] === undefined) game.playerScores[username] = 0;
+  if (!game.playerWords[username]) game.playerWords[username] = [];
+  if (!game.playerWordDetails[username]) game.playerWordDetails[username] = [];
+  if (!game.playerAchievements[username]) game.playerAchievements[username] = [];
+  if (!game.playerWordsSet[username]) game.playerWordsSet[username] = new Set<string>();
+  if (game.playerCombos[username] === undefined) game.playerCombos[username] = 0;
+}
+
+function initializePlayerData(gameCode: string): void {
   const users = getGameUsers(gameCode);
   const playerUsernames = users.map(u => u.username);
   const gameForInit = getGame(gameCode);
@@ -638,15 +668,14 @@ function initializePlayerData(_game: Game, gameCode: string): void {
     if (!gameForInit.playerWords) gameForInit.playerWords = {};
 
     // Also clear playerWordsSet to prevent stale O(1) lookup data
-    const gameAny = gameForInit as any;
-    if (!gameAny.playerWordsSet) gameAny.playerWordsSet = {};
+    if (!gameForInit.playerWordsSet) gameForInit.playerWordsSet = {};
 
     playerUsernames.forEach((username: string) => {
       gameForInit.playerWordDetails![username] = [];
       gameForInit.playerWords[username] = [];
       gameForInit.playerScores[username] = 0;
       gameForInit.playerAchievements[username] = [];
-      gameAny.playerWordsSet[username] = new Set<string>();
+      gameForInit.playerWordsSet![username] = new Set<string>();
     });
 
     gameForInit.firstWordFound = false;
@@ -657,5 +686,6 @@ function initializePlayerData(_game: Game, gameCode: string): void {
 export {
   registerGameLifecycleHandlers,
   handleExistingAuthConnection,
-  initializePlayerData
+  initializePlayerData,
+  ensurePlayerState
 };

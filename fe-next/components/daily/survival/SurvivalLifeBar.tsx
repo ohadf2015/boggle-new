@@ -38,9 +38,10 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
   const isLow = pct <= 20;
   const isDanger = pct <= 33;
 
-  // Drip droplets on damage (replaces shake)
+  // Drip droplets + red flash on damage
   const prevLifeRef = useRef(lifePoints);
   const [drips, setDrips] = useState<{ id: number; x: number; size: number; delay: number }[]>([]);
+  const [isDamaged, setIsDamaged] = useState(false);
   const dripIdRef = useRef(0);
 
   const spawnDrips = useCallback((fillPct: number) => {
@@ -57,9 +58,11 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
   useEffect(() => {
     if (lifePoints < prevLifeRef.current && !isGameOver) {
       spawnDrips(pct);
-      const timer = setTimeout(() => setDrips([]), 1200);
+      setIsDamaged(true);
+      const dripTimer = setTimeout(() => setDrips([]), 1200);
+      const damageTimer = setTimeout(() => setIsDamaged(false), 600);
       prevLifeRef.current = lifePoints;
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(dripTimer); clearTimeout(damageTimer); };
     }
     prevLifeRef.current = lifePoints;
     return undefined;
@@ -115,9 +118,9 @@ export const SurvivalLifeBar: React.FC<SurvivalLifeBarProps> = ({
       <div className="flex-1 relative">
       <AdaptiveMotion.div
         className={cn(
-          "h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
+          "h-7 sm:h-8 rounded-neo overflow-hidden border-3 shadow-hard-sm relative transition-colors duration-200",
           "bg-neo-navy/80",
-          isLow ? "border-red-500" : "border-neo-black",
+          isDamaged ? "border-red-500 bg-red-900/30" : isLow ? "border-red-500" : "border-neo-black",
           isLifeGaining && "life-gain-flash life-meter-pulse"
         )}
         animate={

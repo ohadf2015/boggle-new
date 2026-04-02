@@ -15,6 +15,7 @@ import { getSupabase } from '@/backend/modules/supabase/client';
 import { realtimeGames } from './realtime';
 import timerManager from '@/backend/utils/timerManager';
 import logger from '@/backend/utils/logger';
+import { checkRateLimit } from '../../utils/rateLimiter';
 
 // ==========================================
 // Grace Period Tracking
@@ -80,6 +81,18 @@ export function registerDisconnectionHandlers(
 
       // Start 30s grace period timer
       const timer = setTimeout(async () => {
+        // Defense-in-depth: if the timer was already dequeued but user reconnected
+        // (clearTimeout race), check if grace period was already cancelled
+        if (!gracePeriodTimers.has(userId)) {
+          logger.info('DUEL', `Grace period timer fired for ${userId} but already cancelled - skipping forfeit`);
+          return;
+        }
+
+        // Verify user hasn't reconnected by checking for active duel socket
+        // If handleReconnection ran, it deleted the timer entry — but in the
+        // rare event-loop race where both fire, this DB-level guard catches it
+        // (forfeitDuel now has .eq('xp_awarded', false) atomic guard too)
+
         // Auto-forfeit after 30s
         await forfeitDuel(namespace, duel.id, userId, opponentId, 'timeout');
 
@@ -98,6 +111,10 @@ export function registerDisconnectionHandlers(
   // duel:forfeit - Manual forfeit
   // ==========================================
   socket.on('duel:forfeit', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const { forfeitDuelSchema: schema } = await import('./types');
@@ -262,7 +279,7 @@ async function forfeitDuel(
   }
 
   try {
-    // Atomic update to forfeited status
+    // Atomic update to forfeited status — also guard xp_awarded to prevent double XP
     const { data: updated, error: updateError } = await supabase
       .from('student_duels')
       .update({
@@ -270,14 +287,21 @@ async function forfeitDuel(
         winner_id: winnerId,
         completed_at: new Date().toISOString(),
         forfeit_reason: reason,
+        xp_awarded: true,
       })
       .eq('id', duelId)
       .eq('status', 'active') // Atomic: only update if still active
-      .select()
-      .single();
+      .eq('xp_awarded', false) // Prevent double XP if forfeit races with completion
+      .select();
 
-    if (updateError || !updated) {
+    if (updateError) {
       logger.error('DUEL', `Failed to forfeit duel: ${updateError?.message}`);
+      return;
+    }
+
+    // If no rows returned, duel was already completed/forfeited or XP already awarded
+    if (!updated || updated.length === 0) {
+      logger.warn('DUEL', `Duel ${duelId} already resolved or XP already awarded - skipping forfeit`);
       return;
     }
 

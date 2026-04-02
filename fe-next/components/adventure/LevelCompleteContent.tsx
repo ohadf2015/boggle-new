@@ -5,7 +5,6 @@
 'use client';
 
 import { memo, useState } from 'react';
-import Image from 'next/image';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,20 +12,10 @@ import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
 import { RewardedAdButton } from '@/components/ads/RewardedAdButton';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
+import { MissedWordsPanel } from './MissedWordsPanel';
+import { LootRevealAnimation } from './LootRevealAnimation';
 import type { LevelObjective, LevelAttempt } from '@/types/adventure';
 
-const LOOT_DROP_IMAGES: Record<string, string> = {
-  gold: '/images/adventure/loot/loot-gold-coins.webp',
-  xp: '/images/adventure/loot/loot-xp-star.webp',
-  bonusGold: '/images/adventure/loot/loot-bonus-gold.webp',
-  bossTrophy: '/images/adventure/loot/loot-boss-trophy.webp',
-  runeFragment: '/images/runes/rune-goldvein.webp',
-  loreScroll: '/images/adventure/floating-scroll.webp',
-  goldenQuill: '/images/adventure/loot/loot-golden-quill.webp',
-  worldEssence: '/images/adventure/loot/loot-world-essence.webp',
-  ancientRelic: '/images/adventure/loot/loot-ancient-relic.webp',
-  cosmicShard: '/images/adventure/loot/loot-cosmic-shard.webp',
-};
 
 export interface LevelCompleteContentProps {
   stars: number;
@@ -49,6 +38,8 @@ export interface LevelCompleteContentProps {
   nextLevelPreview?: { worldName: string; levelNumber: number; mechanic?: string } | null;
   bossDefeatShare?: null;
   bestAttempt?: LevelAttempt | null;
+  /** Words on the board the player didn't find */
+  missedWords?: string[];
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -56,7 +47,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
   stars, score, objectives, isHighScore, isFailed,
   xpEarned, goldEarned,
   lootDrops, storyBeatText,
-  nextLevelPreview, bestAttempt, t,
+  nextLevelPreview, bestAttempt, missedWords, t,
   // Kept in interface for backwards compat but used by LevelCompleteActions now
   onContinue: _onContinue, onRetry: _onRetry, onExit: _onExit,
   isLastLevelOfWorld: _isLastLevelOfWorld, onNextWorld: _onNextWorld,
@@ -137,30 +128,18 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
         </ul>
       </div>
 
-      {/* Loot Drops */}
+      {/* Words You Missed */}
+      {missedWords && missedWords.length > 0 && (
+        <MissedWordsPanel
+          missedWords={missedWords}
+          foundWords={[]}
+          className="mb-2"
+        />
+      )}
+
+      {/* Loot Drops — staggered reveal animation */}
       {lootDrops.length > 0 && !isFailed && (
-        <div className="flex flex-wrap gap-2 mb-4 justify-center">
-          {lootDrops.map((drop, i) => {
-            const imgSrc = LOOT_DROP_IMAGES[drop.type];
-            return (
-              <AdaptiveMotion.div
-                key={`loot-${i}`}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.8 + i * 0.1, type: 'spring', stiffness: 300 }}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 text-xs font-bold',
-                  drop.rarity === 'legendary' ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow' :
-                  drop.rarity === 'rare' ? 'bg-neo-purple/20 border-neo-purple text-neo-purple' :
-                  'bg-neo-cyan/20 border-neo-cyan/50 text-neo-cyan'
-                )}
-              >
-                {imgSrc && <Image src={imgSrc} alt={drop.label || drop.type} width={20} height={20} />}
-                {drop.label || drop.type}
-              </AdaptiveMotion.div>
-            );
-          })}
-        </div>
+        <LootRevealAnimation drops={lootDrops} baseDelay={0.8} className="mb-4" />
       )}
 
       {/* Story Beat */}

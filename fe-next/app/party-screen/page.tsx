@@ -5,8 +5,8 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import PartyScreenContent from './PartyScreenContent';
 
 export const metadata: Metadata = {
-  title: 'Party | LexiClash',
-  description: 'Party screen for LexiClash',
+  title: 'Party TV Screen — Display Game on the Big Screen | LexiClash',
+  description: 'Cast LexiClash party games to your TV or big screen. Players join from their phones while the game displays here. Perfect for game nights and gatherings.',
 };
 
 export default function PartyScreenLanding() {

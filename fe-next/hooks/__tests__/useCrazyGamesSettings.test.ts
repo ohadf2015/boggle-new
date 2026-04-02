@@ -18,14 +18,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   }),
 }));
 
-const { useCrazyGamesSettings, triggerHappytime } = await import('../useCrazyGamesSettings');
-
-// Mock CrazyGames SDK on window for triggerHappytime
-const mockSDK = {
-  game: {
-    happyTime: vi.fn(),
-  },
-};
+const { useCrazyGamesSettings } = await import('../useCrazyGamesSettings');
 
 describe('useCrazyGamesSettings', () => {
   beforeEach(() => {
@@ -96,53 +89,5 @@ describe('useCrazyGamesSettings', () => {
 
       expect(mockRemoveSettingsChangeListener).toHaveBeenCalledTimes(1);
     });
-  });
-});
-
-describe('triggerHappytime', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-
-    (window as any).CrazyGames = {
-      SDK: mockSDK,
-    };
-  });
-
-  afterEach(() => {
-    delete (window as any).CrazyGames;
-  });
-
-  it('should call SDK happyTime when available', async () => {
-    await triggerHappytime();
-
-    expect(mockSDK.game.happyTime).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not throw when SDK unavailable', async () => {
-    delete (window as any).CrazyGames;
-
-    await expect(triggerHappytime()).resolves.not.toThrow();
-  });
-
-  it('should handle multiple rapid calls', async () => {
-    await triggerHappytime();
-    await triggerHappytime();
-    await triggerHappytime();
-
-    expect(mockSDK.game.happyTime).toHaveBeenCalledTimes(3);
-  });
-
-  it('should work even if SDK is null', async () => {
-    (window as any).CrazyGames = null;
-
-    await expect(triggerHappytime()).resolves.not.toThrow();
-  });
-
-  it('should handle errors gracefully', async () => {
-    mockSDK.game.happyTime.mockImplementation(() => {
-      throw new Error('SDK error');
-    });
-
-    await expect(triggerHappytime()).resolves.not.toThrow();
   });
 });

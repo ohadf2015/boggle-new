@@ -13,6 +13,7 @@ import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import logger from '@/backend/utils/logger';
 import timerManager from '@/backend/utils/timerManager';
+import { checkRateLimit } from '../../utils/rateLimiter';
 
 // ==========================================
 // In-Memory Game State
@@ -30,6 +31,8 @@ interface RealtimeGameState {
   opponentWords: string[];
   challengerScore: number;
   opponentScore: number;
+  /** Set to true when completion is in progress — blocks new word submissions */
+  completing?: boolean;
 }
 
 /**
@@ -55,6 +58,10 @@ export function registerRealtimeHandlers(
   // duel:submit-word - Submit word with server-side validation
   // ==========================================
   socket.on('duel:submit-word', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = submitWordSchema.safeParse(data);
@@ -70,7 +77,7 @@ export function registerRealtimeHandlers(
 
       // Get game state
       const gameState = realtimeGames.get(payload.duelId);
-      if (!gameState) {
+      if (!gameState || gameState.completing) {
         socket.emit('duel:error', {
           message: 'Duel not found or not active',
         });
@@ -242,6 +249,13 @@ async function completeRealtimeDuel(
       logger.warn('DUEL', `Game state not found for duel ${duelId}`);
       return;
     }
+
+    // Mark as completing to block concurrent word submissions
+    if (gameState.completing) {
+      logger.warn('DUEL', `Duel ${duelId} already completing - skipping`);
+      return;
+    }
+    gameState.completing = true;
 
     // Determine winner
     let winnerId: string | null = null;

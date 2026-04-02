@@ -274,6 +274,66 @@ const sv = {
       "description": "Visa spelarprofiler, spelstatistik, prestationer och matchhistorik på LexiClash.",
       "ogTitle": "Spelarprofil - LexiClash",
       "ogDescription": "Visa spelarstatistik, prestationer och matchhistorik."
+    },
+    "partyJoin": {
+      "title": "Gå med i ett partyspel — Ange kod och spela direkt",
+      "description": "Gå med i ett LexiClash-partyspel med en rumskod. Ta din telefon, ange koden på skärmen och hoppa in i ordstrider med vänner.",
+      "ogTitle": "Gå med i LexiClash-partyspel",
+      "ogDescription": "Ange en rumskod och gå med i ordstriden direkt!"
+    },
+    "partyHost": {
+      "title": "Var värd för partyspel — Ordstrider på storskärmen",
+      "description": "Var värd för ett LexiClash-partyspel på storskärmen. Visa spelet på TV:n, låt vänner ansluta med sina telefoner.",
+      "ogTitle": "Var värd för LexiClash-partyspel",
+      "ogDescription": "Kör ordstrider på storskärmen — vänner ansluter med sina telefoner!"
+    },
+    "partyPlay": {
+      "title": "Partyspel — Spela från din telefon",
+      "description": "Spela LexiClash-partyspel från din telefon. Skicka ord, rösta på texter och tävla i realtid.",
+      "ogTitle": "Spela LexiClash-partyspel",
+      "ogDescription": "Spela ordspel från din telefon i realtid!"
+    },
+    "educationHub": {
+      "title": "Utbildningscenter — Ordspel för klassrum och lärare",
+      "description": "Använd LexiClash i ditt klassrum! Skapa ordspelslektioner, följ elevernas ordförråd och gör lärandet roligt.",
+      "ogTitle": "LexiClash utbildningscenter",
+      "ogDescription": "Ordspel för klassrum — skapa lektioner, följ framsteg!"
+    },
+    "educationDuels": {
+      "title": "Ordförrådsdueller — Elev mot elev ordstrider",
+      "description": "Utmana klasskamrater till ordförrådsdueller! 1-mot-1 ordstrider i realtid som testar stavning och snabbtänkande.",
+      "ogTitle": "Ordförrådsdueller - LexiClash utbildning",
+      "ogDescription": "1-mot-1 ordstrider för ordförrådsträning!"
+    },
+    "communityBoard": {
+      "title": "Community-pussel — Spelarskapat ordpussel",
+      "description": "Spela ett community-skapat ordpussel på LexiClash. Lös spelarskapade brädor och tävla om högsta poäng.",
+      "ogTitle": "Community ordpussel - LexiClash",
+      "ogDescription": "Spela och tävla på spelarskapade ordpussel!"
+    },
+    "adventureBossRush": {
+      "title": "Boss Rush — Bekämpa 5 bossar i rad",
+      "description": "Möt 5 ordbossar i rad med hälsa som följer med mellan strider. Klara alla bossar för bonusguld och exklusiva belöningar.",
+      "ogTitle": "Boss Rush - LexiClash äventyr",
+      "ogDescription": "Bekämpa 5 ordbossar i rad — hälsan följer med. Klarar du alla?"
+    },
+    "adventureEndless": {
+      "title": "Oändligt läge — Procedurella ordvåningar med ökande svårighet",
+      "description": "Hur långt kan du nå? Oändliga procedurellt genererade ordpussel med ökande svårighet. Varje våning svårare än den förra.",
+      "ogTitle": "Oändligt läge - LexiClash äventyr",
+      "ogDescription": "Oändliga ordvåningar — hur djupt kan du nå?"
+    },
+    "adventureSkills": {
+      "title": "Färdighetsträd — Lås upp äventyrsordkrafter",
+      "description": "Lås upp och uppgradera färdigheter för att förbättra ditt LexiClash-äventyrsspel. Välj din build och anpassa din strategi.",
+      "ogTitle": "Färdighetsträd - LexiClash äventyr",
+      "ogDescription": "Lås upp färdigheter och anpassa din äventyrsbuild!"
+    },
+    "adventureAchievements": {
+      "title": "Äventyrsprestationer — Följ framsteg och milstolpar",
+      "description": "Se alla dina LexiClash-äventyrsprestationer, milstolpar och framsteg. Se avklarade utmaningar och bossvinster.",
+      "ogTitle": "Äventyrsprestationer - LexiClash",
+      "ogDescription": "Följ milstolpar, bossvinster och prestationsframsteg."
     }
   },
   "cookieConsent": {
@@ -1048,14 +1108,19 @@ const sv = {
       "joinRoomAction": "Gå med i {{roomName}}",
       "availableRooms": "Tillgängliga rum",
       "roomsListLabel": "Lista över tillgängliga spelrum",
-      "linkCopied": "Inbjudningslänk kopierad — skicka till vänner!"
+      "linkCopied": "Inbjudningslänk kopierad — skicka till vänner!",
+      "fetchTimeout": "Det gick inte att ladda rum. Kontrollera din anslutning.",
+      "retry": "Försök igen"
     },
     "joinModal": {
       "title": "Gå med i striden",
       "yourName": "Kalla mig...",
       "namePlaceholder": "Ditt stridsnamn",
       "joinButton": "Kör!",
-      "joining": "Hoppar in..."
+      "joining": "Hoppar in...",
+      "roomFull": "Rummet är fullt",
+      "roomFullSpectate": "Rummet är fullt. Du kan titta på istället.",
+      "spectateButton": "Titta på"
     },
     "createModal": {
       "title": "Starta en strid",
@@ -4069,6 +4134,10 @@ const sv = {
     "multiPlayer": "Flerspelarläge",
     "multiplayer": "Flerspelarläge",
     "multiplayerDesc": "Tävla med vänner i realtid!",
+    "arena": "Ordarenan",
+    "arenaDesc": "Spela ensam eller utmana vänner!",
+    "practice": "Träning",
+    "practiceDesc": "Ingen press, bara ord",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
@@ -9391,6 +9460,7 @@ const sv = {
     goToPanel: "Gå till regel {{panel}}",
     gotIt: "Fattar!",
     skip: "Hoppa över",
+    quickTipsTitle: "Snabbtips",
   },
   wordHuntNudge: {
     lifeDrop: "Svepa ord på brädet för att läka! Varje ord ger tillbaka liv.",

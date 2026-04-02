@@ -105,7 +105,7 @@ const socketContextValue = {
   isConnected: true,
   connectionError: null,
   isReconnecting: false,
-  reconnectAttempt: 0,
+  getReconnectAttempt: () => 0,
   maxReconnectAttempts: 5,
   manualReconnect: vi.fn(),
 };

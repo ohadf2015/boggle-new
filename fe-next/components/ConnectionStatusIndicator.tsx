@@ -274,10 +274,11 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
     isConnected,
     isReconnecting,
     connectionError,
-    reconnectAttempt,
+    getReconnectAttempt,
     maxReconnectAttempts,
     manualReconnect
   } = useSocket();
+  const reconnectAttempt = getReconnectAttempt();
   const { t } = useLanguage();
   const [showBanner, setShowBanner] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

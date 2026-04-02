@@ -274,6 +274,66 @@ const ja = {
       "description": "LexiClashのプレイヤープロフィール、ゲーム統計、実績、マッチ履歴を閲覧。",
       "ogTitle": "プレイヤープロフィール - LexiClash",
       "ogDescription": "プレイヤー統計、実績、マッチ履歴を閲覧。"
+    },
+    "partyJoin": {
+      "title": "パーティーゲームに参加 — コードを入力してすぐプレイ",
+      "description": "ルームコードでLexiClashパーティーゲームに参加。スマホを手に取り、画面のコードを入力して友達とワードバトルに飛び込もう。",
+      "ogTitle": "LexiClashパーティーゲームに参加",
+      "ogDescription": "ルームコードを入力してすぐにワードバトルに参加！"
+    },
+    "partyHost": {
+      "title": "パーティーゲームをホスト — 大画面でワードバトル",
+      "description": "LexiClashパーティーゲームを大画面でホスト。TVにゲームを映して、友達はスマホから参加。",
+      "ogTitle": "LexiClashパーティーゲームをホスト",
+      "ogDescription": "大画面でワードバトル — 友達はスマホから参加！"
+    },
+    "partyPlay": {
+      "title": "パーティーゲーム — スマホでプレイ",
+      "description": "スマホからLexiClashパーティーゲームをプレイ。言葉を送信、キャプションに投票、リアルタイムで競争。",
+      "ogTitle": "LexiClashパーティーゲームをプレイ",
+      "ogDescription": "スマホからリアルタイムでパーティーワードゲームをプレイ！"
+    },
+    "educationHub": {
+      "title": "教育ハブ — 教室と先生のためのワードゲーム",
+      "description": "教室でLexiClashを活用！ワードゲームレッスンを作成、生徒の語彙力を追跡、楽しく学習。",
+      "ogTitle": "LexiClash教育ハブ",
+      "ogDescription": "教室向けワードゲーム — レッスン作成、進捗追跡、楽しく学習！"
+    },
+    "educationDuels": {
+      "title": "語彙デュエル — 生徒対生徒のワードバトル",
+      "description": "クラスメートに語彙デュエルを挑戦！リアルタイム1対1のワードバトルでスペル、語彙、素早い思考力をテスト。",
+      "ogTitle": "語彙デュエル - LexiClash教育",
+      "ogDescription": "語彙練習のための1対1ワードバトル！"
+    },
+    "communityBoard": {
+      "title": "コミュニティパズル — プレイヤー作成ワードボード",
+      "description": "LexiClashのコミュニティ作成ワードパズルをプレイ。プレイヤー作成ボードを解き、ハイスコアを競おう。",
+      "ogTitle": "コミュニティワードパズル - LexiClash",
+      "ogDescription": "プレイヤー作成のワードパズルでプレイ＆競争！"
+    },
+    "adventureBossRush": {
+      "title": "ボスラッシュ — 5体のボスと連続バトル",
+      "description": "HPを引き継ぎながら5体のワードボスと連続対決。全ボスクリアでボーナスゴールドと限定報酬を獲得。",
+      "ogTitle": "ボスラッシュ - LexiClashアドベンチャー",
+      "ogDescription": "5体のワードボスと連続バトル — HPは引き継ぎ。全クリアできる？"
+    },
+    "adventureEndless": {
+      "title": "エンドレスモード — 難易度が上がるプロシージャルワードフロア",
+      "description": "どこまで行ける？難易度が上がり続けるプロシージャル生成ワードパズル。各フロアは前のフロアより難しい。",
+      "ogTitle": "エンドレスモード - LexiClashアドベンチャー",
+      "ogDescription": "無限のプロシージャルワードフロア — どこまで潜れる？"
+    },
+    "adventureSkills": {
+      "title": "スキルツリー — アドベンチャーワードパワーを解放",
+      "description": "スキルを解放・アップグレードしてLexiClashアドベンチャーを強化。ビルドを選択、戦略をカスタマイズ。",
+      "ogTitle": "スキルツリー - LexiClashアドベンチャー",
+      "ogDescription": "スキルを解放してアドベンチャービルドをカスタマイズ！"
+    },
+    "adventureAchievements": {
+      "title": "アドベンチャー実績 — 進捗とマイルストーンを追跡",
+      "description": "LexiClashアドベンチャーの全実績、マイルストーン、進捗を確認。完了チャレンジ、ボス勝利、コレクション統計。",
+      "ogTitle": "アドベンチャー実績 - LexiClash",
+      "ogDescription": "マイルストーン、ボス勝利、実績進捗を追跡。"
     }
   },
   "cookieConsent": {
@@ -1048,14 +1108,19 @@ const ja = {
       "joinRoomAction": "{{roomName}}に参加",
       "availableRooms": "利用可能なルーム",
       "roomsListLabel": "利用可能なゲームルームの一覧",
-      "linkCopied": "招待リンクをコピーしました — 友達に送ろう！"
+      "linkCopied": "招待リンクをコピーしました — 友達に送ろう！",
+      "fetchTimeout": "ルームを読み込めませんでした。接続を確認してください。",
+      "retry": "再試行"
     },
     "joinModal": {
       "title": "バトルに参戦",
       "yourName": "呼び名は...",
       "namePlaceholder": "バトルネーム",
       "joinButton": "いくぞ！",
-      "joining": "転送中..."
+      "joining": "転送中...",
+      "roomFull": "部屋が満員です",
+      "roomFullSpectate": "部屋が満員です。観戦できます。",
+      "spectateButton": "観戦"
     },
     "createModal": {
       "title": "バトルを開催",
@@ -4069,6 +4134,10 @@ const ja = {
     "multiPlayer": "マルチプレイヤー",
     "multiplayer": "マルチプレイヤー",
     "multiplayerDesc": "リアルタイムで友達と対戦！",
+    "arena": "ワードアリーナ",
+    "arenaDesc": "ソロでもフレンドとでも！",
+    "practice": "練習",
+    "practiceDesc": "プレッシャーなし、言葉だけ",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
@@ -9372,6 +9441,7 @@ const ja = {
     goToPanel: "ルール{{panel}}へ",
     gotIt: "わかった！",
     skip: "スキップ",
+    quickTipsTitle: "クイックヒント",
   },
   wordHuntNudge: {
     lifeDrop: "ボード上の単語をスワイプして回復！各単語でライフが戻ります。",

@@ -5,7 +5,8 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, LetterGrid, Language, DifficultyLevel, GameMode } from '@/shared/types';
+import type { LetterGrid, Language, DifficultyLevel, GameMode } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
 import {
   getGame,
@@ -36,7 +37,8 @@ import { ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
 import { startGameTimer } from './shared.js';
-import { findAllWords, getCachedTrie } from '../modules/boggleSolver.js';
+import { getCachedTrie } from '../modules/boggleSolver.js';
+import { findAllWordsAsync } from '../modules/wordValidatorPool.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
@@ -44,9 +46,14 @@ import { initializePlayerData } from './gameLifecycleHandler.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
-import { initBlastModeState } from '../modules/blastModeManager.js';
+import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
+
+// In-memory mutex to prevent concurrent startGame flows for the same game.
+// The state machine transition is synchronous, but async work before it
+// (dictionary load, classroom game fetch) creates a window for duplicates.
+const gamesStarting = new Set<string>();
 
 interface StartGamePayload {
   letterGrid: LetterGrid;
@@ -86,14 +93,14 @@ function buildStartGamePayload(
   };
 
   if (resolvedMode === 'blast') {
-    payload.blastTileOverlay = (game as any)?.blastModeState?.overlay || [];
-    payload.blastSeed = (game as any)?.blastModeState?.seed ?? null;
+    payload.blastTileOverlay = game?.blastModeState?.overlay || [];
+    payload.blastSeed = game?.blastModeState?.seed ?? null;
   }
 
   if (resolvedMode === 'word-hunt') {
-    payload.wordHuntTargetLength = (game as any)?.wordHuntState?.targetWordLength ?? 0;
-    payload.wordHuntTargetCategory = (game as any)?.wordHuntState?.targetCategory ?? null;
-    payload.wordHuntPlayerLives = (game as any)?.wordHuntState?.playerLives ?? {};
+    payload.wordHuntTargetLength = game?.wordHuntState?.targetWordLength ?? 0;
+    payload.wordHuntTargetCategory = game?.wordHuntState?.targetCategory ?? null;
+    payload.wordHuntPlayerLives = game?.wordHuntState?.playerLives ?? {};
   }
 
   if (isRetry) {
@@ -104,43 +111,59 @@ function buildStartGamePayload(
 }
 
 /**
- * Calculate and broadcast total words on board (async, non-blocking)
+ * Calculate and broadcast total words on board.
+ *
+ * PERF-012: Previously called findAllWords() directly inside setImmediate(),
+ * which deferred the start of the computation but still blocked the event loop
+ * for 50-100 ms once running (synchronous DFS over a 6×6 grid + 275k-word trie).
+ *
+ * Now delegates to findAllWordsAsync() which routes through the worker pool
+ * when workers are available, or wraps the sync call in a setImmediate-deferred
+ * Promise when running in sync-only mode — ensuring at minimum that any I/O
+ * callbacks queued before game-start can flush before the blocking work begins.
+ *
+ * TODO(PERF-012): ship wordValidatorWorker.mjs with a 'findAllWords' action
+ * to get full worker-thread offloading for all deployments.
  */
-function emitTotalBoardWords(
+async function emitTotalBoardWords(
   io: Server,
   gameCode: string,
   letterGrid: LetterGrid,
   gameLang: Language,
   minWordLength: number
-): void {
-  setImmediate(() => {
-    try {
-      const trie = getCachedTrie(gameLang);
-      const allWords = findAllWords(letterGrid, gameLang, {
-        minLength: minWordLength,
-        maxLength: 15,
-        maxWords: 10000,
-        trie
-      });
-      const MIN_DISPLAY_WORD_LENGTH = 5;
-      const totalBoardWords = allWords.filter((word: string) => word.length >= MIN_DISPLAY_WORD_LENGTH).length;
+): Promise<void> {
+  try {
+    const trie = getCachedTrie(gameLang);
+    const allWords = await findAllWordsAsync(letterGrid, gameLang, {
+      minLength: minWordLength,
+      maxLength: 15,
+      maxWords: 10000,
+      trie
+    });
+    const MIN_DISPLAY_WORD_LENGTH = 5;
+    const totalBoardWords = allWords.filter((word: string) => word.length >= MIN_DISPLAY_WORD_LENGTH).length;
 
-      const currentGame = getGame(gameCode);
-      if (currentGame) {
-        currentGame.totalBoardWords = totalBoardWords;
-      }
-
-      broadcastToRoom(io, getGameRoom(gameCode), 'totalBoardWords', {
-        count: totalBoardWords
-      });
-
-      logger.debug('SOCKET', `Game ${gameCode} has ${totalBoardWords} possible words on board`);
-    } catch (err: unknown) {
-      const error = err as Error;
-      logger.error('SOCKET', `Failed to calculate total board words for ${gameCode}`, error);
+    const currentGame = getGame(gameCode);
+    if (currentGame) {
+      currentGame.totalBoardWords = totalBoardWords;
     }
-  });
+
+    broadcastToRoom(io, getGameRoom(gameCode), 'totalBoardWords', {
+      count: totalBoardWords
+    });
+
+    logger.debug('SOCKET', `Game ${gameCode} has ${totalBoardWords} possible words on board`);
+  } catch (err: unknown) {
+    const error = err as Error;
+    logger.error('SOCKET', `Failed to calculate total board words for ${gameCode}`, error);
+  }
 }
+
+/**
+ * Exported for unit testing only — not part of public API.
+ * @internal
+ */
+export const emitTotalBoardWordsForTest = emitTotalBoardWords;
 
 /**
  * Register startGame socket event handler
@@ -179,6 +202,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       emitError(socket, ErrorMessages.ONLY_HOST_CAN_START);
       return;
     }
+
+    // Mutex: prevent concurrent startGame flows for the same game
+    if (gamesStarting.has(gameCode)) {
+      logger.warn('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
+      emitError(socket, 'Game is already starting');
+      return;
+    }
+    gamesStarting.add(gameCode);
 
     const currentGameState = game.gameState;
     logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
@@ -221,10 +252,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Only the first caller wins; all others bail out before any side effects.
     const transitionResult = transitionGameState(gameCode, 'START');
     if (!transitionResult.success) {
+      gamesStarting.delete(gameCode);
       logger.warn('SOCKET', `Rejected concurrent startGame for ${gameCode}: ${transitionResult.error}`);
       emitError(socket, 'Failed to start game');
       return;
     }
+
+    // State machine now guards against concurrent starts — release the mutex
+    gamesStarting.delete(gameCode);
 
     broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', {
       gameMode: resolvedMode,
@@ -251,12 +286,21 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
       : undefined;
 
-    // SECURITY: Regenerate grid server-side for competitive modes only
-    // to prevent the host from crafting favorable boards
-    if (resolvedMode === 'blast') {
-      letterGrid = generateRandomTable(6, 6, gameLang);
+    // SECURITY: Regenerate grid server-side for ALL multiplayer games (2+ players).
+    // A client-supplied grid lets the host craft favorable boards — never trust it
+    // in competitive play. Solo games (1 player before bots are added) may use the
+    // client grid; bots are appended after this block so the count is accurate.
+    const playerCount = Object.keys(game.users).length;
+    if (playerCount >= 2) {
+      if (resolvedMode === 'blast') {
+        letterGrid = generateRandomTable(6, 6, gameLang);
+      } else {
+        // Classic / Word Hunt: grid size scales with difficulty
+        const resolvedDifficulty = difficulty || 'MEDIUM';
+        const gridSize = resolvedDifficulty === 'HARD' ? 6 : 5; // EASY and MEDIUM use 5x5
+        letterGrid = generateRandomTable(gridSize, gridSize, gameLang);
+      }
     }
-    // Classic and Word Hunt modes: use client-provided grid (not competitive)
 
     updateGame(gameCode, {
       letterGrid,
@@ -280,13 +324,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
     ensureGame(gameCode);
 
-    initializePlayerData(game as unknown as Game, gameCode);
+    initializePlayerData(gameCode);
 
     // Auto-add bots if solo player started the game
-    const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game as any);
+    const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game);
     if (autoAddResult.botsAdded > 0) {
       // Re-initialize player data to include bots
-      initializePlayerData(game as unknown as Game, gameCode);
+      initializePlayerData(gameCode);
       // Broadcast updated user list so clients see the bots
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode),
@@ -300,10 +344,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Initialize blast mode state if needed
     if (resolvedMode === 'blast') {
       const mpBlastWave = playerUsernames.length >= 2 ? 3 : 1;
-      const blastState = initBlastModeState(letterGrid, playerUsernames, mpBlastWave);
+      const overlaySeed = hashStringToSeed(gameCode);
+      const blastState = initBlastModeState(letterGrid, playerUsernames, mpBlastWave, overlaySeed);
       const currentGame = getGame(gameCode);
       if (currentGame) {
-        (currentGame as any).blastModeState = blastState;
+        currentGame.blastModeState = blastState;
       }
     }
 
@@ -312,13 +357,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     let wordHuntSolveReused = false;
     if (resolvedMode === 'word-hunt') {
       const trie = getCachedTrie(gameLang);
-      const allValidWords = findAllWords(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
+      const allValidWords = await findAllWordsAsync(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
       const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang);
       if (targetWord) {
         const huntState = initWordHuntState(targetWord, playerUsernames);
         const currentGame = getGame(gameCode);
         if (currentGame) {
-          (currentGame as any).wordHuntState = huntState;
+          currentGame.wordHuntState = huntState;
           // Reuse solve result for totalBoardWords (avoids second findAllWords call)
           const MIN_DISPLAY_WORD_LENGTH = 5;
           currentGame.totalBoardWords = allValidWords.filter((w: string) => w.length >= MIN_DISPLAY_WORD_LENGTH).length;

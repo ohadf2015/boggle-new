@@ -9,11 +9,20 @@ import LootChestReveal from './LootChestReveal';
 import LevelEntryOverlay from './LevelEntryOverlay';
 import { BossOverlay, PlayerHealthBar } from './boss';
 import { StoryBeatCard } from './StoryBeatCard';
-import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer } from './effects/AdventureEffectsLayer';
+import AdventureEffectsLayerFull, { AdventureEffectsLayer as EdgeVignetteLayer, type ChainBurstConfig, type ParticleConfig, type ScorePopupData, type PendingExplosion } from './effects/AdventureEffectsLayer';
 import { PauseOverlay } from './ui';
-import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES, WORLD_UNLOCK_DURATION_FRAMES } from './cinematics';
+import { VICTORY_DURATION_FRAMES, DEFEAT_DURATION_FRAMES, WORLD_UNLOCK_DURATION_FRAMES } from './cinematics/constants';
 import dynamic from 'next/dynamic';
-import type { LevelObjective } from '@/types/adventure';
+import type { LevelObjective, LevelAttempt, FlashChallenge, AdventureGameState, LootDrop } from '@/types/adventure';
+import type { BossConfig, BossHealthState } from '@/types/boss';
+import type { EffectCallbacks } from '@/hooks/useBossEffectExecutor';
+import type { PlayerHealthState } from '@/hooks/usePlayerHealth';
+import type { WorldUnlockCinematicProps } from './cinematics/WorldUnlockCinematic';
+import type { StoryBeat } from '@/lib/adventure/storyConfig';
+import type { LexiReaction as LexiReactionData } from '@/hooks/useLexiReactions';
+import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import type { ComboMilestoneConfig } from '@/hooks/useComboMilestone';
+import type { BossTier } from '@/components/celebration/BossDefeatFireworks';
 
 const VictoryCinematic = dynamic(() => import('./cinematics/VictoryCinematic').then(mod => ({ default: mod.VictoryCinematic as React.ComponentType<any> })), { ssr: false });
 const DefeatCinematic = dynamic(() => import('./cinematics/DefeatCinematic').then(mod => ({ default: mod.DefeatCinematic as React.ComponentType<any> })), { ssr: false });
@@ -22,26 +31,26 @@ const CinematicPlayer = dynamic(() => import('./boss/cinematics/CinematicPlayer'
 
 export interface AdventureGameOverlaysProps {
   // Boss overlay
-  bossConfig: any;
+  bossConfig: BossConfig | null;
   bossMaxHP: number;
-  bossTaunt: any;
+  bossTaunt: string | null;
   showBossIntro: boolean;
   handleBossIntroStart: () => void;
   handleBossIntroSkip?: () => void;
-  bossHealthState: any;
-  bossEffectCallbacks: any;
+  bossHealthState: BossHealthState;
+  bossEffectCallbacks: EffectCallbacks;
   isBossLevel: boolean;
   isBossActive: boolean;
   showBossFireworks: boolean;
-  defeatedBossTier: any;
+  defeatedBossTier: BossTier | null;
   showEdgeVignette: boolean;
-  playerHealthState: any;
+  playerHealthState: PlayerHealthState;
   // Game state
   showLevelComplete: boolean;
   gameStars: number;
   gameScore: number;
   wordsFound: string[];
-  gameState: any;
+  gameState: AdventureGameState;
   // Handlers
   handleContinue: () => void;
   handleRetry: () => void;
@@ -53,7 +62,7 @@ export interface AdventureGameOverlaysProps {
   handleLootChestComplete: () => void;
   handlePopupComplete: () => void;
   // Flash challenge
-  activeChallenge: any;
+  activeChallenge: FlashChallenge | null;
   isChallengeComplete: boolean;
   dismissChallenge: () => void;
   challengeTimeLeft: number;
@@ -68,16 +77,16 @@ export interface AdventureGameOverlaysProps {
   showVictoryCinematic: boolean;
   showDefeatCinematic: boolean;
   showWorldUnlockCinematic: boolean;
-  worldUnlockProps: any;
+  worldUnlockProps: WorldUnlockCinematicProps | null;
   timeRemaining: number;
   t: (key: string) => string;
   // Loot
   showLootChest: boolean;
-  lootDrops: any[];
+  lootDrops: LootDrop[];
   // Level complete modal (non-boss)
   objectives: LevelObjective[];
   totalStars?: number;
-  bestAttempt: any;
+  bestAttempt: LevelAttempt | null;
   previousBestStars: number;
   earnedXp: number;
   earnedGold: number;
@@ -89,22 +98,22 @@ export interface AdventureGameOverlaysProps {
   saveFailed?: boolean;
   onRetrySave?: () => void;
   // Story beat
-  storyBeat: any;
+  storyBeat: StoryBeat | null;
   showStoryBeat: boolean;
   // Effects layer
-  currentPopup: any;
-  scoreDisplayRef: any;
-  reaction: any;
+  currentPopup: ScorePopupData | null;
+  scoreDisplayRef: React.RefObject<HTMLDivElement | null>;
+  reaction: LexiReactionData | null;
   dismissReaction: () => void;
-  chainBurstConfig: any;
-  setChainBurstConfig: (v: any) => void;
-  particleConfig: any;
-  setParticleConfig: (v: any) => void;
-  pendingExplosions: any[];
+  chainBurstConfig: ChainBurstConfig | null;
+  setChainBurstConfig: (v: ChainBurstConfig | null) => void;
+  particleConfig: ParticleConfig | null;
+  setParticleConfig: (v: ParticleConfig | null) => void;
+  pendingExplosions: PendingExplosion[];
   removeExplosion: (id: number) => void;
-  levelUpData: any;
+  levelUpData: LevelUpPayload | null;
   handleLevelUpClose: () => void;
-  currentMilestone: any;
+  currentMilestone: ComboMilestoneConfig | null;
 }
 
 const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({

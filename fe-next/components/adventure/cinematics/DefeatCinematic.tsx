@@ -26,8 +26,8 @@ import { BackgroundGlow, StatItem, StatsPanel, SparkleField } from '../../../lib
 // CONSTANTS
 // ==============================================
 
-/** Total duration in frames (5 seconds) */
-export const DEFEAT_DURATION_FRAMES = 150;
+/** Total duration in frames (5 seconds) — canonical value in ./constants */
+export { DEFEAT_DURATION_FRAMES } from './constants';
 
 /** Phase timing in frames */
 const PHASE_FRAMES = {

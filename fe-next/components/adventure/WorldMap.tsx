@@ -544,6 +544,7 @@ const WorldMap = memo(function WorldMap({
       ref={containerRef}
       data-testid="world-map"
       className="relative h-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent"
+      style={{ WebkitOverflowScrolling: 'touch' }}
     >
       <WorldMapBackground
         parallaxX={parallaxX}

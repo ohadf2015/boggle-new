@@ -229,6 +229,10 @@ vi.mock('@/hooks/useAdventureHints', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAdventureMusic', () => ({
+  useAdventureMusic: () => ({ currentTrack: 1, stopMusic: vi.fn(), hasMusic: false }),
+}));
+
 // Mock MusicContext - useMusic is called in AdventureGame to stop global music
 vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({

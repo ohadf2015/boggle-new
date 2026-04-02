@@ -1,184 +1,110 @@
 'use client';
 
-import { memo, useState, useEffect, useCallback } from 'react';
-import { Target, Heart, Lightbulb, AlertTriangle } from 'lucide-react';
+import { memo, useEffect, useRef } from 'react';
+import { Target, Heart, Lightbulb, AlertTriangle, X } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
-const PANEL_COUNT = 4;
-const AUTO_ADVANCE_MS = 4000;
+const AUTO_DISMISS_MS = 8000;
 
 export interface WordHuntQuickRulesProps {
   onDismiss: () => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: (key: string) => string;
 }
 
-interface RulePanel {
+interface Tip {
   icon: React.ReactNode;
-  titleKey: string;
-  descKey: string;
+  textKey: string;
   accent: string;
-  bgGlow: string;
 }
 
-const PANELS: RulePanel[] = [
+const TIPS: Tip[] = [
   {
-    icon: <Target size={40} strokeWidth={2.5} />,
-    titleKey: 'wordHuntRules.panel1Title',
-    descKey: 'wordHuntRules.panel1Desc',
+    icon: <Target size={16} strokeWidth={2.5} />,
+    textKey: 'wordHuntRules.panel1Title',
     accent: 'text-neo-pink',
-    bgGlow: 'from-neo-pink/20',
   },
   {
-    icon: <Heart size={40} strokeWidth={2.5} />,
-    titleKey: 'wordHuntRules.panel2Title',
-    descKey: 'wordHuntRules.panel2Desc',
+    icon: <Heart size={16} strokeWidth={2.5} />,
+    textKey: 'wordHuntRules.panel2Title',
     accent: 'text-neo-red',
-    bgGlow: 'from-neo-red/20',
   },
   {
-    icon: <Lightbulb size={40} strokeWidth={2.5} />,
-    titleKey: 'wordHuntRules.panel3Title',
-    descKey: 'wordHuntRules.panel3Desc',
+    icon: <Lightbulb size={16} strokeWidth={2.5} />,
+    textKey: 'wordHuntRules.panel3Title',
     accent: 'text-neo-lime',
-    bgGlow: 'from-neo-lime/20',
   },
   {
-    icon: <AlertTriangle size={40} strokeWidth={2.5} />,
-    titleKey: 'wordHuntRules.panel4Title',
-    descKey: 'wordHuntRules.panel4Desc',
+    icon: <AlertTriangle size={16} strokeWidth={2.5} />,
+    textKey: 'wordHuntRules.panel4Title',
     accent: 'text-neo-cyan',
-    bgGlow: 'from-neo-cyan/20',
   },
 ];
 
+const TIP_COUNT = TIPS.length;
+
 /**
- * Pre-game quick rules overlay for Word Hunt MP.
- * 4 swipeable/auto-advancing panels, each teaching one mechanic.
+ * Non-blocking compact quick-tips card for Word Hunt.
+ * Floats at the top of the screen during gameplay, auto-dismisses.
  */
 const WordHuntQuickRules = memo<WordHuntQuickRulesProps>(({ onDismiss, t }) => {
-  const [activePanel, setActivePanel] = useState(0);
-  const [autoAdvance, setAutoAdvance] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Auto-advance panels
   useEffect(() => {
-    if (!autoAdvance) return;
-    const timer = setInterval(() => {
-      setActivePanel((prev) => {
-        if (prev >= PANEL_COUNT - 1) {
-          setAutoAdvance(false);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, AUTO_ADVANCE_MS);
-    return () => clearInterval(timer);
-  }, [autoAdvance]);
-
-  const handleDotClick = useCallback((index: number) => {
-    setActivePanel(index);
-    setAutoAdvance(false);
-  }, []);
-
-  const panel = PANELS[activePanel];
+    timerRef.current = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [onDismiss]);
 
   return (
-    <AdaptiveMotion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-neo-navy/95 px-6"
-      data-testid="quick-rules"
-    >
-      {/* Radial glow behind icon */}
-      <div className={cn(
-        'absolute inset-0 pointer-events-none bg-radial-gradient to-transparent',
-        panel.bgGlow,
-      )} style={{ background: `radial-gradient(circle at center, var(--tw-gradient-from) 0%, transparent 60%)` }} />
-
-      {/* Panel content */}
-      <AdaptiveAnimatePresence mode="wait">
-        <AdaptiveMotion.div
-          key={activePanel}
-          initial={{ opacity: 0, x: 60 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -60 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="relative flex flex-col items-center gap-5 max-w-sm text-center"
-          data-testid={`rules-panel-${activePanel}`}
-        >
-          {/* Icon */}
-          <AdaptiveMotion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 250, damping: 15, delay: 0.1 }}
-            className={panel.accent}
-          >
-            {panel.icon}
-          </AdaptiveMotion.div>
-
-          {/* Title */}
-          <h2 className={cn(
-            'font-neo-display font-black text-2xl sm:text-3xl uppercase tracking-wide',
-            panel.accent,
-          )}>
-            {t(panel.titleKey)}
-          </h2>
-
-          {/* Description */}
-          <p className="text-neo-cream/80 font-neo-body text-base leading-relaxed max-w-[280px]">
-            {t(panel.descKey)}
-          </p>
-        </AdaptiveMotion.div>
-      </AdaptiveAnimatePresence>
-
-      {/* Dot indicators */}
-      <div className="relative flex gap-2 mt-8" data-testid="rules-dots">
-        {PANELS.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => handleDotClick(i)}
-            aria-label={t('wordHuntRules.goToPanel', { panel: i + 1 })}
-            className={cn(
-              'w-2.5 h-2.5 rounded-full border-2 border-neo-white/30 transition-all',
-              i === activePanel
-                ? 'bg-neo-white scale-125'
-                : 'bg-neo-white/20 hover:bg-neo-white/40',
-            )}
-          />
-        ))}
-      </div>
-
-      {/* Got it / Skip button */}
-      <AdaptiveMotion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.4 }}
-        type="button"
-        onClick={onDismiss}
+    <AdaptiveAnimatePresence>
+      <AdaptiveMotion.div
+        initial={{ opacity: 0, y: -30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className={cn(
-          'relative mt-6 px-8 py-3 rounded-neo border-3 border-neo-black',
-          'font-neo-display font-black text-lg uppercase tracking-wider',
-          'bg-neo-lime text-neo-black shadow-hard',
-          'hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5',
-          'transition-all',
+          'fixed top-3 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,360px)]',
+          'bg-neo-navy-light/95 backdrop-blur-sm',
+          'border-2 border-neo-white/20 rounded-neo shadow-hard-sm',
+          'px-4 py-3',
         )}
-        data-testid="rules-dismiss"
+        data-testid="quick-rules"
       >
-        {activePanel >= PANEL_COUNT - 1
-          ? t('wordHuntRules.gotIt')
-          : t('wordHuntRules.skip')
-        }
-      </AdaptiveMotion.button>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-neo-display font-bold text-xs uppercase tracking-wider text-neo-lime">
+            {t('wordHuntRules.quickTipsTitle')}
+          </span>
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="p-0.5 rounded text-neo-white/50 hover:text-neo-white transition-colors"
+            data-testid="rules-dismiss"
+            aria-label={t('wordHuntRules.gotIt')}
+          >
+            <X size={14} />
+          </button>
+        </div>
 
-      {/* Panel counter */}
-      <span className="relative mt-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
-        {activePanel + 1} / {PANEL_COUNT}
-      </span>
-    </AdaptiveMotion.div>
+        {/* Tips list */}
+        <ul className="flex flex-col gap-1.5">
+          {TIPS.map((tip, i) => (
+            <li
+              key={i}
+              className="flex items-center gap-2"
+              data-testid={`tip-${i}`}
+            >
+              <span className={cn('shrink-0', tip.accent)}>{tip.icon}</span>
+              <span className="text-[11px] font-neo-body text-neo-cream/80 leading-tight">
+                {t(tip.textKey)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </AdaptiveMotion.div>
+    </AdaptiveAnimatePresence>
   );
 });
 
 WordHuntQuickRules.displayName = 'WordHuntQuickRules';
-export { WordHuntQuickRules, PANELS, PANEL_COUNT };
+export { WordHuntQuickRules, TIPS, TIP_COUNT, AUTO_DISMISS_MS };

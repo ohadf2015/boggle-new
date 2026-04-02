@@ -11,6 +11,7 @@ import fs from 'fs';
 import os from 'os';
 import { createWorker, WorkerLike, isBun } from './workerRuntime';
 import * as validator from './wordValidator';
+import { findAllWords as solverFindAllWords, type FindWordsOptions } from './boggleSolver';
 import logger from '../utils/logger';
 
 // Interfaces
@@ -261,6 +262,12 @@ export class WordValidatorPool {
         return validator.getWordPath(data.word as string, data.board as string[][], positions);
       case 'makePositionsMap':
         return Array.from(validator.makePositionsMap(data.board as string[][]).entries());
+      case 'findAllWords':
+        return solverFindAllWords(
+          data.board as string[][],
+          data.language as string,
+          (data.options ?? {}) as FindWordsOptions
+        );
       default:
         throw new Error(`Unknown action: ${action}`);
     }
@@ -347,6 +354,48 @@ export class WordValidatorPool {
   }
 
   /**
+   * Find all valid words on a Boggle grid (async).
+   *
+   * When workers are available the computation runs in a worker thread,
+   * keeping the event loop free during the 50-100 ms DFS over a 6×6 grid.
+   * When in sync-only mode (worker file absent) the call is wrapped in a
+   * setImmediate-deferred Promise so that at minimum any I/O callbacks
+   * queued before game-start can flush before we block.
+   *
+   * TODO(PERF-012): create wordValidatorWorker.mjs with a 'findAllWords'
+   * action so this path fully offloads to a worker thread.
+   */
+  async findAllWordsAsync(
+    board: string[][],
+    language: string,
+    options: FindWordsOptions = {}
+  ): Promise<string[]> {
+    await this.initialize();
+
+    if (this.syncOnly) {
+      // Defer to next event-loop iteration so queued I/O can flush first,
+      // then run the synchronous (but potentially blocking) DFS.
+      return new Promise<string[]>((resolve, reject) => {
+        setImmediate(() => {
+          try {
+            resolve(solverFindAllWords(board, language, options));
+          } catch (err) {
+            reject(err);
+          }
+        });
+      });
+    }
+
+    try {
+      return await this._submitTask('findAllWords', { board, language, options }) as string[];
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.warn('WORKER_POOL', 'findAllWords falling back to sync', { error: errorMessage });
+      return solverFindAllWords(board, language, options);
+    }
+  }
+
+  /**
    * Get pool statistics
    */
   getStats(): PoolStats {
@@ -420,6 +469,17 @@ export function getWordPathAsync(
  */
 export function makePositionsMapAsync(board: string[][]): Promise<PositionsMap> {
   return pool.makePositionsMapAsync(board);
+}
+
+/**
+ * Find all valid words on a Boggle grid (async, worker-offloaded when available)
+ */
+export function findAllWordsAsync(
+  board: string[][],
+  language: string,
+  options?: FindWordsOptions
+): Promise<string[]> {
+  return pool.findAllWordsAsync(board, language, options);
 }
 
 /**

@@ -557,6 +557,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           case 'clearIce':
             newCurrent += iceClearedCount;
             break;
+          case 'collectGems':
+            // Count gold tiles collected in this word
+            if (path) {
+              newCurrent += path.filter(
+                (pos) => state.gameState.tiles[pos.row]?.[pos.col]?.type === 'gold'
+              ).length;
+            }
+            break;
           default:
             break;
         }

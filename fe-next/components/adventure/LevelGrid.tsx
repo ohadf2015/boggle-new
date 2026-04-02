@@ -249,7 +249,7 @@ const LevelGrid = memo(function LevelGrid({
       </div>
 
       {/* Scrollable content layer */}
-      <div ref={scrollContainerRef} className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent z-10">
+      <div ref={scrollContainerRef} className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-neo-white/20 scrollbar-track-transparent z-10" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="relative pt-6 sm:pt-8 pb-8 px-4 sm:px-6 max-w-3xl mx-auto">
         <LevelGridHeader
           world={world}

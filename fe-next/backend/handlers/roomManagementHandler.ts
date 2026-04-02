@@ -61,6 +61,7 @@ function registerRoomManagementHandlers(io: Server, socket: Socket): void {
 
   // Handle get active rooms
   socket.on('getActiveRooms', () => {
+    if (!checkRateLimit(socket.id)) return;
     socket.emit('activeRooms', { rooms: getActiveRooms() });
   });
 

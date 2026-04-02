@@ -127,15 +127,15 @@ export function calculateGameScores(
 
         if (percentageWhoFound <= 5) {
           // Only 1 player in 20 found this - legendary!
-          rarityMultiplier = 2.0;
+          rarityMultiplier = 1.5;   // GD-023: reduced from 2.0 (too swingy)
           wordRarity = 'legendary';
         } else if (percentageWhoFound <= 15) {
           // Less than 15% of players found this - rare
-          rarityMultiplier = 1.5;
+          rarityMultiplier = 1.3;   // GD-023: reduced from 1.5
           wordRarity = 'rare';
         } else if (percentageWhoFound <= 30) {
           // 15-30% of players found this - uncommon
-          rarityMultiplier = 1.25;
+          rarityMultiplier = 1.15;  // GD-023: reduced from 1.25
           wordRarity = 'uncommon';
         }
         // else: common word (50%+ found it), no bonus

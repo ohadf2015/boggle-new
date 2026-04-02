@@ -83,7 +83,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
             data-testid="challenge-dismiss"
             onClick={onDismiss}
             aria-label={t('common.dismiss')}
-            className={cn('w-5 h-5 flex items-center justify-center flex-shrink-0',
+            className={cn('min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0',
               isFailed ? 'text-neo-red/50' : isComplete ? 'text-neo-black/50' : 'text-neo-white/40'
             )}
           >

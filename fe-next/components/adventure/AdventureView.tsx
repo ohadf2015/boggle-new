@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Loader2, Sparkles, X } from 'lucide-react';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import Link from 'next/link';
@@ -42,12 +42,6 @@ import BossRushResults from './BossRushResults';
 const AdventureGame = dynamic(() => import('./AdventureGame'), { ssr: false, loading: () => <div className="h-screen bg-neo-navy flex items-center justify-center"><Loader2 className="w-12 h-12 text-neo-yellow animate-spin" /></div> });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
-interface GameTimerState {
-  timeRemaining: number;
-  totalTime: number;
-  isPlaying: boolean;
-  isPaused: boolean;
-}
 
 function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
@@ -82,10 +76,6 @@ function AdventureView(): React.JSX.Element {
     openWorldMapFromHub, historyBack,
   } = useAdventureHistory(hasCompletions ? 'hub' : 'levelGrid', hasCompletions ? null : 1);
 
-  const [gameTimerState, setGameTimerState] = useState<GameTimerState>({
-    timeRemaining: 0, totalTime: 0, isPlaying: false, isPaused: false,
-  });
-
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
 
   // Hide main header during active gameplay
@@ -95,14 +85,19 @@ function AdventureView(): React.JSX.Element {
     return () => setIsInGame(false);
   }, [viewState, setIsInGame]);
 
+  // Ambient music for hub/map/levelGrid screens.
+  // During gameplay, this hook is disabled (enabled:false) so that timer ticks
+  // inside AdventureGame do NOT cause AdventureView to re-render.
+  // AdventureGame handles in-game music internally.
+  const isInGameplay = viewState === 'playing' || viewState === 'bossRush' || viewState === 'weeklyChallenge';
   const currentMusicWorld = selectedWorld || 1;
   useAdventureMusic({
     worldNumber: currentMusicWorld,
-    isPlaying: viewState === 'playing' ? gameTimerState.isPlaying : true,
-    isPaused: viewState === 'playing' ? gameTimerState.isPaused : false,
-    timeRemaining: viewState === 'playing' ? gameTimerState.timeRemaining : 0,
-    totalTime: viewState === 'playing' ? gameTimerState.totalTime : 0,
-    enabled: true,
+    isPlaying: true,
+    isPaused: false,
+    timeRemaining: 0,
+    totalTime: 0,
+    enabled: !isInGameplay,
   });
 
   const playerLevel = progression?.playerLevel ?? 1;
@@ -363,9 +358,9 @@ function AdventureView(): React.JSX.Element {
       {(viewState === 'worldMap' || viewState === 'levelGrid' || viewState === 'hub') && <div className="h-14 flex-shrink-0" />}
 
       <div className="relative z-10 flex-1 min-h-0">
-        <AnimatePresence mode="wait">
+        <AdaptiveAnimatePresence mode="wait">
           {viewState === 'hub' && (
-            <motion.div key="hub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="hub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
               <AdventureHub
                 streakDays={streakDays}
                 bestStreak={bestStreak}
@@ -379,44 +374,44 @@ function AdventureView(): React.JSX.Element {
                 onPlayLevel={selectLevel}
                 onOpenShop={openShop}
                 wordAlbumCount={progression?.wordAlbum?.length ?? 0}
-                onWeeklyChallenge={openWeeklyChallenge}
+
                 onBossRush={handleStartBossRush}
                 canBossRush={bossRush.canStartBossRush}
                 onOpenWordAlbum={openWordAlbum}
               />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {viewState === 'worldMap' && (
-            <motion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
+            <AdaptiveMotion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
               {/* First-time player welcome banner */}
               {!hasCompletions && (
                 <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} />
               )}
               <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {viewState === 'levelGrid' && selectedWorldConfig && (
-            <motion.div key="level-grid" initial={{ opacity: 0, x: isRTL ? -100 : 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="level-grid" initial={{ opacity: 0, x: isRTL ? -100 : 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
               <LevelGrid world={selectedWorldConfig} completions={completions} totalStars={totalStars} onLevelSelect={selectLevel} />
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {viewState === 'playing' && levelConfig && gameGrid && (
-            <motion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="playing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
               <AdventureGameErrorBoundary onExit={handleGameExit}>
-                <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} onTimerStateChange={setGameTimerState} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
+                <AdventureGame levelConfig={levelConfig} initialGrid={gameGrid} onLevelComplete={handleLevelComplete} onExit={handleGameExit} totalStars={totalStars} onNextWorld={navigateToWorldMap} />
               </AdventureGameErrorBoundary>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {viewState === 'weeklyChallenge' && (
-            <motion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+            <AdaptiveMotion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
               <AdventureGameErrorBoundary onExit={() => setViewState('hub')}>
-                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} onTimerStateChange={setGameTimerState} totalStars={totalStars} />
+                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} totalStars={totalStars} />
               </AdventureGameErrorBoundary>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {viewState === 'bossRush' && (() => {
@@ -429,26 +424,26 @@ function AdventureView(): React.JSX.Element {
             // Show results if rush is complete or failed
             if (bossRush.state.isComplete || bossRush.state.isFailed) {
               return (
-                <motion.div key="boss-rush-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
+                <AdaptiveMotion.div key="boss-rush-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
                   <BossRushResults state={bossRush.state} onRetry={handleBossRushRetry} onExit={handleBossRushExit} />
-                </motion.div>
+                </AdaptiveMotion.div>
               );
             }
 
             // Active boss fight
             if (rushConfig && rushGrid) {
               return (
-                <motion.div key={`boss-rush-${bossRush.state.currentBossIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
+                <AdaptiveMotion.div key={`boss-rush-${bossRush.state.currentBossIndex}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
                   <AdventureGameErrorBoundary onExit={handleBossRushExit}>
-                    <AdventureGame levelConfig={rushConfig} initialGrid={rushGrid} onLevelComplete={handleBossRushBossDefeated} onExit={handleBossRushFailed} onTimerStateChange={setGameTimerState} totalStars={totalStars} />
+                    <AdventureGame levelConfig={rushConfig} initialGrid={rushGrid} onLevelComplete={handleBossRushBossDefeated} onExit={handleBossRushFailed} totalStars={totalStars} />
                   </AdventureGameErrorBoundary>
-                </motion.div>
+                </AdaptiveMotion.div>
               );
             }
 
             return null;
           })()}
-        </AnimatePresence>
+        </AdaptiveAnimatePresence>
       </div>
 
       {(viewState === 'worldMap' || viewState === 'levelGrid') && (
@@ -472,7 +467,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
   const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
   return (
-    <motion.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -502,7 +497,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
           </button>
         </div>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }
 

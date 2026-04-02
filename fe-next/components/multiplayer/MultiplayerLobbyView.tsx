@@ -170,7 +170,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
           <MobileShareSection gameCode={gameCode} t={t} compact />
           <button
             onClick={onExitRoom}
-            className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
+            className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
             aria-label={t('common.exit')}
           >
             <LogOut className="w-3.5 h-3.5 text-neo-black rtl:scale-x-[-1]" />
@@ -237,13 +237,13 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
               <button
                 data-testid="name-save-button"
                 onClick={handleSaveName}
-                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
               >
                 <Check className="w-4 h-4 text-neo-black" />
               </button>
               <button
                 onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+                className="w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
               >
                 <X className="w-4 h-4 text-neo-cream" />
               </button>
@@ -257,7 +257,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
                 <button
                   data-testid="edit-name-button"
                   onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  className="flex-shrink-0 w-7 h-7 min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                   aria-label={t('playerView.editName')}
                 >
                   <Pencil className="w-3.5 h-3.5 text-slate-400" />

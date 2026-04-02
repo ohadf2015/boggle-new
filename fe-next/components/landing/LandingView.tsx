@@ -31,7 +31,6 @@ import { LandingMobileCards } from './LandingMobileCards';
 // LiveActivityTicker moved out to reduce landing clutter
 const UrgencyCard = dynamic(() => import('./UrgencyCard').then(m => m.UrgencyCard), { ssr: false });
 // Engagement widgets — only high-value conditional ones on landing
-const DailyModeQuestCard = dynamic(() => import('./DailyModeQuestCard').then(m => m.DailyModeQuestCard), { ssr: false });
 const VaultCardConnected = dynamic(() => import('@/components/vault/VaultCardConnected').then(m => m.VaultCardConnected), { ssr: false });
 const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRivalWidget').then(m => m.GhostRivalWidget), { ssr: false });
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
@@ -127,7 +126,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
   const handlePlayClick = () => {
     unlockAudio();
-    trackModeSelected('singleplayer', 'home_mobile_cta');
+    trackModeSelected('arena', 'home_mobile_cta');
     router.push(`/${language}/multiplayer?autoCreate=true`);
   };
 
@@ -216,7 +215,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
         {hydrated && isAuthenticated && (
           <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
-            <DailyModeQuestCard />
             <UrgencyCard />
             <GhostRivalWidget />
             <VaultCardConnected />

@@ -133,7 +133,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         if (tile.tileType === 'bomb') processedBombs.add(`${tile.row},${tile.col}`);
       }
     }
-    bonusScore += baseScore * (comboMultiplier - 1);
+    // comboMultiplier applied after effectiveBase is computed (see score calculation below)
   }
 
   // ── Main path loop ──
@@ -280,24 +280,27 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       pendingPopups.push({ id: `gold-bonus-${now}-${cell.row}-${cell.col}`, score: perTileBonus, row: cell.row, col: cell.col, isSpecial: true, timestamp: now, tileType: (t?.type ?? 'gold') as 'gold' });
     }
   }
-  const totalScore = effectiveBase * goldMultiplier + bonusScore;
+  // Combo multiplier stacks with gold/rainbow/mirror multipliers
+  const totalScore = effectiveBase * goldMultiplier * comboMultiplier + bonusScore;
 
   if (path.length > 0) {
     const midIdx = Math.floor(path.length / 2);
     pendingPopups.push({ id: `score-${now}-${path[midIdx].row}-${path[midIdx].col}`, score: totalScore, row: path[midIdx].row, col: path[midIdx].col, isSpecial: bonusScore > 0, timestamp: now });
   }
 
-  // Row-clear reward for 7+ letter words
+  // Row-clear reward for 7+ letter words — clears all tile types in the row
   if (word.length >= 7 && path.length > 0) {
     const midCell = path[Math.floor(path.length / 2)];
     const targetRow = midCell.row;
     for (let c = 0; c < gridSize; c++) {
       const tile = next[targetRow]?.[c];
-      if (tile && !tile.isCleared && tile.type === 'standard') {
-        tile.isCleared = true;
-        newlyClearedCount++;
-        newExplosions.push({ id: `row-clear-${now}-${targetRow}-${c}`, type: 'clear', row: targetRow, col: c, intensity: 2, timestamp: now });
+      if (!tile || tile.isCleared) continue;
+      if (isMultiHitAlive(tile)) {
+        hitMultiHitTile(tile);
+      } else {
+        markCleared(tile);
       }
+      newExplosions.push({ id: `row-clear-${now}-${targetRow}-${c}`, type: 'clear', row: targetRow, col: c, intensity: 2, timestamp: now });
     }
   }
 

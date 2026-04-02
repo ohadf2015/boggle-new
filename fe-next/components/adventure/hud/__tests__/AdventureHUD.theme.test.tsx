@@ -66,7 +66,6 @@ vi.mock('../../../../hooks/usePrefersReducedMotion', () => ({
 describe('AdventureHUD — Theme Integration', () => {
   const defaultProps = {
     remainingTime: 120,
-    totalTime: 180,
     score: 1500,
     objectives: [
       { id: 'obj1', type: 'score' as const, target: 1000, current: 500, label: 'Score 1000' },

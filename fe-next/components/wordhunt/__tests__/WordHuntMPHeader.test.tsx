@@ -48,4 +48,23 @@ describe('WordHuntMPHeader', () => {
     expect(badge?.className).toContain('border-3');
     expect(badge?.className).toContain('shadow-hard-sm');
   });
+
+  it('should render help button when onShowHelp is provided', () => {
+    const onShowHelp = vi.fn();
+    render(<WordHuntMPHeader {...defaultProps} onShowHelp={onShowHelp} />);
+    const helpBtn = screen.getByTestId('wh-help-button');
+    expect(helpBtn).toBeInTheDocument();
+  });
+
+  it('should call onShowHelp when help button is clicked', () => {
+    const onShowHelp = vi.fn();
+    render(<WordHuntMPHeader {...defaultProps} onShowHelp={onShowHelp} />);
+    fireEvent.click(screen.getByTestId('wh-help-button'));
+    expect(onShowHelp).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render spacer when onShowHelp is not provided', () => {
+    render(<WordHuntMPHeader {...defaultProps} />);
+    expect(screen.queryByTestId('wh-help-button')).not.toBeInTheDocument();
+  });
 });

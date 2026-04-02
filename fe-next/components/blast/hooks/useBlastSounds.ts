@@ -1,36 +1,48 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+
+// ── Web Audio path-tone oscillator ──
+// Chromatic scale from C4 upward — each letter in the path plays the next note
+const PATH_TONE_FREQUENCIES = [
+  261.6, 293.7, 329.6, 349.2, 392.0, 440.0, 493.9, 523.3, // C4–C5
+  587.3, 659.3, 698.5, 784.0, 880.0, 987.8, 1047,          // D5–C6
+];
 
 /**
  * useBlastSounds — consolidates all blast-specific sound triggers.
  * Maps blast game events to the shared SoundEffectsContext functions.
+ * Includes Web Audio oscillator for path-building chromatic tones.
  */
 export function useBlastSounds() {
   const {
-    playWordAcceptedSound,
     playComboSound,
     playComboMilestoneSound,
     playComboBreakSound,
     playErrorSound,
     playAchievementSound,
     playCountdownBeep,
+    playSound,
   } = useSoundEffects();
 
-  /** Play tile clear sound with pitch variation based on word length */
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  /** Play tile clear sound with pitch scaled by word length */
   const playTileClear = useCallback((count: number) => {
-    // Reuse word accepted; longer words feel more rewarding via the base sound
-    playWordAcceptedSound();
-    // For longer clears, layer a combo sound at low level for depth
+    // Pitch up for longer words: 3-letter=1.0, 7-letter=1.3
+    const rate = 1.0 + Math.max(0, count - 3) * 0.075;
+    playSound('wordAccepted', { volume: 0.4, rate: Math.min(rate, 1.5) });
+    // Layer combo sound for 5+ letter clears
     if (count >= 5) {
       playComboSound(Math.min(count - 3, 5));
     }
-  }, [playWordAcceptedSound, playComboSound]);
+  }, [playSound, playComboSound]);
 
-  /** Play cascade chain sound with increasing level */
+  /** Play cascade chain sound — pitch escalates faster for Blast chains */
   const playCascadeChain = useCallback((level: number) => {
-    playComboSound(level);
+    // Boost level by 2 so Blast cascades feel more dramatic than standard combos
+    playComboSound(level + 2);
   }, [playComboSound]);
 
   /** Play combo activation sound — milestone for tier 2+, combo for tier 1 */
@@ -64,6 +76,32 @@ export function useBlastSounds() {
     playComboBreakSound(1);
   }, [playComboBreakSound]);
 
+  /** Play a chromatic tone as the player adds a tile to their path.
+   *  Uses Web Audio oscillator — zero-latency, no asset needed. */
+  const playPathTone = useCallback((pathLength: number) => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const freq = PATH_TONE_FREQUENCIES[Math.min(pathLength - 1, PATH_TONE_FREQUENCIES.length - 1)];
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } catch {
+      // Silently ignore — audio not critical
+    }
+  }, []);
+
   return {
     playTileClear,
     playCascadeChain,
@@ -72,5 +110,6 @@ export function useBlastSounds() {
     playMoveWarning,
     playWordReject,
     playComboTimeout,
+    playPathTone,
   };
 }

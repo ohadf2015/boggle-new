@@ -71,7 +71,7 @@ function executeKick(
   gameStartCoordinator.handlePlayerDisconnect(gameCode, targetUsername);
 
   // Clean up player data and remove
-  cleanupPlayerData(game as any, targetUsername);
+  cleanupPlayerData(game, targetUsername);
   removeUserFromGame(gameCode, targetUsername);
 
   // Block re-join

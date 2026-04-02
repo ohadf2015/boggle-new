@@ -119,6 +119,10 @@ export interface GameState {
   blastModeState?: BlastModeState | null;
   wordHuntState?: WordHuntState | null;
   kickedPlayers?: Set<string>;
+  /** O(1) duplicate-word lookup set, parallel to playerWords (not persisted to Redis) */
+  playerWordsSet?: Record<string, Set<string>>;
+  /** Cached validatedScores/validationComplete payload for reconnecting clients */
+  cachedResultsPayload?: Record<string, unknown> | null;
 }
 
 // Game creation data interface

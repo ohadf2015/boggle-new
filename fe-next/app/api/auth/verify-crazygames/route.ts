@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { captureApiError } from '@/utils/sentry';
+import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 
 /**
  * CrazyGames token verification endpoint.
@@ -27,6 +28,15 @@ const EXPECTED_ISSUER = 'crazygames.com';
 const EXPECTED_AUDIENCE = process.env.CRAZYGAMES_GAME_DOMAIN || undefined;
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per 60 seconds per IP
+  const rateLimit = checkApiRateLimit(request, 'verify-crazygames', {
+    maxRequests: 10,
+    windowMs: 60_000,
+  });
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const body = await request.json();
     const { token } = body;

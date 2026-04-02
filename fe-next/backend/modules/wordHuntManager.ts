@@ -8,7 +8,7 @@ import type { WordHuntModeState, LetterFeedback } from '@/shared/types/game';
 import {
   HUNT_LIFE_DRAIN_RATE,
   HUNT_INITIAL_LIFE,
-  HUNT_FIRST_FINDER_BONUS,
+  HUNT_SUBSEQUENT_FINDER_BONUSES,
   HUNT_WRONG_GUESS_PENALTY,
   getHuntLifeBonus,
   getDrainRate,
@@ -84,6 +84,11 @@ export async function getCommonWordsAsync(lang = 'en'): Promise<Set<string>> {
         commonWordsByLang[lang] = words;
         delete loadingPromises[lang];
         return words;
+      })
+      .catch(err => {
+        // Clear rejected promise so next request retries instead of returning stale rejection
+        delete loadingPromises[lang];
+        throw err;
       });
   }
   return loadingPromises[lang];
@@ -190,6 +195,7 @@ export function initWordHuntState(
     eliminatedPlayers: [],
     targetFoundBy: null,
     isFirstFinderClaimed: false,
+    finderCount: 0,
   };
 }
 
@@ -261,17 +267,23 @@ export function validateTargetGuess(
 /**
  * Record that a player found the target word.
  * Returns whether they are the first finder and their bonus.
+ * Subsequent finders during the 3s end-game window get decreasing bonuses.
  */
 export function recordTargetFound(
   state: WordHuntModeState,
   username: string,
 ): { isFirstFinder: boolean; bonus: number } {
-  if (!state.isFirstFinderClaimed) {
+  const finderIndex = state.finderCount ?? 0;
+  const bonus = HUNT_SUBSEQUENT_FINDER_BONUSES[finderIndex] ?? HUNT_SUBSEQUENT_FINDER_BONUSES[HUNT_SUBSEQUENT_FINDER_BONUSES.length - 1];
+  const isFirstFinder = finderIndex === 0;
+
+  if (isFirstFinder) {
     state.targetFoundBy = username;
     state.isFirstFinderClaimed = true;
-    return { isFirstFinder: true, bonus: HUNT_FIRST_FINDER_BONUS };
   }
-  return { isFirstFinder: false, bonus: 0 };
+  state.finderCount = finderIndex + 1;
+
+  return { isFirstFinder, bonus };
 }
 
 /**

@@ -295,7 +295,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   const socketContextValue = useMemo(() => ({
     socket, isConnected, connectionError: error, isReconnecting: attemptingReconnect,
-    reconnectAttempt: 0, maxReconnectAttempts: 20, manualReconnect: handleManualReconnect,
+    getReconnectAttempt: () => 0, maxReconnectAttempts: 20, manualReconnect: handleManualReconnect,
   }), [socket, isConnected, error, attemptingReconnect, handleManualReconnect]);
 
   const renderView = (): React.JSX.Element => {

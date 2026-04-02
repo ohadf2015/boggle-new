@@ -274,6 +274,66 @@ const en = {
       "description": "View player profiles, game statistics, achievements, and match history on LexiClash. See how any player stacks up on the leaderboard.",
       "ogTitle": "Player Profile - LexiClash",
       "ogDescription": "View player stats, achievements, and match history."
+    },
+    "partyJoin": {
+      "title": "Join a Party Game — Enter Code & Play Instantly",
+      "description": "Join a LexiClash party game with a room code. Grab your phone, enter the code on screen, and jump into party word battles with friends.",
+      "ogTitle": "Join a LexiClash Party Game",
+      "ogDescription": "Enter a room code and join the party word battle instantly!"
+    },
+    "partyHost": {
+      "title": "Host a Party Game — Big Screen Word Battles",
+      "description": "Host a LexiClash party game on the big screen. Display the game on TV, let friends join with their phones, and run epic word battle rounds.",
+      "ogTitle": "Host a LexiClash Party Game",
+      "ogDescription": "Run party word battles on the big screen — friends join with their phones!"
+    },
+    "partyPlay": {
+      "title": "Party Game — Play on Your Phone",
+      "description": "Play LexiClash party games from your phone. Submit words, vote on captions, and compete in real-time party word battles.",
+      "ogTitle": "Play LexiClash Party Game",
+      "ogDescription": "Play party word games from your phone in real time!"
+    },
+    "educationHub": {
+      "title": "Education Hub — Word Games for Classrooms & Teachers",
+      "description": "Use LexiClash in your classroom! Create word game lessons, track student vocabulary progress, and make learning fun with multiplayer word battles.",
+      "ogTitle": "LexiClash Education Hub",
+      "ogDescription": "Word games for classrooms — create lessons, track progress, make learning fun!"
+    },
+    "educationDuels": {
+      "title": "Vocabulary Duels — Student vs Student Word Battles",
+      "description": "Challenge classmates to vocabulary duels! Real-time 1v1 word battles that test spelling, vocabulary, and quick thinking in educational settings.",
+      "ogTitle": "Vocabulary Duels - LexiClash Education",
+      "ogDescription": "1v1 student word battles for vocabulary practice!"
+    },
+    "communityBoard": {
+      "title": "Community Puzzle — Player-Created Word Board",
+      "description": "Play a community-created word puzzle on LexiClash. Solve player-made boards, compete for high scores, and share your own custom puzzles.",
+      "ogTitle": "Community Word Puzzle - LexiClash",
+      "ogDescription": "Play and compete on player-created word puzzles!"
+    },
+    "adventureBossRush": {
+      "title": "Boss Rush Mode — Fight 5 Bosses Back-to-Back",
+      "description": "Take on 5 word bosses in a row with health carrying over between fights. Clear all bosses for bonus gold and exclusive rewards in LexiClash Adventure.",
+      "ogTitle": "Boss Rush - LexiClash Adventure",
+      "ogDescription": "Fight 5 word bosses back-to-back — health carries over. Can you clear them all?"
+    },
+    "adventureEndless": {
+      "title": "Endless Mode — Procedural Word Floors With Escalating Difficulty",
+      "description": "How far can you go? Endless procedurally generated word puzzles with escalating difficulty. Each floor harder than the last in LexiClash Adventure.",
+      "ogTitle": "Endless Mode - LexiClash Adventure",
+      "ogDescription": "Infinite procedural word floors — how deep can you go?"
+    },
+    "adventureSkills": {
+      "title": "Skill Tree — Unlock Adventure Word Powers",
+      "description": "Unlock and upgrade skills to enhance your LexiClash Adventure gameplay. Choose your build, invest skill points, and customize your word-finding strategy.",
+      "ogTitle": "Skill Tree - LexiClash Adventure",
+      "ogDescription": "Unlock skills and customize your adventure build!"
+    },
+    "adventureAchievements": {
+      "title": "Adventure Achievements — Track Your Progress & Milestones",
+      "description": "View all your LexiClash Adventure achievements, milestones, and progress. See completed challenges, boss victories, and collection stats.",
+      "ogTitle": "Adventure Achievements - LexiClash",
+      "ogDescription": "Track adventure milestones, boss victories, and achievement progress."
     }
   },
   "cookieConsent": {
@@ -1033,14 +1093,19 @@ const en = {
       "joinRoomAction": "Join {{roomName}}",
       "availableRooms": "Available Rooms",
       "roomsListLabel": "List of available game rooms",
-      "linkCopied": "Invite link copied — send it to friends!"
+      "linkCopied": "Invite link copied — send it to friends!",
+      "fetchTimeout": "Couldn't load rooms. Check your connection.",
+      "retry": "Retry"
     },
     "joinModal": {
       "title": "Join the Fight",
       "yourName": "Call me...",
       "namePlaceholder": "Your battle name",
       "joinButton": "Let's Go!",
-      "joining": "Warping in..."
+      "joining": "Warping in...",
+      "roomFull": "Room is full",
+      "roomFullSpectate": "Room is full. You can spectate instead.",
+      "spectateButton": "Spectate"
     },
     "createModal": {
       "title": "Host a Battle",
@@ -4174,6 +4239,10 @@ const en = {
     "multiPlayer": "Multiplayer",
     "multiplayer": "Multiplayer",
     "multiplayerDesc": "Live word battles!",
+    "arena": "Word Arena",
+    "arenaDesc": "Play solo or challenge friends!",
+    "practice": "Practice",
+    "practiceDesc": "No pressure, just words",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
@@ -9176,6 +9245,7 @@ const en = {
     goToPanel: "Go to rule {{panel}}",
     gotIt: "Got it!",
     skip: "Skip",
+    quickTipsTitle: "Quick Tips",
   },
   wordHuntNudge: {
     lifeDrop: "Swipe words on the board to heal! Each word restores life.",

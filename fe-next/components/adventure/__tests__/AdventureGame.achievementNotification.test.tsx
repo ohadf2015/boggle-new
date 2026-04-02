@@ -540,6 +540,10 @@ vi.mock('@/components/animations/ComboTierBadge', () => ({
   ComboTierBadge: () => null,
 }));
 
+vi.mock('@/hooks/useAdventureMusic', () => ({
+  useAdventureMusic: () => ({ currentTrack: 1, stopMusic: vi.fn(), hasMusic: false }),
+}));
+
 // ==============================================
 // TESTS
 // ==============================================

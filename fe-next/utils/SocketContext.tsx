@@ -12,7 +12,7 @@ export interface SocketContextValue {
   isConnected: boolean;
   isReconnecting: boolean;
   connectionError: string | null;
-  reconnectAttempt: number;
+  getReconnectAttempt: () => number;
   maxReconnectAttempts: number;
   manualReconnect: () => void;
 }
@@ -163,6 +163,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
+  const reconnectAttemptRef = useRef<number>(0);
   const socketRef = useRef<Socket | null>(null);
 
   // Manual reconnect function
@@ -226,6 +227,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const handleReconnectAttempt = (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
+      reconnectAttemptRef.current = attemptNumber;
       setReconnectAttempt(attemptNumber);
 
       // Refresh auth token before each reconnection attempt
@@ -312,17 +314,22 @@ export function SocketProvider({ children }: SocketProviderProps) {
     };
   }, []);
 
-  // Memoize the context value to prevent unnecessary re-renders of all consumers
-  // This is critical - Socket.IO state changes frequently but consumers may not care about all changes
+  // Stable callback that reads from ref — does not change between reconnect attempts
+  const getReconnectAttempt = useCallback(() => reconnectAttemptRef.current, []);
+
+  // Memoize the context value to prevent unnecessary re-renders of all consumers.
+  // reconnectAttempt state is intentionally excluded: during reconnection (up to 20 attempts)
+  // it would cause all consumers to re-render on every attempt. Consumers that need the
+  // current attempt number should call getReconnectAttempt() instead (PERF-007).
   const value = useMemo<SocketContextValue>(() => ({
     socket,
     isConnected,
     isReconnecting,
     connectionError,
-    reconnectAttempt,
+    getReconnectAttempt,
     maxReconnectAttempts: SOCKET_CONFIG.reconnectionAttempts,
     manualReconnect
-  }), [socket, isConnected, isReconnecting, connectionError, reconnectAttempt, manualReconnect]);
+  }), [socket, isConnected, isReconnecting, connectionError, getReconnectAttempt, manualReconnect]);
 
   return (
     <SocketContext.Provider value={value}>
@@ -422,10 +429,16 @@ export function useGameSocket(): GameSocketOperations {
   const { socket, isConnected, connectionError } = useSocket();
   const emit = useSocketEmit();
 
+  // Keep a ref to emit so all game-operation callbacks can be stable (PERF-008).
+  // Without this, every time emit changes (socket reconnect) all 15 callbacks are
+  // recreated, causing re-renders in every consumer component.
+  const emitRef = useRef(emit);
+  useEffect(() => { emitRef.current = emit; }, [emit]);
+
   // Create game
   const createGame = useCallback((gameCode: string, roomName: string, language: Language, hostUsername: string) => {
-    return emit('createGame', { gameCode, roomName: sanitizeRoomName(roomName), language, hostUsername });
-  }, [emit]);
+    return emitRef.current('createGame', { gameCode, roomName: sanitizeRoomName(roomName), language, hostUsername });
+  }, []);
 
   // Join game
   const joinGame = useCallback((
@@ -435,76 +448,76 @@ export function useGameSocket(): GameSocketOperations {
     avatar: Avatar,
     authContext?: { authUserId?: string | null; guestTokenHash?: string | null; guestSessionId?: string | null }
   ) => {
-    return emit('join', { gameCode, username, playerId, avatar, ...authContext });
-  }, [emit]);
+    return emitRef.current('join', { gameCode, username, playerId, avatar, ...authContext });
+  }, []);
 
   // Start game
   const startGame = useCallback((letterGrid: LetterGrid, timerSeconds: number, language: Language) => {
-    return emit('startGame', { letterGrid, timerSeconds, language });
-  }, [emit]);
+    return emitRef.current('startGame', { letterGrid, timerSeconds, language });
+  }, []);
 
   // Acknowledge game start
   const acknowledgeGameStart = useCallback((messageId: string) => {
-    return emit('startGameAck', { messageId });
-  }, [emit]);
+    return emitRef.current('startGameAck', { messageId });
+  }, []);
 
   // Submit word
   const submitWord = useCallback((word: string) => {
-    return emit('submitWord', { word });
-  }, [emit]);
+    return emitRef.current('submitWord', { word });
+  }, []);
 
   // Send chat message
   const sendChatMessage = useCallback((gameCode: string, message: string, isHost: boolean) => {
-    return emit('chatMessage', { gameCode, message, isHost });
-  }, [emit]);
+    return emitRef.current('chatMessage', { gameCode, message, isHost });
+  }, []);
 
   // End game
   const endGame = useCallback(() => {
-    return emit('endGame', {});
-  }, [emit]);
+    return emitRef.current('endGame', {});
+  }, []);
 
   // Reset game
   const resetGame = useCallback(() => {
-    return emit('resetGame', {});
-  }, [emit]);
+    return emitRef.current('resetGame', {});
+  }, []);
 
   // Close room
   const closeRoom = useCallback(() => {
-    return emit('closeRoom', {});
-  }, [emit]);
+    return emitRef.current('closeRoom', {});
+  }, []);
 
   // Validate words
   const validateWords = useCallback((validatedScores: unknown) => {
-    return emit('validateWords', { validatedScores });
-  }, [emit]);
+    return emitRef.current('validateWords', { validatedScores });
+  }, []);
 
   // Get active rooms
   const getActiveRooms = useCallback(() => {
-    return emit('getActiveRooms', {});
-  }, [emit]);
+    return emitRef.current('getActiveRooms', {});
+  }, []);
 
   // Host keep alive
   const hostKeepAlive = useCallback(() => {
-    return emit('hostKeepAlive', {});
-  }, [emit]);
+    return emitRef.current('hostKeepAlive', {});
+  }, []);
 
   // Host reactivate
   const hostReactivate = useCallback(() => {
-    return emit('hostReactivate', {});
-  }, [emit]);
+    return emitRef.current('hostReactivate', {});
+  }, []);
 
   // Tournament operations
   const createTournament = useCallback((name: string, totalRounds: number) => {
-    return emit('createTournament', { name, totalRounds });
-  }, [emit]);
+    return emitRef.current('createTournament', { name, totalRounds });
+  }, []);
 
   const getTournamentStandings = useCallback(() => {
-    return emit('getTournamentStandings', {});
-  }, [emit]);
+    return emitRef.current('getTournamentStandings', {});
+  }, []);
 
   const cancelTournament = useCallback(() => {
-    return emit('cancelTournament', {});
-  }, [emit]);
+    return emitRef.current('cancelTournament', {});
+  }, []);
 
   return {
     socket,

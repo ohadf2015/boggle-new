@@ -8,26 +8,37 @@ import { render, screen } from '@testing-library/react';
 import BlastResultsSummary from '../BlastResultsSummary';
 
 // Mock translations
-vi.mock('@/contexts/LanguageContext', () => ({
+jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('framer-motion', () => {
+jest.mock('framer-motion', () => {
   const React = require('react');
-  const makeMotion = (_target: Record<string, unknown>, prop: string) => {
-    // eslint-disable-next-line react/display-name
-    const Comp = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
-      const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
-      return React.createElement(prop, { ...rest, ref });
-    });
-    return Comp;
-  };
+  // eslint-disable-next-line react/display-name
+  const MotionDiv = React.forwardRef(
+    ({ children, initial, animate, exit, variants, whileHover, whileTap, transition, ...rest }: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) =>
+      React.createElement('div', { ...rest, ref }, children)
+  );
   return {
-    ...vi.importActual('framer-motion'),
+    motion: new Proxy({}, {
+      get: (_target: Record<string, unknown>, prop: string) => {
+        if (prop === 'div') return MotionDiv;
+        // eslint-disable-next-line react/display-name
+        return React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+          const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
+          return React.createElement(prop, { ...rest, ref });
+        });
+      },
+    }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     useReducedMotion: () => true,
-    motion: new Proxy({}, { get: makeMotion }),
   };
 });
+
+// Mock ScoreCountUp to render the number directly
+jest.mock('@/components/results/shared', () => ({
+  ScoreCountUp: ({ to }: { to: number }) => React.createElement('span', null, String(to)),
+}));
 
 describe('BlastResultsSummary', () => {
   it('should render moves used', () => {
@@ -43,7 +54,7 @@ describe('BlastResultsSummary', () => {
 
   it('should render tile bonus total', () => {
     render(<BlastResultsSummary movesUsed={10} tilesCleared={8} tileBonus={45} />);
-    // '+' prefix and '45' may be in separate elements due to ScoreCountUp animation
+    // '+' prefix and '45' may be in separate elements due to ScoreCountUp
     expect(screen.getByText((_content, element) =>
       element?.textContent === '+45'
     )).toBeInTheDocument();

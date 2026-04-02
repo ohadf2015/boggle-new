@@ -310,10 +310,12 @@ export function useBlastEngine(
     return {
       gravity: gravityResult,
       hasNewWords: false,
-      /** Call after sequencer animation completes to commit to React state */
+      /** Call after sequencer animation completes to commit to React state.
+       *  Reads from refs (not captured closure) so a submitWord() between
+       *  startCascade() and commit() won't be overwritten. */
       commit: () => {
-        setCurrentGrid(gravityResult.newGrid);
-        setTileStates(gravityResult.newTileStates);
+        setCurrentGrid(effectiveGridRef.current);
+        setTileStates(tileStatesRef.current);
       },
     };
   }, [gridSize, language, specialTileChance, customDistribution, effectiveBlastSeed, options?.isMultiplayer, config.boardClearMode]);

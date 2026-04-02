@@ -12,7 +12,7 @@
 
 import { createSupabasePublicClient } from '@/lib/supabaseServer';
 
-export type LandingGameMode = 'singleplayer' | 'multiplayer' | 'daily' | 'adventure' | 'blast';
+export type LandingGameMode = 'practice' | 'arena' | 'daily' | 'adventure' | 'blast';
 
 export interface GameModeStats {
   mode: LandingGameMode;
@@ -75,8 +75,8 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
     const dailyTotal = (dailyWordHuntResult.count ?? 0) + (dailyPuzzleResult.count ?? 0);
 
     const stats: GameModeStats[] = [
-      { mode: 'singleplayer', playCount: spTotal },
-      { mode: 'multiplayer', playCount: mpResult.count ?? 0 },
+      { mode: 'practice', playCount: spTotal },
+      { mode: 'arena', playCount: (mpResult.count ?? 0) + spTotal },
       { mode: 'daily', playCount: dailyTotal },
       { mode: 'adventure', playCount: adventureResult.count ?? 0 },
       { mode: 'blast', playCount: blastResult.count ?? 0 },
@@ -92,10 +92,10 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
 }
 
 /** Default card order when no stats available */
-const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'multiplayer', 'singleplayer', 'adventure'];
+const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'adventure'];
 
 /** Modes pinned to the front regardless of popularity */
-const PINNED_FIRST: LandingGameMode[] = ['daily', 'multiplayer'];
+const PINNED_FIRST: LandingGameMode[] = ['daily', 'arena'];
 
 /** Compute card display order from popularity stats. Blast excluded (shown separately). */
 export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
@@ -120,8 +120,8 @@ export function getCardOrder(stats?: GameModeStats[]): LandingGameMode[] {
 /** Fallback when Supabase is unavailable — preserves default card order */
 function getDefaultStats(): GameModeStats[] {
   return [
-    { mode: 'singleplayer', playCount: 0 },
-    { mode: 'multiplayer', playCount: 0 },
+    { mode: 'practice', playCount: 0 },
+    { mode: 'arena', playCount: 0 },
     { mode: 'daily', playCount: 0 },
     { mode: 'adventure', playCount: 0 },
     { mode: 'blast', playCount: 0 },

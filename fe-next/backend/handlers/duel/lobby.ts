@@ -17,6 +17,7 @@ import type { DuelSocket } from './types';
 import { getPendingDuelsForStudent } from '@/lib/supabase/education/duels';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import logger from '@/backend/utils/logger';
+import { checkRateLimit } from '../../utils/rateLimiter';
 
 // ==========================================
 // Types
@@ -158,6 +159,10 @@ export function registerLobbyHandlers(
   // duel:join-lobby - Join classroom lobby
   // ==========================================
   socket.on('duel:join-lobby', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = joinLobbySchema.safeParse(data);
@@ -225,6 +230,10 @@ export function registerLobbyHandlers(
   // duel:leave-lobby - Leave classroom lobby
   // ==========================================
   socket.on('duel:leave-lobby', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = leaveLobbySchema.safeParse(data);

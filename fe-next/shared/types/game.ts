@@ -283,6 +283,8 @@ export interface WordHuntModeState {
   eliminatedPlayers: string[];
   targetFoundBy: string | null;
   isFirstFinderClaimed: boolean;
+  /** How many players have found the target word (used for decreasing bonuses) */
+  finderCount?: number;
   discoveryWordCount?: number;
   /** Timestamp of last wordHandler life broadcast (prevents double broadcast with timer) */
   lastLifeUpdateAt?: number;

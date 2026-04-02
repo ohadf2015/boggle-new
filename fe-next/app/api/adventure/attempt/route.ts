@@ -191,7 +191,14 @@ export async function POST(request: NextRequest) {
  * GET /api/adventure/attempt
  * Fetch all attempts for the current user
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitResult = checkApiRateLimit(request, 'adventure-attempt-get', {
+    maxRequests: 60,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     // Get authenticated user
     const supabase = await createClient();

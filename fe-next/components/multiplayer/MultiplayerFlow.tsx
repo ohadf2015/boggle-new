@@ -82,6 +82,20 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
   const [selectedRoom, setSelectedRoom] = useState<ActiveRoom | null>(null);
 
+  // UX-007: Track which room is being joined to show per-card loading state
+  const [joiningRoomCode, setJoiningRoomCode] = useState<string | null>(null);
+
+  // UX-014: Room fetch timeout — if rooms haven't loaded after 10s, show retry banner
+  const [roomFetchTimedOut, setRoomFetchTimedOut] = useState(false);
+  useEffect(() => {
+    if (roomsLoading) {
+      const timeout = setTimeout(() => setRoomFetchTimedOut(true), 10000);
+      return () => clearTimeout(timeout);
+    }
+    setRoomFetchTimedOut(false);
+    return undefined;
+  }, [roomsLoading]);
+
   // CrazyGames invite integration
   const {
     isReady: isCrazyGamesReady,
@@ -165,6 +179,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const handleRoomClick = useCallback((room: ActiveRoom) => {
     if (isAuthenticated && displayName) {
       // Fast-join: skip modal for authenticated users
+      setJoiningRoomCode(room.gameCode);
       setGameCode(room.gameCode);
       setUsername(displayName);
       handleJoin(false, null, room.gameCode, undefined, displayName);
@@ -173,6 +188,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     if (hasProfile()) {
       // Guest with stored profile — also fast-join
       const profile = getProfileData();
+      setJoiningRoomCode(room.gameCode);
       setGameCode(room.gameCode);
       setUsername(profile.username);
       handleJoin(false, null, room.gameCode, undefined, profile.username);
@@ -182,6 +198,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setSelectedRoom(room);
     setFlowState('join-modal');
   }, [isAuthenticated, displayName, hasProfile, getProfileData, handleJoin, setGameCode, setUsername]);
+
+  // Clear joining state when join completes or fails
+  useEffect(() => {
+    if (!isJoining) setJoiningRoomCode(null);
+  }, [isJoining]);
 
   // Handle create room button
   const handleCreateClick = useCallback(() => {
@@ -290,6 +311,22 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         <SeasonBanner />
         {/* TODO: Wire "Ranked Match" button + MatchmakingOverlay once player ELO is available in lobby context */}
       </div>
+
+      {/* UX-014: Room fetch timeout retry banner */}
+      {roomFetchTimedOut && !roomsLoading && activeRooms.length === 0 && (
+        <div className="mx-4 mb-3 p-3 bg-neo-red/20 border-2 border-neo-red rounded-neo flex items-center justify-between gap-3">
+          <p className="text-sm font-bold text-neo-white">
+            {t('multiplayerFlow.roomList.fetchTimeout')}
+          </p>
+          <button
+            onClick={refreshRooms}
+            className="text-sm font-black uppercase text-neo-red border-2 border-neo-red rounded-neo px-3 py-1 hover:bg-neo-red/30 transition-colors"
+          >
+            {t('multiplayerFlow.roomList.retry')}
+          </button>
+        </div>
+      )}
+
       <RoomListView
         activeRooms={activeRooms}
         roomsLoading={roomsLoading}
@@ -297,6 +334,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         onRoomClick={handleRoomClick}
         onCreateRoom={handleCreateClick}
         onQuickPlay={handleQuickPlay}
+        isQuickPlayLoading={!!joiningRoomCode || isJoining}
       />
 
       {/* Join Room Modal */}

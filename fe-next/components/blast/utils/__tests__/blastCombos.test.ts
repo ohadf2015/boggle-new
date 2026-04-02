@@ -226,7 +226,25 @@ describe('detectSpecialCombos', () => {
 
   // ── TRIPLE SPECIAL ────────────────────────────────────────────────────────
 
-  it('should detect triple_special when 3+ special tiles in path', () => {
+  it('should detect triple_special when 3+ unclaimed special tiles remain after pair combos', () => {
+    // 4 gold tiles: gold_special claims 1 gold + 1 effect tile (needs effect → none here)
+    // So all 4 gold tiles stay unclaimed → 4 unclaimed ≥ 3 → triple_special
+    const grid = makeGrid([
+      { row: 0, col: 0, type: 'gold' },
+      { row: 0, col: 1, type: 'gold' },
+      { row: 0, col: 2, type: 'gold' },
+      { row: 0, col: 3, type: 'gold' },
+    ]);
+    const path = makePath([0, 0], [0, 1], [0, 2], [0, 3]);
+
+    const combos = detectSpecialCombos(path, grid);
+
+    const tripleCombo = combos.find(c => c.type === 'triple_special');
+    expect(tripleCombo).toBeDefined();
+    expect(tripleCombo!.scoreMultiplier).toBe(4);
+  });
+
+  it('should NOT detect triple_special when all 3 specials are claimed by pair combos', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 0, col: 1, type: 'lightning' },
@@ -236,9 +254,7 @@ describe('detectSpecialCombos', () => {
 
     const combos = detectSpecialCombos(path, grid);
 
-    const tripleCombo = combos.find(c => c.type === 'triple_special');
-    expect(tripleCombo).toBeDefined();
-    expect(tripleCombo!.scoreMultiplier).toBe(4);
+    expect(combos.find(c => c.type === 'triple_special')).toBeUndefined();
   });
 
   it('should NOT detect triple_special with only 2 specials', () => {
@@ -255,7 +271,7 @@ describe('detectSpecialCombos', () => {
 
   // ── Ordering / priority ───────────────────────────────────────────────────
 
-  it('should return multiple combos when applicable (e.g., bomb_lightning + triple_special)', () => {
+  it('should return only one pair combo per tile (deduplication)', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 0, col: 1, type: 'lightning' },
@@ -265,12 +281,15 @@ describe('detectSpecialCombos', () => {
 
     const combos = detectSpecialCombos(path, grid);
 
+    // With dedup, highest-priority pair claims tiles first; remaining tiles can't
+    // form more pairs. Should NOT have triple_special (all tiles claimed).
     const types = combos.map(c => c.type);
-    // Should have bomb_lightning, bomb_prism, lightning_prism, AND triple_special
-    expect(types).toContain('bomb_lightning');
-    expect(types).toContain('bomb_prism');
+    // lightning_prism is highest priority of these three pairs
     expect(types).toContain('lightning_prism');
-    expect(types).toContain('triple_special');
+    // Each tile only used once — at most 1 pair combo from 3 tiles
+    const pairCombos = combos.filter(c => c.type !== 'triple_special' && c.type !== 'gold_special' && c.type !== 'rainbow_special');
+    expect(pairCombos.length).toBeLessThanOrEqual(1);
+    expect(types).not.toContain('triple_special');
   });
 
   // ── Edge cases ────────────────────────────────────────────────────────────
@@ -291,7 +310,7 @@ describe('detectSpecialCombos', () => {
     expect(combos).toEqual([]);
   });
 
-  it('should use highest-priority combo when same pair appears (bomb+bomb before individual)', () => {
+  it('should use highest-priority combo when same pair appears (bomb+bomb claims 2, no triple)', () => {
     const grid = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 0, col: 1, type: 'bomb' },
@@ -301,9 +320,9 @@ describe('detectSpecialCombos', () => {
 
     const combos = detectSpecialCombos(path, grid);
 
-    // Should detect bomb_bomb (at least one) + triple_special
+    // bomb_bomb claims 2 tiles, only 1 unclaimed → no triple_special
     expect(combos.find(c => c.type === 'bomb_bomb')).toBeDefined();
-    expect(combos.find(c => c.type === 'triple_special')).toBeDefined();
+    expect(combos.find(c => c.type === 'triple_special')).toBeUndefined();
   });
 
   it('should include label string for each combo', () => {
@@ -607,13 +626,23 @@ describe('detectSpecialCombos', () => {
     expect(combos.find(c => c.type === 'gold_special')).toBeDefined();
   });
 
-  it('should still detect triple_special for 3+ specials including new tile types', () => {
-    const grid = makeGrid([
+  it('should detect triple_special only when 3+ unclaimed specials remain (new tile types)', () => {
+    // 3 tiles but pair combos claim them → no triple_special
+    const grid3 = makeGrid([
       { row: 0, col: 0, type: 'bomb' },
       { row: 0, col: 1, type: 'rainbow' },
       { row: 0, col: 2, type: 'mirror' },
     ]);
-    const combos = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid);
-    expect(combos.find(c => c.type === 'triple_special')).toBeDefined();
+    const combos3 = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid3);
+    expect(combos3.find(c => c.type === 'triple_special')).toBeUndefined();
+
+    // 3 gold tiles (not in pair matrix) → all unclaimed → triple_special
+    const grid3g = makeGrid([
+      { row: 0, col: 0, type: 'gold' },
+      { row: 0, col: 1, type: 'gold' },
+      { row: 0, col: 2, type: 'gold' },
+    ]);
+    const combos3g = detectSpecialCombos(makePath([0, 0], [0, 1], [0, 2]), grid3g);
+    expect(combos3g.find(c => c.type === 'triple_special')).toBeDefined();
   });
 });

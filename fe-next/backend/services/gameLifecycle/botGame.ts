@@ -15,7 +15,7 @@ import {
   getGame,
   recordFirstFinder,
 } from '../../modules/gameStateManager';
-import { volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove } from '../../modules/blastModeManager';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import * as botManager from '../../modules/botManager';
@@ -81,7 +81,7 @@ export function startBotsForGame(
   if (bots.length === 0) return;
 
   const game = getGame(gameCode);
-  const isWordHunt = game?.gameMode === 'word-hunt' && (game as any).wordHuntState;
+  const isWordHunt = game?.gameMode === 'word-hunt' && game.wordHuntState;
 
   // Safety check: ensure letterGrid is valid before starting bots
   if (!letterGrid || !Array.isArray(letterGrid) || letterGrid.length === 0) {
@@ -166,6 +166,11 @@ export function startBotsForGame(
           try {
             const lifeBonus = getLifeBonus(word.length);
             restoreLife(currentGame.wordHuntState, username, lifeBonus);
+            // Broadcast life update so frontend leaderboard shows bot life recovery
+            broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntLifeUpdate', {
+              playerLives: currentGame.wordHuntState.playerLives,
+              eliminatedPlayers: currentGame.wordHuntState.eliminatedPlayers,
+            });
           } catch { /* non-critical */ }
         }
 
@@ -177,6 +182,17 @@ export function startBotsForGame(
           username,
           word,
           score: totalScore,
+        });
+
+        // Also emit playerFoundWord so the frontend treats bot words like human words
+        // (leaderboard updates, opponent activity feed, word count tracking)
+        const playerWordCount = currentGame?.playerWords?.[username]?.length || 0;
+        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
+          username,
+          word,
+          wordCount: playerWordCount,
+          score: (currentGame?.playerScores?.[username] || 0),
+          comboLevel: comboLevel || 0,
         });
 
         const leaderboard = getLeaderboard(gameCode);
@@ -196,7 +212,7 @@ export function startBotsForGame(
     setTimeout(() => {
       const freshBots = botManager.getGameBots(gameCode);
       if (freshBots.length > 0) {
-        startBotsForWordHunt(io, gameCode, freshBots, (game as any).wordHuntState, language, timerSeconds);
+        startBotsForWordHunt(io, gameCode, freshBots, game!.wordHuntState!, language, timerSeconds);
       }
     }, 100);
   }

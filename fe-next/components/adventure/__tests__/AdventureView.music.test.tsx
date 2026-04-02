@@ -526,7 +526,7 @@ describe('AdventureView Music Integration', () => {
   });
 
   describe('AdventureGame screen', () => {
-    it('should pass timer info to music hook during gameplay', () => {
+    it('should disable music hook in AdventureView during gameplay (AdventureGame owns in-game music)', () => {
       // GIVEN
       renderAndNavigateToWorldMap();
       fireEvent.click(screen.getByTestId('world-1'));
@@ -535,18 +535,16 @@ describe('AdventureView Music Integration', () => {
       // WHEN - start playing level 1
       fireEvent.click(screen.getByTestId('level-button-1'));
 
-      // THEN - should pass timer info for dynamic track switching
+      // THEN - AdventureView disables its music hook so timer ticks inside
+      // AdventureGame never cause AdventureView to re-render.
+      // AdventureGame is memo-wrapped and manages in-game music internally.
       const lastCall =
         mockUseAdventureMusic.mock.calls[
           mockUseAdventureMusic.mock.calls.length - 1
         ];
       expect(lastCall[0]).toMatchObject({
-        worldNumber: 1,
-        enabled: true,
+        enabled: false,
       });
-      // During gameplay, timeRemaining and totalTime should be present
-      expect(lastCall[0]).toHaveProperty('timeRemaining');
-      expect(lastCall[0]).toHaveProperty('totalTime');
     });
   });
 

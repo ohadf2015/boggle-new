@@ -15,6 +15,7 @@ import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import { updateDuelChallengeProgress } from './realtime';
 import logger from '@/backend/utils/logger';
+import { checkRateLimit } from '../../utils/rateLimiter';
 
 // ==========================================
 // Validation Schemas
@@ -47,6 +48,10 @@ export function registerGameplayHandlers(
   // duel:submit-score - Submit score with server-side validation
   // ==========================================
   socket.on('duel:submit-score', async (data: unknown) => {
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('duel:error', { error: 'Rate limited' });
+      return;
+    }
     try {
       // Validate payload
       const validation = submitScoreSchema.safeParse(data);
@@ -178,9 +183,10 @@ export function registerGameplayHandlers(
         return;
       }
 
-      // Emit score submitted to duel room
+      // Emit score submitted only to the submitting player (not opponent)
+      // to prevent second-mover seeing first player's score before playing (GD-017)
       const duelRoom = `duel:${payload.duelId}`;
-      namespace.to(duelRoom).emit('duel:score-submitted', {
+      socket.emit('duel:score-submitted', {
         playerId: userId,
         score: serverScore,
         wordsValidated: validatedWords.length,

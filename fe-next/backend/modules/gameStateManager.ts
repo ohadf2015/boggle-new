@@ -72,6 +72,14 @@ export type { TransferHostResult } from './hostManager';
 // Game storage
 const games: Record<string, GameState> = {};
 
+// Active rooms cache (dirty-flag pattern to avoid O(n) on every call)
+let activeRoomsCache: ReturnType<typeof gameQueryManager.getActiveRooms> | null = null;
+let activeRoomsCacheDirty = true;
+
+function markActiveRoomsDirty(): void {
+  activeRoomsCacheDirty = true;
+}
+
 // Persistence helpers (bound to games object)
 const persistGameState = (gameCode: string): void => doPersist(gameCode, games);
 const persistGameStateNow = (gameCode: string): Promise<void> => doPersistNow(gameCode, games);
@@ -129,6 +137,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     gameMode: 'classic',
     modeHistory: []
   };
+  markActiveRoomsDirty();
   persistGameState(gameCode);
   return games[gameCode];
 }
@@ -140,6 +149,7 @@ function getGame(gameCode: string): GameState | null {
 function updateGame(gameCode: string, updates: Partial<GameState>, immediate = false): void {
   if (!games[gameCode]) return;
   Object.assign(games[gameCode], updates, { lastActivity: Date.now() });
+  markActiveRoomsDirty();
   if (immediate) persistGameStateNow(gameCode);
   else persistGameState(gameCode);
 }
@@ -148,7 +158,7 @@ function deleteGame(gameCode: string): void {
   const game = games[gameCode];
   if (!game) return;
 
-  if (game.hostReconnectionTimeout) clearTimeout(game.hostReconnectionTimeout);
+  timerManager.clearTimer(`hostReconnect:${gameCode}`);
   if (game.validationTimeout) clearTimeout(game.validationTimeout);
   clearPersistTimer(gameCode);
   // Clear any pending delayed engagement timeouts to prevent
@@ -156,11 +166,17 @@ function deleteGame(gameCode: string): void {
   clearEngagementTimeouts(gameCode);
   // Clear tracked spam cooldown timers for this game
   timerManager.clearTimersWithPrefix(`spam:cooldown:${gameCode}:`);
+  // Clear player reconnection timers
+  timerManager.clearTimersWithPrefix(`reconnect:${gameCode}:`);
+  // Clear feedback and other orphaned timers keyed by gameCode
+  timerManager.clearTimer(`feedback:${gameCode}`);
+  timerManager.clearTimer(`wordHuntEnd:${gameCode}`);
 
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];
+  markActiveRoomsDirty();
 }
 
 const gameExists = (gameCode: string): boolean => !!games[gameCode];
@@ -245,17 +261,11 @@ function resetGameForNewRound(gameCode: string): boolean {
 
   // Clear all player reconnection timeouts to prevent orphaned timeouts
   // from removing players from the NEW game after reset
-  for (const [, userData] of Object.entries(game.users)) {
-    if (userData && (userData as any).reconnectionTimeout) {
-      clearTimeout((userData as any).reconnectionTimeout);
-      (userData as any).reconnectionTimeout = null;
-    }
+  for (const [username] of Object.entries(game.users)) {
+    timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
   }
   // Also clear host reconnection timeout
-  if (game.hostReconnectionTimeout) {
-    clearTimeout(game.hostReconnectionTimeout);
-    game.hostReconnectionTimeout = null;
-  }
+  timerManager.clearTimer(`hostReconnect:${gameCode}`);
 
   game.earthquakeTriggered = false;
   game.letterGrid = null;
@@ -264,6 +274,8 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.gameEndedAt = null;
   game.wordHuntState = null;
   game.blastModeState = null;
+  // firstFinderMap is cleared by scoreManager.resetScoresForNewRound above
+  game.playerCombos = {};
   game.gameSessionId = (game.gameSessionId || 0) + 1;
 
   persistGameState(gameCode);
@@ -458,11 +470,13 @@ const removePeerRejectedWordScore = (gameCode: string, word: string, submitter: 
 function addSpectatorToGame(gameCode: string, username: string, socketId: string, options: SpectatorOptions = {}): void {
   spectatorManager.addSpectatorToGame(asBase<SpectatorGameBase>(games[gameCode]), username, socketId, options);
   persistGameState(gameCode);
+  markActiveRoomsDirty();
 }
 
 function removeSpectatorFromGame(gameCode: string, username: string): void {
   spectatorManager.removeSpectatorFromGame(asBase<SpectatorGameBase>(games[gameCode]), username);
   persistGameState(gameCode);
+  markActiveRoomsDirty();
 }
 
 const getGameSpectators = (gameCode: string) =>
@@ -507,7 +521,14 @@ function unmarkPlayerReady(gameCode: string, username: string): void {
 // Game Queries Delegation
 const getAllGames = () => gameQueryManager.getAllGames(games as unknown as Record<string, QueryGameBase>);
 const getDetailedGames = () => gameQueryManager.getDetailedGames(games as unknown as Record<string, QueryGameBase>);
-const getActiveRooms = () => gameQueryManager.getActiveRooms(games as unknown as Record<string, QueryGameBase>);
+function getActiveRooms(): ReturnType<typeof gameQueryManager.getActiveRooms> {
+  if (!activeRoomsCacheDirty && activeRoomsCache !== null) {
+    return activeRoomsCache;
+  }
+  activeRoomsCache = gameQueryManager.getActiveRooms(games as unknown as Record<string, QueryGameBase>);
+  activeRoomsCacheDirty = false;
+  return activeRoomsCache;
+}
 const getEmptyRooms = (): string[] => gameQueryManager.getEmptyRooms(games as unknown as Record<string, QueryGameBase>);
 const isRoomEmpty = (gameCode: string): boolean => gameQueryManager.isRoomEmpty(asBase<QueryGameBase>(games[gameCode]));
 const getTournamentIdFromGame = (gameCode: string): string | null => gameQueryManager.getTournamentIdFromGame(asBase<QueryGameBase>(games[gameCode]));

@@ -14,12 +14,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/multiplayer-word-game-online`;
 
   return {
-    title: 'Multiplayer Word Game Online Free - Real-Time Boggle & Word Battles | LexiClash',
-    description: 'Play the best free multiplayer word game online! Like Boggle, Scrabble, and Wordle combined. Create a room, send a link to friends, and compete in real-time word battles. 10,000+ words, no download required, completely free.',
-    keywords: 'multiplayer word game, word game online free, real-time word game, boggle online multiplayer, word game with friends, free word games, online word battles, word game like wordle, word game like scrabble',
+    title: 'Free Multiplayer Word Game Online With Friends — No Download | LexiClash',
+    description: 'Play the best free multiplayer word game online with friends! Words With Friends alternative where everyone plays at once. Create a room, send a link, compete in real-time word battles with 2-20+ players. Like Boggle meets Scrabble — no download, no signup, instant play.',
+    keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, words with friends multiplayer free online, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word game like wordle, word game like scrabble, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, online web based multiplayer words games, word combo game, real-time word battle, word game you type in words',
     openGraph: {
-      title: 'Free Multiplayer Word Game Online - Real-Time Word Battles | LexiClash',
-      description: 'Like Boggle, Scrabble & Wordle combined! Create a room, invite friends, compete in real-time. Free, no download.',
+      title: 'Free Multiplayer Word Game Online With Friends | LexiClash',
+      description: 'Words With Friends alternative — everyone plays at once! Create a room, invite 2-20+ friends, compete in real-time word battles. Free, no download.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,

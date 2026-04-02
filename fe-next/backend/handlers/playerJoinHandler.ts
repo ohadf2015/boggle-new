@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, Avatar } from '@/shared/types';
+import type { GameUser, Avatar } from '@/shared/types';
 
 import {
   getGame,
@@ -13,6 +13,7 @@ import {
   removeUserFromGame,
   getUsernameBySocketId,
   getSocketIdByUsername,
+  getGameBySocketId,
   getGameUsers,
   getActiveRooms,
   isRoomEmpty,
@@ -36,7 +37,7 @@ import {
 
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
-import { clearGameTimer } from '../utils/timerManager.js';
+import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
@@ -52,6 +53,7 @@ import {
   handleTournamentJoin,
   handleExistingAuthConnectionJoin
 } from './playerReconnectHandler';
+import { ensurePlayerState } from './gameLifecycleHandler';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -177,7 +179,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Handle reconnection
     if (existingSocketId || game.users[username]) {
-      handleReconnection(io, socket, game as unknown as Game, gameCode, username, authUserId, guestTokenHash);
+      handleReconnection(io, socket, game, gameCode, username, authUserId, guestTokenHash);
       return;
     }
 
@@ -208,7 +210,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // If game is in progress, send current state (use state machine helper)
     if (shouldSendGameState(game.gameState)) {
-      handleLateJoin(socket, game as unknown as Game, gameCode, username);
+      handleLateJoin(socket, game, gameCode, username);
     }
 
     // Handle tournament join
@@ -240,6 +242,10 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const username = getUsernameBySocketId(socket.id);
     if (!gameCode || !username) return;
 
+    // Guard: if socket→game mapping already cleared (disconnect fired first), bail
+    const mappedGame = getGameBySocketId(socket.id);
+    if (!mappedGame || mappedGame !== gameCode) return;
+
     const game = getGame(gameCode);
     if (!game) return;
 
@@ -251,11 +257,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
       if (game.users[username]) {
         // Cancel any pending reconnection timeout from a prior disconnect
-        const userWithTimeout = game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> };
-        if (userWithTimeout.reconnectionTimeout) {
-          clearTimeout(userWithTimeout.reconnectionTimeout);
-          delete userWithTimeout.reconnectionTimeout;
-        }
+        timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
 
         game.users[username].disconnected = true;
         game.users[username].disconnectedAt = Date.now();
@@ -397,23 +399,11 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // If game is in progress, initialize player data and send current state
     if (isLateJoin) {
-      // Initialize score/word tracking for the new player (prevents undefined access in results)
       const currentGame = getGame(gameCode);
       if (currentGame) {
-        if (!currentGame.playerScores) currentGame.playerScores = {};
-        if (!currentGame.playerWords) currentGame.playerWords = {};
-        if (!currentGame.playerWordDetails) currentGame.playerWordDetails = {};
-        if (!currentGame.playerAchievements) currentGame.playerAchievements = {};
-        currentGame.playerScores[username] = 0;
-        currentGame.playerWords[username] = [];
-        currentGame.playerWordDetails[username] = [];
-        currentGame.playerAchievements[username] = [];
-        // Also initialize playerWordsSet for O(1) duplicate checking
-        const gameAny = currentGame as any;
-        if (!gameAny.playerWordsSet) gameAny.playerWordsSet = {};
-        gameAny.playerWordsSet[username] = new Set<string>();
+        ensurePlayerState(currentGame, username);
       }
-      handleLateJoin(socket, game as unknown as Game, gameCode, username);
+      handleLateJoin(socket, game, gameCode, username);
     }
 
     // Broadcast updates to room

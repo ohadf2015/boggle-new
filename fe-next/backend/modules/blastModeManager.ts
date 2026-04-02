@@ -16,7 +16,19 @@ import {
 } from '@/shared/constants/blastMultiplayerConstants';
 
 import { getWaveConfig, getWaveDistribution } from '@/components/blast/utils/blastWaveConfig';
-import { rollSpecialType } from '@/components/blast/utils/blastLetterGenerator';
+import { rollSpecialType, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
+
+/**
+ * Derive a deterministic unsigned 32-bit seed from an arbitrary string (e.g. gameCode).
+ * Uses a simple djb2-style hash so the same code always produces the same seed.
+ */
+export function hashStringToSeed(str: string): number {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash + str.charCodeAt(i)) >>> 0;
+  }
+  return hash || 1; // avoid 0
+}
 
 /**
  * Generate blast tile overlay for a grid using wave-aware tile distribution.
@@ -26,20 +38,24 @@ import { rollSpecialType } from '@/components/blast/utils/blastLetterGenerator';
  * @param grid - The letter grid
  * @param specialChance - Base probability of a special tile [0, 1]
  * @param wave - Current wave number (defaults to 1); gates which tile types can appear
+ * @param seed - Optional seed for deterministic overlay generation (multiplayer). When
+ *               omitted, Math.random is used (singleplayer behaviour).
  * @returns Array of special tile overlays (standard tiles omitted)
  */
 export function generateBlastOverlay(
   grid: string[][],
   specialChance: number,
-  wave = 1
+  wave = 1,
+  seed?: number
 ): BlastTileOverlay[] {
   const overlay: BlastTileOverlay[] = [];
   const waveConfig = getWaveConfig(wave);
   const distribution = getWaveDistribution(waveConfig);
+  const rng = seed !== undefined ? createSeededRandom(seed) : Math.random;
 
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[row].length; col++) {
-      const tileType = rollSpecialType(specialChance, distribution);
+      const tileType = rollSpecialType(specialChance, distribution, 0, rng);
       if (tileType !== 'standard') {
         overlay.push({ row, col, type: tileType as BlastTileType });
       }
@@ -81,13 +97,16 @@ export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
  * @param grid - The letter grid
  * @param players - Player usernames
  * @param wave - Current wave number (defaults to 1); passed to generateBlastOverlay for tile gating
+ * @param overlaySeed - Optional seed for deterministic overlay generation. Derive from gameCode via
+ *                      hashStringToSeed() so all players in a session share an identical overlay.
  */
 export function initBlastModeState(
   grid: string[][],
   players: string[],
-  wave = 1
+  wave = 1,
+  overlaySeed?: number
 ): BlastModeState {
-  const overlay = generateBlastOverlay(grid, BLAST_SPECIAL_TILE_CHANCE, wave);
+  const overlay = generateBlastOverlay(grid, BLAST_SPECIAL_TILE_CHANCE, wave, overlaySeed);
 
   const playerMoves: Record<string, number> = {};
   const playerBonusMoves: Record<string, number> = {};

@@ -18,19 +18,19 @@ interface PageProps {
 }
 
 const titleMap: Record<string, string> = {
-  en: 'LexiClash – Free Online Word Game | Play With Friends',
-  he: 'לקסיקלאש – משחק מילים חינם | שחקו עם חברים אונליין',
-  sv: 'LexiClash – Gratis Ordspel Online | Spela Med Vänner',
-  ja: 'LexiClash – 無料オンラインワードゲーム | 友達と対戦',
-  es: 'LexiClash – Juego de Palabras Gratis | Juega Con Amigos',
+  en: 'LexiClash – Free Multiplayer Word Game Online | No Download, Play Now',
+  he: 'לקסיקלאש – משחק מילים מרובה משתתפים חינם | בוגל אונליין בעברית',
+  sv: 'LexiClash – Gratis Ordspel Online Med Vänner | Ingen Nedladdning',
+  ja: 'LexiClash – 無料マルチプレイヤーワードゲーム | ブラウザで即プレイ',
+  es: 'LexiClash – Juego de Palabras Multijugador Online Gratis | Sin Descarga',
 };
 
 const descriptionMap: Record<string, string> = {
-  en: 'Play free word games online with friends — no download needed. Real-time multiplayer word battles, daily word wheel, adventure mode, brain training. Like Boggle & Wordle but competitive. 5 languages, instant play.',
-  he: 'שחקו משחקי מילים חינם עם חברים — ללא הורדה. קרבות מילים בזמן אמת, גלגל מילים יומי, מצב הרפתקה, אימון מוח. כמו בוגל ווורדל אבל תחרותי. 5 שפות, משחק מיידי.',
-  sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids multiplayer-ordstrider, dagligt ordhjul, äventyrsläge, hjärnträning. Som Boggle och Wordle men tävlingsinriktat. 5 språk, spela direkt.',
-  ja: '友達と無料のオンラインワードゲームをプレイ — ダウンロード不要。リアルタイムマルチプレイヤーワードバトル、デイリーワードホイール、アドベンチャーモード、脳トレ。BoggleやWordleのような対戦型。5言語で即座にプレイ。',
-  es: 'Juega juegos de palabras gratis online con amigos — sin descarga. Batallas de palabras multijugador en tiempo real, rueda de palabras diaria, modo aventura, entrenamiento cerebral. Como Boggle y Wordle pero competitivo. 5 idiomas, juega al instante.',
+  en: 'Play the best free multiplayer word game online — no download, no signup. Real-time word battles with friends like Boggle & Words With Friends combined. Daily word wheel, adventure mode, brain training. 2-20+ players, 5 languages, instant play in your browser.',
+  he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה! כמו בוגל וסקראבל אבל בזמן אמת עם חברים. אתגר מילים יומי, מצב הרפתקה, אימון מוח. 10,000+ מילים בעברית, מושלם למסיבות וערבי משפחה.',
+  sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids multiplayer-ordstrider som Alfapet och Boggle men snabbare. Dagligt ordhjul, äventyrsläge, hjärnträning. Perfekt för spelkvällar och fester. 5 språk, spela direkt.',
+  ja: '友達と無料マルチプレイヤーワードゲームをプレイ — ダウンロード不要。リアルタイムワードバトル、デイリーワードホイール、アドベンチャーモード、脳トレ。ブラウザゲームで即座にプレイ。',
+  es: 'Juega el mejor juego de palabras multijugador online gratis con amigos — sin descarga. Batallas de palabras en tiempo real, rueda de palabras diaria, modo aventura. Como Boggle y Wordle pero competitivo. 5 idiomas, juega al instante.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

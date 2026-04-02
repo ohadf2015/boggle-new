@@ -6,8 +6,9 @@
  * Wave 2: word_length(2, min=4) + score_target(50)
  * Wave 3: collect_type(bomb, 2) + score_target(80)
  * Wave 4: collect_type(lightning, 2) + word_length(1, min=5)
- * Wave 5: clear_all_type(frozen) + score_target(150)
- * Wave 6: collect_type(prism, 2) + word_length(2, min=5)
+ * Wave 5: collect_type(diamond, 1) + score_target(120)
+ * Wave 6: clear_all_type(frozen) + score_target(150)
+ * Wave 7: collect_type(prism, 2) + word_length(2, min=5)
  */
 import { renderHook } from '@testing-library/react';
 import { useBlastObjectives } from '../useBlastObjectives';
@@ -95,13 +96,13 @@ describe('useBlastObjectives', () => {
 
   describe('clear_all_type objective', () => {
     it('uses tileTypeClears for progress and total from initial tile counts', () => {
-      // Wave 5: clear_all_type frozen
+      // Wave 6: clear_all_type frozen
       const tileTypeClears = { frozen: 3 } as Record<BlastTileType, number>;
       const { result } = renderHook(() =>
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 5,
+          waveNumber: 6,
           wordsFound: [],
           initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
         }),
@@ -119,7 +120,7 @@ describe('useBlastObjectives', () => {
         useBlastObjectives({
           gameState: makeGameState(),
           tileTypeClears,
-          waveNumber: 5,
+          waveNumber: 6,
           wordsFound: [],
           initialTileTypeCounts: { frozen: 5 } as Record<BlastTileType, number>,
         }),

@@ -77,7 +77,15 @@ const leaveClassroomGameSchema = z.object({
  * Returns null if not authenticated.
  */
 function getAuthUserId(socket: Socket): string | null {
-  return (socket.handshake.auth?.authUserId as string) || null;
+  // Prefer server-verified user ID (set by auth middleware)
+  const verified = (socket.data as Record<string, unknown>)?.verifiedUserId as string | undefined;
+  if (verified) return verified;
+  // Fallback for backwards compatibility — log warning
+  const handshakeAuth = (socket.handshake.auth?.authUserId as string) || null;
+  if (handshakeAuth) {
+    logger.warn('AUTH', `Using unverified authUserId from handshake for socket ${socket.id}`);
+  }
+  return handshakeAuth;
 }
 
 /**

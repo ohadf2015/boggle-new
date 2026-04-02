@@ -1,8 +1,11 @@
 /**
  * useAdventureAchievements Hook
  *
- * Manages adventure achievement state with localStorage persistence.
- * Provides methods to earn achievements and query achievement status.
+ * Manages adventure achievement state with localStorage persistence
+ * and server sync via /api/adventure/achievements.
+ *
+ * On mount: fetches server counts, merges with localStorage (higher value wins).
+ * On earn: updates localStorage + POSTs latest counts to server.
  *
  * Usage:
  * ```
@@ -16,7 +19,7 @@
  * ```
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   ADVENTURE_ACHIEVEMENTS,
   type AdventureAchievementId,
@@ -45,113 +48,154 @@ export interface UseAdventureAchievementsReturn {
 // ==============================================
 
 const STORAGE_KEY = 'lexiclash-adventure-achievements';
+const API_PATH = '/api/adventure/achievements';
+
+// ==============================================
+// HELPERS
+// ==============================================
+
+function loadFromStorage(): Record<AdventureAchievementId, number> {
+  if (typeof window === 'undefined') return {} as Record<AdventureAchievementId, number>;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {
+    // ignore corrupted data
+  }
+  return {} as Record<AdventureAchievementId, number>;
+}
+
+function saveToStorage(counts: Record<AdventureAchievementId, number>) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(counts));
+  } catch {
+    // ignore quota errors
+  }
+}
+
+/**
+ * Merge local and server counts — take the higher value per key.
+ */
+function mergeCounts(
+  local: Record<string, number>,
+  server: Record<string, number>
+): Record<AdventureAchievementId, number> {
+  const merged: Record<string, number> = { ...local };
+  for (const [key, serverVal] of Object.entries(server)) {
+    merged[key] = Math.max(merged[key] || 0, serverVal);
+  }
+  return merged as Record<AdventureAchievementId, number>;
+}
+
+async function fetchServerCounts(): Promise<Record<string, number> | null> {
+  try {
+    const res = await fetch(API_PATH);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.counts ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function postServerCounts(counts: Record<string, number>): Promise<void> {
+  try {
+    await fetch(API_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ counts }),
+    });
+  } catch {
+    // Best-effort — local state already updated
+  }
+}
 
 // ==============================================
 // HOOK
 // ==============================================
 
 export function useAdventureAchievements(): UseAdventureAchievementsReturn {
-  // Initialize state from localStorage
   const [achievementCounts, setAchievementCounts] = useState<
     Record<AdventureAchievementId, number>
-  >(() => {
-    if (typeof window === 'undefined') {
-      // SSR: return empty counts
-      return {} as Record<AdventureAchievementId, number>;
-    }
+  >(loadFromStorage);
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (error) {
-      console.warn('Failed to load adventure achievements:', error);
-    }
+  // Keep a ref for use inside callbacks without stale closures
+  const countsRef = useRef(achievementCounts);
+  countsRef.current = achievementCounts;
 
-    return {} as Record<AdventureAchievementId, number>;
-  });
+  // On mount: fetch server counts and merge
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchServerCounts().then((serverCounts) => {
+      if (cancelled || !serverCounts) return;
+      setAchievementCounts((prev) => {
+        const merged = mergeCounts(prev, serverCounts);
+        saveToStorage(merged);
+        return merged;
+      });
+    });
+
+    return () => { cancelled = true; };
+  }, []);
 
   // Persist to localStorage on changes
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(achievementCounts));
-    } catch (error) {
-      console.warn('Failed to save adventure achievements:', error);
-    }
+    saveToStorage(achievementCounts);
   }, [achievementCounts]);
 
   /**
-   * Earn an achievement
-   * Returns true if this is a new earn or tier upgrade
+   * Earn an achievement.
+   * Returns true if this is a new earn or tier upgrade.
    */
   const earnAchievement = useCallback(
     (id: AdventureAchievementId): boolean => {
       const achievement = ADVENTURE_ACHIEVEMENTS[id];
       if (!achievement) return false;
 
-      const currentCount = achievementCounts[id] || 0;
-      const currentTier = getAchievementTierInfo(id, achievementCounts).tier;
+      const currentCounts = countsRef.current;
+      const currentCount = currentCounts[id] || 0;
+      const currentTier = getAchievementTierInfo(id, currentCounts).tier;
 
       // For one-time achievements, only earn once
       if (achievement.oneTime && currentCount > 0) {
         return false;
       }
 
-      // Increment count
       const newCounts = {
-        ...achievementCounts,
+        ...currentCounts,
         [id]: currentCount + 1,
       };
+
       setAchievementCounts(newCounts);
 
       // Check if this is a new tier
       const newTier = getAchievementTierInfo(id, newCounts).tier;
       const isNewTier = newTier !== currentTier;
 
-      // Return true if first earn or tier upgrade
+      // Sync to server (best-effort, non-blocking)
+      postServerCounts(newCounts);
+
       return currentCount === 0 || isNewTier;
     },
-    [achievementCounts]
+    [] // stable — reads from ref
   );
 
-  /**
-   * Check if an achievement has been earned at least once
-   */
   const isEarned = useCallback(
-    (id: AdventureAchievementId): boolean => {
-      return (achievementCounts[id] || 0) > 0;
-    },
+    (id: AdventureAchievementId): boolean => (achievementCounts[id] || 0) > 0,
     [achievementCounts]
   );
 
-  /**
-   * Get the count for a specific achievement
-   */
   const getCount = useCallback(
-    (id: AdventureAchievementId): number => {
-      return achievementCounts[id] || 0;
-    },
+    (id: AdventureAchievementId): number => achievementCounts[id] || 0,
     [achievementCounts]
   );
 
-  /**
-   * Get tier info for an achievement
-   */
   const getTierInfo = useCallback(
-    (id: AdventureAchievementId) => {
-      return getAchievementTierInfo(id, achievementCounts);
-    },
+    (id: AdventureAchievementId) => getAchievementTierInfo(id, achievementCounts),
     [achievementCounts]
   );
 
-  return {
-    achievementCounts,
-    earnAchievement,
-    isEarned,
-    getCount,
-    getTierInfo,
-  };
+  return { achievementCounts, earnAchievement, isEarned, getCount, getTierInfo };
 }

@@ -414,6 +414,12 @@ module.exports = {
           "70%":  { transform: "translateX(1px) rotate(-0.1deg)" },
           "100%": { transform: "translateX(0) rotate(0deg)" },
         },
+        "neo-damage-drip": {
+          "0%":   { boxShadow: "inset 0 0 0 0 rgba(239,68,68,0)", borderColor: "currentColor" },
+          "15%":  { boxShadow: "inset 0 -4px 8px 0 rgba(239,68,68,0.5)", borderColor: "#ef4444" },
+          "40%":  { boxShadow: "inset 0 -2px 4px 0 rgba(239,68,68,0.3)", borderColor: "#ef4444" },
+          "100%": { boxShadow: "inset 0 0 0 0 rgba(239,68,68,0)", borderColor: "currentColor" },
+        },
         "neo-reject-flash": {
           "0%":   { borderColor: "currentColor", backgroundColor: "transparent" },
           "15%":  { borderColor: "#FF3366", backgroundColor: "rgba(255,51,102,0.15)" },
@@ -544,6 +550,7 @@ module.exports = {
         "neo-pop": "neo-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
+        "neo-damage-drip": "neo-damage-drip 0.8s ease-out",
         "neo-reject-flash": "neo-reject-flash 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",

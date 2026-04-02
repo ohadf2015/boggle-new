@@ -87,7 +87,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                   : isEliminated
                     ? 'border-neo-red/30 bg-neo-red/5 opacity-40'
                     : 'border-neo-white/15 bg-neo-white/5',
-                isDamaged && !isEliminated && 'animate-neo-shake'
+                isDamaged && !isEliminated && 'animate-neo-damage-drip'
               )}
             >
               {/* Name + Score row */}
@@ -172,7 +172,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     : isEliminated
                       ? 'border-neo-red/30 bg-neo-red/5 opacity-50'
                       : 'border-neo-white/10 bg-neo-white/5',
-                  isDamaged && !isEliminated && 'animate-neo-shake'
+                  isDamaged && !isEliminated && 'animate-neo-damage-drip'
                 )}
               >
                 {/* Name + Score */}
@@ -195,7 +195,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                       {player.score}
                     </span>
                     {isDamaged && !isEliminated && (
-                      <X size={14} className="text-neo-red animate-neo-shake" data-wrong-guess />
+                      <X size={14} className="text-neo-red" data-wrong-guess />
                     )}
                     {isEliminated && (
                       <Skull size={14} className="text-neo-red" />

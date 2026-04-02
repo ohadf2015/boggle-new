@@ -65,7 +65,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   displayName,
   profileAvatar,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
@@ -126,7 +126,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const isNameValid = usernameValidation.isValid && username.length > 0;
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={!isAvatarBuilderOpen}>
-      <DialogContent noDescription className="!max-w-[420px] sm:!max-w-[420px] lg:!max-w-[420px] xl:!max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
+      <DialogContent noDescription dir={dir} className="!max-w-[420px] sm:!max-w-[420px] lg:!max-w-[420px] xl:!max-w-[420px] max-h-[90dvh] overflow-y-auto !p-0 !gap-0 !border-4">
         <DialogHeader className="sr-only">
           <DialogTitle>{t('multiplayerFlow.createModal.title')}</DialogTitle>
         </DialogHeader>

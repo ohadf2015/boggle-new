@@ -44,7 +44,7 @@ export function startGameTimer(
    
   updateGame(gameCode, {
     timerSeconds: timerSeconds,
-  } as any);
+  });
 
   // Clear any existing timer
   clearGameTimer(gameCode);
@@ -62,7 +62,7 @@ export function startGameTimer(
     // Only update game state when the second actually changed (avoids no-op Redis persist debounces)
     const secondChanged = remainingTime !== lastBroadcastSecond;
     if (secondChanged) {
-      updateGame(gameCode, { remainingTime } as any);
+      updateGame(gameCode, { remainingTime });
     }
 
     // Broadcast every second for accurate client timer display
@@ -77,8 +77,8 @@ export function startGameTimer(
 
     // Word Hunt: drain life from all non-eliminated players each tick
     const currentGame = getGame(gameCode);
-    if (currentGame?.gameMode === 'word-hunt' && (currentGame as any).wordHuntState) {
-      const huntState = (currentGame as any).wordHuntState;
+    if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
+      const huntState = currentGame.wordHuntState;
       const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
       const { updatedLives, newlyEliminated } = drainLife(huntState, elapsedSeconds);
 

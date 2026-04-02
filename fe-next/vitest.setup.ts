@@ -98,14 +98,15 @@ const localStorageMock = {
   key: vi.fn((i: number) => Object.keys(localStorageStore)[i] ?? null),
 };
 
-// Mock sessionStorage
+// Mock sessionStorage with functional storage (mirrors localStorage mock pattern)
+const sessionStorageStore: Record<string, string> = {};
 const sessionStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-  length: 0,
-  key: vi.fn(),
+  getItem: vi.fn((key: string) => sessionStorageStore[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => { sessionStorageStore[key] = value; }),
+  removeItem: vi.fn((key: string) => { delete sessionStorageStore[key]; }),
+  clear: vi.fn(() => { Object.keys(sessionStorageStore).forEach(k => delete sessionStorageStore[k]); }),
+  get length() { return Object.keys(sessionStorageStore).length; },
+  key: vi.fn((i: number) => Object.keys(sessionStorageStore)[i] ?? null),
 };
 
 if (isBrowser) {
@@ -342,6 +343,9 @@ afterEach(() => {
 
   localStorageMock.getItem.mockClear();
   localStorageMock.setItem.mockClear();
+
+  // Clear sessionStorage backing store between tests to prevent state bleed
+  Object.keys(sessionStorageStore).forEach(k => delete sessionStorageStore[k]);
 
   mockSocket.on.mockClear();
   mockSocket.off.mockClear();

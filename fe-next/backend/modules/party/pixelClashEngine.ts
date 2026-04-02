@@ -10,7 +10,7 @@ import logger from '../../utils/logger.js';
 // ==================== Types ====================
 
 /** CanvasPath from react-sketch-canvas — serialized over the wire */
-interface CanvasPath {
+export interface CanvasPath {
   paths: Array<{ x: number; y: number }>;
   strokeWidth: number;
   strokeColor: string;
@@ -19,7 +19,7 @@ interface CanvasPath {
   endTimestamp?: number;
 }
 
-type DrawingData = CanvasPath[];
+export type DrawingData = CanvasPath[];
 type PixelMode = 'telephone' | 'showdown' | 'relay';
 
 interface TelephoneStep {
@@ -87,6 +87,8 @@ const DRAW_PROMPTS = [
 // ==================== State ====================
 
 const activeGames = new Map<string, PixelGameState>();
+// Track delayed cleanup timers (endPixelClash schedules a 60s delayed delete)
+const delayedCleanupTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 // ==================== Helpers ====================
 
@@ -624,7 +626,11 @@ function endPixelClash(io: Server, roomCode: string): void {
     gameState: null,
   });
 
-  setTimeout(() => activeGames.delete(roomCode), 60000);
+  const delayTimer = setTimeout(() => {
+    activeGames.delete(roomCode);
+    delayedCleanupTimers.delete(roomCode);
+  }, 60000);
+  delayedCleanupTimers.set(roomCode, delayTimer);
   logger.info('PARTY', `Pixel Clash ended in ${roomCode}. Winner: ${finalScores[0]?.username}`);
 }
 
@@ -634,6 +640,12 @@ export function cleanupPixelClash(roomCode: string): void {
     for (const round of game.rounds) {
       if (round.timer) clearTimeout(round.timer);
     }
+  }
+  // Clear delayed cleanup timer from endPixelClash if still pending
+  const delayTimer = delayedCleanupTimers.get(roomCode);
+  if (delayTimer) {
+    clearTimeout(delayTimer);
+    delayedCleanupTimers.delete(roomCode);
   }
   activeGames.delete(roomCode);
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UpgradeShop } from './meta/UpgradeShop';
@@ -45,9 +45,9 @@ export default function AdventureViewModals({
   t,
 }: AdventureViewModalsProps): React.JSX.Element {
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {showShop && !isPlaying && (
-        <motion.div
+        <AdaptiveMotion.div
           key="shop-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -55,7 +55,7 @@ export default function AdventureViewModals({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           onClick={onCloseShop}
         >
-          <motion.div
+          <AdaptiveMotion.div
             role="dialog"
             aria-modal="true"
             aria-label={t('adventure.upgrades.shopTitle')}
@@ -86,8 +86,8 @@ export default function AdventureViewModals({
               currentWorld={selectedWorld ?? 1}
               onPurchase={onShopPurchase}
             />
-          </motion.div>
-        </motion.div>
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Word Album Panel */}
@@ -110,6 +110,6 @@ export default function AdventureViewModals({
           onPlay={onPlayWeeklyChallenge}
         />
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

@@ -4,13 +4,14 @@
  * Displays all adventure achievements with progress and tiers.
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { AchievementsPageClient } from './AchievementsPageClient';
 
-export const metadata: Metadata = {
-  title: 'Achievements | LexiClash Adventure',
-  description: 'View your adventure mode achievements and progress',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'adventureAchievements', path: '/adventure/achievements', locale });
+}
 
 export default function AchievementsPage() {
   return <AchievementsPageClient />;

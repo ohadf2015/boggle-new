@@ -16,27 +16,34 @@ const GRACE_PERIOD_LOCK_TTL = 2000; // 2 seconds max (grace period is 1.5s)
 const GRACE_PERIOD_LOCK_PREFIX = `${LOCK_PREFIX}:graceperiod`;
 
 /**
- * Acquire a lock for grace period word submission
+ * Acquire a lock for grace period word submission.
+ * Lock is per-player so different players can submit simultaneously,
+ * while preventing the same player from double-submitting.
  *
  * @param gameCode - The game code
+ * @param username - Optional player username for per-player locking
  * @returns Lock ID if acquired, null if failed
  */
-export async function acquireGracePeriodLock(gameCode: string): Promise<string | null> {
+export async function acquireGracePeriodLock(gameCode: string, username?: string): Promise<string | null> {
   const lockId = randomUUID();
 
-  // Use a grace period specific key
+  // Per-player key allows parallel grace submissions from different players
+  const lockKey = username
+    ? `graceperiod:${gameCode}:${username}`
+    : `graceperiod:${gameCode}`;
+
   const acquired = await acquireGameLock(
-    `graceperiod:${gameCode}`,
+    lockKey,
     lockId,
     GRACE_PERIOD_LOCK_TTL
   );
 
   if (acquired) {
-    logger.debug('GRACE_LOCK', `Acquired grace period lock for ${gameCode}`);
+    logger.debug('GRACE_LOCK', `Acquired grace period lock for ${lockKey}`);
     return lockId;
   }
 
-  logger.debug('GRACE_LOCK', `Failed to acquire grace period lock for ${gameCode}`);
+  logger.debug('GRACE_LOCK', `Failed to acquire grace period lock for ${lockKey}`);
   return null;
 }
 
@@ -45,13 +52,18 @@ export async function acquireGracePeriodLock(gameCode: string): Promise<string |
  *
  * @param gameCode - The game code
  * @param lockId - The lock ID returned from acquireGracePeriodLock
+ * @param username - Optional player username (must match acquireGracePeriodLock call)
  */
 export async function releaseGracePeriodLock(
   gameCode: string,
-  lockId: string
+  lockId: string,
+  username?: string
 ): Promise<void> {
-  await releaseGameLock(`graceperiod:${gameCode}`, lockId);
-  logger.debug('GRACE_LOCK', `Released grace period lock for ${gameCode}`);
+  const lockKey = username
+    ? `graceperiod:${gameCode}:${username}`
+    : `graceperiod:${gameCode}`;
+  await releaseGameLock(lockKey, lockId);
+  logger.debug('GRACE_LOCK', `Released grace period lock for ${lockKey}`);
 }
 
 /**

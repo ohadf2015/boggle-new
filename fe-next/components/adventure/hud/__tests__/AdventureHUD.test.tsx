@@ -65,7 +65,6 @@ vi.mock('@/contexts/AdventureThemeContext', () => ({
 describe('AdventureHUD', () => {
   const defaultProps = {
     remainingTime: 120,
-    totalTime: 180,
     score: 1500,
     objectives: [
       {

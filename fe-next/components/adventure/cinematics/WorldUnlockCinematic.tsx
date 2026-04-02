@@ -33,8 +33,8 @@ import {
 // CONSTANTS
 // ==============================================
 
-/** Total duration in frames (10 seconds @ 30fps) */
-export const WORLD_UNLOCK_DURATION_FRAMES = 300;
+/** Total duration in frames (10 seconds @ 30fps) — canonical value in ./constants */
+export { WORLD_UNLOCK_DURATION_FRAMES } from './constants';
 
 const PHASE_FRAMES = {
   OLD_FADE_START: 0,

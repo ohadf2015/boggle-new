@@ -35,6 +35,7 @@ import timerManager from '../utils/timerManager.js';
 import { isSocketMigrating } from './shared';
 import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } from '../utils/socketValidation.js';
 import { handleValidatedWord, handleWordBecameValid, handlePeerRejection, type PeerValidationResult } from './wordValidationHandler';
+import { ensurePlayerState } from './gameLifecycleHandler';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 import { calculateWordScore } from '../modules/scoringEngine.js';
@@ -91,14 +92,12 @@ function handleSpamDetection(socket: Socket, gameCode: string, username: string,
 
     case PenaltyTier.PENALTY:
       if (result.penaltyApplied && result.penaltyApplied > 0) {
-        // Apply point deduction using atomic delta
-        updatePlayerScore(gameCode, username, -result.penaltyApplied, true);
-        // Clamp to 0 atomically — write directly to avoid race with concurrent valid word updates
-        const postPenaltyScore = game.playerScores?.[username] || 0;
-        if (postPenaltyScore < 0) {
-          game.playerScores[username] = 0;
-        }
-        const newScore = Math.max(0, game.playerScores?.[username] || 0);
+        // Atomic penalty + clamp: read current score, compute floored result, write absolute value.
+        // This avoids the race where a concurrent valid word increments the score between the delta
+        // write and a separate clamp, causing those points to be silently discarded.
+        const currentScore = game.playerScores?.[username] || 0;
+        const newScore = Math.max(0, currentScore - result.penaltyApplied);
+        updatePlayerScore(gameCode, username, newScore);
 
         socket.emit('spamPenalty', {
           invalidCount: result.invalidCount,
@@ -225,10 +224,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       // Grace period lock: Prevent race conditions in multi-instance deployments
       // where multiple late word submissions could be processed in parallel
       if (isWithinGracePeriod) {
-        gracePeriodLockId = await acquireGracePeriodLock(gameCode);
+        gracePeriodLockId = await acquireGracePeriodLock(gameCode, username);
         if (!gracePeriodLockId) {
-          // Another instance is processing a grace period word, skip
-          logger.debug('WORD', `Grace period lock not acquired for ${gameCode}, skipping`);
+          // Another instance is processing a grace period word for this player, skip
+          logger.debug('WORD', `Grace period lock not acquired for ${gameCode}:${username}, skipping`);
           return;
         }
         logger.info('WORD', `Word accepted during grace period`, {
@@ -242,7 +241,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       // Helper to release grace period lock on early returns
       const releaseGraceLockIfNeeded = async (): Promise<void> => {
         if (gracePeriodLockId) {
-          await releaseGracePeriodLock(gameCode, gracePeriodLockId);
+          await releaseGracePeriodLock(gameCode, gracePeriodLockId, username);
         }
       };
 
@@ -318,7 +317,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         const confirmationScore = Math.floor(baseScore * 0.5);
 
         if (confirmationScore > 0) {
-          updatePlayerScore(gameCode, username, confirmationScore);
+          updatePlayerScore(gameCode, username, confirmationScore, true);
           addPlayerWordToGame(gameCode, username, normalizedWord, {
             score: confirmationScore,
             validated: true,
@@ -332,7 +331,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           foundByAvatar: firstFinder.avatar || null,
           confirmationScore,
         });
-        // Don't reset combo — player found a valid word, just not first
+        // Increment combo — player found a valid word, just not first
+        ensurePlayerState(game, username);
+        game.playerCombos[username] = (game.playerCombos[username] || 0) + 1;
         await releaseGraceLockIfNeeded();
         return;
       }
@@ -399,8 +400,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
       // since socket may have disconnected and getGameBySocketId returns null
       if (gracePeriodLockId) {
         const catchGameCode2 = getGameBySocketId(socket.id) || outerGameCode;
+        const catchUsername2 = getUsernameBySocketId(socket.id);
         if (catchGameCode2) {
-          await releaseGracePeriodLock(catchGameCode2, gracePeriodLockId);
+          await releaseGracePeriodLock(catchGameCode2, gracePeriodLockId, catchUsername2 || undefined);
         }
       }
     }

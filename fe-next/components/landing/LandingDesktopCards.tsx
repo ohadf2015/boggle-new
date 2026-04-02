@@ -3,7 +3,7 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { User, Users, Trophy, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Users, Trophy, Map, Bomb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ModeCard from './ModeCard';
 import { LandingShareBanner } from './LandingShareBanner';
@@ -54,7 +54,7 @@ export function LandingDesktopCards({
   return (
     <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 items-stretch px-4 lg:px-6 xl:px-8">
-        {/* Single Player (cyan) */}
+        {/* Word Arena (pink) — solo or with friends */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -62,34 +62,10 @@ export function LandingDesktopCards({
           className="w-full h-full"
         >
           <ModeCard
-            title={t('landing.singlePlayer')}
-            description={t('landing.singlePlayerDesc')}
-            href={`/${language}/singleplayer`}
-            icon={<User className="w-6 h-6" />}
-            variant="cyan"
-            className="w-full"
-            personalBest={playerAllTimeBest ? {
-              score: playerAllTimeBest.score,
-              label: t('landing.personalBest'),
-            } : undefined}
-            highlighted={isFirstTimer}
-            highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
-            onClick={() => trackModeSelected('singleplayer')}
-          />
-        </motion.div>
-
-        {/* Multiplayer (pink) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
-          className="w-full h-full"
-        >
-          <ModeCard
-            title={t('landing.multiplayer')}
-            description={t('landing.multiplayerDesc')}
+            title={t('landing.arena')}
+            description={t('landing.arenaDesc')}
             href={`/${language}/multiplayer`}
-            icon={<Users className="w-6 h-6" />}
+            icon={<Swords className="w-6 h-6" />}
             variant="pink"
             className="w-full"
             liveBadge={{
@@ -102,7 +78,31 @@ export function LandingDesktopCards({
               count: activePlayers,
               label: t('landing.playingNow'),
             }}
-            onClick={() => trackModeSelected('multiplayer')}
+            highlighted={isFirstTimer}
+            highlightLabel={isFirstTimer ? t('onboarding.welcome.startHere') : undefined}
+            onClick={() => trackModeSelected('arena')}
+          />
+        </motion.div>
+
+        {/* Practice (cyan) — relaxed, no pressure */}
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
+          className="w-full h-full"
+        >
+          <ModeCard
+            title={t('landing.practice')}
+            description={t('landing.practiceDesc')}
+            href={`/${language}/singleplayer?mode=practice`}
+            icon={<BookOpen className="w-6 h-6" />}
+            variant="cyan"
+            className="w-full"
+            personalBest={playerAllTimeBest ? {
+              score: playerAllTimeBest.score,
+              label: t('landing.personalBest'),
+            } : undefined}
+            onClick={() => trackModeSelected('practice')}
           />
         </motion.div>
 
