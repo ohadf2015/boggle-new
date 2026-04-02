@@ -116,7 +116,7 @@ export const BlastBoard = memo(function BlastBoard({
   return (
     <div
       ref={containerRef}
-      className="blast-board relative w-full aspect-square max-w-[min(96vw,96dvh-180px)] sm:max-w-[min(460px,90dvh-180px)] lg:max-w-[min(500px,55vh)] overflow-hidden"
+      className="blast-board relative w-full aspect-square max-w-[min(96vw,96dvh-180px)] sm:max-w-[min(420px,88dvh-180px)] md:max-w-[min(480px,85dvh-180px)] lg:max-w-[min(500px,55dvh)] overflow-hidden"
       style={{ contain: 'layout paint' }}
     >
       {/* Layer 1: GridComponent — word selection via touch/drag */}
