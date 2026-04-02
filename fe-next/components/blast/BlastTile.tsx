@@ -344,6 +344,7 @@ export const BlastTile = memo(function BlastTile({
         getSpecialEffectClasses(type, phase, hitsRemaining),
         activationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
         activationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
+        (type === 'prism' && effectivePhase === 'clearing') ? 'blast-tile-prism-flash' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
         isComboPreview ? 'blast-combo-preview' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',

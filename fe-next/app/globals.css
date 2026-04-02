@@ -1401,6 +1401,25 @@ body {
     }
   }
 
+  /* ── Prism rainbow flash — rapid hue cycling before cross clear ── */
+  .blast-tile-prism-flash {
+    animation: blast-prism-flash 250ms linear forwards;
+  }
+
+  @keyframes blast-prism-flash {
+    0%   { filter: hue-rotate(0deg) brightness(1.4); }
+    25%  { filter: hue-rotate(90deg) brightness(1.6); }
+    50%  { filter: hue-rotate(180deg) brightness(1.8); }
+    75%  { filter: hue-rotate(270deg) brightness(1.6); }
+    100% { filter: hue-rotate(360deg) brightness(2.0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blast-tile-prism-flash {
+      animation: none;
+    }
+  }
+
   /* ── Earned tile birth — pop+shimmer when a word creates a new special ── */
   .blast-tile-earned {
     animation: blast-tile-birth 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
