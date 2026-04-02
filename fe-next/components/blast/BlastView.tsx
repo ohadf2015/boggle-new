@@ -39,6 +39,9 @@ export function BlastView() {
     ...baseConfig,
     specialTileChance: waveConfig.specialTileChance,
     customDistribution: getWaveDistribution(waveConfig),
+    // Waves 1-2 refill tiles to teach mechanics; wave 3+ switches to shrink mode
+    // so the board progressively clears — the core puzzle mechanic
+    boardClearMode: (currentWave >= 3 ? 'shrink' : 'refill') as 'shrink' | 'refill',
   };
 
   /** Wave completed — transition to next wave */
