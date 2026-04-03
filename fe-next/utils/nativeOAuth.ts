@@ -84,10 +84,9 @@ export async function initializeNativeOAuth(): Promise<boolean> {
     // Note: Use 'online' mode to get idToken directly, which is needed for signInWithIdToken
     // 'offline' mode returns serverAuthCode instead, which requires server-side token exchange
     // Apple Sign-In is only supported on iOS - Android requires a redirectUrl that we don't have
-    const providerConfig: { google: { webClientId: string; mode: 'online' }; apple?: Record<string, never> } = {
+    const providerConfig: { google: { webClientId: string }; apple?: Record<string, never> } = {
       google: {
         webClientId: config.google.webClientId,
-        mode: 'online'  // Returns idToken and accessToken directly
       },
     };
 
@@ -95,6 +94,9 @@ export async function initializeNativeOAuth(): Promise<boolean> {
     if (isIOS()) {
       providerConfig.apple = {};  // No config needed for iOS
     }
+
+    // DEBUG: store the webClientId so we can see it in the banner
+    setDebugStep(`init: wcid=${config.google.webClientId.substring(0, 30)}...`);
 
     await SocialLogin.initialize(providerConfig);
 
@@ -157,11 +159,10 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     logger.log('[NativeOAuth] Starting Google native sign-in');
 
     // Perform native Google sign-in with 15s timeout
+    // Note: removed scopes and mode:'online' — they can cause error 16
     const loginPromise = SocialLogin.login({
       provider: 'google',
-      options: {
-        scopes: ['email', 'profile']
-      }
+      options: {}
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -173,12 +174,11 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     setDebugStep(`got result: ${JSON.stringify(result).slice(0, 150)}`);
     logger.log('[NativeOAuth] Raw SocialLogin result:', JSON.stringify(result));
 
-    // Type guard for online response (contains idToken)
+    // Extract idToken — accept any responseType since we removed mode:'online'
     const googleResult = result.result;
-    if (!googleResult || googleResult.responseType !== 'online') {
-      setDebugStep(`ERR: bad responseType: ${JSON.stringify(result).slice(0, 100)}`);
-      logger.error('[NativeOAuth] Unexpected Google response type (expected online)');
-      return { success: false, error: `Unexpected response type: ${JSON.stringify(result).slice(0, 200)}` };
+    if (!googleResult) {
+      setDebugStep(`ERR: no result obj: ${JSON.stringify(result).slice(0, 100)}`);
+      return { success: false, error: `No result object: ${JSON.stringify(result).slice(0, 200)}` };
     }
 
     const idToken = googleResult.idToken;
