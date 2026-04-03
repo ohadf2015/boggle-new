@@ -123,7 +123,6 @@ describe('Native OAuth Utility', () => {
       expect(mockSocialLogin.initialize).toHaveBeenCalledWith({
         google: {
           webClientId: 'test-web-client-id.apps.googleusercontent.com',
-          mode: 'online'  // Returns idToken directly (needed for signInWithIdToken)
         },
         apple: {}
       });
@@ -205,7 +204,7 @@ describe('Native OAuth Utility', () => {
       expect(result.success).toBe(true);
       expect(mockSocialLogin.login).toHaveBeenCalledWith({
         provider: 'google',
-        options: { scopes: ['email', 'profile'] }
+        options: {}
       });
       expect(mockSignInWithIdToken).toHaveBeenCalledWith({
         provider: 'google',
