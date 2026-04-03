@@ -13,6 +13,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { cn } from '@/lib/utils';
+import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 
 // Language options
 const LANGUAGES = [
@@ -424,6 +425,9 @@ export default function SettingsPageClient(): React.JSX.Element {
           </motion.section>
           </div>{/* end right column */}
         </div>{/* end grid */}
+
+        {/* Delete Account */}
+        <DeleteAccountSection isDarkMode={isDarkMode} />
 
         {/* Footer */}
         <motion.div
