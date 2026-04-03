@@ -214,7 +214,7 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     setDebugStep(`CATCH: ${errorMessage}`);
-    logger.error('[NativeOAuth] Google sign-in error:', error);
+    logger.error(error instanceof Error ? error : new Error(errorMessage), '[NativeOAuth] Google sign-in error');
 
     // Handle user cancellation
     if (errorMessage.includes('cancel') || errorMessage.includes('CANCELED')) {

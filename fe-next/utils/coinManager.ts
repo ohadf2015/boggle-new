@@ -205,7 +205,7 @@ export function calculateDailyReward(
 
   const base = COIN_EARNING.DAILY_BASE;
   const efficiency = Math.floor(efficiencyScore * COIN_EARNING.EFFICIENCY_MULTIPLIER);
-  const streak = streakDays * COIN_EARNING.STREAK_BONUS;
+  const streak = Math.min(streakDays, 100) * COIN_EARNING.STREAK_BONUS;
 
   // Streak tier coin bonus (applied to subtotal)
   const subtotal = base + efficiency + streak;

@@ -148,8 +148,8 @@ export async function getDuelById(
       .select(
         `
         *,
-        challenger:profiles!student_duels_challenger_id_fkey(id, display_name, avatar_url),
-        opponent:profiles!student_duels_opponent_id_fkey(id, display_name, avatar_url)
+        challenger:profiles!student_duels_challenger_id_fkey(id, display_name, avatar_config),
+        opponent:profiles!student_duels_opponent_id_fkey(id, display_name, avatar_config)
       `
       )
       .eq('id', duelId)
@@ -224,8 +224,8 @@ export async function getDuelHistory(
       .select(
         `
         *,
-        challenger:profiles!student_duels_challenger_id_fkey(id, display_name, avatar_url),
-        opponent:profiles!student_duels_opponent_id_fkey(id, display_name, avatar_url)
+        challenger:profiles!student_duels_challenger_id_fkey(id, display_name, avatar_config),
+        opponent:profiles!student_duels_opponent_id_fkey(id, display_name, avatar_config)
       `
       )
       .eq('status', 'completed')

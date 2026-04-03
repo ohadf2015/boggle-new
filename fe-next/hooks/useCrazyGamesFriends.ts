@@ -54,7 +54,7 @@ export function useCrazyGamesFriends(): UseCrazyGamesFriendsReturn {
       setHasMore(result.hasMore);
       setPage(prev => prev + 1);
     } catch (error) {
-      console.error('Failed to load CrazyGames friends:', error);
+      console.warn('Failed to load CrazyGames friends:', error);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ export function useCrazyGamesFriends(): UseCrazyGamesFriendsReturn {
       setHasMore(result.hasMore);
       setPage(1);
     } catch (error) {
-      console.error('Failed to refresh CrazyGames friends:', error);
+      console.warn('Failed to refresh CrazyGames friends:', error);
     } finally {
       setIsLoading(false);
     }

@@ -521,7 +521,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           gameMode: selectedGameMode,
         });
       } else {
-        logger.warn('[RESULTS] Game reset failed:', response?.error);
+        logger.debug('[RESULTS] Game reset failed:', response?.error);
       }
     });
   }, [socket, isHost, roomLanguage, selectedGameMode, preGeneratedGrid, gameCode]);
