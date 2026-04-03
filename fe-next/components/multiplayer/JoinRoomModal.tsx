@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Users } from 'lucide-react';
+import { Users, Swords, Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -108,42 +108,46 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent noDescription dir={dir} className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader variant="pink">
           <DialogTitle>{t('multiplayerFlow.joinModal.title')}</DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-5">
-          {/* Room Info Card */}
-          <div className="flex items-center gap-4 p-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
-            <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-neo-white truncate text-lg" title={room.roomName || room.gameCode}>
-                {room.roomName || room.gameCode}
-              </p>
-              <p className={cn(
-                'text-sm flex items-center gap-1.5 font-medium',
-                room.maxPlayers && room.playerCount >= room.maxPlayers ? 'text-neo-red' : 'text-neo-cyan'
-              )}>
-                <Users className="w-4 h-4" />
-                {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
-                {room.maxPlayers && room.playerCount >= room.maxPlayers && (
-                  <span className="text-xs font-black uppercase ml-1">
-                    {t('multiplayerFlow.joinModal.roomFull')}
-                  </span>
-                )}
-              </p>
+        <DialogBody className="space-y-4">
+          {/* Room Info Card — lobby ticket style */}
+          <div className="relative rounded-neo border-3 border-neo-black shadow-hard-sm bg-neo-navy-light overflow-hidden">
+            {/* Dashed separator line for "ticket" feel */}
+            <div className="absolute inset-x-0 bottom-0 border-b-2 border-dashed border-neo-white/10" />
+            <div className="flex items-center gap-3 p-3">
+              <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-neo-white truncate text-lg tracking-tight" title={room.roomName || room.gameCode}>
+                  {room.roomName || room.gameCode}
+                </p>
+                <p className={cn(
+                  'text-sm flex items-center gap-1.5 font-bold',
+                  room.maxPlayers && room.playerCount >= room.maxPlayers ? 'text-neo-red' : 'text-neo-cyan'
+                )}>
+                  <Users className="w-4 h-4" />
+                  {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
+                  {room.maxPlayers && room.playerCount >= room.maxPlayers && (
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-neo-red/20 text-neo-red px-1.5 py-0.5 rounded-sm border border-neo-red/30">
+                      {t('multiplayerFlow.joinModal.roomFull')}
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Avatar + Name — compact inline layout */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-3">
             <AvatarSelector
               selectedAvatar={customAvatar}
               onAvatarChange={setCustomAvatar}
               compact
             />
-            <div className="flex-1 space-y-1.5">
-              <Label htmlFor="join-username" className="text-xs font-bold uppercase text-neo-cyan">
+            <div className="flex-1 space-y-1">
+              <Label htmlFor="join-username" className="text-xs font-black uppercase tracking-wider text-neo-pink">
                 {t('multiplayerFlow.joinModal.yourName')}
               </Label>
               {isAuthenticated ? (
@@ -151,7 +155,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                   id="join-username"
                   value={username}
                   disabled
-                  className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
+                  className="font-bold bg-neo-navy-light border-neo-black text-neo-white cursor-not-allowed opacity-90"
                 />
               ) : (
                 <Input
@@ -167,7 +171,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                   aria-invalid={!!nameError}
                   aria-describedby={nameError ? 'join-username-error' : undefined}
                   className={cn(
-                    'font-bold bg-neo-navy/40 border-2 border-neo-black text-neo-white placeholder:text-neo-white/40',
+                    'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/30 focus-visible:ring-neo-pink',
                     nameError && 'border-red-500 animate-neo-shake'
                   )}
                   placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
@@ -185,7 +189,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
         <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
           {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
             <>
-              <p className="text-xs text-center text-neo-white/60 font-bold">
+              <p className="text-xs text-center text-neo-white/50 font-bold">
                 {t('multiplayerFlow.joinModal.roomFullSpectate')}
               </p>
               <Button
@@ -193,8 +197,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 size="lg"
                 onClick={() => onSpectate?.(username.trim()) || handleJoin()}
                 disabled={isJoining}
-                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
               >
+                <Eye className="w-5 h-5" />
                 {t('multiplayerFlow.joinModal.spectateButton')}
               </Button>
             </>
@@ -204,8 +209,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               size="lg"
               onClick={handleJoin}
               disabled={isJoining}
-              className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-full bg-neo-pink hover:bg-neo-pink-light text-neo-black font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
             >
+              <Swords className="w-5 h-5" />
               {isJoining
                 ? t('multiplayerFlow.joinModal.joining')
                 : t('multiplayerFlow.joinModal.joinButton')}

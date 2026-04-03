@@ -3690,7 +3690,9 @@ const es = {
       "moreModesUnlock": "¡Más modos se desbloquean mientras juegas!",
       "skip": "Omitir",
       "letsGo": "¡Empecemos!",
-      "chooseLanguage": "Elige tu idioma"
+      "chooseLanguage": "Elige tu idioma",
+      "letsPlay": "¡A jugar!",
+      "whereToStart": "¿Por dónde empezar?"
     }
   },
   "preGameTutorial": {

@@ -1699,7 +1699,9 @@ const sv = {
       "moreModesUnlock": "Fler lägen låses upp när du spelar!",
       "skip": "Hoppa över",
       "letsGo": "Nu kör vi!",
-      "chooseLanguage": "Välj språk"
+      "chooseLanguage": "Välj språk",
+      "letsPlay": "Kör igång",
+      "whereToStart": "Var vill du börja?"
     }
   },
   "preGameTutorial": {

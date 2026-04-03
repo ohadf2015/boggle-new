@@ -65,9 +65,7 @@ const ModeOption: React.FC<ModeOptionProps> = ({
         featured && 'ring-2 ring-neo-lime/50 ring-offset-2 ring-offset-neo-navy'
       )}
       style={{
-        background: dark
-          ? undefined
-          : `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
+        background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
         filter: hovered
           ? `drop-shadow(0 0 20px ${glowColor})`
           : undefined,
@@ -161,6 +159,17 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
       className="w-full max-w-sm mx-auto flex flex-col items-center gap-3"
       dir={dir}
     >
+      {/* Section header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-center mb-1"
+      >
+        <h2 className="text-xl font-neo-display font-black text-neo-cream">
+          {t('onboarding.ftue.whereToStart', 'Where to start?')}
+        </h2>
+      </motion.div>
       {/* Join Friend's Game — shown only when user arrived via room invite link */}
       {hasPendingInvite && (
         <ModeOption
@@ -209,9 +218,9 @@ const ModeFork: React.FC<ModeForkProps> = ({ onSelectMode, hasPendingInvite }) =
       <ModeOption
         icon={<Home className="w-7 h-7 text-neo-white" />}
         glowColor="rgba(139, 92, 246, 0.35)"
-        gradientFrom=""
-        gradientTo=""
-        iconBg="bg-neo-white/10"
+        gradientFrom="#2d2150"
+        gradientTo="#1a1a2e"
+        iconBg="bg-neo-purple/20"
         title={t('onboarding.ftue.homePage')}
         description={t('onboarding.ftue.homePageDesc')}
         delay={baseDelay + 0.2}

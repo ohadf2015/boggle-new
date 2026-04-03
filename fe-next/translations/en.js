@@ -1803,7 +1803,9 @@ const en = {
       "moreModesUnlock": "More modes unlock as you play!",
       "skip": "Skip",
       "letsGo": "Let's Start!",
-      "chooseLanguage": "Choose your language"
+      "chooseLanguage": "Choose your language",
+      "letsPlay": "Let's Play",
+      "whereToStart": "Where to start?"
     }
   },
   "preGameTutorial": {

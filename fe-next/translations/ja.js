@@ -1699,7 +1699,9 @@ const ja = {
       "moreModesUnlock": "プレイするほど新しいモードが解放！",
       "skip": "スキップ",
       "letsGo": "はじめよう！",
-      "chooseLanguage": "言語を選択"
+      "chooseLanguage": "言語を選択",
+      "letsPlay": "プレイ開始",
+      "whereToStart": "どこから始める？"
     }
   },
   "preGameTutorial": {

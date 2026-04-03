@@ -54,10 +54,11 @@ describe('LanguageSelect', () => {
   it('highlights the currently selected language', () => {
     render(<LanguageSelect onSelect={mockOnSelect} />);
     const englishButton = screen.getByTestId('lang-en');
-    expect(englishButton.className).toContain('ring');
+    // Selected card uses lime border styling
+    expect(englishButton.className).toContain('border-neo-lime');
   });
 
-  it('calls setLanguage and onSelect when a language is clicked', () => {
+  it('calls setLanguage when a language card is clicked', () => {
     render(<LanguageSelect onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByTestId('lang-he'));
     expect(mockSetLanguage).toHaveBeenCalledWith('he');

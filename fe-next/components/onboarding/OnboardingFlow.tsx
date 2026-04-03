@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,8 +12,20 @@ import TutorialGame from './TutorialGame';
 import QuickProfileSetup from './QuickProfileSetup';
 import ScoreReveal from './ScoreReveal';
 import ModeFork from './ModeFork';
+import OnboardingProgress from './OnboardingProgress';
 
 type FlowStep = 'language' | 'tutorial' | 'profile' | 'scoreReveal' | 'fork';
+
+const STEPS: FlowStep[] = ['language', 'tutorial', 'profile', 'scoreReveal', 'fork'];
+
+/** Step-specific accent colors for the floating background shapes */
+const STEP_ACCENTS: Record<FlowStep, { color1: string; color2: string }> = {
+  language: { color1: 'rgba(191,255,0,0.07)', color2: 'rgba(0,255,255,0.05)' },
+  tutorial: { color1: 'rgba(0,255,255,0.06)', color2: 'rgba(191,255,0,0.04)' },
+  profile: { color1: 'rgba(255,20,147,0.06)', color2: 'rgba(191,255,0,0.04)' },
+  scoreReveal: { color1: 'rgba(191,255,0,0.08)', color2: 'rgba(255,20,147,0.05)' },
+  fork: { color1: 'rgba(139,92,246,0.06)', color2: 'rgba(0,255,255,0.05)' },
+};
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -24,8 +36,8 @@ const DEFAULT_AVERAGE_SCORE = 62;
 
 /**
  * OnboardingFlow - Orchestrates the full FTUE.
- * State machine: tutorial -> profile -> scoreReveal -> fork.
- * Full-screen, no Header/Footer visible.
+ * State machine: language -> tutorial -> profile -> scoreReveal -> fork.
+ * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { language, dir } = useLanguage();
@@ -36,6 +48,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [, setTutorialWords] = useState<string[]>([]);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
+
+  const stepIndex = useMemo(() => STEPS.indexOf(step), [step]);
+  const accent = STEP_ACCENTS[step];
 
   // Step 1: Tutorial complete
   const handleTutorialComplete = useCallback(
@@ -149,20 +164,62 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     }
   };
 
+  const showProgress = step !== 'tutorial';
+
   return (
     <div
       data-testid="onboarding-flow"
-      className="fixed inset-0 z-[100] bg-neo-navy flex items-center justify-center overflow-y-auto"
+      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
       dir={dir}
     >
+      {/* Floating geometric background shapes — shift color per step */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        <motion.div
+          className="absolute w-[300px] h-[300px] rounded-full blur-[120px]"
+          animate={{ background: accent.color1, x: ['-10%', '5%', '-10%'], y: ['-5%', '10%', '-5%'] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ top: '-8%', left: '-5%' }}
+        />
+        <motion.div
+          className="absolute w-[250px] h-[250px] rounded-full blur-[100px]"
+          animate={{ background: accent.color2, x: ['5%', '-8%', '5%'], y: ['5%', '-5%', '5%'] }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ bottom: '5%', right: '-3%' }}
+        />
+        {/* Subtle diagonal grid lines */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 40px, currentColor 40px, currentColor 41px)',
+            color: 'white',
+          }}
+        />
+      </div>
+
+      {/* Progress indicator — hidden during tutorial (gameplay fills the screen) */}
+      <AnimatePresence>
+        {showProgress && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25 }}
+            className="absolute top-6 z-10"
+          >
+            <OnboardingProgress currentStep={stepIndex} totalSteps={STEPS.length} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Step content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="w-full px-4"
+          initial={{ opacity: 0, y: 24, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -16, scale: 0.98 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full px-4 relative z-[1]"
         >
           {renderStep()}
         </motion.div>

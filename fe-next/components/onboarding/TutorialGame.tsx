@@ -101,7 +101,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="mb-4 bg-neo-yellow border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm"
+        className="mb-4 bg-neo-lime border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm"
       >
         <span className="font-black text-neo-black text-lg">
           {t('onboarding.ftue.wordsFound', { count: wordsFound.length })}
@@ -159,11 +159,11 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
           >
             <div className="bg-neo-pink border-4 border-neo-black rounded-neo px-8 py-4 shadow-hard-lg transform rotate-[-2deg]">
               <div className="flex items-center gap-2">
-                <Sparkles className="text-neo-yellow w-8 h-8" />
+                <Sparkles className="text-neo-lime w-8 h-8" />
                 <span className="text-4xl font-black text-neo-white uppercase tracking-wider">
                   {t('onboarding.ftue.amazing')}
                 </span>
-                <Sparkles className="text-neo-yellow w-8 h-8" />
+                <Sparkles className="text-neo-lime w-8 h-8" />
               </div>
             </div>
           </motion.div>
@@ -180,7 +180,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-40"
           >
-            <div className="bg-neo-orange border-4 border-neo-black rounded-neo px-6 py-3 shadow-hard-lg">
+            <div className="bg-neo-cyan border-4 border-neo-black rounded-neo px-6 py-3 shadow-hard-lg">
               <span className="text-2xl font-black text-neo-white">
                 {t('onboarding.ftue.keepGoing', 'COMBO!')}
               </span>

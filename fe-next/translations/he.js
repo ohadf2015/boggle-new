@@ -1716,7 +1716,9 @@ const he = {
       "moreModesUnlock": "מצבי משחק נוספים ייפתחו ככל שתשחקו!",
       "skip": "דלג",
       "letsGo": "יאללה, מתחילים!",
-      "chooseLanguage": "בחרו שפה"
+      "chooseLanguage": "בחרו שפה",
+      "letsPlay": "בואו נשחק",
+      "whereToStart": "מאיפה מתחילים?"
     }
   },
 

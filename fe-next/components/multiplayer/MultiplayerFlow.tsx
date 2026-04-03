@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import RoomListView from './RoomListView';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
@@ -96,16 +96,17 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     return undefined;
   }, [roomsLoading]);
 
+  // Track whether CrazyGames invite was handled (prevents URL prefill from also firing)
+  const cgInviteHandledRef = useRef(false);
+
   // CrazyGames invite integration
   const {
     isReady: isCrazyGamesReady,
-    inviteRoomId,
-    isInstantMultiplayer,
     showInviteButton: cgShowInvite,
   } = useCrazyGamesInvite({
     // When player joins via CrazyGames invite link with roomId
     onInviteJoin: (roomId) => {
-      // Try to auto-join if profile exists
+      cgInviteHandledRef.current = true;
       handleInvitationAutoJoin(roomId);
     },
     // When player starts via "Play with Friends" (instant multiplayer)
@@ -159,20 +160,17 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, defaultLanguage]
   );
 
-  // Handle CrazyGames invite room ID
-  useEffect(() => {
-    if (!isCrazyGamesReady || !inviteRoomId) return;
-    handleInvitationAutoJoin(inviteRoomId);
-  }, [isCrazyGamesReady, inviteRoomId, handleInvitationAutoJoin]);
+  // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.
+  // Do NOT add a separate effect for inviteRoomId — it causes a double-join race.
 
   // Handle URL prefilled room code (invitation links)
   useEffect(() => {
     // Skip if CrazyGames invite already handled
-    if (inviteRoomId) return;
+    if (cgInviteHandledRef.current) return;
     if (!prefilledRoom) return;
 
     handleInvitationAutoJoin(prefilledRoom);
-  }, [inviteRoomId, prefilledRoom, handleInvitationAutoJoin]);
+  }, [prefilledRoom, handleInvitationAutoJoin]);
 
   // Handle room click from list
   // Auth users with profile skip the modal entirely — instant join
