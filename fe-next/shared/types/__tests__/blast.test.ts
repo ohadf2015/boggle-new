@@ -5,8 +5,8 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 13 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(13);
+  it('should contain exactly 18 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(18);
   });
 
   it('should include standard (not normal)', () => {
@@ -14,14 +14,18 @@ describe('BlastTileType canonical definition', () => {
     expect(BLAST_TILE_TYPE_LIST).not.toContain('normal');
   });
 
-  it('should not contain wildcard (removed in Phase 47)', () => {
-    expect(BLAST_TILE_TYPE_LIST).not.toContain('wildcard');
-  });
-
   it('should contain mirror, silver, diamond (added)', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('mirror');
     expect(BLAST_TILE_TYPE_LIST).toContain('silver');
     expect(BLAST_TILE_TYPE_LIST).toContain('diamond');
+  });
+
+  it('should contain wildcard, countdown, virus, portal, catalyst', () => {
+    expect(BLAST_TILE_TYPE_LIST).toContain('wildcard');
+    expect(BLAST_TILE_TYPE_LIST).toContain('countdown');
+    expect(BLAST_TILE_TYPE_LIST).toContain('virus');
+    expect(BLAST_TILE_TYPE_LIST).toContain('portal');
+    expect(BLAST_TILE_TYPE_LIST).toContain('catalyst');
   });
 
   it('should contain all expected tile types', () => {
@@ -39,6 +43,11 @@ describe('BlastTileType canonical definition', () => {
       'mirror',
       'silver',
       'diamond',
+      'wildcard',
+      'countdown',
+      'virus',
+      'portal',
+      'catalyst',
     ];
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);

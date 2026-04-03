@@ -35,6 +35,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     const { missions, completedCount, isGrandSlam } = useDailyMissions();
     const { unreadCount: notificationCount } = useRealtimeNotifications();
     const [isOpen, setIsOpen] = useState(false);
+    const [badgeSeen, setBadgeSeen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
 
@@ -43,6 +44,15 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
 
     // Aggregate badge: gifts + notifications + completed quests
     const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
+
+    // Reset "seen" when badge count increases (new notifications arrived)
+    const prevBadgeCount = useRef(badgeCount);
+    useEffect(() => {
+        if (badgeCount > prevBadgeCount.current) {
+            setBadgeSeen(false);
+        }
+        prevBadgeCount.current = badgeCount;
+    }, [badgeCount]);
 
     const closeMenu = useCallback(() => setIsOpen(false), []);
 
@@ -73,7 +83,10 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
         <div className="relative" ref={dropdownRef}>
             {/* Hamburger Trigger */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    if (!isOpen) setBadgeSeen(true);
+                    setIsOpen(!isOpen);
+                }}
                 className={cn(
                     "flex items-center justify-center",
                     "w-10 h-10",
@@ -95,8 +108,11 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                     {isOpen ? <X size={18} /> : <Menu size={18} />}
                 </motion.div>
                 {/* Aggregated badge: gifts + notifications + completed quests */}
-                {badgeCount > 0 && !isOpen && (
-                    <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none">{badgeCount}</div>
+                {badgeCount > 0 && !badgeSeen && (
+                    <div className={cn(
+                        "absolute -top-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none",
+                        isRtl ? '-left-1.5' : '-right-1.5'
+                    )}>{badgeCount}</div>
                 )}
             </button>
 

@@ -95,6 +95,7 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('@/contexts/CoinContext', () => ({
   useCoin: () => ({ coins: 100, updateCoins: vi.fn() }),
+  useCoinContext: () => ({ coins: 100, updateCoins: vi.fn() }),
   useCoinsFromContext: () => ({ coins: 100, updateCoins: vi.fn() }),
   CoinProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
