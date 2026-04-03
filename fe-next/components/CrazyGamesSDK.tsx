@@ -75,8 +75,9 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
       if (window.CrazyGames?.SDK) {
         try {
+          // Always init — SDK state resets on soft navigations even if env is cached
+          await window.CrazyGames.SDK.init();
           if (!window.__crazyGamesEnvironment) {
-            await window.CrazyGames.SDK.init();
             const env = await window.CrazyGames.SDK.getEnvironment();
             window.__crazyGamesEnvironment = env;
           }
@@ -84,15 +85,19 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const env = window.__crazyGamesEnvironment!;
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
-          setIsInstantMultiplayer(!!window.CrazyGames.SDK.game.isInstantMultiplayer);
+          try {
+            setIsInstantMultiplayer(!!window.CrazyGames.SDK.game.isInstantMultiplayer);
+          } catch {
+            setIsInstantMultiplayer(false);
+          }
 
           // Persist invite params to sessionStorage so they survive route changes
-          const params = window.CrazyGames.SDK.game.inviteParams;
-          if (params && Object.keys(params).length > 0) {
-            try {
+          try {
+            const params = window.CrazyGames.SDK.game.inviteParams;
+            if (params && Object.keys(params).length > 0) {
               sessionStorage.setItem('cg_invite_params', JSON.stringify(params));
-            } catch { /* sessionStorage unavailable */ }
-          }
+            }
+          } catch { /* SDK not ready or sessionStorage unavailable */ }
         } catch {
           setIsAvailable(false);
         }
