@@ -56,9 +56,9 @@ describe('LandingHero', () => {
     expect(screen.getAllByTestId('leaderboard-preview').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('hides leaderboard sidebar on mobile but shows below CTA', () => {
+  it('hides leaderboard sidebar on mobile', () => {
     render(<LandingHero {...baseProps} isMobilePortrait={true} />);
-    // On mobile with players, leaderboard renders below CTA
-    expect(screen.getByTestId('leaderboard-preview')).toBeInTheDocument();
+    // On mobile the leaderboard sidebar is not rendered
+    expect(screen.queryByTestId('leaderboard-preview')).not.toBeInTheDocument();
   });
 });
