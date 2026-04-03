@@ -57,7 +57,7 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false, // Don't allow HTTP in production WebView
     captureInput: true,
-    webContentsDebuggingEnabled: isDev, // Debug only in development
+    webContentsDebuggingEnabled: true, // TODO: set back to isDev after debugging native auth
     backgroundColor: '#1a1a2e',
     // CRITICAL: Do NOT add useLegacyBridge or use CapacitorHttp
   },

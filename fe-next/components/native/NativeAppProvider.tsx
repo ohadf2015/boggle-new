@@ -9,11 +9,12 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { isNative } from '@/utils/platform';
 import logger from '@/utils/logger';
 
 const DeepLinkHandler = dynamic(() => import('@/components/DeepLinkHandler'), { ssr: false });
@@ -26,6 +27,21 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
   // Initialize safe area CSS variables (no-op on web)
   // Hook sets --cap-safe-area-top/bottom/left/right on document root
   useSafeArea();
+
+  // Configure status bar on native: don't overlay WebView content
+  useEffect(() => {
+    if (!isNative()) return;
+
+    import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
+      // Prevent WebView from rendering behind the status bar
+      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: '#1a1a2e' }).catch(() => {});
+      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      logger.log('[NativeAppProvider] Status bar configured');
+    }).catch((err) => {
+      logger.warn('[NativeAppProvider] Failed to configure status bar:', err);
+    });
+  }, []);
 
   // Handle app lifecycle transitions
   useAppLifecycle({

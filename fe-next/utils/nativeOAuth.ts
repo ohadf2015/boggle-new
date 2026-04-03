@@ -30,15 +30,20 @@ interface NativeOAuthConfig {
   apple: Record<string, never>;  // Apple doesn't need config on iOS
 }
 
+// Hardcoded fallback — process.env.NEXT_PUBLIC_* is baked at build time;
+// if Railway doesn't have it during `docker build`, it'll be undefined.
+const GOOGLE_WEB_CLIENT_ID_FALLBACK = '921426916910-38600qbrs14hu6nnrrts0j3q7qab2k1o.apps.googleusercontent.com';
+
 // Load config from environment variables
 const getNativeOAuthConfig = (): NativeOAuthConfig | null => {
-  const webClientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  const webClientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID || GOOGLE_WEB_CLIENT_ID_FALLBACK;
 
   if (!webClientId) {
     logger.warn('[NativeOAuth] NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID not configured');
     return null;
   }
 
+  logger.log('[NativeOAuth] Using webClientId:', webClientId.substring(0, 20) + '...');
   return {
     google: { webClientId },
     apple: {}
@@ -70,8 +75,10 @@ export async function initializeNativeOAuth(): Promise<boolean> {
 
   try {
     // Dynamically import to avoid issues on web builds
+    logger.log('[NativeOAuth] Attempting to import @capgo/capacitor-social-login...');
     const socialLoginModule = await import('@capgo/capacitor-social-login');
     SocialLogin = socialLoginModule.SocialLogin;
+    logger.log('[NativeOAuth] Import successful, SocialLogin:', !!SocialLogin);
 
     // Build provider config based on platform
     // Note: Use 'online' mode to get idToken directly, which is needed for signInWithIdToken
