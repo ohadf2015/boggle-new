@@ -23,7 +23,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
     <IdleMascotWithEntrance
       baseVariant="happy"
       size="xl"
-      sizeClassName={isMobilePortrait ? 'w-16 h-16' : 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40'}
+      sizeClassName={isMobilePortrait ? 'w-12 h-12' : 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40'}
       enableHover={!isMobilePortrait}
       enableClick
       hoverVariant="excited"
@@ -53,10 +53,10 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
         )}>
           {/* Mobile: mascot + title inline for compact layout */}
           {isMobilePortrait ? (
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2 mb-1">
               <HeroMascot isMobilePortrait={isMobilePortrait} />
               <h1
-                className="font-black uppercase tracking-tight text-neo-white text-xl neo-title animate-[fadeInLeft_0.4s_ease-out_0.15s_both]"
+                className="font-black uppercase tracking-tight text-neo-white text-lg neo-title animate-[fadeInLeft_0.4s_ease-out_0.15s_both]"
               >
                 <span className="sr-only">LexiClash — </span>
                 {t('landing.welcomeTitle')}

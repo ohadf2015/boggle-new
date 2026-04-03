@@ -266,8 +266,8 @@ export function getCosmeticsByCategory(category: CosmeticCategory): Cosmetic[] {
  * Rarity color mapping for UI.
  */
 export const RARITY_COLORS: Record<CosmeticRarity, string> = {
-  common: 'text-gray-400 border-gray-400',
-  rare: 'text-blue-400 border-blue-400',
-  epic: 'text-purple-400 border-purple-400',
-  legendary: 'text-yellow-400 border-yellow-400',
+  common: 'text-neo-cream/60 border-neo-cream/30',
+  rare: 'text-neo-cyan border-neo-cyan',
+  epic: 'text-neo-purple border-neo-purple',
+  legendary: 'text-neo-lime border-neo-lime',
 };

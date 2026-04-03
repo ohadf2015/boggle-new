@@ -75,12 +75,10 @@ describe('CosmeticCollection', () => {
     expect(screen.getByText('cosmetics.locked')).toBeDefined();
   });
 
-  it('calls onPreview when clicking a cosmetic card', () => {
-    const onPreview = vi.fn();
-    render(
-      <CosmeticCollection rankTier="Unranked" streakDays={0} coins={0} onPreview={onPreview} />
-    );
+  it('opens preview modal when clicking a cosmetic card', () => {
+    render(<CosmeticCollection rankTier="Unranked" streakDays={0} coins={0} />);
     fireEvent.click(screen.getByText('cosmetics.items.tileDefault'));
-    expect(onPreview).toHaveBeenCalledWith(expect.objectContaining({ id: 'tile-default' }));
+    // Preview modal should appear with dialog role
+    expect(screen.getByRole('dialog')).toBeDefined();
   });
 });

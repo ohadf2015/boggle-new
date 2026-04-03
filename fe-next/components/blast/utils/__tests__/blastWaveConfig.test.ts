@@ -92,15 +92,15 @@ describe('getWaveConfig', () => {
     expect(getWaveConfig(7).scoreThreshold).toBe(400);
   });
 
-  it('caps scaling at wave 7+ (no further changes)', () => {
-    const w7 = getWaveConfig(7);
-    const w10 = getWaveConfig(10);
+  it('caps scaling at wave 12+ (no further changes beyond last WAVE_TABLE entry)', () => {
+    const w12 = getWaveConfig(12);
+    const w15 = getWaveConfig(15);
 
-    expect(w10.minWordLength).toBe(w7.minWordLength);
-    expect(w10.maxCascadeChain).toBe(w7.maxCascadeChain);
-    expect(w10.vowelModifier).toBe(w7.vowelModifier);
-    expect(w10.lightningEnabled).toBe(w7.lightningEnabled);
-    expect(w10.magnetEnabled).toBe(w7.magnetEnabled);
+    expect(w15.minWordLength).toBe(w12.minWordLength);
+    expect(w15.maxCascadeChain).toBe(w12.maxCascadeChain);
+    expect(w15.vowelModifier).toBe(w12.vowelModifier);
+    expect(w15.lightningEnabled).toBe(w12.lightningEnabled);
+    expect(w15.magnetEnabled).toBe(w12.magnetEnabled);
   });
 
   it('increases scoreThreshold linearly beyond wave 7', () => {
@@ -284,11 +284,13 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     }
   });
 
-  it('no wildcard in any wave 1-10', () => {
-    for (let wave = 1; wave <= 10; wave++) {
+  it('no wildcard in waves 1-7, present from wave 8+', () => {
+    for (let wave = 1; wave <= 7; wave++) {
       const dist = getWaveDistribution(getWaveConfig(wave));
       expect(dist.wildcard ?? 0).toBe(0);
     }
+    const dist8 = getWaveDistribution(getWaveConfig(8));
+    expect(dist8.wildcard).toBeGreaterThan(0);
   });
 
   it('WaveConfig has mirrorEnabled, silverEnabled, diamondEnabled flags', () => {

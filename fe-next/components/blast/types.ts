@@ -164,6 +164,41 @@ export const PRISM_USE_BONUS = 2;
 /** Bonus when prism detonates (cross-clear) */
 export const PRISM_CROSS_BONUS = 5;
 
+// ==================== Wildcard Constants ====================
+
+/** Wildcard tiles count as any letter — no score bonus, just flexibility */
+export const WILDCARD_CLEAR_BONUS = 0;
+
+// ==================== Countdown Constants ====================
+
+/** Initial countdown value (moves before auto-explosion) */
+export const COUNTDOWN_INITIAL_MOVES = 3;
+/** Score bonus for clearing a countdown tile in a word (defusing it) */
+export const COUNTDOWN_DEFUSE_BONUS = 15;
+/** Score penalty when countdown reaches 0 and explodes */
+export const COUNTDOWN_EXPLOSION_PENALTY = 50;
+/** Countdown explosion radius (same as bomb) */
+export const COUNTDOWN_EXPLOSION_RADIUS = 1;
+
+// ==================== Virus Constants ====================
+
+/** Score value when clearing a virus tile (worthless — clear them to stop spread) */
+export const VIRUS_CLEAR_SCORE = 0;
+/** Number of adjacent tiles a virus infects per turn */
+export const VIRUS_SPREAD_COUNT = 1;
+
+// ==================== Portal Constants ====================
+
+/** Bonus score for using a portal in a word */
+export const PORTAL_USE_BONUS = 5;
+
+// ==================== Catalyst Constants ====================
+
+/** Bonus score when catalyst is cleared */
+export const CATALYST_CLEAR_BONUS = 10;
+/** Radius of tiles upgraded by catalyst (1 = 3x3 area) */
+export const CATALYST_UPGRADE_RADIUS = 1;
+
 // ==================== Treasure Gem Constants ====================
 
 /** Number of hits required to complete a Treasure Gem (shard collection) */
@@ -227,6 +262,11 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   mirror: 0,
   silver: 0,
   diamond: 0,
+  wildcard: 0,
+  countdown: 0,
+  virus: 0,
+  portal: 0,
+  catalyst: 0,
 };
 
 // ==================== Objectives ====================

@@ -10,6 +10,7 @@ interface UseGridClickHandlerProps {
   submitWord: () => void;
   fireRoundActive: boolean;
   setIsClickSelectMode: (val: boolean) => void;
+  cellFilter?: (row: number, col: number) => boolean;
 }
 
 export function useGridClickHandler({
@@ -18,6 +19,7 @@ export function useGridClickHandler({
   submitWord,
   fireRoundActive,
   setIsClickSelectMode,
+  cellFilter,
 }: UseGridClickHandlerProps) {
   const lastClickTimeRef = useRef(0);
   const lastClickCellRef = useRef<GridPosition | null>(null);
@@ -38,6 +40,7 @@ export function useGridClickHandler({
     lastClickCellRef.current = { row: rowIndex, col: colIndex };
 
     if (selectedCells.length === 0) {
+      if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
       setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
       setIsClickSelectMode(true);
       vibrateClickSelect();
@@ -57,10 +60,11 @@ export function useGridClickHandler({
 
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && isAdjacentCell(lastCell, { row: rowIndex, col: colIndex })) {
+      if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
       setSelectedCells([...selectedCells, { row: rowIndex, col: colIndex, letter }]);
       vibrateClickSelect();
     }
-  }, [selectedCells, setSelectedCells, submitWord, fireRoundActive, setIsClickSelectMode]);
+  }, [selectedCells, setSelectedCells, submitWord, fireRoundActive, setIsClickSelectMode, cellFilter]);
 
   return handleCellClick;
 }

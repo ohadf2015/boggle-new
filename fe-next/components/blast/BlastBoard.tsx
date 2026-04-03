@@ -5,10 +5,22 @@ import GridComponent from '@/components/GridComponent';
 import { BlastTile } from './BlastTile';
 import type { SelectedCell } from '@/components/grid';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { BlastTileState } from './types';
+import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
+import { computeCellFilter } from './hooks/blastCellFilterLogic';
+
+const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
+  bomb: 'bomb',
+  lightning: 'lightning',
+  prism: 'prism',
+  magnet: 'magnet',
+};
+
+function getZonePreview(type: BlastTileType): 'bomb' | 'lightning' | 'prism' | 'magnet' | null {
+  return ZONE_PREVIEW_TILES[type] ?? null;
+}
 
 export interface BlastBoardProps {
   grid: LetterGrid;
@@ -67,6 +79,12 @@ export const BlastBoard = memo(function BlastBoard({
   const handleSelectionChange = useCallback((cells: SelectedCell[]) => {
     setSelectedCells(cells);
   }, []);
+
+  // Cell filter: gates selectability based on tile type (ice, gem, etc.)
+  const cellFilter = useMemo(
+    () => computeCellFilter(tileStates, selectedCells),
+    [tileStates, selectedCells],
+  );
 
   const selectedPositions = useMemo(
     () => new Set(selectedCells.map((c) => `${c.row}-${c.col}`)),
@@ -127,6 +145,7 @@ export const BlastBoard = memo(function BlastBoard({
         onPathSubmit={onPathSubmit}
         onWordChange={onWordChange}
         onSelectionChange={handleSelectionChange}
+        cellFilter={cellFilter}
         hideWordPreview
         hideComboIndicator
         largeText
@@ -188,11 +207,14 @@ export const BlastBoard = memo(function BlastBoard({
                 isSelected={isSelected}
                 isCleared={tile.isCleared}
                 hitsRemaining={tile.hitsRemaining}
+                countdown={tile.countdown}
                 isNearMiss={nearMissSet.has(key)}
                 activationEffect={tile.activationEffect}
                 isComboPreview={comboPreviewSet?.has(key) ?? false}
                 selectionIndex={selectionIndexMap.get(key)}
                 selectionTotal={selectedCells.length}
+                isLocked={!cellFilter(tile.row, tile.col) && !tile.isCleared}
+                zonePreview={isSelected ? getZonePreview(tile.type) : null}
                 clearRotate={animState?.clearRotate}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}

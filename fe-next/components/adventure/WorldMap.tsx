@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useMemo, useCallback, memo, useState, CSSProp
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
-import { Star, Lock, Crown } from 'lucide-react';
+import { Star, Lock, Crown, Play } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,6 +20,7 @@ import {
   getWorldGlow,
   type WorldConfig,
 } from '@/lib/adventure';
+import { getNextUnlockedLevel } from '@/lib/adventure/constants';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { WorldMapBackground } from './WorldMapBackground';
 import { WorldOrbitingLetters, TrailPath } from './WorldMapDecorations';
@@ -29,6 +30,7 @@ interface WorldMapProps {
   completions: Array<{ world: number; level: number; stars: number }>;
   onWorldSelect: (worldId: number) => void;
   masteryTiers?: Record<number, MasteryTier>;
+  onContinue?: (worldId: number, levelId: number) => void;
 }
 
 // Motion variants - extracted to constants to prevent re-creation on every render
@@ -438,6 +440,7 @@ const WorldMap = memo(function WorldMap({
   completions,
   onWorldSelect,
   masteryTiers,
+  onContinue,
 }: WorldMapProps): React.JSX.Element {
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
@@ -539,6 +542,22 @@ const WorldMap = memo(function WorldMap({
     return null;
   }, [worldsData]);
 
+  // Next level for the continue button
+  const nextLevel = useMemo(() => {
+    if (!nextWorldId) return null;
+    return getNextUnlockedLevel(nextWorldId, completions);
+  }, [nextWorldId, completions]);
+
+  const nextWorldConfig = nextLevel ? WORLD_CONFIGS.find(w => w.id === nextLevel.world) : null;
+
+  const handleContinue = useCallback(() => {
+    if (nextLevel && onContinue) {
+      onContinue(nextLevel.world, nextLevel.level);
+    } else if (nextLevel) {
+      onWorldSelect(nextLevel.world);
+    }
+  }, [nextLevel, onContinue, onWorldSelect]);
+
   return (
     <div
       ref={containerRef}
@@ -594,30 +613,37 @@ const WorldMap = memo(function WorldMap({
           );
         })}
 
-        {/* Endless Mode Tease — visible once player reaches World 5+ */}
-        {furthestUnlockedId >= 5 && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className={cn(
-              'mx-auto max-w-[200px] p-4 rounded-neo border-3 border-dashed',
-              'border-neo-purple/40 bg-neo-purple/10',
-              'text-center opacity-70'
-            )}
-          >
-            <div className="text-2xl mb-1">∞</div>
-            <p className="text-neo-purple font-black text-sm uppercase tracking-wide">
-              {t('adventure.endlessMode.teaser')}
-            </p>
-            <p className="text-neo-white/40 text-xs mt-1">
-              {t('adventure.endlessMode.comingSoon')}
-            </p>
-          </AdaptiveMotion.div>
-        )}
-
         <div ref={bottomRef} className="h-24" />
       </div>
+
+      {/* Floating Continue Button */}
+      {nextLevel && nextWorldConfig && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-xs">
+          <AdaptiveMotion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleContinue}
+            className={cn(
+              'w-full py-3 px-5',
+              'flex items-center justify-between',
+              'bg-neo-lime text-neo-black',
+              'font-black text-base uppercase tracking-tight',
+              'border-3 border-neo-black rounded-neo shadow-hard-lg',
+            )}
+          >
+            <div className="flex flex-col items-start">
+              <span>{t('adventure.hub.continue')}</span>
+              <span className="text-[11px] font-bold opacity-70 normal-case">
+                {t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}
+              </span>
+            </div>
+            <Play className="w-5 h-5 fill-neo-black" />
+          </AdaptiveMotion.button>
+        </div>
+      )}
     </div>
   );
 });

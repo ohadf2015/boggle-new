@@ -58,7 +58,7 @@ describe('CosmeticPreview', () => {
   it('calls onClose when close button clicked', () => {
     const onClose = vi.fn();
     render(<CosmeticPreview cosmetic={mockCosmetic} isUnlocked={false} onClose={onClose} />);
-    fireEvent.click(screen.getByLabelText('Close'));
+    fireEvent.click(screen.getByLabelText('cosmetics.close'));
     expect(onClose).toHaveBeenCalled();
   });
 });

@@ -299,6 +299,66 @@ describe('BlastTile', () => {
     });
   });
 
+  describe('locked tile overlay (ice/frozen)', () => {
+    it('renders locked overlay for unthawed ice tile', () => {
+      render(<BlastTile {...baseProps} type="ice" isLocked />);
+      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
+    });
+
+    it('renders locked overlay for unthawed frozen tile', () => {
+      render(<BlastTile {...baseProps} type="frozen" isLocked />);
+      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
+    });
+
+    it('does NOT render locked overlay when isLocked is false', () => {
+      render(<BlastTile {...baseProps} type="ice" isLocked={false} />);
+      expect(screen.queryByTestId('locked-overlay')).not.toBeInTheDocument();
+    });
+
+    it('does NOT render locked overlay for non-lockable tiles', () => {
+      render(<BlastTile {...baseProps} type="bomb" />);
+      expect(screen.queryByTestId('locked-overlay')).not.toBeInTheDocument();
+    });
+
+    it('applies reduced opacity class when locked', () => {
+      render(<BlastTile {...baseProps} type="ice" isLocked />);
+      const button = screen.getByRole('button');
+      expect(button.className).toContain('blast-tile-locked');
+    });
+  });
+
+  describe('zone preview indicators', () => {
+    it('renders zone-preview for bomb tile when selected', () => {
+      render(<BlastTile {...baseProps} type="bomb" isSelected zonePreview="bomb" selectionIndex={0} selectionTotal={1} />);
+      expect(screen.getByTestId('zone-preview')).toBeInTheDocument();
+    });
+
+    it('renders zone-preview for lightning tile when selected', () => {
+      render(<BlastTile {...baseProps} type="lightning" isSelected zonePreview="lightning" selectionIndex={0} selectionTotal={1} />);
+      expect(screen.getByTestId('zone-preview')).toBeInTheDocument();
+    });
+
+    it('renders zone-preview for prism tile when selected', () => {
+      render(<BlastTile {...baseProps} type="prism" isSelected zonePreview="prism" selectionIndex={0} selectionTotal={1} />);
+      expect(screen.getByTestId('zone-preview')).toBeInTheDocument();
+    });
+
+    it('renders zone-preview for magnet tile when selected', () => {
+      render(<BlastTile {...baseProps} type="magnet" isSelected zonePreview="magnet" selectionIndex={0} selectionTotal={1} />);
+      expect(screen.getByTestId('zone-preview')).toBeInTheDocument();
+    });
+
+    it('does NOT render zone-preview when not selected', () => {
+      render(<BlastTile {...baseProps} type="bomb" zonePreview="bomb" />);
+      expect(screen.queryByTestId('zone-preview')).not.toBeInTheDocument();
+    });
+
+    it('does NOT render zone-preview for non-zone tiles', () => {
+      render(<BlastTile {...baseProps} type="gold" isSelected selectionIndex={0} selectionTotal={1} />);
+      expect(screen.queryByTestId('zone-preview')).not.toBeInTheDocument();
+    });
+  });
+
   describe('accessibility', () => {
     it('includes tile type in aria-label for special tiles', () => {
       render(<BlastTile {...baseProps} type="bomb" />);

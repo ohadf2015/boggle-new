@@ -16,6 +16,11 @@ export function getInitialHitsRemaining(type: BlastTileType): number {
     case 'mirror': return 0;
     case 'silver': return 0;
     case 'diamond': return 0;
+    case 'wildcard': return 0;
+    case 'countdown': return 0;
+    case 'virus': return 0;
+    case 'portal': return 0;
+    case 'catalyst': return 0;
     default: return 0;
   }
 }

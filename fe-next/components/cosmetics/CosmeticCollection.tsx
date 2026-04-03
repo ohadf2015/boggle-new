@@ -5,12 +5,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCosmetics } from '@/hooks/useCosmetics';
 import { type CosmeticCategory, RARITY_COLORS, type Cosmetic } from '@/lib/cosmetics';
 import { Lock } from 'lucide-react';
+import { CosmeticPreview } from './CosmeticPreview';
 
 interface CosmeticCollectionProps {
   rankTier: string;
   streakDays: number;
   coins: number;
-  onPreview?: (cosmetic: Cosmetic) => void;
+  spendCoins?: (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<boolean>;
 }
 
 const TABS: { key: CosmeticCategory; label: string }[] = [
@@ -20,14 +21,16 @@ const TABS: { key: CosmeticCategory; label: string }[] = [
   { key: 'profileFrame', label: 'cosmetics.profileFrames' },
 ];
 
-export function CosmeticCollection({ rankTier, streakDays, coins, onPreview }: CosmeticCollectionProps) {
+export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: CosmeticCollectionProps) {
   const { t } = useLanguage();
   const { equipCosmetic, purchaseCosmetic, getCosmeticsByCategory } = useCosmetics({
     rankTier,
     streakDays,
     coins,
+    spendCoins,
   });
   const [activeTab, setActiveTab] = useState<CosmeticCategory>('tileSkin');
+  const [previewItem, setPreviewItem] = useState<(Cosmetic & { isUnlocked: boolean }) | null>(null);
 
   const items = getCosmeticsByCategory(activeTab);
 
@@ -57,10 +60,13 @@ export function CosmeticCollection({ rankTier, streakDays, coins, onPreview }: C
         {items.map((item) => {
           const rarityClass = RARITY_COLORS[item.rarity];
           return (
-            <button
+            <div
               key={item.id}
-              onClick={() => onPreview?.(item)}
-              className={`relative p-3 rounded-neo border-neo bg-neo-navy-light text-start transition-transform hover:scale-[1.02] ${rarityClass}`}
+              onClick={() => setPreviewItem(item)}
+              className={`relative p-3 rounded-neo border-neo bg-neo-navy-light text-start transition-transform hover:scale-[1.02] cursor-pointer ${rarityClass}`}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPreviewItem(item); } }}
             >
               {/* Preview area */}
               <div className={`h-16 rounded mb-2 bg-neo-navy flex items-center justify-center ${item.preview}`}>
@@ -77,7 +83,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, onPreview }: C
 
               {/* Status badges */}
               {item.isEquipped && (
-                <span className="absolute top-1 right-1 bg-neo-lime text-black text-xs px-1.5 py-0.5 rounded-neo font-bold">
+                <span className="absolute top-1 end-1 bg-neo-lime text-black text-xs px-1.5 py-0.5 rounded-neo font-bold">
                   {t('cosmetics.equipped')}
                 </span>
               )}
@@ -101,17 +107,28 @@ export function CosmeticCollection({ rankTier, streakDays, coins, onPreview }: C
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    purchaseCosmetic(item.id);
+                    void purchaseCosmetic(item.id);
                   }}
                   className="mt-1 text-xs bg-neo-lime text-black px-2 py-0.5 rounded-neo font-bold border-neo shadow-hard-sm"
                 >
                   {t('cosmetics.purchase', { cost: item.unlockCondition.cost })}
                 </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
+
+      {/* Preview modal */}
+      {previewItem && (
+        <CosmeticPreview
+          cosmetic={previewItem}
+          isUnlocked={previewItem.isUnlocked}
+          onClose={() => setPreviewItem(null)}
+          onEquip={(id) => { equipCosmetic(id); setPreviewItem(null); }}
+          onPurchase={(id) => { void purchaseCosmetic(id); setPreviewItem(null); }}
+        />
+      )}
     </div>
   );
 }

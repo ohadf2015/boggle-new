@@ -47,6 +47,8 @@ interface GridComponentProps {
   onSelectionChange?: (cells: SelectedCell[]) => void;
   /** Whether keyboard typing mode is active (from useKeyboardWordInput) */
   isTypingMode?: boolean;
+  /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles) */
+  cellFilter?: (row: number, col: number) => boolean;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -71,6 +73,7 @@ const GridComponent = memo<GridComponentProps>(({
   disableLetterKeyInput = false,
   onSelectionChange,
   isTypingMode = false,
+  cellFilter,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -122,6 +125,7 @@ const GridComponent = memo<GridComponentProps>(({
     onSingleTapDetected,
     language,
     disableLetterKeyInput,
+    cellFilter,
   });
 
   // Stable handlers that read row/col from data attributes to avoid inline arrows per cell

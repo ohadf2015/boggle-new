@@ -45,6 +45,25 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Fallback: detect CrazyGames iframe via referrer/ancestor origins when SDK fails
+    const isCrazyGamesIframe = (): boolean => {
+      try {
+        // Check ancestor origins (Chrome/Edge)
+        if (window.location.ancestorOrigins?.length) {
+          for (let i = 0; i < window.location.ancestorOrigins.length; i++) {
+            if (window.location.ancestorOrigins[i]?.includes('crazygames.com')) return true;
+          }
+        }
+      } catch { /* cross-origin access denied — expected */ }
+      try {
+        if (document.referrer?.includes('crazygames.com')) return true;
+      } catch { /* noop */ }
+      try {
+        if (window.self !== window.top && window.__crazyGamesEnvironment === 'crazygames') return true;
+      } catch { /* cross-origin — likely an iframe */ }
+      return false;
+    };
+
     const checkSDK = async () => {
       let attempts = 0;
       const maxAttempts = 50; // 5 seconds max
@@ -77,6 +96,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
         } catch {
           setIsAvailable(false);
         }
+      } else if (isCrazyGamesIframe()) {
+        // SDK failed to load but we're definitely on CrazyGames — hide external auth
+        setEnvironment('crazygames');
+        setIsAvailable(false);
       }
       setIsLoading(false);
 

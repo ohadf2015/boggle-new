@@ -12,7 +12,12 @@
  * Wave 4: + lightning
  * Wave 5: + diamond, mirror
  * Wave 6: + frost
- * Wave 7+: + vortex (everything)
+ * Wave 7: + vortex
+ * Wave 8: + wildcard
+ * Wave 9: + countdown
+ * Wave 10: + virus
+ * Wave 11: + portal
+ * Wave 12+: + catalyst (everything)
  */
 
 export interface WaveConfig {
@@ -52,6 +57,16 @@ export interface WaveConfig {
   silverEnabled: boolean;
   /** Whether diamond tiles can appear (unlocks wave 4) */
   diamondEnabled: boolean;
+  /** Whether wildcard tiles can appear (unlocks wave 8) */
+  wildcardEnabled: boolean;
+  /** Whether countdown tiles can appear (unlocks wave 9) */
+  countdownEnabled: boolean;
+  /** Whether virus tiles can appear (unlocks wave 10) */
+  virusEnabled: boolean;
+  /** Whether portal tiles can appear (unlocks wave 11) */
+  portalEnabled: boolean;
+  /** Whether catalyst tiles can appear (unlocks wave 12) */
+  catalystEnabled: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -64,7 +79,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 1.0, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 20,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 20,
   },
   // Wave 1 — basics only: bomb, ice, gold, silver, rainbow (25 moves — generous tutorial)
   // Higher vowel modifier + lower special chance so new players find words easily
@@ -73,7 +90,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 1.1, maxCascadeChain: 2, cascadeChainBonus: 0.5, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 25,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 25,
   },
   // Wave 2 — treasure gem unlocks (18 moves)
   // Slightly lower special tile chance (0.13) to ramp gradually
@@ -82,7 +101,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 0.95, maxCascadeChain: 2, cascadeChainBonus: 0.6, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 18,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 18,
   },
   // Wave 3 — prism unlock (17 moves, no score threshold — learn new mechanic freely)
   {
@@ -90,7 +111,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 0.90, maxCascadeChain: 2, cascadeChainBonus: 0.7, scoreThreshold: undefined,
     lightningEnabled: false, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 17,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 17,
   },
   // Wave 4 — lightning unlock only (16 moves, learn one new mechanic)
   {
@@ -98,7 +121,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.8, scoreThreshold: 150,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false, movesAllowed: 16,
+    mirrorEnabled: false, silverEnabled: true, diamondEnabled: false,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 16,
   },
   // Wave 5 — diamond + mirror unlock (15 moves, minWordLength stays 3)
   {
@@ -106,7 +131,9 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 0.85, maxCascadeChain: 3, cascadeChainBonus: 0.9, scoreThreshold: 200,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 15,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 15,
   },
   // Wave 6 — frost unlock (14 moves, minWordLength rises to 4)
   {
@@ -114,15 +141,69 @@ const WAVE_TABLE: WaveConfig[] = [
     vowelModifier: 0.82, maxCascadeChain: 3, cascadeChainBonus: 0.95, scoreThreshold: 300,
     lightningEnabled: true, vortexEnabled: false, magnetEnabled: false,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 14,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 14,
   },
-  // Wave 7+ — vortex unlock, everything available (12 moves — tight, requires strategy)
+  // Wave 7 — vortex unlock (12 moves — tight, requires strategy)
   {
     minWordLength: 4, specialTileChance: 0.25, iceDistribution: 0.30, goldDistribution: 0.12,
     vowelModifier: 0.82, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 400,
     lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
-    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true, movesAllowed: 12,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: false, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 12,
+  },
+  // Wave 8 — wildcard unlock (11 moves — flexibility reward)
+  {
+    minWordLength: 4, specialTileChance: 0.26, iceDistribution: 0.30, goldDistribution: 0.11,
+    vowelModifier: 0.80, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 450,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: true, countdownEnabled: false, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 11,
+  },
+  // Wave 9 — countdown unlock (11 moves — tension mechanic, defuse or suffer)
+  {
+    minWordLength: 4, specialTileChance: 0.27, iceDistribution: 0.30, goldDistribution: 0.10,
+    vowelModifier: 0.78, maxCascadeChain: 4, cascadeChainBonus: 1.0, scoreThreshold: 500,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, virusEnabled: false, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 11,
+  },
+  // Wave 10 — virus unlock (10 moves — urgency, clear them before they spread)
+  {
+    minWordLength: 4, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
+    vowelModifier: 0.76, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 550,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, virusEnabled: true, portalEnabled: false, catalystEnabled: false,
+    movesAllowed: 10,
+  },
+  // Wave 11 — portal unlock (10 moves — teleport paths for creative combos)
+  {
+    minWordLength: 4, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
+    vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 600,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, virusEnabled: true, portalEnabled: true, catalystEnabled: false,
+    movesAllowed: 10,
+  },
+  // Wave 12+ — catalyst unlock, everything available (9 moves — master tier)
+  {
+    minWordLength: 4, specialTileChance: 0.30, iceDistribution: 0.30, goldDistribution: 0.10,
+    vowelModifier: 0.75, maxCascadeChain: 5, cascadeChainBonus: 1.0, scoreThreshold: 650,
+    lightningEnabled: true, vortexEnabled: true, magnetEnabled: true,
+    gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
+    mirrorEnabled: true, silverEnabled: true, diamondEnabled: true,
+    wildcardEnabled: true, countdownEnabled: true, virusEnabled: true, portalEnabled: true, catalystEnabled: true,
+    movesAllowed: 9,
   },
 ];
 
@@ -132,12 +213,12 @@ const WAVE_TABLE: WaveConfig[] = [
  * with linearly increasing score threshold.
  */
 export function getWaveConfig(wave: number): WaveConfig {
-  const clamped = Math.min(Math.max(wave, 1), 7);
+  const clamped = Math.min(Math.max(wave, 1), 12);
   const config = { ...WAVE_TABLE[clamped] };
 
-  // Beyond wave 7: increase scoreThreshold linearly
-  if (wave > 7) {
-    config.scoreThreshold = 400 + (wave - 7) * 40;
+  // Beyond wave 12: increase scoreThreshold linearly
+  if (wave > 12) {
+    config.scoreThreshold = 650 + (wave - 12) * 40;
   }
 
   return config;
@@ -209,18 +290,25 @@ const FROST_SHARE = 0.05;
 const MIRROR_SHARE = 0.06;
 /** Diamond share when enabled (taken from gold + rainbow) */
 const DIAMOND_SHARE = 0.04;
+/** Wildcard share when enabled */
+const WILDCARD_SHARE = 0.04;
+/** Countdown share when enabled */
+const COUNTDOWN_SHARE = 0.04;
+/** Virus share when enabled */
+const VIRUS_SHARE = 0.03;
+/** Portal share when enabled (spawns in pairs) */
+const PORTAL_SHARE = 0.04;
+/** Catalyst share when enabled */
+const CATALYST_SHARE = 0.04;
 
 /**
  * Build tile distribution for a wave, gating special tiles by unlock progression.
  *
  * Candy Crush staircase unlock order:
- * Wave 1: bomb, ice, gold, silver, rainbow (no wildcard)
- * Wave 2: + gem (treasure)
- * Wave 3: + prism
- * Wave 4: + lightning
- * Wave 5: + diamond, mirror
- * Wave 6: + frost
- * Wave 7+: + vortex
+ * Wave 1-7: original tiles (see file header)
+ * Wave 8: + wildcard   Wave 9: + countdown
+ * Wave 10: + virus     Wave 11: + portal
+ * Wave 12+: + catalyst (everything)
  *
  * New tile shares are carved from gold + rainbow proportionally via takeShare().
  * Returns a record suitable for customDistribution in BlastGameConfig.
@@ -231,6 +319,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     lightningEnabled, vortexEnabled, magnetEnabled,
     gemEnabled, prismEnabled, frostEnabled, frozenEnabled,
     mirrorEnabled, diamondEnabled,
+    wildcardEnabled, countdownEnabled, virusEnabled, portalEnabled, catalystEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -252,6 +341,11 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let frost = 0;
   let mirror = 0;
   let diamond = 0;
+  let wildcard = 0;
+  let countdown = 0;
+  let virus = 0;
+  let portal = 0;
+  let catalyst = 0;
   const silver = SILVER_BASE;
 
   // Helper: take a share proportionally from gold + rainbow
@@ -298,6 +392,31 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(DIAMOND_SHARE);
   }
 
+  if (wildcardEnabled) {
+    wildcard = WILDCARD_SHARE;
+    takeShare(WILDCARD_SHARE);
+  }
+
+  if (countdownEnabled) {
+    countdown = COUNTDOWN_SHARE;
+    takeShare(COUNTDOWN_SHARE);
+  }
+
+  if (virusEnabled) {
+    virus = VIRUS_SHARE;
+    takeShare(VIRUS_SHARE);
+  }
+
+  if (portalEnabled) {
+    portal = PORTAL_SHARE;
+    takeShare(PORTAL_SHARE);
+  }
+
+  if (catalystEnabled) {
+    catalyst = CATALYST_SHARE;
+    takeShare(CATALYST_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -314,6 +433,11 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     frozen: frost,
     mirror,
     diamond,
+    wildcard,
+    countdown,
+    virus,
+    portal,
+    catalyst,
   };
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)

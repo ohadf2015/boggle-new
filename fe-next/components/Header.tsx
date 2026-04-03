@@ -45,7 +45,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2",
+                "w-full mb-1 sm:mb-2 lg:mb-3 pb-1 lg:pb-2",
                 "sticky top-0 lg:static",
                 "z-[60] bg-slate-50 dark:bg-slate-900",
                 "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
@@ -63,9 +63,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
                     "bg-neo-white/90 dark:bg-neo-navy",
                     "backdrop-blur-md",
-                    "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
-                    "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
-                    "rounded-neo-lg xl:rounded-neo-lg 2xl:rounded-neo-lg",
+                    "border-b-4 border-neo-black",
                     "transition-all duration-100",
                     "min-w-0"
                 )}

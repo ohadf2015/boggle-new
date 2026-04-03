@@ -16,6 +16,10 @@ import {
   MIRROR_MULTIPLIER,
   SILVER_MULTIPLIER,
   DIAMOND_MULTIPLIER,
+  WILDCARD_CLEAR_BONUS,
+  COUNTDOWN_DEFUSE_BONUS,
+  VIRUS_CLEAR_SCORE,
+  PORTAL_USE_BONUS,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -33,6 +37,7 @@ import {
   processBombBFS,
   handleFrostFinalHit,
   spawnGemSpecials,
+  fireCatalystUpgrade,
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
@@ -234,6 +239,47 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         bonusScore += pullResult.bonusScore;
         vortexLetterSwaps.push(...pullResult.letterSwaps);
         bonusScore += fireMagnetExplode(cell.row, cell.col, ctx);
+        break;
+      }
+
+      case 'wildcard':
+        // Wildcard already matched any letter during path validation — no special effect on clear
+        bonusScore += WILDCARD_CLEAR_BONUS;
+        break;
+
+      case 'countdown':
+        // Defused! Player included it in a word before it exploded
+        bonusScore += COUNTDOWN_DEFUSE_BONUS;
+        newExplosions.push({ id: `countdown-defuse-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        break;
+
+      case 'virus':
+        // Virus cleared — no score, just removal stops the spread
+        bonusScore += VIRUS_CLEAR_SCORE;
+        break;
+
+      case 'portal': {
+        bonusScore += PORTAL_USE_BONUS;
+        newExplosions.push({ id: `portal-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        // Clear the paired portal too
+        const pairId = prev[cell.row]?.[cell.col]?.portalPairId;
+        if (pairId) {
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const t = next[r][c];
+              if (!t.isCleared && t.type === 'portal' && t.portalPairId === pairId && !(r === cell.row && c === cell.col)) {
+                markCleared(t);
+                newExplosions.push({ id: `portal-pair-${now}-${r}-${c}`, row: r, col: c, type: 'word', intensity: 2, timestamp: now });
+              }
+            }
+          }
+        }
+        break;
+      }
+
+      case 'catalyst': {
+        newExplosions.push({ id: `catalyst-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 3, timestamp: now });
+        bonusScore += fireCatalystUpgrade(cell.row, cell.col, ctx, currentWave, rollSpecialFromDistribution);
         break;
       }
     }

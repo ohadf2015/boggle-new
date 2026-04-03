@@ -59,26 +59,41 @@ describe('useCosmetics', () => {
     expect(neonTile?.isUnlocked).toBe(false);
   });
 
-  it('purchaseCosmetic unlocks a purchasable item and deducts coins', () => {
+  it('purchaseCosmetic unlocks a purchasable item and deducts coins', async () => {
+    const mockSpendCoins = vi.fn().mockResolvedValue(true);
     const { result } = renderHook(() =>
-      useCosmetics({ rankTier: 'Unranked', streakDays: 0, coins: 200 })
+      useCosmetics({ rankTier: 'Unranked', streakDays: 0, coins: 200, spendCoins: mockSpendCoins })
     );
     let success: boolean = false;
-    act(() => {
-      success = result.current.purchaseCosmetic('tile-wooden');
+    await act(async () => {
+      success = await result.current.purchaseCosmetic('tile-wooden');
     });
     expect(success).toBe(true);
+    expect(mockSpendCoins).toHaveBeenCalledWith(expect.any(Number), 'cosmetic_purchase', { cosmeticId: 'tile-wooden' });
     expect(result.current.unlockedCosmetics.some((c) => c.id === 'tile-wooden')).toBe(true);
   });
 
-  it('purchaseCosmetic fails if not enough coins', () => {
+  it('purchaseCosmetic fails if not enough coins', async () => {
     const { result } = renderHook(() =>
       useCosmetics({ rankTier: 'Unranked', streakDays: 0, coins: 10 })
     );
     let success: boolean = true;
-    act(() => {
-      success = result.current.purchaseCosmetic('tile-wooden');
+    await act(async () => {
+      success = await result.current.purchaseCosmetic('tile-wooden');
     });
     expect(success).toBe(false);
+  });
+
+  it('purchaseCosmetic fails if spendCoins rejects', async () => {
+    const mockSpendCoins = vi.fn().mockResolvedValue(false);
+    const { result } = renderHook(() =>
+      useCosmetics({ rankTier: 'Unranked', streakDays: 0, coins: 200, spendCoins: mockSpendCoins })
+    );
+    let success: boolean = true;
+    await act(async () => {
+      success = await result.current.purchaseCosmetic('tile-wooden');
+    });
+    expect(success).toBe(false);
+    expect(result.current.unlockedCosmetics.some((c) => c.id === 'tile-wooden')).toBe(false);
   });
 });

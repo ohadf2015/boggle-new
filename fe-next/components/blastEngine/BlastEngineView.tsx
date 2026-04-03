@@ -30,6 +30,8 @@ const BlastGameCanvas = dynamic(
 
 const MIN_WIDTH = 320;
 const MAX_WIDTH = 560;
+// border-neo = 3px each side = 6px total; account for it so grid isn't clipped
+const BORDER_TOTAL = 6;
 
 function useResponsiveCanvasSize(containerRef: React.RefObject<HTMLDivElement | null>) {
   const [size, setSize] = useState({ width: 400, height: 560 });
@@ -39,11 +41,9 @@ function useResponsiveCanvasSize(containerRef: React.RefObject<HTMLDivElement | 
     if (!el) return;
 
     const measure = () => {
-      const w = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, el.clientWidth - 16));
-      // Canvas height = grid (square, ~w) + HUD space (top bar + objectives + bottom word)
-      // The grid fills most of the width, and height = width + HUD overhead
-      const viewH = typeof window !== 'undefined' ? window.innerHeight - 16 : 800;
-      // Grid is square (w×w), plus ~140px for HUD/objectives/word display
+      // Subtract padding (px-2 = 16px) AND border (border-neo = 6px) so canvas fits
+      const w = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, el.clientWidth - 16 - BORDER_TOTAL));
+      const viewH = typeof window !== 'undefined' ? window.innerHeight - 16 - BORDER_TOTAL : 800;
       const idealH = w + 140;
       const h = Math.min(viewH, idealH);
       setSize({ width: w, height: Math.round(h) });
@@ -524,20 +524,35 @@ export function BlastEngineView() {
               </span>
             </div>
           ) : game.wordsFound.length > 0 ? (
-            <div
-              className="px-5 py-2 rounded-xl"
+            <motion.div
+              key={game.wordsFound.length}
+              initial={{ scale: 1.3, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-neo-cyan/30"
               style={{
-                background: 'rgba(15,12,41,0.7)',
-                backdropFilter: 'blur(6px)',
+                background: 'linear-gradient(90deg, rgba(0,255,255,0.12) 0%, rgba(15,12,41,0.8) 50%, rgba(0,255,255,0.12) 100%)',
+                backdropFilter: 'blur(8px)',
               }}
             >
-              <span className="font-neo-display text-neo-cyan text-base font-bold">
+              <span className="text-neo-lime text-lg">✓</span>
+              <span className="font-neo-display text-neo-cyan text-lg font-black tracking-wide" style={{ textShadow: '0 0 8px rgba(0,255,255,0.4)' }}>
                 {game.wordsFound[game.wordsFound.length - 1]?.toUpperCase()}
               </span>
-              <span className="text-white/40 text-xs ml-2 font-neo-body tabular-nums">
+              {game.lastScoreFly && (
+                <span className="font-neo-display text-neo-lime text-sm font-bold">
+                  +{game.lastScoreFly.score}
+                </span>
+              )}
+              {game.comboLevel > 1 && (
+                <span className="text-neo-pink text-xs font-bold px-1.5 py-0.5 rounded bg-neo-pink/15 border border-neo-pink/30">
+                  {game.comboLevel}x
+                </span>
+              )}
+              <span className="text-white/30 text-xs font-neo-body tabular-nums ml-1">
                 {game.wordsFound.length} {t('blast.words') || 'words'}
               </span>
-            </div>
+            </motion.div>
           ) : null}
         </div>
 

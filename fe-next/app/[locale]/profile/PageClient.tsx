@@ -35,6 +35,7 @@ import {
   ProfileBackButtons,
 } from '@/components/profile';
 import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
+import { useCoinContext } from '@/contexts/CoinContext';
 
 interface GameSession {
   gameCode?: string;
@@ -66,6 +67,7 @@ export default function ProfilePageClient(): React.JSX.Element {
   const [activeSection, setActiveSection] = useState<ProfileSection>(getInitialSection);
 
   // Hooks
+  const { spendCoins } = useCoinContext();
   const { collectibles: playerCollectibles, isLoading: isLoadingCollectibles } = usePlayerCollectibles(user?.id);
 
   // Pull-to-refresh
@@ -342,6 +344,8 @@ export default function ProfilePageClient(): React.JSX.Element {
                     rankTier={profile?.rank_tier || 'Bronze'}
                     streakDays={profile?.streak_days || 0}
                     coins={profile?.total_coins || 0}
+                    spendCoins={spendCoins}
+
                   />
                 </motion.div>
                 {user && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><EmailPreferences isDarkMode={isDarkMode} /></motion.div>}
@@ -408,6 +412,8 @@ export default function ProfilePageClient(): React.JSX.Element {
             rankTier={profile?.rank_tier || 'Bronze'}
             streakDays={profile?.streak_days || 0}
             coins={profile?.total_coins || 0}
+            spendCoins={spendCoins}
+
           />
 
           {/* 8. Settings & Navigation */}

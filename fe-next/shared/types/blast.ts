@@ -6,7 +6,7 @@
 
 // ==================== Tile Type ====================
 
-/** All possible blast mode tile types (standard + 12 special) */
+/** All possible blast mode tile types (standard + 17 special) */
 export type BlastTileType =
   | 'standard'
   | 'gold'
@@ -20,7 +20,12 @@ export type BlastTileType =
   | 'frozen'
   | 'mirror'
   | 'silver'
-  | 'diamond';
+  | 'diamond'
+  | 'wildcard'
+  | 'countdown'
+  | 'virus'
+  | 'portal'
+  | 'catalyst';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -37,6 +42,11 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'mirror',
   'silver',
   'diamond',
+  'wildcard',
+  'countdown',
+  'virus',
+  'portal',
+  'catalyst',
 ] as const;
 
 // ==================== Tile State ====================
@@ -55,4 +65,10 @@ export interface BlastTileState {
   hitsRemaining: number;
   /** For Frost (frozen) tiles: the hidden special revealed on second hit */
   innerType?: BlastTileType;
+  /** Whether an ice/frozen tile has been thawed by an adjacent word (now selectable) */
+  isThawed?: boolean;
+  /** Countdown tiles: moves remaining before auto-explosion (decrements each turn) */
+  countdown?: number;
+  /** Portal tiles: ID linking a portal pair (both share the same ID) */
+  portalPairId?: string;
 }

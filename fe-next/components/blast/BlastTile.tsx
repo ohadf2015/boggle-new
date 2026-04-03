@@ -31,6 +31,12 @@ export interface BlastTileProps {
   selectionIndex?: number;
   /** Total selected tiles in current word */
   selectionTotal?: number;
+  /** Whether this tile is locked (unthawed ice/frozen — not selectable) */
+  isLocked?: boolean;
+  /** Countdown moves remaining (countdown tile only) */
+  countdown?: number;
+  /** Zone preview type — shows effect radius indicator when tile is selected */
+  zonePreview?: 'bomb' | 'lightning' | 'prism' | 'magnet' | null;
   onClick?: () => void;
 }
 
@@ -177,6 +183,41 @@ const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: string; text
       boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.15), 0 4px 0 #008899, 0 6px 12px rgba(0,238,255,0.3), 0 0 14px rgba(0,255,255,0.2)',
     },
   },
+  wildcard: {
+    bg: '', indicator: '🃏', text: 'text-neo-navy',
+    style: {
+      background: 'linear-gradient(135deg, #FFE4FF 0%, #E8B4F8 40%, #C084FC 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.6), inset 0 -2px 3px rgba(0,0,0,0.1), 0 4px 0 #9333EA, 0 6px 10px rgba(192,132,252,0.3)',
+    },
+  },
+  countdown: {
+    bg: '', indicator: '⏳', text: 'text-white',
+    style: {
+      background: 'linear-gradient(180deg, #FF9966 0%, #FF6633 40%, #CC3300 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(255,200,150,0.5), inset 0 -2px 4px rgba(0,0,0,0.2), 0 4px 0 #992200, 0 6px 10px rgba(255,102,51,0.3)',
+    },
+  },
+  virus: {
+    bg: '', indicator: '🦠', text: 'text-white',
+    style: {
+      background: 'linear-gradient(180deg, #66FF66 0%, #33CC33 40%, #009900 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(200,255,200,0.5), inset 0 -2px 4px rgba(0,0,0,0.2), 0 4px 0 #006600, 0 6px 10px rgba(51,204,51,0.3)',
+    },
+  },
+  portal: {
+    bg: '', indicator: '🔗', text: 'text-white',
+    style: {
+      background: 'radial-gradient(circle, #7B68EE 0%, #4B0082 60%, #2E0054 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(200,180,255,0.5), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 0 #1A0040, 0 6px 10px rgba(75,0,130,0.4), 0 0 14px rgba(123,104,238,0.25)',
+    },
+  },
+  catalyst: {
+    bg: '', indicator: '⚗️', text: 'text-neo-navy',
+    style: {
+      background: 'linear-gradient(180deg, #FFFACD 0%, #FFD700 40%, #DAA520 100%)',
+      boxShadow: 'inset 0 2px 5px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.15), 0 4px 0 #B8860B, 0 6px 10px rgba(218,165,32,0.3), 0 0 12px rgba(255,215,0,0.15)',
+    },
+  },
 };
 
 /** Clearing phase background color per tile type */
@@ -193,6 +234,11 @@ const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; borde
   mirror:    { background: 'radial-gradient(circle, #E0E0FF 0%, #8888FF 100%)', border: '2px solid rgba(136,136,255,0.8)' },
   silver:    { background: 'radial-gradient(circle, #E8E8E8 0%, #B0B0B0 100%)', border: '2px solid rgba(192,192,192,0.8)' },
   diamond:   { background: 'radial-gradient(circle, #B9F2FF 0%, #00CED1 100%)', border: '2px solid rgba(0,206,209,0.8)' },
+  wildcard:  { background: 'radial-gradient(circle, #E8B4F8 0%, #9333EA 100%)', border: '2px solid rgba(192,132,252,0.8)' },
+  countdown: { background: 'radial-gradient(circle, #FF9966 0%, #CC3300 100%)', border: '2px solid rgba(255,102,51,0.8)' },
+  virus:     { background: 'radial-gradient(circle, #66FF66 0%, #009900 100%)', border: '2px solid rgba(51,204,51,0.8)' },
+  portal:    { background: 'radial-gradient(circle, #7B68EE 0%, #2E0054 100%)', border: '2px solid rgba(123,104,238,0.8)' },
+  catalyst:  { background: 'radial-gradient(circle, #FFD700 0%, #DAA520 100%)', border: '2px solid rgba(218,165,32,0.8)' },
 };
 
 /** Type-specific clearing transform overrides — visually distinct death animations.
@@ -211,6 +257,11 @@ const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; transit
   magnet:    { transform: 'scale(0.05) rotate(1080deg)', transition: 'all 300ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(0.3) saturate(3)' },
   mirror:    { transform: 'scaleX(0) scaleY(1.8)', transition: 'all 180ms ease-in', filter: 'brightness(3)' },
   diamond:   { transform: 'scale(1.9) rotate(45deg)', transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(3) saturate(2)' },
+  wildcard:  { transform: 'scale(1.5) rotate(360deg)', transition: 'all 250ms ease-out', filter: 'brightness(2) hue-rotate(90deg)' },
+  countdown: { transform: 'scale(2.5) rotate(30deg)', transition: 'all 180ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(3) saturate(2.5)' },
+  virus:     { transform: 'scale(0.2) rotate(-90deg)', transition: 'all 200ms cubic-bezier(0.55, 0.06, 0.68, 0.19)', filter: 'brightness(0.5) saturate(3)' },
+  portal:    { transform: 'scale(0.01) rotate(720deg)', transition: 'all 350ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(2) blur(2px)' },
+  catalyst:  { transform: 'scale(2.0) rotate(-15deg)', transition: 'all 220ms ease-out', filter: 'brightness(2.5) saturate(2)' },
 };
 
 /** Letters that get a rare glow effect — high Scrabble-value letters */
@@ -314,7 +365,7 @@ function stripGlowShadows(boxShadow: string): string {
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
-  selectionIndex, selectionTotal, onClick,
+  selectionIndex, selectionTotal, isLocked, countdown, zonePreview, onClick,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { enableGlowEffects } = useDevicePerformance();
@@ -352,6 +403,7 @@ export const BlastTile = memo(function BlastTile({
         (type === 'prism' && effectivePhase === 'clearing') ? 'blast-tile-prism-flash' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
         isComboPreview ? 'blast-combo-preview' : '',
+        isLocked ? 'blast-tile-locked' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',
         getPhaseClasses(effectivePhase, isSelected, selectionIndex, selectionTotal),
       ].filter(Boolean).join(' ')}
@@ -407,6 +459,39 @@ export const BlastTile = memo(function BlastTile({
           })}
         </span>
       )}
+      {type === 'countdown' && countdown != null && (
+        <span
+          data-testid="countdown-badge"
+          className={`absolute bottom-0.5 start-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
+            countdown <= 1 ? 'bg-red-500/80 text-white animate-pulse' : 'bg-orange-400/70 text-white'
+          }`}
+          aria-label={`${countdown} moves until explosion`}
+        >
+          {countdown}
+        </span>
+      )}
+      {isLocked && (
+        <span
+          data-testid="locked-overlay"
+          className="absolute inset-0 rounded-xl bg-white/30 backdrop-blur-[1px] pointer-events-none z-20 flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <span className="text-[clamp(0.6rem,2.5cqw,1rem)]">🔒</span>
+        </span>
+      )}
+      {zonePreview && isSelected && (
+        <span
+          data-testid="zone-preview"
+          className={[
+            'absolute inset-0 rounded-xl pointer-events-none z-20 border-2 border-dashed',
+            zonePreview === 'bomb' ? 'border-red-400/70 bg-red-500/10' : '',
+            zonePreview === 'lightning' ? 'border-yellow-400/70 bg-yellow-500/10' : '',
+            zonePreview === 'prism' ? 'border-purple-400/70 bg-purple-500/10' : '',
+            zonePreview === 'magnet' ? 'border-cyan-400/70 bg-cyan-500/10' : '',
+          ].filter(Boolean).join(' ')}
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }, (prev, next) =>
@@ -416,6 +501,7 @@ export const BlastTile = memo(function BlastTile({
   prev.isSelected === next.isSelected &&
   prev.isCleared === next.isCleared &&
   prev.hitsRemaining === next.hitsRemaining &&
+  prev.countdown === next.countdown &&
   prev.fallOffset === next.fallOffset &&
   prev.clearRotate === next.clearRotate &&
   prev.spawnOffset === next.spawnOffset &&
@@ -424,6 +510,8 @@ export const BlastTile = memo(function BlastTile({
   prev.isComboPreview === next.isComboPreview &&
   prev.selectionIndex === next.selectionIndex &&
   prev.selectionTotal === next.selectionTotal &&
+  prev.isLocked === next.isLocked &&
+  prev.zonePreview === next.zonePreview &&
   prev.onClick === next.onClick
 );
 

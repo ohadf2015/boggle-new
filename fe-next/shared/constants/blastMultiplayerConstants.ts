@@ -35,6 +35,11 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   mirror: 1.25,
   silver: 2,
   diamond: 2.5,
+  wildcard: 1,     // no score bonus — flexibility is the reward
+  countdown: 1.5,  // reward for defusing under pressure
+  virus: 0,        // 0 score — clearing virus is purely defensive
+  portal: 1.25,    // mild bonus for teleport path usage
+  catalyst: 1.5,   // reward for triggering upgrade effect
 };
 
 export const BLAST_RAINBOW_FLAT_BONUS = 3;

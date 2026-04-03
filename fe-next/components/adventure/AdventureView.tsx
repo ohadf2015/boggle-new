@@ -307,7 +307,7 @@ function AdventureView(): React.JSX.Element {
 
   return (
     <AdventureThemeProvider initialWorldId={selectedWorld || 1} initialLevel={selectedLevel || 1}>
-    <div className="min-h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
+    <div className="h-screen bg-neo-navy relative flex flex-col overflow-x-hidden">
       {(viewState === 'worldMap' || viewState === 'levelGrid') && (
         <AdventureViewHeader
           viewState={viewState}
@@ -348,7 +348,7 @@ function AdventureView(): React.JSX.Element {
               {!hasCompletions && (
                 <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} />
               )}
-              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} />
+              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} onContinue={selectLevel} />
             </AdaptiveMotion.div>
           )}
 

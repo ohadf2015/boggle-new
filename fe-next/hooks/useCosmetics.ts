@@ -23,6 +23,7 @@ interface UseCosmeticsInput {
   rankTier: string;
   streakDays: number;
   coins: number;
+  spendCoins?: (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<boolean>;
 }
 
 interface CosmeticWithStatus extends Cosmetic {
@@ -40,7 +41,11 @@ function syncCosmeticsToSupabase(
     .from('profiles')
     .update({ equipped_cosmetics: equipped, purchased_cosmetics: purchased })
     .eq('id', userId)
-    .then(() => {}, () => {});
+    .then(({ error }) => {
+      if (error) console.error('[Cosmetics] Supabase sync failed:', error.message);
+    }, (err) => {
+      console.error('[Cosmetics] Supabase sync error:', err);
+    });
 }
 
 export function useCosmetics(input: UseCosmeticsInput) {
@@ -116,12 +121,19 @@ export function useCosmetics(input: UseCosmeticsInput) {
   );
 
   const purchaseCosmetic = useCallback(
-    (cosmeticId: string): boolean => {
+    async (cosmeticId: string): Promise<boolean> => {
       const cosmetic = COSMETICS.find((c) => c.id === cosmeticId);
       if (!cosmetic) return false;
       if (cosmetic.unlockCondition.type !== 'purchase') return false;
-      if (input.coins < cosmetic.unlockCondition.cost) return false;
+      const cost = cosmetic.unlockCondition.cost;
+      if (input.coins < cost) return false;
       if (purchasedIds.includes(cosmeticId)) return false;
+
+      // Deduct coins via CoinContext
+      if (input.spendCoins) {
+        const success = await input.spendCoins(cost, 'cosmetic_purchase', { cosmeticId });
+        if (!success) return false;
+      }
 
       const next = [...purchasedIds, cosmeticId];
       setPurchasedIds(next);
@@ -129,7 +141,7 @@ export function useCosmetics(input: UseCosmeticsInput) {
       if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, equippedIds, next);
       return true;
     },
-    [input.coins, purchasedIds, isAuthenticated, user, equippedIds]
+    [input, purchasedIds, isAuthenticated, user, equippedIds]
   );
 
   const getCosmeticsByCategory = useCallback(

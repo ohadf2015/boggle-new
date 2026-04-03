@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame, Bell, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,7 +11,8 @@ import MusicControls from '../MusicControls';
 import { CoinBalance } from '../CoinBalance';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
-import { NotificationBell } from '../notifications/NotificationBell';
+import { NotificationItem } from '../notifications/NotificationItem';
+import type { NotificationData } from '../notifications/types';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import Avatar from '../Avatar';
@@ -19,6 +20,7 @@ import { getStoredCustomAvatar } from '../../utils/profileStorage';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
+import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -62,7 +64,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
     const engagementStatus = useEngagementStatus();
     const { missions, completedCount, isGrandSlam } = useDailyMissions();
-    const { unreadCount: notificationCount } = useRealtimeNotifications();
+    const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead } = useRealtimeNotifications();
+    const [showAllNotifications, setShowAllNotifications] = useState(false);
+    const { isCrazyGames } = useCrazyGamesAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     // Aggregate badge: gifts + notifications + completed quests
@@ -125,25 +129,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
     return (
         <>
-            {/* Mobile: Avatar + Volume + Notifications + Hamburger */}
+            {/* Mobile: Volume + Auth + Hamburger */}
             <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0">
-                <Link
-                    href={`/${language}/profile`}
-                    className="flex-shrink-0 rounded-full border-2 border-neo-black shadow-hard-sm"
-                    aria-label={t('profile.viewProfile')}
-                >
-                    <Avatar
-                        customAvatar={avatarConfig}
-                        avatarImage={profile?.avatar_image}
-                        userId={user?.id}
-                        size="md"
-                    />
-                </Link>
                 <MusicControls />
-                {isAuthenticated && <NotificationBell />}
 
-                {/* Sign In button for guests */}
-                {!isAuthenticated && !loading && (
+                {/* Unified auth button for guests (hidden on CrazyGames) */}
+                {!isAuthenticated && !loading && !isCrazyGames && (
                     <button
                         onClick={onSignIn}
                         className={cn(
@@ -373,6 +364,69 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             {completedCount}/{missions.length}
                                         </span>
                                     </Link>
+                                )}
+
+                                {/* ── Notifications Section (in-menu) ── */}
+                                {isAuthenticated && (notifications as NotificationData[]).length > 0 && (
+                                    <div className="mx-4 mt-2">
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <div className="flex items-center gap-2">
+                                                <Bell className="w-3.5 h-3.5 text-neo-yellow" />
+                                                <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
+                                                    {t('notifications.title')}
+                                                </span>
+                                                {notificationCount > 0 && (
+                                                    <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-yellow rounded-full border border-black text-[9px] font-black text-black">
+                                                        {notificationCount}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {notificationCount > 0 && (
+                                                <button
+                                                    onClick={() => markAllAsRead()}
+                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-yellow transition-colors font-bold"
+                                                >
+                                                    <Check size={10} />
+                                                    {t('notifications.markAllRead')}
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className={cn(
+                                            "rounded-neo border-2 border-neo-white/10 overflow-hidden",
+                                            "bg-neo-white/5"
+                                        )}>
+                                            {(showAllNotifications
+                                                ? (notifications as NotificationData[])
+                                                : (notifications as NotificationData[]).slice(0, 3)
+                                            ).map((n) => (
+                                                <NotificationItem
+                                                    key={n.id}
+                                                    notification={n}
+                                                    onClick={() => {
+                                                        if (n.notification_type === 'gift') {
+                                                            handleOpenGift();
+                                                        } else if (n.action_url) {
+                                                            closeMenu();
+                                                            const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
+                                                            window.location.href = url;
+                                                        }
+                                                    }}
+                                                    onMarkAsRead={() => markAsRead(n.id)}
+                                                />
+                                            ))}
+                                        </div>
+                                        {(notifications as NotificationData[]).length > 3 && (
+                                            <button
+                                                onClick={() => setShowAllNotifications(!showAllNotifications)}
+                                                className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                            >
+                                                {showAllNotifications
+                                                    ? t('common.showLess')
+                                                    : t('notifications.viewAll') + ` (${(notifications as NotificationData[]).length})`
+                                                }
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
 
                                 {/* ── Menu Items (Staggered) ── */}

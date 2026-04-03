@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type Cosmetic, RARITY_COLORS } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
@@ -16,14 +17,29 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
   const { t } = useLanguage();
   const rarityClass = RARITY_COLORS[cosmetic.rarity];
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t(cosmetic.name)}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className={`relative w-full max-w-sm bg-neo-navy border-neo rounded-neo p-5 shadow-hard ${rarityClass}`}>
         {/* Close */}
         <button
           onClick={onClose}
-          aria-label="Close"
-          className="absolute top-2 right-2 text-neo-cream hover:text-neo-lime"
+          aria-label={t('cosmetics.close')}
+          className="absolute top-2 end-2 text-neo-cream hover:text-neo-lime"
         >
           <X className="w-5 h-5" />
         </button>

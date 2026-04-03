@@ -44,9 +44,12 @@ describe('WaveConfig movesAllowed', () => {
     expect(getWaveConfig(6).movesAllowed).toBe(14);
   });
 
-  it('wave 7+ allows 12 moves', () => {
+  it('wave 7 allows 12 moves', () => {
     expect(getWaveConfig(7).movesAllowed).toBe(12);
-    expect(getWaveConfig(10).movesAllowed).toBe(12);
+  });
+
+  it('late waves (10+) reduce moves for difficulty', () => {
+    expect(getWaveConfig(10).movesAllowed).toBe(10);
   });
 });
 

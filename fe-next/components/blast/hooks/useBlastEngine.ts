@@ -6,6 +6,8 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { generateTileStates } from '../utils/blastTileGeneration';
 import { guaranteeObjectiveTiles } from '../utils/blastObjectiveGuarantee';
 import { processTilesForWord } from '../utils/clearTilesProcessor';
+import { applyBetweenTurnEffects } from '../utils/blastTileEffects';
+import { computeThawedCells } from './blastCellFilterLogic';
 import { computeGravityResult, type GravityResult } from '../utils/blastGravity';
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
@@ -42,6 +44,10 @@ export interface WordSubmitResult {
   clearedTiles: Array<{ row: number; col: number; type: BlastTileType }>;
   explosions: Array<{ row: number; col: number; type: string }>;
   bonusMoves: number;
+  /** Countdown tiles that exploded this turn (penalty applied) */
+  countdownExplosions: Array<{ row: number; col: number }>;
+  /** Tiles newly infected by virus spread */
+  virusInfections: Array<{ row: number; col: number }>;
 }
 
 export interface CascadeResult {
@@ -240,7 +246,21 @@ export function useBlastEngine(
       }
     }
 
-    setTileStates(next);
+    // Thaw ice/frozen tiles adjacent to the word path
+    const thawedCells = computeThawedCells(next, path);
+    const tilesAfterThaw = thawedCells.length > 0
+      ? next.map(row => row.map(tile => {
+          if (thawedCells.some(c => c.row === tile.row && c.col === tile.col)) {
+            return { ...tile, isThawed: true };
+          }
+          return tile;
+        }))
+      : next;
+
+    // Between-turn effects: countdown tick + virus spread
+    const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
+
+    setTileStates(tilesAfterThaw);
 
     setGameState(prev => {
       const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
@@ -250,7 +270,7 @@ export function useBlastEngine(
       }
       return {
         ...prev,
-        score: prev.score + totalScore,
+        score: prev.score + totalScore - betweenTurn.penalty,
         wordsFound: [...prev.wordsFound, word],
         tilesCleared: prev.tilesCleared + newlyClearedCount,
         movesRemaining: newMovesRemaining,
@@ -265,11 +285,13 @@ export function useBlastEngine(
       .map(cell => ({ row: cell.row, col: cell.col, type: next[cell.row][cell.col].type }));
 
     return {
-      score: totalScore,
+      score: totalScore - betweenTurn.penalty,
       combos: detectedCombos,
       clearedTiles,
       explosions: newExplosions.map(e => ({ row: e.row, col: e.col, type: e.type })),
       bonusMoves: bonusMoveCount,
+      countdownExplosions: betweenTurn.countdownExplosions,
+      virusInfections: betweenTurn.virusInfections,
     };
   }, [gridSize, currentWave]);
 

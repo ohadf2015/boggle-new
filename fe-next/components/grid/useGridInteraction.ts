@@ -37,6 +37,8 @@ interface UseGridInteractionProps {
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
   language?: Language;
   disableLetterKeyInput?: boolean;
+  /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles) */
+  cellFilter?: (row: number, col: number) => boolean;
 }
 
 interface UseGridInteractionReturn {
@@ -76,6 +78,7 @@ export function useGridInteraction({
   onSingleTapDetected,
   language = 'en',
   disableLetterKeyInput = false,
+  cellFilter,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -247,6 +250,8 @@ export function useGridInteraction({
     velocityTrackerRef.current.start(touch.clientX, touch.clientY);
     lastDirectionRef.current = null;
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
+    // Check cell filter — skip if cell is not selectable (e.g. ice tile)
+    if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
     // Init drag ref + DOM class (no React re-render during drag)
     const cell = { row: rowIndex, col: colIndex, letter };
     dragSelectionRef.current = [cell];
@@ -255,7 +260,7 @@ export function useGridInteraction({
     clearAllDragClasses();
     toggleDragClass(rowIndex, colIndex, true);
     vibrateCellTap(fireRoundActive);
-  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass, setSelectedCells]);
+  }, [interactive, fireRoundActive, cancelFadeOut, clearAllDragClasses, toggleDragClass, setSelectedCells, cellFilter]);
 
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
     velocityTrackerRef.current.recordPosition(touchX, touchY);
@@ -288,6 +293,8 @@ export function useGridInteraction({
       return;
     }
     if (isAdjacentCell(lastCell, currentCell)) {
+      // Check cell filter — skip if cell is blocked (e.g. unthawed ice)
+      if (cellFilter && !cellFilter(currentCell.row, currentCell.col)) return;
       const newCount = dragCells.length + 1;
       const prevTier = getSelectionEscalation(0, dragCells.length, comboLevel).tier;
       const newTier = getSelectionEscalation(0, newCount, comboLevel).tier;
@@ -302,7 +309,7 @@ export function useGridInteraction({
         vibrateCellDrag(fireRoundActive, newTier);
       }
     }
-  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells]);
+  }, [fireRoundActive, comboLevel, getCellAtPos, toggleDragClass, setSelectedCells, cellFilter]);
 
   const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
     if (!interactive || !isTouchingRef.current) return;
@@ -383,6 +390,7 @@ export function useGridInteraction({
     submitWord,
     fireRoundActive,
     setIsClickSelectMode,
+    cellFilter,
   });
 
   const handleMouseDown = useCallback((
@@ -394,11 +402,19 @@ export function useGridInteraction({
         isTouchingRef.current = true;
         startPosRef.current = { x: event.clientX, y: event.clientY };
         hasMovedRef.current = false;
+        isDraggingRef.current = false;
+        // Init drag ref so processTouchMove can read from it during mouse drag
+        cancelFadeOut();
+        const cell = { row: rowIndex, col: colIndex, letter };
+        dragSelectionRef.current = [cell];
+        clearAllDragClasses();
+        toggleDragClass(rowIndex, colIndex, true);
+        velocityTrackerRef.current.start(event.clientX, event.clientY);
       }
       return;
     }
     handleTouchStart(rowIndex, colIndex, letter, event);
-  }, [handleCellClick, handleTouchStart, selectedCells.length, isClickSelectMode]);
+  }, [handleCellClick, handleTouchStart, selectedCells.length, isClickSelectMode, cancelFadeOut, clearAllDragClasses, toggleDragClass]);
 
   const pendingMouseRef = useRef<{ x: number; y: number } | null>(null);
   const mouseRafIdRef = useRef<number | null>(null);

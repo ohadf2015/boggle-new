@@ -7,8 +7,8 @@
 import { useState, useCallback, useRef } from 'react';
 import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import type { BlastGameConfig } from '@/components/blast/types';
-import { generateBlastLetter, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
 import { generateTileStates, nextTileUid } from '@/components/blast/utils/blastTileGeneration';
+import { generateSeededLetterGrid } from '@/components/blastEngine/utils/blastWordSeeder';
 import type { Language } from '@/shared/types/game';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -51,19 +51,6 @@ export interface GameLoopState {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────
-
-function generateLetterGrid(rows: number, cols: number, language: Language, seed: number): string[][] {
-  const rng = createSeededRandom(seed);
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => generateBlastLetter(language, 1.0, rng)),
-  );
-}
-
-function generateRandomLetter(language: Language): string {
-  const pools: Record<string, string> = { en: 'EEEEEEAAAAIIIOOONNNSSSRRRTTTTLLLCCCDDDUUUGGGBBMMPPFFHHVVWWYYKJXQZ', he: 'ייייווווההההללללננננממממרררראאאאתתתששששכככבבבדדדעעעגגצצפפפזחטס', sv: 'EEEEEEAAAAIIIOONNNSSRRTTLLDDUUGGKKMMBBPPFFHHVVJJYYCCXXZZWWQQ', ja: 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん', es: 'EEEEEEAAAAIIIOOONNNSSSRRRTTTLLLDDDCCUUUBBMMPPFFGGHHVVJJYYZZKQWX' };
-  const pool = pools[language] || pools.en;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
 
 function isAdjacent(a: { row: number; col: number }, b: { row: number; col: number }): boolean {
   const dr = Math.abs(a.row - b.row);
@@ -205,7 +192,7 @@ function expandSpecialTiles(
 }
 
 function applyGravity(
-  grid: string[][], tileStates: BlastTileState[][], size: number, language: Language,
+  grid: string[][], tileStates: BlastTileState[][], size: number, _language: Language,
 ): { grid: string[][]; tileStates: BlastTileState[][] } {
   const newGrid = grid.map(r => [...r]);
   const newStates = tileStates.map(r => r.map(s => ({ ...s })));
@@ -215,17 +202,16 @@ function applyGravity(
     for (let row = size - 1; row >= 0; row--) {
       if (!newStates[row][col].isCleared) remaining.push({ letter: newGrid[row][col], state: newStates[row][col] });
     }
-    // Place surviving tiles from bottom up, then fill top with new tiles
+    // Place surviving tiles from bottom up; empty top cells stay cleared (no refill)
     for (let row = size - 1; row >= 0; row--) {
       const item = remaining.shift();
       if (item) {
-        // Existing tile falls — preserve its uid
         newGrid[row][col] = item.letter;
         newStates[row][col] = { ...item.state, row, col, isCleared: false };
       } else {
-        // New tile spawns at top — gets a fresh uid
-        newGrid[row][col] = generateRandomLetter(language);
-        newStates[row][col] = { uid: nextTileUid(), row, col, type: 'standard', isCleared: false, activationEffect: null, hitsRemaining: 0 };
+        // Empty cell — stays cleared so the board progressively empties
+        newGrid[row][col] = '';
+        newStates[row][col] = { uid: nextTileUid(), row, col, type: 'standard', isCleared: true, activationEffect: null, hitsRemaining: 0 };
       }
     }
   }
@@ -238,7 +224,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
   const size = config.gridSize;
   const totalMoves = movesAllowed ?? (25 - Math.min(wave, 5) * 2);
 
-  const [letterGrid, setLetterGrid] = useState<string[][]>(() => generateLetterGrid(size, size, language, Date.now()));
+  const [letterGrid, setLetterGrid] = useState<string[][]>(() => generateSeededLetterGrid(size, language, Date.now()));
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() =>
     generateTileStates(size, config.specialTileChance, Date.now(), config.customDistribution, wave),
   );
@@ -400,7 +386,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
   // ─── Reset ──────────────────────────────────────────────────────────
 
   const reset = useCallback(() => {
-    const newGrid = generateLetterGrid(size, size, language, Date.now());
+    const newGrid = generateSeededLetterGrid(size, language, Date.now());
     const newStates = generateTileStates(size, config.specialTileChance, Date.now(), config.customDistribution, wave);
     setLetterGrid(newGrid);
     setTileStates(newStates);

@@ -1,5 +1,6 @@
 import {
   SPECIAL_TILE_DISTRIBUTION,
+  COUNTDOWN_INITIAL_MOVES,
   type BlastTileState,
   type BlastTileType,
 } from '../types';
@@ -101,8 +102,29 @@ export function generateTileStates(
         activationEffect: null,
         hitsRemaining: getInitialHitsRemaining(type),
         ...(innerType !== undefined ? { innerType } : {}),
+        ...(type === 'countdown' ? { countdown: COUNTDOWN_INITIAL_MOVES } : {}),
       };
     }
+  }
+
+  // Pair portal tiles — each pair shares a portalPairId
+  const portalTiles: BlastTileState[] = [];
+  for (const row of tiles) {
+    for (const tile of row) {
+      if (tile.type === 'portal') portalTiles.push(tile);
+    }
+  }
+  let pairIdx = 0;
+  for (let i = 0; i + 1 < portalTiles.length; i += 2) {
+    const pairId = `portal-${pairIdx++}`;
+    portalTiles[i].portalPairId = pairId;
+    portalTiles[i + 1].portalPairId = pairId;
+  }
+  // Odd portal out — convert to standard (can't have unpaired portal)
+  if (portalTiles.length % 2 === 1) {
+    const orphan = portalTiles[portalTiles.length - 1];
+    orphan.type = 'standard';
+    orphan.hitsRemaining = 0;
   }
 
   return tiles;
