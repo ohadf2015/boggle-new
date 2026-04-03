@@ -255,7 +255,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   return (
     <div className={cn(
-      'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
+      'flex-1 flex flex-col min-h-0 overflow-x-clip overflow-y-auto transition-colors duration-300',
       gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
     )}>
 

@@ -85,7 +85,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             <div
               className={cn(
                 'h-full rounded-full',
-                'bg-gradient-to-r from-neo-lime to-neo-orange',
+                'bg-gradient-to-r from-neo-lime to-neo-pink',
                 'transition-all duration-500 ease-out'
               )}
               style={{ width: `${progressPercent}%` }}

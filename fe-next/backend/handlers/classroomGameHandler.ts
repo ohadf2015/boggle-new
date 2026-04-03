@@ -17,6 +17,7 @@ import {
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
+import { getRedisClient } from '../redisClient.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -282,9 +283,13 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     const leavePayload = leaveValidation.data as { gameCode: string; userId: string };
 
-    // Auth check: userId must match authenticated user if present
+    // Auth check: authentication required, and userId must match authenticated user
     const leaveAuthUserId = getAuthUserId(socket);
-    if (leaveAuthUserId && leaveAuthUserId !== leavePayload.userId) {
+    if (!leaveAuthUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+    if (leaveAuthUserId !== leavePayload.userId) {
       socket.emit('classroomGameError', { error: 'User ID does not match authenticated user' });
       return;
     }
@@ -435,6 +440,12 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
 
+    const classroomGameEndAuthUserId = getAuthUserId(socket);
+    if (!classroomGameEndAuthUserId) {
+      socket.emit('classroomGameError', { error: 'Authentication required' });
+      return;
+    }
+
     try {
       const game = await getClassroomGame(payload.gameCode);
       if (!game) {
@@ -466,6 +477,18 @@ async function persistClassroomGameScores(
   playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }>
 ): Promise<void> {
   if (!game) return;
+
+  // Idempotency guard: only persist once per game using Redis SET NX
+  const redis = getRedisClient();
+  if (redis) {
+    const idempotencyKey = `classroom_game_persisted:${game.gameCode}`;
+    // Returns 1 if key was set (first time), 0 if already existed
+    const acquired = await redis.set(idempotencyKey, '1', 'EX', 86400, 'NX');
+    if (!acquired) {
+      logger.info('CLASSROOM_GAME', `Scores for game ${game.gameCode} already persisted — skipping duplicate`);
+      return;
+    }
+  }
 
   const supabase = getSupabase();
   if (!supabase) {

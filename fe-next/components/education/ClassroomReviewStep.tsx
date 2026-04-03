@@ -1,4 +1,4 @@
-import { Users, Copy, Check, ChevronDown, ChevronUp, LayoutGrid, Search, Zap } from 'lucide-react';
+import { Users, Copy, Check, ChevronDown, ChevronUp, LayoutGrid, Search, Zap, X } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -155,7 +155,7 @@ export function ClassroomReviewStep({
             </div>
             <div>
               <p className="text-neo-white/50 text-xs mb-1">{t('education.template.lateJoin')}</p>
-              <p className="text-neo-white font-bold">{settings.allowLateJoin ? '✓' : '✗'}</p>
+              <p className="text-neo-white font-bold">{settings.allowLateJoin ? <Check className="w-4 h-4 inline" /> : <X className="w-4 h-4 inline" />}</p>
             </div>
           </div>
 

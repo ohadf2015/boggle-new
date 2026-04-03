@@ -342,11 +342,7 @@ function AdventureView(): React.JSX.Element {
         <AdaptiveAnimatePresence mode="wait">
           {viewState === 'worldMap' && (
             <AdaptiveMotion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
-              {/* First-time player welcome banner */}
-              {!hasCompletions && (
-                <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} />
-              )}
-              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} onContinue={selectLevel} />
+              <WorldMap totalStars={totalStars} completions={completions} onWorldSelect={selectWorld} masteryTiers={masteryTiers} onContinue={selectLevel} welcomeBanner={!hasCompletions ? <AdventureWelcomeBanner t={t} onSelectWorld={() => selectWorld(1)} /> : undefined} />
             </AdaptiveMotion.div>
           )}
 
@@ -429,7 +425,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="absolute top-2 inset-x-4 z-30 bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
+      className="relative bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
     >
       <button
         onClick={() => setDismissed(true)}

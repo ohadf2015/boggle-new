@@ -105,7 +105,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
     <AdaptiveMotion.div
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-hidden"
+      className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-visible"
       style={{
         background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
       }}

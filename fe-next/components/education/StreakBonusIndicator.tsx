@@ -14,6 +14,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -125,7 +126,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
             }}
             className={sizeConfig.emoji}
           >
-            🔥
+            <Flame className="w-4 h-4" />
           </motion.span>
           <span className={cn(
             'font-neo-display font-black text-neo-black',
@@ -179,7 +180,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         }}
         className={sizeConfig.emoji}
       >
-        🔥
+        <Flame className="w-4 h-4" />
       </motion.span>
       <span className="font-neo-display font-black text-neo-orange">
         {currentStreak}

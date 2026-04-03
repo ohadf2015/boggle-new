@@ -204,11 +204,19 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     }
   }, []);
 
-  // Dismiss a notification — mark as read and remove from local list
+  // Dismiss a notification — mark as read (keeps it in history)
   const dismissNotification = useCallback(async (notificationId: string) => {
-    await markNotificationRead(notificationId);
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    const success = await markNotificationRead(notificationId);
+    if (success) {
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId
+            ? { ...n, read: true, read_at: new Date().toISOString() }
+            : n
+        )
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    }
   }, []);
 
   // Clear the latest notification (called after toast auto-dismisses)

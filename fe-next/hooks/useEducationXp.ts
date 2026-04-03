@@ -163,11 +163,15 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 
   const recordXpMutation = useMutation({
     mutationFn: async (params: { xpAmount: number; lessonId: string; activityType: string }) => {
-      await fetch('/api/education/record-xp', {
+      const response = await fetch('/api/education/record-xp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
       });
+      if (!response.ok) {
+        const text = await response.text().catch(() => response.statusText);
+        throw new Error(`record-xp failed (${response.status}): ${text}`);
+      }
     },
     onSuccess: () => setPendingUpdate(null),
     onError: (err) => {
@@ -200,7 +204,17 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 
       try {
         // Validate session type
-        const validTypes = ['flashcard', 'solo_board', 'lesson_completion'];
+        const validTypes = [
+          'flashcard',
+          'solo_board',
+          'lesson_completion',
+          'matching',
+          'spelling',
+          'blitz',
+          'duel_async',
+          'duel_realtime',
+          'daily_challenge',
+        ];
         if (!validTypes.includes(session.type)) {
           throw new Error(`Invalid session type: ${session.type}`);
         }
@@ -218,7 +232,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
           ? getStreakMilestoneMessage(milestoneDay)
           : null;
 
-        // Calculate new total XP
+        // Calculate new total XP (use functional update to avoid stale closure)
         const newTotalXp = totalXp + xpResult.totalXp;
         const oldLevel = currentLevel;
         const newLevel = getLevelFromXp(newTotalXp);
@@ -226,8 +240,8 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         // Check for level up
         const levelUpResult: LevelUpResult = checkLevelUp(oldLevel, newLevel);
 
-        // Update state (optimistic update)
-        setTotalXp(newTotalXp);
+        // Update state (functional update avoids stale closure race)
+        setTotalXp(prev => prev + xpResult.totalXp);
         setCurrentLevel(newLevel);
 
         // Create pending update for database persistence

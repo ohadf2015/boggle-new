@@ -362,6 +362,7 @@ const sv = {
     "errorOccurred": "Ett fel uppstod",
     "creating": "Skapar...",
     "guest": "Gäst",
+    "unknown": "Okänd",
     "back": "Tillbaka",
     "backHome": "Tillbaka hem",
     "backToHome": "Tillbaka till startsidan",
@@ -8103,835 +8104,6 @@ const sv = {
     }
   },
   "education": {
-    "badges": {
-      "wordExplorer": "Ordutforskare",
-      "vocabMaster": "Ordmästare",
-      "speedScholar": "Snabblärd",
-      "locked": "Låst"
-    },
-    "wordOfTheDay": {
-      "title": "Dagens Ord",
-      "learnMore": "Läs Mer"
-    },
-    "landing": {
-      "title": "Utbildningsläge",
-      "teacher": "Jag är lärare",
-      "teacherDesc": "Skapa klassrum, bygg ordförrådslektioner och spåra elevernas framsteg",
-      "student": "Jag är elev",
-      "studentDesc": "Gå med i ditt klassrum och öva ordförrådslektioner",
-      "signInRequired": "Inloggning krävs",
-      "tagline": "Där lärande möter lek",
-      "socialProof": "Gå med i 1000+ klassrum världen över som förbättrar sitt ordförråd tillsammans!",
-      "teacherFeature1": "Skapa anpassade ordlistor",
-      "teacherFeature2": "Hantera flera klassrum",
-      "teacherFeature3": "Liveanalys av prestationer",
-      "studentFeature1": "Gå med i interaktiva klassrum",
-      "studentFeature2": "Roliga ordförrådsutmaningar",
-      "studentFeature3": "Veckovisa topplistor",
-      "teacherCta": "Lärarinloggning krävs",
-      "studentCta": "Gå till elevhubben",
-      "premium": "Premium",
-      "freeAccess": "Fri tillgång",
-      "duelTeaser": {
-        "headline": "Utmana en klasskamrat",
-        "subtext": "Spela en mot en och klättra i klassrankingen",
-        "cta": "Starta en Duel →"
-      },
-      "roleTeacher": "Lärare",
-      "roleStudent": "Elev",
-      "roleGuest": "Inloggad",
-      "goToDashboard": "Gå till instrumentpanel",
-      "startGame": "Starta ett spel"
-    },
-    "template": {
-      "settings": "Inställningar",
-      "create": "Skapa mall",
-      "edit": "Redigera mall",
-      "description": "Konfigurera spelinställningar för denna lektion",
-      "name": "Mallnamn",
-      "namePlaceholder": "t.ex. Snabb repetition",
-      "nameRequired": "Mallnamn krävs",
-      "timer": "Speltid",
-      "difficulty": "Brädstorlek",
-      "boardSize": "Brädstorlek",
-      "boardPreview": "Brädet blir",
-      "minWordLength": "Minsta ordlängd",
-      "allowLateJoin": "Tillåt sen anslutning",
-      "lateJoin": "Sen anslutning",
-      "allowLateJoinDesc": "Spelare kan ansluta efter spelets start",
-      "setDefault": "Ange som standard",
-      "setDefaultDesc": "Använd dessa inställningar som standard för denna lektion",
-      "save": "Spara mall",
-      "saving": "Sparar...",
-      "saved": "Mall sparad!",
-      "startGame": "Starta spel",
-      "roomSettings": "Spelinställningar"
-    },
-    "practice": {
-      "title": "Övningsläge",
-      "flashcards": "Ordkort",
-      "flashcardsDesc": "Repetera ord med kort",
-      "soloBoard": "Soloövning",
-      "soloBoardDesc": "Hitta ord i din egen takt",
-      "wordList": "Ordlista",
-      "wordListDesc": "Se alla glosor",
-      "warmup": "Uppvärmning",
-      "warmupDesc": "Öva med ledtrådar",
-      "matching": "Ordmatchning",
-      "matchingDesc": "Dra och matcha ord med deras definitioner",
-      "spelling": "Stavningsutmaning",
-      "spellingDesc": "Skriv det rätta ordet utifrån dess definition",
-      "blitz": "Tidsblixt",
-      "blitzDesc": "60-sekunders snabbrunda — hur många klarar du?",
-      "gotIt": "Kunde!",
-      "dontKnow": "Kunde inte",
-      "complete": "Övningen klar!",
-      "sessionComplete": "Sessionen klar!",
-      "sessionsCompleted": "sessioner avklarade",
-      "progress": "Din framsteg",
-      "wordsFound": "Hittade ord",
-      "cardsReviewed": "Granskade kort",
-      "accuracy": "Precision",
-      "timeSpent": "Tid spenderad",
-      "time": "Tid",
-      "word": "Ord",
-      "wordCount": "ord",
-      "definition": "Definition",
-      "tapToFlip": "Tryck för att vända",
-      "tapCard": "Tryck på kortet för att se svaret",
-      "chooseAnswer": "Välj ditt svar",
-      "finish": "Avsluta",
-      "hints": "Ledtrådar",
-      "hintsUsed": "Ledtradar anvanda",
-      "hint": "Ledtråd",
-      "maxStreak": "Basta svit",
-      "searchWords": "Sök ord...",
-      "noResults": "Inga matchande ord hittades",
-      "noWords": "Inga ord tillgängliga",
-      "noDefinition": "Ingen definition tillgänglig",
-      "quickPractice": "Snabböva",
-      "moreOptions": "Fler alternativ",
-      "tryAgain": "Försök igen",
-      "back": "Tillbaka",
-      "correctCount": "rätt",
-      "encouragement0": "Fortsätt försöka! Övning ger färdighet.",
-      "encouragement50": "Bra jobbat! Fortsätt öva.",
-      "encouragement80": "Snyggt! Nästan där.",
-      "encouragement100": "Perfekt! Du kan dessa ord nu.",
-      "swipeHint": "Svep för att svara",
-      "swipeExplain": "Svep höger för 'Kunde', vänster för 'Kunde inte'",
-      "matchingWords": "Ord",
-      "matchingDefinitions": "Definitioner",
-      "matchPairs": "Matcha paren",
-      "pairsMatched": "par matchade",
-      "dragToMatch": "Dra ett ord till dess definition",
-      "tapToSelect": "Tryck på ett ord, sedan på dess definition",
-      "correctMatch": "Rätt!",
-      "wrongMatch": "Försök igen",
-      "spellTheWord": "Stava ordet",
-      "typeTheWord": "Skriv ordet som matchar denna definition",
-      "correctSpelling": "Rätt!",
-      "incorrectSpelling": "Det rätta ordet är:",
-      "blitzTitle": "Tidsblixt",
-      "getReady": "Gör dig redo!",
-      "go": "KÖR!",
-      "timesUp": "Tiden är ute!",
-      "wordsFound": "Hittade ord",
-      "maxCombo": "maxkombo",
-      "blitzScore": "Blixtpoäng",
-      "needsMoreWords": "Denna lektion behöver minst 4 ord med definitioner för detta läge",
-      "combo": "Kombo",
-      "submit": "Skicka",
-      "typeAnswer": "Skriv ditt svar",
-      "typeWord": "Skriv ordet...",
-      "correct": "Rätt!",
-      "incorrect": "Fel",
-      "correctAnswer": "Rätt svar:",
-      "streak": "Svit",
-      "difficulty": {
-        "easy": "Lätt",
-        "medium": "Medel",
-        "hard": "Svår"
-      },
-      "mastery": {
-        "not_started": "Ej påbörjad",
-        "started": "Påbörjad",
-        "practicing": "Övar",
-        "mastered": "Bemästrad"
-      },
-      "points": "poäng",
-      "vocabularyWords": "Ordförrådsord",
-      "vocabularyWordsFound": "Ordförrådsord hittade:",
-      "vocabulary": "Ordförråd",
-      "vocab": "ordförråd",
-      "foundWordsLabel": "Hittade ord:",
-      "more": "mer",
-      "allVocabFound": "Alla ordförrådsord hittade!",
-      "total": "totalt",
-      "canEmbed": "kan bädda in",
-      "trackOnly": "enbart spårning"
-    },
-    "duels": {
-      "addWord": "Lägg till ord",
-      "backToLobby": "Tillbaka till lobbyn",
-      "challengeClassmate": "Utmana en klasskompis!",
-      "draw": "Oavgjort!",
-      "draws": "Oavgjorda",
-      "duelHistory": "Duellhistorik",
-      "findWords": "Hitta ord och samla poäng!",
-      "loading": "Laddar duell...",
-      "losses": "Förluster",
-      "noDuelsYet": "Inga dueller ännu. Utmana nån!",
-      "playDuel": "Spela duell",
-      "recentDuels": "Senaste duellerna",
-      "scoreToBeat": "Poäng att slå",
-      "submitScore": "Skicka poäng",
-      "typeWord": "Skriv ett ord...",
-      "vs": "MOT",
-      "waitingForOpponent": "Väntar på motståndare...",
-      "winRate": "Vinstprocent",
-      "wins": "Vinster",
-      "winStreak": "Vinsvit",
-      "wordsAccepted": "Godkända ord",
-      "wordsRejected": "Nekade ord",
-      "xpEarned": "Intjänad XP",
-    "you": "Du",
-      "youLose": "Du förlorade!",
-      "youWin": "Du vann!"
-    },
-    "student": {
-      "dashboard": "Mina lektioner",
-      "joinClassroom": "Gå med i klassrum",
-      "enterCode": "Ange klassrumskod",
-      "progress": "Din framsteg",
-      "startPractice": "Börja öva",
-      "noLessons": "Inga lektioner tilldelade ännu",
-      "askTeacher": "Be din lärare om en klassrumskod",
-      "lessonsAssigned": "Tilldelade lektioner",
-      "join": {
-        "title": "Gå med i en klass",
-        "subtitle": "Ange din lärares kod",
-        "codeLabel": "Klasskod",
-        "codeHint": "6 tecken från din lärare",
-        "button": "Gå med",
-        "joining": "Går med...",
-        "pasteButton": "Klistra in",
-        "success": "Du är med!",
-        "invalidCode": "Den koden fungerar inte",
-        "alreadyMember": "Du är redan med i den här klassen!",
-        "codePasted": "Inklistrat!",
-        "emptyClipboard": "Inget att klistra in",
-        "clipboardError": "Kunde inte hämta urklipp"
-      },
-      "keepGoing": "Fortsätt öva för att nå nästa nivå!",
-      "newTitleUnlocked": "Ny titel upplåst!",
-      "continue": "Fortsätt",
-      "mastery": {
-        "perfectFlashcard": "Perfekt! Du behärskar alla {count} ord!",
-        "learnedWords": "Du lärde dig {count} ord!",
-        "discoveredVocab": "Du upptäckte {count} nya ord!",
-        "greatPractice": "Bra övning! Fortsätt hitta ord!",
-        "lessonMastered": "Lektion behärskad! Du kan dessa ord!",
-        "keepPracticing": "Bra jobbat! Fortsätt öva för att behärska lektionen."
-      },
-      "streakMilestone": {
-        "week": "1 VECKAS SVIT!",
-        "weekDesc": "En hel vecka av lärande!",
-        "twoWeeks": "2 VECKORS SVIT!",
-        "twoWeeksDesc": "Två veckors engagemang!",
-        "month": "MÅNADSMASTER!",
-        "monthDesc": "30 dagar av excellens!"
-      }
-    },
-    "xp": {
-      "level": "Nivå",
-      "maxLevel": "Max nivå",
-      "nextLevel": "Nästa nivå",
-      "xpGained": "Intjänad XP",
-      "totalXp": "Total XP",
-      "progress": "Framsteg",
-      "levelUp": "Nivå upp!",
-      "newLevel": "Du nådde nivå",
-      "streak": "Dagsvit",
-      "streakBonus": "Svitbonus",
-      "keepGoing": "Fortsätt öva för att nå nästa nivå!",
-      "newTitleUnlocked": "Ny titel upplåst!",
-      "continue": "Fortsätt",
-      "mastery": {
-        "perfectFlashcard": "Perfekt! Du behärskar alla {count} ord!",
-        "learnedWords": "Du lärde dig {count} ord!",
-        "discoveredVocab": "Du upptäckte {count} nya ord!",
-        "greatPractice": "Bra övning! Fortsätt hitta ord!",
-        "lessonMastered": "Lektion behärskad! Du kan dessa ord!",
-        "keepPracticing": "Bra jobbat! Fortsätt öva för att behärska lektionen."
-      },
-      "streakMilestone": {
-        "week": "1 VECKAS SVIT!",
-        "weekDesc": "En hel vecka av lärande!",
-        "twoWeeks": "2 VECKORS SVIT!",
-        "twoWeeksDesc": "Två veckors engagemang!",
-        "month": "MÅNADSMASTER!",
-        "monthDesc": "30 dagar av excellens!"
-      }
-    },
-    "lesson": {
-      "definition": "Definition",
-      "examples": "Användningsexempel",
-      "contextualExamples": "I sammanhang",
-      "pronounce": "Lyssna på uttal",
-      "speaking": "Talar...",
-      "pronunciationFallback": "Uttal",
-      "gotIt": "Kan det",
-      "dontKnow": "Vet inte",
-      "tapToReveal": "Tryck för att visa",
-      "classicMode": "Klassiskt läge",
-      "swipeMode": "Svep-läge",
-      "autoPronounce": "Auto-uttala",
-      "enrichingContent": "Laddar berikat innehåll...",
-      "word": "ord",
-      "words": "ord"
-    },
-    "leaderboard": {
-      "title": "Klassrumets Topplista",
-      "ariaLabel": "Klassrumtopplista som visar toppstuderande",
-      "yourPosition": "Din Position",
-      "youAreRank": "Du är #{rank}",
-      "studentsInClass": "{count} elever",
-      "inactive": "Inaktiv",
-      "noStudentsYet": "Inga elever i klassrummet än",
-      "joinClassroomPrompt": "Gå med i ett klassrum för att se topplistan",
-      "level": "Nivå {level}",
-      "xp": "{xp} XP",
-      "rank": "Placering",
-      "totalXP": "Totalt XP",
-      "streak": "Svit",
-      "weekly": "Veckovis",
-      "monthly": "Månadsvis",
-      "allTime": "Alla tider",
-      "rankUp": "+{{count}}",
-      "rankDown": "-{{count}}",
-      "newEntry": "NY",
-      "noChange": "-",
-      "top10": "Topp 10%",
-      "top25": "Topp 25%",
-      "top50": "Topp 50%"
-    },
-    "achievements": {
-      "all": "Alla",
-      "progress": "Framsteg",
-      "skill": "Skicklighet",
-      "consistency": "Konsekvens",
-      "exploration": "Utforskning",
-      "locked": "Låst"
-    },
-    "header": {
-      "title": "LexiClash",
-      "subtitle": "Utbildning",
-      "homeLink": "Utbildning Hem",
-      "menu": "Utbildningsmeny",
-      "navigation": "Navigering",
-      "teacherDashboard": "Läraröversikt",
-      "studentDashboard": "Mina lektioner",
-      "educationHome": "Utbildning Hem",
-      "breadcrumbs": {
-        "navigation": "Utbildningsnavigering",
-        "education": "Utbildning",
-        "teacher": "Läraröversikt",
-        "student": "Elevöversikt",
-        "lessons": "Lektioner",
-        "classrooms": "Klassrum",
-        "classroomGame": "Klassrumsspel",
-        "join": "Gå med i klassrum",
-        "profile": "Profil"
-      }
-    },
-    "teacher": {
-      "activeGames": "aktiva spel",
-      "noActiveGames": "Inga aktiva spel"
-    },
-    "classroomGame": {
-      "title": "Klassrumsspel",
-      "createGame": "Skapa klassrumsspel",
-      "createGameDesc": "Välj lektioner och klassrum för att starta ett flerspelarspel",
-      "startGameDescription": "Starta ett flerspelar ordförrådsspel för ditt klassrum",
-      "shareCode": "Dela denna kod med eleverna",
-      "waitingForPlayers": "Väntar på spelare...",
-      "settings": "Spelinställningar",
-      "vocabularyWords": "Ordförrådsord",
-      "lessons": "Lektioner",
-      "selectLessons": "Välj lektioner",
-      "selectClassroom": "Välj klassrum",
-      "lessonsSelected": "{{count}} valda",
-      "noLessonsAvailable": "Inga lektioner tillgängliga",
-      "multiLessonHelp": "Ord från alla valda lektioner kombineras",
-      "totalWords": "Totalt antal ord",
-      "noClassrooms": "Inga klassrum hittades. Skapa ett klassrum först.",
-      "classroomNotFound": "Klassrum hittades inte",
-      "missingRequirements": "Välj minst en lektion och ett klassrum",
-      "gameCreated": "Spel skapat! Skickar till lobby...",
-      "playable": "spelbara",
-      "noPlayableWords": "Inga spelbara ord i denna lektion",
-      "startGame": "Starta spel",
-      "starting": "Startar...",
-      "lessonNotFound": "Lektionen hittades inte",
-      "lessonNotFoundDesc": "Den begärda lektionen kunde inte hittas.",
-      "backToEducation": "Tillbaka till utbildning",
-      "gameSettings": "Spelinställningar",
-      "reviewAndStart": "Granska och starta",
-      "selectClassroomAndLessons": "Välj klassrum och lektioner",
-      "selectClassroomAndLessonsDesc": "Välj ett klassrum och en eller flera lektioner att öva",
-      "shareCodeWithStudents": "Dela kod med elever",
-      "words": "Ord",
-      "selectAllLessons": "Välj alla",
-      "deselectAll": "Avmarkera alla",
-      "createClassroom": "Skapa klassrum",
-      "createLesson": "Skapa lektion",
-      "scanToJoin": "Skanna för att gå med",
-      "classroomSession": "Klassrumslektion",
-      "connecting": "Ansluter till spelet..."
-    },
-    "lessonWords": {
-      "title": "Lektionsordförråd",
-      "subtitle": "Din prestation på lektionsorden",
-      "found": "Hittade",
-      "total": "Totalt",
-      "completion": "Resultat",
-      "foundList": "Ord du hittade",
-      "missedList": "Ord du missade",
-      "perfectScore": "Perfekt! Du hittade alla lektionsord!"
-    },
-    "students": "elever",
-    "onboarding": {
-      "step": "Steg",
-      "of": "av",
-      "getStarted": "Sätt igång!",
-      "welcome": {
-        "title": "Välkommen till utbildningsläget!",
-        "description": "LexiClash Utbildning hjälper dig skapa engagerande ordförrådsövningar och följa elevernas framsteg. Låt oss komma igång!"
-      },
-      "classroom": {
-        "title": "Skapa ditt första klassrum",
-        "description": "Börja med att skapa ett klassrum. Du får en unik kod som eleverna kan använda för att gå med och komma åt dina lektioner."
-      },
-      "lesson": {
-        "title": "Bygg din första lektion",
-        "description": "Lägg till ordförrådsord för att skapa anpassade lektioner. Eleverna kan öva med flashkort och ordspel med ditt ordförråd."
-      },
-      "invite": {
-        "title": "Bjud in dina elever",
-        "description": "Dela din klassrumskod med eleverna. De kan gå med, öva lektioner och tävla i klassrumsspel!"
-      }
-    },
-    "analytics": {
-      "title": "Klassanalys",
-      "subtitle": "Följ elevernas framsteg och identifiera lärandemöjligheter",
-      "studentsNeedingHelp": "Elever som behöver hjälp",
-      "classAverageXp": "Klassens genomsnittliga XP",
-      "activeStudentsToday": "Aktiva idag",
-      "commonMistakes": "Vanliga misstag",
-      "weeklyEngagement": "Veckoengagemang",
-      "viewStudents": "Visa elever",
-      "createReviewLesson": "Skapa repetition",
-      "noData": "Ingen analysdata ännu",
-      "assignLessons": "Tilldela lektioner till elever för att se analys",
-      "loading": "Laddar analys...",
-      "error": "Kunde inte ladda analys",
-      "retry": "Försök igen",
-      "lessonEffectiveness": "Lektionseffektivitet",
-      "avgXpGain": "Genomsnittlig XP-vinst",
-      "completionRate": "Slutförandegrad",
-      "avgAccuracy": "Genomsnittlig precision",
-      "timeToMastery": "Tid till behärskning",
-      "studentProgress": "Elevframsteg",
-      "student": "Elev",
-      "level": "Nivå",
-      "mastery": "Behärskning",
-      "accuracy": "Precision",
-      "streak": "Svit",
-      "lastActive": "Senast aktiv",
-      "noStudents": "Inga elever i denna klass ännu",
-      "inviteStudents": "Dela anslutningskoden för att bjuda in elever",
-      "struggling": "Behöver hjälp",
-      "daysAgo": "{{count}} dagar sedan",
-      "today": "Idag",
-      "yesterday": "Igår",
-      "students": "Elever",
-      "noLessons": "Inga lektioner tilldelade till denna klass",
-      "assignLessonsHint": "Skapa och tilldela lektioner för att se effektivitetsdata",
-      "vocabularyMastery": "Ordforrådsbehärskning",
-      "masteryLevels": "Behärskningsnivåer",
-      "mastered": "Behärskad",
-      "practicing": "Övar",
-      "struggling": "Kämpar",
-      "notStarted": "Ej påbörjad",
-      "accuracyTooltip": "{{student}}: {{accuracy}}% på \"{{word}}\"",
-      "noVocabularyData": "Ingen ordförrådsdata ännu",
-      "practiceToSee": "Elever behöver öva för att se behärskning",
-      "viewLessons": "Lektioner",
-      "viewVocabulary": "Ordförråd",
-      "viewAssignments": "Uppgifter",
-      "backToClassroom": "Tillbaka till klassrum",
-      "exportReport": "Exportera rapport",
-      "studentDetail": "Elevdetaljer",
-      "live": "Live",
-      "offline": "Offline",
-      "connecting": "Ansluter...",
-      "connectionError": "Anslutningsproblem",
-      "activeNow": "{{count}} aktiva nu",
-      "noActivity": "Ingen aktivitet",
-      "updatedAgo": "Uppdaterad {{time}} sedan"
-    },
-    "reports": {
-      "title": "Framstegsrapporter",
-      "subtitle": "Skapa rapporter för elever och föräldrar",
-      "classReport": "Klassrapport",
-      "studentReport": "Elevrapport",
-      "exportPDF": "Exportera PDF",
-      "exportCSV": "Exportera CSV",
-      "generateReport": "Skapa rapport",
-      "generating": "Skapar...",
-      "dateRange": "Datumintervall",
-      "allTime": "All tid",
-      "lastWeek": "Senaste 7 dagarna",
-      "lastMonth": "Senaste 30 dagarna",
-      "custom": "Anpassat",
-      "from": "Från",
-      "to": "Till",
-      "selectStudent": "Välj elev",
-      "allStudents": "Alla elever",
-      "noDataAvailable": "Ingen data för denna period",
-      "reportGenerated": "Rapport skapad",
-      "downloadReady": "Din rapport är redo att ladda ner",
-      "metrics": {
-        "wordsLearned": "Inlärda ord",
-        "totalWords": "Totalt antal ord",
-        "accuracy": "Precision",
-        "practiceTime": "Övningstid",
-        "currentStreak": "Nuvarande svit",
-        "longestStreak": "Längsta svit",
-        "sessionsCompleted": "Slutförda sessioner",
-        "averageScore": "Genomsnittspoäng",
-        "masteryLevel": "Behärskningsnivå",
-        "improvement": "Förbättring"
-      },
-      "classMetrics": {
-        "classAverage": "Klassgenomsnitt",
-        "topPerformer": "Bäst i klassen",
-        "mostImproved": "Mest förbättrad",
-        "needsAttention": "Behöver extra stöd",
-        "participationRate": "Deltagande",
-        "completionRate": "Slutförande"
-      },
-      "sections": {
-        "summary": "Sammanfattning",
-        "wordMastery": "Ordbehärskning",
-        "practiceHistory": "Övningshistorik",
-        "recommendations": "Rekommendationer"
-      },
-      "studentRanking": "Elevranking",
-      "rank": "Rank",
-      "student": "Elev",
-      "score": "Poäng",
-      "noStudents": "Inga elever hittades",
-      "printReport": "Skriv ut rapport",
-      "emailReport": "Mejla rapport",
-      "error": {
-        "generateFailed": "Kunde inte skapa rapport",
-        "exportFailed": "Kunde inte exportera rapport",
-        "noData": "Ingen data för rapport"
-      }
-    },
-    "milestones": {
-      "xpRemaining": "{{xp}} XP till nivå {{level}}",
-      "nextMilestone": "Nästa milstolpe",
-      "titleUnlock": "Låser upp: {{title}}",
-      "reached": "Milstolpe uppnådd!",
-      "xpBonus": "+{{xp}} XP Bonus",
-      "coinBonus": "+{{coins}} Mynt",
-      "continue": "Fortsätt",
-      "maxLevel": "Max nivå!",
-      "level": "Nivå",
-      "titleUnlocked": "Titel upplåst"
-    },
-    "achievements": {
-      "title": "Prestationer",
-      "completion": "{percent}% Slutfört - {earned}/{total} märken",
-      "featured": "Utvalda Märken",
-      "progress": "{current}/{next}",
-      "toNext": "{percent}% till {tier}",
-      "maxTier": "Max Nivå!",
-      "pin": "Fäst märke",
-      "unpin": "Ta bort märke",
-      "maxPinsReached": "Ta bort ett annat märke först",
-      "locked": "Låst",
-      "secret": "Hemlig Prestation",
-      "unlocked": "Prestation Upplåst!",
-      "upgraded": "Uppgraderad till {tier}!",
-      "continue": "Fortsätt",
-      "newBadge": "Nytt Märke!",
-      "tierUpgrade": "Nivåuppgradering!",
-      "all": "Alla",
-      "skill": "Skicklighet",
-      "consistency": "Konsistens",
-      "exploration": "Utforskning",
-      "maxTier": "MAX",
-      "tierProgress": "{{current}} / {{target}}",
-      "tiers": {
-        "bronze": "Brons",
-        "silver": "Silver",
-        "gold": "Guld",
-        "platinum": "Platina"
-      },
-      "categories": {
-        "progress": "Framstegsmål",
-        "skill": "Färdighetsbaserade Bedrifter",
-        "consistency": "Konsekvent Vanor",
-        "exploration": "Utforskning"
-      },
-      "earned": "{count}/{total} uppnådda",
-      "secretRemaining": "{count} hemliga märken är fortfarande dolda...",
-      "pinLimit": "{current}/{max} fästa",
-      "first_lesson": {
-        "name": "Första Lektionen",
-        "description": "Slutför din första lektion",
-        "hint": "Slutför 1 lektion för att låsa upp"
-      },
-      "word_master": {
-        "name": "Ordmästare",
-        "description": "Bemästra ordförråd genom övning",
-        "hint": "Bemästra 50 ord för att låsa upp"
-      },
-      "level_climber": {
-        "name": "Nivåklättrare",
-        "description": "Nå nya XP-nivåer",
-        "hint": "Nå nivå 5 för att låsa upp"
-      },
-      "xp_collector": {
-        "name": "XP-samlare",
-        "description": "Tjäna erfarenhetspoäng genom övning",
-        "hint": "Tjäna 500 XP för att låsa upp"
-      },
-      "practice_veteran": {
-        "name": "Övningsveteran",
-        "description": "Slutför många övningstillfällen",
-        "hint": "Slutför 10 övningstillfällen för att låsa upp"
-      },
-      "speed_demon": {
-        "name": "Hastighetsdemon",
-        "description": "Hitta många ord i ett enda spel",
-        "hint": "Hitta 10 ord i ett spel för att låsa upp"
-      },
-      "perfect_streak": {
-        "name": "Perfekt Serie",
-        "description": "Uppnå perfekt precision i spel",
-        "hint": "Få 100% precision i 5 spel för att låsa upp"
-      },
-      "boss_slayer": {
-        "name": "Bossdödare",
-        "description": "Besegra utmanande bossstrider",
-        "hint": "Besegra 1 boss för att låsa upp"
-      },
-      "combo_master": {
-        "name": "Kombomästare",
-        "description": "Bygg imponerande ordkombon",
-        "hint": "Bygg 5 kombon för att låsa upp"
-      },
-      "streak_starter": {
-        "name": "Seriestartare",
-        "description": "Öva flera dagar i rad",
-        "hint": "Öva 3 dagar i rad för att låsa upp"
-      },
-      "early_bird": {
-        "name": "Morgonfågel",
-        "description": "Öva före kl. 9",
-        "hint": "Öva före kl. 9 5 gånger för att låsa upp"
-      },
-      "dedicated_learner": {
-        "name": "Dedikerad Elev",
-        "description": "Öva många dagar denna månad",
-        "hint": "Öva 5 olika dagar denna månad för att låsa upp"
-      },
-      "weekly_warrior": {
-        "name": "Veckokrigare",
-        "description": "Öva 5+ dagar per vecka",
-        "hint": "Slutför 1 vecka med 5+ övningsdagar för att låsa upp"
-      },
-      "streak_champion": {
-        "name": "Seriemästare",
-        "description": "Upprätthåll de längsta övningsserierna",
-        "hint": "Dold tills upptäckt..."
-      },
-      "mode_explorer": {
-        "name": "Lägesutforskare",
-        "description": "Prova olika övningslägen",
-        "hint": "Prova 2 olika övningslägen för att låsa upp"
-      },
-      "lesson_collector": {
-        "name": "Lektionssamlare",
-        "description": "Slutför många olika lektioner",
-        "hint": "Slutför 3 olika lektioner för att låsa upp"
-      },
-      "classroom_contributor": {
-        "name": "Klassrumsmedverkare",
-        "description": "Gå med och delta i klassrum",
-        "hint": "Gå med i 1 klassrum för att låsa upp"
-      },
-      "word_variety": {
-        "name": "Ordvariation",
-        "description": "Upptäck många unika ordförrådsord",
-        "hint": "Dold tills upptäckt..."
-      },
-      "duel_champion": {
-        "name": "Duellmästare",
-        "description": "Vinn dueller mot klasskamrater"
-      },
-      "duel_streak": {
-        "name": "Vinstsvit",
-        "description": "Vinn dueller i följd"
-      },
-      "comeback_king": {
-        "name": "Comebackkungen",
-        "description": "Vinn efter att ha legat under"
-      },
-      "speed_dueler": {
-        "name": "Snabbduellant",
-        "description": "Hitta ord snabbt i realtidsdueller"
-      },
-      "duel_veteran": {
-        "name": "Duellveteran",
-        "description": "Spela många dueller"
-      },
-      "spelling_ace": {
-        "name": "Stavningsäss",
-        "description": "Perfekta stavningsrundor"
-      },
-      "matching_master": {
-        "name": "Matchningsmästare",
-        "description": "Snabba matchningar"
-      },
-      "blitz_champion": {
-        "name": "Blitzmästare",
-        "description": "Få höga poäng i Blitz"
-      },
-      "practice_streak": {
-        "name": "Övningssvit",
-        "description": "Öva på dagar i rad"
-      },
-      "mode_master": {
-        "name": "Lägemästare",
-        "description": "Genomför alla övningslägen"
-      }
-    },
-    "starterPacks": {
-      "title": "Startpaket för lektioner",
-      "subtitle": "Färdiga ordförrådsuppsättningar att tilldela",
-      "useThisPack": "Använd detta paket",
-      "commonEnglish": {
-        "name": "Vanliga engelska ord",
-        "description": "30 grundläggande vardagsord för nybörjare"
-      },
-      "academicVocab": {
-        "name": "Akademiskt ordförråd",
-        "description": "25 viktiga akademiska termer för läsning och skrivning"
-      },
-      "beginnerHebrew": {
-        "name": "Nybörjarhebreiska",
-        "description": "20 grundläggande hebreiska ord med definitioner"
-      }
-    }
-  },
-  "crazygames": {
-    "ads": {
-      "watchForReward": "Se reklam för {{reward}}",
-      "adPlaying": "Reklam spelas...",
-      "adError": "Reklam ej tillgänglig",
-      "adblockDetected": "Annonsblockerare upptäckt - vissa funktioner kan vara begränsade",
-      "thanksForWatching": "Tack för att du tittade!"
-    },
-    "cloudSave": {
-      "syncing": "Synkroniserar...",
-      "syncSuccess": "Framsteg synkade!",
-      "syncError": "Synkning misslyckades - försöker igen",
-      "conflictResolved": "Framsteg uppdaterade från molnet"
-    }
-  },
-  "notifications": {
-    "title": "Aviseringar",
-    "bell": "Aviseringar",
-    "bellUnread": "{count} olästa aviseringar",
-    "empty": "Inga aviseringar än",
-    "emptyDesc": "När du får aviseringar visas de här",
-    "markAllRead": "Markera alla som lästa",
-    "markAsRead": "Markera som läst",
-    "viewAll": "Visa alla",
-    "more": "fler",
-    "newNotification": "Ny avisering",
-    "justNow": "Just nu",
-    "minutesAgo": "{count} minut sedan",
-    "minutesAgoPlural": "{count} minuter sedan",
-    "hoursAgo": "{count} timme sedan",
-    "hoursAgoPlural": "{count} timmar sedan",
-    "daysAgo": "{count} dag sedan",
-    "daysAgoPlural": "{count} dagar sedan",
-    "view": "Visa",
-    "dismiss": "Avfärda",
-    "types": {
-      "gift": "Gåva",
-      "system": "System",
-      "achievement": "Prestation",
-      "social": "Socialt",
-      "marketing": "Nyheter"
-    },
-    "gift": {
-      "title": "Du fick en gåva!",
-      "body": "{sender} skickade dig {xp} XP och {coins} mynt!"
-    },
-    "admin": {
-      "sendTitle": "Skicka avisering",
-      "selectPlayers": "Välj mottagare",
-      "chooseType": "Välj typ",
-      "writeMessage": "Skriv meddelande",
-      "preview": "Förhandsgranska",
-      "send": "Skicka",
-      "sending": "Skickar...",
-      "sent": "Avisering skickad!",
-      "recipients": "Mottagare",
-      "type": "Typ",
-      "sendingTo": "Skickar till",
-      "titleLabel": "Titel",
-      "titlePlaceholder": "Aviseringstitel...",
-      "bodyLabel": "Meddelande",
-      "bodyPlaceholder": "Aviseringsmeddelande...",
-      "actionUrlLabel": "Åtgärds-URL",
-      "sendSuccess": "Avisering skickad!",
-      "sendError": "Misslyckades med att skicka avisering. Försök igen."
-    },
-    "prompt": {
-      "title": "Håll dig i spelet!",
-      "body": "Få påminnelser om dagliga utmaningar och svit-varningar",
-      "enable": "Aktivera aviseringar",
-      "notNow": "Inte nu"
-    },
-    "preferences": {
-      "title": "Aviseringsinställningar",
-      "dailyChallenge": "Daglig utmaningspåminnelse",
-      "streakWarning": "Varning för hotad svit",
-      "friendInvites": "Kompis-utmaningar",
-      "weeklySummary": "Veckosammanfattning"
-    }
-  },
-  "native": {
-    "offline": {
-      "title": "Ingen anslutning",
-      "message": "Vi kan inte nå spelservern. Kontrollera din internetanslutning.",
-      "retry": "Försök igen",
-      "retrying": "Ansluter..."
-    }
-  },
-  "system": {
-    "updatingToNewVersion": "Uppdaterar till ny version..."
-  },
-  "education": {
     "reviewDue": "{count} ord att repetera",
     "postGame": {
       "wordsYouLearned": "Ord du lärt dig",
@@ -8949,20 +8121,29 @@ const sv = {
       "joinClassroomToDuel": "Gå med i ett klassrum för att duellera",
       "noClassmatesOnline": "Inga klasskompisar är online just nu",
       "challengeSomeone": "Utmana någon!",
-      "rematch": "Returmatch"
+      "rematch": "Returmatch",
+      "loading": "Laddar din duell...",
+      "vs": "mot",
+      "pvp": "PVP",
+      "unknownLesson": "Okänd lektion",
+      "online": "Online"
+    },
+    "challenges": {
+      "xpReward": "+{{amount}} XP",
+      "coinReward": "+{{amount}} mynt"
     },
     "achievements": {
       "completion": "{{percent}}% klart",
       "continue": "Fortsätt kämpa!",
-      "earned": "Uppnådd {{date}}",
+      "earned": "{{count}} av {{total}} uppnådda",
       "featured": "Utvalt märke",
       "locked": "Låst",
       "maxPinsReached": "Max antal fästa",
       "maxTier": "Högsta nivå",
       "newBadge": "Nytt märke upplåst!",
       "pin": "Fäst på profil",
-      "pinLimit": "Ta bort ett för att fästa nytt",
-      "progress": "{{current}}/{{total}}",
+      "pinLimit": "{{current}}/{{max}} fästa. Ta bort ett för att fästa nytt",
+      "progress": "{{current}}/{{next}}",
       "secret": "Hemlig prestation",
       "secretRemaining": "{{count}} hemligheter kvar",
       "tierUpgrade": "Nivå upp!",
@@ -8976,7 +8157,7 @@ const sv = {
       "toNext": "{{percent}}% till {{tier}}",
       "unlocked": "Upplåst!",
       "unpin": "Ta bort",
-      "upgraded": "Märke uppgraderat!"
+      "upgraded": "Märke uppgraderat till {{tier}}!"
     },
     "mastery": {
       "flashcardPerfect": "Perfekt! Du behärskar alla {{count}} ord!",
@@ -9146,7 +8327,7 @@ const sv = {
       "top50": "Topp 50",
       "totalXP": "Totalt XP",
       "weekly": "Veckovis",
-      "xp": "{{amount}} XP"
+      "xp": "{{xp}} XP"
     },
     "lesson": {
       "autoPronounce": "Automatiskt uttal",
@@ -9311,8 +8492,186 @@ const sv = {
       "nextLevel": "Nästa nivå",
       "streak": "Daglig svit",
       "totalXp": "Totalt XP",
-      "xpGained": "XP intjänat"
+      "xpGained": "XP intjänat",
+      "xpLabel": "XP"
+    },
+    "teacher": {
+      "activeGames": "aktiva spel",
+      "noActiveGames": "Inga aktiva spel"
+    },
+    "wordOfTheDay": {
+      "title": "Dagens Ord",
+      "learnMore": "Läs Mer"
+    },
+    "lessonWords": {
+      "title": "Lektionsordförråd",
+      "subtitle": "Din prestation på lektionsorden",
+      "found": "Hittade",
+      "total": "Totalt",
+      "completion": "Resultat",
+      "foundList": "Ord du hittade",
+      "missedList": "Ord du missade",
+      "perfectScore": "Perfekt! Du hittade alla lektionsord!"
+    },
+    "badges": {
+      "wordExplorer": "Ordutforskare",
+      "vocabMaster": "Ordmästare",
+      "speedScholar": "Snabblärd",
+      "locked": "Låst"
+    },
+    "reports": {
+      "title": "Framstegsrapporter",
+      "subtitle": "Skapa rapporter för elever och föräldrar",
+      "classReport": "Klassrapport",
+      "studentReport": "Elevrapport",
+      "exportPDF": "Exportera PDF",
+      "exportCSV": "Exportera CSV",
+      "generateReport": "Skapa rapport",
+      "generating": "Skapar...",
+      "dateRange": "Datumintervall",
+      "allTime": "All tid",
+      "lastWeek": "Senaste 7 dagarna",
+      "lastMonth": "Senaste 30 dagarna",
+      "custom": "Anpassat",
+      "from": "Från",
+      "to": "Till",
+      "selectStudent": "Välj elev",
+      "allStudents": "Alla elever",
+      "noDataAvailable": "Ingen data för denna period",
+      "reportGenerated": "Rapport skapad",
+      "downloadReady": "Din rapport är redo att ladda ner",
+      "metrics": {
+        "wordsLearned": "Inlärda ord",
+        "totalWords": "Totalt antal ord",
+        "accuracy": "Precision",
+        "practiceTime": "Övningstid",
+        "currentStreak": "Nuvarande svit",
+        "longestStreak": "Längsta svit",
+        "sessionsCompleted": "Slutförda sessioner",
+        "averageScore": "Genomsnittspoäng",
+        "masteryLevel": "Behärskningsnivå",
+        "improvement": "Förbättring"
+      },
+      "classMetrics": {
+        "classAverage": "Klassgenomsnitt",
+        "topPerformer": "Bäst i klassen",
+        "mostImproved": "Mest förbättrad",
+        "needsAttention": "Behöver extra stöd",
+        "participationRate": "Deltagande",
+        "completionRate": "Slutförande"
+      },
+      "sections": {
+        "summary": "Sammanfattning",
+        "wordMastery": "Ordbehärskning",
+        "practiceHistory": "Övningshistorik",
+        "recommendations": "Rekommendationer"
+      },
+      "studentRanking": "Elevranking",
+      "rank": "Rank",
+      "student": "Elev",
+      "score": "Poäng",
+      "noStudents": "Inga elever hittades",
+      "printReport": "Skriv ut rapport",
+      "emailReport": "Mejla rapport",
+      "error": {
+        "generateFailed": "Kunde inte skapa rapport",
+        "exportFailed": "Kunde inte exportera rapport",
+        "noData": "Ingen data för rapport"
+      }
+    },
+  },
+  "crazygames": {
+    "ads": {
+      "watchForReward": "Se reklam för {{reward}}",
+      "adPlaying": "Reklam spelas...",
+      "adError": "Reklam ej tillgänglig",
+      "adblockDetected": "Annonsblockerare upptäckt - vissa funktioner kan vara begränsade",
+      "thanksForWatching": "Tack för att du tittade!"
+    },
+    "cloudSave": {
+      "syncing": "Synkroniserar...",
+      "syncSuccess": "Framsteg synkade!",
+      "syncError": "Synkning misslyckades - försöker igen",
+      "conflictResolved": "Framsteg uppdaterade från molnet"
     }
+  },
+  "notifications": {
+    "title": "Aviseringar",
+    "bell": "Aviseringar",
+    "bellUnread": "{count} olästa aviseringar",
+    "empty": "Inga aviseringar än",
+    "emptyDesc": "När du får aviseringar visas de här",
+    "markAllRead": "Markera alla som lästa",
+    "markAsRead": "Markera som läst",
+    "viewAll": "Visa alla",
+    "more": "fler",
+    "newNotification": "Ny avisering",
+    "justNow": "Just nu",
+    "minutesAgo": "{count} minut sedan",
+    "minutesAgoPlural": "{count} minuter sedan",
+    "hoursAgo": "{count} timme sedan",
+    "hoursAgoPlural": "{count} timmar sedan",
+    "daysAgo": "{count} dag sedan",
+    "daysAgoPlural": "{count} dagar sedan",
+    "view": "Visa",
+    "dismiss": "Avfärda",
+    "showAll": "Alla",
+    "unreadOnly": "Olästa",
+    "types": {
+      "gift": "Gåva",
+      "system": "System",
+      "achievement": "Prestation",
+      "social": "Socialt",
+      "marketing": "Nyheter"
+    },
+    "gift": {
+      "title": "Du fick en gåva!",
+      "body": "{sender} skickade dig {xp} XP och {coins} mynt!"
+    },
+    "admin": {
+      "sendTitle": "Skicka avisering",
+      "selectPlayers": "Välj mottagare",
+      "chooseType": "Välj typ",
+      "writeMessage": "Skriv meddelande",
+      "preview": "Förhandsgranska",
+      "send": "Skicka",
+      "sending": "Skickar...",
+      "sent": "Avisering skickad!",
+      "recipients": "Mottagare",
+      "type": "Typ",
+      "sendingTo": "Skickar till",
+      "titleLabel": "Titel",
+      "titlePlaceholder": "Aviseringstitel...",
+      "bodyLabel": "Meddelande",
+      "bodyPlaceholder": "Aviseringsmeddelande...",
+      "actionUrlLabel": "Åtgärds-URL",
+      "sendSuccess": "Avisering skickad!",
+      "sendError": "Misslyckades med att skicka avisering. Försök igen."
+    },
+    "prompt": {
+      "title": "Håll dig i spelet!",
+      "body": "Få påminnelser om dagliga utmaningar och svit-varningar",
+      "enable": "Aktivera aviseringar",
+      "notNow": "Inte nu"
+    },
+    "preferences": {
+      "title": "Aviseringsinställningar",
+      "dailyChallenge": "Daglig utmaningspåminnelse",
+      "streakWarning": "Varning för hotad svit",
+      "friendInvites": "Kompis-utmaningar",
+      "weeklySummary": "Veckosammanfattning"
+    }
+  },
+  "native": {
+    "offline": {
+      "title": "Ingen anslutning",
+      "message": "Vi kan inte nå spelservern. Kontrollera din internetanslutning.",
+      "retry": "Försök igen",
+      "retrying": "Ansluter..."
+    }
+  },
+  "system": {
+    "updatingToNewVersion": "Uppdaterar till ny version..."
   },
   "duels": {
     "addWord": "Lägg till ord",

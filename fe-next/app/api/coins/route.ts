@@ -4,7 +4,7 @@ import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 
 // Server-side coin amount limits to prevent abuse
-const MAX_COIN_AWARD = 500;
+const MAX_COIN_AWARD = 2000;
 const MAX_COIN_SPEND = 10000;
 
 /**

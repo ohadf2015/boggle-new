@@ -361,6 +361,7 @@ const es = {
     "errorOccurred": "Ocurrió un error",
     "creating": "Creando...",
     "guest": "Invitado",
+    "unknown": "Desconocido",
     "back": "Atrás",
     "backHome": "Volver a Inicio",
     "backToHome": "Volver al Inicio",
@@ -8169,800 +8170,6 @@ const es = {
     }
   },
   "education": {
-    "badges": {
-      "wordExplorer": "Explorador de Palabras",
-      "vocabMaster": "Maestro del Vocabulario",
-      "speedScholar": "Erudito Veloz",
-      "locked": "Bloqueado"
-    },
-    "wordOfTheDay": {
-      "title": "Palabra del Dia",
-      "learnMore": "Saber Mas"
-    },
-    "landing": {
-      "title": "Modo Educativo",
-      "teacher": "Soy Profesor",
-      "teacherDesc": "Crea aulas, lecciones de vocabulario y sigue el progreso",
-      "student": "Soy Estudiante",
-      "studentDesc": "Únete a tu aula y practica vocabulario",
-      "signInRequired": "Requiere iniciar sesión",
-      "tagline": "Donde el aprendizaje se encuentra con el juego",
-      "socialProof": "Únete a más de 1000 aulas en todo el mundo que mejoran su vocabulario juntos!",
-      "teacherFeature1": "Crear listas de palabras personalizadas",
-      "teacherFeature2": "Gestionar múltiples aulas",
-      "teacherFeature3": "Análisis de rendimiento en vivo",
-      "studentFeature1": "Unirse a aulas interactivas",
-      "studentFeature2": "Desafíos de vocabulario divertidos",
-      "studentFeature3": "Tablas de clasificación semanales",
-      "teacherCta": "Requiere inicio de sesión de profesor",
-      "studentCta": "Entrar al centro de estudiantes",
-      "premium": "Premium",
-      "freeAccess": "Acceso gratuito",
-      "duelTeaser": {
-        "headline": "Reta a un compañero",
-        "subtext": "Juega cara a cara y sube en el ranking del salón",
-        "cta": "Iniciar Duelo →"
-      },
-      "roleTeacher": "Profesor",
-      "roleStudent": "Estudiante",
-      "roleGuest": "Conectado",
-      "goToDashboard": "Ir al Panel",
-      "startGame": "Iniciar Juego"
-    },
-    "template": {
-      "settings": "Ajustes",
-      "create": "Crear Plantilla",
-      "edit": "Editar Plantilla",
-      "description": "Configura los ajustes del juego para esta lección",
-      "name": "Nombre de Plantilla",
-      "namePlaceholder": "ej. Repaso Rápido",
-      "nameRequired": "El nombre es requerido",
-      "timer": "Duración del Juego",
-      "difficulty": "Tamaño del Tablero",
-      "boardSize": "Tamaño del Tablero",
-      "boardPreview": "El tablero será de",
-      "minWordLength": "Longitud Mínima de Palabra",
-      "allowLateJoin": "Permitir Unirse Tarde",
-      "lateJoin": "Unirse Tarde",
-      "allowLateJoinDesc": "Los jugadores pueden unirse después de iniciar",
-      "setDefault": "Usar por Defecto",
-      "setDefaultDesc": "Usar esta configuración por defecto para esta lección",
-      "save": "Guardar Plantilla",
-      "saving": "Guardando...",
-      "saved": "¡Plantilla guardada!",
-      "startGame": "Iniciar Juego",
-      "roomSettings": "Configuración del Juego"
-    },
-    "practice": {
-      "title": "Modo Práctica",
-      "flashcards": "Tarjetas de Repaso",
-      "flashcardsDesc": "Repasa palabras con tarjetas",
-      "soloBoard": "Tablero Individual",
-      "soloBoardDesc": "Encuentra palabras a tu ritmo",
-      "wordList": "Lista de Palabras",
-      "wordListDesc": "Ver todo el vocabulario",
-      "warmup": "Calentamiento",
-      "warmupDesc": "Practica con pistas habilitadas",
-      "gotIt": "¡Entendido!",
-      "dontKnow": "No lo sé",
-      "complete": "¡Práctica Completa!",
-      "progress": "Tu Progreso",
-      "wordsFound": "Palabras Encontradas",
-      "cardsReviewed": "Tarjetas Revisadas",
-      "accuracy": "Precisión",
-      "timeSpent": "Tiempo Empleado",
-      "word": "Palabra",
-      "definition": "Definición",
-      "tapToFlip": "Toca para voltear",
-      "tapCard": "Toca la tarjeta para ver la respuesta",
-      "chooseAnswer": "Elige tu respuesta",
-      "finish": "Terminar",
-      "hints": "Pistas",
-      "searchWords": "Buscar palabras...",
-      "noResults": "Sin resultados",
-      "noWords": "Sin palabras disponibles",
-      "noDefinition": "Sin definición disponible",
-      "quickPractice": "Practicar",
-      "moreOptions": "Más opciones",
-      "tryAgain": "Intentar de Nuevo",
-      "back": "Volver",
-      "correctCount": "correctas",
-      "encouragement0": "¡Sigue intentando! La práctica hace al maestro.",
-      "encouragement50": "¡Buen esfuerzo! Sigue practicando.",
-      "encouragement80": "¡Muy bien! Ya casi llegas.",
-      "encouragement100": "¡Perfecto! Dominaste estas palabras.",
-      "swipeHint": "Desliza para responder",
-      "swipeExplain": "Desliza derecha para 'Lo sé', izquierda para 'No lo sé'",
-      "mastery": {
-        "not_started": "Sin Empezar",
-        "started": "Empezando",
-        "practicing": "Practicando",
-        "mastered": "Dominado"
-      },
-      "matching": "Emparejar",
-      "matchingDesc": "Conecta palabras con sus definiciones",
-      "spelling": "Ortografía",
-      "spellingDesc": "Escribe las palabras correctamente",
-      "blitz": "Blitz",
-      "blitzDesc": "¡Responde rápido antes de que se acabe el tiempo!",
-      "sessionComplete": "¡Sesión completada!",
-      "hint": "Pista",
-      "matchingWords": "Palabras",
-      "matchingDefinitions": "Definiciones",
-      "matchPairs": "Empareja los pares",
-      "pairsMatched": "Pares emparejados",
-      "dragToMatch": "Arrastra para emparejar",
-      "tapToSelect": "Toca para seleccionar",
-      "correctMatch": "¡Correcto!",
-      "wrongMatch": "Incorrecto",
-      "spellTheWord": "Escribe la palabra",
-      "typeTheWord": "Escribe la palabra",
-      "correctSpelling": "¡Bien escrito!",
-      "incorrectSpelling": "Incorrecto",
-      "blitzTitle": "¡Blitz!",
-      "getReady": "¡Prepárate!",
-      "go": "¡Ya!",
-      "timesUp": "¡Se acabó el tiempo!",
-      "maxCombo": "Combo máximo",
-      "blitzScore": "Puntaje Blitz",
-      "needsMoreWords": "Necesitas más palabras",
-      "combo": "Combo",
-      "submit": "Enviar",
-      "typeAnswer": "Escribe tu respuesta",
-      "typeWord": "Escribe la palabra",
-      "correct": "¡Correcto!",
-      "incorrect": "Incorrecto",
-      "correctAnswer": "Respuesta correcta",
-      "streak": "Racha",
-      "difficulty": {
-        "easy": "Fácil",
-        "medium": "Medio",
-        "hard": "Difícil"
-      },
-      "sessionsCompleted": "sesiones completadas",
-      "time": "Tiempo",
-      "wordCount": "palabras",
-      "hintsUsed": "Pistas Usadas",
-      "maxStreak": "Racha Máxima",
-      "points": "puntos",
-      "vocabularyWords": "Palabras de vocabulario",
-      "vocabularyWordsFound": "Palabras de vocabulario encontradas:",
-      "vocabulary": "Vocabulario",
-      "vocab": "vocabulario",
-      "foundWordsLabel": "Palabras encontradas:",
-      "more": "más",
-      "allVocabFound": "¡Todas las palabras encontradas!",
-      "total": "total",
-      "canEmbed": "se puede incrustar",
-      "trackOnly": "solo seguimiento"
-    },
-    "student": {
-      "dashboard": "Mis Lecciones",
-      "joinClassroom": "Unirse a Aula",
-      "enterCode": "Ingresa el código del aula",
-      "progress": "Tu Progreso",
-      "startPractice": "Empezar Práctica",
-      "noLessons": "Sin lecciones asignadas aún",
-      "askTeacher": "Pide el código a tu profesor",
-      "lessonsAssigned": "Lecciones Asignadas",
-      "join": {
-        "title": "Unirse a Aula",
-        "subtitle": "Ingresa el código de tu profesor",
-        "codeLabel": "Código del Aula",
-        "codeHint": "Pide el código de 6 caracteres a tu profesor",
-        "button": "Unirse al Aula",
-        "joining": "Uniéndose...",
-        "pasteButton": "Pegar código",
-        "success": "¡Te uniste al aula!",
-        "invalidCode": "Código inválido",
-        "alreadyMember": "Ya eres miembro de esta aula",
-        "codePasted": "¡Código pegado!",
-        "emptyClipboard": "El portapapeles está vacío",
-        "clipboardError": "No se pudo leer el portapapeles"
-      }
-    },
-    "xp": {
-      "level": "Nivel",
-      "maxLevel": "Nivel Máximo",
-      "nextLevel": "Siguiente Nivel",
-      "xpGained": "XP Ganado",
-      "totalXp": "XP Total",
-      "progress": "Progreso",
-      "levelUp": "¡Subiste de Nivel!",
-      "newLevel": "Alcanzaste el nivel",
-      "streak": "Racha de Días",
-      "streakBonus": "Bonus de Racha",
-      "keepGoing": "¡Sigue practicando para subir de nivel!",
-      "newTitleUnlocked": "¡Nuevo Título Desbloqueado!",
-      "continue": "Continuar",
-      "mastery": {
-        "perfectFlashcard": "¡Perfecto! ¡Dominaste las {count} palabras!",
-        "learnedWords": "¡Aprendiste {count} palabras!",
-        "discoveredVocab": "¡Descubriste {count} palabras de vocabulario nuevas!",
-        "greatPractice": "¡Excelente práctica! ¡Sigue encontrando palabras!",
-        "lessonMastered": "¡Lección dominada! ¡Ya sabes estas palabras!",
-        "keepPracticing": "¡Buen trabajo! Sigue practicando para dominar esta lección."
-      },
-      "streakMilestone": {
-        "week": "¡RACHA DE 1 SEMANA!",
-        "weekDesc": "¡Una semana completa aprendiendo!",
-        "twoWeeks": "¡2 SEMANAS SEGUIDAS!",
-        "twoWeeksDesc": "¡Dos semanas de dedicación!",
-        "month": "¡MAESTRO MENSUAL!",
-        "monthDesc": "¡30 días de excelencia!"
-      }
-    },
-    "duels": {
-      "loading": "Cargando...",
-      "playDuel": "Jugar Duelo",
-      "findWords": "Encontrar Palabras",
-      "submitScore": "Enviar Puntuación",
-      "waitingForOpponent": "Esperando al oponente...",
-      "youWin": "¡Ganaste!",
-      "youLose": "Perdiste",
-      "draw": "¡Empate!",
-      "xpEarned": "XP Ganado",
-      "backToLobby": "Volver al Lobby",
-      "wordsAccepted": "Palabras Aceptadas",
-      "wordsRejected": "Palabras Rechazadas",
-      "scoreToBeat": "Puntuación a Superar",
-      "typeWord": "Escribe una palabra...",
-      "addWord": "Agregar Palabra",
-      "vs": "vs",
-    "you": "Tú",
-      "duelHistory": "Historial de Duelos",
-      "wins": "Victorias",
-      "losses": "Derrotas",
-      "draws": "Empates",
-      "winStreak": "Racha de Victorias",
-      "winRate": "Tasa de Victoria",
-      "recentDuels": "Duelos Recientes",
-      "noDuelsYet": "Aún no se han jugado duelos",
-      "challengeClassmate": "¡Desafía a un compañero!"
-    },
-    "lesson": {
-      "definition": "Definición",
-      "examples": "Ejemplos de Uso",
-      "contextualExamples": "En Contexto",
-      "pronounce": "Escuchar pronunciación",
-      "speaking": "Reproduciendo...",
-      "pronunciationFallback": "Pronunciación",
-      "gotIt": "Lo sé",
-      "dontKnow": "No lo sé",
-      "tapToReveal": "Toca para revelar",
-      "classicMode": "Modo Clásico",
-      "swipeMode": "Modo Deslizar",
-      "autoPronounce": "Auto-pronunciar",
-      "enrichingContent": "Cargando contenido enriquecido...",
-      "word": "palabra",
-      "words": "palabras"
-    },
-    "leaderboard": {
-      "title": "Tabla de Clasificación del Aula",
-      "yourPosition": "Tu Posición",
-      "youAreRank": "Estás en el puesto #{rank}",
-      "studentsInClass": "{count} estudiantes",
-      "inactive": "Inactivo",
-      "noStudentsYet": "Aún no hay estudiantes en esta aula",
-      "joinClassroomPrompt": "Únete a un aula para ver la tabla de clasificación",
-      "ariaLabel": "Tabla de líderes del aula mostrando los mejores estudiantes",
-      "rank": "Lugar",
-      "totalXP": "XP Total",
-      "streak": "Racha",
-      "level": "Nv. {level}",
-      "xp": "{xp} XP",
-      "weekly": "Semanal",
-      "monthly": "Mensual",
-      "allTime": "Histórico",
-      "rankUp": "+{{count}}",
-      "rankDown": "-{{count}}",
-      "newEntry": "NUEVO",
-      "noChange": "-",
-      "top10": "Top 10%",
-      "top25": "Top 25%",
-      "top50": "Top 50%"
-    },
-    "header": {
-      "title": "LexiClash",
-      "subtitle": "Educación",
-      "homeLink": "Inicio Educación",
-      "menu": "Menú Educación",
-      "navigation": "Navegación",
-      "teacherDashboard": "Panel del Profesor",
-      "studentDashboard": "Mis Lecciones",
-      "educationHome": "Inicio Educación",
-      "breadcrumbs": {
-        "navigation": "Navegación educativa",
-        "education": "Educación",
-        "teacher": "Panel del Profesor",
-        "student": "Panel del Estudiante",
-        "lessons": "Lecciones",
-        "classrooms": "Aulas",
-        "classroomGame": "Juego del Aula",
-        "join": "Unirse al Aula",
-        "profile": "Perfil"
-      }
-    },
-    "classroomGame": {
-      "title": "Juego del Aula",
-      "startGameDescription": "Inicia un juego de vocabulario multijugador para tu aula",
-      "shareCode": "Comparte este código con los estudiantes",
-      "waitingForPlayers": "Esperando jugadores...",
-      "settings": "Configuración del Juego",
-      "vocabularyWords": "Palabras de Vocabulario",
-      "playable": "jugables",
-      "noPlayableWords": "No hay palabras jugables en esta lección",
-      "startGame": "Iniciar Juego",
-      "starting": "Iniciando...",
-      "lessonNotFound": "Lección No Encontrada",
-      "lessonNotFoundDesc": "No se pudo encontrar la lección solicitada.",
-      "backToEducation": "Volver a Educación",
-      "createGame": "Crear Juego",
-      "createGameDesc": "Selecciona lecciones y clase para iniciar un juego multijugador",
-      "lessons": "Lecciones",
-      "selectLessons": "Seleccionar lecciones",
-      "selectClassroom": "Seleccionar clase",
-      "lessonsSelected": "{{count}} seleccionadas",
-      "noLessonsAvailable": "No hay lecciones disponibles",
-      "multiLessonHelp": "Se combinarán palabras de todas las lecciones",
-      "totalWords": "Total de palabras",
-      "noClassrooms": "Sin clases",
-      "classroomNotFound": "Clase no encontrada",
-      "missingRequirements": "Selecciona al menos una lección y una clase",
-      "gameCreated": "¡Juego creado!",
-      "gameSettings": "Ajustes del Juego",
-      "reviewAndStart": "Revisar e Iniciar",
-      "selectClassroomAndLessons": "Selecciona Clase y Lecciones",
-      "selectClassroomAndLessonsDesc": "Elige una clase y una o más lecciones para practicar",
-      "shareCodeWithStudents": "Comparte este código con los estudiantes",
-      "words": "palabras",
-      "selectAllLessons": "Seleccionar todo",
-      "deselectAll": "Deseleccionar todo",
-      "createClassroom": "Crear aula",
-      "createLesson": "Crear lección",
-      "scanToJoin": "Escanea para unirte",
-      "classroomSession": "Sesión de clase"
-    },
-    "onboarding": {
-      "step": "Paso",
-      "of": "de",
-      "getStarted": "¡Empezar!",
-      "welcome": {
-        "title": "¡Bienvenido al Modo Educación!",
-        "description": "LexiClash Educación te ayuda a crear lecciones de vocabulario atractivas y seguir el progreso de los estudiantes. ¡Comencemos!"
-      },
-      "classroom": {
-        "title": "Crea tu Primera Aula",
-        "description": "Comienza creando un aula. Recibirás un código único que los estudiantes pueden usar para unirse y acceder a tus lecciones."
-      },
-      "lesson": {
-        "title": "Crea tu Primera Lección",
-        "description": "Agrega palabras de vocabulario para crear lecciones personalizadas. Los estudiantes pueden practicar con tarjetas y juegos de palabras usando tu vocabulario."
-      },
-      "invite": {
-        "title": "Invita a tus Estudiantes",
-        "description": "¡Comparte el código del aula con los estudiantes. Podrán unirse, practicar lecciones y competir en juegos del aula!"
-      }
-    },
-    "analytics": {
-      "title": "Análisis de Clase",
-      "subtitle": "Seguimiento del progreso de los estudiantes e identificación de oportunidades de aprendizaje",
-      "studentsNeedingHelp": "Estudiantes que Necesitan Ayuda",
-      "classAverageXp": "XP Promedio de la Clase",
-      "activeStudentsToday": "Activos Hoy",
-      "commonMistakes": "Errores Comunes",
-      "weeklyEngagement": "Participación Semanal",
-      "viewStudents": "Ver Estudiantes",
-      "createReviewLesson": "Crear Revisión",
-      "noData": "Aún no hay datos de análisis",
-      "assignLessons": "Asigna lecciones a los estudiantes para ver análisis",
-      "loading": "Cargando análisis...",
-      "error": "Error al cargar análisis",
-      "retry": "Reintentar",
-      "lessonEffectiveness": "Efectividad de Lecciones",
-      "avgXpGain": "Ganancia XP Promedio",
-      "completionRate": "Tasa de Finalización",
-      "avgAccuracy": "Precisión Promedio",
-      "timeToMastery": "Tiempo para Dominar",
-      "studentProgress": "Progreso del Estudiante",
-      "student": "Estudiante",
-      "level": "Nivel",
-      "mastery": "Dominio",
-      "accuracy": "Precisión",
-      "streak": "Racha",
-      "lastActive": "Última Actividad",
-      "noStudents": "Aún no hay estudiantes en esta aula",
-      "inviteStudents": "Comparte el código de unión para invitar estudiantes",
-      "struggling": "Necesita Ayuda",
-      "daysAgo": "hace {{count}} días",
-      "today": "Hoy",
-      "yesterday": "Ayer",
-      "students": "Estudiantes",
-      "noLessons": "No hay lecciones asignadas a esta aula",
-      "assignLessonsHint": "Crea y asigna lecciones para ver datos de efectividad",
-      "vocabularyMastery": "Dominio de Vocabulario",
-      "masteryLevels": "Niveles de Dominio",
-      "mastered": "Dominado",
-      "practicing": "Practicando",
-      "live": "En Vivo",
-      "offline": "Desconectado",
-      "connecting": "Conectando...",
-      "connectionError": "Problema de conexión",
-      "activeNow": "{{count}} activos ahora",
-      "noActivity": "Sin actividad",
-      "updatedAgo": "Actualizado hace {{time}}",
-      "notStarted": "No Iniciado",
-      "accuracyTooltip": "{{student}}: {{accuracy}}% en \"{{word}}\"",
-      "noVocabularyData": "Aún no hay datos de vocabulario",
-      "practiceToSee": "Los estudiantes deben practicar para ver el dominio",
-      "viewLessons": "Lecciones",
-      "viewVocabulary": "Vocabulario",
-      "viewAssignments": "Tareas",
-      "backToClassroom": "Volver al Aula",
-      "exportReport": "Exportar Informe",
-      "studentDetail": "Detalle del Estudiante"
-    },
-    "reports": {
-      "title": "Reportes de Progreso",
-      "subtitle": "Genera reportes detallados para estudiantes y padres",
-      "classReport": "Reporte de la Clase",
-      "studentReport": "Reporte del Estudiante",
-      "exportPDF": "Exportar PDF",
-      "exportCSV": "Exportar CSV",
-      "generateReport": "Generar Reporte",
-      "generating": "Generando...",
-      "dateRange": "Rango de Fechas",
-      "allTime": "Todo el Tiempo",
-      "lastWeek": "Últimos 7 Días",
-      "lastMonth": "Últimos 30 Días",
-      "custom": "Rango Personalizado",
-      "from": "Desde",
-      "to": "Hasta",
-      "selectStudent": "Seleccionar Estudiante",
-      "allStudents": "Todos los Estudiantes",
-      "noDataAvailable": "No hay datos para este período",
-      "reportGenerated": "Reporte generado exitosamente",
-      "downloadReady": "Tu reporte está listo para descargar",
-      "metrics": {
-        "wordsLearned": "Palabras Aprendidas",
-        "totalWords": "Total de Palabras",
-        "accuracy": "Precisión",
-        "practiceTime": "Tiempo de Práctica",
-        "currentStreak": "Racha Actual",
-        "longestStreak": "Racha Más Larga",
-        "sessionsCompleted": "Sesiones Completadas",
-        "averageScore": "Puntuación Promedio",
-        "masteryLevel": "Nivel de Dominio",
-        "improvement": "Mejora"
-      },
-      "classMetrics": {
-        "classAverage": "Promedio de la Clase",
-        "topPerformer": "Mejor Desempeño",
-        "mostImproved": "Mayor Mejora",
-        "needsAttention": "Necesita Atención",
-        "participationRate": "Tasa de Participación",
-        "completionRate": "Tasa de Finalización"
-      },
-      "sections": {
-        "summary": "Resumen",
-        "wordMastery": "Dominio de Palabras",
-        "practiceHistory": "Historial de Práctica",
-        "recommendations": "Recomendaciones"
-      },
-      "studentRanking": "Ranking de Estudiantes",
-      "rank": "Puesto",
-      "student": "Estudiante",
-      "score": "Puntuación",
-      "noStudents": "No se encontraron estudiantes",
-      "printReport": "Imprimir Reporte",
-      "emailReport": "Enviar Reporte por Email",
-      "error": {
-        "generateFailed": "Error al generar el reporte",
-        "exportFailed": "Error al exportar el reporte",
-        "noData": "No hay datos disponibles para el reporte"
-      }
-    },
-    "achievements": {
-      "title": "Logros",
-      "completion": "{percent}% Completado - {earned}/{total} insignias",
-      "featured": "Insignias Destacadas",
-      "progress": "{current}/{next}",
-      "toNext": "{percent}% hasta {tier}",
-      "maxTier": "¡Nivel Máximo!",
-      "pin": "Fijar insignia",
-      "unpin": "Desfijar insignia",
-      "maxPinsReached": "Desfija otra insignia primero",
-      "locked": "Bloqueado",
-      "secret": "Logro Secreto",
-      "unlocked": "¡Logro Desbloqueado!",
-      "upgraded": "¡Mejorado a {tier}!",
-      "continue": "Continuar",
-      "newBadge": "¡Nueva Insignia!",
-      "tierUpgrade": "¡Mejora de Nivel!",
-      "tiers": {
-        "bronze": "Bronce",
-        "silver": "Plata",
-        "gold": "Oro",
-        "platinum": "Platino"
-      },
-      "categories": {
-        "progress": "Hitos de Progreso",
-        "skill": "Hazañas Basadas en Habilidad",
-        "consistency": "Hábitos de Consistencia",
-        "exploration": "Exploración"
-      },
-      "earned": "{count}/{total} obtenidos",
-      "secretRemaining": "{count} insignias secretas permanecen ocultas...",
-      "pinLimit": "{current}/{max} fijados",
-      "first_lesson": {
-        "name": "Primera Lección",
-        "description": "Completa tu primera lección",
-        "hint": "Completa 1 lección para desbloquear"
-      },
-      "word_master": {
-        "name": "Maestro de Palabras",
-        "description": "Domina el vocabulario a través de la práctica",
-        "hint": "Domina 50 palabras para desbloquear"
-      },
-      "level_climber": {
-        "name": "Escalador de Niveles",
-        "description": "Alcanza nuevos niveles de XP",
-        "hint": "Alcanza el nivel 5 para desbloquear"
-      },
-      "xp_collector": {
-        "name": "Coleccionista de XP",
-        "description": "Gana puntos de experiencia practicando",
-        "hint": "Gana 500 XP para desbloquear"
-      },
-      "practice_veteran": {
-        "name": "Veterano de Práctica",
-        "description": "Completa muchas sesiones de práctica",
-        "hint": "Completa 10 sesiones de práctica para desbloquear"
-      },
-      "speed_demon": {
-        "name": "Demonio de Velocidad",
-        "description": "Encuentra muchas palabras en un solo juego",
-        "hint": "Encuentra 10 palabras en un juego para desbloquear"
-      },
-      "perfect_streak": {
-        "name": "Racha Perfecta",
-        "description": "Logra precisión perfecta en los juegos",
-        "hint": "Obtén 100% de precisión en 5 juegos para desbloquear"
-      },
-      "boss_slayer": {
-        "name": "Cazador de Jefes",
-        "description": "Derrota batallas de jefes desafiantes",
-        "hint": "Derrota 1 jefe para desbloquear"
-      },
-      "combo_master": {
-        "name": "Maestro de Combos",
-        "description": "Construye combos de palabras impresionantes",
-        "hint": "Construye 5 combos para desbloquear"
-      },
-      "streak_starter": {
-        "name": "Iniciador de Rachas",
-        "description": "Practica varios días seguidos",
-        "hint": "Practica 3 días seguidos para desbloquear"
-      },
-      "early_bird": {
-        "name": "Madrugador",
-        "description": "Practica antes de las 9 am",
-        "hint": "Practica antes de las 9 am 5 veces para desbloquear"
-      },
-      "dedicated_learner": {
-        "name": "Aprendiz Dedicado",
-        "description": "Practica muchos días este mes",
-        "hint": "Practica 5 días diferentes este mes para desbloquear"
-      },
-      "weekly_warrior": {
-        "name": "Guerrero Semanal",
-        "description": "Practica 5+ días por semana",
-        "hint": "Completa 1 semana con 5+ días de práctica para desbloquear"
-      },
-      "streak_champion": {
-        "name": "Campeón de Rachas",
-        "description": "Mantén las rachas de práctica más largas",
-        "hint": "Oculto hasta descubrirlo..."
-      },
-      "mode_explorer": {
-        "name": "Explorador de Modos",
-        "description": "Prueba diferentes modos de práctica",
-        "hint": "Prueba 2 modos de práctica diferentes para desbloquear"
-      },
-      "lesson_collector": {
-        "name": "Coleccionista de Lecciones",
-        "description": "Completa muchas lecciones diferentes",
-        "hint": "Completa 3 lecciones diferentes para desbloquear"
-      },
-      "classroom_contributor": {
-        "name": "Contribuidor del Aula",
-        "description": "Únete y participa en las aulas",
-        "hint": "Únete a 1 aula para desbloquear"
-      },
-      "word_variety": {
-        "name": "Variedad de Palabras",
-        "description": "Descubre muchas palabras de vocabulario únicas",
-        "hint": "Oculto hasta descubrirlo..."
-      },
-      "all": "Todos",
-      "skill": "Habilidad",
-      "consistency": "Constancia",
-      "exploration": "Exploración",
-      "tierProgress": "{{current}} / {{target}}",
-      "duel_champion": {
-        "name": "Campeón de Duelos",
-        "description": "Gana duelos contra compañeros"
-      },
-      "duel_streak": {
-        "name": "Racha Ganadora",
-        "description": "Gana duelos consecutivos"
-      },
-      "comeback_king": {
-        "name": "Rey de la Remontada",
-        "description": "Gana después de ir perdiendo"
-      },
-      "speed_dueler": {
-        "name": "Duelista Veloz",
-        "description": "Encuentra palabras rápido en duelos en vivo"
-      },
-      "duel_veteran": {
-        "name": "Veterano de Duelos",
-        "description": "Juega muchos duelos"
-      },
-      "spelling_ace": {
-        "name": "As de Ortografía",
-        "description": "Rondas de ortografía perfectas"
-      },
-      "matching_master": {
-        "name": "Maestro de Emparejamiento",
-        "description": "Emparejamientos rápidos"
-      },
-      "blitz_champion": {
-        "name": "Campeón Blitz",
-        "description": "Puntaje alto en modo Blitz"
-      },
-      "practice_streak": {
-        "name": "Racha de Práctica",
-        "description": "Practica en días consecutivos"
-      },
-      "mode_master": {
-        "name": "Maestro de Modos",
-        "description": "Completa todos los modos de práctica"
-      }
-    },
-    "lessonWords": {
-      "title": "Vocabulario de la Lección",
-      "subtitle": "Tu rendimiento con las palabras de la lección",
-      "found": "Encontradas",
-      "total": "Total",
-      "completion": "Puntuación",
-      "foundList": "Palabras que Encontraste",
-      "missedList": "Palabras que Perdiste",
-      "perfectScore": "¡Perfecto! ¡Encontraste todas las palabras de la lección!"
-    },
-    "students": "estudiantes",
-    "milestones": {
-      "xpRemaining": "{{xp}} XP para Nivel {{level}}",
-      "nextMilestone": "Próximo Hito",
-      "titleUnlock": "Desbloquea: {{title}}",
-      "reached": "¡Hito Alcanzado!",
-      "xpBonus": "+{{xp}} XP Bonus",
-      "coinBonus": "+{{coins}} Monedas",
-      "continue": "Continuar",
-      "maxLevel": "¡Nivel Máximo!",
-      "level": "Nivel",
-      "titleUnlocked": "Título Desbloqueado"
-    },
-    "starterPacks": {
-      "title": "Paquetes de Lecciones",
-      "subtitle": "Conjuntos de vocabulario listos para asignar",
-      "useThisPack": "Usar este paquete",
-      "commonEnglish": {
-        "name": "Palabras Comunes en Inglés",
-        "description": "30 palabras cotidianas esenciales para principiantes"
-      },
-      "academicVocab": {
-        "name": "Vocabulario Académico",
-        "description": "25 términos académicos clave para lectura y escritura"
-      },
-      "beginnerHebrew": {
-        "name": "Hebreo para Principiantes",
-        "description": "20 palabras básicas en hebreo con definiciones"
-      }
-    }
-  },
-  "crazygames": {
-    "ads": {
-      "watchForReward": "Ver anuncio por {{reward}}",
-      "adPlaying": "Reproduciendo anuncio...",
-      "adError": "Anuncio no disponible",
-      "adblockDetected": "Adblock detectado — algunas funciones pueden estar limitadas",
-      "thanksForWatching": "¡Gracias por ver!"
-    },
-    "cloudSave": {
-      "syncing": "Sincronizando progreso...",
-      "syncSuccess": "¡Progreso sincronizado!",
-      "syncError": "Falló la sincronización — lo intentaremos de nuevo",
-      "conflictResolved": "Progreso actualizado desde la nube"
-    }
-  },
-  "notifications": {
-    "title": "Notificaciones",
-    "bell": "Notificaciones",
-    "bellUnread": "{count} notificaciones sin leer",
-    "empty": "Sin notificaciones aún",
-    "emptyDesc": "Cuando recibas notificaciones, aparecerán aquí",
-    "markAllRead": "Marcar todo como leído",
-    "markAsRead": "Marcar como leído",
-    "viewAll": "Ver todo",
-    "more": "más",
-    "newNotification": "Nueva notificación",
-    "justNow": "Ahora mismo",
-    "minutesAgo": "Hace {count} minuto",
-    "minutesAgoPlural": "Hace {count} minutos",
-    "hoursAgo": "Hace {count} hora",
-    "hoursAgoPlural": "Hace {count} horas",
-    "daysAgo": "Hace {count} día",
-    "daysAgoPlural": "Hace {count} días",
-    "view": "Ver",
-    "dismiss": "Descartar",
-    "types": {
-      "gift": "Regalo",
-      "system": "Sistema",
-      "achievement": "Logro",
-      "social": "Social",
-      "marketing": "Noticias"
-    },
-    "gift": {
-      "title": "¡Recibiste un regalo!",
-      "body": "{sender} te envió {xp} XP y {coins} monedas!"
-    },
-    "admin": {
-      "sendTitle": "Enviar Notificación",
-      "selectPlayers": "Seleccionar Destinatarios",
-      "chooseType": "Elegir Tipo",
-      "writeMessage": "Escribir Mensaje",
-      "preview": "Vista Previa",
-      "send": "Enviar",
-      "sending": "Enviando...",
-      "sent": "¡Notificación Enviada!",
-      "recipients": "Destinatarios",
-      "type": "Tipo",
-      "sendingTo": "Enviando a",
-      "titleLabel": "Título",
-      "titlePlaceholder": "Título de la notificación...",
-      "bodyLabel": "Mensaje",
-      "bodyPlaceholder": "Mensaje de la notificación...",
-      "actionUrlLabel": "URL de Acción",
-      "sendSuccess": "¡Notificación enviada con éxito!",
-      "sendError": "Error al enviar notificación. Intenta de nuevo."
-    },
-    "prompt": {
-      "title": "¡Mantente en el juego!",
-      "body": "Recibe recordatorios de desafíos diarios y advertencias de racha",
-      "enable": "Activar notificaciones",
-      "notNow": "Ahora no"
-    },
-    "preferences": {
-      "title": "Configuración de notificaciones",
-      "dailyChallenge": "Recordatorio de desafío diario",
-      "streakWarning": "Advertencia de racha en riesgo",
-      "friendInvites": "Invitaciones de desafío de amigos",
-      "weeklySummary": "Resumen semanal"
-    }
-  },
-  "native": {
-    "offline": {
-      "title": "Sin Conexión",
-      "message": "No podemos conectar con el servidor del juego. Por favor, verifica tu conexión a Internet.",
-      "retry": "Intentar de Nuevo",
-      "retrying": "Conectando..."
-    }
-  },
-  "system": {
-    "updatingToNewVersion": "Actualizando a nueva versión..."
-  },
-  "education": {
     "reviewDue": "{count} palabras por repasar",
     "postGame": {
       "wordsYouLearned": "Palabras que aprendiste",
@@ -8980,20 +8187,29 @@ const es = {
       "joinClassroomToDuel": "Únete a una clase para competir",
       "noClassmatesOnline": "No hay compañeros conectados ahora",
       "challengeSomeone": "¡Reta a alguien!",
-      "rematch": "Revancha"
+      "rematch": "Revancha",
+      "loading": "Cargando tu duelo...",
+      "vs": "vs",
+      "pvp": "PVP",
+      "unknownLesson": "Lección desconocida",
+      "online": "En línea"
+    },
+    "challenges": {
+      "xpReward": "+{{amount}} XP",
+      "coinReward": "+{{amount}} monedas"
     },
     "achievements": {
       "completion": "{{percent}}% completado",
       "continue": "¡Sigue así!",
-      "earned": "Obtenido {{date}}",
+      "earned": "{{count}} de {{total}} obtenidos",
       "featured": "Insignia destacada",
       "locked": "Bloqueado",
       "maxPinsReached": "Máximo de fijados alcanzado",
       "maxTier": "Nivel máximo",
       "newBadge": "¡Nueva insignia desbloqueada!",
       "pin": "Fijar en tu perfil",
-      "pinLimit": "Desfija una para fijar otra",
-      "progress": "{{current}}/{{total}}",
+      "pinLimit": "{{current}}/{{max}} fijados. Desfija una para fijar otra",
+      "progress": "{{current}}/{{next}}",
       "secret": "Logro secreto",
       "secretRemaining": "Quedan {{count}} secretos",
       "tierUpgrade": "¡Subiste de nivel!",
@@ -9007,7 +8223,7 @@ const es = {
       "toNext": "{{percent}}% para {{tier}}",
       "unlocked": "¡Desbloqueado!",
       "unpin": "Desfijar",
-      "upgraded": "¡Insignia mejorada!"
+      "upgraded": "¡Insignia mejorada a {{tier}}!"
     },
     "mastery": {
       "flashcardPerfect": "¡Perfecto! ¡Dominaste las {{count}} palabras!",
@@ -9177,7 +8393,7 @@ const es = {
       "top50": "Top 50",
       "totalXP": "XP total",
       "weekly": "Semanal",
-      "xp": "{{amount}} XP"
+      "xp": "{{xp}} XP"
     },
     "lesson": {
       "autoPronounce": "Auto-pronunciar",
@@ -9342,8 +8558,182 @@ const es = {
       "streak": "Racha de días",
       "keepGoing": "¡Sigue practicando para subir!",
       "newTitleUnlocked": "¡Nuevo título desbloqueado!",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "xpLabel": "XP"
+    },
+    "lessonWords": {
+      "title": "Vocabulario de la Lección",
+      "subtitle": "Tu rendimiento con las palabras de la lección",
+      "found": "Encontradas",
+      "total": "Total",
+      "completion": "Puntuación",
+      "foundList": "Palabras que Encontraste",
+      "missedList": "Palabras que Perdiste",
+      "perfectScore": "¡Perfecto! ¡Encontraste todas las palabras de la lección!"
+    },
+    "badges": {
+      "wordExplorer": "Explorador de Palabras",
+      "vocabMaster": "Maestro del Vocabulario",
+      "speedScholar": "Erudito Veloz",
+      "locked": "Bloqueado"
+    },
+    "reports": {
+      "title": "Reportes de Progreso",
+      "subtitle": "Genera reportes detallados para estudiantes y padres",
+      "classReport": "Reporte de la Clase",
+      "studentReport": "Reporte del Estudiante",
+      "exportPDF": "Exportar PDF",
+      "exportCSV": "Exportar CSV",
+      "generateReport": "Generar Reporte",
+      "generating": "Generando...",
+      "dateRange": "Rango de Fechas",
+      "allTime": "Todo el Tiempo",
+      "lastWeek": "Últimos 7 Días",
+      "lastMonth": "Últimos 30 Días",
+      "custom": "Rango Personalizado",
+      "from": "Desde",
+      "to": "Hasta",
+      "selectStudent": "Seleccionar Estudiante",
+      "allStudents": "Todos los Estudiantes",
+      "noDataAvailable": "No hay datos para este período",
+      "reportGenerated": "Reporte generado exitosamente",
+      "downloadReady": "Tu reporte está listo para descargar",
+      "metrics": {
+        "wordsLearned": "Palabras Aprendidas",
+        "totalWords": "Total de Palabras",
+        "accuracy": "Precisión",
+        "practiceTime": "Tiempo de Práctica",
+        "currentStreak": "Racha Actual",
+        "longestStreak": "Racha Más Larga",
+        "sessionsCompleted": "Sesiones Completadas",
+        "averageScore": "Puntuación Promedio",
+        "masteryLevel": "Nivel de Dominio",
+        "improvement": "Mejora"
+      },
+      "classMetrics": {
+        "classAverage": "Promedio de la Clase",
+        "topPerformer": "Mejor Desempeño",
+        "mostImproved": "Mayor Mejora",
+        "needsAttention": "Necesita Atención",
+        "participationRate": "Tasa de Participación",
+        "completionRate": "Tasa de Finalización"
+      },
+      "sections": {
+        "summary": "Resumen",
+        "wordMastery": "Dominio de Palabras",
+        "practiceHistory": "Historial de Práctica",
+        "recommendations": "Recomendaciones"
+      },
+      "studentRanking": "Ranking de Estudiantes",
+      "rank": "Puesto",
+      "student": "Estudiante",
+      "score": "Puntuación",
+      "noStudents": "No se encontraron estudiantes",
+      "printReport": "Imprimir Reporte",
+      "emailReport": "Enviar Reporte por Email",
+      "error": {
+        "generateFailed": "Error al generar el reporte",
+        "exportFailed": "Error al exportar el reporte",
+        "noData": "No hay datos disponibles para el reporte"
+      }
+    },
+    "wordOfTheDay": {
+      "title": "Palabra del Dia",
+      "learnMore": "Saber Mas"
+    },
+  },
+  "crazygames": {
+    "ads": {
+      "watchForReward": "Ver anuncio por {{reward}}",
+      "adPlaying": "Reproduciendo anuncio...",
+      "adError": "Anuncio no disponible",
+      "adblockDetected": "Adblock detectado — algunas funciones pueden estar limitadas",
+      "thanksForWatching": "¡Gracias por ver!"
+    },
+    "cloudSave": {
+      "syncing": "Sincronizando progreso...",
+      "syncSuccess": "¡Progreso sincronizado!",
+      "syncError": "Falló la sincronización — lo intentaremos de nuevo",
+      "conflictResolved": "Progreso actualizado desde la nube"
     }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "bell": "Notificaciones",
+    "bellUnread": "{count} notificaciones sin leer",
+    "empty": "Sin notificaciones aún",
+    "emptyDesc": "Cuando recibas notificaciones, aparecerán aquí",
+    "markAllRead": "Marcar todo como leído",
+    "markAsRead": "Marcar como leído",
+    "viewAll": "Ver todo",
+    "more": "más",
+    "newNotification": "Nueva notificación",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "Hace {count} minuto",
+    "minutesAgoPlural": "Hace {count} minutos",
+    "hoursAgo": "Hace {count} hora",
+    "hoursAgoPlural": "Hace {count} horas",
+    "daysAgo": "Hace {count} día",
+    "daysAgoPlural": "Hace {count} días",
+    "view": "Ver",
+    "dismiss": "Descartar",
+    "showAll": "Todas",
+    "unreadOnly": "No leídas",
+    "types": {
+      "gift": "Regalo",
+      "system": "Sistema",
+      "achievement": "Logro",
+      "social": "Social",
+      "marketing": "Noticias"
+    },
+    "gift": {
+      "title": "¡Recibiste un regalo!",
+      "body": "{sender} te envió {xp} XP y {coins} monedas!"
+    },
+    "admin": {
+      "sendTitle": "Enviar Notificación",
+      "selectPlayers": "Seleccionar Destinatarios",
+      "chooseType": "Elegir Tipo",
+      "writeMessage": "Escribir Mensaje",
+      "preview": "Vista Previa",
+      "send": "Enviar",
+      "sending": "Enviando...",
+      "sent": "¡Notificación Enviada!",
+      "recipients": "Destinatarios",
+      "type": "Tipo",
+      "sendingTo": "Enviando a",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Título de la notificación...",
+      "bodyLabel": "Mensaje",
+      "bodyPlaceholder": "Mensaje de la notificación...",
+      "actionUrlLabel": "URL de Acción",
+      "sendSuccess": "¡Notificación enviada con éxito!",
+      "sendError": "Error al enviar notificación. Intenta de nuevo."
+    },
+    "prompt": {
+      "title": "¡Mantente en el juego!",
+      "body": "Recibe recordatorios de desafíos diarios y advertencias de racha",
+      "enable": "Activar notificaciones",
+      "notNow": "Ahora no"
+    },
+    "preferences": {
+      "title": "Configuración de notificaciones",
+      "dailyChallenge": "Recordatorio de desafío diario",
+      "streakWarning": "Advertencia de racha en riesgo",
+      "friendInvites": "Invitaciones de desafío de amigos",
+      "weeklySummary": "Resumen semanal"
+    }
+  },
+  "native": {
+    "offline": {
+      "title": "Sin Conexión",
+      "message": "No podemos conectar con el servidor del juego. Por favor, verifica tu conexión a Internet.",
+      "retry": "Intentar de Nuevo",
+      "retrying": "Conectando..."
+    }
+  },
+  "system": {
+    "updatingToNewVersion": "Actualizando a nueva versión..."
   },
   "duels": {
     "addWord": "Agregar palabra",

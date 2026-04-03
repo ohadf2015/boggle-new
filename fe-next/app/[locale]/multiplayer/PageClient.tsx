@@ -365,7 +365,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   return (
     <SocketContext.Provider value={socketContextValue}>
       <ErrorBoundary>
-        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-hidden">
+        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-clip">
           {/* Banners inside h-dvh so they participate in flex layout */}
           {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
             setIsActive(false); setIsHost(false); setGameCode('');

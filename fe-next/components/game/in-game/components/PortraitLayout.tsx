@@ -299,7 +299,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-4 lg:px-3 xl:px-4">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-4 px-2 lg:px-3 xl:px-4">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -318,7 +318,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div

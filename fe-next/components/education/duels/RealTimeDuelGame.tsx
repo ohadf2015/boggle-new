@@ -299,7 +299,7 @@ export function RealTimeDuelGame({
             <p className="text-sm opacity-70">{t('duels.you')}</p>
             <p className="text-3xl font-bold">{myScore}</p>
           </div>
-          <div className="text-neo-white text-3xl">vs</div>
+          <div className="text-neo-white text-3xl">{t('education.duels.vs')}</div>
           <div className="text-neo-white">
             <p className="text-sm opacity-70">{opponentName}</p>
             <p className="text-3xl font-bold">{opponentScore}</p>

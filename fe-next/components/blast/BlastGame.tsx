@@ -73,7 +73,7 @@ export function BlastGame({
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
-  const { playComboSound } = useSoundEffects();
+  const { playComboSound, playBoardShuffleSound } = useSoundEffects();
   const sounds = useBlastSounds();
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
@@ -341,6 +341,16 @@ export function BlastGame({
     if (word.length > 0) sounds.playPathTone(word.length);
   }, [sounds]);
 
+  // Play rejection sound when word is rejected
+  const prevFeedbackIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const fb = wordSubmission.currentFeedback;
+    if (fb && fb.type === 'rejected' && fb.id !== prevFeedbackIdRef.current) {
+      sounds.playWordReject();
+    }
+    prevFeedbackIdRef.current = fb?.id ?? null;
+  }, [wordSubmission.currentFeedback, sounds]);
+
   const handleQuit = useCallback(() => {
     onQuit();
   }, [onQuit]);
@@ -374,18 +384,27 @@ export function BlastGame({
     prevMovesRef.current = movesRemaining;
   }, [engine.gameState.movesRemaining, sounds]);
 
+  // Play wave-clear sound once when objectives are met (but don't end the game)
+  const waveClearPlayedRef = useRef(false);
+  useEffect(() => {
+    if (objectives.allObjectivesComplete && !waveClearPlayedRef.current) {
+      sounds.playWaveClear();
+      waveClearPlayedRef.current = true;
+    }
+  }, [objectives.allObjectivesComplete, sounds]);
+
   // Game end detection (SP only — MP uses server timer)
+  // Player keeps playing until moves run out, board clears, or dead end — objectives don't stop the game
   useEffect(() => {
     if (isMultiplayer) return undefined;
 
-    // All objectives met
-    if (objectives.allObjectivesComplete) {
-      sounds.playWaveClear();
+    // Board cleared — all tiles gone
+    if (engine.gameState.isComplete) {
       const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
       const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
       const scoreThreshold = waveConfig?.scoreThreshold;
 
-      if (onWaveComplete && (!scoreThreshold || score >= scoreThreshold)) {
+      if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
         const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
         return () => clearTimeout(timer);
       }
@@ -395,15 +414,17 @@ export function BlastGame({
       return () => clearTimeout(timer);
     }
 
-    // Board cleared (no objectives or objectives not met)
-    if (engine.gameState.isComplete) {
-      const results = engine.getResults(combo.maxCombo);
-      const timer = setTimeout(() => onGameEnd(results), 2000);
-      return () => clearTimeout(timer);
-    }
-
-    // Dead end — give player 5s grace to shuffle before auto-ending
+    // Dead end (includes moves exhausted) — check if objectives were met for wave advance
     if (engine.gameState.isDeadEnd) {
+      const { score, wordsFound, tilesCleared, totalTiles } = engine.gameState;
+      const clearPct = totalTiles > 0 ? Math.min(100, Math.round((tilesCleared / totalTiles) * 100)) : 0;
+      const scoreThreshold = waveConfig?.scoreThreshold;
+
+      if (onWaveComplete && objectives.allObjectivesComplete && (!scoreThreshold || score >= scoreThreshold)) {
+        const timer = setTimeout(() => onWaveComplete(score, wordsFound, clearPct), 2000);
+        return () => clearTimeout(timer);
+      }
+
       const results = engine.getResults(combo.maxCombo);
       const timer = setTimeout(() => onGameEnd(results), 5000);
       return () => clearTimeout(timer);
@@ -413,6 +434,7 @@ export function BlastGame({
   }, [
     engine.gameState.isComplete,
     engine.gameState.isDeadEnd,
+    engine.gameState.movesRemaining,
     objectives.allObjectivesComplete,
     engine,
     combo.maxCombo,
@@ -455,7 +477,7 @@ export function BlastGame({
         onWordSubmit={handleWordSubmit}
         onPathSubmit={handlePathSubmit}
         onWordChange={handleWordChange}
-        onShuffle={engine.shuffleGrid}
+        onShuffle={() => { engine.shuffleGrid(); playBoardShuffleSound(); }}
         onQuit={handleQuit}
         noWordsRemaining={engine.noWordsRemaining}
         scoreFlyEvents={scoreFlyEvents}

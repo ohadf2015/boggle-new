@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Swords, Trophy, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,7 +15,8 @@ type Tab = 'lobby' | 'history' | 'classmates';
 
 export default function DuelsPageClient() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('lobby');
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
@@ -22,7 +24,10 @@ export default function DuelsPageClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      router.push(`/${language}/education`);
+      return;
+    }
 
     async function loadData() {
       setLoading(true);
@@ -40,7 +45,7 @@ export default function DuelsPageClient() {
       setLoading(false);
     }
     loadData();
-  }, [user]);
+  }, [user, router, language]);
 
   if (!user) return null;
 

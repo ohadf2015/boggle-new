@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 // ============================================
@@ -161,7 +162,7 @@ export default function AchievementProgressCard({
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
               >
-                <span className="text-lg">{isPinned ? '⭐' : '☆'}</span>
+                {isPinned ? <Star className="w-4 h-4 fill-current" /> : <Star className="w-4 h-4" />}
               </button>
             )}
           </div>

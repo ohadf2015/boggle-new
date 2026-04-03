@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DailyChallengeRow } from '@/lib/supabase/education/types';
 
@@ -14,7 +15,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
   const tierColors = {
     easy: 'bg-green-500',
-    medium: 'bg-neo-orange',
+    medium: 'bg-neo-pink',
     hard: 'bg-neo-pink',
   };
 
@@ -46,7 +47,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
         {t(challenge.title)}
       </h3>
       <p className="text-sm text-neo-white/60 mb-3" data-testid="challenge-description">
-        {t(challenge.description).replace('{target}', String(challenge.target_value))}
+        {t(challenge.description, { target: challenge.target_value })}
       </p>
 
       {/* Progress Bar */}
@@ -65,9 +66,9 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
       {/* Rewards */}
       <div className="flex items-center gap-3 mb-3 text-sm">
-        <span className="text-neo-lime">+{challenge.xp_reward} XP</span>
+        <span className="text-neo-lime">{t('education.challenges.xpReward', { amount: challenge.xp_reward })}</span>
         {challenge.bonus_reward?.coins && (
-          <span className="text-neo-orange">+{challenge.bonus_reward.coins} coins</span>
+          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: challenge.bonus_reward.coins })}</span>
         )}
       </div>
 
@@ -85,7 +86,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       {/* Claimed State */}
       {isClaimed && (
         <div className="text-center text-green-400 font-bold" data-testid="claimed-badge">
-          ✓ {t('challenges.claimed')}
+          <Check className="w-4 h-4 inline" /> {t('challenges.claimed')}
         </div>
       )}
     </div>

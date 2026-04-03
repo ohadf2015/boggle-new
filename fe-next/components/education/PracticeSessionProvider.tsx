@@ -139,9 +139,9 @@ export function PracticeSessionProvider({
   const [perfectGames, setPerfectGames] = useState<number>(0);
   const [morningPractices, setMorningPractices] = useState<number>(0);
   const modesTriedRef = useRef<Set<string>>(new Set());
-  const [modesTriedCount, setModesTriedCount] = useState<number>(1);
+  const [, setModesTriedCount] = useState<number>(1);
   const uniqueWordsRef = useRef<Set<string>>(new Set());
-  const [uniqueWordsCount, setUniqueWordsCount] = useState<number>(0);
+  const [, setUniqueWordsCount] = useState<number>(0);
   const [practiceDaysThisMonth, setPracticeDaysThisMonth] = useState<number>(0);
 
   // Initialize achievement trackers from localStorage on mount
@@ -293,25 +293,27 @@ export function PracticeSessionProvider({
           setPracticeDaysThisMonth(newDaysThisMonth);
         } catch { /* noop */ }
 
-        // Check for achievement unlocks after XP is awarded
+        // Check for achievement unlocks after XP is awarded.
+        // Fields not tracked in education context use 0 (won't falsely unlock)
+        // rather than hardcoded 1 which could falsely unlock achievements.
         checkForUnlocks({
           totalXp: totalXp + result.totalXp,
           wordsMastered: newWordsMastered,
           currentLevel: result.newLevel || currentLevel,
           currentStreak: streak.currentStreak,
           practiceSessions: newSessionCount,
-          lessonsCompleted: 1, // At least 1 if practicing
+          lessonsCompleted: newSessionCount,
           wordsInGame,
           perfectGames: newPerfectGames,
-          bossesDefeated: 0, // Not applicable in education context
-          combosAchieved: 0, // Not applicable in education context
+          bossesDefeated: 0,
+          combosAchieved: 0,
           morningPractices: newMorningPractices,
           daysThisMonth: newDaysThisMonth,
-          weeksWith5Days: 0, // Requires weekly aggregation — not yet tracked
+          weeksWith5Days: 0,
           longestStreak: streak.longestStreak || 0,
           modesTried: newModesTriedCount,
-          lessonsCollected: 1,
-          classroomsJoined: 1, // Assume 1 if in classroom
+          lessonsCollected: newModesTriedCount,
+          classroomsJoined: 0,
           uniqueWords: newUniqueWordsCount,
         });
       } catch (error) {

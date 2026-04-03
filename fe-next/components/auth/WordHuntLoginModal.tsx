@@ -20,6 +20,7 @@ import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { isNative } from '../../utils/platform';
 import { validateEmail } from '../../utils/validation';
 import { cn } from '../../lib/utils';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -44,6 +45,7 @@ interface WordHuntLoginModalProps {
 
 const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -62,6 +64,14 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     onError: (msg) => setError(msg),
     onSuccess: () => onClose(),
   });
+
+  // On CrazyGames, use their native auth instead of our modal
+  useEffect(() => {
+    if (isOpen && isOnCrazyGamesPlatform) {
+      showAuthPrompt();
+      onClose();
+    }
+  }, [isOpen, isOnCrazyGamesPlatform, showAuthPrompt, onClose]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
     setError(null);

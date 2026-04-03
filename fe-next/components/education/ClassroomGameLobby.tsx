@@ -11,7 +11,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
-import { BookOpen, School, LayoutGrid, Search, Zap } from 'lucide-react';
+import { BookOpen, School } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -96,22 +96,41 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   // Initialize Socket.IO
   useEffect(() => {
     const socketUrl = getSocketURL();
-    const socketInstance = io(socketUrl, { transports: ['websocket', 'polling'] });
+    let socketInstance: ReturnType<typeof io>;
 
-    socketInstance.on('connect', () => { logger.info('Connected to Socket.IO'); });
-    socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
-      if (data.success) {
-        toast.success(t('education.classroomGame.gameCreated'));
-        router.push(`/${language}/multiplayer?code=${data.gameCode}&classroom=true`);
+    async function initSocket() {
+      let token: string | undefined;
+      try {
+        const { createClient } = await import('@/utils/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
+      } catch {
+        // proceed without token
       }
-    });
-    socketInstance.on('classroomGameError', (data: { error: string }) => {
-      toast.error(data.error);
-      setIsStarting(false);
-    });
 
-    setSocket(socketInstance);
-    return () => { socketInstance.disconnect(); };
+      socketInstance = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        auth: token ? { token } : {},
+      });
+
+      socketInstance.on('connect', () => { logger.info('Connected to Socket.IO'); });
+      socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
+        if (data.success) {
+          toast.success(t('education.classroomGame.gameCreated'));
+          router.push(`/${language}/multiplayer?code=${data.gameCode}&classroom=true`);
+        }
+      });
+      socketInstance.on('classroomGameError', (data: { error: string }) => {
+        toast.error(data.error);
+        setIsStarting(false);
+      });
+
+      setSocket(socketInstance);
+    }
+
+    initSocket();
+    return () => { socketInstance?.disconnect(); };
   }, [t, language, router]);
 
   // Generate game code on mount

@@ -17,7 +17,7 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Users, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, ArrowUp, ArrowDown, Flame, User, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { getLeaderboardTier } from '@/lib/supabase/education/leaderboard';
@@ -279,7 +279,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-neo-navy border-neo border-neo-black flex items-center justify-center">
-            <span className="text-2xl">👤</span>
+            <User className="w-4 h-4" />
           </div>
         )}
 
@@ -313,7 +313,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
                 data-testid="streak-badge"
                 className="px-2 py-0.5 text-xs font-neo-body bg-neo-orange text-white rounded flex items-center gap-1"
               >
-                🔥 {currentStreak}
+                <Flame className="w-4 h-4 inline" /> {currentStreak}
               </span>
             )}
 
@@ -453,7 +453,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           animate={{ opacity: 1, x: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
         >
-          <span className="text-3xl">🏆</span>
+          <Trophy className="w-5 h-5" />
           <h2 className="font-neo-display font-black text-2xl text-neo-white">
             {t('education.leaderboard.title')}
           </h2>
@@ -466,7 +466,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
         <AdaptiveAnimatePresence mode="wait">
           <AdaptiveMotion.div
             key={timeScope}
-            className="space-y-3 max-h-[600px] overflow-y-auto"
+            className="space-y-3 max-h-[60vh] overflow-y-auto"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}

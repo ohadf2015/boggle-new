@@ -41,7 +41,7 @@ export async function getStudentsProgressSummary(
 
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id, display_name, avatar_url')
+      .select('id, display_name, avatar_config')
       .in('id', studentIds);
 
     if (profileError) {
@@ -121,7 +121,7 @@ export async function getStudentsProgressSummary(
 
       summaries.push({
         studentId, displayName: profile.display_name || 'Unknown',
-        avatarUrl: profile.avatar_url, totalXp, currentLevel, vocabularyMastery,
+        avatarUrl: profile.avatar_config || null, totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,
       });
@@ -191,8 +191,7 @@ export async function getLessonEffectiveness(
     const { data: progressData, error: progressError } = await supabase
       .from('student_lesson_progress')
       .select('student_id, lesson_id, total_xp, completed_at, words_attempted')
-      .in('student_id', studentIds)
-      .eq('classroom_id', classroomId);
+      .in('student_id', studentIds);
 
     if (progressError) {
       logger.error('Error fetching student progress:', progressError);

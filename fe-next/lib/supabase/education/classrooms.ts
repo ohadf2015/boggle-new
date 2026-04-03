@@ -338,7 +338,7 @@ export async function getClassroomStudents(
     const studentIds = memberships.map(m => m.student_id);
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, username, avatar_emoji, avatar_color')
+      .select('id, username, avatar_config')
       .in('id', studentIds);
 
     if (profilesError) {

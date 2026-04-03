@@ -157,9 +157,10 @@ export function WorldMapBackground({
           translateY: cloudsParallaxY,
         }}
       >
-        <Cloud className="top-[15%] left-[5%]" size="md" speed={0.5} />
-        <Cloud className="top-[50%] right-[6%]" size="lg" speed={0.4} />
-        <Cloud className="top-[80%] left-[8%]" size="sm" speed={0.6} />
+        <Cloud className="top-[12%] left-[3%]" size="lg" speed={0.3} />
+        <Cloud className="top-[45%] right-[4%]" size="md" speed={0.4} />
+        <Cloud className="top-[75%] left-[6%]" size="lg" speed={0.35} />
+        <Cloud className="top-[30%] right-[12%]" size="sm" speed={0.5} />
       </AdaptiveMotion.div>
     </>
   );

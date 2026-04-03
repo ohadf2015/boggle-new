@@ -34,7 +34,7 @@ export async function getStudentReportData(
     // Get student profile
     const { data: student, error: studentError } = await supabase
       .from('profiles')
-      .select('id, display_name, avatar_url')
+      .select('id, display_name, avatar_config')
       .eq('id', studentId)
       .single();
 
@@ -136,7 +136,7 @@ export async function getStudentReportData(
     const reportData: StudentReportData = {
       studentId,
       studentName: student.display_name || 'Unknown Student',
-      avatarUrl: student.avatar_url,
+      avatarUrl: student.avatar_config || null,
       classroomName: classroom.name,
       dateRange: dateRange || null,
       metrics: {
@@ -197,7 +197,7 @@ export async function getClassReportData(
       .from('classroom_students')
       .select(`
         student_id,
-        profiles!classroom_students_student_id_fkey(id, display_name, avatar_url)
+        profiles!classroom_students_student_id_fkey(id, display_name, avatar_config)
       `)
       .eq('classroom_id', classroomId)
       .eq('status', 'active');
@@ -234,7 +234,7 @@ export async function getClassReportData(
 
     students?.forEach((studentRecord) => {
       const profilesData = studentRecord.profiles;
-      const profile = (Array.isArray(profilesData) ? profilesData[0] : profilesData) as { id: string; display_name: string | null; avatar_url: string | null } | null;
+      const profile = (Array.isArray(profilesData) ? profilesData[0] : profilesData) as { id: string; display_name: string | null; avatar_config: Record<string, unknown> | null } | null;
       const studentProgress = progressData?.filter(p => p.student_id === studentRecord.student_id) || [];
 
       let studentCorrect = 0;

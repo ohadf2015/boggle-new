@@ -20,6 +20,8 @@ import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
+import { BlastScoreMilestone } from './BlastScoreMilestone';
+import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
@@ -170,6 +172,11 @@ export function BlastStage({
         intensity={sequencerState?.chainLevel ?? 0}
       />
 
+      {/* Score milestone announcements */}
+      <BlastScoreMilestone score={score} />
+      {/* Combo milestone announcements */}
+      <ComboMilestoneAnnouncement comboLevel={comboLevel} />
+
       {/* 1. HUD */}
       <BlastHUD
         score={score}
@@ -256,7 +263,7 @@ export function BlastStage({
       >
         {/* Ornate board frame — golden trim with recessed interior */}
         <div
-          className="relative w-full max-w-[min(96vw,96dvh-180px)] sm:max-w-[min(420px,88dvh-180px)] md:max-w-[min(480px,85dvh-180px)] lg:max-w-[min(500px,55dvh)]"
+          className="relative w-full max-w-[min(90vw,90dvh-180px)] sm:max-w-[min(420px,88dvh-180px)] md:max-w-[min(480px,85dvh-180px)] lg:max-w-[min(500px,55dvh)]"
           style={{
             padding: '6px',
             borderRadius: '20px',

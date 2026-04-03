@@ -31,64 +31,80 @@ export function useActiveClassroomGame(classroomId: string) {
 
   useEffect(() => {
     const socketUrl = getSocketURL();
-    const socketInstance = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-    });
+    let socketInstance: ReturnType<typeof io>;
 
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-      requestActiveGames(socketInstance);
-    });
-
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    socketInstance.io.on('reconnect', () => {
-      requestActiveGames(socketInstance);
-    });
-
-    socketInstance.on('classroomGameCreated', (data: {
-      gameCode: string;
-      teacherName: string;
-      lessonNames: string[];
-    }) => {
-      setActiveGame({
-        gameCode: data.gameCode,
-        teacherName: data.teacherName,
-        lessonNames: data.lessonNames,
-      });
-    });
-
-    socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
-      if (data.games && data.games.length > 0) {
-        setActiveGame(data.games[0]);
+    async function initSocket() {
+      let token: string | undefined;
+      try {
+        const { createClient } = await import('@/utils/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
+      } catch {
+        // proceed without token
       }
-    });
 
-    socketInstance.on('classroomGamePlayerJoined', (data: {
-      gameCode: string;
-      playerCount: number;
-    }) => {
-      setActiveGame((current) => {
-        if (current && current.gameCode === data.gameCode) {
-          return { ...current, playerCount: data.playerCount };
-        }
-        return current;
+      socketInstance = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        auth: token ? { token } : {},
       });
-    });
 
-    setSocket(socketInstance);
+      socketInstance.on('connect', () => {
+        setIsConnected(true);
+        requestActiveGames(socketInstance);
+      });
 
-    pollIntervalRef.current = setInterval(() => {
-      requestActiveGames(socketInstance);
-    }, POLL_INTERVAL);
+      socketInstance.on('disconnect', () => {
+        setIsConnected(false);
+      });
 
+      socketInstance.io.on('reconnect', () => {
+        requestActiveGames(socketInstance);
+      });
+
+      socketInstance.on('classroomGameCreated', (data: {
+        gameCode: string;
+        teacherName: string;
+        lessonNames: string[];
+      }) => {
+        setActiveGame({
+          gameCode: data.gameCode,
+          teacherName: data.teacherName,
+          lessonNames: data.lessonNames,
+        });
+      });
+
+      socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
+        if (data.games && data.games.length > 0) {
+          setActiveGame(data.games[0]);
+        }
+      });
+
+      socketInstance.on('classroomGamePlayerJoined', (data: {
+        gameCode: string;
+        playerCount: number;
+      }) => {
+        setActiveGame((current) => {
+          if (current && current.gameCode === data.gameCode) {
+            return { ...current, playerCount: data.playerCount };
+          }
+          return current;
+        });
+      });
+
+      setSocket(socketInstance);
+
+      pollIntervalRef.current = setInterval(() => {
+        requestActiveGames(socketInstance);
+      }, POLL_INTERVAL);
+    }
+
+    initSocket();
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
-      socketInstance.disconnect();
+      socketInstance?.disconnect();
     };
   }, [classroomId, requestActiveGames]);
 

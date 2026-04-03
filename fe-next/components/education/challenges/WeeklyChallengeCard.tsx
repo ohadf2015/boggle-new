@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { WeeklyQuestRow } from '@/lib/supabase/education/types';
 
@@ -35,7 +36,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
 
       <h3 className="font-neo-display text-lg text-white mb-1">{t(quest.title)}</h3>
       <p className="text-sm text-neo-white/60 mb-3">
-        {t(quest.description).replace('{target}', String(requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0))}
+        {t(quest.description, { target: requirementKey ? (quest.requirements as any)?.[requirementKey] || 0 : 0 })}
       </p>
 
       <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
@@ -51,9 +52,9 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       </div>
 
       <div className="flex items-center gap-3 mb-3 text-sm">
-        <span className="text-neo-lime">+{quest.xp_reward} XP</span>
+        <span className="text-neo-lime">{t('education.challenges.xpReward', { amount: quest.xp_reward })}</span>
         {quest.bonus_rewards?.coins && (
-          <span className="text-neo-orange">+{quest.bonus_rewards.coins} coins</span>
+          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: quest.bonus_rewards.coins })}</span>
         )}
       </div>
 
@@ -69,7 +70,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
 
       {quest.claimed && (
         <div className="text-center text-green-400 font-bold">
-          ✓ {t('challenges.claimed')}
+          <Check className="w-4 h-4 inline" /> {t('challenges.claimed')}
         </div>
       )}
     </div>

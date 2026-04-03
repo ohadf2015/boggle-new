@@ -25,6 +25,7 @@ export function NotificationDropdown({
   const { t } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showAll, setShowAll] = useState(false);
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
   // Reset expanded state when dropdown closes — derived from prop change
   const prevIsOpen = useRef(isOpen);
@@ -33,8 +34,11 @@ export function NotificationDropdown({
   }
   prevIsOpen.current = isOpen;
 
-  const visibleNotifications = showAll ? notifications : notifications.slice(0, MAX_VISIBLE);
-  const hasMore = notifications.length > MAX_VISIBLE;
+  const filteredNotifications = showUnreadOnly
+    ? notifications.filter((n) => !n.read)
+    : notifications;
+  const visibleNotifications = showAll ? filteredNotifications : filteredNotifications.slice(0, MAX_VISIBLE);
+  const hasMore = filteredNotifications.length > MAX_VISIBLE;
 
   // Close on click outside
   useEffect(() => {
@@ -83,17 +87,30 @@ export function NotificationDropdown({
         <h3 className="font-neo-display text-neo-white text-lg">
           {t('notifications.title')}
         </h3>
-        {unreadCount > 0 && (
-          <button
-            onClick={onMarkAllAsRead}
-            className="
-              text-xs text-neo-cyan hover:text-neo-yellow
-              transition-colors font-medium
-            "
-          >
-            {t('notifications.markAllRead')}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {notifications.length > unreadCount && (
+            <button
+              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+              className={`
+                text-xs transition-colors font-medium
+                ${showUnreadOnly ? 'text-neo-yellow' : 'text-neo-white/50 hover:text-neo-cyan'}
+              `}
+            >
+              {showUnreadOnly ? t('notifications.showAll', 'All') : t('notifications.unreadOnly', 'Unread')}
+            </button>
+          )}
+          {unreadCount > 0 && (
+            <button
+              onClick={onMarkAllAsRead}
+              className="
+                text-xs text-neo-cyan hover:text-neo-yellow
+                transition-colors font-medium
+              "
+            >
+              {t('notifications.markAllRead')}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Notification list */}
@@ -128,7 +145,7 @@ export function NotificationDropdown({
               hover:text-neo-yellow transition-colors font-medium
             "
           >
-            {t('notifications.viewAll')} ({notifications.length - MAX_VISIBLE} {t('notifications.more', 'more')})
+            {t('notifications.viewAll')} ({filteredNotifications.length - MAX_VISIBLE} {t('notifications.more', 'more')})
           </button>
         </div>
       )}

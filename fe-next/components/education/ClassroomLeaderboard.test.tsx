@@ -422,8 +422,9 @@ describe('ClassroomLeaderboard', () => {
       );
 
       // THEN: Should show streak badge with count
-      expect(screen.getByTestId('streak-badge')).toBeInTheDocument();
-      expect(screen.getByText('🔥 5')).toBeInTheDocument();
+      const badge = screen.getByTestId('streak-badge');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveTextContent('5');
     });
 
     it('does not show streak badge for streak < 3', () => {

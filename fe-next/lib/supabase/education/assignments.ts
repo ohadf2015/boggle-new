@@ -155,17 +155,20 @@ export async function getClassroomAssignments(
       .select('*', { count: 'exact', head: true })
       .eq('classroom_id', classroomId);
 
-    // Get completion counts for each assignment
+    // Get completion counts from student_lesson_progress (completed_at IS NOT NULL)
     const assignmentIds = assignments.map(a => a.id);
     const { data: completions } = await supabase
-      .from('assignment_completions')
+      .from('student_lesson_progress')
       .select('assignment_id')
-      .in('assignment_id', assignmentIds);
+      .in('assignment_id', assignmentIds)
+      .not('completed_at', 'is', null);
 
     // Count completions per assignment
     const completionCounts: Record<string, number> = {};
     completions?.forEach(c => {
-      completionCounts[c.assignment_id] = (completionCounts[c.assignment_id] || 0) + 1;
+      if (c.assignment_id) {
+        completionCounts[c.assignment_id] = (completionCounts[c.assignment_id] || 0) + 1;
+      }
     });
 
     // Merge completion data into assignments
@@ -193,9 +196,10 @@ export async function getAssignmentCompletions(
 
   try {
     const { data: completions, error } = await supabase
-      .from('assignment_completions')
-      .select('*, profiles(display_name, avatar_emoji)')
+      .from('student_lesson_progress')
+      .select('*')
       .eq('assignment_id', assignmentId)
+      .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false });
 
     if (error) {
@@ -203,7 +207,19 @@ export async function getAssignmentCompletions(
       return { data: [], error: { message: error.message } };
     }
 
-    return { data: completions || [], error: null };
+    // Fetch profiles separately since FK goes to auth.users not profiles
+    const studentIds = [...new Set((completions || []).map(c => c.student_id))];
+    const { data: profiles } = studentIds.length > 0
+      ? await supabase.from('profiles').select('id, display_name, avatar_emoji').in('id', studentIds)
+      : { data: [] };
+
+    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+    const enriched = (completions || []).map(c => ({
+      ...c,
+      profiles: profileMap.get(c.student_id) || null,
+    }));
+
+    return { data: enriched, error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getAssignmentCompletions:', error);

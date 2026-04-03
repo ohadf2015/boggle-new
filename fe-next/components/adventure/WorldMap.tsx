@@ -31,6 +31,7 @@ interface WorldMapProps {
   onWorldSelect: (worldId: number) => void;
   masteryTiers?: Record<number, MasteryTier>;
   onContinue?: (worldId: number, levelId: number) => void;
+  welcomeBanner?: React.ReactNode;
 }
 
 // Motion variants - extracted to constants to prevent re-creation on every render
@@ -171,7 +172,7 @@ const WorldNode = memo(function WorldNode({
       ref={nodeRef}
       className={cn(
         'relative w-full px-3 sm:px-6 lg:px-10',
-        'flex items-center gap-2 sm:gap-4 lg:gap-6',
+        'flex items-center gap-3 sm:gap-4 lg:gap-6',
         isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
         isLeft ? 'flex-row' : 'flex-row-reverse',
         'world-node-entrance'
@@ -332,7 +333,7 @@ const WorldNode = memo(function WorldNode({
       <div
         className={cn(
           'flex-shrink min-w-0 relative',
-          'w-[160px] sm:w-[210px] lg:w-[240px]',
+          'w-[180px] sm:w-[210px] lg:w-[240px]',
           !isUnlocked && 'opacity-50',
           'world-card-entrance'
         )}
@@ -442,6 +443,7 @@ const WorldMap = memo(function WorldMap({
   onWorldSelect,
   masteryTiers,
   onContinue,
+  welcomeBanner,
 }: WorldMapProps): React.JSX.Element {
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
@@ -574,7 +576,7 @@ const WorldMap = memo(function WorldMap({
       />
 
       {/* World trail */}
-      <div className="relative z-10 py-8 sm:py-12 lg:max-w-4xl lg:mx-auto">
+      <div className="relative z-10 pt-16 pb-8 sm:pt-20 sm:pb-12 lg:max-w-4xl lg:mx-auto">
         {worldsData.map((data, index) => {
           const isLeft = isRtl ? index % 2 !== 0 : index % 2 === 0;
 
@@ -614,12 +616,17 @@ const WorldMap = memo(function WorldMap({
           );
         })}
 
-        <div ref={bottomRef} className="h-24" />
+        {welcomeBanner && (
+          <div className="px-4 pb-4">
+            {welcomeBanner}
+          </div>
+        )}
+        <div ref={bottomRef} className="h-32" />
       </div>
 
       {/* Floating Continue Button */}
       {nextLevel && nextWorldConfig && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-xs">
+        <div className="sticky bottom-4 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-xs mx-auto">
           <AdaptiveMotion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

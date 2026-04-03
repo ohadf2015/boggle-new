@@ -212,7 +212,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   // ============================================
 
   if (phase === 'loading') {
-    return <PageLoader text="Loading your duel..." size="lg" nested />;
+    return <PageLoader text={t('education.duels.loading')} size="lg" nested />;
   }
 
   if (error) {

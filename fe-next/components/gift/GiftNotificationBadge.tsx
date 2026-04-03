@@ -26,7 +26,7 @@ export function GiftNotificationBadge({ count, className }: GiftNotificationBadg
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
         className={cn(
-          'absolute -top-1 -right-1 z-10',
+          'absolute -top-1 -end-1 z-10',
           'min-w-[18px] h-[18px] px-1',
           'flex items-center justify-center',
           'bg-neo-pink text-white text-xs font-bold',

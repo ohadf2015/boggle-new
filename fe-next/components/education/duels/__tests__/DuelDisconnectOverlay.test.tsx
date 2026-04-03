@@ -11,12 +11,18 @@ vi.mock('framer-motion', () => ({
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
         'duels.opponentDisconnected': '{opponentName} disconnected',
         'duels.autoForfeitMessage': "You'll win automatically",
       };
-      return translations[key] || key;
+      let result = translations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          result = result.replace(`{${k}}`, String(v));
+        });
+      }
+      return result;
     },
   }),
 }));

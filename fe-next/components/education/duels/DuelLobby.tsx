@@ -163,7 +163,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
           {t('duelLobbyTitle')}
         </h2>
         <span className="px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-pink text-white">
-          PVP
+          {t('education.duels.pvp')}
         </span>
       </div>
 
@@ -195,7 +195,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                     {t('challengeFrom', { name: (challenge as any).challenger?.display_name || challenge.challenger_id })}
                   </p>
                   <p className="text-black/60 text-sm font-bold">
-                    {lessons.find((l) => l.id === challenge.lesson_id)?.name || 'Unknown Lesson'}
+                    {lessons.find((l) => l.id === challenge.lesson_id)?.name || t('education.duels.unknownLesson')}
                   </p>
                 </div>
 
@@ -248,7 +248,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan'
           )}
         >
-          <Swords className="w-6 h-6 inline me-2" />
+          <Swords className="w-6 h-6 inline me-2" aria-hidden="true" />
           {t('quickMatch')}
         </button>
       </div>
@@ -301,7 +301,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                     {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
                   </span>
                   {/* Online indicator — neo-cyan glow */}
-                  <div className="absolute -top-1.5 -end-1.5 w-4 h-4 rounded-full bg-neo-cyan border-3 border-black shadow-[0_0_8px_theme(colors.neo-cyan)]" />
+                  <div className="absolute -top-1.5 -end-1.5 w-4 h-4 rounded-full bg-neo-cyan border-3 border-black shadow-[0_0_8px_theme(colors.neo-cyan)]" aria-label={t('education.duels.online')} role="status" />
                 </div>
 
                 {/* Name */}

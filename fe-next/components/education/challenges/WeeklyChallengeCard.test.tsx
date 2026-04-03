@@ -15,7 +15,7 @@ vi.mock('framer-motion', () => ({
 // Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
         'challenges.weekly.title': 'Weekly Quests',
         'challenges.weekly.claim': 'Claim Reward',
@@ -25,8 +25,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'challenges.claimed': 'Claimed!',
         'quests.weeklyWordMastery': 'Weekly Word Mastery',
         'quests.weeklyWordMasteryDesc': 'Master {target} words this week',
+        'education.challenges.xpReward': '{amount} XP',
+        'education.challenges.coinReward': '{amount} Coins',
       };
-      return translations[key] || key;
+      let result = translations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          result = result.replace(`{${k}}`, String(v));
+        });
+      }
+      return result;
     },
     language: 'en',
   }),
@@ -73,12 +81,12 @@ describe('WeeklyChallengeCard', () => {
 
   it('displays XP reward', () => {
     render(<WeeklyChallengeCard quest={baseQuest} onClaim={mockOnClaim} />);
-    expect(screen.getByText('+300 XP')).toBeInTheDocument();
+    expect(screen.getByText('300 XP')).toBeInTheDocument();
   });
 
   it('displays coin bonus reward', () => {
     render(<WeeklyChallengeCard quest={baseQuest} onClaim={mockOnClaim} />);
-    expect(screen.getByText('+50 coins')).toBeInTheDocument();
+    expect(screen.getByText('50 Coins')).toBeInTheDocument();
   });
 
   it('shows Claim button when completed=true and claimed=false', () => {

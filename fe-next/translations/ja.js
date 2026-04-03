@@ -362,6 +362,7 @@ const ja = {
     "errorOccurred": "エラーが発生しました",
     "creating": "作成中...",
     "guest": "ゲスト",
+    "unknown": "不明",
     "back": "戻る",
     "backHome": "ホームへ",
     "backToHome": "ホームに戻る",
@@ -8155,817 +8156,6 @@ const ja = {
     }
   },
   "education": {
-    "badges": {
-      "wordExplorer": "ワードエクスプローラー",
-      "vocabMaster": "語彙マスター",
-      "speedScholar": "スピードスカラー",
-      "locked": "ロック中"
-    },
-    "wordOfTheDay": {
-      "title": "今日の単語",
-      "learnMore": "もっと見る"
-    },
-    "landing": {
-      "title": "教育モード",
-      "teacher": "私は教師です",
-      "teacherDesc": "クラスルームを作成し、語彙レッスンを構築し、生徒の進捗を追跡します",
-      "student": "私は生徒です",
-      "studentDesc": "クラスルームに参加して語彙レッスンを練習します",
-      "signInRequired": "サインインが必要です",
-      "tagline": "学びと遊びが出会う場所",
-      "socialProof": "世界中の1000以上の教室が一緒に語彙力を向上させています！",
-      "teacherFeature1": "カスタム単語リストを作成",
-      "teacherFeature2": "複数のクラスルームを管理",
-      "teacherFeature3": "リアルタイム成績分析",
-      "studentFeature1": "インタラクティブな教室に参加",
-      "studentFeature2": "楽しい語彙チャレンジ",
-      "studentFeature3": "週間リーダーボード",
-      "teacherCta": "教師ログインが必要",
-      "studentCta": "生徒ハブへ入る",
-      "premium": "プレミアム",
-      "freeAccess": "無料アクセス",
-      "duelTeaser": {
-        "headline": "クラスメートに挑戦",
-        "subtext": "一対一で対決してクラスランキングを上げよう",
-        "cta": "デュエルを始める →"
-      },
-      "roleTeacher": "教師",
-      "roleStudent": "学生",
-      "roleGuest": "ログイン済み",
-      "goToDashboard": "ダッシュボードへ",
-      "startGame": "ゲームを始める"
-    },
-    "template": {
-      "settings": "設定",
-      "create": "テンプレート作成",
-      "edit": "テンプレート編集",
-      "description": "このレッスンのゲーム設定を構成",
-      "name": "テンプレート名",
-      "namePlaceholder": "例：クイックレビュー",
-      "nameRequired": "テンプレート名が必要です",
-      "timer": "ゲーム時間",
-      "difficulty": "ボードサイズ",
-      "boardSize": "ボードサイズ",
-      "boardPreview": "ボードは",
-      "minWordLength": "最小単語長",
-      "allowLateJoin": "途中参加を許可",
-      "lateJoin": "途中参加",
-      "allowLateJoinDesc": "ゲーム開始後もプレイヤーが参加可能",
-      "setDefault": "デフォルトに設定",
-      "setDefaultDesc": "このレッスンのデフォルト設定として使用",
-      "save": "テンプレート保存",
-      "saving": "保存中...",
-      "saved": "テンプレートを保存しました！",
-      "startGame": "ゲーム開始",
-      "roomSettings": "ゲーム設定"
-    },
-    "practice": {
-      "title": "練習モード",
-      "flashcards": "フラッシュカード",
-      "flashcardsDesc": "カードで単語を復習",
-      "soloBoard": "ソロ練習",
-      "soloBoardDesc": "自分のペースで単語を探す",
-      "wordList": "単語リスト",
-      "wordListDesc": "すべての語彙を表示",
-      "warmup": "ウォーミングアップ",
-      "warmupDesc": "ヒント付きで練習",
-      "matching": "単語マッチング",
-      "matchingDesc": "単語をドラッグして定義と一致させよう",
-      "spelling": "スペリングチャレンジ",
-      "spellingDesc": "定義から正しい単語を入力しよう",
-      "blitz": "タイムブリッツ",
-      "blitzDesc": "60秒の速答ラウンド — いくつ正解できる？",
-      "gotIt": "わかった！",
-      "dontKnow": "わからない",
-      "complete": "練習完了！",
-      "sessionComplete": "セッション完了！",
-      "sessionsCompleted": "完了したセッション",
-      "progress": "あなたの進捗",
-      "wordsFound": "見つけた単語",
-      "cardsReviewed": "復習したカード",
-      "accuracy": "正確度",
-      "timeSpent": "費やした時間",
-      "time": "時間",
-      "word": "単語",
-      "wordCount": "単語",
-      "definition": "定義",
-      "tapToFlip": "タップして裏返す",
-      "tapCard": "タップして答えを見る",
-      "chooseAnswer": "答えを選んでください",
-      "finish": "終了",
-      "hints": "ヒント",
-      "hintsUsed": "使用したヒント",
-      "hint": "ヒント",
-      "maxStreak": "最大連続正解",
-      "searchWords": "単語を検索...",
-      "noResults": "一致する単語が見つかりません",
-      "noWords": "単語がありません",
-      "noDefinition": "定義がありません",
-      "quickPractice": "クイック練習",
-      "moreOptions": "その他のオプション",
-      "tryAgain": "もう一度",
-      "back": "戻る",
-      "correctCount": "正解",
-      "encouragement0": "頑張って！練習で上達するよ。",
-      "encouragement50": "いい調子！練習を続けよう。",
-      "encouragement80": "すごい！もう少しで完璧！",
-      "encouragement100": "完璧！この単語をマスターしたね。",
-      "swipeHint": "スワイプで回答",
-      "swipeExplain": "右にスワイプで「わかった」、左にスワイプで「わからない」",
-      "matchingWords": "単語",
-      "matchingDefinitions": "定義",
-      "matchPairs": "ペアを合わせよう",
-      "pairsMatched": "ペア一致",
-      "dragToMatch": "単語をドラッグして定義に合わせよう",
-      "tapToSelect": "単語をタップしてから定義をタップ",
-      "correctMatch": "正解！",
-      "wrongMatch": "もう一度",
-      "spellTheWord": "単語を綴ろう",
-      "typeTheWord": "この定義に合う単語を入力してください",
-      "correctSpelling": "正解！",
-      "incorrectSpelling": "正しい単語は：",
-      "blitzTitle": "タイムブリッツ",
-      "getReady": "準備して！",
-      "go": "スタート！",
-      "timesUp": "時間切れ！",
-      "wordsFound": "見つけた単語",
-      "maxCombo": "最大コンボ",
-      "blitzScore": "ブリッツスコア",
-      "needsMoreWords": "このレッスンにはこのモードに必要な定義付き単語が4つ以上必要です",
-      "combo": "コンボ",
-      "submit": "送信",
-      "typeAnswer": "答えを入力",
-      "typeWord": "単語を入力...",
-      "correct": "正解！",
-      "incorrect": "不正解",
-      "correctAnswer": "正しい答え：",
-      "streak": "連続正解",
-      "difficulty": {
-        "easy": "簡単",
-        "medium": "普通",
-        "hard": "難しい"
-      },
-      "mastery": {
-        "not_started": "未開始",
-        "started": "開始済み",
-        "practicing": "練習中",
-        "mastered": "マスター"
-      },
-      "points": "ポイント",
-      "vocabularyWords": "語彙単語",
-      "vocabularyWordsFound": "見つけた語彙:",
-      "vocabulary": "語彙",
-      "vocab": "語彙",
-      "foundWordsLabel": "見つけた単語:",
-      "more": "もっと",
-      "allVocabFound": "すべての語彙を見つけました！",
-      "total": "合計",
-      "canEmbed": "埋め込み可能",
-      "trackOnly": "トラッキングのみ"
-    },
-    "student": {
-      "dashboard": "マイレッスン",
-      "joinClassroom": "クラスに参加",
-      "enterCode": "クラスコードを入力",
-      "progress": "あなたの進捗",
-      "startPractice": "練習開始",
-      "noLessons": "まだレッスンが割り当てられていません",
-      "askTeacher": "先生にクラスコードを聞いてください",
-      "lessonsAssigned": "割り当てられたレッスン",
-      "join": {
-        "title": "クラスに参加",
-        "subtitle": "先生からのコードを入力してください",
-        "codeLabel": "クラスコード",
-        "codeHint": "6文字のクラスコードを先生に聞いてください",
-        "button": "クラスに参加",
-        "joining": "参加中...",
-        "pasteButton": "コードを貼り付け",
-        "success": "クラスに参加しました！",
-        "invalidCode": "無効なクラスコードです",
-        "alreadyMember": "すでにこのクラスのメンバーです",
-        "codePasted": "コードが貼り付けられました！",
-        "emptyClipboard": "クリップボードは空です",
-        "clipboardError": "クリップボードを読み取れませんでした"
-      }
-    },
-    "duels": {
-      "addWord": "単語を追加",
-      "backToLobby": "ロビーに戻る",
-      "challengeClassmate": "クラスメイトに挑戦！",
-      "draw": "引き分け！",
-      "draws": "引き分け",
-      "duelHistory": "デュエル履歴",
-      "findWords": "単語を見つけてポイントゲット！",
-      "loading": "デュエルを読み込み中...",
-      "losses": "敗北",
-      "noDuelsYet": "まだデュエルなし。クラスメイトに挑戦！",
-      "playDuel": "デュエル開始",
-      "recentDuels": "最近のデュエル",
-      "scoreToBeat": "目標スコア",
-      "submitScore": "スコアを送信",
-      "typeWord": "単語を入力...",
-      "vs": "VS",
-      "waitingForOpponent": "対戦相手を待機中...",
-      "winRate": "勝率",
-      "wins": "勝利",
-      "winStreak": "連勝",
-      "wordsAccepted": "正解した単語",
-      "wordsRejected": "不正解の単語",
-      "xpEarned": "獲得XP",
-    "you": "あなた",
-      "youLose": "負けた！",
-      "youWin": "勝った！"
-    },
-    "xp": {
-      "level": "レベル",
-      "maxLevel": "最大レベル",
-      "nextLevel": "次のレベル",
-      "xpGained": "獲得XP",
-      "totalXp": "合計XP",
-      "progress": "進捗",
-      "levelUp": "レベルアップ！",
-      "newLevel": "レベル達成",
-      "streak": "日連続",
-      "streakBonus": "連続ボーナス",
-      "keepGoing": "練習を続けてレベルアップしよう！",
-      "newTitleUnlocked": "新しい称号を獲得！",
-      "continue": "続ける",
-      "mastery": {
-        "perfectFlashcard": "完璧！{count}個の単語をマスター！",
-        "learnedWords": "{count}個の単語を学びました！",
-        "discoveredVocab": "{count}個の新しい単語を発見！",
-        "greatPractice": "素晴らしい練習！単語を探し続けよう！",
-        "lessonMastered": "レッスンマスター！これらの単語を覚えました！",
-        "keepPracticing": "よくできました！練習を続けてレッスンをマスターしよう。"
-      },
-      "streakMilestone": {
-        "week": "1週間連続！",
-        "weekDesc": "一週間の学習達成！",
-        "twoWeeks": "2週間連続！",
-        "twoWeeksDesc": "二週間の努力！",
-        "month": "月間マスター！",
-        "monthDesc": "30日間の素晴らしい成果！"
-      }
-    },
-    "lesson": {
-      "definition": "定義",
-      "examples": "使用例",
-      "contextualExamples": "文脈での使用",
-      "pronounce": "発音を聞く",
-      "speaking": "再生中...",
-      "pronunciationFallback": "発音",
-      "gotIt": "分かった",
-      "dontKnow": "分からない",
-      "tapToReveal": "タップして表示",
-      "classicMode": "クラシックモード",
-      "swipeMode": "スワイプモード",
-      "autoPronounce": "自動発音",
-      "enrichingContent": "拡張コンテンツを読み込み中...",
-      "word": "単語",
-      "words": "単語"
-    },
-    "leaderboard": {
-      "title": "クラスリーダーボード",
-      "ariaLabel": "トップ生徒を表示するクラスリーダーボード",
-      "yourPosition": "あなたの順位",
-      "youAreRank": "あなたは#{rank}位です",
-      "studentsInClass": "{count}人の生徒",
-      "inactive": "非アクティブ",
-      "noStudentsYet": "まだこのクラスに生徒がいません",
-      "joinClassroomPrompt": "リーダーボードを見るにはクラスに参加してください",
-      "level": "レベル{level}",
-      "xp": "{xp} XP",
-      "rank": "順位",
-      "totalXP": "合計XP",
-      "streak": "連続記録",
-      "weekly": "週間",
-      "monthly": "月間",
-      "allTime": "全期間",
-      "rankUp": "+{{count}}",
-      "rankDown": "-{{count}}",
-      "newEntry": "NEW",
-      "noChange": "-",
-      "top10": "トップ10%",
-      "top25": "トップ25%",
-      "top50": "トップ50%"
-    },
-    "achievements": {
-      "all": "すべて",
-      "progress": "進捗",
-      "skill": "スキル",
-      "consistency": "一貫性",
-      "exploration": "探索",
-      "locked": "ロック済み"
-    },
-    "header": {
-      "title": "LexiClash",
-      "subtitle": "教育",
-      "homeLink": "教育ホーム",
-      "menu": "教育メニュー",
-      "navigation": "ナビゲーション",
-      "teacherDashboard": "教師ダッシュボード",
-      "studentDashboard": "マイレッスン",
-      "educationHome": "教育ホーム",
-      "breadcrumbs": {
-        "navigation": "教育ナビゲーション",
-        "education": "教育",
-        "teacher": "教師ダッシュボード",
-        "student": "生徒ダッシュボード",
-        "lessons": "レッスン",
-        "classrooms": "クラスルーム",
-        "classroomGame": "クラスゲーム",
-        "join": "クラスに参加",
-        "profile": "プロフィール"
-      }
-    },
-    "teacher": {
-      "activeGames": "アクティブなゲーム",
-      "noActiveGames": "アクティブなゲームはありません"
-    },
-    "classroomGame": {
-      "title": "クラスゲーム",
-      "createGame": "クラスゲームを作成",
-      "createGameDesc": "レッスンとクラスを選んでマルチプレイヤーゲームを開始",
-      "startGameDescription": "クラス用のマルチプレイヤー語彙ゲームを開始する",
-      "shareCode": "このコードを生徒と共有してください",
-      "waitingForPlayers": "プレイヤーを待っています...",
-      "settings": "ゲーム設定",
-      "vocabularyWords": "語彙単語",
-      "lessons": "レッスン",
-      "selectLessons": "レッスンを選択",
-      "selectClassroom": "クラスを選択",
-      "lessonsSelected": "{{count}}個選択中",
-      "noLessonsAvailable": "レッスンがありません",
-      "multiLessonHelp": "選択した全レッスンの単語が組み合わされます",
-      "totalWords": "合計単語数",
-      "noClassrooms": "クラスが見つかりません。先にクラスを作成してください。",
-      "classroomNotFound": "クラスが見つかりません",
-      "missingRequirements": "少なくとも1つのレッスンとクラスを選択してください",
-      "gameCreated": "ゲーム作成完了！ロビーに移動中...",
-      "playable": "プレイ可能",
-      "noPlayableWords": "このレッスンにプレイ可能な単語がありません",
-      "startGame": "ゲーム開始",
-      "starting": "開始中...",
-      "lessonNotFound": "レッスンが見つかりません",
-      "lessonNotFoundDesc": "リクエストされたレッスンが見つかりませんでした。",
-      "backToEducation": "教育に戻る",
-      "gameSettings": "ゲーム設定",
-      "reviewAndStart": "確認して開始",
-      "selectClassroomAndLessons": "クラスとレッスンを選択",
-      "selectClassroomAndLessonsDesc": "クラスと1つ以上のレッスンを選んで練習",
-      "shareCodeWithStudents": "コードを生徒と共有",
-      "words": "単語",
-      "selectAllLessons": "すべて選択",
-      "deselectAll": "選択解除",
-      "createClassroom": "教室を作成",
-      "createLesson": "レッスンを作成",
-      "scanToJoin": "スキャンして参加",
-      "classroomSession": "教室セッション",
-      "connecting": "ゲームに接続中..."
-    },
-    "lessonWords": {
-      "title": "レッスン語彙",
-      "subtitle": "レッスン単語のパフォーマンス",
-      "found": "見つけた",
-      "total": "合計",
-      "completion": "スコア",
-      "foundList": "見つけた単語",
-      "missedList": "見逃した単語",
-      "perfectScore": "完璧！全単語を見つけました！"
-    },
-    "students": "人の生徒",
-    "onboarding": {
-      "step": "ステップ",
-      "of": "/",
-      "getStarted": "始めましょう！",
-      "welcome": {
-        "title": "教育モードへようこそ！",
-        "description": "LexiClash教育は、魅力的な語彙レッスンを作成し、生徒の進捗を追跡するのに役立ちます。セットアップを始めましょう！"
-      },
-      "classroom": {
-        "title": "最初のクラスルームを作成",
-        "description": "クラスルームを作成することから始めましょう。生徒がレッスンに参加してアクセスするために使用できる固有のコードが発行されます。"
-      },
-      "lesson": {
-        "title": "最初のレッスンを作成",
-        "description": "語彙単語を追加してカスタムレッスンを作成します。生徒はあなたの語彙を使ってフラッシュカードやワードゲームで練習できます。"
-      },
-      "invite": {
-        "title": "生徒を招待",
-        "description": "クラスルームコードを生徒と共有してください。参加してレッスンを練習し、クラスゲームで競争できます！"
-      }
-    },
-    "analytics": {
-      "title": "クラス分析",
-      "subtitle": "生徒の進捗を追跡し、学習機会を特定",
-      "studentsNeedingHelp": "サポートが必要な生徒",
-      "classAverageXp": "クラス平均XP",
-      "activeStudentsToday": "今日アクティブ",
-      "commonMistakes": "よくある間違い",
-      "weeklyEngagement": "週間エンゲージメント",
-      "viewStudents": "生徒を見る",
-      "createReviewLesson": "復習を作成",
-      "noData": "まだ分析データがありません",
-      "assignLessons": "分析を表示するには生徒にレッスンを割り当ててください",
-      "loading": "分析を読み込み中...",
-      "error": "分析の読み込みに失敗しました",
-      "retry": "再試行",
-      "lessonEffectiveness": "レッスンの効果",
-      "avgXpGain": "平均XP獲得",
-      "completionRate": "完了率",
-      "avgAccuracy": "平均正確性",
-      "timeToMastery": "習熟までの時間",
-      "studentProgress": "生徒の進捗",
-      "student": "生徒",
-      "level": "レベル",
-      "mastery": "習熟度",
-      "accuracy": "正確性",
-      "streak": "連続",
-      "lastActive": "最終アクティブ",
-      "noStudents": "このクラスにはまだ生徒がいません",
-      "inviteStudents": "参加コードを共有して生徒を招待してください",
-      "struggling": "サポートが必要",
-      "daysAgo": "{{count}}日前",
-      "today": "今日",
-      "yesterday": "昨日",
-      "students": "生徒",
-      "noLessons": "このクラスにはレッスンが割り当てられていません",
-      "assignLessonsHint": "効果データを見るにはレッスンを作成して割り当ててください",
-      "vocabularyMastery": "語彙習熟度",
-      "masteryLevels": "習熟レベル",
-      "mastered": "習得済み",
-      "practicing": "練習中",
-      "struggling": "苦戦中",
-      "notStarted": "未開始",
-      "accuracyTooltip": "{{student}}: \"{{word}}\"で{{accuracy}}%",
-      "noVocabularyData": "まだ語彙データがありません",
-      "practiceToSee": "習熟度を見るには生徒が練習する必要があります",
-      "viewLessons": "レッスン",
-      "viewVocabulary": "語彙",
-      "viewAssignments": "課題",
-      "backToClassroom": "クラスルームに戻る",
-      "exportReport": "レポートを出力",
-      "studentDetail": "生徒の詳細",
-      "live": "ライブ",
-      "offline": "オフライン",
-      "connecting": "接続中...",
-      "connectionError": "接続エラー",
-      "activeNow": "{{count}}人がアクティブ",
-      "noActivity": "アクティビティなし",
-      "updatedAgo": "{{time}}前に更新"
-    },
-    "reports": {
-      "title": "進捗レポート",
-      "subtitle": "生徒と保護者向けの詳細レポートを生成",
-      "classReport": "クラス進捗レポート",
-      "studentReport": "生徒進捗レポート",
-      "exportPDF": "PDF出力",
-      "exportCSV": "CSV出力",
-      "generateReport": "レポートを生成",
-      "generating": "生成中...",
-      "dateRange": "期間",
-      "allTime": "全期間",
-      "lastWeek": "過去7日間",
-      "lastMonth": "過去30日間",
-      "custom": "カスタム期間",
-      "from": "開始日",
-      "to": "終了日",
-      "selectStudent": "生徒を選択",
-      "allStudents": "全生徒",
-      "noDataAvailable": "この期間のデータはありません",
-      "reportGenerated": "レポートが生成されました",
-      "downloadReady": "レポートのダウンロード準備ができました",
-      "metrics": {
-        "wordsLearned": "学習した単語",
-        "totalWords": "合計単語数",
-        "accuracy": "正確度",
-        "practiceTime": "練習時間",
-        "currentStreak": "現在の連続記録",
-        "longestStreak": "最長連続記録",
-        "sessionsCompleted": "完了したセッション",
-        "averageScore": "平均スコア",
-        "masteryLevel": "習熟レベル",
-        "improvement": "上達度"
-      },
-      "classMetrics": {
-        "classAverage": "クラス平均",
-        "topPerformer": "トップパフォーマー",
-        "mostImproved": "最も上達した生徒",
-        "needsAttention": "サポートが必要",
-        "participationRate": "参加率",
-        "completionRate": "完了率"
-      },
-      "sections": {
-        "summary": "サマリー",
-        "wordMastery": "単語習熟度",
-        "practiceHistory": "練習履歴",
-        "recommendations": "おすすめ"
-      },
-      "studentRanking": "生徒ランキング",
-      "rank": "順位",
-      "student": "生徒",
-      "score": "スコア",
-      "noStudents": "生徒が見つかりません",
-      "printReport": "レポートを印刷",
-      "emailReport": "レポートをメール送信",
-      "error": {
-        "generateFailed": "レポートの生成に失敗しました",
-        "exportFailed": "レポートの出力に失敗しました",
-        "noData": "レポートに使用できるデータがありません"
-      }
-    },
-    "milestones": {
-      "xpRemaining": "レベル{{level}}まで {{xp}} XP",
-      "nextMilestone": "次のマイルストーン",
-      "titleUnlock": "解放: {{title}}",
-      "reached": "マイルストーン達成!",
-      "xpBonus": "+{{xp}} XPボーナス",
-      "coinBonus": "+{{coins}} コイン",
-      "continue": "続ける",
-      "maxLevel": "最大レベル!",
-      "level": "レベル",
-      "titleUnlocked": "タイトル解放"
-    },
-    "achievements": {
-      "title": "実績",
-      "completion": "{percent}%完了 - {earned}/{total}バッジ",
-      "featured": "注目のバッジ",
-      "progress": "{current}/{next}",
-      "toNext": "{tier}まで{percent}%",
-      "maxTier": "最高ランク！",
-      "pin": "バッジをピン留め",
-      "unpin": "ピン留めを解除",
-      "maxPinsReached": "まず他のバッジのピン留めを解除してください",
-      "locked": "ロック中",
-      "secret": "秘密の実績",
-      "unlocked": "実績アンロック！",
-      "upgraded": "{tier}にアップグレード！",
-      "continue": "続ける",
-      "newBadge": "新しいバッジ！",
-      "tierUpgrade": "ランクアップ！",
-      "all": "全て",
-      "skill": "スキル",
-      "consistency": "継続",
-      "exploration": "探索",
-      "maxTier": "MAX",
-      "tierProgress": "{{current}} / {{target}}",
-      "tiers": {
-        "bronze": "ブロンズ",
-        "silver": "シルバー",
-        "gold": "ゴールド",
-        "platinum": "プラチナ"
-      },
-      "categories": {
-        "progress": "進捗マイルストーン",
-        "skill": "スキルベースの偉業",
-        "consistency": "継続習慣",
-        "exploration": "探索"
-      },
-      "earned": "{count}/{total}獲得",
-      "secretRemaining": "{count}個の秘密のバッジが隠されています...",
-      "pinLimit": "{current}/{max} ピン留め",
-      "first_lesson": {
-        "name": "初めてのレッスン",
-        "description": "最初のレッスンを完了する",
-        "hint": "1つのレッスンを完了してアンロック"
-      },
-      "word_master": {
-        "name": "単語マスター",
-        "description": "練習を通じて語彙をマスターする",
-        "hint": "50個の単語をマスターしてアンロック"
-      },
-      "level_climber": {
-        "name": "レベルクライマー",
-        "description": "新しいXPレベルに到達する",
-        "hint": "レベル5に到達してアンロック"
-      },
-      "xp_collector": {
-        "name": "XPコレクター",
-        "description": "練習を通じて経験値を獲得する",
-        "hint": "500 XPを獲得してアンロック"
-      },
-      "practice_veteran": {
-        "name": "練習ベテラン",
-        "description": "多くの練習セッションを完了する",
-        "hint": "10回の練習セッションを完了してアンロック"
-      },
-      "speed_demon": {
-        "name": "スピードデーモン",
-        "description": "1つのゲームで多くの単語を見つける",
-        "hint": "1つのゲームで10個の単語を見つけてアンロック"
-      },
-      "perfect_streak": {
-        "name": "完璧な連続",
-        "description": "ゲームで完璧な精度を達成する",
-        "hint": "5つのゲームで100%の精度を達成してアンロック"
-      },
-      "boss_slayer": {
-        "name": "ボススレイヤー",
-        "description": "挑戦的なボスバトルを倒す",
-        "hint": "1体のボスを倒してアンロック"
-      },
-      "combo_master": {
-        "name": "コンボマスター",
-        "description": "印象的な単語コンボを構築する",
-        "hint": "5つのコンボを構築してアンロック"
-      },
-      "streak_starter": {
-        "name": "連続スターター",
-        "description": "複数日連続で練習する",
-        "hint": "3日連続で練習してアンロック"
-      },
-      "early_bird": {
-        "name": "早起きの鳥",
-        "description": "午前9時前に練習する",
-        "hint": "午前9時前に5回練習してアンロック"
-      },
-      "dedicated_learner": {
-        "name": "献身的な学習者",
-        "description": "今月たくさん練習する",
-        "hint": "今月5日練習してアンロック"
-      },
-      "weekly_warrior": {
-        "name": "週間戦士",
-        "description": "週5日以上練習する",
-        "hint": "週5日以上練習する週を1週間完了してアンロック"
-      },
-      "streak_champion": {
-        "name": "連続チャンピオン",
-        "description": "最長の練習連続記録を維持する",
-        "hint": "発見されるまで隠されています..."
-      },
-      "mode_explorer": {
-        "name": "モード探索者",
-        "description": "さまざまな練習モードを試す",
-        "hint": "2つの異なる練習モードを試してアンロック"
-      },
-      "lesson_collector": {
-        "name": "レッスンコレクター",
-        "description": "多くの異なるレッスンを完了する",
-        "hint": "3つの異なるレッスンを完了してアンロック"
-      },
-      "classroom_contributor": {
-        "name": "クラスルーム貢献者",
-        "description": "クラスルームに参加して貢献する",
-        "hint": "1つのクラスルームに参加してアンロック"
-      },
-      "word_variety": {
-        "name": "単語バラエティ",
-        "description": "多くのユニークな語彙を発見する",
-        "hint": "発見されるまで隠されています..."
-      },
-      "duel_champion": {
-        "name": "デュエルチャンピオン",
-        "description": "クラスメートとのデュエルに勝利"
-      },
-      "duel_streak": {
-        "name": "連勝記録",
-        "description": "連続でデュエルに勝利"
-      },
-      "comeback_king": {
-        "name": "逆転王",
-        "description": "劣勢から勝利"
-      },
-      "speed_dueler": {
-        "name": "スピードデュエリスト",
-        "description": "リアルタイムデュエルで素早く単語を発見"
-      },
-      "duel_veteran": {
-        "name": "デュエルベテラン",
-        "description": "多くのデュエルをプレイ"
-      },
-      "spelling_ace": {
-        "name": "スペリングの達人",
-        "description": "完璧なスペリングラウンド"
-      },
-      "matching_master": {
-        "name": "マッチングマスター",
-        "description": "素早いマッチング完了"
-      },
-      "blitz_champion": {
-        "name": "ブリッツチャンピオン",
-        "description": "ブリッツモードで高得点"
-      },
-      "practice_streak": {
-        "name": "練習連続記録",
-        "description": "連続日数で練習"
-      },
-      "mode_master": {
-        "name": "モードマスター",
-        "description": "全練習モードを完了"
-      }
-    },
-    "starterPacks": {
-      "title": "スターターレッスンパック",
-      "subtitle": "すぐに使える語彙セット",
-      "useThisPack": "このパックを使う",
-      "commonEnglish": {
-        "name": "基本英単語",
-        "description": "初心者向けの日常英単語30語"
-      },
-      "academicVocab": {
-        "name": "学術語彙",
-        "description": "読み書きに必要な学術用語25語"
-      },
-      "beginnerHebrew": {
-        "name": "ヘブライ語入門",
-        "description": "定義付きの基本ヘブライ語20語"
-      }
-    }
-  },
-  "crazygames": {
-    "ads": {
-      "watchForReward": "Watch ad for {{reward}}",
-      "adPlaying": "Ad playing...",
-      "adError": "Ad unavailable",
-      "adblockDetected": "Adblock detected - some features may be limited",
-      "thanksForWatching": "Thanks for watching!"
-    },
-    "cloudSave": {
-      "syncing": "Syncing progress...",
-      "syncSuccess": "Progress synced!",
-      "syncError": "Sync failed - will retry",
-      "conflictResolved": "Progress updated from cloud"
-    }
-  },
-  "notifications": {
-    "title": "通知",
-    "bell": "通知",
-    "bellUnread": "未読の通知が{count}件あります",
-    "empty": "通知はまだありません",
-    "emptyDesc": "通知を受け取ると、ここに表示されます",
-    "markAllRead": "すべて既読にする",
-    "markAsRead": "既読にする",
-    "viewAll": "すべて表示",
-    "more": "件",
-    "newNotification": "新しい通知",
-    "justNow": "たった今",
-    "minutesAgo": "{count}分前",
-    "minutesAgoPlural": "{count}分前",
-    "hoursAgo": "{count}時間前",
-    "hoursAgoPlural": "{count}時間前",
-    "daysAgo": "{count}日前",
-    "daysAgoPlural": "{count}日前",
-    "view": "表示",
-    "dismiss": "閉じる",
-    "types": {
-      "gift": "ギフト",
-      "system": "システム",
-      "achievement": "実績",
-      "social": "ソーシャル",
-      "marketing": "ニュース"
-    },
-    "gift": {
-      "title": "ギフトを受け取りました！",
-      "body": "{sender}から{xp} XPと{coins}コインが届きました！"
-    },
-    "admin": {
-      "sendTitle": "通知を送信",
-      "selectPlayers": "受信者を選択",
-      "chooseType": "タイプを選択",
-      "writeMessage": "メッセージを書く",
-      "preview": "プレビュー",
-      "send": "送信",
-      "sending": "送信中...",
-      "sent": "通知が送信されました！",
-      "recipients": "受信者",
-      "type": "タイプ",
-      "sendingTo": "送信先",
-      "titleLabel": "タイトル",
-      "titlePlaceholder": "通知タイトル...",
-      "bodyLabel": "メッセージ",
-      "bodyPlaceholder": "通知メッセージ...",
-      "actionUrlLabel": "アクションURL",
-      "sendSuccess": "通知が正常に送信されました！",
-      "sendError": "通知の送信に失敗しました。もう一度お試しください。"
-    },
-    "prompt": {
-      "title": "ゲームに参加し続けよう！",
-      "body": "デイリーチャレンジとストリーク警告のリマインダーを受け取る",
-      "enable": "通知を有効にする",
-      "notNow": "今はしない"
-    },
-    "preferences": {
-      "title": "通知設定",
-      "dailyChallenge": "デイリーチャレンジリマインダー",
-      "streakWarning": "ストリーク危険警告",
-      "friendInvites": "フレンドチャレンジ招待",
-      "weeklySummary": "週間サマリー"
-    }
-  },
-  "native": {
-    "offline": {
-      "title": "接続なし",
-      "message": "ゲームサーバーに接続できません。インターネット接続を確認してください。",
-      "retry": "再試行",
-      "retrying": "接続中..."
-    }
-  },
-  "backToLobby": "ロビーに戻る",
-  "duelNotFound": "デュエルが見つかりません",
-  "duelsTitle": "デュエル",
-  "notParticipant": "このデュエルの参加者ではありません",
-  "education": {
     "reviewDue": "復習する単語が{count}個あります",
     "postGame": {
       "wordsYouLearned": "学んだ単語",
@@ -8983,20 +8173,29 @@ const ja = {
       "joinClassroomToDuel": "デュエルするにはクラスに参加してください",
       "noClassmatesOnline": "現在オンラインのクラスメートはいません",
       "challengeSomeone": "誰かに挑戦しよう！",
-      "rematch": "再戦"
+      "rematch": "再戦",
+      "loading": "デュエルを読み込み中...",
+      "vs": "VS",
+      "pvp": "PVP",
+      "unknownLesson": "不明なレッスン",
+      "online": "オンライン"
+    },
+    "challenges": {
+      "xpReward": "+{{amount}} XP",
+      "coinReward": "+{{amount}} コイン"
     },
     "achievements": {
       "completion": "{{percent}}%達成",
       "continue": "この調子で！",
-      "earned": "{{date}}に獲得",
+      "earned": "{{total}}個中{{count}}個獲得",
       "featured": "注目バッジ",
       "locked": "ロック中",
       "maxPinsReached": "ピン上限に達しました",
       "maxTier": "最高ランク",
       "newBadge": "新バッジ獲得！",
       "pin": "プロフィールにピン留め",
-      "pinLimit": "ピンを1つ外してからどうぞ",
-      "progress": "{{current}}/{{total}}",
+      "pinLimit": "{{current}}/{{max}}ピン留め中。1つ外してから追加してください",
+      "progress": "{{current}}/{{next}}",
       "secret": "シークレット実績",
       "secretRemaining": "あと{{count}}個の秘密が...",
       "tierUpgrade": "ランクアップ！",
@@ -9010,7 +8209,7 @@ const ja = {
       "toNext": "{{tier}}まで{{percent}}%",
       "unlocked": "アンロック！",
       "unpin": "ピン解除",
-      "upgraded": "バッジがランクアップ！"
+      "upgraded": "バッジが{{tier}}にランクアップ！"
     },
     "mastery": {
       "flashcardPerfect": "完璧！{{count}}個の単語をマスター！",
@@ -9180,7 +8379,7 @@ const ja = {
       "top50": "トップ50",
       "totalXP": "合計XP",
       "weekly": "週間",
-      "xp": "{{amount}} XP"
+      "xp": "{{xp}} XP"
     },
     "lesson": {
       "autoPronounce": "自動発音",
@@ -9331,7 +8530,8 @@ const ja = {
       "nextLevel": "次のレベル",
       "streak": "連続ログイン",
       "totalXp": "合計XP",
-      "xpGained": "獲得XP"
+      "xpGained": "獲得XP",
+      "xpLabel": "XP"
     },
     "starterPacks": {
       "academicVocab": {
@@ -9346,8 +8546,186 @@ const ja = {
       "subtitle": "すぐに使える語彙セット",
       "title": "スターターパック",
       "useThisPack": "このパックを使う"
+    },
+    "teacher": {
+      "activeGames": "アクティブなゲーム",
+      "noActiveGames": "アクティブなゲームはありません"
+    },
+    "wordOfTheDay": {
+      "title": "今日の単語",
+      "learnMore": "もっと見る"
+    },
+    "lessonWords": {
+      "title": "レッスン語彙",
+      "subtitle": "レッスン単語のパフォーマンス",
+      "found": "見つけた",
+      "total": "合計",
+      "completion": "スコア",
+      "foundList": "見つけた単語",
+      "missedList": "見逃した単語",
+      "perfectScore": "完璧！全単語を見つけました！"
+    },
+    "badges": {
+      "wordExplorer": "ワードエクスプローラー",
+      "vocabMaster": "語彙マスター",
+      "speedScholar": "スピードスカラー",
+      "locked": "ロック中"
+    },
+    "reports": {
+      "title": "進捗レポート",
+      "subtitle": "生徒と保護者向けの詳細レポートを生成",
+      "classReport": "クラス進捗レポート",
+      "studentReport": "生徒進捗レポート",
+      "exportPDF": "PDF出力",
+      "exportCSV": "CSV出力",
+      "generateReport": "レポートを生成",
+      "generating": "生成中...",
+      "dateRange": "期間",
+      "allTime": "全期間",
+      "lastWeek": "過去7日間",
+      "lastMonth": "過去30日間",
+      "custom": "カスタム期間",
+      "from": "開始日",
+      "to": "終了日",
+      "selectStudent": "生徒を選択",
+      "allStudents": "全生徒",
+      "noDataAvailable": "この期間のデータはありません",
+      "reportGenerated": "レポートが生成されました",
+      "downloadReady": "レポートのダウンロード準備ができました",
+      "metrics": {
+        "wordsLearned": "学習した単語",
+        "totalWords": "合計単語数",
+        "accuracy": "正確度",
+        "practiceTime": "練習時間",
+        "currentStreak": "現在の連続記録",
+        "longestStreak": "最長連続記録",
+        "sessionsCompleted": "完了したセッション",
+        "averageScore": "平均スコア",
+        "masteryLevel": "習熟レベル",
+        "improvement": "上達度"
+      },
+      "classMetrics": {
+        "classAverage": "クラス平均",
+        "topPerformer": "トップパフォーマー",
+        "mostImproved": "最も上達した生徒",
+        "needsAttention": "サポートが必要",
+        "participationRate": "参加率",
+        "completionRate": "完了率"
+      },
+      "sections": {
+        "summary": "サマリー",
+        "wordMastery": "単語習熟度",
+        "practiceHistory": "練習履歴",
+        "recommendations": "おすすめ"
+      },
+      "studentRanking": "生徒ランキング",
+      "rank": "順位",
+      "student": "生徒",
+      "score": "スコア",
+      "noStudents": "生徒が見つかりません",
+      "printReport": "レポートを印刷",
+      "emailReport": "レポートをメール送信",
+      "error": {
+        "generateFailed": "レポートの生成に失敗しました",
+        "exportFailed": "レポートの出力に失敗しました",
+        "noData": "レポートに使用できるデータがありません"
+      }
+    },
+  },
+  "crazygames": {
+    "ads": {
+      "watchForReward": "Watch ad for {{reward}}",
+      "adPlaying": "Ad playing...",
+      "adError": "Ad unavailable",
+      "adblockDetected": "Adblock detected - some features may be limited",
+      "thanksForWatching": "Thanks for watching!"
+    },
+    "cloudSave": {
+      "syncing": "Syncing progress...",
+      "syncSuccess": "Progress synced!",
+      "syncError": "Sync failed - will retry",
+      "conflictResolved": "Progress updated from cloud"
     }
   },
+  "notifications": {
+    "title": "通知",
+    "bell": "通知",
+    "bellUnread": "未読の通知が{count}件あります",
+    "empty": "通知はまだありません",
+    "emptyDesc": "通知を受け取ると、ここに表示されます",
+    "markAllRead": "すべて既読にする",
+    "markAsRead": "既読にする",
+    "viewAll": "すべて表示",
+    "more": "件",
+    "newNotification": "新しい通知",
+    "justNow": "たった今",
+    "minutesAgo": "{count}分前",
+    "minutesAgoPlural": "{count}分前",
+    "hoursAgo": "{count}時間前",
+    "hoursAgoPlural": "{count}時間前",
+    "daysAgo": "{count}日前",
+    "daysAgoPlural": "{count}日前",
+    "view": "表示",
+    "dismiss": "閉じる",
+    "showAll": "すべて",
+    "unreadOnly": "未読",
+    "types": {
+      "gift": "ギフト",
+      "system": "システム",
+      "achievement": "実績",
+      "social": "ソーシャル",
+      "marketing": "ニュース"
+    },
+    "gift": {
+      "title": "ギフトを受け取りました！",
+      "body": "{sender}から{xp} XPと{coins}コインが届きました！"
+    },
+    "admin": {
+      "sendTitle": "通知を送信",
+      "selectPlayers": "受信者を選択",
+      "chooseType": "タイプを選択",
+      "writeMessage": "メッセージを書く",
+      "preview": "プレビュー",
+      "send": "送信",
+      "sending": "送信中...",
+      "sent": "通知が送信されました！",
+      "recipients": "受信者",
+      "type": "タイプ",
+      "sendingTo": "送信先",
+      "titleLabel": "タイトル",
+      "titlePlaceholder": "通知タイトル...",
+      "bodyLabel": "メッセージ",
+      "bodyPlaceholder": "通知メッセージ...",
+      "actionUrlLabel": "アクションURL",
+      "sendSuccess": "通知が正常に送信されました！",
+      "sendError": "通知の送信に失敗しました。もう一度お試しください。"
+    },
+    "prompt": {
+      "title": "ゲームに参加し続けよう！",
+      "body": "デイリーチャレンジとストリーク警告のリマインダーを受け取る",
+      "enable": "通知を有効にする",
+      "notNow": "今はしない"
+    },
+    "preferences": {
+      "title": "通知設定",
+      "dailyChallenge": "デイリーチャレンジリマインダー",
+      "streakWarning": "ストリーク危険警告",
+      "friendInvites": "フレンドチャレンジ招待",
+      "weeklySummary": "週間サマリー"
+    }
+  },
+  "native": {
+    "offline": {
+      "title": "接続なし",
+      "message": "ゲームサーバーに接続できません。インターネット接続を確認してください。",
+      "retry": "再試行",
+      "retrying": "接続中..."
+    }
+  },
+  "backToLobby": "ロビーに戻る",
+  "duelNotFound": "デュエルが見つかりません",
+  "duelsTitle": "デュエル",
+  "notParticipant": "このデュエルの参加者ではありません",
   "duels": {
     "addWord": "単語を追加",
     "backToLobby": "ロビーに戻る",

@@ -32,9 +32,16 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
   };
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       className={`
         relative flex gap-3 p-3 cursor-pointer transition-all duration-200
         border-b-2 border-black/10 last:border-b-0 w-full text-start
@@ -96,7 +103,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
           "
         />
       )}
-    </button>
+    </div>
   );
 }
 

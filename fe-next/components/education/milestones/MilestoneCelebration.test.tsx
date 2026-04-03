@@ -54,7 +54,8 @@ describe('MilestoneCelebration', () => {
 
     render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
 
-    expect(screen.getByText('🏆')).toBeInTheDocument();
+    // Trophy icon renders as SVG with lucide-trophy class
+    expect(document.querySelector('.lucide-trophy')).toBeInTheDocument();
   });
 
   it('should show minor milestone star emoji', () => {
@@ -66,7 +67,8 @@ describe('MilestoneCelebration', () => {
 
     render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
 
-    expect(screen.getByText('⭐')).toBeInTheDocument();
+    // Star icon renders as SVG with lucide-star class
+    expect(document.querySelector('.lucide-star')).toBeInTheDocument();
   });
 
   it('should display milestone level', () => {

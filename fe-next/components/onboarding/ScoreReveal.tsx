@@ -1,10 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, RotateCcw, ArrowRight } from 'lucide-react';
+import { RotateCcw, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { fireVictoryConfetti } from '@/utils/confettiUtils';
+
+// Generated once at module load — avoids impure Math.random calls during render
+const SPARKLE_COLORS = ['text-neo-lime', 'text-neo-pink', 'text-neo-cyan'] as const;
+const SPARKLE_SIZES = ['w-3 h-3', 'w-4 h-4', 'w-5 h-5'] as const;
+const INITIAL_SPARKLES = Array.from(
+  { length: 4 + Math.floor(Math.random() * 3) },
+  () => ({
+    x: Math.random() < 0.5 ? -14 + Math.random() * 10 : 88 + Math.random() * 12,
+    y: -10 + Math.random() * 80,
+    delay: 0.3 + Math.random() * 0.6,
+    startRotate: -60 + Math.random() * 30,
+    size: SPARKLE_SIZES[Math.floor(Math.random() * SPARKLE_SIZES.length)],
+    color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
+  })
+);
 
 interface ScoreRevealProps {
   score: number;
@@ -14,8 +30,9 @@ interface ScoreRevealProps {
 }
 
 /**
- * ScoreReveal - Shows player score vs today's average.
+ * ScoreReveal - Celebration screen after first game.
  * Step 4 of the FTUE: The Hook (90-120s).
+ * Celebration-first design — Continue is the primary CTA.
  */
 const ScoreReveal: React.FC<ScoreRevealProps> = ({
   score,
@@ -26,84 +43,176 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
   const { t, dir } = useLanguage();
   const isAboveAverage = score >= averageScore;
 
+  const sparkles = INITIAL_SPARKLES;
+
+  const barPercent = useMemo(() => {
+    const max = Math.max(score, averageScore, 1);
+    return Math.min(Math.round((score / max) * 100), 100);
+  }, [score, averageScore]);
+
+  useEffect(() => {
+    fireVictoryConfetti();
+  }, []);
+
   return (
     <motion.div
       data-testid="score-reveal"
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-sm mx-auto"
+      className="w-full max-w-sm mx-auto relative"
       dir={dir}
     >
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-6 shadow-hard-md text-center">
-        {/* Score display */}
+      {/* Floating sparkle decorations — positions randomized per render */}
+      {sparkles.map((spark, i) => (
+        <motion.div
+          key={i}
+          initial={{ scale: 0, rotate: spark.startRotate }}
+          animate={{ scale: [0, 1.2, 1], rotate: [spark.startRotate, 15, 0] }}
+          transition={{ delay: spark.delay, duration: 0.5, ease: 'easeOut' }}
+          className="absolute pointer-events-none"
+          style={{ left: `${spark.x}%`, top: `${spark.y}%` }}
+        >
+          <Sparkles className={cn(spark.size, spark.color)} />
+        </motion.div>
+      ))}
+
+      <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-6 shadow-hard-lg text-center relative overflow-hidden">
+        {/* Subtle radial glow behind score */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            background: isAboveAverage
+              ? 'radial-gradient(circle at 50% 35%, #BFFF00 0%, transparent 60%)'
+              : 'radial-gradient(circle at 50% 35%, #00FFFF 0%, transparent 60%)',
+          }}
+        />
+
+        {/* Celebration header */}
+        <motion.div
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 500, damping: 15 }}
+          className="mb-1 relative"
+        >
+          <Trophy className="w-8 h-8 text-neo-lime mx-auto drop-shadow-[0_0_8px_rgba(191,255,0,0.5)]" />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-xs font-black uppercase tracking-widest text-neo-black/50 mb-1"
+        >
+          {t('onboarding.ftue.niceWork', 'Nice work!')}
+        </motion.div>
+
+        {/* Score display with decorative circle */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 20 }}
-          className="mb-4"
+          transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 18 }}
+          className="relative mb-3"
         >
-          <div className="text-sm font-bold text-neo-black/60 mb-1">
-            {t('onboarding.ftue.yourScore', { score: '' })}
+          <div className="relative inline-block">
+            {/* Decorative ring */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className={cn(
+                'absolute -inset-4 rounded-full border-3 border-dashed',
+                isAboveAverage ? 'border-neo-lime/40' : 'border-neo-cyan/40'
+              )}
+            />
+            <div
+              className="text-7xl font-black text-neo-lime relative"
+              style={{ WebkitTextStroke: '2.5px black' }}
+            >
+              {score}
+            </div>
           </div>
-          <div
-            className={cn(
-              'text-5xl font-black',
-              isAboveAverage ? 'text-neo-lime' : 'text-neo-orange'
-            )}
-            style={{ WebkitTextStroke: '2px black' }}
-          >
-            {score}
-          </div>
+          {isAboveAverage && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className={cn(
+                'inline-block mt-2 px-3 py-0.5 rounded-full',
+                'bg-neo-lime/20 border-2 border-neo-lime/50',
+                'text-xs font-black text-neo-black/80 uppercase tracking-wide'
+              )}
+            >
+              {t('onboarding.ftue.aboveAverage', 'Above average!')}
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Divider */}
-        <div className="w-full h-[3px] bg-neo-black/20 rounded-full mb-4" />
-
-        {/* Average display */}
+        {/* Visual comparison bar */}
         <motion.div
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mb-6"
+          className="mb-5 px-2"
         >
-          <div className="flex items-center justify-center gap-2 text-neo-black/70">
-            <TrendingUp className="w-4 h-4" />
-            <span className="text-sm font-bold">
-              {t('onboarding.ftue.averageScore', { average: '' })}
-            </span>
+          <div className="flex items-center justify-between text-[10px] font-bold text-neo-black/50 uppercase tracking-wider mb-1.5">
+            <span>{t('onboarding.ftue.yourScore', { score: '' }).replace('{{score}}', '').trim()}</span>
+            <span>{t('onboarding.ftue.averageScore', { average: '' }).replace('{{average}}', '').trim()}</span>
           </div>
-          <div className="text-3xl font-black text-neo-black mt-1">
-            {averageScore}
+          <div className="relative h-5 bg-neo-black/10 rounded-full border-2 border-neo-black/20 overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${barPercent}%` }}
+              transition={{ delay: 0.7, duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+              className={cn(
+                'absolute inset-y-0 left-0 rounded-full',
+                isAboveAverage ? 'bg-neo-lime' : 'bg-neo-cyan'
+              )}
+            />
+            {/* Average marker */}
+            <div
+              className="absolute top-0 bottom-0 w-0.5 bg-neo-black/60"
+              style={{
+                left: `${Math.min(Math.round((averageScore / Math.max(score, averageScore, 1)) * 100), 100)}%`,
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-sm font-black text-neo-black">{score}</span>
+            <span className="text-sm font-bold text-neo-black/50">{averageScore}</span>
           </div>
         </motion.div>
 
-        {/* Action buttons */}
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={onTryAgain}
+        {/* Action buttons — Continue is primary */}
+        <div className="flex flex-col gap-2 relative">
+          <motion.button
+            data-testid="continue-button"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: [0.9, 1.04, 1], opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.5, ease: 'easeOut' }}
+            onClick={onContinue}
             className={cn(
-              'w-full py-3 bg-neo-yellow border-3 border-neo-black rounded-neo',
-              'font-black text-neo-black text-base uppercase',
+              'w-full py-3.5 bg-neo-lime border-3 border-neo-black rounded-neo',
+              'font-black text-neo-black text-base uppercase tracking-wide',
               'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed',
               'transition-all active:translate-y-[2px]',
               'flex items-center justify-center gap-2'
             )}
           >
-            <RotateCcw className="w-5 h-5" />
-            {t('onboarding.ftue.tryAgain')}
-          </button>
+            {t('onboarding.ftue.continue', 'Continue')}
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
           <button
-            onClick={onContinue}
+            onClick={onTryAgain}
             className={cn(
-              'w-full py-2.5 bg-neo-white/50 border-2 border-neo-black/30 rounded-neo',
-              'font-bold text-neo-black/70 text-sm',
-              'hover:bg-neo-white/80 transition-colors',
+              'w-full py-2 bg-transparent border-2 border-neo-black/20 rounded-neo',
+              'font-bold text-neo-black/50 text-sm',
+              'hover:bg-neo-black/5 hover:border-neo-black/30 transition-colors',
               'flex items-center justify-center gap-2'
             )}
           >
-            {t('onboarding.ftue.continue', 'Continue')}
-            <ArrowRight className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
+            {t('onboarding.ftue.tryAgain')}
           </button>
         </div>
       </div>

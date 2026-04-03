@@ -145,7 +145,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
                 'font-neo-body text-neo-black/50 dark:text-neo-white/50',
                 sizeConfig.xpText
               )}>
-                XP
+                {t('education.xp.xpLabel')}
               </span>
             </div>
           )}

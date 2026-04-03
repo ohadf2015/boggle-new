@@ -7,7 +7,7 @@ const devUrl = process.env.CAPACITOR_DEV_URL;
 const config: CapacitorConfig = {
   appId: 'live.lexiclash.app',
   appName: 'LexiClash',
-  webDir: 'public', // Minimal fallback assets only (not used with server.url)
+  webDir: 'capacitor-assets', // Minimal fallback — actual app loads from server.url
 
   server: isDev && devUrl ? {
     // Development: Load from local dev server

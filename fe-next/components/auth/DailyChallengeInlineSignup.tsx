@@ -14,6 +14,7 @@ import { isNative } from '../../utils/platform';
 import { cn } from '../../lib/utils';
 import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import { validateEmail, validatePassword } from '../../utils/validation';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { Language } from '@/types';
 
 // Brand icon SVG components
@@ -65,6 +66,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   className,
 }) => {
   const { t, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -95,6 +97,9 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     onBeforeRedirect: () => setPendingDailyResult(pendingResult),
     onError: (msg) => setError(msg),
   });
+
+  // Hide signup UI entirely on CrazyGames — they use their own auth
+  if (isOnCrazyGamesPlatform) return null;
 
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
     setError(null);

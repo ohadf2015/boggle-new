@@ -36,7 +36,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
 
   const { deviceType, isLandscape, viewportSize } = useCrazyGamesViewport();
-  useCrazyGamesScrollPrevention(!CRAZYGAMES_FORCE_DISABLED);
+  useCrazyGamesScrollPrevention(environment === 'crazygames');
 
   // Initialize SDK
   useEffect(() => {

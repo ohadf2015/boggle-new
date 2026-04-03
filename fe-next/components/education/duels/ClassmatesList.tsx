@@ -81,7 +81,7 @@ export function ClassmatesList({
           ? classmate.profiles[0]
           : classmate.profiles;
 
-        const displayName = profile?.username || 'Unknown';
+        const displayName = profile?.username || t('common.unknown');
         return (
           <div
             key={classmate.id}

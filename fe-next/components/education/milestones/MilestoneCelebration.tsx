@@ -10,6 +10,7 @@
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -105,7 +106,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
               transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
             >
-              {isMajor ? '🏆' : '⭐'}
+              {isMajor ? <Trophy className="w-8 h-8" /> : <Star className="w-8 h-8" />}
             </motion.span>
 
             {/* Title */}
@@ -130,7 +131,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
-                  'bg-neo-orange/20 border-4 border-neo-orange',
+                  'bg-neo-pink/20 border-4 border-neo-pink',
                   'rounded-full'
                 )}
                 initial={{ scale: 0 }}
@@ -140,8 +141,8 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
                 <span
                   className={cn(
                     'text-4xl md:text-5xl font-black',
-                    'text-neo-orange',
-                    'drop-shadow-[0_0_10px_rgb(255_107_53/0.5)]'
+                    'text-neo-pink',
+                    'drop-shadow-[0_0_10px_rgb(255_20_147/0.5)]'
                   )}
                 >
                   {level}
@@ -193,13 +194,13 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               <motion.div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-orange/20 border-neo border-neo-orange'
+                  'bg-neo-pink/20 border-neo border-neo-pink'
                 )}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
               >
-                <p className="text-neo-orange font-bold text-sm uppercase tracking-wide mb-2">
+                <p className="text-neo-pink font-bold text-sm uppercase tracking-wide mb-2">
                   {t('education.milestones.titleUnlocked')}
                 </p>
                 <p className="text-lg md:text-xl font-black text-neo-white">
@@ -213,7 +214,7 @@ export const MilestoneCelebration = memo<MilestoneCelebrationProps>(
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
-                'bg-neo-lime hover:bg-neo-orange',
+                'bg-neo-lime hover:bg-neo-pink',
                 'text-neo-black font-black text-lg',
                 'border-3 border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',

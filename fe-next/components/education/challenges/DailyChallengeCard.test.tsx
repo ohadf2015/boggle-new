@@ -6,7 +6,7 @@ import type { DailyChallengeRow } from '@/lib/supabase/education/types';
 // Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
         'challenges.easy': 'Easy',
         'challenges.medium': 'Medium',
@@ -15,8 +15,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'challenges.daily.practiceSessionsDesc': 'Finish {target} practice sessions today',
         'challenges.claim': 'Claim Reward',
         'challenges.claimed': 'Claimed!',
+        'education.challenges.xpReward': '{amount} XP',
+        'education.challenges.coinReward': '{amount} Coins',
       };
-      return translations[key] || key;
+      let result = translations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          result = result.replace(`{${k}}`, String(v));
+        });
+      }
+      return result;
     },
     language: 'en',
   }),
@@ -74,7 +82,7 @@ describe('DailyChallengeCard', () => {
     render(<DailyChallengeCard challenge={mediumChallenge} onClaim={mockOnClaim} />);
 
     const badge = screen.getByTestId('tier-badge');
-    expect(badge).toHaveClass('bg-neo-orange');
+    expect(badge).toHaveClass('bg-neo-pink');
   });
 
   it('renders tier badge with correct color for hard', () => {
@@ -88,8 +96,8 @@ describe('DailyChallengeCard', () => {
   it('displays XP and coin rewards', () => {
     render(<DailyChallengeCard challenge={baseMockChallenge} onClaim={mockOnClaim} />);
 
-    expect(screen.getByText('+50 XP')).toBeInTheDocument();
-    expect(screen.getByText('+10 coins')).toBeInTheDocument();
+    expect(screen.getByText('50 XP')).toBeInTheDocument();
+    expect(screen.getByText('10 Coins')).toBeInTheDocument();
   });
 
   it('shows Claim button when completed=true and claimed=false', () => {

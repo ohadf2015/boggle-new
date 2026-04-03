@@ -128,8 +128,8 @@ export function TrailPath({
   isUnlocked: boolean;
   fromLeft: boolean;
 }): React.JSX.Element {
-  const leftX = 30;
-  const rightX = 70;
+  const leftX = 38;
+  const rightX = 62;
 
   const path = fromLeft
     ? `M ${leftX} -5 C ${leftX} 25, ${rightX} 35, ${rightX} 65`

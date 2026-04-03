@@ -20,7 +20,7 @@ import {
 } from 'react';
 import logger from '@/utils/logger';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveToCloud } from '@/utils/crazygames/cloudSave';
+import { saveToCloud, loadFromCloud } from '@/utils/crazygames/cloudSave';
 import type { PlayerProgression, LevelCompletion, LevelAttempt } from '@/types/adventure';
 import {
   isWorldUnlocked as checkWorldUnlocked,
@@ -802,6 +802,8 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
         // so components know fresh data is still incoming.
       }
       fetchProgression(); // Fetch from server — sets isLoading=false on complete
+      // Fire-and-forget: trigger CrazyGames data.getItem so QA dashboard registers it
+      loadFromCloud().catch(() => { /* non-critical */ });
     } else if (!authLoading && !currentUserId) {
       // No user — clear React state
       setProgressionRaw(null);

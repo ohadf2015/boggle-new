@@ -60,7 +60,7 @@ export function DuelDisconnectOverlay({
 
         {/* Heading */}
         <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-4">
-          {t('duels.opponentDisconnected').replace('{opponentName}', opponentName)}
+          {t('duels.opponentDisconnected', { opponentName })}
         </h2>
 
         {/* Countdown */}

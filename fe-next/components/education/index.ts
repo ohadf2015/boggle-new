@@ -30,8 +30,6 @@ export type {
 export { default as ClassroomLeaderboard } from './ClassroomLeaderboard';
 export type { ClassroomLeaderboardProps } from './ClassroomLeaderboard';
 
-export { default as AchievementUnlockModal } from './AchievementUnlockModal';
-export type { AchievementUnlockModalProps } from './AchievementUnlockModal';
 
 export { default as EducationBadgeGrid } from './EducationBadgeGrid';
 export type { StudentAchievement } from '../../types/education';

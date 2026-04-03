@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomStudents, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Users, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import Avatar from '@/components/Avatar';
 
 interface ClassroomStudentListProps {
   classroomId: string;
@@ -82,7 +82,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
         const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
         const username = profile?.username || t('teacher.classrooms.students.unknown');
         const email = profile?.email || '';
-        const avatarUrl = profile?.avatar_url;
+        const avatarConfig = profile?.avatar_config;
         const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });
         const accentBg = accentColors[idx % accentColors.length];
 
@@ -93,22 +93,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
           >
             {/* Avatar */}
             <div className="flex-shrink-0">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={username}
-                  width={44}
-                  height={44}
-                  className="w-11 h-11 rounded-neo border-2 border-black object-cover shadow-hard-sm"
-                  unoptimized
-                />
-              ) : (
-                <div className={cn('w-11 h-11 rounded-neo border-2 border-black flex items-center justify-center shadow-hard-sm', accentBg)}>
-                  <span className="text-black font-neo-display font-black text-lg">
-                    {username.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              <Avatar customAvatar={avatarConfig} userId={student.student_id || student.id} size="lg" />
             </div>
 
             {/* Student Info */}

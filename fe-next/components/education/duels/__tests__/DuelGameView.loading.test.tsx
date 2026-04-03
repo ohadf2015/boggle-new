@@ -17,6 +17,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
       const map: Record<string, string> = {
         'duels.loading': 'Loading...',
         'duels.loadingDuel': 'Loading your duel...',
+        'education.duels.loading': 'Loading your duel...',
       };
       return map[key] ?? key;
     },

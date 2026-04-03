@@ -98,7 +98,8 @@
 .world-map-cloud {
   position: absolute;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.35;
+  filter: blur(2px);
   animation: cloud-float var(--cloud-duration, 15s) ease-in-out infinite;
 }
 
@@ -371,12 +372,13 @@
 /* Pure CSS cloud shape — eliminates 3 image loads (75KB total).
  * Uses box-shadow for the puffy lobes, single DOM element. */
 .world-map-cloud-shape {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.10);
   border-radius: 50px;
   box-shadow:
-    -12px -6px 0 6px rgba(255, 255, 255, 0.12),
-    12px -4px 0 8px rgba(255, 255, 255, 0.10),
-    0 -10px 0 10px rgba(255, 255, 255, 0.08);
+    -14px -8px 0 8px rgba(255, 255, 255, 0.08),
+    14px -5px 0 10px rgba(255, 255, 255, 0.07),
+    -6px -14px 0 12px rgba(255, 255, 255, 0.06),
+    8px -12px 0 6px rgba(255, 255, 255, 0.05);
 }
 
 /* Reduce motion for users who prefer it */

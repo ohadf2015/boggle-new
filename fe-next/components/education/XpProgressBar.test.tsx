@@ -15,6 +15,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'education.xp.progress': 'Progress',
         'education.xp.keepGoing': 'Keep practicing to level up!',
         'education.xp.totalXp': 'Total XP',
+        'education.xp.xpLabel': 'XP',
       };
       let result = translations[key] || key;
       if (params) {

@@ -13,7 +13,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2, Trophy, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAchievementPin, mergePinStatus } from '../../hooks/useAchievementPin';
 import { StudentAchievement } from '../../types/education';
@@ -137,7 +137,7 @@ export default function EducationBadgeGrid({
       {/* Header Section */}
       <div className="space-y-4">
         <h2 className="font-neo-display text-3xl font-bold text-neo-white flex items-center gap-3">
-          <span>🏆</span>
+          <Trophy className="w-5 h-5" />
           {t('education.achievements.title')}
         </h2>
 
@@ -171,7 +171,7 @@ export default function EducationBadgeGrid({
       {pinnedCount > 0 && (
         <div data-testid="featured-badges" className="space-y-4">
           <h3 className="font-neo-display text-xl font-bold text-neo-white flex items-center gap-2">
-            <span>⭐</span>
+            <Star className="w-5 h-5" />
             {t('education.achievements.featured')}
           </h3>
 
@@ -221,6 +221,8 @@ export default function EducationBadgeGrid({
             {/* Category Header */}
             <button
               onClick={() => toggleCategory(category)}
+              aria-expanded={!isCollapsed}
+              aria-controls={`category-${category}`}
               className="w-full flex items-center justify-between text-left group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors"
             >
               <h3 className="font-neo-display text-xl font-bold text-neo-white group-hover:text-neo-cyan transition-colors">
@@ -244,9 +246,11 @@ export default function EducationBadgeGrid({
 
             {/* Category Content */}
             <div
+              id={`category-${category}`}
               data-testid={`category-${category}`}
               data-category={category}
               data-expanded={!isCollapsed}
+              role="region"
               className={cn(
                 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 origin-top',
                 isCollapsed
