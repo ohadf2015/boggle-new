@@ -86,9 +86,12 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
 
       // Check if we should use native OAuth
       // Native OAuth is available for Google (iOS/Android) and Apple (iOS only)
+      const nativeAvail = isNativeOAuthAvailable();
       const canUseNativeOAuth = !forceBrowserOAuth &&
-        isNativeOAuthAvailable() &&
+        nativeAvail &&
         (provider === 'google' || provider === 'apple');
+
+      logger.log(`[useOAuthSignIn] provider=${provider} native=${isNative()} nativeOAuthAvail=${nativeAvail} canUseNative=${canUseNativeOAuth} forceBrowser=${forceBrowserOAuth}`);
 
       // PRIORITY 1: Native SDK OAuth (best UX - no browser)
       if (canUseNativeOAuth) {
