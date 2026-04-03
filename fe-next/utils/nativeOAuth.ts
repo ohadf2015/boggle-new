@@ -181,7 +181,7 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
       return { success: false, error: `No result object: ${JSON.stringify(result).slice(0, 200)}` };
     }
 
-    const idToken = googleResult.idToken;
+    const idToken = (googleResult as unknown as Record<string, unknown>).idToken as string | undefined;
     if (!idToken) {
       setDebugStep('ERR: no idToken');
       logger.error('[NativeOAuth] No ID token received from Google');
