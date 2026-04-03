@@ -71,6 +71,8 @@ export interface UseBlastEngineReturn {
   startCascade: () => CascadeResult;
   setTileStates: (updater: (prev: BlastTileState[][]) => BlastTileState[][]) => void;
   trackWordFail: () => void;
+  /** Consume a move without clearing tiles (e.g. invalid word submission) */
+  consumeMove: () => void;
   noWordsRemaining: boolean;
 }
 
@@ -394,6 +396,15 @@ export function useBlastEngine(
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'fail');
   }, []);
 
+  // ── consumeMove — deduct a move without clearing tiles (invalid word penalty) ──
+  const consumeMove = useCallback(() => {
+    setGameState(prev => {
+      if (!isFinite(prev.totalMoves)) return prev; // infinite-move mode — no penalty
+      const newMovesRemaining = Math.max(0, prev.movesRemaining - 1);
+      return { ...prev, movesRemaining: newMovesRemaining, movesUsed: prev.movesUsed + 1 };
+    });
+  }, []);
+
   return {
     grid: effectiveGrid,
     tileStates,
@@ -407,6 +418,7 @@ export function useBlastEngine(
     startCascade,
     setTileStates,
     trackWordFail,
+    consumeMove,
     noWordsRemaining,
   };
 }

@@ -341,15 +341,16 @@ export function BlastGame({
     if (word.length > 0) sounds.playPathTone(word.length);
   }, [sounds]);
 
-  // Play rejection sound when word is rejected
+  // Play rejection sound + consume a move when word is rejected
   const prevFeedbackIdRef = useRef<string | null>(null);
   useEffect(() => {
     const fb = wordSubmission.currentFeedback;
-    if (fb && fb.type === 'rejected' && fb.id !== prevFeedbackIdRef.current) {
-      sounds.playWordReject();
+    if (fb && (fb.type === 'rejected' || fb.type === 'duplicate') && fb.id !== prevFeedbackIdRef.current) {
+      if (fb.type === 'rejected') sounds.playWordReject();
+      engine.consumeMove();
     }
     prevFeedbackIdRef.current = fb?.id ?? null;
-  }, [wordSubmission.currentFeedback, sounds]);
+  }, [wordSubmission.currentFeedback, sounds, engine]);
 
   const handleQuit = useCallback(() => {
     onQuit();
