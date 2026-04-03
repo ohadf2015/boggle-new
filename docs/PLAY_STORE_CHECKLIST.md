@@ -64,8 +64,8 @@ npm run mobile:android:play
 
 ### Store Listing (all required)
 - [ ] **App name**: LexiClash (max 30 chars)
-- [ ] **Short description**: 80 chars max, in all supported languages (EN, HE, SV, JA, ES)
-- [ ] **Full description**: 4000 chars max, in all supported languages
+- [x] **Short description**: 80 chars max, in all supported languages — see `docs/PLAY_STORE_LISTING.md`
+- [x] **Full description**: 4000 chars max, in all supported languages — see `docs/PLAY_STORE_LISTING.md`
 - [ ] **App icon**: 512x512 PNG, 32-bit, no alpha
 - [ ] **Feature graphic**: 1024x500 PNG or JPG
 - [ ] **Phone screenshots**: Min 2, max 8 (16:9 or 9:16, min 320px, max 3840px)
@@ -75,6 +75,7 @@ npm run mobile:android:play
 - [ ] **Tags**: word game, multiplayer, boggle, vocabulary
 - [ ] **Contact email**: Required
 - [ ] **Privacy policy URL**: `https://www.lexiclash.live/en/legal/privacy`
+- [x] **Account deletion URL**: `https://www.lexiclash.live/en/account/delete`
 
 ### Content Rating
 - [ ] Fill out **IARC questionnaire** in Play Console
@@ -116,7 +117,7 @@ Fill these in Play Console under **Data Safety**:
 ### Security Practices
 - [x] Data encrypted in transit (HTTPS)
 - [x] Data can be deleted (user can request account deletion)
-- [ ] **Add account deletion flow** — Play Store requires a way for users to delete their account and data
+- [x] Account deletion flow — in-app (Settings) + web page (/account/delete)
 
 ### Important Notes
 - If using Google Sign-In: declare you collect authentication tokens
