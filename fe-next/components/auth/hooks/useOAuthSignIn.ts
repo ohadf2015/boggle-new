@@ -106,9 +106,12 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         }
 
         // If native OAuth failed but not due to user cancellation,
-        // fall back to browser-based OAuth
+        // TODO: TEMPORARILY show error instead of falling through to browser, for debugging
         if (nativeResult.error && !nativeResult.error.includes('cancel')) {
-          logger.warn(`[useOAuthSignIn] Native OAuth failed, falling back to browser: ${nativeResult.error}`);
+          logger.warn(`[useOAuthSignIn] Native OAuth failed: ${nativeResult.error}`);
+          setError(`[DEBUG] Native OAuth error: ${nativeResult.error}`);
+          onError?.(`[DEBUG] Native OAuth error: ${nativeResult.error}`);
+          return; // TEMP: stop here instead of falling through to browser
         } else if (nativeResult.error?.includes('cancel')) {
           // User cancelled - don't fall back, just clear loading state
           setError(null);
