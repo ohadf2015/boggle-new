@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, AlertTriangle, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,7 +17,6 @@ export default function DeleteAccountPageClient() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { theme } = useTheme();
-  const router = useRouter();
   const isDarkMode = theme === 'dark';
 
   const [step, setStep] = useState<Step>(user ? 'confirm' : 'email');
