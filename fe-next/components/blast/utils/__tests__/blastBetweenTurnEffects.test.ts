@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { applyBetweenTurnEffects, spreadVirus } from '../blastTileEffects';
-import type { BlastTileState } from '../../types';
-import { COUNTDOWN_EXPLOSION_PENALTY } from '../../types';
+import { type BlastTileState, COUNTDOWN_EXPLOSION_PENALTY } from '../../types';
 
 /** Helper to create a minimal tile */
 function makeTile(row: number, col: number, type: BlastTileState['type'] = 'standard', overrides: Partial<BlastTileState> = {}): BlastTileState {

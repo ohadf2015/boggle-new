@@ -332,7 +332,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 {/* Daily Missions progress */}
                                 {isAuthenticated && missions.length > 0 && (
                                     <Link
-                                        href={`/${language}/daily`}
+                                        href={`/${language}/quests`}
                                         onClick={closeMenu}
                                         className={cn(
                                             "mx-4 mt-2 flex items-center gap-3 px-3 py-2 rounded-neo",
