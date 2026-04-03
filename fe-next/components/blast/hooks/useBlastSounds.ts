@@ -24,9 +24,31 @@ export function useBlastSounds() {
     playAchievementSound,
     playCountdownBeep,
     playSound,
+    playBlastBombSound,
+    playBlastLightningSound,
+    playBlastPrismSound,
+    playTileSelectSound,
+    playLongWordBonusSound,
   } = useSoundEffects();
 
   const audioCtxRef = useRef<AudioContext | null>(null);
+
+  /** Play special tile activation sound based on tile type */
+  const playSpecialTileSound = useCallback((tileType: string) => {
+    if (tileType === 'bomb') playBlastBombSound();
+    else if (tileType === 'lightning') playBlastLightningSound();
+    else if (tileType === 'prism') playBlastPrismSound();
+  }, [playBlastBombSound, playBlastLightningSound, playBlastPrismSound]);
+
+  /** Play tile select sound when player adds a tile to path */
+  const playTileSelect = useCallback(() => {
+    playTileSelectSound();
+  }, [playTileSelectSound]);
+
+  /** Play long word bonus sound for 6+ letter words */
+  const playLongWordBonus = useCallback((wordLength: number) => {
+    if (wordLength >= 6) playLongWordBonusSound();
+  }, [playLongWordBonusSound]);
 
   /** Play tile clear sound with pitch scaled by word length */
   const playTileClear = useCallback((count: number) => {
@@ -111,5 +133,8 @@ export function useBlastSounds() {
     playWordReject,
     playComboTimeout,
     playPathTone,
+    playSpecialTileSound,
+    playTileSelect,
+    playLongWordBonus,
   };
 }

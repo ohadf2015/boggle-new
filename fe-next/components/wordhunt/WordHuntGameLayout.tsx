@@ -4,7 +4,6 @@ import { memo } from 'react';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
-import type { WordFeedback } from '@/components/game/WordFormingArea';
 import { WordHuntMPHeader } from './WordHuntMPHeader';
 import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
 import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
@@ -48,10 +47,10 @@ export interface WordHuntGameLayoutProps {
   onWordChange: (word: string, count: number) => void;
   highlightedPath?: HighlightedCell[];
 
-  // Word forming
-  formedWord: string;
-  letterCount: number;
-  wordFeedback: WordFeedback | null;
+  // Word forming (kept for caller compat, not rendered — feedback shown in clue boxes)
+  formedWord?: string;
+  letterCount?: number;
+  wordFeedback?: unknown;
 
   // Leaderboard
   playerLives: Record<string, number>;
@@ -99,11 +98,6 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   onWordSubmit,
   onWordChange,
   highlightedPath,
-
-  // Word forming
-  formedWord,
-  letterCount,
-  wordFeedback,
 
   // Leaderboard
   playerLives,
@@ -173,34 +167,11 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             t={t}
           />
 
-          {/* Floating invalid word notification over grid */}
-          {wordFeedback && (wordFeedback.type === 'rejected' || wordFeedback.type === 'duplicate') && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-              <div className={`px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-bold text-sm animate-neo-shake ${
-                wordFeedback.type === 'rejected' ? 'bg-neo-red text-neo-cream' : 'bg-neo-pink text-neo-black'
-              }`}>
-                {wordFeedback.type === 'rejected' && '✗ '}
-                {wordFeedback.type === 'duplicate' && '⟳ '}
-                {wordFeedback.message || (wordFeedback.type === 'duplicate' ? t('playerView.wordAlreadyFound') : t('playerView.invalidWord'))}
-              </div>
-            </div>
-          )}
-
           {/* Game over overlay — death or victory, then spectator mode */}
           <WordHuntGameOverOverlay
             reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
             t={t}
             deathRecapStats={deathRecapStats}
-          />
-        </div>
-
-        {/* Word Forming Area */}
-        <div className="px-2 flex-shrink-0">
-          <WordFormingArea
-            word={formedWord}
-            letterCount={letterCount}
-            feedback={wordFeedback}
-            compact
           />
         </div>
 

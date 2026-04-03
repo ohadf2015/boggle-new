@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { Coins, Lock, Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
   UPGRADE_CATEGORIES,
   getAvailableUpgrades,
@@ -42,6 +43,7 @@ export function UpgradeShop({
   className = '',
 }: UpgradeShopProps) {
   const { t } = useLanguage();
+  const { playUpgradePurchaseSound } = useSoundEffects();
   const [activeCategory, setActiveCategory] = useState<UpgradeCategory>('excavation');
   const [flashId, setFlashId] = useState<string | null>(null);
 
@@ -56,6 +58,7 @@ export function UpgradeShop({
     if (!result) return;
     setFlashId(upgradeId);
     setTimeout(() => setFlashId(null), 800);
+    playUpgradePurchaseSound();
     onPurchase(upgradeId, result.state, result.gold);
   };
 

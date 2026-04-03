@@ -7,7 +7,7 @@
  * on every screen. Pulses red when streak is at risk.
  */
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useRef } from 'react';
 import { Flame, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +16,9 @@ import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
 import { PowerHourBadge } from './PowerHourBadge';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+
+const STREAK_MILESTONES = [7, 14, 30, 50, 100];
 
 function formatNumber(n: number): string {
   return n.toLocaleString('en-US');
@@ -28,6 +31,17 @@ export const StreakBar: React.FC = memo(() => {
   const reducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const { playStreakMilestoneSound } = useSoundEffects();
+  const prevStreakRef = useRef<number | null>(null);
+  useEffect(() => {
+    const prev = prevStreakRef.current;
+    const curr = status.streak;
+    if (prev !== null && curr > prev) {
+      const hitMilestone = STREAK_MILESTONES.some(m => curr >= m && prev < m);
+      if (hitMilestone) playStreakMilestoneSound();
+    }
+    prevStreakRef.current = curr;
+  }, [status.streak, playStreakMilestoneSound]);
 
   // Always return null on server & first client render to avoid hydration mismatch
   if (!mounted) return null;

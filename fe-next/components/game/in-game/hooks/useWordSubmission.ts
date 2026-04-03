@@ -20,6 +20,7 @@ interface UseWordSubmissionOptions {
   comboLevelRef: MutableRefObject<number>;
   t: TranslationFn;
   playWordAcceptedSound: () => void;
+  playWordRejectedSound: () => void;
   announceWordResult: (word: string, isAccepted: boolean, score?: number, message?: string) => void;
   onWordSubmit?: (word: string) => void;
   onResetCombo?: () => void;
@@ -51,6 +52,7 @@ export function useWordSubmission(
     comboLevelRef,
     t,
     playWordAcceptedSound,
+    playWordRejectedSound,
     announceWordResult,
     onWordSubmit,
     onResetCombo,
@@ -105,6 +107,7 @@ export function useWordSubmission(
       });
       // Haptic feedback for error
       hapticError();
+      playWordRejectedSound();
       // Announce rejection for screen readers
       announceWordResult(formedWord, false, undefined, msg);
       // Reset combo if duplicate word
@@ -126,6 +129,7 @@ export function useWordSubmission(
         timestamp: Date.now(),
       });
       hapticError();
+      playWordRejectedSound();
       announceWordResult(formedWord, false, undefined, notOnBoardMsg);
       return;
     }
@@ -157,6 +161,7 @@ export function useWordSubmission(
     onResetCombo,
     t,
     playWordAcceptedSound,
+    playWordRejectedSound,
     announceWordResult,
     comboLevelRef,
     comboTypeRef,

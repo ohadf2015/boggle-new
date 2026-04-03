@@ -106,6 +106,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Sound effects
   const {
     playWordAcceptedSound,
+    playWordRejectedSound,
     playEarthquakeRumble,
     playEarthquakeShake,
     playFireRoundStart,
@@ -113,6 +114,8 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     stopFireCrackleLoop,
     playComboMilestoneSound,
     playComboBreakSound,
+    playRoundStartSound,
+    playTimesUpSound,
     setGameActive: setSoundGameActive,
   } = useSoundEffects();
 
@@ -129,6 +132,30 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       announceTimer(remainingTime);
     }
   }, [remainingTime, gameActive, announceTimer]);
+
+  // Play round start sound when game becomes active
+  const hasFiredRoundStartRef = useRef(false);
+  useEffect(() => {
+    if (gameActive && !showStartAnimation && !hasFiredRoundStartRef.current) {
+      hasFiredRoundStartRef.current = true;
+      playRoundStartSound();
+    }
+    if (!gameActive) {
+      hasFiredRoundStartRef.current = false;
+    }
+  }, [gameActive, showStartAnimation, playRoundStartSound]);
+
+  // Play times-up sound when timer hits zero
+  const hasFiredTimesUpRef = useRef(false);
+  useEffect(() => {
+    if (remainingTime === 0 && gameActive === false && !hasFiredTimesUpRef.current) {
+      hasFiredTimesUpRef.current = true;
+      playTimesUpSound();
+    }
+    if (gameActive) {
+      hasFiredTimesUpRef.current = false;
+    }
+  }, [remainingTime, gameActive, playTimesUpSound]);
 
   // CrazyGames SDK lifecycle
   const isGameOver = remainingTime === 0;
@@ -265,6 +292,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     comboLevelRef: effectiveComboLevelRef,
     t,
     playWordAcceptedSound,
+    playWordRejectedSound,
     announceWordResult,
     onWordSubmit,
     onResetCombo,

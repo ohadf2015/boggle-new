@@ -60,6 +60,19 @@ interface SoundEffectsContextType {
   playTileSelectSound: () => void;
   playRoundStartSound: () => void;
   playTimesUpSound: () => void;
+  // New ElevenLabs-generated sound functions
+  playCoinCollectSound: () => void;
+  playButtonClickSound: () => void;
+  playChestOpenSound: () => void;
+  playQuestCompleteSound: () => void;
+  playBoardShuffleSound: () => void;
+  playUpgradePurchaseSound: () => void;
+  playHintRevealSound: () => void;
+  playDailyRewardSound: () => void;
+  playTimerUrgentSound: () => void;
+  playStreakFireSound: () => void;
+  playScreenTransitionSound: () => void;
+  playLongWordBonusSound: () => void;
 }
 
 interface SfxSettings {
@@ -103,20 +116,20 @@ const SOUND_EFFECTS = {
   streakMilestone: '/sounds/streak-milestone.mp3',
   tierPromotion: '/sounds/tier-promotion.mp3',
   tileSelect: '/sounds/tile-select.mp3',
-  // TTS announcer voice lines
-  ttsVictory: '/sounds/tts-victory.mp3',
-  ttsDefeat: '/sounds/tts-defeat.mp3',
-  ttsLevelUp: '/sounds/tts-level-up.mp3',
-  ttsBossEntrance: '/sounds/tts-boss-entrance.mp3',
-  ttsBossDefeat: '/sounds/tts-boss-defeat.mp3',
-  ttsMatchFound: '/sounds/tts-match-found.mp3',
-  ttsComboMilestone: '/sounds/tts-combo-milestone.mp3',
-  ttsPowerUp: '/sounds/tts-power-up.mp3',
-  ttsBlastBomb: '/sounds/tts-blast-bomb.mp3',
-  ttsStreak: '/sounds/tts-streak.mp3',
-  ttsTierPromotion: '/sounds/tts-tier-promotion.mp3',
-  ttsRoundStart: '/sounds/tts-round-start.mp3',
-  ttsTimesUp: '/sounds/tts-times-up.mp3',
+  // New ElevenLabs-generated sounds
+  coinCollect: '/sounds/coin-collect.mp3',
+  buttonClick: '/sounds/button-click.mp3',
+  chestOpen: '/sounds/chest-open.mp3',
+  questComplete: '/sounds/quest-complete.mp3',
+  boardShuffle: '/sounds/board-shuffle.mp3',
+  upgradePurchase: '/sounds/upgrade-purchase.mp3',
+  hintReveal: '/sounds/hint-reveal.mp3',
+  dailyReward: '/sounds/daily-reward.mp3',
+  timerUrgent: '/sounds/timer-urgent.mp3',
+  streakFire: '/sounds/streak-fire.mp3',
+  screenTransition: '/sounds/screen-transition.mp3',
+  longWordBonus: '/sounds/long-word-bonus.mp3',
+  roundStart: '/sounds/round-start.mp3',
 } as const;
 
 // Sound effect priority levels for progressive loading
@@ -155,20 +168,20 @@ const SOUND_PRIORITIES: Record<keyof typeof SOUND_EFFECTS, AUDIO_LOAD_PRIORITY> 
   streakMilestone: AUDIO_LOAD_PRIORITY.LOW,
   tierPromotion: AUDIO_LOAD_PRIORITY.LOW,
   tileSelect: AUDIO_LOAD_PRIORITY.CRITICAL,
-  // TTS lines - all low priority (loaded on demand)
-  ttsVictory: AUDIO_LOAD_PRIORITY.LOW,
-  ttsDefeat: AUDIO_LOAD_PRIORITY.LOW,
-  ttsLevelUp: AUDIO_LOAD_PRIORITY.LOW,
-  ttsBossEntrance: AUDIO_LOAD_PRIORITY.LOW,
-  ttsBossDefeat: AUDIO_LOAD_PRIORITY.LOW,
-  ttsMatchFound: AUDIO_LOAD_PRIORITY.LOW,
-  ttsComboMilestone: AUDIO_LOAD_PRIORITY.LOW,
-  ttsPowerUp: AUDIO_LOAD_PRIORITY.LOW,
-  ttsBlastBomb: AUDIO_LOAD_PRIORITY.LOW,
-  ttsStreak: AUDIO_LOAD_PRIORITY.LOW,
-  ttsTierPromotion: AUDIO_LOAD_PRIORITY.LOW,
-  ttsRoundStart: AUDIO_LOAD_PRIORITY.LOW,
-  ttsTimesUp: AUDIO_LOAD_PRIORITY.LOW,
+  // New ElevenLabs-generated sounds
+  coinCollect: AUDIO_LOAD_PRIORITY.NORMAL,
+  buttonClick: AUDIO_LOAD_PRIORITY.HIGH,
+  chestOpen: AUDIO_LOAD_PRIORITY.LOW,
+  questComplete: AUDIO_LOAD_PRIORITY.LOW,
+  boardShuffle: AUDIO_LOAD_PRIORITY.NORMAL,
+  upgradePurchase: AUDIO_LOAD_PRIORITY.LOW,
+  hintReveal: AUDIO_LOAD_PRIORITY.NORMAL,
+  dailyReward: AUDIO_LOAD_PRIORITY.LOW,
+  timerUrgent: AUDIO_LOAD_PRIORITY.NORMAL,
+  streakFire: AUDIO_LOAD_PRIORITY.LOW,
+  screenTransition: AUDIO_LOAD_PRIORITY.NORMAL,
+  longWordBonus: AUDIO_LOAD_PRIORITY.NORMAL,
+  roundStart: AUDIO_LOAD_PRIORITY.NORMAL,
 };
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
@@ -577,20 +590,17 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Victory: SFX fanfare + TTS "Victory!"
   const playVictorySound = useCallback(() => {
     playSound('victoryFanfare', { volume: 0.8, requiresGameActive: false });
-    setTimeout(() => playSound('ttsVictory', { volume: 0.9, requiresGameActive: false }), 300);
     haptics.success();
   }, [playSound]);
 
   // Defeat: SFX sting + TTS "Defeated!"
   const playDefeatSound = useCallback(() => {
     playSound('defeatSting', { volume: 0.7, requiresGameActive: false });
-    setTimeout(() => playSound('ttsDefeat', { volume: 0.8, requiresGameActive: false }), 300);
   }, [playSound]);
 
   // Adventure level complete
   const playLevelUpSound = useCallback(() => {
     playSound('levelUp', { volume: 0.8 });
-    setTimeout(() => playSound('ttsLevelUp', { volume: 0.9 }), 200);
     haptics.success();
   }, [playSound]);
 
@@ -600,10 +610,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     haptics.success();
   }, [playSound]);
 
-  // Power-up activation + TTS
+  // Power-up activation
   const playPowerUpSound = useCallback(() => {
     playSound('powerUp', { volume: 0.7 });
-    playSound('ttsPowerUp', { volume: 0.6 });
     haptics.tap();
   }, [playSound]);
 
@@ -620,19 +629,16 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   const playBossEntranceSound = useCallback(() => {
     playSound('bossEntrance', { volume: 0.8, requiresGameActive: false });
-    setTimeout(() => playSound('ttsBossEntrance', { volume: 0.9, requiresGameActive: false }), 500);
   }, [playSound]);
 
   const playBossDefeatSound = useCallback(() => {
     playSound('bossDefeat', { volume: 0.8 });
-    setTimeout(() => playSound('ttsBossDefeat', { volume: 0.9 }), 300);
     haptics.success();
   }, [playSound]);
 
   // Blast special tile sounds
   const playBlastBombSound = useCallback(() => {
     playSound('blastBomb', { volume: 0.7 });
-    playSound('ttsBlastBomb', { volume: 0.5 });
     haptics.tap();
   }, [playSound]);
 
@@ -649,21 +655,18 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Matchmaking
   const playMatchFoundSound = useCallback(() => {
     playSound('matchFound', { volume: 0.8, requiresGameActive: false });
-    setTimeout(() => playSound('ttsMatchFound', { volume: 0.9, requiresGameActive: false }), 200);
     haptics.success();
   }, [playSound]);
 
-  // Streak milestone + TTS
+  // Streak milestone
   const playStreakMilestoneSound = useCallback(() => {
     playSound('streakMilestone', { volume: 0.8, requiresGameActive: false });
-    setTimeout(() => playSound('ttsStreak', { volume: 0.7, requiresGameActive: false }), 200);
     haptics.success();
   }, [playSound]);
 
-  // Tier/rank promotion + TTS
+  // Tier/rank promotion
   const playTierPromotionSound = useCallback(() => {
     playSound('tierPromotion', { volume: 0.8, requiresGameActive: false });
-    setTimeout(() => playSound('ttsTierPromotion', { volume: 0.9, requiresGameActive: false }), 400);
     haptics.success();
   }, [playSound]);
 
@@ -672,14 +675,70 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound('tileSelect', { volume: 0.3 });
   }, [playSound]);
 
-  // Round start + TTS
+  // Round start
   const playRoundStartSound = useCallback(() => {
-    playSound('ttsRoundStart', { volume: 0.8, requiresGameActive: false });
+    playSound('roundStart', { volume: 0.8, requiresGameActive: false });
   }, [playSound]);
 
-  // Time's up + TTS
+  // Time's up
   const playTimesUpSound = useCallback(() => {
-    playSound('ttsTimesUp', { volume: 0.8 });
+    playSound('timerUrgent', { volume: 0.8 });
+  }, [playSound]);
+
+  // ==================== New ElevenLabs-Generated Sounds ====================
+
+  const playCoinCollectSound = useCallback(() => {
+    playSound('coinCollect', { volume: 0.5, requiresGameActive: false });
+  }, [playSound]);
+
+  const playButtonClickSound = useCallback(() => {
+    playSound('buttonClick', { volume: 0.3, requiresGameActive: false });
+  }, [playSound]);
+
+  const playChestOpenSound = useCallback(() => {
+    playSound('chestOpen', { volume: 0.7, requiresGameActive: false });
+    haptics.success();
+  }, [playSound]);
+
+  const playQuestCompleteSound = useCallback(() => {
+    playSound('questComplete', { volume: 0.8, requiresGameActive: false });
+    haptics.success();
+  }, [playSound]);
+
+  const playBoardShuffleSound = useCallback(() => {
+    playSound('boardShuffle', { volume: 0.5 });
+  }, [playSound]);
+
+  const playUpgradePurchaseSound = useCallback(() => {
+    playSound('upgradePurchase', { volume: 0.7, requiresGameActive: false });
+    haptics.success();
+  }, [playSound]);
+
+  const playHintRevealSound = useCallback(() => {
+    playSound('hintReveal', { volume: 0.5 });
+  }, [playSound]);
+
+  const playDailyRewardSound = useCallback(() => {
+    playSound('dailyReward', { volume: 0.8, requiresGameActive: false });
+    haptics.success();
+  }, [playSound]);
+
+  const playTimerUrgentSound = useCallback(() => {
+    playSound('timerUrgent', { volume: 0.6 });
+  }, [playSound]);
+
+  const playStreakFireSound = useCallback(() => {
+    playSound('streakFire', { volume: 0.7, requiresGameActive: false });
+    haptics.tap();
+  }, [playSound]);
+
+  const playScreenTransitionSound = useCallback(() => {
+    playSound('screenTransition', { volume: 0.3, requiresGameActive: false });
+  }, [playSound]);
+
+  const playLongWordBonusSound = useCallback(() => {
+    playSound('longWordBonus', { volume: 0.6 });
+    haptics.tap();
   }, [playSound]);
 
   // Memoize context value to prevent unnecessary re-renders of all consumers
@@ -730,6 +789,19 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playTileSelectSound,
     playRoundStartSound,
     playTimesUpSound,
+    // New ElevenLabs-generated sounds
+    playCoinCollectSound,
+    playButtonClickSound,
+    playChestOpenSound,
+    playQuestCompleteSound,
+    playBoardShuffleSound,
+    playUpgradePurchaseSound,
+    playHintRevealSound,
+    playDailyRewardSound,
+    playTimerUrgentSound,
+    playStreakFireSound,
+    playScreenTransitionSound,
+    playLongWordBonusSound,
   }), [
     sfxVolume,
     sfxMuted,
@@ -771,6 +843,18 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playTileSelectSound,
     playRoundStartSound,
     playTimesUpSound,
+    playCoinCollectSound,
+    playButtonClickSound,
+    playChestOpenSound,
+    playQuestCompleteSound,
+    playBoardShuffleSound,
+    playUpgradePurchaseSound,
+    playHintRevealSound,
+    playDailyRewardSound,
+    playTimerUrgentSound,
+    playStreakFireSound,
+    playScreenTransitionSound,
+    playLongWordBonusSound,
   ]);
 
   return (
@@ -824,6 +908,18 @@ const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
   playTileSelectSound: NOOP,
   playRoundStartSound: NOOP,
   playTimesUpSound: NOOP,
+  playCoinCollectSound: NOOP,
+  playButtonClickSound: NOOP,
+  playChestOpenSound: NOOP,
+  playQuestCompleteSound: NOOP,
+  playBoardShuffleSound: NOOP,
+  playUpgradePurchaseSound: NOOP,
+  playHintRevealSound: NOOP,
+  playDailyRewardSound: NOOP,
+  playTimerUrgentSound: NOOP,
+  playStreakFireSound: NOOP,
+  playScreenTransitionSound: NOOP,
+  playLongWordBonusSound: NOOP,
 };
 
 export function useSoundEffects(): SoundEffectsContextType {

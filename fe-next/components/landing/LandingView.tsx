@@ -14,7 +14,6 @@ import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { trackModeSelected } from '@/utils/growthTracking';
 import { useLandingStats } from '@/hooks/useLandingStats';
-import { useHallOfFame } from '@/hooks/useHallOfFame';
 import { AdPlaceholder } from '@/components/ads';
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
@@ -25,6 +24,7 @@ const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').th
 });
 const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), { ssr: false });
 import { LandingChallengeCards } from './LandingChallengeCards';
+import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
 import { LandingMobileCards } from './LandingMobileCards';
 
 // Below-the-fold sections — lazy load to speed up initial render
@@ -36,8 +36,6 @@ const GhostRivalWidget = dynamic(() => import('@/components/engagement/GhostRiva
 const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), { ssr: false });
 const LandingShareBanner = dynamic(() => import('./LandingShareBanner').then(m => m.LandingShareBanner), { ssr: false });
 const LandingCommunityShowcase = dynamic(() => import('./LandingCommunityShowcase').then(m => m.LandingCommunityShowcase), { ssr: false });
-const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), { ssr: false });
-const LandingHallOfFame = dynamic(() => import('./LandingHallOfFame').then(m => m.LandingHallOfFame), { ssr: false });
 // LeaguePositionBadge, WotdTeaser, WordPact, FriendsActivity moved to dedicated pages
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -89,9 +87,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   });
   const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats({
     initialGamesToday: initialData?.gamesToday,
-  });
-  const { champions, loading: hallLoading } = useHallOfFame(3, {
-    initialData: initialData?.topPlayers?.slice(0, 3),
   });
   const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
   const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
@@ -182,7 +177,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
       <section className="w-full max-w-7xl mx-auto [overflow-x:clip] relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-3 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
-        {/* Hero: Mascot + Title + CTA + Leaderboard Preview */}
+        {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
         <LandingHero
           players={topPlayers}
           playersLoading={topPlayersLoading}
@@ -212,6 +207,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
           cardOrder={initialData?.cardOrder}
         />
 
+        {/* Leaderboard — mobile only (desktop shows in hero sidebar) */}
+        {hydrated && isMobilePortrait && (
+          <div className="w-full max-w-4xl mx-auto">
+            <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
+          </div>
+        )}
+
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
         {hydrated && isAuthenticated && (
           <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
@@ -234,13 +236,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
             </div>
 
             <LandingCommunityShowcase />
-            <LandingHallOfFame champions={champions} loading={hallLoading} />
 
             <div className="w-full max-w-4xl mx-auto">
               <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
             </div>
-
-            <LandingBlogSection />
           </>
         )}
       </section>

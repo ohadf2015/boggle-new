@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 export type MissionType = 'wordHunt' | 'brainDrill' | 'adventure' | 'community';
 
@@ -57,6 +58,7 @@ function buildMissions(data: {
 export function useDailyMissions(): UseDailyMissionsReturn {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { playQuestCompleteSound } = useSoundEffects();
   const playerId = user?.id ?? null;
   const isMounted = useRef(true);
   const prevGrandSlamRef = useRef(false);
@@ -139,11 +141,12 @@ export function useDailyMissions(): UseDailyMissionsReturn {
           xpReward: 500,
           isGrandSlam: true,
           t,
+          onComplete: playQuestCompleteSound,
         });
       });
     }
     prevGrandSlamRef.current = isGrandSlam;
-  }, [isGrandSlam, loading, t]);
+  }, [isGrandSlam, loading, t, playQuestCompleteSound]);
 
   const refresh = useCallback(async () => {
     setLoading(true);

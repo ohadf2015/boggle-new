@@ -41,12 +41,14 @@ function AssignmentCard({
     completed: { label: t('teacher.tracking.statusCompleted'), color: 'bg-neo-navy' },
   };
 
-  const typeConfig = {
+  const typeConfig: Record<string, { label: string; icon: typeof BookOpen; color: string }> = {
     practice: { label: t('teacher.tracking.practice'), icon: BookOpen, color: 'bg-neo-cyan' },
     duel: { label: t('teacher.tracking.duel'), icon: Swords, color: 'bg-neo-pink' },
   };
 
-  const TypeIcon = typeConfig[assignment.assignment_type].icon;
+  const fallback = { label: assignment.assignment_type ?? '?', icon: BookOpen, color: 'bg-neo-navy' };
+  const assignmentTypeConfig = typeConfig[assignment.assignment_type] ?? fallback;
+  const TypeIcon = assignmentTypeConfig.icon;
 
   return (
     <div className="rounded-neo border-neo border-neo-black bg-neo-navy/50 overflow-hidden">
@@ -61,12 +63,12 @@ function AssignmentCard({
               <div
                 className={cn(
                   'px-2 py-1 rounded text-xs font-bold border-neo flex items-center gap-1',
-                  typeConfig[assignment.assignment_type].color,
+                  assignmentTypeConfig.color,
                   'text-neo-black'
                 )}
               >
                 <TypeIcon className="w-3 h-3" />
-                {typeConfig[assignment.assignment_type].label}
+                {assignmentTypeConfig.label}
               </div>
               <div
                 className={cn(

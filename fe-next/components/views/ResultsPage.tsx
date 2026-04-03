@@ -12,6 +12,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { getGuestStatsSummary } from '@/utils/guestManager';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import logger from '@/utils/logger';
 import type { ResultsPageProps } from '@/types/components';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
@@ -308,6 +309,20 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  // Victory / defeat sounds on results mount
+  const { playVictorySound, playDefeatSound } = useSoundEffects();
+  const hasFiredResultSoundRef = useRef(false);
+  useEffect(() => {
+    if (hasFiredResultSoundRef.current) return;
+    if (sortedScores.length === 0) return;
+    hasFiredResultSoundRef.current = true;
+    if (isCurrentUserWinner) {
+      playVictorySound();
+    } else {
+      playDefeatSound();
+    }
+  }, [sortedScores.length, isCurrentUserWinner, playVictorySound, playDefeatSound]);
 
   // Word review card for classroom games (shared between mobile + desktop)
   const postGameWordReviewNode = lessonGameData ? (

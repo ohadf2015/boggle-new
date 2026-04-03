@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyModeQuest } from '@/hooks/useDailyModeQuest';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 /**
  * Compact daily quest progress bar for landing page.
@@ -13,6 +14,7 @@ import { useDailyModeQuest } from '@/hooks/useDailyModeQuest';
 export function DailyModeQuestCard() {
   const { t } = useLanguage();
   const { getQuestProgress, claimReward, data } = useDailyModeQuest();
+  const { playDailyRewardSound } = useSoundEffects();
   const [expanded, setExpanded] = useState(false);
   const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
@@ -24,6 +26,7 @@ export function DailyModeQuestCard() {
     const coins = claimReward();
     if (coins !== null) {
       setRewardAmount(coins);
+      playDailyRewardSound();
     }
   };
 

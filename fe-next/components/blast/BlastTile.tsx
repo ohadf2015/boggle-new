@@ -195,18 +195,22 @@ const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string; borde
   diamond:   { background: 'radial-gradient(circle, #B9F2FF 0%, #00CED1 100%)', border: '2px solid rgba(0,206,209,0.8)' },
 };
 
-/** Type-specific clearing transform overrides — gives each tile a unique death animation */
-const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; transition: string }>> = {
-  bomb:      { transform: 'scale(1.8)', transition: 'all 220ms cubic-bezier(0.17, 0.67, 0.83, 0.67)' },
-  lightning: { transform: 'scaleY(2.5) scaleX(0.3)', transition: 'all 160ms ease-in' },
-  prism:     { transform: 'scale(1.6) rotate(180deg)', transition: 'all 250ms ease-out' },
-  ice:       { transform: 'scale(0.6) rotate(8deg)', transition: 'all 200ms ease-in' },
-  frozen:    { transform: 'scale(0.5) rotate(-12deg)', transition: 'all 220ms cubic-bezier(0.55, 0.06, 0.68, 0.19)' },
-  gem:       { transform: 'scale(1.5) rotate(45deg)', transition: 'all 200ms ease-out' },
-  rainbow:   { transform: 'scale(1.4) rotate(360deg)', transition: 'all 300ms ease-out' },
-  magnet:    { transform: 'scale(0.2) rotate(720deg)', transition: 'all 250ms cubic-bezier(0.36, 0, 0.66, -0.56)' },
-  mirror:    { transform: 'scaleX(-1) scale(1.3)', transition: 'all 200ms ease-in' },
-  diamond:   { transform: 'scale(1.5)', transition: 'all 180ms ease-out' },
+/** Type-specific clearing transform overrides — visually distinct death animations.
+ * Each type has a UNIQUE signature: bombs explode outward, ice shatters inward,
+ * lightning stretches vertically, magnet implodes with spin, etc. */
+const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; transition: string; filter?: string }>> = {
+  bomb:      { transform: 'scale(2.2) rotate(15deg)', transition: 'all 200ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(2.5) saturate(2)' },
+  lightning: { transform: 'scaleY(3.5) scaleX(0.15) translateY(-30%)', transition: 'all 140ms ease-in', filter: 'brightness(3) contrast(1.5)' },
+  prism:     { transform: 'scale(2.0) rotate(270deg)', transition: 'all 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', filter: 'hue-rotate(180deg) brightness(1.8)' },
+  ice:       { transform: 'scale(0.3) rotate(25deg) translateY(10px)', transition: 'all 180ms cubic-bezier(0.55, 0.06, 0.68, 0.19)', filter: 'brightness(2) blur(2px)' },
+  frozen:    { transform: 'scale(0.1) rotate(-45deg)', transition: 'all 250ms cubic-bezier(0.55, 0.06, 0.68, 0.19)', filter: 'brightness(1.5) blur(3px)' },
+  gem:       { transform: 'scale(1.8) rotate(90deg)', transition: 'all 220ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2) saturate(3)' },
+  gold:      { transform: 'scale(1.6) rotate(-20deg)', transition: 'all 200ms ease-out', filter: 'brightness(2.5) saturate(2)' },
+  silver:    { transform: 'scale(1.3) translateY(-15px)', transition: 'all 180ms ease-out', filter: 'brightness(2)' },
+  rainbow:   { transform: 'scale(2.0) rotate(540deg)', transition: 'all 350ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'hue-rotate(360deg) brightness(2)' },
+  magnet:    { transform: 'scale(0.05) rotate(1080deg)', transition: 'all 300ms cubic-bezier(0.36, 0, 0.66, -0.56)', filter: 'brightness(0.3) saturate(3)' },
+  mirror:    { transform: 'scaleX(0) scaleY(1.8)', transition: 'all 180ms ease-in', filter: 'brightness(3)' },
+  diamond:   { transform: 'scale(1.9) rotate(45deg)', transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(3) saturate(2)' },
 };
 
 /** Letters that get a rare glow effect — high Scrabble-value letters */
@@ -225,6 +229,7 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       return {
         transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
         opacity: 0,
+        filter: clearingAnim?.filter,
         transition: clearingAnim?.transition ?? 'all 180ms ease-in',
         ...(clearing && { background: clearing.background, border: clearing.border }),
         ...(isLightning && {

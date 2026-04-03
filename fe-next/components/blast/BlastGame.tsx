@@ -186,11 +186,11 @@ export function BlastGame({
       sounds.playComboActivation(flashTier);
     }
 
-    // 5. Haptic feedback based on tile types in path
+    // 5. Haptic + sound feedback based on tile types in path
     const clearedTypes = new Set(clearedInfo.map(c => c.type));
-    if (clearedTypes.has('bomb')) vibrateBlastBomb();
-    else if (clearedTypes.has('lightning')) vibrateBlastLightning();
-    else if (clearedTypes.has('prism')) vibrateBlastPrism();
+    if (clearedTypes.has('bomb')) { vibrateBlastBomb(); sounds.playSpecialTileSound('bomb'); }
+    else if (clearedTypes.has('lightning')) { vibrateBlastLightning(); sounds.playSpecialTileSound('lightning'); }
+    else if (clearedTypes.has('prism')) { vibrateBlastPrism(); sounds.playSpecialTileSound('prism'); }
 
     // 6. Near-miss detection — shimmer tiles the player almost included
     const nearMiss = detectNearMiss(path, engine.grid!, engine.tileStates, config.gridSize, hadCombo);
@@ -293,6 +293,7 @@ export function BlastGame({
     comboStreak.onWordSubmitted();
 
     sounds.playTileClear(clearedInfo.length);
+    sounds.playLongWordBonus(path.length);
   }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize]);
 
   // Score fly + combo flash handlers
@@ -333,6 +334,10 @@ export function BlastGame({
 
   const handleWordChange = useCallback((word: string) => {
     setFormedWord(word);
+    if (word.length > prevWordLenRef.current) {
+      sounds.playTileSelect();
+    }
+    prevWordLenRef.current = word.length;
     if (word.length > 0) sounds.playPathTone(word.length);
   }, [sounds]);
 
@@ -359,6 +364,7 @@ export function BlastGame({
   }, [comboStreak.streak.level, sounds]);
 
   // Move warning sound at 3, 2, 1 moves remaining
+  const prevWordLenRef = useRef<number>(0);
   const prevMovesRef = useRef<number>(Infinity);
   useEffect(() => {
     const movesRemaining = engine.gameState.movesRemaining;

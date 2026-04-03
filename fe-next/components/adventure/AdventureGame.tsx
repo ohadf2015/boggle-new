@@ -88,7 +88,12 @@ const AdventureGame = memo<AdventureGameProps>(
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
     const { t, language } = useLanguage();
-    const { playWordAcceptedSound, playComboSound, setGameActive, playCountdownBeep } = useSoundEffects();
+    const {
+      playWordAcceptedSound, playComboSound, setGameActive, playCountdownBeep,
+      playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
+      playBossDefeatSound, playTimerUrgentSound,
+      playCoinCollectSound, playQuestCompleteSound, playBoardShuffleSound,
+    } = useSoundEffects();
 
     const {
       gameState, tiles: tiles2D, tilesVersion, objectives, timeRemaining,
@@ -176,6 +181,7 @@ const AdventureGame = memo<AdventureGameProps>(
       if (flashChallenge.isChallengeComplete && flashChallenge.activeChallenge && !hasAwardedFlashGoldRef.current) {
         hasAwardedFlashGoldRef.current = true;
         init.addGold(flashChallenge.activeChallenge.rewardCoins);
+        playCoinCollectSound();
       }
       if (!flashChallenge.isChallengeComplete) {
         hasAwardedFlashGoldRef.current = false;
@@ -202,7 +208,19 @@ const AdventureGame = memo<AdventureGameProps>(
     useAdventureSFX({
       isPlaying, timeRemaining, wordsFoundLength: gameState.wordsFound.length,
       prevWordsFoundLen, comboCount: gameState.comboCount,
-      sfx: { setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound },
+      sfx: {
+        setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound,
+        playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
+        playBossDefeatSound, playTimerUrgentSound,
+      },
+      isBossLevel,
+      showBossIntro: bossOrch.showBossIntro,
+      showBossFireworks: bossOrch.showBossFireworks,
+      bossHealthPhase: bossOrch.bossHealthState.phase,
+      bossCurrentHP: bossOrch.bossCurrentHP,
+      // showLevelComplete acts as non-boss level completion trigger
+      nonBossCompleted: !isBossLevel && showLevelComplete,
+      gameStars: gameState.stars,
     });
     // In-game music: AdventureGame owns this so timer-driven track switches
     // never cause AdventureView to re-render.
@@ -580,7 +598,7 @@ const AdventureGame = memo<AdventureGameProps>(
               isFrozen={isFrozen}
               onFreezeClick={() => activateFreeze(init.upgradeEffects.timeFreezeSeconds)}
               shufflesRemaining={shufflesRemaining}
-              onShuffleClick={shuffleTiles}
+              onShuffleClick={() => { shuffleTiles(); playBoardShuffleSound(); }}
               canDetonate={init.upgradeEffects.canDetonateWords}
               detonateActive={detonateActive}
               onDetonateToggle={() => setDetonateActive(prev => !prev)}

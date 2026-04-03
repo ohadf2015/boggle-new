@@ -49,8 +49,8 @@ export function useAdventureLevel(
 ): UseAdventureLevelReturn {
   // Validate inputs and get configs
   const { levelConfig, worldConfig, error } = useMemo(() => {
-    // Validate world
-    if (world < 1 || world > WORLDS_COUNT) {
+    // Validate world (world=0 is valid for weekly challenges)
+    if (world !== 0 && (world < 1 || world > WORLDS_COUNT)) {
       return {
         levelConfig: null,
         worldConfig: null,

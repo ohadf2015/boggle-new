@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, ChevronRight, Sparkles, User, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,6 +16,9 @@ import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import Avatar from '../Avatar';
 import { getStoredCustomAvatar } from '../../utils/profileStorage';
+import { useEngagementStatus } from '@/hooks/useEngagementStatus';
+import { useDailyMissions } from '@/hooks/useDailyMissions';
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -57,7 +60,13 @@ const staggerItemRtl = {
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
+    const engagementStatus = useEngagementStatus();
+    const { missions, completedCount, isGrandSlam } = useDailyMissions();
+    const { unreadCount: notificationCount } = useRealtimeNotifications();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+    // Aggregate badge: gifts + notifications + completed quests
+    const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
@@ -177,6 +186,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                     >
                         {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
                     </motion.div>
+                    {/* Aggregated badge */}
+                    {badgeCount > 0 && !showMobileMenu && (
+                        <div className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none">{badgeCount}</div>
+                    )}
                 </button>
             </div>
 
@@ -280,6 +293,15 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} />
                                                     </div>
+                                                    {engagementStatus.streak > 0 && (
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <Flame className="w-3.5 h-3.5 text-neo-orange fill-current" />
+                                                            <span className="text-[10px] font-black text-neo-orange">{engagementStatus.streak}</span>
+                                                            <span className="text-[10px] font-bold text-neo-cyan/80">
+                                                                {t('streakBar.level', { level: engagementStatus.level })}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                     {profile.total_games != null && profile.total_games > 0 && (
                                                         <span className="text-[10px] text-neo-white/40 mt-0.5 font-bold">
                                                             {profile.total_games} {t('profile.gamesPlayed')}
@@ -315,6 +337,43 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Daily Missions progress */}
+                                {isAuthenticated && missions.length > 0 && (
+                                    <Link
+                                        href={`/${language}/daily`}
+                                        onClick={closeMenu}
+                                        className={cn(
+                                            "mx-4 mt-2 flex items-center gap-3 px-3 py-2 rounded-neo",
+                                            "bg-neo-navy-light/50 border-2 border-neo-white/10",
+                                            "hover:border-neo-lime/30 transition-colors"
+                                        )}
+                                    >
+                                        <Trophy className="w-4 h-4 text-neo-lime flex-shrink-0" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-[10px] font-bold text-neo-white/60 mb-1">
+                                                {t('dailyMissions.title')}
+                                            </div>
+                                            <div className="flex gap-1">
+                                                {missions.map((m) => (
+                                                    <div
+                                                        key={m.type}
+                                                        className={cn(
+                                                            "h-1.5 flex-1 rounded-full",
+                                                            m.completed ? "bg-neo-lime" : "bg-neo-white/15"
+                                                        )}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <span className={cn(
+                                            "text-xs font-black",
+                                            isGrandSlam ? "text-neo-lime" : "text-neo-white/50"
+                                        )}>
+                                            {completedCount}/{missions.length}
+                                        </span>
+                                    </Link>
+                                )}
 
                                 {/* ── Menu Items (Staggered) ── */}
                                 <motion.div

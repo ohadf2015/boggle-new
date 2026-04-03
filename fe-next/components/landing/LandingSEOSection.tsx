@@ -60,6 +60,10 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagMultiplayer',
     fallbackTitle: 'Real-Time Multiplayer',
     fallbackTag: '2-20 players',
+    gradient: 'from-neo-pink/20 to-neo-pink/5',
+    borderHover: 'hover:border-neo-pink/40',
+    iconBg: 'bg-neo-pink/15 border-neo-pink/25',
+    iconColor: 'text-neo-pink',
   },
   {
     icon: CalendarDays,
@@ -67,6 +71,10 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagDaily',
     fallbackTitle: 'Daily Challenges',
     fallbackTag: 'New puzzle daily',
+    gradient: 'from-neo-lime/20 to-neo-lime/5',
+    borderHover: 'hover:border-neo-lime/40',
+    iconBg: 'bg-neo-lime/15 border-neo-lime/25',
+    iconColor: 'text-neo-lime',
   },
   {
     icon: Map,
@@ -74,6 +82,10 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagAdventure',
     fallbackTitle: 'Adventure Mode',
     fallbackTag: '100 levels',
+    gradient: 'from-neo-cyan/20 to-neo-cyan/5',
+    borderHover: 'hover:border-neo-cyan/40',
+    iconBg: 'bg-neo-cyan/15 border-neo-cyan/25',
+    iconColor: 'text-neo-cyan',
   },
   {
     icon: Sparkles,
@@ -81,6 +93,10 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagBlast',
     fallbackTitle: 'Blast Mode',
     fallbackTag: 'Chain reactions',
+    gradient: 'from-neo-purple/20 to-neo-purple/5',
+    borderHover: 'hover:border-neo-purple/40',
+    iconBg: 'bg-neo-purple/15 border-neo-purple/25',
+    iconColor: 'text-neo-purple',
   },
   {
     icon: PencilRuler,
@@ -88,12 +104,19 @@ const GAME_MODES = [
     tagKey: 'landing.seo.modeTagCommunity',
     fallbackTitle: 'Community Boards',
     fallbackTag: 'Player-made puzzles',
+    gradient: 'from-neo-lime/15 to-neo-lime/5',
+    borderHover: 'hover:border-neo-lime/30',
+    iconBg: 'bg-neo-lime/10 border-neo-lime/20',
+    iconColor: 'text-neo-lime',
   },
 ] as const;
 
 /* ── How to Play steps ──────────────────────────────────── */
 
 const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
+const STEP_COLORS = ['text-neo-pink', 'text-neo-cyan', 'text-neo-lime', 'text-neo-purple'] as const;
+const STEP_BG = ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-purple'] as const;
+const STEP_GLOW = ['shadow-[0_0_20px_rgba(255,20,147,0.3)]', 'shadow-[0_0_20px_rgba(0,255,255,0.3)]', 'shadow-[0_0_20px_rgba(191,255,0,0.3)]', 'shadow-[0_0_20px_rgba(139,92,246,0.3)]'] as const;
 
 /* ── FAQ Accordion item ─────────────────────────────────── */
 
@@ -202,94 +225,110 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </p>
       </AdaptiveMotion.div>
 
-      {/* ── Game Modes ── */}
+      {/* ── Game Modes — colored showcase cards ── */}
       <AdaptiveMotion.div
-        className="mb-12 sm:mb-14"
+        className="mb-14 sm:mb-16"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
+        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-8 neo-title">
           {t('landing.seo.featuresTitle')}
         </h2>
         <AdaptiveMotion.div
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
-          {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag }) => (
+          {GAME_MODES.map(({ icon: Icon, titleKey, tagKey, fallbackTitle, fallbackTag, gradient, borderHover, iconBg, iconColor }) => (
             <AdaptiveMotion.div
               key={titleKey}
               variants={staggerItem}
-              whileHover={{ y: -4, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+              whileHover={{ y: -6, scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
               className={cn(
-                'p-4 sm:p-5 rounded-neo border-2 border-neo-white/10',
-                'bg-neo-white/[0.03]',
-                'hover:border-neo-white/20 hover:bg-neo-white/[0.06]',
-                'flex flex-col items-center text-center gap-2.5',
-                'transition-colors duration-200 cursor-default select-none'
+                'relative p-4 sm:p-5 rounded-neo border-2 border-neo-white/10',
+                'bg-gradient-to-b', gradient,
+                borderHover,
+                'flex flex-col items-center text-center gap-3',
+                'transition-all duration-300 cursor-default select-none',
+                'overflow-hidden group'
               )}
             >
-              <div className="p-2.5 bg-neo-lime/10 rounded-neo border border-neo-lime/20">
-                <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-neo-lime" aria-hidden="true" />
+              {/* Subtle glow dot behind icon */}
+              <div className={cn(
+                'absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500',
+                iconColor === 'text-neo-pink' && 'bg-neo-pink',
+                iconColor === 'text-neo-lime' && 'bg-neo-lime',
+                iconColor === 'text-neo-cyan' && 'bg-neo-cyan',
+                iconColor === 'text-neo-purple' && 'bg-neo-purple',
+              )} />
+              <div className={cn('relative p-3 rounded-neo border', iconBg)}>
+                <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7', iconColor)} aria-hidden="true" />
               </div>
-              <p className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
-                {t(titleKey) || fallbackTitle}
-              </p>
-              <span className="text-[10px] sm:text-xs font-medium text-neo-white/60 uppercase tracking-wider">
-                {t(tagKey) || fallbackTag}
-              </span>
+              <div className="relative flex flex-col gap-1">
+                <p className="font-black text-neo-white text-xs sm:text-sm uppercase leading-tight">
+                  {t(titleKey) || fallbackTitle}
+                </p>
+                <span className="text-[10px] sm:text-xs font-semibold text-neo-white/50 uppercase tracking-widest">
+                  {t(tagKey) || fallbackTag}
+                </span>
+              </div>
             </AdaptiveMotion.div>
           ))}
         </AdaptiveMotion.div>
       </AdaptiveMotion.div>
 
-      {/* ── How to Play ─────── */}
+      {/* ── How to Play — connected timeline flow ─────── */}
       <AdaptiveMotion.div
-        className="mb-12 sm:mb-14"
+        className="mb-14 sm:mb-16"
         variants={sectionReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
       >
-        <h2 className="text-lg sm:text-xl font-black uppercase text-neo-white text-center mb-6 neo-title-sm">
+        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-10 neo-title">
           {t('landing.seo.howToPlayTitle')}
         </h2>
         <AdaptiveMotion.div
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          className="relative grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4 sm:gap-x-2"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-30px' }}
         >
+          {/* Connecting line — desktop only */}
+          <div className="hidden sm:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-neo-pink/40 via-neo-cyan/40 via-50% to-neo-purple/40" aria-hidden="true" />
+
           {steps.map((step, i) => {
             const StepIcon = STEP_ICONS[i];
+            const color = STEP_COLORS[i];
+            const bg = STEP_BG[i];
+            const glow = STEP_GLOW[i];
             return (
               <AdaptiveMotion.div
                 key={i}
                 variants={staggerItem}
-                className={cn(
-                  'flex flex-col items-center gap-3 p-4 sm:p-5',
-                  'rounded-neo border-2 border-neo-white/10',
-                  'bg-neo-white/[0.03]',
-                  'text-center'
-                )}
+                className="flex flex-col items-center text-center gap-3 relative"
               >
-                <div className="flex items-center gap-2">
-                  <span className={cn(
-                    'w-6 h-6 flex items-center justify-center',
-                    'bg-neo-white/10 text-neo-white font-black text-xs rounded-full'
-                  )}>
-                    {i + 1}
-                  </span>
+                {/* Large numbered badge with glow */}
+                <div className={cn(
+                  'relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-full',
+                  'flex items-center justify-center',
+                  'border-3 border-neo-black',
+                  bg, glow,
+                  'transition-shadow duration-300'
+                )}>
+                  <span className="font-black text-neo-black text-xl sm:text-2xl">{i + 1}</span>
                 </div>
-                <div className="p-2 rounded-full bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink">
-                  <StepIcon className="w-5 h-5 text-neo-black" aria-hidden="true" />
+                {/* Icon below badge */}
+                <div className={cn('p-2', color)}>
+                  <StepIcon className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight">
+                {/* Step text */}
+                <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight max-w-[140px]">
                   {step}
                 </span>
               </AdaptiveMotion.div>

@@ -3,26 +3,44 @@ import { vi } from 'vitest';
  * MobileShareSection Component Tests
  *
  * Tests for the share button + dialog in the mobile host lobby.
- * Layout: Single trigger button opens dialog with Copy Link, WhatsApp, Telegram options.
+ * Layout: Single trigger button opens dialog with hero image, room code (tap to copy),
+ * Copy Link, WhatsApp, and native share options.
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import MobileShareSection from '../MobileShareSection';
 
 // Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    button: ({ children, whileTap, animate, transition, ...props }: React.ComponentProps<'button'> & { whileTap?: unknown; animate?: unknown; transition?: unknown }) => (
-      <button {...props}>{children}</button>
+vi.mock('framer-motion', () => {
+  const MotionButton = React.forwardRef<HTMLButtonElement, React.ComponentProps<'button'> & Record<string, unknown>>(
+    ({ children, whileTap, animate, transition, initial, exit, ...props }, ref) => (
+      <button ref={ref} {...props}>{children}</button>
     ),
-  },
+  );
+  MotionButton.displayName = 'MotionButton';
+  const MotionDiv = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'> & Record<string, unknown>>(
+    ({ children, initial, animate, exit, transition, whileTap, ...props }, ref) => (
+      <div ref={ref} {...props}>{children}</div>
+    ),
+  );
+  MotionDiv.displayName = 'MotionDiv';
+  return {
+    motion: { button: MotionButton, div: MotionDiv },
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
+
+// Mock next/image
+vi.mock('next/image', () => ({
+  default: ({ src, alt, ...props }: { src: string; alt: string; fill?: boolean; className?: string; priority?: boolean }) => (
+    <img src={src} alt={alt} data-testid="invite-hero-image" />
+  ),
 }));
 
 // Mock social icons
 vi.mock('../../../../components/icons/SocialIcons', () => ({
   WhatsAppIcon: ({ size }: { size?: number }) => <svg data-testid="whatsapp-icon" width={size} height={size} />,
-  TelegramIcon: ({ size }: { size?: number }) => <svg data-testid="telegram-icon" width={size} height={size} />,
 }));
 
 // Mock share utils
@@ -30,7 +48,6 @@ vi.mock('../../../../utils/share', () => ({
   getJoinUrl: vi.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
   copyJoinUrl: vi.fn().mockResolvedValue(true),
   shareViaWhatsApp: vi.fn(),
-  shareViaTelegram: vi.fn(),
 }));
 
 // Translation mock
@@ -40,17 +57,15 @@ const mockT = (key: string) => {
     'roomCode.copyLink': 'Copy Link',
     'share.copyLink': 'Copy Link',
     'share.invite': 'Invite',
-    'share.telegram': 'Telegram',
     'share.inviteMessage': 'Join my LexiClash game!',
     'share.inviteTitle': 'Join LexiClash',
     'share.code': 'Code',
     'share.button': 'Share',
+    'share.more': 'More',
+    'share.modalTitle': 'Rally Your Squad',
     'common.error': 'Failed to copy',
     'common.copied': 'Copied!',
     'hostView.inviteFriends': 'Invite Friends',
-    'hostView.sendLinkToFriends': 'Send link to friends',
-    'hostView.waitingForFriendsHint': 'Waiting for friends to join...',
-    'hostView.roomCode': 'Room Code',
     'roomCode.title': 'Room Code',
   };
   return translations[key] || key;
@@ -99,16 +114,20 @@ describe('MobileShareSection', () => {
       expect(screen.getByText('Invite')).toBeInTheDocument();
     });
 
-    it('renders all three share buttons inside dialog', async () => {
+    it('renders copy link and WhatsApp buttons inside dialog', async () => {
       await renderAndOpenDialog('TEST123');
       expect(screen.getByTestId('mobile-copy-link-button')).toBeInTheDocument();
       expect(screen.getByTestId('mobile-whatsapp-button')).toBeInTheDocument();
-      expect(screen.getByTestId('mobile-telegram-button')).toBeInTheDocument();
+    });
+
+    it('renders hero image in dialog', async () => {
+      await renderAndOpenDialog('TEST123');
+      expect(screen.getByTestId('invite-hero-image')).toBeInTheDocument();
     });
 
     it('renders dialog title when opened', async () => {
       await renderAndOpenDialog('TEST123');
-      expect(screen.getByText('Invite Friends')).toBeInTheDocument();
+      expect(screen.getByText('Rally Your Squad')).toBeInTheDocument();
     });
 
     it('displays game code in dialog', async () => {
@@ -124,13 +143,25 @@ describe('MobileShareSection', () => {
   });
 
   describe('copy functionality', () => {
-    it('copies link to clipboard when copy button is clicked', async () => {
+    it('copies link when copy button is clicked', async () => {
       const { copyJoinUrl } = await import('../../../../utils/share');
       await renderAndOpenDialog('COPY123');
 
       const copyButton = screen.getByTestId('mobile-copy-link-button');
       await act(async () => {
         fireEvent.click(copyButton);
+      });
+
+      expect(copyJoinUrl).toHaveBeenCalledWith('COPY123', mockT, 'mobile-lobby');
+    });
+
+    it('copies link when room code area is tapped', async () => {
+      const { copyJoinUrl } = await import('../../../../utils/share');
+      await renderAndOpenDialog('COPY123');
+
+      const codeCopy = screen.getByTestId('invite-code-copy');
+      await act(async () => {
+        fireEvent.click(codeCopy);
       });
 
       expect(copyJoinUrl).toHaveBeenCalledWith('COPY123', mockT, 'mobile-lobby');
@@ -191,19 +222,6 @@ describe('MobileShareSection', () => {
       expect(shareViaWhatsApp).toHaveBeenCalledWith('SOCIAL123', '', mockT);
     });
 
-    it('calls shareViaTelegram when Telegram button clicked', async () => {
-      const { shareViaTelegram } = await import('../../../../utils/share');
-
-      await renderAndOpenDialog('SOCIAL123');
-
-      const telegramBtn = screen.getByTestId('mobile-telegram-button');
-      await act(async () => {
-        fireEvent.click(telegramBtn);
-      });
-
-      expect(shareViaTelegram).toHaveBeenCalled();
-    });
-
     it('WhatsApp button has brand-whatsapp background color', async () => {
       await renderAndOpenDialog('STYLE123');
 
@@ -227,14 +245,14 @@ describe('MobileShareSection', () => {
       expect(copyBtn.className).toContain('h-12');
     });
 
-    it('social buttons have shadow-hard-sm styling', async () => {
+    it('WhatsApp button has shadow-hard-sm styling', async () => {
       await renderAndOpenDialog('STYLE123');
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
       expect(whatsappBtn.className).toContain('shadow-hard-sm');
     });
 
-    it('social buttons have border-2 border-neo-black styling', async () => {
+    it('WhatsApp button has border-2 border-neo-black styling', async () => {
       await renderAndOpenDialog('STYLE123');
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
@@ -249,13 +267,6 @@ describe('MobileShareSection', () => {
 
       const whatsappBtn = screen.getByTestId('mobile-whatsapp-button');
       expect(whatsappBtn).toHaveAttribute('aria-label', 'Share via WhatsApp');
-    });
-
-    it('Telegram button has proper aria-label', async () => {
-      await renderAndOpenDialog('A11Y123');
-
-      const telegramBtn = screen.getByTestId('mobile-telegram-button');
-      expect(telegramBtn).toHaveAttribute('aria-label', 'Share via Telegram');
     });
   });
 

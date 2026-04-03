@@ -13,6 +13,12 @@ interface SFXHandlers {
   playCountdownBeep: (timeRemaining: number) => void;
   playWordAcceptedSound: () => void;
   playComboSound: (comboCount: number) => void;
+  playLevelUpSound: () => void;
+  playBossEntranceSound: () => void;
+  playBossHitSound: () => void;
+  playBossPhaseChangeSound: () => void;
+  playBossDefeatSound: () => void;
+  playTimerUrgentSound: () => void;
 }
 
 interface UseAdventureSFXOptions {
@@ -22,10 +28,21 @@ interface UseAdventureSFXOptions {
   prevWordsFoundLen: number | undefined;
   comboCount: number;
   sfx: SFXHandlers;
+  /** Boss fight state */
+  isBossLevel?: boolean;
+  showBossIntro?: boolean;
+  showBossFireworks?: boolean;
+  bossHealthPhase?: string;
+  bossCurrentHP?: number;
+  /** Level just completed (non-boss) */
+  nonBossCompleted?: boolean;
+  gameStars?: number;
 }
 
 export function useAdventureSFX({
   isPlaying, timeRemaining, wordsFoundLength, prevWordsFoundLen, comboCount, sfx,
+  isBossLevel, showBossIntro, showBossFireworks, bossHealthPhase, bossCurrentHP,
+  nonBossCompleted, gameStars,
 }: UseAdventureSFXOptions): void {
   // Gate sounds to active gameplay
   useEffect(() => { sfx.setGameActive(isPlaying); return () => sfx.setGameActive(false); }, [isPlaying, sfx]);
@@ -35,6 +52,11 @@ export function useAdventureSFX({
     if (isPlaying && timeRemaining <= 10 && timeRemaining > 0) sfx.playCountdownBeep(timeRemaining);
   }, [isPlaying, timeRemaining, sfx]);
 
+  // Timer urgent in last 5s (supplements countdown beep)
+  useEffect(() => {
+    if (isPlaying && timeRemaining === 5) sfx.playTimerUrgentSound();
+  }, [isPlaying, timeRemaining, sfx]);
+
   // Word accepted sound + combo sound
   useEffect(() => {
     if (prevWordsFoundLen !== undefined && wordsFoundLength > prevWordsFoundLen && isPlaying) {
@@ -42,6 +64,47 @@ export function useAdventureSFX({
       if (comboCount >= 2) sfx.playComboSound(comboCount);
     }
   }, [wordsFoundLength, prevWordsFoundLen, comboCount, isPlaying, sfx]);
+
+  // Level up sound when non-boss level completes with at least 1 star
+  const prevNonBossCompleted = useRef(false);
+  useEffect(() => {
+    if (nonBossCompleted && !prevNonBossCompleted.current && (gameStars ?? 0) >= 1) {
+      sfx.playLevelUpSound();
+    }
+    prevNonBossCompleted.current = !!nonBossCompleted;
+  }, [nonBossCompleted, gameStars, sfx]);
+
+  // Boss entrance sound when boss intro begins
+  const prevShowBossIntro = useRef(false);
+  useEffect(() => {
+    if (showBossIntro && !prevShowBossIntro.current) sfx.playBossEntranceSound();
+    prevShowBossIntro.current = !!showBossIntro;
+  }, [showBossIntro, sfx]);
+
+  // Boss defeat sound when fireworks appear
+  const prevShowBossFireworks = useRef(false);
+  useEffect(() => {
+    if (showBossFireworks && !prevShowBossFireworks.current) sfx.playBossDefeatSound();
+    prevShowBossFireworks.current = !!showBossFireworks;
+  }, [showBossFireworks, sfx]);
+
+  // Boss phase change sound
+  const prevBossHealthPhase = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (isBossLevel && bossHealthPhase && bossHealthPhase !== prevBossHealthPhase.current && prevBossHealthPhase.current !== undefined) {
+      sfx.playBossPhaseChangeSound();
+    }
+    prevBossHealthPhase.current = bossHealthPhase;
+  }, [isBossLevel, bossHealthPhase, sfx]);
+
+  // Boss hit sound when boss takes damage (HP decreases)
+  const prevBossCurrentHP = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (isBossLevel && bossCurrentHP !== undefined && prevBossCurrentHP.current !== undefined && bossCurrentHP < prevBossCurrentHP.current) {
+      sfx.playBossHitSound();
+    }
+    prevBossCurrentHP.current = bossCurrentHP;
+  }, [isBossLevel, bossCurrentHP, sfx]);
 }
 
 interface UseAdventureAnalyticsOptions {

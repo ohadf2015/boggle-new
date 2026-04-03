@@ -3,6 +3,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 export type MatchmakingStatus = 'idle' | 'searching' | 'found' | 'timeout';
 
@@ -33,6 +34,7 @@ export function useMatchmaking(): UseMatchmakingReturn {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const socket = getSharedSocketIfExists();
+  const { playMatchFoundSound } = useSoundEffects();
 
   const joinQueue = useCallback(
     (gameMode: string, language: string) => {
@@ -69,6 +71,7 @@ export function useMatchmaking(): UseMatchmakingReturn {
       setStatus('found');
       setOpponent(data.opponent);
       setRoomId(data.roomId);
+      playMatchFoundSound();
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -103,7 +106,7 @@ export function useMatchmaking(): UseMatchmakingReturn {
         clearInterval(timerRef.current);
       }
     };
-  }, [socket]);
+  }, [socket, playMatchFoundSound]);
 
   return {
     status,

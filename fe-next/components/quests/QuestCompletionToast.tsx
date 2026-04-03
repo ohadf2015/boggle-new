@@ -23,6 +23,7 @@ interface QuestCompletionOptions {
   isGrandSlam?: boolean;
   isAllComplete?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
+  onComplete?: () => void;
 }
 
 /**
@@ -36,7 +37,9 @@ export function showQuestCompletionToast({
   isGrandSlam = false,
   isAllComplete = false,
   t,
+  onComplete,
 }: QuestCompletionOptions) {
+  onComplete?.();
   // Fire confetti based on achievement tier
   if (isAllComplete) {
     fireFireworks(4, 2500);

@@ -14,7 +14,6 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
-import { useDailyQuests } from '@/hooks/useDailyQuests';
 import { getWeeklyChallengeConfig } from '@/lib/adventure/weeklyChallenge';
 import {
   getWorldConfig,
@@ -28,7 +27,6 @@ import { AdventureThemeProvider } from '@/contexts/AdventureThemeContext';
 
 import { calculateWorldMastery, convertQuestProgressWithTargets, deriveBossHighHealth } from '@/lib/adventure/mastery';
 import type { MasteryTier } from '@/types/adventure';
-import AdventureHub from './AdventureHub';
 import AdventureViewHeader from './AdventureViewHeader';
 import AdventureViewModals from './AdventureViewModals';
 import AdventureShopFAB from './AdventureShopFAB';
@@ -61,9 +59,7 @@ function AdventureView(): React.JSX.Element {
   // Stable callbacks for modal toggles — prevents child re-renders via memo
   const openShop = useCallback(() => setShowShop(true), []);
   const closeShop = useCallback(() => setShowShop(false), []);
-  const openWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(true), []);
   const closeWeeklyChallenge = useCallback(() => setShowWeeklyChallenge(false), []);
-  const openWordAlbum = useCallback(() => setShowWordAlbum(true), []);
   const closeWordAlbum = useCallback(() => setShowWordAlbum(false), []);
   const { stopMusic: stopGlobalMusic } = useMusic();
   const setIsInGame = useHideNavigation();
@@ -73,8 +69,8 @@ function AdventureView(): React.JSX.Element {
     viewState, setViewState,
     selectedWorld, selectedLevel, setSelectedLevel,
     navigateToWorldMap, selectWorld, selectLevel,
-    openWorldMapFromHub, historyBack,
-  } = useAdventureHistory(hasCompletions ? 'hub' : 'levelGrid', hasCompletions ? null : 1);
+    historyBack,
+  } = useAdventureHistory(hasCompletions ? 'worldMap' : 'levelGrid', hasCompletions ? null : 1);
 
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
 
@@ -125,11 +121,6 @@ function AdventureView(): React.JSX.Element {
   // Boss Rush
   const bossRush = useBossRush(completions);
 
-  const handleStartBossRush = useCallback(() => {
-    bossRush.startRush();
-    setViewState('bossRush');
-  }, [bossRush, setViewState]);
-
   const handleBossRushBossDefeated = useCallback((_stars: number, score: number) => {
     bossRush.addScore(score);
     bossRush.advanceToNextBoss();
@@ -147,16 +138,8 @@ function AdventureView(): React.JSX.Element {
 
   const handleBossRushExit = useCallback(() => {
     bossRush.resetRush();
-    setViewState('hub');
+    setViewState('worldMap');
   }, [bossRush, setViewState]);
-
-  const streakDays = progression?.streak?.currentStreak ?? 0;
-  const bestStreak = progression?.streak?.bestStreak ?? 0;
-
-  const { quests: dailyQuests } = useDailyQuests({
-    initialProgress: progression?.dailyQuestProgress,
-    lastQuestDate: progression?.dailyQuestDate,
-  });
 
   const selectedWorldConfig = selectedWorld ? getWorldConfig(selectedWorld) : null;
 
@@ -205,7 +188,7 @@ function AdventureView(): React.JSX.Element {
         body: JSON.stringify({ score, wordsFound, longestWord, playerName: userId ? 'Player' : 'Guest' }),
       });
     } catch { /* Fire and forget */ }
-    setViewState('hub');
+    setViewState('worldMap');
     setShowWeeklyChallenge(true);
   }, [userId, setViewState]);
 
@@ -355,33 +338,10 @@ function AdventureView(): React.JSX.Element {
         t={t}
       />
 
-      {(viewState === 'worldMap' || viewState === 'levelGrid' || viewState === 'hub') && <div className="h-14 flex-shrink-0" />}
+      {(viewState === 'worldMap' || viewState === 'levelGrid') && <div className="h-14 flex-shrink-0" />}
 
       <div className="relative z-10 flex-1 min-h-0">
         <AdaptiveAnimatePresence mode="wait">
-          {viewState === 'hub' && (
-            <AdaptiveMotion.div key="hub" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="h-full">
-              <AdventureHub
-                streakDays={streakDays}
-                bestStreak={bestStreak}
-                dailyQuests={dailyQuests}
-                totalStars={totalStars}
-                playerLevel={playerLevel}
-                gold={gold}
-                completions={completions}
-                currentWorld={progression?.currentWorld ?? 1}
-                onOpenWorldMap={openWorldMapFromHub}
-                onPlayLevel={selectLevel}
-                onOpenShop={openShop}
-                wordAlbumCount={progression?.wordAlbum?.length ?? 0}
-
-                onBossRush={handleStartBossRush}
-                canBossRush={bossRush.canStartBossRush}
-                onOpenWordAlbum={openWordAlbum}
-              />
-            </AdaptiveMotion.div>
-          )}
-
           {viewState === 'worldMap' && (
             <AdaptiveMotion.div key="world-map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: isRTL ? 100 : -100 }} transition={{ duration: 0.3 }} className="h-full relative">
               {/* First-time player welcome banner */}
@@ -408,8 +368,8 @@ function AdventureView(): React.JSX.Element {
 
           {viewState === 'weeklyChallenge' && (
             <AdaptiveMotion.div key="weekly" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="h-full">
-              <AdventureGameErrorBoundary onExit={() => setViewState('hub')}>
-                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('hub')} totalStars={totalStars} />
+              <AdventureGameErrorBoundary onExit={() => setViewState('worldMap')}>
+                <AdventureGame levelConfig={weeklyLevelConfig} initialGrid={weeklyConfig.grid} onLevelComplete={handleWeeklyChallengeComplete} onExit={() => setViewState('worldMap')} totalStars={totalStars} />
               </AdventureGameErrorBoundary>
             </AdaptiveMotion.div>
           )}

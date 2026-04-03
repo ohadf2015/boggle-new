@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
-// 220-line component only visible on md+ — lazy load to reduce initial bundle
 const LandingLeaderboardPreview = dynamic(
   () => import('./LandingLeaderboardPreview').then(m => m.LandingLeaderboardPreview),
   { ssr: false }
@@ -85,7 +84,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
 
         </div>
 
-        {/* Right: Leaderboard Preview (visible on tablet+) */}
+        {/* Right: Leaderboard Preview (desktop only — mobile moves below game cards) */}
         {!isMobilePortrait && (
           <div
             className="hidden md:block w-64 lg:w-80 xl:w-[26rem] shrink-0 animate-[fadeInRight_0.5s_ease-out_0.3s_both]"
@@ -94,15 +93,6 @@ export function LandingHero({ players, playersLoading, isMobilePortrait }: Landi
           </div>
         )}
       </div>
-
-      {/* Leaderboard below CTA on mobile — compact 3-player view */}
-      {isMobilePortrait && (
-        <div
-          className="mt-2 animate-[fadeInUp_0.4s_ease-out_0.45s_both]"
-        >
-          <LandingLeaderboardPreview players={players} loading={playersLoading} compact />
-        </div>
-      )}
     </div>
   );
 }

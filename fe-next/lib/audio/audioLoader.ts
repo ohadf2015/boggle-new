@@ -29,10 +29,32 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
   if (!_howlPromise) {
     _howlPromise = import('howler').then((mod) => {
       _HowlCtor = mod.Howl;
+      patchHowlerRemoveEventListenerRace();
       return _HowlCtor;
     });
   }
   return _howlPromise;
+}
+
+/**
+ * Patch Howler.js HTML5 audio race condition where _endTimers[id] is cleared
+ * before the 'ended' event fires, causing removeEventListener to receive
+ * undefined instead of a function. We wrap Audio.prototype.removeEventListener
+ * to silently ignore non-function listeners (matches browser spec behavior
+ * for null listeners but not undefined).
+ */
+function patchHowlerRemoveEventListenerRace(): void {
+  if (typeof window === 'undefined') return;
+  const origRemove = HTMLAudioElement.prototype.removeEventListener;
+  HTMLAudioElement.prototype.removeEventListener = function (
+    this: HTMLAudioElement,
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions
+  ) {
+    if (listener == null || typeof listener === 'number') return;
+    return origRemove.call(this, type, listener, options);
+  } as typeof origRemove;
 }
 
 /**
