@@ -329,6 +329,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     } else {
       playDefeatSound();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using .length to avoid re-firing on array reference changes; ref guard prevents double-play
   }, [sortedScores.length, isCurrentUserWinner, playVictorySound, playDefeatSound, playEpicVictorySound]);
 
   // Word review card for classroom games (shared between mobile + desktop)
