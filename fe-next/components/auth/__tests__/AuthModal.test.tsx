@@ -493,6 +493,7 @@ describe('AuthModal', () => {
 
     it('calls showAuthPrompt when CrazyGames button clicked', () => {
       renderModal();
+      mockShowAuthPrompt.mockClear(); // clear the auto-call from useEffect
       fireEvent.click(screen.getByText('Log in with CrazyGames'));
       expect(mockShowAuthPrompt).toHaveBeenCalledTimes(1);
     });
