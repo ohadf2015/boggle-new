@@ -9,6 +9,35 @@ import { useLanguage } from '@/contexts/LanguageContext';
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
 
+// Mock new hooks used by HeaderMenuDropdown
+vi.mock('@/hooks/useEngagementStatus', () => ({
+    useEngagementStatus: () => ({ streak: 0, level: 1, xp: 0 }),
+}));
+vi.mock('@/hooks/useDailyMissions', () => ({
+    useDailyMissions: () => ({ missions: [], completedCount: 0, isGrandSlam: false }),
+}));
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+    useRealtimeNotifications: () => ({ unreadCount: 0 }),
+}));
+vi.mock('@/components/Avatar', () => ({
+    default: function MockAvatar() { return <div data-testid="mock-avatar" />; },
+}));
+vi.mock('@/components/CoinBalance', () => ({
+    CoinBalance: function MockCoinBalance() { return <div data-testid="mock-coin-balance" />; },
+}));
+vi.mock('@/components/gift/GiftNotificationBadge', () => ({
+    GiftNotificationBadge: function MockGiftBadge({ count }: { count: number }) { return <span>{count}</span>; },
+}));
+vi.mock('@/components/notifications/NotificationBell', () => ({
+    NotificationBell: function MockNotificationBell() { return <div data-testid="mock-notification-bell" />; },
+}));
+vi.mock('@/components/QuickLanguageSwitcher', () => ({
+    QuickLanguageSwitcher: function MockQuickLanguageSwitcher() { return <div data-testid="mock-language-switcher" />; },
+}));
+vi.mock('@/utils/profileStorage', () => ({
+    getStoredCustomAvatar: () => null,
+}));
+
 // Mock Next.js Link
 vi.mock('next/link', () => {
     const MockLink = ({ children, href, onClick }: { children: React.ReactNode; href: string; onClick?: () => void }) => {
@@ -81,7 +110,7 @@ describe('HeaderMenuDropdown', () => {
             expect(button).toHaveAttribute('aria-expanded', 'false');
 
             // Dropdown content should not be visible
-            expect(screen.queryByText(/brain.nav.profile/i)).not.toBeInTheDocument();
+            expect(screen.queryByText(/settings.accessibility/i)).not.toBeInTheDocument();
         });
 
         it('should open dropdown when clicking the trigger button', async () => {
@@ -171,8 +200,8 @@ describe('HeaderMenuDropdown', () => {
                 expect(button).toHaveAttribute('aria-expanded', 'true');
             });
 
-            // Should NOT show authenticated-only items
-            expect(screen.queryByText(/brain.nav.profile/i)).not.toBeInTheDocument();
+            // Should NOT show authenticated-only items (profile hero link with username not shown for guests)
+            expect(screen.queryByRole('link', { name: /testuser/i })).not.toBeInTheDocument();
             expect(screen.queryByText(/landing.brainTraining/i)).not.toBeInTheDocument();
 
             // Should show public items
@@ -180,8 +209,8 @@ describe('HeaderMenuDropdown', () => {
             expect(screen.getByText(/settings.title/i)).toBeInTheDocument();
             expect(screen.getByTestId('mock-auth-button')).toBeInTheDocument();
 
-            // Music controls are now in the header, NOT in the dropdown
-            expect(screen.queryByTestId('mock-music-controls')).not.toBeInTheDocument();
+            // Music controls are now inside the dropdown settings section
+            expect(screen.getByTestId('mock-music-controls')).toBeInTheDocument();
         });
     });
 
@@ -211,8 +240,10 @@ describe('HeaderMenuDropdown', () => {
                 expect(button).toHaveAttribute('aria-expanded', 'true');
             });
 
-            // Should show authenticated items
-            expect(screen.getByText(/brain.nav.profile/i)).toBeInTheDocument();
+            // Should show profile hero link with username (not a translation key)
+            const profileLink = screen.getByRole('link', { name: /testuser/i });
+            expect(profileLink).toBeInTheDocument();
+
             // Brain Training is temporarily disabled (wrapped in {false && ...})
             expect(screen.queryByText(/landing.brainTraining/i)).not.toBeInTheDocument();
 
@@ -231,8 +262,8 @@ describe('HeaderMenuDropdown', () => {
                 expect(button).toHaveAttribute('aria-expanded', 'true');
             });
 
-            // Click on Profile link
-            const profileLink = screen.getByText(/brain.nav.profile/i);
+            // Click on Profile link (hero section has username as link text)
+            const profileLink = screen.getByRole('link', { name: /testuser/i });
             fireEvent.click(profileLink);
 
             await waitFor(() => {

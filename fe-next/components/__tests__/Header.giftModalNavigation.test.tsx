@@ -150,6 +150,30 @@ vi.mock('@/components/QuickLanguageSwitcher', () => ({
   },
 }));
 
+vi.mock('@/hooks/useEngagementStatus', () => ({
+  useEngagementStatus: () => ({ streak: 0, level: 1, xp: 0 }),
+}));
+
+vi.mock('@/hooks/useDailyMissions', () => ({
+  useDailyMissions: () => ({ missions: [], completedCount: 0, isGrandSlam: false }),
+}));
+
+vi.mock('@/hooks/useRealtimeNotifications', () => ({
+  useRealtimeNotifications: () => ({ unreadCount: 0 }),
+}));
+
+vi.mock('@/components/Avatar', () => ({
+  default: function MockAvatar() { return <div data-testid="mock-avatar" />; },
+}));
+
+vi.mock('@/components/notifications/NotificationBell', () => ({
+  NotificationBell: function MockNotificationBell() { return null; },
+}));
+
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredCustomAvatar: () => null,
+}));
+
 // Import Header after mocks are set up
 import Header from '../Header';
 
@@ -275,12 +299,22 @@ describe('Header - Gift Modal Database Persistence', () => {
       expect(screen.queryByTestId('gift-modal')).not.toBeInTheDocument();
     });
 
-    it('should still show gift badge in header even when auto-show is dismissed', async () => {
-      render(<Header />);
+    it('should still show gift badge in dropdown when auto-show is dismissed', async () => {
+      const { container } = render(<Header />);
 
-      // Gift badge should be visible (showing there's an unclaimed gift)
-      expect(screen.getByTestId('gift-badge')).toBeInTheDocument();
-      expect(screen.getByTestId('gift-badge')).toHaveTextContent('1');
+      // Gift badge is now inside the HeaderMenuDropdown — open it first
+      const desktopControls = container.querySelector('.hidden.sm\\:flex');
+      const menuButton = desktopControls?.querySelector('button[aria-haspopup]') as HTMLElement | null;
+      if (menuButton) {
+        fireEvent.click(menuButton);
+      }
+
+      // Gift badge should be visible inside the open dropdown
+      await waitFor(() => {
+        const badge = screen.getByTestId('gift-badge');
+        expect(badge).toBeInTheDocument();
+        expect(badge).toHaveTextContent('1');
+      });
     });
 
     it('should auto-show gift when created AFTER the dismissal timestamp', async () => {

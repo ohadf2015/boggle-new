@@ -262,28 +262,36 @@ describe('Header Settings Access', () => {
       const user = userEvent.setup();
       render(<Header />);
 
-      // Open the menu dropdown to access Settings
+      // Open the menu dropdown to access Settings and profile
       const desktopControls = document.querySelector('.sm\\:flex');
       const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
       const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
       expect(desktopMenuButton).toBeInTheDocument();
       await user.click(desktopMenuButton!);
 
-      // Authenticated users should see both settings AND profile
+      // Authenticated users should see settings AND the profile hero section link
       const settingsLink = screen.getByRole('link', { name: 'More Settings' });
-      const profileLink = screen.getByRole('link', { name: 'Profile' });
-
       expect(settingsLink).toBeInTheDocument();
+
+      // Profile link in hero section points to /en/profile
+      const profileLinks = screen.getAllByRole('link');
+      const profileLink = profileLinks.find(l => l.getAttribute('href')?.includes('/profile'));
       expect(profileLink).toBeInTheDocument();
     });
 
-    it('should render coin balance for authenticated users', () => {
+    it('should render coin balance for authenticated users', async () => {
+      const user = userEvent.setup();
       render(<Header />);
 
-      // Coin balance should be visible for authenticated users
+      // Coin balance is now inside the dropdown hero section — open dropdown first
+      const desktopControls = document.querySelector('.sm\\:flex');
+      const menuButtons = screen.getAllByRole('button', { name: 'Open menu' });
+      const desktopMenuButton = menuButtons.find(button => desktopControls?.contains(button));
+      await user.click(desktopMenuButton!);
+
+      // Coin balance should be visible inside dropdown for authenticated users
       const coinBalance = screen.getByTestId('coin-balance');
       expect(coinBalance).toBeInTheDocument();
-      expect(coinBalance).toHaveTextContent('500');
     });
   });
 

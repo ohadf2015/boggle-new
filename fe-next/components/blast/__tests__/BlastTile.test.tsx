@@ -107,12 +107,12 @@ describe('BlastTile', () => {
   });
 
   describe('type-specific clearing animations', () => {
-    it('bomb clearing scales larger than standard (1.8 vs 1.3)', () => {
+    it('bomb clearing scales larger than standard (2.2 vs 1.3)', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="bomb" phase="clearing" clearRotate={5} />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.8)');
+      expect(button?.style.transform).toContain('scale(2.2)');
     });
 
     it('lightning clearing stretches vertically', () => {
@@ -120,8 +120,8 @@ describe('BlastTile', () => {
         <BlastTile {...baseProps} type="lightning" phase="clearing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scaleY(2.5)');
-      expect(button?.style.transform).toContain('scaleX(0.3)');
+      expect(button?.style.transform).toContain('scaleY(3.5)');
+      expect(button?.style.transform).toContain('scaleX(0.15)');
     });
 
     it('standard clearing uses default spin+scale', () => {
@@ -138,8 +138,8 @@ describe('BlastTile', () => {
         <BlastTile {...baseProps} type="magnet" phase="clearing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(0.2)');
-      expect(button?.style.transform).toContain('rotate(720deg)');
+      expect(button?.style.transform).toContain('scale(0.05)');
+      expect(button?.style.transform).toContain('rotate(1080deg)');
     });
   });
 

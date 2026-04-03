@@ -150,15 +150,13 @@ describe('Header Color Consistency - Desktop Mode', () => {
             // Find the dropdown menu container (it's absolutely positioned)
             const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
 
-            // Get utility buttons from WITHIN the dropdown menu only
-            const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+            // Get utility buttons from WITHIN the dropdown menu only (dark panel MenuLink style)
             const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
             const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
-            // All utility buttons should have the SAME neutral background
-            expect(profileButton).toHaveClass('bg-neo-cream');
-            expect(settingsButton).toHaveClass('bg-neo-cream');
-            expect(a11yButton).toHaveClass('bg-neo-cream');
+            // All utility MenuLinks should use consistent styling (rounded-neo, font-bold)
+            expect(settingsButton).toHaveClass('rounded-neo');
+            expect(a11yButton).toHaveClass('rounded-neo');
         });
 
         it('should NOT use special accent colors for utility buttons', () => {
@@ -195,12 +193,19 @@ describe('Header Color Consistency - Desktop Mode', () => {
     describe('Notification Button Distinction', () => {
         it('should allow Gift button to use distinct color as it is a notification', () => {
             const { container } = render(<Header />);
-            const desktopControls = container.querySelector('.hidden.sm\\:flex');
 
-            const giftButton = desktopControls?.querySelector('button[aria-label*="gift"]');
+            // Open dropdown to see gift button (it's inside the dropdown when unclaimedCount > 0)
+            const desktopControls = container.querySelector('.hidden.sm\\:flex');
+            const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+            if (desktopMenuButton) {
+                fireEvent.click(desktopMenuButton);
+            }
+
+            const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+            const giftButton = dropdownMenu?.querySelector('button');
 
             // Gift button CAN use amber (semantic reason: notification/reward)
-            expect(giftButton).toHaveClass('bg-amber-400');
+            expect(giftButton).toHaveClass('bg-amber-400/20');
         });
     });
 
@@ -218,15 +223,13 @@ describe('Header Color Consistency - Desktop Mode', () => {
             // Find the dropdown menu container (it's absolutely positioned)
             const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
 
-            // Get utility buttons from WITHIN the dropdown menu only
-            const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+            // Get utility buttons from WITHIN the dropdown menu only (dark panel MenuLink)
             const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
             const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
-            // All should have the same hover background (neo-cyan/30)
-            expect(profileButton).toHaveClass('hover:bg-neo-cyan/30');
-            expect(settingsButton).toHaveClass('hover:bg-neo-cyan/30');
-            expect(a11yButton).toHaveClass('hover:bg-neo-cyan/30');
+            // All MenuLinks share same hover (hover:bg-neo-white/10)
+            expect(settingsButton).toHaveClass('hover:bg-neo-white/10');
+            expect(a11yButton).toHaveClass('hover:bg-neo-white/10');
         });
     });
 });

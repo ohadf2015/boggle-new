@@ -33,8 +33,9 @@ vi.mock('framer-motion', () => {
 
 // Mock next/image
 vi.mock('next/image', () => ({
-  default: ({ src, alt, ...props }: { src: string; alt: string; fill?: boolean; className?: string; priority?: boolean }) => (
-    <img src={src} alt={alt} data-testid="invite-hero-image" />
+   
+  default: ({ src, alt }: { src: string; alt: string; fill?: boolean; className?: string; priority?: boolean }) => (
+    <div data-testid="invite-hero-image" data-src={src} role="img" aria-label={alt} />
   ),
 }));
 

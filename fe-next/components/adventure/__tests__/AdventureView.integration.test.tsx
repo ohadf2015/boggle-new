@@ -549,16 +549,9 @@ const createMockProgression = (overrides = {}): PlayerProgression => ({
 // ==============================================
 
 /** Render AdventureView.
- * Note: With completions in mock, initial view is 'hub'.
- * Most tests call navigatePastHub() first to get to worldMap. */
+ * Note: Initial view is now 'worldMap' (hub was removed). */
 const renderAdventureView = () => {
-  const result = render(<AdventureView />);
-  // Auto-navigate past hub for backward compatibility with existing tests
-  const hub = screen.queryByTestId('adventure-hub');
-  if (hub) {
-    fireEvent.click(screen.getByTestId('hub-world-map'));
-  }
-  return result;
+  return render(<AdventureView />);
 };
 
 // ==============================================
@@ -620,17 +613,9 @@ describe('AdventureView Integration', () => {
     });
   });
 
-  describe('Hub View (Initial State for returning players)', () => {
-    it('should render hub as initial view for players with completions', () => {
-      // Use raw render to avoid auto-navigation past hub
+  describe('World Map (Initial State)', () => {
+    it('should render world map as initial view', () => {
       render(<AdventureView />);
-      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
-    });
-
-    it('should navigate to world map when World Map button is clicked', () => {
-      render(<AdventureView />);
-      expect(screen.getByTestId('adventure-hub')).toBeInTheDocument();
-      fireEvent.click(screen.getByTestId('hub-world-map'));
       expect(screen.getByTestId('world-map')).toBeInTheDocument();
     });
   });

@@ -172,23 +172,30 @@ describe('Header Button Consistency', () => {
             fireEvent.click(desktopMenuButton);
         }
 
-        // Find profile button inside the dropdown menu
+        // Find accessibility link inside the dropdown menu (MenuLink style: rounded-neo, dark panel)
         const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
-        const profileButton = dropdownMenu?.querySelector('a[href="/en/profile"]');
+        const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
-        expect(profileButton).toHaveClass('bg-neo-cream');
-        expect(profileButton).toHaveClass('border-3');
+        expect(a11yButton).toHaveClass('rounded-neo');
+        expect(a11yButton).toHaveClass('font-bold');
     });
 
     it('should render gift button with distinctive amber background', () => {
         const { container } = render(<Header />);
 
-        // Get desktop controls section
+        // Open the dropdown menu (gift button is inside dropdown, not in desktop controls directly)
         const desktopControls = container.querySelector('.hidden.sm\\:flex');
-        const giftButton = desktopControls?.querySelector('button[aria-label*="gift"]');
+        const desktopMenuButton = desktopControls?.querySelector('button[aria-label="common.openMenu"]');
+        if (desktopMenuButton) {
+            fireEvent.click(desktopMenuButton);
+        }
 
-        expect(giftButton).toHaveClass('bg-amber-400');
-        expect(giftButton).toHaveClass('border-3');
+        // Gift button inside dropdown uses amber/20 style (shown only when unclaimedCount > 0)
+        const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
+        const giftButton = dropdownMenu?.querySelector('button');
+
+        // Gift button uses amber styling in the dark panel
+        expect(giftButton).toHaveClass('bg-amber-400/20');
     });
 
     it('should render accessibility button with neutral background', () => {
@@ -201,12 +208,12 @@ describe('Header Button Consistency', () => {
             fireEvent.click(desktopMenuButton);
         }
 
-        // Find accessibility button inside the dropdown menu
+        // Find accessibility button inside the dropdown menu (dark panel MenuLink)
         const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
         const a11yButton = dropdownMenu?.querySelector('a[href="/en/settings#accessibility"]');
 
-        expect(a11yButton).toHaveClass('bg-neo-cream');
-        expect(a11yButton).toHaveClass('border-3');
+        expect(a11yButton).toHaveClass('rounded-neo');
+        expect(a11yButton).toHaveClass('font-bold');
     });
 
     it('should render settings button with neutral background', () => {
@@ -219,12 +226,12 @@ describe('Header Button Consistency', () => {
             fireEvent.click(desktopMenuButton);
         }
 
-        // Find settings button inside the dropdown menu
+        // Find settings button inside the dropdown menu (dark panel MenuLink)
         const dropdownMenu = container.querySelector('[class*="absolute top-full"]');
         const settingsButton = dropdownMenu?.querySelector('a[href="/en/settings"]');
 
-        expect(settingsButton).toHaveClass('bg-neo-cream');
-        expect(settingsButton).toHaveClass('border-3');
+        expect(settingsButton).toHaveClass('rounded-neo');
+        expect(settingsButton).toHaveClass('font-bold');
     });
 
     it('should render all buttons with consistent size', () => {

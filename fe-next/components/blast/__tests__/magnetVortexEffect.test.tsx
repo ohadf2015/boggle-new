@@ -89,8 +89,8 @@ describe('Magnet/Vortex Effect', () => {
         <BlastTile {...baseProps} phase="clearing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(0.2)');
-      expect(button?.style.transform).toContain('rotate(720deg)');
+      expect(button?.style.transform).toContain('scale(0.05)');
+      expect(button?.style.transform).toContain('rotate(1080deg)');
     });
 
     it('magnet anticipation phase applies brightness filter', () => {

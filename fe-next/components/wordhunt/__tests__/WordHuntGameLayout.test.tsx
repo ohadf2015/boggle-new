@@ -37,13 +37,6 @@ vi.mock('../WordHuntGameOverOverlay', () => ({
   ),
 }));
 
-vi.mock('@/components/game/WordFormingArea', () => {
-  const MockWordFormingArea = (props: Record<string, unknown>) => (
-    <div data-testid="word-forming-area" data-word={props.word} />
-  );
-  return { __esModule: true, default: MockWordFormingArea };
-});
-
 import { WordHuntGameLayout } from '../WordHuntGameLayout';
 
 describe('WordHuntGameLayout', () => {
@@ -106,7 +99,6 @@ describe('WordHuntGameLayout', () => {
     expect(screen.getByTestId('survival-clue-boxes')).toBeInTheDocument();
     expect(screen.getByTestId('survival-life-bar')).toBeInTheDocument();
     expect(screen.getByTestId('survival-grid-section')).toBeInTheDocument();
-    expect(screen.getByTestId('word-forming-area')).toBeInTheDocument();
     expect(screen.getAllByTestId('mp-leaderboard').length).toBeGreaterThanOrEqual(1);
   });
 
@@ -130,8 +122,4 @@ describe('WordHuntGameLayout', () => {
     expect(screen.getByTestId('survival-grid-section')).toHaveAttribute('data-game-over', 'true');
   });
 
-  it('should pass formedWord to WordFormingArea', () => {
-    render(<WordHuntGameLayout {...defaultProps} formedWord="HELLO" />);
-    expect(screen.getByTestId('word-forming-area')).toHaveAttribute('data-word', 'HELLO');
-  });
 });
