@@ -251,7 +251,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                             )}
 
                             {/* Notifications (inline) */}
-                            {isAuthenticated && (notifications as NotificationData[]).length > 0 && (
+                            {isAuthenticated && ((notifications as NotificationData[]) ?? []).length > 0 && (
                                 <div className="mt-1">
                                     <div className="flex items-center justify-between mb-1.5">
                                         <div className="flex items-center gap-2">
