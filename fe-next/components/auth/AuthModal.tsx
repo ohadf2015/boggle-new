@@ -67,6 +67,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
 
+  // On CrazyGames, skip the modal entirely — trigger native CG auth prompt
+  useEffect(() => {
+    if (isOpen && isOnCrazyGamesPlatform) {
+      showAuthPrompt();
+      onClose();
+    }
+  }, [isOpen, isOnCrazyGamesPlatform, showAuthPrompt, onClose]);
+
   // Email/password form state
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
   const [usePassword, setUsePassword] = useState(false);
@@ -333,7 +341,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     if (!showOtpFlow && isNative()) setShowOtpFlow(true);
   }, [showOtpFlow]);
 
-  const providers: Provider[] = [
+  const allProviders: Provider[] = [
     {
       id: 'google',
       icon: GoogleIcon,
@@ -347,6 +355,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       className: 'bg-brand-discord text-white border-3 border-neo-black hover:bg-brand-discord-hover shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
     },
   ];
+  // On native, only show Google (Discord requires browser OAuth which leaves the app)
+  const providers = isNative() ? allProviders.filter(p => p.id === 'google') : allProviders;
 
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
