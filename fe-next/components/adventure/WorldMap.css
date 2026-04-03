@@ -323,6 +323,62 @@
   contain-intrinsic-size: auto 200px;
 }
 
+/* World node entrance — CSS replaces 20 framer-motion spring instances on mount.
+ * A single CSS animation per node is vastly cheaper than a JS-driven spring. */
+@keyframes world-node-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.world-node-entrance {
+  animation: world-node-enter 0.4s ease-out both;
+  animation-delay: var(--entrance-delay, 0s);
+}
+
+/* World info card entrance */
+@keyframes world-card-enter {
+  from { opacity: 0; transform: translateX(var(--card-x, -20px)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.world-card-entrance {
+  animation: world-card-enter 0.35s ease-out both;
+  animation-delay: var(--card-delay, 0s);
+}
+
+/* Trail dot — CSS offset-path replaces SMIL animateMotion.
+ * offset-path animations are compositor-promoted; SMIL runs on main thread. */
+@keyframes trail-dot-move {
+  0% { offset-distance: 0%; opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0.6; }
+}
+
+.world-map-trail-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  offset-path: var(--trail-path);
+  offset-rotate: 0deg;
+  animation: trail-dot-move 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Pure CSS cloud shape — eliminates 3 image loads (75KB total).
+ * Uses box-shadow for the puffy lobes, single DOM element. */
+.world-map-cloud-shape {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  box-shadow:
+    -12px -6px 0 6px rgba(255, 255, 255, 0.12),
+    12px -4px 0 8px rgba(255, 255, 255, 0.10),
+    0 -10px 0 10px rgba(255, 255, 255, 0.08);
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .world-map-star,
@@ -334,7 +390,15 @@
   .world-map-crown,
   .world-map-mascot,
   .world-map-scroll-hint,
-  .world-fog-shimmer::after {
+  .world-fog-shimmer::after,
+  .world-map-trail-dot,
+  .world-node-entrance,
+  .world-card-entrance {
     animation: none;
+  }
+  .world-node-entrance,
+  .world-card-entrance {
+    opacity: 1;
+    transform: none;
   }
 }

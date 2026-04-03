@@ -23,28 +23,32 @@ vi.mock('framer-motion', () => {
     } = props;
     return rest;
   };
+  const motion = {
+    div: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div {...stripFramerProps(props)}>{children}</div>
+    ),
+    span: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <span {...stripFramerProps(props)}>{children}</span>
+    ),
+    button: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <button {...stripFramerProps(props)}>{children}</button>
+    ),
+  };
   return {
-    motion: {
-      div: ({
-        children,
-        ...props
-      }: React.PropsWithChildren<Record<string, unknown>>) => (
-        <div {...stripFramerProps(props)}>{children}</div>
-      ),
-      span: ({
-        children,
-        ...props
-      }: React.PropsWithChildren<Record<string, unknown>>) => (
-        <span {...stripFramerProps(props)}>{children}</span>
-      ),
-      button: ({
-        children,
-        ...props
-      }: React.PropsWithChildren<Record<string, unknown>>) => (
-        <button {...stripFramerProps(props)}>{children}</button>
-      ),
-    },
+    motion,
+    m: motion,
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
   };
 });
 

@@ -50,7 +50,7 @@ export function SpectatorBanner({
         'shadow-hard-xl'
       )}
       style={{
-        paddingTop: 'max(env(safe-area-inset-top), 0px)',
+        top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))',
       }}
       role="status"
       aria-live="polite"

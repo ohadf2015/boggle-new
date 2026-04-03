@@ -29,6 +29,8 @@ export function useBlastSounds() {
     playBlastPrismSound,
     playTileSelectSound,
     playLongWordBonusSound,
+    playLegendaryWordSound,
+    playMegaCascadeSound,
   } = useSoundEffects();
 
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -45,10 +47,11 @@ export function useBlastSounds() {
     playTileSelectSound();
   }, [playTileSelectSound]);
 
-  /** Play long word bonus sound for 6+ letter words */
+  /** Play long word bonus sound for 6+ letter words, legendary for 8+ */
   const playLongWordBonus = useCallback((wordLength: number) => {
-    if (wordLength >= 6) playLongWordBonusSound();
-  }, [playLongWordBonusSound]);
+    if (wordLength >= 8) playLegendaryWordSound();
+    else if (wordLength >= 6) playLongWordBonusSound();
+  }, [playLongWordBonusSound, playLegendaryWordSound]);
 
   /** Play tile clear sound with pitch scaled by word length */
   const playTileClear = useCallback((count: number) => {
@@ -63,9 +66,14 @@ export function useBlastSounds() {
 
   /** Play cascade chain sound — pitch escalates faster for Blast chains */
   const playCascadeChain = useCallback((level: number) => {
-    // Boost level by 2 so Blast cascades feel more dramatic than standard combos
-    playComboSound(level + 2);
-  }, [playComboSound]);
+    // Mega cascade at 5+ chain
+    if (level >= 5) {
+      playMegaCascadeSound();
+    } else {
+      // Boost level by 2 so Blast cascades feel more dramatic than standard combos
+      playComboSound(level + 2);
+    }
+  }, [playComboSound, playMegaCascadeSound]);
 
   /** Play combo activation sound — milestone for tier 2+, combo for tier 1 */
   const playComboActivation = useCallback((tier: 1 | 2 | 3) => {

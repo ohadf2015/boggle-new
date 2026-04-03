@@ -228,33 +228,33 @@ module.exports = {
         '5': '5px',
         '6': '6px',
       },
-      // Hard Shadow Utilities (NO blur - Neo-Brutalist style)
+      // Hard Shadow Utilities (NO blur - Neo-Brutalist style, cleaned-up: lighter offsets)
       boxShadow: {
-        'hard-sm': '2px 2px 0px rgb(var(--neo-black))',
-        'hard': '4px 4px 0px rgb(var(--neo-black))',
-        'hard-md': '4px 4px 0px rgb(var(--neo-black))',
-        'hard-lg': '6px 6px 0px rgb(var(--neo-black))',
-        'hard-xl': '8px 8px 0px rgb(var(--neo-black))',
-        'hard-2xl': '10px 10px 0px rgb(var(--neo-black))',
-        'hard-pressed': '2px 2px 0px rgb(var(--neo-black))',
+        'hard-sm': '1px 1px 0px rgb(var(--neo-black))',
+        'hard': '2px 2px 0px rgb(var(--neo-black))',
+        'hard-md': '2px 2px 0px rgb(var(--neo-black))',
+        'hard-lg': '3px 3px 0px rgb(var(--neo-black))',
+        'hard-xl': '5px 5px 0px rgb(var(--neo-black))',
+        'hard-2xl': '7px 7px 0px rgb(var(--neo-black))',
+        'hard-pressed': '1px 1px 0px rgb(var(--neo-black))',
         // Colored hard shadows
-        'hard-yellow': '4px 4px 0px var(--neo-yellow)',
-        'hard-pink': '4px 4px 0px var(--neo-pink)',
-        'hard-cyan': '4px 4px 0px var(--neo-cyan)',
-        'hard-lime': '4px 4px 0px var(--neo-lime)',
-        'hard-purple': '4px 4px 0px #581c87',
-        'hard-purple-lg': '6px 6px 0px #581c87',
+        'hard-yellow': '2px 2px 0px var(--neo-yellow)',
+        'hard-pink': '2px 2px 0px var(--neo-pink)',
+        'hard-cyan': '2px 2px 0px var(--neo-cyan)',
+        'hard-lime': '2px 2px 0px var(--neo-lime)',
+        'hard-purple': '2px 2px 0px #581c87',
+        'hard-purple-lg': '3px 3px 0px #581c87',
         // Remove default shadows
         'none': 'none',
       },
-      // Border Radius - Chunky Neo-Brutalist options
+      // Border Radius — cleaned-up: softer corners for modern feel
       borderRadius: {
         'none': '0px',
-        'neo-sm': '2px',
-        'neo': '4px',
-        'neo-md': '4px',
-        'neo-lg': '8px',
-        'neo-xl': '12px',
+        'neo-sm': '4px',
+        'neo': '8px',
+        'neo-md': '8px',
+        'neo-lg': '12px',
+        'neo-xl': '16px',
         'neo-pill': '9999px',
         lg: "var(--radius-lg)",
         md: "var(--radius-md)",
@@ -295,13 +295,13 @@ module.exports = {
         // Neo-Brutalist animations
         "neo-press": {
           "0%": { transform: "translate(0, 0)", boxShadow: "var(--shadow-md)" },
-          "100%": { transform: "translate(2px, 2px)", boxShadow: "var(--shadow-pressed)" },
+          "100%": { transform: "translate(1px, 1px)", boxShadow: "var(--shadow-pressed)" },
         },
         // Enhanced button press with bounce
         "neo-press-bounce": {
           "0%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "var(--shadow-md)" },
-          "40%": { transform: "translate(3px, 3px) rotate(-1deg)", boxShadow: "1px 1px 0px rgb(var(--neo-black))" },
-          "60%": { transform: "translate(1px, 1px) rotate(0.5deg)", boxShadow: "3px 3px 0px rgb(var(--neo-black))" },
+          "40%": { transform: "translate(2px, 2px) rotate(-0.5deg)", boxShadow: "var(--shadow-pressed)" },
+          "60%": { transform: "translate(1px, 1px) rotate(0.25deg)", boxShadow: "2px 2px 0px rgb(var(--neo-black))" },
           "100%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "var(--shadow-md)" },
         },
         // Floating animation for decorative elements

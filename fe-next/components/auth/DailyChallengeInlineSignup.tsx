@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, AlertCircle, type LucideIcon } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
@@ -8,7 +8,9 @@ import Link from 'next/link';
 import { Button } from '../ui/button';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink } from '../../lib/supabase';
+import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { isNative } from '../../utils/platform';
 import { cn } from '../../lib/utils';
 import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -69,6 +71,13 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [usePassword, setUsePassword] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
 
   // Email form state
   const [email, setEmail] = useState('');
@@ -82,30 +91,15 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     () => MASCOT_MESSAGES[Math.floor(Math.random() * MASCOT_MESSAGES.length)]
   );
 
+  const { signIn: oauthSignIn } = useOAuthSignIn({
+    onBeforeRedirect: () => setPendingDailyResult(pendingResult),
+    onError: (msg) => setError(msg),
+  });
+
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
-
-    try {
-      // Store the pending result in localStorage before OAuth redirect
-      setPendingDailyResult(pendingResult);
-
-      let result;
-      if (provider === 'google') {
-        result = await signInWithGoogle();
-      } else {
-        result = await signInWithDiscord();
-      }
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-      // OAuth will redirect, so no need to do anything else
-    } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
-      setIsLoading(null);
-    }
+    setPendingDailyResult(pendingResult);
+    await oauthSignIn(provider);
   };
 
   // Real-time validation handlers
@@ -198,12 +192,31 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
 
     try {
       setPendingDailyResult(pendingResult);
-      const result = await signInWithMagicLink(email);
 
-      if (result.error) {
-        setError(result.error.message);
+      if (showOtpFlow && otpSent) {
+        // Verify OTP code
+        const result = await verifyOtpCode(email, otpCode);
+        if (result.error) {
+          setError(result.error.message);
+        }
+        // Auth context handles redirect on success
+      } else if (showOtpFlow) {
+        // Send OTP code (native — no browser redirect)
+        const result = await sendOtpCode(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setOtpSent(true);
+          setSuccess(t('auth.otp.codeSent'));
+        }
       } else {
-        setSuccess(t('auth.magicLink.checkEmail'));
+        // Web: magic link
+        const result = await signInWithMagicLink(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setSuccess(t('auth.magicLink.checkEmail'));
+        }
       }
       setIsLoading(null);
     } catch (err) {
@@ -449,17 +462,36 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                           "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                           emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                         )}
-                        disabled={isAnyLoading}
+                        disabled={isAnyLoading || otpSent}
                       />
                       {emailError && (
                         <p id="dc-magic-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                       )}
                     </div>
 
+                    {/* OTP code input (native only, after code sent) */}
+                    {showOtpFlow && otpSent && (
+                      <div>
+                        <label htmlFor="dc-otp-code" className="sr-only">{t('auth.otp.enterCode')}</label>
+                        <input
+                          id="dc-otp-code"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          maxLength={6}
+                          value={otpCode}
+                          onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                          placeholder={t('auth.otp.enterCode')}
+                          className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                          disabled={isAnyLoading}
+                        />
+                      </div>
+                    )}
+
                     <Button
                       type="submit"
                       variant="secondary"
-                      disabled={isAnyLoading || !email || !!emailError}
+                      disabled={isAnyLoading || !email || !!emailError || (otpSent && otpCode.length < 6)}
                       className="w-full"
                     >
                       {isLoading === 'magiclink' ? (
@@ -467,7 +499,13 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       ) : (
                         <>
                           <Wand2 className="w-4 h-4" />
-                          <span className="ms-2">{t('auth.magicLink.sendLink')}</span>
+                          <span className="ms-2">
+                            {otpSent
+                              ? t('auth.otp.verify')
+                              : showOtpFlow
+                                ? t('auth.otp.sendCode')
+                                : t('auth.magicLink.sendLink')}
+                          </span>
                         </>
                       )}
                     </Button>

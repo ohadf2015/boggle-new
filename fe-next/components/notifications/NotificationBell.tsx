@@ -25,6 +25,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     latestNotification,
     markAsRead,
     markAllAsRead,
+    dismissNotification,
     clearLatestNotification,
   } = useRealtimeNotifications();
 
@@ -36,7 +37,12 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     (notification: NotificationData) => {
       setIsDropdownOpen(false);
       if (notification.notification_type === 'gift') {
-        window.dispatchEvent(new CustomEvent('openGiftModal'));
+        window.dispatchEvent(new CustomEvent('openGiftModal', {
+          detail: { giftId: notification.related_entity_id },
+        }));
+        if (!notification.read) {
+          markAsRead(notification.id);
+        }
         return;
       }
       if (notification.action_url) {
@@ -46,14 +52,16 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         router.push(url);
       }
     },
-    [router, language]
+    [router, language, markAsRead]
   );
 
   // Handle toast action (also needs locale prefix)
   // Gift notifications open the gift modal directly instead of navigating
   const handleToastAction = useCallback(() => {
     if (latestNotification?.notification_type === 'gift') {
-      window.dispatchEvent(new CustomEvent('openGiftModal'));
+      window.dispatchEvent(new CustomEvent('openGiftModal', {
+        detail: { giftId: latestNotification.related_entity_id },
+      }));
       clearLatestNotification();
       return;
     }
@@ -122,6 +130,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         onMarkAsRead={markAsRead}
         onMarkAllAsRead={markAllAsRead}
         onNotificationClick={handleNotificationClick}
+        onDismiss={dismissNotification}
       />
 
       {/* Toast for new notifications */}

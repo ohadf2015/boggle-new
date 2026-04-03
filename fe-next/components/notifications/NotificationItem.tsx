@@ -7,9 +7,10 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { X } from 'lucide-react';
 import { NOTIFICATION_TYPE_ICONS, NOTIFICATION_TYPE_COLORS, type NotificationItemProps } from './types';
 
-export function NotificationItem({ notification, onClick, onMarkAsRead }: NotificationItemProps) {
+export function NotificationItem({ notification, onClick, onMarkAsRead, onDismiss }: NotificationItemProps) {
   const { t } = useLanguage();
 
   const icon = NOTIFICATION_TYPE_ICONS[notification.notification_type];
@@ -25,9 +26,9 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
     onClick();
   };
 
-  const handleMarkAsRead = (e: React.MouseEvent) => {
+  const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onMarkAsRead();
+    onDismiss();
   };
 
   return (
@@ -70,17 +71,29 @@ export function NotificationItem({ notification, onClick, onMarkAsRead }: Notifi
         </span>
       </div>
 
+      {/* Dismiss button */}
+      <button
+        onClick={handleDismiss}
+        className="
+          absolute top-2 end-2
+          w-6 h-6 rounded-full
+          flex items-center justify-center
+          text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10
+          transition-all duration-150
+        "
+        title={t('notifications.dismiss')}
+      >
+        <X size={14} />
+      </button>
+
       {/* Unread indicator */}
       {!notification.read && (
-        <button
-          onClick={handleMarkAsRead}
+        <span
           className="
-            absolute top-3 end-3
-            w-3 h-3 rounded-full bg-neo-yellow
+            absolute bottom-3 end-3
+            w-2.5 h-2.5 rounded-full bg-neo-cyan
             border border-black
-            hover:scale-125 transition-transform
           "
-          title={t('notifications.markAsRead')}
         />
       )}
     </button>

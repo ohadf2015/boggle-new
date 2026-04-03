@@ -161,7 +161,7 @@ export function PortraitGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
       {/* Dynamic Energy Background */}
       <DynamicEnergyBackground />
 

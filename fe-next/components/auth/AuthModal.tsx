@@ -11,9 +11,10 @@ import { Button as ButtonComponent } from '../ui/button';
 // Type assertion for JSX Button component
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { trackEvent } from '@/components/GoogleAnalytics';
-import { isMobile } from '../../utils/platform';
+import { isNative } from '../../utils/platform';
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -88,6 +89,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
+  // OAuth sign-in with native SDK priority (Google/Apple native → in-app browser → redirect)
+  const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider } = useOAuthSignIn({
+    onError: (msg) => setError(msg),
+    onSuccess: () => onClose(),
+  });
+
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -150,22 +157,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   }, [isOpen, handleKeyDown]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
-
-    try {
-      const result = provider === 'google'
-        ? await signInWithGoogle()
-        : await signInWithDiscord();
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-    } catch (err) {
-      setError((err as Error).message || t('common.errorOccurred'));
-      setIsLoading(null);
-    }
+    await oauthSignIn(provider);
   };
 
   const handleEmailChange = (value: string) => {
@@ -319,8 +312,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     }
   };
 
-  const isAnyLoading = isLoading !== null;
-  const showOtpFlow = isMobile();
+  const isAnyLoading = isLoading !== null || oauthLoadingProvider !== null;
+  // Use OTP on native — magic links open Safari and never return to the app.
+  // Re-check on mount in case Capacitor bridge initializes after first render.
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
 
   const providers: Provider[] = [
     {
@@ -461,7 +459,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         )}
                         asChild={false}
                       >
-                        {isLoading === provider.id ? (
+                        {(isLoading === provider.id || oauthLoadingProvider === provider.id) ? (
                           <Loader size="sm" />
                         ) : (
                           <>

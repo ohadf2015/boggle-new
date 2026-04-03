@@ -25,12 +25,18 @@ vi.mock('gsap', () => ({
   },
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+  };
+  return {
+    motion,
+    m: motion,
+    AnimatePresence: ({ children }: any) => <>{children}</>,
+    LazyMotion: ({ children }: any) => <>{children}</>,
+    domAnimation: {},
+  };
+});
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

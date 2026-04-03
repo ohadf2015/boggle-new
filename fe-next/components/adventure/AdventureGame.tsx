@@ -93,6 +93,7 @@ const AdventureGame = memo<AdventureGameProps>(
       playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
       playBossDefeatSound, playTimerUrgentSound,
       playCoinCollectSound, playQuestCompleteSound, playBoardShuffleSound,
+      playBossDefeatLegendarySound, playLegendaryWordSound,
     } = useSoundEffects();
 
     const {
@@ -211,7 +212,7 @@ const AdventureGame = memo<AdventureGameProps>(
       sfx: {
         setGameActive, playCountdownBeep, playWordAcceptedSound, playComboSound,
         playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
-        playBossDefeatSound, playTimerUrgentSound,
+        playBossDefeatSound, playTimerUrgentSound, playBossDefeatLegendarySound, playLegendaryWordSound,
       },
       isBossLevel,
       showBossIntro: bossOrch.showBossIntro,
@@ -221,6 +222,7 @@ const AdventureGame = memo<AdventureGameProps>(
       // showLevelComplete acts as non-boss level completion trigger
       nonBossCompleted: !isBossLevel && showLevelComplete,
       gameStars: gameState.stars,
+      lastWordLength: gameState.wordsFound.length > 0 ? gameState.wordsFound[gameState.wordsFound.length - 1]?.length : undefined,
     });
     // In-game music: AdventureGame owns this so timer-driven track switches
     // never cause AdventureView to re-render.

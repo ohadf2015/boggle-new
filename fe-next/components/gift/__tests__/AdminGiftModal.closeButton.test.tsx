@@ -7,6 +7,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { AdminGiftModal } from '../AdminGiftModal';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
+// Mock framer-motion (m + LazyMotion API)
+vi.mock('framer-motion', () => {
+  const React = require('react');
+  const el = (tag: string) => { const c = React.forwardRef(({ children, whileHover, whileTap, animate, initial, exit, transition, variants, ...rest }: any, ref: any) => React.createElement(tag, { ...rest, ref }, children)); c.displayName = `Motion_${tag}`; return c; };
+  const motion = { div: el('div'), span: el('span'), button: el('button') };
+  return { motion, m: motion, AnimatePresence: ({ children }: any) => children, LazyMotion: ({ children }: any) => children, domAnimation: {} };
+});
+
 // Mock modules
 vi.mock('gsap', () => ({
   __esModule: true,

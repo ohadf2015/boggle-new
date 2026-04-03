@@ -7,6 +7,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HeaderMenuDropdown from '../../components/HeaderMenuDropdown';
 
+// Mock framer-motion (m + LazyMotion API)
+vi.mock('framer-motion', () => {
+  const React = require('react');
+  const el = (tag: string) => { const c = React.forwardRef(({ children, whileHover, whileTap, animate, initial, exit, transition, variants, ...rest }: any, ref: any) => React.createElement(tag, { ...rest, ref }, children)); c.displayName = `Motion_${tag}`; return c; };
+  const motion = { div: el('div'), span: el('span'), button: el('button'), nav: el('nav') };
+  return { motion, m: motion, AnimatePresence: ({ children }: any) => children, LazyMotion: ({ children }: any) => children, domAnimation: {} };
+});
+
 // Mock dependencies
 vi.mock('../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),

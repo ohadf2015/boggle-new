@@ -109,6 +109,12 @@ export async function signInWithEmail(email: string, password: string) {
 export async function signInWithMagicLink(email: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
+  // Magic links open in the device browser on native — use OTP instead
+  const { isNative } = await import('@/utils/platform');
+  if (isNative()) {
+    return sendOtpCode(email);
+  }
+
   // Include current locale in the URL path so proxy.ts preserves it (not as query param)
   const currentLocale = getCurrentLocale();
   const locale = currentLocale || 'en';

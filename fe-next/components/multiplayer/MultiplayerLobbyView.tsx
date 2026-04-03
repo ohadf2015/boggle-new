@@ -156,7 +156,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
 
   // ==================== Shared Header ====================
   const renderHeader = () => (
-    <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0px))' }}>
+    <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {isHost && <DJMascotWithEntrance size="sm" delay={0.3} />}

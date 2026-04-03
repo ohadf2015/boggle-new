@@ -1,6 +1,21 @@
 /**
  * Re-engagement Email HTML Template
  * Neo-brutalist design with RTL support and localized content
+ *
+ * Design principles:
+ * - Single visual hero: word tiles are the star, placed prominently
+ * - Loss-aversion CTA: "Reveal the Word" > "Play Now"
+ * - 3-zone layout: emotional hook → curiosity gap → CTA
+ * - Mobile-first: 44px+ tap targets, 16px+ body text
+ * - Minimal clutter: one card, one CTA, one message
+ *
+ * Gmail Dark Mode hardening:
+ * - Every gradient has a solid background-color fallback
+ * - No rgba() — all solid hex
+ * - No opacity on text elements
+ * - Word tiles use <td> not <div> (Gmail strips divs)
+ * - Footer text has sufficient contrast to survive inversion
+ * - [data-ogsc] overrides for Gmail's color-shifting
  */
 
 import { EMAIL_COLORS } from '@/lib/email';
@@ -25,65 +40,73 @@ const LOCALIZED_STRINGS: Record<string, {
   streakLost: string;
   unsubscribe: string;
   privacy: string;
+  missedDays: string;
+  comeBack: string;
 }> = {
   en: {
     greeting: (name) => `We miss you, ${name}!`,
     teaser: "Today's word starts with...",
     question: 'Can you figure it out?',
-    cta: 'Play Now',
+    cta: 'Reveal the Word',
     footerReason: 'You subscribed to daily challenges.',
     urgency: 'Expires at midnight',
     streakLost: 'Your streak is fading...',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
+    missedDays: 'days without playing',
+    comeBack: "Your friends are still climbing the leaderboard",
   },
   he: {
     greeting: (name) => `!${name} ,התגעגענו אליך`,
     teaser: '...המילה של היום מתחילה ב',
     question: '?תצליח/י לגלות',
-    cta: 'שחקו עכשיו',
+    cta: 'גלו את המילה',
     footerReason: '.נרשמת לאתגר היומי',
-
     urgency: 'נגמר בחצות',
     streakLost: '...הרצף שלך נעלם',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
+    missedDays: 'ימים בלי לשחק',
+    comeBack: 'החברים שלך עדיין מטפסים בטבלה',
   },
   sv: {
     greeting: (name) => `Vi saknar dig, ${name}!`,
     teaser: 'Dagens ord börjar med...',
     question: 'Kan du lista ut det?',
-    cta: 'Spela nu',
+    cta: 'Avslöja ordet',
     footerReason: 'Du prenumererar på dagliga utmaningar.',
-
     urgency: 'Slutar vid midnatt',
     streakLost: 'Din streak bleknar...',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
+    missedDays: 'dagar utan att spela',
+    comeBack: 'Dina vänner klättrar fortfarande på topplistan',
   },
   ja: {
     greeting: (name) => `${name}さん、お待ちしています！`,
     teaser: '今日の単語の最初の文字は...',
     question: 'わかりますか？',
-    cta: '今すぐプレイ',
+    cta: '単語を明かす',
     footerReason: 'デイリーチャレンジに登録しています。',
-
     urgency: '深夜0時に終了',
     streakLost: '連続記録が消えかけています...',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
+    missedDays: '日間プレイなし',
+    comeBack: 'フレンドはまだランキングを上げています',
   },
   es: {
     greeting: (name) => `¡Te extrañamos, ${name}!`,
     teaser: 'La palabra de hoy empieza con...',
     question: '¿Puedes adivinarla?',
-    cta: 'Jugar ahora',
+    cta: 'Revelar la palabra',
     footerReason: 'Te suscribiste al desafío diario.',
-
     urgency: 'Expira a medianoche',
     streakLost: 'Tu racha se desvanece...',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
+    missedDays: 'días sin jugar',
+    comeBack: 'Tus amigos siguen subiendo en la tabla',
   },
 };
 
@@ -155,6 +178,11 @@ export function getReengagementSubject(
 
 /**
  * Generate the HTML email for re-engagement
+ *
+ * Layout (3-zone):
+ *   Zone 1 — Emotional hook: mascot + greeting + streak warning
+ *   Zone 2 — Curiosity gap: word tiles (the hero element)
+ *   Zone 3 — CTA: single prominent button + urgency
  */
 export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   subject: string;
@@ -173,8 +201,19 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
   const shadowDir = isRTL ? '-' : '';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
-  // Flip play arrow for RTL
   const playArrow = isRTL ? '&#9664;' : '&#9654;';
+
+  // Gmail dark mode-safe colors (no rgba, all solid hex)
+  const bgOuter = '#0d0d1f';
+  const bgCard = '#1a1a35';
+  const bgTileEmpty = '#252548';
+  const borderCard = '#2e2e55';
+  const borderTileEmpty = '#3a3a65';
+  const textMuted = '#8888aa';
+  const textSubtle = '#6a6a90';
+  const textFooter = '#707090';
+  const urgencyBg = '#2a1028';
+  const urgencyBorder = '#5a2048';
 
   const html = `
 <!DOCTYPE html>
@@ -196,76 +235,78 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
     * { box-sizing: border-box; }
     body {
       margin: 0; padding: 0;
-      background-color: #0a0a1a;
+      background-color: ${bgOuter};
       font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    a.cta-link:hover { transform: translate(2px, 2px) !important; box-shadow: ${shadowDir}3px 3px 0px ${colors.black} !important; }
+    /* Gmail dark mode: prevent color inversion on key elements */
+    u + .body { background-color: ${bgOuter} !important; }
+    [data-ogsc] h1,
+    [data-ogsc] .greeting-text { color: ${colors.white} !important; }
+    [data-ogsc] .cta-link { background-color: ${colors.lime} !important; color: ${colors.black} !important; }
+    [data-ogsc] .streak-text { color: ${colors.pinkLight} !important; }
+    [data-ogsc] .question-text { color: ${colors.cyan} !important; }
+    [data-ogsc] .tile-letter { background-color: ${colors.lime} !important; color: ${colors.black} !important; }
+    [data-ogsc] .tile-empty { background-color: ${bgTileEmpty} !important; color: #55558a !important; }
+    a.cta-link:hover {
+      transform: translate(2px, 2px) !important;
+      box-shadow: ${shadowDir}3px 3px 0px ${colors.black} !important;
+    }
     @media only screen and (max-width: 600px) {
-      .container { padding: 16px !important; }
-      .main-card { padding: 28px 18px 32px !important; }
-      .word-tile { width: 46px !important; height: 46px !important; font-size: 20px !important; line-height: 40px !important; }
-      .word-tile-first { width: 46px !important; height: 46px !important; font-size: 24px !important; line-height: 40px !important; }
-      .mascot-img { width: 72px !important; height: 72px !important; }
+      .container { padding: 12px !important; }
+      .main-card { padding: 24px 16px 28px !important; }
+      .word-tile { width: 48px !important; height: 48px !important; font-size: 20px !important; }
+      .word-tile-first { width: 52px !important; height: 52px !important; font-size: 24px !important; }
+      .mascot-img { width: 64px !important; height: 64px !important; }
       .greeting-text { font-size: 22px !important; }
-      .teaser-text { font-size: 13px !important; }
-      .cta-link { padding: 14px 36px !important; font-size: 18px !important; }
-      .streak-badge { font-size: 12px !important; padding: 6px 14px !important; }
-      .urgency-badge { font-size: 11px !important; padding: 6px 14px !important; }
+      .teaser-text { font-size: 14px !important; }
+      .cta-link { padding: 16px 36px !important; font-size: 17px !important; }
+      .urgency-badge { font-size: 12px !important; padding: 6px 14px !important; }
+      .social-proof { font-size: 11px !important; }
     }
   </style>
 </head>
-<body>
-  <!-- Preheader -->
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: #0a0a1a;">
+<body class="body" style="margin: 0; padding: 0; background-color: ${bgOuter};">
+  <!-- Preheader — acts as a second subject line -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; color: ${bgOuter};">
     ${strings.teaser} ${firstLetter} — ${strings.question} &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: #0a0a1a;">
+  <!-- Outer wrapper — solid bg, no gradient -->
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: ${bgOuter};">
     <tr>
-      <td align="center" class="container" style="padding: 32px 20px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 460px;">
+      <td align="center" class="container" style="padding: 28px 20px; background-color: ${bgOuter};">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="max-width: 440px;">
 
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding-bottom: 20px;">
+            <td align="center" style="padding-bottom: 24px;">
               <a href="${playUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="120" style="display: block; max-width: 120px; height: auto;" />
+                <img src="${logoUrl}" alt="LexiClash" width="100" style="display: block; max-width: 100px; height: auto;" />
               </a>
             </td>
           </tr>
 
-          <!-- Streak Lost Badge -->
-          <tr>
-            <td align="center" style="padding-bottom: 20px;">
-              <table role="presentation" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td class="streak-badge" style="background: linear-gradient(135deg, #2a1028, #3d1040); border: 2px solid ${colors.pink}; border-radius: 24px; padding: 8px 20px; font-size: 13px; color: ${colors.pinkLight}; font-weight: 600; letter-spacing: 0.3px;">
-                    &#x1F525; ${strings.streakLost}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Main Card -->
+          <!-- Main Card — solid bg-color fallback before gradient -->
           <tr>
             <td>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background: linear-gradient(180deg, #1e1e3a 0%, #161630 100%); border: 2px solid #2a2a50; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}, 0 0 40px rgba(191, 255, 0, 0.06); overflow: hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" dir="${dir}" style="background-color: ${bgCard}; border: 2px solid ${borderCard}; border-radius: 20px; box-shadow: ${shadowDir}6px 6px 0px ${colors.black}; overflow: hidden;">
 
-                <!-- Accent bar — lime glow -->
+                <!-- Top accent bar — solid fallback -->
                 <tr>
-                  <td style="background: linear-gradient(90deg, ${colors.lime}, #90E000); height: 3px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td style="background-color: ${colors.lime}; height: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
                 </tr>
 
                 <tr>
-                  <td class="main-card" style="padding: 36px 28px 40px;">
+                  <td class="main-card" style="padding: 32px 28px 36px; background-color: ${bgCard};">
+
+                    <!-- ═══ ZONE 1: Emotional Hook ═══ -->
 
                     <!-- Mascot -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" style="padding-bottom: 16px;">
-                          <img src="${mascotUrl}" alt="Lexi" width="88" height="88" class="mascot-img" style="display: block; width: 88px; height: 88px;" />
+                        <td align="center" style="padding-bottom: 12px;">
+                          <img src="${mascotUrl}" alt="Lexi" width="72" height="72" class="mascot-img" style="display: block; width: 72px; height: 72px;" />
                         </td>
                       </tr>
                     </table>
@@ -281,36 +322,45 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       </tr>
                     </table>
 
+                    <!-- Streak fading -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="center" dir="${dir}" style="padding-bottom: 28px;">
+                          <p class="streak-text" style="color: ${colors.pinkLight}; font-size: 14px; margin: 0; font-weight: 500; text-align: center; direction: ${dir};">
+                            &#x1F525; ${strings.streakLost}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- ═══ ZONE 2: Curiosity Gap (Hero) ═══ -->
+
                     <!-- Teaser -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}" style="padding-bottom: 24px;">
-                          <p class="teaser-text" style="color: #9090b8; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir};">
+                        <td align="center" dir="${dir}" style="padding-bottom: 16px;">
+                          <p class="teaser-text" style="color: ${textMuted}; font-size: 15px; line-height: 1.5; margin: 0; text-align: center; font-weight: 500; direction: ${dir}; letter-spacing: 0.3px;">
                             ${strings.teaser}
                           </p>
                         </td>
                       </tr>
                     </table>
 
-                    <!-- Tile Row -->
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                    <!-- Word Tiles — using <td> elements, not <div> (Gmail-safe) -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
                       <tr>
-                        <td align="center" style="padding-bottom: 16px;">
-                          <table role="presentation" cellpadding="0" cellspacing="0" dir="${dir}">
+                        <td align="center">
+                          <table role="presentation" cellpadding="0" cellspacing="8" dir="${dir}" style="border-collapse: separate;">
                             <tr>
                               ${Array.from({ length: WORD_TILE_COUNT }, (_, i) => {
                                 const isFirst = isRTL ? i === WORD_TILE_COUNT - 1 : i === 0;
                                 if (isFirst) {
-                                  return `<td style="padding: 0 3px;">
-                                    <div class="word-tile word-tile-first" style="width: 52px; height: 52px; background: ${colors.lime}; border: 3px solid ${colors.black}; border-radius: 10px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}, 0 0 12px rgba(191, 255, 0, 0.35); text-align: center; line-height: 46px; font-size: 26px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif;">
+                                  return `<td class="word-tile word-tile-first tile-letter" width="56" height="56" align="center" valign="middle" style="width: 56px; height: 56px; background-color: ${colors.lime}; border: 3px solid ${colors.black}; border-radius: 12px; box-shadow: ${shadowDir}3px 3px 0px ${colors.black}; font-size: 28px; font-weight: 700; color: ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; text-align: center;">
                                       ${firstLetter}
-                                    </div>
                                   </td>`;
                                 }
-                                return `<td style="padding: 0 3px;">
-                                  <div class="word-tile" style="width: 52px; height: 52px; background: #252548; border: 2px solid #3a3a60; border-radius: 10px; box-shadow: ${shadowDir}2px 2px 0px ${colors.black}; text-align: center; line-height: 48px; font-size: 20px; font-weight: 600; color: #6060a0; font-family: 'Fredoka', Arial, sans-serif;">
+                                return `<td class="word-tile tile-empty" width="56" height="56" align="center" valign="middle" style="width: 56px; height: 56px; background-color: ${bgTileEmpty}; border: 2px solid ${borderTileEmpty}; border-radius: 12px; box-shadow: ${shadowDir}2px 2px 0px #0a0a18; font-size: 22px; font-weight: 600; color: #55558a; font-family: 'Fredoka', Arial, sans-serif; text-align: center;">
                                     ?
-                                  </div>
                                 </td>`;
                               }).join('')}
                             </tr>
@@ -323,25 +373,27 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td align="center" dir="${dir}" style="padding-bottom: 28px;">
-                          <p style="color: ${colors.cyan}; font-size: 15px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
+                          <p class="question-text" style="color: ${colors.cyan}; font-size: 16px; text-align: center; margin: 0; font-weight: 600; direction: ${dir};">
                             ${strings.question}
                           </p>
                         </td>
                       </tr>
                     </table>
 
+                    <!-- ═══ ZONE 3: CTA ═══ -->
+
                     <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td align="center" style="padding-bottom: 20px;">
                           <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:54px;v-text-anchor:middle;width:260px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:56px;v-text-anchor:middle;width:280px;" arcsize="18%" stroke="t" strokecolor="${colors.black}" strokeweight="3px" fillcolor="#BFFF00">
                             <w:anchorlock/>
                             <center style="color:#000;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;">${playArrow} ${strings.cta}</center>
                           </v:roundrect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background: linear-gradient(180deg, #D4FF33 0%, ${colors.lime} 100%); color: ${colors.black}; font-size: 19px; font-weight: 700; text-decoration: none; padding: 16px 52px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px;">
+                          <a href="${playUrl}" target="_blank" class="cta-link" dir="${dir}" style="display: inline-block; background-color: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 700; text-decoration: none; padding: 18px 52px; border: 3px solid ${colors.black}; border-radius: 14px; box-shadow: ${shadowDir}5px 5px 0px ${colors.black}; font-family: 'Fredoka', Arial, sans-serif; direction: ${dir}; letter-spacing: 0.5px; min-width: 220px; text-align: center;">
                             ${playArrow}&nbsp;&nbsp;${strings.cta}
                           </a>
                           <!--<![endif]-->
@@ -349,17 +401,28 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
                       </tr>
                     </table>
 
-                    <!-- Urgency badge -->
+                    <!-- Urgency badge — solid colors, no rgba -->
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="center" dir="${dir}">
+                        <td align="center" dir="${dir}" style="padding-bottom: 12px;">
                           <table role="presentation" cellpadding="0" cellspacing="0">
                             <tr>
-                              <td class="urgency-badge" style="background: rgba(255, 20, 147, 0.1); border: 1px solid rgba(255, 20, 147, 0.3); border-radius: 16px; padding: 6px 16px; font-size: 12px; color: ${colors.pinkLight}; font-weight: 600; text-align: center; direction: ${dir};">
+                              <td class="urgency-badge" style="background-color: ${urgencyBg}; border: 1px solid ${urgencyBorder}; border-radius: 20px; padding: 8px 18px; font-size: 13px; color: ${colors.pinkLight}; font-weight: 600; text-align: center; direction: ${dir};">
                                 &#x23F0; ${strings.urgency}
                               </td>
                             </tr>
                           </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Social proof -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="center" dir="${dir}">
+                          <p class="social-proof" style="color: ${textSubtle}; font-size: 13px; margin: 0; font-weight: 400; text-align: center; direction: ${dir}; font-style: italic;">
+                            ${strings.comeBack}
+                          </p>
                         </td>
                       </tr>
                     </table>
@@ -370,25 +433,25 @@ export function generateReengagementEmailHtml(params: EmailTemplateParams): {
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Footer — bumped contrast for dark mode survival -->
           <tr>
             <td align="center" dir="${dir}" style="padding: 24px 0 8px;">
-              <p style="color: #3a3a58; font-size: 11px; margin: 0 0 8px 0; line-height: 1.6; direction: ${dir};">
+              <p style="color: ${textFooter}; font-size: 11px; margin: 0 0 8px 0; line-height: 1.6; direction: ${dir};">
                 ${strings.footerReason}
               </p>
-              <p style="color: #3a3a58; font-size: 11px; margin: 0; line-height: 1.6;">
-                <a href="${unsubscribeUrl}" target="_blank" style="color: #505070; text-decoration: underline;">${strings.unsubscribe}</a>
-                <span style="color: #2a2a40;">&nbsp;&middot;&nbsp;</span>
-                <a href="${playUrl}" target="_blank" style="color: #505070; text-decoration: underline;">LexiClash</a>
-                <span style="color: #2a2a40;">&nbsp;&middot;&nbsp;</span>
-                <a href="${privacyUrl}" target="_blank" style="color: #505070; text-decoration: underline;">${strings.privacy}</a>
+              <p style="color: ${textFooter}; font-size: 11px; margin: 0; line-height: 1.6;">
+                <a href="${unsubscribeUrl}" target="_blank" style="color: ${textMuted}; text-decoration: underline;">${strings.unsubscribe}</a>
+                <span style="color: #404060;">&nbsp;&middot;&nbsp;</span>
+                <a href="${playUrl}" target="_blank" style="color: ${textMuted}; text-decoration: underline;">LexiClash</a>
+                <span style="color: #404060;">&nbsp;&middot;&nbsp;</span>
+                <a href="${privacyUrl}" target="_blank" style="color: ${textMuted}; text-decoration: underline;">${strings.privacy}</a>
               </p>
             </td>
           </tr>
 
           <tr>
             <td align="center" style="padding: 4px 0 0;">
-              <span style="color: #222238; font-size: 10px;">&copy; ${currentYear} LexiClash</span>
+              <span style="color: #505070; font-size: 10px;">&copy; ${currentYear} LexiClash</span>
             </td>
           </tr>
 
@@ -416,6 +479,8 @@ ${strings.question}
 \u25B6 ${strings.cta}: ${playUrl}
 
 \u23F0 ${strings.urgency}
+
+${strings.comeBack}
 
 ---
 

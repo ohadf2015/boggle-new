@@ -167,17 +167,16 @@ const WorldNode = memo(function WorldNode({
   }), [isUnlocked, glowColor]);
 
   return (
-    <AdaptiveMotion.div
+    <div
       ref={nodeRef}
       className={cn(
         'relative w-full px-3 sm:px-6 lg:px-10',
         'flex items-center gap-2 sm:gap-4 lg:gap-6',
         isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
-        isLeft ? 'flex-row' : 'flex-row-reverse'
+        isLeft ? 'flex-row' : 'flex-row-reverse',
+        'world-node-entrance'
       )}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, type: 'spring', stiffness: 100, damping: 15 }}
+      style={{ '--entrance-delay': `${index * 0.08}s` } as React.CSSProperties}
     >
       {/* World orb with progress ring */}
       <div className="flex-shrink-0">
@@ -329,16 +328,18 @@ const WorldNode = memo(function WorldNode({
         </div>
       </div>
 
-      {/* World Info Card — redesigned with layered depth */}
-      <AdaptiveMotion.div
+      {/* World Info Card — CSS entrance instead of framer-motion spring */}
+      <div
         className={cn(
           'flex-shrink min-w-0 relative',
           'w-[160px] sm:w-[210px] lg:w-[240px]',
-          !isUnlocked && 'opacity-50'
+          !isUnlocked && 'opacity-50',
+          'world-card-entrance'
         )}
-        initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: index * 0.08 + 0.12, type: 'spring', stiffness: 120, damping: 18 }}
+        style={{
+          '--card-delay': `${index * 0.08 + 0.12}s`,
+          '--card-x': isLeft ? '-20px' : '20px',
+        } as React.CSSProperties}
       >
         {/* Card background with world-colored top accent bar */}
         <div className={cn(
@@ -426,8 +427,8 @@ const WorldNode = memo(function WorldNode({
             />
           )}
         </div>
-      </AdaptiveMotion.div>
-    </AdaptiveMotion.div>
+      </div>
+    </div>
   );
 });
 

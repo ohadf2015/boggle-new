@@ -311,18 +311,25 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   });
 
   // Victory / defeat sounds on results mount
-  const { playVictorySound, playDefeatSound } = useSoundEffects();
+  const { playVictorySound, playDefeatSound, playEpicVictorySound } = useSoundEffects();
   const hasFiredResultSoundRef = useRef(false);
   useEffect(() => {
     if (hasFiredResultSoundRef.current) return;
     if (sortedScores.length === 0) return;
     hasFiredResultSoundRef.current = true;
     if (isCurrentUserWinner) {
-      playVictorySound();
+      // Epic victory for decisive wins (2x+ the runner-up score)
+      const runnerUpScore = sortedScores[1]?.score ?? 0;
+      const winnerScore = sortedScores[0]?.score ?? 0;
+      if (runnerUpScore > 0 && winnerScore >= runnerUpScore * 2) {
+        playEpicVictorySound();
+      } else {
+        playVictorySound();
+      }
     } else {
       playDefeatSound();
     }
-  }, [sortedScores.length, isCurrentUserWinner, playVictorySound, playDefeatSound]);
+  }, [sortedScores.length, isCurrentUserWinner, playVictorySound, playDefeatSound, playEpicVictorySound]);
 
   // Word review card for classroom games (shared between mobile + desktop)
   const postGameWordReviewNode = lessonGameData ? (

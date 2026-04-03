@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { Gift, Sparkles, Coins, Crown, X, Award } from 'lucide-react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -28,6 +28,7 @@ interface GiftData {
   coin_amount: number;
   badge_id?: string | null;
   badge?: BadgeInfo | null;
+  claimed?: boolean;
   sender?: {
     username: string;
     display_name: string | null;
@@ -64,14 +65,14 @@ export function AdminGiftModal({
   className,
 }: AdminGiftModalProps) {
   const { t } = useLanguage();
-  const { isLowEnd, prefersReducedMotion, enableGlowEffects } = useDevicePerformance();
+  const { prefersReducedMotion, enableGlowEffects } = useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<{ kill: () => void } | null>(null);
   const [phase, setPhase] = useState<'entrance' | 'reveal' | 'ready' | 'claiming' | 'done'>('entrance');
   const [claiming, setClaiming] = useState(false);
-  // Track XP/coins at start to show before/after
-  const [startXp, setStartXp] = useState(currentXp);
-  const [startCoins, setStartCoins] = useState(currentCoins);
+  // Track XP/coins at start to show before/after — captured when modal opens
+  const startXpRef = useRef(currentXp);
+  const startCoinsRef = useRef(currentCoins);
 
   // Ref to always have latest onDismiss callback (prevents stale closure in setTimeout)
   const onDismissRef = useRef(onDismiss);
@@ -100,7 +101,7 @@ export function AdminGiftModal({
     legendary: { border: 'border-amber-400', bg: 'bg-gradient-to-br from-amber-500/30 to-orange-500/30', text: 'text-amber-300' },
   };
 
-  // GSAP Timeline Animation
+  // GSAP Timeline Animation — extracted to avoid try/catch value block issue
   useEffect(() => {
     if (!show || !gift) return;
 
@@ -113,7 +114,8 @@ export function AdminGiftModal({
     const container = containerRef.current;
     let ctx: { revert: () => void } | null = null;
 
-    import('gsap').then(({ default: gsap }) => {
+    const runAnimation = async () => {
+      const { default: gsap } = await import('gsap');
       if (!container.isConnected) return;
 
       ctx = gsap.context(() => {
@@ -179,7 +181,9 @@ export function AdminGiftModal({
         });
 
       }, container);
-    }); // end dynamic import
+    };
+
+    runAnimation();
 
     return () => {
       ctx?.revert();
@@ -189,17 +193,18 @@ export function AdminGiftModal({
     };
   }, [show, gift, prefersReducedMotion]);
 
-  // Reset phase when gift changes
-  useEffect(() => {
+  // Reset phase when gift changes — capture start values on open
+  const prevShow = useRef(show);
+  if (prevShow.current !== show) {
     if (!show) {
       setPhase('entrance');
       setClaiming(false);
     } else {
-      // Capture starting XP/coins when modal opens
-      setStartXp(currentXp);
-      setStartCoins(currentCoins);
+      startXpRef.current = currentXp;
+      startCoinsRef.current = currentCoins;
     }
-  }, [show, currentXp, currentCoins]);
+    prevShow.current = show;
+  }
 
   const handleClaim = async () => {
     if (!gift || claiming) return;
@@ -266,16 +271,17 @@ export function AdminGiftModal({
   };
 
   return (
-    <AnimatePresence>
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
       {show && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           {/* Backdrop */}
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -284,7 +290,7 @@ export function AdminGiftModal({
           />
 
           {/* Modal Content */}
-          <motion.div
+          <m.div
             ref={containerRef}
             className={cn(
               'relative w-full max-w-md',
@@ -332,14 +338,14 @@ export function AdminGiftModal({
             {/* Content */}
             <div className="relative p-6 text-center">
               {/* Header Line */}
-              <motion.div
+              <m.div
                 className="text-amber-400 text-sm font-medium mb-4 tracking-wide uppercase"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 {getHeaderLine()}
-              </motion.div>
+              </m.div>
 
               {/* Icon Container with Glow Ring */}
               <div className="gift-icon-container relative mx-auto w-24 h-24 mb-6">
@@ -405,9 +411,9 @@ export function AdminGiftModal({
                     )}
                   </div>
 
-                  {/* Before/After Balance Display */}
-                  {phase === 'done' ? (
-                    <motion.div
+                  {/* Before/After Balance Display (skip for already-claimed gifts) */}
+                  {gift.claimed ? null : phase === 'done' ? (
+                    <m.div
                       className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs"
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -416,28 +422,28 @@ export function AdminGiftModal({
                       {gift.xp_amount > 0 && (
                         <div className="text-purple-300/80">
                           <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
-                          <span className="font-bold">{(startXp + gift.xp_amount).toLocaleString()} XP</span>
+                          <span className="font-bold">{(startXpRef.current + gift.xp_amount).toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div className="text-amber-300/80">
                           <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
-                          <span className="font-bold">{(startCoins + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
+                          <span className="font-bold">{(startCoinsRef.current + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
-                    </motion.div>
+                    </m.div>
                   ) : (
                     <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/60">
                       {gift.xp_amount > 0 && (
                         <div>
                           <span>{t('gift.currentBalance')}:</span>{' '}
-                          <span className="font-mono">{startXp.toLocaleString()} XP</span>
+                          <span className="font-mono">{startXpRef.current.toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div>
                           <span>{t('gift.currentBalance')}:</span>{' '}
-                          <span className="font-mono">{startCoins.toLocaleString()} {t('gift.coins')}</span>
+                          <span className="font-mono">{startCoinsRef.current.toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
                     </div>
@@ -447,7 +453,7 @@ export function AdminGiftModal({
 
               {/* Badge Section */}
               {gift.badge && (
-                <motion.div
+                <m.div
                   className="gift-badge mb-6 p-4 bg-white/5 rounded-lg border border-white/10"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -489,12 +495,12 @@ export function AdminGiftModal({
                       </p>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Claim Button */}
               <Button
-                onClick={handleClaim}
+                onClick={gift.claimed ? onDismiss : handleClaim}
                 disabled={claiming || phase === 'done'}
                 className={cn(
                   'gift-claim-btn w-full py-6 text-lg font-bold',
@@ -504,12 +510,12 @@ export function AdminGiftModal({
                   'shadow-hard transition-all duration-200',
                   'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-                  phase === 'done' && 'bg-neo-lime from-neo-lime to-neo-lime'
+                  (phase === 'done' || gift.claimed) && 'bg-neo-lime from-neo-lime to-neo-lime'
                 )}
               >
                 {claiming ? (
                   <Loader size="sm" />
-                ) : phase === 'done' ? (
+                ) : phase === 'done' || gift.claimed ? (
                   <>
                     <Gift className="w-5 h-5 me-2" />
                     {t('gift.claimed')}
@@ -529,9 +535,10 @@ export function AdminGiftModal({
                 </p>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </LazyMotion>
   );
 }

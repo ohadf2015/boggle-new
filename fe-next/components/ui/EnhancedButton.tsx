@@ -21,15 +21,15 @@ const buttonVariants = cva(
   [
     // Base styles: Neo-Brutalist foundation
     'inline-flex items-center justify-center gap-2 whitespace-nowrap',
-    'text-sm font-bold uppercase tracking-wide',
-    'border-3 border-neo-black rounded-neo',
+    'text-sm font-semibold tracking-wide',
+    'border-2 border-neo-black rounded-neo',
     'shadow-hard',
     'transition-all duration-100',
     // Enhanced touch target - minimum 48px
     'min-h-[48px] min-w-[48px]',
-    // Press effect: translate to close shadow gap
-    'hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg',
-    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+    // Press effect: subtle translate to close shadow gap
+    'hover:translate-x-[-0.5px] hover:translate-y-[-0.5px] hover:shadow-hard-lg',
+    'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
     // Enhanced focus styling with visible ring
     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy',
     // Disabled state

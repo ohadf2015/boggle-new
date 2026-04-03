@@ -139,14 +139,6 @@ export function useGridInteraction({
     });
   }, [gridRef]);
 
-  // Sync drag ref to React state (called on drag end)
-  const syncDragToState = useCallback(() => {
-    const cells = dragSelectionRef.current;
-    if (cells.length > 0) {
-      setSelectedCells([...cells]);
-    }
-    clearAllDragClasses();
-  }, [setSelectedCells, clearAllDragClasses]);
 
   useEffect(() => {
     const lastCell = selectedCells[selectedCells.length - 1];

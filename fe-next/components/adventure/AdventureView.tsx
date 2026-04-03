@@ -70,7 +70,7 @@ function AdventureView(): React.JSX.Element {
     selectedWorld, selectedLevel, setSelectedLevel,
     navigateToWorldMap, selectWorld, selectLevel,
     historyBack,
-  } = useAdventureHistory(hasCompletions ? 'worldMap' : 'levelGrid', hasCompletions ? null : 1);
+  } = useAdventureHistory('worldMap', null);
 
   useEffect(() => { stopGlobalMusic(500); }, [stopGlobalMusic]);
 
@@ -180,14 +180,12 @@ function AdventureView(): React.JSX.Element {
   ) => {
     // Find the longest word from the game session
     const longestWord = wordList?.reduce((a, b) => b.length > a.length ? b : a, '') ?? '';
-    try {
-      await fetch('/api/adventure/weekly-challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ score, wordsFound, longestWord, playerName: userId ? 'Player' : 'Guest' }),
-      });
-    } catch { /* Fire and forget */ }
+    await fetch('/api/adventure/weekly-challenge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ score, wordsFound, longestWord, playerName: userId ? 'Player' : 'Guest' }),
+    }).catch(() => { /* Fire and forget */ });
     setViewState('worldMap');
     setShowWeeklyChallenge(true);
   }, [userId, setViewState]);

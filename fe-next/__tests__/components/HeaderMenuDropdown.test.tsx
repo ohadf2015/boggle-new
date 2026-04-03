@@ -5,6 +5,24 @@ import HeaderMenuDropdown from '@/components/HeaderMenuDropdown';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+// Mock framer-motion (m + LazyMotion API)
+vi.mock('framer-motion', () => {
+  const strip = (props: Record<string, unknown>) => {
+    const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
+    return rest;
+  };
+  const motion = {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...strip(props)}>{children}</div>,
+    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <span {...strip(props)}>{children}</span>,
+    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...strip(props)}>{children}</button>,
+    nav: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <nav {...strip(props)}>{children}</nav>,
+    ul: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <ul {...strip(props)}>{children}</ul>,
+    li: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <li {...strip(props)}>{children}</li>,
+    a: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <a {...strip(props)}>{children}</a>,
+  };
+  return { motion, m: motion, AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>, LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>, domAnimation: {} };
+});
+
 // Mock contexts
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');

@@ -257,7 +257,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     <div className={cn(
       'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
       gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
-    )} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    )}>
 
 
       {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}

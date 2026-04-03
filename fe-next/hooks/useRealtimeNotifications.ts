@@ -37,6 +37,8 @@ interface UseRealtimeNotificationsReturn {
   markAsRead: (notificationId: string) => Promise<void>;
   /** Mark all notifications as read */
   markAllAsRead: () => Promise<void>;
+  /** Dismiss a notification (mark read + remove from local list) */
+  dismissNotification: (notificationId: string) => Promise<void>;
   /** Clear the latest notification (after toast is dismissed) */
   clearLatestNotification: () => void;
   /** Refresh notifications from server */
@@ -202,6 +204,13 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     }
   }, []);
 
+  // Dismiss a notification — mark as read and remove from local list
+  const dismissNotification = useCallback(async (notificationId: string) => {
+    await markNotificationRead(notificationId);
+    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+  }, []);
+
   // Clear the latest notification (called after toast auto-dismisses)
   const clearLatestNotification = useCallback(() => {
     setLatestNotification(null);
@@ -215,6 +224,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     latestNotification,
     markAsRead,
     markAllAsRead,
+    dismissNotification,
     clearLatestNotification,
     refresh,
   };

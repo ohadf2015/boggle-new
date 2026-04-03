@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
@@ -15,7 +15,9 @@ import {
 
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signInWithMagicLink } from '../../lib/supabase';
+import { signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { isNative } from '../../utils/platform';
 import { validateEmail } from '../../utils/validation';
 import { cn } from '../../lib/utils';
 
@@ -48,33 +50,22 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
+
+  const { signIn: oauthSignIn } = useOAuthSignIn({
+    onError: (msg) => setError(msg),
+    onSuccess: () => onClose(),
+  });
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
-
-    try {
-      let result;
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'discord':
-          result = await signInWithDiscord();
-          break;
-        default:
-          throw new Error('Unknown provider');
-      }
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-      // OAuth will redirect, so no need to close modal
-    } catch (err) {
-      setError((err as Error).message || 'An error occurred');
-      setIsLoading(null);
-    }
+    await oauthSignIn(provider);
   };
 
   const handleEmailChange = (value: string) => {
@@ -87,7 +78,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     }
   };
 
-  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const emailValidation = validateEmail(email);
@@ -101,11 +92,31 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     setEmailError(null);
 
     try {
-      const result = await signInWithMagicLink(email);
-      if (result.error) {
-        setError(result.error.message);
+      if (showOtpFlow && otpSent) {
+        // Verify OTP code
+        const result = await verifyOtpCode(email, otpCode);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          onClose();
+        }
+      } else if (showOtpFlow) {
+        // Send OTP code
+        const result = await sendOtpCode(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setOtpSent(true);
+          setSuccess(t('auth.otp.codeSent'));
+        }
       } else {
-        setSuccess(t('auth.magicLink.checkEmail'));
+        // Web: magic link
+        const result = await signInWithMagicLink(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setSuccess(t('auth.magicLink.checkEmail'));
+        }
       }
       setIsLoading(null);
     } catch (err) {
@@ -190,7 +201,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                 </Button>
               </motion.div>
 
-              {/* Magic Link Form */}
+              {/* Email Form (OTP on native, magic link on web) */}
               {!showEmailForm ? (
                 <button
                   onClick={() => setShowEmailForm(true)}
@@ -203,7 +214,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                 <motion.form
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  onSubmit={handleMagicLinkSubmit}
+                  onSubmit={handleEmailSubmit}
                   className="mb-4 space-y-3"
                 >
                   <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -223,16 +234,33 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                         "w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
                         emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                       )}
-                      disabled={isLoading !== null}
+                      disabled={isLoading !== null || otpSent}
                     />
                     {emailError && (
                       <p className="mt-1 text-xs text-red-400">{emailError}</p>
                     )}
                   </div>
 
+                  {/* OTP code input (native only, after code sent) */}
+                  {showOtpFlow && otpSent && (
+                    <div>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={6}
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder={t('auth.otp.enterCode')}
+                        className="w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                        disabled={isLoading !== null}
+                      />
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
-                    disabled={isLoading !== null || !email || !!emailError}
+                    disabled={isLoading !== null || !email || !!emailError || (otpSent && otpCode.length < 6)}
                     className="w-full h-12 bg-cyan-500 text-white hover:bg-cyan-600 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
                     asChild={false}
                   >
@@ -241,7 +269,13 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                     ) : (
                       <>
                         <Wand2 className="w-4 h-4" />
-                        <span>{t('auth.magicLink.sendLink')}</span>
+                        <span>
+                          {otpSent
+                            ? t('auth.otp.verify')
+                            : showOtpFlow
+                              ? t('auth.otp.sendCode')
+                              : t('auth.magicLink.sendLink')}
+                        </span>
                       </>
                     )}
                   </Button>

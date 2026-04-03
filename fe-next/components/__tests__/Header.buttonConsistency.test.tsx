@@ -11,6 +11,14 @@ vi.mock('framer-motion', () => ({
         div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     },
     AnimatePresence: ({ children }: any) => <>{children}</>,
+    LazyMotion: ({ children }: any) => <>{children}</>,
+    domAnimation: {},
+    m: {
+        button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+        div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+        span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+        nav: ({ children, ...props }: any) => <nav {...props}>{children}</nav>,
+    },
 }));
 
 // Mock MusicControls and AuthButton

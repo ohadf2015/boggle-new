@@ -46,13 +46,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         <header
             className={cn(
                 "w-full mb-1 sm:mb-2 lg:mb-3 pb-1 lg:pb-2",
-                "sticky top-0 lg:static",
+                "sticky lg:static",
                 "z-[60] bg-slate-50 dark:bg-slate-900",
                 "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
                 className
             )}
             style={{
-                paddingTop: safeArea.top > 0 ? `${safeArea.top + 8}px` : undefined,
+                top: safeArea.top > 0 ? `${safeArea.top}px` : 0,
             }}
         >
             {/* NEO-BRUTALIST Header Bar */}

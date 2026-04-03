@@ -43,7 +43,7 @@ export const GameLayout = memo(function GameLayout({
         'flex flex-col',
         'overflow-hidden',
         'relative',
-        'pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]',
+        'pb-[env(safe-area-inset-bottom)]',
         className
       )}
     >

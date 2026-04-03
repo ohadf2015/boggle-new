@@ -5,10 +5,12 @@
  * Dropdown list showing recent notifications
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { NotificationItem } from './NotificationItem';
 import type { NotificationDropdownProps } from './types';
+
+const MAX_VISIBLE = 3;
 
 export function NotificationDropdown({
   isOpen,
@@ -18,9 +20,21 @@ export function NotificationDropdown({
   onMarkAsRead,
   onMarkAllAsRead,
   onNotificationClick,
+  onDismiss,
 }: NotificationDropdownProps) {
   const { t } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  // Reset expanded state when dropdown closes — derived from prop change
+  const prevIsOpen = useRef(isOpen);
+  if (prevIsOpen.current && !isOpen) {
+    setShowAll(false);
+  }
+  prevIsOpen.current = isOpen;
+
+  const visibleNotifications = showAll ? notifications : notifications.slice(0, MAX_VISIBLE);
+  const hasMore = notifications.length > MAX_VISIBLE;
 
   // Close on click outside
   useEffect(() => {
@@ -92,28 +106,29 @@ export function NotificationDropdown({
             </p>
           </div>
         ) : (
-          notifications.map((notification) => (
+          visibleNotifications.map((notification) => (
             <NotificationItem
               key={notification.id}
               notification={notification}
               onClick={() => onNotificationClick(notification)}
               onMarkAsRead={() => onMarkAsRead(notification.id)}
+              onDismiss={() => onDismiss(notification.id)}
             />
           ))
         )}
       </div>
 
       {/* Footer */}
-      {notifications.length > 0 && (
+      {hasMore && !showAll && (
         <div className="px-4 py-2 border-t-2 border-black/20 bg-neo-navy/50">
           <button
-            onClick={onClose}
+            onClick={() => setShowAll(true)}
             className="
-              w-full text-center text-xs text-neo-white/60
-              hover:text-neo-cyan transition-colors
+              w-full text-center text-xs text-neo-cyan
+              hover:text-neo-yellow transition-colors font-medium
             "
           >
-            {t('notifications.viewAll')}
+            {t('notifications.viewAll')} ({notifications.length - MAX_VISIBLE} {t('notifications.more', 'more')})
           </button>
         </div>
       )}

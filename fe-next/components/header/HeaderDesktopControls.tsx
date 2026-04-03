@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import HeaderMenuDropdown from '../HeaderMenuDropdown';
 import AuthButton from '../auth/AuthButton';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
+import MusicControls from '../MusicControls';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 
 interface HeaderDesktopControlsProps {
@@ -33,6 +34,9 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ unclaimedCount
                     <span className="text-xs font-black text-neo-orange">{engagementStatus.streak}</span>
                 </Link>
             )}
+
+            {/* Sound controls */}
+            <MusicControls />
 
             {/* Language switcher — always visible */}
             <QuickLanguageSwitcher compact />

@@ -71,18 +71,18 @@
   --neo-cream: #FFFEF0;
   --neo-black: 0 0 0;
   --neo-white: 255 255 255;
-  --neo-gray: #2d2d44;
+  --neo-gray: #32324d;
 
-  /* Hard Shadow Offsets (NO BLUR) */
-  --shadow-sm: 2px 2px 0px rgb(var(--neo-black));
-  --shadow-md: 4px 4px 0px rgb(var(--neo-black));
-  --shadow-lg: 6px 6px 0px rgb(var(--neo-black));
-  --shadow-xl: 8px 8px 0px rgb(var(--neo-black));
-  --shadow-pressed: 2px 2px 0px rgb(var(--neo-black));
+  /* Hard Shadow Offsets (NO BLUR) — cleaned-up: smaller offsets for a lighter feel */
+  --shadow-sm: 1px 1px 0px rgb(var(--neo-black));
+  --shadow-md: 2px 2px 0px rgb(var(--neo-black));
+  --shadow-lg: 3px 3px 0px rgb(var(--neo-black));
+  --shadow-xl: 5px 5px 0px rgb(var(--neo-black));
+  --shadow-pressed: 1px 1px 0px rgb(var(--neo-black));
 
-  /* Border Widths */
-  --border-neo: 3px;
-  --border-neo-thick: 4px;
+  /* Border Widths — cleaned-up: thinner borders for lighter feel */
+  --border-neo: 2px;
+  --border-neo-thick: 3px;
 
   /* Mobile Layout Variables */
   /* Tab bar height calculation:
@@ -109,14 +109,14 @@
   --duration-snap: 100ms;
   --duration-quick: 150ms;
 
-  /* Halftone Pattern (SVG-based) - white dots for dark backgrounds - very subtle */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23FFFFFF' fill-opacity='0.015'/%3E%3C/svg%3E");
-  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.015'/%3E%3C/svg%3E");
+  /* Halftone Pattern (SVG-based) - white dots for dark backgrounds - nearly invisible for cleaner look */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
+  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
 
-  /* Retro Grid Pattern for backgrounds - very subtle */
+  /* Retro Grid Pattern for backgrounds - nearly invisible for cleaner look */
   --retro-grid-pattern:
-    linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.012) 1px, transparent 1px);
 
   /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
   --background: var(--neo-navy);
@@ -139,11 +139,11 @@
   --input: var(--neo-navy-light);
   --ring: var(--neo-cyan);
 
-  /* Border Radius - Chunky Neo-Brutalist */
-  --radius: 4px;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
+  /* Border Radius — cleaned-up: softer corners for modern feel */
+  --radius: 8px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 
   /* Avatar Color Palette */
   --avatar-1: #FF6B6B;
@@ -300,11 +300,11 @@
 
 /* RTL Hard Shadow Offsets */
 [dir="rtl"] {
-  --shadow-sm: -2px 2px 0px rgb(var(--neo-black));
-  --shadow-md: -4px 4px 0px rgb(var(--neo-black));
-  --shadow-lg: -6px 6px 0px rgb(var(--neo-black));
-  --shadow-xl: -8px 8px 0px rgb(var(--neo-black));
-  --shadow-pressed: -2px 2px 0px rgb(var(--neo-black));
+  --shadow-sm: -1px 1px 0px rgb(var(--neo-black));
+  --shadow-md: -2px 2px 0px rgb(var(--neo-black));
+  --shadow-lg: -3px 3px 0px rgb(var(--neo-black));
+  --shadow-xl: -5px 5px 0px rgb(var(--neo-black));
+  --shadow-pressed: -1px 1px 0px rgb(var(--neo-black));
 }
 
 /* Light Mode Variables */
@@ -514,24 +514,24 @@ body {
 
   /* RTL-aware hard shadows */
   [dir="rtl"] .shadow-hard-sm {
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
+    box-shadow: -1px 1px 0px rgb(var(--neo-black));
   }
 
   [dir="rtl"] .shadow-hard,
   [dir="rtl"] .shadow-hard-md {
-    box-shadow: -4px 4px 0px rgb(var(--neo-black));
+    box-shadow: -2px 2px 0px rgb(var(--neo-black));
   }
 
   [dir="rtl"] .shadow-hard-lg {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
+    box-shadow: -3px 3px 0px rgb(var(--neo-black));
   }
 
   [dir="rtl"] .shadow-hard-xl {
-    box-shadow: -8px 8px 0px rgb(var(--neo-black));
+    box-shadow: -5px 5px 0px rgb(var(--neo-black));
   }
 
   [dir="rtl"] .shadow-hard-pressed {
-    box-shadow: -2px 2px 0px rgb(var(--neo-black));
+    box-shadow: -1px 1px 0px rgb(var(--neo-black));
   }
 
   /* Neo-Brutalist Border */
@@ -2335,6 +2335,9 @@ html {
   /* Prevent elastic overscroll bounce — lets pull-to-refresh work
      without needing preventDefault() to block native scroll */
   overscroll-behavior-y: contain;
+  /* Push content below device status bar on native (notch/Dynamic Island).
+     Uses the combined safe area var set by Capacitor plugin + CSS env() fallback. */
+  padding-top: var(--combined-safe-area-top, env(safe-area-inset-top, 0px));
 }
 
 /* Full-screen flex container - LOCKED (no scroll) */
@@ -2345,6 +2348,7 @@ html {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-top: var(--combined-safe-area-top, env(safe-area-inset-top, 0px));
 }
 
 /* Scrollable content area - fills remaining space */

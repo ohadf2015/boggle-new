@@ -35,12 +35,14 @@ export interface NotificationDropdownProps {
   onMarkAsRead: (id: string) => void;
   onMarkAllAsRead: () => void;
   onNotificationClick: (notification: NotificationData) => void;
+  onDismiss: (id: string) => void;
 }
 
 export interface NotificationItemProps {
   notification: NotificationData;
   onClick: () => void;
   onMarkAsRead: () => void;
+  onDismiss: () => void;
 }
 
 export interface NotificationToastProps {

@@ -52,7 +52,12 @@ export function useBlastEngineSounds(events: BlastSoundEvents): void {
   // ─── Combo sounds ──────────────────────────────────────────────
   useEffect(() => {
     if (events.comboLevel > prevCombo.current && events.comboLevel >= 2) {
-      sfx.playComboSound?.(events.comboLevel);
+      // Ultra combo at 10+ — legendary sound!
+      if (events.comboLevel >= 10 && prevCombo.current < 10) {
+        sfx.playUltraComboSound?.();
+      } else {
+        sfx.playComboSound?.(events.comboLevel);
+      }
 
       // Milestone sounds at 5, 10, 15
       if (events.comboLevel % 5 === 0) {
@@ -65,8 +70,12 @@ export function useBlastEngineSounds(events: BlastSoundEvents): void {
   // ─── Cascade chain sounds ──────────────────────────────────────
   useEffect(() => {
     if (events.cascadeLevel > prevCascade.current && events.cascadeLevel >= 1) {
-      // Each cascade step gets a combo sound with increasing pitch
-      sfx.playComboSound?.(events.cascadeLevel);
+      // Mega cascade at 5+ chain — legendary sound!
+      if (events.cascadeLevel >= 5) {
+        sfx.playMegaCascadeSound?.();
+      } else {
+        sfx.playComboSound?.(events.cascadeLevel);
+      }
     }
     prevCascade.current = events.cascadeLevel;
   }, [events.cascadeLevel, sfx]);

@@ -31,17 +31,21 @@ export const StreakBar: React.FC = memo(() => {
   const reducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const { playStreakMilestoneSound } = useSoundEffects();
+  const { playStreakMilestoneSound, playStreakLegendarySound } = useSoundEffects();
   const prevStreakRef = useRef<number | null>(null);
   useEffect(() => {
     const prev = prevStreakRef.current;
     const curr = status.streak;
     if (prev !== null && curr > prev) {
       const hitMilestone = STREAK_MILESTONES.some(m => curr >= m && prev < m);
-      if (hitMilestone) playStreakMilestoneSound();
+      if (hitMilestone) {
+        // Legendary sound for 7+ day streaks, regular for smaller milestones
+        if (curr >= 7) playStreakLegendarySound();
+        else playStreakMilestoneSound();
+      }
     }
     prevStreakRef.current = curr;
-  }, [status.streak, playStreakMilestoneSound]);
+  }, [status.streak, playStreakMilestoneSound, playStreakLegendarySound]);
 
   // Always return null on server & first client render to avoid hydration mismatch
   if (!mounted) return null;

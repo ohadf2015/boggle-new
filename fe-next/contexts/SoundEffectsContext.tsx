@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
 import type { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
@@ -8,72 +8,9 @@ import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY, ensureHowl } from '@/lib/audio/audioLoader';
 import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
-
-interface SoundEffectOptions {
-  volume?: number;
-  rate?: number;
-  /** If false, sound plays even when game is not active (e.g., for achievements, chat) */
-  requiresGameActive?: boolean;
-}
-
-interface SoundEffectsContextType {
-  sfxVolume: number;
-  sfxMuted: boolean;
-  isGameActive: boolean;
-  setSfxVolume: (volume: number) => void;
-  toggleSfxMute: () => void;
-  setGameActive: (active: boolean) => void;
-  playSound: (soundKey: keyof typeof SOUND_EFFECTS, options?: SoundEffectOptions) => void;
-  playComboSound: (comboLevel: number) => void;
-  playAchievementSound: () => void;
-  playWordAcceptedSound: () => void;
-  playCountdownBeep: (secondsRemaining: number) => void;
-  playMessageSound: () => void;
-  playErrorSound: () => void;
-  // Combo feedback sounds
-  playComboMilestoneSound: (milestoneLevel: number) => void;
-  playComboBreakSound: (lostLevel: number) => void;
-  playComboSavedSound: () => void;
-  // Earthquake/Fire Round sounds
-  playEarthquakeRumble: () => void;
-  playEarthquakeShake: () => void;
-  playFireRoundStart: () => void;
-  startFireCrackleLoop: () => void;
-  stopFireCrackleLoop: () => void;
-  // New game event sounds
-  playWordRejectedSound: () => void;
-  playVictorySound: () => void;
-  playDefeatSound: () => void;
-  playLevelUpSound: () => void;
-  playLevelUpModalSound: () => void;
-  playPowerUpSound: () => void;
-  playBossHitSound: () => void;
-  playBossPhaseChangeSound: () => void;
-  playBossEntranceSound: () => void;
-  playBossDefeatSound: () => void;
-  playBlastBombSound: () => void;
-  playBlastLightningSound: () => void;
-  playBlastPrismSound: () => void;
-  playMatchFoundSound: () => void;
-  playStreakMilestoneSound: () => void;
-  playTierPromotionSound: () => void;
-  playTileSelectSound: () => void;
-  playRoundStartSound: () => void;
-  playTimesUpSound: () => void;
-  // New ElevenLabs-generated sound functions
-  playCoinCollectSound: () => void;
-  playButtonClickSound: () => void;
-  playChestOpenSound: () => void;
-  playQuestCompleteSound: () => void;
-  playBoardShuffleSound: () => void;
-  playUpgradePurchaseSound: () => void;
-  playHintRevealSound: () => void;
-  playDailyRewardSound: () => void;
-  playTimerUrgentSound: () => void;
-  playStreakFireSound: () => void;
-  playScreenTransitionSound: () => void;
-  playLongWordBonusSound: () => void;
-}
+import { pickVariant, SOUND_VARIATIONS } from '@/lib/audio/soundVariations';
+import { SOUND_EFFECTS, SOUND_PRIORITIES, type SoundEffectOptions, type SoundEffectsContextType } from '@/lib/audio/soundEffectsConfig';
+import { useSoundPlayFunctions } from '@/hooks/useSoundPlayFunctions';
 
 interface SfxSettings {
   volume: number;
@@ -81,108 +18,6 @@ interface SfxSettings {
 }
 
 const SoundEffectsContext = createContext<SoundEffectsContextType | null>(null);
-
-// Sound effect definitions
-const SOUND_EFFECTS = {
-  achievement: '/sounds/achievment.mp3',
-  combo: '/sounds/combo.wav',
-  wordAccepted: '/sounds/word-accepted.wav',
-  countdownBeep: '/sounds/countdown-beep.wav',
-  message: '/sounds/message.mp3',
-  // Combo feedback sounds (user will provide custom files)
-  comboMilestone: '/sounds/combo-milestone.mp3',
-  comboBreak: '/sounds/combo-break.mp3',
-  comboSaved: '/sounds/combo-saved.mp3',
-  // Earthquake/Fire Round sounds (user will provide custom files)
-  earthquakeRumble: '/sounds/earthquake-rumble.wav',
-  earthquakeShake: '/sounds/earthquake-shake.wav',
-  fireRoundStart: '/sounds/fire-round-start.wav',
-  fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
-  // New game event sounds
-  wordRejected: '/sounds/word-rejected.mp3',
-  victoryFanfare: '/sounds/victory-fanfare.mp3',
-  defeatSting: '/sounds/defeat-sting.mp3',
-  levelUp: '/sounds/level-up.mp3',
-  levelUpModal: '/sounds/level-up-modal.mp3',
-  powerUp: '/sounds/power-up.mp3',
-  bossHit: '/sounds/boss-hit.mp3',
-  bossPhaseChange: '/sounds/boss-phase-change.mp3',
-  bossEntrance: '/sounds/boss-entrance.mp3',
-  bossDefeat: '/sounds/boss-defeat.mp3',
-  blastBomb: '/sounds/blast-bomb.mp3',
-  blastLightning: '/sounds/blast-lightning.mp3',
-  blastPrism: '/sounds/blast-prism.mp3',
-  matchFound: '/sounds/match-found.mp3',
-  streakMilestone: '/sounds/streak-milestone.mp3',
-  tierPromotion: '/sounds/tier-promotion.mp3',
-  tileSelect: '/sounds/tile-select.mp3',
-  // New ElevenLabs-generated sounds
-  coinCollect: '/sounds/coin-collect.mp3',
-  buttonClick: '/sounds/button-click.mp3',
-  chestOpen: '/sounds/chest-open.mp3',
-  questComplete: '/sounds/quest-complete.mp3',
-  boardShuffle: '/sounds/board-shuffle.mp3',
-  upgradePurchase: '/sounds/upgrade-purchase.mp3',
-  hintReveal: '/sounds/hint-reveal.mp3',
-  dailyReward: '/sounds/daily-reward.mp3',
-  timerUrgent: '/sounds/timer-urgent.mp3',
-  streakFire: '/sounds/streak-fire.mp3',
-  screenTransition: '/sounds/screen-transition.mp3',
-  longWordBonus: '/sounds/long-word-bonus.mp3',
-  roundStart: '/sounds/round-start.mp3',
-} as const;
-
-// Sound effect priority levels for progressive loading
-const SOUND_PRIORITIES: Record<keyof typeof SOUND_EFFECTS, AUDIO_LOAD_PRIORITY> = {
-  // Critical - load on first user interaction
-  wordAccepted: AUDIO_LOAD_PRIORITY.CRITICAL,
-  comboBreak: AUDIO_LOAD_PRIORITY.CRITICAL,
-  // High - load during idle time
-  combo: AUDIO_LOAD_PRIORITY.HIGH,
-  countdownBeep: AUDIO_LOAD_PRIORITY.HIGH,
-  comboMilestone: AUDIO_LOAD_PRIORITY.HIGH,
-  // Normal - load on-demand
-  message: AUDIO_LOAD_PRIORITY.NORMAL,
-  comboSaved: AUDIO_LOAD_PRIORITY.NORMAL,
-  // Low - rare, load only when needed
-  achievement: AUDIO_LOAD_PRIORITY.LOW,
-  earthquakeRumble: AUDIO_LOAD_PRIORITY.LOW,
-  earthquakeShake: AUDIO_LOAD_PRIORITY.LOW,
-  fireRoundStart: AUDIO_LOAD_PRIORITY.LOW,
-  fireCrackleLoop: AUDIO_LOAD_PRIORITY.LOW,
-  // New game event sounds
-  wordRejected: AUDIO_LOAD_PRIORITY.HIGH,
-  victoryFanfare: AUDIO_LOAD_PRIORITY.NORMAL,
-  defeatSting: AUDIO_LOAD_PRIORITY.NORMAL,
-  levelUp: AUDIO_LOAD_PRIORITY.NORMAL,
-  levelUpModal: AUDIO_LOAD_PRIORITY.LOW,
-  powerUp: AUDIO_LOAD_PRIORITY.NORMAL,
-  bossHit: AUDIO_LOAD_PRIORITY.NORMAL,
-  bossPhaseChange: AUDIO_LOAD_PRIORITY.LOW,
-  bossEntrance: AUDIO_LOAD_PRIORITY.LOW,
-  bossDefeat: AUDIO_LOAD_PRIORITY.LOW,
-  blastBomb: AUDIO_LOAD_PRIORITY.NORMAL,
-  blastLightning: AUDIO_LOAD_PRIORITY.NORMAL,
-  blastPrism: AUDIO_LOAD_PRIORITY.NORMAL,
-  matchFound: AUDIO_LOAD_PRIORITY.NORMAL,
-  streakMilestone: AUDIO_LOAD_PRIORITY.LOW,
-  tierPromotion: AUDIO_LOAD_PRIORITY.LOW,
-  tileSelect: AUDIO_LOAD_PRIORITY.CRITICAL,
-  // New ElevenLabs-generated sounds
-  coinCollect: AUDIO_LOAD_PRIORITY.NORMAL,
-  buttonClick: AUDIO_LOAD_PRIORITY.HIGH,
-  chestOpen: AUDIO_LOAD_PRIORITY.LOW,
-  questComplete: AUDIO_LOAD_PRIORITY.LOW,
-  boardShuffle: AUDIO_LOAD_PRIORITY.NORMAL,
-  upgradePurchase: AUDIO_LOAD_PRIORITY.LOW,
-  hintReveal: AUDIO_LOAD_PRIORITY.NORMAL,
-  dailyReward: AUDIO_LOAD_PRIORITY.LOW,
-  timerUrgent: AUDIO_LOAD_PRIORITY.NORMAL,
-  streakFire: AUDIO_LOAD_PRIORITY.LOW,
-  screenTransition: AUDIO_LOAD_PRIORITY.NORMAL,
-  longWordBonus: AUDIO_LOAD_PRIORITY.NORMAL,
-  roundStart: AUDIO_LOAD_PRIORITY.NORMAL,
-};
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
 const DEFAULT_SFX_SETTINGS: SfxSettings = { volume: 0.7, muted: false };
@@ -332,6 +167,16 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
         });
       });
 
+      // Pre-create lazy Howls for all variation files so they're ready when picked
+      Object.values(SOUND_VARIATIONS).forEach(variants => {
+        variants.forEach(src => {
+          const varKey = `_var_${src}`;
+          if (!soundsRef.current[varKey]) {
+            soundsRef.current[varKey] = createLazyHowl(src, { volume: 0.6 });
+          }
+        });
+      });
+
       soundsLoadedRef.current = true;
     }).catch(() => {});
 
@@ -355,7 +200,24 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const requiresGameActive = options.requiresGameActive !== false;
     if (requiresGameActive && !isGameActiveRef.current) return;
 
-    const howl = soundsRef.current[soundKey];
+    // Check for sound variations — pick a random variant if available
+    const baseSrc = SOUND_EFFECTS[soundKey];
+    const chosenSrc = pickVariant(soundKey, baseSrc);
+    const isVariant = chosenSrc !== baseSrc;
+
+    // Use a variation Howl on-the-fly, or the base Howl
+    let howl: Howl;
+    if (isVariant) {
+      // Lazily create/cache variation Howls using the same ref map
+      const varKey = `_var_${chosenSrc}`;
+      if (!soundsRef.current[varKey]) {
+        soundsRef.current[varKey] = createLazyHowl(chosenSrc, { volume: 0.6 });
+      }
+      howl = soundsRef.current[varKey];
+    } else {
+      howl = soundsRef.current[soundKey];
+    }
+
     if (!howl) {
       logger.warn(`[SFX] Sound not found: ${soundKey}`);
       return;
@@ -363,7 +225,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
     // Preload on-demand if not loaded - wait for loading to complete
     if (howl.state() === 'unloaded') {
-      logger.log(`[SFX] Preloading sound on demand: ${soundKey}`);
+      logger.log(`[SFX] Preloading sound on demand: ${isVariant ? chosenSrc : soundKey}`);
       try {
         await preloadAudioOnDemand(howl);
       } catch (err) {
@@ -411,102 +273,21 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     haptics.tap();
   }, [audioUnlocked, sfxMuted, playSound]);
 
-  // Play achievement unlock sound with haptic feedback
-  // Achievements can trigger on results screen, so don't require game active
-  const playAchievementSound = useCallback(() => {
-    playSound('achievement', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Play word accepted sound
-  const playWordAcceptedSound = useCallback(() => {
-    playSound('wordAccepted', { volume: 0.4 });
-  }, [playSound]);
-
   // Play countdown beep with increasing pitch (10→1 seconds remaining)
-  // Smooth linear ramp: rate 0.7→1.4, volume 0.3→0.9
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
     const params = getCountdownBeepParams(secondsRemaining);
     if (!params) return;
-
     playSound('countdownBeep', { rate: params.rate, volume: params.volume });
   }, [audioUnlocked, sfxMuted, playSound]);
 
-  // Play chat message notification sound
-  // Chat works throughout the app, so don't require game active
-  const playMessageSound = useCallback(() => {
-    playSound('message', { volume: 0.5, requiresGameActive: false });
-  }, [playSound]);
-
-  // Play error sound for invalid actions
-  const playErrorSound = useCallback(() => {
-    playSound('comboBreak', { volume: 0.4 });
-  }, [playSound]);
-
-  // ==================== Combo Feedback Sounds ====================
-
-  /**
-   * Play milestone celebration sound for combo 5, 10, 15
-   * Higher milestones get slightly louder and higher pitched
-   */
-  const playComboMilestoneSound = useCallback((milestoneLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    // Pitch and volume increase with milestone level
-    const pitchMap: Record<number, number> = { 5: 1.0, 10: 1.1, 15: 1.2 };
-    const volumeMap: Record<number, number> = { 5: 0.7, 10: 0.8, 15: 0.9 };
-
-    const rate = pitchMap[milestoneLevel] || 1.0;
-    const volume = volumeMap[milestoneLevel] || 0.7;
-
-    playSound('comboMilestone', { rate, volume });
-    // Milestone also triggers a celebratory haptic
-    haptics.success();
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  /**
-   * Play combo break sound when combo is lost
-   * Louder for higher combos that were lost (more impactful loss)
-   */
-  const playComboBreakSound = useCallback((lostLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    // Volume scales with lost combo level (losing a big combo is more impactful)
-    // But capped to not be too harsh
-    const volume = Math.min(0.3 + (lostLevel * 0.04), 0.6);
-
-    playSound('comboBreak', { volume });
-    haptics.error();
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  /**
-   * Play combo saved sound when player narrowly avoids losing combo
-   */
-  const playComboSavedSound = useCallback(() => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    playSound('comboSaved', { volume: 0.5 });
-    haptics.success();
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  // Earthquake/Fire Round sound effects
-
-  // Play earthquake rumble (warning phase - 2 seconds)
-  const playEarthquakeRumble = useCallback(() => {
-    playSound('earthquakeRumble', { volume: 0.7 });
-  }, [playSound]);
-
-  // Play earthquake shake (shake phase - 1 second)
-  const playEarthquakeShake = useCallback(() => {
-    playSound('earthquakeShake', { volume: 0.8 });
-  }, [playSound]);
-
-  // Play fire round start sound
-  const playFireRoundStart = useCallback(() => {
-    playSound('fireRoundStart', { volume: 0.8 });
-  }, [playSound]);
+  // All individual play functions extracted to useSoundPlayFunctions hook
+  const soundFns = useSoundPlayFunctions(playSound, {
+    audioUnlocked,
+    sfxMuted,
+    isTabVisibleRef,
+    isGameActiveRef,
+  });
 
   // Start fire crackle ambient loop (plays for 15 seconds)
   const startFireCrackleLoop = useCallback(async () => {
@@ -580,228 +361,21 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }
   }, [sfxMuted]);
 
-  // ==================== New Game Event Sounds ====================
-
-  const playWordRejectedSound = useCallback(() => {
-    playSound('wordRejected', { volume: 0.5 });
-    haptics.error();
-  }, [playSound]);
-
-  // Victory: SFX fanfare + TTS "Victory!"
-  const playVictorySound = useCallback(() => {
-    playSound('victoryFanfare', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Defeat: SFX sting + TTS "Defeated!"
-  const playDefeatSound = useCallback(() => {
-    playSound('defeatSting', { volume: 0.7, requiresGameActive: false });
-  }, [playSound]);
-
-  // Adventure level complete
-  const playLevelUpSound = useCallback(() => {
-    playSound('levelUp', { volume: 0.8 });
-    haptics.success();
-  }, [playSound]);
-
-  // XP level up modal
-  const playLevelUpModalSound = useCallback(() => {
-    playSound('levelUpModal', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Power-up activation
-  const playPowerUpSound = useCallback(() => {
-    playSound('powerUp', { volume: 0.7 });
-    haptics.tap();
-  }, [playSound]);
-
-  // Boss sounds
-  const playBossHitSound = useCallback(() => {
-    playSound('bossHit', { volume: 0.6 });
-    haptics.tap();
-  }, [playSound]);
-
-  const playBossPhaseChangeSound = useCallback(() => {
-    playSound('bossPhaseChange', { volume: 0.8 });
-    haptics.error();
-  }, [playSound]);
-
-  const playBossEntranceSound = useCallback(() => {
-    playSound('bossEntrance', { volume: 0.8, requiresGameActive: false });
-  }, [playSound]);
-
-  const playBossDefeatSound = useCallback(() => {
-    playSound('bossDefeat', { volume: 0.8 });
-    haptics.success();
-  }, [playSound]);
-
-  // Blast special tile sounds
-  const playBlastBombSound = useCallback(() => {
-    playSound('blastBomb', { volume: 0.7 });
-    haptics.tap();
-  }, [playSound]);
-
-  const playBlastLightningSound = useCallback(() => {
-    playSound('blastLightning', { volume: 0.7 });
-    haptics.tap();
-  }, [playSound]);
-
-  const playBlastPrismSound = useCallback(() => {
-    playSound('blastPrism', { volume: 0.7 });
-    haptics.tap();
-  }, [playSound]);
-
-  // Matchmaking
-  const playMatchFoundSound = useCallback(() => {
-    playSound('matchFound', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Streak milestone
-  const playStreakMilestoneSound = useCallback(() => {
-    playSound('streakMilestone', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Tier/rank promotion
-  const playTierPromotionSound = useCallback(() => {
-    playSound('tierPromotion', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  // Tile select - lightweight, no haptic (already handled by grid)
-  const playTileSelectSound = useCallback(() => {
-    playSound('tileSelect', { volume: 0.3 });
-  }, [playSound]);
-
-  // Round start
-  const playRoundStartSound = useCallback(() => {
-    playSound('roundStart', { volume: 0.8, requiresGameActive: false });
-  }, [playSound]);
-
-  // Time's up
-  const playTimesUpSound = useCallback(() => {
-    playSound('timerUrgent', { volume: 0.8 });
-  }, [playSound]);
-
-  // ==================== New ElevenLabs-Generated Sounds ====================
-
-  const playCoinCollectSound = useCallback(() => {
-    playSound('coinCollect', { volume: 0.5, requiresGameActive: false });
-  }, [playSound]);
-
-  const playButtonClickSound = useCallback(() => {
-    playSound('buttonClick', { volume: 0.3, requiresGameActive: false });
-  }, [playSound]);
-
-  const playChestOpenSound = useCallback(() => {
-    playSound('chestOpen', { volume: 0.7, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  const playQuestCompleteSound = useCallback(() => {
-    playSound('questComplete', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  const playBoardShuffleSound = useCallback(() => {
-    playSound('boardShuffle', { volume: 0.5 });
-  }, [playSound]);
-
-  const playUpgradePurchaseSound = useCallback(() => {
-    playSound('upgradePurchase', { volume: 0.7, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  const playHintRevealSound = useCallback(() => {
-    playSound('hintReveal', { volume: 0.5 });
-  }, [playSound]);
-
-  const playDailyRewardSound = useCallback(() => {
-    playSound('dailyReward', { volume: 0.8, requiresGameActive: false });
-    haptics.success();
-  }, [playSound]);
-
-  const playTimerUrgentSound = useCallback(() => {
-    playSound('timerUrgent', { volume: 0.6 });
-  }, [playSound]);
-
-  const playStreakFireSound = useCallback(() => {
-    playSound('streakFire', { volume: 0.7, requiresGameActive: false });
-    haptics.tap();
-  }, [playSound]);
-
-  const playScreenTransitionSound = useCallback(() => {
-    playSound('screenTransition', { volume: 0.3, requiresGameActive: false });
-  }, [playSound]);
-
-  const playLongWordBonusSound = useCallback(() => {
-    playSound('longWordBonus', { volume: 0.6 });
-    haptics.tap();
-  }, [playSound]);
-
   // Memoize context value to prevent unnecessary re-renders of all consumers
   const value = useMemo<SoundEffectsContextType>(() => ({
-    // Volume state
     sfxVolume,
     sfxMuted,
     setSfxVolume,
     toggleSfxMute,
-    // Game active state
     isGameActive,
     setGameActive,
-    // Sound playback
     playSound,
     playComboSound,
-    playAchievementSound,
-    playWordAcceptedSound,
     playCountdownBeep,
-    playMessageSound,
-    playErrorSound,
-    // Combo feedback sounds
-    playComboMilestoneSound,
-    playComboBreakSound,
-    playComboSavedSound,
-    // Earthquake/Fire Round sounds
-    playEarthquakeRumble,
-    playEarthquakeShake,
-    playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
-    // New game event sounds
-    playWordRejectedSound,
-    playVictorySound,
-    playDefeatSound,
-    playLevelUpSound,
-    playLevelUpModalSound,
-    playPowerUpSound,
-    playBossHitSound,
-    playBossPhaseChangeSound,
-    playBossEntranceSound,
-    playBossDefeatSound,
-    playBlastBombSound,
-    playBlastLightningSound,
-    playBlastPrismSound,
-    playMatchFoundSound,
-    playStreakMilestoneSound,
-    playTierPromotionSound,
-    playTileSelectSound,
-    playRoundStartSound,
-    playTimesUpSound,
-    // New ElevenLabs-generated sounds
-    playCoinCollectSound,
-    playButtonClickSound,
-    playChestOpenSound,
-    playQuestCompleteSound,
-    playBoardShuffleSound,
-    playUpgradePurchaseSound,
-    playHintRevealSound,
-    playDailyRewardSound,
-    playTimerUrgentSound,
-    playStreakFireSound,
-    playScreenTransitionSound,
-    playLongWordBonusSound,
+    // All individual play functions from extracted hook
+    ...soundFns,
   }), [
     sfxVolume,
     sfxMuted,
@@ -811,50 +385,10 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     setGameActive,
     playSound,
     playComboSound,
-    playAchievementSound,
-    playWordAcceptedSound,
     playCountdownBeep,
-    playMessageSound,
-    playErrorSound,
-    playComboMilestoneSound,
-    playComboBreakSound,
-    playComboSavedSound,
-    playEarthquakeRumble,
-    playEarthquakeShake,
-    playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
-    playWordRejectedSound,
-    playVictorySound,
-    playDefeatSound,
-    playLevelUpSound,
-    playLevelUpModalSound,
-    playPowerUpSound,
-    playBossHitSound,
-    playBossPhaseChangeSound,
-    playBossEntranceSound,
-    playBossDefeatSound,
-    playBlastBombSound,
-    playBlastLightningSound,
-    playBlastPrismSound,
-    playMatchFoundSound,
-    playStreakMilestoneSound,
-    playTierPromotionSound,
-    playTileSelectSound,
-    playRoundStartSound,
-    playTimesUpSound,
-    playCoinCollectSound,
-    playButtonClickSound,
-    playChestOpenSound,
-    playQuestCompleteSound,
-    playBoardShuffleSound,
-    playUpgradePurchaseSound,
-    playHintRevealSound,
-    playDailyRewardSound,
-    playTimerUrgentSound,
-    playStreakFireSound,
-    playScreenTransitionSound,
-    playLongWordBonusSound,
+    soundFns,
   ]);
 
   return (
@@ -866,61 +400,37 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
 // No-op stub returned when provider is unavailable (e.g., during SSR edge cases)
 const NOOP = () => {};
-const ASYNC_NOOP = async () => {};
-const SOUND_EFFECTS_FALLBACK: SoundEffectsContextType = {
-  sfxVolume: 0.7,
-  sfxMuted: true,
-  isGameActive: false,
-  setSfxVolume: NOOP,
-  toggleSfxMute: NOOP,
-  setGameActive: NOOP,
-  playSound: ASYNC_NOOP,
-  playComboSound: NOOP,
-  playAchievementSound: NOOP,
-  playWordAcceptedSound: NOOP,
-  playCountdownBeep: NOOP,
-  playMessageSound: NOOP,
-  playErrorSound: NOOP,
-  playComboMilestoneSound: NOOP,
-  playComboBreakSound: NOOP,
-  playComboSavedSound: NOOP,
-  playEarthquakeRumble: NOOP,
-  playEarthquakeShake: NOOP,
-  playFireRoundStart: NOOP,
-  startFireCrackleLoop: NOOP,
-  stopFireCrackleLoop: NOOP,
-  playWordRejectedSound: NOOP,
-  playVictorySound: NOOP,
-  playDefeatSound: NOOP,
-  playLevelUpSound: NOOP,
-  playLevelUpModalSound: NOOP,
-  playPowerUpSound: NOOP,
-  playBossHitSound: NOOP,
-  playBossPhaseChangeSound: NOOP,
-  playBossEntranceSound: NOOP,
-  playBossDefeatSound: NOOP,
-  playBlastBombSound: NOOP,
-  playBlastLightningSound: NOOP,
-  playBlastPrismSound: NOOP,
-  playMatchFoundSound: NOOP,
-  playStreakMilestoneSound: NOOP,
-  playTierPromotionSound: NOOP,
-  playTileSelectSound: NOOP,
-  playRoundStartSound: NOOP,
-  playTimesUpSound: NOOP,
-  playCoinCollectSound: NOOP,
-  playButtonClickSound: NOOP,
-  playChestOpenSound: NOOP,
-  playQuestCompleteSound: NOOP,
-  playBoardShuffleSound: NOOP,
-  playUpgradePurchaseSound: NOOP,
-  playHintRevealSound: NOOP,
-  playDailyRewardSound: NOOP,
-  playTimerUrgentSound: NOOP,
-  playStreakFireSound: NOOP,
-  playScreenTransitionSound: NOOP,
-  playLongWordBonusSound: NOOP,
-};
+const SOUND_EFFECTS_FALLBACK = {
+  sfxVolume: 0.7, sfxMuted: true, isGameActive: false,
+  setSfxVolume: NOOP, toggleSfxMute: NOOP, setGameActive: NOOP,
+  playSound: NOOP, playComboSound: NOOP, playCountdownBeep: NOOP,
+  startFireCrackleLoop: NOOP, stopFireCrackleLoop: NOOP,
+  // All individual play functions
+  playWordAcceptedSound: NOOP, playWordRejectedSound: NOOP,
+  playAchievementSound: NOOP, playMessageSound: NOOP, playErrorSound: NOOP,
+  playComboMilestoneSound: NOOP, playComboBreakSound: NOOP, playComboSavedSound: NOOP,
+  playEarthquakeRumble: NOOP, playEarthquakeShake: NOOP, playFireRoundStart: NOOP,
+  playVictorySound: NOOP, playDefeatSound: NOOP,
+  playLevelUpSound: NOOP, playLevelUpModalSound: NOOP, playPowerUpSound: NOOP,
+  playBossHitSound: NOOP, playBossPhaseChangeSound: NOOP,
+  playBossEntranceSound: NOOP, playBossDefeatSound: NOOP,
+  playBlastBombSound: NOOP, playBlastLightningSound: NOOP, playBlastPrismSound: NOOP,
+  playMatchFoundSound: NOOP, playStreakMilestoneSound: NOOP, playTierPromotionSound: NOOP,
+  playTileSelectSound: NOOP, playRoundStartSound: NOOP, playTimesUpSound: NOOP,
+  playCoinCollectSound: NOOP, playButtonClickSound: NOOP, playChestOpenSound: NOOP,
+  playQuestCompleteSound: NOOP, playBoardShuffleSound: NOOP, playUpgradePurchaseSound: NOOP,
+  playHintRevealSound: NOOP, playDailyRewardSound: NOOP, playTimerUrgentSound: NOOP,
+  playStreakFireSound: NOOP, playScreenTransitionSound: NOOP, playLongWordBonusSound: NOOP,
+  playBoardClearSound: NOOP, playCoinCascadeSound: NOOP, playCrownVictorySound: NOOP,
+  playGiftReceivedSound: NOOP, playLeadChangeSound: NOOP, playMatchStartSound: NOOP,
+  playMenuOpenSound: NOOP, playMenuCloseSound: NOOP, playOpponentScoredSound: NOOP,
+  playPathConnectSound: NOOP, playPerfectWordSound: NOOP,
+  playPlayerJoinedSound: NOOP, playPlayerLeftSound: NOOP, playRareWordSound: NOOP,
+  playSwipeTransitionSound: NOOP, playTileAppearSound: NOOP,
+  playTimeBonusSound: NOOP, playTimerHeartbeatSound: NOOP, playXpGainSound: NOOP,
+  playMegaCascadeSound: NOOP, playUltraComboSound: NOOP, playBossDefeatLegendarySound: NOOP,
+  playLegendaryWordSound: NOOP, playEpicVictorySound: NOOP, playStreakLegendarySound: NOOP,
+} as SoundEffectsContextType;
 
 export function useSoundEffects(): SoundEffectsContextType {
   const context = useContext(SoundEffectsContext);

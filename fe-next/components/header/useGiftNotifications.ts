@@ -65,16 +65,45 @@ export function useGiftNotifications() {
 
     // Listen for openGiftModal events dispatched by NotificationBell
     useEffect(() => {
-        const handleOpenGiftModal = () => {
+        const handleOpenGiftModal = async (e: Event) => {
+            const giftId = (e as CustomEvent).detail?.giftId;
+
+            // If we have a specific gift ID, try local first then fetch
+            if (giftId) {
+                const localGift = gifts.find(g => g.id === giftId);
+                if (localGift) {
+                    setSelectedGift(localGift);
+                    setShowGiftModal(true);
+                    return;
+                }
+                // Gift not in local unclaimed list — fetch by ID (may be already claimed)
+                try {
+                    const res = await fetch(`/api/player/gifts/${giftId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.gift) {
+                            setSelectedGift(data.gift);
+                            setShowGiftModal(true);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch gift by ID:', err);
+                }
+            }
+
+            // Fallback: open oldest unclaimed gift
             const unclaimedGift = gifts.find(g => !g.claimed);
             if (unclaimedGift) {
                 setSelectedGift(unclaimedGift);
                 setShowGiftModal(true);
+            } else {
+                refreshGifts();
             }
         };
         window.addEventListener('openGiftModal', handleOpenGiftModal);
         return () => window.removeEventListener('openGiftModal', handleOpenGiftModal);
-    }, [gifts]);
+    }, [gifts, refreshGifts]);
 
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
     useEffect(() => {

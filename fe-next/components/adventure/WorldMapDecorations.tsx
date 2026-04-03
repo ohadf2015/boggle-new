@@ -1,10 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-/** Floating cloud component - CSS animation for performance */
+/** Floating cloud component - pure CSS, no image load */
 export function Cloud({
   className,
   size = 'md',
@@ -18,21 +17,12 @@ export function Cloud({
 
   return (
     <div
-      className={cn('world-map-cloud', sizes[size], className)}
+      className={cn('world-map-cloud world-map-cloud-shape', sizes[size], className)}
       style={{
         '--cloud-drift': `${20 * speed}px`,
         '--cloud-duration': `${15 / speed}s`,
       } as React.CSSProperties}
-    >
-      <Image
-        src="/images/adventure/cloud.webp"
-        alt=""
-        fill
-        sizes="128px"
-        loading="lazy"
-        className="object-contain"
-      />
-    </div>
+    />
   );
 }
 
@@ -128,7 +118,9 @@ export function WorldOrbitingLetters({
   );
 }
 
-/** Dynamic SVG trail connector between worlds */
+/** Dynamic SVG trail connector between worlds.
+ *  The moving dot uses CSS offset-path instead of SMIL animateMotion —
+ *  CSS animations are compositor-promoted while SMIL runs on the main thread. */
 export function TrailPath({
   isUnlocked,
   fromLeft,
@@ -136,8 +128,6 @@ export function TrailPath({
   isUnlocked: boolean;
   fromLeft: boolean;
 }): React.JSX.Element {
-  // SVG coordinates are physical (not affected by CSS dir), so isLeft inversion
-  // for RTL is handled by the parent (WorldMap) before passing fromLeft.
   const leftX = 30;
   const rightX = 70;
 
@@ -172,26 +162,14 @@ export function TrailPath({
           strokeDasharray={isUnlocked ? '0' : '10 8'}
           opacity={isUnlocked ? 0.7 : 1}
         />
-        {isUnlocked && (
-          <circle r="3" fill="#FFFFFF" opacity={0.8}>
-            <animateMotion
-              dur="3s"
-              repeatCount="indefinite"
-              path={path}
-              keyPoints="0;1"
-              keyTimes="0;1"
-              calcMode="spline"
-              keySplines="0.4 0 0.2 1"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.6;1;0.6"
-              dur="3s"
-              repeatCount="indefinite"
-            />
-          </circle>
-        )}
       </svg>
+      {/* CSS offset-path dot — compositor-accelerated, replaces SMIL animateMotion */}
+      {isUnlocked && (
+        <div
+          className="world-map-trail-dot"
+          style={{ '--trail-path': `path('${path}')` } as React.CSSProperties}
+        />
+      )}
     </div>
   );
 }

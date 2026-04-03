@@ -381,7 +381,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
       {/* Header */}
-      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))' }}>
+      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <MobileShareSection gameCode={gameCode} t={t} compact />

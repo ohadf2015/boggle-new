@@ -18,7 +18,9 @@ interface SFXHandlers {
   playBossHitSound: () => void;
   playBossPhaseChangeSound: () => void;
   playBossDefeatSound: () => void;
+  playBossDefeatLegendarySound: () => void;
   playTimerUrgentSound: () => void;
+  playLegendaryWordSound: () => void;
 }
 
 interface UseAdventureSFXOptions {
@@ -34,6 +36,8 @@ interface UseAdventureSFXOptions {
   showBossFireworks?: boolean;
   bossHealthPhase?: string;
   bossCurrentHP?: number;
+  /** Length of the last word found (for legendary word sound) */
+  lastWordLength?: number;
   /** Level just completed (non-boss) */
   nonBossCompleted?: boolean;
   gameStars?: number;
@@ -42,7 +46,7 @@ interface UseAdventureSFXOptions {
 export function useAdventureSFX({
   isPlaying, timeRemaining, wordsFoundLength, prevWordsFoundLen, comboCount, sfx,
   isBossLevel, showBossIntro, showBossFireworks, bossHealthPhase, bossCurrentHP,
-  nonBossCompleted, gameStars,
+  lastWordLength, nonBossCompleted, gameStars,
 }: UseAdventureSFXOptions): void {
   // Gate sounds to active gameplay
   useEffect(() => { sfx.setGameActive(isPlaying); return () => sfx.setGameActive(false); }, [isPlaying, sfx]);
@@ -65,6 +69,15 @@ export function useAdventureSFX({
     }
   }, [wordsFoundLength, prevWordsFoundLen, comboCount, isPlaying, sfx]);
 
+  // Legendary word sound for 8+ letter words in adventure
+  const prevWordCount = useRef(0);
+  useEffect(() => {
+    if (wordsFoundLength > prevWordCount.current && lastWordLength && lastWordLength >= 8) {
+      sfx.playLegendaryWordSound();
+    }
+    prevWordCount.current = wordsFoundLength;
+  }, [wordsFoundLength, lastWordLength, sfx]);
+
   // Level up sound when non-boss level completes with at least 1 star
   const prevNonBossCompleted = useRef(false);
   useEffect(() => {
@@ -81,10 +94,10 @@ export function useAdventureSFX({
     prevShowBossIntro.current = !!showBossIntro;
   }, [showBossIntro, sfx]);
 
-  // Boss defeat sound when fireworks appear
+  // Boss defeat sound when fireworks appear — legendary version!
   const prevShowBossFireworks = useRef(false);
   useEffect(() => {
-    if (showBossFireworks && !prevShowBossFireworks.current) sfx.playBossDefeatSound();
+    if (showBossFireworks && !prevShowBossFireworks.current) sfx.playBossDefeatLegendarySound();
     prevShowBossFireworks.current = !!showBossFireworks;
   }, [showBossFireworks, sfx]);
 

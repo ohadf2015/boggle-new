@@ -1,5 +1,5 @@
 import { memo, useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, Accessibility, Settings, Sparkles, BarChart3,
     Gift, Users, Flame, Trophy, HelpCircle, Mail, Coffee, Info
@@ -47,12 +47,10 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
 
     // Reset "seen" when badge count increases (new notifications arrived)
     const prevBadgeCount = useRef(badgeCount);
-    useEffect(() => {
-        if (badgeCount > prevBadgeCount.current) {
-            setBadgeSeen(false);
-        }
-        prevBadgeCount.current = badgeCount;
-    }, [badgeCount]);
+    if (badgeCount > prevBadgeCount.current) {
+        setBadgeSeen(false);
+    }
+    prevBadgeCount.current = badgeCount;
 
     const closeMenu = useCallback(() => setIsOpen(false), []);
 
@@ -101,12 +99,12 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <motion.div
+                <m.div
                     animate={{ rotate: isOpen ? 90 : 0 }}
                     transition={{ type: 'spring', damping: 15, stiffness: 200 }}
                 >
                     {isOpen ? <X size={18} /> : <Menu size={18} />}
-                </motion.div>
+                </m.div>
                 {/* Aggregated badge: gifts + notifications + completed quests */}
                 {badgeCount > 0 && !badgeSeen && (
                     <div className={cn(
@@ -116,9 +114,10 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                 )}
             </button>
 
+            <LazyMotion features={domAnimation}>
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: -12, scale: 0.92 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -129,7 +128,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                             "bg-neo-navy",
                             "border-4 border-neo-black",
                             "rounded-neo-lg shadow-hard-xl",
-                            "z-60 overflow-hidden"
+                            "z-60 overflow-y-auto max-h-[calc(100dvh-5rem)]"
                         )}
                     >
                         {/* Decorative top stripe */}
@@ -144,7 +143,6 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                             <div className="rounded-full border-3 border-neo-lime shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors">
                                                 <Avatar
                                                     customAvatar={avatarConfig}
-                                                    avatarImage={profile.avatar_image}
                                                     userId={user?.id}
                                                     size="lg"
                                                 />
@@ -355,9 +353,10 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
 
                         {/* Decorative bottom stripe */}
                         <div className="h-1 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-lime" />
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
+            </LazyMotion>
         </div>
     );
 });

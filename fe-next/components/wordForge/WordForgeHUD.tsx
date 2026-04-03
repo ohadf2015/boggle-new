@@ -72,7 +72,7 @@ export function WordForgeHUD({
 
   return (
     <div className={cn(
-      'border-b-3 border-neo-black px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 space-y-2',
+      'border-b-3 border-neo-black px-4 pt-3 pb-2 space-y-2',
       bossConstraint ? 'bg-neo-red/10 border-neo-red/50' : 'bg-[#0A0A1A]',
     )}>
       {/* Top row: Round | Timer | Score */}
