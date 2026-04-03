@@ -115,6 +115,10 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
           setError(null);
           return;
         }
+
+        // TODO: TEMPORARY DEBUG — catch-all for unexpected result shapes
+        setError(`DEBUG native result: ${JSON.stringify(nativeResult)}`);
+        return;
       }
 
       // PRIORITY 2: In-app browser OAuth on mobile (Capacitor)

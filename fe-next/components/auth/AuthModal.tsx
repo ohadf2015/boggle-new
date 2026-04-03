@@ -109,11 +109,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   useEffect(() => {
     const native = isNative();
     const oauthAvail = isNativeOAuthAvailable();
-    const capExists = typeof globalThis !== 'undefined' && !!(globalThis as any).Capacitor;
-    const capPlatform = capExists ? (globalThis as any).Capacitor?.getPlatform?.() : 'N/A';
+    const capPlatform = (globalThis as any).Capacitor?.getPlatform?.() ?? 'N/A';
     setNativeDebugInfo(
-      `isNative:${native} | oauthAvail:${oauthAvail} | hookAvail:${nativeOAuthAvailable} | cap:${capExists} | platform:${capPlatform}`
+      `native:${native} | avail:${oauthAvail} | plat:${capPlatform}`
     );
+    // Poll the debug step from globalThis every 500ms
+    const interval = setInterval(() => {
+      const step = (globalThis as any).__nativeOAuthStep;
+      if (step) {
+        setNativeDebugInfo(prev => {
+          const base = prev.split(' || STEP:')[0];
+          return `${base} || STEP: ${step}`;
+        });
+      }
+    }, 500);
+    return () => clearInterval(interval);
   }, [nativeOAuthAvailable]);
 
   // Reset form when modal opens/closes

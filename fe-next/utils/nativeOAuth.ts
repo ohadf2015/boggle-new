@@ -129,43 +129,66 @@ export function isNativeOAuthAvailable(): boolean {
  * Perform Google sign-in using native SDK
  * Returns the result - on success, Supabase session is automatically created
  */
+// TODO: TEMPORARY DEBUG — use globalThis so bundler can't break the binding
+function setDebugStep(step: string) {
+  (globalThis as any).__nativeOAuthStep = step;
+}
+
 export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
+  setDebugStep('start');
+
   if (!supabase) {
+    setDebugStep('ERR: no supabase');
     return { success: false, error: 'Supabase not configured' };
   }
 
   if (!isNativeOAuthAvailable()) {
+    setDebugStep('ERR: not available');
     return { success: false, error: 'Native OAuth not available' };
   }
 
   if (!SocialLogin) {
+    setDebugStep('ERR: no SocialLogin');
     return { success: false, error: 'SocialLogin not initialized' };
   }
 
   try {
+    setDebugStep('calling SocialLogin.login...');
     logger.log('[NativeOAuth] Starting Google native sign-in');
 
-    // Perform native Google sign-in
-    const result = await SocialLogin.login({
+    // Perform native Google sign-in with 15s timeout
+    const loginPromise = SocialLogin.login({
       provider: 'google',
       options: {
         scopes: ['email', 'profile']
       }
     });
 
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT: SocialLogin.login() did not resolve in 15s')), 15000)
+    );
+
+    const result = await Promise.race([loginPromise, timeoutPromise]);
+
+    setDebugStep(`got result: ${JSON.stringify(result).slice(0, 150)}`);
+    logger.log('[NativeOAuth] Raw SocialLogin result:', JSON.stringify(result));
+
     // Type guard for online response (contains idToken)
     const googleResult = result.result;
     if (!googleResult || googleResult.responseType !== 'online') {
+      setDebugStep(`ERR: bad responseType: ${JSON.stringify(result).slice(0, 100)}`);
       logger.error('[NativeOAuth] Unexpected Google response type (expected online)');
-      return { success: false, error: 'Unexpected response type from Google' };
+      return { success: false, error: `Unexpected response type: ${JSON.stringify(result).slice(0, 200)}` };
     }
 
     const idToken = googleResult.idToken;
     if (!idToken) {
+      setDebugStep('ERR: no idToken');
       logger.error('[NativeOAuth] No ID token received from Google');
       return { success: false, error: 'No ID token received from Google' };
     }
 
+    setDebugStep('exchanging token with Supabase...');
     logger.log('[NativeOAuth] Got Google ID token, exchanging with Supabase');
 
     // Exchange ID token with Supabase
@@ -175,18 +198,22 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     });
 
     if (error) {
+      setDebugStep(`ERR: supabase: ${error.message}`);
       logger.error('[NativeOAuth] Supabase signInWithIdToken error:', error);
       return { success: false, error: error.message };
     }
 
     if (!data.session) {
+      setDebugStep('ERR: no session');
       return { success: false, error: 'No session created' };
     }
 
+    setDebugStep('SUCCESS');
     logger.log('[NativeOAuth] Google sign-in successful');
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    setDebugStep(`CATCH: ${errorMessage}`);
     logger.error('[NativeOAuth] Google sign-in error:', error);
 
     // Handle user cancellation
