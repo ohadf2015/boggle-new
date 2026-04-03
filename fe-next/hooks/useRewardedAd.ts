@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
+import { useAdMob } from '@/hooks/useAdMob';
 import { useCoinContext } from '@/contexts/CoinContext';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
@@ -138,16 +139,18 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
+  const adMob = useAdMob();
   const adPlacement = useAdPlacement();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
-  const shouldUseAdSense = !shouldUseCrazyGames && adPlacement.isReady;
+  const shouldUseAdMob = !shouldUseCrazyGames && adMob.isAvailable;
+  const shouldUseAdSense = !shouldUseCrazyGames && !shouldUseAdMob && adPlacement.isReady;
   // Simulation only in development — never award free gold in production
   const isDev = process.env.NODE_ENV === 'development';
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdSense;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAdSense;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdSense && !shouldUseSimulation;
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAdSense && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
   const isAdAvailable = true;
@@ -158,6 +161,12 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const showAd = useCallback(() => {
     if (status === 'loading' || status === 'showing') {
       return; // Don't allow multiple simultaneous ads
+    }
+
+    // Enforce daily limit across all platforms
+    if (isDailyLimitReached()) {
+      onAdError?.('Daily ad limit reached');
+      return;
     }
 
     // Enforce placeholder cooldown
@@ -171,7 +180,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     setError(null);
 
     // Determine platform for logging
-    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdSense ? 'adsense' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
+    const platform = shouldUseCrazyGames ? 'crazygames' : shouldUseAdMob ? 'admob' : shouldUseAdSense ? 'adsense' : shouldUseSimulation ? 'simulation' : 'no-ad-placeholder';
 
     // Award coins helper - uses unified CoinContext for auth/guest sync
     const awardCoinsAndNotify = async () => {
@@ -216,16 +225,36 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
           handleAdError(errorMsg || 'Ad failed to load');
         },
       });
+    } else if (shouldUseAdMob) {
+      // Priority 1.5: AdMob SDK for native Capacitor apps
+      setStatus('showing');
+      onAdStarted?.();
+      let rewarded = false;
+      adMob.showRewarded({
+        onReward: () => {
+          rewarded = true;
+          awardCoinsAndNotify();
+        },
+        onDismiss: () => {
+          // Dismiss fires after reward — only treat as error if no reward was granted
+          if (!rewarded) handleAdError('Ad dismissed without reward');
+        },
+        onError: (errorMsg: string) => {
+          handleAdError(errorMsg || 'Ad failed to load');
+        },
+      });
     } else if (shouldUseAdSense) {
       // Priority 1.5: AdSense for Games rewarded ads
       setStatus('showing');
       onAdStarted?.();
+      let adsenseRewarded = false;
       adPlacement.showRewarded('rewarded-gold', {
         onReward: () => {
+          adsenseRewarded = true;
           awardCoinsAndNotify();
         },
         onDismiss: () => {
-          handleAdError('Ad dismissed');
+          if (!adsenseRewarded) handleAdError('Ad dismissed without reward');
         },
       });
     } else if (shouldUseSimulation) {
@@ -245,7 +274,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdSense, shouldUseSimulation, crazyGames, adPlacement, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAdSense, shouldUseSimulation, crazyGames, adMob, adPlacement, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
 
   return {
     status,

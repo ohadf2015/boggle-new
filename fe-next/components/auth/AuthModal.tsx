@@ -15,7 +15,7 @@ import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, ver
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { trackEvent } from '@/components/GoogleAnalytics';
 import { isNative } from '../../utils/platform';
-import { isNativeOAuthAvailable } from '../../utils/nativeOAuth';
+
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
@@ -99,32 +99,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
   // OAuth sign-in with native SDK priority (Google/Apple native → in-app browser → redirect)
-  const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider, nativeOAuthAvailable } = useOAuthSignIn({
+  const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider } = useOAuthSignIn({
     onError: (msg) => setError(msg),
     onSuccess: () => onClose(),
   });
-
-  // TODO: TEMPORARY DEBUG — remove after fixing native OAuth
-  const [nativeDebugInfo, setNativeDebugInfo] = useState('');
-  useEffect(() => {
-    const native = isNative();
-    const oauthAvail = isNativeOAuthAvailable();
-    const capPlatform = (globalThis as any).Capacitor?.getPlatform?.() ?? 'N/A';
-    setNativeDebugInfo(
-      `native:${native} | avail:${oauthAvail} | plat:${capPlatform}`
-    );
-    // Poll the debug step from globalThis every 500ms
-    const interval = setInterval(() => {
-      const step = (globalThis as any).__nativeOAuthStep;
-      if (step) {
-        setNativeDebugInfo(prev => {
-          const base = prev.split(' || STEP:')[0];
-          return `${base} || STEP: ${step}`;
-        });
-      }
-    }, 500);
-    return () => clearInterval(interval);
-  }, [nativeOAuthAvailable]);
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -476,12 +454,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                 </div>
               ) : (
                 <div className="space-y-2.5">
-                  {/* TODO: TEMPORARY DEBUG BANNER — remove after fixing native OAuth */}
-                  {nativeDebugInfo && (
-                    <div className="text-[10px] bg-yellow-900/80 text-yellow-200 px-2 py-1 rounded font-mono break-all">
-                      {nativeDebugInfo}
-                    </div>
-                  )}
                   {providers.map((provider, idx) => (
                     <motion.div
                       key={provider.id}

@@ -33,6 +33,17 @@ function isDevHost(): boolean {
   return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0';
 }
 
+/** Returns true inside a Capacitor native app — AdSense is prohibited in WebViews */
+function isNativeApp(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+     
+    return (window as any).Capacitor?.isNativePlatform?.() ?? false;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Renders a real Google AdSense `<ins>` display ad.
  *
@@ -75,7 +86,7 @@ export const AdUnit: React.FC<AdUnitProps> = ({ adSlot, width, height, className
     requestAnimationFrame(raf);
   }, []);
 
-  if (isDevHost()) return null;
+  if (isDevHost() || isNativeApp()) return null;
 
   const isFixed = width != null && height != null;
 

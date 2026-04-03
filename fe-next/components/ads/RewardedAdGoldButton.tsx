@@ -52,7 +52,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
         'border-2 border-black rounded-neo',
         'transition-all active:translate-y-0.5',
         isDark
-          ? 'bg-neo-navy-light text-neo-yellow border-neo-yellow/40 hover:bg-neo-navy-light/80'
+          ? 'bg-neo-navy-light text-neo-lime border-neo-lime/40 hover:bg-neo-navy-light/80'
           : 'bg-yellow-50 text-amber-800 border-amber-400 hover:bg-yellow-100',
         'active:shadow-none',
         'disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0',
@@ -60,7 +60,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       )}
     >
       <Icon className={cn('h-3.5 w-3.5', (status === 'loading' || status === 'showing') && 'animate-spin')} />
-      <Coins className="h-3.5 w-3.5 text-neo-yellow" />
+      <Coins className="h-3.5 w-3.5 text-neo-lime" />
       <span>{label}</span>
     </button>
   );

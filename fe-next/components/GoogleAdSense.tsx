@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { ADSENSE_PUBLISHER_ID } from '@/lib/adsense';
 
@@ -10,17 +11,28 @@ import { ADSENSE_PUBLISHER_ID } from '@/lib/adsense';
  * When consent is denied, Google still serves non-personalized ads,
  * preserving revenue while respecting user privacy.
  *
- * Skipped only in development / localhost to avoid console errors.
+ * Skipped in development, on localhost, and inside native WebView apps.
  *
  * @see /components/GoogleConsentMode.tsx for consent defaults
  * @see /components/CookieConsent.tsx for consent management
  */
 export function GoogleAdSense() {
-  // Skip AdSense in development
-  if (process.env.NODE_ENV === 'development') return null;
+  const [shouldRender, setShouldRender] = useState(false);
 
-  // Don't load on localhost
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') return null;
+  useEffect(() => {
+    // Skip AdSense in development
+    if (process.env.NODE_ENV === 'development') return;
+    // Only check in browser — avoids SSR rendering the script for native WebViews
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return;
+
+     
+    if ((window as any).Capacitor?.isNativePlatform?.()) return;
+
+    setShouldRender(true);
+  }, []);
+
+  if (!shouldRender) return null;
 
   return (
     <>

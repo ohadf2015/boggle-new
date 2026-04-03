@@ -13,7 +13,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
-import { isNative, isIOS, isAndroid } from '@/utils/platform';
+import { isNative, isIOS } from '@/utils/platform';
 import logger from '@/utils/logger';
 
 export interface NativeOAuthResult {
@@ -52,6 +52,12 @@ const getNativeOAuthConfig = (): NativeOAuthConfig | null => {
 
 let socialLoginInitialized = false;
 let SocialLogin: typeof import('@capgo/capacitor-social-login').SocialLogin | null = null;
+
+/** Reset module state — test-only */
+export function __resetForTesting(): void {
+  socialLoginInitialized = false;
+  SocialLogin = null;
+}
 
 /**
  * Initialize the Social Login plugin
@@ -95,9 +101,6 @@ export async function initializeNativeOAuth(): Promise<boolean> {
       providerConfig.apple = {};  // No config needed for iOS
     }
 
-    // DEBUG: store the webClientId so we can see it in the banner
-    setDebugStep(`init: wcid=${config.google.webClientId.substring(0, 30)}...`);
-
     await SocialLogin.initialize(providerConfig);
 
     socialLoginInitialized = true;
@@ -131,31 +134,23 @@ export function isNativeOAuthAvailable(): boolean {
  * Perform Google sign-in using native SDK
  * Returns the result - on success, Supabase session is automatically created
  */
-// TODO: TEMPORARY DEBUG — use globalThis so bundler can't break the binding
-function setDebugStep(step: string) {
-  (globalThis as any).__nativeOAuthStep = step;
-}
-
 export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
-  setDebugStep('start');
 
   if (!supabase) {
-    setDebugStep('ERR: no supabase');
+
     return { success: false, error: 'Supabase not configured' };
   }
 
   if (!isNativeOAuthAvailable()) {
-    setDebugStep('ERR: not available');
+
     return { success: false, error: 'Native OAuth not available' };
   }
 
   if (!SocialLogin) {
-    setDebugStep('ERR: no SocialLogin');
     return { success: false, error: 'SocialLogin not initialized' };
   }
 
   try {
-    setDebugStep('calling SocialLogin.login...');
     logger.log('[NativeOAuth] Starting Google native sign-in');
 
     // Perform native Google sign-in with 15s timeout
@@ -171,24 +166,20 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
 
     const result = await Promise.race([loginPromise, timeoutPromise]);
 
-    setDebugStep(`got result: ${JSON.stringify(result).slice(0, 150)}`);
     logger.log('[NativeOAuth] Raw SocialLogin result:', JSON.stringify(result));
 
     // Extract idToken — accept any responseType since we removed mode:'online'
     const googleResult = result.result;
     if (!googleResult) {
-      setDebugStep(`ERR: no result obj: ${JSON.stringify(result).slice(0, 100)}`);
       return { success: false, error: `No result object: ${JSON.stringify(result).slice(0, 200)}` };
     }
 
     const idToken = (googleResult as unknown as Record<string, unknown>).idToken as string | undefined;
     if (!idToken) {
-      setDebugStep('ERR: no idToken');
       logger.error('[NativeOAuth] No ID token received from Google');
       return { success: false, error: 'No ID token received from Google' };
     }
 
-    setDebugStep('exchanging token with Supabase...');
     logger.log('[NativeOAuth] Got Google ID token, exchanging with Supabase');
 
     // Exchange ID token with Supabase
@@ -198,22 +189,18 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     });
 
     if (error) {
-      setDebugStep(`ERR: supabase: ${error.message}`);
       logger.error('[NativeOAuth] Supabase signInWithIdToken error:', error);
       return { success: false, error: error.message };
     }
 
     if (!data.session) {
-      setDebugStep('ERR: no session');
       return { success: false, error: 'No session created' };
     }
 
-    setDebugStep('SUCCESS');
     logger.log('[NativeOAuth] Google sign-in successful');
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    setDebugStep(`CATCH: ${errorMessage}`);
     logger.error(error instanceof Error ? error : new Error(errorMessage), '[NativeOAuth] Google sign-in error');
 
     // Handle user cancellation

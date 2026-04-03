@@ -11,7 +11,8 @@ import {
   signInWithGoogleNative,
   signInWithAppleNative,
   performNativeOAuth,
-  logoutFromNativeProviders
+  logoutFromNativeProviders,
+  __resetForTesting
 } from '../nativeOAuth';
 import * as platform from '../platform';
 import { supabase } from '@/lib/supabase';
@@ -65,6 +66,7 @@ describe('Native OAuth Utility', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    __resetForTesting();
 
     // Reset environment
     process.env = {

@@ -75,10 +75,11 @@
   "dependencies": {
     "@9am/fire-flame-react": "^0.3.2",
     "@arvidbt/swedish-words": "^1.0.6",
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor/android": "^8.0.1",
     "@capacitor/app": "^8.0.0",
     "@capacitor/browser": "^8.0.0",
-    "@capacitor/core": "^8.0.1",
+    "@capacitor/core": "^8.3.0",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/ios": "^8.0.1",
     "@capacitor/keyboard": "^8.0.0",

@@ -1,5 +1,5 @@
 import { vi, type Mock, } from 'vitest';
-import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness, getVocabularyHeatmapData } from '../analytics';
+import { getClassroomMetrics, getCommonMistakes, getStudentProgressMetrics, getStudentsProgressSummary, getLessonEffectiveness } from '../analytics';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
@@ -402,8 +402,7 @@ describe('analytics - getLessonEffectiveness', () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -444,8 +443,7 @@ describe('analytics - getLessonEffectiveness', () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN
@@ -479,8 +477,7 @@ describe('analytics - getLessonEffectiveness', () => {
       })
       .mockReturnValueOnce({
         select: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
+        in: vi.fn().mockResolvedValue({ data: mockProgress, error: null }),
       });
 
     // WHEN

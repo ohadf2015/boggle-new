@@ -5,6 +5,9 @@
  * Note: The component has a known re-fetch loop (fetchTeacherData depends on
  * selectedClassroomId, which it sets during the fetch).  The tests use
  * findBy* queries so they retry across re-renders.
+ *
+ * Both QR assertions live in a single test to avoid within-file contamination
+ * from lingering async effects (socket init, data fetch) between tests.
  */
 
 import React from 'react';
@@ -73,6 +76,27 @@ vi.mock('@/utils/SocketContext', () => ({
   getSharedSocket: vi.fn(() => stableQrSocket),
 }));
 
+// Mock socket.io-client explicitly — another test file auto-mocks it, which
+// can leak through the thread pool and change how io() behaves in this file.
+vi.mock('socket.io-client', () => ({
+  io: vi.fn(() => ({
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+    disconnect: vi.fn(),
+    connected: true,
+  })),
+}));
+
+// Mock the dynamic import of supabase/client used in the socket init effect.
+vi.mock('@/utils/supabase/client', () => ({
+  createClient: vi.fn(() => ({
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+    },
+  })),
+}));
+
 vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: { success: vi.fn(), error: vi.fn() },
@@ -123,28 +147,6 @@ vi.mock('../MultiLessonSelector', () => ({
   ),
 }));
 
-// ── helper: advance to Step 2 ─────────────────────────────────────────────────
-
-/**
- * Waits for the lesson-selector to appear (data loaded), selects lessons,
- * then clicks Next to advance to Step 2.
- */
-async function goToStep2() {
-  // Step 1: wait for data load to expose the lesson selector
-  const selectBtn = await screen.findByTestId('select-lessons', {}, { timeout: 8000 });
-  fireEvent.click(selectBtn);
-
-  // Wait for the Next button to become enabled, then click it
-  await waitFor(
-    () => {
-      const btn = screen.getByTestId('wizard-next');
-      expect(btn).not.toBeDisabled();
-    },
-    { timeout: 5000 }
-  );
-  fireEvent.click(screen.getByTestId('wizard-next'));
-}
-
 // ── tests ─────────────────────────────────────────────────────────────────────
 
 describe('ClassroomGameLobby — QR code', () => {
@@ -155,31 +157,35 @@ describe('ClassroomGameLobby — QR code', () => {
     });
   });
 
-  it('renders the QR code element in step 2', async () => {
+  it('renders QR code in step 2 with a valid join URL', async () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    await goToStep2();
 
-    // QR appears after joinUrl effect fires (gameCode must be set first)
+    // Step 1: wait for data load, select lessons, advance
+    const selectBtn = await screen.findByTestId('select-lessons', {}, { timeout: 8000 });
+    fireEvent.click(selectBtn);
+
     await waitFor(
-      () => expect(screen.getByTestId('qr-code')).toBeInTheDocument(),
+      () => {
+        const btn = screen.getByTestId('wizard-next');
+        expect(btn).not.toBeDisabled();
+      },
       { timeout: 5000 }
     );
-  }, 15000);
+    fireEvent.click(screen.getByTestId('wizard-next'));
 
-  it('encodes a join URL containing the game code', async () => {
-    render(<ClassroomGameLobby onBack={vi.fn()} />);
-    await goToStep2();
-
+    // Step 2: QR code appears with correct URL format
     let qrValue = '';
     await waitFor(
       () => {
         const qr = screen.getByTestId('qr-code');
+        expect(qr).toBeInTheDocument();
         qrValue = qr.getAttribute('data-value') ?? '';
         expect(qrValue).toMatch(/^http:\/\/localhost\/join\?code=[A-Z0-9]{6}$/);
       },
       { timeout: 5000 }
     );
 
+    // Verify the game code is exactly 6 alphanumeric characters
     const codeMatch = qrValue.match(/code=([A-Z0-9]+)$/);
     expect(codeMatch).not.toBeNull();
     expect(codeMatch![1]).toHaveLength(6);

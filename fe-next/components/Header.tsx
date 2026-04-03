@@ -52,7 +52,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 className
             )}
             style={{
-                top: safeArea.top > 0 ? `${safeArea.top}px` : 0,
+                top: 0,
+                paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
             }}
         >
             {/* NEO-BRUTALIST Header Bar */}
