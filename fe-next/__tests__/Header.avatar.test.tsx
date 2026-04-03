@@ -1,5 +1,5 @@
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
@@ -122,13 +122,14 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar is rendered as profile links (desktop + mobile), not on the hamburger button
-      const avatars = screen.getAllByTestId('header-avatar');
-      expect(avatars.length).toBeGreaterThanOrEqual(1);
-
-      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
+      // Multiple menu buttons exist (desktop + mobile); click any to open
       const menuButtons = screen.getAllByLabelText(/menu/i);
       expect(menuButtons.length).toBeGreaterThanOrEqual(1);
+      fireEvent.click(menuButtons[0]);
+
+      // Avatar is rendered inside the mobile menu as a profile link
+      const avatars = screen.getAllByTestId('header-avatar');
+      expect(avatars.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show avatar as profile link for authenticated user with avatar', () => {
@@ -152,13 +153,11 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar is rendered as profile links (desktop + mobile)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      fireEvent.click(menuButtons[0]);
+
       const avatars = screen.getAllByTestId('header-avatar');
       expect(avatars.length).toBeGreaterThanOrEqual(1);
-
-      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
-      const menuButtons = screen.getAllByLabelText(/menu/i);
-      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show avatar as profile link for any authenticated user', () => {
@@ -183,13 +182,11 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar is rendered as profile links (desktop + mobile)
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      fireEvent.click(menuButtons[0]);
+
       const avatars = screen.getAllByTestId('header-avatar');
       expect(avatars.length).toBeGreaterThanOrEqual(1);
-
-      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
-      const menuButtons = screen.getAllByLabelText(/menu/i);
-      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show avatar as profile link when user is not authenticated (guest avatar)', () => {
@@ -203,13 +200,11 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar is still rendered as a profile link for guests
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      fireEvent.click(menuButtons[0]);
+
       const avatars = screen.getAllByTestId('header-avatar');
       expect(avatars.length).toBeGreaterThanOrEqual(1);
-
-      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
-      const menuButtons = screen.getAllByLabelText(/menu/i);
-      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show avatar as profile link when profile is null', () => {
@@ -223,13 +218,11 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar is still rendered as a profile link
+      const menuButtons = screen.getAllByLabelText(/menu/i);
+      fireEvent.click(menuButtons[0]);
+
       const avatars = screen.getAllByTestId('header-avatar');
       expect(avatars.length).toBeGreaterThanOrEqual(1);
-
-      // Menu icon should be present (multiple menu buttons exist, check at least one is present)
-      const menuButtons = screen.getAllByLabelText(/menu/i);
-      expect(menuButtons.length).toBeGreaterThanOrEqual(1);
     });
   });
 });
