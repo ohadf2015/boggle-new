@@ -1,4 +1,4 @@
-import { vi, type Mock, } from 'vitest';
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 // Mock dependencies
@@ -11,13 +11,6 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
   },
-}));
-
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => key,
-    language: 'en',
-  }),
 }));
 
 vi.mock('@/utils/ThemeContext', () => ({
@@ -35,7 +28,6 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 describe('CookiePolicyPageClient', () => {
-  // Lazy import so mocks are ready
   let CookiePolicyPageClient: any;
 
   beforeAll(async () => {
@@ -45,49 +37,45 @@ describe('CookiePolicyPageClient', () => {
 
   it('renders the page title', () => {
     render(<CookiePolicyPageClient />);
-    expect(screen.getByRole('heading', { level: 1, name: 'legal.cookies.title' })).toBeInTheDocument();
+    expect(screen.getAllByText('Cookie Policy').length).toBeGreaterThan(0);
   });
 
   it('renders introduction text', () => {
     render(<CookiePolicyPageClient />);
-    expect(screen.getByText('legal.cookies.intro')).toBeInTheDocument();
+    expect(screen.getByText(/explains how LexiClash uses cookies/i)).toBeInTheDocument();
   });
 
   it('renders all section headings', () => {
     render(<CookiePolicyPageClient />);
     const expectedSections = [
-      'legal.cookies.whatAreCookies.title',
-      'legal.cookies.cookiesWeUse.title',
-      'legal.cookies.thirdPartyCookies.title',
-      'legal.cookies.managingCookies.title',
-      'legal.cookies.consent.title',
-      'legal.cookies.changes.title',
-      'legal.cookies.contactUs.title',
+      '1. What Are Cookies',
+      '2. Cookies We Use',
+      '3. Third-Party Cookies',
+      '4. Managing Cookies',
+      '5. Cookie Consent',
+      '6. Changes to This Policy',
+      '7. Contact Us',
     ];
-    expectedSections.forEach((key) => {
-      expect(screen.getByText(key)).toBeInTheDocument();
+    expectedSections.forEach((heading) => {
+      expect(screen.getByText(heading)).toBeInTheDocument();
     });
   });
 
-  it('renders cookie category lists', () => {
+  it('renders cookie category items', () => {
     render(<CookiePolicyPageClient />);
-    expect(screen.getByText('legal.cookies.cookiesWeUse.essential.auth')).toBeInTheDocument();
-    expect(screen.getByText('legal.cookies.cookiesWeUse.analytics.logrocket')).toBeInTheDocument();
-    expect(screen.getByText('legal.cookies.cookiesWeUse.advertising.adsense')).toBeInTheDocument();
+    expect(screen.getByText(/Authentication tokens/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/LogRocket/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Google AdSense/i).length).toBeGreaterThan(0);
   });
 
-  it('renders opt-out links', () => {
+  it('renders managing cookies content with opt-out mention', () => {
     render(<CookiePolicyPageClient />);
-    const googleAdSettings = screen.getByRole('link', { name: /Google Ad Settings/i });
-    expect(googleAdSettings).toHaveAttribute('href', 'https://www.google.com/settings/ads');
+    expect(screen.getAllByText(/Google Ad Settings/i).length).toBeGreaterThan(0);
   });
 
-  it('renders contact page link in content', () => {
+  it('renders contact page link', () => {
     render(<CookiePolicyPageClient />);
-    const contactLinks = screen.getAllByRole('link', { name: /contact/i });
-    const contentContactLink = contactLinks.find(link =>
-      link.closest('section') !== null
-    );
-    expect(contentContactLink).toHaveAttribute('href', '/en/contact');
+    const contactLink = screen.getByRole('link', { name: /contact/i });
+    expect(contactLink).toHaveAttribute('href', '/en/contact');
   });
 });

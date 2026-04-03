@@ -1,57 +1,43 @@
 'use client';
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import LegalPageLayout from '@/components/legal/LegalPageLayout';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import { contentByLocale, type TermsContent } from './content';
 
 export default function TermsOfServicePageClient(): React.ReactElement {
-  const { t } = useLanguage();
+  const params = useParams();
+  const locale = params.locale as string;
+  const c: TermsContent = contentByLocale[locale] || contentByLocale.en;
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
-  const sections = [
-    'acceptance',
-    'service',
-    'accounts',
-    'conduct',
-    'contentLicense',
-    'intellectualProperty',
-    'disclaimers',
-    'liability',
-    'indemnification',
-    'termination',
-    'modifications',
-    'governingLaw',
-    'disputes',
-    'severability'
-  ] as const;
-
   return (
-    <LegalPageLayout title={t('legal.terms.title')} lastUpdated={t('legal.lastUpdatedDate')}>
+    <LegalPageLayout title={c.title}>
       {/* Introduction */}
       <p className={cn(
         'text-lg mb-6',
         isDarkMode ? 'text-gray-300' : 'text-gray-600'
       )}>
-        {t('legal.terms.intro')}
+        {c.intro}
       </p>
 
       {/* Sections */}
-      {sections.map((section) => (
-        <section key={section} className="mb-6">
+      {c.sections.map((section) => (
+        <section key={section.title} className="mb-6">
           <h2 className={cn(
             'text-xl font-bold mb-3',
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}>
-            {t(`legal.terms.${section}.title`)}
+            {section.title}
           </h2>
           <p className={cn(
             'leading-relaxed',
             isDarkMode ? 'text-gray-300' : 'text-gray-600'
           )}>
-            {t(`legal.terms.${section}.content`)}
+            {section.content}
           </p>
         </section>
       ))}

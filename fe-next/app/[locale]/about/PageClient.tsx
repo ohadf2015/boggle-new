@@ -1,24 +1,24 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import LegalPageLayout from '@/components/legal/LegalPageLayout';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { Mail, Gamepad2, Globe, BookOpen, Users, Shield, Zap } from 'lucide-react';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
+import { contentByLocale, type AboutContent } from './content';
 
 function FeatureCard({
   icon: Icon,
-  titleKey,
-  contentKey,
+  title,
+  content,
   isDarkMode,
 }: {
   icon: React.ComponentType<{ className?: string }>;
-  titleKey: string;
-  contentKey: string;
+  title: string;
+  content: string;
   isDarkMode: boolean;
 }) {
-  const { t } = useLanguage();
   return (
     <div
       className={cn(
@@ -36,18 +36,20 @@ function FeatureCard({
           <Icon className="w-5 h-5 text-neo-black" />
         </div>
         <h3 className={cn('font-bold text-lg', isDarkMode ? 'text-white' : 'text-gray-900')}>
-          {t(titleKey)}
+          {title}
         </h3>
       </div>
       <p className={cn('leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-        {t(contentKey)}
+        {content}
       </p>
     </div>
   );
 }
 
 export default function AboutPageClient(): React.ReactElement {
-  const { t } = useLanguage();
+  const params = useParams();
+  const locale = params.locale as string;
+  const c: AboutContent = contentByLocale[locale] || contentByLocale.en;
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
@@ -62,84 +64,62 @@ export default function AboutPageClient(): React.ReactElement {
 
   return (
     <LegalPageLayout
-      title={t('legal.about.title')}
-      breadcrumbs={[{ label: t('legal.about.title') }]}
+      title={c.title}
+      breadcrumbs={[{ label: c.title }]}
     >
       {/* Last Updated */}
       <p className="text-sm mb-6 text-gray-500">
-        {t('legal.lastUpdated')}: {t('legal.lastUpdatedDate')}
+        Last updated: {c.lastUpdated}
       </p>
 
       {/* Section 1: Who We Are */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.whoWeAre.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.whoWeAre.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.whoWeAre.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.whoWeAre.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.whoWeAre.content}</p>
+        <p className={paragraphClass}>{c.whoWeAre.content2}</p>
       </section>
 
       {/* Section 2: Our Story */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.story.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.story.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.story.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.story.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.story.content}</p>
+        <p className={paragraphClass}>{c.story.content2}</p>
       </section>
 
       {/* Section 3: Our Mission */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.mission.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.mission.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.mission.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.mission.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.mission.content}</p>
+        <p className={paragraphClass}>{c.mission.content2}</p>
       </section>
 
       {/* Section 4: What Makes Us Different */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.whatMakesUsDifferent.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-5')}>
-          {t('legal.about.whatMakesUsDifferent.intro')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.whatMakesUsDifferent.title}</h2>
+        <p className={cn(paragraphClass, 'mb-5')}>{c.whatMakesUsDifferent.intro}</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <FeatureCard
             icon={Gamepad2}
-            titleKey="legal.about.whatMakesUsDifferent.gameModes.title"
-            contentKey="legal.about.whatMakesUsDifferent.gameModes.content"
+            title={c.whatMakesUsDifferent.gameModes.title}
+            content={c.whatMakesUsDifferent.gameModes.content}
             isDarkMode={isDarkMode}
           />
           <FeatureCard
             icon={Globe}
-            titleKey="legal.about.whatMakesUsDifferent.multilingual.title"
-            contentKey="legal.about.whatMakesUsDifferent.multilingual.content"
+            title={c.whatMakesUsDifferent.multilingual.title}
+            content={c.whatMakesUsDifferent.multilingual.content}
             isDarkMode={isDarkMode}
           />
           <FeatureCard
             icon={BookOpen}
-            titleKey="legal.about.whatMakesUsDifferent.education.title"
-            contentKey="legal.about.whatMakesUsDifferent.education.content"
+            title={c.whatMakesUsDifferent.education.title}
+            content={c.whatMakesUsDifferent.education.content}
             isDarkMode={isDarkMode}
           />
           <FeatureCard
             icon={Shield}
-            titleKey="legal.about.whatMakesUsDifferent.design.title"
-            contentKey="legal.about.whatMakesUsDifferent.design.content"
+            title={c.whatMakesUsDifferent.design.title}
+            content={c.whatMakesUsDifferent.design.content}
             isDarkMode={isDarkMode}
           />
         </div>
@@ -147,72 +127,44 @@ export default function AboutPageClient(): React.ReactElement {
 
       {/* Section 5: What We Do */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.whatWeDo.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.whatWeDo.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.whatWeDo.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.whatWeDo.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.whatWeDo.content}</p>
+        <p className={paragraphClass}>{c.whatWeDo.content2}</p>
       </section>
 
       {/* Section 6: Technology */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.technology.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.technology.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.technology.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.technology.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.technology.content}</p>
+        <p className={paragraphClass}>{c.technology.content2}</p>
       </section>
 
       {/* Section 7: For Educators */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.forEducators.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.forEducators.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.forEducators.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.forEducators.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.forEducators.content}</p>
+        <p className={paragraphClass}>{c.forEducators.content2}</p>
       </section>
 
       {/* Section 8: Community */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.community.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.community.content')}
-        </p>
-        <p className={paragraphClass}>
-          {t('legal.about.community.content2')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.community.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.community.content}</p>
+        <p className={paragraphClass}>{c.community.content2}</p>
       </section>
 
       {/* Section 9: Values */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.values.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.values.content')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.values.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.values.content}</p>
         <div className="grid gap-4 sm:grid-cols-3 mt-5">
-          {[
-            { icon: Users, key: 'accessibility' },
-            { icon: Shield, key: 'privacy' },
-            { icon: Zap, key: 'fairPlay' },
-          ].map(({ icon: ValIcon, key }) => (
+          {([
+            { icon: Users, data: c.values.accessibility },
+            { icon: Shield, data: c.values.privacy },
+            { icon: Zap, data: c.values.fairPlay },
+          ] as const).map(({ icon: ValIcon, data }) => (
             <div
-              key={key}
+              key={data.title}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black text-center',
                 isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
@@ -227,10 +179,10 @@ export default function AboutPageClient(): React.ReactElement {
                 <ValIcon className="w-5 h-5 text-white" />
               </div>
               <h3 className={cn('font-bold mb-2', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                {t(`legal.about.values.${key}.title`)}
+                {data.title}
               </h3>
               <p className={cn('text-sm leading-relaxed', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t(`legal.about.values.${key}.content`)}
+                {data.content}
               </p>
             </div>
           ))}
@@ -239,25 +191,16 @@ export default function AboutPageClient(): React.ReactElement {
 
       {/* Section 10: Our Team */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.team.title')}
-        </h2>
-        <p className={paragraphClass}>
-          {t('legal.about.team.content')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.team.title}</h2>
+        <p className={paragraphClass}>{c.team.content}</p>
       </section>
 
       {/* Section 11: Contact Information */}
       <section className="mb-8">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.contact.title')}
-        </h2>
-        <p className={cn(paragraphClass, 'mb-4')}>
-          {t('legal.about.contact.content')}
-        </p>
+        <h2 className={sectionHeadingClass}>{c.contact.title}</h2>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.contact.content}</p>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {/* Email */}
           <a
             href="mailto:lexiclash.game@gmail.com"
             className={cn(
@@ -272,7 +215,7 @@ export default function AboutPageClient(): React.ReactElement {
             </div>
             <div>
               <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('contact.emailLabel')}
+                {c.businessInfo.emailLabel}
               </p>
               <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 lexiclash.game@gmail.com
@@ -280,7 +223,6 @@ export default function AboutPageClient(): React.ReactElement {
             </div>
           </a>
 
-          {/* Instagram */}
           <a
             href="https://www.instagram.com/lexi.clash"
             target="_blank"
@@ -312,62 +254,27 @@ export default function AboutPageClient(): React.ReactElement {
 
       {/* Section 12: Business Information */}
       <section className="mb-6">
-        <h2 className={sectionHeadingClass}>
-          {t('legal.about.businessInfo.title')}
-        </h2>
+        <h2 className={sectionHeadingClass}>{c.businessInfo.title}</h2>
         <div className={cn(
           'p-6 rounded-neo border-3 border-neo-black',
           isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
         )}>
           <dl className="space-y-4">
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.companyLabel')}
-              </dt>
-              <dd className={cn('text-lg font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.company')}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.founderLabel')}
-              </dt>
-              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.founder')}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.locationLabel')}
-              </dt>
-              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.location')}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.foundedLabel')}
-              </dt>
-              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.founded')}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.emailLabel')}
-              </dt>
-              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.email')}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-bold uppercase mb-1 text-gray-500">
-                {t('legal.about.businessInfo.instagramLabel')}
-              </dt>
-              <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('legal.about.businessInfo.instagram')}
-              </dd>
-            </div>
+            {([
+              [c.businessInfo.companyLabel, c.businessInfo.company],
+              [c.businessInfo.founderLabel, c.businessInfo.founder],
+              [c.businessInfo.locationLabel, c.businessInfo.location],
+              [c.businessInfo.foundedLabel, c.businessInfo.founded],
+              [c.businessInfo.emailLabel, c.businessInfo.email],
+              [c.businessInfo.instagramLabel, c.businessInfo.instagram],
+            ] as const).map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-sm font-bold uppercase mb-1 text-gray-500">{label}</dt>
+                <dd className={cn('font-medium', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                  {value}
+                </dd>
+              </div>
+            ))}
           </dl>
         </div>
       </section>

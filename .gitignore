@@ -49,3 +49,7 @@ fe-next/tmp/
 fe-next/dist/
 .env.local
 dump.rdb
+
+# Release signing keys
+*.keystore
+*.jks

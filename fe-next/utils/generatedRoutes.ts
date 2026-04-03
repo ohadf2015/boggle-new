@@ -4,6 +4,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/about",
   "/about/the-word-nerd",
   "/accessibility",
+  "/account/delete",
   "/adventure",
   "/adventure/achievements",
   "/adventure/boss-rush",
