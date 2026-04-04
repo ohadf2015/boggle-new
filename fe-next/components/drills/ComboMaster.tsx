@@ -76,7 +76,7 @@ export default function ComboMaster({
   const comboBreaksRef = useRef(comboBreaks);
   comboBreaksRef.current = comboBreaks;
 
-  const { validateWord, availableWordSet } = useDrillWordSubmit({
+  const { validateWord } = useDrillWordSubmit({
     grid,
     language,
     availableWords,

@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { FlashChallenge } from '@/types/adventure';
 import { getFlashChallengeForWorld } from '@/lib/adventure/flashChallengeConfig';
 
+const TRIGGER_THRESHOLDS = [0.30, 0.60, 0.85] as const;
+
 interface UseFlashChallengeProps {
   worldId: number;
   totalTimeSeconds: number;
@@ -60,7 +62,6 @@ export function useFlashChallenge({
   const failedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** How many challenges have triggered this level (max 3 at 30%/60%/85% elapsed) */
   const triggerCount = useRef(0);
-  const TRIGGER_THRESHOLDS = [0.30, 0.60, 0.85];
   const challengeStartWords = useRef<string[]>([]);
   const challengeStartTime = useRef<number>(0);
   const usedGoldTile = useRef(false);
