@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
@@ -12,6 +12,8 @@ interface CircularTimerProps {
   totalTime?: number;
   /** Size variant: 'xs' for ultra-compact mobile, 'sm' for compact landscape mode, 'md' (default) for normal, 'lg' for desktop */
   size?: 'xs' | 'sm' | 'md' | 'lg';
+  /** Called when timer urgency state changes — used by parent to render screen glow effect */
+  onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
 }
 
 // Size configurations - frameClasses removed since we no longer have a background frame
@@ -27,8 +29,9 @@ const SIZES = {
  * Memoized to prevent unnecessary re-renders when parent updates
  * Respects prefers-reduced-motion for accessibility
  */
-const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md' }) => {
+const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState }) => {
   const reduceMotion = useReducedMotion();
+  const prevStateRef = useRef<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const config = SIZES[size];
 
   // Calculate the progress percentage
@@ -50,6 +53,23 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   if (isVeryLowTime) {
     preloadResultsChunks();
   }
+
+  // Notify parent of timer urgency state changes
+  const currentState: 'normal' | 'low' | 'veryLow' | 'critical' = isCriticalTime
+    ? 'critical'
+    : isVeryLowTime
+    ? 'veryLow'
+    : isLowTime
+    ? 'low'
+    : 'normal';
+
+   
+  useEffect(() => {
+    if (onTimerState && currentState !== prevStateRef.current) {
+      prevStateRef.current = currentState;
+      onTimerState(currentState);
+    }
+  }, [currentState, onTimerState]);
 
   const svgCenter = config.svgSize / 2;
 

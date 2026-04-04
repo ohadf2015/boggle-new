@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { getRandomMilestoneEntrance } from './blastEffectVariations';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
@@ -31,12 +32,14 @@ interface BlastScoreMilestoneProps {
 export function BlastScoreMilestone({ score }: BlastScoreMilestoneProps) {
   const [activeMilestone, setActiveMilestone] = useState<MilestoneConfig | null>(null);
   const lastMilestoneRef = useRef(0);
+  const entranceRef = useRef(getRandomMilestoneEntrance());
   const { playAchievementSound } = useSoundEffects();
 
   const checkMilestone = useCallback(() => {
     const crossed = SCORE_MILESTONES.find(m => score >= m && lastMilestoneRef.current < m);
     if (crossed) {
       lastMilestoneRef.current = crossed;
+      entranceRef.current = getRandomMilestoneEntrance();
       const config = getMilestoneConfig(crossed);
       setActiveMilestone(config);
       playAchievementSound();
@@ -54,10 +57,10 @@ export function BlastScoreMilestone({ score }: BlastScoreMilestoneProps) {
     <AdaptiveAnimatePresence>
       {activeMilestone && (
         <AdaptiveMotion.div
-          initial={{ opacity: 0, scale: 0.4, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 1.8, y: -20 }}
-          transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+          initial={entranceRef.current.initial}
+          animate={entranceRef.current.animate}
+          exit={entranceRef.current.exit}
+          transition={entranceRef.current.transition}
           className="absolute top-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           role="status"
           aria-live="assertive"

@@ -408,7 +408,8 @@ const BossOverlay = memo<BossOverlayProps>(
                       {derivedPhase === 'enraged' && (
                         <AdaptiveMotion.div
                           className="absolute inset-0 border-2 border-neo-red rounded-neo"
-                          animate={{ opacity: [0.3, 0.9, 0.3], boxShadow: ['inset 0 0 8px rgba(255,51,102,0.2)', 'inset 0 0 16px rgba(255,51,102,0.5)', 'inset 0 0 8px rgba(255,51,102,0.2)'] }}
+                          style={{ boxShadow: 'inset 0 0 16px rgba(255,51,102,0.5)' }}
+                          animate={{ opacity: [0.3, 0.9, 0.3] }}
                           transition={{ repeat: Infinity, duration: 0.6 }}
                         />
                       )}

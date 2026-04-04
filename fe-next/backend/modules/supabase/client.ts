@@ -12,7 +12,11 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Max concurrent HTTP requests to Supabase PostgREST API.
 // Supabase free/Pro Varnish layer typically allows 20-60 concurrent connections.
-const MAX_CONCURRENT_REQUESTS = parseInt(process.env.SUPABASE_MAX_CONCURRENT || '15', 10);
+// Default bumped from 15→25 to handle burst writes at game-end (multiple players saving results).
+const MAX_CONCURRENT_REQUESTS = parseInt(process.env.SUPABASE_MAX_CONCURRENT || '25', 10);
+
+// Queue depth warning threshold — alert when too many requests are waiting
+const QUEUE_DEPTH_WARNING = parseInt(process.env.SUPABASE_QUEUE_WARN || '10', 10);
 
 // Semaphore for limiting concurrent Supabase API requests
 let activeRequests = 0;
@@ -35,6 +39,11 @@ function releaseSlot(): void {
   activeRequests--;
   const next = requestQueue.shift();
   if (next) next();
+
+  // Warn when queue depth indicates sustained backpressure
+  if (requestQueue.length >= QUEUE_DEPTH_WARNING) {
+    logger.warn('SUPABASE', `Request queue depth: ${requestQueue.length} (threshold: ${QUEUE_DEPTH_WARNING}). Active: ${activeRequests}/${MAX_CONCURRENT_REQUESTS}`);
+  }
 }
 
 // Concurrency-limited fetch wrapper for Supabase client

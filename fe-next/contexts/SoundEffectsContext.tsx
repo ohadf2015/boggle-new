@@ -430,6 +430,8 @@ const SOUND_EFFECTS_FALLBACK = {
   playTimeBonusSound: NOOP, playTimerHeartbeatSound: NOOP, playXpGainSound: NOOP,
   playMegaCascadeSound: NOOP, playUltraComboSound: NOOP, playBossDefeatLegendarySound: NOOP,
   playLegendaryWordSound: NOOP, playEpicVictorySound: NOOP, playStreakLegendarySound: NOOP,
+  playDrillStartSound: NOOP, playDrillCompleteSound: NOOP, playWheelSpinSound: NOOP,
+  playFlashChallengeSound: NOOP, playWordRevealSound: NOOP,
 } as SoundEffectsContextType;
 
 export function useSoundEffects(): SoundEffectsContextType {

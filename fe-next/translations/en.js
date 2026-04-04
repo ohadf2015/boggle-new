@@ -604,6 +604,16 @@ const en = {
     "tookLead": "You're in the lead!",
     "lostLead": "{{username}} took the lead!"
   },
+  "roundEvent": {
+    "blizzardWarning": "❄️ Blizzard incoming!",
+    "lightningWarning": "⚡ Lightning round!",
+    "meteorWarning": "🌟 Meteor strike!",
+    "active": "Active"
+  },
+  "specialWord": {
+    "bonus": "+{{bonus}} ⭐",
+    "foundBy": "Found by {{username}}"
+  },
   "countdown": {
     "hint": "Swipe letters to form words!",
     "go": "GO!",
@@ -1921,6 +1931,7 @@ const en = {
     "rewardsEarned": "Loot Earned",
     "achievementUnlocked": "Trophy Unlocked!",
     "achievementsUnlocked": "Trophies Unlocked!",
+    "showDetails": "Show Details",
     "details": "Details",
     "performanceDetails": "The Breakdown",
     "badges": "Badges",
@@ -6305,6 +6316,25 @@ const en = {
     "perfect": "Perfect!",
     "restart": "Restart",
     "gold": "Gold",
+    "loading": "Loading adventure...",
+    "currency": {
+      "goldAmount": "{amount} gold"
+    },
+    "levelLocked": "Level {level} — Locked",
+    "bossLevel": "Boss Level {level}",
+    "playLevel": "Level {level} — {stars} of {maxStars} stars",
+    "unlockRequirement": "Complete Level {level}",
+    "tutorial": {
+      "step1Title": "Swipe to Form Words",
+      "step1Body": "Drag across adjacent letters to form words. Longer words score more points!",
+      "step2Title": "Complete Objectives",
+      "step2Body": "Each level has star objectives — reach them to earn stars and unlock new levels.",
+      "step3Title": "Beat the Boss",
+      "step3Body": "Every chapter ends with a boss fight. Deal damage by finding words before time runs out!",
+      "skip": "Skip Tutorial",
+      "next": "Next",
+      "gotIt": "Got it!"
+    },
     "score": "Score",
     "victory": "Victory!",
     "hint": {
@@ -6341,7 +6371,16 @@ const en = {
       "mirrorPalace": "Mirror Palace",
       "neologismNebula": "Neologism Nebula",
       "polyglotPeaks": "Polyglot Peaks",
-      "lexiconThrone": "Lexicon Throne"
+      "lexiconThrone": "Lexicon Throne",
+      "mechanicHint2": "Find synonym pairs for bonus points!",
+      "mechanicHint3": "Words with common roots score extra!",
+      "mechanicHint4": "Build idioms from smaller words!",
+      "mechanicHint5": "Form compound words for big bonuses!",
+      "mechanicHint6": "Find anagram pairs among your words!",
+      "mechanicHint7": "Palindromes earn bonus rewards!",
+      "mechanicHint8": "Create rare & unusual words!",
+      "mechanicHint9": "Words from multiple languages score more!",
+      "mechanicHint10": "Master all mechanics for the final challenge!"
     },
     "chapters": {
       "meadows": {
@@ -7660,6 +7699,25 @@ const en = {
     "chain": {
       "badge": "Chain x{level}"
     },
+    "tile": {
+      "gold":      { "name": "Gold",      "desc": "3× score + grants 1 bonus move." },
+      "silver":    { "name": "Silver",    "desc": "1.5× score. Extends countdowns by 1 move." },
+      "diamond":   { "name": "Diamond",   "desc": "5× score. Reveals hidden frost contents for 3 turns." },
+      "bomb":      { "name": "Bomb",      "desc": "Clears 3×3 area. Chains to nearby bombs." },
+      "lightning": { "name": "Lightning", "desc": "Clears entire column instantly." },
+      "prism":     { "name": "Prism",     "desc": "2 hits. Clears full row + column. Chains bombs and lightning." },
+      "rainbow":   { "name": "Rainbow",   "desc": "Copies the best special in your word and doubles it. Solo: 2× score." },
+      "ice":       { "name": "Ice",       "desc": "2 hits. Freezes adjacent viruses on clear." },
+      "gem":       { "name": "Gem",       "desc": "3 hits to collect. Spawns 2 new specials on completion." },
+      "frozen":    { "name": "Frost",     "desc": "2 hits. Hides a special inside — could be a bomb, lightning, prism, gem, or rainbow." },
+      "magnet":    { "name": "Vortex",    "desc": "Pulls nearby tiles inward, then explodes the area." },
+      "mirror":    { "name": "Mirror",    "desc": "Copies the first offensive special in your word. Solo: 2× score." },
+      "wildcard":  { "name": "Wildcard",  "desc": "Matches any letter. Scores Scrabble value of the letter used." },
+      "countdown": { "name": "Countdown", "desc": "Ticks down each move. Defuse it in a word for +15 pts and 2 bonus moves. Let it expire: -50 pts and 3×3 blast." },
+      "virus":     { "name": "Virus",     "desc": "Spreads each turn. Clear 3+ in one word to cure all viruses on the board." },
+      "portal":    { "name": "Portal",    "desc": "Clears its linked pair too. 2× word score. +5 bonus." },
+      "catalyst":  { "name": "Catalyst",  "desc": "+10 pts. Upgrades adjacent standard tiles into specials." }
+    },
     "title": "Blast Mode",
     "description": "Clear the board! Words explode tiles.",
     "progress": "Cleared",
@@ -7979,7 +8037,12 @@ const en = {
       "analytics": "Analytics",
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
-      "viewReportsDesc": "View detailed reports and analytics for your classrooms"
+      "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "tab": {
+        "play": "Play",
+        "prepare": "Prepare",
+        "review": "Review"
+      }
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -8932,7 +8995,7 @@ const en = {
     "you": "You",
     "youLose": "You Lose!",
     "youWin": "You Win!",
-    "opponentDisconnected": "{opponentName} disconnected",
+    "opponentDisconnected": "{{opponentName}} disconnected",
     "autoForfeitMessage": "You'll win automatically",
     "forfeitTitle": "Forfeit Duel?",
     "forfeitDescription": "You'll lose and opponent wins. Can't be undone.",
@@ -9797,15 +9860,22 @@ const en = {
       "rule3": "Special tiles (💣⚡🔷) trigger explosive chain reactions",
       "rule4": "Clear 50%+ of tiles to advance to the next wave"
     },
-    "waveComplete": "Wave ${wave} Complete!",
+    "waveComplete": "Wave {{wave}} Complete!",
     "score": "Score",
     "wordsFound": "words",
     "cleared": "cleared",
-    "nextWave": "Wave ${wave}",
+    "nextWave": "Wave {{wave}}",
     "gameOver": "GAME OVER",
     "waves": "waves",
     "bestWord": "Best",
     "playAgain": "PLAY AGAIN",
+    "chain": {
+      "cascade": "Cascade!",
+      "double": "Double!",
+      "triple": "TRIPLE!",
+      "mega": "MEGA!",
+      "ultra": "ULTRA!!"
+    },
     "tileGuide": {
       "title": "Tile Guide",
       "standard": { "name": "Standard", "desc": "Basic tile" },

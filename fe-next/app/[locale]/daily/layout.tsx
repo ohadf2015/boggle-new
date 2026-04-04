@@ -265,7 +265,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
       '@type': 'Organization',
       name: 'LexiClash',
     },
-    image: 'https://www.lexiclash.live/og-image-en.jpg',
+    image: 'https://www.lexiclash.live/og-image-en.webp',
     isAccessibleForFree: true,
     inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
   };

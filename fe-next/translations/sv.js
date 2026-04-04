@@ -619,6 +619,16 @@ const sv = {
     "pointsAhead": "poäng före",
     "wordsFound": "{{count}} ord"
   },
+  "roundEvent": {
+    "blizzardWarning": "❄️ Snöstorm på väg!",
+    "lightningWarning": "⚡ Blixtomgång!",
+    "meteorWarning": "🌟 Meteorstrike!",
+    "active": "Aktiv"
+  },
+  "specialWord": {
+    "bonus": "+{{bonus}} ⭐",
+    "foundBy": "Hittad av {{username}}"
+  },
   "countdown": {
     "hint": "Svep bokstäver för att bilda ord!",
     "go": "KÖR!",
@@ -1817,6 +1827,7 @@ const sv = {
     "rewardsEarned": "Belöningar",
     "achievementUnlocked": "Prestation upplåst!",
     "achievementsUnlocked": "Prestationer upplåsta",
+    "showDetails": "Visa detaljer",
     "details": "Detaljer",
     "performanceDetails": "Prestandadetaljer",
     "badges": "Märken",
@@ -6373,6 +6384,25 @@ const sv = {
     "perfect": "Perfekt!",
     "restart": "Börja om",
     "gold": "Guld",
+    "loading": "Laddar äventyr...",
+    "currency": {
+      "goldAmount": "{amount} guld"
+    },
+    "levelLocked": "Nivå {level} — Låst",
+    "bossLevel": "Bossnivå {level}",
+    "playLevel": "Nivå {level} — {stars} av {maxStars} stjärnor",
+    "unlockRequirement": "Klara nivå {level}",
+    "tutorial": {
+      "step1Title": "Svep för att bilda ord",
+      "step1Body": "Dra över intilliggande bokstäver för att bilda ord. Längre ord ger fler poäng!",
+      "step2Title": "Uppfyll mål",
+      "step2Body": "Varje nivå har stjärnmål — uppnå dem för att tjäna stjärnor och låsa upp nya nivåer.",
+      "step3Title": "Besegra bossen",
+      "step3Body": "Varje kapitel slutar med en bossstrid. Orsaka skada genom att hitta ord innan tiden tar slut!",
+      "skip": "Hoppa över guide",
+      "next": "Nästa",
+      "gotIt": "Uppfattat!"
+    },
     "score": "Poäng",
     "victory": "Seger!",
     "world": "Värld",
@@ -6428,7 +6458,16 @@ const sv = {
       "mirrorPalace": "Spegelpalatset",
       "neologismNebula": "Neologismnebulosan",
       "polyglotPeaks": "Polyglottopparna",
-      "lexiconThrone": "Lexikontronen"
+      "lexiconThrone": "Lexikontronen",
+      "mechanicHint2": "Hitta synonympar för bonuspoäng!",
+      "mechanicHint3": "Ord med gemensamma rötter ger extra poäng!",
+      "mechanicHint4": "Bygg idiom av mindre ord!",
+      "mechanicHint5": "Bilda sammansatta ord för stora bonusar!",
+      "mechanicHint6": "Hitta anagrampar bland dina ord!",
+      "mechanicHint7": "Palindromer ger bonusbelöningar!",
+      "mechanicHint8": "Skapa sällsynta och ovanliga ord!",
+      "mechanicHint9": "Ord från flera språk ger mer poäng!",
+      "mechanicHint10": "Bemästra alla mekaniker för den sista utmaningen!"
     },
     "chapters": {
       "meadows": {
@@ -7466,6 +7505,25 @@ const sv = {
     "chain": {
       "badge": "Kedja x{level}"
     },
+    "tile": {
+      "gold":      { "name": "Guld",      "desc": "3× poäng + 1 bonusdrag." },
+      "silver":    { "name": "Silver",    "desc": "1,5× poäng. Förlänger nedräkningar med 1." },
+      "diamond":   { "name": "Diamant",   "desc": "5× poäng. Avslöjar frostinnehåll i 3 turer." },
+      "bomb":      { "name": "Bomb",      "desc": "Rensar 3×3-yta. Kedjar till närliggande bomber." },
+      "lightning": { "name": "Blixt",     "desc": "Rensar hela kolumnen direkt." },
+      "prism":     { "name": "Prisma",    "desc": "2 träffar. Rensar hel rad + kolumn. Kedjar bomber och blixtar." },
+      "rainbow":   { "name": "Regnbåge",  "desc": "Kopierar och fördubblar bästa specialen. Ensam: 2× poäng." },
+      "ice":       { "name": "Is",        "desc": "2 träffar. Fryser intilliggande virus vid rensning." },
+      "gem":       { "name": "Ädelsten",  "desc": "3 träffar att samla. Skapar 2 nya specialer vid slutförande." },
+      "frozen":    { "name": "Frost",     "desc": "2 träffar. Döljer en special inuti — bomb, blixt, prisma, ädelsten eller regnbåge." },
+      "magnet":    { "name": "Virvel",    "desc": "Drar närliggande brickor inåt, sedan exploderar området." },
+      "mirror":    { "name": "Spegel",    "desc": "Kopierar den första offensiva specialen i ditt ord. Ensam: 2× poäng." },
+      "wildcard":  { "name": "Joker",     "desc": "Matchar vilken bokstav som helst. Poäng baserat på Scrabble-värde." },
+      "countdown": { "name": "Nedräkning","desc": "Tickar ner. Desarmera i ett ord: +15 p och 2 bonusdrag. Går ut: -50 p och 3×3 explosion." },
+      "virus":     { "name": "Virus",     "desc": "Sprider sig varje tur. Rensa 3+ i ett ord för att bota alla virus." },
+      "portal":    { "name": "Portal",    "desc": "Rensar sitt länkade par också. 2× ordpoäng. +5 bonus." },
+      "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." }
+    },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
     "progress": "Rensat",
@@ -7785,7 +7843,12 @@ const sv = {
       "analytics": "Analys",
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
-      "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum"
+      "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum",
+      "tab": {
+        "play": "Spela",
+        "prepare": "Förbered",
+        "review": "Granska"
+      }
     },
     "game": {
       "qrCode": "Visa QR-kod",
@@ -8128,7 +8191,7 @@ const sv = {
     }
   },
   "education": {
-    "reviewDue": "{count} ord att repetera",
+    "reviewDue": "{{count}} ord att repetera",
     "postGame": {
       "wordsYouLearned": "Ord du lärt dig",
       "found": "Hittade",
@@ -8725,7 +8788,7 @@ const sv = {
     "you": "Du",
     "youLose": "Du förlorade!",
     "youWin": "Du vann!",
-    "opponentDisconnected": "{opponentName} kopplades från",
+    "opponentDisconnected": "{{opponentName}} kopplades från",
     "autoForfeitMessage": "Du vinner automatiskt",
     "forfeitTitle": "Ge upp duellen?",
     "forfeitDescription": "Du förlorar och motståndaren vinner. Kan inte ångras.",
@@ -8737,11 +8800,11 @@ const sv = {
   "backToLobby": "Tillbaka till lobbyn",
   "cancel": "Avbryt",
   "challengeAction": "Utmana",
-  "challengeFrom": "Utmaning från",
-  "challengePlayer": "Utmana",
+  "challengeFrom": "Utmaning från {{name}}",
+  "challengePlayer": "Utmana {{name}}",
   "challengeReceived": "Utmaning mottagen!",
   "challengeSent": "Utmaning skickad!",
-  "challengedYou": "utmanade dig",
+  "challengedYou": "{{name}} utmanade dig",
   "classmates": "Klasskamrater",
   "decline": "Neka",
   "duelLobbyTitle": "Duellarena",
@@ -9712,15 +9775,22 @@ const sv = {
       "rule3": "Specialbrickor (💣⚡🔷) utlöser explosiva kedjereaktioner",
       "rule4": "Rensa 50%+ av brickorna för att gå vidare till nästa våg"
     },
-    "waveComplete": "Våg ${wave} klar!",
+    "waveComplete": "Våg {{wave}} klar!",
     "score": "Poäng",
     "wordsFound": "ord",
     "cleared": "rensat",
-    "nextWave": "Våg ${wave}",
+    "nextWave": "Våg {{wave}}",
     "gameOver": "SPELET SLUT",
     "waves": "vågor",
     "bestWord": "Bästa",
     "playAgain": "SPELA IGEN",
+    "chain": {
+      "cascade": "Kaskad!",
+      "double": "Dubbel!",
+      "triple": "TRIPPEL!",
+      "mega": "MEGA!",
+      "ultra": "ULTRA!!"
+    },
     "tileGuide": {
       "title": "Brickguide",
       "standard": { "name": "Standard", "desc": "Vanlig bricka" },

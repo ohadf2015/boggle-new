@@ -1,7 +1,8 @@
 /**
  * Bot Score Cap Tests
  *
- * Verifies that bots never outscore the best human player.
+ * Verifies percentage-based score capping: bots target a % of best human score
+ * per difficulty level, with initial ceilings before any human scores.
  */
 
 import { getBestHumanScore, shouldBotScore } from '../botGame';
@@ -12,6 +13,8 @@ jest.mock('../../../modules/gameStateManager', () => ({
   addPlayerWord: jest.fn(),
   updatePlayerScore: jest.fn(),
   trackBotWord: jest.fn(),
+  getGame: jest.fn(),
+  recordFirstFinder: jest.fn(),
 }));
 
 // Mock botManager
@@ -24,6 +27,7 @@ jest.mock('../../../modules/botManager', () => ({
 // Mock socketHelpers
 jest.mock('../../../utils/socketHelpers', () => ({
   broadcastToRoom: jest.fn(),
+  volatileBroadcastToRoom: jest.fn(),
   getGameRoom: jest.fn((code: string) => `room:${code}`),
 }));
 
@@ -35,12 +39,37 @@ jest.mock('../../../utils/logger', () => ({
   debug: jest.fn(),
 }));
 
+// Mock botWordHunt
+jest.mock('../botWordHunt', () => ({
+  startBotsForWordHunt: jest.fn(),
+}));
+
+// Mock blastModeManager
+jest.mock('../../../modules/blastModeManager', () => ({
+  calculateBlastTileBonus: jest.fn(),
+  getTilesOnPath: jest.fn(),
+  recordBlastMove: jest.fn(),
+}));
+
+// Mock wordHuntManager
+jest.mock('../../../modules/wordHuntManager', () => ({
+  restoreLife: jest.fn(),
+  getLifeBonus: jest.fn(),
+}));
+
 const { getLeaderboard } = require('../../../modules/gameStateManager');
-const { isBot } = require('../../../modules/botManager');
 
 describe('Bot Score Cap', () => {
+  let mathRandomSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    // Fix variance at 1.0 (middle) for deterministic tests
+    mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+  });
+
+  afterEach(() => {
+    mathRandomSpy.mockRestore();
   });
 
   describe('getBestHumanScore', () => {
@@ -48,7 +77,6 @@ describe('Bot Score Cap', () => {
       getLeaderboard.mockReturnValue([
         { username: 'Bot1', score: 50, isBot: true },
       ]);
-      isBot.mockReturnValue(true);
 
       expect(getBestHumanScore('GAME1')).toBe(0);
     });
@@ -70,54 +98,99 @@ describe('Bot Score Cap', () => {
     });
   });
 
-  describe('shouldBotScore', () => {
-    it('allows bot to score when below best human', () => {
-      getLeaderboard.mockReturnValue([
-        { username: 'Alice', score: 50, isBot: false },
-        { username: 'TestBot', score: 20, isBot: true },
-      ]);
-
-      expect(shouldBotScore('GAME1', 'TestBot', 20, 10)).toBe(true);
-    });
-
-    it('blocks bot from exceeding best human score', () => {
-      getLeaderboard.mockReturnValue([
-        { username: 'Alice', score: 30, isBot: false },
-        { username: 'TestBot', score: 28, isBot: true },
-      ]);
-
-      // Bot at 28, wants to add 10 = 38 > 30
-      expect(shouldBotScore('GAME1', 'TestBot', 28, 10)).toBe(false);
-    });
-
-    it('allows small buffer when no human has scored yet', () => {
+  describe('shouldBotScore — no human scored yet (initial ceilings)', () => {
+    beforeEach(() => {
       getLeaderboard.mockReturnValue([
         { username: 'Alice', score: 0, isBot: false },
-        { username: 'TestBot', score: 5, isBot: true },
+        { username: 'TestBot', score: 0, isBot: true },
       ]);
-
-      // Bot at 5, wants to add 5 = 10 <= BOT_SCORE_BUFFER (20)
-      expect(shouldBotScore('GAME1', 'TestBot', 5, 5)).toBe(true);
     });
 
-    it('blocks bot beyond buffer when no human has scored', () => {
-      getLeaderboard.mockReturnValue([
-        { username: 'Alice', score: 0, isBot: false },
-        { username: 'TestBot', score: 18, isBot: true },
-      ]);
-
-      // Bot at 18, wants to add 5 = 23 > BOT_SCORE_BUFFER (20)
-      expect(shouldBotScore('GAME1', 'TestBot', 18, 5)).toBe(false);
+    it('easy bot: allows up to ceiling of 40', () => {
+      expect(shouldBotScore('GAME1', 'TestBot', 30, 10, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 35, 10, 'easy')).toBe(false);
     });
 
-    it('allows scoring up to exactly the human score', () => {
+    it('medium bot: allows up to ceiling of 80', () => {
+      expect(shouldBotScore('GAME1', 'TestBot', 70, 10, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 75, 10, 'medium')).toBe(false);
+    });
+
+    it('hard bot: allows up to ceiling of 150', () => {
+      expect(shouldBotScore('GAME1', 'TestBot', 140, 10, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 145, 10, 'hard')).toBe(false);
+    });
+
+    it('defaults to medium ceiling for unknown difficulty', () => {
+      expect(shouldBotScore('GAME1', 'TestBot', 70, 10, 'unknown')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 75, 10, 'unknown')).toBe(false);
+    });
+  });
+
+  describe('shouldBotScore — percentage-based targeting', () => {
+    it('easy bot targets 55% of best human (with variance=1.0)', () => {
+      // Human at 300, easy target = 300 * 0.55 * 1.0 = 165
       getLeaderboard.mockReturnValue([
-        { username: 'Alice', score: 40, isBot: false },
-        { username: 'TestBot', score: 35, isBot: true },
+        { username: 'Alice', score: 300, isBot: false },
       ]);
 
-      // Bot at 35, wants to add 5 = 40 === 40 (equal is OK)
-      expect(shouldBotScore('GAME1', 'TestBot', 35, 5)).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 160, 5, 'easy')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 160, 10, 'easy')).toBe(false);
+    });
+
+    it('medium bot targets 80% of best human (with variance=1.0)', () => {
+      // Human at 300, medium target = 300 * 0.80 * 1.0 = 240
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 300, isBot: false },
+      ]);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 230, 10, 'medium')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 235, 10, 'medium')).toBe(false);
+    });
+
+    it('hard bot targets 95% of best human (with variance=1.0)', () => {
+      // Human at 300, hard target = 300 * 0.95 * 1.0 = 285
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 300, isBot: false },
+      ]);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 280, 5, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 280, 10, 'hard')).toBe(false);
+    });
+
+    it('variance affects the target range', () => {
+      // Human at 200, medium base = 200 * 0.80 = 160
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 200, isBot: false },
+      ]);
+
+      // Low variance (Math.random = 0 → variance = 0.9): target = 200 * 0.80 * 0.9 = 144
+      mathRandomSpy.mockReturnValue(0);
+      expect(shouldBotScore('GAME1', 'TestBot', 140, 5, 'medium')).toBe(false);
+
+      // High variance (Math.random = 1 → variance = 1.1): target = 200 * 0.80 * 1.1 = 176
+      mathRandomSpy.mockReturnValue(1);
+      expect(shouldBotScore('GAME1', 'TestBot', 170, 5, 'medium')).toBe(true);
+    });
+
+    it('scales with human score — bots can reach high scores when human does', () => {
+      // Human at 1000, hard target = 1000 * 0.95 * 1.0 = 950
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 1000, isBot: false },
+      ]);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 900, 50, 'hard')).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 945, 10, 'hard')).toBe(false);
+    });
+
+    it('defaults to medium when difficulty is omitted', () => {
+      // Human at 100, medium target = 100 * 0.80 * 1.0 = 80
+      getLeaderboard.mockReturnValue([
+        { username: 'Alice', score: 100, isBot: false },
+      ]);
+
+      expect(shouldBotScore('GAME1', 'TestBot', 75, 5)).toBe(true);
+      expect(shouldBotScore('GAME1', 'TestBot', 75, 10)).toBe(false);
     });
   });
 });

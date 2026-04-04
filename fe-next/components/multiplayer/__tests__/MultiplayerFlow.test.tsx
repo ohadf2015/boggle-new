@@ -41,6 +41,13 @@ vi.mock('@/utils/avatarConfig', () => ({
   getAvatarEmojiAndColor: vi.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
 }));
 
+let mockIsOnCrazyGamesPlatform = false;
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({
+    isOnCrazyGamesPlatform: mockIsOnCrazyGamesPlatform,
+  }),
+}));
+
 vi.mock('@/shared/types/customAvatar', () => ({
   getRandomAvatarConfig: () => ({
     gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
@@ -456,5 +463,107 @@ describe('MultiplayerFlow - Game Code Generation', () => {
     generatedCodes.forEach(code => {
       expect(code).toMatch(/^[A-Z0-9]{6}$/);
     });
+  });
+
+});
+
+describe('CrazyGames Smart Auto-Join', () => {
+  const baseProps = {
+    handleJoin: vi.fn(),
+    refreshRooms: vi.fn(),
+    activeRooms: [
+      {
+        gameCode: 'ROOM01',
+        roomName: 'Test Room 1',
+        playerCount: 2,
+        language: 'en' as Language,
+        gameState: 'waiting' as const,
+        isRanked: false,
+        createdAt: Date.now(),
+      },
+    ],
+    roomsLoading: false,
+    isJoining: false,
+    isAuthenticated: true,
+    displayName: 'CGPlayer',
+    defaultLanguage: 'en' as Language,
+    setGameCode: vi.fn(),
+    setUsername: vi.fn(),
+    setRoomName: vi.fn(),
+    setHostUsername: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIsOnCrazyGamesPlatform = true;
+  });
+
+  afterEach(() => {
+    mockIsOnCrazyGamesPlatform = false;
+  });
+
+  it('should auto-join first open room on CrazyGames platform', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} />);
+
+    expect(handleJoin).toHaveBeenCalledWith(
+      false, null, 'ROOM01', undefined, 'CGPlayer',
+    );
+  });
+
+  it('should trigger quick-play when no open rooms on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+    // Quick play creates a room (host mode = true)
+    expect(handleJoin).toHaveBeenCalledWith(
+      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+    );
+  });
+
+  it('should skip full rooms when auto-joining on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    const fullRooms: ActiveRoom[] = [
+      {
+        gameCode: 'FULL01', roomName: 'Full Room', playerCount: 8, maxPlayers: 8,
+        language: 'en' as Language, gameState: 'waiting', isRanked: false, createdAt: Date.now(),
+      },
+    ];
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={fullRooms} />);
+
+    // Should quick-play since the only room is full
+    expect(handleJoin).toHaveBeenCalledWith(
+      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+    );
+  });
+
+  it('should skip in-progress rooms when auto-joining on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    const rooms: ActiveRoom[] = [
+      {
+        gameCode: 'PLAY01', roomName: 'In Progress', playerCount: 3,
+        language: 'en' as Language, gameState: 'playing', isRanked: false, createdAt: Date.now(),
+      },
+    ];
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={rooms} />);
+
+    expect(handleJoin).toHaveBeenCalledWith(
+      true, expect.any(String), expect.any(String), expect.any(String), 'CGPlayer',
+    );
+  });
+
+  it('should NOT auto-join on non-CrazyGames platforms', () => {
+    mockIsOnCrazyGamesPlatform = false;
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('should NOT auto-join when rooms are still loading', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} roomsLoading={true} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 });

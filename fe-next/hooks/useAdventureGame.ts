@@ -85,6 +85,8 @@ interface UseAdventureGameReturn {
   shufflesRemaining: number;
   /** Update a specific objective (for boss events, collectGems, etc.) */
   updateObjective: (objectiveType: string, value: number, mode?: 'set' | 'increment') => void;
+  /** Effective combo timeout in ms (accounts for upgrade multiplier) */
+  effectiveComboTimeout: number;
 }
 
 // ==============================================
@@ -308,5 +310,6 @@ export function useAdventureGame({
     useShuffle,
     shufflesRemaining: state.shufflesRemaining,
     updateObjective,
+    effectiveComboTimeout,
   };
 }

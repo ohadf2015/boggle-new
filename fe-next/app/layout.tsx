@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         siteName: 'LexiClash',
         images: [
             {
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
                 alt: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'LexiClash – Free Online Word Game | Play With Friends',
         description: 'Play boggle free online with friends — no download. Real-time multiplayer word battles, daily challenges, 5 languages.',
-        images: ['https://www.lexiclash.live/og-image-en.jpg'],
+        images: ['https://www.lexiclash.live/og-image-en.webp'],
     },
     // Block indexing for preview/staging environments
     robots: isPreviewEnvironment ? {

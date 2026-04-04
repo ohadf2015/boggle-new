@@ -1,6 +1,6 @@
 /**
  * Tile tooltip descriptions for the tile guide / long-press preview.
- * TODO: Wire into i18n via t() keys — currently English-only.
+ * Uses i18n keys when a translator is provided; falls back to English.
  */
 import type { BlastTileType } from '@/shared/types/blast';
 
@@ -11,22 +11,59 @@ export interface TileTooltip {
   icon: string;
 }
 
-export const TILE_TOOLTIPS: Partial<Record<BlastTileType, TileTooltip>> = {
-  gold:      { name: 'Gold',      desc: '3× score multiplier',                         icon: '✦' },
-  silver:    { name: 'Silver',    desc: '1.5× score multiplier',                       icon: '🪙' },
-  diamond:   { name: 'Diamond',   desc: '5× score multiplier',                         icon: '💠' },
-  bomb:      { name: 'Bomb',      desc: 'Clears 3×3 area around it. Chains to nearby bombs.', icon: '💣' },
-  lightning: { name: 'Lightning', desc: 'Clears entire column.',                        icon: '⚡' },
-  prism:     { name: 'Prism',     desc: '2 hits to break. Clears full row + column.',   icon: '🔷' },
-  rainbow:   { name: 'Rainbow',   desc: 'Copies and doubles the best special in your word.', icon: '🌈' },
-  ice:       { name: 'Ice',       desc: '2 hits to break. Blocks tile underneath.',     icon: '❄' },
-  gem:       { name: 'Gem',       desc: '3 hits to complete. Spawns 2 new specials.',   icon: '💎' },
-  frozen:    { name: 'Frost',     desc: '2 hits to reveal a hidden special inside.',    icon: '🧊' },
-  magnet:    { name: 'Vortex',    desc: 'Pulls nearby tiles inward, then explodes.',    icon: '🌀' },
-  mirror:    { name: 'Mirror',    desc: 'Copies the first offensive special in your word.', icon: '🪞' },
+/** i18n keys per tile type */
+const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string; icon: string }>> = {
+  gold:      { name: 'blast.tile.gold.name',      desc: 'blast.tile.gold.desc',      icon: '✦' },
+  silver:    { name: 'blast.tile.silver.name',    desc: 'blast.tile.silver.desc',    icon: '🪙' },
+  diamond:   { name: 'blast.tile.diamond.name',   desc: 'blast.tile.diamond.desc',   icon: '💠' },
+  bomb:      { name: 'blast.tile.bomb.name',      desc: 'blast.tile.bomb.desc',      icon: '💣' },
+  lightning: { name: 'blast.tile.lightning.name', desc: 'blast.tile.lightning.desc', icon: '⚡' },
+  prism:     { name: 'blast.tile.prism.name',     desc: 'blast.tile.prism.desc',     icon: '🔷' },
+  rainbow:   { name: 'blast.tile.rainbow.name',   desc: 'blast.tile.rainbow.desc',   icon: '🌈' },
+  ice:       { name: 'blast.tile.ice.name',       desc: 'blast.tile.ice.desc',       icon: '❄' },
+  gem:       { name: 'blast.tile.gem.name',       desc: 'blast.tile.gem.desc',       icon: '💎' },
+  frozen:    { name: 'blast.tile.frozen.name',    desc: 'blast.tile.frozen.desc',    icon: '🧊' },
+  magnet:    { name: 'blast.tile.magnet.name',    desc: 'blast.tile.magnet.desc',    icon: '🌀' },
+  mirror:    { name: 'blast.tile.mirror.name',    desc: 'blast.tile.mirror.desc',    icon: '🪞' },
+  wildcard:  { name: 'blast.tile.wildcard.name',  desc: 'blast.tile.wildcard.desc',  icon: '🃏' },
+  countdown: { name: 'blast.tile.countdown.name', desc: 'blast.tile.countdown.desc', icon: '⏳' },
+  virus:     { name: 'blast.tile.virus.name',     desc: 'blast.tile.virus.desc',     icon: '🦠' },
+  portal:    { name: 'blast.tile.portal.name',    desc: 'blast.tile.portal.desc',    icon: '🌀' },
+  catalyst:  { name: 'blast.tile.catalyst.name',  desc: 'blast.tile.catalyst.desc',  icon: '⚗️' },
 };
 
-/** Get tooltip for a tile type. Returns null for standard. */
-export function getTileTooltip(type: BlastTileType): TileTooltip | null {
-  return TILE_TOOLTIPS[type] ?? null;
+/** English fallbacks */
+const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
+  gold:      { name: 'Gold',      desc: '3\u00d7 score + grants 1 bonus move.',                          icon: '✦' },
+  silver:    { name: 'Silver',    desc: '1.5\u00d7 score + extends all countdown timers by 1.',           icon: '🪙' },
+  diamond:   { name: 'Diamond',   desc: '5\u00d7 score + reveals frozen inner types for 3 turns.',        icon: '💠' },
+  bomb:      { name: 'Bomb',      desc: 'Clears 3\u00d73 area. Chains to nearby bombs.',                  icon: '💣' },
+  lightning: { name: 'Lightning', desc: 'Clears entire column. Chains to other lightning bolts.',     icon: '⚡' },
+  prism:     { name: 'Prism',     desc: '2 hits. Clears row + column. Converts 2 tiles to specials.',icon: '🔷' },
+  rainbow:   { name: 'Rainbow',   desc: 'Copies and doubles the best special in your word.',         icon: '🌈' },
+  ice:       { name: 'Ice',       desc: '2 hits to break. Shattering freezes adjacent viruses.',     icon: '❄' },
+  gem:       { name: 'Gem',       desc: '3 hits to complete. Spawns 2 specials + 2 bonus moves.',    icon: '💎' },
+  frozen:    { name: 'Frost',     desc: '2 hits to reveal a hidden special inside.',                  icon: '🧊' },
+  magnet:    { name: 'Vortex',    desc: 'Pulls nearby tiles inward, then explodes.',                  icon: '🌀' },
+  mirror:    { name: 'Mirror',    desc: 'Copies the first offensive special in your word.',           icon: '🪞' },
+  wildcard:  { name: 'Wildcard',  desc: 'Matches any letter. Scores based on letter rarity.',        icon: '🃏' },
+  countdown: { name: 'Countdown', desc: 'Explodes if not defused! Defusing grants 2 bonus moves.',   icon: '⏳' },
+  virus:     { name: 'Virus',     desc: 'Spreads each turn. Clear 3+ in one word to cure ALL.',      icon: '🦠' },
+  portal:    { name: 'Portal',    desc: 'Teleport through paired portals. Words score 2\u00d7.',     icon: '🌀' },
+  catalyst:  { name: 'Catalyst',  desc: 'Clears and upgrades adjacent tiles to random specials.',    icon: '⚗️' },
+};
+
+/** Get tooltip for a tile type. Uses t() for i18n when provided, English fallback otherwise. */
+export function getTileTooltip(type: BlastTileType, t?: (key: string) => string | undefined): TileTooltip | null {
+  const keys = TILE_I18N_KEYS[type];
+  if (!keys) return null;
+
+  if (t) {
+    const name = t(keys.name);
+    const desc = t(keys.desc);
+    // Only use i18n result if it differs from the key (avoids passthrough mocks / missing translations)
+    if (name && desc && name !== keys.name && desc !== keys.desc) return { name, desc, icon: keys.icon };
+  }
+
+  return ENGLISH_FALLBACK[type] ?? null;
 }

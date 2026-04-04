@@ -8,18 +8,25 @@ import { executeComboEffect } from './blastComboEffects';
 import { getWordLengthScaleFactor } from './blastComboScaling';
 import {
   GOLD_MULTIPLIER,
+  GOLD_BONUS_MOVES,
   RAINBOW_BOOST_MULTIPLIER,
   ICE_CLEAR_BONUS,
   PRISM_USE_BONUS,
   PRISM_CROSS_BONUS,
   TREASURE_GEM_COMPLETION_BONUS,
+  TREASURE_GEM_BONUS_MOVES,
   MIRROR_MULTIPLIER,
   SILVER_MULTIPLIER,
+  SILVER_COUNTDOWN_EXTEND,
   DIAMOND_MULTIPLIER,
-  WILDCARD_CLEAR_BONUS,
+  DIAMOND_REVEAL_TURNS,
+  SCRABBLE_VALUES,
   COUNTDOWN_DEFUSE_BONUS,
+  COUNTDOWN_DEFUSE_MOVES,
   VIRUS_CLEAR_SCORE,
+  VIRUS_MASS_CURE_THRESHOLD,
   PORTAL_USE_BONUS,
+  PORTAL_WORD_MULTIPLIER,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -62,6 +69,14 @@ export interface TileProcessingResult {
   vortexLetterSwaps: Array<{ fromR: number; fromC: number; toR: number; toC: number }>;
   detectedCombos: SpecialCombo[];
   bonusMoveCount: number;
+  /** Turns of diamond reveal to add to game state */
+  diamondRevealTurns: number;
+  /** Silver extended countdown timers (already applied to tiles) */
+  silverCountdownExtended: boolean;
+  /** Virus mass cure triggered (3+ virus cleared in one word) */
+  virusMassCure: boolean;
+  /** Portal word multiplier (applied if word passes through portal) */
+  portalMultiplier: number;
 }
 
 /**
@@ -81,6 +96,11 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   const clearedTypeCounts: Partial<Record<BlastTileType, number>> = {};
   let goldMultiplier = 1;
   let gemsCompletedThisWord = 0;
+  let tileBonusMoves = 0;
+  let diamondRevealTurns = 0;
+  let silverCountdownExtended = false;
+  let virusClearedCount = 0;
+  let hasPortal = false;
 
   // Pre-scan for Rainbow (best offensive) and Mirror (first offensive)
   const hasRainbow = path.some(cell => prev[cell.row]?.[cell.col]?.type === 'rainbow');
@@ -159,21 +179,37 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     switch (tile.type) {
       case 'gold':
         goldMultiplier *= GOLD_MULTIPLIER;
+        tileBonusMoves += GOLD_BONUS_MOVES;
         newExplosions.push({ id: `gold-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
       case 'silver':
         goldMultiplier *= SILVER_MULTIPLIER;
+        // Extend all active countdown timers on the board
+        if (!silverCountdownExtended) {
+          silverCountdownExtended = true;
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const t = next[r][c];
+              if (t.type === 'countdown' && !t.isCleared && t.countdown != null) {
+                t.countdown += SILVER_COUNTDOWN_EXTEND;
+              }
+            }
+          }
+        }
         newExplosions.push({ id: `silver-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
       case 'diamond':
         goldMultiplier *= DIAMOND_MULTIPLIER;
+        diamondRevealTurns = Math.max(diamondRevealTurns, DIAMOND_REVEAL_TURNS);
         newExplosions.push({ id: `diamond-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 3, timestamp: now });
         break;
 
       case 'mirror': {
         newExplosions.push({ id: `mirror-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         if (mirrorFirstSpecial !== null) {
-          bonusScore += reFireOffensiveSpecial(mirrorFirstSpecial, ctx);
+          const mirrorRefire = reFireOffensiveSpecial(mirrorFirstSpecial, ctx);
+          bonusScore += mirrorRefire.bonusScore;
+          vortexLetterSwaps.push(...mirrorRefire.letterSwaps);
         } else {
           mirrorSoloMultiplier = MIRROR_MULTIPLIER;
         }
@@ -188,7 +224,9 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       case 'rainbow': {
         newExplosions.push({ id: `rainbow-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         if (bestOffensiveSpecial !== null) {
-          bonusScore += reFireOffensiveSpecial(bestOffensiveSpecial, ctx);
+          const rainbowRefire = reFireOffensiveSpecial(bestOffensiveSpecial, ctx);
+          bonusScore += rainbowRefire.bonusScore;
+          vortexLetterSwaps.push(...rainbowRefire.letterSwaps);
         } else {
           rainbowSoloMultiplier = RAINBOW_BOOST_MULTIPLIER;
         }
@@ -197,12 +235,50 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
 
       case 'ice':
         bonusScore += ICE_CLEAR_BONUS;
+        // Ice shatter: freeze adjacent virus tiles (prevent spread for 2 turns)
+        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+          const r = cell.row + dr;
+          const c = cell.col + dc;
+          if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+            const adj = next[r][c];
+            if (!adj.isCleared && adj.type === 'virus') {
+              adj.activationEffect = 'virus-frozen';
+              // Convert virus to ice (2 hits to break, stops spread)
+              adj.type = 'ice';
+              adj.hitsRemaining = 2;
+            }
+          }
+        }
         break;
 
       case 'prism': {
         bonusScore += PRISM_USE_BONUS + PRISM_CROSS_BONUS;
         newExplosions.push({ id: `prism-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'prism', intensity: 4, timestamp: now });
         bonusScore += firePrismCross(cell.row, cell.col, ctx);
+        // Prism converts 2 random standard tiles to specials
+        {
+          const standardTiles: BlastTileState[] = [];
+          for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+              const t = next[r][c];
+              if (!t.isCleared && t.type === 'standard' && !path.some(p => p.row === r && p.col === c)) {
+                standardTiles.push(t);
+              }
+            }
+          }
+          // Pick 2 random standard tiles and convert them
+          for (let i = standardTiles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [standardTiles[i], standardTiles[j]] = [standardTiles[j], standardTiles[i]];
+          }
+          const prismConvertCount = Math.min(2, standardTiles.length);
+          for (let i = 0; i < prismConvertCount; i++) {
+            const t = standardTiles[i];
+            const specials: BlastTileType[] = ['bomb', 'lightning', 'gold', 'rainbow'];
+            t.type = specials[Math.floor(Math.random() * specials.length)];
+            t.activationEffect = 'prism-convert';
+          }
+        }
         break;
       }
 
@@ -242,24 +318,34 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         break;
       }
 
-      case 'wildcard':
-        // Wildcard already matched any letter during path validation — no special effect on clear
-        bonusScore += WILDCARD_CLEAR_BONUS;
+      case 'wildcard': {
+        // Wildcard scores based on highest Scrabble-value letter it could represent
+        const letterIdx = path.indexOf(cell);
+        const wildcardLetter = letterIdx >= 0 ? word[letterIdx]?.toUpperCase() : null;
+        const wildcardValue = wildcardLetter ? (SCRABBLE_VALUES[wildcardLetter] ?? 1) : 1;
+        bonusScore += wildcardValue;
+        if (wildcardValue >= 4) {
+          newExplosions.push({ id: `wildcard-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        }
         break;
+      }
 
       case 'countdown':
-        // Defused! Player included it in a word before it exploded
+        // Defused! Player included it in a word before it exploded — bonus moves reward
         bonusScore += COUNTDOWN_DEFUSE_BONUS;
+        tileBonusMoves += COUNTDOWN_DEFUSE_MOVES;
         newExplosions.push({ id: `countdown-defuse-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
 
       case 'virus':
-        // Virus cleared — no score, just removal stops the spread
+        // Virus cleared — track count for mass cure
         bonusScore += VIRUS_CLEAR_SCORE;
+        virusClearedCount++;
         break;
 
       case 'portal': {
         bonusScore += PORTAL_USE_BONUS;
+        hasPortal = true;
         newExplosions.push({ id: `portal-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         // Clear the paired portal too
         const pairId = prev[cell.row]?.[cell.col]?.portalPairId;
@@ -283,6 +369,26 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         break;
       }
     }
+  }
+
+  // Virus mass cure: clearing 3+ virus tiles in one word cures ALL virus on board
+  const virusMassCure = virusClearedCount >= VIRUS_MASS_CURE_THRESHOLD;
+  if (virusMassCure) {
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        const t = next[r][c];
+        if (t.type === 'virus' && !t.isCleared) {
+          markCleared(t);
+          t.activationEffect = 'virus-cured';
+          newExplosions.push({ id: `virus-cure-${now}-${r}-${c}`, row: r, col: c, type: 'clear', intensity: 2, timestamp: now });
+        }
+      }
+    }
+  }
+
+  // Gem completion bonus moves
+  if (gemsCompletedThisWord > 0) {
+    tileBonusMoves += gemsCompletedThisWord * TREASURE_GEM_BONUS_MOVES;
   }
 
   // Treasure Gem spawns
@@ -312,8 +418,9 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     newExplosions.push({ id: `word-${now}`, row: path[midIdx].row, col: path[midIdx].col, type: 'word', intensity: intensity as 1 | 2 | 3 | 4, timestamp: now });
   }
 
-  // Score calculation: solo multipliers -> gold multiplier -> bonus
-  const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier;
+  // Score calculation: solo multipliers -> gold multiplier -> portal -> bonus
+  const portalMultiplier = hasPortal ? PORTAL_WORD_MULTIPLIER : 1;
+  const effectiveBase = baseScore * rainbowSoloMultiplier * mirrorSoloMultiplier * portalMultiplier;
   const goldBonusScore = effectiveBase * goldMultiplier - effectiveBase;
   if (goldMultiplier > 1) {
     const multiplierTiles = path.filter(cell => {
@@ -350,7 +457,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
-  const bonusMoveCount = calculateBonusMoves(word.length);
+  const bonusMoveCount = calculateBonusMoves(word.length) + tileBonusMoves;
 
   return {
     next,
@@ -362,5 +469,9 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     vortexLetterSwaps,
     detectedCombos,
     bonusMoveCount,
+    diamondRevealTurns,
+    silverCountdownExtended,
+    virusMassCure,
+    portalMultiplier,
   };
 }

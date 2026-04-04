@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-he.jpg`,
+          url: `${BASE_URL}/og-image-he.webp`,
           width: 1200,
           height: 630,
           alt: 'לקסיקלאש - משחק מילים בעברית',
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'משחק מילים בעברית - לקסיקלאש',
       description: 'משחק מילים מרובה משתתפים בעברית! צרו חדר, שלחו לינק והתחרו בזמן אמת. חינם!',
-      images: [`${BASE_URL}/og-image-he.jpg`],
+      images: [`${BASE_URL}/og-image-he.webp`],
     },
     alternates: {
       canonical: pageUrl,

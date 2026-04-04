@@ -157,10 +157,10 @@ describe('useAdventureGame - Combo timeout after game end', () => {
     expect(result.current.gameState.comboCount).toBe(1);
   });
 
-  it('should not dispatch COMBO_TIMEOUT after objectives are met (auto-complete)', () => {
-    // GIVEN - Level with 1-word primary objective
+  it('should not dispatch COMBO_TIMEOUT after timer expires', () => {
+    // GIVEN - Level with short timer
     const config = createConfig({
-      timerSeconds: 60,
+      timerSeconds: 2,
       objectives: [{ type: 'wordCount', target: 1, isPrimary: true }],
     });
     const { result } = renderHook(() =>
@@ -169,13 +169,14 @@ describe('useAdventureGame - Combo timeout after game end', () => {
 
     act(() => result.current.startGame());
 
-    // Submit word that completes the primary objective (auto-complete)
+    // Submit word, then let timer expire
     act(() => result.current.submitWord('CATS', 100));
+    act(() => vi.advanceTimersByTime(2000));
 
     expect(result.current.gameState.isComplete).toBe(true);
     expect(result.current.gameState.comboCount).toBe(1);
 
-    // WHEN - Combo timeout fires (3s later)
+    // WHEN - Combo timeout fires after game is complete
     act(() => vi.advanceTimersByTime(4000));
 
     // THEN - Combo should not be reset after game is complete

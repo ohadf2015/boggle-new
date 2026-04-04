@@ -57,12 +57,12 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
               <h2 className="font-neo-display font-bold text-neo-white text-lg">
-                {t('blast.tileGuide.title') ?? 'Tile Guide'}
+                {t('blast.tileGuide.title')}
               </h2>
               <button
                 onClick={onClose}
                 className="text-white/40 hover:text-white transition-colors"
-                aria-label={t('common.close') ?? 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -81,10 +81,10 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
                     </span>
                     <div className="min-w-0">
                       <span className="block font-neo-display font-bold text-neo-white text-sm capitalize">
-                        {t(`blast.tileGuide.${key}.name`) ?? type}
+                        {t(`blast.tileGuide.${key}.name`)}
                       </span>
                       <span className="block font-neo-body text-white/60 text-xs">
-                        {t(`blast.tileGuide.${key}.desc`) ?? ''}
+                        {t(`blast.tileGuide.${key}.desc`)}
                       </span>
                     </div>
                   </div>

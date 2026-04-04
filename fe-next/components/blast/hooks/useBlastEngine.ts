@@ -144,6 +144,7 @@ export function useBlastEngine(
     totalMoves: movesAllowed === Infinity ? Infinity : movesAllowed,
     bonusMoveScore: 0,
     tileTypeClears: {} as Record<BlastTileType, number>,
+    diamondRevealTurns: 0,
   });
 
   const gameStateRef = useRef(gameState);
@@ -229,7 +230,7 @@ export function useBlastEngine(
 
     const currentTiles = tileStatesRef.current;
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, diamondRevealTurns: newDiamondReveal } = result;
 
     if (word.length > bestWordRef.current.length) bestWordRef.current = word;
 
@@ -278,6 +279,10 @@ export function useBlastEngine(
         movesRemaining: newMovesRemaining,
         movesUsed: prev.movesUsed + 1,
         tileTypeClears: mergedTypeClears,
+        diamondRevealTurns: Math.max(
+          newDiamondReveal,
+          prev.diamondRevealTurns > 0 ? prev.diamondRevealTurns - 1 : 0,
+        ),
       };
     });
 

@@ -18,7 +18,7 @@ function generateHowToPlaySchema(locale: string, t: (key: string) => string) {
         "@type": "HowTo",
         "name": t('rules.pageTitle'),
         "description": t('howToPlay.description'),
-        "image": "https://lexiclash.live/og-image.png",
+        "image": "https://www.lexiclash.live/og-image-en.webp",
         "inLanguage": locale,
         "totalTime": "PT2M",
         "estimatedCost": {

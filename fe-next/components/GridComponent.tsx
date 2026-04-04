@@ -49,6 +49,8 @@ interface GridComponentProps {
   isTypingMode?: boolean;
   /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles) */
   cellFilter?: (row: number, col: number) => boolean;
+  /** Golden letter positions from backend startGame payload */
+  goldenLetters?: Array<{ row: number; col: number }>;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -74,6 +76,7 @@ const GridComponent = memo<GridComponentProps>(({
   onSelectionChange,
   isTypingMode = false,
   cellFilter,
+  goldenLetters = [],
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -203,6 +206,11 @@ const GridComponent = memo<GridComponentProps>(({
     }
     return hints;
   }, [selectedCells, selectedCellsSet, grid]);
+
+  const goldenCellsSet = useMemo(
+    () => new Set(goldenLetters.map(c => `${c.row}-${c.col}`)),
+    [goldenLetters],
+  );
 
   const { highlightedCellsSet, highlightedCellOrder } = useMemo(() => {
     const set = new Set<string>();
@@ -428,6 +436,7 @@ const GridComponent = memo<GridComponentProps>(({
               const isAdjacentHint = adjacentHintCells.has(cellKey);
               const isHighlighted = highlightedCellsSet.has(cellKey);
               const highlightedOrder = highlightedCellOrder.get(cellKey);
+              const isGolden = goldenCellsSet.has(cellKey);
               const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
               const isHovered = hoveredCell?.row === i && hoveredCell?.col === j;
               const isLastSelected = selectedCells.length > 0 &&
@@ -453,6 +462,7 @@ const GridComponent = memo<GridComponentProps>(({
                   isFocused={isFocused}
                   isAdjacentHint={isAdjacentHint}
                   isHighlighted={isHighlighted}
+                  isGolden={isGolden}
                   isEliminated={isEliminated}
                   isHovered={isHovered}
                   highlightedOrder={highlightedOrder}

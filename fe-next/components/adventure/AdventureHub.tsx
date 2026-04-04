@@ -9,17 +9,20 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
-import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home } from 'lucide-react';
+import { Flame, ChevronRight, Map, Swords, Target, Check, Coins, Star, BookOpen, ShoppingBag, Home, Crown, Zap, Infinity as InfinityIcon } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { GhostRivalWidget } from '@/components/engagement/GhostRivalWidget';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getStreakMultiplier } from '@/lib/adventure/adventureStreak';
 import { getNextUnlockedLevel } from '@/lib/adventure/constants';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
+import { getAscensionLevel } from '@/lib/adventure/ascensionConfig';
 import type { DailyQuest } from '@/lib/adventure/dailyQuests';
 import type { LevelCompletion } from '@/types/adventure';
+import type { WeeklyModifier } from '@/lib/adventure/weeklyModifiers';
 
 // ==============================================
 // TYPES
@@ -48,6 +51,8 @@ interface AdventureHubProps {
   onBossRush?: () => void;
   canBossRush?: boolean;
   onOpenWordAlbum?: () => void;
+  ascensionLevel?: number;
+  weeklyModifiers?: WeeklyModifier[];
 }
 
 // ==============================================
@@ -91,9 +96,12 @@ const AdventureHub = memo<AdventureHubProps>(({
 
   wordAlbumCount = 0,
   onOpenWordAlbum,
+  ascensionLevel = 0,
+  weeklyModifiers = [],
 }) => {
   const { t } = useLanguageSafe();
   const multiplier = getStreakMultiplier(streakDays);
+  const ascension = ascensionLevel > 0 ? getAscensionLevel(ascensionLevel) : null;
 
   const nextLevel = useMemo(() => {
     return getNextUnlockedLevel(currentWorld, completions);
@@ -108,7 +116,7 @@ const AdventureHub = memo<AdventureHubProps>(({
   return (
     <div className="flex flex-col min-h-[calc(100dvh-56px)] max-w-md mx-auto">
       {/* Hero Section — world image with overlaid stats */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
@@ -138,8 +146,16 @@ const AdventureHub = memo<AdventureHubProps>(({
         {/* Player stats — overlaid bottom */}
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between z-10">
           <div>
-            <div className="text-neo-white font-black text-xl leading-tight">
-              {t('adventure.level')} {playerLevel}
+            <div className="flex items-center gap-2">
+              <span className="text-neo-white font-black text-xl leading-tight">
+                {t('adventure.level')} {playerLevel}
+              </span>
+              {ascension && (
+                <span className="flex items-center gap-1 text-[10px] font-black text-neo-yellow bg-neo-yellow/20 border border-neo-yellow/40 px-1.5 py-0.5 rounded">
+                  <Crown className="w-3 h-3" />
+                  {t(ascension.nameKey)}
+                </span>
+              )}
             </div>
             <div className="text-neo-white/60 text-xs font-bold mt-0.5">
               {t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}
@@ -154,13 +170,13 @@ const AdventureHub = memo<AdventureHubProps>(({
             </span>
           </div>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Content area */}
       <div className="flex flex-col gap-4 px-4 py-4 flex-1">
 
         {/* Streak + Daily Quests — single compact row */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.15 }}
@@ -214,7 +230,7 @@ const AdventureHub = memo<AdventureHubProps>(({
                 const progress = Math.min(dq.current / dq.quest.target, 1);
                 return (
                   <div key={dq.quest.id} className="flex-1 h-1.5 bg-neo-white/10 rounded-full overflow-hidden">
-                    <motion.div
+                    <AdaptiveMotion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${progress * 100}%` }}
                       transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
@@ -228,17 +244,38 @@ const AdventureHub = memo<AdventureHubProps>(({
               })}
             </div>
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
+
+        {/* Weekly modifiers — active modifier pills */}
+        {weeklyModifiers.length > 0 && (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...spring, delay: 0.2 }}
+            className="flex flex-wrap gap-1.5"
+          >
+            {weeklyModifiers.map((mod) => (
+              <span
+                key={mod.id}
+                className="flex items-center gap-1 text-[10px] font-bold text-neo-purple bg-neo-purple/15 border border-neo-purple/30 px-2 py-1 rounded-neo"
+                title={t(mod.descriptionKey)}
+              >
+                <Zap className="w-3 h-3" />
+                {t(mod.nameKey)}
+              </span>
+            ))}
+          </AdaptiveMotion.div>
+        )}
 
         {/* Quest detail rows — staggered entrance */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.25 }}
           className="space-y-1.5"
         >
           {dailyQuests.map((dq, i) => (
-            <motion.div
+            <AdaptiveMotion.div
               key={dq.quest.id}
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
@@ -251,13 +288,13 @@ const AdventureHub = memo<AdventureHubProps>(({
               )}
             >
               {dq.isComplete ? (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring' as const, stiffness: 400, damping: 10, delay: 0.45 + i * 0.08 }}
                 >
                   <Check className="w-4 h-4 text-neo-lime shrink-0" />
-                </motion.div>
+                </AdaptiveMotion.div>
               ) : (
                 <div className="w-4 h-4 rounded-full border-2 border-neo-white/20 shrink-0" />
               )}
@@ -270,28 +307,31 @@ const AdventureHub = memo<AdventureHubProps>(({
               <span className="text-[10px] font-mono text-neo-white/40 tabular-nums shrink-0">
                 {Math.min(dq.current, dq.quest.target)}/{dq.quest.target}
               </span>
-            </motion.div>
+            </AdaptiveMotion.div>
           ))}
 
           {/* All quests complete bonus */}
           {completedQuestCount === totalQuests && totalQuests > 0 && (
-            <motion.div
+            <AdaptiveMotion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
               className="py-1.5 text-center text-neo-lime font-bold text-xs uppercase rounded-neo border border-neo-lime/30 bg-neo-lime/10"
             >
               {t('adventure.hub.allQuestsComplete')}
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
+
+        {/* Ghost Rival — weekly rivalry widget */}
+        <GhostRivalWidget />
 
         {/* Spacer to push CTA + actions to bottom */}
         <div className="flex-1 min-h-2" />
 
         {/* Continue Button — hero CTA with subtle pulse */}
         {nextLevel && nextWorldConfig && (
-          <motion.button
+          <AdaptiveMotion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{
               opacity: 1,
@@ -322,17 +362,17 @@ const AdventureHub = memo<AdventureHubProps>(({
               </span>
             </div>
             <ChevronRight className="w-6 h-6 rtl:scale-x-[-1]" />
-          </motion.button>
+          </AdaptiveMotion.button>
         )}
 
         {/* Secondary actions — compact row */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.4 }}
           className="flex gap-2 w-full pb-2"
         >
-          <motion.button
+          <AdaptiveMotion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onOpenWorldMap}
@@ -347,11 +387,28 @@ const AdventureHub = memo<AdventureHubProps>(({
           >
             <Map className="w-4 h-4" />
             {t('adventure.hub.worldMap')}
-          </motion.button>
+          </AdaptiveMotion.button>
 
+
+          {currentWorld >= 3 && (
+            <Link
+              href="/adventure/endless"
+              className={cn(
+                'flex-1 py-2.5 px-3',
+                'flex items-center justify-center gap-1.5',
+                'bg-neo-purple/10 text-neo-purple',
+                'font-bold text-xs',
+                'border border-neo-purple/30 rounded-neo',
+                'hover:bg-neo-purple/20 transition-colors'
+              )}
+            >
+              <InfinityIcon className="w-4 h-4" />
+              {t('adventure.endlessMode.title')}
+            </Link>
+          )}
 
           {canBossRush && onBossRush && (
-            <motion.button
+            <AdaptiveMotion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onBossRush}
@@ -366,18 +423,18 @@ const AdventureHub = memo<AdventureHubProps>(({
             >
               <Swords className="w-4 h-4" />
               {t('adventure.bossRush.title')}
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Tertiary actions — shop + word album */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.5 }}
           className="flex gap-2 w-full pb-2"
         >
-          <motion.button
+          <AdaptiveMotion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onOpenShop}
@@ -392,10 +449,10 @@ const AdventureHub = memo<AdventureHubProps>(({
           >
             <ShoppingBag className="w-4 h-4" />
             {t('adventure.shop.title')}
-          </motion.button>
+          </AdaptiveMotion.button>
 
           {onOpenWordAlbum && (
-            <motion.button
+            <AdaptiveMotion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onOpenWordAlbum}
@@ -415,9 +472,9 @@ const AdventureHub = memo<AdventureHubProps>(({
                   {wordAlbumCount}
                 </span>
               )}
-            </motion.button>
+            </AdaptiveMotion.button>
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
     </div>
   );

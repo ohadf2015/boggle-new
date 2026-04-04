@@ -1,8 +1,10 @@
 'use client';
+'use no memo'; // Disable React Compiler memoization — manual memoization with optional-chained deps incompatible
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { getRandomComboFlash, generateAccentParticles, type ComboFlashVariation } from './blastEffectVariations';
 
 export interface BlastComboFlashProps {
   flash: { id: string; tier: 1 | 2 | 3 } | null;
@@ -17,8 +19,32 @@ const TIER_CONFIG: Record<1 | 2 | 3, { color: string; duration: number; opacity:
   3: { color: 'linear-gradient(135deg, #FF1493, #FFE135, #00FFFF, #FF6B35)', duration: 0.45, opacity: 0.35 },
 };
 
+function buildFlashBg(cfg: { color: string }, isGradient: boolean, variation: ComboFlashVariation): string {
+  if (variation.type === 'diamond') {
+    return isGradient
+      ? `conic-gradient(from ${variation.rotation ?? 45}deg, ${cfg.color}, transparent 25%)`
+      : `conic-gradient(from ${variation.rotation ?? 45}deg, ${cfg.color}, transparent 25%)`;
+  }
+  if (variation.type === 'cross') {
+    return isGradient
+      ? `repeating-conic-gradient(from 0deg, ${cfg.color} 0deg 5deg, transparent 5deg 90deg)`
+      : `repeating-conic-gradient(from 0deg, ${cfg.color} 0deg 5deg, transparent 5deg 90deg)`;
+  }
+  const rot = variation.rotation ? ` at 50% 50%` : '';
+  return isGradient
+    ? `radial-gradient(circle${rot}, ${cfg.color}, transparent 70%)`
+    : `radial-gradient(circle${rot}, ${cfg.color}, transparent 60%)`;
+}
+
 export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastComboFlashProps) {
   const shouldReduceMotion = useReducedMotion();
+  const variation = useMemo(() => getRandomComboFlash(), [flash?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* eslint-disable react-hooks/preserve-manual-memoization */
+  const accentParticles = useMemo(
+    () => (flash && flash.tier >= 2 ? generateAccentParticles(flash.tier === 3 ? 12 : 6) : []),
+    [flash?.id, flash?.tier], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  /* eslint-enable react-hooks/preserve-manual-memoization */
 
   if (!flash) return null;
 
@@ -28,9 +54,8 @@ export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastCombo
 
   const cfg = TIER_CONFIG[flash.tier];
   const isGradient = flash.tier === 3;
-  const bgValue = isGradient
-    ? `radial-gradient(circle, ${cfg.color}, transparent 70%)`
-    : `radial-gradient(circle, ${cfg.color}, transparent 60%)`;
+  const bgValue = buildFlashBg(cfg, isGradient, variation);
+  const [scaleFrom, scaleTo] = variation.scaleRange ?? [0.3, 1.5];
 
   return (
     <AdaptiveAnimatePresence>
@@ -43,36 +68,104 @@ export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastCombo
         transition={{ duration: cfg.duration, ease: 'easeOut' }}
         onAnimationComplete={onComplete}
       >
+        {/* Main flash shape */}
         <AdaptiveMotion.div
           className="absolute"
-          style={{ inset: '-50%', background: bgValue }}
-          initial={{ scale: 0.3, opacity: cfg.opacity }}
-          animate={{ scale: 1.5, opacity: 0 }}
+          style={{
+            inset: '-50%',
+            background: bgValue,
+            rotate: variation.rotation ? `${variation.rotation}deg` : undefined,
+          }}
+          initial={{ scale: scaleFrom, opacity: cfg.opacity }}
+          animate={{ scale: scaleTo, opacity: 0 }}
           transition={{ duration: cfg.duration * 0.9, ease: 'easeOut' }}
         />
-        {flash.tier >= 2 && (
+
+        {/* Ripple rings for ripple variation */}
+        {variation.type === 'ripple' && Array.from({ length: variation.extraElements ?? 3 }).map((_, i) => (
           <AdaptiveMotion.div
+            key={`ripple-${i}`}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: 0,
-              width: '100%',
-              height: flash.tier === 3 ? 4 : 2,
-              background: isGradient
-                ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)'
-                : `linear-gradient(90deg, transparent, ${cfg.color}80, transparent)`,
-              transform: 'translateY(-50%)',
+              border: `2px solid ${isGradient ? '#FFFFFF' : cfg.color}`,
+              width: '10%',
+              height: '10%',
             }}
-            initial={{ scaleX: 0, opacity: 1 }}
-            animate={{ scaleX: 1, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            initial={{ scale: 0.5, opacity: cfg.opacity }}
+            animate={{ scale: 3 + i * 1.5, opacity: 0 }}
+            transition={{ duration: cfg.duration * (0.7 + i * 0.15), ease: 'easeOut', delay: i * 0.06 }}
           />
+        ))}
+
+        {/* Cross beams — horizontal + vertical scan lines */}
+        {(flash.tier >= 2 || variation.type === 'cross') && (
+          <>
+            <AdaptiveMotion.div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: 0,
+                width: '100%',
+                height: flash.tier === 3 ? 4 : 2,
+                background: isGradient
+                  ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)'
+                  : `linear-gradient(90deg, transparent, ${cfg.color}80, transparent)`,
+                transform: 'translateY(-50%)',
+              }}
+              initial={{ scaleX: 0, opacity: 1 }}
+              animate={{ scaleX: 1, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            />
+            {variation.type === 'cross' && (
+              <AdaptiveMotion.div
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: 0,
+                  height: '100%',
+                  width: flash.tier === 3 ? 4 : 2,
+                  background: isGradient
+                    ? 'linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent)'
+                    : `linear-gradient(180deg, transparent, ${cfg.color}80, transparent)`,
+                  transform: 'translateX(-50%)',
+                }}
+                initial={{ scaleY: 0, opacity: 1 }}
+                animate={{ scaleY: 1, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              />
+            )}
+          </>
         )}
+
+        {/* Accent particles shooting outward */}
+        {accentParticles.map((p, i) => {
+          const rad = (p.angle * Math.PI) / 180;
+          const endX = Math.cos(rad) * p.distance;
+          const endY = Math.sin(rad) * p.distance;
+          return (
+            <AdaptiveMotion.div
+              key={`accent-${i}`}
+              className="absolute left-1/2 top-1/2 rounded-full"
+              style={{
+                width: p.size,
+                height: p.size,
+                backgroundColor: p.color,
+                marginLeft: -p.size / 2,
+                marginTop: -p.size / 2,
+              }}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1.5 }}
+              animate={{ x: endX, y: endY, opacity: 0, scale: 0 }}
+              transition={{ duration: cfg.duration * 0.8, delay: p.delay, ease: 'easeOut' }}
+            />
+          );
+        })}
+
+        {/* Combo type label */}
         {comboTypeName && (
           <AdaptiveMotion.div
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
-            initial={{ scale: 0.5, opacity: 1 }}
-            animate={{ scale: 1.2, opacity: 0 }}
+            initial={{ scale: 0.5, opacity: 1, rotate: variation.rotation ? -variation.rotation / 4 : 0 }}
+            animate={{ scale: 1.2, opacity: 0, rotate: 0 }}
             transition={{ duration: cfg.duration * 0.8, ease: 'easeOut' }}
           >
             <span

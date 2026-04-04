@@ -222,7 +222,7 @@ describe('POST /api/adventure/weekly-challenge', () => {
           insert: vi.fn().mockResolvedValue({
             error: insertError ?? (existingScore ? { code: '23505', message: 'duplicate' } : null),
           }),
-          // For re-reading current best after conflict
+          // For rank counting (count query) and re-reading current best after conflict
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
@@ -230,7 +230,9 @@ describe('POST /api/adventure/weekly-challenge', () => {
                   data: existingScore ?? { score: 1200 },
                   error: null,
                 }),
+                gt: vi.fn().mockResolvedValue({ count: 0, error: null }),
               }),
+              gt: vi.fn().mockResolvedValue({ count: 0, error: null }),
             }),
           }),
         };
@@ -285,6 +287,7 @@ describe('POST /api/adventure/weekly-challenge', () => {
       expect(res.status).toBe(200);
       expect(res.data.success).toBe(true);
       expect(res.data.updated).toBe(true);
+      expect(res.data.rank).toBe(1);
     });
 
     it('does not downgrade when existing score is higher (GREATEST)', async () => {
@@ -304,6 +307,7 @@ describe('POST /api/adventure/weekly-challenge', () => {
       expect(res.status).toBe(200);
       expect(res.data.success).toBe(true);
       expect(res.data.updated).toBe(true);
+      expect(res.data.rank).toBe(1);
     });
   });
 

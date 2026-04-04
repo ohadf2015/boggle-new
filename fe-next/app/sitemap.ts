@@ -59,9 +59,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = [];
 
   const commonImages = [
-    `${BASE_URL}/og-image.jpg`,
-    `${BASE_URL}/og-image-en.jpg`,
-    `${BASE_URL}/og-image-he.jpg`,
+    `${BASE_URL}/og-image-en.webp`,
+    `${BASE_URL}/og-image-he.webp`,
     `${BASE_URL}/favicon.ico`,
     `${BASE_URL}/icon-192.png`,
     `${BASE_URL}/icon-512.png`,
@@ -77,7 +76,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority,
       alternates: { languages: langAlternates('') },
-      images: [...commonImages, `${BASE_URL}/og-image-${locale === 'he' ? 'he' : 'en'}.jpg`],
+      images: [...commonImages, `${BASE_URL}/og-image-${locale === 'he' ? 'he' : 'en'}.webp`],
     });
   });
 
@@ -205,7 +204,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
           'es-CO': `${BASE_URL}/es/juego-de-palabras-multijugador`,
         },
       },
-      images: [`${BASE_URL}/og-image-${img}.jpg`],
+      images: [`${BASE_URL}/og-image-${img}.webp`],
     });
   });
 

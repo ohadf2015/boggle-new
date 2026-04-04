@@ -12,6 +12,7 @@ import {
 } from '@/utils/profileStorage';
 import { getJoinUrl } from '@/utils/share';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { SeasonBanner } from '@/components/multiplayer/SeasonBanner';
@@ -77,6 +78,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setHostUsername,
 }) => {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Flow state - simplified to room-list with modal overlays
   const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
@@ -98,6 +100,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Track whether CrazyGames invite was handled (prevents URL prefill from also firing)
   const cgInviteHandledRef = useRef(false);
+
+  // Track whether CrazyGames auto-join was handled (prevents double-firing)
+  const cgAutoJoinHandledRef = useRef(false);
 
   // CrazyGames invite integration
   const {
@@ -292,6 +297,28 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       // Clipboard API not available — no-op
     }
   }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, t, cgShowInvite]);
+
+  // CrazyGames Smart Auto-Join: join an open room or quick-play on first load
+  useEffect(() => {
+    if (!isOnCrazyGamesPlatform) return;
+    if (cgAutoJoinHandledRef.current) return;
+    if (cgInviteHandledRef.current) return;
+    if (prefilledRoom) return;
+    if (autoCreate) return;
+    if (roomsLoading) return;
+
+    cgAutoJoinHandledRef.current = true;
+
+    const joinableRoom = activeRooms.find(
+      (r) => r.gameState === 'waiting' && r.playerCount < (r.maxPlayers || 8),
+    );
+
+    if (joinableRoom) {
+      handleRoomClick(joinableRoom);
+    } else {
+      handleQuickPlay();
+    }
+  }, [isOnCrazyGamesPlatform, roomsLoading, activeRooms, prefilledRoom, autoCreate, handleRoomClick, handleQuickPlay]);
 
   // Show branded loading while CrazyGames SDK initializes (prevents flash of wrong UI)
   if (!isCrazyGamesReady) {

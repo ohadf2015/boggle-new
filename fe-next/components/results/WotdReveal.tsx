@@ -5,11 +5,12 @@
  * Celebratory style if player found the word, muted style if missed.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Eye, Share2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
 
 interface WotdRevealProps {
@@ -26,7 +27,15 @@ interface WotdRevealProps {
  */
 export function WotdReveal({ playerWords, className }: WotdRevealProps) {
   const { t, language } = useLanguage();
+  const { playWordRevealSound } = useSoundEffects();
   const { word, stats, loading } = useWordOfTheDay(language);
+
+  // Play reveal sound after mount (delayed to sync with entrance animation)
+  useEffect(() => {
+    if (!word || loading) return;
+    const timer = setTimeout(() => playWordRevealSound(), 500);
+    return () => clearTimeout(timer);
+  }, [word, loading, playWordRevealSound]);
 
   const normalizedPlayerWords = playerWords.map(w => w.toLowerCase().trim());
   const found = word ? normalizedPlayerWords.includes(word.toLowerCase()) : false;

@@ -4,6 +4,8 @@ import { memo } from 'react';
 import { EarthquakeWarning, FireRoundIndicator, FireBottomEffect } from '@/components/earthquake';
 import KeyboardHintTooltip from '../../KeyboardHintTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator } from '@/components/keyboard';
+import { RoundEventOverlay, type RoundEventState } from './RoundEventOverlay';
+import { SpecialWordToast, type SpecialWordEvent } from './SpecialWordToast';
 import type { EarthquakeState, TranslationFn } from '../types';
 
 interface GameOverlaysProps {
@@ -18,6 +20,12 @@ interface GameOverlaysProps {
   isTypingMode: boolean;
   isHelpOpen: boolean;
   onCloseHelp: () => void;
+
+  // Round events
+  roundEvent?: RoundEventState | null;
+
+  // Special word
+  specialWordEvent?: SpecialWordEvent | null;
 
   // Translations and direction
   t: TranslationFn;
@@ -36,6 +44,8 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
   isTypingMode,
   isHelpOpen,
   onCloseHelp,
+  roundEvent,
+  specialWordEvent,
   t,
 }) {
   return (
@@ -66,6 +76,12 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
 
       {/* Keyboard Shortcuts Overlay - Desktop only (user-triggered) */}
       {isDesktop && <KeyboardShortcutsOverlay isOpen={isHelpOpen} onClose={onCloseHelp} t={t} />}
+
+      {/* Round Event Overlay (blizzard / lightning / meteor) */}
+      <RoundEventOverlay event={roundEvent ?? null} t={t} />
+
+      {/* Special Word Toast */}
+      <SpecialWordToast event={specialWordEvent ?? null} t={t} />
     </>
   );
 });

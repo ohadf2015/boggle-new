@@ -818,6 +818,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   isSeriesComplete={isSeriesComplete}
                   seriesWinnerUsername={seriesWinnerUsername}
                   onNewSeries={handleNewSeries}
+                  isClassroom={!!lessonGameData}
                 />
               </div>
             </motion.div>

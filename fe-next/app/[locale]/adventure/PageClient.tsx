@@ -4,14 +4,16 @@ import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 // Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {
+  const { t } = useLanguageSafe();
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
-        <PageLoader size="lg" text="Loading adventure..." />
+        <PageLoader size="lg" text={t('adventure.loading')} />
       </div>
     </div>
   );

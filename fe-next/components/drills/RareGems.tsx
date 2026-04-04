@@ -78,7 +78,7 @@ export default function RareGems({
   onPlayAgain,
 }: RareGemsProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -122,6 +122,7 @@ export default function RareGems({
 
   // Start game
   const startGame = useCallback(() => {
+    playDrillStartSound();
     setPhase('playing');
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
@@ -138,7 +139,7 @@ export default function RareGems({
         return prev - 1;
       });
     }, 1000);
-  }, [levelConfig.timeLimit]);
+  }, [levelConfig.timeLimit, playDrillStartSound]);
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
@@ -194,9 +195,10 @@ export default function RareGems({
 
   useEffect(() => {
     if (phase === 'complete') {
+      playDrillCompleteSound();
       onComplete(getResults());
     }
-  }, [phase, getResults, onComplete]);
+  }, [phase, getResults, onComplete, playDrillCompleteSound]);
 
   useEffect(() => {
     return () => {

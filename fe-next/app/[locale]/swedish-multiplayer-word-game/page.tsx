@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-sv.jpg`,
+          url: `${BASE_URL}/og-image-sv.webp`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Multiplayer Ordspel på Svenska',
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Multiplayer Ordspel Online på Svenska - LexiClash',
       description: 'Gillar du Wordfeud eller Boggle? Testa LexiClash - multiplayer ordspel på svenska! Skapa rum, bjud in vänner och tävla i realtid. Gratis!',
-      images: [`${BASE_URL}/og-image-sv.jpg`],
+      images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
       canonical: pageUrl,

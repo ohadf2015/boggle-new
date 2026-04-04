@@ -47,9 +47,44 @@ const WORLD_THEMES: Record<number, { textColor: string; glowColor: string; gradi
     gradient: 'from-neo-cyan to-blue-400',
   },
   3: {
-    textColor: 'text-neo-orange',
-    glowColor: 'rgba(255, 107, 53, 0.6)',
-    gradient: 'from-neo-orange to-amber-400',
+    textColor: 'text-neo-purple',
+    glowColor: 'rgba(139, 92, 246, 0.6)',
+    gradient: 'from-neo-purple to-violet-400',
+  },
+  4: {
+    textColor: 'text-orange-400',
+    glowColor: 'rgba(251, 146, 60, 0.6)',
+    gradient: 'from-orange-400 to-amber-400',
+  },
+  5: {
+    textColor: 'text-neo-red',
+    glowColor: 'rgba(255, 51, 102, 0.6)',
+    gradient: 'from-neo-red to-rose-400',
+  },
+  6: {
+    textColor: 'text-neo-pink',
+    glowColor: 'rgba(255, 20, 147, 0.6)',
+    gradient: 'from-neo-pink to-fuchsia-400',
+  },
+  7: {
+    textColor: 'text-cyan-300',
+    glowColor: 'rgba(103, 232, 249, 0.6)',
+    gradient: 'from-cyan-300 to-teal-400',
+  },
+  8: {
+    textColor: 'text-purple-300',
+    glowColor: 'rgba(196, 181, 253, 0.6)',
+    gradient: 'from-purple-300 to-indigo-400',
+  },
+  9: {
+    textColor: 'text-cyan-400',
+    glowColor: 'rgba(34, 211, 238, 0.6)',
+    gradient: 'from-cyan-400 to-sky-400',
+  },
+  10: {
+    textColor: 'text-yellow-300',
+    glowColor: 'rgba(253, 224, 71, 0.6)',
+    gradient: 'from-yellow-300 to-amber-300',
   },
 };
 
@@ -223,6 +258,18 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
               >
                 {levelNumber}
               </AdaptiveMotion.span>
+
+              {/* World mechanic hint on first level of W2+ */}
+              {levelNumber === 1 && worldNumber >= 2 && (
+                <AdaptiveMotion.span
+                  className="text-xs font-neo-body text-neo-white/60 text-center mt-2 max-w-[200px]"
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.4 }}
+                >
+                  {t(`adventure.worlds.mechanicHint${worldNumber}`)}
+                </AdaptiveMotion.span>
+              )}
             </div>
 
             {/* Burst particles */}

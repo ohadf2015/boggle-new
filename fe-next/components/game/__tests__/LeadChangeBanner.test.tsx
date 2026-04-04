@@ -48,18 +48,18 @@ describe('LeadChangeBanner', () => {
     expect(screen.getByText('rival took the lead!')).toBeInTheDocument();
   });
 
-  it('should use neo-yellow background for took-lead', () => {
+  it('should use neo-lime background for took-lead', () => {
     const event: LeadChangeEvent = { type: 'took-lead', newLeader: 'player1' };
     render(<LeadChangeBanner event={event} />);
     const banner = screen.getByTestId('lead-change-banner');
-    expect(banner.className).toContain('bg-neo-yellow');
+    expect(banner.className).toContain('bg-neo-lime');
   });
 
-  it('should use neo-orange background for lost-lead', () => {
+  it('should use neo-pink background for lost-lead', () => {
     const event: LeadChangeEvent = { type: 'lost-lead', newLeader: 'rival' };
     render(<LeadChangeBanner event={event} />);
     const banner = screen.getByTestId('lead-change-banner');
-    expect(banner.className).toContain('bg-neo-orange');
+    expect(banner.className).toContain('bg-neo-pink');
   });
 
   it('should have pointer-events-none to not block grid interaction', () => {

@@ -24,6 +24,8 @@ export const ADVENTURE_XP_CONFIG = {
   COMBO_MULTIPLIER: 0.1, // +10% per combo level above 1
   PERFECT_CLEAR_BONUS: 0.25, // +25% for perfect clear
 
+  // World scaling: XP multiplier per world (1.0x for W1, increasing)
+  WORLD_XP_MULTIPLIER: 0.25, // +25% per world above 1
 } as const;
 
 // ==================== Types ====================
@@ -53,6 +55,8 @@ export interface LevelUpCheck {
 export interface AdventureXpBonuses {
   perfectClear?: boolean;
   timeBonus?: number;
+  /** World number (1-10) for world-based XP scaling */
+  worldId?: number;
 }
 
 // ==================== Core Functions ====================
@@ -190,6 +194,12 @@ export function calculateAdventureXp(
   // Apply time bonus
   if (bonuses.timeBonus && bonuses.timeBonus > 0) {
     totalXp *= (1 + bonuses.timeBonus);
+  }
+
+  // Apply world-based XP scaling: +25% per world above 1
+  // W1=1.0x, W5=2.0x, W10=3.25x — makes later worlds worth pursuing
+  if (bonuses.worldId && bonuses.worldId > 1) {
+    totalXp *= 1 + (bonuses.worldId - 1) * ADVENTURE_XP_CONFIG.WORLD_XP_MULTIPLIER;
   }
 
   return Math.round(totalXp);

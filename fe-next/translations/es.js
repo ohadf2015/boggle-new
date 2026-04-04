@@ -6393,6 +6393,25 @@ const es = {
     "perfect": "¡Perfecto!",
     "restart": "Reiniciar",
     "gold": "Oro",
+    "loading": "Cargando aventura...",
+    "currency": {
+      "goldAmount": "{amount} oro"
+    },
+    "levelLocked": "Nivel {level} — Bloqueado",
+    "bossLevel": "Nivel jefe {level}",
+    "playLevel": "Nivel {level} — {stars} de {maxStars} estrellas",
+    "unlockRequirement": "Completa el nivel {level}",
+    "tutorial": {
+      "step1Title": "Desliza para formar palabras",
+      "step1Body": "Arrastra sobre letras adyacentes para formar palabras. ¡Las palabras más largas dan más puntos!",
+      "step2Title": "Completa objetivos",
+      "step2Body": "Cada nivel tiene objetivos de estrellas — alcánzalos para ganar estrellas y desbloquear nuevos niveles.",
+      "step3Title": "Derrota al jefe",
+      "step3Body": "Cada capítulo termina con una pelea de jefe. ¡Causa daño encontrando palabras antes de que se acabe el tiempo!",
+      "skip": "Saltar tutorial",
+      "next": "Siguiente",
+      "gotIt": "¡Entendido!"
+    },
     "score": "Puntuación",
     "victory": "¡Victoria!",
     "hint": {
@@ -6429,7 +6448,16 @@ const es = {
       "mirrorPalace": "Palacio de Espejos",
       "neologismNebula": "Nebulosa de Neologismos",
       "polyglotPeaks": "Cumbres Políglotas",
-      "lexiconThrone": "Trono del Léxico"
+      "lexiconThrone": "Trono del Léxico",
+      "mechanicHint2": "¡Encuentra pares de sinónimos para puntos extra!",
+      "mechanicHint3": "¡Las palabras con raíces comunes dan puntos extra!",
+      "mechanicHint4": "¡Construye modismos con palabras pequeñas!",
+      "mechanicHint5": "¡Forma palabras compuestas para grandes bonos!",
+      "mechanicHint6": "¡Encuentra pares de anagramas entre tus palabras!",
+      "mechanicHint7": "¡Los palíndromos dan recompensas extra!",
+      "mechanicHint8": "¡Crea palabras raras e inusuales!",
+      "mechanicHint9": "¡Las palabras de varios idiomas puntúan más!",
+      "mechanicHint10": "¡Domina todas las mecánicas para el desafío final!"
     },
     "chapters": {
       "meadows": {
@@ -7532,6 +7560,25 @@ const es = {
     "chain": {
       "badge": "Cadena x{level}"
     },
+    "tile": {
+      "gold":      { "name": "Oro",        "desc": "Puntos ×3 + 1 movimiento extra." },
+      "silver":    { "name": "Plata",      "desc": "Puntos ×1.5. Extiende cuentas atrás en 1." },
+      "diamond":   { "name": "Diamante",   "desc": "Puntos ×5. Revela contenido de escarcha por 3 turnos." },
+      "bomb":      { "name": "Bomba",      "desc": "Limpia área 3×3. Encadena con bombas cercanas." },
+      "lightning": { "name": "Rayo",       "desc": "Limpia la columna entera al instante." },
+      "prism":     { "name": "Prisma",     "desc": "2 golpes. Limpia fila + columna. Encadena bombas y rayos." },
+      "rainbow":   { "name": "Arcoíris",   "desc": "Copia y duplica el mejor especial. Solo: puntos ×2." },
+      "ice":       { "name": "Hielo",      "desc": "2 golpes. Congela virus adyacentes al limpiar." },
+      "gem":       { "name": "Gema",       "desc": "3 golpes para recoger. Genera 2 especiales al completar." },
+      "frozen":    { "name": "Escarcha",   "desc": "2 golpes. Oculta un especial dentro — bomba, rayo, prisma, gema o arcoíris." },
+      "magnet":    { "name": "Vórtice",    "desc": "Atrae fichas cercanas y luego explota el área." },
+      "mirror":    { "name": "Espejo",     "desc": "Copia el primer especial ofensivo de tu palabra. Solo: puntos ×2." },
+      "wildcard":  { "name": "Comodín",    "desc": "Cualquier letra. Puntúa según valor Scrabble de la letra usada." },
+      "countdown": { "name": "Cuenta atrás","desc": "Cuenta movimientos. Desarma en palabra: +15 pts y 2 extras. Expira: -50 pts y explosión 3×3." },
+      "virus":     { "name": "Virus",      "desc": "Se propaga cada turno. Limpia 3+ en una palabra para curar todos los virus." },
+      "portal":    { "name": "Portal",     "desc": "Limpia su par vinculado también. Puntos ×2. +5 bonus." },
+      "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." }
+    },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
     "progress": "Limpiado",
@@ -7752,7 +7799,7 @@ const es = {
     },
     "activeGame": {
       "title": "Juego Activo",
-      "teacherStarted": "Tu profesor inició un juego",
+      "teacherStarted": "{{teacher}} inició un juego en el aula",
       "joinNow": "Unirse Ahora",
       "joining": "Uniéndose...",
       "listening": "Esperando juegos de clase...",
@@ -7838,7 +7885,12 @@ const es = {
       "analytics": "Analíticas",
       "insights": "DATOS",
       "viewReports": "Ver informes",
-      "viewReportsDesc": "Ver informes detallados y análisis de tus aulas"
+      "viewReportsDesc": "Ver informes detallados y análisis de tus aulas",
+      "tab": {
+        "play": "Jugar",
+        "prepare": "Preparar",
+        "review": "Revisar"
+      }
     },
     "game": {
       "qrCode": "Mostrar Código QR",
@@ -8082,7 +8134,7 @@ const es = {
       "imported": "¡Importado!",
       "importError": "Error al importar",
       "preview": "Vista previa",
-      "wordCount": "Cantidad de palabras",
+      "wordCount": "{{count}} palabras",
       "noResults": "Sin resultados",
       "selectGrade": "Seleccionar grado",
       "selectSubject": "Seleccionar materia",
@@ -8194,7 +8246,7 @@ const es = {
     }
   },
   "education": {
-    "reviewDue": "{count} palabras por repasar",
+    "reviewDue": "{{count}} palabras por repasar",
     "postGame": {
       "wordsYouLearned": "Palabras que aprendiste",
       "found": "Encontradas",
@@ -8787,7 +8839,7 @@ const es = {
     "you": "Tú",
     "youLose": "¡Perdiste!",
     "youWin": "¡Ganaste!",
-    "opponentDisconnected": "{opponentName} se desconectó",
+    "opponentDisconnected": "{{opponentName}} se desconectó",
     "autoForfeitMessage": "Ganarás automáticamente",
     "forfeitTitle": "¿Abandonar duelo?",
     "forfeitDescription": "Perderás y tu oponente ganará. No se puede deshacer.",
@@ -8830,11 +8882,11 @@ const es = {
   "backToLobby": "Volver a la sala",
   "cancel": "Cancelar",
   "challengeAction": "Desafiar",
-  "challengeFrom": "Desafío de",
-  "challengePlayer": "Desafiar jugador",
+  "challengeFrom": "Desafío de {{name}}",
+  "challengePlayer": "Desafiar a {{name}}",
   "challengeReceived": "¡Desafío recibido!",
   "challengeSent": "¡Desafío enviado!",
-  "challengedYou": "¡te desafió!",
+  "challengedYou": "¡{{name}} te desafió!",
   "classmates": "Compañeros",
   "decline": "Rechazar",
   "duelLobbyTitle": "Arena de Duelos",
@@ -9791,15 +9843,22 @@ const es = {
       "rule3": "Fichas especiales (💣⚡🔷) provocan reacciones en cadena",
       "rule4": "Limpia 50%+ de fichas para avanzar a la siguiente oleada"
     },
-    "waveComplete": "¡Oleada ${wave} completada!",
+    "waveComplete": "¡Oleada {{wave}} completada!",
     "score": "Puntos",
     "wordsFound": "palabras",
     "cleared": "limpiado",
-    "nextWave": "Oleada ${wave}",
+    "nextWave": "Oleada {{wave}}",
     "gameOver": "FIN DEL JUEGO",
     "waves": "oleadas",
     "bestWord": "Mejor",
     "playAgain": "JUGAR DE NUEVO",
+    "chain": {
+      "cascade": "¡Cascada!",
+      "double": "¡Doble!",
+      "triple": "¡TRIPLE!",
+      "mega": "¡MEGA!",
+      "ultra": "¡¡ULTRA!!"
+    },
     "tileGuide": {
       "title": "Guía de fichas",
       "standard": { "name": "Estándar", "desc": "Ficha básica" },

@@ -65,6 +65,18 @@ const RPGLevelCard = memo(function RPGLevelCard({
         isCurrent && 'level-grid-current-pulse',
       )}
       style={{ boxShadow: cardShadow }}
+      role="button"
+      tabIndex={isUnlocked ? 0 : -1}
+      aria-disabled={isLocked}
+      aria-label={isLocked
+        ? t('adventure.levelLocked', { level: levelNum })
+        : isBoss
+          ? t('adventure.bossLevel', { level: levelNum })
+          : t('adventure.playLevel', { level: levelNum, stars, maxStars })
+      }
+      onKeyDown={isUnlocked ? (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
+      } : undefined}
       whileHover={isUnlocked ? { scale: 1.04, y: -5 } : undefined}
       whileTap={isUnlocked ? { scale: 0.96 } : undefined}
       onClick={isUnlocked ? onClick : undefined}
@@ -108,7 +120,14 @@ const RPGLevelCard = memo(function RPGLevelCard({
 
           {/* Level Number or Lock */}
           {isLocked ? (
-            <Lock data-testid="lock-icon" className="w-7 h-7 text-neo-white/40 mb-2" />
+            <div className="flex flex-col items-center">
+              <Lock data-testid="lock-icon" className="w-7 h-7 text-neo-white/40 mb-1" />
+              {levelNum > 1 && (
+                <span className="text-[9px] text-neo-white/30 font-neo-body text-center leading-tight">
+                  {t('adventure.unlockRequirement', { level: String(levelNum - 1) })}
+                </span>
+              )}
+            </div>
           ) : (
             <span
               data-testid="level-number"

@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import logger from '@/utils/logger';
 
 /**
  * Hook for managing CrazyGames ad integration (midgame and rewarded ads).
@@ -122,7 +123,7 @@ export function useCrazyGamesAds() {
           } else if (code === 'adblock') {
             setHasAdblock(true);
           } else if (code !== 'adCooldown' && code !== 'unfilled') {
-            console.warn('Midgame ad error:', code, errorData);
+            logger.debug('Midgame ad error:', code, errorData);
           }
           settle(false);
         },
@@ -171,7 +172,7 @@ export function useCrazyGamesAds() {
           } else if (code === 'adblock') {
             setHasAdblock(true);
           } else if (code !== 'adCooldown' && code !== 'unfilled') {
-            console.warn('Rewarded ad error:', code, errorData);
+            logger.debug('Rewarded ad error:', code, errorData);
           }
           settle(false);
         },

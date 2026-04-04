@@ -80,8 +80,7 @@ export const STARS_TO_UNLOCK_NEXT_LEVEL = 1;
 export const STARS_TO_UNLOCK_NEXT_WORLD = 11;
 
 /**
- * Legacy constant — World 10 now uses the standard formula (11 * 9 = 99 stars).
- * Kept for backward compatibility with any code that references this constant.
+ * Legacy constant — World 10 uses the standard formula (11 * 9 = 99 stars).
  */
 export const TOTAL_STARS_FOR_FINAL_WORLD = 99;
 

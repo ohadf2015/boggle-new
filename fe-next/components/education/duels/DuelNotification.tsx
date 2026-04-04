@@ -19,7 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type ChallengeReceivedData } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
 import { Swords, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -76,9 +76,9 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
   }, [timeoutId]);
 
   return (
-    <AnimatePresence>
+    <AdaptiveAnimatePresence>
       {challenge && (
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 100 }}
@@ -116,13 +116,13 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             <button
               onClick={handleDismiss}
               className="flex-shrink-0 text-neo-white/50 hover:text-neo-white transition-colors"
-              aria-label="Dismiss"
+              aria-label={t('common.dismiss', 'Dismiss')}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
-    </AnimatePresence>
+    </AdaptiveAnimatePresence>
   );
 }

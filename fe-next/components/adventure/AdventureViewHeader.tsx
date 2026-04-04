@@ -38,6 +38,7 @@ export default function AdventureViewHeader({
         {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (
           <button
             onClick={onBack}
+            aria-label={t('common.back')}
             className={cn(
               'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
               'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
@@ -53,6 +54,7 @@ export default function AdventureViewHeader({
         ) : (
           <Link
             href="/"
+            aria-label={t('common.back')}
             className={cn(
               'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
               'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
@@ -66,13 +68,13 @@ export default function AdventureViewHeader({
         )}
 
         {/* Title + Breadcrumb */}
-        <div className="hidden sm:flex flex-col items-center">
+        <div className="flex flex-col items-center">
           <div className="flex items-center gap-2">
-            <Map className="w-6 h-6 text-neo-lime" />
-            <h1 className="text-xl font-black text-neo-white uppercase tracking-tight">
+            <Map className="w-4 h-4 sm:w-6 sm:h-6 text-neo-lime" />
+            <h1 className="text-sm sm:text-xl font-black text-neo-white uppercase tracking-tight">
               {t('adventure.title')}
             </h1>
-            <Sparkles className="w-6 h-6 text-neo-yellow" />
+            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-neo-yellow hidden sm:block" />
           </div>
           {viewState === 'levelGrid' && worldName && (
             <p className="text-xs text-neo-white/50 font-bold mt-0.5">

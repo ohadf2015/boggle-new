@@ -1,10 +1,9 @@
 /**
- * AdventureGame Auto-Complete Tests
+ * AdventureGame Level Completion Tests
  *
- * Tests for the bug: Level should auto-complete when player achieves
- * all primary objectives (e.g., finds required number of words).
- *
- * Following TDD: These tests should FAIL initially, then we fix the implementation.
+ * Levels should NOT auto-complete when primary objectives are met.
+ * They run until timer expires, giving players time to earn secondary
+ * objectives for 2-3 stars.
  */
 
 import React from 'react';
@@ -56,7 +55,7 @@ const mockGrid = [
 // TESTS
 // ==============================================
 
-describe('AdventureGame - Auto-Completion Bug', () => {
+describe('AdventureGame - Level does NOT auto-complete', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -65,9 +64,8 @@ describe('AdventureGame - Auto-Completion Bug', () => {
     vi.useRealTimers();
   });
 
-  describe('Bug #1: Level should auto-complete when primary objectives are met', () => {
-    it('should set isComplete=true when canComplete becomes true', () => {
-      // GIVEN - Level requires 2 words to complete
+  describe('Game continues after primary objectives met', () => {
+    it('should NOT set isComplete when primary objectives are met', () => {
       const levelConfig = createMockLevelConfig({
         objectives: [{ type: 'wordCount', target: 2, isPrimary: true }],
       });
@@ -76,62 +74,16 @@ describe('AdventureGame - Auto-Completion Bug', () => {
         useAdventureGame({ levelConfig, initialGrid: mockGrid })
       );
 
-      // Start game
-      act(() => {
-        result.current.startGame();
-      });
+      act(() => result.current.startGame());
+      act(() => result.current.submitWord('CAT', 30));
+      act(() => result.current.submitWord('DOG', 30));
 
-      // WHEN - Submit 2 words (meeting the primary objective)
-      act(() => {
-        result.current.submitWord('CAT', 30);
-      });
-      act(() => {
-        result.current.submitWord('DOG', 30);
-      });
-
-      // THEN - canComplete should be true (this works)
+      // canComplete is true but game keeps running
       expect(result.current.canComplete).toBe(true);
-
-      // AND - game should auto-complete (THIS IS THE BUG - currently fails!)
-      // The game should detect that canComplete is true and set isComplete=true
-      expect(result.current.gameState.isComplete).toBe(true);
-    });
-
-    it('should calculate stars correctly when auto-completing', () => {
-      // GIVEN - Level with primary (2 words) + 2 secondary objectives (need 3 completed for 3 stars)
-      const levelConfig = createMockLevelConfig({
-        objectives: [
-          { type: 'wordCount', target: 2, isPrimary: true },
-          { type: 'scoreTarget', target: 100, isPrimary: false },
-          { type: 'longWords', target: 0, isPrimary: false },
-        ],
-      });
-
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: mockGrid })
-      );
-
-      act(() => {
-        result.current.startGame();
-      });
-
-      // WHEN - Submit 2 words with total score >= 100
-      act(() => {
-        result.current.submitWord('CAT', 60);
-      });
-      act(() => {
-        result.current.submitWord('DOG', 60); // Total: 120 >= 100
-      });
-
-      // THEN - Should have 3 stars (primary + all secondary met)
-      expect(result.current.canComplete).toBe(true);
-      // This will fail until auto-complete is fixed
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.gameState.stars).toBe(3);
+      expect(result.current.gameState.isComplete).toBe(false);
     });
 
     it('should NOT auto-complete if only secondary objectives are met', () => {
-      // GIVEN - Level with primary (5 words) + secondary (score >= 50)
       const levelConfig = createMockLevelConfig({
         objectives: [
           { type: 'wordCount', target: 5, isPrimary: true },
@@ -143,64 +95,19 @@ describe('AdventureGame - Auto-Completion Bug', () => {
         useAdventureGame({ levelConfig, initialGrid: mockGrid })
       );
 
-      act(() => {
-        result.current.startGame();
-      });
+      act(() => result.current.startGame());
+      act(() => result.current.submitWord('CAT', 60));
 
-      // WHEN - Submit 1 word with score >= 50 (secondary met, but not primary)
-      act(() => {
-        result.current.submitWord('CAT', 60);
-      });
-
-      // THEN - canComplete should be false, game should NOT auto-complete
       expect(result.current.canComplete).toBe(false);
       expect(result.current.gameState.isComplete).toBe(false);
     });
 
-    it('should preserve time remaining when auto-completing', () => {
-      // GIVEN - Level with 120 second timer
+    it('should allow earning more objectives after primary is met', () => {
       const levelConfig = createMockLevelConfig({
-        timerSeconds: 120,
-        objectives: [{ type: 'wordCount', target: 1, isPrimary: true }],
-      });
-
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: mockGrid })
-      );
-
-      act(() => {
-        result.current.startGame();
-      });
-
-      // Let 10 seconds pass
-      act(() => {
-        vi.advanceTimersByTime(10000);
-      });
-
-      expect(result.current.timeRemaining).toBe(110);
-
-      // WHEN - Complete primary objective
-      act(() => {
-        result.current.submitWord('CAT', 30);
-      });
-
-      // THEN - Should auto-complete with time remaining > 0
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.timeRemaining).toBeGreaterThan(0);
-      // Should still have ~110 seconds (not 0)
-      expect(result.current.timeRemaining).toBeGreaterThanOrEqual(109);
-    });
-  });
-
-  describe('Bug #2: Stars should be calculated at completion time', () => {
-    it('should have correct stars accessible after auto-complete', () => {
-      // GIVEN - Level with primary + 2 secondary objectives
-      // When only primary is met, should get 1 star
-      const levelConfig = createMockLevelConfig({
+        timerSeconds: 10,
         objectives: [
           { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 500, isPrimary: false }, // Won't be met with 30 points
-          { type: 'longWords', target: 2, isPrimary: false }, // Won't be met with 3-letter word
+          { type: 'scoreTarget', target: 100, isPrimary: false },
         ],
       });
 
@@ -208,24 +115,50 @@ describe('AdventureGame - Auto-Completion Bug', () => {
         useAdventureGame({ levelConfig, initialGrid: mockGrid })
       );
 
-      act(() => {
-        result.current.startGame();
+      act(() => result.current.startGame());
+
+      // Meet primary with low score
+      act(() => result.current.submitWord('CAT', 30));
+      expect(result.current.gameState.isComplete).toBe(false);
+
+      // Keep playing — earn more score toward secondary
+      act(() => result.current.submitWord('DOG', 80));
+      expect(result.current.gameState.isComplete).toBe(false);
+
+      // Timer expires — now complete with correct stars
+      act(() => vi.advanceTimersByTime(10000));
+      expect(result.current.gameState.isComplete).toBe(true);
+      // Primary met + scoreTarget met (30+80=110 >= 100) = 2 stars
+      expect(result.current.gameState.stars).toBe(2);
+    });
+  });
+
+  describe('Stars calculated at timer expiry', () => {
+    it('should get 1 star when only primary met at timer expiry', () => {
+      const levelConfig = createMockLevelConfig({
+        timerSeconds: 5,
+        objectives: [
+          { type: 'wordCount', target: 1, isPrimary: true },
+          { type: 'scoreTarget', target: 500, isPrimary: false },
+          { type: 'longWords', target: 2, isPrimary: false },
+        ],
       });
 
-      // WHEN - Meet only primary objective (1 word, low score, short word)
-      act(() => {
-        result.current.submitWord('CAT', 30);
-      });
+      const { result } = renderHook(() =>
+        useAdventureGame({ levelConfig, initialGrid: mockGrid })
+      );
 
-      // THEN - Stars should be 1 (only primary met, no secondary objectives met)
-      // This tests that stars are calculated at auto-complete time
+      act(() => result.current.startGame());
+      act(() => result.current.submitWord('CAT', 30));
+      act(() => vi.advanceTimersByTime(5000));
+
       expect(result.current.gameState.isComplete).toBe(true);
       expect(result.current.gameState.stars).toBe(1);
     });
 
-    it('should get 3 stars when all objectives met at auto-complete', () => {
-      // GIVEN - Level with primary + 2 secondary objectives, all achievable
+    it('should get 3 stars when all objectives met at timer expiry', () => {
       const levelConfig = createMockLevelConfig({
+        timerSeconds: 5,
         objectives: [
           { type: 'wordCount', target: 1, isPrimary: true },
           { type: 'scoreTarget', target: 20, isPrimary: false },
@@ -237,16 +170,10 @@ describe('AdventureGame - Auto-Completion Bug', () => {
         useAdventureGame({ levelConfig, initialGrid: mockGrid })
       );
 
-      act(() => {
-        result.current.startGame();
-      });
+      act(() => result.current.startGame());
+      act(() => result.current.submitWord('CLASH', 30));
+      act(() => vi.advanceTimersByTime(5000));
 
-      // WHEN - Meet all objectives (5+ letter word for longWords, score >= 20)
-      act(() => {
-        result.current.submitWord('CLASH', 30);
-      });
-
-      // THEN - Stars should be 3 (all 3 objectives met)
       expect(result.current.gameState.isComplete).toBe(true);
       expect(result.current.gameState.stars).toBe(3);
     });

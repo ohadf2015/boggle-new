@@ -16,7 +16,7 @@ const BLOG_IMAGE_MAP: Record<string, string> = {
     'word-games-for-brain-training': '/images/blog/brain-training-words.jpg',
 };
 
-const FALLBACK_IMAGE = '/og-image-en.jpg';
+const FALLBACK_IMAGE = '/og-image-en.webp';
 
 function getBlogImage(slug: string): string {
     return `${SITE_URL}${BLOG_IMAGE_MAP[slug] || FALLBACK_IMAGE}`;

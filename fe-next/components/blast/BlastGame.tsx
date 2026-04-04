@@ -73,7 +73,7 @@ export function BlastGame({
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
-  const { playComboSound, playBoardShuffleSound } = useSoundEffects();
+  const { playComboSound, playBoardShuffleSound, setGameActive } = useSoundEffects();
   const sounds = useBlastSounds();
 
   const minWordLength = waveConfig?.minWordLength ?? 2;
@@ -112,6 +112,12 @@ export function BlastGame({
 
   // Dictionary cache for cascade word detection + validation gate
   const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
+
+  // Enable sound gate on mount, disable on unmount
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   // Effects state
   const [scoreFlyEvents, setScoreFlyEvents] = useState<ScoreFlyEvent[]>([]);
@@ -200,12 +206,15 @@ export function BlastGame({
     }
 
     // 7. Run cascade + animate with multi-chain support
+    // Pause combo timer so cascades don't penalise the player's streak
+    comboStreak.pauseTimer();
     let chainLevel = 0;
     let cascadeResult = engine.startCascade();
     await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
     cascadeResult.commit?.();
 
     // Chain cascades: match-3 clusters + auto-formed words after gravity
+    const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
     const foundWordsSet = new Set(engine.gameState.wordsFound);
     while (chainLevel < MAX_CASCADE_CHAIN) {
       const grid = engine.grid;
@@ -227,7 +236,7 @@ export function BlastGame({
         chainLevel++;
         hadClears = true;
         for (const cluster of clusters) {
-          const bonus = Math.round(cluster.cells.length * 3 * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          const bonus = Math.round(cluster.cells.length * 3 * cascadeBonusMult * chainLevel);
           engine.submitWord(cluster.cells, `[${cluster.letter}×${cluster.cells.length}]`, bonus);
         }
       }
@@ -241,7 +250,7 @@ export function BlastGame({
         hadClears = true;
         const toClear = vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
         for (const vw of toClear) {
-          const bonus = Math.round(vw.word.length * vw.word.length * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          const bonus = Math.round(vw.word.length * vw.word.length * cascadeBonusMult * chainLevel);
           engine.submitWord(vw.path, vw.word, bonus);
           foundWordsSet.add(vw.word);
         }
@@ -256,7 +265,7 @@ export function BlastGame({
         hadClears = true;
         const toClear = horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
         for (const hw of toClear) {
-          const bonus = Math.round(hw.word.length * hw.word.length * CASCADE_CHAIN_BONUS_MULTIPLIER * chainLevel);
+          const bonus = Math.round(hw.word.length * hw.word.length * cascadeBonusMult * chainLevel);
           engine.submitWord(hw.path, hw.word, bonus);
           foundWordsSet.add(hw.word);
         }
@@ -289,12 +298,15 @@ export function BlastGame({
       cascadeResult.commit?.();
     }
 
+    // Resume combo timer after cascades complete
+    comboStreak.resumeTimer();
+
     // Track combo streak
     comboStreak.onWordSubmitted();
 
     sounds.playTileClear(clearedInfo.length);
     sounds.playLongWordBonus(path.length);
-  }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize]);
+  }, [engine, comboStreak, onComboDetected, sounds, sequencer, checkWord, config.gridSize, waveConfig?.cascadeChainBonus]);
 
   // Score fly + combo flash handlers
   const handleScoreFlyComplete = useCallback((id: string) => {
@@ -332,7 +344,7 @@ export function BlastGame({
     lastPathRef.current = cells;
   }, []);
 
-  const handleWordChange = useCallback((word: string) => {
+  const handleWordChange = useCallback((word: string, _count: number) => {
     setFormedWord(word);
     if (word.length > prevWordLenRef.current) {
       sounds.playTileSelect();
@@ -348,6 +360,7 @@ export function BlastGame({
     if (fb && (fb.type === 'rejected' || fb.type === 'duplicate') && fb.id !== prevFeedbackIdRef.current) {
       if (fb.type === 'rejected') sounds.playWordReject();
       engine.consumeMove();
+      engine.trackWordFail();
     }
     prevFeedbackIdRef.current = fb?.id ?? null;
   }, [wordSubmission.currentFeedback, sounds, engine]);
@@ -491,6 +504,8 @@ export function BlastGame({
         waveCleared={objectives.allObjectivesComplete}
         leaderboard={leaderboard}
         username={username}
+        comboStreak={comboStreak.streak}
+        comboStreakArcRef={comboStreak.arcRef}
         t={(key: string) => t(key) || undefined}
       />
     </div>

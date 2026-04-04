@@ -377,6 +377,10 @@ module.exports = {
           "0%, 100%": { opacity: "0.3", transform: "scale(0.8)" },
           "50%": { opacity: "1", transform: "scale(1.2)" },
         },
+        "golden-pulse": {
+          "0%, 100%": { boxShadow: "0 0 6px rgba(255,215,0,0.4), 0 0 2px rgba(255,215,0,0.2)" },
+          "50%": { boxShadow: "0 0 14px rgba(255,215,0,0.8), 0 0 6px rgba(255,215,0,0.5)" },
+        },
         // Hero entrance animations (CSS-only, no Framer Motion needed)
         "fadeInUp": {
           "0%": { opacity: "0", transform: "translateY(20px)" },
@@ -576,6 +580,7 @@ module.exports = {
         "letter-bounce": "letter-bounce 0.6s ease-in-out infinite",
         "drift": "drift 6s ease-in-out infinite",
         "twinkle": "twinkle 2s ease-in-out infinite",
+        "golden-pulse": "golden-pulse 1.8s ease-in-out infinite",
         // Game mode card animations
         "mode-glow-breathe": "mode-glow-breathe 2s ease-in-out infinite",
         "mode-icon-bounce": "mode-icon-bounce 2s ease-in-out infinite",

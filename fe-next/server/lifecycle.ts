@@ -51,6 +51,23 @@ export async function initializeServer(io: Server): Promise<void> {
     lifecycleLogger.error({ err: error }, 'Redis adapter setup failed — running in degraded mode');
   }
 
+  // Restore active games from Redis (persisted during previous graceful shutdown)
+  try {
+    const restoredCount = await gameStateManager.restoreAllGamesFromRedis();
+    if (restoredCount > 0) {
+      lifecycleLogger.info({ count: restoredCount }, 'Restored active games from Redis — players can reconnect');
+    }
+  } catch (error) {
+    lifecycleLogger.error({ err: error }, 'Failed to restore games from Redis');
+  }
+
+  // Start cross-replica cache invalidation (only active when REDIS_PRIMARY=true)
+  try {
+    await gameStateManager.initCacheInvalidation();
+  } catch (error) {
+    lifecycleLogger.warn({ err: error }, 'Cache invalidation listener failed to start — running without cross-replica eviction');
+  }
+
   // Restore tournaments from Redis
   try {
     await restoreTournamentsFromRedis();
@@ -145,6 +162,9 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     clearCleanupTimers();
     stopConnectionHealthCheck();
     stopEmptyRoomCleanup();
+
+    // Stop cache invalidation listener
+    await gameStateManager.shutdownCacheInvalidation();
 
     // Persist all active games to Redis before shutdown
     // This ensures running games survive deployments

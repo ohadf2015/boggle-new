@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.jpg`, width: 1200, height: 630, alt: 'LexiClash vs Scrabble GO Comparison' }],
+      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash vs Scrabble GO Comparison' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Scrabble GO — No Ads, Real Players',
       description: 'Tired of Scrabble GO ads? LexiClash is the clean alternative.',
-      images: [`${BASE_URL}/og-image-en.jpg`],
+      images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,

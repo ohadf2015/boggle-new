@@ -53,6 +53,8 @@ interface GameHeaderProps {
   elapsedTime?: number;
   /** Current combo count */
   comboCount?: number;
+  /** Combo decay timeout in ms (for countdown bar animation) */
+  comboTimeoutMs?: number;
   className?: string;
 }
 
@@ -73,6 +75,7 @@ export const GameHeader = memo(function GameHeader({
   isBossLevel = false,
   elapsedTime = 0,
   comboCount = 0,
+  comboTimeoutMs = 3000,
   className,
 }: GameHeaderProps) {
   const { t } = useLanguage();
@@ -122,10 +125,22 @@ export const GameHeader = memo(function GameHeader({
           className="text-lg sm:text-xl font-black leading-none tabular-nums"
         />
         {comboCount > 0 && (
-          <span className="text-[10px] font-black text-neo-purple tabular-nums mt-0.5">
-            <Flame className="w-3 h-3 inline-block -mt-0.5 me-0.5" />
-            {comboCount}x {t('adventure.combo')}
-          </span>
+          <div className="flex flex-col items-center mt-0.5">
+            <span className="text-[10px] font-black text-neo-purple tabular-nums">
+              <Flame className="w-3 h-3 inline-block -mt-0.5 me-0.5" />
+              {comboCount}x {t('adventure.combo')}
+            </span>
+            {/* Combo decay countdown bar — pure CSS animation, re-triggers on comboCount change */}
+            <div className="w-16 h-1 bg-neo-white/10 rounded-full mt-0.5 overflow-hidden">
+              <div
+                key={comboCount}
+                className="h-full bg-neo-purple rounded-full origin-left"
+                style={{
+                  animation: `combo-shrink ${comboTimeoutMs}ms linear forwards`,
+                }}
+              />
+            </div>
+          </div>
         )}
       </div>
 

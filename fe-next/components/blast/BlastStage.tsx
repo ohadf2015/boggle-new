@@ -29,6 +29,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
+import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
 interface BlastStageProps {
   // From engine
@@ -73,6 +74,9 @@ interface BlastStageProps {
   // Multiplayer leaderboard
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: any }>;
   username?: string;
+  // Combo streak
+  comboStreak?: ComboStreakState;
+  comboStreakArcRef?: React.RefObject<SVGCircleElement | null>;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -111,6 +115,8 @@ export function BlastStage({
   waveCleared = false,
   leaderboard,
   username,
+  comboStreak,
+  comboStreakArcRef,
   t,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete } = gameState;
@@ -189,6 +195,8 @@ export function BlastStage({
         totalTiles={totalTiles}
         onQuit={onQuit}
         onShowHelp={onShowHelp ?? (() => setShowTileGuide(true))}
+        comboStreak={comboStreak}
+        comboStreakArcRef={comboStreakArcRef}
         t={t}
       />
 
@@ -308,6 +316,7 @@ export function BlastStage({
                 onWordChange={onWordChange}
                 sequencerState={sequencerState}
                 nearMissCells={nearMissCells}
+                diamondRevealTurns={gameState.diamondRevealTurns}
               />
             </div>
           </div>
@@ -318,7 +327,7 @@ export function BlastStage({
           <div className="absolute bottom-1 right-1 w-3 h-3 rounded-br-lg border-b-2 border-r-2 border-amber-400/40 pointer-events-none" />
         </div>
         {/* Chain escalation text — scoped within board area */}
-        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} />
+        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} />
       </div>
 

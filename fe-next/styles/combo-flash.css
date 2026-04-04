@@ -26,6 +26,12 @@
   transition: background-color 100ms ease-out;
 }
 
+/* Combo decay countdown bar — shrinks from full to zero */
+@keyframes combo-shrink {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
 /* Accessibility: Disable flash animation for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .combo-flash {

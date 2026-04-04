@@ -188,7 +188,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           variants={headerVariants}
           initial="hidden"
           animate="visible"
-          className="flex items-center justify-between py-4 px-4 lg:px-6 flex-shrink-0 border-b-4 border-neo-black bg-neo-navy-light"
+          className="flex items-center justify-between py-3 px-4 lg:px-6 flex-shrink-0 border-b-2 border-white/10"
         >
           <Link
             href="/"
@@ -243,51 +243,41 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             </motion.div>
           )}
 
-          {/* Quick Start CTA — Large lime card */}
+          {/* Action Buttons — Quick Start + Create Room side by side */}
           {onQuickPlay && (
             <motion.section
               variants={quickPlayVariants}
               initial="hidden"
               animate="visible"
-              className="flex flex-col items-center"
+              className="flex gap-3"
             >
               <motion.button
                 onClick={onQuickPlay}
                 disabled={isQuickPlayLoading}
-                className="w-full py-8 flex flex-col items-center justify-center gap-2 bg-neo-lime border-4 border-neo-black rounded-2xl shadow-hard-lg active:translate-y-1 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="flex-[2] py-4 flex items-center justify-center gap-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
-                animate={!isQuickPlayLoading ? {
-                  boxShadow: [
-                    '0 0 20px rgba(191,255,0,0.4), 8px 8px 0px #000',
-                    '0 0 50px rgba(191,255,0,0.7), 8px 8px 0px #000',
-                    '0 0 20px rgba(191,255,0,0.4), 8px 8px 0px #000',
-                  ],
-                } : {}}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' as const }}
               >
                 {isQuickPlayLoading ? (
                   <Loader size="sm" />
                 ) : (
-                  <motion.div
-                    animate={{ rotate: [0, -10, 10, 0] }}
-                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
-                  >
-                    <Zap className="w-10 h-10 text-neo-black" />
-                  </motion.div>
+                  <Zap className="w-5 h-5 text-neo-black" />
                 )}
-                <span className="text-neo-black font-black text-3xl uppercase tracking-tight">
+                <span className="text-neo-black font-black text-lg uppercase tracking-tight">
                   {t('multiplayerFlow.roomList.quickStart')}
                 </span>
               </motion.button>
 
               <motion.button
                 onClick={onCreateRoom}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-4 text-neo-pink hover:text-neo-pink/80 font-black text-xs uppercase tracking-[0.15em] transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime rounded-full px-4 py-2"
+                whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
+                whileTap={{ scale: 0.97 }}
+                className="flex-1 py-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/60 rounded-xl shadow-hard-sm hover:border-neo-pink active:translate-y-0.5 active:shadow-hard-pressed transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
               >
-                {t('multiplayerFlow.roomList.createPrivateBattle')}
+                <Users className="w-4 h-4 text-neo-pink" />
+                <span className="text-neo-pink font-black text-xs uppercase tracking-wide">
+                  {t('multiplayerFlow.roomList.createPrivateBattle')}
+                </span>
               </motion.button>
             </motion.section>
           )}
@@ -304,10 +294,10 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">
+              <h2 className="text-xs font-black text-white/50 uppercase tracking-[0.15em]">
                 {t('multiplayerFlow.roomList.openArenas')}
                 {totalPlayers > 0 && (
-                  <span className="text-neo-cyan ms-2">
+                  <span className="text-neo-cyan ms-2 text-[11px]">
                     {totalPlayers} {t('multiplayerFlow.roomList.online')}
                   </span>
                 )}
@@ -451,31 +441,20 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 variants={emptyStateVariants}
                 initial="hidden"
                 animate="visible"
-                className="bg-neo-navy-light/30 border-2 border-white/5 rounded-2xl p-6 flex flex-col items-center text-center"
+                className="bg-neo-navy-light/30 border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center text-center"
               >
                 <motion.div
-                  animate={{ y: [0, -8, 0] }}
+                  animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' as const }}
                 >
-                  <Ghost className="w-10 h-10 text-white/60 mb-3" />
+                  <Ghost className="w-12 h-12 text-white/30 mb-2" />
                 </motion.div>
-                <h3 className="text-slate-400 font-bold text-sm uppercase tracking-widest">
+                <h3 className="text-white/50 font-black text-sm uppercase tracking-widest">
                   {t('multiplayerFlow.roomList.noRoomsYet')}
                 </h3>
-                <p className="text-slate-500 text-xs mt-2 font-bold">
+                <p className="text-white/30 text-xs mt-1.5 font-bold max-w-[240px]">
                   {t('multiplayerFlow.roomList.beTheLegend')}
                 </p>
-                {onQuickPlay && (
-                  <motion.button
-                    onClick={onQuickPlay}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.93 }}
-                    className="mt-4 px-6 py-2.5 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard-sm font-black text-sm uppercase text-neo-black hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed transition-all flex items-center gap-2"
-                  >
-                    <Zap className="w-4 h-4" />
-                    {t('multiplayerFlow.roomList.startBattle')}
-                  </motion.button>
-                )}
               </motion.div>
             )}
           </motion.section>

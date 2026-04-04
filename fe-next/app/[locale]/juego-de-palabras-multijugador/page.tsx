@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-es.jpg`,
+          url: `${BASE_URL}/og-image-es.webp`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Juego de Palabras Multijugador Online',
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Juego de Palabras Multijugador Online Gratis - LexiClash',
       description: 'Como Boggle, Scrabble y Wordle combinados. Crea una sala, invita amigos y compite en tiempo real. Gratis y sin registro.',
-      images: [`${BASE_URL}/og-image-es.jpg`],
+      images: [`${BASE_URL}/og-image-es.webp`],
     },
     alternates: {
       canonical: pageUrl,

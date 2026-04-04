@@ -198,7 +198,7 @@ describe('POST /api/blast/result', () => {
     it('rejects negative score', async () => {
       const res = await POST(makeRequest({ ...validBody, score: -1 }));
       expect(res.status).toBe(400);
-      expect(res.data.error).toContain('non-negative');
+      expect(res.data.error).toContain('Invalid score');
     });
 
     it('rejects stars < 1', async () => {
@@ -227,34 +227,48 @@ describe('POST /api/blast/result', () => {
     });
   });
 
-  // ===== SECURITY: CLIENT-TRUSTED SCORES =====
-  describe('SECURITY: Client controls score/stats (vulnerability)', () => {
-    it('accepts any score value — client can send 999999', async () => {
-      // DOCUMENTS VULNERABILITY: server trusts client score without validation
-      setupDbMocks();
+  // ===== SECURITY: Score/stats upper bounds =====
+  describe('Score and stats upper bound validation', () => {
+    it('rejects score exceeding upper bound', async () => {
       const res = await POST(makeRequest({ ...validBody, score: 999999 }));
-      expect(res.status).toBe(200);
-      expect(res.data.success).toBe(true);
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Invalid score');
     });
 
-    it('accepts any maxCombo value — client can send 999', async () => {
-      setupDbMocks();
+    it('rejects maxCombo exceeding upper bound', async () => {
       const res = await POST(makeRequest({ ...validBody, maxCombo: 999 }));
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Invalid maxCombo');
     });
 
-    it('accepts any clearPercentage — client can claim 100% with 0 tiles', async () => {
-      setupDbMocks();
+    it('rejects clearPercentage inconsistent with tilesCleared/totalTiles', async () => {
       const res = await POST(makeRequest({ ...validBody, clearPercentage: 100, tilesCleared: 0 }));
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('clearPercentage');
+    });
+
+    it('accepts tilesCleared > totalTiles (cumulative in gravity mode)', async () => {
+      setupDbMocks();
+      const res = await POST(makeRequest({ ...validBody, tilesCleared: 30, totalTiles: 25, clearPercentage: 100 }));
       expect(res.status).toBe(200);
     });
 
-    it('accepts fabricated wordsFound — no server-side word validation', async () => {
+    it('rejects totalTiles > max grid size (36)', async () => {
+      const res = await POST(makeRequest({ ...validBody, totalTiles: 100, tilesCleared: 20 }));
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('totalTiles');
+    });
+
+    it('accepts score at upper bound (50000)', async () => {
       setupDbMocks();
-      const res = await POST(makeRequest({
-        ...validBody,
-        wordsFound: ['aaaa', 'bbbb', 'cccc', 'dddd', 'eeee'],
-      }));
+      const res = await POST(makeRequest({ ...validBody, score: 50000 }));
+      expect(res.status).toBe(200);
+    });
+
+    it('accepts consistent clearPercentage', async () => {
+      setupDbMocks();
+      // 20/25 = 80%
+      const res = await POST(makeRequest({ ...validBody, tilesCleared: 20, totalTiles: 25, clearPercentage: 80 }));
       expect(res.status).toBe(200);
     });
   });
@@ -331,10 +345,10 @@ describe('POST /api/blast/result', () => {
       expect(res.status).toBe(200);
     });
 
-    it('very large score is accepted (no cap)', async () => {
-      setupDbMocks();
+    it('very large score is rejected by upper bound', async () => {
       const res = await POST(makeRequest({ ...validBody, score: Number.MAX_SAFE_INTEGER }));
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
+      expect(res.data.error).toContain('Invalid score');
     });
 
     it('empty wordsFound array is accepted', async () => {
@@ -406,7 +420,7 @@ describe('POST /api/blast/result', () => {
 
     it('caps XP at a maximum to prevent farming', async () => {
       setupDbMocks();
-      await POST(makeRequest({ ...validBody, score: 999999 }));
+      await POST(makeRequest({ ...validBody, score: 50000 }));
       const xpAmount = mockRpc.mock.calls[0]?.[1]?.p_xp_amount;
       expect(xpAmount).toBeLessThanOrEqual(150);
     });

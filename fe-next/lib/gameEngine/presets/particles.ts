@@ -293,6 +293,104 @@ export const VORTEX_EXPLOSION: ParticleConfig = {
   shape: 'star',
 };
 
+// ─── Tile Explosion Variations ───────────────────────────────────────
+// Alternate burst patterns for standard tile clears — picked randomly.
+
+/** Tight implosion then outward pop */
+export const TILE_IMPLOSION: ParticleConfig = {
+  ...TILE_EXPLOSION,
+  speed: { min: 60, max: 200 },
+  scale: { start: 0.3, end: 2.0 },
+  lifetime: { min: 0.15, max: 0.4 },
+  colors: ['ffffff', 'bfff00', '00ffff'],
+  spawnConfig: { directions: 8 },
+};
+
+/** Spiraling sparks that corkscrew outward */
+export const TILE_SPIRAL: ParticleConfig = {
+  ...TILE_EXPLOSION,
+  rotationSpeed: { min: -600, max: 600 },
+  speed: { min: 100, max: 300 },
+  lifetime: { min: 0.3, max: 0.8 },
+  colors: ['00ffff', 'ff88cc', 'ffffff', 'bfff00'],
+  spawnShape: 'circle',
+  spawnConfig: { radius: 6 },
+};
+
+/** Heavy debris with gravity — shards rain down */
+export const TILE_SHRAPNEL: ParticleConfig = {
+  ...TILE_EXPLOSION,
+  gravity: { x: 0, y: 500 },
+  speed: { min: 250, max: 550 },
+  scale: { start: 2.0, end: 0.4 },
+  lifetime: { min: 0.4, max: 0.9 },
+  colors: ['ffcc00', 'ffffff', '88ddff'],
+  shape: 'rect',
+};
+
+/** All tile explosion variants for random selection */
+export const TILE_EXPLOSION_VARIANTS: readonly ParticleConfig[] = [
+  TILE_EXPLOSION, TILE_EXPLOSION, TILE_IMPLOSION, TILE_SPIRAL, TILE_SHRAPNEL,
+];
+
+// ─── Bomb Explosion Variations ──────────────────────────────────────
+
+/** Slow-mo nuclear flash — big scale, long lifetime */
+export const BOMB_NUCLEAR: ParticleConfig = {
+  ...BOMB_EXPLOSION,
+  maxParticles: 60,
+  particlesPerWave: 60,
+  scale: { start: 3.5, end: 0 },
+  lifetime: { min: 0.5, max: 1.2 },
+  speed: { min: 150, max: 400 },
+  colors: ['ffffff', 'ffee00', 'ff6600', 'ff2200'],
+};
+
+/** Fragmentation burst — many small fast pieces */
+export const BOMB_FRAG: ParticleConfig = {
+  ...BOMB_EXPLOSION,
+  maxParticles: 70,
+  particlesPerWave: 70,
+  scale: { start: 0.8, end: 0 },
+  speed: { min: 400, max: 800 },
+  lifetime: { min: 0.15, max: 0.4 },
+  colors: ['ff4400', 'ffaa00', 'ffffff'],
+  spawnConfig: { directions: 32 },
+  shape: 'rect',
+};
+
+export const BOMB_EXPLOSION_VARIANTS: readonly ParticleConfig[] = [
+  BOMB_EXPLOSION, BOMB_EXPLOSION, BOMB_NUCLEAR, BOMB_FRAG,
+];
+
+// ─── Combo Flash Variations (PixiJS layer) ──────────────────────────
+
+/** Tight star-burst with fewer, brighter particles */
+export const COMBO_FLASH_TIGHT: ParticleConfig = {
+  ...COMBO_FLASH,
+  maxParticles: 16,
+  particlesPerWave: 16,
+  speed: { min: 350, max: 800 },
+  lifetime: { min: 0.15, max: 0.4 },
+  scale: { start: 2.0, end: 0 },
+  spawnConfig: { directions: 8 },
+  shape: 'star',
+};
+
+/** Wide ring expansion */
+export const COMBO_FLASH_RING: ParticleConfig = {
+  ...COMBO_FLASH,
+  scale: { start: 0.5, end: 2.5 },
+  speed: { min: 100, max: 250 },
+  lifetime: { min: 0.4, max: 0.9 },
+  colors: ['ff1493', 'bfff00', '00ffff', 'ffffff'],
+  shape: 'ring',
+};
+
+export const COMBO_FLASH_VARIANTS: readonly ParticleConfig[] = [
+  COMBO_FLASH, COMBO_FLASH, COMBO_FLASH_TIGHT, COMBO_FLASH_RING,
+];
+
 // ═══════════════════════════════════════════════════════════════════════
 // Shape-Based Presets — use the new particle shape system
 // ═══════════════════════════════════════════════════════════════════════

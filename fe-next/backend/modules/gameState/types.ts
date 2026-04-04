@@ -12,6 +12,7 @@ export interface RedisClient {
   getGameState: (gameCode: string) => Promise<GameState | null>;
   deleteGameState?: (gameCode: string) => Promise<void>;
   getAllGameKeys?: () => Promise<string[]>;
+  getAllGameCodes?: () => Promise<string[]>;
 }
 
 // Game user interface
@@ -123,6 +124,14 @@ export interface GameState {
   playerWordsSet?: Record<string, Set<string>>;
   /** Cached validatedScores/validationComplete payload for reconnecting clients */
   cachedResultsPayload?: Record<string, unknown> | null;
+  /** Golden letter positions for this round (row, col pairs) */
+  goldenLetters?: Array<{ row: number; col: number }>;
+  /** Special high-value words solvable on the board */
+  specialWords?: Array<{ word: string; foundBy?: string }>;
+  /** Scheduled round event type and trigger time */
+  roundEventSchedule?: { eventType: string; triggerAtPercent: number } | null;
+  /** Currently active round event */
+  activeRoundEvent?: string | null;
 }
 
 // Game creation data interface

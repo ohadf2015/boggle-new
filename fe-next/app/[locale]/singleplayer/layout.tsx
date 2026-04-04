@@ -80,8 +80,8 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
 
   const localePath = `/${locale}`;
   const ogImage = locale === 'he'
-    ? 'https://www.lexiclash.live/og-image-he.jpg'
-    : 'https://www.lexiclash.live/og-image-en.jpg';
+    ? 'https://www.lexiclash.live/og-image-he.webp'
+    : 'https://www.lexiclash.live/og-image-en.webp';
 
   return {
     title: seo.title,

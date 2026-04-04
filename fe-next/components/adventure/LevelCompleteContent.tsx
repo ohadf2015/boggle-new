@@ -6,7 +6,7 @@
 
 import { memo, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap } from 'lucide-react';
+import { Check, X, Trophy, RotateCcw, DoorOpen, Coins, Zap, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { OBJECTIVE_TRANSLATION_KEYS } from '@/lib/adventure/constants';
 import { RollingNumber } from './ui/RollingNumber';
@@ -296,11 +296,14 @@ export interface LevelCompleteActionsProps {
   goldEarned?: number;
   saveFailed?: boolean;
   onRetrySave?: () => void;
+  score?: number;
+  worldNumber?: number;
+  levelNumber?: number;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
-  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, t,
+  isFailed, isLastLevelOfWorld, onNextWorld, onContinue, onRetry, onExit, canRetryFree, stars, goldEarned: _goldEarned, saveFailed, onRetrySave, score = 0, worldNumber = 1, levelNumber = 1, t,
 }) => {
   const [goldDoubled, setGoldDoubled] = useState(false);
 
@@ -348,6 +351,24 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
       )}
 
       <div className="flex gap-2">
+        {/* Share — 3-star only, compact icon button */}
+        {stars === 3 && !isFailed && (
+          <button
+            onClick={() => {
+              const text = `⭐⭐⭐ W${worldNumber}-L${levelNumber} — ${score.toLocaleString()} pts! 🏆`;
+              if (navigator.share) {
+                navigator.share({ text }).catch(() => {});
+              } else {
+                navigator.clipboard?.writeText(text);
+              }
+            }}
+            className="py-2.5 px-3 bg-neo-yellow/20 text-neo-yellow border-2 border-neo-yellow/40 rounded-neo hover:bg-neo-yellow/30 transition-colors"
+            aria-label={t('common.share')}
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+        )}
+
         <button
           onClick={onRetry}
           className={cn(

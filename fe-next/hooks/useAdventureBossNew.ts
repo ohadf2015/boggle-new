@@ -301,9 +301,10 @@ export function useAdventureBossNew({
   const dealDamage = useCallback((score: number): number => {
     if (!isActiveRef.current) return 0;
 
+    const damage = score;
     const currentHP = hpRef.current;
-    const actualDamage = Math.min(score, currentHP);
-    const newHP = Math.max(0, currentHP - score);
+    const actualDamage = Math.min(damage, currentHP);
+    const newHP = Math.max(0, currentHP - damage);
 
     hpRef.current = newHP;
 

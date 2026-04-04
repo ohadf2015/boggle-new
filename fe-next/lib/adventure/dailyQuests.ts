@@ -46,10 +46,19 @@ function seededRandom(seed: string): () => number {
   };
 }
 
-/** Get 3 daily quests for a given date (YYYY-MM-DD format) */
-export function getDailyQuests(dateStr: string): DailyQuest[] {
+/** Quest types that require specific world progress */
+const WORLD_RESTRICTED_TYPES: Record<string, number> = {
+  bossDefeat: 2,    // bosses start at world 1 level 7, but W2+ is when players understand them
+  mechanicUse: 2,   // world mechanics start at world 2
+};
+
+/** Get 3 daily quests for a given date, filtered by player's current world */
+export function getDailyQuests(dateStr: string, currentWorld = 10): DailyQuest[] {
   const rng = seededRandom(dateStr);
-  const pool = [...DAILY_QUEST_POOL];
+  const pool = [...DAILY_QUEST_POOL].filter(q => {
+    const minWorld = WORLD_RESTRICTED_TYPES[q.type];
+    return !minWorld || currentWorld >= minWorld;
+  });
   const selected: DailyQuest[] = [];
 
   for (let i = 0; i < 3 && pool.length > 0; i++) {

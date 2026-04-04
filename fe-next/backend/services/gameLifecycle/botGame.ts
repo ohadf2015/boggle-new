@@ -25,8 +25,19 @@ import type { Bot } from '../../modules/botBehavior';
 import { startBotsForWordHunt } from './botWordHunt';
 import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
 
-/** Score buffer when no human has scored yet — creates initial pressure */
-const BOT_SCORE_BUFFER = 20;
+/** Score target ratios per difficulty — bots aim for this % of best human score */
+const BOT_SCORE_TARGET: Record<string, number> = {
+  easy: 0.55,    // Easy bots aim for ~55% of best human
+  medium: 0.80,  // Medium bots aim for ~80%
+  hard: 0.95,    // Hard bots aim for ~95% — close but usually beatable
+};
+
+/** Minimum score bots can reach before any human scores (creates early pressure) */
+const BOT_INITIAL_CEILING: Record<string, number> = {
+  easy: 40,
+  medium: 80,
+  hard: 150,
+};
 
 /**
  * Get the best human (non-bot) player's score in a game.
@@ -44,24 +55,32 @@ export function getBestHumanScore(gameCode: string): number {
 
 /**
  * Check whether a bot should be allowed to score.
- * Bots must never exceed the best human player's score.
- * When no human has scored, bots get a small buffer to create pressure.
+ * Bots target a percentage of the best human's score (difficulty-dependent).
+ * This creates competitive pressure without making bots unbeatable.
+ * A ±10% random variance is applied to the target to feel natural.
  */
 export function shouldBotScore(
   gameCode: string,
   _botUsername: string,
   currentBotScore: number,
-  pendingScore: number
+  pendingScore: number,
+  botDifficulty: string = 'medium'
 ): boolean {
   const bestHuman = getBestHumanScore(gameCode);
   const projectedScore = currentBotScore + pendingScore;
 
   if (bestHuman === 0) {
-    // No human scored yet — allow up to buffer
-    return projectedScore <= BOT_SCORE_BUFFER;
+    // No human scored yet — allow up to difficulty-based ceiling
+    const ceiling = BOT_INITIAL_CEILING[botDifficulty] ?? BOT_INITIAL_CEILING.medium;
+    return projectedScore <= ceiling;
   }
 
-  return projectedScore <= bestHuman;
+  const baseTarget = BOT_SCORE_TARGET[botDifficulty] ?? BOT_SCORE_TARGET.medium;
+  // Add slight per-game variance (±10%) so bots don't always land at exact same ratio
+  const variance = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
+  const scoreTarget = bestHuman * baseTarget * variance;
+
+  return projectedScore <= scoreTarget;
 }
 
 /**
@@ -138,9 +157,9 @@ export function startBotsForGame(
 
         const totalScore = score + blastTileBonus + wordHuntBoardBonus;
 
-        // Score cap: don't let bot outscore best human
-        if (!shouldBotScore(gameCode, username, bot.score, totalScore)) {
-          logger.debug('BOT', `Bot "${username}" score capped (would exceed best human)`);
+        // Score cap: keep bot within competitive range of best human
+        if (!shouldBotScore(gameCode, username, bot.score, totalScore, bot.difficulty)) {
+          logger.debug('BOT', `Bot "${username}" score capped at ${bot.score} (target reached for ${bot.difficulty})`);
           return;
         }
 

@@ -619,6 +619,16 @@ const ja = {
     "pointsAhead": "点リード",
     "wordsFound": "{{count}}語"
   },
+  "roundEvent": {
+    "blizzardWarning": "❄️ 吹雪が来る！",
+    "lightningWarning": "⚡ 雷ラウンド！",
+    "meteorWarning": "🌟 流星落下！",
+    "active": "発動中"
+  },
+  "specialWord": {
+    "bonus": "+{{bonus}} ⭐",
+    "foundBy": "{{username}}が発見"
+  },
   "countdown": {
     "hint": "スワイプして単語を作ろう！",
     "go": "スタート！",
@@ -1816,6 +1826,7 @@ const ja = {
     "rewardsEarned": "ゲットした報酬",
     "achievementUnlocked": "アチーブメント解除",
     "achievementsUnlocked": "アチーブメント解除",
+    "showDetails": "詳細を表示",
     "details": "詳細",
     "performanceDetails": "内訳",
     "badges": "バッジ",
@@ -4586,9 +4597,9 @@ const ja = {
   "availableOpponents": "対戦可能な相手",
   "cancel": "キャンセル",
   "challengeAction": "挑戦する",
-  "challengedYou": "が挑戦してきた！",
-  "challengeFrom": "からの挑戦",
-  "challengePlayer": "プレイヤーに挑戦",
+  "challengedYou": "{{name}}が挑戦してきた！",
+  "challengeFrom": "{{name}}からの挑戦",
+  "challengePlayer": "{{name}}に挑戦",
   "challengeReceived": "挑戦を受けた！",
   "challengeSent": "挑戦状を送った！",
   "classmates": "クラスメート",
@@ -6443,6 +6454,25 @@ const ja = {
     "perfect": "パーフェクト！",
     "restart": "リスタート",
     "gold": "ゴールド",
+    "loading": "アドベンチャーを読み込み中...",
+    "currency": {
+      "goldAmount": "{amount} ゴールド"
+    },
+    "levelLocked": "レベル{level} — ロック中",
+    "bossLevel": "ボスレベル{level}",
+    "playLevel": "レベル{level} — {stars}/{maxStars}スター",
+    "unlockRequirement": "レベル{level}をクリア",
+    "tutorial": {
+      "step1Title": "スワイプで単語を作ろう",
+      "step1Body": "隣接する文字をドラッグして単語を作ります。長い単語ほど高得点！",
+      "step2Title": "目標を達成しよう",
+      "step2Body": "各レベルにはスター目標があります。達成してスターを獲得し、新しいレベルを解放しましょう。",
+      "step3Title": "ボスを倒そう",
+      "step3Body": "各チャプターの最後にはボス戦があります。時間内に単語を見つけてダメージを与えよう！",
+      "skip": "チュートリアルをスキップ",
+      "next": "次へ",
+      "gotIt": "了解！"
+    },
     "score": "スコア",
     "victory": "勝利！",
     "hint": {
@@ -6479,7 +6509,16 @@ const ja = {
       "mirrorPalace": "鏡の宮殿",
       "neologismNebula": "新語の星雲",
       "polyglotPeaks": "多言語の峰",
-      "lexiconThrone": "辞書の玉座"
+      "lexiconThrone": "辞書の玉座",
+      "mechanicHint2": "同義語ペアを見つけてボーナスポイント！",
+      "mechanicHint3": "共通の語根を持つ単語で追加ポイント！",
+      "mechanicHint4": "小さな単語からイディオムを作ろう！",
+      "mechanicHint5": "複合語を作って大きなボーナス！",
+      "mechanicHint6": "アナグラムペアを見つけよう！",
+      "mechanicHint7": "回文で追加報酬ゲット！",
+      "mechanicHint8": "珍しい単語を作ろう！",
+      "mechanicHint9": "複数言語の単語でスコアアップ！",
+      "mechanicHint10": "全メカニクスをマスターして最終チャレンジへ！"
     },
     "chapters": {
       "meadows": {
@@ -7518,6 +7557,25 @@ const ja = {
     "chain": {
       "badge": "チェイン x{level}"
     },
+    "tile": {
+      "gold":      { "name": "ゴールド",    "desc": "スコア3倍 + ボーナス1手。" },
+      "silver":    { "name": "シルバー",    "desc": "スコア1.5倍。カウントダウンを1手延長。" },
+      "diamond":   { "name": "ダイヤモンド", "desc": "スコア5倍。フロスト内容を3ターン公開。" },
+      "bomb":      { "name": "ボム",        "desc": "周囲3×3をクリア。近くのボムに連鎖。" },
+      "lightning": { "name": "ライトニング", "desc": "列全体を即座にクリア。" },
+      "prism":     { "name": "プリズム",    "desc": "2回。行と列を全クリア。ボムとライトニングに連鎖。" },
+      "rainbow":   { "name": "レインボー",  "desc": "最強スペシャルをコピー＆倍増。単独: 2倍スコア。" },
+      "ice":       { "name": "アイス",      "desc": "2回。クリア時に隣接ウイルスを凍結。" },
+      "gem":       { "name": "ジェム",      "desc": "3回で収集。完了時にスペシャル2個生成。" },
+      "frozen":    { "name": "フロスト",    "desc": "2回。内部にスペシャルを隠す — ボム、ライトニング、プリズム、ジェム、レインボー。" },
+      "magnet":    { "name": "ボルテックス", "desc": "近くのタイルを引き寄せ、エリアを爆発。" },
+      "mirror":    { "name": "ミラー",      "desc": "単語内の最初の攻撃スペシャルをコピー。単独: 2倍スコア。" },
+      "wildcard":  { "name": "ワイルド",    "desc": "どの文字にもなれる。使用文字のスクラブル値でスコア。" },
+      "countdown": { "name": "カウントダウン", "desc": "毎手減少。単語で解除: +15点と2ボーナス手。期限切れ: -50点と3×3爆発。" },
+      "virus":     { "name": "ウイルス",    "desc": "毎ターン拡散。1単語で3個以上クリアで全ウイルス治癒。" },
+      "portal":    { "name": "ポータル",    "desc": "リンクペアも同時クリア。単語スコア2倍。+5ボーナス。" },
+      "catalyst":  { "name": "触媒",        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。" }
+    },
     "title": "ブラストモード",
     "description": "ボードをクリア！単語でタイルを爆破。",
     "progress": "クリア済み",
@@ -7837,7 +7895,12 @@ const ja = {
       "analytics": "アナリティクス",
       "insights": "インサイト",
       "viewReports": "レポートを見る",
-      "viewReportsDesc": "クラスの詳細なレポートと分析を表示"
+      "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
+      "tab": {
+        "play": "プレイ",
+        "prepare": "準備",
+        "review": "レビュー"
+      }
     },
     "game": {
       "qrCode": "QRコードを表示",
@@ -8134,7 +8197,7 @@ const ja = {
       "imported": "インポート完了！",
       "importError": "インポートに失敗",
       "preview": "プレビュー",
-      "wordCount": "単語数",
+      "wordCount": "{{count}}語",
       "noResults": "結果なし",
       "selectGrade": "学年を選択",
       "selectSubject": "科目を選択",
@@ -8180,7 +8243,7 @@ const ja = {
     }
   },
   "education": {
-    "reviewDue": "復習する単語が{count}個あります",
+    "reviewDue": "復習する単語が{{count}}個あります",
     "postGame": {
       "wordsYouLearned": "学んだ単語",
       "found": "見つけた",
@@ -8778,7 +8841,7 @@ const ja = {
     "you": "あなた",
     "youLose": "敗北...",
     "youWin": "勝利！",
-    "opponentDisconnected": "相手が切断しました",
+    "opponentDisconnected": "{{opponentName}}が切断しました",
     "autoForfeitMessage": "相手が再接続しなければ自動的に勝利します",
     "forfeitTitle": "デュエルを棄権しますか？",
     "forfeitDescription": "このデュエルに負け、相手が勝ちます。取り消しできません。",
@@ -9712,15 +9775,22 @@ const ja = {
       "rule3": "特殊タイル（💣⚡🔷）が爆発的な連鎖反応を起こす",
       "rule4": "タイルの50%以上をクリアして次のウェーブへ"
     },
-    "waveComplete": "ウェーブ${wave}クリア！",
+    "waveComplete": "ウェーブ{{wave}}クリア！",
     "score": "スコア",
     "wordsFound": "単語",
     "cleared": "クリア",
-    "nextWave": "ウェーブ${wave}",
+    "nextWave": "ウェーブ{{wave}}",
     "gameOver": "ゲームオーバー",
     "waves": "ウェーブ",
     "bestWord": "ベスト",
     "playAgain": "もう一度",
+    "chain": {
+      "cascade": "カスケード！",
+      "double": "ダブル！",
+      "triple": "トリプル！",
+      "mega": "メガ！",
+      "ultra": "ウルトラ！！"
+    },
     "tileGuide": {
       "title": "タイルガイド",
       "standard": { "name": "通常", "desc": "基本タイル" },

@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useMemo, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Type, Zap } from 'lucide-react';
+import { Sparkles, Type, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -15,9 +14,6 @@ import ResultsPodium from '@/components/results/ResultsPodium';
 import ConsolationRows from '@/components/results/ConsolationRows';
 import HighlightsBar from '@/components/results/HighlightsBar';
 import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
-
-// Keep existing components for stats/words detail
-const SeriesStandingsBanner = dynamic(() => import('@/components/results/SeriesStandingsBanner'), { ssr: false });
 
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
@@ -108,9 +104,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   currentPlayerRank,
   username,
   gameMode,
-  missedWords,
-  seriesStandings,
-  seriesRoundNumber,
   t,
   allPlayerWords,
   gameDuration: _gameDuration,
@@ -118,10 +111,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
   nearRankData,
   wordHuntSummary,
   onPodiumReaction,
-  emojiReactions,
+  emojiReactions: _emojiReactions,
+  seriesStandings: _seriesStandings,
+  seriesRoundNumber: _seriesRoundNumber,
+  missedWords: _missedWords,
 }) => {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
+  const [showDetails, setShowDetails] = useState(false);
 
   // Derived data
   const winnerScore = sortedScores[0]?.score ?? 0;
@@ -189,11 +186,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Cinematic results in YOU-FIRST order */}
-
       {/* Win Streak Badge */}
       {winStreakData && winStreakData.currentStreak >= 2 && (
         <WinStreakBadge streak={winStreakData.currentStreak} t={t} />
+      )}
+
+      {/* Near Rank Teaser */}
+      {nearRankData && (
+        <NearRankTeaser nextTier={nearRankData.nextTier} eloNeeded={nearRankData.eloNeeded} />
       )}
 
       {/* 1. YOUR RESULT HERO */}
@@ -213,7 +213,12 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* 2. TOP 3 PODIUM */}
+      {/* 2. HIGHLIGHTS BAR */}
+      {currentPlayerData && (
+        <HighlightsBar stats={highlightStats} />
+      )}
+
+      {/* 3. TOP 3 PODIUM */}
       {isMultiplayer && podiumPlayers.length >= 2 && (
         <ResultsPodium
           players={podiumPlayers}
@@ -224,7 +229,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
         />
       )}
 
-      {/* 3. CONSOLATION ROWS (4th+ with archetype titles) */}
+      {/* 4. CONSOLATION ROWS (4th+ with archetype titles) */}
       {consolationPlayers.length > 0 && (
         <ConsolationRows
           players={consolationPlayers}
@@ -232,16 +237,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           currentUsername={username}
           t={t}
         />
-      )}
-
-      {/* Near Rank Teaser */}
-      {nearRankData && (
-        <NearRankTeaser nextTier={nearRankData.nextTier} eloNeeded={nearRankData.eloNeeded} />
-      )}
-
-      {/* 4. HIGHLIGHTS BAR */}
-      {currentPlayerData && (
-        <HighlightsBar stats={highlightStats} />
       )}
 
       {/* 5. REVENGE CARD */}
@@ -255,33 +250,35 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = ({
           reducedMotion={reducedMotion}
           revengeDelay={0.3}
           t={t}
-          missedWords={missedWords}
         />
       )}
 
-      {/* Series Standings */}
-      {seriesStandings && seriesRoundNumber && seriesRoundNumber >= 2 && (
-        <SeriesStandingsBanner
-          standings={seriesStandings}
-          roundNumber={seriesRoundNumber}
-          currentUsername={username}
-          t={t}
-        />
-      )}
-
-      {/* Stats + Words Detail */}
+      {/* 6. DETAILS (collapsed by default) */}
       {currentPlayerData && (
-        <ResultsWordsSection
-          currentPlayerData={currentPlayerData}
-          currentPlayerValidWords={currentPlayerValidWords}
-          currentPlayerRank={currentPlayerRank}
-          reducedMotion={reducedMotion}
-          statsDelay={0.4}
-          wordsDelay={0.5}
-          isStatsVisible
-          isWordsVisible
-          t={t}
-        />
+        <div>
+          <button
+            onClick={() => setShowDetails(v => !v)}
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-cream font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+          >
+            {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {t('results.showDetails')}
+          </button>
+          {showDetails && (
+            <div className="mt-4">
+              <ResultsWordsSection
+                currentPlayerData={currentPlayerData}
+                currentPlayerValidWords={currentPlayerValidWords}
+                currentPlayerRank={currentPlayerRank}
+                reducedMotion={reducedMotion}
+                statsDelay={0}
+                wordsDelay={0.1}
+                isStatsVisible
+                isWordsVisible
+                t={t}
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

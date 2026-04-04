@@ -14,6 +14,23 @@ import type { GameDataInput, GameStateData } from './types';
 
 import logger from '../utils/logger';
 
+/**
+ * Strip socket-related refs from user/spectator objects before Redis persistence.
+ * Socket IDs are process-local and meaningless after crash/restore.
+ */
+function stripSocketRefs(obj: Record<string, unknown>): Record<string, unknown> {
+  const cleaned: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'object' && value !== null) {
+      const { socketId, socket, ...rest } = value as Record<string, unknown>;
+      cleaned[key] = rest;
+    } else {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
+
 /** Safely parse JSON with a fallback — prevents a single corrupted field from crashing the entire game state */
 function safeJsonParse<T>(value: string | undefined, fallback: T, fieldName: string, gameCode?: string): T {
   try {
@@ -32,22 +49,59 @@ export async function saveGameState(gameCode: string, gameData: GameDataInput): 
   const key = KEYS.game(gameCode);
   const client = getRedisClient()!;
 
-  // Sanitize data - exclude WebSocket objects
+  // Sanitize data — serialize all fields, converting non-serializable types.
+  // Users stored as full objects (v2) for complete crash recovery.
   const sanitizedData: Record<string, string> = {
     roomName: gameData.roomName || '',
+    // v2: store full user objects (strip socket refs). v1 compat: 'users' key kept as username list.
     users: JSON.stringify(Object.keys(gameData.users || {})),
+    usersV2: JSON.stringify(stripSocketRefs(gameData.users || {})),
+    spectators: JSON.stringify(stripSocketRefs(gameData.spectators || {})),
     playerScores: JSON.stringify(gameData.playerScores || {}),
     playerWords: JSON.stringify(gameData.playerWords || {}),
     playerAchievements: JSON.stringify(gameData.playerAchievements || {}),
     playerWordDetails: JSON.stringify(gameData.playerWordDetails || {}),
+    playerCombos: JSON.stringify(gameData.playerCombos || {}),
     firstWordFound: JSON.stringify(gameData.firstWordFound || {}),
     gameState: gameData.gameState || 'waiting',
     startTime: gameData.startTime || '',
     endTime: gameData.endTime || '',
     letterGrid: JSON.stringify(gameData.letterGrid || []),
     timerSeconds: String(gameData.timerSeconds || 60),
+    remainingTime: String(gameData.remainingTime ?? ''),
     language: gameData.language || 'en',
     tournamentId: gameData.tournamentId || '',
+    gameMode: gameData.gameMode || '',
+    blastModeState: JSON.stringify(gameData.blastModeState || null),
+    wordHuntState: JSON.stringify(gameData.wordHuntState || null),
+    isRanked: String(gameData.isRanked ?? false),
+    allowLateJoin: String(gameData.allowLateJoin ?? true),
+    chatHistory: JSON.stringify(gameData.chatHistory || []),
+    aiApprovedWords: JSON.stringify(gameData.aiApprovedWords || []),
+    peerValidationVotes: JSON.stringify(gameData.peerValidationVotes || {}),
+    cachedResultsPayload: JSON.stringify(gameData.cachedResultsPayload || null),
+    // Serialize Map → Array<[key, value]> for letterPositions
+    letterPositions: JSON.stringify(
+      gameData.letterPositions instanceof Map ? Array.from(gameData.letterPositions.entries()) : []
+    ),
+    // Serialize Set → string[] for vocabulary/kicked
+    selectedVocabulary: JSON.stringify(
+      gameData.selectedVocabulary instanceof Set ? Array.from(gameData.selectedVocabulary) : []
+    ),
+    lessonVocabulary: JSON.stringify(
+      gameData.lessonVocabulary instanceof Set ? Array.from(gameData.lessonVocabulary) : []
+    ),
+    kickedPlayers: JSON.stringify(
+      gameData.kickedPlayers instanceof Set ? Array.from(gameData.kickedPlayers) : []
+    ),
+    createdAt: String(gameData.createdAt || ''),
+    lastActivity: String(gameData.lastActivity || ''),
+    gameDuration: String(gameData.gameDuration ?? ''),
+    minWordLength: String(gameData.minWordLength ?? ''),
+    difficulty: gameData.difficulty || '',
+    gameStartedAt: String(gameData.gameStartedAt ?? ''),
+    hostUsername: gameData.hostUsername || '',
+    hostPlayerId: gameData.hostPlayerId || '',
   };
 
   for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
@@ -92,18 +146,43 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
     return {
       roomName: data.roomName,
       users: safeJsonParse<string[]>(data.users, [], 'users', gameCode),
+      usersV2: data.usersV2 ? safeJsonParse<Record<string, unknown>>(data.usersV2, {}, 'usersV2', gameCode) : undefined,
+      spectators: data.spectators ? safeJsonParse<Record<string, unknown>>(data.spectators, {}, 'spectators', gameCode) : undefined,
       playerScores: safeJsonParse<Record<string, number>>(data.playerScores, {}, 'playerScores', gameCode),
       playerWords: safeJsonParse<Record<string, string[]>>(data.playerWords, {}, 'playerWords', gameCode),
       playerAchievements: safeJsonParse<Record<string, string[]>>(data.playerAchievements, {}, 'playerAchievements', gameCode),
       playerWordDetails: safeJsonParse<Record<string, unknown[]>>(data.playerWordDetails, {}, 'playerWordDetails', gameCode),
+      playerCombos: data.playerCombos ? safeJsonParse<Record<string, number>>(data.playerCombos, {}, 'playerCombos', gameCode) : undefined,
       firstWordFound: safeJsonParse<Record<string, boolean>>(data.firstWordFound, {}, 'firstWordFound', gameCode),
       gameState: data.gameState,
       startTime: data.startTime,
       endTime: data.endTime,
       letterGrid: safeJsonParse<string[][]>(data.letterGrid, [], 'letterGrid', gameCode),
       timerSeconds: parseInt(data.timerSeconds) || 60,
+      remainingTime: data.remainingTime ? parseInt(data.remainingTime) : null,
       language: data.language,
       tournamentId: data.tournamentId || null,
+      gameMode: data.gameMode || null,
+      blastModeState: safeJsonParse<Record<string, unknown> | null>(data.blastModeState, null, 'blastModeState', gameCode),
+      wordHuntState: safeJsonParse<Record<string, unknown> | null>(data.wordHuntState, null, 'wordHuntState', gameCode),
+      isRanked: data.isRanked === 'true',
+      allowLateJoin: data.allowLateJoin !== 'false',
+      chatHistory: data.chatHistory ? safeJsonParse<unknown[]>(data.chatHistory, [], 'chatHistory', gameCode) : undefined,
+      aiApprovedWords: data.aiApprovedWords ? safeJsonParse<unknown[]>(data.aiApprovedWords, [], 'aiApprovedWords', gameCode) : undefined,
+      peerValidationVotes: data.peerValidationVotes ? safeJsonParse<Record<string, string>>(data.peerValidationVotes, {}, 'peerValidationVotes', gameCode) : undefined,
+      cachedResultsPayload: data.cachedResultsPayload ? safeJsonParse<Record<string, unknown> | null>(data.cachedResultsPayload, null, 'cachedResultsPayload', gameCode) : undefined,
+      letterPositions: data.letterPositions ? safeJsonParse<Array<[string, [number, number][]]>>(data.letterPositions, [], 'letterPositions', gameCode) : undefined,
+      selectedVocabulary: data.selectedVocabulary ? safeJsonParse<string[]>(data.selectedVocabulary, [], 'selectedVocabulary', gameCode) : undefined,
+      lessonVocabulary: data.lessonVocabulary ? safeJsonParse<string[]>(data.lessonVocabulary, [], 'lessonVocabulary', gameCode) : undefined,
+      kickedPlayers: data.kickedPlayers ? safeJsonParse<string[]>(data.kickedPlayers, [], 'kickedPlayers', gameCode) : undefined,
+      createdAt: data.createdAt ? parseInt(data.createdAt) : undefined,
+      lastActivity: data.lastActivity ? parseInt(data.lastActivity) : undefined,
+      gameDuration: data.gameDuration ? parseInt(data.gameDuration) : undefined,
+      minWordLength: data.minWordLength ? parseInt(data.minWordLength) : undefined,
+      difficulty: data.difficulty || undefined,
+      gameStartedAt: data.gameStartedAt ? parseInt(data.gameStartedAt) : undefined,
+      hostUsername: data.hostUsername || null,
+      hostPlayerId: data.hostPlayerId || undefined,
     };
   } catch (error: unknown) {
     const err = error as Error;

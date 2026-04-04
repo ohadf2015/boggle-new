@@ -33,6 +33,7 @@ import {
   persistGameState as doPersist,
   persistGameStateNow as doPersistNow,
   restoreGameFromRedis as doRestore,
+  restoreAllGamesFromRedis as doRestoreAll,
   getAllGameCodesFromRedis,
   deleteGameFromRedis,
   clearPersistTimer
@@ -59,6 +60,8 @@ import type { HostGameBase, TransferHostResult } from './hostManager';
 
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
+import { LRUCache } from 'lru-cache';
+import { publishCacheInvalidation, startCacheInvalidationListener, stopCacheInvalidationListener } from '../redis/cacheInvalidation';
 
 import logger from '../utils/logger';
 const { canTransition, transition, getValidEvents } = require('../utils/gameStateMachine');
@@ -69,8 +72,18 @@ export type { SpectatorOptions, SpectatorInfo } from './spectatorManager';
 export type { ReadyCountResult } from './readyStateManager';
 export type { TransferHostResult } from './hostManager';
 
-// Game storage
+// Feature flag: when true, Redis is source of truth with local LRU cache
+const REDIS_PRIMARY = process.env.REDIS_PRIMARY === 'true';
+
+// Game storage (in-memory primary mode)
 const games: Record<string, GameState> = {};
+
+// LRU cache for Redis-primary mode — holds recently-accessed games in memory
+// to avoid Redis round-trips on every getGame() call
+const gameCache = new LRUCache<string, GameState>({
+  max: parseInt(process.env.GAME_CACHE_MAX || '200', 10),
+  ttl: 30 * 60 * 1000, // 30 min — stale games evicted automatically
+});
 
 // Active rooms cache (dirty-flag pattern to avoid O(n) on every call)
 let activeRoomsCache: ReturnType<typeof gameQueryManager.getActiveRooms> | null = null;
@@ -83,6 +96,7 @@ function markActiveRoomsDirty(): void {
 // Persistence helpers (bound to games object)
 const persistGameState = (gameCode: string): void => doPersist(gameCode, games);
 const persistGameStateNow = (gameCode: string): Promise<void> => doPersistNow(gameCode, games);
+const restoreAllGamesFromRedis = (): Promise<number> => doRestoreAll(games);
 
 // Per-game restoration lock to prevent duplicate concurrent restores
 const restoreLocks = new Map<string, Promise<GameState | null>>();
@@ -146,12 +160,45 @@ function getGame(gameCode: string): GameState | null {
   return games[gameCode] || null;
 }
 
+/**
+ * Async version of getGame that checks the LRU cache first, then Redis.
+ * When REDIS_PRIMARY=true, this is the preferred accessor.
+ * Handlers can migrate from getGame() → getGameAsync() incrementally.
+ */
+async function getGameAsync(gameCode: string): Promise<GameState | null> {
+  // Fast path: in-memory hit (works in both modes)
+  const local = games[gameCode];
+  if (local) return local;
+
+  if (!REDIS_PRIMARY) return null;
+
+  // LRU cache hit
+  const cached = gameCache.get(gameCode);
+  if (cached) return cached;
+
+  // Redis fetch
+  const restored = await restoreGameFromRedis(gameCode);
+  if (restored) {
+    gameCache.set(gameCode, restored);
+  }
+  return restored;
+}
+
 function updateGame(gameCode: string, updates: Partial<GameState>, immediate = false): void {
   if (!games[gameCode]) return;
   Object.assign(games[gameCode], updates, { lastActivity: Date.now() });
   markActiveRoomsDirty();
-  if (immediate) persistGameStateNow(gameCode);
-  else persistGameState(gameCode);
+
+  if (REDIS_PRIMARY) {
+    // In Redis-primary mode, always persist immediately and update cache
+    gameCache.set(gameCode, games[gameCode]);
+    persistGameStateNow(gameCode);
+    publishCacheInvalidation(gameCode);
+  } else if (immediate) {
+    persistGameStateNow(gameCode);
+  } else {
+    persistGameState(gameCode);
+  }
 }
 
 function deleteGame(gameCode: string): void {
@@ -176,6 +223,8 @@ function deleteGame(gameCode: string): void {
   scoreManager.clearLeaderboardThrottle(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];
+  gameCache.delete(gameCode);
+  if (REDIS_PRIMARY) publishCacheInvalidation(gameCode);
   markActiveRoomsDirty();
 }
 
@@ -539,9 +588,22 @@ function setTournamentIdForGame(gameCode: string, tournamentId: string | null): 
   return result;
 }
 
+// Cache invalidation lifecycle
+async function initCacheInvalidation(): Promise<void> {
+  if (!REDIS_PRIMARY) return;
+  await startCacheInvalidationListener((gameCode) => {
+    gameCache.delete(gameCode);
+    logger.debug('CACHE_INVALIDATION', `Evicted ${gameCode} from local LRU cache`);
+  });
+}
+
+async function shutdownCacheInvalidation(): Promise<void> {
+  await stopCacheInvalidationListener();
+}
+
 // Exports
 export {
-  createGame, getGame, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
+  createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
@@ -556,12 +618,13 @@ export {
   updateUserPresence, updateUserHeartbeat, markUserActivity, getPresenceConfig, checkUserConnectionHealth, markHostActive, reactivateHost,
   getAuthUserConnection, setAuthUserConnection, removeAuthUserConnection, clearSocketMappings, clearSocketMappingsForLeave,
   getTournamentIdFromGame, setTournamentIdForGame,
-  persistGameState, persistGameStateNow, restoreGameFromRedis, getAllGameCodesFromRedis
+  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, getAllGameCodesFromRedis,
+  initCacheInvalidation, shutdownCacheInvalidation
 };
 
 // CommonJS exports (re-use ESM exports to avoid duplication)
 const cjsExports = {
-  createGame, getGame, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
+  createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
@@ -576,7 +639,8 @@ const cjsExports = {
   updateUserPresence, updateUserHeartbeat, markUserActivity, getPresenceConfig, checkUserConnectionHealth, markHostActive, reactivateHost,
   getAuthUserConnection, setAuthUserConnection, removeAuthUserConnection, clearSocketMappings, clearSocketMappingsForLeave,
   getTournamentIdFromGame, setTournamentIdForGame,
-  persistGameState, persistGameStateNow, restoreGameFromRedis, getAllGameCodesFromRedis
+  persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, getAllGameCodesFromRedis,
+  initCacheInvalidation, shutdownCacheInvalidation
 };
 
 Object.defineProperty(cjsExports, 'games', {

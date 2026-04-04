@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Swords, Trophy, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -281,14 +281,14 @@ export function RealTimeDuelGame({
     const xp = isWinner ? result.xpAwarded.winner : result.xpAwarded.loser;
 
     return (
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center min-h-[500px] text-center p-8"
         data-testid="realtime-duel-game"
       >
         {/* Result Badge */}
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
@@ -306,7 +306,7 @@ export function RealTimeDuelGame({
           ) : (
             <Swords className="w-16 h-16 text-neo-white" />
           )}
-        </motion.div>
+        </AdaptiveMotion.div>
 
         {/* Result Text */}
         <h2 className="text-4xl font-neo-display font-bold text-neo-white mb-4">
@@ -351,7 +351,7 @@ export function RealTimeDuelGame({
             {t('duels.backToLobby')}
           </button>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
     );
   }
 
@@ -452,7 +452,7 @@ export function RealTimeDuelGame({
 
           {/* Found Words List */}
           <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {words.length === 0 ? (
                 <p className="text-neo-white/50 text-sm text-center py-8">
                   {t('duels.typeWord')}
@@ -460,7 +460,7 @@ export function RealTimeDuelGame({
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {words.map((wordStatus, idx) => (
-                    <motion.div
+                    <AdaptiveMotion.div
                       key={idx}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -474,11 +474,11 @@ export function RealTimeDuelGame({
                     >
                       {wordStatus.word}
                       {wordStatus.points && ` (+${wordStatus.points})`}
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   ))}
                 </div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
           </div>
 
           {/* Forfeit Button */}

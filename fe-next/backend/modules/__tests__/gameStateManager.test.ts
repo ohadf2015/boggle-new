@@ -19,6 +19,7 @@ jest.mock('../gameState/persistence', () => ({
   persistGameState: jest.fn(),
   persistGameStateNow: jest.fn().mockResolvedValue(undefined),
   restoreGameFromRedis: jest.fn().mockResolvedValue(null),
+  restoreAllGamesFromRedis: jest.fn().mockResolvedValue(0),
   getAllGameCodesFromRedis: jest.fn().mockResolvedValue([]),
   deleteGameFromRedis: jest.fn(),
   clearPersistTimer: jest.fn(),

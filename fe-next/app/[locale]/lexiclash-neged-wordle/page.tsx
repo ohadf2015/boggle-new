@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-he.jpg`,
+          url: `${BASE_URL}/og-image-he.webp`,
           width: 1200,
           height: 630,
           alt: 'לקסיקלאש נגד וורדל - השוואת משחקי מילים',
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: 'לקסיקלאש נגד וורדל - מה עדיף?',
       description:
         'וורדל = מילה אחת ביום. לקסיקלאש = אינסוף, מרובה משתתפים, עברית מלאה. השוואה בפנים!',
-      images: [`${BASE_URL}/og-image-he.jpg`],
+      images: [`${BASE_URL}/og-image-he.webp`],
     },
     alternates: {
       canonical: pageUrl,

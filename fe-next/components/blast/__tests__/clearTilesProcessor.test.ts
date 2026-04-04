@@ -1,0 +1,294 @@
+/**
+ * Tests for unique tile effects in clearTilesProcessor.processTilesForWord.
+ * Covers: gold bonus moves, silver countdown extend, diamond reveal turns,
+ * ice→virus freeze, wildcard Scrabble scoring, countdown defuse moves,
+ * virus mass cure, portal word multiplier, gem completion bonus moves,
+ * prism tile conversion.
+ */
+import { processTilesForWord, type TileProcessingInput } from '../utils/clearTilesProcessor';
+import type { BlastTileState } from '@/shared/types/blast';
+import {
+  GOLD_BONUS_MOVES,
+  COUNTDOWN_DEFUSE_MOVES,
+  TREASURE_GEM_BONUS_MOVES,
+  DIAMOND_REVEAL_TURNS,
+  PORTAL_WORD_MULTIPLIER,
+} from '../types';
+
+// Mock tile generation to avoid randomness
+jest.mock('../utils/blastTileGeneration', () => ({
+  rollSpecialFromDistribution: () => 'bomb' as const,
+}));
+
+// Deterministic Math.random for prism conversion tests
+const originalRandom = Math.random;
+afterEach(() => { Math.random = originalRandom; });
+
+/** Create a standard tile */
+function tile(row: number, col: number, type: BlastTileState['type'] = 'standard', overrides?: Partial<BlastTileState>): BlastTileState {
+  return {
+    uid: `${row}-${col}`,
+    row, col, type,
+    isCleared: false,
+    activationEffect: null,
+    hitsRemaining: 0,
+    ...overrides,
+  };
+}
+
+/** Build a gridSize×gridSize grid of standard tiles */
+function makeGrid(gridSize: number, overrides?: Array<{ row: number; col: number; tile: Partial<BlastTileState> }>): BlastTileState[][] {
+  const grid: BlastTileState[][] = [];
+  for (let r = 0; r < gridSize; r++) {
+    grid[r] = [];
+    for (let c = 0; c < gridSize; c++) {
+      grid[r][c] = tile(r, c);
+    }
+  }
+  for (const o of overrides ?? []) {
+    grid[o.row][o.col] = tile(o.row, o.col, (o.tile.type ?? 'standard') as BlastTileState['type'], o.tile);
+  }
+  return grid;
+}
+
+function makeInput(grid: BlastTileState[][], path: Array<{ row: number; col: number }>, word: string, opts?: Partial<TileProcessingInput>): TileProcessingInput {
+  return {
+    prev: grid,
+    path,
+    word,
+    baseScore: 10,
+    gridSize: grid.length,
+    currentWave: 1,
+    preDetectedCombos: [],
+    ...opts,
+  };
+}
+
+describe('processTilesForWord — unique tile effects', () => {
+  describe('gold tile: bonus moves', () => {
+    it('awards GOLD_BONUS_MOVES per gold tile in word', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'gold' } },
+        { row: 0, col: 1, tile: { type: 'gold' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
+      // 2 gold tiles * GOLD_BONUS_MOVES + word-length bonus (3 letters = 0 from calculateBonusMoves)
+      expect(result.bonusMoveCount).toBeGreaterThanOrEqual(2 * GOLD_BONUS_MOVES);
+    });
+  });
+
+  describe('silver tile: countdown extension', () => {
+    it('extends countdown timers by 1 when silver is cleared', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'silver' } },
+        { row: 2, col: 2, tile: { type: 'countdown', countdown: 2 } },
+        { row: 3, col: 3, tile: { type: 'countdown', countdown: 1 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.silverCountdownExtended).toBe(true);
+      // Countdown timers should have been extended in the returned grid
+      expect(result.next[2][2].countdown).toBe(3); // was 2
+      expect(result.next[3][3].countdown).toBe(2); // was 1
+    });
+
+    it('does not extend already-cleared countdown tiles', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'silver' } },
+        { row: 2, col: 2, tile: { type: 'countdown', countdown: 2, isCleared: true } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[2][2].countdown).toBe(2); // unchanged
+    });
+  });
+
+  describe('diamond tile: reveal turns', () => {
+    it('sets diamondRevealTurns to DIAMOND_REVEAL_TURNS', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'diamond' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.diamondRevealTurns).toBe(DIAMOND_REVEAL_TURNS);
+    });
+  });
+
+  describe('ice tile: virus freeze', () => {
+    it('converts adjacent virus tiles to ice with 2 hits', () => {
+      const grid = makeGrid(4, [
+        { row: 1, col: 1, tile: { type: 'ice' } },
+        { row: 0, col: 1, tile: { type: 'virus' } }, // above
+        { row: 1, col: 2, tile: { type: 'virus' } }, // right
+        { row: 2, col: 2, tile: {} },                  // not adjacent — unchanged
+      ]);
+      const path = [{ row: 1, col: 0 }, { row: 1, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[0][1].type).toBe('ice');
+      expect(result.next[0][1].hitsRemaining).toBe(2);
+      expect(result.next[0][1].activationEffect).toBe('virus-frozen');
+      expect(result.next[1][2].type).toBe('ice');
+    });
+
+    it('does not convert non-virus adjacent tiles', () => {
+      const grid = makeGrid(4, [
+        { row: 1, col: 1, tile: { type: 'ice' } },
+        { row: 0, col: 1, tile: { type: 'gold' } },
+      ]);
+      const path = [{ row: 1, col: 0 }, { row: 1, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[0][1].type).toBe('gold'); // unchanged
+    });
+  });
+
+  describe('wildcard tile: Scrabble scoring', () => {
+    it('scores based on letter Scrabble value', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 1, tile: { type: 'wildcard' } },
+      ]);
+      // Wildcard is at index 1 in path, representing letter 'Z' (10 points)
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AZ'));
+      // Total includes baseScore (10) + bonus from wildcard Scrabble value
+      expect(result.totalScore).toBeGreaterThan(10); // base 10 + Z bonus (10)
+    });
+
+    it('fires explosion for high-value letters (>=4)', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 1, tile: { type: 'wildcard' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AQ')); // Q = 10
+      const wildcardExplosion = result.explosions.find(e => e.id.startsWith('wildcard-'));
+      expect(wildcardExplosion).toBeDefined();
+    });
+
+    it('does NOT fire explosion for low-value letters (<4)', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 1, tile: { type: 'wildcard' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AE')); // E = 1
+      const wildcardExplosion = result.explosions.find(e => e.id.startsWith('wildcard-'));
+      expect(wildcardExplosion).toBeUndefined();
+    });
+  });
+
+  describe('countdown tile: defuse bonus moves', () => {
+    it('awards COUNTDOWN_DEFUSE_MOVES when defused', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'countdown', countdown: 2 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.bonusMoveCount).toBeGreaterThanOrEqual(COUNTDOWN_DEFUSE_MOVES);
+    });
+  });
+
+  describe('virus tile: mass cure', () => {
+    it('cures ALL virus on board when 3+ virus cleared in one word', () => {
+      const grid = makeGrid(5, [
+        { row: 0, col: 0, tile: { type: 'virus' } },
+        { row: 0, col: 1, tile: { type: 'virus' } },
+        { row: 0, col: 2, tile: { type: 'virus' } },
+        { row: 3, col: 3, tile: { type: 'virus' } }, // not in path — should be cured
+        { row: 4, col: 4, tile: { type: 'virus' } }, // not in path — should be cured
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
+      expect(result.virusMassCure).toBe(true);
+      expect(result.next[3][3].isCleared).toBe(true);
+      expect(result.next[4][4].isCleared).toBe(true);
+      expect(result.next[3][3].activationEffect).toBe('virus-cured');
+    });
+
+    it('does NOT trigger mass cure with fewer than 3 virus', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'virus' } },
+        { row: 0, col: 1, tile: { type: 'virus' } },
+        { row: 3, col: 3, tile: { type: 'virus' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
+      expect(result.virusMassCure).toBe(false);
+      expect(result.next[3][3].isCleared).toBe(false); // untouched
+    });
+  });
+
+  describe('portal tile: word multiplier', () => {
+    it('applies PORTAL_WORD_MULTIPLIER to portal words', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'portal', portalPairId: 'p1' } },
+        { row: 3, col: 3, tile: { type: 'portal', portalPairId: 'p1' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.portalMultiplier).toBe(PORTAL_WORD_MULTIPLIER);
+    });
+
+    it('clears paired portal when one is used', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'portal', portalPairId: 'p1' } },
+        { row: 3, col: 3, tile: { type: 'portal', portalPairId: 'p1' } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.next[3][3].isCleared).toBe(true);
+    });
+
+    it('returns portalMultiplier 1 when no portal in word', () => {
+      const grid = makeGrid(4);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.portalMultiplier).toBe(1);
+    });
+  });
+
+  describe('gem tile: completion bonus moves', () => {
+    it('awards TREASURE_GEM_BONUS_MOVES when gem completes (3rd hit)', () => {
+      // Gem with 1 hit remaining = final hit
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'gem', hitsRemaining: 1 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      expect(result.bonusMoveCount).toBeGreaterThanOrEqual(TREASURE_GEM_BONUS_MOVES);
+    });
+  });
+
+  describe('prism tile: converts standard tiles to specials', () => {
+    it('converts up to 2 standard tiles to specials after clearing', () => {
+      Math.random = (() => { let i = 0; return () => [0.1, 0.2, 0.3, 0.4, 0.5][i++ % 5]; })();
+      // Prism with 1 hit remaining (final hit triggers clear + convert)
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'prism', hitsRemaining: 1 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }];
+      const result = processTilesForWord(makeInput(grid, path, 'AB'));
+      // Count non-standard, non-prism tiles that weren't in the path and aren't cleared
+      let convertedCount = 0;
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 4; c++) {
+          if (path.some(p => p.row === r && p.col === c)) continue;
+          if (result.next[r][c].type !== 'standard' && !result.next[r][c].isCleared) {
+            convertedCount++;
+          }
+        }
+      }
+      expect(convertedCount).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('multiple effects stack', () => {
+    it('gold + countdown in same word gives combined bonus moves', () => {
+      const grid = makeGrid(4, [
+        { row: 0, col: 0, tile: { type: 'gold' } },
+        { row: 0, col: 1, tile: { type: 'countdown', countdown: 2 } },
+      ]);
+      const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+      const result = processTilesForWord(makeInput(grid, path, 'ABC'));
+      expect(result.bonusMoveCount).toBeGreaterThanOrEqual(GOLD_BONUS_MOVES + COUNTDOWN_DEFUSE_MOVES);
+    });
+  });
+});

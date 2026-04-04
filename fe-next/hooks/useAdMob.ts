@@ -15,7 +15,7 @@ async function getAdMob() {
 function isNativePlatform(): boolean {
   if (typeof window === 'undefined') return false;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const cap = (window as any).Capacitor;
     return cap?.isNativePlatform?.() ?? false;
   } catch {

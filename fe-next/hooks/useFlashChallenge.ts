@@ -58,7 +58,9 @@ export function useFlashChallenge({
   const [isChallengeFailed, setIsChallengeFailed] = useState(false);
   const [challengeTimeLeft, setChallengeTimeLeft] = useState(0);
   const failedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasTriggered = useRef(false);
+  /** How many challenges have triggered this level (max 3 at 30%/60%/85% elapsed) */
+  const triggerCount = useRef(0);
+  const TRIGGER_THRESHOLDS = [0.30, 0.60, 0.85];
   const challengeStartWords = useRef<string[]>([]);
   const challengeStartTime = useRef<number>(0);
   const usedGoldTile = useRef(false);
@@ -74,11 +76,13 @@ export function useFlashChallenge({
 
   // Trigger at 30% elapsed
   useEffect(() => {
-    if (!isPlaying || hasTriggered.current || activeChallenge) return;
+    if (!isPlaying || activeChallenge) return;
+    const nextThreshold = TRIGGER_THRESHOLDS[triggerCount.current];
+    if (!nextThreshold) return; // All 3 challenges used
     const elapsed = totalTimeSeconds - timeRemaining;
     const pct = elapsed / totalTimeSeconds;
-    if (pct >= 0.30) {
-      hasTriggered.current = true;
+    if (pct >= nextThreshold) {
+      triggerCount.current += 1;
       const candidates = getFlashChallengeForWorld(worldId, locale);
       const challenge = candidates[Math.floor(Math.random() * candidates.length)];
       setActiveChallenge(challenge);
@@ -123,7 +127,7 @@ export function useFlashChallenge({
           setIsChallengeFailed(false);
         }, 1500);
       }
-    }, 200);
+    }, 1000);
     return () => clearInterval(interval);
   }, [activeChallenge, isChallengeComplete, isPlaying]);
 
@@ -216,7 +220,7 @@ export function useFlashChallenge({
     setIsChallengeComplete(false);
     setIsChallengeFailed(false);
     setChallengeTimeLeft(0);
-    hasTriggered.current = false;
+    triggerCount.current = 0;
     challengeStartWords.current = [];
     challengeStartTime.current = 0;
     usedGoldTile.current = false;

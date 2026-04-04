@@ -11,6 +11,8 @@ import type {
   TournamentData,
 } from '@/shared/types/view';
 import type { BoardTheme } from '@/shared/types/socket';
+import type { RoundEventState } from '@/components/game/in-game/components/RoundEventOverlay';
+import type { SpecialWordEvent } from '@/components/game/in-game/components/SpecialWordToast';
 
 /**
  * State for hints feature in single-player mode
@@ -107,6 +109,19 @@ export interface InGameScreenProps {
 
   // Tutorial callback - opens onboarding tutorial
   onShowTutorial?: () => void;
+
+  // Round events (blizzard/lightning/meteor)
+  roundEvent?: RoundEventState | null;
+
+  // Special word found by any player
+  specialWordEvent?: SpecialWordEvent | null;
+
+  // Golden letters (bonus tiles highlighted on grid)
+  goldenLetters?: Array<{ row: number; col: number }>;
+
+  // Timer urgency state — drives screen border glow
+  timerUrgencyState?: 'normal' | 'low' | 'veryLow' | 'critical';
+  onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
 }
 
 /**

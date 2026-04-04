@@ -129,7 +129,8 @@ export async function startBot(
   const config = BOT_CONFIG.WORDS[bot.difficulty] || BOT_CONFIG.WORDS.medium;
   const targetWords = Math.floor((gameDuration / 60) * config.wordsPerMinute);
 
-  const maxWords = Math.max(3, targetWords * 2);
+  // Allow 3x target words to ensure bots have enough ammo for the full game
+  const maxWords = Math.max(10, targetWords * 3);
   bot.wordsToFind = bot.wordsToFind.slice(0, Math.min(bot.wordsToFind.length, maxWords));
 
   const actualStartTime = gameStartTime || Date.now();

@@ -374,10 +374,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           }} /> : <ConnectionDot />}
           <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
           {isClassroomMode ? (
-            <>
-              <EducationHeader showBackButton title={t('education.classroomGame.title')} />
-              <ClassroomModeBanner lessonData={lessonDataState} />
-            </>
+            // Hide header + banner during active gameplay to maximize grid space;
+            // show in lobby and results
+            isActive && !showResults ? null : (
+              <>
+                <EducationHeader showBackButton title={t('education.classroomGame.title')} />
+                <ClassroomModeBanner lessonData={lessonDataState} />
+              </>
+            )
           ) : (
             <AutoHideHeader />
           )}

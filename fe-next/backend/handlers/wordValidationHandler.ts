@@ -97,7 +97,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
     fireRoundBonus: fireRoundBonus,
-    fromLesson: fromLesson
+    fromLesson: fromLesson,
   });
 
   // Save to database if dictionary word
@@ -117,8 +117,42 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ? normalizedWord.length * BOARD_WORD_SCORE_PER_LETTER
     : 0;
 
-  // Single atomic score update: word score + blast tile bonus + word-hunt board bonus (if any)
-  updatePlayerScore(gameCode, username, wordScore + blastTileBonus + wordHuntBoardBonus, true);
+  // ---- Golden Letter Bonus ----
+  // +25% rounded up if any letter of the word sits on a golden position
+  let goldenBonus = 0;
+  if (game.goldenLetters?.length && game.letterGrid) {
+    const goldenChars = game.goldenLetters.map(g => {
+      const row = game.letterGrid![g.row];
+      return row ? String(row[g.col]).toLowerCase() : '';
+    }).filter(Boolean);
+    const usesGolden = normalizedWord.toLowerCase().split('').some(ch => goldenChars.includes(ch));
+    if (usesGolden) {
+      goldenBonus = Math.ceil(wordScore * 0.25);
+    }
+  }
+
+  // ---- Special Word Detection ----
+  let isSpecialWord = false;
+  const specialWordBonus = 10;
+  if (game.specialWords?.length) {
+    const upperWord = normalizedWord.toUpperCase();
+    const specialEntry = game.specialWords.find(sw => sw.word.toUpperCase() === upperWord && !sw.foundBy);
+    if (specialEntry) {
+      specialEntry.foundBy = username;
+      isSpecialWord = true;
+      broadcastToRoom(io, getGameRoom(gameCode), 'specialWordFound', {
+        word: normalizedWord,
+        foundBy: username,
+        bonus: specialWordBonus,
+        gameSessionId: game.gameSessionId,
+      });
+      logger.info('SPECIAL_WORD', `Game ${gameCode}: '${normalizedWord}' found by ${username} (+${specialWordBonus})`);
+    }
+  }
+  const specialBonus = isSpecialWord ? specialWordBonus : 0;
+
+  // Single atomic score update: word score + blast tile bonus + word-hunt board bonus + bonuses
+  updatePlayerScore(gameCode, username, wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + specialBonus, true);
 
   inc('wordAccepted');
   incPerGame(gameCode, 'wordAccepted');
@@ -134,6 +168,8 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     fireRoundBonus: fireRoundBonus,
     autoValidated: true,
     fromLesson: fromLesson,
+    ...(goldenBonus > 0 ? { goldenBonus } : {}),
+    ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
     ...(blastMoveResult ? {
       blast: {

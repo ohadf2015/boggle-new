@@ -20,13 +20,40 @@ export interface SocketContextValue {
 // Socket.IO Context
 export const SocketContext = createContext<SocketContextValue | null>(null);
 
-// Configuration - increased for better handling of poor network conditions
-const SOCKET_CONFIG = {
-  reconnectionAttempts: 20,        // Increased from 10 for poor connections
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 45000,     // Increased from 30000 for longer grace period
-  timeout: 30000,                  // Increased from 20000 for slow connections
-};
+/**
+ * Detect if we're running inside a native app WebView (Android/iOS).
+ * Native apps set a custom user agent or inject a bridge object.
+ */
+function isMobileApp(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return (
+    /LexiClash\/(Android|iOS)/i.test(ua) ||
+    !!(window as Record<string, unknown>).__LEXICLASH_NATIVE__
+  );
+}
+
+/**
+ * Detect if user is on a mobile browser (not native app, but mobile Safari/Chrome).
+ */
+function isMobileBrowser(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && !isMobileApp();
+}
+
+// Configuration - adaptive for platform
+// Mobile gets more aggressive reconnection (network switches are frequent)
+// and larger timeouts (cellular latency is higher)
+const SOCKET_CONFIG = (() => {
+  const mobile = typeof window !== 'undefined' && (isMobileApp() || isMobileBrowser());
+  return {
+    reconnectionAttempts: mobile ? 30 : 20,         // Mobile: more attempts for network switches
+    reconnectionDelay: mobile ? 500 : 1000,          // Mobile: faster initial retry
+    reconnectionDelayMax: mobile ? 30000 : 45000,    // Mobile: shorter max (users leave faster)
+    timeout: mobile ? 45000 : 30000,                 // Mobile: higher timeout for cellular
+    pingInterval: mobile ? 30000 : 25000,            // Mobile: slightly less frequent to save battery
+  };
+})();
 
 // Shared socket singleton to prevent duplicate connections across components
 let sharedSocketInstance: Socket | null = null;
@@ -162,7 +189,6 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
   const reconnectAttemptRef = useRef<number>(0);
   const socketRef = useRef<Socket | null>(null);
 
@@ -171,7 +197,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const socketInstance = socketRef.current;
     if (socketInstance && !socketInstance.connected) {
       logger.log('[SOCKET.IO] Manual reconnection triggered');
-      setReconnectAttempt(0);
+      reconnectAttemptRef.current = 0;
       setConnectionError(null);
       socketInstance.connect();
     }
@@ -228,7 +254,6 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
       reconnectAttemptRef.current = attemptNumber;
-      setReconnectAttempt(attemptNumber);
 
       // Refresh auth token before each reconnection attempt
       // Prevents stale JWT from causing silent guest fallback
@@ -298,6 +323,51 @@ export function SocketProvider({ children }: SocketProviderProps) {
     // Schedule setSocket asynchronously to avoid synchronous setState in effect
     Promise.resolve().then(() => setSocket(socketInstance));
 
+    // Mobile optimization: handle app backgrounding/foregrounding.
+    // When the app is backgrounded (tab hidden, app minimized), disconnect the socket
+    // to save battery and mobile data. Reconnect when returning to foreground.
+    // This is critical for Android WebView where the OS may throttle background timers.
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // App backgrounded — disconnect after a grace period (user might just be switching tabs briefly)
+        (handleVisibilityChange as any)._bgTimer = setTimeout(() => {
+          if (socketInstance.connected) {
+            logger.log('[SOCKET.IO] App backgrounded — disconnecting to save resources');
+            socketInstance.disconnect();
+          }
+        }, 5000); // 5s grace period
+      } else {
+        // App foregrounded — cancel pending disconnect and reconnect if needed
+        clearTimeout((handleVisibilityChange as any)._bgTimer);
+        if (!socketInstance.connected) {
+          logger.log('[SOCKET.IO] App foregrounded — reconnecting');
+          // Refresh auth token before reconnecting (may have expired while backgrounded)
+          getAuthToken().then(token => {
+            if (token && socketInstance) {
+              socketInstance.auth = { ...socketInstance.auth, token };
+            }
+            socketInstance.connect();
+          }).catch(() => socketInstance.connect());
+        }
+      }
+    };
+
+    // Only add visibility listener on mobile (desktop users expect persistent connections)
+    const mobile = isMobileApp() || isMobileBrowser();
+    if (mobile) {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    // Handle network status changes (mobile network switches: WiFi→cellular, etc.)
+    const handleOnline = () => {
+      if (!socketInstance.connected) {
+        logger.log('[SOCKET.IO] Network restored — reconnecting');
+        socketInstance.connect();
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
     // Cleanup on unmount
     return () => {
       logger.log('[SOCKET.IO] SocketProvider cleaning up listeners');
@@ -310,6 +380,11 @@ export function SocketProvider({ children }: SocketProviderProps) {
       socketInstance.off('reconnect_failed', handleReconnectFailed);
       socketInstance.off('serverShutdown', handleServerShutdown);
       socketInstance.off('error', handleError);
+      if (mobile) {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        clearTimeout((handleVisibilityChange as any)._bgTimer);
+      }
+      window.removeEventListener('online', handleOnline);
       releaseSharedSocket();
     };
   }, []);

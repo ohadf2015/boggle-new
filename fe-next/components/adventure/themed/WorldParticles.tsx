@@ -145,7 +145,7 @@ const CrystalParticle = memo<ParticleShapeProps>(({ particle, color, size }) => 
     <svg width={size} height={size} viewBox="0 0 20 20" className="overflow-visible">
       {/* Glow effect */}
       <defs>
-        <filter id={`glow-${particle.id}`}>
+        <filter id={`wp-glow-${particle.id}`}>
           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
@@ -158,7 +158,7 @@ const CrystalParticle = memo<ParticleShapeProps>(({ particle, color, size }) => 
         d="M10 2 L16 10 L10 18 L4 10 Z"
         fill={color}
         opacity="0.8"
-        filter={`url(#glow-${particle.id})`}
+        filter={`url(#wp-glow-${particle.id})`}
       />
       {/* Inner facets */}
       <path

@@ -41,7 +41,7 @@ export async function getStudentsProgressSummary(
 
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id, display_name, avatar_url')
+      .select('id, display_name, avatar_emoji, avatar_config')
       .in('id', studentIds);
 
     if (profileError) {
@@ -121,7 +121,7 @@ export async function getStudentsProgressSummary(
 
       summaries.push({
         studentId, displayName: profile.display_name || 'Unknown',
-        avatarUrl: profile.avatar_url || null, totalXp, currentLevel, vocabularyMastery,
+        avatarUrl: profile.avatar_config || profile.avatar_emoji || null, totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,
       });

@@ -54,6 +54,14 @@ export function generateLootChest(
     drops.push({ type: 'bonusGold', amount: trophyGold, nameKey: 'adventure.loot.bossTrophy', rarity: 'epic' });
   }
 
+  // Rare bonus roll: fragment drop on worlds 3+, 15% chance on 3-star, 5% on 2-star
+  if (worldId >= 3) {
+    const fragmentChance = stars === 3 ? 0.15 : stars === 2 ? 0.05 : 0;
+    if (fragmentChance > 0 && seededRandom(worldId * 1000 + levelNumber * 17 + stars) < fragmentChance) {
+      drops.push({ type: 'bonusGold', amount: 25 * worldId, nameKey: 'adventure.loot.fragment', rarity: 'rare' });
+    }
+  }
+
   const chestTier = stars === 3 ? 'golden' : stars === 2 ? 'silver' : 'wooden';
 
   return { drops, chestTier };

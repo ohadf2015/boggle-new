@@ -37,7 +37,7 @@ export default function NativeOAuthInitializer() {
       })
       .catch(error => {
         // Non-fatal - browser OAuth will be used as fallback
-        logger.warn('[NativeOAuthInitializer] Failed to initialize:', error);
+        logger.debug('[NativeOAuthInitializer] Failed to initialize:', error);
       });
   }, []);
 

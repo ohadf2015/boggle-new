@@ -34,6 +34,8 @@ interface StickyReadyBarProps {
   seriesWinnerUsername?: string;
   /** Callback to reset the series and start fresh */
   onNewSeries?: () => void;
+  /** Classroom mode — teacher controls game flow, no auto-countdown */
+  isClassroom?: boolean;
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
@@ -66,6 +68,7 @@ export default function StickyReadyBar({
   isSeriesComplete,
   seriesWinnerUsername,
   onNewSeries,
+  isClassroom = false,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
 
@@ -95,8 +98,9 @@ export default function StickyReadyBar({
   // Determine if we should show auto-countdown
   // Host: always (auto-starts game)
   // Non-host: only if not yet ready
+  // Classroom: never — teacher controls game flow manually
   const needsAction = isHost ? true : !isCurrentPlayerReady;
-  const showCountdown = needsAction && !cancelled && totalPlayers > 0;
+  const showCountdown = needsAction && !cancelled && totalPlayers > 0 && !isClassroom;
 
   const handleCountdownComplete = useCallback(() => {
     if (completedRef.current) return;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Copy, Check, Share2, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -227,7 +227,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
   const isLegendary = bossId === 'lexiconDragon';
 
   return (
-    <motion.div
+    <AdaptiveMotion.div
       data-testid="boss-defeat-share-card"
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -264,7 +264,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
       </div>
 
       {/* Killing word — the hero moment */}
-      <motion.div
+      <AdaptiveMotion.div
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.25, type: 'spring' }}
@@ -279,23 +279,23 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
             {killingWord}
           </div>
         </div>
-      </motion.div>
+      </AdaptiveMotion.div>
 
       {/* Witty taunt */}
-      <motion.p
+      <AdaptiveMotion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
         className="text-neo-white/60 text-xs font-bold italic mb-3 leading-relaxed"
       >
         &ldquo;{taunt}&rdquo;
-      </motion.p>
+      </AdaptiveMotion.p>
 
       {/* Stars + Score */}
       <div className="flex items-center justify-between mb-3">
         <div className="text-xl tracking-wider" aria-label={`${stars} of 3 stars`}>
           {Array.from({ length: 3 }, (_, i) => (
-            <motion.span
+            <AdaptiveMotion.span
               key={i}
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -303,10 +303,10 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
               className={cn('inline-block', i >= stars && 'opacity-25 grayscale')}
             >
               ⭐
-            </motion.span>
+            </AdaptiveMotion.span>
           ))}
         </div>
-        <motion.div
+        <AdaptiveMotion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
@@ -314,7 +314,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
         >
           {score.toLocaleString()}{' '}
           <span className="text-neo-white/30 font-normal text-xs">{t('common.pts')}</span>
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
 
       {/* Domain */}
@@ -358,6 +358,6 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
           {copied ? t('common.copied') : t('share.emojiCard.copy')}
         </Button>
       </div>
-    </motion.div>
+    </AdaptiveMotion.div>
   );
 }

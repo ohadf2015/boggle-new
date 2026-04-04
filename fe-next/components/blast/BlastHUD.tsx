@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BlastComboStreakBadge } from './BlastComboStreakBadge';
+import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
 /** Smoothly lerps a number for display with a CSS transition on scale */
 function useAnimatedScore(target: number) {
@@ -51,6 +53,10 @@ interface BlastHUDProps {
   totalTiles: number;
   onQuit: () => void;
   onShowHelp?: () => void;
+  /** Combo streak state from useBlastComboStreak */
+  comboStreak?: ComboStreakState;
+  /** Ref for the SVG arc — driven at 60fps by useBlastComboStreak */
+  comboStreakArcRef?: React.RefObject<SVGCircleElement | null>;
   t: (key: string) => string | undefined;
 }
 
@@ -69,19 +75,24 @@ export function BlastHUD({
   totalTiles,
   onQuit,
   onShowHelp,
+  comboStreak,
+  comboStreakArcRef,
   t,
 }: BlastHUDProps) {
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
   const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(score);
 
-  const moveColorClass = movesRemaining <= 2
-    ? 'text-neo-red blast-heartbeat'
-    : movesRemaining <= 3
-    ? 'text-neo-red'
-    : movesRemaining <= 5
-    ? 'text-neo-yellow'
-    : 'text-neo-white';
+  let moveColorClass: string;
+  if (movesRemaining <= 2) {
+    moveColorClass = 'text-neo-red blast-heartbeat';
+  } else if (movesRemaining <= 3) {
+    moveColorClass = 'text-neo-red';
+  } else if (movesRemaining <= 5) {
+    moveColorClass = 'text-neo-yellow';
+  } else {
+    moveColorClass = 'text-neo-white';
+  }
 
   return (
     <div
@@ -128,6 +139,11 @@ export function BlastHUD({
         )}
       </div>
 
+      {/* Combo streak badge */}
+      {comboStreak && comboStreakArcRef && (
+        <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
+      )}
+
       {/* Center: move counter in circle */}
       <div className="flex flex-col items-center" aria-live="polite">
         {isFiniteMoves ? (
@@ -143,7 +159,7 @@ export function BlastHUD({
           </div>
         ) : (
           <span className="text-xs font-bold text-white/50 tabular-nums">
-            {wordsFoundCount} {t('blast.words') ?? 'words'}
+            {wordsFoundCount} {t('blast.words')}
           </span>
         )}
       </div>
@@ -173,18 +189,18 @@ export function BlastHUD({
           <button
             onClick={onShowHelp}
             className="text-white/30 hover:text-white/60 transition-colors"
-            aria-label={t('blast.help') ?? 'Help'}
+            aria-label={t('blast.help')}
           >
             <HelpCircle className="h-4 w-4" />
           </button>
         )}
         <button
           onClick={onQuit}
-          className="text-white/30 hover:text-neo-red transition-colors"
-          aria-label={t('common.quit') ?? 'Quit'}
+          className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white/50 hover:text-neo-red transition-colors"
+          aria-label={t('common.quit')}
           data-testid="blast-quit-btn"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5" />
         </button>
       </div>
     </div>

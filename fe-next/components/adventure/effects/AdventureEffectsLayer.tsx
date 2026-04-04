@@ -146,10 +146,10 @@ const AdventureEffectsLayerFull = memo<AdventureEffectsLayerProps>(({
         <ScorePopup
           score={currentPopup.value}
           position={{ x: currentPopup.x, y: currentPopup.y }}
-          targetPosition={scoreDisplayRef.current ? {
-            x: scoreDisplayRef.current.getBoundingClientRect().left + scoreDisplayRef.current.getBoundingClientRect().width / 2,
-            y: scoreDisplayRef.current.getBoundingClientRect().top + scoreDisplayRef.current.getBoundingClientRect().height / 2,
-          } : undefined}
+          targetPosition={scoreDisplayRef.current ? (() => {
+            const rect = scoreDisplayRef.current!.getBoundingClientRect();
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          })() : undefined}
           comboMultiplier={currentPopup.bonus ? parseFloat(currentPopup.bonus.replace('x', '')) : undefined}
           onComplete={onPopupComplete}
         />

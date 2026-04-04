@@ -35,8 +35,8 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         exit={{ x: 60, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         className={cn(
-          // Compact chip below boss HUD strip
-          'fixed top-[6.5rem] sm:top-[7.5rem] end-2 z-30',
+          // Compact chip below header, centered to avoid covering grid corners
+          'fixed top-[3.5rem] sm:top-[4rem] left-1/2 -translate-x-1/2 z-30',
           'w-auto max-w-[280px]',
           'rounded-neo border-2 shadow-hard-sm',
           'px-3 py-2',

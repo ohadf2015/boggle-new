@@ -5,8 +5,6 @@
  * Extracted from botManager.js for better separation of concerns
  */
 
-import type { Language } from '@/shared/types/game';
-
 export type BotDifficulty = 'easy' | 'medium' | 'hard';
 export type BotPersonality = 'aggressive' | 'methodical' | 'streaky' | 'steady';
 
@@ -60,22 +58,22 @@ export const BOT_CONFIG: BotConfigType = {
   // Medium and hard bots are intentionally slower to feel more realistic
   TIMING: {
     easy: {
-      minDelay: 4000,    // Minimum time between words
-      maxDelay: 12000,   // Maximum time between words
-      startDelay: 3000,  // Initial delay before first word
-      typingSpeed: 300,  // Base ms per character "typing"
+      minDelay: 3000,    // Minimum time between words
+      maxDelay: 8000,    // Maximum time between words
+      startDelay: 2500,  // Initial delay before first word
+      typingSpeed: 200,  // Base ms per character "typing"
     },
     medium: {
-      minDelay: 3500,    // Increased from 2500 - more realistic thinking time
-      maxDelay: 10000,   // Increased from 8000 - occasional longer pauses
-      startDelay: 2500,  // Increased from 2000 - takes time to scan the board
-      typingSpeed: 250,  // Increased from 200 - more realistic typing
+      minDelay: 2000,    // Thinks quickly
+      maxDelay: 6000,    // Occasional pauses
+      startDelay: 1800,  // Scans board then starts
+      typingSpeed: 150,  // Faster typing
     },
     hard: {
-      minDelay: 3000,    // Increased from 2500 - still thinks before acting
-      maxDelay: 9000,    // Increased from 7000 - occasional pondering
-      startDelay: 2000,  // Increased from 1500 - scans board first
-      typingSpeed: 200,  // Increased from 150 - more human-like typing
+      minDelay: 1500,    // Fast word recognition
+      maxDelay: 4500,    // Brief thinking pauses
+      startDelay: 1200,  // Quick scan
+      typingSpeed: 100,  // Expert typing speed
     }
   },
 
@@ -84,24 +82,24 @@ export const BOT_CONFIG: BotConfigType = {
   WORDS: {
     easy: {
       maxWordLength: 5,       // Only find shorter words
-      wordsPerMinute: 3,      // Average words found per minute
+      wordsPerMinute: 5,      // Steady pace
       focusOnShort: true,     // Prefer 3-4 letter words
-      missChance: 0.15,       // 15% chance to "miss" a word (realistic errors)
-      wrongWordChance: 0.12,  // 12% chance to submit a wrong word (like humans do)
+      missChance: 0.15,       // 15% chance to "miss" a word
+      wrongWordChance: 0.10,  // 10% chance to submit a wrong word
     },
     medium: {
       maxWordLength: 7,
-      wordsPerMinute: 4,      // Reduced from 5 - more realistic pace
+      wordsPerMinute: 8,      // Competitive pace
       focusOnShort: false,
-      missChance: 0.10,       // Increased from 0.08 - more realistic mistakes
-      wrongWordChance: 0.08,  // 8% wrong word chance
+      missChance: 0.08,       // Fewer mistakes
+      wrongWordChance: 0.06,  // 6% wrong word chance
     },
     hard: {
-      maxWordLength: 10,      // was 8 - experts find longer words
-      wordsPerMinute: 6,      // was 4 - experts play faster
+      maxWordLength: 10,      // Experts find long words
+      wordsPerMinute: 12,     // Fast and aggressive
       focusOnShort: false,
-      missChance: 0.05,       // was 0.10 - experts miss less
-      wrongWordChance: 0.03,  // was 0.05 - experts make fewer mistakes
+      missChance: 0.03,       // Rarely misses
+      wrongWordChance: 0.02,  // Very few mistakes
     }
   },
 

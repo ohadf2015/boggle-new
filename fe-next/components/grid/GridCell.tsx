@@ -24,6 +24,7 @@ export interface GridCellProps {
   isFocused: boolean;
   isAdjacentHint: boolean;
   isHighlighted: boolean;
+  isGolden: boolean;
   isEliminated: boolean;
   isHovered: boolean;
   highlightedOrder: number | undefined;
@@ -54,7 +55,7 @@ export interface GridCellProps {
 const GridCell = memo<GridCellProps>(({
   cell, row, col,
   isSelected, isFirstSelected, isLastSelected, isFading, isFocused,
-  isAdjacentHint, isHighlighted, isEliminated, isHovered,
+  isAdjacentHint, isHighlighted, isGolden, isEliminated, isHovered,
   highlightedOrder, selectionIdx, escalation, shakeOffset,
   effectiveRenderMode, earthquakePhase, getPhaseAnimation,
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
@@ -168,6 +169,7 @@ const GridCell = memo<GridCellProps>(({
           : isEliminated
             ? "bg-gray-400/60 text-gray-500/50 border border-gray-400/30 shadow-none cursor-not-allowed"
             : "letter-tile-gradient text-neo-black border-2 border-neo-black/30 shadow-sm hover:shadow-md hover:border-neo-black/50 active:shadow-none",
+      isGolden && !isSelected && !isEliminated && "ring-2 ring-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.6)] animate-golden-pulse",
       isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
       isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
       isHovered && isLastSelected && selectedCellsLength >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
@@ -238,6 +240,15 @@ const GridCell = memo<GridCellProps>(({
     >
       {cell}
     </span>
+
+    {isGolden && !isEliminated && (
+      <span
+        className="absolute top-0.5 right-0.5 text-[8px] leading-none pointer-events-none select-none z-10"
+        aria-hidden="true"
+      >
+        ⭐
+      </span>
+    )}
 
     {isHighlighted && highlightedOrder !== undefined && (
       <span

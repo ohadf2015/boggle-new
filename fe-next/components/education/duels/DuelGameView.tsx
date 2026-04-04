@@ -85,7 +85,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
       const { data, error } = await getDuelById(duelId);
 
       if (error || !data) {
-        setError(error?.message || 'Failed to load duel');
+        setError(error?.message || t('errors.loadFailed', 'Failed to load duel'));
         setPhase('playing'); // Set to non-loading phase so error renders
         return;
       }
@@ -109,6 +109,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
     }
 
     loadDuel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duelId, studentId]);
 
   // G4 fix: Countdown timer — auto-submits when time expires

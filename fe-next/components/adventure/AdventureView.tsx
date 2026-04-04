@@ -14,7 +14,8 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
-import { getWeeklyChallengeConfig } from '@/lib/adventure/weeklyChallenge';
+import { getWeeklyChallengeConfig, getCurrentWeekId } from '@/lib/adventure/weeklyChallenge';
+import { getWeeklyModifiers, applyModifiers } from '@/lib/adventure/weeklyModifiers';
 import {
   getWorldConfig,
   getLevelConfig,
@@ -45,7 +46,7 @@ function AdventureView(): React.JSX.Element {
   const { t, dir, language } = useLanguageSafe();
   const isRTL = dir === 'rtl';
   const { progression, isLoading, error, isAuthError, completeLevel, updateCurrency, refreshProgression } = useProgression();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const isGuest = !user?.id;
 
   const gold = progression?.gold ?? 0;
@@ -159,15 +160,26 @@ function AdventureView(): React.JSX.Element {
   }, [updateCurrency]);
 
   const weeklyConfig = useMemo(() => getWeeklyChallengeConfig(), []);
-  const weeklyLevelConfig = useMemo(() => ({
-    world: 0, level: 1,
-    gridSize: weeklyConfig.gridSize as 4 | 5 | 6 | 7,
-    timerSeconds: weeklyConfig.timerSeconds,
-    minWordLength: 3 as const,
-    objectives: [{ type: 'scoreTarget' as const, target: 500, isPrimary: true }],
-    specialTiles: [], difficulty: 'MEDIUM' as const,
-    chapterNumber: 1 as const, levelInChapter: 1 as const, isBossLevel: false,
-  }), [weeklyConfig]);
+  const weeklyModifiers = useMemo(() => {
+    const wid = getCurrentWeekId();
+    const [yearStr, weekStr] = wid.split('-W');
+    return getWeeklyModifiers(Number(yearStr), Number(weekStr));
+  }, []);
+  const weeklyLevelConfig = useMemo(() => {
+    const modified = applyModifiers(
+      { timerSeconds: weeklyConfig.timerSeconds, minWordLength: 3, scoreMultiplier: 1 },
+      weeklyModifiers,
+    );
+    return {
+      world: 0, level: 1,
+      gridSize: weeklyConfig.gridSize as 4 | 5 | 6 | 7,
+      timerSeconds: modified.timerSeconds,
+      minWordLength: modified.minWordLength as 2 | 3 | 4 | 5,
+      objectives: [{ type: 'scoreTarget' as const, target: 500, isPrimary: true }],
+      specialTiles: [], difficulty: 'MEDIUM' as const,
+      chapterNumber: 1 as const, levelInChapter: 1 as const, isBossLevel: false,
+    };
+  }, [weeklyConfig, weeklyModifiers]);
 
   const handlePlayWeeklyChallenge = useCallback(() => {
     setShowWeeklyChallenge(false);
@@ -184,11 +196,18 @@ function AdventureView(): React.JSX.Element {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ score, wordsFound, longestWord, playerName: userId ? 'Player' : 'Guest' }),
-    }).catch(() => { /* Fire and forget */ });
+      body: JSON.stringify({ score, wordsFound, longestWord, playerName: profile?.display_name || profile?.username || (userId ? 'Adventurer' : 'Guest') }),
+    }).then(async (res) => {
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data?.rank) {
+          toast.success(`#${data.rank} on the leaderboard!`);
+        }
+      }
+    }).catch(() => { /* Network error — silent */ });
     setViewState('worldMap');
     setShowWeeklyChallenge(true);
-  }, [userId, setViewState]);
+  }, [userId, profile, setViewState]);
 
   const handleLevelComplete = useCallback(
     async (stars: number, score: number, wordsFound: number, goldEarned: number, longWords?: number) => {

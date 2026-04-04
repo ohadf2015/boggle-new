@@ -15,7 +15,7 @@
  * - Neo-brutalist modal style
  */
 
-import { useState, useCallback, useEffect, useRef, useId } from 'react';
+import { useState, useCallback, useRef, useId } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
@@ -107,7 +107,7 @@ export default function DuelChallengeModal({
           <button
             onClick={onClose}
             className="text-neo-white/50 hover:text-neo-white transition-colors"
-            aria-label="Close"
+            aria-label={t('common.close', 'Close')}
           >
             <X className="w-6 h-6" />
           </button>
@@ -191,7 +191,7 @@ export default function DuelChallengeModal({
               'text-neo-white font-neo-body shadow-hard-sm',
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan'
             )}
-            role="combobox"
+            aria-label={t('selectLesson')}
           >
             <option value="">{t('selectLesson')}</option>
             {lessons.map((lesson) => (

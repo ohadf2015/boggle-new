@@ -85,6 +85,8 @@ export interface BlastGameState {
   bonusMoveScore: number;
   /** Per-type count of tiles cleared this wave (for objective tracking) */
   tileTypeClears: Record<BlastTileType, number>;
+  /** Turns remaining where frozen tile inner types are revealed (diamond effect) */
+  diamondRevealTurns: number;
 }
 
 /** Per-wave summary for results breakdown */
@@ -117,10 +119,16 @@ export interface BlastResultsData {
 
 /** Score multiplier for gold tiles */
 export const GOLD_MULTIPLIER = 3;
+/** Gold tile awards +1 bonus move when cleared */
+export const GOLD_BONUS_MOVES = 1;
 /** Score multiplier for silver tiles (wave 2+) */
 export const SILVER_MULTIPLIER = 1.5;
+/** Silver tile extends all active countdown timers by +1 move */
+export const SILVER_COUNTDOWN_EXTEND = 1;
 /** Score multiplier for diamond tiles (wave 4+) */
 export const DIAMOND_MULTIPLIER = 5;
+/** Diamond reveals frozen tiles' inner types for N turns */
+export const DIAMOND_REVEAL_TURNS = 3;
 /** Mirror tile: doubles partner special's effect. Solo = 2x word score. */
 export const MIRROR_MULTIPLIER = 2;
 /** Number of adjacent cells a bomb clears */
@@ -166,8 +174,13 @@ export const PRISM_CROSS_BONUS = 5;
 
 // ==================== Wildcard Constants ====================
 
-/** Wildcard tiles count as any letter — no score bonus, just flexibility */
+/** Wildcard scores the highest Scrabble-value letter it could represent */
 export const WILDCARD_CLEAR_BONUS = 0;
+/** Scrabble letter values for wildcard scoring */
+export const SCRABBLE_VALUES: Record<string, number> = {
+  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4, I: 1, J: 8, K: 5, L: 1, M: 3,
+  N: 1, O: 1, P: 3, Q: 10, R: 1, S: 1, T: 1, U: 1, V: 4, W: 4, X: 8, Y: 4, Z: 10,
+};
 
 // ==================== Countdown Constants ====================
 
@@ -175,6 +188,8 @@ export const WILDCARD_CLEAR_BONUS = 0;
 export const COUNTDOWN_INITIAL_MOVES = 3;
 /** Score bonus for clearing a countdown tile in a word (defusing it) */
 export const COUNTDOWN_DEFUSE_BONUS = 15;
+/** Bonus moves awarded for defusing a countdown tile */
+export const COUNTDOWN_DEFUSE_MOVES = 2;
 /** Score penalty when countdown reaches 0 and explodes */
 export const COUNTDOWN_EXPLOSION_PENALTY = 50;
 /** Countdown explosion radius (same as bomb) */
@@ -186,11 +201,15 @@ export const COUNTDOWN_EXPLOSION_RADIUS = 1;
 export const VIRUS_CLEAR_SCORE = 0;
 /** Number of adjacent tiles a virus infects per turn */
 export const VIRUS_SPREAD_COUNT = 1;
+/** Clearing 3+ virus tiles in one word triggers a mass cure (clears ALL virus) */
+export const VIRUS_MASS_CURE_THRESHOLD = 3;
 
 // ==================== Portal Constants ====================
 
 /** Bonus score for using a portal in a word */
 export const PORTAL_USE_BONUS = 5;
+/** Portal words score at this multiplier */
+export const PORTAL_WORD_MULTIPLIER = 2;
 
 // ==================== Catalyst Constants ====================
 
@@ -207,6 +226,8 @@ export const TREASURE_GEM_HITS_REQUIRED = 3;
 export const TREASURE_GEM_COMPLETION_BONUS = 25;
 /** Number of random special tiles spawned on the board when a Treasure Gem completes */
 export const TREASURE_GEM_SPAWN_COUNT = 2;
+/** Bonus moves awarded when a gem is completed */
+export const TREASURE_GEM_BONUS_MOVES = 2;
 
 // ==================== Cascade Chain Constants ====================
 

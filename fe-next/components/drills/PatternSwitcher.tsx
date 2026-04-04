@@ -56,7 +56,7 @@ export default function PatternSwitcher({
   onPlayAgain,
 }: PatternSwitcherProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -130,8 +130,9 @@ export default function PatternSwitcher({
     setPatternsCompleted(0);
     setCurrentFeedback(null);
     startTimeRef.current = Date.now();
+    playDrillStartSound();
     setPhase('playing');
-  }, [generatePattern, levelConfig.lives, onPlayAgain]);
+  }, [generatePattern, levelConfig.lives, onPlayAgain, playDrillStartSound]);
 
   // Handle word submission with integrated validation feedback
   const handleWordSubmit = useCallback((word: string) => {
@@ -253,9 +254,10 @@ export default function PatternSwitcher({
 
   useEffect(() => {
     if (phase === 'complete') {
+      playDrillCompleteSound();
       onComplete(getResults());
     }
-  }, [phase, getResults, onComplete]);
+  }, [phase, getResults, onComplete, playDrillCompleteSound]);
 
   return (
     <div dir={dir} className={cn(

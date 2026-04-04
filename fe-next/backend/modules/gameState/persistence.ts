@@ -27,7 +27,7 @@ function getRedisClient(): RedisClient {
 
 // Debounce timers for persistence
 const persistTimers: Record<string, ReturnType<typeof setTimeout>> = {};
-const PERSIST_DEBOUNCE_MS = 1000;
+const PERSIST_DEBOUNCE_MS = parseInt(process.env.PERSIST_DEBOUNCE_MS || '200', 10);
 
 export function persistGameState(
   gameCode: string,
@@ -82,37 +82,87 @@ export async function restoreGameFromRedis(
 
     logger.info('PERSIST', `Restoring game ${gameCode} from Redis`);
 
+    // Prefer v2 full user objects; fall back to empty if only v1 username list
+    const usersV2 = (redisState as any).usersV2;
+    const restoredUsers = (usersV2 && typeof usersV2 === 'object' && !Array.isArray(usersV2))
+      ? usersV2 as Record<string, any>
+      : {};
+
+    // Null out socket IDs — they're stale after crash
+    for (const user of Object.values(restoredUsers)) {
+      if (user && typeof user === 'object') {
+        (user as any).socketId = null;
+      }
+    }
+
+    const spectators = (redisState as any).spectators;
+    const restoredSpectators = (spectators && typeof spectators === 'object' && !Array.isArray(spectators))
+      ? spectators as Record<string, any>
+      : {};
+
     games[gameCode] = {
       gameCode,
       hostSocketId: null,
-      hostUsername: null,
+      hostUsername: (redisState as any).hostUsername || null,
+      hostPlayerId: (redisState as any).hostPlayerId || undefined,
       roomName: redisState.roomName,
       language: redisState.language || 'en',
-      users: {},
-      spectators: {},
+      users: restoredUsers,
+      spectators: restoredSpectators,
       playerScores: redisState.playerScores || {},
       playerWords: redisState.playerWords || {},
       playerAchievements: redisState.playerAchievements || {},
-      playerCombos: {},
+      playerCombos: (redisState as any).playerCombos || {},
       gameState: redisState.gameState || 'waiting',
       letterGrid: redisState.letterGrid,
       timerSeconds: redisState.timerSeconds || 180,
+      remainingTime: redisState.remainingTime ?? undefined,
+      gameDuration: (redisState as any).gameDuration ?? undefined,
+      minWordLength: (redisState as any).minWordLength ?? undefined,
+      difficulty: (redisState as any).difficulty || undefined,
+      gameStartedAt: (redisState as any).gameStartedAt ?? undefined,
       tournamentId: redisState.tournamentId,
       reconnectionTimeout: null,
-      isRanked: false,
-      allowLateJoin: true,
-      aiApprovedWords: [],
+      isRanked: (redisState as any).isRanked ?? false,
+      allowLateJoin: (redisState as any).allowLateJoin ?? true,
+      aiApprovedWords: (redisState as any).aiApprovedWords || [],
       peerValidationWord: null,
-      peerValidationVotes: {},
-      createdAt: Date.now(),
-      lastActivity: Date.now(),
+      peerValidationVotes: (redisState as any).peerValidationVotes || {},
+      createdAt: (redisState as any).createdAt || Date.now(),
+      lastActivity: (redisState as any).lastActivity || Date.now(),
       restoredFromRedis: true,
       gameSessionId: 0,
-      playersReadyForNextGame: {}
+      playersReadyForNextGame: {},
+      gameMode: (redisState.gameMode as any) || 'classic',
+      blastModeState: redisState.blastModeState as any || null,
+      wordHuntState: redisState.wordHuntState as any || null,
+      chatHistory: (redisState as any).chatHistory || undefined,
+      cachedResultsPayload: (redisState as any).cachedResultsPayload || undefined,
     };
 
-    // Reconstruct O(1) lookup Sets from restored word arrays
     const restored = games[gameCode] as any;
+
+    // Reconstruct Map from serialized entries
+    const lpEntries = (redisState as any).letterPositions;
+    if (Array.isArray(lpEntries) && lpEntries.length > 0) {
+      restored.letterPositions = new Map(lpEntries);
+    }
+
+    // Reconstruct Sets from serialized arrays
+    const selVocab = (redisState as any).selectedVocabulary;
+    if (Array.isArray(selVocab) && selVocab.length > 0) {
+      restored.selectedVocabulary = new Set(selVocab);
+    }
+    const lesVocab = (redisState as any).lessonVocabulary;
+    if (Array.isArray(lesVocab) && lesVocab.length > 0) {
+      restored.lessonVocabulary = new Set(lesVocab);
+    }
+    const kicked = (redisState as any).kickedPlayers;
+    if (Array.isArray(kicked) && kicked.length > 0) {
+      restored.kickedPlayers = new Set(kicked);
+    }
+
+    // Reconstruct O(1) lookup Sets from restored word arrays
     restored.playerWordsSet = {};
     for (const [u, words] of Object.entries(restored.playerWords)) {
       restored.playerWordsSet[u] = new Set(words as string[]);
@@ -128,6 +178,7 @@ export async function restoreGameFromRedis(
 export async function getAllGameCodesFromRedis(): Promise<string[]> {
   try {
     const redis = getRedisClient();
+    if (redis.getAllGameCodes) return await redis.getAllGameCodes();
     if (redis.getAllGameKeys) return await redis.getAllGameKeys();
     return [];
   } catch (error) {
@@ -141,6 +192,51 @@ export async function deleteGameFromRedis(gameCode: string): Promise<void> {
     await getRedisClient().deleteGameState?.(gameCode);
   } catch (error) {
     logger.error('PERSIST', `Failed to delete game ${gameCode} from Redis`, error);
+  }
+}
+
+/**
+ * Restore all active games from Redis on server startup.
+ * Games that were persisted during graceful shutdown are loaded back into memory
+ * so reconnecting players find their game state intact.
+ * Games with no players reconnecting within RESTORE_CLEANUP_MS are cleaned up.
+ */
+const RESTORE_CLEANUP_MS = 2 * 60 * 1000; // 2 minutes
+
+export async function restoreAllGamesFromRedis(
+  games: Record<string, GameState>
+): Promise<number> {
+  try {
+    const gameCodes = await getAllGameCodesFromRedis();
+    if (gameCodes.length === 0) return 0;
+
+    logger.info('PERSIST', `Found ${gameCodes.length} games in Redis, restoring...`);
+
+    let restored = 0;
+    for (const gameCode of gameCodes) {
+      try {
+        const game = await restoreGameFromRedis(gameCode, games);
+        if (game) {
+          restored++;
+          // Set a cleanup timer — if no players reconnect, clean up the game
+          setTimeout(() => {
+            const g = games[gameCode];
+            if (g && Object.keys(g.users).length === 0) {
+              logger.info('PERSIST', `No players reconnected to ${gameCode} within ${RESTORE_CLEANUP_MS / 1000}s, cleaning up`);
+              delete games[gameCode];
+            }
+          }, RESTORE_CLEANUP_MS);
+        }
+      } catch (error) {
+        logger.error('PERSIST', `Failed to restore game ${gameCode}`, error);
+      }
+    }
+
+    logger.info('PERSIST', `Restored ${restored}/${gameCodes.length} games from Redis`);
+    return restored;
+  } catch (error) {
+    logger.error('PERSIST', 'Failed to restore games from Redis', error);
+    return 0;
   }
 }
 

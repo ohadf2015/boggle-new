@@ -619,6 +619,16 @@ const he = {
     "pointsAhead": "נק׳ יתרון",
     "wordsFound": "{{count}} מילים"
   },
+  "roundEvent": {
+    "blizzardWarning": "❄️ סופת שלגים בדרך!",
+    "lightningWarning": "⚡ סיבוב ברק!",
+    "meteorWarning": "🌟 מטאור בדרך!",
+    "active": "פעיל"
+  },
+  "specialWord": {
+    "bonus": "+{{bonus}} ⭐",
+    "foundBy": "נמצא על ידי {{username}}"
+  },
   "countdown": {
     "hint": "גררו אותיות כדי ליצור מילים!",
     "go": "קדימה!",
@@ -1836,6 +1846,7 @@ const he = {
     "rewardsEarned": "שלל שנאסף",
     "achievementUnlocked": "הישג נפתח",
     "achievementsUnlocked": "הישגים נפתחו",
+    "showDetails": "הצג פרטים",
     "details": "פרטים",
     "performanceDetails": "הפירוט המלא",
     "badges": "תגים",
@@ -6246,6 +6257,25 @@ const he = {
     "perfect": "מושלם!",
     "restart": "מחדש",
     "gold": "זהב",
+    "loading": "טוען הרפתקה...",
+    "currency": {
+      "goldAmount": "{amount} זהב"
+    },
+    "levelLocked": "שלב {level} — נעול",
+    "bossLevel": "שלב בוס {level}",
+    "playLevel": "שלב {level} — {stars} מתוך {maxStars} כוכבים",
+    "unlockRequirement": "השלם שלב {level}",
+    "tutorial": {
+      "step1Title": "החלק ליצירת מילים",
+      "step1Body": "גרור על אותיות סמוכות כדי ליצור מילים. מילים ארוכות שוות יותר נקודות!",
+      "step2Title": "השלם מטרות",
+      "step2Body": "לכל שלב יש מטרות כוכבים — השג אותן כדי להרוויח כוכבים ולפתוח שלבים חדשים.",
+      "step3Title": "נצח את הבוס",
+      "step3Body": "כל פרק מסתיים בקרב בוס. גרום נזק על ידי מציאת מילים לפני שנגמר הזמן!",
+      "skip": "דלג על הדרכה",
+      "next": "הבא",
+      "gotIt": "הבנתי!"
+    },
     "score": "ניקוד",
     "victory": "ניצחון!",
     "hint": {
@@ -6453,7 +6483,16 @@ const he = {
       "mirrorPalace": "ארמון המראות",
       "neologismNebula": "ערפילית המילים החדשות",
       "polyglotPeaks": "פסגות הרב-לשוניות",
-      "lexiconThrone": "כס המילון"
+      "lexiconThrone": "כס המילון",
+      "mechanicHint2": "מצא זוגות מילים נרדפות לניקוד בונוס!",
+      "mechanicHint3": "מילים עם שורשים משותפים מזכות בנקודות נוספות!",
+      "mechanicHint4": "בנה ביטויים ממילים קטנות!",
+      "mechanicHint5": "צור מילים מורכבות לבונוסים גדולים!",
+      "mechanicHint6": "מצא זוגות אנגרמות בין המילים שלך!",
+      "mechanicHint7": "פלינדרומים מזכים בפרסים נוספים!",
+      "mechanicHint8": "צור מילים נדירות ויוצאות דופן!",
+      "mechanicHint9": "מילים ממספר שפות מזכות בניקוד גבוה יותר!",
+      "mechanicHint10": "שלוט בכל המכניקות לאתגר הסופי!"
     },
     "chapters": {
       "meadows": {
@@ -7501,6 +7540,25 @@ const he = {
     "chain": {
       "badge": "שרשרת x{level}"
     },
+    "tile": {
+      "gold":      { "name": "זהב",      "desc": "ניקוד ×3 + מהלך בונוס 1." },
+      "silver":    { "name": "כסף",      "desc": "ניקוד ×1.5. מאריך ספירות לאחור ב-1." },
+      "diamond":   { "name": "יהלום",    "desc": "ניקוד ×5. חושף תוכן כפור למשך 3 תורות." },
+      "bomb":      { "name": "פצצה",     "desc": "מנקה אזור 3×3. משרשרת לפצצות סמוכות." },
+      "lightning": { "name": "ברק",      "desc": "מנקה את כל העמודה מיידית." },
+      "prism":     { "name": "פריזמה",   "desc": "2 פגיעות. מנקה שורה + עמודה. משרשרת פצצות וברקים." },
+      "rainbow":   { "name": "קשת",      "desc": "מעתיק ומכפיל את המיוחד הטוב ביותר. לבד: ×2 ניקוד." },
+      "ice":       { "name": "קרח",      "desc": "2 פגיעות. מקפיא וירוסים סמוכים בניקוי." },
+      "gem":       { "name": "אבן חן",   "desc": "3 פגיעות לאיסוף. יוצר 2 מיוחדים חדשים בהשלמה." },
+      "frozen":    { "name": "כפור",     "desc": "2 פגיעות. מסתיר מיוחד בפנים — פצצה, ברק, פריזמה, אבן חן או קשת." },
+      "magnet":    { "name": "מערבולת",  "desc": "מושך אריחים קרובים פנימה, ואז מפוצץ את האזור." },
+      "mirror":    { "name": "מראה",     "desc": "מעתיק את המיוחד ההתקפי הראשון במילה. לבד: ×2 ניקוד." },
+      "wildcard":  { "name": "ג׳וקר",    "desc": "מתאים לכל אות. מנקד לפי ערך סקרבל של האות." },
+      "countdown": { "name": "ספירה לאחור", "desc": "סופר מהלכים. נטרלו במילה: +15 נק׳ ו-2 בונוס. פג תוקף: -50 נק׳ ופיצוץ 3×3." },
+      "virus":     { "name": "וירוס",    "desc": "מתפשט בכל תור. נקו 3+ במילה אחת כדי לרפא את כל הוירוסים." },
+      "portal":    { "name": "פורטל",    "desc": "מנקה גם את הזוג המקושר. ×2 ניקוד מילה. +5 בונוס." },
+      "catalyst":  { "name": "זרז",      "desc": "+10 נק׳. משדרג אריחים רגילים סמוכים למיוחדים." }
+    },
     "title": "מצב פיצוץ",
     "description": "נקו את הלוח! מילים מפוצצות אריחים.",
     "progress": "נוקה",
@@ -7820,7 +7878,12 @@ const he = {
       "analytics": "אנליטיקה",
       "insights": "תובנות",
       "viewReports": "צפה בדוחות",
-      "viewReportsDesc": "צפה בדוחות מפורטים ואנליטיקה עבור הכיתות שלך"
+      "viewReportsDesc": "צפה בדוחות מפורטים ואנליטיקה עבור הכיתות שלך",
+      "tab": {
+        "play": "שחק",
+        "prepare": "הכן",
+        "review": "סקור"
+      }
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -8163,7 +8226,7 @@ const he = {
     }
   },
   "education": {
-    "reviewDue": "{count} מילים לחזרה",
+    "reviewDue": "{{count}} מילים לחזרה",
     "postGame": {
       "wordsYouLearned": "מילים שלמדת",
       "found": "נמצאו",
@@ -8737,11 +8800,11 @@ const he = {
   "backToLobby": "חזרה ללובי",
   "cancel": "ביטול",
   "challengeAction": "אתגר",
-  "challengeFrom": "אתגר מ",
-  "challengePlayer": "אתגר",
+  "challengeFrom": "אתגר מ{{name}}",
+  "challengePlayer": "אתגר את {{name}}",
   "challengeReceived": "התקבל אתגר! ⚔️",
   "challengeSent": "האתגר נשלח! 🚀",
-  "challengedYou": "אתגר אותך",
+  "challengedYou": "{{name}} אתגר אותך",
   "classmates": "חברים לכיתה",
   "decline": "דחה",
   "duelLobbyTitle": "זירת הדו-קרב",
@@ -8816,7 +8879,7 @@ const he = {
     "you": "אתה",
     "youLose": "הפסדת! 😢",
     "youWin": "ניצחת! 🏆",
-    "opponentDisconnected": "{opponentName} התנתק",
+    "opponentDisconnected": "{{opponentName}} התנתק",
     "autoForfeitMessage": "תנצח אוטומטית",
     "forfeitTitle": "לוותר על הדו-קרב?",
     "forfeitDescription": "תפסיד והיריב ינצח. אי אפשר לבטל.",
@@ -9747,15 +9810,22 @@ const he = {
       "rule3": "אריחים מיוחדים (💣⚡🔷) מפעילים תגובות שרשרת",
       "rule4": "נקו 50%+ מהאריחים כדי להתקדם לגל הבא"
     },
-    "waveComplete": "גל ${wave} הושלם!",
+    "waveComplete": "גל {{wave}} הושלם!",
     "score": "ניקוד",
     "wordsFound": "מילים",
     "cleared": "נוקה",
-    "nextWave": "גל ${wave}",
+    "nextWave": "גל {{wave}}",
     "gameOver": "המשחק נגמר",
     "waves": "גלים",
     "bestWord": "הטובה ביותר",
     "playAgain": "שחק שוב",
+    "chain": {
+      "cascade": "!שרשרת",
+      "double": "!כפול",
+      "triple": "!משולש",
+      "mega": "!מגה",
+      "ultra": "!!אולטרה"
+    },
     "tileGuide": {
       "title": "מדריך אריחים",
       "standard": { "name": "רגיל", "desc": "אריח בסיסי" },

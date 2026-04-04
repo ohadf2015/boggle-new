@@ -1,13 +1,13 @@
 /**
- * useAdventureGame Auto-Complete Tests
+ * useAdventureGame Level Completion Tests
  *
- * Bug: When completing a level by meeting primary objectives,
- * stars are not properly calculated/passed through.
+ * Levels should NOT auto-complete when primary objectives are met.
+ * Instead, they run until timer expires so players can earn secondary
+ * objectives for 2-3 stars.
  *
- * This test specifically verifies the auto-complete flow:
- * 1. User submits word that meets primary objective
- * 2. Game auto-completes
- * 3. Stars are correctly set in gameState
+ * Level ends only when:
+ * 1. Timer runs out
+ * 2. Boss kills the player (boss levels)
  */
 
 import { vi } from 'vitest';
@@ -57,7 +57,7 @@ function createMockGrid(size: number = 4): string[][] {
 // TESTS
 // ==============================================
 
-describe('useAdventureGame - Auto-Complete Star Calculation', () => {
+describe('useAdventureGame - Level does NOT auto-complete on primary objective', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -66,173 +66,121 @@ describe('useAdventureGame - Auto-Complete Star Calculation', () => {
     vi.useRealTimers();
   });
 
-  describe('Bug: Stars should be calculated when game auto-completes on word submission', () => {
-    it('should set stars to 1 when primary objective is met but no secondary', () => {
-      // GIVEN - Level with wordCount=1 (primary) and scoreTarget=500 (secondary)
-      const levelConfig = createMockLevelConfig({
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 500, isPrimary: false },
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
+  it('should keep playing after primary objective is met', () => {
+    const levelConfig = createMockLevelConfig({
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'scoreTarget', target: 500, isPrimary: false },
+      ],
+    });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
 
-      // WHEN - Submit word that meets primary objective but NOT secondary
-      act(() => {
-        result.current.submitWord('CAT', 50); // Only 50 points, not 500
-      });
-
-      // THEN - Game should be complete with 1 star
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.gameState.stars).toBe(1);
+    // Submit word that meets primary objective
+    act(() => {
+      result.current.submitWord('CAT', 50);
     });
 
-    it('should set stars to 2 when primary + some secondary objectives are met', () => {
-      // GIVEN - Level with wordCount=1 (primary), scoreTarget=100 (secondary), longWords=1 (secondary)
-      const levelConfig = createMockLevelConfig({
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 100, isPrimary: false },
-          { type: 'longWords', target: 2, isPrimary: false },
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // WHEN - Submit word that meets primary + scoreTarget but NOT longWords
-      act(() => {
-        result.current.submitWord('CAT', 150); // Meets wordCount and scoreTarget
-      });
-
-      // THEN - Game should be complete with 2 stars
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.gameState.stars).toBe(2);
-    });
-
-    it('should set stars to 3 when all objectives are met', () => {
-      // GIVEN - Level with 3+ achievable objectives (need 3 completed for 3 stars)
-      const levelConfig = createMockLevelConfig({
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 100, isPrimary: false },
-          { type: 'longWords', target: 1, isPrimary: false },
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // WHEN - Submit long word that meets ALL objectives (5+ letters for longWords)
-      act(() => {
-        result.current.submitWord('TESTS', 150); // Meets wordCount, scoreTarget, and longWords
-      });
-
-      // THEN - Game should be complete with 3 stars
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.gameState.stars).toBe(3);
-    });
-
-    it('should properly calculate stars with time bonus objective', () => {
-      // GIVEN - Level with time bonus objective
-      const levelConfig = createMockLevelConfig({
-        timerSeconds: 120,
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 30, isPrimary: false }, // Met with score 50
-          { type: 'timeBonus', target: 60, isPrimary: false }, // Need 60+ seconds remaining
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // Start the game
-      act(() => {
-        result.current.startGame();
-      });
-
-      // Let 30 seconds pass (still have 90 seconds left)
-      act(() => {
-        vi.advanceTimersByTime(30000);
-      });
-
-      // WHEN - Submit word with 90 seconds remaining (> 60 target)
-      act(() => {
-        result.current.submitWord('CAT', 50);
-      });
-
-      // THEN - Game should have 3 stars (primary + timeBonus met)
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.timeRemaining).toBe(90);
-      expect(result.current.gameState.stars).toBe(3);
-    });
-
-    it('should set stars to 1 when time bonus is NOT met', () => {
-      // GIVEN - Level with time bonus objective
-      const levelConfig = createMockLevelConfig({
-        timerSeconds: 120,
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'timeBonus', target: 100, isPrimary: false }, // Need 100+ seconds remaining
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // Start the game
-      act(() => {
-        result.current.startGame();
-      });
-
-      // Let 50 seconds pass (only 70 seconds left, below 100 target)
-      act(() => {
-        vi.advanceTimersByTime(50000);
-      });
-
-      // WHEN - Submit word with 70 seconds remaining (< 100 target)
-      act(() => {
-        result.current.submitWord('CAT', 50);
-      });
-
-      // THEN - Game should have 1 star (only primary met)
-      expect(result.current.gameState.isComplete).toBe(true);
-      expect(result.current.timeRemaining).toBe(70);
-      expect(result.current.gameState.stars).toBe(1);
-    });
+    // Game should NOT be complete — timer still running
+    expect(result.current.gameState.isComplete).toBe(false);
   });
 
-  describe('Stars should be immediately available after auto-complete', () => {
-    it('gameState.stars should be > 0 immediately after word submission triggers completion', () => {
-      // GIVEN - Level with primary + secondary objectives
-      // (with only primary, meeting it = ALL met = 3 stars, which is correct behavior)
-      const levelConfig = createMockLevelConfig({
-        objectives: [
-          { type: 'wordCount', target: 1, isPrimary: true },
-          { type: 'scoreTarget', target: 500, isPrimary: false }, // Won't be met
-        ],
-      });
-      const grid = createMockGrid();
-      const { result } = renderHook(() =>
-        useAdventureGame({ levelConfig, initialGrid: grid })
-      );
-
-      // WHEN - Submit word that completes primary objective but NOT secondary
-      act(() => {
-        result.current.submitWord('CAT', 50); // Only 50 points, not 500
-      });
-
-      // THEN - Stars should be immediately set (not 0) - should be 1 star
-      expect(result.current.gameState.stars).toBeGreaterThan(0);
-      expect(result.current.gameState.stars).toBe(1);
+  it('should allow earning secondary objectives after primary is met', () => {
+    const levelConfig = createMockLevelConfig({
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'scoreTarget', target: 100, isPrimary: false },
+        { type: 'longWords', target: 1, isPrimary: false },
+      ],
     });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
+
+    // Submit short word — meets primary only
+    act(() => {
+      result.current.submitWord('CAT', 50);
+    });
+
+    expect(result.current.gameState.isComplete).toBe(false);
+
+    // Submit long word — meets secondary objectives
+    act(() => {
+      result.current.submitWord('TESTS', 150);
+    });
+
+    // Still playing — level ends on timer only
+    expect(result.current.gameState.isComplete).toBe(false);
+  });
+
+  it('should complete with correct stars when timer expires', () => {
+    const levelConfig = createMockLevelConfig({
+      timerSeconds: 5,
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'scoreTarget', target: 500, isPrimary: false },
+      ],
+    });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
+
+    act(() => {
+      result.current.startGame();
+    });
+
+    // Submit word that meets primary
+    act(() => {
+      result.current.submitWord('CAT', 50);
+    });
+
+    expect(result.current.gameState.isComplete).toBe(false);
+
+    // Run timer to zero
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    // Now complete with 1 star (primary met, secondary not)
+    expect(result.current.gameState.isComplete).toBe(true);
+    expect(result.current.gameState.stars).toBe(1);
+  });
+
+  it('should get 3 stars when all objectives met at timer expiry', () => {
+    const levelConfig = createMockLevelConfig({
+      timerSeconds: 5,
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'scoreTarget', target: 100, isPrimary: false },
+        { type: 'longWords', target: 1, isPrimary: false },
+      ],
+    });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
+
+    act(() => {
+      result.current.startGame();
+    });
+
+    // Submit long word that meets all objectives
+    act(() => {
+      result.current.submitWord('TESTS', 150);
+    });
+
+    expect(result.current.gameState.isComplete).toBe(false);
+
+    // Timer expires
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(result.current.gameState.isComplete).toBe(true);
+    expect(result.current.gameState.stars).toBe(3);
   });
 });

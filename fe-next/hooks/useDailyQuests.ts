@@ -33,6 +33,8 @@ interface UseDailyQuestsProps {
   lastQuestDate?: string;
   /** Callback to persist progress */
   onProgressChange?: (progress: Record<string, number>, date: string) => void;
+  /** Player's current world — filters out quests requiring later worlds */
+  currentWorld?: number;
 }
 
 export interface UseDailyQuestsReturn {
@@ -72,9 +74,10 @@ export function useDailyQuests({
   initialProgress,
   lastQuestDate,
   onProgressChange,
+  currentWorld,
 }: UseDailyQuestsProps = {}): UseDailyQuestsReturn {
   const todayStr = useMemo(() => getTodayStr(), []);
-  const dailyQuests = useMemo(() => getDailyQuests(todayStr), [todayStr]);
+  const dailyQuests = useMemo(() => getDailyQuests(todayStr, currentWorld), [todayStr, currentWorld]);
   const { isAuthenticated } = useAuth();
   const hasSyncedRef = useRef(false);
 

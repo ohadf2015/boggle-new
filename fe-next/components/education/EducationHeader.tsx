@@ -2,7 +2,7 @@
 
 import { memo, useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -11,10 +11,7 @@ import {
   GraduationCap,
   BookOpen,
   Users,
-  BarChart3,
-  Settings,
   LogOut,
-  User,
   ArrowLeft,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -272,11 +269,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
       {/* Mobile Menu Slide-out Pane */}
       {mounted && createPortal(
-        <AnimatePresence>
+        <AdaptiveAnimatePresence>
           {showMobileMenu && (
             <>
               {/* Backdrop overlay */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -285,7 +282,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 onClick={() => setShowMobileMenu(false)}
               />
               {/* Slide-out pane */}
-              <motion.div
+              <AdaptiveMotion.div
                 ref={mobileMenuRef}
                 initial={{ x: isRTL ? '-100%' : '100%' }}
                 animate={{ x: 0 }}
@@ -426,10 +423,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                     </>
                   )}
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
             </>
           )}
-        </AnimatePresence>,
+        </AdaptiveAnimatePresence>,
         document.body
       )}
     </header>
@@ -495,9 +492,9 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
         <Menu size={18} />
       </button>
 
-      <AnimatePresence>
+      <AdaptiveAnimatePresence>
         {isOpen && (
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -579,9 +576,9 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 </div>
               </>
             )}
-          </motion.div>
+          </AdaptiveMotion.div>
         )}
-      </AnimatePresence>
+      </AdaptiveAnimatePresence>
     </div>
   );
 });

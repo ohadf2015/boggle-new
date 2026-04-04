@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.jpg`, width: 1200, height: 630, alt: 'LexiClash Daily Word Wheel' }],
+      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash Daily Word Wheel' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Daily Word Wheel — Free Daily Puzzle | LexiClash',
       description: 'New word wheel every day. Find words, beat friends, chase the world record!',
-      images: [`${BASE_URL}/og-image-en.jpg`],
+      images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,

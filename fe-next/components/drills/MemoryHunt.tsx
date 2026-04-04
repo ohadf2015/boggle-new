@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMemoryHuntGame } from './useMemoryHuntGame';
 import { MemoryHuntCompletePhase } from './MemoryHuntCompletePhase';
 
@@ -39,6 +40,7 @@ export default function MemoryHunt({
   onPlayAgain,
 }: MemoryHuntProps) {
   const { t, dir } = useLanguage();
+  const { playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
   const studyModalRef = useRef<HTMLDivElement>(null);
 
   const game = useMemoryHuntGame({
@@ -50,6 +52,13 @@ export default function MemoryHunt({
   });
 
   useFocusTrap(studyModalRef, game.phase === 'study' && game.showStudyModal);
+
+  // Play drill complete sound when game finishes
+  useEffect(() => {
+    if (game.phase === 'complete') {
+      playDrillCompleteSound();
+    }
+  }, [game.phase, playDrillCompleteSound]);
 
   // Keyboard support for desktop users (only during recall phase)
   const keyboard = useDrillKeyboardSupport({
@@ -133,7 +142,7 @@ export default function MemoryHunt({
             </div>
             <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
-              onClick={game.startGame}
+              onClick={() => { playDrillStartSound(); game.startGame(); }}
               className={cn(
                 'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                 'font-bold text-lg uppercase',

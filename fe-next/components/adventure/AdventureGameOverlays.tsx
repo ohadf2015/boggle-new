@@ -64,6 +64,7 @@ export interface AdventureGameOverlaysProps {
   // Flash challenge
   activeChallenge: FlashChallenge | null;
   isChallengeComplete: boolean;
+  isChallengeFailed?: boolean;
   dismissChallenge: () => void;
   challengeTimeLeft: number;
   // Pause
@@ -123,7 +124,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
   showLevelComplete, gameStars, gameScore, wordsFound, gameState,
   handleContinue, handleRetry, onExit, handleCinematicComplete, handlePauseToggle,
   handleEntryPhaseComplete, handleStoryBeatContinue, handleLootChestComplete, handlePopupComplete,
-  activeChallenge, isChallengeComplete, dismissChallenge, challengeTimeLeft,
+  activeChallenge, isChallengeComplete, isChallengeFailed, dismissChallenge, challengeTimeLeft,
   isPaused, entryPhase, levelNumber, worldNumber,
   showVictoryCinematic, showDefeatCinematic, showWorldUnlockCinematic, worldUnlockProps,
   timeRemaining, t,
@@ -162,6 +163,7 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
       <FlashChallengeToast
         challenge={activeChallenge}
         isComplete={isChallengeComplete}
+        isFailed={isChallengeFailed}
         onDismiss={dismissChallenge}
         timeLeft={challengeTimeLeft}
       />

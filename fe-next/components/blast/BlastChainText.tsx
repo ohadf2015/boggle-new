@@ -1,22 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { getRandomChainEntrance } from './blastEffectVariations';
 
 interface BlastChainTextProps {
   /** Current chain level (0 = none, 1+ = show text) */
   chainLevel: number;
   /** Word length that triggered this (for word-length celebrations) */
   wordLength?: number;
+  /** Translation function */
+  t: (key: string) => string | undefined;
 }
 
 const TIERS = [
   null, // 0 - hidden
-  { text: 'Cascade!', color: 'text-yellow-300', glow: 'rgba(255,215,0,0.4)', scale: 0.85 },
-  { text: 'Double!', color: 'text-neo-cyan', glow: 'rgba(0,255,255,0.4)', scale: 1.0 },
-  { text: 'TRIPLE!', color: 'text-neo-lime', glow: 'rgba(191,255,0,0.4)', scale: 1.2 },
-  { text: 'MEGA!', color: 'text-neo-pink', glow: 'rgba(255,20,147,0.4)', scale: 1.4 },
-  { text: 'ULTRA!!', color: 'text-purple-400', glow: 'rgba(168,85,247,0.5)', scale: 1.6 },
+  { key: 'blast.chain.cascade', color: 'text-yellow-300', glow: 'rgba(255,215,0,0.4)', scale: 0.85 },
+  { key: 'blast.chain.double', color: 'text-neo-cyan', glow: 'rgba(0,255,255,0.4)', scale: 1.0 },
+  { key: 'blast.chain.triple', color: 'text-neo-lime', glow: 'rgba(191,255,0,0.4)', scale: 1.2 },
+  { key: 'blast.chain.mega', color: 'text-neo-pink', glow: 'rgba(255,20,147,0.4)', scale: 1.4 },
+  { key: 'blast.chain.ultra', color: 'text-purple-400', glow: 'rgba(168,85,247,0.5)', scale: 1.6 },
 ] as const;
 
 function getChainTier(chainLevel: number) {
@@ -39,9 +42,10 @@ function getTier(chainLevel: number, wordLength?: number) {
   return chain.scale >= word.scale ? chain : word;
 }
 
-export default function BlastChainText({ chainLevel, wordLength }: BlastChainTextProps) {
+export default function BlastChainText({ chainLevel, wordLength, t }: BlastChainTextProps) {
   const [visible, setVisible] = useState(false);
-  const [key, setKey] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
+  const entranceRef = useRef(getRandomChainEntrance());
 
   const tier = getTier(chainLevel, wordLength);
 
@@ -49,8 +53,9 @@ export default function BlastChainText({ chainLevel, wordLength }: BlastChainTex
 
   useEffect(() => {
     if (!tier) { setVisible(false); return; }
+    entranceRef.current = getRandomChainEntrance();
     setVisible(true);
-    setKey(k => k + 1);
+    setAnimKey(k => k + 1);
     const id = setTimeout(dismiss, 800);
     return () => clearTimeout(id);
   }, [chainLevel, wordLength, tier, dismiss]);
@@ -60,11 +65,11 @@ export default function BlastChainText({ chainLevel, wordLength }: BlastChainTex
       <AdaptiveAnimatePresence mode="wait">
         {visible && tier && (
           <AdaptiveMotion.div
-            key={key}
-            initial={{ scale: 1.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            key={animKey}
+            initial={entranceRef.current.initial}
+            animate={entranceRef.current.animate}
+            exit={entranceRef.current.exit}
+            transition={entranceRef.current.transition}
           >
             <span
               className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-6 py-2 rounded-neo bg-black/60`}
@@ -73,7 +78,7 @@ export default function BlastChainText({ chainLevel, wordLength }: BlastChainTex
                 textShadow: `0 2px 8px rgba(0,0,0,0.5), 0 0 20px ${tier.glow}`,
               }}
             >
-              {tier.text}
+              {t(tier.key)}
             </span>
           </AdaptiveMotion.div>
         )}

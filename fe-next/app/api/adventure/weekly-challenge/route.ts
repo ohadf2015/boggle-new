@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     const { data: scores, error } = await supabase
       .from('weekly_challenge_scores')
-      .select('user_id, score, words_found, longest_word, player_name, submitted_at')
+      .select('score, words_found, longest_word, player_name, submitted_at')
       .eq('week_id', weekId)
       .order('score', { ascending: false })
       .limit(50);
@@ -125,8 +125,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (updated) {
-      // Score was higher — row updated
-      return NextResponse.json({ success: true, updated: true });
+      // Score was higher — row updated. Compute rank.
+      const { count } = await supabase
+        .from('weekly_challenge_scores')
+        .select('*', { count: 'exact', head: true })
+        .eq('week_id', weekId)
+        .gt('score', newScore);
+      return NextResponse.json({ success: true, updated: true, rank: (count ?? 0) + 1 });
     }
 
     // Step 2: No row updated — either no row exists (first submission) or existing score is higher.
@@ -155,7 +160,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to submit score' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, updated: true });
+    // First submission — compute rank
+    const { count } = await supabase
+      .from('weekly_challenge_scores')
+      .select('*', { count: 'exact', head: true })
+      .eq('week_id', weekId)
+      .gt('score', newScore);
+    return NextResponse.json({ success: true, updated: true, rank: (count ?? 0) + 1 });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/adventure/weekly-challenge', { method: 'POST' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

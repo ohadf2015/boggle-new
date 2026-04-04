@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { GraduationCap, BookOpen, Globe, Lock, Star, Puzzle, ArrowRight, Gamepad2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,7 +72,7 @@ function SimpleRoleCard({
   index,
 }: SimpleRoleCardProps) {
   return (
-    <motion.button
+    <AdaptiveMotion.button
       custom={index}
       variants={cardEntrance}
       initial="hidden"
@@ -112,7 +112,7 @@ function SimpleRoleCard({
         </div>
 
         {/* Title + Description */}
-        <h2 className="text-xl font-black uppercase text-neo-black mb-1">{title}</h2>
+        <span className="block text-xl font-black uppercase text-neo-black mb-1" role="heading" aria-level={2}>{title}</span>
         <p className="text-sm text-neo-black/70 mb-4">{description}</p>
 
         {/* CTA button */}
@@ -127,7 +127,7 @@ function SimpleRoleCard({
           </span>
         </div>
       </div>
-    </motion.button>
+    </AdaptiveMotion.button>
   );
 }
 
@@ -186,7 +186,7 @@ export default function EducationPageClient() {
         <div className="max-w-3xl mx-auto">
 
           {/* Hero Section */}
-          <motion.div
+          <AdaptiveMotion.div
             variants={heroEntrance}
             initial="hidden"
             animate="visible"
@@ -209,7 +209,7 @@ export default function EducationPageClient() {
                 </p>
               </div>
 
-              <motion.div
+              <AdaptiveMotion.div
                 className="flex-shrink-0 hidden sm:block"
                 initial={{ scale: 0, rotate: 20 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -223,12 +223,12 @@ export default function EducationPageClient() {
                   enableClick
                   clickAnimation="bounce"
                 />
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Social Proof Banner */}
-          <motion.div
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 25 }}
@@ -241,11 +241,11 @@ export default function EducationPageClient() {
               <Globe className="w-4 h-4 text-neo-lime flex-shrink-0" />
               {t('education.landing.socialProof')}
             </p>
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Authenticated user dashboard shortcut (students already redirected above) */}
           {isAuthenticated && !authLoading && (
-            <motion.div
+            <AdaptiveMotion.div
               data-testid="auth-dashboard-shortcut"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -301,7 +301,7 @@ export default function EducationPageClient() {
                   </Link>
                 </div>
               </div>
-            </motion.div>
+            </AdaptiveMotion.div>
           )}
 
           {/* Role Selection Cards — only for unauthenticated or guest users */}

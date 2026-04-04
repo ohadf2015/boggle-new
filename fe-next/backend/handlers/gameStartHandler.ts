@@ -49,6 +49,7 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
+import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 
 // In-memory mutex to prevent concurrent startGame flows for the same game.
 // The state machine transition is synchronous, but async work before it
@@ -101,6 +102,10 @@ function buildStartGamePayload(
     payload.wordHuntTargetLength = game?.wordHuntState?.targetWordLength ?? 0;
     payload.wordHuntTargetCategory = game?.wordHuntState?.targetCategory ?? null;
     payload.wordHuntPlayerLives = game?.wordHuntState?.playerLives ?? {};
+  }
+
+  if (game?.goldenLetters?.length) {
+    payload.goldenLetters = game.goldenLetters;
   }
 
   if (isRetry) {
@@ -290,15 +295,22 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // A client-supplied grid lets the host craft favorable boards — never trust it
     // in competitive play. Solo games (1 player before bots are added) may use the
     // client grid; bots are appended after this block so the count is accurate.
+    // For classroom games, embed lesson vocabulary words into the grid so students
+    // can actually find them during gameplay.
+    const vocabToEmbed = classroomGame?.vocabularyWords?.map(w => w.toUpperCase()) ?? [];
     const playerCount = Object.keys(game.users).length;
     if (playerCount >= 2) {
       if (resolvedMode === 'blast') {
-        letterGrid = generateRandomTable(6, 6, gameLang);
+        letterGrid = vocabToEmbed.length > 0
+          ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
+          : generateRandomTable(6, 6, gameLang);
       } else {
         // Classic / Word Hunt: grid size scales with difficulty
         const resolvedDifficulty = difficulty || 'MEDIUM';
         const gridSize = resolvedDifficulty === 'HARD' ? 6 : 5; // EASY and MEDIUM use 5x5
-        letterGrid = generateRandomTable(gridSize, gridSize, gameLang);
+        letterGrid = vocabToEmbed.length > 0
+          ? generateRandomTable(gridSize, gridSize, gameLang, vocabToEmbed)
+          : generateRandomTable(gridSize, gridSize, gameLang);
       }
     }
 
@@ -325,6 +337,28 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     ensureGame(gameCode);
 
     initializePlayerData(gameCode);
+
+    // ---- Golden Letters ----
+    // Pick 2-3 random grid positions to be "golden" (worth +25% bonus)
+    {
+      const gridRows = letterGrid.length;
+      const gridCols = (letterGrid[0] as unknown[])?.length || 0;
+      const goldenCount = gridRows >= 6 ? 3 : 2;
+      const goldenLetters: Array<{ row: number; col: number }> = [];
+      const usedPositions = new Set<string>();
+      while (goldenLetters.length < goldenCount) {
+        const row = Math.floor(Math.random() * gridRows);
+        const col = Math.floor(Math.random() * gridCols);
+        const key = `${row},${col}`;
+        if (!usedPositions.has(key)) {
+          usedPositions.add(key);
+          goldenLetters.push({ row, col });
+        }
+      }
+      updateGame(gameCode, { goldenLetters });
+      const currentGame = getGame(gameCode);
+      if (currentGame) currentGame.goldenLetters = goldenLetters;
+    }
 
     // Auto-add bots if solo player started the game
     const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game);
@@ -392,6 +426,41 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       });
     } else {
       emitTotalBoardWords(io, gameCode, letterGrid, gameLang, effectiveMinWordLength);
+    }
+
+    // ---- Special Words ----
+    // After emitTotalBoardWords we do a best-effort async pick of 1-2 longest words
+    // that become "special" (not revealed to clients until found).
+    (async () => {
+      try {
+        const trie = getCachedTrie(gameLang);
+        const allWords = await findAllWordsAsync(letterGrid, gameLang, {
+          minLength: 4,
+          maxLength: 12,
+          maxWords: 5000,
+          trie,
+        });
+        if (allWords.length > 0) {
+          const sorted = [...allWords].sort((a: string, b: string) => b.length - a.length);
+          const pickCount = Math.min(2, sorted.length);
+          const specialWords = sorted.slice(0, pickCount).map((word: string) => ({ word }));
+          const cg = getGame(gameCode);
+          if (cg) {
+            cg.specialWords = specialWords;
+            updateGame(gameCode, { specialWords });
+          }
+          logger.debug('ROUND_EVENT', `Game ${gameCode}: special words set: ${specialWords.map((w: { word: string }) => w.word).join(', ')}`);
+        }
+      } catch (err: unknown) {
+        const error = err as Error;
+        logger.error('ROUND_EVENT', `Failed to compute special words for ${gameCode}: ${error.message}`);
+      }
+    })();
+
+    // ---- Round Event Schedule ----
+    // Only schedule for multiplayer classic games (not blast/word-hunt to keep events simple)
+    if (resolvedMode === 'classic' && playerUsernames.length >= 2) {
+      scheduleRoundEvent(io, gameCode, game, validTimer);
     }
 
     // Schedule retries for players who don't acknowledge quickly

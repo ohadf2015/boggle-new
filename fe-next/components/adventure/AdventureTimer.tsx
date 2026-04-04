@@ -192,17 +192,12 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
           <FlipDigit digit={secOnes} />
         </div>
 
-        {/* Urgency glow effect */}
+        {/* Urgency glow effect — opacity-only animation (GPU-composited) */}
         {isDanger && (
           <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
-            animate={{
-              boxShadow: [
-                '0 0 10px rgba(255, 0, 0, 0.4)',
-                '0 0 25px rgba(255, 0, 0, 0.6)',
-                '0 0 10px rgba(255, 0, 0, 0.4)',
-              ],
-            }}
+            style={{ boxShadow: '0 0 25px rgba(255, 0, 0, 0.6)' }}
+            animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
         )}

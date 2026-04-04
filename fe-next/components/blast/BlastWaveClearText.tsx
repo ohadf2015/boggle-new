@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { getRandomWaveClear } from './blastEffectVariations';
 
 interface BlastWaveClearTextProps {
   waveCleared: boolean;
@@ -33,9 +34,11 @@ export function BlastWaveClearText({ waveCleared, movesRemaining }: BlastWaveCle
   const [key, setKey] = useState(0);
 
   const dismiss = useCallback(() => setVisible(false), []);
+  const variationRef = useRef(getRandomWaveClear());
 
   useEffect(() => {
     if (!waveCleared) { setVisible(false); return; }
+    variationRef.current = getRandomWaveClear();
     setVisible(true);
     setKey(k => k + 1);
     const id = setTimeout(dismiss, 1500);
@@ -52,10 +55,10 @@ export function BlastWaveClearText({ waveCleared, movesRemaining }: BlastWaveCle
       <AdaptiveAnimatePresence mode="wait">
         <AdaptiveMotion.div
           key={key}
-          initial={{ scale: 2, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.6, opacity: 0, y: -30 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          initial={variationRef.current.initial}
+          animate={variationRef.current.animate}
+          exit={variationRef.current.exit}
+          transition={variationRef.current.transition}
         >
           <span
             className={`${tier.color} font-neo-display font-black uppercase tracking-wider px-6 py-2 rounded-neo bg-black/60`}

@@ -24,6 +24,8 @@ import {
 
 // Extracted sub-components
 import { PortraitLayout } from './in-game/components';
+import type { RoundEventState } from './in-game/components/RoundEventOverlay';
+import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
 
 // Types
 import type { InGameScreenProps, EarthquakeState } from './in-game/types';
@@ -116,6 +118,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     playComboBreakSound,
     playRoundStartSound,
     playTimesUpSound,
+    playTimerHeartbeatSound,
     setGameActive: setSoundGameActive,
   } = useSoundEffects();
 
@@ -255,6 +258,104 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       playComboBreakSound(1);
     }
   }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
+
+  // Golden letter positions from backend startGame payload
+  const [goldenLetters, setGoldenLetters] = useState<Array<{ row: number; col: number }>>([]);
+
+  // Round event state
+  const [roundEvent, setRoundEvent] = useState<RoundEventState | null>(null);
+  const roundEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Special word toast state
+  const [specialWordEvent, setSpecialWordEvent] = useState<SpecialWordEvent | null>(null);
+  const specialWordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Timer state for heartbeat sound and screen border glow
+  const [timerUrgencyState, setTimerUrgencyState] = useState<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Heartbeat sound at ≤10s
+  useEffect(() => {
+    if (timerUrgencyState === 'veryLow' || timerUrgencyState === 'critical') {
+      if (!heartbeatIntervalRef.current) {
+        heartbeatIntervalRef.current = setInterval(() => {
+          playTimerHeartbeatSound();
+        }, timerUrgencyState === 'critical' ? 600 : 1000);
+      }
+    } else {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+    };
+  }, [timerUrgencyState, playTimerHeartbeatSound]);
+
+  // Socket listeners for new round events, special words, and golden letters
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleGoldenLetters = (data: { goldenLetters?: Array<{ row: number; col: number }> }) => {
+      setGoldenLetters(data.goldenLetters ?? []);
+    };
+
+    const handleRoundEventWarning = (data: { eventType: string }) => {
+      const type = data.eventType as RoundEventState['type'];
+      setRoundEvent({ type, phase: 'warning' });
+    };
+
+    const handleRoundEventStart = (data: { eventType: string; duration: number }) => {
+      const type = data.eventType as RoundEventState['type'];
+      setRoundEvent({ type, phase: 'active', duration: data.duration });
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      roundEventTimerRef.current = setTimeout(() => {
+        setRoundEvent(null);
+      }, data.duration * 1000);
+    };
+
+    const handleRoundEventEnd = () => {
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      setRoundEvent(null);
+    };
+
+    const handleSpecialWordFound = (data: { word: string; bonus?: number; username?: string }) => {
+      setSpecialWordEvent({
+        word: data.word,
+        bonus: data.bonus ?? 10,
+        finderUsername: data.username ?? '',
+      });
+      if (specialWordTimerRef.current) clearTimeout(specialWordTimerRef.current);
+      specialWordTimerRef.current = setTimeout(() => {
+        setSpecialWordEvent(null);
+      }, 3000);
+    };
+
+    socket.on('startGame', handleGoldenLetters);
+    socket.on('roundEventWarning', handleRoundEventWarning);
+    socket.on('roundEventStart', handleRoundEventStart);
+    socket.on('roundEventEnd', handleRoundEventEnd);
+    socket.on('specialWordFound', handleSpecialWordFound);
+
+    return () => {
+      socket.off('startGame', handleGoldenLetters);
+      socket.off('roundEventWarning', handleRoundEventWarning);
+      socket.off('roundEventStart', handleRoundEventStart);
+      socket.off('roundEventEnd', handleRoundEventEnd);
+      socket.off('specialWordFound', handleSpecialWordFound);
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      if (specialWordTimerRef.current) clearTimeout(specialWordTimerRef.current);
+    };
+  }, [socket]);
+
+  // Clear golden letters when game resets
+  useEffect(() => {
+    if (!gameActive) setGoldenLetters([]);
+  }, [gameActive]);
 
   // Ref to hold detected combo type from path (blast multiplayer)
   const comboTypeRef = useRef<string | null>(null);
@@ -398,6 +499,11 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     wordHuntPlayerLives,
     wordHuntEliminatedPlayers,
     onWordHuntGuess,
+    goldenLetters,
+    roundEvent,
+    specialWordEvent,
+    timerUrgencyState,
+    onTimerState: setTimerUrgencyState,
   } as const;
 
   // Portrait/Desktop Layout

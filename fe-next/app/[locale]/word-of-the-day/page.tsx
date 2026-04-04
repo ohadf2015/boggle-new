@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       siteName: 'LexiClash',
-      images: [{ url: `${SITE_URL}/og-image-${locale === 'he' ? 'he' : 'en'}.jpg`, width: 1200, height: 630, alt: title }],
+      images: [{ url: `${SITE_URL}/og-image-${locale === 'he' ? 'he' : 'en'}.webp`, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: 'summary_large_image',

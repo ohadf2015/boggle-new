@@ -164,6 +164,13 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playEpicVictorySound = useCallback(() => { playSound('epicVictory', { volume: 0.9, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playStreakLegendarySound = useCallback(() => { playSound('streakLegendary', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
 
+  // New game mode sounds
+  const playDrillStartSound = useCallback(() => { playSound('drillStart', { volume: 0.7 }); }, [playSound]);
+  const playDrillCompleteSound = useCallback(() => { playSound('drillComplete', { volume: 0.8 }); haptics.success(); }, [playSound]);
+  const playWheelSpinSound = useCallback(() => { playSound('wheelSpin', { volume: 0.6, requiresGameActive: false }); }, [playSound]);
+  const playFlashChallengeSound = useCallback(() => { playSound('flashChallenge', { volume: 0.7 }); haptics.tap(); }, [playSound]);
+  const playWordRevealSound = useCallback(() => { playSound('wordReveal', { volume: 0.6, requiresGameActive: false }); }, [playSound]);
+
   return {
     playWordAcceptedSound,
     playWordRejectedSound,
@@ -231,5 +238,10 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
     playLegendaryWordSound,
     playEpicVictorySound,
     playStreakLegendarySound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWheelSpinSound,
+    playFlashChallengeSound,
+    playWordRevealSound,
   };
 }

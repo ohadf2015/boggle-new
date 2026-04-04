@@ -56,7 +56,7 @@ export default function LightningRound({
   onPlayAgain,
 }: LightningRoundProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -91,6 +91,7 @@ export default function LightningRound({
 
   // Start game
   const startGame = useCallback(() => {
+    playDrillStartSound();
     setPhase('playing');
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
@@ -107,7 +108,7 @@ export default function LightningRound({
         return prev - 1;
       });
     }, 1000);
-  }, [levelConfig.timeLimit]);
+  }, [levelConfig.timeLimit, playDrillStartSound]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -160,9 +161,10 @@ export default function LightningRound({
   // Handle completion
   useEffect(() => {
     if (phase === 'complete') {
+      playDrillCompleteSound();
       onComplete(getResults());
     }
-  }, [phase, getResults, onComplete]);
+  }, [phase, getResults, onComplete, playDrillCompleteSound]);
 
   // Cleanup timer
   useEffect(() => {

@@ -13,10 +13,11 @@
  *       via `npm run db:migrate` before deploying.
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -147,7 +148,16 @@ export async function handlePostComboCodex(
  * POST /api/blast/combo-codex
  * Merges incoming discovered combos with server record (additive union, never shrinks).
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Rate limit: 30 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'blast-combo-codex', {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const authSupabase = await createClient();
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();
@@ -178,7 +188,15 @@ export async function POST(request: Request) {
  * GET /api/blast/combo-codex
  * Returns discovered combos for the authenticated user.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitResult = checkApiRateLimit(request, 'blast-combo-codex', {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   try {
     const authSupabase = await createClient();
     const { data: { user }, error: authError } = await authSupabase.auth.getUser();

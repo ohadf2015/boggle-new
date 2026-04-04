@@ -423,6 +423,13 @@ const HostView: React.FC<HostViewProps> = memo(({
           onShowQR={() => state.setShowQR(true)}
           onClose={() => state.setFinalScores(null)}
           t={t}
+          socket={socket}
+          gameCode={gameCode}
+          language={state.roomLanguage}
+          isTeacher={!!lessonData}
+          allWords={(tournament.finalScores?.players ?? []).flatMap((p: PlayerResult) =>
+            (p.allWords ?? []).map(w => ({ word: w.word, score: w.score ?? 0, foundBy: [p.username] }))
+          )}
         />
       )}
 

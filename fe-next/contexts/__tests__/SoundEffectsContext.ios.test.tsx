@@ -151,16 +151,16 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
       // Expected sound effects
       const expectedSounds = [
         '/sounds/achievment.mp3',
-        '/sounds/combo.wav',
-        '/sounds/word-accepted.wav',
-        '/sounds/countdown-beep.wav',
+        '/sounds/combo.mp3',
+        '/sounds/word-accepted.mp3',
+        '/sounds/countdown-beep.mp3',
         '/sounds/message.mp3',
         '/sounds/combo-milestone.mp3',
         '/sounds/combo-break.mp3',
         '/sounds/combo-saved.mp3',
-        '/sounds/earthquake-rumble.wav',
-        '/sounds/earthquake-shake.wav',
-        '/sounds/fire-round-start.wav',
+        '/sounds/earthquake-rumble.mp3',
+        '/sounds/earthquake-shake.mp3',
+        '/sounds/fire-round-start.mp3',
         '/sounds/fire-crackle-loop.wav',
       ];
 

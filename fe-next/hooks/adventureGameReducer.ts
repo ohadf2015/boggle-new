@@ -383,19 +383,37 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newTime = Math.max(0, state.timeRemaining - 1);
       if (newTime === 0) {
+        // Evaluate timeBonus objectives with final remaining time (0)
+        const finalObjectives = state.objectives.map((obj) => {
+          if (obj.type === 'timeBonus') {
+            return { ...obj, current: 0, isComplete: false };
+          }
+          return obj;
+        });
         return {
           ...state,
           timeRemaining: 0,
           isPlaying: false,
+          objectives: finalObjectives,
           gameState: {
             ...state.gameState,
             isComplete: true,
-            stars: calculateStars(state.objectives),
+            stars: calculateStars(finalObjectives),
           },
         };
       }
 
-      return { ...state, timeRemaining: newTime };
+      // Update timeBonus objectives with current remaining time so stars
+      // are calculated correctly at completion
+      const updatedObjectives = state.objectives.map((obj) => {
+        if (obj.type === 'timeBonus') {
+          const isComplete = newTime >= obj.target;
+          return { ...obj, current: newTime, isComplete };
+        }
+        return obj;
+      });
+
+      return { ...state, timeRemaining: newTime, objectives: updatedObjectives };
     }
 
     case 'TIMER_EXPIRED': {
@@ -578,38 +596,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newComboCount = state.gameState.comboCount + 1;
 
-      // Check auto-complete
-      const primaryObjectives = newObjectives.filter((o) => o.isPrimary);
-      const allPrimaryMet = primaryObjectives.every(
-        (o) => (o.current ?? 0) >= o.target
-      );
-
-      if (allPrimaryMet) {
-        const finalObjectives = newObjectives.map((obj) => {
-          if (obj.type === 'timeBonus') {
-            const isComplete = newTimeRemaining >= obj.target;
-            return { ...obj, current: newTimeRemaining, isComplete };
-          }
-          return obj;
-        });
-
-        return {
-          ...state,
-          tiles: newTiles,
-          tilesVersion: state.tilesVersion + 1,
-          objectives: finalObjectives,
-          isPlaying: false,
-          timeRemaining: newTimeRemaining,
-          gameState: {
-            ...state.gameState,
-            score: state.gameState.score + finalScore,
-            wordsFound: [...state.gameState.wordsFound, word],
-            comboCount: newComboCount,
-            isComplete: true,
-            stars: calculateStars(finalObjectives),
-          },
-        };
-      }
+      // Don't auto-complete on primary objectives met — let the timer run out
+      // so players have time to earn secondary objectives for 2-3 stars.
+      // Level ends only when timer expires (TICK) or boss kills player.
 
       return {
         ...state,

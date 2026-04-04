@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-en.jpg`,
+          url: `${BASE_URL}/og-image-en.webp`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Free Multiplayer Word Game Online',
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Free Multiplayer Word Game Online - LexiClash',
       description: 'Like Boggle, Scrabble & Wordle combined! Create a room, invite friends, compete in real-time.',
-      images: [`${BASE_URL}/og-image-en.jpg`],
+      images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,

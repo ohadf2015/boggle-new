@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useCrazyGames, type CrazyGamesFriend } from '@/components/CrazyGamesSDK';
+import logger from '@/utils/logger';
 
 interface UseCrazyGamesFriendsReturn {
   /** List of loaded friends */
@@ -54,7 +55,7 @@ export function useCrazyGamesFriends(): UseCrazyGamesFriendsReturn {
       setHasMore(result.hasMore);
       setPage(prev => prev + 1);
     } catch (error) {
-      console.warn('Failed to load CrazyGames friends:', error);
+      logger.debug('Failed to load CrazyGames friends:', error instanceof Error ? error.message : JSON.stringify(error));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +75,7 @@ export function useCrazyGamesFriends(): UseCrazyGamesFriendsReturn {
       setHasMore(result.hasMore);
       setPage(1);
     } catch (error) {
-      console.warn('Failed to refresh CrazyGames friends:', error);
+      logger.debug('Failed to refresh CrazyGames friends:', error instanceof Error ? error.message : JSON.stringify(error));
     } finally {
       setIsLoading(false);
     }

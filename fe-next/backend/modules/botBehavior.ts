@@ -376,8 +376,6 @@ export function submitBotWord(bot: Bot, onWordSubmit: ((data: WordSubmissionData
   bot.wordsFound.push(word);
 
   const score = calculateWordScore(word, bot.comboLevel);
-  bot.score += score;
-  bot.comboLevel++;
 
   if (onWordSubmit && typeof onWordSubmit === 'function') {
     onWordSubmit({
@@ -385,9 +383,13 @@ export function submitBotWord(bot: Bot, onWordSubmit: ((data: WordSubmissionData
       username: bot.username,
       word,
       score,
-      comboLevel: bot.comboLevel - 1,
+      comboLevel: bot.comboLevel,
     });
   }
+
+  // Update bot state AFTER callback so shouldBotScore sees accurate currentBotScore
+  bot.score += score;
+  bot.comboLevel++;
 
   logger.debug('BOT', `Bot "${bot.username}" submitted "${word}" (score: ${score}, combo: ${bot.comboLevel})`);
 }

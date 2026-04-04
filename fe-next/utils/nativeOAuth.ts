@@ -39,7 +39,7 @@ const getNativeOAuthConfig = (): NativeOAuthConfig | null => {
   const webClientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID || GOOGLE_WEB_CLIENT_ID_FALLBACK;
 
   if (!webClientId) {
-    logger.warn('[NativeOAuth] NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID not configured');
+    logger.log('[NativeOAuth] NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID not configured');
     return null;
   }
 
@@ -112,7 +112,7 @@ export async function initializeNativeOAuth(): Promise<boolean> {
 
     // Android Apple redirect URL error is expected - Apple Sign-In isn't configured for Android
     if (errorMessage.includes('redirectUrl is null or empty') || errorMessage.includes('apple.android')) {
-      logger.warn('[NativeOAuth] Apple Sign-In not configured for Android (expected) - Google Sign-In still available');
+      logger.log('[NativeOAuth] Apple Sign-In not configured for Android (expected) - Google Sign-In still available');
       // Still mark as initialized - Google Sign-In should work
       socialLoginInitialized = true;
       return true;
@@ -200,8 +200,8 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     logger.log('[NativeOAuth] Google sign-in successful');
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error(error instanceof Error ? error : new Error(errorMessage), '[NativeOAuth] Google sign-in error');
+    const errorMessage = error instanceof Error ? error.message : (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    logger.log('[NativeOAuth] Google sign-in error:', errorMessage);
 
     // Handle user cancellation
     if (errorMessage.includes('cancel') || errorMessage.includes('CANCELED')) {
@@ -340,6 +340,6 @@ export async function logoutFromNativeProviders(): Promise<void> {
       SocialLogin.logout({ provider: 'apple' }).catch(() => {})
     ]);
   } catch (error) {
-    logger.warn('[NativeOAuth] Error during logout:', error);
+    logger.log('[NativeOAuth] Error during logout:', error);
   }
 }

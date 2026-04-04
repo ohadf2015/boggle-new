@@ -85,6 +85,12 @@ export interface SoundEffectsContextType {
   playLegendaryWordSound: () => void;
   playEpicVictorySound: () => void;
   playStreakLegendarySound: () => void;
+  // New game mode sounds
+  playDrillStartSound: () => void;
+  playDrillCompleteSound: () => void;
+  playWheelSpinSound: () => void;
+  playFlashChallengeSound: () => void;
+  playWordRevealSound: () => void;
 }
 
 export interface SoundEffectOptions {
@@ -97,16 +103,16 @@ export interface SoundEffectOptions {
 // Sound effect definitions — maps keys to file paths
 export const SOUND_EFFECTS = {
   achievement: '/sounds/achievment.mp3',
-  combo: '/sounds/combo.wav',
-  wordAccepted: '/sounds/word-accepted.wav',
-  countdownBeep: '/sounds/countdown-beep.wav',
+  combo: '/sounds/combo.mp3',
+  wordAccepted: '/sounds/word-accepted.mp3',
+  countdownBeep: '/sounds/countdown-beep.mp3',
   message: '/sounds/message.mp3',
   comboMilestone: '/sounds/combo-milestone.mp3',
   comboBreak: '/sounds/combo-break.mp3',
   comboSaved: '/sounds/combo-saved.mp3',
-  earthquakeRumble: '/sounds/earthquake-rumble.wav',
-  earthquakeShake: '/sounds/earthquake-shake.wav',
-  fireRoundStart: '/sounds/fire-round-start.wav',
+  earthquakeRumble: '/sounds/earthquake-rumble.mp3',
+  earthquakeShake: '/sounds/earthquake-shake.mp3',
+  fireRoundStart: '/sounds/fire-round-start.mp3',
   fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
   wordRejected: '/sounds/word-rejected.mp3',
   victoryFanfare: '/sounds/victory-fanfare.mp3',
@@ -164,6 +170,12 @@ export const SOUND_EFFECTS = {
   legendaryWord: '/sounds/legendary-word.mp3',
   epicVictory: '/sounds/epic-victory.mp3',
   streakLegendary: '/sounds/streak-legendary.mp3',
+  // New game mode sounds
+  drillStart: '/sounds/drill-start.mp3',
+  drillComplete: '/sounds/drill-complete.mp3',
+  wheelSpin: '/sounds/wheel-spin.mp3',
+  flashChallenge: '/sounds/flash-challenge.mp3',
+  wordReveal: '/sounds/word-reveal.mp3',
 } as const;
 
 export type SoundEffectKey = keyof typeof SOUND_EFFECTS;
@@ -238,4 +250,10 @@ export const SOUND_PRIORITIES: Record<SoundEffectKey, AUDIO_LOAD_PRIORITY> = {
   legendaryWord: AUDIO_LOAD_PRIORITY.LOW,
   epicVictory: AUDIO_LOAD_PRIORITY.LOW,
   streakLegendary: AUDIO_LOAD_PRIORITY.LOW,
+  // New game mode sounds
+  drillStart: AUDIO_LOAD_PRIORITY.NORMAL,
+  drillComplete: AUDIO_LOAD_PRIORITY.NORMAL,
+  wheelSpin: AUDIO_LOAD_PRIORITY.LOW,
+  flashChallenge: AUDIO_LOAD_PRIORITY.NORMAL,
+  wordReveal: AUDIO_LOAD_PRIORITY.LOW,
 };

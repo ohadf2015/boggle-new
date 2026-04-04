@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.jpg`, width: 1200, height: 630, alt: 'LexiClash - Free Word Games Online' }],
+      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash - Free Word Games Online' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Word Games Online Free — No Download | LexiClash',
       description: 'Play free word games instantly — multiplayer, daily puzzles, adventure mode. No download!',
-      images: [`${BASE_URL}/og-image-en.jpg`],
+      images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
       canonical: pageUrl,

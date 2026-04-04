@@ -29,7 +29,7 @@ function formatCountdown(ms: number): string {
 }
 
 const RANK_ICONS = [Crown, Medal, Medal]; // 1st, 2nd, 3rd
-const RANK_COLORS = ['text-neo-yellow', 'text-neo-white/80', 'text-neo-orange'];
+const RANK_COLORS = ['text-neo-lime', 'text-neo-white/80', 'text-neo-pink'];
 
 const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
   isOpen,
@@ -87,7 +87,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-neo-yellow" />
+              <Trophy className="w-6 h-6 text-neo-lime" />
               <h2 className="text-xl font-black text-neo-white uppercase">
                 {t('adventure.weeklyChallenge.title')}
               </h2>
@@ -120,7 +120,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
               className={cn(
                 'w-full py-3 px-4 mb-5',
                 'flex items-center justify-center gap-2',
-                'bg-neo-yellow text-neo-black',
+                'bg-neo-lime text-neo-black',
                 'font-black text-lg uppercase',
                 'border-3 border-neo-black rounded-neo shadow-hard',
                 'hover:-translate-y-0.5 hover:shadow-hard-lg',
@@ -151,10 +151,10 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
                 const rankColor = i < 3 ? RANK_COLORS[i] : 'text-neo-white/50';
                 return (
                   <div
-                    key={`${entry.rank}-${entry.playerName}`}
+                    key={entry.rank}
                     className={cn(
                       'flex items-center gap-3 px-3 py-2 rounded-neo',
-                      i < 3 ? 'bg-neo-yellow/5 border border-neo-yellow/20' : 'bg-neo-white/3'
+                      i < 3 ? 'bg-neo-lime/5 border border-neo-lime/20' : 'bg-neo-white/5'
                     )}
                   >
                     {/* Rank */}
@@ -173,7 +173,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
                     {/* Score */}
                     <span className={cn(
                       'text-lg font-black tabular-nums',
-                      i === 0 ? 'text-neo-yellow' : 'text-neo-white'
+                      i === 0 ? 'text-neo-lime' : 'text-neo-white'
                     )}>
                       {entry.score.toLocaleString()}
                     </span>

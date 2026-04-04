@@ -30,7 +30,7 @@ export function LeadChangeBanner({ event }: LeadChangeBannerProps) {
             px-3 py-1
             border-3 border-neo-black shadow-hard-sm rounded-neo
             text-xs sm:text-sm font-neo-display font-bold text-neo-black
-            ${event.type === 'took-lead' ? 'bg-neo-yellow' : 'bg-neo-orange'}
+            ${event.type === 'took-lead' ? 'bg-neo-lime' : 'bg-neo-pink'}
           `}
         >
           {event.type === 'took-lead' && <Crown size={14} />}

@@ -30,6 +30,8 @@ import type { ExtendedLeaderboardPlayer as LeaderboardPlayer, FoundWord } from '
 import type { HintsState, EarthquakeState, TranslationFn, TappedCellPosition } from '../types';
 import { LeadChangeBanner } from '../../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
+import type { RoundEventState } from './RoundEventOverlay';
+import type { SpecialWordEvent } from './SpecialWordToast';
 import { BlastMultiplayerOverlay } from '../../BlastMultiplayerOverlay';
 import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
@@ -138,6 +140,19 @@ interface PortraitLayoutProps {
 
   // Achievement dock
   children?: ReactNode;
+
+  // Golden letters (multiplayer engagement)
+  goldenLetters?: Array<{ row: number; col: number }>;
+
+  // Round events
+  roundEvent?: RoundEventState | null;
+
+  // Special word toast
+  specialWordEvent?: SpecialWordEvent | null;
+
+  // Timer urgency state (for screen border glow)
+  timerUrgencyState?: 'normal' | 'low' | 'veryLow' | 'critical';
+  onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
 }
 
 /**
@@ -202,6 +217,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   wordHuntEliminatedPlayers,
   onWordHuntGuess,
   children,
+  goldenLetters = [],
+  roundEvent,
+  specialWordEvent,
+  timerUrgencyState = 'normal',
+  onTimerState,
 }) {
   // Combo event for leaderboard badges (from Zustand blastComboSync)
   const blastComboSync = useBlastComboSync();
@@ -270,6 +290,21 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       {/* Dynamic Energy Background - animated vortex, aurora, particles */}
       <DynamicEnergyBackground />
 
+      {/* Countdown tension: screen border glow at ≤20s */}
+      {timerUrgencyState !== 'normal' && (
+        <div
+          aria-hidden="true"
+          className={cn(
+            'fixed inset-0 pointer-events-none z-30 transition-all duration-500',
+            timerUrgencyState === 'critical'
+              ? 'shadow-[inset_0_0_60px_rgba(255,50,50,0.6)] animate-pulse'
+              : timerUrgencyState === 'veryLow'
+              ? 'shadow-[inset_0_0_40px_rgba(255,80,0,0.45)] animate-pulse'
+              : 'shadow-[inset_0_0_30px_rgba(255,120,0,0.25)]',
+          )}
+        />
+      )}
+
       {/* Combo milestone announcement + screen flash */}
       {isPlaying && (
         <>
@@ -296,6 +331,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         isTypingMode={isTypingMode}
         isHelpOpen={isHelpOpen}
         onCloseHelp={onCloseHelp}
+        roundEvent={roundEvent}
+        specialWordEvent={specialWordEvent}
         t={t}
       />
 
@@ -366,7 +403,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   className="relative z-20 shrink-0"
                 >
                   <div className="hidden lg:block">
-                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
                   </div>
                   <div className="hidden md:block lg:hidden">
                     <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
@@ -525,6 +562,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 onSingleTapDetected={onSingleTapDetected}
                 language={gameLanguage}
                 isTypingMode={isTypingMode}
+                goldenLetters={goldenLetters}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

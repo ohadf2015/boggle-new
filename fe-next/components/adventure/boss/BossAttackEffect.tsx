@@ -183,7 +183,7 @@ function SlashEffect({ config, rotation }: { config: AttackEffectConfig; rotatio
         initial={{ scaleX: 0, opacity: 0 }}
         animate={{ scaleX: [0, 1.1, 0.9], opacity: [0, 0.6, 0] }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
-        style={{ background: config.glowColor, filter: 'blur(8px)' }}
+        style={{ background: config.glowColor, opacity: 0.6 }}
       />
       {/* Core */}
       <AdaptiveMotion.div

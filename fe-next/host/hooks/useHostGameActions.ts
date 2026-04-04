@@ -340,7 +340,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           icon: TOAST_ICONS.xCircle,
           duration: 3000,
         });
-        logger.warn('[HOST] Game reset failed:', response?.error);
+        logger.debug('[HOST] Game reset failed:', response?.error);
       }
     });
   }, [

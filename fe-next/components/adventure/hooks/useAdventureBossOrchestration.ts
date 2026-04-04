@@ -164,6 +164,19 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     }
   }, [bossPhaseValue, prevBossPhase, bossIsActive, shake, bossTriggerTaunt, addTime, bossMechanics]);
 
+  // Timed phase rotation for W10 finalWord boss (cycles 9 mechanics every phaseDuration seconds)
+  useEffect(() => {
+    const boss = bossMechanics.boss;
+    if (!isPlaying || !bossIsActive || !boss || boss.twistMechanic.type !== 'finalWord') return;
+
+    const phaseDuration = (boss.twistMechanic.params.phaseDuration as number) || 15;
+    const interval = setInterval(() => {
+      bossMechanics.advancePhase();
+    }, phaseDuration * 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, bossIsActive, bossMechanics]);
+
   // Player death → defeat: when player HP reaches 0 during an active boss fight,
   // trigger defeat. Without this, the player could continue playing at 0 HP.
   useEffect(() => {
@@ -300,6 +313,9 @@ export function useAdventureBossOrchestration(props: UseAdventureBossOrchestrati
     bossCurrentHP: bossHP,
     bossMaxHP,
     lockedTiles: bossLockedTiles,
+
+    // Boss mechanic state (for W10 finalWord rotating phase)
+    bossMechanicState: bossMechanics.bossState,
 
     // Boss combat functions
     checkBossWord,

@@ -33,6 +33,8 @@ export interface BlastBoardProps {
   onWordChange: (word: string, count: number) => void;
   sequencerState?: SequencerState;
   nearMissCells?: Array<{ row: number; col: number }>;
+  /** Remaining turns of diamond reveal (shows frozen tile inner types) */
+  diamondRevealTurns?: number;
 }
 
 /**
@@ -53,6 +55,7 @@ export const BlastBoard = memo(function BlastBoard({
   onWordChange,
   sequencerState,
   nearMissCells = [],
+  diamondRevealTurns = 0,
 }: BlastBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -215,6 +218,8 @@ export const BlastBoard = memo(function BlastBoard({
                 selectionTotal={selectedCells.length}
                 isLocked={!cellFilter(tile.row, tile.col) && !tile.isCleared}
                 zonePreview={isSelected ? getZonePreview(tile.type) : null}
+                isDiamondRevealed={tile.type === 'frozen' && diamondRevealTurns > 0 && tile.innerType != null}
+                innerType={tile.innerType}
                 clearRotate={animState?.clearRotate}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
                 spawnOffset={animState?.spawnOffset ? animState.spawnOffset * cellHeight : undefined}

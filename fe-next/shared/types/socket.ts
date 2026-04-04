@@ -272,6 +272,14 @@ export interface ServerToClientEvents {
   roomCreate: (data: { gameCode: string; roomName: string }) => void;
   avatarUpdated: (data: { username: string; avatarImage?: unknown; customAvatar?: unknown }) => void;
 
+  // Round events (monotonic breakers)
+  roundEventWarning: (data: { eventType: string; gameSessionId?: number; timestamp: number }) => void;
+  roundEventStart: (data: { eventType: string; gameSessionId?: number; duration: number; data?: Record<string, unknown> }) => void;
+  roundEventEnd: (data: { eventType: string; gameSessionId?: number }) => void;
+
+  // Special word found
+  specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
+
   // Earthquake / Fire Round events
   fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
   fireRoundEnd: (data: { gameSessionId?: string }) => void;
@@ -366,6 +374,7 @@ export interface StartGameBroadcast {
   lateJoin?: boolean;
   skipAck?: boolean;
   gameMode?: GameMode;
+  goldenLetters?: Array<{ row: number; col: number }>;
 }
 
 export interface WordAcceptedPayload {
@@ -378,6 +387,8 @@ export interface WordAcceptedPayload {
   fireRoundActive?: boolean;
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
+  goldenBonus?: number;
+  isSpecialWord?: boolean;
   /** Merged blast data (Fix 2) — present when gameMode is blast */
   blast?: {
     tileBonus: number;

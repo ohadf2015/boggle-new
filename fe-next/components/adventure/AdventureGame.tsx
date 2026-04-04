@@ -28,6 +28,8 @@ import { getStoryBeat } from '@/lib/adventure/storyConfig';
 import GameplayBackground from './themed/GameplayBackground';
 import { GameHeader, GameSidebar, GameGridArea, GameLayout } from './ui';
 import AdventureGameOverlays from './AdventureGameOverlays';
+import RetryAssistModal from './RetryAssistModal';
+import { AdventureTutorial, hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
 import { useAdventureGridInteraction } from './hooks/useAdventureGridInteraction';
@@ -94,6 +96,7 @@ const AdventureGame = memo<AdventureGameProps>(
       playBossDefeatSound, playTimerUrgentSound,
       playCoinCollectSound, playQuestCompleteSound, playBoardShuffleSound,
       playBossDefeatLegendarySound, playLegendaryWordSound,
+      playFlashChallengeSound,
     } = useSoundEffects();
 
     const {
@@ -102,6 +105,7 @@ const AdventureGame = memo<AdventureGameProps>(
       isPlaying, submitWordWithPath, startGame, pauseGame, completeLevel,
       resetGame, markCascadeComplete, isCascading, cascadePhase, addTime,
       activateFreeze, isFrozen, freezeUsed, useShuffle: shuffleTiles, shufflesRemaining, updateObjective,
+      effectiveComboTimeout,
     } = useAdventureGame({
       levelConfig: boostedLevelConfig, initialGrid,
       comboDecayMultiplier: init.upgradeEffects.comboDecayMultiplier * init.runeEffects.comboDecay,
@@ -139,6 +143,7 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showLootChest, setShowLootChest] = useState(false);
     const [retriesUsed, setRetriesUsed] = useState(0);
     const [showStoryBeat, setShowStoryBeat] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(() => !hasSeenTutorial());
     const [detonateActive, setDetonateActive] = useState(false);
     const masteryAura = useMemo(() => getMasteryAura(init.currentLevel), [init.currentLevel]);
     const storyBeat = useMemo(() => getStoryBeat(levelConfig.world, levelConfig.level), [levelConfig.world, levelConfig.level]);
@@ -176,6 +181,18 @@ const AdventureGame = memo<AdventureGameProps>(
       lastWordTileTypes,
       locale: language,
     });
+
+    // Play sound when a new flash challenge appears
+    const prevChallengeIdRef = useRef<string | null>(null);
+    useEffect(() => {
+      if (flashChallenge.activeChallenge && flashChallenge.activeChallenge.id !== prevChallengeIdRef.current) {
+        prevChallengeIdRef.current = flashChallenge.activeChallenge.id;
+        playFlashChallengeSound();
+      }
+      if (!flashChallenge.activeChallenge) {
+        prevChallengeIdRef.current = null;
+      }
+    }, [flashChallenge.activeChallenge, playFlashChallengeSound]);
 
     const hasAwardedFlashGoldRef = useRef(false);
     useEffect(() => {
@@ -311,6 +328,13 @@ const AdventureGame = memo<AdventureGameProps>(
       gameStateForReactions: { gameState: lexiGameState, isPlaying: isPlaying && entryPhase === 'playing' && !isPaused },
     });
 
+    const getPopupStartPosition = useCallback(() => {
+      if (selectedIndices.length === 0) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const el = gridRef.current?.querySelectorAll('[role="gridcell"]')[selectedIndices[selectedIndices.length - 1]];
+      if (el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+      return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    }, [selectedIndices, gridRef]);
+
     const wordSubmit = useAdventureWordSubmit({
       isPlaying, isPaused, isValidating, isCascading, currentWord, selectedIndices, tiles,
       gridSize: levelConfig.gridSize, minWordLength, validateWord, submitWordWithPath,
@@ -323,15 +347,11 @@ const AdventureGame = memo<AdventureGameProps>(
       addScorePopup: effects.addScorePopup, getScoreMultiplier,
       upgradeBonuses: init.upgradeBonuses, skillEffects: augmentedSkillEffects,
       worldMechanic: levelConfig.worldMechanic ?? null,
+      bossCurrentPhase: (bossOrch.bossMechanicState?.mechanicState?.currentPhase as string) ?? null,
       bossHealPerWord: init.upgradeEffects.bossHealPerWord,
       healPlayerHealth: bossOrch.isBossActive ? bossOrch.healPlayer : undefined,
       detonateActive,
-      t, getPopupStartPosition: () => {
-        if (selectedIndices.length === 0) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        const el = gridRef.current?.querySelectorAll('[role="gridcell"]')[selectedIndices[selectedIndices.length - 1]];
-        if (el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
-        return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-      },
+      t, getPopupStartPosition,
     });
 
     clickSubmitRef.current = wordSubmit.handleWordSubmit;
@@ -488,6 +508,35 @@ const AdventureGame = memo<AdventureGameProps>(
       handleRetryBase();
     }, [handleRetryBase, resetTracking]);
 
+    // RetryAssistModal — progressive assists for consecutive failures
+    const [showRetryAssist, setShowRetryAssist] = useState(false);
+    const consecutiveFailures = (bestAttempt?.consecutiveFailures ?? 0) + (showLevelComplete && gameState.stars === 0 ? 1 : 0);
+
+    // Show RetryAssistModal after defeat cinematic when player has failed multiple times
+    useEffect(() => {
+      if (showLevelComplete && gameState.stars === 0 && consecutiveFailures >= 2) {
+        setShowRetryAssist(true);
+      }
+    }, [showLevelComplete, gameState.stars, consecutiveFailures]);
+
+    const handleRetryWithBonus = useCallback(() => {
+      setShowRetryAssist(false);
+      addTime(15); // 15 second bonus
+      handleRetry();
+    }, [handleRetry, addTime]);
+
+    const handleRetryWithHint = useCallback(() => {
+      setShowRetryAssist(false);
+      handleRetry();
+      // Hint will be auto-triggered after game starts via a short delay
+      setTimeout(() => { if (getHint) getHint(); }, 1500);
+    }, [handleRetry, getHint]);
+
+    const handleRetryFromAssist = useCallback(() => {
+      setShowRetryAssist(false);
+      handleRetry();
+    }, [handleRetry]);
+
     const [hintGoldPending, setHintGoldPending] = useState(false);
     const executeHintAction = useCallback(() => {
       getHint(); dismissAutoHint(); hintsUsedRef.current += 1;
@@ -499,8 +548,9 @@ const AdventureGame = memo<AdventureGameProps>(
       // Confirm gold spend when hint isn't free
       if (nextHintCost > 0 && !hintGoldPending) {
         setHintGoldPending(true);
-        // Auto-dismiss after 5s
-        setTimeout(() => setHintGoldPending(false), 5000);
+        // Auto-dismiss after 5s — track timer to prevent setState on unmount
+        if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+        hintTimerRef.current = setTimeout(() => setHintGoldPending(false), 5000);
         return;
       }
       executeHintAction();
@@ -561,7 +611,7 @@ const AdventureGame = memo<AdventureGameProps>(
               onPauseToggle={gridInteraction.handlePauseToggle} onExit={handleExitWithConfirm}
               gold={init.gold} xpProgress={init.xpProgress.progressPercent / 100}
               isBossLevel={isBossLevel} elapsedTime={isBossLevel ? timeRemaining : undefined}
-              comboCount={gameState.comboCount} />
+              comboCount={gameState.comboCount} comboTimeoutMs={effectiveComboTimeout} />
           }
           gridArea={
             <GameGridArea tiles={tiles} gridSize={levelConfig.gridSize}
@@ -626,6 +676,7 @@ const AdventureGame = memo<AdventureGameProps>(
               handleStoryBeatContinue={handleStoryBeatContinue} handleLootChestComplete={handleLootChestComplete}
               handlePopupComplete={gridInteraction.handlePopupComplete}
               activeChallenge={flashChallenge.activeChallenge} isChallengeComplete={flashChallenge.isChallengeComplete}
+              isChallengeFailed={flashChallenge.isChallengeFailed}
               dismissChallenge={flashChallenge.dismiss} challengeTimeLeft={flashChallenge.challengeTimeLeft}
               isPaused={isPaused} entryPhase={entryPhase}
               levelNumber={levelConfig.level} worldNumber={levelConfig.world}
@@ -664,6 +715,22 @@ const AdventureGame = memo<AdventureGameProps>(
             />
           }
         />
+        {showRetryAssist && (
+          <RetryAssistModal
+            isOpen={showRetryAssist}
+            consecutiveFailures={consecutiveFailures}
+            bestWords={gameState.wordsFound.length}
+            bestScore={gameState.score}
+            attemptCount={(bestAttempt?.attemptCount ?? 0) + 1}
+            onRetry={handleRetryFromAssist}
+            onRetryWithBonus={handleRetryWithBonus}
+            onRetryWithHint={handleRetryWithHint}
+            onExit={onExit}
+          />
+        )}
+        {showTutorial && (
+          <AdventureTutorial onComplete={() => setShowTutorial(false)} />
+        )}
       </div>
     );
   }

@@ -41,6 +41,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playErrorSound: vi.fn(),
+    playDrillStartSound: vi.fn(),
+    playSound: vi.fn(),
   }),
 }));
 

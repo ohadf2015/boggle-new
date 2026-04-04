@@ -9,6 +9,7 @@
 
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 /**
  * Component props
@@ -46,9 +47,11 @@ export function CurrencyDisplay({
   className = '',
 }: CurrencyDisplayProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { t, language } = useLanguageSafe();
 
-  // Format number with commas
-  const formattedAmount = amount.toLocaleString('en-US');
+  // Format number with locale-aware separators
+  const localeMap: Record<string, string> = { en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP' };
+  const formattedAmount = amount.toLocaleString(localeMap[language] ?? 'en-US');
 
   // Size classes
   const sizeClasses = {
@@ -76,7 +79,7 @@ export function CurrencyDisplay({
         ${sizeClasses[size]}
         ${className}
       `}
-      aria-label={`${amount} gold`}
+      aria-label={t('adventure.currency.goldAmount', { amount: String(amount) })}
     >
       {/* Coin icon */}
       <span

@@ -1,12 +1,10 @@
 /**
- * TeacherDashboard - Game HUD Edition
+ * TeacherDashboard - Friendly Homeroom Edition
  *
- * "Battle Station" command center aesthetic:
- * - neo-title text stroke headings + italic
- * - Oversized CTA panels with ghost background icons
- * - XP bar divider between sections
- * - HUD-style accordion headers (rotated icon boxes, slanted badge pills)
- * - Bouncing COMMANDER'S INTEL tip card
+ * 3-tab layout matching a teacher's daily workflow:
+ * - Play: Start games, quick start, duel activity
+ * - Prepare: Classrooms + Lesson builder
+ * - Review: Analytics, assignments, reports
  */
 
 'use client';
@@ -27,188 +25,39 @@ import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import {
-  Gamepad2, BookPlus, ChevronDown, Swords, ClipboardList, Users,
-  ListTodo, Hammer, BarChart3, FileText,
+  Gamepad2, BookOpen, BarChart3, FileText, Users, Swords,
 } from 'lucide-react';
 import Link from 'next/link';
 
-// --- Animation variants ---
+type Tab = 'play' | 'prepare' | 'review';
 
-const pageEntrance = {
+const tabConfig: { id: Tab; icon: typeof Gamepad2; color: string; activeBg: string; activeText: string }[] = [
+  { id: 'play', icon: Gamepad2, color: 'neo-cyan', activeBg: 'bg-neo-cyan', activeText: 'text-black' },
+  { id: 'prepare', icon: BookOpen, color: 'neo-pink', activeBg: 'bg-neo-pink', activeText: 'text-black' },
+  { id: 'review', icon: BarChart3, color: 'neo-lime', activeBg: 'bg-neo-lime', activeText: 'text-black' },
+];
+
+const fadeSlide = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 26 } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.15 } },
+};
+
+const stagger = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
 };
 
-const slideInUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 340, damping: 24 } },
+const slideUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 24 } },
 };
-
-const cardEntrance = {
-  hidden: { opacity: 0, y: 28, scale: 0.95 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 380, damping: 20 } },
-};
-
-const accordionBody = {
-  hidden: { height: 0, opacity: 0 },
-  visible: {
-    height: 'auto',
-    opacity: 1,
-    transition: {
-      height: { type: 'spring' as const, stiffness: 280, damping: 30 },
-      opacity: { duration: 0.15 },
-    },
-  },
-  exit: {
-    height: 0,
-    opacity: 0,
-    transition: {
-      height: { type: 'spring' as const, stiffness: 300, damping: 35 },
-      opacity: { duration: 0.08 },
-    },
-  },
-};
-
-// --- XP Bar decorative divider ---
-
-function SectionDivider() {
-  return (
-    <div className="flex items-center gap-4 mb-10" aria-hidden="true">
-      <div className="flex-1 h-1 bg-neo-lime/20 rounded-neo" />
-      <div className="flex items-center gap-2 px-4 py-1.5 bg-black border-3 border-neo-lime/40 rounded-neo shadow-hard-sm">
-        <Hammer className="w-4 h-4 text-neo-lime" />
-        <span className="font-neo-body font-black text-[10px] uppercase tracking-widest text-neo-lime whitespace-nowrap">
-          {/* No hardcoded text — purely decorative divider */}
-          ▸ ▸ ▸
-        </span>
-      </div>
-      <div className="flex-1 h-1 bg-neo-lime/20 rounded-neo" />
-    </div>
-  );
-}
-
-// --- HUD Section ---
-
-interface HudSectionProps {
-  label: string;
-  badge: string;
-  badgeColor: 'yellow' | 'pink' | 'cyan';
-  icon: React.ReactNode;
-  emoji: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}
-
-const badgePalette = {
-  yellow: 'bg-neo-lime text-black border-black',
-  pink: 'bg-neo-pink text-white border-black',
-  cyan: 'bg-neo-cyan text-black border-black',
-};
-
-const headerActiveBg = {
-  yellow: 'bg-neo-lime text-black border-b-black',
-  pink: 'bg-neo-pink text-black',
-  cyan: 'bg-neo-cyan text-black',
-};
-
-const headerCollapsedHover = {
-  yellow: 'hover:bg-neo-lime',
-  pink: 'hover:bg-neo-pink',
-  cyan: 'hover:bg-neo-cyan',
-};
-
-function HudSection({ label, badge, badgeColor, emoji, icon, isOpen, onToggle, children }: HudSectionProps) {
-  return (
-    <section
-      className={cn(
-        'rounded-neo-xl border-4 border-black bg-neo-navy overflow-hidden shadow-hard-lg',
-        // Party mode: thick left accent when collapsed
-        !isOpen && cn('border-s-[10px]', {
-          yellow: 'border-s-neo-lime',
-          pink: 'border-s-neo-pink',
-          cyan: 'border-s-neo-cyan',
-        }[badgeColor])
-      )}
-    >
-      <button
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        className={cn(
-          'w-full flex items-center justify-between p-6 border-b-4 border-black transition-colors',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-          isOpen
-            ? headerActiveBg[badgeColor]
-            : cn('bg-neo-cream text-black', headerCollapsedHover[badgeColor])
-        )}
-      >
-        <div className="flex items-center gap-4">
-          {/* Party mode: emoji that wobbles when section opens */}
-          <motion.span
-            className="text-2xl"
-            animate={isOpen ? { rotate: [0, -12, 10, -5, 0], scale: [1, 1.25, 1.1, 1.2, 1] } : {}}
-            transition={{ duration: 0.45 }}
-          >
-            {emoji}
-          </motion.span>
-          {/* Game HUD: rotated icon box */}
-          <div
-            className={cn(
-              'w-10 h-10 rounded-neo border-3 border-black flex items-center justify-center shadow-hard-sm',
-              isOpen ? 'bg-black rotate-[-2deg]' : 'bg-black rotate-[2deg]'
-            )}
-          >
-            <span className={isOpen ? 'text-neo-lime' : 'text-white'}>{icon}</span>
-          </div>
-          <h2 className="text-3xl font-neo-display font-black uppercase tracking-tighter italic text-black">
-            {label}
-          </h2>
-          {/* Slanted badge */}
-          <span
-            className={cn(
-              'px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest',
-              isOpen ? 'bg-black text-neo-lime' : badgePalette[badgeColor],
-              isOpen ? '' : 'rotate-2'
-            )}
-          >
-            {badge}
-          </span>
-        </div>
-        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ type: 'spring' as const, stiffness: 350, damping: 25 }}>
-          <ChevronDown className="w-8 h-8 text-black" aria-hidden="true" />
-        </motion.div>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            key="body"
-            variants={accordionBody}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            style={{ overflow: 'hidden' }}
-            className="bg-neo-gray/50"
-          >
-            <div className="p-6">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-}
-
-// --- Main dashboard ---
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
-  const [showClassrooms, setShowClassrooms] = useState(true);
-  const [showLessons, setShowLessons] = useState(false);
-  const [showAssignments, setShowAssignments] = useState(false);
-  const [showDuels, setShowDuels] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>('play');
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms } = useClassrooms();
@@ -228,17 +77,22 @@ export default function TeacherDashboard() {
     [router, language]
   );
 
-  const classroomSelect = (
-    <select
-      value={selectedClassroomId}
-      onChange={(e) => setSelectedClassroomId(e.target.value)}
-      className="px-4 py-2 bg-neo-cream border-2 border-black text-black font-neo-body font-bold shadow-hard-sm rounded-neo focus:outline-none focus:ring-2 focus:ring-neo-cyan"
-    >
-      {classrooms.map((c) => (
-        <option key={c.id} value={c.id}>{c.name}</option>
-      ))}
-    </select>
-  );
+  const classroomSelect = classrooms.length > 1 ? (
+    <div className="flex items-center gap-3 mb-4">
+      <label className="text-neo-white font-neo-body font-bold text-sm">
+        {t('teacher.dashboard.selectClassroom')}:
+      </label>
+      <select
+        value={selectedClassroomId}
+        onChange={(e) => setSelectedClassroomId(e.target.value)}
+        className="px-3 py-1.5 bg-neo-cream border-2 border-black text-black font-neo-body font-bold text-sm shadow-hard-sm rounded-neo focus:outline-none focus:ring-2 focus:ring-neo-cyan"
+      >
+        {classrooms.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
+        ))}
+      </select>
+    </div>
+  ) : null;
 
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
@@ -246,300 +100,210 @@ export default function TeacherDashboard() {
       <TeacherOnboarding />
 
       <motion.div
-        className="w-full max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1"
-        variants={pageEntrance}
+        className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"
+        variants={stagger}
         initial="hidden"
         animate="visible"
       >
-        {/* Page Header — game HUD + party mode blend */}
-        <motion.div variants={slideInUp} className="mb-10 flex items-center gap-5">
-          <div className="flex gap-2">
-            {/* Party mode: floating school emoji */}
-            <motion.span
-              className="text-3xl"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              🏫
-            </motion.span>
-            {/* Game HUD: controller in pink rotated box */}
-            <motion.div
-              className="p-3 bg-neo-pink border-4 border-black rounded-neo-xl shadow-hard-lg"
-              style={{ rotate: -3 }}
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-            >
-              <span className="text-3xl">🎮</span>
+        {/* Greeting */}
+        <motion.div variants={slideUp} className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
+            {t('teacher.dashboard.title')}
+          </h1>
+          <p className="text-sm text-neo-white/60 font-neo-body mt-1">
+            {t('teacher.dashboard.subtitle')}
+          </p>
+        </motion.div>
+
+        {/* Tab Bar */}
+        <motion.div variants={slideUp} className="mb-6">
+          <div
+            className="inline-flex rounded-neo border-2 border-black bg-neo-navy-light p-1 gap-1 shadow-hard-sm"
+            role="tablist"
+          >
+            {tabConfig.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'relative flex items-center gap-2 px-4 py-2 rounded-neo font-neo-body font-bold text-sm transition-all',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-1 focus-visible:ring-offset-neo-navy',
+                    isActive
+                      ? cn(tab.activeBg, tab.activeText, 'border-2 border-black shadow-hard-sm')
+                      : 'text-neo-white/60 hover:text-neo-white hover:bg-neo-white/5 border-2 border-transparent'
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {t(`teacher.dashboard.tab.${tab.id}`)}
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'play' && (
+            <motion.div key="play" {...fadeSlide} className="space-y-6">
+              {/* Start Game CTA */}
+              <motion.button
+                onClick={() => router.push(`/${language}/education/classroom-game`)}
+                whileHover={{ y: -3, boxShadow: '6px 6px 0px black' }}
+                whileTap={{ scale: 0.98, y: 1, boxShadow: '2px 2px 0px black' }}
+                className={cn(
+                  'w-full flex items-center gap-5 p-6 rounded-neo border-3 border-black',
+                  'bg-neo-cyan shadow-hard-lg text-left',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime'
+                )}
+              >
+                <div className="w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                  <Gamepad2 className="w-7 h-7 text-neo-cyan" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-neo-display font-black text-black uppercase tracking-tight">
+                    {t('education.classroomGame.startGame')}
+                  </h2>
+                  <p className="text-sm text-black/70 font-neo-body font-bold mt-0.5">
+                    {t('education.classroomGame.startGameDescription')}
+                  </p>
+                </div>
+              </motion.button>
+
+              {/* Quick Start */}
+              {hasRecentConfig && (
+                <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
+              )}
+
+              {/* Duel Activity */}
+              {classrooms.length > 0 && selectedClassroomId && (
+                <section className="rounded-neo border-2 border-black/30 bg-neo-navy-light p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Swords className="w-4 h-4 text-neo-pink" />
+                    <h3 className="text-base font-neo-display font-bold text-neo-white">
+                      {t('teacher.dashboard.duelActivity')}
+                    </h3>
+                    <span className="px-2 py-0.5 text-[10px] font-black uppercase bg-neo-pink text-black rounded-neo border border-black">
+                      {t('teacher.dashboard.live')}
+                    </span>
+                  </div>
+                  {classroomSelect}
+                  <DuelMonitoringPanel classroomId={selectedClassroomId} />
+                </section>
+              )}
+
+              {/* Tip */}
+              <div className="flex items-start gap-3 p-4 rounded-neo border-2 border-neo-lime/30 bg-neo-lime/5">
+                <span className="text-lg flex-shrink-0">💡</span>
+                <div>
+                  <p className="text-sm font-bold text-neo-lime">{t('teacher.dashboard.quickTip')}</p>
+                  <p className="text-xs text-neo-white/60 font-neo-body mt-0.5">
+                    {t('teacher.dashboard.quickTipDescription')}
+                  </p>
+                </div>
+              </div>
             </motion.div>
-          </div>
-          <div>
-            <h1 className="neo-title text-5xl sm:text-6xl font-neo-display font-black text-neo-white uppercase italic tracking-tighter">
-              {t('teacher.dashboard.title')}
-            </h1>
-            <p className="text-neo-cyan font-neo-body font-black uppercase tracking-widest text-xs bg-black/40 inline-block px-3 py-1 rounded-neo mt-2">
-              {t('teacher.dashboard.subtitle')}
-            </p>
-          </div>
-        </motion.div>
+          )}
 
-        {/* Quick Actions — oversized game panels */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <motion.button
-            variants={cardEntrance}
-            onClick={() => router.push(`/${language}/education/classroom-game`)}
-            style={{ rotate: -1.5 }}
-            whileHover={{ rotate: 0, y: -6, x: -3, boxShadow: '10px 10px 0px black' }}
-            whileTap={{ rotate: 0, scale: 0.97, y: 1, x: 1, boxShadow: '2px 2px 0px black' }}
-            className={cn(
-              'group relative overflow-hidden p-10 rounded-neo-xl border-4 border-black',
-              'bg-neo-cyan shadow-hard-xl text-left',
-              'focus:outline-none focus:ring-2 focus:ring-neo-lime'
-            )}
-          >
-            {/* Ghost background icon */}
-            <div className="absolute -right-8 -bottom-8 opacity-10 pointer-events-none group-hover:rotate-12 transition-transform duration-300">
-              <Gamepad2 className="w-60 h-60 text-black" />
-            </div>
-            <div className="flex items-center gap-6 relative">
-              <div className="w-24 h-24 rounded-neo-xl bg-black border-4 border-black flex items-center justify-center shadow-hard group-hover:scale-110 transition-transform">
-                <Gamepad2 className="w-12 h-12 text-neo-cyan" />
-              </div>
-              <div>
-                <h3 className="text-4xl font-neo-display font-black text-black uppercase tracking-tight italic">
-                  {t('education.classroomGame.startGame')}
-                </h3>
-                <p className="text-sm text-black/70 font-neo-body font-bold mt-1 leading-snug max-w-xs">
-                  {t('education.classroomGame.startGameDescription')}
-                </p>
-              </div>
-            </div>
-          </motion.button>
+          {activeTab === 'prepare' && (
+            <motion.div key="prepare" {...fadeSlide} className="space-y-8">
+              {/* Classrooms */}
+              <section>
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="w-4 h-4 text-neo-cyan" />
+                  <h2 className="text-lg font-neo-display font-bold text-neo-white">
+                    {t('teacher.dashboard.classrooms')}
+                  </h2>
+                </div>
+                <ClassroomManager />
+              </section>
 
-          <motion.button
-            variants={cardEntrance}
-            onClick={() => setShowLessons(true)}
-            style={{ rotate: 1 }}
-            whileHover={{ rotate: 0, y: -6, x: -3, boxShadow: '10px 10px 0px black' }}
-            whileTap={{ rotate: 0, scale: 0.97, y: 1, x: 1, boxShadow: '2px 2px 0px black' }}
-            className={cn(
-              'group relative overflow-hidden p-10 rounded-neo-xl border-4 border-black',
-              'bg-neo-pink shadow-hard-xl text-left',
-              'focus:outline-none focus:ring-2 focus:ring-neo-lime'
-            )}
-          >
-            {/* Ghost background icon */}
-            <div className="absolute -right-8 -bottom-8 opacity-10 pointer-events-none group-hover:-rotate-12 transition-transform duration-300">
-              <Hammer className="w-60 h-60 text-black" />
-            </div>
-            <div className="flex items-center gap-6 relative">
-              <div className="w-24 h-24 rounded-neo-xl bg-black border-4 border-black flex items-center justify-center shadow-hard group-hover:scale-110 transition-transform">
-                <BookPlus className="w-12 h-12 text-neo-pink" />
-              </div>
-              <div>
-                <h3 className="text-4xl font-neo-display font-black text-black uppercase tracking-tight italic">
-                  {t('teacher.dashboard.createLesson')}
-                </h3>
-                <p className="text-sm text-black/70 font-neo-body font-bold mt-1 leading-snug max-w-xs">
-                  {t('teacher.dashboard.createLessonDescription')}
-                </p>
-              </div>
-            </div>
-          </motion.button>
-        </div>
+              {/* Lessons */}
+              <section>
+                <div className="flex items-center gap-2 mb-4">
+                  <BookOpen className="w-4 h-4 text-neo-pink" />
+                  <h2 className="text-lg font-neo-display font-bold text-neo-white">
+                    {t('teacher.dashboard.lessons')}
+                  </h2>
+                </div>
+                <LessonBuilder />
+              </section>
+            </motion.div>
+          )}
 
-        {/* Quick Start */}
-        {hasRecentConfig && (
-          <motion.div variants={slideInUp} className="mb-8">
-            <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
-          </motion.div>
-        )}
-
-        {/* Section divider */}
-        <motion.div variants={slideInUp}>
-          <SectionDivider />
-        </motion.div>
-
-        {/* HUD Sections */}
-        <div className="space-y-6">
-          {/* Assignments */}
-          <motion.div variants={slideInUp}>
-            <HudSection
-              label={t('teacher.dashboard.assignments')}
-              badge={t('teacher.dashboard.track')}
-              badgeColor="yellow"
-              emoji="📝"
-              icon={<ListTodo className="w-5 h-5" />}
-              isOpen={showAssignments}
-              onToggle={() => setShowAssignments(!showAssignments)}
-            >
+          {activeTab === 'review' && (
+            <motion.div key="review" {...fadeSlide} className="space-y-6">
               {classrooms.length === 0 ? (
-                <p className="text-neo-white/60 font-neo-body font-bold text-center py-4">
+                <p className="text-neo-white/60 font-neo-body font-bold text-center py-8">
                   {t('teacher.dashboard.createClassroomFirst')}
                 </p>
               ) : (
-                <div className="space-y-4">
-                  {classrooms.length > 1 && (
-                    <div className="flex items-center gap-3">
-                      <label className="text-neo-white font-neo-body font-bold">
-                        {t('teacher.dashboard.selectClassroom')}:
-                      </label>
-                      {classroomSelect}
+                <>
+                  {/* Analytics */}
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <BarChart3 className="w-4 h-4 text-neo-lime" />
+                      <h2 className="text-lg font-neo-display font-bold text-neo-white">
+                        {t('teacher.dashboard.analytics')}
+                      </h2>
                     </div>
-                  )}
+                    {classroomSelect}
+                    {selectedClassroomId && (
+                      <AnalyticsDashboard
+                        classroomId={selectedClassroomId}
+                        onCreateReviewLesson={(words) => {
+                          const wordsParam = encodeURIComponent(words.join(','));
+                          router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
+                        }}
+                      />
+                    )}
+                  </section>
+
+                  {/* Assignments */}
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <FileText className="w-4 h-4 text-neo-lime" />
+                      <h2 className="text-lg font-neo-display font-bold text-neo-white">
+                        {t('teacher.dashboard.assignments')}
+                      </h2>
+                    </div>
+                    {classroomSelect}
+                    {selectedClassroomId && (
+                      <AssignmentTrackingPanel
+                        classroomId={selectedClassroomId}
+                        onCreateAssignment={() => setShowAssignmentCreator(true)}
+                      />
+                    )}
+                  </section>
+
+                  {/* Reports link */}
                   {selectedClassroomId && (
-                    <AssignmentTrackingPanel
-                      classroomId={selectedClassroomId}
-                      onCreateAssignment={() => setShowAssignmentCreator(true)}
-                    />
+                    <Link
+                      href={`/${language}/teacher/reports`}
+                      className={cn(
+                        'flex items-center gap-3 p-4 rounded-neo border-2 border-black',
+                        'bg-neo-cream shadow-hard hover:shadow-hard-lg transition-shadow',
+                        'text-black font-neo-body font-bold'
+                      )}
+                    >
+                      <div className="w-10 h-10 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm flex-shrink-0">
+                        <FileText className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black uppercase">{t('teacher.dashboard.viewReports')}</p>
+                        <p className="text-xs text-black/60">{t('teacher.dashboard.viewReportsDesc')}</p>
+                      </div>
+                    </Link>
                   )}
-                </div>
+                </>
               )}
-            </HudSection>
-          </motion.div>
-
-          {/* Duels */}
-          {classrooms.length > 0 && (
-            <motion.div variants={slideInUp}>
-              <HudSection
-                label={t('teacher.dashboard.duelActivity')}
-                badge={t('teacher.dashboard.live')}
-                badgeColor="pink"
-                emoji="⚔️"
-                icon={<Swords className="w-5 h-5" />}
-                isOpen={showDuels}
-                onToggle={() => setShowDuels(!showDuels)}
-              >
-                {classrooms.length > 1 && (
-                  <div className="flex items-center gap-3 mb-4">
-                    <label className="text-neo-white font-neo-body font-bold">
-                      {t('teacher.dashboard.selectClassroom')}:
-                    </label>
-                    {classroomSelect}
-                  </div>
-                )}
-                {selectedClassroomId && <DuelMonitoringPanel classroomId={selectedClassroomId} />}
-              </HudSection>
             </motion.div>
           )}
-
-          {/* Analytics */}
-          {classrooms.length > 0 && (
-            <motion.div variants={slideInUp}>
-              <HudSection
-                label={t('teacher.dashboard.analytics')}
-                badge={t('teacher.dashboard.insights')}
-                badgeColor="cyan"
-                emoji="📊"
-                icon={<BarChart3 className="w-5 h-5" />}
-                isOpen={showAnalytics}
-                onToggle={() => setShowAnalytics(!showAnalytics)}
-              >
-                {classrooms.length > 1 && (
-                  <div className="flex items-center gap-3 mb-4">
-                    <label className="text-neo-white font-neo-body font-bold">
-                      {t('teacher.dashboard.selectClassroom')}:
-                    </label>
-                    {classroomSelect}
-                  </div>
-                )}
-                {selectedClassroomId && (
-                  <AnalyticsDashboard
-                    classroomId={selectedClassroomId}
-                    onCreateReviewLesson={(words) => {
-                      // P11 fix: Pre-populate lesson builder with struggling words
-                      const wordsParam = encodeURIComponent(words.join(','));
-                      router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
-                    }}
-                  />
-                )}
-              </HudSection>
-            </motion.div>
-          )}
-
-          {/* Classrooms */}
-          <motion.div variants={slideInUp}>
-            <HudSection
-              label={t('teacher.dashboard.classrooms')}
-              badge={t('teacher.dashboard.manage')}
-              badgeColor="cyan"
-              emoji="👥"
-              icon={<Users className="w-5 h-5" />}
-              isOpen={showClassrooms}
-              onToggle={() => setShowClassrooms(!showClassrooms)}
-            >
-              <ClassroomManager />
-            </HudSection>
-          </motion.div>
-
-          {/* Lessons */}
-          <motion.div variants={slideInUp}>
-            <HudSection
-              label={t('teacher.dashboard.lessons')}
-              badge={t('teacher.dashboard.build')}
-              badgeColor="pink"
-              emoji="📖"
-              icon={<ClipboardList className="w-5 h-5" />}
-              isOpen={showLessons}
-              onToggle={() => setShowLessons(!showLessons)}
-            >
-              <LessonBuilder />
-            </HudSection>
-          </motion.div>
-        </div>
-
-        {/* Reports quick link */}
-        {classrooms.length > 0 && selectedClassroomId && (
-          <motion.div variants={slideInUp} className="mt-8">
-            <Link
-              href={`/${language}/teacher/reports`}
-              className={cn(
-                'flex items-center gap-4 p-5 rounded-neo-xl border-4 border-black',
-                'bg-neo-cream shadow-hard-lg hover:shadow-hard-xl transition-shadow',
-                'text-black font-neo-body font-bold'
-              )}
-            >
-              <div className="w-12 h-12 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
-                <FileText className="w-6 h-6 text-black" />
-              </div>
-              <div>
-                <p className="text-lg font-black uppercase">{t('teacher.dashboard.viewReports')}</p>
-                <p className="text-sm text-black/60">{t('teacher.dashboard.viewReportsDesc')}</p>
-              </div>
-            </Link>
-          </motion.div>
-        )}
-
-        {/* Commander's Intel tip card */}
-        <motion.div
-          variants={slideInUp}
-          whileHover={{ y: -3, boxShadow: '8px 8px 0px black' }}
-          className="mt-12 p-6 rounded-neo-xl border-4 border-black bg-neo-lime shadow-hard text-black relative overflow-hidden"
-        >
-          {/* Decorative circle */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rotate-12 -me-16 -mt-16 rounded-full pointer-events-none" />
-          <div className="flex items-start gap-5 relative z-10">
-            <motion.div
-              className="p-3 bg-black rounded-neo shadow-hard-sm flex-shrink-0"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
-            >
-              <span className="text-2xl">💡</span>
-            </motion.div>
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-neo-display font-black uppercase tracking-tight italic">
-                  {t('teacher.dashboard.quickTip')}
-                </h3>
-                <span className="text-[10px] font-black bg-black text-neo-lime px-2 py-0.5 rounded uppercase tracking-widest">
-                  PRO
-                </span>
-              </div>
-              <p className="font-bold leading-relaxed text-black/80">
-                {t('teacher.dashboard.quickTipDescription')}
-              </p>
-            </div>
-          </div>
-        </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       {selectedClassroomId && (

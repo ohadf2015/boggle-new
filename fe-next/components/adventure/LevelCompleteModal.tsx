@@ -336,6 +336,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               goldEarned={goldEarned}
               saveFailed={saveFailed}
               onRetrySave={onRetrySave}
+              score={score}
+              worldNumber={worldNumber}
+              levelNumber={levelNumber}
               t={t}
             />
           </AdaptiveMotion.div>

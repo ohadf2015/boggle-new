@@ -12,6 +12,7 @@ import { getAllGames, getGameCount } from '../backend/modules/gameStateManager';
 import { getSocketMapSizes } from '../backend/modules/userManager';
 import { getBotManagerStats } from '../backend/modules/botManager';
 import { getMetrics, getRoomMetrics, resetAll } from '../backend/utils/metrics';
+import { getConnectionMetrics } from '../backend/modules/supabase/client';
 import * as dictionary from '../backend/dictionary';
 
 import type { ExtendedSocketServer } from './redisAdapter';
@@ -110,7 +111,9 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
   });
 
-  // Detailed health check for scaling/load balancer with capacity metrics
+  // Detailed health check for scaling/load balancer with capacity metrics.
+  // The `readyForMore` boolean is designed for autoscalers — true means this
+  // replica can accept more traffic without degrading game experience.
   app.get('/health/scaling', (_req: Request, res: Response): void => {
     const games: GameInfo[] = getAllGames();
     const socketConnections = io.sockets.sockets.size;
@@ -118,9 +121,26 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     const socketMaps = getSocketMapSizes();
     const botStats = getBotManagerStats();
     const memUsage = process.memoryUsage();
+    const metrics = getMetrics();
+    const supabaseMetrics = getConnectionMetrics();
+
+    // Compute pressure signals for autoscaler
+    const connectionUtilization = socketConnections / maxConnections;
+    const heapUtilization = memUsage.heapUsed / memUsage.heapTotal;
+    const eventLoopLagMs = metrics.eventLoopLagMs;
+    const supabaseQueueDepth = supabaseMetrics.queueLength;
+
+    // readyForMore: true when this replica has headroom across all dimensions.
+    // Autoscalers can scale up when ALL replicas report readyForMore=false.
+    const readyForMore =
+      connectionUtilization < 0.75 &&
+      heapUtilization < 0.85 &&
+      eventLoopLagMs < 100 &&
+      supabaseQueueDepth < 8;
 
     res.json({
       status: 'ok',
+      readyForMore,
       scaling: {
         horizontalReady: !!extendedIo.pubClient && isRedisAvailable(),
         redisAdapter: !!extendedIo.pubClient,
@@ -132,9 +152,19 @@ export function configureHealthRoutes(app: Application, io: Server): void {
       capacity: {
         socketConnections,
         maxConnections,
-        utilizationPercent: Math.round((socketConnections / maxConnections) * 100),
+        utilizationPercent: Math.round(connectionUtilization * 100),
         activeGames: getGameCount(),
         totalPlayers: games.reduce((sum: number, g: GameInfo) => sum + g.playerCount, 0),
+      },
+      pressure: {
+        eventLoopLagMs: Math.round(eventLoopLagMs),
+        heapUtilizationPercent: Math.round(heapUtilization * 100),
+        connectionUtilizationPercent: Math.round(connectionUtilization * 100),
+        supabase: {
+          activeRequests: supabaseMetrics.activeRequests,
+          queueDepth: supabaseQueueDepth,
+          maxConcurrent: supabaseMetrics.maxConcurrent,
+        },
       },
       internals: {
         socketMaps,

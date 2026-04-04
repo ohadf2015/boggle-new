@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-ja.jpg`,
+          url: `${BASE_URL}/og-image-ja.webp`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - マルチプレイヤー単語ゲーム',
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'マルチプレイヤー単語ゲーム - LexiClash',
       description: 'リアルタイムで友達と対戦できるマルチプレイヤー単語ゲーム！ボグルやスクラブル好きにおすすめ。無料・登録不要。',
-      images: [`${BASE_URL}/og-image-ja.jpg`],
+      images: [`${BASE_URL}/og-image-ja.webp`],
     },
     alternates: {
       canonical: pageUrl,

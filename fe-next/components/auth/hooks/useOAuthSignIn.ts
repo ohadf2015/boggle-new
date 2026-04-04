@@ -107,7 +107,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
 
         // If native OAuth failed, show the error (don't silently fall through to browser)
         if (nativeResult.error && !nativeResult.error.includes('cancel')) {
-          logger.warn(`[useOAuthSignIn] Native OAuth failed: ${nativeResult.error}`);
+          logger.debug(`[useOAuthSignIn] Native OAuth failed: ${nativeResult.error}`);
           setError(`Native auth error: ${nativeResult.error}`);
           return;
         } else if (nativeResult.error?.includes('cancel')) {
