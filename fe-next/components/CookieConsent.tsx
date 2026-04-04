@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   hasConsentDecision,
   getConsentState,
@@ -70,12 +71,16 @@ export default function CookieConsent() {
     setShowDetails(false);
   }, [analytics, advertising]);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, visible, handleDeclineAll);
+
   if (!visible) return null;
 
   const isRtl = language === 'he';
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-label={t('cookieConsent.title')}
       aria-modal="true"

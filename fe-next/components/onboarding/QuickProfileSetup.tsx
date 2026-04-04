@@ -173,7 +173,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           initial="hidden"
           animate="visible"
         >
-          <label className="block text-[10px] font-black text-neo-black/60 uppercase tracking-wide mb-1">
+          <label htmlFor="profile-name" className="block text-[10px] font-black text-neo-black/60 uppercase tracking-wide mb-1">
             {t('validation.usernameRequired')}
           </label>
           <motion.div
@@ -181,6 +181,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             transition={{ duration: 0.4 }}
           >
             <input
+              id="profile-name"
               ref={inputRef}
               type="text"
               value={name}

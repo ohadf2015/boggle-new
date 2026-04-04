@@ -161,7 +161,7 @@ describe('SoundEffectsContext iOS Safari Compatibility', () => {
         '/sounds/earthquake-rumble.mp3',
         '/sounds/earthquake-shake.mp3',
         '/sounds/fire-round-start.mp3',
-        '/sounds/fire-crackle-loop.wav',
+        '/sounds/fire-crackle-loop.mp3',
       ];
 
       // Verify all sounds are configured with html5: true

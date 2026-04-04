@@ -15,6 +15,10 @@ import { GameCanvas, type GameCanvasConfig } from '@/lib/gameEngine';
 import { BlastReadyScreen, BlastWaveTransitionScreen, BlastResultsScreen } from './BlastPhaseScreens';
 import { useBlastGameLoop } from './hooks/useBlastGameLoop';
 import { useBlastEngineSounds } from './hooks/useBlastEngineSounds';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
+import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from '@/components/blast/types';
 import { getWaveConfig, getWaveDistribution, getWaveObjectives } from '@/components/blast/utils/blastWaveConfig';
 import { calculateEarnedStars } from '@/components/blast/utils/blastStarCalculator';
@@ -43,7 +47,9 @@ function useResponsiveCanvasSize(containerRef: React.RefObject<HTMLDivElement | 
     const measure = () => {
       // Subtract padding (px-2 = 16px) AND border (border-neo = 6px) so canvas fits
       const w = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, el.clientWidth - 16 - BORDER_TOTAL));
-      const viewH = typeof window !== 'undefined' ? window.innerHeight - 16 - BORDER_TOTAL : 800;
+      // Use visualViewport for accurate mobile height (accounts for keyboard, notch, etc.)
+      const vp = typeof window !== 'undefined' ? (window.visualViewport?.height ?? window.innerHeight) : 800;
+      const viewH = vp - 16 - BORDER_TOTAL;
       const idealH = w + 140;
       const h = Math.min(viewH, idealH);
       setSize({ width: w, height: Math.round(h) });
@@ -54,7 +60,12 @@ function useResponsiveCanvasSize(containerRef: React.RefObject<HTMLDivElement | 
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     window.addEventListener('resize', measure);
-    return () => { ro.disconnect(); window.removeEventListener('resize', measure); };
+    window.visualViewport?.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+      window.visualViewport?.removeEventListener('resize', measure);
+    };
   }, [containerRef]);
 
   return size;
@@ -109,6 +120,35 @@ export function BlastEngineView() {
     gameOver: phase === 'results',
     swapOccurred: false,
     wordsFoundCount: game.wordsFound.length,
+  });
+
+  // ─── Move warning sounds (3, 2, 1 remaining) ──────────────────
+  const sfx = useSoundEffects();
+  const prevMovesRef = useRef(game.movesRemaining);
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    if (game.movesRemaining < prevMovesRef.current && game.movesRemaining >= 1 && game.movesRemaining <= 3) {
+      sfx.playCountdownBeep?.(game.movesRemaining);
+    }
+    prevMovesRef.current = game.movesRemaining;
+  }, [game.movesRemaining, phase, sfx]);
+
+  // ─── Round start sound ─────────────────────────────────────────
+  const prevPhaseRef = useRef(phase);
+  useEffect(() => {
+    if (phase === 'playing' && prevPhaseRef.current !== 'playing') {
+      sfx.playRoundStartSound?.();
+    }
+    prevPhaseRef.current = phase;
+  }, [phase, sfx]);
+
+  // ─── CrazyGames SDK lifecycle ──────────────────────────────────
+  useCrazyGamesLifecycle({
+    isGameActive: phase === 'playing',
+    isGameOver: phase === 'results',
+    score: totalScore + game.score,
+    maxCombo: game.comboLevel,
+    wordsFound: game.wordsFound.length,
   });
 
   // ─── Phase handlers ─────────────────────────────────────────────
@@ -234,7 +274,7 @@ export function BlastEngineView() {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col items-center justify-start min-h-screen w-full px-2 py-2"
+      className="flex flex-col items-center justify-start min-h-dvh w-full px-2 py-2"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #2d1b4e 0%, #0f0c29 70%, #080618 100%)' }}
     >
       <GameCanvas
@@ -245,7 +285,7 @@ export function BlastEngineView() {
       >
         {/* HUD — compact translucent top bar */}
         <div
-          className="pointer-events-auto flex items-center justify-between gap-2 px-3 py-2"
+          className="pointer-events-auto flex items-center justify-between gap-2 px-3 py-2 pt-safe"
           style={{
             background: 'linear-gradient(180deg, rgba(15,12,41,0.85) 0%, rgba(15,12,41,0.5) 100%)',
             backdropFilter: 'blur(8px)',
@@ -363,6 +403,20 @@ export function BlastEngineView() {
             </motion.div>
           ) : null}
         </div>
+
+        {/* ─── Overlays ─────────────────────────────────────────── */}
+        <ScreenFlashOverlay trigger={game.wordsFound.length} />
+        <ComboMilestoneAnnouncement comboLevel={game.comboLevel} />
+
+        {/* Low-moves urgency vignette (≤3 moves) */}
+        {game.movesRemaining <= 3 && game.movesRemaining > 0 && (
+          <div
+            className="absolute inset-0 pointer-events-none z-40 transition-opacity duration-300"
+            style={{
+              background: `radial-gradient(ellipse at center, transparent 40%, rgba(255,0,0,${0.15 + (3 - game.movesRemaining) * 0.1}) 100%)`,
+            }}
+          />
+        )}
 
         {/* PixiJS game canvas layer */}
         <BlastGameCanvas

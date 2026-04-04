@@ -19,9 +19,9 @@ export function LeadChangeBanner({ event }: LeadChangeBannerProps) {
           key={event.type + event.newLeader}
           data-testid="lead-change-banner"
           dir={dir}
-          initial={{ y: -40, opacity: 0, scale: 0.9 }}
+          initial={{ y: 0, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: -20, opacity: 0, scale: 0.95 }}
+          exit={{ y: 0, opacity: 0, scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           className={`
             absolute top-0 left-1/2 -translate-x-1/2 z-50

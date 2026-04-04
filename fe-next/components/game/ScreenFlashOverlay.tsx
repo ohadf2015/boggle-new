@@ -35,7 +35,7 @@ export function ScreenFlashOverlay({ trigger }: ScreenFlashOverlayProps) {
           animate={{ opacity: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="absolute inset-0 z-40 pointer-events-none bg-white"
+          className="absolute inset-0 z-50 pointer-events-none bg-white"
         />
       )}
     </AnimatePresence>

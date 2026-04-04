@@ -30,7 +30,8 @@ const TIER_GLOW: Record<1 | 2 | 3, string | undefined> = {
   3: '0 0 24px rgba(191,255,0,0.6), 0 0 48px rgba(191,255,0,0.3)',
 };
 
-const TARGET_X = 120;
+// Target the score display area (responsive — percentage of container)
+const TARGET_X = typeof window !== 'undefined' ? Math.min(120, window.innerWidth * 0.3) : 120;
 const TARGET_Y = 8;
 const MAX_FLIES = 3;
 
@@ -49,7 +50,7 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
       style={{
         color: TIER_COLORS[fly.tier],
         textShadow: `0 2px 8px rgba(0,0,0,0.6), 0 0 12px ${TIER_COLORS[fly.tier]}80`,
-        fontSize: fly.tier === 3 ? 36 : fly.tier === 2 ? 28 : 22,
+        fontSize: `clamp(${fly.tier === 3 ? '1.5rem' : fly.tier === 2 ? '1.2rem' : '1rem'}, ${fly.tier === 3 ? '5cqw' : fly.tier === 2 ? '4cqw' : '3cqw'}, ${fly.tier === 3 ? '2.25rem' : fly.tier === 2 ? '1.75rem' : '1.375rem'})`,
         WebkitTextStroke: '1.5px rgba(0,0,0,0.7)',
         paintOrder: 'stroke fill',
       }}

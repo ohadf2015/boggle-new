@@ -113,16 +113,19 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                   </p>
                 </div>
 
-                <p className={cn('text-xs mb-2', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                <label htmlFor="delete-confirm" className={cn('text-xs mb-2 block', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                   {t('settings.deleteAccountTypeConfirm')}
-                </p>
+                </label>
 
                 <input
+                  id="delete-confirm"
                   type="text"
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
                   placeholder="DELETE"
                   autoComplete="off"
+                  aria-invalid={error ? 'true' : undefined}
+                  aria-describedby={error ? 'delete-error' : undefined}
                   className={cn(
                     'w-full px-3 py-2 rounded-neo border-3 font-mono text-sm mb-3',
                     isDarkMode
@@ -132,7 +135,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                 />
 
                 {error && (
-                  <p className="text-neo-red text-sm mb-3 font-medium">{error}</p>
+                  <p id="delete-error" className="text-neo-red text-sm mb-3 font-medium" role="alert">{error}</p>
                 )}
 
                 <div className="flex gap-2">

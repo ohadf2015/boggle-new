@@ -1,7 +1,9 @@
 'use client';
 
+import { useRef } from 'react';
 import type { MatchmakingOpponent, MatchmakingStatus } from '@/hooks/useMatchmaking';
 import { getRankTier } from '@/shared/utils/eloRating';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface MatchmakingOverlayProps {
   status: MatchmakingStatus;
@@ -26,6 +28,9 @@ export function MatchmakingOverlay({
   onCreateRoom,
   t,
 }: MatchmakingOverlayProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, status !== 'idle', onCancel);
+
   if (status === 'idle') return null;
 
   const tier = getRankTier(elo);
@@ -39,7 +44,7 @@ export function MatchmakingOverlay({
       role="dialog"
       aria-label={t('matchmaking.findingOpponent')}
     >
-      <div className="mx-4 w-full max-w-md rounded-neo border-neo bg-neo-navy p-6 shadow-hard-lg">
+      <div ref={dialogRef} className="mx-4 w-full max-w-md rounded-neo border-neo bg-neo-navy p-6 shadow-hard-lg">
         {status === 'searching' && (
           <div className="flex flex-col items-center gap-4">
             {/* Spinner */}

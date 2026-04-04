@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { UpgradeShop } from './meta/UpgradeShop';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import WordAlbumPanel from './WordAlbumPanel';
@@ -44,6 +45,9 @@ export default function AdventureViewModals({
   onShopPurchase,
   t,
 }: AdventureViewModalsProps): React.JSX.Element {
+  const shopRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(shopRef, showShop && !isPlaying, onCloseShop);
+
   return (
     <AdaptiveAnimatePresence>
       {showShop && !isPlaying && (
@@ -56,6 +60,7 @@ export default function AdventureViewModals({
           onClick={onCloseShop}
         >
           <AdaptiveMotion.div
+            ref={shopRef}
             role="dialog"
             aria-modal="true"
             aria-label={t('adventure.upgrades.shopTitle')}

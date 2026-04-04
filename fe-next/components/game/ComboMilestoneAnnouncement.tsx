@@ -45,7 +45,7 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 1.5, y: -10 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-          className="absolute top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          className="absolute top-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           role="status"
           aria-live="assertive"
           aria-label={`Combo ${comboLevel}x - ${milestone}`}

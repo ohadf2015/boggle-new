@@ -66,11 +66,18 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
     const checkSDK = async () => {
       let attempts = 0;
-      const maxAttempts = 50; // 5 seconds max
+      // Non-CG users: bail after 500ms (5 attempts) instead of 5s (50 attempts)
+      // CG iframe users get the full 5s to allow slow SDK loads
+      const quickBailAttempts = 5;
+      const maxAttempts = 50;
 
       while (!window.CrazyGames?.SDK && attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
+        // Early exit: if not in a CG iframe and SDK hasn't appeared after 500ms, stop waiting
+        if (attempts === quickBailAttempts && !window.CrazyGames?.SDK && !isCrazyGamesIframe()) {
+          break;
+        }
       }
 
       if (window.CrazyGames?.SDK) {

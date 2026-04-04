@@ -259,12 +259,10 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const playComboSound = useCallback((comboLevel: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || comboLevel < 1) return;
 
-    // Calculate pitch rate: starts at 1.0, increases by ~0.1 per combo level
-    // Uses logarithmic scaling for smooth progression that doesn't get too extreme
-    // Level 1: 1.0, Level 5: ~1.3, Level 10: ~1.6, Level 20: ~2.0
+    // Pitch scales gently with combo level — capped at 1.8x to stay musical
     const baseRate = 1.0;
-    const pitchIncrease = Math.log2(comboLevel + 1) * 0.25;
-    const rate = Math.min(baseRate + pitchIncrease, 3.0); // Cap at 3x for sanity
+    const pitchIncrease = Math.log2(comboLevel + 1) * 0.2;
+    const rate = Math.min(baseRate + pitchIncrease, 1.8);
 
     // Also increase volume slightly with combo level (max 1.0)
     const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);

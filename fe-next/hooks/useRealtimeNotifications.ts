@@ -39,6 +39,8 @@ interface UseRealtimeNotificationsReturn {
   markAllAsRead: () => Promise<void>;
   /** Dismiss a notification (mark read + remove from local list) */
   dismissNotification: (notificationId: string) => Promise<void>;
+  /** Clear all notifications (mark all read + remove from list) */
+  clearAllNotifications: () => Promise<void>;
   /** Clear the latest notification (after toast is dismissed) */
   clearLatestNotification: () => void;
   /** Refresh notifications from server */
@@ -204,18 +206,26 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     }
   }, []);
 
-  // Dismiss a notification — mark as read (keeps it in history)
+  // Dismiss a notification — mark as read and remove from list
   const dismissNotification = useCallback(async (notificationId: string) => {
     const success = await markNotificationRead(notificationId);
     if (success) {
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId
-            ? { ...n, read: true, read_at: new Date().toISOString() }
-            : n
-        )
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      setNotifications((prev) => {
+        const removed = prev.find((n) => n.id === notificationId);
+        if (removed && !removed.read) {
+          setUnreadCount((c) => Math.max(0, c - 1));
+        }
+        return prev.filter((n) => n.id !== notificationId);
+      });
+    }
+  }, []);
+
+  // Clear all notifications — mark all as read and remove from list
+  const clearAllNotifications = useCallback(async () => {
+    const success = await markAllNotificationsRead();
+    if (success) {
+      setNotifications([]);
+      setUnreadCount(0);
     }
   }, []);
 
@@ -233,6 +243,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     markAsRead,
     markAllAsRead,
     dismissNotification,
+    clearAllNotifications,
     clearLatestNotification,
     refresh,
   };

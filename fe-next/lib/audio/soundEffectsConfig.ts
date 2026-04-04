@@ -113,7 +113,7 @@ export const SOUND_EFFECTS = {
   earthquakeRumble: '/sounds/earthquake-rumble.mp3',
   earthquakeShake: '/sounds/earthquake-shake.mp3',
   fireRoundStart: '/sounds/fire-round-start.mp3',
-  fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
+  fireCrackleLoop: '/sounds/fire-crackle-loop.mp3',
   wordRejected: '/sounds/word-rejected.mp3',
   victoryFanfare: '/sounds/victory-fanfare.mp3',
   defeatSting: '/sounds/defeat-sting.mp3',

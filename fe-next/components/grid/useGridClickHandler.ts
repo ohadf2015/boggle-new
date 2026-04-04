@@ -10,7 +10,7 @@ interface UseGridClickHandlerProps {
   submitWord: () => void;
   fireRoundActive: boolean;
   setIsClickSelectMode: (val: boolean) => void;
-  cellFilter?: (row: number, col: number) => boolean;
+  cellFilter?: (row: number, col: number, currentPathLength?: number) => boolean;
 }
 
 export function useGridClickHandler({
@@ -40,7 +40,7 @@ export function useGridClickHandler({
     lastClickCellRef.current = { row: rowIndex, col: colIndex };
 
     if (selectedCells.length === 0) {
-      if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
+      if (cellFilter && !cellFilter(rowIndex, colIndex, 0)) return;
       setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
       setIsClickSelectMode(true);
       vibrateClickSelect();
@@ -60,7 +60,7 @@ export function useGridClickHandler({
 
     const lastCell = selectedCells[selectedCells.length - 1];
     if (lastCell && isAdjacentCell(lastCell, { row: rowIndex, col: colIndex })) {
-      if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
+      if (cellFilter && !cellFilter(rowIndex, colIndex, selectedCells.length)) return;
       setSelectedCells([...selectedCells, { row: rowIndex, col: colIndex, letter }]);
       vibrateClickSelect();
     }

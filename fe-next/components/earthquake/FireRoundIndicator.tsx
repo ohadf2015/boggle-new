@@ -30,7 +30,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   if (disableFireLights || reduceMotion) {
     if (!isActive) return null;
     return (
-      <div className="fixed z-40" style={{ top: 'calc(5rem + var(--cap-safe-area-top, env(safe-area-inset-top, 0px)))' }} role="status" aria-live="polite" aria-label={`${t('earthquake.fireRound')} - ${remainingSeconds}s`}>
+      <div className="fixed z-50" style={{ top: 'calc(5rem + var(--cap-safe-area-top, env(safe-area-inset-top, 0px)))' }} role="status" aria-live="polite" aria-label={`${t('earthquake.fireRound')} - ${remainingSeconds}s`}>
         <div className="relative bg-gradient-to-r from-neo-orange to-neo-red border-4 border-neo-black rounded-neo-lg px-4 py-2 shadow-hard-lg ltr:right-4 rtl:left-4">
           <div className="relative z-10 flex items-center gap-2">
             <span className="text-2xl">🔥</span>
@@ -50,13 +50,13 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   // Determine position based on layout
   // Position below header to avoid overlapping with header controls
   // Use logical 'end' property for RTL support (flips to left in Hebrew)
-  const positionClasses = 'top-20 sm:top-24 ltr:right-4 rtl:left-4';
+  const positionClasses = 'top-24 sm:top-28 ltr:right-4 rtl:left-4';
 
   return (
     <AnimatePresence>
       {isActive && (
         <motion.div
-          className={`fixed z-40 ${positionClasses}`}
+          className={`fixed z-50 ${positionClasses}`}
           initial={{ scale: 0, opacity: 0, y: -20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0, opacity: 0, y: -20 }}

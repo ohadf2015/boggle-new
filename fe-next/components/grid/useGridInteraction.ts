@@ -37,8 +37,9 @@ interface UseGridInteractionProps {
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
   language?: Language;
   disableLetterKeyInput?: boolean;
-  /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles) */
-  cellFilter?: (row: number, col: number) => boolean;
+  /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles).
+   *  Third arg is the current drag path length (avoids stale React state during drag). */
+  cellFilter?: (row: number, col: number, currentPathLength?: number) => boolean;
 }
 
 interface UseGridInteractionReturn {
@@ -243,7 +244,7 @@ export function useGridInteraction({
     lastDirectionRef.current = null;
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
     // Check cell filter — skip if cell is not selectable (e.g. ice tile)
-    if (cellFilter && !cellFilter(rowIndex, colIndex)) return;
+    if (cellFilter && !cellFilter(rowIndex, colIndex, 0)) return;
     // Init drag ref + DOM class (no React re-render during drag)
     const cell = { row: rowIndex, col: colIndex, letter };
     dragSelectionRef.current = [cell];
@@ -285,11 +286,11 @@ export function useGridInteraction({
       return;
     }
     if (isAdjacentCell(lastCell, currentCell)) {
-      // Check cell filter — skip if cell is blocked (e.g. unthawed ice)
-      if (cellFilter && !cellFilter(currentCell.row, currentCell.col)) return;
+      // Check cell filter — pass current drag length so gem filter uses real-time count
+      if (cellFilter && !cellFilter(currentCell.row, currentCell.col, dragCells.length)) return;
       const newCount = dragCells.length + 1;
-      const prevTier = getSelectionEscalation(0, dragCells.length, comboLevel).tier;
-      const newTier = getSelectionEscalation(0, newCount, comboLevel).tier;
+      const prevTier = getSelectionEscalation(dragCells.length - 1, dragCells.length, comboLevel).tier;
+      const newTier = getSelectionEscalation(dragCells.length, newCount, comboLevel).tier;
       const newCell = { row: currentCell.row, col: currentCell.col, letter: currentCell.letter };
       const newDragCells = [...dragCells, newCell];
       dragSelectionRef.current = newDragCells;
@@ -365,7 +366,7 @@ export function useGridInteraction({
         setTimeout(() => setSelectedCells([]), 150);
       }
     } else {
-      if (dragCells.length === 1 && !hasMovedRef.current && isTouchDeviceRef.current && onSingleTapDetected) {
+      if (dragCells.length === 1 && !hasMovedRef.current && onSingleTapDetected) {
         const cell = dragCells[0];
         onSingleTapDetected({ row: cell.row, col: cell.col, letter: cell.letter });
       }
@@ -574,10 +575,13 @@ export function useGridInteraction({
     resizeObserver.observe(element);
     window.addEventListener('orientationchange', invalidateCache);
     window.addEventListener('resize', invalidateCache);
+    // Invalidate after CSS transitions (e.g. board animating into position)
+    element.addEventListener('transitionend', invalidateCache);
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener('orientationchange', invalidateCache);
       window.removeEventListener('resize', invalidateCache);
+      element.removeEventListener('transitionend', invalidateCache);
     };
   }, [gridRef]);
 

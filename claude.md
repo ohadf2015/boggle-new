@@ -10,7 +10,7 @@ cd fe-next && npm install && npm run dev
 ```
 
 ## Tech Stack
-Next.js 16 | TypeScript | Tailwind | Express | Socket.IO | Supabase | Redis | Jest/Playwriter
+Next.js 16 | TypeScript | Tailwind | Express | Socket.IO | Supabase | Redis | Vitest+Jest/Playwright
 
 ## Critical Guidelines
 - All UI text: `t('key')` - NO hardcoded strings

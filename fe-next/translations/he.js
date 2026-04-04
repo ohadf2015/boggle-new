@@ -8724,6 +8724,7 @@ const he = {
     "empty": "אין התראות עדיין",
     "emptyDesc": "כשתקבלו התראות, הן יופיעו כאן",
     "markAllRead": "סמן הכל כנקרא",
+    "clearAll": "נקה הכל",
     "markAsRead": "סמן כנקרא",
     "viewAll": "הצג הכל",
     "more": "נוספות",

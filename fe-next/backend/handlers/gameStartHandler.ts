@@ -305,12 +305,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
           : generateRandomTable(6, 6, gameLang);
       } else {
-        // Classic / Word Hunt: grid size scales with difficulty
-        const resolvedDifficulty = difficulty || 'MEDIUM';
-        const gridSize = resolvedDifficulty === 'HARD' ? 6 : 5; // EASY and MEDIUM use 5x5
+        // Multiplayer always uses 6x6 grid for classic/word-hunt
         letterGrid = vocabToEmbed.length > 0
-          ? generateRandomTable(gridSize, gridSize, gameLang, vocabToEmbed)
-          : generateRandomTable(gridSize, gridSize, gameLang);
+          ? generateRandomTable(6, 6, gameLang, vocabToEmbed)
+          : generateRandomTable(6, 6, gameLang);
       }
     }
 

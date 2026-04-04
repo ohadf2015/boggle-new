@@ -320,8 +320,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     }
   }, [isOnCrazyGamesPlatform, roomsLoading, activeRooms, prefilledRoom, autoCreate, handleRoomClick, handleQuickPlay]);
 
-  // Show branded loading while CrazyGames SDK initializes (prevents flash of wrong UI)
-  if (!isCrazyGamesReady) {
+  // CrazyGames SDK initializes async — only block render when actually on CG platform
+  // Non-CG users see the lobby immediately
+  if (!isCrazyGamesReady && isOnCrazyGamesPlatform) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-neo-navy">
         <PageLoader size="md" />

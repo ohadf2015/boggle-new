@@ -7,16 +7,19 @@
  * and hides for PROMPT_DISMISS_DAYS days if "Not Now" is clicked.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowPushPrompt, dismissPushPrompt } from '@/utils/pushNotifications';
 import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 export function PushNotificationPrompt() {
   const { t } = useLanguage();
   const [visible, setVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, visible, () => { dismissPushPrompt(); setVisible(false); });
 
   useEffect(() => {
     setVisible(shouldShowPushPrompt());
@@ -54,6 +57,7 @@ export function PushNotificationPrompt() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          ref={dialogRef}
           className="fixed bottom-20 inset-x-4 z-50 mx-auto max-w-md"
           role="dialog"
           aria-label={t('notifications.prompt.title')}

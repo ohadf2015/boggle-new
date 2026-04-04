@@ -807,8 +807,8 @@ describe('analytics - getStudentsProgressSummary', () => {
     ];
 
     const mockProfiles = [
-      { id: 'student-1', display_name: 'Alice', avatar_url: 'avatar1.png' },
-      { id: 'student-2', display_name: 'Bob', avatar_url: null },
+      { id: 'student-1', display_name: 'Alice', avatar_url: null, avatar_config: 'avatar1.png', avatar_emoji: null },
+      { id: 'student-2', display_name: 'Bob', avatar_url: null, avatar_config: null, avatar_emoji: null },
     ];
 
     const mockLessons = [

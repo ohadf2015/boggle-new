@@ -29,11 +29,11 @@ const TARGET_FOUND_END_DELAY_MS = 3000;
 /** Score buffer when no human has scored yet (matches botGame.ts) */
 const BOT_SCORE_BUFFER = 20;
 
-/** Timing config per difficulty */
-const HUNT_TIMING: Record<string, { minDelay: number; maxDelay: number; startDelay: number }> = {
-  easy:   { minDelay: 8000,  maxDelay: 15000, startDelay: 5000 },
-  medium: { minDelay: 5000,  maxDelay: 10000, startDelay: 3000 },
-  hard:   { minDelay: 3000,  maxDelay: 7000,  startDelay: 2000 },
+/** Timing config per difficulty — startDelay is high so bots find regular words first */
+const HUNT_TIMING: Record<string, { minDelay: number; maxDelay: number; startDelay: number; minWrongGuesses: number }> = {
+  easy:   { minDelay: 8000,  maxDelay: 15000, startDelay: 15000, minWrongGuesses: 3 },
+  medium: { minDelay: 5000,  maxDelay: 10000, startDelay: 10000, minWrongGuesses: 2 },
+  hard:   { minDelay: 3000,  maxDelay: 7000,  startDelay: 6000,  minWrongGuesses: 1 },
 };
 
 export interface BotWordHuntStrategy {
@@ -42,6 +42,8 @@ export interface BotWordHuntStrategy {
   minDelay: number;
   maxDelay: number;
   startDelay: number;
+  minWrongGuesses: number;
+  targetWord: string;
 }
 
 /**
@@ -90,9 +92,24 @@ export function filterCandidatesByFeedback(
 
 /**
  * Pick a guess from remaining candidates.
+ * Avoids the target word until the bot has made enough wrong guesses,
+ * simulating a human who explores before honing in on the answer.
  */
-export function pickBotGuess(candidates: string[], _difficulty: string): string | null {
+export function pickBotGuess(
+  candidates: string[],
+  _difficulty: string,
+  strategy?: BotWordHuntStrategy
+): string | null {
   if (candidates.length === 0) return null;
+
+  // If the bot hasn't made enough wrong guesses yet, avoid the target
+  if (strategy && strategy.guessesMade.length < strategy.minWrongGuesses) {
+    const nonTarget = candidates.filter(w => w !== strategy.targetWord);
+    if (nonTarget.length > 0) {
+      return nonTarget[Math.floor(Math.random() * nonTarget.length)];
+    }
+  }
+
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
@@ -102,7 +119,8 @@ export function pickBotGuess(candidates: string[], _difficulty: string): string 
 export function createBotWordHuntStrategy(
   allWords: string[],
   targetLength: number,
-  difficulty: string
+  difficulty: string,
+  targetWord: string = ''
 ): BotWordHuntStrategy {
   const candidates = allWords.filter(w => w.length === targetLength);
   const timing = HUNT_TIMING[difficulty] || HUNT_TIMING.medium;
@@ -113,6 +131,8 @@ export function createBotWordHuntStrategy(
     minDelay: timing.minDelay,
     maxDelay: timing.maxDelay,
     startDelay: timing.startDelay,
+    minWrongGuesses: timing.minWrongGuesses,
+    targetWord,
   };
 }
 
@@ -148,7 +168,7 @@ export function startBotsForWordHunt(
   const gameEndTime = Date.now() + timerSeconds * 1000;
 
   for (const bot of bots) {
-    const strategy = createBotWordHuntStrategy(allWords, huntState.targetWordLength, bot.difficulty);
+    const strategy = createBotWordHuntStrategy(allWords, huntState.targetWordLength, bot.difficulty, huntState.targetWord);
 
     if (strategy.candidates.length === 0) {
       logger.warn('BOT', `Bot "${bot.username}" has no word-hunt candidates (target length: ${huntState.targetWordLength})`);
@@ -192,8 +212,8 @@ function scheduleWordHuntGuess(
     return;
   }
 
-  // Pick a guess
-  const guess = pickBotGuess(strategy.candidates, bot.difficulty);
+  // Pick a guess — avoids target until enough wrong guesses made
+  const guess = pickBotGuess(strategy.candidates, bot.difficulty, strategy);
   if (!guess) {
     logger.debug('BOT', `Bot "${bot.username}" has no more word-hunt candidates`);
     return;

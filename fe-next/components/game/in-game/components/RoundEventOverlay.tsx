@@ -75,7 +75,7 @@ export const RoundEventOverlay = memo<RoundEventOverlayProps>(function RoundEven
             exit={{ y: -40, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
             className={`
-              absolute top-0 left-1/2 -translate-x-1/2 z-50
+              absolute top-24 left-1/2 -translate-x-1/2 z-50
               pointer-events-none
               flex items-center gap-2
               px-4 py-2
@@ -103,7 +103,7 @@ export const RoundEventOverlay = memo<RoundEventOverlayProps>(function RoundEven
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className={`
-              absolute inset-0 z-40 pointer-events-none rounded-neo
+              absolute inset-0 z-50 pointer-events-none rounded-neo
               border-3 ${config.activeBorderColor} ${config.activeShadow}
               animate-pulse
             `}

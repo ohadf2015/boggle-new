@@ -8895,6 +8895,7 @@ const en = {
     "bellUnread": "{count} unread notifications",
     "emptyDesc": "When you receive notifications, they'll appear here",
     "markAllRead": "Mark all as read",
+    "clearAll": "Clear all",
     "markAsRead": "Mark as read",
     "viewAll": "View All",
     "more": "more",

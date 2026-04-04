@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { type Cosmetic, RARITY_COLORS } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
 
@@ -16,15 +17,8 @@ interface CosmeticPreviewProps {
 export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurchase }: CosmeticPreviewProps) {
   const { t } = useLanguage();
   const rarityClass = RARITY_COLORS[cosmetic.rarity];
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose();
-  }, [onClose]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, true, onClose);
 
   return (
     <div
@@ -34,7 +28,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
       aria-label={t(cosmetic.name)}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className={`relative w-full max-w-sm bg-neo-navy border-neo rounded-neo p-5 shadow-hard ${rarityClass}`}>
+      <div ref={dialogRef} className={`relative w-full max-w-sm bg-neo-navy border-neo rounded-neo p-5 shadow-hard ${rarityClass}`}>
         {/* Close */}
         <button
           onClick={onClose}

@@ -275,13 +275,14 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
             {/* Display Name Input */}
             <div>
-              <label className={cn(
+              <label htmlFor="winner-display-name" className={cn(
                 'block text-sm font-bold mb-2 uppercase tracking-wide',
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
               )}>
                 {t('auth.winnerOnboarding.displayName')}
               </label>
               <input
+                id="winner-display-name"
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -296,6 +297,8 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                     : 'bg-white text-neo-black placeholder-gray-400 focus:ring-4 focus:ring-amber-400/50',
                   error ? 'border-red-500' : ''
                 )}
+                aria-invalid={error ? 'true' : undefined}
+                aria-describedby={error ? 'winner-name-error' : undefined}
               />
               <div className="flex justify-between items-center mt-1">
                 <p className={cn(
@@ -305,7 +308,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   {displayName.length}/20 {t('daily.characters')}
                 </p>
                 {error && (
-                  <p className="text-xs text-red-500 font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3 shrink-0" />{error}</p>
+                  <p id="winner-name-error" className="text-xs text-red-500 font-semibold flex items-center gap-1" role="alert"><AlertCircle className="w-3 h-3 shrink-0" />{error}</p>
                 )}
               </div>
             </div>

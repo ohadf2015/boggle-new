@@ -39,15 +39,16 @@ interface StickyReadyBarProps {
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'blast', 'classic', 'random'];
-const AUTO_SECONDS = 30;
+const AUTO_SECONDS = 35;
 
 /**
  * Inline ready bar — renders as flex items inside a parent floating bar.
  * No fixed positioning or background — the parent ResultsPage handles that.
  *
- * All players (host + non-host) get a 21s auto-countdown.
- * - Host: auto-starts game after 21s
- * - Non-host: auto-marks ready after 21s
+ * All players (host + non-host) get a 35s auto-countdown.
+ * - Host: auto-starts game after 35s
+ * - Non-host: auto-marks ready after 35s
+ * - Cancellation persists across game rounds (sessionStorage)
  * - Non-1st-place players see "Revenge {winner}"
  * - 1st-place sees "Defend Title"
  * - Bots are always counted as ready
@@ -89,8 +90,12 @@ export default function StickyReadyBar({
 
   const winnerAvatar = winnerUsername ? playerMap.get(winnerUsername)?.avatar : undefined;
 
-  // ---------- Unified 21s countdown for ALL players ----------
-  const [cancelled, setCancelled] = useState(false);
+  // ---------- Unified auto-countdown for ALL players ----------
+  // Persist cancellation across game rounds via sessionStorage
+  const [cancelled, setCancelled] = useState(() => {
+    try { return sessionStorage.getItem('mp-auto-advance-cancelled') === '1'; }
+    catch { return false; }
+  });
   const [secondsLeft, setSecondsLeft] = useState(AUTO_SECONDS);
   const completedRef = useRef(false);
   const countdownStartedRef = useRef(false);
@@ -102,15 +107,20 @@ export default function StickyReadyBar({
   const needsAction = isHost ? true : !isCurrentPlayerReady;
   const showCountdown = needsAction && !cancelled && totalPlayers > 0 && !isClassroom;
 
+  const clearCancelFlag = useCallback(() => {
+    try { sessionStorage.removeItem('mp-auto-advance-cancelled'); } catch {}
+  }, []);
+
   const handleCountdownComplete = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
+    clearCancelFlag();
     if (isHost) {
       onStartGame();
     } else {
       onMarkReady();
     }
-  }, [isHost, onStartGame, onMarkReady]);
+  }, [isHost, onStartGame, onMarkReady, clearCancelFlag]);
 
   useEffect(() => {
     if (!showCountdown) return;
@@ -162,11 +172,18 @@ export default function StickyReadyBar({
             className={cn(btnBase, btnColor, 'relative overflow-hidden')}
             whileTap={{ scale: 0.95 }}
           >
-            <motion.div
-              className="absolute inset-0 bg-neo-black/15 origin-right"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: AUTO_SECONDS, ease: 'linear' }}
+            {/* CSS-only progress fill — GPU-composited, no JS animation loop */}
+            <div
+              className="absolute inset-0 bg-neo-black/15 origin-right will-change-transform"
+              ref={(el) => {
+                if (el) {
+                  // Force browser to acknowledge scaleX(0), then transition to 1
+                  el.style.transform = 'scaleX(0)';
+                  el.getBoundingClientRect();
+                  el.style.transition = `transform ${AUTO_SECONDS}s linear`;
+                  el.style.transform = 'scaleX(1)';
+                }
+              }}
             />
             <span className="relative z-10 flex items-center gap-3">
               {isRevenge && winnerUsername ? (
@@ -187,7 +204,10 @@ export default function StickyReadyBar({
           </motion.button>
           <button
             data-testid="auto-countdown-cancel"
-            onClick={() => setCancelled(true)}
+            onClick={() => {
+              setCancelled(true);
+              try { sessionStorage.setItem('mp-auto-advance-cancelled', '1'); } catch {}
+            }}
             className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
             aria-label={t('autoPlay.exit')}
           >
@@ -203,7 +223,7 @@ export default function StickyReadyBar({
     if (isHost) {
       return (
         <motion.button
-          onClick={onStartGame}
+          onClick={() => { clearCancelFlag(); onStartGame(); }}
           whileTap={{ scale: 0.95 }}
           className={cn(btnBase, isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black')}
         >
@@ -228,7 +248,7 @@ export default function StickyReadyBar({
     if (isRevenge && winnerUsername) {
       return (
         <motion.button
-          onClick={onMarkReady}
+          onClick={() => { clearCancelFlag(); onMarkReady(); }}
           whileTap={{ scale: 0.95 }}
           className={cn(btnBase, 'bg-neo-pink text-white')}
         >
@@ -243,7 +263,7 @@ export default function StickyReadyBar({
     // Winner — DEFEND TITLE
     return (
       <motion.button
-        onClick={onMarkReady}
+        onClick={() => { clearCancelFlag(); onMarkReady(); }}
         whileTap={{ scale: 0.95 }}
         className={cn(btnBase, 'bg-neo-lime text-neo-black')}
       >

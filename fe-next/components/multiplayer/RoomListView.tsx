@@ -12,8 +12,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
-import HowToPlay from '@/components/HowToPlay';
-import MultiplayerWelcomeCard from '@/components/multiplayer/MultiplayerWelcomeCard';
+import dynamic from 'next/dynamic';
+
+const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
+const MultiplayerWelcomeCard = dynamic(() => import('@/components/multiplayer/MultiplayerWelcomeCard'), { ssr: false });
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import AvatarStack from '@/components/multiplayer/AvatarStack';

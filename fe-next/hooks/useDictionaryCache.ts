@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Language } from '@/shared/types/game';
+import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 // IndexedDB configuration
 const DB_NAME = 'lexiclash-dictionary';
@@ -214,8 +215,18 @@ export function useDictionaryCache(language: Language): UseDictionaryCacheReturn
    */
   const checkWord = useCallback((word: string): boolean => {
     if (!dictionaryRef.current) return false;
-    return dictionaryRef.current.has(word.toLowerCase().trim());
-  }, []);
+    const normalized = word.toLowerCase().trim();
+    if (dictionaryRef.current.has(normalized)) return true;
+    // Hebrew: board tiles use regular forms only, but dictionary has final forms (sofit).
+    // Try with final letter applied (e.g., שלומ → שלום).
+    if (language === 'he') {
+      const base = normalizeHebrewWord(normalized);
+      if (dictionaryRef.current.has(base)) return true;
+      const withSofit = applyHebrewFinalLetters(base);
+      if (dictionaryRef.current.has(withSofit)) return true;
+    }
+    return false;
+  }, [language]);
 
   return {
     checkWord,

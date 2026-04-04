@@ -8741,6 +8741,7 @@ const ja = {
     "empty": "通知はまだありません",
     "emptyDesc": "通知を受け取ると、ここに表示されます",
     "markAllRead": "すべて既読にする",
+    "clearAll": "すべて消去",
     "markAsRead": "既読にする",
     "viewAll": "すべて表示",
     "more": "件",

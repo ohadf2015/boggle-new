@@ -355,7 +355,7 @@ describe('registerStartGameHandler', () => {
       expect(mockGenerateRandomTable).toHaveBeenCalledWith(6, 6, 'en');
     });
 
-    it('regenerates 5x5 grid for classic MEDIUM difficulty with 2+ players', async () => {
+    it('always regenerates 6x6 grid for classic MP regardless of difficulty', async () => {
       mockGetGame.mockReturnValue(makeGame({
         users: {
           Host: { socketId: 'socket-host', isHost: true },
@@ -366,21 +366,6 @@ describe('registerStartGameHandler', () => {
       registerStartGameHandler(mockIo, socket);
 
       await triggerStartGame(handlers, makePayload({ gameMode: 'classic', difficulty: 'MEDIUM' }));
-
-      expect(mockGenerateRandomTable).toHaveBeenCalledWith(5, 5, 'en');
-    });
-
-    it('regenerates 6x6 grid for classic HARD difficulty with 2+ players', async () => {
-      mockGetGame.mockReturnValue(makeGame({
-        users: {
-          Host: { socketId: 'socket-host', isHost: true },
-          Player2: { socketId: 'socket-p2', isHost: false },
-        },
-      }));
-      const { socket, handlers } = createMockSocket('socket-host');
-      registerStartGameHandler(mockIo, socket);
-
-      await triggerStartGame(handlers, makePayload({ gameMode: 'classic', difficulty: 'HARD' }));
 
       expect(mockGenerateRandomTable).toHaveBeenCalledWith(6, 6, 'en');
     });

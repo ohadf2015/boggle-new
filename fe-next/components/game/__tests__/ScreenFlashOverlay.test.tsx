@@ -45,12 +45,12 @@ describe('ScreenFlashOverlay', () => {
     expect(screen.queryByTestId('screen-flash')).not.toBeInTheDocument();
   });
 
-  it('flash is full-screen with z-40 and pointer-events-none', () => {
+  it('flash is full-screen with z-50 and pointer-events-none', () => {
     const { rerender } = render(<ScreenFlashOverlay trigger={0} />);
     rerender(<ScreenFlashOverlay trigger={1} />);
     const flash = screen.getByTestId('screen-flash');
     expect(flash.className).toContain('inset-0');
-    expect(flash.className).toContain('z-40');
+    expect(flash.className).toContain('z-50');
     expect(flash.className).toContain('pointer-events-none');
   });
 

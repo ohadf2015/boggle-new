@@ -8740,6 +8740,7 @@ const es = {
     "empty": "Sin notificaciones aún",
     "emptyDesc": "Cuando recibas notificaciones, aparecerán aquí",
     "markAllRead": "Marcar todo como leído",
+    "clearAll": "Borrar todo",
     "markAsRead": "Marcar como leído",
     "viewAll": "Ver todo",
     "more": "más",

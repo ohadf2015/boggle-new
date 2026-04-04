@@ -8,6 +8,7 @@ import {
   filterCandidatesByFeedback,
   pickBotGuess,
   createBotWordHuntStrategy,
+  type BotWordHuntStrategy,
 } from '../botWordHunt';
 import type { LetterFeedback } from '@/shared/types/game';
 
@@ -82,7 +83,7 @@ describe('Bot Word Hunt', () => {
   describe('createBotWordHuntStrategy', () => {
     it('creates strategy with candidates matching target length', () => {
       const allWords = ['cat', 'dog', 'apple', 'beach', 'go', 'crane', 'at'];
-      const strategy = createBotWordHuntStrategy(allWords, 5, 'medium');
+      const strategy = createBotWordHuntStrategy(allWords, 5, 'medium', 'apple');
 
       // Only 5-letter words should be candidates
       expect(strategy.candidates.every(w => w.length === 5)).toBe(true);
@@ -92,17 +93,82 @@ describe('Bot Word Hunt', () => {
     });
 
     it('sets appropriate delay range based on difficulty', () => {
-      const easy = createBotWordHuntStrategy(['apple'], 5, 'easy');
-      const hard = createBotWordHuntStrategy(['apple'], 5, 'hard');
+      const easy = createBotWordHuntStrategy(['apple'], 5, 'easy', 'apple');
+      const hard = createBotWordHuntStrategy(['apple'], 5, 'hard', 'apple');
 
       expect(easy.minDelay).toBeGreaterThan(hard.minDelay);
       expect(easy.maxDelay).toBeGreaterThan(hard.maxDelay);
     });
 
     it('tracks guesses made', () => {
-      const strategy = createBotWordHuntStrategy(['apple', 'beach'], 5, 'medium');
+      const strategy = createBotWordHuntStrategy(['apple', 'beach'], 5, 'medium', 'apple');
 
       expect(strategy.guessesMade).toEqual([]);
+    });
+
+    it('stores targetWord and minWrongGuesses', () => {
+      const strategy = createBotWordHuntStrategy(['apple', 'beach'], 5, 'medium', 'apple');
+
+      expect(strategy.targetWord).toBe('apple');
+      expect(strategy.minWrongGuesses).toBe(2);
+    });
+
+    it('easy bots require more wrong guesses than hard bots', () => {
+      const easy = createBotWordHuntStrategy(['apple'], 5, 'easy', 'apple');
+      const hard = createBotWordHuntStrategy(['apple'], 5, 'hard', 'apple');
+
+      expect(easy.minWrongGuesses).toBeGreaterThan(hard.minWrongGuesses);
+    });
+  });
+
+  describe('pickBotGuess - human-like behavior', () => {
+    it('avoids the target word when not enough wrong guesses made', () => {
+      const strategy: BotWordHuntStrategy = {
+        candidates: ['apple', 'beach', 'crane'],
+        guessesMade: [],
+        minDelay: 5000,
+        maxDelay: 10000,
+        startDelay: 10000,
+        minWrongGuesses: 2,
+        targetWord: 'apple',
+      };
+
+      // Run multiple times to verify it never picks the target
+      for (let i = 0; i < 50; i++) {
+        const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
+        expect(guess).not.toBe('apple');
+      }
+    });
+
+    it('can pick the target word after enough wrong guesses', () => {
+      const strategy: BotWordHuntStrategy = {
+        candidates: ['apple'],
+        guessesMade: ['beach', 'crane'],
+        minDelay: 5000,
+        maxDelay: 10000,
+        startDelay: 10000,
+        minWrongGuesses: 2,
+        targetWord: 'apple',
+      };
+
+      const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
+      expect(guess).toBe('apple');
+    });
+
+    it('falls back to target if it is the only candidate before min guesses', () => {
+      const strategy: BotWordHuntStrategy = {
+        candidates: ['apple'],
+        guessesMade: [],
+        minDelay: 5000,
+        maxDelay: 10000,
+        startDelay: 10000,
+        minWrongGuesses: 2,
+        targetWord: 'apple',
+      };
+
+      // Only candidate is the target — must return it
+      const guess = pickBotGuess(strategy.candidates, 'medium', strategy);
+      expect(guess).toBe('apple');
     });
   });
 });

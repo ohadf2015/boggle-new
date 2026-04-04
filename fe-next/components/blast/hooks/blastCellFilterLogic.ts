@@ -21,8 +21,8 @@ const THAWABLE_TYPES = new Set(['ice', 'frozen']);
 export function computeCellFilter(
   tileStates: BlastTileState[][],
   currentPath: CellCoord[],
-): (row: number, col: number) => boolean {
-  return (row: number, col: number): boolean => {
+): (row: number, col: number, currentPathLength?: number) => boolean {
+  return (row: number, col: number, currentPathLength?: number): boolean => {
     const tile = tileStates[row]?.[col];
     if (!tile) return false;
 
@@ -35,7 +35,9 @@ export function computeCellFilter(
     }
 
     // Gem: requires 2+ tiles already in path (strategic gating)
-    if (tile.type === 'gem' && currentPath.length < 2) {
+    // Use currentPathLength from drag ref when available (avoids stale React state)
+    const pathLen = currentPathLength ?? currentPath.length;
+    if (tile.type === 'gem' && pathLen < 2) {
       return false;
     }
 

@@ -34,7 +34,7 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
     const { isAuthenticated, isAdmin, profile, user } = useAuth();
     const engagementStatus = useEngagementStatus();
     const { missions, completedCount, isGrandSlam } = useDailyMissions();
-    const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification } = useRealtimeNotifications();
+    const { notifications, unreadCount: notificationCount, markAsRead, markAllAsRead, dismissNotification, clearAllNotifications } = useRealtimeNotifications();
     const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [badgeSeen, setBadgeSeen] = useState(false);
@@ -108,10 +108,10 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                     {isOpen ? <X size={18} /> : <Menu size={18} />}
                 </m.div>
                 {/* Aggregated badge: gifts + notifications + completed quests */}
-                {badgeCount > 0 && !badgeSeen && (
+                {badgeCount > 0 && !isOpen && !badgeSeen && (
                     <div className={cn(
-                        "absolute -top-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none",
-                        isRtl ? '-left-1.5' : '-right-1.5'
+                        "absolute -top-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-neo-red rounded-full border-2 border-neo-cream text-[10px] font-black text-white leading-none",
+                        isRtl ? '-left-2' : '-right-2'
                     )}>{badgeCount}</div>
                 )}
             </button>
@@ -265,15 +265,24 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                                                 </span>
                                             )}
                                         </div>
-                                        {notificationCount > 0 && (
+                                        <div className="flex items-center gap-2">
+                                            {notificationCount > 0 && (
+                                                <button
+                                                    onClick={() => markAllAsRead()}
+                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-yellow transition-colors font-bold"
+                                                >
+                                                    <Check size={10} />
+                                                    {t('notifications.markAllRead')}
+                                                </button>
+                                            )}
                                             <button
-                                                onClick={() => markAllAsRead()}
-                                                className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-yellow transition-colors font-bold"
+                                                onClick={() => clearAllNotifications()}
+                                                className="flex items-center gap-1 text-[10px] text-neo-white/40 hover:text-neo-red transition-colors font-bold"
                                             >
-                                                <Check size={10} />
-                                                {t('notifications.markAllRead')}
+                                                <X size={10} />
+                                                {t('notifications.clearAll', 'Clear all')}
                                             </button>
-                                        )}
+                                        </div>
                                     </div>
                                     <div className={cn(
                                         "rounded-neo border-2 border-neo-white/10 overflow-hidden",

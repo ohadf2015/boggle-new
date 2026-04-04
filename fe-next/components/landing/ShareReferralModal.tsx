@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Share2, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { useReferralShare } from './useReferralShare';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em" aria-hidden="true">
@@ -30,21 +31,14 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
   const { isAuthenticated } = useAuth();
   const { referralCode, referralRewardXp, isLoading, copied, fetchShareData, handleCopy, handleShare } =
     useReferralShare();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, isOpen, onClose);
 
   useEffect(() => {
     if (isOpen) {
       fetchShareData();
     }
   }, [isOpen, fetchShareData]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   return (
     <AnimatePresence>
@@ -61,6 +55,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
           />
 
           <motion.div
+            ref={dialogRef}
             initial={{ opacity: 0, y: 60, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}

@@ -20,6 +20,7 @@ import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -66,6 +67,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
+  useFocusTrap(modalRef, isOpen, onClose);
 
   // On CrazyGames, skip the modal entirely — trigger native CG auth prompt
   useEffect(() => {
@@ -122,12 +124,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   }, [isOpen, initialMode]);
 
   // Focus trap and keyboard handling
+  // Escape is handled by useFocusTrap — only handle Tab here
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-      return;
-    }
-
     if (e.key === 'Tab' && modalRef.current) {
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -143,7 +141,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         firstElement?.focus();
       }
     }
-  }, [onClose]);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {

@@ -8689,6 +8689,7 @@ const sv = {
     "empty": "Inga aviseringar än",
     "emptyDesc": "När du får aviseringar visas de här",
     "markAllRead": "Markera alla som lästa",
+    "clearAll": "Rensa alla",
     "markAsRead": "Markera som läst",
     "viewAll": "Visa alla",
     "more": "fler",

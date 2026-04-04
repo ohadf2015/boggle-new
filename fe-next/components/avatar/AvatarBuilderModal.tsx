@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { createPortal } from 'react-dom';
 import { X, Shuffle, Undo2, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins, Brush } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -121,24 +122,23 @@ export default function AvatarBuilderModal({
     onClose();
   }, [config, onSave, onClose]);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, isOpen, onClose);
+
   useEffect(() => {
     if (!isOpen) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="avatar-builder-title"
