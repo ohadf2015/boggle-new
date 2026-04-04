@@ -20,6 +20,7 @@ import { useInterval } from '@/hooks/useSafeTimeout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swords, Trophy, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDuelSocket } from '@/hooks/useDuelSocket';
 import type {
   DuelStartedData,
@@ -70,6 +71,7 @@ export function RealTimeDuelGame({
   onBackToLobby,
 }: RealTimeDuelGameProps) {
   const { t } = useLanguage();
+  const { playWordAcceptedSound, playWordRejectedSound, playCountdownBeep, setGameActive } = useSoundEffects();
   const {
     socket: duelSocket,
     submitWord,
@@ -104,6 +106,20 @@ export function RealTimeDuelGame({
   // TIMER EFFECT
   // ============================================
 
+  // Enable sound gate during gameplay
+  useEffect(() => {
+    const isPlaying = phase === 'playing';
+    setGameActive(isPlaying);
+    return () => setGameActive(false);
+  }, [phase, setGameActive]);
+
+  // Countdown beep in last 10 seconds
+  useEffect(() => {
+    if (phase === 'playing' && timeRemaining <= 10 && timeRemaining > 0) {
+      playCountdownBeep(timeRemaining);
+    }
+  }, [timeRemaining, phase, playCountdownBeep]);
+
   useInterval(() => {
     const start = new Date(startTime).getTime();
     const now = new Date().getTime();
@@ -134,6 +150,7 @@ export function RealTimeDuelGame({
       );
       setMyScore(data.totalScore);
       setMyWordCount(data.wordCount);
+      playWordAcceptedSound();
     });
 
     const cleanupWordRejected = onWordRejected((data: WordRejectedData) => {
@@ -144,6 +161,7 @@ export function RealTimeDuelGame({
             : w
         )
       );
+      playWordRejectedSound();
     });
 
     const cleanupOpponentProgress = onOpponentProgress((data: OpponentProgressData) => {
@@ -182,6 +200,8 @@ export function RealTimeDuelGame({
     onOpponentDisconnected,
     onOpponentReconnected,
     onDuelCompleted,
+    playWordAcceptedSound,
+    playWordRejectedSound,
   ]);
 
   // ============================================

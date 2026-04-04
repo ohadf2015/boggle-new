@@ -117,7 +117,7 @@ export function useSurvivalGameLogic({
   t,
 }: UseSurvivalGameLogicProps): [SurvivalGameState, SurvivalGameActions] {
   const { user } = useAuth();
-  const { playWordAcceptedSound, setGameActive } = useSoundEffects();
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
   const { fadeToTrack, TRACKS } = useMusic();
 
   // Game direction for RTL support
@@ -292,6 +292,7 @@ export function useSurvivalGameLogic({
     dispatch,
     showToast,
     playWordAcceptedSound,
+    playWordRejectedSound,
     clueActions,
     feedbackTimeout,
     lifeAnimationTimeout,

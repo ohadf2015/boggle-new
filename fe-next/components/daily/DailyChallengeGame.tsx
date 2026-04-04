@@ -57,7 +57,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playComboSound, setGameActive } = useSoundEffects();
+  const { playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const { awardComboMilestone } = useCoinContext();
   const { isLowEnd } = useDevicePerformance();
@@ -159,6 +159,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     onTimeUp: stableOnTimeUp,
   });
 
+  // Countdown beep in last 10 seconds
+  useEffect(() => {
+    if (!isGameOver && timer.remainingTime <= 10 && timer.remainingTime > 0) {
+      playCountdownBeep(timer.remainingTime);
+    }
+  }, [timer.remainingTime, isGameOver, playCountdownBeep]);
+
   // CrazyGames SDK lifecycle events (gameplayStart/Stop, happyTime)
   useCrazyGamesLifecycle({
     isGameActive: !isGameOver && timer.remainingTime > 0,
@@ -183,6 +190,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       triggerPopup(wordScore, word);
     },
     onWordRejected: () => {
+      playWordRejectedSound();
       combo.resetCombo();
     },
     onComboReset: () => {

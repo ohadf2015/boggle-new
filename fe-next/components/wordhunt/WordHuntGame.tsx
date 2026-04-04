@@ -3,6 +3,7 @@
 import { memo, useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
 import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
 import { WordHuntGameLayout } from './WordHuntGameLayout';
@@ -55,6 +56,13 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   foundWords,
 }) => {
   const { t, dir } = useLanguage();
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+  // Enable sound gate on mount
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   // Bridge: convert Zustand MP state → SP-compatible props
   const bridge = useWordHuntMultiplayerBridge();
@@ -117,6 +125,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
         message: validation.errorKey ? t(validation.errorKey) : undefined,
         timestamp: Date.now(),
       });
+      playWordRejectedSound();
       setFormedWord('');
       setLetterCount(0);
       return;
@@ -132,6 +141,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
         message: t('playerView.wordNotOnBoard'),
         timestamp: Date.now(),
       });
+      playWordRejectedSound();
       setFormedWord('');
       setLetterCount(0);
       return;
@@ -166,6 +176,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       word,
       timestamp: Date.now(),
     });
+    playWordAcceptedSound();
 
     // Clear formed word
     setFormedWord('');

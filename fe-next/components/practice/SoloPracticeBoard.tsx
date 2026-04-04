@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,14 @@ export default function SoloPracticeBoard({
   xpSessionData,
 }: SoloPracticeBoardProps) {
   const { t, language: uiLanguage } = useLanguage();
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
   const isRTL = uiLanguage === 'he';
+
+  // Enable sound gate
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   // Get vocabulary words that can be integrated (normalized for comparison)
   const vocabularyWords = useMemo(() =>
@@ -95,11 +103,15 @@ export default function SoloPracticeBoard({
     minWordLength: 2,
     t,
     onWordAccepted: (word) => {
+      playWordAcceptedSound();
       const isVocab = isVocabularyWordCheck(word);
       if (isVocab) {
         setVocabularyFound((prev) => [...prev, word]);
       }
       onWordFound?.(word, isVocab);
+    },
+    onWordRejected: () => {
+      playWordRejectedSound();
     },
   });
 

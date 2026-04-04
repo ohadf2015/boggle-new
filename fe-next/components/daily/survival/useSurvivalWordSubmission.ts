@@ -37,6 +37,7 @@ export interface UseSurvivalWordSubmissionProps {
   // Callbacks
   showToast: (type: FeedbackType, message: string) => void;
   playWordAcceptedSound: (() => void) | undefined;
+  playWordRejectedSound: (() => void) | undefined;
   clueActions: {
     updateCluesFromFeedback: (feedback: LetterFeedback[], attempts: TargetAttempt[]) => void;
     updateCluesFromDiscovery: (word: string) => number;
@@ -67,6 +68,7 @@ export function useSurvivalWordSubmission({
   dispatch,
   showToast,
   playWordAcceptedSound,
+  playWordRejectedSound,
   clueActions,
   feedbackTimeout,
   lifeAnimationTimeout,
@@ -103,6 +105,7 @@ export function useSurvivalWordSubmission({
   const handleTargetAttempt = useCallback((word: string, target: string) => {
     const normalizedWord = normalizeWord(word, language);
     if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
+      playWordRejectedSound?.();
       showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
       return;
     }
@@ -142,7 +145,7 @@ export function useSurvivalWordSubmission({
       feedbackTimeout.clear();
       handleGameOverRef.current?.(false, newAttempts);
     }
-  }, [attempts, playWordAcceptedSound, t, showToast, clueActions, language, feedbackTimeout, dispatch, handleGameOverRef]);
+  }, [attempts, playWordAcceptedSound, playWordRejectedSound, t, showToast, clueActions, language, feedbackTimeout, dispatch, handleGameOverRef]);
 
   // Handle discovery feedback (for different-length words)
   const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
@@ -177,21 +180,25 @@ export function useSurvivalWordSubmission({
   // Handle word discovery
   const handleWordDiscovery = useCallback(async (word: string) => {
     if (word.length < MIN_DISCOVERY_WORD_LENGTH) {
+      playWordRejectedSound?.();
       showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`);
       return;
     }
 
     if (word.length > MAX_DISCOVERY_WORD_LENGTH) {
+      playWordRejectedSound?.();
       showToast('too-long', t('wordHunt.feedback.tooLong') || `Maximum ${MAX_DISCOVERY_WORD_LENGTH} letters`);
       return;
     }
 
     if (discoveredWords.some(w => w.word === word)) {
+      playWordRejectedSound?.();
       showToast('duplicate', t('wordHunt.feedback.duplicate') || 'Already found!');
       return;
     }
 
     if (!isWordOnBoard(word, grid, language)) {
+      playWordRejectedSound?.();
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
       showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
       recordNotOnBoard(word, language, 'daily_word_hunt');
@@ -200,6 +207,7 @@ export function useSurvivalWordSubmission({
 
     const isValidWord = await validateWordInDictionary(word);
     if (!isValidWord) {
+      playWordRejectedSound?.();
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
       showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`);
       recordNotInDictionary(word, language, 'daily_word_hunt');
@@ -236,7 +244,7 @@ export function useSurvivalWordSubmission({
       ? `${rewardMessage} 🔥 +${longWordBonus} long word bonus!`
       : rewardMessage;
     showToast('valid-word', bonusMessage);
-  }, [discoveredWords, lifePoints, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch]);
+  }, [discoveredWords, lifePoints, grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch]);
 
   // Handle word submission (main entry point)
   const handleWordSubmit = useCallback((word: string) => {

@@ -67,8 +67,8 @@ export function useSinglePlayerCore({
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   const {
-    playWordAcceptedSound, playComboSound, playEarthquakeRumble,
-    playEarthquakeShake, playFireRoundStart, startFireCrackleLoop,
+    playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep,
+    playEarthquakeRumble, playEarthquakeShake, playFireRoundStart, startFireCrackleLoop,
     stopFireCrackleLoop, setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
@@ -189,6 +189,14 @@ export function useSinglePlayerCore({
   });
 
   const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
+
+  // Countdown beep in last 10 seconds
+  useEffect(() => {
+    if (gameActive && timer.remainingTime <= 10 && timer.remainingTime > 0) {
+      playCountdownBeep(timer.remainingTime);
+    }
+  }, [timer.remainingTime, gameActive, playCountdownBeep]);
+
   useAutoScrollOnGameStart(gameStatsRef, { gameActive, isLandscape: false });
   useCrazyGamesLifecycle({ isGameActive: gameActive, isGameOver, score, maxCombo: combo.maxCombo });
 
@@ -249,7 +257,7 @@ export function useSinglePlayerCore({
       let msg = t(errorKey) || errorKey;
       if (localValidation.errorParams?.min) msg = msg.replace('${min}', String(localValidation.errorParams.min));
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: msg, timestamp: now });
-      hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
+      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
       return;
     }
 
@@ -257,14 +265,14 @@ export function useSinglePlayerCore({
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
       const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
-      hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
+      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
       return;
     }
 
     if (foundWordsSetRef.current.has(normalizedWord)) {
       const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: alreadyFoundMsg, timestamp: now });
-      hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
+      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
       return;
     }
 
@@ -326,7 +334,7 @@ export function useSinglePlayerCore({
     wordPace.recordWord();
           const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
           setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
-          hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
+          playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
           recordNotInDictionary(normalizedWord, settings.language, 'single_player');
         }
       })
@@ -339,9 +347,9 @@ export function useSinglePlayerCore({
     wordPace.recordWord();
         const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
         setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
-        hapticError();
+        playWordRejectedSound(); hapticError();
       });
-  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace]);
+  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playWordRejectedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace]);
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,

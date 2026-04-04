@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,14 @@ export default function WarmupRound({
   xpSessionData,
 }: WarmupRoundProps) {
   const { t, language: uiLanguage } = useLanguage();
+  const { playWordAcceptedSound, setGameActive } = useSoundEffects();
   const isRTL = uiLanguage === 'he';
+
+  // Enable sound gate
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   // Get vocabulary words that can be integrated (normalized for comparison)
   const vocabularyWords = useMemo(() =>
@@ -106,13 +114,14 @@ export default function WarmupRound({
 
     setFoundWords((prev) => [...prev, normalizedWord]);
     setScore((prev) => prev + wordScore + bonusScore);
+    playWordAcceptedSound();
 
     if (isVocab) {
       setVocabularyFound((prev) => [...prev, normalizedWord]);
     }
 
     onWordFound?.(normalizedWord, isVocab);
-  }, [foundWords, isVocabularyWord, language, onWordFound]);
+  }, [foundWords, isVocabularyWord, language, onWordFound, playWordAcceptedSound]);
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {
