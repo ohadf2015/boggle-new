@@ -162,8 +162,9 @@ export function useBlastEngine(
   const gameStateRef = useRef(gameState);
   gameStateRef.current = gameState;
 
-  // Cascade tracking
-  const [isCascading, setIsCascading] = useState(false);
+  // Cascade tracking — use ref, not state, because startCascade() sets true+false
+  // synchronously and React would batch both into just false.
+  const isCascadingRef = useRef(false);
 
   // DDA invisible assist
   const ddaStateRef = useRef(createDDAState());
@@ -202,7 +203,7 @@ export function useBlastEngine(
   useEffect(() => {
     if (!isDictLoaded || !effectiveGrid) return;
     if (gameState.isComplete || gameState.isDeadEnd) return;
-    if (isCascading) return;
+    if (isCascadingRef.current) return;
     if (wordsFoundCount === 0) return;
 
     // Build display grid (hide cleared tiles)
@@ -231,7 +232,7 @@ export function useBlastEngine(
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- minWordLength is stable config; including it would re-run dead-end detection on every render
-  }, [isDictLoaded, effectiveGrid, isCascading, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict, tileStates]);
+  }, [isDictLoaded, effectiveGrid, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict, tileStates]);
 
   // ── submitWord ──
   const submitWord = useCallback((
@@ -277,7 +278,7 @@ export function useBlastEngine(
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
-    // eslint-disable-next-line react-hooks/immutability
+     
     tileStatesRef.current = tilesAfterThaw;
 
     setGameState(prev => {
@@ -319,13 +320,13 @@ export function useBlastEngine(
 
   // ── startCascade ──
   const startCascade = useCallback((): CascadeResult => {
-    setIsCascading(true);
+    isCascadingRef.current = true;
 
     const grid = effectiveGridRef.current;
     const tiles = tileStatesRef.current;
 
     if (!grid) {
-      setIsCascading(false);
+      isCascadingRef.current = false;
       return {
         gravity: { newGrid: [], newTileStates: [], clearedTiles: [], fallingTiles: [], newTiles: [] },
         hasNewWords: false,
@@ -347,10 +348,10 @@ export function useBlastEngine(
     // but defer React state updates — caller should call commitCascade()
     // after animation completes so tiles don't snap to new positions mid-fall.
     effectiveGridRef.current = gravityResult.newGrid;
-    // eslint-disable-next-line react-hooks/immutability
+     
     tileStatesRef.current = gravityResult.newTileStates;
 
-    setIsCascading(false);
+    isCascadingRef.current = false;
 
     return {
       gravity: gravityResult,
@@ -442,7 +443,7 @@ export function useBlastEngine(
     endGame,
     unlockMoves,
     getResults,
-    isCascading,
+    isCascading: isCascadingRef.current,
     startCascade,
     setTileStates,
     trackWordFail,

@@ -58,7 +58,9 @@ export const BlastBoard = memo(function BlastBoard({
   diamondRevealTurns = 0,
 }: BlastBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
+  // Initialize to 1 (not 0) so the overlay grid renders immediately.
+  // Fall animation pixel math degrades gracefully until ResizeObserver fires.
+  const [containerWidth, setContainerWidth] = useState(1);
 
   // Measure container for overlay alignment
   useEffect(() => {

@@ -60,6 +60,7 @@ export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   specialTileChance: 0.15,
   language: 'en',
   difficulty: 'medium',
+  boardClearMode: 'refill',
 };
 
 export type BlastPhase = 'ready' | 'waveIntro' | 'playing' | 'waveTransition' | 'results';

@@ -442,18 +442,53 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
   }
 
   // Row-clear reward for 7+ letter words — clears all tile types in the row
+  // Trigger special tile effects (bomb, lightning, prism) instead of silently clearing
   if (word.length >= 7 && path.length > 0) {
     const midCell = path[Math.floor(path.length / 2)];
     const targetRow = midCell.row;
     for (let c = 0; c < gridSize; c++) {
       const tile = next[targetRow]?.[c];
       if (!tile || tile.isCleared) continue;
+      // Skip tiles already in the word path (already processed above)
+      if (path.some(p => p.row === targetRow && p.col === c)) continue;
+
       if (isMultiHitAlive(tile)) {
         hitMultiHitTile(tile);
       } else {
+        tile.activationEffect = tile.type !== 'standard' ? tile.type : null;
         markCleared(tile);
+        // Trigger offensive specials so bombs explode, lightning fires, etc.
+        switch (tile.type) {
+          case 'bomb': {
+            const bk = `${targetRow},${c}`;
+            if (!processedBombs.has(bk)) {
+              processedBombs.add(bk);
+              bombQueue.push({ row: targetRow, col: c, depth: 0 });
+            }
+            break;
+          }
+          case 'lightning': {
+            const lk = `${targetRow},${c}`;
+            if (!processedLightning.has(lk)) {
+              processedLightning.add(lk);
+              bonusScore += fireLightningColumn(targetRow, c, ctx);
+            }
+            break;
+          }
+          case 'prism':
+            bonusScore += firePrismCross(targetRow, c, ctx);
+            break;
+          default:
+            break;
+        }
       }
       newExplosions.push({ id: `row-clear-${now}-${targetRow}-${c}`, type: 'clear', row: targetRow, col: c, intensity: 2, timestamp: now });
+    }
+    // Process any bombs queued by row-clear (main BFS already ran earlier)
+    if (bombQueue.length > 0) {
+      const rowClearBombResult = processBombBFS(ctx);
+      bonusScore += rowClearBombResult.bonusScore;
+      newExplosions.push(...rowClearBombResult.explosions);
     }
   }
 

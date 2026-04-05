@@ -221,30 +221,30 @@ export function BlastGame({
     const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
     const foundWordsSet = new Set(engine.gameState.wordsFound);
     while (chainLevel < MAX_CASCADE_CHAIN) {
-      // Read from refs (not React state) — React state is stale during async batching
-      const { grid, tileStates: latestTiles } = engine.getLatestState();
-      if (!grid) break;
-
+      // Use the CURRENT cascadeResult (from either initial or previous iteration's gravity)
       const affectedCols = new Set(cascadeResult.gravity.newTiles.map(t => t.col));
       const affectedRows = new Set(cascadeResult.gravity.newTiles.map(t => t.row));
-      // Also include rows where tiles fell TO
       for (const ft of cascadeResult.gravity.fallingTiles) {
         affectedRows.add(ft.row);
         affectedCols.add(ft.col);
       }
 
-      let hadClears = false;
+      // Read latest state from refs AFTER the previous gravity committed
+      const { grid, tileStates: latestTiles } = engine.getLatestState();
+      if (!grid) break;
 
-      // 1. Match-3 clusters (Candy Crush mechanic — most frequent cascade source)
-      // Cap at MAX_CASCADE_WORDS_PER_LEVEL to prevent overwhelming chain reactions
+      let totalClearsThisLevel = 0;
+
+      // 1. Match-3 clusters
       const allClusters = detectMatch3Clusters(grid, latestTiles, affectedCols);
       const clusters = allClusters.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
       if (clusters.length > 0) {
         chainLevel++;
-        hadClears = true;
         for (const cluster of clusters) {
           const bonus = Math.round(cluster.cells.length * 3 * cascadeBonusMult * chainLevel);
-          engine.submitWord(cluster.cells, `[${cluster.letter}×${cluster.cells.length}]`, bonus);
+          const result = engine.submitWord(cluster.cells, `[${cluster.letter}×${cluster.cells.length}]`, bonus);
+          totalClearsThisLevel += result.clearedTiles.length;
+          foundWordsSet.add(`[${cluster.letter}×${cluster.cells.length}]`);
         }
       }
 
@@ -253,12 +253,12 @@ export function BlastGame({
         grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
       );
       if (vertWords.length > 0) {
-        if (!hadClears) chainLevel++;
-        hadClears = true;
+        if (totalClearsThisLevel === 0) chainLevel++;
         const toClear = vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
         for (const vw of toClear) {
           const bonus = Math.round(vw.word.length * vw.word.length * cascadeBonusMult * chainLevel);
-          engine.submitWord(vw.path, vw.word, bonus);
+          const result = engine.submitWord(vw.path, vw.word, bonus);
+          totalClearsThisLevel += result.clearedTiles.length;
           foundWordsSet.add(vw.word);
         }
       }
@@ -268,22 +268,23 @@ export function BlastGame({
         grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
       );
       if (horizWords.length > 0) {
-        if (!hadClears) chainLevel++;
-        hadClears = true;
+        if (totalClearsThisLevel === 0) chainLevel++;
         const toClear = horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
         for (const hw of toClear) {
           const bonus = Math.round(hw.word.length * hw.word.length * cascadeBonusMult * chainLevel);
-          engine.submitWord(hw.path, hw.word, bonus);
+          const result = engine.submitWord(hw.path, hw.word, bonus);
+          totalClearsThisLevel += result.clearedTiles.length;
           foundWordsSet.add(hw.word);
         }
       }
 
-      if (!hadClears) break;
+      // Break if nothing was actually cleared this iteration
+      if (totalClearsThisLevel === 0) break;
 
       // Cascade chain sound
       sounds.playCascadeChain(chainLevel);
 
-      // Chain score fly — show chain multiplier at grid center
+      // Chain score fly
       const chainFlyId = `chain-${++flyIdRef.current}`;
       const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
       const chainBonus = chainLevel * 5;
@@ -299,7 +300,7 @@ export function BlastGame({
         vibrateBlastCascade();
       }
 
-      // Cascade again with chain acceleration
+      // Run gravity for this chain level, then animate + commit before next iteration
       cascadeResult = engine.startCascade();
       await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
       cascadeResult.commit?.();
