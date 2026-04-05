@@ -230,7 +230,7 @@ describe('InteractiveMascot', () => {
         vi.advanceTimersByTime(500);
       });
 
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/main.gif');
+      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/winner.gif');
 
       vi.useRealTimers();
     });
