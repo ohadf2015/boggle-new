@@ -57,7 +57,7 @@ describe('InteractiveMascot', () => {
     it('renders the correct image source for variant', () => {
       render(<InteractiveMascot variant="thinking" />);
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/study.gif');
+      expect(img).toHaveAttribute('src', '/mascot/question.gif');
     });
   });
 
@@ -86,14 +86,14 @@ describe('InteractiveMascot', () => {
       render(<InteractiveMascot variant="confused" />);
       const img = screen.getByRole('img');
       // 'confused' falls back to 'thinking' (which is now a GIF variant)
-      expect(img).toHaveAttribute('src', '/mascot/study.gif');
+      expect(img).toHaveAttribute('src', '/mascot/question.gif');
     });
 
     it('renders activity variant mapped to GIF (eating_pizza → happy)', () => {
       render(<InteractiveMascot variant="eating_pizza" />);
       const img = screen.getByRole('img');
-      // eating_pizza maps to happy GIF
-      expect(img).toHaveAttribute('src', '/mascot/main.gif');
+      // eating_pizza maps to happy → winner.gif
+      expect(img).toHaveAttribute('src', '/mascot/winner.gif');
     });
 
     it('renders gaming variant with GIF', () => {
@@ -150,7 +150,7 @@ describe('InteractiveMascot', () => {
       fireEvent.mouseLeave(button);
 
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/main.gif');
+      expect(img).toHaveAttribute('src', '/mascot/winner.gif');
     });
 
     it('calls onHover callback', () => {
@@ -373,7 +373,7 @@ describe('InteractiveMascotWithEntrance', () => {
       />
     );
     const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', '/mascot/study.gif');
+    expect(img).toHaveAttribute('src', '/mascot/question.gif');
   });
 
   it('accepts delay prop', () => {
