@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
 
@@ -340,6 +341,23 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain'))}
                     {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain'))}
                   </p>
+                </motion.div>
+
+                {/* Excited mascot */}
+                <motion.div
+                  initial={{ scale: 0, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
+                >
+                  <Image
+                    src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.gif' : '/mascot/flexing.gif'}
+                    alt=""
+                    width={80}
+                    height={80}
+                    className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                    unoptimized
+                    aria-hidden="true"
+                  />
                 </motion.div>
 
                 {/* Tap to dismiss */}

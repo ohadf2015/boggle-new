@@ -25,7 +25,7 @@ describe('GIF Quality Verification', () => {
 
   it('should maintain reasonable file sizes (optimized: 500KB-2.2MB)', () => {
     // GIVEN: Mascot GIFs exist (optimized for web delivery)
-    const gifs = ['main-nobg.gif', 'play-nobg.gif', 'study-nobg.gif', 'celebration-nobg.gif'];
+    const gifs = ['winner.gif', 'play.gif', 'question.gif', 'celebration.gif'];
 
     gifs.forEach((gifName) => {
       const gifPath = path.join(MASCOT_DIR, gifName);

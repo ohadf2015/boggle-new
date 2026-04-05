@@ -1058,7 +1058,7 @@ const BattleScene: React.FC = () => {
             }}
           >
             <AnimatedImage
-              src={staticFile('mascot/flexing-nobg.gif')}
+              src={staticFile('mascot/flexing.gif')}
               width={130}
               height={130}
               fit="contain"
@@ -1250,7 +1250,7 @@ const CTAScene: React.FC = () => {
           }}
         >
           <AnimatedImage
-            src={staticFile('mascot/celebration-nobg.gif')}
+            src={staticFile('mascot/celebration.gif')}
             width={280}
             height={280}
             fit="contain"

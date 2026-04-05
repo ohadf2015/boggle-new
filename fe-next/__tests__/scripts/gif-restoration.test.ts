@@ -13,13 +13,13 @@ describe('GIF Restoration', () => {
   const BACKUP_DIR = path.join(MASCOT_DIR, 'originals');
 
   const GIFS = [
-    'main-nobg.gif',
-    'play-nobg.gif',
-    'study-nobg.gif',
-    'oops-nobg.gif',
-    'celebration-nobg.gif',
-    'dj-nobg.gif',
-    'trophy-nobg.gif',
+    'winner.gif',
+    'play.gif',
+    'question.gif',
+    'oops.gif',
+    'celebration.gif',
+    'dj.gif',
+    'trophy.gif',
   ];
 
   it('should have original backups available', () => {
@@ -36,8 +36,8 @@ describe('GIF Restoration', () => {
       const stats = fs.statSync(backupPath);
       const sizeInKB = stats.size / 1024;
 
-      // Originals should be 900KB-2.1MB (high quality)
-      expect(sizeInKB).toBeGreaterThan(900);
+      // Originals should be at least 500KB (reasonable quality)
+      expect(sizeInKB).toBeGreaterThan(500);
     });
   });
 

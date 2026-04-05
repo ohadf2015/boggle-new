@@ -7,56 +7,67 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
  * Mascot variants - GIF-ONLY
- * All mascot images are animated GIFs with backgrounds removed
+ * All mascot images are animated GIFs in 3 background categories:
+ * - dark: Dark bg matching app's neo-navy — renders directly, blends seamlessly
+ * - white: White bg — auto-clipped to circle with neo border
+ * - nobg: Transparent bg — works on any surface
  */
 export type MascotVariant =
-  | 'happy'       // main.gif - Happy/idle states
-  | 'gaming'      // play.gif - Gaming/active/energetic states
-  | 'thinking'    // study.gif - Thinking/focused/waiting states
-  | 'oops'        // oops.gif - Error/mistake/surprised states
-  | 'celebration' // celebration.gif - Victory/cheering states
-  | 'dj'          // dj.gif - Party/music/dancing states
-  | 'trophy'      // trophy.gif - Winner/achievement states
-  | 'panic'       // panic.gif - Panicking/time pressure
-  | 'crying'      // crying.gif - Sad/losing/defeated
-  | 'onfire'      // onfire.gif - On fire/hot streak
-  | 'bored'       // bored.gif - Bored/waiting/idle
-  | 'mindblown'   // mindblown.gif - Amazed/shocked
-  | 'encouraging' // encouraging.gif - Supportive/cheering on
-  | 'explorer'    // explorer.gif - Adventuring/discovering
-  | 'flexing'     // flexing.gif - Proud/strong/earned it
-  | 'scared'      // scared.gif - Frightened/nervous
-  | 'shopkeeper'  // shopkeeper.gif - Shop/store context
-  | 'spectating'  // spectating.gif - Watching/observing
-  | 'waving'      // waving.gif - Greeting/welcoming
-  | 'powerup'     // powerup.gif - Power-up activation
-  | 'sleepy'      // sleepy.gif - Sleeping/idle timeout
-  | 'waiting'     // waiting.gif - Loading/queue/patience
-  | 'gg'          // gg.gif - Game over/good game
-  | 'scholar'     // scholar.gif - Education/learning
-  | 'rage'        // rage.gif - Competitive anger/losing badly
-  | 'bomber'      // bomber.gif - Blast mode
-  | 'winner'      // winner.gif - Victory/winning
-  | 'knight'      // knight.gif - Battle/ranked/combat
-  | 'sad'         // sad.gif - Loss/disappointment
-  | 'ghostly';    // ghostly.gif - Spooky/halloween/sleepy
+  | 'happy'       // winner.gif (dark) - Happy/idle states
+  | 'gaming'      // play.gif (dark) - Gaming/active/energetic states
+  | 'thinking'    // question.gif (dark) - Thinking/focused/waiting states
+  | 'oops'        // oops.gif (dark) - Error/mistake/surprised states
+  | 'celebration' // celebration.gif (dark) - Victory/cheering states
+  | 'dj'          // dj.gif (dark) - Party/music/dancing states
+  | 'trophy'      // trophy.gif (dark) - Winner/achievement states
+  | 'panic'       // panic.gif (dark) - Panicking/time pressure
+  | 'crying'      // crying.gif (dark) - Sad/losing/defeated
+  | 'onfire'      // onfire-nobg.gif (nobg) - On fire/hot streak
+  | 'bored'       // bored-nobg.gif (nobg) - Bored/waiting/idle
+  | 'mindblown'   // mindblown-nobg.gif (nobg) - Amazed/shocked
+  | 'encouraging' // encouraging.gif (dark) - Supportive/cheering on
+  | 'explorer'    // explorer.gif (dark) - Adventuring/discovering
+  | 'flexing'     // flexing.gif (dark) - Proud/strong/earned it
+  | 'scared'      // scared.gif (white) - Frightened/nervous
+  | 'shopkeeper'  // shopkeeper.gif (dark) - Shop/store context
+  | 'spectating'  // spectating.gif (dark) - Watching/observing
+  | 'waving'      // waving.gif (white) - Greeting/welcoming
+  | 'powerup'     // powerup-nobg.gif (nobg) - Power-up activation
+  | 'sleepy'      // ghostly.gif (dark) - Sleeping/idle timeout
+  | 'waiting'     // waiting.gif (dark) - Loading/queue/patience
+  | 'gg'          // gg.gif (dark) - Game over/good game
+  | 'scholar'     // scholar.gif (dark) - Education/learning
+  | 'rage'        // rage.gif (dark) - Competitive anger/losing badly
+  | 'bomber'      // bomber.gif (dark) - Blast mode
+  | 'winner'      // winner.gif (dark) - Victory/winning
+  | 'knight'      // knight.gif (dark) - Battle/ranked/combat
+  | 'sad'         // crying.gif (dark) - Loss/disappointment
+  | 'ghostly'     // ghostly.gif (dark) - Spooky/halloween/sleepy
+  | 'dance'       // dance.gif (dark) - Dancing/celebration
+  | 'question';   // question.gif (dark) - Confused/help needed
+
+/**
+ * Background type for each mascot GIF.
+ * Determines automatic rendering treatment.
+ */
+export type MascotBgType = 'dark' | 'white' | 'nobg';
 
 /**
  * Mascot GIF paths (ALL mascots use animated GIFs)
  */
 export const MASCOT_IMAGES: Record<MascotVariant, string> = {
-  happy: '/mascot/main.gif',
+  happy: '/mascot/winner.gif',
   gaming: '/mascot/play.gif',
-  thinking: '/mascot/study.gif',
+  thinking: '/mascot/question.gif',
   oops: '/mascot/oops.gif',
   celebration: '/mascot/celebration.gif',
   dj: '/mascot/dj.gif',
   trophy: '/mascot/trophy.gif',
   panic: '/mascot/panic.gif',
   crying: '/mascot/crying.gif',
-  onfire: '/mascot/onfire.gif',
-  bored: '/mascot/bored.gif',
-  mindblown: '/mascot/mindblown.gif',
+  onfire: '/mascot/onfire-nobg.gif',
+  bored: '/mascot/bored-nobg.gif',
+  mindblown: '/mascot/mindblown-nobg.gif',
   encouraging: '/mascot/encouraging.gif',
   explorer: '/mascot/explorer.gif',
   flexing: '/mascot/flexing.gif',
@@ -64,8 +75,8 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   shopkeeper: '/mascot/shopkeeper.gif',
   spectating: '/mascot/spectating.gif',
   waving: '/mascot/waving.gif',
-  powerup: '/mascot/powerup.gif',
-  sleepy: '/mascot/sleepy.gif',
+  powerup: '/mascot/powerup-nobg.gif',
+  sleepy: '/mascot/ghostly.gif',
   waiting: '/mascot/waiting.gif',
   gg: '/mascot/gg.gif',
   scholar: '/mascot/scholar.gif',
@@ -73,29 +84,72 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   bomber: '/mascot/bomber.gif',
   winner: '/mascot/winner.gif',
   knight: '/mascot/knight.gif',
-  sad: '/mascot/sad.gif',
+  sad: '/mascot/crying.gif',
   ghostly: '/mascot/ghostly.gif',
+  dance: '/mascot/dance.gif',
+  question: '/mascot/question.gif',
+};
+
+/**
+ * Background type for each mascot variant.
+ * - dark: Dark bg matching neo-navy — no clip needed, blends with app bg
+ * - white: White bg — auto-clipped to circle with neo border
+ * - nobg: Transparent — works on any surface without treatment
+ */
+export const MASCOT_BG_TYPE: Record<MascotVariant, MascotBgType> = {
+  happy: 'dark',
+  gaming: 'dark',
+  thinking: 'dark',
+  oops: 'dark',
+  celebration: 'dark',
+  dj: 'dark',
+  trophy: 'dark',
+  panic: 'dark',
+  crying: 'dark',
+  onfire: 'nobg',
+  bored: 'nobg',
+  mindblown: 'nobg',
+  encouraging: 'dark',
+  explorer: 'dark',
+  flexing: 'dark',
+  scared: 'white',
+  shopkeeper: 'dark',
+  spectating: 'dark',
+  waving: 'white',
+  powerup: 'nobg',
+  sleepy: 'dark',
+  waiting: 'dark',
+  gg: 'dark',
+  scholar: 'dark',
+  rage: 'dark',
+  bomber: 'dark',
+  winner: 'dark',
+  knight: 'dark',
+  sad: 'dark',
+  ghostly: 'dark',
+  dance: 'dark',
+  question: 'dark',
 };
 
 /**
  * Get the image path for a mascot variant.
- * All variants use animated GIFs.
- *
- * @param variant - The mascot variant
- * @returns GIF image path
  */
 export function getMascotImagePath(variant: MascotVariant): string {
   return MASCOT_IMAGES[variant];
 }
 
 /**
+ * Get the background type for a mascot variant.
+ */
+export function getMascotBgType(variant: MascotVariant): MascotBgType {
+  return MASCOT_BG_TYPE[variant];
+}
+
+/**
  * Check if a variant uses an animated GIF
  * All mascot variants use GIFs.
- *
- * @param variant - The mascot variant (unused, kept for backward compatibility)
- * @returns Always true (all mascots are GIFs)
  */
-export function isGifVariant(variant: MascotVariant): boolean {
+export function isGifVariant(_variant: MascotVariant): boolean {
   return true;
 }
 
@@ -496,6 +550,22 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
       },
     },
+    // Dance: Rhythmic bounce
+    dance: {
+      animate: {
+        y: [0, -8, 0, -5, 0],
+        rotate: [0, -4, 4, -2, 0],
+        transition: { duration: 0.7, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Question: Curious tilt
+    question: {
+      animate: {
+        y: [0, -4, 0],
+        rotate: [0, 3, -3, 0],
+        transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
   };
 
   return animations[variant];
@@ -518,6 +588,26 @@ function getAnimationVariants(variant: MascotVariant): Variants {
  * // Oops state - errors, mistakes, surprises
  * <Mascot variant="oops" size="sm" animated />
  */
+/**
+ * Resolve clip/border/bg based on mascot background type.
+ * - dark: no clip (blends with app bg)
+ * - white: circle clip + pink border
+ * - nobg: no clip (transparent works everywhere)
+ */
+function getAutoStyle(variant: MascotVariant, clipShape?: MascotClipShape, clipBorder?: MascotBorderColor, clipBg?: string) {
+  const bgType = getMascotBgType(variant);
+
+  if (clipShape !== undefined && clipShape !== 'none') {
+    return { shape: clipShape, border: clipBorder ?? 'pink', bg: clipBg ?? 'bg-neo-navy' };
+  }
+
+  if (bgType === 'white') {
+    return { shape: 'circle' as MascotClipShape, border: clipBorder ?? 'pink', bg: clipBg ?? 'bg-white' };
+  }
+
+  return { shape: (clipShape ?? 'none') as MascotClipShape, border: clipBorder ?? 'none', bg: clipBg ?? '' };
+}
+
 export const Mascot = memo(function Mascot({
   variant,
   size = 'md',
@@ -525,9 +615,9 @@ export const Mascot = memo(function Mascot({
   className = '',
   priority = false,
   alt,
-  clipShape = 'none',
-  clipBorder = 'none',
-  clipBg = 'bg-neo-navy',
+  clipShape,
+  clipBorder,
+  clipBg,
 }: MascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -541,7 +631,8 @@ export const Mascot = memo(function Mascot({
   const shouldPrioritize = priority ?? (variant === 'happy');
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
 
-  const hasClip = clipShape !== 'none';
+  const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);
+  const hasClip = shape !== 'none';
 
   return (
     <motion.div
@@ -550,7 +641,7 @@ export const Mascot = memo(function Mascot({
       animate={shouldAnimate ? 'animate' : undefined}
     >
       <div
-        className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}
+        className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
       >
         <Image
           src={imageSrc}
@@ -578,9 +669,9 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   priority = false,
   alt,
   delay = 0,
-  clipShape = 'none',
-  clipBorder = 'none',
-  clipBg = 'bg-neo-navy',
+  clipShape,
+  clipBorder,
+  clipBg,
 }: MascotProps & { delay?: number }) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -594,7 +685,8 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const shouldPrioritize = priority ?? (variant === 'happy');
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
 
-  const hasClip = clipShape !== 'none';
+  const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);
+  const hasClip = shape !== 'none';
 
   return (
     <motion.div
@@ -614,7 +706,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
         animate={shouldAnimate ? 'animate' : undefined}
       >
         <div
-          className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}
+          className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
         >
           <Image
             src={imageSrc}

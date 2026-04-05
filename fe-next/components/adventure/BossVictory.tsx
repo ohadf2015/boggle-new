@@ -10,6 +10,7 @@
 
 import { memo, useMemo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import Image from 'next/image';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -292,6 +293,24 @@ const BossVictory = memo<BossVictoryProps>(
                 </p>
               </div>
             </div>
+
+            {/* Mascot reaction */}
+            <AdaptiveMotion.div
+              className="flex justify-center mb-4"
+              initial={{ scale: 0, rotate: isVictory ? 10 : -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 14 }}
+            >
+              <Image
+                src={isVictory ? '/mascot/flexing.gif' : '/mascot/encouraging.gif'}
+                alt=""
+                width={80}
+                height={80}
+                className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                unoptimized
+                aria-hidden="true"
+              />
+            </AdaptiveMotion.div>
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">

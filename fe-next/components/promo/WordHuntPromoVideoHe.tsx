@@ -162,7 +162,7 @@ const HookScene: React.FC = () => {
         />
         <div style={{ marginTop: 50, transform: `scale(${mIn})`, opacity: mIn }}>
           <AnimatedImage
-            src={staticFile('mascot/play-nobg.gif')}
+            src={staticFile('mascot/play.gif')}
             width={280}
             height={280}
             fit="contain"
@@ -429,7 +429,7 @@ const VSScene: React.FC = () => {
             frame={frame}
             fps={fps}
             fromX={-400}
-            mascotSrc="mascot/flexing-nobg.gif"
+            mascotSrc="mascot/flexing.gif"
           />
           <div
             style={{
@@ -586,7 +586,7 @@ const StatsScene: React.FC = () => {
         </div>
         <div style={{ marginTop: 45, transform: `scale(${mIn})`, opacity: mIn > 0.01 ? mIn : 0 }}>
           <AnimatedImage
-            src={staticFile('mascot/celebration-nobg.gif')}
+            src={staticFile('mascot/celebration.gif')}
             width={250}
             height={250}
             fit="contain"
@@ -697,7 +697,7 @@ const CTAScene: React.FC = () => {
         </div>
         <div style={{ marginTop: 50, transform: `scale(${mIn})`, opacity: mIn }}>
           <AnimatedImage
-            src={staticFile('mascot/waving-nobg.gif')}
+            src={staticFile('mascot/waving.gif')}
             width={260}
             height={260}
             fit="contain"

@@ -92,16 +92,21 @@ export const CelebrationMascot = memo(function CelebrationMascot({
   className = '',
   priority = false,
   alt,
-  clipShape = 'circle',
-  clipBorder = 'white',
-  clipBg = 'bg-neo-navy',
+  clipShape,
+  clipBorder,
+  clipBg,
 }: CelebrationMascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   const imageSrc = VARIANT_PATHS[variant];
   const altText = alt || `Lexi mascot - ${variant}`;
-  const hasClip = clipShape !== 'none';
+
+  // Both celebration variants use dark-bg GIFs — auto-resolve styling
+  const resolvedShape = clipShape ?? 'none';
+  const resolvedBorder = clipBorder ?? 'none';
+  const resolvedBg = clipBg ?? '';
+  const hasClip = resolvedShape !== 'none';
 
   return (
     <AdaptiveMotion.div
@@ -121,7 +126,7 @@ export const CelebrationMascot = memo(function CelebrationMascot({
         ease: 'easeInOut',
       }}
     >
-      <div className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}>
+      <div className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
         <Image
           src={imageSrc}
           alt={altText}

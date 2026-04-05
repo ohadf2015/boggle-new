@@ -16,6 +16,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -211,6 +212,24 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
               : '0 0 30px rgba(191, 255, 0, 0.5)',
           }}
         >
+          {/* Celebration mascot */}
+          <motion.div
+            className="flex justify-center mb-2"
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
+          >
+            <Image
+              src="/mascot/celebration.gif"
+              alt=""
+              width={64}
+              height={64}
+              className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+              unoptimized
+              aria-hidden="true"
+            />
+          </motion.div>
+
           {/* Achievement Icon */}
           <motion.div
             initial={{ scale: 0 }}

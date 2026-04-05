@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ScoreCountUp } from './ScoreCountUp';
 import { StatsCardGrid, type StatCardItem } from './StatsCardGrid';
@@ -103,6 +104,24 @@ export function ResultsHero({
         >
           {outcomeLabel}
         </motion.h1>
+      </motion.div>
+
+      {/* Mascot reaction */}
+      <motion.div
+        initial={{ scale: 0, rotate: -15 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 12 }}
+        className="flex justify-center"
+      >
+        <Image
+          src={variant === 'win' ? '/mascot/celebration.gif' : variant === 'loss' ? '/mascot/encouraging.gif' : '/mascot/flexing.gif'}
+          alt=""
+          width={72}
+          height={72}
+          className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+          unoptimized
+          aria-hidden="true"
+        />
       </motion.div>
 
       {/* Subtitle (e.g. puzzle number) */}

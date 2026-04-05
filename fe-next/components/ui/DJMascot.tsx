@@ -80,13 +80,13 @@ export const DJMascot = memo(function DJMascot({
         ease: 'easeInOut',
       }}
     >
-      <div className="w-full h-full rounded-full overflow-hidden border-3 border-neo-pink bg-neo-navy">
+      <div className="w-full h-full">
         <Image
           src="/mascot/dj.gif"
           alt={altText}
           width={SIZE_PIXELS[size]}
           height={SIZE_PIXELS[size]}
-          className="object-contain scale-110 drop-shadow-lg"
+          className="object-contain drop-shadow-lg"
           priority={priority}
           unoptimized
         />

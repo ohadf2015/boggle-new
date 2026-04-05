@@ -44,7 +44,16 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
         />
       </div>
 
-      {/* Offline Icon */}
+      {/* Mascot + Offline Icon */}
+      <Image
+        src="/mascot/sad.gif"
+        alt=""
+        width={96}
+        height={96}
+        className="mb-4 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+        unoptimized
+        aria-hidden="true"
+      />
       <div className="mb-6 rounded-full bg-neo-orange/20 p-6">
         <WifiOff className="h-16 w-16 text-neo-orange" aria-hidden="true" />
       </div>

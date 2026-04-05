@@ -60,7 +60,7 @@ export const DEFAULT_BLAST_CONFIG: BlastGameConfig = {
   specialTileChance: 0.15,
   language: 'en',
   difficulty: 'medium',
-  boardClearMode: 'refill',
+  boardClearMode: 'shrink',
 };
 
 export type BlastPhase = 'ready' | 'waveIntro' | 'playing' | 'waveTransition' | 'results';
@@ -233,9 +233,9 @@ export const TREASURE_GEM_BONUS_MOVES = 2;
 // ==================== Cascade Chain Constants ====================
 
 /** Maximum number of auto-cascade chain levels before stopping */
-export const MAX_CASCADE_CHAIN = 5;
+export const MAX_CASCADE_CHAIN = 2;
 /** Maximum words/clusters cleared per cascade level */
-export const MAX_CASCADE_WORDS_PER_LEVEL = 3;
+export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 3;
 /** Delay (ms) before scanning for cascade words after grid settles.

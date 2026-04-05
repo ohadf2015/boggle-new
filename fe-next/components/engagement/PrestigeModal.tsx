@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
@@ -123,6 +124,15 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center gap-4 py-6"
               >
+                <Image
+                  src="/mascot/powerup.gif"
+                  alt=""
+                  width={80}
+                  height={80}
+                  className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                  unoptimized
+                  aria-hidden="true"
+                />
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.5, repeat: 3 }}

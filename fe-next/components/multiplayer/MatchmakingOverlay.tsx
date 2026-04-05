@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import type { MatchmakingOpponent, MatchmakingStatus } from '@/hooks/useMatchmaking';
 import { getRankTier } from '@/shared/utils/eloRating';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -47,8 +48,16 @@ export function MatchmakingOverlay({
       <div ref={dialogRef} className="mx-4 w-full max-w-md rounded-neo border-neo bg-neo-navy p-6 shadow-hard-lg">
         {status === 'searching' && (
           <div className="flex flex-col items-center gap-4">
-            {/* Spinner */}
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-neo-lime/30 border-t-neo-lime" />
+            {/* Searching mascot */}
+            <Image
+              src="/mascot/spectating.gif"
+              alt=""
+              width={80}
+              height={80}
+              className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+              unoptimized
+              aria-hidden="true"
+            />
 
             <h2 className="font-neo-display text-xl text-neo-white">
               {t('matchmaking.findingOpponent')}

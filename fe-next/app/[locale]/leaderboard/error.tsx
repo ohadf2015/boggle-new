@@ -47,7 +47,8 @@ export default function LeaderboardError({
     <div className="flex-1 bg-neo-navy">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center py-12">
-          <div className="mx-auto text-6xl text-gray-600 mb-4">🏆</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/mascot/oops.gif" alt="" width={96} height={96} className="mx-auto mb-4 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" aria-hidden="true" />
           <h2 className="text-2xl font-bold text-white mb-2">
             {t(locale, 'errors.failedToLoadLeaderboard')}
           </h2>

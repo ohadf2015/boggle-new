@@ -261,7 +261,7 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/mascot/waving-nobg.gif');
+    expect(html).toContain('/mascot/waving.gif');
     expect(html).toContain('alt="Lexi"');
   });
 
@@ -296,7 +296,7 @@ describe('generateReengagementEmailHtml', () => {
     // CTA link
     expect(html).toContain('cta-link');
     // Mascot image (waving gif)
-    expect(html).toContain('waving-nobg.gif');
+    expect(html).toContain('waving.gif');
     // Accessible mascot alt text
     expect(html).toContain('alt="Lexi"');
   });

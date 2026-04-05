@@ -12,7 +12,8 @@
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { PartyPopper } from 'lucide-react';
+import Image from 'next/image';
+
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -101,15 +102,23 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
-            {/* Celebration Emoji */}
-            <AdaptiveMotion.span
-              className="block text-6xl mb-4"
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
-              transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+            {/* Celebration mascot */}
+            <AdaptiveMotion.div
+              className="mb-4"
+              initial={{ scale: 0, rotate: -15 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
             >
-              <PartyPopper className="w-8 h-8" />
-            </AdaptiveMotion.span>
+              <Image
+                src="/mascot/celebration.gif"
+                alt=""
+                width={96}
+                height={96}
+                className="mx-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                unoptimized
+                aria-hidden="true"
+              />
+            </AdaptiveMotion.div>
 
             {/* Title */}
             <h2

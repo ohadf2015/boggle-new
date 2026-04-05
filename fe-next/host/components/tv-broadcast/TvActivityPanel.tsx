@@ -338,7 +338,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
             aria-hidden="true"
           >
             <Image
-              src="/mascot/celebration-nobg.gif"
+              src="/mascot/celebration.gif"
               alt=""
               width={100}
               height={100}

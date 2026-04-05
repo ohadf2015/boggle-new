@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Trophy, Flame, X, TrendingUp, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { Trophy, Flame, X, TrendingUp, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -141,15 +142,15 @@ export default function WelcomeBackCard({
             {/* Header with dismiss button */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <Sparkles className={cn(
-                    'w-6 h-6',
-                    isDarkMode ? 'text-neo-lime' : 'text-neo-purple'
-                  )} />
-                </motion.div>
+                <Image
+                  src="/mascot/encouraging.gif"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                  unoptimized
+                  aria-hidden="true"
+                />
                 <h3 className={cn(
                   'text-lg font-black uppercase',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'

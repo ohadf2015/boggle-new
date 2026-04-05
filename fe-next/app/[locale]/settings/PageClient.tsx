@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -201,6 +202,15 @@ export default function SettingsPageClient(): React.JSX.Element {
           )}>
             {t('settings.title')}
           </h1>
+          <Image
+            src="/mascot/shopkeeper.gif"
+            alt=""
+            width={48}
+            height={48}
+            className="ms-auto drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+            unoptimized
+            aria-hidden="true"
+          />
         </motion.div>
 
         {/* Settings Sections */}

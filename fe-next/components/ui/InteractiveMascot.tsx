@@ -4,7 +4,7 @@ import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MascotVariant, getMascotImagePath, isGifVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
+import { MascotVariant, getMascotImagePath, getMascotBgType, isGifVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
 import {
   getBaseVariant,
   type ExtendedMascotVariant,
@@ -44,6 +44,8 @@ const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVar
   spectating: 'onfire',   // Spectating → On Fire (get hyped)
   waving: 'happy',        // Waving → Happy (greet)
   powerup: 'onfire',      // Powerup → On Fire (unleash)
+  dance: 'celebration',   // Dance → Celebration (party!)
+  question: 'happy',      // Question → Happy (figured it out)
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
@@ -68,6 +70,8 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVar
   spectating: 'celebration', // Spectating → Celebration (impressed!)
   waving: 'celebration',  // Waving → Celebration (let's go!)
   powerup: 'trophy',      // Powerup → Trophy (powered up!)
+  dance: 'dj',            // Dance → DJ (mix it up!)
+  question: 'celebration', // Question → Celebration (eureka!)
 };
 
 const CLIP_CLASSES: Record<MascotClipShape, string> = {
@@ -375,6 +379,18 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       opacity: [1, 0.7, 1],
       transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
     },
+    // Dance: Rhythmic bounce
+    dance: {
+      y: [0, -8, 0, -5, 0],
+      rotate: [0, -4, 4, -2, 0],
+      transition: { duration: 0.7, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Question: Curious tilt
+    question: {
+      y: [0, -4, 0],
+      rotate: [0, 3, -3, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
   };
 
   const baseVariant = getBaseVariant(variant);
@@ -448,9 +464,9 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   onHover,
   tooltip,
   ariaLabel,
-  clipShape = 'circle',
-  clipBorder = 'white',
-  clipBg = 'bg-neo-navy',
+  clipShape,
+  clipBorder,
+  clipBg,
 }: InteractiveMascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -521,6 +537,18 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const altText = alt || ariaLabel || `Lexi mascot - ${currentVariant}`;
   const idleAnimation = useMemo(() => getIdleAnimation(currentVariant), [currentVariant]);
 
+  // Auto-resolve clip/border/bg based on mascot background type
+  const autoStyle = useMemo(() => {
+    const bgType = getMascotBgType(baseVariant);
+    if (clipShape !== undefined) {
+      return { shape: clipShape, border: clipBorder ?? 'pink' as MascotBorderColor, bg: clipBg ?? 'bg-neo-navy' };
+    }
+    if (bgType === 'white') {
+      return { shape: 'circle' as MascotClipShape, border: clipBorder ?? 'pink' as MascotBorderColor, bg: clipBg ?? 'bg-white' };
+    }
+    return { shape: 'none' as MascotClipShape, border: clipBorder ?? 'none' as MascotBorderColor, bg: clipBg ?? '' };
+  }, [baseVariant, clipShape, clipBorder, clipBg]);
+
   const handleMouseEnter = useCallback(() => {
     if (enableHover) {
       setIsHovered(true);
@@ -589,13 +617,13 @@ export const InteractiveMascot = memo(function InteractiveMascot({
               transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="w-full h-full"
             >
-              <div className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${clipShape !== 'none' ? clipBg : ''}`}>
+              <div className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
                 <Image
                   src={imageSrc}
                   alt={altText}
                   width={SIZE_PIXELS[size]}
                   height={SIZE_PIXELS[size]}
-                  className={`object-contain ${clipShape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                  className={`object-contain ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
                   priority={priority}
                   fetchPriority={fetchPriority}
                   unoptimized={isGif}

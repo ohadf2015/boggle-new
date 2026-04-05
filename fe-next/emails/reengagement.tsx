@@ -222,7 +222,7 @@ export default function ReengagementEmail({
   const logoUrl = language === 'he'
     ? `${baseUrl}/logos/lexiclash_logo_hebrew-min.webp`
     : `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
-  const mascotUrl = `${baseUrl}/mascot/waving-nobg.gif`;
+  const mascotUrl = `${baseUrl}/mascot/waving.gif`;
 
   // Build tile indices — RTL reverses which tile gets the letter
   const tiles = Array.from({ length: WORD_TILE_COUNT }, (_, i) => {

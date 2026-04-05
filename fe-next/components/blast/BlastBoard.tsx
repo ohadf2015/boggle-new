@@ -190,15 +190,7 @@ export const BlastBoard = memo(function BlastBoard({
               );
             }
 
-            // Skip rendering overlay for standard unselected tiles only when no animation active
-            if (!animLookup && tile.type === 'standard' && !isSelected && !tile.isCleared) {
-              return (
-                <div
-                  key={key}
-                  className="aspect-square"
-                />
-              );
-            }
+            // Always render BlastTile for non-cleared tiles so standard tiles stay visible
 
             const letter = grid[tile.row]?.[tile.col] ?? '';
             const cellHeight = containerWidth / gridSize;

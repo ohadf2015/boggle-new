@@ -92,6 +92,18 @@ export const BASE_VARIANTS: MascotVariant[] = [
   'spectating',
   'waving',
   'powerup',
+  'sleepy',
+  'waiting',
+  'gg',
+  'scholar',
+  'rage',
+  'bomber',
+  'winner',
+  'knight',
+  'sad',
+  'ghostly',
+  'dance',
+  'question',
 ];
 
 /**

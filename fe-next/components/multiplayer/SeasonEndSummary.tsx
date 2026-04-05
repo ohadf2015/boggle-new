@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { calculateSoftReset } from '@/lib/seasons';
 
@@ -48,6 +49,21 @@ export const SeasonEndSummary: React.FC<SeasonEndSummaryProps> = ({
           transition={{ type: 'spring', damping: 20 }}
         >
           <div className="text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 14 }}
+            >
+              <Image
+                src="/mascot/trophy.gif"
+                alt=""
+                width={80}
+                height={80}
+                className="mx-auto mb-2 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                unoptimized
+                aria-hidden="true"
+              />
+            </motion.div>
             <h2 className="font-neo-display text-2xl text-neo-lime">
               {seasonName}
             </h2>

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RankTier } from '@/shared/utils/eloRating';
 
@@ -108,6 +109,24 @@ export function RankUpCinematic({ from, to, onDismiss }: RankUpCinematicProps) {
         >
           {t('multiplayer.welcomeToTier', { tier: to.name })}
         </motion.h2>
+
+        {/* Celebration mascot */}
+        <motion.div
+          className="mt-6"
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 12 }}
+        >
+          <Image
+            src="/mascot/celebration.gif"
+            alt=""
+            width={120}
+            height={120}
+            className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]"
+            unoptimized
+            aria-hidden="true"
+          />
+        </motion.div>
       </motion.div>
     </AnimatePresence>
   );

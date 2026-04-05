@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EnhancedButton } from './EnhancedButton';
@@ -43,6 +44,8 @@ export interface EnhancedEmptyStateProps {
   reduceMotion?: boolean;
   /** Custom className */
   className?: string;
+  /** Optional mascot GIF path (e.g. '/mascot/explorer.gif') */
+  mascotSrc?: string;
 }
 
 const iconComponents = {
@@ -62,6 +65,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
   compact = false,
   reduceMotion = false,
   className,
+  mascotSrc,
 }) => {
   const IconComponent = typeof icon === 'string' ? iconComponents[icon as keyof typeof iconComponents] : null;
 
@@ -95,47 +99,64 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
       role="status"
       aria-live="polite"
     >
-      {/* Icon Container */}
-      <motion.div
-        className={cn(
-          'relative flex items-center justify-center rounded-neo-lg border-4 border-neo-black shadow-hard mb-6',
-          compact ? 'w-16 h-16' : 'w-24 h-24',
-          'bg-gradient-to-br from-neo-lime to-neo-lime-hover'
-        )}
-        variants={reduceMotion ? {} : itemVariants}
-        whileHover={reduceMotion ? {} : { scale: 1.05, rotate: [-2, 2, 0] }}
-        transition={{ type: 'spring', stiffness: 300 }}
-      >
-        {IconComponent ? (
-          <IconComponent
-            className={cn(
-              'text-neo-black',
-              compact ? 'w-8 h-8' : 'w-12 h-12'
-            )}
+      {/* Icon or Mascot */}
+      {mascotSrc ? (
+        <motion.div
+          className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
+          variants={reduceMotion ? {} : itemVariants}
+        >
+          <Image
+            src={mascotSrc}
+            alt=""
+            width={compact ? 64 : 96}
+            height={compact ? 64 : 96}
+            className="object-contain drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+            unoptimized
             aria-hidden="true"
           />
-        ) : (
-          <div className={cn('text-neo-black', compact ? 'w-8 h-8' : 'w-12 h-12')}>
-            {icon}
-          </div>
-        )}
-        
-        {/* Decorative sparkles */}
-        {!reduceMotion && !compact && (
-          <>
-            <motion.div
-              className="absolute -top-2 -right-2 w-4 h-4 bg-neo-pink rounded-full border-2 border-neo-black"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
+        </motion.div>
+      ) : (
+        <motion.div
+          className={cn(
+            'relative flex items-center justify-center rounded-neo-lg border-4 border-neo-black shadow-hard mb-6',
+            compact ? 'w-16 h-16' : 'w-24 h-24',
+            'bg-gradient-to-br from-neo-lime to-neo-lime-hover'
+          )}
+          variants={reduceMotion ? {} : itemVariants}
+          whileHover={reduceMotion ? {} : { scale: 1.05, rotate: [-2, 2, 0] }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          {IconComponent ? (
+            <IconComponent
+              className={cn(
+                'text-neo-black',
+                compact ? 'w-8 h-8' : 'w-12 h-12'
+              )}
+              aria-hidden="true"
             />
-            <motion.div
-              className="absolute -bottom-1 -left-2 w-3 h-3 bg-neo-cyan rounded-full border-2 border-neo-black"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-            />
-          </>
-        )}
-      </motion.div>
+          ) : (
+            <div className={cn('text-neo-black', compact ? 'w-8 h-8' : 'w-12 h-12')}>
+              {icon}
+            </div>
+          )}
+
+          {/* Decorative sparkles */}
+          {!reduceMotion && !compact && (
+            <>
+              <motion.div
+                className="absolute -top-2 -right-2 w-4 h-4 bg-neo-pink rounded-full border-2 border-neo-black"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute -bottom-1 -left-2 w-3 h-3 bg-neo-cyan rounded-full border-2 border-neo-black"
+                animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              />
+            </>
+          )}
+        </motion.div>
+      )}
 
       {/* Title */}
       <motion.h3
@@ -211,6 +232,7 @@ export const EmptySearchResults: React.FC<{
         : 'Try adjusting your search or filters to find what you\'re looking for.'
     }
     icon="search"
+    mascotSrc="/mascot/explorer.gif"
     action={
       onClearSearch
         ? {
@@ -289,6 +311,7 @@ export const ErrorState: React.FC<{
     title={title}
     description={description}
     icon="sad"
+    mascotSrc="/mascot/oops.gif"
     action={
       onRetry
         ? {
@@ -319,6 +342,7 @@ export const SuccessState: React.FC<{
     title={title}
     description={description}
     icon="sparkles"
+    mascotSrc="/mascot/celebration.gif"
     action={
       onContinue
         ? {
