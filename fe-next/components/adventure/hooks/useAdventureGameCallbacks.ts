@@ -109,13 +109,22 @@ export function useAdventureGameCallbacks(params: UseAdventureGameCallbacksParam
     }
 
     handleCinematicCompleteBase();
+
+    // After WorldUnlockCinematic for boss levels: auto-navigate to next world
+    // instead of showing the loot modal (the cinematic IS the transition)
+    if (showWorldUnlockCinematic && isBossLevel && gameStars > 0) {
+      const longWords = wordsFoundList.filter(w => w.length >= 6).length;
+      onLevelComplete(gameStars, gameScore, wordsFoundList.length, earnedGold, longWords);
+      return;
+    }
+
     if (storyBeat && gameStars > 0) {
       setShowStoryBeat(true);
     } else {
       showLootOrComplete();
     }
-  }, [showVictoryCinematic, isBossLevel, gameStars, worldNumber, showWorldUnlockCinematic,
-    handleCinematicCompleteBase, showWorldUnlock, t, storyBeat, showLootOrComplete, setShowStoryBeat]);
+  }, [showVictoryCinematic, isBossLevel, gameStars, gameScore, worldNumber, showWorldUnlockCinematic,
+    handleCinematicCompleteBase, showWorldUnlock, t, storyBeat, showLootOrComplete, setShowStoryBeat, onLevelComplete, earnedGold, wordsFoundList]);
 
   const handleContinue = useCallback(() => {
     if (gameStars >= 3) recordLevelPerfect();

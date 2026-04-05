@@ -100,7 +100,7 @@ export const PageLoader = memo(function PageLoader({
               size={spinnerSize.mascot}
               animated={true}
               priority={true}
-              clipBorder="cyan"
+              clipBorder="none"
             />
           </div>
         </div>

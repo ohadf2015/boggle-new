@@ -29,7 +29,7 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePort
       hoverVariant="excited"
       clickVariant="celebrating"
       clickAnimation="bounce"
-      clipBorder="lime"
+      clipBorder="none"
       delay={0.1}
     />
   );

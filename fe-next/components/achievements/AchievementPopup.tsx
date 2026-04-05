@@ -162,7 +162,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                     </span>
                   </div>
                   <div className="absolute -bottom-1 -right-1">
-                    <Mascot variant="trophy" size="xs" animated={false} clipBorder="lime" />
+                    <Mascot variant="trophy" size="xs" animated={false} clipBorder="none" />
                   </div>
                 </div>
               </motion.div>

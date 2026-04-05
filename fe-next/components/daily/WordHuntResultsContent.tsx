@@ -123,12 +123,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Performance mascot — reacts to how many words the player found */}
     {showFlexing && (
       <div className="flex justify-center mb-3">
-        <MascotWithEntrance variant="flexing" size="md" delay={0.2} clipBorder="cyan" />
+        <MascotWithEntrance variant="flexing" size="md" delay={0.2} clipBorder="none" />
       </div>
     )}
     {showEncouraging && (
       <div className="flex justify-center mb-3">
-        <MascotWithEntrance variant="encouraging" size="sm" delay={0.2} clipBorder="cyan" />
+        <MascotWithEntrance variant="encouraging" size="sm" delay={0.2} clipBorder="none" />
       </div>
     )}
 

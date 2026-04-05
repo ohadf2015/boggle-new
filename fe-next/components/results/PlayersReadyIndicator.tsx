@@ -204,7 +204,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
               className="overflow-hidden"
             >
               <div className="px-3 py-1.5 bg-emerald-500/10 border-t border-emerald-500/20 flex items-center justify-center gap-2">
-                <MascotWithEntrance variant="celebration" size="xs" delay={0.2} clipBorder="pink" />
+                <MascotWithEntrance variant="celebration" size="xs" delay={0.2} clipBorder="none" />
                 <p className="text-center text-xs font-bold text-emerald-300">
                   {isHost
                     ? (t('results.allReadyHostCanStart'))

@@ -190,41 +190,59 @@ const HeaderMenuDropdown = memo<HeaderMenuDropdownProps>(({
                             )}
                         </div>
 
-                        {/* ── Daily Missions ── */}
+                        {/* ── Daily Missions (expanded) ── */}
                         {isAuthenticated && missions.length > 0 && (
-                            <Link
-                                href={`/${language}/daily`}
-                                onClick={closeMenu}
-                                className={cn(
-                                    "flex items-center gap-3 px-5 py-2.5",
-                                    "bg-neo-navy-light/30 border-b-2 border-neo-white/10",
-                                    "hover:bg-neo-lime/10 transition-colors"
-                                )}
-                            >
-                                <Trophy className="w-4 h-4 text-neo-lime flex-shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-[10px] font-bold text-neo-white/50 mb-1">
-                                        {t('dailyMissions.title')}
+                            <div className="px-5 py-3 bg-neo-navy-light/30 border-b-2 border-neo-white/10 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Trophy className="w-4 h-4 text-neo-lime flex-shrink-0" />
+                                        <span className="text-[10px] font-black text-neo-white/50 uppercase tracking-widest">
+                                            {t('dailyMissions.title')}
+                                        </span>
                                     </div>
-                                    <div className="flex gap-1">
-                                        {missions.map((m) => (
-                                            <div
-                                                key={m.type}
-                                                className={cn(
-                                                    "h-1.5 flex-1 rounded-full",
-                                                    m.completed ? "bg-neo-lime" : "bg-neo-white/15"
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
+                                    <span className={cn(
+                                        "text-xs font-black",
+                                        isGrandSlam ? "text-neo-lime" : "text-neo-white/40"
+                                    )}>
+                                        {completedCount}/{missions.length}
+                                    </span>
                                 </div>
-                                <span className={cn(
-                                    "text-xs font-black",
-                                    isGrandSlam ? "text-neo-lime" : "text-neo-white/40"
-                                )}>
-                                    {completedCount}/{missions.length}
-                                </span>
-                            </Link>
+                                {missions.map((m) => (
+                                    <Link
+                                        key={m.type}
+                                        href={`/${language}${m.href}`}
+                                        onClick={closeMenu}
+                                        className={cn(
+                                            "flex items-center gap-2.5 px-3 py-2 rounded-neo",
+                                            m.completed
+                                                ? "bg-neo-lime/10 border border-neo-lime/30"
+                                                : "bg-neo-white/5 border border-neo-white/10 hover:border-neo-lime/30",
+                                            "transition-colors"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                            m.completed ? "border-neo-lime bg-neo-lime/20" : "border-neo-white/20"
+                                        )}>
+                                            {m.completed && <Check size={10} className="text-neo-lime" />}
+                                        </div>
+                                        <span className={cn(
+                                            "text-xs font-bold flex-1",
+                                            m.completed ? "text-neo-lime/80 line-through" : "text-neo-white/70"
+                                        )}>
+                                            {t(`dailyMissions.${m.type}`)}
+                                        </span>
+                                    </Link>
+                                ))}
+                                <Link
+                                    href={`/${language}/quests`}
+                                    onClick={closeMenu}
+                                    className="flex items-center justify-center gap-1.5 mt-1 text-[10px] font-bold text-neo-cyan hover:text-neo-lime transition-colors"
+                                >
+                                    <Sparkles size={10} />
+                                    {t('quests.title')}
+                                </Link>
+                            </div>
                         )}
 
                         {/* ── Quick Actions ── */}

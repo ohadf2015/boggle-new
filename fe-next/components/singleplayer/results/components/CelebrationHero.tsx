@@ -258,16 +258,16 @@ export const CelebrationHero = memo(function CelebrationHero({
                     variant="trophy"
                     size={compact ? 'sm' : 'lg'}
                     delay={0.6}
-                    clipShape="circle"
-                    clipBorder="cyan"
+                   
+                    clipBorder="none"
                   />
                 ) : (
                   <MascotWithEntrance
                     variant="happy"
                     size={compact ? 'sm' : 'lg'}
                     delay={0.6}
-                    clipShape="circle"
-                    clipBorder="cyan"
+                   
+                    clipBorder="none"
                   />
                 )}
               </div>

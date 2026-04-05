@@ -85,7 +85,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete }) => {
         transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
         className="flex items-center gap-3 mb-4"
       >
-        <Mascot variant="encouraging" size="sm" clipBorder="lime" />
+        <Mascot variant="encouraging" size="sm" clipBorder="none" />
         <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard-sm relative max-w-xs">
           <span className="font-bold text-neo-black text-sm">
             {t('onboarding.ftue.findMultipleWords')}

@@ -83,7 +83,7 @@ export function SpectatorBanner({
           </div>
 
           {/* Mascot: spectating */}
-          <Mascot variant="spectating" size="sm" className="flex-shrink-0" clipBorder="pink" />
+          <Mascot variant="spectating" size="sm" className="flex-shrink-0" clipBorder="none" />
 
           {/* Right: Action button */}
           {onRequestUpgrade && (

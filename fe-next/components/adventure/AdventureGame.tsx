@@ -250,6 +250,7 @@ const AdventureGame = memo<AdventureGameProps>(
       timeRemaining,
       totalTime: init.adjustedLevelConfig.timerSeconds,
       enabled: true,
+      isBossLevel,
     });
     useCrazyGamesLifecycle({
       isGameActive: isPlaying && entryPhase === 'playing' && !isPaused,

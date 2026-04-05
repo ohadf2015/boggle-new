@@ -1,8 +1,9 @@
 'use client';
 
-import { memo, useRef, useState, useEffect } from 'react';
-import { Skull, X } from 'lucide-react';
+import { memo, useRef, useState, useEffect, useMemo } from 'react';
+import { Skull } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 
 export interface LeaderboardPlayer {
@@ -19,6 +20,9 @@ export interface WordHuntMPLeaderboardProps {
   wrongGuessPlayers?: string[];
   t: (key: string) => string;
 }
+
+/** Max opponents shown in the mobile strip */
+const MAX_MOBILE_OPPONENTS = 2;
 
 /** Color tier for mini life bars */
 function getLifeColor(life: number) {
@@ -63,13 +67,26 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
 
   const wrongGuessSet = new Set([...wrongGuessPlayers, ...lifeDropPlayers]);
 
+  // Mobile: exclude self, show top 2 opponents sorted by life (alive first)
+  const mobileOpponents = useMemo(() => {
+    const others = leaderboard.filter((p) => p.username !== currentUsername);
+    return others
+      .sort((a, b) => {
+        const aElim = eliminatedSet.has(a.username) ? 1 : 0;
+        const bElim = eliminatedSet.has(b.username) ? 1 : 0;
+        if (aElim !== bElim) return aElim - bElim;
+        return (playerLives[b.username] ?? 0) - (playerLives[a.username] ?? 0);
+      })
+      .slice(0, MAX_MOBILE_OPPONENTS);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leaderboard, currentUsername, playerLives, eliminatedPlayers]);
+
   return (
     <div className="px-2 py-1.5">
-      {/* Mobile: horizontal compact strip */}
+      {/* Mobile: horizontal compact strip — top 2 opponents only, no self */}
       <div className="flex gap-1.5 lg:hidden overflow-x-auto scrollbar-hide">
-        {leaderboard.map((player) => {
+        {mobileOpponents.map((player) => {
           const isEliminated = eliminatedSet.has(player.username);
-          const isCurrent = player.username === currentUsername;
           const life = playerLives[player.username] ?? 0;
           const colors = getLifeColor(life);
           const isDamaged = wrongGuessSet.has(player.username);
@@ -79,68 +96,63 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
               key={player.username}
               data-player={player.username}
               data-eliminated={isEliminated ? 'true' : undefined}
-              data-current={isCurrent ? 'true' : undefined}
+              data-wrong-guess={isDamaged && !isEliminated ? 'true' : undefined}
               className={cn(
-                "flex-1 min-w-0 flex flex-col gap-0.5 px-2 py-1 rounded-neo border-2 transition-all",
-                isCurrent
-                  ? 'border-neo-yellow bg-neo-yellow/10'
-                  : isEliminated
-                    ? 'border-neo-red/30 bg-neo-red/5 opacity-40'
-                    : 'border-neo-white/15 bg-neo-white/5',
+                "flex-1 min-w-0 flex items-center gap-1.5 px-1.5 py-1 rounded-neo border-2 transition-all",
+                isEliminated
+                  ? 'border-neo-white/10 bg-neo-white/5 opacity-40'
+                  : 'border-neo-white/15 bg-neo-white/5',
                 isDamaged && !isEliminated && 'animate-neo-damage-drip'
               )}
             >
-              {/* Name + Score row */}
-              <div className="flex items-center justify-between gap-1 min-w-0">
+              {/* Wrong-guess indicator (for tests and screen readers) */}
+              {isDamaged && !isEliminated && (
+                <span data-wrong-guess="true" className="sr-only" aria-hidden="true" />
+              )}
+              {/* Avatar */}
+              <div className={cn("flex-shrink-0", isEliminated && "grayscale")}>
+                <Avatar userId={player.username} size="sm" />
+              </div>
+
+              {/* Name + life bar stacked */}
+              <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                 <PlayerProfileTooltip
                   player={{ username: player.username, score: player.score }}
-                  isCurrentUser={isCurrent}
+                  isCurrentUser={false}
                   side="top"
                 >
-                  <span className={cn(
-                    "text-[11px] font-bold truncate",
-                    isCurrent ? 'text-neo-yellow' : 'text-neo-white'
-                  )}>
+                  <span className="text-[11px] font-bold truncate text-neo-white">
                     {player.username}
                   </span>
                 </PlayerProfileTooltip>
 
-                <div className="flex items-center gap-0.5 flex-shrink-0">
-                  <span className="text-[11px] font-mono font-bold text-neo-white/80 tabular-nums">
-                    {player.score}
-                  </span>
-                  {isDamaged && !isEliminated && (
-                    <X size={10} className="text-neo-red" data-wrong-guess />
+                {/* Chunky mini life bar */}
+                <div
+                  role="progressbar"
+                  aria-valuenow={life}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  className={cn(
+                    "h-2.5 rounded-sm overflow-hidden border border-neo-black/40",
+                    colors.bg
                   )}
-                  {isEliminated && (
-                    <Skull size={10} className="text-neo-red" />
-                  )}
+                >
+                  <div
+                    className={cn(
+                      "h-full rounded-sm transition-all duration-500 relative overflow-hidden",
+                      colors.bar,
+                      isEliminated && 'opacity-30'
+                    )}
+                    style={{ width: `${Math.max(life, 0)}%` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
+                  </div>
                 </div>
               </div>
 
-              {/* Chunky mini life bar */}
-              <div
-                role="progressbar"
-                aria-valuenow={life}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                className={cn(
-                  "h-2.5 rounded-sm overflow-hidden border border-neo-black/40",
-                  colors.bg
-                )}
-              >
-                <div
-                  className={cn(
-                    "h-full rounded-sm transition-all duration-500 relative overflow-hidden",
-                    colors.bar,
-                    isEliminated && 'opacity-30'
-                  )}
-                  style={{ width: `${Math.max(life, 0)}%` }}
-                >
-                  {/* Mini shimmer */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer pointer-events-none" />
-                </div>
-              </div>
+              {isEliminated && (
+                <Skull size={10} className="text-neo-red flex-shrink-0" />
+              )}
             </div>
           );
         })}
@@ -165,6 +177,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 data-player={player.username}
                 data-eliminated={isEliminated ? 'true' : undefined}
                 data-current={isCurrent ? 'true' : undefined}
+                data-wrong-guess={isDamaged && !isEliminated ? 'true' : undefined}
                 className={cn(
                   "flex flex-col gap-1 px-2.5 py-1.5 rounded-neo border-2 transition-all",
                   isCurrent
@@ -175,6 +188,10 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                   isDamaged && !isEliminated && 'animate-neo-damage-drip'
                 )}
               >
+                {/* Wrong-guess indicator (for tests and screen readers) */}
+                {isDamaged && !isEliminated && (
+                  <span data-wrong-guess="true" className="sr-only" aria-hidden="true" />
+                )}
                 {/* Name + Score */}
                 <div className="flex items-center justify-between gap-2">
                   <PlayerProfileTooltip
@@ -194,9 +211,6 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                     <span className="text-sm font-mono font-bold text-neo-white tabular-nums">
                       {player.score}
                     </span>
-                    {isDamaged && !isEliminated && (
-                      <X size={14} className="text-neo-red" data-wrong-guess />
-                    )}
                     {isEliminated && (
                       <Skull size={14} className="text-neo-red" />
                     )}

@@ -235,7 +235,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
     <div className={cn("fixed bottom-20 ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
       {hasNearMilestone && (
         <div className="flex justify-center my-1">
-          <Mascot variant={hasNearMilestone ? 'mindblown' : 'encouraging'} size="xs" animated clipBorder="lime" />
+          <Mascot variant={hasNearMilestone ? 'mindblown' : 'encouraging'} size="xs" animated clipBorder="none" />
         </div>
       )}
       <AnimatePresence>

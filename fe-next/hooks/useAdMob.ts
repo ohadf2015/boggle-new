@@ -26,7 +26,7 @@ function isNativePlatform(): boolean {
 /** Removes an array of pending AdMob plugin listeners */
 async function removeListeners(listeners: Array<Promise<{ remove: () => void }>>) {
   for (const p of listeners) {
-    try { (await p).remove(); } catch { /* already removed */ }
+    try { (await Promise.resolve(p)).remove(); } catch { /* already removed */ }
   }
 }
 
@@ -130,17 +130,17 @@ export function useAdMob(): UseAdMobReturn {
       const { RewardAdPluginEvents } = await import('@capacitor-community/admob');
 
       listeners.push(
-        AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+        Promise.resolve(AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
           callbacks.onReward();
-        }),
-        AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+        })),
+        Promise.resolve(AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
           callbacks.onDismiss?.();
           removeListeners(listeners);
-        }),
-        AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
+        })),
+        Promise.resolve(AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
           callbacks.onError?.(error.message || 'Ad failed to load');
           removeListeners(listeners);
-        }),
+        })),
       );
 
       await AdMob.prepareRewardVideoAd({ adId: ADMOB_REWARDED_ID } as Parameters<typeof AdMob.prepareRewardVideoAd>[0]);
@@ -190,14 +190,14 @@ export function useAdMob(): UseAdMobReturn {
       const { InterstitialAdPluginEvents } = await import('@capacitor-community/admob');
 
       listeners.push(
-        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+        Promise.resolve(AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
           callbacks?.onDismiss?.();
           removeListeners(listeners);
-        }),
-        AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
+        })),
+        Promise.resolve(AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
           callbacks?.onError?.(error.message || 'Interstitial failed to load');
           removeListeners(listeners);
-        }),
+        })),
       );
 
       await AdMob.prepareInterstitial({
@@ -227,17 +227,17 @@ export function useAdMob(): UseAdMobReturn {
       const { RewardInterstitialAdPluginEvents } = await import('@capacitor-community/admob');
 
       listeners.push(
-        AdMob.addListener(RewardInterstitialAdPluginEvents.Rewarded, () => {
+        Promise.resolve(AdMob.addListener(RewardInterstitialAdPluginEvents.Rewarded, () => {
           callbacks.onReward();
-        }),
-        AdMob.addListener(RewardInterstitialAdPluginEvents.Dismissed, () => {
+        })),
+        Promise.resolve(AdMob.addListener(RewardInterstitialAdPluginEvents.Dismissed, () => {
           callbacks.onDismiss?.();
           removeListeners(listeners);
-        }),
-        AdMob.addListener(RewardInterstitialAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
+        })),
+        Promise.resolve(AdMob.addListener(RewardInterstitialAdPluginEvents.FailedToLoad, (error: { message?: string }) => {
           callbacks.onError?.(error.message || 'Rewarded interstitial failed to load');
           removeListeners(listeners);
-        }),
+        })),
       );
 
       await AdMob.prepareRewardInterstitialAd({ adId: ADMOB_REWARDED_INTERSTITIAL_ID });

@@ -36,7 +36,7 @@ export default function FirstTimeEncouragement({ trigger, onDismiss }: FirstTime
         aria-live="polite"
         onClick={onDismiss}
       >
-        <Mascot variant={config.mascot} size="xs" className="shrink-0" clipBorder="pink" />
+        <Mascot variant={config.mascot} size="xs" className="shrink-0" clipBorder="none" />
         <span className="text-neo-black text-sm font-neo-body font-medium truncate">
           {t(config.key)}
         </span>

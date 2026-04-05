@@ -50,7 +50,7 @@ export default function DuelsPageClient() {
   if (!user) return null;
 
   if (loading) {
-    return <PageLoader text={t('education.duels.findingClassmates')} size="lg" nested />;
+    return <PageLoader text={t('education.duels.findingClassmates')} size="lg" nested mascotVariant="knight" />;
   }
 
   if (!classroom) {

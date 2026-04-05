@@ -146,7 +146,7 @@ export async function getOrCreateWeeklyRival(
   const rival = await findSkillSimilarRival(playerId, playerScore, weekStartDate);
 
   if (!rival) {
-    logger.warn('ghostRival', 'No rival found for player', { playerId });
+    logger.debug('ghostRival', 'No rival found for player', { playerId });
     return null;
   }
 

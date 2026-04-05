@@ -104,10 +104,8 @@ export function WordHuntLifeBar({ life, maxLife }: WordHuntLifeBarProps) {
           className={cn(
             "h-7 rounded-neo overflow-hidden border-3 shadow-hard-sm relative",
             "bg-neo-navy/80",
-            isLow ? "border-red-500" : "border-neo-black"
+            "border-neo-black"
           )}
-          animate={isLow ? { borderColor: ['#ef4444', '#991b1b', '#ef4444'] } : {}}
-          transition={{ duration: 1, repeat: isLow ? Infinity : 0 }}
         >
           {/* Fill — gradient classes transition smoothly via CSS */}
           <motion.div

@@ -10,26 +10,36 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
  * All mascot images are animated GIFs with backgrounds removed
  */
 export type MascotVariant =
-  | 'happy'       // main-nobg.gif - Happy/idle states
-  | 'gaming'      // play-nobg.gif - Gaming/active/energetic states
-  | 'thinking'    // study-nobg.gif - Thinking/focused/waiting states
-  | 'oops'        // oops-nobg.gif - Error/mistake/surprised states
-  | 'celebration' // celebration-nobg.gif - Victory/cheering states
-  | 'dj'          // dj-nobg.gif - Party/music/dancing states
-  | 'trophy'      // trophy-nobg.gif - Winner/achievement states
-  | 'panic'       // panic-nobg.gif - Panicking/time pressure
-  | 'crying'      // crying-nobg.gif - Sad/losing/defeated
-  | 'onfire'      // onfire-nobg.gif - On fire/hot streak
-  | 'bored'       // bored-nobg.gif - Bored/waiting/idle
-  | 'mindblown'   // mindblown-nobg.gif - Amazed/shocked
-  | 'encouraging' // encouraging-nobg.gif - Supportive/cheering on
-  | 'explorer'    // explorer-nobg.gif - Adventuring/discovering
-  | 'flexing'     // flexing-nobg.gif - Proud/strong/earned it
-  | 'scared'      // scared-nobg.gif - Frightened/nervous
-  | 'shopkeeper'  // shopkeeper-nobg.gif - Shop/store context
-  | 'spectating'  // spectating-nobg.gif - Watching/observing
-  | 'waving'      // waving-nobg.gif - Greeting/welcoming
-  | 'powerup';    // powerup-nobg.gif - Power-up activation
+  | 'happy'       // main.gif - Happy/idle states
+  | 'gaming'      // play.gif - Gaming/active/energetic states
+  | 'thinking'    // study.gif - Thinking/focused/waiting states
+  | 'oops'        // oops.gif - Error/mistake/surprised states
+  | 'celebration' // celebration.gif - Victory/cheering states
+  | 'dj'          // dj.gif - Party/music/dancing states
+  | 'trophy'      // trophy.gif - Winner/achievement states
+  | 'panic'       // panic.gif - Panicking/time pressure
+  | 'crying'      // crying.gif - Sad/losing/defeated
+  | 'onfire'      // onfire.gif - On fire/hot streak
+  | 'bored'       // bored.gif - Bored/waiting/idle
+  | 'mindblown'   // mindblown.gif - Amazed/shocked
+  | 'encouraging' // encouraging.gif - Supportive/cheering on
+  | 'explorer'    // explorer.gif - Adventuring/discovering
+  | 'flexing'     // flexing.gif - Proud/strong/earned it
+  | 'scared'      // scared.gif - Frightened/nervous
+  | 'shopkeeper'  // shopkeeper.gif - Shop/store context
+  | 'spectating'  // spectating.gif - Watching/observing
+  | 'waving'      // waving.gif - Greeting/welcoming
+  | 'powerup'     // powerup.gif - Power-up activation
+  | 'sleepy'      // sleepy.gif - Sleeping/idle timeout
+  | 'waiting'     // waiting.gif - Loading/queue/patience
+  | 'gg'          // gg.gif - Game over/good game
+  | 'scholar'     // scholar.gif - Education/learning
+  | 'rage'        // rage.gif - Competitive anger/losing badly
+  | 'bomber'      // bomber.gif - Blast mode
+  | 'winner'      // winner.gif - Victory/winning
+  | 'knight'      // knight.gif - Battle/ranked/combat
+  | 'sad'         // sad.gif - Loss/disappointment
+  | 'ghostly';    // ghostly.gif - Spooky/halloween/sleepy
 
 /**
  * Mascot GIF paths (ALL mascots use animated GIFs)
@@ -55,6 +65,16 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   spectating: '/mascot/spectating.gif',
   waving: '/mascot/waving.gif',
   powerup: '/mascot/powerup.gif',
+  sleepy: '/mascot/sleepy.gif',
+  waiting: '/mascot/waiting.gif',
+  gg: '/mascot/gg.gif',
+  scholar: '/mascot/scholar.gif',
+  rage: '/mascot/rage.gif',
+  bomber: '/mascot/bomber.gif',
+  winner: '/mascot/winner.gif',
+  knight: '/mascot/knight.gif',
+  sad: '/mascot/sad.gif',
+  ghostly: '/mascot/ghostly.gif',
 };
 
 /**
@@ -397,6 +417,85 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         },
       },
     },
+    // Sleepy: Slow drift down
+    sleepy: {
+      animate: {
+        y: [0, 3, 0],
+        rotate: [0, 2, -2, 0],
+        transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Waiting: Patient swaying with hourglass
+    waiting: {
+      animate: {
+        y: [0, -3, 0],
+        rotate: [0, 1, -1, 0],
+        transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // GG: Confident swagger
+    gg: {
+      animate: {
+        y: [0, -5, 0],
+        scale: [1, 1.03, 1],
+        transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Scholar: Focused reading bob
+    scholar: {
+      animate: {
+        y: [0, -2, 0],
+        transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Rage: Intense shaking
+    rage: {
+      animate: {
+        x: [0, -4, 4, -3, 3, 0],
+        scale: [1, 1.05, 1],
+        transition: { duration: 0.4, repeat: Infinity, ease: 'easeOut' },
+      },
+    },
+    // Bomber: Mischievous bounce
+    bomber: {
+      animate: {
+        y: [0, -6, 0],
+        rotate: [0, -3, 3, 0],
+        transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Winner: Triumphant float
+    winner: {
+      animate: {
+        y: [0, -10, 0],
+        scale: [1, 1.06, 1],
+        transition: { duration: 1.2, repeat: Infinity, ease: 'easeOut' },
+      },
+    },
+    // Knight: Battle-ready stance
+    knight: {
+      animate: {
+        y: [0, -4, 0],
+        rotate: [0, -2, 2, 0],
+        transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Sad: Gentle droop
+    sad: {
+      animate: {
+        y: [0, 2, 0],
+        rotate: [0, -1, 1, 0],
+        transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
+    // Ghostly: Ethereal float
+    ghostly: {
+      animate: {
+        y: [0, -8, 0],
+        opacity: [1, 0.85, 1],
+        transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+      },
+    },
   };
 
   return animations[variant];
@@ -426,8 +525,8 @@ export const Mascot = memo(function Mascot({
   className = '',
   priority = false,
   alt,
-  clipShape = 'circle',
-  clipBorder = 'white',
+  clipShape = 'none',
+  clipBorder = 'none',
   clipBg = 'bg-neo-navy',
 }: MascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
@@ -479,8 +578,8 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   priority = false,
   alt,
   delay = 0,
-  clipShape = 'circle',
-  clipBorder = 'white',
+  clipShape = 'none',
+  clipBorder = 'none',
   clipBg = 'bg-neo-navy',
 }: MascotProps & { delay?: number }) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();

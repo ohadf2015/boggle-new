@@ -111,10 +111,15 @@ export function useAdventureSFX({
   }, [isBossLevel, bossHealthPhase, sfx]);
 
   // Boss hit sound when boss takes damage (HP decreases)
+  // Boss defeat sound when HP reaches 0 (before fireworks)
   const prevBossCurrentHP = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (isBossLevel && bossCurrentHP !== undefined && prevBossCurrentHP.current !== undefined && bossCurrentHP < prevBossCurrentHP.current) {
-      sfx.playBossHitSound();
+      if (bossCurrentHP <= 0) {
+        sfx.playBossDefeatSound();
+      } else {
+        sfx.playBossHitSound();
+      }
     }
     prevBossCurrentHP.current = bossCurrentHP;
   }, [isBossLevel, bossCurrentHP, sfx]);

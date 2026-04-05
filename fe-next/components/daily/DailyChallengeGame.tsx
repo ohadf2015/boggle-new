@@ -425,14 +425,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         {/* Panic mascot: urgency indicator when clock runs low */}
         {timer.remainingTime <= PANIC_TIMER_THRESHOLD && (
           <div className="absolute top-2 end-2 z-10 pointer-events-none">
-            <Mascot variant="panic" size="sm" animated clipBorder="cyan" />
+            <Mascot variant="panic" size="sm" animated clipBorder="none" />
           </div>
         )}
 
         {/* On-fire mascot: celebrates active combo streaks */}
         {combo.comboLevel >= ONFIRE_COMBO_THRESHOLD && timer.remainingTime > PANIC_TIMER_THRESHOLD && (
           <div className="absolute top-2 start-2 z-10 pointer-events-none">
-            <Mascot variant="onfire" size="sm" animated clipBorder="cyan" />
+            <Mascot variant="onfire" size="sm" animated clipBorder="none" />
           </div>
         )}
       </div>

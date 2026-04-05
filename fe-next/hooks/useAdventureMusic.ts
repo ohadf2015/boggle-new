@@ -22,6 +22,8 @@ interface UseAdventureMusicOptions {
   totalTime: number;
   /** Whether music is enabled (defaults to true) */
   enabled?: boolean;
+  /** Whether this is a boss level — plays boss-battle.mp3 instead of world music */
+  isBossLevel?: boolean;
 }
 
 interface AdventureTrackPaths {
@@ -68,7 +70,15 @@ const CROSSFADE_MS = 2000;
  * Get track paths for a given world number
  * Returns null if world doesn't have music tracks
  */
-function getWorldTrackPaths(worldNumber: number): AdventureTrackPaths | null {
+function getWorldTrackPaths(worldNumber: number, isBossLevel?: boolean): AdventureTrackPaths | null {
+  // Boss levels get dedicated boss battle music
+  if (isBossLevel) {
+    return {
+      track1: '/music/boss-battle.mp3',
+      track2: null,
+    };
+  }
+
   if (!WORLDS_WITH_MUSIC.includes(worldNumber)) {
     return null;
   }
@@ -113,6 +123,7 @@ export function useAdventureMusic({
   timeRemaining,
   totalTime,
   enabled = true,
+  isBossLevel = false,
 }: UseAdventureMusicOptions) {
   // Get volume and mute settings from MusicContext
   // This ensures MusicControls works correctly in adventure mode
@@ -321,13 +332,14 @@ export function useAdventureMusic({
    * Initialize tracks for the current world
    */
   const initializeTracks = useCallback(() => {
-    const paths = getWorldTrackPaths(worldNumber);
+    const paths = getWorldTrackPaths(worldNumber, isBossLevel);
     if (!paths) {
       logger.log(`[AdventureMusic] World ${worldNumber} has no music tracks`);
       return;
     }
 
-    logger.log(`[AdventureMusic] Initializing tracks for world ${worldNumber}`);
+    const trackLabel = isBossLevel ? 'Boss Battle' : `World ${worldNumber}`;
+    logger.log(`[AdventureMusic] Initializing tracks for ${trackLabel}`);
 
     // Clean up existing tracks
     if (track1Ref.current) {
@@ -340,16 +352,16 @@ export function useAdventureMusic({
     }
 
     // Create new tracks
-    track1Ref.current = createHowl(paths.track1, `World ${worldNumber} Track 1`);
+    track1Ref.current = createHowl(paths.track1, `${trackLabel} Track 1`);
     track2Ref.current = paths.track2
-      ? createHowl(paths.track2, `World ${worldNumber} Track 2`)
+      ? createHowl(paths.track2, `${trackLabel} Track 2`)
       : null;
 
     // Reset state
     setCurrentTrack(null);
     hasSwitchedToTrack2Ref.current = false;
     worldNumberRef.current = worldNumber;
-  }, [worldNumber, createHowl, setCurrentTrack]);
+  }, [worldNumber, isBossLevel, createHowl, setCurrentTrack]);
 
   /**
    * Start playing track 1
@@ -459,7 +471,7 @@ export function useAdventureMusic({
 
   // Handle playing state changes
   useEffect(() => {
-    const paths = getWorldTrackPaths(worldNumber);
+    const paths = getWorldTrackPaths(worldNumber, isBossLevel);
     if (!paths || !enabled) return;
 
     if (isPlaying && !isPaused) {
@@ -478,7 +490,7 @@ export function useAdventureMusic({
       // Pause music when game is paused or not playing
       suspendAudio('Game paused/stopped');
     }
-  }, [isPlaying, isPaused, enabled, worldNumber, startTrack1, suspendAudio, getEffectiveVolume]);
+  }, [isPlaying, isPaused, enabled, worldNumber, isBossLevel, startTrack1, suspendAudio, getEffectiveVolume]);
 
   // Handle track switching based on time
   useEffect(() => {
@@ -542,7 +554,7 @@ export function useAdventureMusic({
     /** Stop all music with optional fade */
     stopMusic,
     /** Whether this world has music tracks */
-    hasMusic: WORLDS_WITH_MUSIC.includes(worldNumber),
+    hasMusic: isBossLevel || WORLDS_WITH_MUSIC.includes(worldNumber),
   };
 }
 

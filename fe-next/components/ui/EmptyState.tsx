@@ -33,8 +33,8 @@ interface EmptyStateProps {
 
 const TYPE_CONFIG: Record<EmptyStateType, { icon: ReactNode; mascot: MascotVariant; emoji: string }> = {
   'no-words': { icon: <Search className="w-full h-full" />, mascot: 'explorer', emoji: '🔎' },
-  'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'waving', emoji: '👋' },
-  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'bored', emoji: '🎮' },
+  'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'waiting', emoji: '👋' },
+  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'sleepy', emoji: '🎮' },
   'no-results': { icon: <Trophy className="w-full h-full" />, mascot: 'thinking', emoji: '📊' },
   'error': { icon: null, mascot: 'oops', emoji: '😅' },
   'custom': { icon: null, mascot: 'encouraging', emoji: '✨' },

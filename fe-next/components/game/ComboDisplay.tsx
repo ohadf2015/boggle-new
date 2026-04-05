@@ -498,7 +498,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 animated={!prefersReducedMotion}
                 enableHover={false}
                 enableClick={false}
-                clipBorder="pink"
+                clipBorder="none"
               />
             </motion.div>
           )}

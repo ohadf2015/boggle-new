@@ -129,7 +129,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
           {/* Optional mascot */}
           {showMascot && (
             <div className="hidden sm:block">
-              <Mascot variant={getMascotVariant(mode)} size="xs" animated clipBorder="purple" />
+              <Mascot variant={getMascotVariant(mode)} size="xs" animated clipBorder="none" />
             </div>
           )}
 

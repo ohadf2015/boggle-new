@@ -10,7 +10,7 @@ function LoadingFallback(): React.JSX.Element {
     <div className="flex-1 flex items-center justify-center bg-neo-navy relative">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
-        <PageLoader size="lg" text="Loading Blast Mode..." />
+        <PageLoader size="lg" text="Loading Blast Mode..." mascotVariant="bomber" />
       </div>
     </div>
   );

@@ -109,7 +109,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
           className="mb-4"
         >
-          <Mascot variant={mascotVariant} size="lg" animated clipBorder="purple" />
+          <Mascot variant={mascotVariant} size="lg" animated clipBorder="none" />
         </AdaptiveMotion.div>
 
         {/* Animated trophy */}

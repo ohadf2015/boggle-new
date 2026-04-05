@@ -93,7 +93,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
               {...getStepTransition(direction, isRTL)}
               className="flex flex-col items-center text-center space-y-4"
             >
-              <MascotWithEntrance variant="happy" size="xl" priority clipShape="circle" clipBorder="cyan" />
+              <MascotWithEntrance variant="happy" size="xl" priority clipBorder="none" />
 
               {/* Speech bubble with staggered entrance */}
               <motion.div
@@ -142,7 +142,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
                 transition={{ delay: 0.15, ...SPRING_SOFT }}
               >
                 <div className="flex items-center gap-3">
-                  <Mascot variant="gaming" size="md" clipShape="circle" clipBorder="cyan" />
+                  <Mascot variant="gaming" size="md" clipBorder="none" />
                   <p className="font-bold text-sm text-neo-white/80">
                     {t('preGameTutorial.practice.instruction')}
                   </p>
@@ -193,7 +193,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete }) => {
               {...getStepTransition(direction, isRTL)}
               className="flex flex-col items-center text-center space-y-4 w-full"
             >
-              <Mascot variant="celebration" size="lg" clipShape="circle" clipBorder="cyan" />
+              <Mascot variant="celebration" size="lg" clipBorder="none" />
 
               <motion.div
                 className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm"

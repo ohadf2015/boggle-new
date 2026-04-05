@@ -98,7 +98,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
       >
         {/* Crying mascot — Lexi commiserates with the player */}
         <div className="flex justify-center mb-3">
-          <Mascot variant="crying" size="lg" animated clipBorder="pink" />
+          <Mascot variant="crying" size="lg" animated clipBorder="none" />
         </div>
         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
           <Target className="w-4 h-4" />
@@ -148,7 +148,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         <div className="relative z-10">
           {/* Crying mascot — Lexi commiserates with the player */}
           <div className="flex justify-center mb-3">
-            <Mascot variant="crying" size="lg" animated clipBorder="pink" />
+            <Mascot variant="crying" size="lg" animated clipBorder="none" />
           </div>
 
           {/* Header with emoji */}

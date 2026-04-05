@@ -225,7 +225,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
-          <MascotWithEntrance variant="explorer" size="md" delay={0.1} clipBorder="cyan" />
+          <MascotWithEntrance variant="explorer" size="md" delay={0.1} />
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}

@@ -316,6 +316,65 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       y: [0, -8, 0],
       transition: { duration: 0.8, repeat: Infinity, ease: 'easeOut' },
     },
+    // Sleepy: Slow drowsy drift
+    sleepy: {
+      y: [0, -2, 0],
+      rotate: [0, 1, -1, 0],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Waiting: Idle tap
+    waiting: {
+      y: [0, -3, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // GG: Victory bounce
+    gg: {
+      y: [0, -8, 0],
+      scale: [1, 1.05, 1],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Scholar: Thoughtful nod
+    scholar: {
+      y: [0, -3, 0],
+      rotate: [0, 2, 0, -2, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Rage: Intense shaking
+    rage: {
+      x: [0, -4, 4, -3, 3, -1, 1, 0],
+      y: [0, -3, 0],
+      transition: { duration: 0.4, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Bomber: Recoil pulse
+    bomber: {
+      scale: [1, 1.06, 1],
+      y: [0, -5, 0],
+      transition: { duration: 0.7, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Winner: Proud float
+    winner: {
+      y: [0, -10, 0, -6, 0],
+      scale: [1, 1.05, 1, 1.03, 1],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Knight: Stalwart sway
+    knight: {
+      y: [0, -4, 0],
+      rotate: [0, -2, 2, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Sad: Slow droop
+    sad: {
+      y: [0, -2, 0],
+      rotate: [0, -1, 1, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Ghostly: Ethereal float
+    ghostly: {
+      y: [0, -8, 0],
+      opacity: [1, 0.7, 1],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
   };
 
   const baseVariant = getBaseVariant(variant);

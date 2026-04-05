@@ -283,9 +283,9 @@ const PracticeResults = memo(function PracticeResults({
                 }}
               >
                 {tier === 'warmup' ? (
-                  <MascotWithEntrance variant="encouraging" size="md" delay={0.4} clipShape="circle" clipBorder="cyan" />
+                  <MascotWithEntrance variant="encouraging" size="md" delay={0.4} clipBorder="none" />
                 ) : (
-                  <CelebrationMascotWithEntrance variant="celebration" size="md" delay={0.4} clipShape="circle" clipBorder="cyan" />
+                  <CelebrationMascotWithEntrance variant="celebration" size="md" delay={0.4} clipBorder="none" />
                 )}
               </motion.div>
             </div>
