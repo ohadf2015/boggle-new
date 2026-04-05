@@ -177,9 +177,9 @@ npm run test:backend:watch   # Watch mode
 **Test structure:**
 - Unit tests: `backend/**/*.test.ts`
 - Integration tests: `backend/**/*.integration.test.ts`
-- Mocks: Use `jest.mock()` for Redis, Supabase
+- Mocks: Use `vi.mock()` for Redis, Supabase (Vitest)
 
 **Common patterns:**
 - Mock SocketIO: `import { createMockSocket } from 'backend/test-utils'`
 - Mock Redis: Auto-mocked via `__mocks__/ioredis.ts`
-- Test cleanup: `afterEach(() => jest.clearAllMocks())`
+- Test cleanup: `afterEach(() => vi.clearAllMocks())`

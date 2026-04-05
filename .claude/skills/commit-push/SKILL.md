@@ -55,7 +55,7 @@ SRC_FILES=$(echo "$CHANGED_FILES" | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '__te
 TEST_FILES=$(echo "$CHANGED_FILES" | grep -E '(__tests__/.*\.(ts|tsx|js|jsx)$|\.test\.(ts|tsx|js|jsx)$|\.spec\.(ts|tsx|js|jsx)$)')
 BACKEND_FILES=$(echo "$SRC_FILES" | grep '^backend/')
 FRONTEND_FILES=$(echo "$SRC_FILES" | grep -v '^backend/')
-CONFIG_FILES=$(echo "$CHANGED_FILES" | grep -E '(next\.config|tsconfig|tailwind\.config|package\.json|vitest\.config|jest\.config|eslint)')
+CONFIG_FILES=$(echo "$CHANGED_FILES" | grep -E '(next\.config|tsconfig|tailwind\.config|package\.json|vitest\.config|eslint)')
 ```
 
 Save these lists — they drive all subsequent phases.
@@ -66,7 +66,7 @@ Save these lists — they drive all subsequent phases.
 |---|---|---|---|---|
 | Only test files | skip | skip | run related tests only | skip |
 | Only frontend src | lint changed files | full tsc | vitest --related | skip (unless config changed) |
-| Only backend src | lint changed files | full tsc | jest --findRelatedTests | skip |
+| Only backend src | lint changed files | full tsc | vitest --related | skip |
 | Config files (next.config, tsconfig, etc.) | full lint | full tsc | full tests | full build |
 | package.json / lock file | full lint | full tsc | full tests | full build |
 | Mix of above | lint changed files | full tsc | related tests only | full build only if config changed |
@@ -80,14 +80,14 @@ Save these lists — they drive all subsequent phases.
 ```bash
 cd /Users/ohadfisher/git/boggle-new/fe-next
 
-# If config files changed → full lint
+# If config files changed → full lint: npm run lint
 # Otherwise → lint only changed .ts/.tsx/.js/.jsx files
 LINT_FILES="[space-separated list of changed source + test files]"
 
 if [ -n "$LINT_FILES" ]; then
-  npx eslint $LINT_FILES --fix
+  npm run lint -- $LINT_FILES --fix
   # If --fix didn't resolve all: read files, apply manual fixes
-  npx eslint $LINT_FILES  # verify clean
+  npm run lint -- $LINT_FILES  # verify clean
 fi
 ```
 
@@ -124,10 +124,10 @@ if [ -n "$TEST_CHANGED" ]; then
   npx vitest run --config vitest.config.ts $TEST_CHANGED
 fi
 
-# Backend (jest): use --findRelatedTests
+# Backend (vitest): use --related
 BACKEND_CHANGED="[space-separated list of changed backend files]"
 if [ -n "$BACKEND_CHANGED" ]; then
-  npx jest --config=backend/jest.config.js --findRelatedTests $BACKEND_CHANGED
+  npx vitest run --config backend/vitest.config.ts --related $BACKEND_CHANGED
 fi
 ```
 
