@@ -160,18 +160,20 @@ describe('ClassroomGameLobby — QR code', () => {
   it('renders QR code in step 2 with a valid join URL', async () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
 
-    // Step 1: wait for data load, select lessons, advance
+    // Step 1: wait for data load, select lessons, advance.
+    // The component has a re-fetch loop (fetchTeacherData depends on
+    // selectedClassroomId which it sets during fetch), so the setup step
+    // may briefly unmount between fetch cycles. Use findByTestId to retry.
     const selectBtn = await screen.findByTestId('select-lessons', {}, { timeout: 8000 });
     fireEvent.click(selectBtn);
 
+    // Wait for the Next button to be enabled after the re-fetch loop settles.
+    const nextBtn = await screen.findByTestId('wizard-next', {}, { timeout: 8000 });
     await waitFor(
-      () => {
-        const btn = screen.getByTestId('wizard-next');
-        expect(btn).not.toBeDisabled();
-      },
+      () => expect(nextBtn).not.toBeDisabled(),
       { timeout: 5000 }
     );
-    fireEvent.click(screen.getByTestId('wizard-next'));
+    fireEvent.click(nextBtn);
 
     // Step 2: QR code appears with correct URL format
     let qrValue = '';

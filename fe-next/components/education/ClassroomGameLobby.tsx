@@ -73,8 +73,11 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       if (lessonsResult.data) setLessons(lessonsResult.data);
       if (classroomsResult.data) {
         setClassrooms(classroomsResult.data);
-        if (classroomsResult.data.length > 0 && !selectedClassroomId) {
-          setSelectedClassroomId(classroomsResult.data[0].id);
+        if (classroomsResult.data.length > 0) {
+          // Use functional update to avoid depending on selectedClassroomId,
+          // which would create a re-fetch loop (fetch sets id → callback
+          // recreated → effect re-runs → isLoading=true → fetch again).
+          setSelectedClassroomId((prev) => prev || classroomsResult.data[0].id);
         }
       }
     } catch (error) {
@@ -83,7 +86,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedClassroomId, t]);
+  }, [user, t]);
 
   useEffect(() => {
     if (!user) {
