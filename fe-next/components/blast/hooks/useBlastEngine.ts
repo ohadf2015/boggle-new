@@ -230,6 +230,7 @@ export function useBlastEngine(
         deadEndIdleRef.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- minWordLength is stable config; including it would re-run dead-end detection on every render
   }, [isDictLoaded, effectiveGrid, isCascading, gameState.isComplete, gameState.isDeadEnd, wordsFoundCount, gameState.wordsFound, language, checkWordInDict, tileStates]);
 
   // ── submitWord ──
