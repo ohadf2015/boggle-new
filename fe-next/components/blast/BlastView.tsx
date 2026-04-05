@@ -191,7 +191,7 @@ export function BlastView() {
                 onClick={handleWaveAdvance}
                 className="min-h-[56px] w-full font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
               >
-                {t('blast.nextWave') || 'NEXT WAVE'}
+                {t('blast.nextWave', { wave: currentWave + 1 }) || 'NEXT WAVE'}
               </Button>
             </AdaptiveMotion.div>
           </div>

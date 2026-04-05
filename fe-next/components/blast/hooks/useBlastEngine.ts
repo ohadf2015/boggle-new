@@ -264,6 +264,7 @@ export function useBlastEngine(
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
+    tileStatesRef.current = tilesAfterThaw;
 
     setGameState(prev => {
       const newMovesRemaining = Math.max(0, prev.movesRemaining - 1) + bonusMoveCount;
