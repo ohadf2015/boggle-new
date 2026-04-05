@@ -45,30 +45,34 @@ describe('MilestoneCelebration', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('should show major milestone trophy emoji', () => {
+  it('should show major milestone trophy mascot', () => {
     const milestone = {
       level: 5,
       isMajor: true,
       rewards: { xpBonus: 100, coinBonus: 25, title: 'WORD_SEEKER' },
     };
 
-    render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
+    const { container } = render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
 
-    // Trophy icon renders as SVG with lucide-trophy class
-    expect(document.querySelector('.lucide-trophy')).toBeInTheDocument();
+    // Major milestone shows trophy mascot GIF (aria-hidden, so use querySelector)
+    const img = container.querySelector('img');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', expect.stringContaining('trophy'));
   });
 
-  it('should show minor milestone star emoji', () => {
+  it('should show minor milestone celebration mascot', () => {
     const milestone = {
       level: 3,
       isMajor: false,
       rewards: { xpBonus: 50, coinBonus: 10, title: null },
     };
 
-    render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
+    const { container } = render(<MilestoneCelebration milestone={milestone} onClose={mockOnClose} />);
 
-    // Star icon renders as SVG with lucide-star class
-    expect(document.querySelector('.lucide-star')).toBeInTheDocument();
+    // Minor milestone shows celebration mascot GIF (aria-hidden, so use querySelector)
+    const img = container.querySelector('img');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', expect.stringContaining('celebration'));
   });
 
   it('should display milestone level', () => {

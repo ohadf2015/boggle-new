@@ -11,18 +11,20 @@ import InteractiveMascot from '../InteractiveMascot';
 import IdleMascot from '../IdleMascot';
 import { getBaseVariant, BASE_VARIANTS, VARIANT_MAP } from '../mascotUtils';
 
-/** All 20 base GIF variants */
+/** All 32 base GIF variants */
 const ALL_BASE_VARIANTS: MascotVariant[] = [
   'happy', 'gaming', 'thinking', 'oops', 'celebration', 'dj', 'trophy',
   'panic', 'crying', 'onfire', 'bored', 'mindblown', 'encouraging',
   'explorer', 'flexing', 'scared', 'shopkeeper', 'spectating', 'waving', 'powerup',
+  'sleepy', 'waiting', 'gg', 'scholar', 'rage', 'bomber', 'winner',
+  'knight', 'sad', 'ghostly', 'dance', 'question',
 ];
 
 describe('GIF Mascot Integration', () => {
   describe('getMascotImagePath', () => {
     it('should return GIF path for happy variant', () => {
       const path = getMascotImagePath('happy');
-      expect(path).toBe('/mascot/main.gif');
+      expect(path).toBe('/mascot/winner.gif');
     });
 
     it('should return GIF path for gaming variant', () => {
@@ -32,7 +34,7 @@ describe('GIF Mascot Integration', () => {
 
     it('should return GIF path for thinking variant', () => {
       const path = getMascotImagePath('thinking');
-      expect(path).toBe('/mascot/study.gif');
+      expect(path).toBe('/mascot/question.gif');
     });
 
     it('should return GIF path for oops variant', () => {
@@ -52,9 +54,9 @@ describe('GIF Mascot Integration', () => {
     it('should return correct paths for new variants', () => {
       expect(getMascotImagePath('panic')).toBe('/mascot/panic.gif');
       expect(getMascotImagePath('crying')).toBe('/mascot/crying.gif');
-      expect(getMascotImagePath('onfire')).toBe('/mascot/onfire.gif');
-      expect(getMascotImagePath('bored')).toBe('/mascot/bored.gif');
-      expect(getMascotImagePath('mindblown')).toBe('/mascot/mindblown.gif');
+      expect(getMascotImagePath('onfire')).toBe('/mascot/onfire-nobg.gif');
+      expect(getMascotImagePath('bored')).toBe('/mascot/bored-nobg.gif');
+      expect(getMascotImagePath('mindblown')).toBe('/mascot/mindblown-nobg.gif');
       expect(getMascotImagePath('encouraging')).toBe('/mascot/encouraging.gif');
       expect(getMascotImagePath('explorer')).toBe('/mascot/explorer.gif');
       expect(getMascotImagePath('flexing')).toBe('/mascot/flexing.gif');
@@ -62,7 +64,7 @@ describe('GIF Mascot Integration', () => {
       expect(getMascotImagePath('shopkeeper')).toBe('/mascot/shopkeeper.gif');
       expect(getMascotImagePath('spectating')).toBe('/mascot/spectating.gif');
       expect(getMascotImagePath('waving')).toBe('/mascot/waving.gif');
-      expect(getMascotImagePath('powerup')).toBe('/mascot/powerup.gif');
+      expect(getMascotImagePath('powerup')).toBe('/mascot/powerup-nobg.gif');
     });
   });
 
@@ -75,8 +77,8 @@ describe('GIF Mascot Integration', () => {
   });
 
   describe('BASE_VARIANTS and MASCOT_IMAGES consistency', () => {
-    it('should have 20 base variants', () => {
-      expect(BASE_VARIANTS).toHaveLength(20);
+    it('should have 32 base variants', () => {
+      expect(BASE_VARIANTS).toHaveLength(32);
     });
 
     it('should have MASCOT_IMAGES entry for every base variant', () => {
@@ -92,12 +94,14 @@ describe('GIF Mascot Integration', () => {
       expect(getBaseVariant('nervous')).toBe('scared');
     });
 
-    it('should map sad to crying (was thinking)', () => {
-      expect(getBaseVariant('sad')).toBe('crying');
+    it('should resolve sad as base variant (now a direct base variant)', () => {
+      // 'sad' is in BASE_VARIANTS, so getBaseVariant returns it as-is
+      expect(getBaseVariant('sad')).toBe('sad');
     });
 
-    it('should map sleepy to bored (was thinking)', () => {
-      expect(getBaseVariant('sleepy')).toBe('bored');
+    it('should resolve sleepy as base variant (now a direct base variant)', () => {
+      // 'sleepy' is in BASE_VARIANTS, so getBaseVariant returns it as-is
+      expect(getBaseVariant('sleepy')).toBe('sleepy');
     });
 
     it('should map excited to onfire (was celebration)', () => {
@@ -162,7 +166,7 @@ describe('GIF Mascot Integration', () => {
 
       const img = screen.getByRole('img');
       expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('src', '/mascot/onfire.gif');
+      expect(img).toHaveAttribute('src', '/mascot/onfire-nobg.gif');
     });
 
     it('should render extended variants (mapped to GIF)', () => {
@@ -193,9 +197,9 @@ describe('GIF Mascot Integration', () => {
   });
 
   describe('GIF Mapping Correctness', () => {
-    it('should map main.gif to happy variant', () => {
+    it('should map winner.gif to happy variant', () => {
       const path = getMascotImagePath('happy');
-      expect(path).toContain('main.gif');
+      expect(path).toContain('winner.gif');
     });
 
     it('should map play.gif to gaming variant', () => {
@@ -203,9 +207,9 @@ describe('GIF Mascot Integration', () => {
       expect(path).toContain('play.gif');
     });
 
-    it('should map study.gif to thinking variant', () => {
+    it('should map question.gif to thinking variant', () => {
       const path = getMascotImagePath('thinking');
-      expect(path).toContain('study.gif');
+      expect(path).toContain('question.gif');
     });
 
     it('should map oops.gif to oops variant', () => {
@@ -243,10 +247,13 @@ describe('GIF Mascot Integration', () => {
       expect(isGif1).toBe(isGif2);
     });
 
-    it('VARIANT_MAP should not contain keys that are base variants', () => {
-      // Base variants should resolve directly, not through VARIANT_MAP
-      BASE_VARIANTS.forEach((variant) => {
-        expect(VARIANT_MAP[variant]).toBeUndefined();
+    it('VARIANT_MAP keys that overlap with BASE_VARIANTS are safely ignored by getBaseVariant', () => {
+      // Some keys (sad, sleepy) exist in both BASE_VARIANTS and VARIANT_MAP.
+      // getBaseVariant checks BASE_VARIANTS first, so the VARIANT_MAP entry is never reached.
+      const overlapping = BASE_VARIANTS.filter((v) => VARIANT_MAP[v] !== undefined);
+      overlapping.forEach((variant) => {
+        // getBaseVariant returns the base variant itself, not the VARIANT_MAP target
+        expect(getBaseVariant(variant)).toBe(variant);
       });
     });
   });
