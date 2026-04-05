@@ -32,7 +32,8 @@ export function detectMatch3Clusters(
   const cols = grid[0].length;
   const results: Match3Cluster[] = [];
 
-  // Track already-matched cells to avoid overlapping clusters
+  // Track already-matched cells to prevent the same cell appearing in both
+  // a horizontal and a vertical cluster (which would double-clear it)
   const matched = new Set<string>();
 
   const isUsable = (r: number, c: number): boolean => {
@@ -72,17 +73,17 @@ export function detectMatch3Clusters(
     }
   }
 
-  // Vertical scan
+  // Vertical scan — skip cells already claimed by horizontal matches
   for (let c = 0; c < cols; c++) {
     if (affectedCols && !affectedCols.has(c)) continue;
 
     let runStart = 0;
     while (runStart < rows) {
-      if (!isUsable(runStart, c)) { runStart++; continue; }
+      if (!isUsable(runStart, c) || matched.has(`${runStart}-${c}`)) { runStart++; continue; }
 
       const letter = letterAt(runStart, c);
       let runEnd = runStart + 1;
-      while (runEnd < rows && isUsable(runEnd, c) && letterAt(runEnd, c) === letter) {
+      while (runEnd < rows && isUsable(runEnd, c) && !matched.has(`${runEnd}-${c}`) && letterAt(runEnd, c) === letter) {
         runEnd++;
       }
 

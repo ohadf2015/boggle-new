@@ -7,7 +7,9 @@ import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariation
 export interface ScoreFlyEvent {
   id: string;
   score: number;
+  /** Start X as percentage of container width (0-100) */
   startX: number;
+  /** Start Y as percentage of container height (0-100) */
   startY: number;
   tier: 1 | 2 | 3;
 }
@@ -39,8 +41,10 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
   // Pick a random path variation once per fly event
   const path = useMemo<ScoreFlyPath>(() => getRandomScoreFlyPath(), []);
 
-  const xKeys = path.x(fly.startX, TARGET_X);
-  const yKeys = path.y(fly.startY, TARGET_Y);
+  // Path functions expect pixel coords; use 0 as origin and TARGET as dest,
+  // then apply deltas from the percentage-positioned element.
+  const xKeys = path.x(0, TARGET_X);
+  const yKeys = path.y(0, TARGET_Y);
 
   return (
     <AdaptiveMotion.div
@@ -48,6 +52,8 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
       data-testid="score-fly"
       className="absolute pointer-events-none z-50 font-neo-display font-black tabular-nums"
       style={{
+        left: `${fly.startX}%`,
+        top: `${fly.startY}%`,
         color: TIER_COLORS[fly.tier],
         textShadow: `0 2px 8px rgba(0,0,0,0.6), 0 0 12px ${TIER_COLORS[fly.tier]}80`,
         fontSize: `clamp(${fly.tier === 3 ? '1.5rem' : fly.tier === 2 ? '1.2rem' : '1rem'}, ${fly.tier === 3 ? '5cqw' : fly.tier === 2 ? '4cqw' : '3cqw'}, ${fly.tier === 3 ? '2.25rem' : fly.tier === 2 ? '1.75rem' : '1.375rem'})`,
@@ -55,8 +61,8 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
         paintOrder: 'stroke fill',
       }}
       initial={{
-        x: fly.startX,
-        y: fly.startY,
+        x: xKeys[0],
+        y: yKeys[0],
         scale: path.scale[0],
         opacity: 1,
         rotate: path.rotate?.[0] ?? 0,

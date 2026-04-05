@@ -5,7 +5,7 @@ import type { GravityResult } from '../utils/blastGravity';
 
 // ==================== Types ====================
 
-export type AnimPhase = 'idle' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'chain_pause';
+export type AnimPhase = 'idle' | 'anticipation' | 'clearing' | 'falling' | 'landing' | 'appearing' | 'chain_pause';
 
 export interface TileAnimState {
   row: number;
@@ -161,8 +161,16 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
       }));
       commit({ ...workingRef.current, phase: 'falling', activeTiles: fallTiles, chainLevel });
       const maxFall = gravity.fallingTiles.reduce((m, t) => Math.max(m, t.fallDistance), 0);
-      const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall + ANIM_TIMING.landBounce) * speed;
+      const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall) * speed;
       await wait(fallDur, timersRef.current);
+
+      // Landing phase — brief squish-bounce at destination
+      const landTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
+        row: t.row, col: t.col, phase: 'landing' as AnimPhase,
+        fallDistance: t.fallDistance, column: t.col,
+      }));
+      commit({ ...workingRef.current, phase: 'landing', activeTiles: landTiles, chainLevel });
+      await wait(ANIM_TIMING.landBounce * speed, timersRef.current);
     }
 
     // Phase 3: Appearing

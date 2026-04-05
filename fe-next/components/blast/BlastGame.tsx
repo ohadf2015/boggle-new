@@ -92,6 +92,7 @@ export function BlastGame({
     isMultiplayer,
     blastSeed: isMultiplayer ? blastSeed : undefined,
     initialTileStates: isMultiplayer ? initialTileStates : undefined,
+    minWordLength,
   });
 
   // Combo system
@@ -180,7 +181,10 @@ export function BlastGame({
     const flyId = `fly-${++flyIdRef.current}`;
     const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
     setScoreFlyEvents(prev => [...prev.slice(-2), {
-      id: flyId, score: result.score, startX: avgCol * 60, startY: avgRow * 60, tier,
+      id: flyId, score: result.score,
+      startX: ((avgCol + 0.5) / config.gridSize) * 100,
+      startY: ((avgRow + 0.5) / config.gridSize) * 100,
+      tier,
     }]);
 
     // 4. Combo flash effect
@@ -217,7 +221,8 @@ export function BlastGame({
     const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
     const foundWordsSet = new Set(engine.gameState.wordsFound);
     while (chainLevel < MAX_CASCADE_CHAIN) {
-      const grid = engine.grid;
+      // Read from refs (not React state) — React state is stale during async batching
+      const { grid, tileStates: latestTiles } = engine.getLatestState();
       if (!grid) break;
 
       const affectedCols = new Set(cascadeResult.gravity.newTiles.map(t => t.col));
@@ -231,7 +236,9 @@ export function BlastGame({
       let hadClears = false;
 
       // 1. Match-3 clusters (Candy Crush mechanic — most frequent cascade source)
-      const clusters = detectMatch3Clusters(grid, engine.tileStates, affectedCols);
+      // Cap at MAX_CASCADE_WORDS_PER_LEVEL to prevent overwhelming chain reactions
+      const allClusters = detectMatch3Clusters(grid, latestTiles, affectedCols);
+      const clusters = allClusters.slice(0, MAX_CASCADE_WORDS_PER_LEVEL);
       if (clusters.length > 0) {
         chainLevel++;
         hadClears = true;
@@ -243,7 +250,7 @@ export function BlastGame({
 
       // 2. Vertical auto-words
       const vertWords = detectVerticalWords(
-        grid, engine.tileStates, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
+        grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols,
       );
       if (vertWords.length > 0) {
         if (!hadClears) chainLevel++;
@@ -258,7 +265,7 @@ export function BlastGame({
 
       // 3. Horizontal auto-words
       const horizWords = detectHorizontalWords(
-        grid, engine.tileStates, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
+        grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows,
       );
       if (horizWords.length > 0) {
         if (!hadClears) chainLevel++;
@@ -282,7 +289,7 @@ export function BlastGame({
       const chainBonus = chainLevel * 5;
       setScoreFlyEvents(prev => [...prev.slice(-3), {
         id: chainFlyId, score: chainBonus,
-        startX: (config.gridSize / 2) * 60, startY: (config.gridSize / 2) * 60,
+        startX: 50, startY: 50,
         tier: chainTier,
       }]);
 
@@ -369,12 +376,29 @@ export function BlastGame({
     onQuit();
   }, [onQuit]);
 
+  // Compute initial tile type counts once per wave (for clear_all_type objectives)
+  const initialTileTypeCounts = useMemo(() => {
+    const tiles = engine.tileStates;
+    if (!tiles.length) return undefined;
+    const counts: Record<string, number> = {};
+    for (const row of tiles) {
+      for (const tile of row) {
+        if (!tile.isCleared) {
+          counts[tile.type] = (counts[tile.type] || 0) + 1;
+        }
+      }
+    }
+    return counts as Record<import('./types').BlastTileType, number>;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- capture once per wave
+  }, [waveNumber]);
+
   // Objective tracking
   const objectives = useBlastObjectives({
     gameState: engine.gameState,
     tileTypeClears: engine.gameState.tileTypeClears,
     waveNumber,
     wordsFound: engine.gameState.wordsFound,
+    initialTileTypeCounts,
   });
 
   // Combo timeout sound when streak drops to 0

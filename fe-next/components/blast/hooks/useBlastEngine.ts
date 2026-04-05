@@ -36,6 +36,8 @@ export interface UseBlastEngineOptions {
   isMultiplayer?: boolean;
   blastSeed?: number | null;
   initialTileStates?: BlastTileState[][] | null;
+  /** Minimum word length for dead-end detection (defaults to 2) */
+  minWordLength?: number;
 }
 
 export interface WordSubmitResult {
@@ -74,6 +76,8 @@ export interface UseBlastEngineReturn {
   /** Consume a move without clearing tiles (e.g. invalid word submission) */
   consumeMove: () => void;
   noWordsRemaining: boolean;
+  /** Read current grid/tileStates from refs — use in async loops where React state is stale */
+  getLatestState: () => { grid: LetterGrid | null; tileStates: BlastTileState[][] };
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -109,7 +113,14 @@ export function useBlastEngine(
   const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(null);
   const effectiveGrid = currentGrid || initialGrid;
   const effectiveGridRef = useRef(effectiveGrid);
-  effectiveGridRef.current = effectiveGrid;
+  // NOTE: Do NOT sync ref from state on every render (effectiveGridRef.current = effectiveGrid)
+  // — during async cascades, React re-renders overwrite refs with stale pre-gravity state.
+  // Sync only when initialGrid first loads (currentGrid is still null).
+  useEffect(() => {
+    if (!currentGrid && initialGrid) {
+      effectiveGridRef.current = initialGrid;
+    }
+  }, [initialGrid, currentGrid]);
 
   // Tile states
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {
@@ -123,11 +134,12 @@ export function useBlastEngine(
   useEffect(() => {
     if (initialTileStatesFromOptions && initialTileStatesFromOptions.length > 0) {
       setTileStates(initialTileStatesFromOptions);
+      tileStatesRef.current = initialTileStatesFromOptions;
     }
   }, [initialTileStatesFromOptions]);
 
   const tileStatesRef = useRef(tileStates);
-  tileStatesRef.current = tileStates;
+  // NOTE: Do NOT sync ref from state on every render — same reason as effectiveGridRef above.
 
   // Game state
   const [gameState, setGameState] = useState<BlastGameState>({
@@ -201,7 +213,7 @@ export function useBlastEngine(
     const timer = setTimeout(() => {
       const run = () => {
         const foundSet = new Set(gameState.wordsFound);
-        const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet);
+        const valid = hasValidWords(displayGrid, language, checkWordInDict, foundSet, options?.minWordLength ?? 2);
         setNoWordsRemaining(!valid);
       };
       if (typeof requestIdleCallback === 'function') {
@@ -264,6 +276,7 @@ export function useBlastEngine(
     const betweenTurn = applyBetweenTurnEffects(tilesAfterThaw, gridSize);
 
     setTileStates(tilesAfterThaw);
+    // eslint-disable-next-line react-hooks/immutability
     tileStatesRef.current = tilesAfterThaw;
 
     setGameState(prev => {
@@ -333,6 +346,7 @@ export function useBlastEngine(
     // but defer React state updates — caller should call commitCascade()
     // after animation completes so tiles don't snap to new positions mid-fall.
     effectiveGridRef.current = gravityResult.newGrid;
+    // eslint-disable-next-line react-hooks/immutability
     tileStatesRef.current = gravityResult.newTileStates;
 
     setIsCascading(false);
@@ -411,6 +425,13 @@ export function useBlastEngine(
     });
   }, []);
 
+  /** Read current grid/tileStates from refs (not React state) — use in async loops
+   *  where React state may be stale due to batching. */
+  const getLatestState = useCallback(() => ({
+    grid: effectiveGridRef.current,
+    tileStates: tileStatesRef.current,
+  }), []);
+
   return {
     grid: effectiveGrid,
     tileStates,
@@ -426,5 +447,6 @@ export function useBlastEngine(
     trackWordFail,
     consumeMove,
     noWordsRemaining,
+    getLatestState,
   };
 }

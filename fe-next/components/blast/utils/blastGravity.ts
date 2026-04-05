@@ -53,11 +53,11 @@ export interface GravityResult {
 export function generateNonDuplicateLetter(
   language: Language,
   rng: () => number,
-  neighborLetter: string,
-  maxRetries = 3,
+  neighborLetters: string[],
+  maxRetries = 5,
 ): string {
   let letter = generateBlastLetter(language, 1.0, rng);
-  for (let attempt = 0; attempt < maxRetries && letter === neighborLetter; attempt++) {
+  for (let attempt = 0; attempt < maxRetries && neighborLetters.includes(letter); attempt++) {
     letter = generateBlastLetter(language, 1.0, rng);
   }
   return letter;
@@ -174,12 +174,19 @@ export function computeGravityResult(
     if (refill) {
       for (let i = 0; i < emptyCount; i++) {
         const row = bottomRow - i; // top-most first
+        // Collect neighbors to avoid: tile below + left + right (prevents both vertical & horizontal match-3)
+        const neighbors: string[] = [];
+        const below = newGrid[row + 1]?.[col];
+        if (below) neighbors.push(below);
+        const left = newGrid[row]?.[col - 1];
+        if (left) neighbors.push(left);
+        const right = newGrid[row]?.[col + 1];
+        if (right) neighbors.push(right);
         const letter = generateNonDuplicateLetter(
           language,
           rng ?? Math.random,
-          // Check the tile below (previously placed refill or surviving tile)
-          newGrid[row + 1]?.[col] ?? '',
-          3,
+          neighbors,
+          5,
         );
         const type = rollSpecialType(specialTileChance, customDistribution, spawnModifier, rng);
 

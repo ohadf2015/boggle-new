@@ -130,11 +130,11 @@ export function detectSpecialCombos(
   // Track which tile coords have been claimed by a specific pair combo
   // (prevents generic rainbow_special/gold_special fallbacks for the same tile)
   const usedTileKeys = new Set<string>();
+  const tileKey = (t: { row: number; col: number }) => `${t.row},${t.col}`;
 
   // Check pair combos: for each defined pair, see if path contains both types.
   // Each tile can only participate in one pair combo (checked via usedTileKeys).
   for (const def of PAIR_COMBOS) {
-    const tileKey = (t: { row: number; col: number }) => `${t.row},${t.col}`;
     const tilesA = specialTiles.filter(t => t.tileType === def.a && !usedTileKeys.has(tileKey(t)));
     const tilesB = def.a === def.b
       ? tilesA.length >= 2 ? tilesA : []
@@ -175,6 +175,8 @@ export function detectSpecialCombos(
       scoreMultiplier: 5,
       label: 'blast.combo.gold_special',
     });
+    usedTileKeys.add(tileKey(goldTiles[0]));
+    usedTileKeys.add(tileKey(effectTilesForGold[0]));
   }
 
   // Rainbow + any effect special (fallback — only if rainbow not already used in a specific pair)
@@ -191,6 +193,8 @@ export function detectSpecialCombos(
       scoreMultiplier: 3,
       label: 'blast.combo.rainbow_special',
     });
+    usedTileKeys.add(tileKey(rainbowTilesUnused[0]));
+    usedTileKeys.add(tileKey(effectTilesForRainbow[0]));
   }
 
   // Triple special: 3+ unclaimed special tiles in one word
