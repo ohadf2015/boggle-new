@@ -45,7 +45,7 @@ PID_TSC=$!
   FAIL=0
 
   if [ -n "$BACKEND_FILES" ]; then
-    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --related $BACKEND_FILES --passWithNoTests 2>&1 || FAIL=1
+    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --passWithNoTests 2>&1 || FAIL=1
   fi
 
   if [ -n "$FRONTEND_FILES" ]; then
