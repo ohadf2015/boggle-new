@@ -1,18 +1,18 @@
 // Mock supabaseServer before importing the router
-jest.mock('../../modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn(() => true),
-  getSupabase: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        order: jest.fn(() => ({
-          limit: jest.fn().mockResolvedValue({ data: [], error: null }),
+vi.mock('../../modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn(() => true),
+  getSupabase: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        order: vi.fn(() => ({
+          limit: vi.fn().mockResolvedValue({ data: [], error: null }),
         })),
-        eq: jest.fn(() => ({
-          single: jest.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
+        eq: vi.fn(() => ({
+          single: vi.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
         })),
-        gte: jest.fn(() => ({
-          order: jest.fn(() => ({
-            limit: jest.fn().mockResolvedValue({ data: [], error: null }),
+        gte: vi.fn(() => ({
+          order: vi.fn(() => ({
+            limit: vi.fn().mockResolvedValue({ data: [], error: null }),
           })),
         })),
       })),
@@ -20,21 +20,22 @@ jest.mock('../../modules/supabaseServer', () => ({
   })),
 }));
 
-jest.mock('../../redisClient', () => ({
-  getCachedLeaderboardTop100: jest.fn().mockResolvedValue(null),
-  cacheLeaderboardTop100: jest.fn().mockResolvedValue(undefined),
-  getCachedUserRank: jest.fn().mockResolvedValue(null),
-  cacheUserRank: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../redisClient', () => ({
+  getCachedLeaderboardTop100: vi.fn().mockResolvedValue(null),
+  cacheLeaderboardTop100: vi.fn().mockResolvedValue(undefined),
+  getCachedUserRank: vi.fn().mockResolvedValue(null),
+  cacheUserRank: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../utils/requestCoalescing', () => ({
-  coalesce: jest.fn((_key: string, fn: () => Promise<any>) => fn()),
+vi.mock('../../utils/requestCoalescing', () => ({
+  coalesce: vi.fn((_key: string, fn: () => Promise<any>) => fn()),
 }));
 
-jest.mock('../../db/queries/leaderboardQueries', () => ({
-  getTopPlayersByScore: jest.fn().mockResolvedValue([]),
+vi.mock('../../db/queries/leaderboardQueries', () => ({
+  getTopPlayersByScore: vi.fn().mockResolvedValue([]),
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { appRouter } from '../../trpc/root';
 
 describe('tRPC leaderboard router', () => {

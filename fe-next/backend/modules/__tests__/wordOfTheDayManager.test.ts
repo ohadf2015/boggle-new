@@ -4,20 +4,24 @@
  */
 
 // Mock supabase before imports
-const mockFrom = jest.fn();
-const mockRpc = jest.fn();
-jest.mock('../supabaseServer', () => ({
+const { mockFrom, mockRpc } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockRpc = vi.fn();
+  return { mockFrom, mockRpc };
+});
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => ({
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
   }),
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() },
+  default: { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() },
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getWordOfTheDay,
   recordWotdAttempt,
@@ -28,7 +32,7 @@ import {
 
 describe('wordOfTheDayManager', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==========================================
@@ -76,10 +80,10 @@ describe('wordOfTheDayManager', () => {
   describe('getWordOfTheDay', () => {
     it('should return a word from the pool for a given date', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -93,10 +97,10 @@ describe('wordOfTheDayManager', () => {
 
     it('should return same word for same date and language', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -109,10 +113,10 @@ describe('wordOfTheDayManager', () => {
 
     it('should return different words for different languages', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -128,10 +132,10 @@ describe('wordOfTheDayManager', () => {
 
     it('should include stats when DB row exists', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: { found_count: 42, total_players: 100 },
                 error: null,
               }),
@@ -152,11 +156,11 @@ describe('wordOfTheDayManager', () => {
   describe('recordWotdAttempt', () => {
     it('should return alreadyRecorded if player already attempted', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({ data: { id: '123' }, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: { id: '123' }, error: null }),
               }),
             }),
           }),
@@ -171,40 +175,40 @@ describe('wordOfTheDayManager', () => {
     it('should record new attempt when player has not tried', async () => {
       // Call 1: check existing (none found)
       const selectChain = {
-        eq: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
       };
-      const insertMock = jest.fn().mockResolvedValue({ error: null });
-      const upsertMock = jest.fn().mockResolvedValue({ error: null });
+      const insertMock = vi.fn().mockResolvedValue({ error: null });
+      const upsertMock = vi.fn().mockResolvedValue({ error: null });
       // Calls 4/5: count queries return { count }
       const countSelectChain = (count: number) => ({
-        eq: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({ count }),
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({ count }),
           count,
         }),
         count,
       });
       // Call 6: update chain
       const updateChain = {
-        eq: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: null }),
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: null }),
         }),
       };
 
       let callCount = 0;
       mockFrom.mockImplementation(() => {
         callCount++;
-        if (callCount === 1) return { select: jest.fn().mockReturnValue(selectChain) };
+        if (callCount === 1) return { select: vi.fn().mockReturnValue(selectChain) };
         if (callCount === 2) return { insert: insertMock };
         if (callCount === 3) return { upsert: upsertMock };
-        if (callCount === 4) return { select: jest.fn().mockReturnValue(countSelectChain(1)) };
-        if (callCount === 5) return { select: jest.fn().mockReturnValue(countSelectChain(1)) };
-        return { update: jest.fn().mockReturnValue(updateChain) };
+        if (callCount === 4) return { select: vi.fn().mockReturnValue(countSelectChain(1)) };
+        if (callCount === 5) return { select: vi.fn().mockReturnValue(countSelectChain(1)) };
+        return { update: vi.fn().mockReturnValue(updateChain) };
       });
 
       const result = await recordWotdAttempt('player1', 'crystal', true, 'en', '2026-03-22');
@@ -228,10 +232,10 @@ describe('wordOfTheDayManager', () => {
   describe('getWotdStats', () => {
     it('should return stats when data exists', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: { found_count: 25, total_players: 100 },
                 error: null,
               }),
@@ -248,10 +252,10 @@ describe('wordOfTheDayManager', () => {
 
     it('should return zeros when no data exists', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: null }),
             }),
           }),
         }),
@@ -265,10 +269,10 @@ describe('wordOfTheDayManager', () => {
 
     it('should calculate percent correctly with rounding', async () => {
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: { found_count: 1, total_players: 3 },
                 error: null,
               }),

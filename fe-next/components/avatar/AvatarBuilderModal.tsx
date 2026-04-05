@@ -61,8 +61,8 @@ interface AvatarBuilderModalProps {
   onClose: () => void;
   onSave: (config: CustomAvatarConfig) => void;
   initialConfig?: CustomAvatarConfig;
-  /** Pass premium context from parent (requires CoinProvider). When omitted, premium gating is disabled. */
-  premium?: AvatarPremium;
+  /** Pass premium context to gate parts, or `null` to explicitly allow only free parts (e.g. onboarding). */
+  premium: AvatarPremium | null;
 }
 
 export default function AvatarBuilderModal({
@@ -214,7 +214,7 @@ export default function AvatarBuilderModal({
                 config={config}
                 updateConfig={updateConfig}
                 t={t}
-                premium={premium}
+                premium={premium ?? undefined}
                 onCoinSpend={setCoinSpendAmount}
               />
             </AdaptiveMotion.div>

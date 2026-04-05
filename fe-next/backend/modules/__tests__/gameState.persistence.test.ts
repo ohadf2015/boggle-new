@@ -3,25 +3,26 @@
  * Focuses on restoreAllGamesFromRedis which enables zero-downtime deploys.
  */
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
-const mockSaveGameState = jest.fn();
-const mockGetGameState = jest.fn();
-const mockDeleteGameState = jest.fn();
-const mockGetAllGameCodes = jest.fn();
+const mockSaveGameState = vi.fn();
+const mockGetGameState = vi.fn();
+const mockDeleteGameState = vi.fn();
+const mockGetAllGameCodes = vi.fn();
 
-jest.mock('../../redisClient', () => ({
+vi.mock('../../redisClient', () => ({
   saveGameState: (...args: unknown[]) => mockSaveGameState(...args),
   getGameState: (...args: unknown[]) => mockGetGameState(...args),
   deleteGameState: (...args: unknown[]) => mockDeleteGameState(...args),
   getAllGameCodes: (...args: unknown[]) => mockGetAllGameCodes(...args),
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   restoreAllGamesFromRedis,
   getAllGameCodesFromRedis,
@@ -33,12 +34,12 @@ describe('restoreAllGamesFromRedis', () => {
 
   beforeEach(() => {
     games = {};
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('restores games found in Redis into the games object', async () => {
@@ -134,7 +135,7 @@ describe('restoreAllGamesFromRedis', () => {
     expect(games['ORPHAN']).toBeDefined();
 
     // Simulate 2 minutes passing with no players reconnecting
-    jest.advanceTimersByTime(2 * 60 * 1000);
+    vi.advanceTimersByTime(2 * 60 * 1000);
 
     expect(games['ORPHAN']).toBeUndefined();
   });
@@ -172,7 +173,7 @@ describe('restoreAllGamesFromRedis', () => {
       },
     } as any;
 
-    jest.advanceTimersByTime(2 * 60 * 1000);
+    vi.advanceTimersByTime(2 * 60 * 1000);
 
     // Game should still exist because a player reconnected
     expect(games['ACTIVE']).toBeDefined();
@@ -213,7 +214,7 @@ describe('restoreAllGamesFromRedis', () => {
 
 describe('getAllGameCodesFromRedis', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('retrieves game codes via getAllGameCodes', async () => {

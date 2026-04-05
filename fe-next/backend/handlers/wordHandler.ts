@@ -35,7 +35,7 @@ import timerManager from '../utils/timerManager.js';
 import { isSocketMigrating } from './shared';
 import { validatePayload, submitWordSchema, submitWordVoteSchema, submitPeerValidationVoteSchema } from '../utils/socketValidation.js';
 import { handleValidatedWord, handleWordBecameValid, handlePeerRejection, type PeerValidationResult } from './wordValidationHandler';
-import { ensurePlayerState } from './gameLifecycleHandler';
+import { ensurePlayerState } from './playerDataInit';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
 import { calculateWordScore } from '../modules/scoringEngine.js';

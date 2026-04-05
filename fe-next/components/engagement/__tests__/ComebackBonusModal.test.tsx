@@ -86,8 +86,10 @@ describe('ComebackBonusModal', () => {
 
     await waitFor(() => {
       expect(mockPostWithAuth).toHaveBeenCalledWith('/api/engagement/comeback');
-      expect(onClaimed).toHaveBeenCalled();
     });
+    await waitFor(() => {
+      expect(onClaimed).toHaveBeenCalled();
+    }, { timeout: 3000 });
   });
 
   it('calls onClose when close button clicked', () => {

@@ -31,6 +31,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useGameActions } from '@/hooks/gameState';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import { neoInfoToast } from '@/components/NeoToast';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 
@@ -263,6 +264,17 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // Sync ref bridge so hooks called before useMultiplayerSocket get the latest socket
   socketRef.current = socket;
 
+  // Listen for room language changes (host changed the game dictionary language)
+  useEffect(() => {
+    if (!socket) return;
+    const handleRoomLanguageChanged = (data: { language: Language; changedBy: string }) => {
+      setRoomLanguage(data.language);
+      neoInfoToast(t('hostView.languageChangedNotification', { name: data.changedBy, language: t(`joinView.${data.language === 'en' ? 'english' : data.language === 'he' ? 'hebrew' : data.language === 'sv' ? 'swedish' : data.language === 'ja' ? 'japanese' : 'spanish'}`) }));
+    };
+    socket.on('roomLanguageChanged', handleRoomLanguageChanged);
+    return () => { socket.off('roomLanguageChanged', handleRoomLanguageChanged); };
+  }, [socket, t]);
+
   const handleJoin = useMultiplayerJoin({
     socket, gameCode, username, roomName, hostUsername,
     language: language as Language, t, isSupabaseEnabled,
@@ -344,6 +356,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             initialPlayers={playersInRoom} username={username}
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
             onGameStartConsumed={() => setPendingGameStart(null)} lessonData={lessonData}
+            onUsernameChange={setUsername}
           />
         </FeatureErrorBoundary>
       );

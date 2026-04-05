@@ -52,30 +52,3 @@ export {
   type PlayerResultOutput,
   type GameResultsOutput,
 } from './gameProcessing';
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  // Client
-  getSupabase: require('./client').getSupabase,
-  isSupabaseConfigured: require('./client').isSupabaseConfigured,
-  // Game results
-  recordGameResult: require('./gameResults').recordGameResult,
-  // Player stats
-  updatePlayerStats: require('./playerStats').updatePlayerStats,
-  // Leaderboard
-  updateLeaderboardEntry: require('./leaderboard').updateLeaderboardEntry,
-  updateRankedProgress: require('./leaderboard').updateRankedProgress,
-  // Guest tokens
-  getOrCreateGuestToken: require('./guestTokens').getOrCreateGuestToken,
-  updateGuestStats: require('./guestTokens').updateGuestStats,
-  // Words
-  saveHostApprovedWord: require('./words').saveHostApprovedWord,
-  savePlayerWord: require('./words').savePlayerWord,
-  getPopularPlayerWords: require('./words').getPopularPlayerWords,
-  incrementBotWordUsage: require('./words').incrementBotWordUsage,
-  recordPlayerWrongWord: require('./words').recordPlayerWrongWord,
-  // Ranked MMR
-  updateRankedMmr: require('./rankedMmr').updateRankedMmr,
-  // Game processing
-  processGameResults: require('./gameProcessing').processGameResults,
-};

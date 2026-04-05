@@ -778,6 +778,7 @@ const es = {
     "code": "Código",
     "joinViaLink": "Toca para unirte",
     "qrCodeTitle": "Escanea para Batallar",
+    "qrCodeAlt": "Código QR para unirse al juego - código de sala {{code}}",
     "codeCopied": "¡Código copiado! 🎯",
     "codeCopyError": "No se pudo copiar",
     "buttonLabel": "Invitar",
@@ -1233,6 +1234,7 @@ const es = {
   },
   "hostView": {
     "lobby": "Cuartel",
+    "lobbyTitle": "Sala multijugador",
     "waitingForPlayers": "Esperando que llegue la banda...",
     "startGame": "¡GO!",
     "startBattle": "¡Iniciar batalla!",
@@ -1379,6 +1381,8 @@ const es = {
     "difficultyTooltipGrid": "El tamaño afecta la dificultad",
     "difficultyTooltipTimer": "Más tiempo = más palabras",
     "bot": "Bot",
+    "gameLanguage": "Idioma del juego",
+    "languageChangedNotification": "{{name}} cambió el idioma del juego a {{language}}",
     "addFriend": "Agregar a {name}",
     "requestSent": "Solicitud enviada"
   },
@@ -3371,7 +3375,10 @@ const es = {
     "hints": "Pistas gratuitas añadidas",
     "streakFreezes": "Congelaciones de racha añadidas",
     "titleUnlocked": "¡Título exclusivo desbloqueado!",
-    "claimButton": "Reclamar mi bono"
+    "claimButton": "Reclamar mi bono",
+    "claimed": "¡Bono activado!",
+    "claimError": "Error — Toca para reintentar",
+    "tapToRetry": "Algo salió mal. Toca el botón para intentar de nuevo."
   },
   "calendar": {
     "title": "Botín Diario",
@@ -3743,6 +3750,13 @@ const es = {
     "later": "Después"
   },
   "tutorial": {
+    "step1Title": "Encuentra palabras",
+    "step1Desc": "Desliza sobre las letras para formar palabras. ¡Cuanto más larga, más puntos!",
+    "step2Title": "Puntaje alto",
+    "step2Desc": "Encadena combos y encuentra palabras raras para multiplicar tu puntaje. ¡La velocidad importa!",
+    "step3Title": "Gana la partida",
+    "step3Desc": "Supera a tus oponentes antes de que se acabe el tiempo. ¡Sube en la tabla!",
+    "uiLanguage": "Idioma de pantalla",
     "skip": "Saltar",
     "prev": "Atrás",
     "next": "Siguiente",
@@ -4993,6 +5007,10 @@ const es = {
       "lifeLeft": "vida restante",
       "firstTry": "¡Primer intento!",
       "guesses": "intentos",
+      "extraTryPenalty": "Penalización por intento extra",
+      "extraTry": "intento extra",
+      "extraTries": "intentos extra",
+      "points": "puntos",
       "wordsFound": "palabras encontradas",
       "improve": {
         "speed": "Termina más rápido para mejorar",

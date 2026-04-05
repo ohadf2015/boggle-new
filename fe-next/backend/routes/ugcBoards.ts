@@ -28,21 +28,16 @@ import {
   japaneseLetters,
 } from '../utils/gameUtils';
 
-// Lazy imports to avoid startup cost
-let _embedMultipleWordsInGrid: ((...args: unknown[]) => string[][]) | null = null;
+// Use require for cross-rootDir modules (outside backend/)
+const { embedMultipleWordsInGrid: _embedMultipleWordsInGrid } = require('../../utils/dailyChallenge/gridPathFinding');
+import { findWordsForBots as _findWordsForBots } from '../modules/boggleSolver';
+
 function getGridEmbedder() {
-  if (!_embedMultipleWordsInGrid) {
-    _embedMultipleWordsInGrid = require('../../utils/dailyChallenge/gridPathFinding').embedMultipleWordsInGrid;
-  }
-  return _embedMultipleWordsInGrid!;
+  return _embedMultipleWordsInGrid as (...args: unknown[]) => string[][];
 }
 
-let _findWordsForBots: ((grid: string[][], language: string) => { easy: string[]; medium: string[]; hard: string[] }) | null = null;
 function getSolver() {
-  if (!_findWordsForBots) {
-    _findWordsForBots = require('../modules/boggleSolver').findWordsForBots;
-  }
-  return _findWordsForBots!;
+  return _findWordsForBots;
 }
 
 const router: Router = express.Router();

@@ -37,6 +37,11 @@ import {
   CASCADE_SPARKLE,
   BOARD_CLEAR,
   AMBIENT_BOKEH,
+  DIAMOND_SHARDS,
+  GOLD_STARS,
+  CONFETTI_BURST,
+  FIRE_EMBERS,
+  ELECTRIC_RINGS,
 } from '@/lib/gameEngine/presets/particles';
 import { pickRandom } from './blastEffectVariations';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
@@ -321,6 +326,31 @@ function EffectsWorker({
           physics.applyExplosion({ x, y }, 0.005, cellSize * 3.5);
         }, 280);
         magnetTimersRef.current.push(tid);
+      // Diamond: crystalline shards + mini shockwave
+      } else if (tile.type === 'diamond') {
+        particles.burst(DIAMOND_SHARDS, x, y);
+        fireShockwave(x, y, 12);
+      // Gold: golden star burst
+      } else if (tile.type === 'gold') {
+        particles.burst(GOLD_STARS, x, y);
+      // Rainbow/Wildcard: confetti celebration
+      } else if (tile.type === 'rainbow' || tile.type === 'wildcard') {
+        particles.burst(CONFETTI_BURST, x, y);
+      // Countdown: fire embers explosion
+      } else if (tile.type === 'countdown') {
+        particles.burst(FIRE_EMBERS, x, y);
+        if (isFinalHit) fireShockwave(x, y, 15);
+      // Virus: toxic green implosion
+      } else if (tile.type === 'virus') {
+        particles.burst(VORTEX_PULL, x, y);
+      // Portal: vortex pull + electric rings
+      } else if (tile.type === 'portal') {
+        particles.burst(VORTEX_PULL, x, y);
+        particles.burst(ELECTRIC_RINGS, x, y);
+      // Catalyst: golden stars + embers
+      } else if (tile.type === 'catalyst') {
+        particles.burst(GOLD_STARS, x, y);
+        particles.burst(FIRE_EMBERS, x, y);
       } else {
         const preset = CLEAR_PRESET_MAP[tile.type] ?? pickRandom(TILE_EXPLOSION_VARIANTS);
         particles.burst(preset, x, y);

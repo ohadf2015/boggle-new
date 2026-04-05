@@ -9,35 +9,66 @@
  * - End game
  */
 
-const { createTestEnvironment, customMatchers } = require('../helpers/socketTestHelper');
-const { _resetBroadcastThrottle } = require('../../utils/socketHelpers');
-
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { createTestEnvironment, customMatchers } from '../helpers/socketTestHelper';
 // Add custom matchers
 expect.extend(customMatchers);
 
+// Mock classroom game manager — no Redis in integration tests
+vi.mock('../../modules/classroomGameManager', () => ({
+  getClassroomGame: vi.fn().mockResolvedValue(null),
+  getClassroomGameByCode: vi.fn().mockResolvedValue(null),
+  updateClassroomGameState: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock gameStartCoordinator to prevent infinite timer loops under fake timers
+vi.mock('../../utils/gameStartCoordinator', () => ({
+  default: {
+    initializeSequence: vi.fn().mockReturnValue('mock-message-id'),
+    scheduleRetries: vi.fn(),
+    setAcknowledgmentTimeout: vi.fn(),
+    clearGame: vi.fn(),
+    cleanupSequence: vi.fn(),
+    handleAcknowledgment: vi.fn(),
+    cancelRetries: vi.fn(),
+  },
+}));
+
+// Mock round events manager to prevent async timer chains under fake timers
+vi.mock('../../modules/roundEventsManager', () => ({
+  scheduleRoundEvent: vi.fn(),
+  cancelRoundEvents: vi.fn(),
+}));
+
+// Reset throttle via dynamic import
+async function resetBroadcastThrottle() {
+  const { _resetBroadcastThrottle } = await import('../../utils/socketHelpers');
+  _resetBroadcastThrottle();
+}
+
 // Increase timeout for dictionary loading during parallel test execution
 // Integration tests may take longer under heavy parallel load
-jest.setTimeout(45000);
+vi.setConfig({ testTimeout: 45000 });
 
 describe('Game Flow Integration', () => {
   let env;
 
   // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
   beforeAll(async () => {
-    const { ensureLanguageLoaded } = require('../../dictionary');
+    const { ensureLanguageLoaded } = await import('../../dictionary');
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(() => {
-    _resetBroadcastThrottle();
+  beforeEach(async () => {
+    await resetBroadcastThrottle();
     env = createTestEnvironment();
     // Clear rate limiter state between tests
-    jest.useFakeTimers({ advanceTimers: true });
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Game Creation', () => {
@@ -266,7 +297,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last player (host) leaves in waiting state', async () => {
-    const { gameExists } = require('../../modules/gameStateManager');
+    const { gameExists } = await import('../../modules/gameStateManager');
     const hostSocket = env.createSocket();
     const gameData = env.createGameData();
 
@@ -288,7 +319,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last player leaves after others left', async () => {
-    const { gameExists } = require('../../modules/gameStateManager');
+    const { gameExists } = await import('../../modules/gameStateManager');
     const hostSocket = env.createSocket();
     const playerSocket = env.createSocket();
     const gameData = env.createGameData();
@@ -325,7 +356,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when host (only player) disconnects', async () => {
-    const { gameExists } = require('../../modules/gameStateManager');
+    const { gameExists } = await import('../../modules/gameStateManager');
     const hostSocket = env.createSocket();
     const gameData = env.createGameData();
 
@@ -343,7 +374,7 @@ describe('Room Auto-Close', () => {
   });
 
   test('room auto-closes when last non-host player disconnects', async () => {
-    const { gameExists, getGame } = require('../../modules/gameStateManager');
+    const { gameExists, getGame } = await import('../../modules/gameStateManager');
     const hostSocket = env.createSocket();
     const playerSocket = env.createSocket();
     const gameData = env.createGameData();

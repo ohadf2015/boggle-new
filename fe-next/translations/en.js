@@ -605,9 +605,9 @@ const en = {
     "lostLead": "{{username}} took the lead!"
   },
   "roundEvent": {
-    "blizzardWarning": "❄️ Blizzard incoming!",
-    "lightningWarning": "⚡ Lightning round!",
-    "meteorWarning": "🌟 Meteor strike!",
+    "blizzardWarning": "Blizzard incoming!",
+    "lightningWarning": "Lightning strike!",
+    "meteorWarning": "Meteor shower!",
     "active": "Active"
   },
   "specialWord": {
@@ -792,6 +792,7 @@ const en = {
     "code": "Code",
     "joinViaLink": "Tap to join",
     "qrCodeTitle": "Scan to Battle",
+    "qrCodeAlt": "QR code to join game - room code {{code}}",
     "codeCopied": "Code copied! 🎯",
     "codeCopyError": "Couldn't copy",
     "buttonLabel": "Invite",
@@ -1210,6 +1211,7 @@ const en = {
   },
   "hostView": {
     "lobby": "War Room",
+    "lobbyTitle": "Multiplayer Lobby",
     "waitingForPlayers": "Gathering warriors...",
     "startGame": "GO!",
     "startBattle": "Start Battle!",
@@ -1356,7 +1358,9 @@ const en = {
     "difficultyTooltipGrid": "Grid size affects difficulty",
     "difficultyTooltipTimer": "Longer time = more words found",
     "roomChat": "Room Chat",
-    "bot": "Bot"
+    "bot": "Bot",
+    "gameLanguage": "Game Language",
+    "languageChangedNotification": "{{name}} changed the game language to {{language}}"
   },
   "tvBroadcast": {
     "liveGameInProgress": "Live Game in Progress",
@@ -2474,6 +2478,13 @@ const en = {
     "later": "Later"
   },
   "tutorial": {
+    "step1Title": "Find Words",
+    "step1Desc": "Swipe across letters to form words. The longer the word, the more points you score!",
+    "step2Title": "Score Big",
+    "step2Desc": "Chain combos and find rare words to multiply your score. Speed matters!",
+    "step3Title": "Win the Match",
+    "step3Desc": "Outscore your opponents before time runs out. Climb the leaderboard!",
+    "uiLanguage": "Display Language",
     "multiDirection": "Swipe in any direction! Words can zigzag across the grid.",
     "skip": "Skip",
     "prev": "Back",
@@ -3721,7 +3732,10 @@ const en = {
     "hints": "Free hints added",
     "streakFreezes": "Streak freezes added",
     "titleUnlocked": "Exclusive title unlocked!",
-    "claimButton": "Claim My Bonus"
+    "claimButton": "Claim My Bonus",
+    "claimed": "Bonus Activated!",
+    "claimError": "Failed — Tap to Retry",
+    "tapToRetry": "Something went wrong. Tap the button to try again."
   },
   "calendar": {
     "title": "Daily Loot",
@@ -5112,6 +5126,10 @@ const en = {
       "firstTry": "First try!",
       "guesses": "guesses",
       "wordsFound": "words found",
+      "extraTryPenalty": "Extra Try Penalty",
+      "extraTry": "extra try",
+      "extraTries": "extra tries",
+      "points": "pts",
       "improve": {
         "speed": "Finish faster to improve",
         "accuracy": "Use fewer guesses",

@@ -10,7 +10,10 @@ import { throttle } from '@/utils/throttle';
  * Performance: Uses throttled resize listener (100ms) to prevent jank on low-end devices
  */
 export function useMobilePortrait(): boolean {
-  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 640 && window.innerWidth <= window.innerHeight;
+  });
   const throttledCheckRef = useRef<ReturnType<typeof throttle> | null>(null);
 
   useEffect(() => {

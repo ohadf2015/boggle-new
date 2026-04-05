@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 // @ts-jest-config: {"diagnostics":false}
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { GameState } from '../../modules/gameState/types';
 import {
   handleReconnection,
@@ -24,53 +25,53 @@ import timerManager from '../../utils/timerManager';
 import { isInProgress } from '../../utils/gameStateMachine';
 import { ACHIEVEMENT_ICONS } from '../../modules/achievementManager';
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
-jest.mock('../../modules/gameStateManager');
-jest.mock('../../utils/socketHelpers');
-jest.mock('../../utils/timerManager', () => ({
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
+vi.mock('../../modules/gameStateManager');
+vi.mock('../../utils/socketHelpers');
+vi.mock('../../utils/timerManager', () => ({
   __esModule: true,
   default: {
-    clearTimer: jest.fn(),
-    setTimeout: jest.fn(),
+    clearTimer: vi.fn(),
+    setTimeout: vi.fn(),
   },
-  clearGameTimer: jest.fn(),
+  clearGameTimer: vi.fn(),
 }));
-jest.mock('../../utils/gameStateMachine');
-jest.mock('../../modules/achievementManager', () => ({
+vi.mock('../../utils/gameStateMachine');
+vi.mock('../../modules/achievementManager', () => ({
   ACHIEVEMENT_ICONS: { SPEED_DEMON: '⚡', COMBO_KING: '👑' },
 }));
-jest.mock('../../modules/tournamentManager', () => ({
-  addPlayerMidTournament: jest.fn(),
-  getTournament: jest.fn(),
-  getTournamentStandings: jest.fn(),
-  getTournamentIdFromGame: jest.fn().mockReturnValue(null),
+vi.mock('../../modules/tournamentManager', () => ({
+  addPlayerMidTournament: vi.fn(),
+  getTournament: vi.fn(),
+  getTournamentStandings: vi.fn(),
+  getTournamentIdFromGame: vi.fn().mockReturnValue(null),
 }));
-jest.mock('../../modules/botManager', () => ({
-  cleanupGameBots: jest.fn(),
+vi.mock('../../modules/botManager', () => ({
+  cleanupGameBots: vi.fn(),
 }));
 
-const mockGetGameUsers = getGameUsers as jest.Mock;
-const mockUpdateUserSocketId = updateUserSocketId as jest.Mock;
-const mockUpdateHostSocketId = updateHostSocketId as jest.Mock;
-const mockGetLeaderboard = getLeaderboard as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
-const mockGetGameRoom = getGameRoom as jest.Mock;
-const mockJoinRoom = joinRoom as jest.Mock;
-const mockLeaveRoom = leaveRoom as jest.Mock;
-const mockIsInProgress = isInProgress as jest.Mock;
-const mockTimerManager = timerManager as jest.Mocked<typeof timerManager>;
+const mockGetGameUsers = getGameUsers as Mock;
+const mockUpdateUserSocketId = updateUserSocketId as Mock;
+const mockUpdateHostSocketId = updateHostSocketId as Mock;
+const mockGetLeaderboard = getLeaderboard as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
+const mockGetGameRoom = getGameRoom as Mock;
+const mockJoinRoom = joinRoom as Mock;
+const mockLeaveRoom = leaveRoom as Mock;
+const mockIsInProgress = isInProgress as Mock;
+const mockTimerManager = timerManager as Mocked<typeof timerManager>;
 
 function createMockSocket(id = 'socket-new') {
   return {
     id,
-    emit: jest.fn(),
-    join: jest.fn(),
-    leave: jest.fn(),
+    emit: vi.fn(),
+    join: vi.fn(),
+    leave: vi.fn(),
     data: {},
   } as any;
 }
@@ -115,7 +116,7 @@ describe('handleReconnection', () => {
   const mockIo = {} as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetGameRoom.mockReturnValue('game:GAME1');
     mockGetGameUsers.mockReturnValue([]);
     mockGetLeaderboard.mockReturnValue([]);
@@ -280,7 +281,7 @@ describe('handleReconnection', () => {
 
 describe('handleLateJoin', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetLeaderboard.mockReturnValue([]);
   });
 

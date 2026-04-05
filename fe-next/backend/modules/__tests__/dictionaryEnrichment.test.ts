@@ -3,6 +3,7 @@
  * Handles promoting verified words to dictionary
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import * as fs from 'fs/promises';
 import {
   promoteVerifiedWordsToDictionary,
@@ -11,18 +12,24 @@ import {
 } from '../dictionaryEnrichment';
 
 // Mock fs/promises
-jest.mock('fs/promises');
-const mockedFs = fs as jest.Mocked<typeof fs>;
+vi.mock('fs/promises');
+const mockedFs = fs as unknown as { appendFile: Mock };
+
+// Hoist mock fn references so they survive vi.clearAllMocks()
+const { mockGetVerifiedWords, mockMarkWordPromoted } = vi.hoisted(() => ({
+  mockGetVerifiedWords: vi.fn(),
+  mockMarkWordPromoted: vi.fn(),
+}));
 
 // Mock milogWordVerifier
-jest.mock('../../services/milogWordVerifier', () => ({
-  getVerifiedWordsForPromotion: jest.fn(),
-  markWordPromoted: jest.fn(),
+vi.mock('../../services/milogWordVerifier', () => ({
+  getVerifiedWordsForPromotion: mockGetVerifiedWords,
+  markWordPromoted: mockMarkWordPromoted,
 }));
 
 // Mock dictionary module with hebrewWords Set
 const mockHebrewWords = new Set<string>();
-jest.mock('../../dictionary', () => ({
+vi.mock('../../dictionary', () => ({
   dictionary: {
     hebrewWords: mockHebrewWords,
   },
@@ -30,7 +37,7 @@ jest.mock('../../dictionary', () => ({
 
 describe('DictionaryEnrichment', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('normalizeHebrewWordForDictionary', () => {
@@ -96,29 +103,25 @@ describe('DictionaryEnrichment', () => {
     });
 
     it('should promote verified words and update database', async () => {
-      const { getVerifiedWordsForPromotion, markWordPromoted } = require('../../services/milogWordVerifier');
-
       // Mock verified words
-      getVerifiedWordsForPromotion.mockResolvedValueOnce([
+      mockGetVerifiedWords.mockResolvedValueOnce([
         { id: 'uuid-1', word: 'שלום', url: 'https://milog.co.il/שלום' },
         { id: 'uuid-2', word: 'בוקר', url: 'https://milog.co.il/בוקר' },
       ]);
 
       // Mock successful promotion
-      markWordPromoted.mockResolvedValue(true);
+      mockMarkWordPromoted.mockResolvedValue(true);
       mockedFs.appendFile.mockResolvedValue(undefined);
 
       const result = await promoteVerifiedWordsToDictionary();
 
       expect(result.promoted).toBe(2);
       expect(result.failed).toBe(0);
-      expect(markWordPromoted).toHaveBeenCalledTimes(2);
+      expect(mockMarkWordPromoted).toHaveBeenCalledTimes(2);
     });
 
     it('should handle empty verified words list', async () => {
-      const { getVerifiedWordsForPromotion } = require('../../services/milogWordVerifier');
-
-      getVerifiedWordsForPromotion.mockResolvedValueOnce([]);
+      mockGetVerifiedWords.mockResolvedValueOnce([]);
 
       const result = await promoteVerifiedWordsToDictionary();
 
@@ -127,9 +130,7 @@ describe('DictionaryEnrichment', () => {
     });
 
     it('should continue on individual word failure', async () => {
-      const { getVerifiedWordsForPromotion, markWordPromoted } = require('../../services/milogWordVerifier');
-
-      getVerifiedWordsForPromotion.mockResolvedValueOnce([
+      mockGetVerifiedWords.mockResolvedValueOnce([
         { id: 'uuid-1', word: 'שלום', url: null },
         { id: 'uuid-2', word: 'בוקר', url: null },
       ]);
@@ -139,7 +140,7 @@ describe('DictionaryEnrichment', () => {
         .mockRejectedValueOnce(new Error('Write error'))
         .mockResolvedValueOnce(undefined);
 
-      markWordPromoted.mockResolvedValue(true);
+      mockMarkWordPromoted.mockResolvedValue(true);
 
       const result = await promoteVerifiedWordsToDictionary();
 
@@ -148,13 +149,11 @@ describe('DictionaryEnrichment', () => {
     });
 
     it('should add words to in-memory dictionary', async () => {
-      const { getVerifiedWordsForPromotion, markWordPromoted } = require('../../services/milogWordVerifier');
-
-      getVerifiedWordsForPromotion.mockResolvedValueOnce([
+      mockGetVerifiedWords.mockResolvedValueOnce([
         { id: 'uuid-1', word: 'מילה', url: null },
       ]);
 
-      markWordPromoted.mockResolvedValue(true);
+      mockMarkWordPromoted.mockResolvedValue(true);
       mockedFs.appendFile.mockResolvedValue(undefined);
 
       await promoteVerifiedWordsToDictionary();

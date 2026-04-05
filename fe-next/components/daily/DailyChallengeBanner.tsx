@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Target, Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
+import { Flame, Check, Clock, Sparkles, X, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
@@ -221,7 +222,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         ref={tiltRef}
         className={cn(
           // Base card styles matching ModeCard
-          "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden",
+          "relative w-full h-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden [container-type:inline-size]",
           // Active effects matching ModeCard
           isRTL
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
@@ -294,45 +295,48 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           </>
         )}
 
-        <div className="flex items-center gap-3 sm:gap-4 relative z-10">
-          {/* Icon or Mascot - Enhanced with animated ring */}
-          {mascot ? (
-            <div className="flex-shrink-0">{mascot}</div>
-          ) : (
-            <div className="relative">
-              {/* Animated glow ring for unplayed state */}
-              {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
-                <motion.div
-                  className={cn(
-                    "absolute inset-0 rounded-neo",
-                    compact ? "-inset-1" : "-inset-1.5"
-                  )}
-                  animate={{
-                    boxShadow: [
-                      '0 0 0px rgba(255, 165, 0, 0)',
-                      '0 0 20px rgba(255, 165, 0, 0.8)',
-                      '0 0 0px rgba(255, 165, 0, 0)'
-                    ],
-                  }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
+        {/* Large blended character — matching ModeCard style */}
+        {!mascot && (
+          <motion.div
+            className={cn(
+              'absolute pointer-events-none',
+              isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
+            )}
+            style={{
+              width: 'clamp(3.75rem, 26cqw, 6rem)',
+              height: 'clamp(3.75rem, 26cqw, 6rem)',
+            }}
+            initial={{ scale: 0.6, opacity: 0, y: 20 }}
+            whileInView={{ scale: 1, opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            animate={isHovered
+              ? { scale: 1.08, y: -6, rotate: isRTL ? -5 : 5 }
+              : { scale: 1, y: 0, rotate: 0 }
+            }
+            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+          >
+            <Image
+              src="/modes/daily.png"
+              alt=""
+              fill
+              className={cn(
+                'object-contain',
+                'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+                isHovered ? 'brightness-110' : 'brightness-100'
               )}
-              <motion.div
-                className={cn(
-                  "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy relative",
-                  compact ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
-                )}
-                animate={!hasPlayed ? {
-                  scale: [1, 1.05, 1],
-                } : undefined}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Target className={cn(
-                  "text-amber-400",
-                  compact ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7"
-                )} />
-              </motion.div>
-            </div>
+              style={{
+                filter: isHovered ? 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))' : undefined,
+                transition: 'filter 0.3s ease',
+              }}
+              sizes="(max-width: 640px) 96px, 192px"
+            />
+          </motion.div>
+        )}
+
+        <div className="flex items-center gap-3 sm:gap-4 relative z-10">
+          {/* Mascot slot (for mobile portrait override) */}
+          {mascot && (
+            <div className="flex-shrink-0">{mascot}</div>
           )}
 
           {/* Content */}
@@ -386,8 +390,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 "flex items-center justify-center rounded-full border-2 border-neo-black",
                 compact ? "w-10 h-10" : "w-12 h-12",
                 hasSolved
-                  ? "bg-neo-lime text-neo-black"  // Green for win
-                  : "bg-neo-pink text-neo-black"   // Pink for loss
+                  ? "bg-neo-lime text-neo-black"
+                  : "bg-neo-pink text-neo-black"
               )}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}

@@ -2,35 +2,39 @@
  * Tests for analytics routes (retention, churn risk, engagement funnel)
  */
 
-const mockRpc = jest.fn();
-const mockSelect = jest.fn().mockReturnThis();
-const mockEq = jest.fn().mockReturnThis();
-const mockLt = jest.fn().mockReturnThis();
-const mockNot = jest.fn().mockReturnThis();
-const mockOrder = jest.fn().mockReturnThis();
-const mockRange = jest.fn().mockResolvedValue({ data: [], count: 0, error: null });
-const mockFrom = jest.fn().mockReturnValue({
-  select: mockSelect,
-  eq: mockEq,
-  lt: mockLt,
-  not: mockNot,
-  order: mockOrder,
-  range: mockRange,
+const { mockRpc, mockSelect, mockEq, mockLt, mockNot, mockOrder, mockRange, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockRpc = vi.fn();
+  const mockSelect = vi.fn().mockReturnThis();
+  const mockEq = vi.fn().mockReturnThis();
+  const mockLt = vi.fn().mockReturnThis();
+  const mockNot = vi.fn().mockReturnThis();
+  const mockOrder = vi.fn().mockReturnThis();
+  const mockRange = vi.fn().mockResolvedValue({ data: [], count: 0, error: null });
+  const mockFrom = vi.fn().mockReturnValue({
+    select: mockSelect,
+    eq: mockEq,
+    lt: mockLt,
+    not: mockNot,
+    order: mockOrder,
+    range: mockRange,
+  });
+  const mockSupabase = { rpc: mockRpc, from: mockFrom };
+  return { mockRpc, mockSelect, mockEq, mockLt, mockNot, mockOrder, mockRange, mockFrom, mockSupabase };
 });
-const mockSupabase = { rpc: mockRpc, from: mockFrom };
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../../redis/connection', () => ({
+vi.mock('../../../redis/connection', () => ({
   getRedisClient: () => ({
-    get: jest.fn().mockResolvedValue(null),
-    setex: jest.fn().mockResolvedValue('OK'),
+    get: vi.fn().mockResolvedValue(null),
+    setex: vi.fn().mockResolvedValue('OK'),
   }),
   isRedisAvailable: () => true,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   fetchCohortRetention,
   fetchChurnRisk,
@@ -38,7 +42,7 @@ import {
 } from '../analyticsRoutes';
 
 describe('analyticsRoutes', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   describe('fetchCohortRetention', () => {
     it('should call admin_cohort_retention RPC with weeks param', async () => {

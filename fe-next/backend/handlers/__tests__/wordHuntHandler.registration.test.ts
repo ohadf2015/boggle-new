@@ -5,45 +5,46 @@
  */
 
 // Mock all handler modules to isolate registration test
-jest.mock('../gameHandler', () => ({ registerGameHandlers: jest.fn(), MAX_PLAYERS_PER_ROOM: 8 }));
-jest.mock('../wordHandler', () => ({ registerWordHandlers: jest.fn() }));
-jest.mock('../chatHandler', () => ({ registerChatHandlers: jest.fn() }));
-jest.mock('../botHandler', () => ({ registerBotHandlers: jest.fn() }));
-jest.mock('../tournamentHandler', () => ({ registerTournamentHandlers: jest.fn() }));
-jest.mock('../presenceHandler', () => ({ registerPresenceHandlers: jest.fn(), startConnectionHealthCheck: jest.fn() }));
-jest.mock('../friendsHandler', () => ({ registerFriendsHandlers: jest.fn() }));
-jest.mock('../friendMessagingHandler', () => ({ registerFriendMessagingHandlers: jest.fn() }));
-jest.mock('../friendChallengeHandler', () => ({ registerFriendChallengeHandlers: jest.fn() }));
-jest.mock('../hostHandler', () => ({ registerHostHandlers: jest.fn() }));
-jest.mock('../connectionHandler', () => ({ registerConnectionHandlers: jest.fn() }));
-jest.mock('../hintHandler', () => ({ registerHintHandlers: jest.fn() }));
-jest.mock('../engagementHandler', () => ({
-  registerEngagementHandlers: jest.fn(),
-  processGameEndEngagement: jest.fn(),
-  processLongWordEngagement: jest.fn(),
-  processAchievementEngagement: jest.fn(),
+vi.mock('../gameHandler', () => ({ registerGameHandlers: vi.fn(), MAX_PLAYERS_PER_ROOM: 8 }));
+vi.mock('../wordHandler', () => ({ registerWordHandlers: vi.fn() }));
+vi.mock('../chatHandler', () => ({ registerChatHandlers: vi.fn() }));
+vi.mock('../botHandler', () => ({ registerBotHandlers: vi.fn() }));
+vi.mock('../tournamentHandler', () => ({ registerTournamentHandlers: vi.fn() }));
+vi.mock('../presenceHandler', () => ({ registerPresenceHandlers: vi.fn(), startConnectionHealthCheck: vi.fn() }));
+vi.mock('../friendsHandler', () => ({ registerFriendsHandlers: vi.fn() }));
+vi.mock('../friendMessagingHandler', () => ({ registerFriendMessagingHandlers: vi.fn() }));
+vi.mock('../friendChallengeHandler', () => ({ registerFriendChallengeHandlers: vi.fn() }));
+vi.mock('../hostHandler', () => ({ registerHostHandlers: vi.fn() }));
+vi.mock('../connectionHandler', () => ({ registerConnectionHandlers: vi.fn() }));
+vi.mock('../hintHandler', () => ({ registerHintHandlers: vi.fn() }));
+vi.mock('../engagementHandler', () => ({
+  registerEngagementHandlers: vi.fn(),
+  processGameEndEngagement: vi.fn(),
+  processLongWordEngagement: vi.fn(),
+  processAchievementEngagement: vi.fn(),
 }));
-jest.mock('../earthquakeHandler', () => ({ registerEarthquakeHandlers: jest.fn(), clearGameEarthquakeState: jest.fn() }));
-jest.mock('../scorecardHandler', () => ({ registerScorecardHandlers: jest.fn() }));
-jest.mock('../vocabularyHandler', () => ({ registerVocabularyHandlers: jest.fn() }));
-jest.mock('../classroomGameHandler', () => ({ registerClassroomGameHandlers: jest.fn() }));
-jest.mock('../avatarHandler', () => ({ registerAvatarHandlers: jest.fn() }));
-jest.mock('../wordHuntHandler', () => ({ registerWordHuntHandlers: jest.fn() }));
-jest.mock('../shared', () => ({
-  startGameTimer: jest.fn(),
-  endGame: jest.fn(),
-  calculateAndBroadcastFinalScores: jest.fn(),
-  isSocketMigrating: jest.fn(),
+vi.mock('../earthquakeHandler', () => ({ registerEarthquakeHandlers: vi.fn(), clearGameEarthquakeState: vi.fn() }));
+vi.mock('../scorecardHandler', () => ({ registerScorecardHandlers: vi.fn() }));
+vi.mock('../vocabularyHandler', () => ({ registerVocabularyHandlers: vi.fn() }));
+vi.mock('../classroomGameHandler', () => ({ registerClassroomGameHandlers: vi.fn() }));
+vi.mock('../avatarHandler', () => ({ registerAvatarHandlers: vi.fn() }));
+vi.mock('../wordHuntHandler', () => ({ registerWordHuntHandlers: vi.fn() }));
+vi.mock('../shared', () => ({
+  startGameTimer: vi.fn(),
+  endGame: vi.fn(),
+  calculateAndBroadcastFinalScores: vi.fn(),
+  isSocketMigrating: vi.fn(),
 }));
-jest.mock('../../modules/gameStateManager', () => ({ getGame: jest.fn() }));
+vi.mock('../../modules/gameStateManager', () => ({ getGame: vi.fn() }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerAllHandlers } from '../index';
 import { registerWordHuntHandlers } from '../wordHuntHandler';
 
 describe('registerAllHandlers includes Word Hunt', () => {
   it('should call registerWordHuntHandlers with io and socket', () => {
     const mockIo = {} as any;
-    const mockSocket = { on: jest.fn() } as any;
+    const mockSocket = { on: vi.fn() } as any;
 
     registerAllHandlers(mockIo, mockSocket);
 

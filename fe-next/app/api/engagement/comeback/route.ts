@@ -117,15 +117,24 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + tier.durationHours);
 
+    // Update engagement: XP multiplier + streak freezes
+    const { data: currentEngagement } = await supabase
+      .from('player_engagement')
+      .select('streak_freezes_available')
+      .eq('player_id', userId)
+      .single();
+
     await supabase
       .from('player_engagement')
       .update({
         comeback_bonus_claimed: true,
         comeback_bonus_expires_at: expiresAt.toISOString(),
         comeback_xp_multiplier: tier.xpMultiplier,
+        streak_freezes_available: (currentEngagement?.streak_freezes_available || 0) + tier.streakFreezes,
       })
       .eq('player_id', userId);
 
+    // Grant free hints
     if (tier.hints > 0) {
       const { data: profile } = await supabase
         .from('profiles')

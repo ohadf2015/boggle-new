@@ -2,28 +2,32 @@
  * Tests for cheat detection routes
  */
 
-const mockSelectChain = {
-  select: jest.fn().mockReturnThis(),
-  gte: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  range: jest.fn().mockResolvedValue({ data: [], count: 0, error: null }),
-};
-const mockFrom = jest.fn().mockReturnValue(mockSelectChain);
-const mockSupabase = { from: mockFrom };
+const { mockSelectChain, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockSelectChain = {
+    select: vi.fn().mockReturnThis(),
+    gte: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    range: vi.fn().mockResolvedValue({ data: [], count: 0, error: null }),
+  };
+  const mockFrom = vi.fn().mockReturnValue(mockSelectChain);
+  const mockSupabase = { from: mockFrom };
+  return { mockSelectChain, mockFrom, mockSupabase };
+});
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../../redis/connection', () => ({
+vi.mock('../../../redis/connection', () => ({
   getRedisClient: () => null,
   isRedisAvailable: () => false,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { fetchFlaggedPlayers } from '../cheatDetectionRoutes';
 
 describe('cheatDetection', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('should query mv_cheat_signals above threshold', async () => {
     mockSelectChain.range.mockResolvedValue({

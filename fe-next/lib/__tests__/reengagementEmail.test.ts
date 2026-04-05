@@ -231,8 +231,8 @@ describe('getFirstLetterForLanguage', () => {
 // generateReengagementEmailHtml tests
 // ==========================================
 describe('generateReengagementEmailHtml', () => {
-  test('should generate valid HTML for English', () => {
-    const { html, text, subject } = generateReengagementEmailHtml({
+  test('should generate valid HTML for English', async () => {
+    const { html, text, subject } = await generateReengagementEmailHtml({
       recipientName: 'John',
       firstLetter: 'H',
       language: 'en',
@@ -241,18 +241,18 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('<!DOCTYPE html>');
+    expect(html).toContain('<!DOCTYPE html');
     expect(html).toContain('John');
     expect(html).toContain('H');
     expect(html).toContain('https://example.com/en/daily');
     expect(html).toContain('https://example.com/unsub');
     expect(subject).toBeTruthy();
-    expect(text).toContain('John');
+    expect(text.toUpperCase()).toContain('JOHN');
     expect(text).toContain('H');
   });
 
-  test('should include mascot image in email', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should include mascot image in email', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'en',
@@ -265,8 +265,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('alt="Lexi"');
   });
 
-  test('should use logo image with LexiClash branding', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should use logo image with LexiClash branding', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'en',
@@ -279,8 +279,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('alt="LexiClash"');
   });
 
-  test('should include greeting, tiles, mascot, and CTA', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should include greeting, tiles, mascot, and CTA', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'en',
@@ -292,17 +292,17 @@ describe('generateReengagementEmailHtml', () => {
     // Greeting text
     expect(html).toContain('We miss you');
     // Word hunt tile row with mystery tiles
-    expect(html).toContain('word-tile');
+    expect(html).toContain('tile-letter');
     // CTA link
     expect(html).toContain('cta-link');
-    // Mascot image
-    expect(html).toContain('mascot-img');
+    // Mascot image (waving gif)
+    expect(html).toContain('waving-nobg.gif');
     // Accessible mascot alt text
     expect(html).toContain('alt="Lexi"');
   });
 
-  test('should use Hebrew logo for Hebrew language', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should use Hebrew logo for Hebrew language', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'יוסי',
       firstLetter: 'ש',
       language: 'he',
@@ -314,8 +314,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('/logos/lexiclash_logo_hebrew-min.webp');
   });
 
-  test('should generate Hebrew template with RTL direction and flipped shadows', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should generate Hebrew template with RTL direction and flipped shadows', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'יוסי',
       firstLetter: 'ש',
       language: 'he',
@@ -330,16 +330,16 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('התגעגענו');
     // RTL shadow direction (negative x offset)
     expect(html).toContain('-6px 6px 0px');
-    // RTL play arrow (left-pointing)
-    expect(html).toContain('&#9664;');
+    // RTL play arrow (left-pointing ◀)
+    expect(html).toContain('\u25C0');
     // Localized footer links
     expect(html).toContain('ביטול הרשמה');
     expect(html).toContain('פרטיות');
     expect(html).toContain('/he/privacy');
   });
 
-  test('should generate Swedish template', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should generate Swedish template', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Erik',
       firstLetter: 'S',
       language: 'sv',
@@ -352,8 +352,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('Vi saknar dig');
   });
 
-  test('should generate Japanese template', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should generate Japanese template', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Taro',
       firstLetter: 'あ',
       language: 'ja',
@@ -366,8 +366,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('お待ちしています');
   });
 
-  test('should generate Spanish template', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should generate Spanish template', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Maria',
       firstLetter: 'P',
       language: 'es',
@@ -380,9 +380,9 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('Te extrañamos');
   });
 
-  test('should have localized footer links for all languages', () => {
+  test('should have localized footer links for all languages', async () => {
     // Spanish
-    const { html: esHtml } = generateReengagementEmailHtml({
+    const { html: esHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'es',
@@ -395,7 +395,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(esHtml).toContain('/es/privacy');
 
     // Japanese
-    const { html: jaHtml } = generateReengagementEmailHtml({
+    const { html: jaHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'ja',
@@ -407,8 +407,8 @@ describe('generateReengagementEmailHtml', () => {
     expect(jaHtml).toContain('プライバシー');
   });
 
-  test('should use LTR play arrow for non-RTL and RTL arrow for Hebrew', () => {
-    const { html: enHtml } = generateReengagementEmailHtml({
+  test('should use LTR play arrow for non-RTL and RTL arrow for Hebrew', async () => {
+    const { html: enHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'en',
@@ -416,10 +416,10 @@ describe('generateReengagementEmailHtml', () => {
       playUrl: '#',
       baseUrl: 'https://example.com',
     });
-    // LTR play arrow (right-pointing)
-    expect(enHtml).toContain('&#9654;');
+    // LTR play arrow (right-pointing ▶)
+    expect(enHtml).toContain('\u25B6');
 
-    const { html: heHtml } = generateReengagementEmailHtml({
+    const { html: heHtml } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'א',
       language: 'he',
@@ -427,12 +427,12 @@ describe('generateReengagementEmailHtml', () => {
       playUrl: '#',
       baseUrl: 'https://example.com',
     });
-    // RTL play arrow (left-pointing)
-    expect(heHtml).toContain('&#9664;');
+    // RTL play arrow (left-pointing ◀)
+    expect(heHtml).toContain('\u25C0');
   });
 
-  test('should default to English for unknown language', () => {
-    const { html } = generateReengagementEmailHtml({
+  test('should default to English for unknown language', async () => {
+    const { html } = await generateReengagementEmailHtml({
       recipientName: 'Test',
       firstLetter: 'A',
       language: 'xx',
@@ -444,9 +444,9 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('We miss you');
   });
 
-  test('should display first letter as large tile in all languages', () => {
+  test('should display first letter as large tile in all languages', async () => {
     for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
-      const { html } = generateReengagementEmailHtml({
+      const { html } = await generateReengagementEmailHtml({
         recipientName: 'Test',
         firstLetter: 'X',
         language: lang,

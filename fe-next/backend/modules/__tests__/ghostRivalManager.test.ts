@@ -5,10 +5,10 @@
 
 // Create a fresh chainable mock for each test
 function createChainMock() {
-  const mock: Record<string, jest.Mock> = {};
+  const mock: Record<string, Mock> = {};
   const methodNames = ['select', 'insert', 'update', 'eq', 'neq', 'gte', 'lte', 'order', 'limit', 'single'];
   for (const name of methodNames) {
-    mock[name] = jest.fn(() => mock);
+    mock[name] = vi.fn(() => mock);
   }
   // Default terminal values
   mock.single.mockResolvedValue({ data: null, error: null });
@@ -18,18 +18,22 @@ function createChainMock() {
 }
 
 let chain = createChainMock();
-const mockRpc = jest.fn();
-const mockFrom = jest.fn(() => chain);
+const { mockRpc, mockFrom } = vi.hoisted(() => {
+  const mockRpc = vi.fn();
+  const mockFrom = vi.fn(() => chain);
+  return { mockRpc, mockFrom };
+});
 
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({ from: mockFrom, rpc: mockRpc })),
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({ from: mockFrom, rpc: mockRpc })),
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() },
+  default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getWeekStart,
   getWeekEnd,

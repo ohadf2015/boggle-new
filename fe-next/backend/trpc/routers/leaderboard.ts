@@ -4,9 +4,9 @@ import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
 import { getTopPlayersByScore } from '../../db/queries/leaderboardQueries';
 
-const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseServer');
-const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../../redisClient');
-const { coalesce } = require('../../utils/requestCoalescing');
+import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
+import { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } from '../../redisClient';
+import { coalesce } from '../../utils/requestCoalescing';
 
 export const leaderboardRouter = router({
   getTop: loggedProcedure
@@ -49,6 +49,9 @@ export const leaderboardRouter = router({
         } catch (drizzleErr) {
           logger.warn('TRPC', `Drizzle leaderboard query failed, falling back to Supabase: ${drizzleErr}`);
           const supabase = getSupabase();
+          if (!supabase) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+          }
           const { data, error } = await supabase
             .from('leaderboard')
             .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
@@ -96,6 +99,9 @@ export const leaderboardRouter = router({
         }
 
         const supabase = getSupabase();
+        if (!supabase) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+        }
         const { data: rpcData, error: rpcError } = await supabase
           .rpc('get_user_leaderboard_rank', { target_user_id: userId });
 

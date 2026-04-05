@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, memo, useRef } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
 import { useSocket } from '../utils/SocketContext';
@@ -12,6 +12,8 @@ import { DIFFICULTIES } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
 import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode } from '@/hooks/gameState/store';
 
 // Extracted components
@@ -74,6 +76,8 @@ interface HostViewProps {
   onGameStartConsumed?: () => void;
   /** Lesson data for vocabulary-based games started from teacher dashboard */
   lessonData?: LessonData | null;
+  /** Callback when host changes their display name */
+  onUsernameChange?: (newName: string) => void;
 }
 
 // ==========================================
@@ -89,6 +93,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   pendingGameStart,
   onGameStartConsumed,
   lessonData,
+  onUsernameChange,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -98,6 +103,28 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
   const currentGameMode = useGameMode();
+
+  // Host name change handler
+  const handleHostNameChange = useCallback((newName: string) => {
+    setStoredUsername(newName);
+    socket?.emit('updateGuestName', { newName });
+  }, [socket]);
+
+  // Listen for server confirmation of name change
+  useEffect(() => {
+    if (!socket) return;
+    const handleNameUpdated = (data: { newName: string }) => {
+      if (data?.newName) onUsernameChange?.(data.newName);
+    };
+    socket.on('guestNameUpdated', handleNameUpdated);
+    return () => { socket.off('guestNameUpdated', handleNameUpdated); };
+  }, [socket, onUsernameChange]);
+
+  // Host avatar change handler — emits socket event so other players see the update
+  const handleHostAvatarChange = useCallback((config: CustomAvatarConfig) => {
+    setStoredCustomAvatar(config);
+    socket?.emit('updateAvatar', { customAvatar: config });
+  }, [socket]);
 
   // Consolidated state management
   const state = useHostViewState({
@@ -514,6 +541,8 @@ const HostView: React.FC<HostViewProps> = memo(({
           onRegenerateBoard={actions.regenerateBoard}
           tournamentCreating={tournament.tournamentCreating}
           lessonData={lessonData}
+          onNameChange={handleHostNameChange}
+          onAvatarChange={handleHostAvatarChange}
         />
       )}
 

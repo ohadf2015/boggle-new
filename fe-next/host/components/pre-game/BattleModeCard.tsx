@@ -356,12 +356,13 @@ export function BattleModeCard({
         <div className="relative mt-3 pt-3 border-t border-neo-white/10 hidden lg:flex items-center gap-2">
           <Monitor className="w-4 h-4 text-neo-cream/50 flex-shrink-0" />
           <Checkbox
-            id="broadcastMode"
+            id={`broadcastMode-${compact ? 'mobile' : 'desktop'}`}
             checked={!hostPlaying}
             onCheckedChange={(checked) => setHostPlaying(checked !== true)}
+            aria-label={t('hostView.broadcastModeTitle')}
           />
           <label
-            htmlFor="broadcastMode"
+            htmlFor={`broadcastMode-${compact ? 'mobile' : 'desktop'}`}
             className="text-xs font-bold uppercase text-neo-cream/80 cursor-pointer flex-1"
           >
             {t('hostView.broadcastModeTitle')}

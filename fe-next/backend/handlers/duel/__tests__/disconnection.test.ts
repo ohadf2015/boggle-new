@@ -3,36 +3,37 @@
  * TDD tests for disconnection grace period, reconnection, and forfeit logic
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerDisconnectionHandlers, handleReconnection } from '../disconnection';
 import { getSupabase } from '@/backend/modules/supabase/client';
 
 // Mock dependencies
-jest.mock('@/backend/modules/supabase/client');
-jest.mock('@/backend/utils/logger');
+vi.mock('@/backend/modules/supabase/client');
+vi.mock('@/backend/utils/logger');
 
-const mockedGetSupabase = jest.mocked(getSupabase);
+const mockedGetSupabase = vi.mocked(getSupabase);
 
 // Enable fake timers for grace period testing
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('Duel Disconnection Handlers', () => {
   let mockSocket: Partial<DuelSocket>;
   let mockNamespace: Partial<Namespace>;
   let mockSupabaseClient: any;
-  let mockFrom: jest.Mock;
-  let mockSelect: jest.Mock;
-  let mockEq: jest.Mock;
-  let mockUpdate: jest.Mock;
-  let mockSingle: jest.Mock;
+  let mockFrom: Mock;
+  let mockSelect: Mock;
+  let mockEq: Mock;
+  let mockUpdate: Mock;
+  let mockSingle: Mock;
   let emittedEvents: Array<{ event: string; data: any }>;
   let roomEmittedEvents: Array<{ room: string; event: string; data: any }>;
 
   beforeEach(() => {
     // Clear mocks and fake timers
-    jest.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllMocks();
+    vi.clearAllTimers();
     emittedEvents = [];
     roomEmittedEvents = [];
 
@@ -44,19 +45,19 @@ describe('Duel Disconnection Handlers', () => {
         displayName: 'Player 1',
         classroomIds: ['classroom-1'],
       },
-      emit: jest.fn((event: string, data: any) => {
+      emit: vi.fn((event: string, data: any) => {
         emittedEvents.push({ event, data });
       }),
-      on: jest.fn(),
-      join: jest.fn(),
+      on: vi.fn(),
+      join: vi.fn(),
     } as any;
 
     // Setup mock namespace
     mockNamespace = {
-      to: jest.fn().mockReturnValue({
-        emit: jest.fn((event: string, data: any) => {
-          const roomCall = (mockNamespace.to as jest.Mock).mock.calls[
-            (mockNamespace.to as jest.Mock).mock.calls.length - 1
+      to: vi.fn().mockReturnValue({
+        emit: vi.fn((event: string, data: any) => {
+          const roomCall = (mockNamespace.to as Mock).mock.calls[
+            (mockNamespace.to as Mock).mock.calls.length - 1
           ];
           const room = roomCall[0];
           roomEmittedEvents.push({ room, event, data });
@@ -65,15 +66,15 @@ describe('Duel Disconnection Handlers', () => {
     } as any;
 
     // Setup Supabase mock
-    mockSingle = jest.fn();
-    mockEq = jest.fn();
-    mockSelect = jest.fn();
-    mockUpdate = jest.fn();
-    mockFrom = jest.fn();
+    mockSingle = vi.fn();
+    mockEq = vi.fn();
+    mockSelect = vi.fn();
+    mockUpdate = vi.fn();
+    mockFrom = vi.fn();
 
     mockSupabaseClient = {
       from: mockFrom,
-      rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
+      rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
 
     // Mock getSupabase
@@ -82,7 +83,7 @@ describe('Duel Disconnection Handlers', () => {
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe('disconnection grace period', () => {
@@ -99,11 +100,11 @@ describe('Duel Disconnection Handlers', () => {
       };
 
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          or: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: activeDuel,
                   error: null,
                 }),
@@ -117,7 +118,7 @@ describe('Duel Disconnection Handlers', () => {
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
       // Get the disconnecting handler
-      const disconnectingHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectingHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnecting'
       )?.[1];
 
@@ -138,7 +139,7 @@ describe('Duel Disconnection Handlers', () => {
       });
 
       // Verify timer started (don't advance yet)
-      expect(jest.getTimerCount()).toBe(1);
+      expect(vi.getTimerCount()).toBe(1);
     });
 
     it('should auto-forfeit after 30s if player does not reconnect', async () => {
@@ -161,11 +162,11 @@ describe('Duel Disconnection Handlers', () => {
 
           if (callCount === 1) {
             return {
-              select: jest.fn().mockReturnValue({
-                or: jest.fn().mockReturnValue({
-                  eq: jest.fn().mockReturnValue({
-                    eq: jest.fn().mockReturnValue({
-                      single: jest.fn().mockResolvedValue({
+              select: vi.fn().mockReturnValue({
+                or: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                      single: vi.fn().mockResolvedValue({
                         data: activeDuel,
                         error: null,
                       }),
@@ -177,11 +178,11 @@ describe('Duel Disconnection Handlers', () => {
           } else {
             // Atomic forfeit update: .eq(id).eq(status).eq(xp_awarded).select()
             return {
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  eq: jest.fn().mockReturnValue({
-                    eq: jest.fn().mockReturnValue({
-                      select: jest.fn().mockResolvedValue({
+              update: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                      select: vi.fn().mockResolvedValue({
                         data: [{ ...activeDuel, status: 'forfeited' }],
                         error: null,
                       }),
@@ -197,7 +198,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const disconnectingHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectingHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnecting'
       )?.[1];
 
@@ -207,7 +208,7 @@ describe('Duel Disconnection Handlers', () => {
       roomEmittedEvents.length = 0;
 
       // Advance timer by 30 seconds
-      await jest.advanceTimersByTimeAsync(30000);
+      await vi.advanceTimersByTimeAsync(30000);
 
       // Verify forfeit occurred
       const completedEvent = roomEmittedEvents.find(
@@ -235,11 +236,11 @@ describe('Duel Disconnection Handlers', () => {
 
       // Mock no active realtime duel (player not in realtime game)
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          or: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: null,
                   error: null,
                 }),
@@ -251,14 +252,14 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const disconnectingHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectingHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnecting'
       )?.[1];
 
       await disconnectingHandler();
 
       // Verify no timer started
-      expect(jest.getTimerCount()).toBe(0);
+      expect(vi.getTimerCount()).toBe(0);
 
       // Verify no opponent notification
       const disconnectedEvent = roomEmittedEvents.find(
@@ -283,11 +284,11 @@ describe('Duel Disconnection Handlers', () => {
 
       // Setup for disconnection
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          or: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: activeDuel,
                   error: null,
                 }),
@@ -299,23 +300,23 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const disconnectingHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectingHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnecting'
       )?.[1];
 
       // Trigger disconnect
       await disconnectingHandler();
-      expect(jest.getTimerCount()).toBe(1);
+      expect(vi.getTimerCount()).toBe(1);
 
       // Clear events from disconnect
       roomEmittedEvents.length = 0;
 
       // Mock for reconnection - query active duel
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          or: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({
                 data: activeDuel,
                 error: null,
               }),
@@ -328,7 +329,7 @@ describe('Duel Disconnection Handlers', () => {
       await handleReconnection(mockNamespace as Namespace, mockSocket as DuelSocket);
 
       // Verify timer cancelled
-      expect(jest.getTimerCount()).toBe(0);
+      expect(vi.getTimerCount()).toBe(0);
 
       // Verify opponent notified of reconnection
       const reconnectedEvent = roomEmittedEvents.find(
@@ -361,11 +362,11 @@ describe('Duel Disconnection Handlers', () => {
       };
 
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          or: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: activeDuel,
                   error: null,
                 }),
@@ -377,7 +378,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const disconnectingHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectingHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnecting'
       )?.[1];
 
@@ -390,7 +391,7 @@ describe('Duel Disconnection Handlers', () => {
       roomEmittedEvents.length = 0;
 
       // Advance timer past 30s
-      await jest.advanceTimersByTimeAsync(35000);
+      await vi.advanceTimersByTimeAsync(35000);
 
       // Verify NO forfeit occurred
       const completedEvent = roomEmittedEvents.find(
@@ -424,9 +425,9 @@ describe('Duel Disconnection Handlers', () => {
           if (callCount === 1) {
             // First call: fetch duel
             return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
                     data: activeDuel,
                     error: null,
                   }),
@@ -436,11 +437,11 @@ describe('Duel Disconnection Handlers', () => {
           } else {
             // Second call: update to forfeited (needs triple .eq() chain: id, status, xp_awarded)
             return {
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  eq: jest.fn().mockReturnValue({
-                    eq: jest.fn().mockReturnValue({
-                      select: jest.fn().mockResolvedValue({
+              update: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                      select: vi.fn().mockResolvedValue({
                         data: [{ ...activeDuel, status: 'forfeited' }],
                         error: null,
                       }),
@@ -456,7 +457,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const forfeitHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const forfeitHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:forfeit'
       )?.[1];
 
@@ -494,9 +495,9 @@ describe('Duel Disconnection Handlers', () => {
       };
 
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: '550e8400-e29b-41d4-a716-446655440001',
                 status: 'completed',
@@ -511,7 +512,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const forfeitHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const forfeitHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:forfeit'
       )?.[1];
 
@@ -531,9 +532,9 @@ describe('Duel Disconnection Handlers', () => {
       };
 
       mockFrom.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: '550e8400-e29b-41d4-a716-446655440001',
                 status: 'active',
@@ -548,7 +549,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const forfeitHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const forfeitHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:forfeit'
       )?.[1];
 
@@ -569,7 +570,7 @@ describe('Duel Disconnection Handlers', () => {
 
       registerDisconnectionHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const forfeitHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const forfeitHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:forfeit'
       )?.[1];
 

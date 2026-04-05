@@ -1,5 +1,4 @@
-const { calculateWordScore, getComboBonus, getComboMultiplier } = require('../modules/scoringEngine');
-
+import { calculateWordScore, getComboBonus, getComboMultiplier } from '../modules/scoringEngine';
 describe('Scoring Engine', () => {
   describe('calculateWordScore', () => {
     describe('base scoring (no combo)', () => {

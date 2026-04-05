@@ -1,28 +1,29 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 /**
  * Tests for removeFromCommunityCache in communityWordManager.ts
  * TDD: Written before implementation (RED phase)
  */
 
 // Mock Supabase before importing module
-jest.mock('../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => null),
-  isSupabaseConfigured: jest.fn(() => false),
+vi.mock('../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => null),
+  isSupabaseConfigured: vi.fn(() => false),
 }));
 
 // Mock dictionary
-jest.mock('../dictionary', () => ({
-  normalizeWord: jest.fn((word: string) => word.toLowerCase()),
-  addApprovedWord: jest.fn(),
+vi.mock('../dictionary', () => ({
+  normalizeWord: vi.fn((word: string) => word.toLowerCase()),
+  addApprovedWord: vi.fn(),
 }));
 
 // Mock logger
-jest.mock('../utils/logger', () => ({
+vi.mock('../utils/logger', () => ({
   __esModule: true,
   default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
@@ -31,9 +32,9 @@ describe('removeFromCommunityCache', () => {
   let isWordCommunityValid: (word: string, language: string) => boolean;
   let addToCommunityCache: (word: string, language: string) => Promise<void>;
 
-  beforeEach(() => {
-    jest.resetModules();
-    const mod = require('../modules/communityWordManager');
+  beforeEach(async () => {
+    vi.resetModules();
+    const mod = await import('../modules/communityWordManager');
     removeFromCommunityCache = mod.removeFromCommunityCache;
     isWordCommunityValid = mod.isWordCommunityValid;
     addToCommunityCache = mod.addToCommunityCache;
@@ -56,7 +57,7 @@ describe('removeFromCommunityCache', () => {
   });
 
   it('should also remove from pendingVotes cache', async () => {
-    const mod = require('../modules/communityWordManager');
+    const mod = await import('../modules/communityWordManager');
 
     // Manually add to pending cache via updatePendingCache
     mod.updatePendingCache('pendingword', 'en', 'like');

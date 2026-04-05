@@ -452,6 +452,8 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 size="sm"
                 delay={0.6}
                 className="drop-shadow-lg"
+                clipShape="circle"
+                clipBorder="pink"
               />
             ) : (
               <MascotWithEntrance
@@ -459,6 +461,8 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 size="sm"
                 delay={0.6}
                 className="drop-shadow-lg"
+                clipShape="circle"
+                clipBorder="pink"
               />
             )}
         </div>

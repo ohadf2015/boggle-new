@@ -10,8 +10,7 @@
 import logger from '../utils/logger';
 import { addToCommunityCache } from './communityWordManager';
 import { getVerifiedWordsForPromotion } from '../services/milogWordVerifier';
-
-const { getSupabase } = require('./supabaseServer');
+import { getSupabase } from './supabaseServer';
 
 export const AUTO_PROMOTION_CONFIG = {
   MIN_SUBMISSIONS: 10,
@@ -76,7 +75,7 @@ export async function runAutoPromotion(): Promise<AutoPromotionResult> {
 }
 
 async function promoteBySubmissionCount(
-  supabase: ReturnType<typeof getSupabase>,
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
   result: AutoPromotionResult
 ): Promise<void> {
   const { data: candidates, error } = await supabase.rpc('get_auto_promotion_candidates', {
@@ -129,7 +128,7 @@ async function promoteBySubmissionCount(
 }
 
 async function promoteByMilogVerification(
-  supabase: ReturnType<typeof getSupabase>,
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
   result: AutoPromotionResult
 ): Promise<void> {
   const milogWords = await getVerifiedWordsForPromotion();

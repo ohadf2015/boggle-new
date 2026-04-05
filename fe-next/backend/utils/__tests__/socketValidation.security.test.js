@@ -3,14 +3,11 @@
  * Tests input validation against common attack vectors
  */
 
-const {
-  usernameSchema,
+import { usernameSchema,
   roomNameSchema,
   playerIdSchema,
   guestTokenHashSchema,
-  avatarSchema
-} = require('../socketValidation');
-
+  avatarSchema } from '../socketValidation';
 describe('Security - Input Validation', () => {
 
   describe('Username Validation', () => {

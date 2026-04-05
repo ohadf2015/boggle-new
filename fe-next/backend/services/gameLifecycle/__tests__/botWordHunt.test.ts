@@ -4,6 +4,7 @@
  * Verifies that bots can play word-hunt mode by making Wordle-style guesses.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   filterCandidatesByFeedback,
   pickBotGuess,
@@ -13,12 +14,12 @@ import {
 import type { LetterFeedback } from '@/shared/types/game';
 
 // Mock logger
-jest.mock('../../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 describe('Bot Word Hunt', () => {
   describe('filterCandidatesByFeedback', () => {

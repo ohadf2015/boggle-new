@@ -146,6 +146,7 @@ interface PortraitLayoutProps {
 
   // Round events
   roundEvent?: RoundEventState | null;
+  eventTiles?: { frozen: Set<string>; charged: Set<string>; meteor: Set<string> };
 
   // Special word toast
   specialWordEvent?: SpecialWordEvent | null;
@@ -219,6 +220,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   children,
   goldenLetters = [],
   roundEvent,
+  eventTiles,
   specialWordEvent,
   timerUrgencyState = 'normal',
   onTimerState,
@@ -254,6 +256,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     setFloatingScore(null);
     setIsFireRoundScore(false);
   }, []);
+
+  // Blizzard frozen tiles cellFilter — prevents selecting frozen cells
+  const frozenCellFilter = useCallback((row: number, col: number) => {
+    if (!eventTiles?.frozen.size) return true;
+    return !eventTiles.frozen.has(`${row}-${col}`);
+  }, [eventTiles]);
 
   // Stable highlighted path for GridComponent — avoids new [] ref every render
   const showTrails = shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed);
@@ -336,7 +344,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-4 px-2 lg:px-3 xl:px-4">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -381,7 +389,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
               {/* Stats row - Timer centered on mobile, Timer + controls on desktop */}
               <div
-                className="flex w-full items-center justify-between relative min-h-[56px] short:min-h-[48px] md:min-h-[70px] lg:min-h-[64px] short:lg:min-h-[56px] gap-2"
+                className="flex w-full items-center justify-between relative min-h-[56px] md:min-h-[70px] lg:min-h-[clamp(48px,8dvh,64px)] gap-2"
                 data-testid="stats-row"
               >
                 {/* Desktop header */}
@@ -544,7 +552,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[min(520px,55vh)] mx-auto">
+            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[clamp(280px,50dvh,520px)] mx-auto">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -563,6 +571,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 language={gameLanguage}
                 isTypingMode={isTypingMode}
                 goldenLetters={goldenLetters}
+                cellFilter={eventTiles?.frozen.size ? frozenCellFilter : undefined}
+                frozenTiles={eventTiles?.frozen}
+                chargedTiles={eventTiles?.charged}
+                meteorTiles={eventTiles?.meteor}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

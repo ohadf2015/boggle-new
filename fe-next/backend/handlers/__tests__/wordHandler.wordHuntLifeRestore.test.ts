@@ -5,77 +5,79 @@
  * so clients see stale life values for up to 1 second (until next timer tick).
  */
 
-import { Server, Socket } from 'socket.io';
-import { createServer } from 'http';
-import { io as Client, Socket as ClientSocket } from 'socket.io-client';
-import { AddressInfo } from 'net';
+import { vi, type Mock } from 'vitest';
 
 // Mock dependencies before imports
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  addPlayerWord: jest.fn(),
-  playerHasWord: jest.fn().mockReturnValue(false),
-  updatePlayerScore: jest.fn(),
-  getLeaderboard: jest.fn().mockReturnValue([]),
-  getLeaderboardThrottled: jest.fn().mockReturnValue([]),
-  markUserActivity: jest.fn(),
-  recordPeerValidationVote: jest.fn(),
-  removePeerRejectedWordScore: jest.fn(),
-  trackAiApprovedWord: jest.fn(),
-  getFirstFinder: jest.fn().mockReturnValue(null),
-  recordFirstFinder: jest.fn(),
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  addPlayerWord: vi.fn(),
+  playerHasWord: vi.fn().mockReturnValue(false),
+  updatePlayerScore: vi.fn(),
+  getLeaderboard: vi.fn().mockReturnValue([]),
+  getLeaderboardThrottled: vi.fn().mockReturnValue([]),
+  markUserActivity: vi.fn(),
+  recordPeerValidationVote: vi.fn(),
+  removePeerRejectedWordScore: vi.fn(),
+  trackAiApprovedWord: vi.fn(),
+  getFirstFinder: vi.fn().mockReturnValue(null),
+  recordFirstFinder: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
-  isWordOnBoardAsync: jest.fn(),
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
+  isWordOnBoardAsync: vi.fn(),
 }));
 
-jest.mock('../../../backend/dictionary', () => ({
-  isDictionaryWord: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/dictionary', () => ({
+  isDictionaryWord: vi.fn().mockReturnValue(true),
+  isValidWordCached: vi.fn().mockResolvedValue(true),
 }));
 
-jest.mock('../../../backend/modules/communityWordManager', () => ({
-  isWordCommunityValid: jest.fn(),
-  isWordValidForScoring: jest.fn(),
-  recordVote: jest.fn(),
-  updatePendingCache: jest.fn(),
+vi.mock('../../../backend/modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(),
+  isWordValidForScoring: vi.fn(),
+  recordVote: vi.fn(),
+  updatePendingCache: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/profanityFilter', () => ({
-  isProfane: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/profanityFilter', () => ({
+  isProfane: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/scoringEngine', () => ({
-  calculateWordScore: jest.fn().mockReturnValue(5),
+vi.mock('../../../backend/modules/scoringEngine', () => ({
+  calculateWordScore: vi.fn().mockReturnValue(5),
 }));
 
-jest.mock('../../../backend/modules/achievementManager', () => ({
-  checkAndAwardAchievements: jest.fn().mockReturnValue([]),
+vi.mock('../../../backend/modules/achievementManager', () => ({
+  checkAndAwardAchievements: vi.fn().mockReturnValue([]),
   ACHIEVEMENT_ICONS: {},
 }));
 
-jest.mock('../../../backend/modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn().mockReturnValue(false),
-  savePlayerWord: jest.fn(),
-  recordPlayerWrongWord: jest.fn(),
+vi.mock('../../../backend/modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn().mockReturnValue(false),
+  savePlayerWord: vi.fn(),
+  recordPlayerWrongWord: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
 
-jest.mock('../../../backend/utils/metrics', () => ({
-  inc: jest.fn(),
-  incPerGame: jest.fn(),
+vi.mock('../../../backend/utils/metrics', () => ({
+  inc: vi.fn(),
+  incPerGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/spamDetector', () => ({
+vi.mock('../../../backend/modules/spamDetector', () => ({
   spamDetector: {
-    isOnCooldown: jest.fn().mockReturnValue(false),
-    getRemainingCooldown: jest.fn().mockReturnValue(0),
-    recordInvalidWord: jest.fn().mockReturnValue({
+    isOnCooldown: vi.fn().mockReturnValue(false),
+    getRemainingCooldown: vi.fn().mockReturnValue(0),
+    recordInvalidWord: vi.fn().mockReturnValue({
       tier: 'warning',
       invalidCount: 1,
       penaltyApplied: 0,
@@ -86,72 +88,108 @@ jest.mock('../../../backend/modules/spamDetector', () => ({
   InvalidReason: { PROFANITY: 'profanity', TOO_SHORT: 'tooShort', NOT_ON_BOARD: 'notOnBoard' },
 }));
 
-jest.mock('../../../backend/handlers/shared', () => ({
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/handlers/shared', () => ({
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/handlers/engagementHandler', () => ({
-  processLongWordEngagement: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/handlers/engagementHandler', () => ({
+  processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockImplementation((gc: string) => `game:${gc}`),
-  getSocketById: jest.fn(),
-  safeEmit: jest.fn(),
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  broadcastToRoomExceptSender: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockImplementation((gc: string) => `game:${gc}`),
+  getSocketById: vi.fn(),
+  safeEmit: vi.fn(),
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/botManager', () => ({}));
+vi.mock('../../../backend/modules/botManager', () => ({ isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(), getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(), removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn() }));
 
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
-  restoreLife: jest.fn().mockReturnValue(85),
-  getLifeBonus: jest.fn().mockReturnValue(5),
+vi.mock('../../../backend/utils/errorHandler', () => ({
+  emitError: vi.fn(),
+  ErrorCodes: { WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR', INVALID_STATE: 'INVALID_STATE' },
 }));
 
-jest.mock('../../../backend/utils/logger', () => {
-  const loggerMock = { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn(), log: jest.fn() };
+vi.mock('../../../backend/utils/timerManager', () => ({
+  __esModule: true,
+  default: { setTimeout: vi.fn(), clearTimeout: vi.fn() },
+}));
+
+vi.mock('../../../backend/utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema: unknown, data: unknown) => ({ success: true, data })),
+  submitWordSchema: {},
+  submitWordVoteSchema: {},
+  submitPeerValidationVoteSchema: {},
+}));
+
+// wordValidationHandler NOT mocked — real implementation needed for broadcastToRoom/wordHuntLifeUpdate
+
+vi.mock('../../../backend/handlers/playerDataInit', () => ({
+  ensurePlayerState: vi.fn(),
+}));
+
+vi.mock('../../../backend/services/gracePeriodLock', () => ({
+  acquireGracePeriodLock: vi.fn().mockResolvedValue(null),
+  releaseGracePeriodLock: vi.fn(),
+}));
+
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  restoreLife: vi.fn().mockReturnValue(85),
+  getLifeBonus: vi.fn().mockReturnValue(5),
+}));
+
+vi.mock('../../../backend/utils/logger', () => {
+  const loggerMock = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn(), log: vi.fn() };
   return { __esModule: true, default: loggerMock };
 });
 
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../../../backend/modules/gameStateManager');
-const { isWordOnBoardAsync } = require('../../../backend/modules/wordValidatorPool');
-const { broadcastToRoom } = require('../../../backend/utils/socketHelpers');
+vi.mock('../../../backend/modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn().mockReturnValue(0),
+  getTilesOnPath: vi.fn().mockReturnValue([]),
+  recordBlastMove: vi.fn().mockReturnValue(null),
+}));
+
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../../../backend/modules/gameStateManager';
+import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
+import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
+import { registerWordHandlers } from '../wordHandler';
+
+function createMockSocket() {
+  const handlers: Record<string, Function> = {};
+  const socket = {
+    id: 'mock-socket-id',
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
+      handlers[event] = handler;
+    }),
+    join: vi.fn(),
+    rooms: new Set(['mock-socket-id']),
+  };
+  return { socket, handlers };
+}
+
+const mockIo = { to: vi.fn().mockReturnThis(), emit: vi.fn() } as any;
 
 describe('wordHandler word-hunt life restore broadcast', () => {
-  let io: Server;
-  let serverSocket: Socket;
-  let clientSocket: ClientSocket;
-  let httpServer: ReturnType<typeof createServer>;
-
-  beforeAll((done) => {
-    httpServer = createServer();
-    io = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = (httpServer.address() as AddressInfo).port;
-      clientSocket = Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-        const { registerWordHandlers } = require('../wordHandler');
-        registerWordHandlers(io, socket);
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-    httpServer.close();
-  });
+  let mockSocket: ReturnType<typeof createMockSocket>['socket'];
+  let handlers: ReturnType<typeof createMockSocket>['handlers'];
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    getGameBySocketId.mockReturnValue('HUNT01');
-    getUsernameBySocketId.mockReturnValue('alice');
+    vi.clearAllMocks();
+
+    const mock = createMockSocket();
+    mockSocket = mock.socket;
+    handlers = mock.handlers;
+    registerWordHandlers(mockIo, mockSocket as any);
+
+    (getGameBySocketId as Mock).mockReturnValue('HUNT01');
+    (getUsernameBySocketId as Mock).mockReturnValue('alice');
   });
 
-  it('should broadcast wordHuntLifeUpdate immediately after restoreLife on accepted word', (done) => {
+  it('should broadcast wordHuntLifeUpdate immediately after restoreLife on accepted word', async () => {
     // GIVEN: word-hunt game with wordHuntState
     const huntState = {
       targetWord: 'hello',
@@ -162,7 +200,7 @@ describe('wordHandler word-hunt life restore broadcast', () => {
       isFirstFinderClaimed: false,
     };
 
-    getGame.mockReturnValue({
+    (getGame as Mock).mockReturnValue({
       gameCode: 'HUNT01',
       gameState: 'in-progress',
       gameMode: 'word-hunt',
@@ -176,23 +214,20 @@ describe('wordHandler word-hunt life restore broadcast', () => {
       wordHuntState: huntState,
     });
 
-    isWordOnBoardAsync.mockResolvedValue(true);
+    (isWordOnBoardAsync as Mock).mockResolvedValue(true);
 
     // WHEN: player submits a valid word
-    clientSocket.emit('submitWord', { word: 'cat' });
+    await handlers['submitWord']({ word: 'cat' });
 
     // THEN: wordHuntLifeUpdate should be broadcast with updated lives
-    setTimeout(() => {
-      const lifeCalls = broadcastToRoom.mock.calls.filter(
-        (call: any[]) => call[2] === 'wordHuntLifeUpdate'
-      );
-      expect(lifeCalls.length).toBeGreaterThanOrEqual(1);
-      expect(lifeCalls[0][3]).toEqual(
-        expect.objectContaining({
-          playerLives: expect.any(Object),
-        })
-      );
-      done();
-    }, 200);
+    const lifeCalls = (broadcastToRoom as Mock).mock.calls.filter(
+      (call: any[]) => call[2] === 'wordHuntLifeUpdate'
+    );
+    expect(lifeCalls.length).toBeGreaterThanOrEqual(1);
+    expect(lifeCalls[0][3]).toEqual(
+      expect.objectContaining({
+        playerLives: expect.any(Object),
+      })
+    );
   });
 });

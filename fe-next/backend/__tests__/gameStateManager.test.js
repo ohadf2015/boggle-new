@@ -3,8 +3,7 @@
  * Tests for centralized game state management
  */
 
-const {
-  createGame,
+import { createGame,
   getGame,
   updateGame,
   deleteGame,
@@ -30,9 +29,7 @@ const {
   updateUserHeartbeat,
   markUserActivity,
   getPresenceConfig,
-  clearAllGames,
-} = require('../modules/gameStateManager');
-
+  clearAllGames, } from '../modules/gameStateManager';
 describe('Game State Manager', () => {
 
   // Clean up after each test

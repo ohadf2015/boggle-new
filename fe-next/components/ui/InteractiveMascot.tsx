@@ -4,7 +4,7 @@ import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
+import { MascotVariant, getMascotImagePath, isGifVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
 import {
   getBaseVariant,
   type ExtendedMascotVariant,
@@ -70,27 +70,42 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVar
   powerup: 'trophy',      // Powerup → Trophy (powered up!)
 };
 
+const CLIP_CLASSES: Record<MascotClipShape, string> = {
+  none: '',
+  circle: 'rounded-full overflow-hidden',
+  'rounded-square': 'rounded-neo overflow-hidden',
+};
+
+const BORDER_CLASSES: Record<MascotBorderColor, string> = {
+  pink: 'border-[3px] border-neo-pink shadow-hard',
+  lime: 'border-[3px] border-neo-lime shadow-hard',
+  cyan: 'border-[3px] border-neo-cyan shadow-hard',
+  purple: 'border-[3px] border-neo-purple shadow-hard',
+  white: 'border-[3px] border-neo-white shadow-hard',
+  none: '',
+};
+
 /**
  * Size presets for the mascot
  */
 type MascotSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 const SIZE_CLASSES: Record<MascotSize, string> = {
-  xs: 'w-10 h-10',
-  sm: 'w-16 h-16',
-  md: 'w-24 h-24',
-  lg: 'w-32 h-32',
-  xl: 'w-40 h-40',
-  '2xl': 'w-48 h-48',
+  xs: 'w-[100px] h-[100px]',
+  sm: 'w-28 h-28',
+  md: 'w-32 h-32',
+  lg: 'w-40 h-40',
+  xl: 'w-48 h-48',
+  '2xl': 'w-56 h-56',
 };
 
 const SIZE_PIXELS: Record<MascotSize, number> = {
-  xs: 40,
-  sm: 64,
-  md: 96,
-  lg: 128,
-  xl: 160,
-  '2xl': 192,
+  xs: 100,
+  sm: 112,
+  md: 128,
+  lg: 160,
+  xl: 192,
+  '2xl': 224,
 };
 
 /**
@@ -159,6 +174,12 @@ export interface InteractiveMascotProps {
   tooltip?: string;
   /** Accessibility label */
   ariaLabel?: string;
+  /** Clip shape to mask GIF background */
+  clipShape?: MascotClipShape;
+  /** Border color when using a clip shape */
+  clipBorder?: MascotBorderColor;
+  /** Background behind the GIF inside the clip */
+  clipBg?: string;
 }
 
 /**
@@ -368,6 +389,9 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   onHover,
   tooltip,
   ariaLabel,
+  clipShape = 'circle',
+  clipBorder = 'white',
+  clipBg = 'bg-neo-navy',
 }: InteractiveMascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -506,16 +530,18 @@ export const InteractiveMascot = memo(function InteractiveMascot({
               transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="w-full h-full"
             >
-              <Image
-                src={imageSrc}
-                alt={altText}
-                width={SIZE_PIXELS[size]}
-                height={SIZE_PIXELS[size]}
-                className="object-contain drop-shadow-lg"
-                priority={priority}
-                fetchPriority={fetchPriority}
-                unoptimized={isGif}
-              />
+              <div className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${clipShape !== 'none' ? clipBg : ''}`}>
+                <Image
+                  src={imageSrc}
+                  alt={altText}
+                  width={SIZE_PIXELS[size]}
+                  height={SIZE_PIXELS[size]}
+                  className={`object-contain ${clipShape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                  priority={priority}
+                  fetchPriority={fetchPriority}
+                  unoptimized={isGif}
+                />
+              </div>
             </motion.div>
           </AnimatePresence>
         </motion.div>

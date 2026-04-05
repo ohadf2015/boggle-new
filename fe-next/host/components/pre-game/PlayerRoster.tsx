@@ -114,9 +114,9 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
     <section className={compact ? 'space-y-1' : 'space-y-3'}>
       {/* Header row */}
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
           {t('hostView.playersInRoom')}
-        </h3>
+        </h2>
         {hostLabel && (
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
             {hostLabel}

@@ -53,7 +53,7 @@ import {
   handleTournamentJoin,
   handleExistingAuthConnectionJoin
 } from './playerReconnectHandler';
-import { ensurePlayerState } from './gameLifecycleHandler';
+import { ensurePlayerState } from './playerDataInit';
 
 // Types for payloads
 interface JoinGamePayload {

@@ -7,7 +7,7 @@ import express, { Response, Router } from 'express';
 import type { AdminRequest, NameCountData, ProfileRow, EventRow, CountMaps } from './types';
 import logger from '../../utils/logger';
 
-const { getSupabase } = require('../../modules/supabaseServer');
+import { getSupabase } from '../../modules/supabaseServer';
 
 const router: Router = express.Router();
 
@@ -18,6 +18,7 @@ const router: Router = express.Router();
 router.get('/players/countries', async (_req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
     // Get authenticated user countries from profiles
     const { data: profileData, error: profileError } = await supabase
@@ -114,6 +115,7 @@ router.get('/players/countries', async (_req: AdminRequest, res: Response): Prom
 router.get('/players/sources', async (_req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
     // Get registered user data from profiles
     const { data: profileData, error: profileError } = await supabase
@@ -230,6 +232,7 @@ router.get('/players/top', async (req: AdminRequest, res: Response): Promise<voi
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
     const { data, error } = await supabase
       .from('profiles')
@@ -264,6 +267,7 @@ router.get('/players/recent', async (req: AdminRequest, res: Response): Promise<
   try {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
     const { data, error } = await supabase
       .from('profiles')
@@ -297,6 +301,7 @@ router.get('/players/recent', async (req: AdminRequest, res: Response): Promise<
 router.get('/players', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const search = (req.query.search as string) || null;
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const offset = parseInt(req.query.offset as string) || 0;
@@ -352,6 +357,7 @@ router.post('/users/:userId/set-teacher-role', async (req: AdminRequest, res: Re
 
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
     // Fetch the target user's current role
     const { data: profile, error: lookupError } = await supabase
@@ -416,6 +422,7 @@ router.post('/players/:id/blast-access', async (req: AdminRequest, res: Response
     }
 
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const { error } = await supabase
       .from('profiles')
       .update({ blast_access: enabled })

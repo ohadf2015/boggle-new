@@ -80,6 +80,9 @@ export interface WordHuntResult {
   hintsUnlocked?: number;
   efficiencyScore?: number;
 
+  // Retry tracking
+  extraTries?: number;          // Number of coin-paid retries (penalty: -150 each)
+
   // Metadata
   streakDays: number;
   completedAt: string;

@@ -4,37 +4,41 @@
  */
 
 // Mock supabaseServer before imports
-const mockSelect = jest.fn();
-const mockInsert = jest.fn();
-const mockUpdate = jest.fn();
-const mockUpsert = jest.fn();
-const mockEq = jest.fn();
-const mockOrder = jest.fn();
-const mockLimit = jest.fn();
-const mockSingle = jest.fn();
-const mockRpc = jest.fn();
-const mockFrom = jest.fn(() => ({
-  select: mockSelect,
-  insert: mockInsert,
-  update: mockUpdate,
-  upsert: mockUpsert,
-}));
-const mockSupabase = { from: mockFrom, rpc: mockRpc };
+const { mockSelect, mockInsert, mockUpdate, mockUpsert, mockEq, mockOrder, mockLimit, mockSingle, mockRpc, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockSelect = vi.fn();
+  const mockInsert = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockUpsert = vi.fn();
+  const mockEq = vi.fn();
+  const mockOrder = vi.fn();
+  const mockLimit = vi.fn();
+  const mockSingle = vi.fn();
+  const mockRpc = vi.fn();
+  const mockFrom = vi.fn(() => ({
+    select: mockSelect,
+    insert: mockInsert,
+    update: mockUpdate,
+    upsert: mockUpsert,
+  }));
+  const mockSupabase = { from: mockFrom, rpc: mockRpc };
+  return { mockSelect, mockInsert, mockUpdate, mockUpsert, mockEq, mockOrder, mockLimit, mockSingle, mockRpc, mockFrom, mockSupabase };
+});
 
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => mockSupabase),
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => mockSupabase),
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
   default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   LEAGUE_TIERS,
   LEAGUE_CONFIG,
@@ -55,7 +59,7 @@ import {
 
 function setupMockChain() {
   // Chainable query builder mock
-  const chain: Record<string, jest.Mock> = {
+  const chain: Record<string, Mock> = {
     select: mockSelect,
     eq: mockEq,
     order: mockOrder,
@@ -75,7 +79,7 @@ function setupMockChain() {
 
 describe('LeagueManager', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupMockChain();
   });
 

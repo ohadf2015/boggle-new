@@ -3,15 +3,19 @@
  */
 
 // Mock supabaseServer before imports
-const mockSelect = jest.fn().mockReturnThis();
-const mockIn = jest.fn().mockResolvedValue({ data: [], error: null });
-const mockFrom = jest.fn().mockReturnValue({ select: mockSelect, in: mockIn });
-const mockSupabase = { from: mockFrom };
+const { mockSelect, mockIn, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockSelect = vi.fn().mockReturnThis();
+  const mockIn = vi.fn().mockResolvedValue({ data: [], error: null });
+  const mockFrom = vi.fn().mockReturnValue({ select: mockSelect, in: mockIn });
+  const mockSupabase = { from: mockFrom };
+  return { mockSelect, mockIn, mockFrom, mockSupabase };
+});
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { resolveUGCTable, UGC_TABLES } from '../ugcModerationRoutes';
 
 describe('UGC Table Validation', () => {

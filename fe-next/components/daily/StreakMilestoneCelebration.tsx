@@ -183,7 +183,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
 
             {/* Celebration mascot — Lexi joins the streak party */}
             <div className="flex justify-center mb-2">
-              <CelebrationMascotWithEntrance variant="celebration" size="xl" delay={0.3} />
+              <CelebrationMascotWithEntrance variant="celebration" size="xl" delay={0.3} clipBorder="cyan" />
             </div>
 
             {/* Animated emoji */}

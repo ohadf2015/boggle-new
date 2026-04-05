@@ -4,38 +4,39 @@
  * TDD RED phase — verifies life drain is wired into timer tick
  */
 
-jest.mock('../../../modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  updateGame: jest.fn(),
+vi.mock('../../../modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  updateGame: vi.fn(),
 }));
 
-jest.mock('../../../modules/communityWordManager', () => ({
-  resetGameAIValidationCount: jest.fn(),
+vi.mock('../../../modules/communityWordManager', () => ({
+  resetGameAIValidationCount: vi.fn(),
 }));
 
-jest.mock('../../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockReturnValue('room:HUNT01'),
+vi.mock('../../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockReturnValue('room:HUNT01'),
 }));
 
-jest.mock('../../../utils/timerManager', () => ({
-  clearGameTimer: jest.fn(),
-  setGameTimer: jest.fn(),
+vi.mock('../../../utils/timerManager', () => ({ default: {
+  clearGameTimer: vi.fn(),
+  setGameTimer: vi.fn(),
+}, clearGameTimer: vi.fn(), setGameTimer: vi.fn() }));
+
+vi.mock('../botGame', () => ({
+  startBotsForGame: vi.fn(),
 }));
 
-jest.mock('../botGame', () => ({
-  startBotsForGame: jest.fn(),
+vi.mock('../gameEnd', () => ({
+  endGame: vi.fn(),
 }));
 
-jest.mock('../gameEnd', () => ({
-  endGame: jest.fn(),
+vi.mock('../../../modules/wordHuntManager', () => ({
+  drainLife: vi.fn(),
+  areAllPlayersEliminated: vi.fn(),
 }));
 
-jest.mock('../../../modules/wordHuntManager', () => ({
-  drainLife: jest.fn(),
-  areAllPlayersEliminated: jest.fn(),
-}));
-
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getGame, updateGame } from '../../../modules/gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../../../utils/socketHelpers';
 import { clearGameTimer } from '../../../utils/timerManager';
@@ -43,25 +44,25 @@ import { drainLife, areAllPlayersEliminated } from '../../../modules/wordHuntMan
 import { endGame } from '../gameEnd';
 import { startGameTimer } from '../gameTimer';
 
-const mockGetGame = getGame as jest.Mock;
-const mockUpdateGame = updateGame as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
-const mockDrainLife = drainLife as jest.Mock;
-const mockAreAllPlayersEliminated = areAllPlayersEliminated as jest.Mock;
-const mockClearGameTimer = clearGameTimer as jest.Mock;
-const mockEndGame = endGame as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockUpdateGame = updateGame as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
+const mockDrainLife = drainLife as Mock;
+const mockAreAllPlayersEliminated = areAllPlayersEliminated as Mock;
+const mockClearGameTimer = clearGameTimer as Mock;
+const mockEndGame = endGame as Mock;
 
 describe('gameTimer word hunt life drain', () => {
   let mockIo: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockIo = {};
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should call drainLife on each tick for word-hunt games', () => {
@@ -91,7 +92,7 @@ describe('gameTimer word hunt life drain', () => {
     startGameTimer(mockIo, 'HUNT01', 60);
 
     // Advance one tick
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     expect(mockDrainLife).toHaveBeenCalledWith(huntState, expect.any(Number));
   });
@@ -121,7 +122,7 @@ describe('gameTimer word hunt life drain', () => {
     });
 
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     expect(mockBroadcastToRoom).toHaveBeenCalledWith(
       mockIo,
@@ -156,7 +157,7 @@ describe('gameTimer word hunt life drain', () => {
     });
 
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     expect(mockBroadcastToRoom).toHaveBeenCalledWith(
       mockIo,
@@ -176,7 +177,7 @@ describe('gameTimer word hunt life drain', () => {
     });
 
     startGameTimer(mockIo, 'CLASSIC01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     expect(mockDrainLife).not.toHaveBeenCalled();
   });
@@ -208,7 +209,7 @@ describe('gameTimer word hunt life drain', () => {
     mockAreAllPlayersEliminated.mockReturnValue(true);
 
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     expect(mockClearGameTimer).toHaveBeenCalledWith('HUNT01');
     expect(mockEndGame).toHaveBeenCalledWith(mockIo, 'HUNT01');
@@ -241,7 +242,7 @@ describe('gameTimer word hunt life drain', () => {
     mockAreAllPlayersEliminated.mockReturnValue(false);
 
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     // endGame should NOT have been called (only clearGameTimer from init is ok)
     expect(mockEndGame).not.toHaveBeenCalled();

@@ -3,7 +3,7 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Swords, BookOpen, Users, Trophy, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Trophy, Map, Bomb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ModeCard from './ModeCard';
 import { LandingShareBanner } from './LandingShareBanner';
@@ -66,6 +66,7 @@ export function LandingDesktopCards({
             description={t('landing.arenaDesc')}
             href={`/${language}/multiplayer`}
             icon={<Swords className="w-6 h-6" />}
+            modeImage="/modes/arena.png"
             variant="pink"
             className="w-full"
             liveBadge={{
@@ -96,6 +97,7 @@ export function LandingDesktopCards({
             description={t('landing.practiceDesc')}
             href={`/${language}/singleplayer?mode=practice`}
             icon={<BookOpen className="w-6 h-6" />}
+            modeImage="/modes/practice.png"
             variant="cyan"
             className="w-full"
             personalBest={playerAllTimeBest ? {
@@ -143,6 +145,7 @@ export function LandingDesktopCards({
             description={t('landing.adventureModeDesc')}
             href={`/${language}/adventure`}
             icon={<Map className="w-6 h-6" />}
+            modeImage="/modes/adventure.png"
             variant="lime"
             className="w-full"
             onClick={() => trackModeSelected('adventure')}
@@ -157,6 +160,7 @@ export function LandingDesktopCards({
               description={t('landing.blastModeDesc')}
               href={`/${language}/blast`}
               icon={<Bomb className="w-6 h-6" />}
+              modeImage="/modes/blast.png"
               variant="orange"
               secondary
               badge="ADMIN"

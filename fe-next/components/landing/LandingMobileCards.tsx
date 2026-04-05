@@ -2,8 +2,9 @@
 
 import { Suspense, lazy, useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, Map, Sparkles, Bomb } from 'lucide-react';
+import { Bot, Trophy, LayoutGrid, Crown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LandingShareBanner } from './LandingShareBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -88,7 +89,9 @@ export function LandingMobileCards({
                 {t('onboarding.welcome.startHere')}
               </motion.span>
             )}
-            <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+              <Image src="/modes/practice.png" alt="" fill className="object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]" sizes="48px" />
+            </div>
             <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer')}</span>
             {!isMobilePortrait && (
               <div className="flex gap-2 text-xs" aria-hidden="true">
@@ -121,7 +124,9 @@ export function LandingMobileCards({
             )}
             aria-label={`${t('landing.multiplayer')} - ${t('landing.multiplayerDesc')}`}
           >
-            <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+              <Image src="/modes/arena.png" alt="" fill className="object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]" sizes="48px" />
+            </div>
             <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer')}</span>
             {activePlayers > 0 && (
               <div className="flex items-center gap-1 bg-neo-lime text-neo-black px-2 py-0.5 rounded-neo border border-neo-black shadow-hard-xs text-xs font-bold">
@@ -181,8 +186,8 @@ export function LandingMobileCards({
             )}
             aria-label={`${t('landing.adventureMode')} - ${t('landing.adventureModeDesc')}`}
           >
-            <div className="flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11 bg-neo-black/15 rounded-neo border-2 border-neo-black/20 flex items-center justify-center">
-              <Map className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" aria-hidden="true" />
+            <div className="flex-shrink-0 relative w-10 h-10 sm:w-12 sm:h-12">
+              <Image src="/modes/adventure.png" alt="" fill className="object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]" sizes="48px" />
             </div>
             <div className="flex-1 min-w-0">
               <span className="block text-sm sm:text-base font-black uppercase text-neo-black leading-tight">
@@ -221,7 +226,9 @@ export function LandingMobileCards({
               <span className="absolute top-1 end-1 sm:top-2 sm:end-2 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-neo-navy text-neo-white font-black uppercase text-[8px] sm:text-[10px] border border-neo-black rounded-neo shadow-hard-xs transform rotate-3 rtl:-rotate-3">
                 ADMIN
               </span>
-              <Bomb className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+                <Image src="/modes/blast.png" alt="" fill className="object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]" sizes="48px" />
+              </div>
               <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.blastMode')}</span>
             </Link>
           </motion.div>

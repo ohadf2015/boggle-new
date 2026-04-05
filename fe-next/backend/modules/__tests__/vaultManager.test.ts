@@ -3,6 +3,7 @@
  * Tests for timed exclusive vault board system
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getActiveVault,
   getVaultLeaderboard,
@@ -17,12 +18,12 @@ const callLog: Array<{ method: string; args: unknown[] }> = [];
 let queryResult: { data: unknown; error: unknown } = { data: null, error: null };
 let upsertResult: { data: unknown; error: unknown } = { data: null, error: null };
 
-function createChain(): Record<string, jest.Mock> {
-  const chain: Record<string, jest.Mock> = {};
+function createChain(): Record<string, Mock> {
+  const chain: Record<string, Mock> = {};
   const methods = ['select', 'insert', 'update', 'upsert', 'eq', 'gte', 'lte', 'lt', 'gt', 'order', 'limit', 'single', 'from', 'maybeSingle'];
 
   for (const method of methods) {
-    chain[method] = jest.fn((...args: unknown[]) => {
+    chain[method] = vi.fn((...args: unknown[]) => {
       callLog.push({ method, args });
       if (method === 'single' || method === 'maybeSingle') {
         return queryResult;
@@ -34,10 +35,10 @@ function createChain(): Record<string, jest.Mock> {
         // upsert is terminal-ish but chains to select
         return {
           ...chain,
-          select: jest.fn((...sArgs: unknown[]) => {
+          select: vi.fn((...sArgs: unknown[]) => {
             callLog.push({ method: 'select', args: sArgs });
             return {
-              single: jest.fn(() => {
+              single: vi.fn(() => {
                 callLog.push({ method: 'single', args: [] });
                 return upsertResult;
               }),
@@ -58,9 +59,9 @@ function createChain(): Record<string, jest.Mock> {
   return chain;
 }
 
-let mockChain: Record<string, jest.Mock>;
+let mockChain: Record<string, Mock>;
 
-jest.mock('../supabaseServer', () => ({
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => ({
     from: (...args: unknown[]) => {
       callLog.push({ method: 'from', args });

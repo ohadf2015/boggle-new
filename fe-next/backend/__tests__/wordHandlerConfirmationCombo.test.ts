@@ -8,86 +8,88 @@
  */
 
 // ── Mock every dependency before importing the handler ──────────────────────
-jest.mock('../utils/logger', () => ({
-  info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn(),
-}));
-jest.mock('../modules/gameStateManager');
-jest.mock('../utils/socketHelpers');
-jest.mock('../utils/profanityFilter', () => ({ isProfane: jest.fn().mockReturnValue(false) }));
-jest.mock('../utils/errorHandler', () => ({
-  emitError: jest.fn(),
+vi.mock('../utils/logger', () => ({ default: {
+  info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn(),
+} }));
+vi.mock('../modules/gameStateManager');
+vi.mock('../utils/socketHelpers');
+vi.mock('../utils/profanityFilter', () => ({ isProfane: vi.fn().mockReturnValue(false) }));
+vi.mock('../utils/errorHandler', () => ({
+  emitError: vi.fn(),
   ErrorCodes: {},
 }));
-jest.mock('../utils/rateLimiter', () => ({ checkRateLimit: jest.fn().mockReturnValue(true) }));
-jest.mock('../utils/metrics', () => ({ inc: jest.fn(), incPerGame: jest.fn() }));
-jest.mock('../handlers/shared', () => ({ isSocketMigrating: jest.fn().mockReturnValue(false) }));
-jest.mock('../utils/socketValidation', () => ({
-  validatePayload: jest.fn().mockImplementation((_schema: unknown, data: unknown) => ({ success: true, data })),
+vi.mock('../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true) }));
+vi.mock('../utils/metrics', () => ({ inc: vi.fn(), incPerGame: vi.fn() }));
+vi.mock('../handlers/shared', () => ({ isSocketMigrating: vi.fn().mockReturnValue(false) }));
+vi.mock('../utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema: unknown, data: unknown) => ({ success: true, data })),
   submitWordSchema: {},
   submitWordVoteSchema: {},
   submitPeerValidationVoteSchema: {},
 }));
-jest.mock('../middleware/rateLimiterRedis', () => ({
-  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+vi.mock('../middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
-jest.mock('../modules/wordValidatorPool', () => ({
-  isWordOnBoardAsync: jest.fn().mockResolvedValue(true),
+vi.mock('../modules/wordValidatorPool', () => ({
+  isWordOnBoardAsync: vi.fn().mockResolvedValue(true),
 }));
-jest.mock('../dictionary', () => ({
-  isDictionaryWord: jest.fn().mockReturnValue(true),
-  isValidWordCached: jest.fn().mockResolvedValue(true),
+vi.mock('../dictionary', () => ({
+  isDictionaryWord: vi.fn().mockReturnValue(true),
+  isValidWordCached: vi.fn().mockResolvedValue(true),
 }));
-jest.mock('../modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn().mockReturnValue(false),
-  recordPlayerWrongWord: jest.fn(),
+vi.mock('../modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn().mockReturnValue(false),
+  recordPlayerWrongWord: vi.fn(),
 }));
-jest.mock('../modules/communityWordManager', () => ({
-  recordVote: jest.fn(),
-  updatePendingCache: jest.fn(),
-  isWordCommunityValid: jest.fn().mockReturnValue(false),
-  isWordValidForScoring: jest.fn().mockReturnValue(false),
+vi.mock('../modules/communityWordManager', () => ({
+  recordVote: vi.fn(),
+  updatePendingCache: vi.fn(),
+  isWordCommunityValid: vi.fn().mockReturnValue(false),
+  isWordValidForScoring: vi.fn().mockReturnValue(false),
 }));
-jest.mock('../modules/spamDetector', () => ({
+vi.mock('../modules/spamDetector', () => ({
   spamDetector: {
-    recordInvalidWord: jest.fn(),
-    clearPlayer: jest.fn(),
-    isOnCooldown: jest.fn().mockReturnValue(false),
-    getRemainingCooldown: jest.fn().mockReturnValue(0),
+    recordInvalidWord: vi.fn(),
+    clearPlayer: vi.fn(),
+    isOnCooldown: vi.fn().mockReturnValue(false),
+    getRemainingCooldown: vi.fn().mockReturnValue(0),
   },
   PenaltyTier: { NONE: 'none', WARNING: 'warning', PENALTY: 'penalty', COOLDOWN: 'cooldown' },
   InvalidReason: {},
 }));
-jest.mock('../services/gracePeriodLock', () => ({
-  acquireGracePeriodLock: jest.fn().mockResolvedValue('lock-id'),
-  releaseGracePeriodLock: jest.fn().mockResolvedValue(undefined),
+vi.mock('../services/gracePeriodLock', () => ({ default: {
+  acquireGracePeriodLock: vi.fn().mockResolvedValue('lock-id'),
+  releaseGracePeriodLock: vi.fn().mockResolvedValue(undefined),
+} }));
+vi.mock('../modules/scoringEngine', () => ({
+  calculateWordScore: vi.fn().mockReturnValue(10),
 }));
-jest.mock('../modules/scoringEngine', () => ({
-  calculateWordScore: jest.fn().mockReturnValue(10),
+vi.mock('../handlers/wordValidationHandler', () => ({
+  handleValidatedWord: vi.fn().mockResolvedValue(undefined),
+  handleWordBecameValid: vi.fn(),
+  handlePeerRejection: vi.fn(),
 }));
-jest.mock('../handlers/wordValidationHandler', () => ({
-  handleValidatedWord: jest.fn().mockResolvedValue(undefined),
-  handleWordBecameValid: jest.fn(),
-  handlePeerRejection: jest.fn(),
-}));
-jest.mock('../utils/timerManager', () => ({
-  default: { setTimeout: jest.fn(), clearTimeout: jest.fn() },
+vi.mock('../utils/timerManager', () => ({
+  default: { setTimeout: vi.fn(), clearTimeout: vi.fn() },
 }));
 
 // ── Imports ──────────────────────────────────────────────────────────────────
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Server, Socket } from 'socket.io';
 
-const gsm = require('../modules/gameStateManager') as Record<string, jest.Mock>;
-const { registerWordHandlers } = require('../handlers/wordHandler');
+import * as gsmModule from '../modules/gameStateManager';
+import { registerWordHandlers } from '../handlers/wordHandler';
 
+const gsm = vi.mocked(gsmModule) as unknown as Record<string, Mock>;
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function makeSocket(overrides: Partial<Socket> = {}): Socket {
   return {
     id: 'socket-player',
-    on: jest.fn((event: string, handler: (...args: unknown[]) => void) => {
+    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
       (makeSocket as any).__handlers = (makeSocket as any).__handlers || {};
       (makeSocket as any).__handlers[event] = handler;
     }),
-    emit: jest.fn(),
+    emit: vi.fn(),
     connected: true,
     ...overrides,
   } as unknown as Socket;
@@ -95,7 +97,7 @@ function makeSocket(overrides: Partial<Socket> = {}): Socket {
 
 function captureHandlers(socket: Socket): Record<string, (...args: unknown[]) => Promise<void>> {
   const handlers: Record<string, (...args: unknown[]) => Promise<void>> = {};
-  (socket.on as jest.Mock).mockImplementation((event: string, handler: (...args: unknown[]) => Promise<void>) => {
+  (socket.on as Mock).mockImplementation((event: string, handler: (...args: unknown[]) => Promise<void>) => {
     handlers[event] = handler;
   });
   return handlers;
@@ -108,7 +110,7 @@ describe('GD-022: confirmation find combo increment', () => {
   let mockGame: Record<string, unknown>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockGame = {
       gameCode: 'TEST1',
@@ -135,7 +137,7 @@ describe('GD-022: confirmation find combo increment', () => {
     socket = makeSocket();
     handlers = captureHandlers(socket);
 
-    const mockIo = { to: jest.fn().mockReturnThis(), emit: jest.fn() } as unknown as Server;
+    const mockIo = { to: vi.fn().mockReturnThis(), emit: vi.fn() } as unknown as Server;
     registerWordHandlers(mockIo, socket);
   });
 

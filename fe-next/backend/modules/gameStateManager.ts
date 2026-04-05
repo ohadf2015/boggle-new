@@ -60,6 +60,7 @@ import type { HostGameBase, TransferHostResult } from './hostManager';
 
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
+import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
 import { LRUCache } from 'lru-cache';
 import { publishCacheInvalidation, startCacheInvalidationListener, stopCacheInvalidationListener } from '../redis/cacheInvalidation';
 
@@ -536,7 +537,6 @@ function upgradeSpectatorToPlayer(gameCode: string, username: string): boolean {
   if (game && game.gameState !== 'waiting') {
     return false;
   }
-  const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
   const result = spectatorManager.upgradeSpectatorToPlayer(asBase<SpectatorGameBase>(game), username, MAX_PLAYERS_PER_ROOM);
   if (result) persistGameState(gameCode);
   return result;

@@ -8,6 +8,8 @@ import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import RoomChat from '../../components/RoomChat';
+import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
@@ -64,6 +66,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onAvatarChange,
 }): React.ReactElement => {
   const { isAuthenticated, updateProfile } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const gameMode = useGameMode();
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -365,14 +368,18 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <MobileShareSection gameCode={gameCode} t={t} />
       <section className="pb-4">
         <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
-          <RoomChat
-            username={username}
-            isHost={false}
-            gameCode={gameCode}
-            className="h-full"
-            onNewMessage={() => {}}
-            variant="embedded"
-          />
+          {isOnCrazyGamesPlatform ? (
+            <LobbyTutorialPanel t={t} />
+          ) : (
+            <RoomChat
+              username={username}
+              isHost={false}
+              gameCode={gameCode}
+              className="h-full"
+              onNewMessage={() => {}}
+              variant="embedded"
+            />
+          )}
         </div>
       </section>
     </div>
@@ -423,14 +430,18 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                   data-testid="desktop-chat-area"
                   className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
                 >
-                  <RoomChat
-                    username={username}
-                    isHost={false}
-                    gameCode={gameCode}
-                    className="h-full"
-                    onNewMessage={() => {}}
-                    variant="embedded"
-                  />
+                  {isOnCrazyGamesPlatform ? (
+                    <LobbyTutorialPanel t={t} />
+                  ) : (
+                    <RoomChat
+                      username={username}
+                      isHost={false}
+                      gameCode={gameCode}
+                      className="h-full"
+                      onNewMessage={() => {}}
+                      variant="embedded"
+                    />
+                  )}
                 </div>
               </>
             }

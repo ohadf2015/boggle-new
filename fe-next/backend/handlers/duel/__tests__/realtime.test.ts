@@ -3,6 +3,7 @@
  * TDD tests for real-time word submission, game state, and timer completion
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerRealtimeHandlers, realtimeGames, startRealtimeDuel } from '../realtime';
@@ -13,17 +14,17 @@ import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 
 // Mock dependencies
-jest.mock('@/backend/modules/supabase/client');
-jest.mock('@/backend/modules/wordValidatorPool');
-jest.mock('@/backend/dictionary');
-jest.mock('@/backend/modules/scoringEngine.types');
-jest.mock('@/backend/utils/logger');
-jest.mock('@/backend/modules/educationXpManager');
+vi.mock('@/backend/modules/supabase/client');
+vi.mock('@/backend/modules/wordValidatorPool');
+vi.mock('@/backend/dictionary');
+vi.mock('@/backend/modules/scoringEngine.types');
+vi.mock('@/backend/utils/logger');
+vi.mock('@/backend/modules/educationXpManager');
 
-const mockedGetSupabase = jest.mocked(getSupabase);
-const mockedIsDictionaryWord = jest.mocked(isDictionaryWord);
-const mockedIsWordOnBoardAsync = jest.mocked(isWordOnBoardAsync);
-const mockedCalculateWordScore = jest.mocked(calculateWordScore);
+const mockedGetSupabase = vi.mocked(getSupabase);
+const mockedIsDictionaryWord = vi.mocked(isDictionaryWord);
+const mockedIsWordOnBoardAsync = vi.mocked(isWordOnBoardAsync);
+const mockedCalculateWordScore = vi.mocked(calculateWordScore);
 
 describe('Real-Time Duel Handlers', () => {
   let mockSocket: Partial<DuelSocket>;
@@ -34,8 +35,8 @@ describe('Real-Time Duel Handlers', () => {
 
   beforeEach(() => {
     // Clear mocks
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     emittedEvents = [];
     roomEmittedEvents = [];
 
@@ -49,19 +50,19 @@ describe('Real-Time Duel Handlers', () => {
         displayName: 'Player 1',
         classroomIds: ['classroom-1'],
       },
-      emit: jest.fn((event: string, data: any) => {
+      emit: vi.fn((event: string, data: any) => {
         emittedEvents.push({ event, data });
       }),
-      to: jest.fn().mockReturnThis(),
-      on: jest.fn(),
+      to: vi.fn().mockReturnThis(),
+      on: vi.fn(),
     } as any;
 
     // Setup mock namespace
     mockNamespace = {
-      to: jest.fn().mockReturnValue({
-        emit: jest.fn((event: string, data: any) => {
-          const roomCall = (mockNamespace.to as jest.Mock).mock.calls[
-            (mockNamespace.to as jest.Mock).mock.calls.length - 1
+      to: vi.fn().mockReturnValue({
+        emit: vi.fn((event: string, data: any) => {
+          const roomCall = (mockNamespace.to as Mock).mock.calls[
+            (mockNamespace.to as Mock).mock.calls.length - 1
           ];
           const room = roomCall[0];
           roomEmittedEvents.push({ room, event, data });
@@ -71,13 +72,13 @@ describe('Real-Time Duel Handlers', () => {
 
     // Setup Supabase mock
     mockSupabaseClient = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-      update: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn(),
+      update: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
 
     // Mock getSupabase
@@ -86,7 +87,7 @@ describe('Real-Time Duel Handlers', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('duel:submit-word handler', () => {
@@ -96,7 +97,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -139,7 +140,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -180,7 +181,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -221,7 +222,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -256,7 +257,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -300,7 +301,7 @@ describe('Real-Time Duel Handlers', () => {
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -348,14 +349,14 @@ describe('Real-Time Duel Handlers', () => {
       mockedCalculateWordScore.mockReturnValue(3);
 
       // Mock socket.to() to emit to room
-      const mockRoomEmit = jest.fn();
-      (mockSocket.to as jest.Mock).mockReturnValue({
+      const mockRoomEmit = vi.fn();
+      (mockSocket.to as Mock).mockReturnValue({
         emit: mockRoomEmit,
       });
 
       registerRealtimeHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitWordHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitWordHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-word'
       )?.[1];
 
@@ -433,8 +434,8 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock duel update (for completion) - must be set up BEFORE timer fires
       const mockEqChain = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({
           data: [{ id: duelId, status: 'completed' }],
           error: null,
           count: 1,
@@ -444,7 +445,7 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock insert turns
       mockSupabaseClient.insert.mockReturnValue({
-        select: jest.fn().mockResolvedValue({
+        select: vi.fn().mockResolvedValue({
           data: [{ id: 'turn-1' }, { id: 'turn-2' }],
           error: null,
         }),
@@ -457,7 +458,7 @@ describe('Real-Time Duel Handlers', () => {
       expect(gameState).toBeDefined();
 
       // Fast-forward time to trigger completion
-      jest.runAllTimers();
+      vi.runAllTimers();
 
       // Wait for async operations
       await new Promise((resolve) => setImmediate(resolve));
@@ -493,8 +494,8 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock atomic update - set up BEFORE timer fires
       const mockEqChain = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({
           data: [{ id: duelId, status: 'completed', winner_id: 'user-1' }],
           error: null,
           count: 1,
@@ -504,7 +505,7 @@ describe('Real-Time Duel Handlers', () => {
 
       // Mock insert turns
       mockSupabaseClient.insert.mockReturnValue({
-        select: jest.fn().mockResolvedValue({
+        select: vi.fn().mockResolvedValue({
           data: [{ id: 'turn-1' }, { id: 'turn-2' }],
           error: null,
         }),
@@ -522,7 +523,7 @@ describe('Real-Time Duel Handlers', () => {
       }
 
       // Fast-forward timer
-      jest.runAllTimers();
+      vi.runAllTimers();
       await new Promise((resolve) => setImmediate(resolve));
 
       // Verify completion emitted
@@ -566,8 +567,8 @@ describe('Real-Time Duel Handlers', () => {
       });
 
       const mockEqChain = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({
           data: [{ id: duelId, status: 'completed', winner_id: null }],
           error: null,
           count: 1,
@@ -576,7 +577,7 @@ describe('Real-Time Duel Handlers', () => {
       mockSupabaseClient.update.mockReturnValue(mockEqChain);
 
       mockSupabaseClient.insert.mockReturnValue({
-        select: jest.fn().mockResolvedValue({
+        select: vi.fn().mockResolvedValue({
           data: [{ id: 'turn-1' }, { id: 'turn-2' }],
           error: null,
         }),
@@ -593,7 +594,7 @@ describe('Real-Time Duel Handlers', () => {
         gameState.opponentWords = ['word'];
       }
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       await new Promise((resolve) => setImmediate(resolve));
 
       const completedEvent = roomEmittedEvents.find((e) => e.event === 'duel:completed');
@@ -633,8 +634,8 @@ describe('Real-Time Duel Handlers', () => {
       });
 
       const mockEqChain = {
-        eq: jest.fn().mockReturnThis(),
-        select: jest.fn().mockResolvedValue({
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({
           data: [{ id: duelId, status: 'completed' }],
           error: null,
           count: 1,
@@ -643,7 +644,7 @@ describe('Real-Time Duel Handlers', () => {
       mockSupabaseClient.update.mockReturnValue(mockEqChain);
 
       mockSupabaseClient.insert.mockReturnValue({
-        select: jest.fn().mockResolvedValue({
+        select: vi.fn().mockResolvedValue({
           data: [{ id: 'turn-1' }, { id: 'turn-2' }],
           error: null,
         }),
@@ -654,7 +655,7 @@ describe('Real-Time Duel Handlers', () => {
       // Verify game state exists before timer fires
       expect(realtimeGames.has(duelId)).toBe(true);
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       await new Promise((resolve) => setImmediate(resolve));
 
       // Verify game state cleaned up

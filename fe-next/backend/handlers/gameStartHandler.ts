@@ -42,7 +42,7 @@ import { findAllWordsAsync } from '../modules/wordValidatorPool.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
-import { initializePlayerData } from './gameLifecycleHandler.js';
+import { initializePlayerData } from './playerDataInit.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
@@ -341,7 +341,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     {
       const gridRows = letterGrid.length;
       const gridCols = (letterGrid[0] as unknown[])?.length || 0;
-      const goldenCount = gridRows >= 6 ? 3 : 2;
+      const totalCells = gridRows * gridCols;
+      const goldenCount = Math.min(gridRows >= 6 ? 3 : 2, totalCells);
       const goldenLetters: Array<{ row: number; col: number }> = [];
       const usedPositions = new Set<string>();
       while (goldenLetters.length < goldenCount) {

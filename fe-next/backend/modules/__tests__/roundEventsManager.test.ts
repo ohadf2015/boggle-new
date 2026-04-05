@@ -2,47 +2,51 @@
  * Round Events Manager Tests
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { GameState } from '../gameState/types';
 
 // Mock dependencies before imports
-jest.mock('../gameStateManager', () => ({
-  getGame: jest.fn(),
-  updateGame: jest.fn(),
+vi.mock('../gameStateManager', () => ({
+  getGame: vi.fn(),
+  updateGame: vi.fn(),
 }));
 
-jest.mock('../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn((gc: string) => `room:${gc}`),
+vi.mock('../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((gc: string) => `room:${gc}`),
 }));
 
-const mockTimerManagerInstance = {
-  setTimeout: jest.fn(),
-  clearTimersWithPrefix: jest.fn(),
-};
+const { mockTimerManagerInstance } = vi.hoisted(() => ({
+  mockTimerManagerInstance: {
+    setTimeout: vi.fn(),
+    clearTimersWithPrefix: vi.fn(),
+  },
+}));
 
-jest.mock('../../utils/timerManager', () => ({
+vi.mock('../../utils/timerManager', () => ({
   __esModule: true,
   default: mockTimerManagerInstance,
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn() },
+  default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-jest.mock('../../events/gameCleanup', () => ({
-  gameCleanupEmitter: {
-    onGameEnd: jest.fn(),
-    onGameReset: jest.fn(),
-  },
-}));
+vi.mock('../../events/gameCleanup', () => {
+  const emitter = {
+    onGameEnd: vi.fn(),
+    onGameReset: vi.fn(),
+  };
+  return { gameCleanupEmitter: emitter, default: emitter };
+});
 
 import { scheduleRoundEvent, clearRoundEventTimers } from '../roundEventsManager';
 import { getGame, updateGame } from '../gameStateManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
-const mockGetGame = getGame as jest.Mock;
-const mockUpdateGame = updateGame as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockUpdateGame = updateGame as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
 const mockTimerSet = mockTimerManagerInstance.setTimeout;
 const mockTimerClear = mockTimerManagerInstance.clearTimersWithPrefix;
 
@@ -66,7 +70,7 @@ describe('roundEventsManager', () => {
   const io = {} as Parameters<typeof scheduleRoundEvent>[0];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('clearRoundEventTimers', () => {

@@ -4,6 +4,7 @@
  * Covers: getAvailableQuests, selectQuest, getActiveQuest, updateQuestProgress
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getAvailableQuests,
   selectQuest,
@@ -17,40 +18,43 @@ import {
 let mockChainResult: { data: unknown; error: unknown } = { data: null, error: null };
 
 const createChain = () => {
-  const chain: Record<string, jest.Mock> = {};
+  const chain: Record<string, Mock> = {};
   const self = () => chain;
 
-  chain.select = jest.fn().mockImplementation(self);
-  chain.eq = jest.fn().mockImplementation(self);
-  chain.insert = jest.fn().mockImplementation(self);
-  chain.update = jest.fn().mockImplementation(self);
-  chain.single = jest.fn().mockImplementation(() => Promise.resolve(mockChainResult));
+  chain.select = vi.fn().mockImplementation(self);
+  chain.eq = vi.fn().mockImplementation(self);
+  chain.insert = vi.fn().mockImplementation(self);
+  chain.update = vi.fn().mockImplementation(self);
+  chain.single = vi.fn().mockImplementation(() => Promise.resolve(mockChainResult));
 
   return chain;
 };
 
 let currentChain = createChain();
-const mockFrom = jest.fn().mockImplementation(() => currentChain);
-const mockSupabase = { from: mockFrom };
+const { mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockFrom = vi.fn().mockImplementation(() => currentChain);
+  const mockSupabase = { from: mockFrom };
+  return { mockFrom, mockSupabase };
+});
 
-jest.mock('../supabaseServer', () => ({
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
   default: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
 const PLAYER_ID = 'player-abc-123';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   currentChain = createChain();
   mockFrom.mockImplementation(() => currentChain);
   mockChainResult = { data: null, error: null };

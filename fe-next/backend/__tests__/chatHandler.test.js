@@ -4,31 +4,31 @@
  */
 
 // Must mock before requiring the module
-jest.mock('../modules/gameStateManager');
-jest.mock('../utils/socketHelpers');
-jest.mock('../utils/profanityFilter');
-jest.mock('../utils/errorHandler');
-jest.mock('../utils/rateLimiter');
-jest.mock('../utils/metrics');
-jest.mock('../handlers/shared');
-jest.mock('../utils/socketValidation');
-jest.mock('../utils/sanitize', () => ({
-  sanitizeHtml: jest.fn((text) => text),
+vi.mock('../modules/gameStateManager');
+vi.mock('../utils/socketHelpers');
+vi.mock('../utils/profanityFilter');
+vi.mock('../utils/errorHandler');
+vi.mock('../utils/rateLimiter', () => ({ default: { checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1') }, checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1') }));
+vi.mock('../utils/metrics');
+vi.mock('../handlers/shared');
+vi.mock('../utils/socketValidation');
+vi.mock('../utils/sanitize', () => ({
+  sanitizeHtml: vi.fn((text) => text),
 }));
-jest.mock('../middleware/rateLimiterRedis', () => ({
-  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+vi.mock('../middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
 
-const { registerChatHandlers } = require('../handlers/chatHandler');
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { cleanProfanity } = require('../utils/profanityFilter');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('../handlers/shared');
-const { validatePayload, chatMessageSchema } = require('../utils/socketValidation');
-
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { registerChatHandlers } from '../handlers/chatHandler';
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { cleanProfanity } from '../utils/profanityFilter';
+import { emitError, ErrorMessages } from '../utils/errorHandler';
+import { checkRateLimit } from '../utils/rateLimiter';
+import { inc } from '../utils/metrics';
+import { isSocketMigrating } from '../handlers/shared';
+import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
 describe('Chat Handler', () => {
   let mockIo;
   let mockSocket;
@@ -36,20 +36,20 @@ describe('Chat Handler', () => {
 
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup event handler capture
     eventHandlers = {};
     mockSocket = {
       id: 'socket-123',
-      on: jest.fn((event, handler) => {
+      on: vi.fn((event, handler) => {
         eventHandlers[event] = handler;
       }),
-      emit: jest.fn()
+      emit: vi.fn()
     };
     mockIo = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn()
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn()
     };
 
     // Default mock implementations

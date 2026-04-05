@@ -4,6 +4,7 @@
  * Backend module for managing Power Hour boost state.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   activatePowerHour,
   getPowerHourStatus,
@@ -12,13 +13,16 @@ import {
 } from '../powerHourManager';
 
 // Mock Supabase
-const mockSelect = jest.fn();
-const mockUpdate = jest.fn();
-const mockUpsert = jest.fn();
-const mockEq = jest.fn();
-const mockSingle = jest.fn();
+const { mockSelect, mockUpdate, mockUpsert, mockEq, mockSingle } = vi.hoisted(() => {
+  const mockSelect = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockUpsert = vi.fn();
+  const mockEq = vi.fn();
+  const mockSingle = vi.fn();
+  return { mockSelect, mockUpdate, mockUpsert, mockEq, mockSingle };
+});
 
-jest.mock('../supabaseServer', () => ({
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => ({
     from: () => ({
       select: (...args: unknown[]) => {
@@ -39,7 +43,7 @@ jest.mock('../supabaseServer', () => ({
 
 describe('powerHourManager', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('POWER_HOUR_DURATION_MS', () => {

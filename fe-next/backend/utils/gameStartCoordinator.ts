@@ -426,8 +426,3 @@ const gameStartCoordinator = new GameStartCoordinator();
 export default gameStartCoordinator;
 export { GameStartCoordinator };
 export type { GameStartSequence, AcknowledgmentResult, DisconnectResult, TimeoutStats, SequenceStats };
-
-// CommonJS compatibility for handlers using require()
-module.exports = gameStartCoordinator;
-module.exports.default = gameStartCoordinator;
-module.exports.GameStartCoordinator = GameStartCoordinator;

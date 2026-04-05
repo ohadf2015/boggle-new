@@ -1,11 +1,14 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { X, Coins, Check, Zap, XCircle } from 'lucide-react';
+import { Coins, Check, Zap, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { FlashChallenge } from '@/types/adventure';
+
+/** Auto-dismiss delay after completion/failure (ms) */
+const AUTO_DISMISS_MS = 2500;
 
 interface FlashChallengeToastProps {
   challenge: FlashChallenge | null;
@@ -24,71 +27,74 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
 }: FlashChallengeToastProps) {
   const { t } = useLanguage();
 
+  // Auto-dismiss after completion or failure
+  useEffect(() => {
+    if (!challenge || (!isComplete && !isFailed)) return;
+    const timer = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    return () => clearTimeout(timer);
+  }, [challenge, isComplete, isFailed, onDismiss]);
+
   if (!challenge) return null;
 
   return (
     <AdaptiveAnimatePresence>
       <AdaptiveMotion.div
         key={isFailed ? `${challenge.id}-failed` : challenge.id}
-        initial={{ x: 60, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 60, opacity: 0 }}
+        initial={{ y: 20, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 10, opacity: 0, scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        data-testid="challenge-dismiss"
         className={cn(
-          // Compact chip below header, centered to avoid covering grid corners
-          'fixed top-[3.5rem] sm:top-[4rem] left-1/2 -translate-x-1/2 z-30',
-          'w-auto max-w-[280px]',
+          // Bottom-right corner — avoids header and grid center
+          'fixed bottom-[5.5rem] sm:bottom-6 end-3 z-30',
+          'w-auto max-w-[240px]',
+          'min-w-[44px] min-h-[44px]',
           'rounded-neo border-2 shadow-hard-sm',
-          'px-3 py-2',
+          'px-2.5 py-1.5',
+          'cursor-pointer',
           isFailed
             ? 'bg-neo-red/20 border-neo-red'
             : isComplete
               ? 'bg-neo-lime border-neo-black'
               : 'bg-neo-navy/95 border-neo-yellow/70 backdrop-blur-sm'
         )}
+        onClick={onDismiss}
+        role="status"
+        aria-label={t('common.dismiss')}
       >
-        {/* Single-row compact layout */}
-        <div className="flex items-center gap-2">
+        {/* Single-row ultra-compact layout */}
+        <div className="flex items-center gap-1.5">
           {isFailed ? (
-            <XCircle className="w-4 h-4 flex-shrink-0 text-neo-red" />
+            <XCircle className="w-3.5 h-3.5 flex-shrink-0 text-neo-red" />
           ) : (
-            <Zap className={cn('w-4 h-4 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+            <Zap className={cn('w-3.5 h-3.5 flex-shrink-0', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
           )}
           <div className="flex-1 min-w-0">
             {isFailed ? (
-              <p className="text-xs font-bold leading-tight text-neo-red" data-testid="challenge-failed-text">
+              <p className="text-[11px] font-bold leading-tight text-neo-red" data-testid="challenge-failed-text">
                 {t('adventure.quests.flash.missed')}
               </p>
             ) : (
-              <>
-                <p className={cn('text-xs font-bold leading-tight truncate', isComplete ? 'text-neo-black' : 'text-neo-white')}>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className={cn('text-[11px] font-bold leading-tight truncate', isComplete ? 'text-neo-black' : 'text-neo-white')}>
                   {t(challenge.descriptionKey, { param: String(challenge.param) })}
                 </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Coins className={cn('w-3.5 h-3.5', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
-                  <span className={cn('text-xs font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
+                <div className="flex items-center gap-1">
+                  <Coins className={cn('w-3 h-3', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
+                  <span className={cn('text-[11px] font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
                     +{challenge.rewardCoins}
                   </span>
                   {!isComplete && (
-                    <span className="text-xs font-mono font-bold text-neo-white/50">{timeLeft}s</span>
+                    <span className="text-[10px] font-mono font-bold text-neo-white/50">{timeLeft}s</span>
                   )}
                   {isComplete && (
-                    <Check data-testid="challenge-complete-badge" className="w-3.5 h-3.5 text-neo-black" strokeWidth={3} />
+                    <Check data-testid="challenge-complete-badge" className="w-3 h-3 text-neo-black" strokeWidth={3} />
                   )}
                 </div>
-              </>
+              </div>
             )}
           </div>
-          <button
-            data-testid="challenge-dismiss"
-            onClick={onDismiss}
-            aria-label={t('common.dismiss')}
-            className={cn('min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0',
-              isFailed ? 'text-neo-red/50' : isComplete ? 'text-neo-black/50' : 'text-neo-white/40'
-            )}
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
         </div>
       </AdaptiveMotion.div>
     </AdaptiveAnimatePresence>

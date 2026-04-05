@@ -2,22 +2,23 @@
  * Tests for Classroom Game Socket.IO Handler
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Server, Socket } from 'socket.io';
 import { registerClassroomGameHandlers } from '../classroomGameHandler';
 import * as classroomGameManager from '../../modules/classroomGameManager';
 import * as gameStateManager from '../../modules/gameStateManager';
 
 // Mock the modules
-jest.mock('../../modules/classroomGameManager');
-jest.mock('../../modules/gameStateManager');
+vi.mock('../../modules/classroomGameManager');
+vi.mock('../../modules/gameStateManager');
 // Mock rate limiter - always allow
-jest.mock('../../utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn(() => true),
-}));
-jest.mock('../../utils/socketValidation', () => {
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: {
+  checkRateLimit: vi.fn(() => true),
+} }));
+vi.mock('../../utils/socketValidation', () => {
   const { z } = require('zod');
   return {
-    validatePayload: jest.fn((schema: unknown, data: unknown) => ({
+    validatePayload: vi.fn((schema: unknown, data: unknown) => ({
       success: true,
       data,
     })),
@@ -25,25 +26,25 @@ jest.mock('../../utils/socketValidation', () => {
     usernameSchema: z.string(),
   };
 });
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 describe('ClassroomGameHandler', () => {
   let mockSocket: any;
   let mockIo: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockSocket = {
       id: 'socket-123',
-      on: jest.fn(),
-      emit: jest.fn(),
-      join: jest.fn(),
+      on: vi.fn(),
+      emit: vi.fn(),
+      join: vi.fn(),
       handshake: {
         auth: {
           authUserId: '00000000-0000-4000-8000-000000000001',
@@ -52,8 +53,8 @@ describe('ClassroomGameHandler', () => {
     };
 
     mockIo = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn(),
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn(),
     };
   });
 
@@ -87,7 +88,7 @@ describe('ClassroomGameHandler', () => {
         },
       };
 
-      (classroomGameManager.createClassroomGame as jest.Mock).mockResolvedValue(undefined);
+      (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
 
       // Register handlers
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -143,7 +144,7 @@ describe('ClassroomGameHandler', () => {
         settings: {},
       };
 
-      (classroomGameManager.createClassroomGame as jest.Mock).mockRejectedValue(
+      (classroomGameManager.createClassroomGame as Mock).mockRejectedValue(
         new Error('Redis error')
       );
 
@@ -177,7 +178,7 @@ describe('ClassroomGameHandler', () => {
         },
       ];
 
-      (classroomGameManager.getActiveClassroomGames as jest.Mock).mockResolvedValue(games);
+      (classroomGameManager.getActiveClassroomGames as Mock).mockResolvedValue(games);
 
       registerClassroomGameHandlers(mockIo, mockSocket);
 
@@ -207,8 +208,8 @@ describe('ClassroomGameHandler', () => {
       // Set auth to student for this test
       mockSocket.handshake.auth.authUserId = studentId;
 
-      (classroomGameManager.addPlayerToClassroomGame as jest.Mock).mockResolvedValue(undefined);
-      (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue({
+      (classroomGameManager.addPlayerToClassroomGame as Mock).mockResolvedValue(undefined);
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
         gameCode: data.gameCode,
         players: [{ userId: data.userId, username: data.username }],
       });
@@ -256,8 +257,8 @@ describe('ClassroomGameHandler', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
       };
 
-      (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue(game);
-      (classroomGameManager.updateClassroomGameStatus as jest.Mock).mockResolvedValue(undefined);
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(game);
+      (classroomGameManager.updateClassroomGameStatus as Mock).mockResolvedValue(undefined);
 
       registerClassroomGameHandlers(mockIo, mockSocket);
 
@@ -291,8 +292,8 @@ describe('ClassroomGameHandler', () => {
       // Set auth to student for this test
       mockSocket.handshake.auth.authUserId = studentId;
 
-      (classroomGameManager.removePlayerFromClassroomGame as jest.Mock).mockResolvedValue(undefined);
-      (classroomGameManager.getClassroomGame as jest.Mock).mockResolvedValue({
+      (classroomGameManager.removePlayerFromClassroomGame as Mock).mockResolvedValue(undefined);
+      (classroomGameManager.getClassroomGame as Mock).mockResolvedValue({
         gameCode: data.gameCode,
         players: [],
       });

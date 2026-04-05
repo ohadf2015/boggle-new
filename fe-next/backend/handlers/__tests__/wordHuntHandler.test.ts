@@ -4,44 +4,44 @@
  */
 
 // Mock dependencies before imports
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  updatePlayerScore: jest.fn(),
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  updatePlayerScore: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
-  isWordOnBoardAsync: jest.fn(),
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
+  isWordOnBoardAsync: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
-  validateTargetGuess: jest.fn(),
-  recordTargetFound: jest.fn(),
-  penalizeWrongGuess: jest.fn(),
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  validateTargetGuess: vi.fn(),
+  recordTargetFound: vi.fn(),
+  penalizeWrongGuess: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockReturnValue('room:TEST123'),
-  safeEmit: jest.fn(),
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockReturnValue('room:TEST123'),
+  safeEmit: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
+  endGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
-  endGame: jest.fn(),
-}));
-
-jest.mock('../../../backend/utils/logger', () => {
+vi.mock('../../../backend/utils/logger', () => {
   const loggerMock = {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    log: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    log: vi.fn(),
   };
   return {
     __esModule: true,
@@ -49,6 +49,7 @@ jest.mock('../../../backend/utils/logger', () => {
   };
 });
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getGame,
   getGameBySocketId,
@@ -67,13 +68,13 @@ import { handleSubmitTargetWord } from '../../handlers/wordHuntHandler';
 
 import type { WordHuntModeState } from '@/shared/types/game';
 
-const mockGetGame = getGame as jest.Mock;
-const mockGetGameBySocketId = getGameBySocketId as jest.Mock;
-const mockGetUsernameBySocketId = getUsernameBySocketId as jest.Mock;
-const mockValidateTargetGuess = validateTargetGuess as jest.Mock;
-const mockRecordTargetFound = recordTargetFound as jest.Mock;
-const mockPenalizeWrongGuess = penalizeWrongGuess as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockGetGameBySocketId = getGameBySocketId as Mock;
+const mockGetUsernameBySocketId = getUsernameBySocketId as Mock;
+const mockValidateTargetGuess = validateTargetGuess as Mock;
+const mockRecordTargetFound = recordTargetFound as Mock;
+const mockPenalizeWrongGuess = penalizeWrongGuess as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
 
 describe('wordHuntHandler', () => {
   let mockSocket: any;
@@ -90,11 +91,11 @@ describe('wordHuntHandler', () => {
   });
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
     mockSocket = {
       id: 'socket-1',
-      emit: jest.fn(),
+      emit: vi.fn(),
     };
     mockIo = {};
     mockGetGameBySocketId.mockReturnValue('TEST123');

@@ -4,30 +4,31 @@
  */
 
 // Mock dependencies before imports
-jest.mock('../../utils/logger', () => {
-  const l = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+vi.mock('../../utils/logger', () => {
+  const l = { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() };
   return { __esModule: true, default: l, ...l };
 });
 
-jest.mock('../../utils/rateLimiter', () => ({
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
   __esModule: true,
-  checkRateLimit: jest.fn().mockReturnValue(true),
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../utils/errorHandler', () => ({
+  __esModule: true,
+  emitError: vi.fn(),
 }));
 
-jest.mock('../../utils/errorHandler', () => ({
+vi.mock('../../modules/friendsManager');
+vi.mock('../../modules/supabaseServer');
+vi.mock('../../utils/socialHelpers');
+vi.mock('../../modules/pushNotificationTriggers', () => ({
   __esModule: true,
-  emitError: jest.fn(),
+  notifyFriendRequest: vi.fn().mockResolvedValue(undefined),
+  notifyFriendAccepted: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../modules/friendsManager');
-jest.mock('../../modules/supabaseServer');
-jest.mock('../../utils/socialHelpers');
-jest.mock('../../modules/pushNotificationTriggers', () => ({
-  __esModule: true,
-  notifyFriendRequest: jest.fn().mockResolvedValue(undefined),
-  notifyFriendAccepted: jest.fn().mockResolvedValue(undefined),
-}));
-
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerFriendsHandlers } from '../friendsHandler';
 import * as friendsManager from '../../modules/friendsManager';
 import { getSupabase } from '../../modules/supabaseServer';
@@ -36,27 +37,27 @@ import { emitError } from '../../utils/errorHandler';
 import { checkRateLimit } from '../../utils/rateLimiter';
 
 // Typed mocks
-const mockGetAuthUserId = getAuthUserId as jest.MockedFunction<typeof getAuthUserId>;
-const mockGetUserProfile = getUserProfile as jest.MockedFunction<typeof getUserProfile>;
-const mockBroadcastToUser = broadcastToUser as jest.MockedFunction<typeof broadcastToUser>;
-const mockGetSupabase = getSupabase as jest.MockedFunction<typeof getSupabase>;
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
-const mockEmitError = emitError as jest.MockedFunction<typeof emitError>;
+const mockGetAuthUserId = getAuthUserId as MockedFunction<typeof getAuthUserId>;
+const mockGetUserProfile = getUserProfile as MockedFunction<typeof getUserProfile>;
+const mockBroadcastToUser = broadcastToUser as MockedFunction<typeof broadcastToUser>;
+const mockGetSupabase = getSupabase as MockedFunction<typeof getSupabase>;
+const mockCheckRateLimit = checkRateLimit as MockedFunction<typeof checkRateLimit>;
+const mockEmitError = emitError as MockedFunction<typeof emitError>;
 
 // Helper to create mock socket with event handlers
 function createTestHarness() {
   const handlers = new Map<string, Function>();
   const socket: any = {
     id: 'socket-1',
-    emit: jest.fn(),
-    on: jest.fn((event: string, handler: Function) => {
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
       handlers.set(event, handler);
     }),
     authUserId: 'user-a',
   };
   const io: any = {
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   };
 
   registerFriendsHandlers(io, socket);
@@ -88,7 +89,7 @@ describe('friendsHandler', () => {
   let harness: ReturnType<typeof createTestHarness>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetAuthUserId.mockReturnValue('user-a');
     mockCheckRateLimit.mockReturnValue(true);
     harness = createTestHarness();
@@ -122,7 +123,7 @@ describe('friendsHandler', () => {
 
   describe('friends:sendRequest', () => {
     it('sends request successfully', async () => {
-      (friendsManager.sendFriendRequest as jest.Mock).mockResolvedValue({
+      (friendsManager.sendFriendRequest as Mock).mockResolvedValue({
         success: true,
         request: { requestId: 'req-1' },
       });
@@ -169,7 +170,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error when already friends', async () => {
-      (friendsManager.sendFriendRequest as jest.Mock).mockResolvedValue({
+      (friendsManager.sendFriendRequest as Mock).mockResolvedValue({
         success: false,
         errorCode: 'ALREADY_FRIENDS',
         message: 'Already friends with this user',
@@ -184,7 +185,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error when request already pending', async () => {
-      (friendsManager.sendFriendRequest as jest.Mock).mockResolvedValue({
+      (friendsManager.sendFriendRequest as Mock).mockResolvedValue({
         success: false,
         errorCode: 'REQUEST_ALREADY_EXISTS',
         message: 'Friend request already sent',
@@ -199,7 +200,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error when profile not found', async () => {
-      (friendsManager.sendFriendRequest as jest.Mock).mockResolvedValue({
+      (friendsManager.sendFriendRequest as Mock).mockResolvedValue({
         success: true,
         request: { requestId: 'req-1' },
       });
@@ -214,7 +215,7 @@ describe('friendsHandler', () => {
     });
 
     it('handles exception gracefully', async () => {
-      (friendsManager.sendFriendRequest as jest.Mock).mockRejectedValue(new Error('DB down'));
+      (friendsManager.sendFriendRequest as Mock).mockRejectedValue(new Error('DB down'));
 
       await harness.trigger('friends:sendRequest', { targetUserId: 'user-b' });
 
@@ -229,10 +230,10 @@ describe('friendsHandler', () => {
 
   describe('friends:acceptRequest', () => {
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn(),
     };
 
     beforeEach(() => {
@@ -240,7 +241,7 @@ describe('friendsHandler', () => {
     });
 
     it('accepts request and notifies both users', async () => {
-      (friendsManager.acceptFriendRequest as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.acceptFriendRequest as Mock).mockResolvedValue({ success: true });
       mockSupabase.single.mockResolvedValue({
         data: { user_id: 'user-b', friend_id: 'user-a' },
       });
@@ -276,7 +277,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error when request not found in manager', async () => {
-      (friendsManager.acceptFriendRequest as jest.Mock).mockResolvedValue({
+      (friendsManager.acceptFriendRequest as Mock).mockResolvedValue({
         success: false,
         errorCode: 'REQUEST_NOT_FOUND',
       });
@@ -290,7 +291,7 @@ describe('friendsHandler', () => {
     });
 
     it('handles supabase unavailable', async () => {
-      (friendsManager.acceptFriendRequest as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.acceptFriendRequest as Mock).mockResolvedValue({ success: true });
       mockGetSupabase.mockReturnValue(null as any);
 
       await harness.trigger('friends:acceptRequest', { requestId: 'req-1' });
@@ -302,7 +303,7 @@ describe('friendsHandler', () => {
     });
 
     it('handles request row not found in DB after accept', async () => {
-      (friendsManager.acceptFriendRequest as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.acceptFriendRequest as Mock).mockResolvedValue({ success: true });
       mockSupabase.single.mockResolvedValue({ data: null });
 
       await harness.trigger('friends:acceptRequest', { requestId: 'req-1' });
@@ -314,7 +315,7 @@ describe('friendsHandler', () => {
     });
 
     it('notifies online status when sender is online', async () => {
-      (friendsManager.acceptFriendRequest as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.acceptFriendRequest as Mock).mockResolvedValue({ success: true });
       mockSupabase.single.mockResolvedValue({
         data: { user_id: 'user-b', friend_id: 'user-a' },
       });
@@ -334,7 +335,7 @@ describe('friendsHandler', () => {
 
   describe('friends:declineRequest', () => {
     it('declines request successfully', async () => {
-      (friendsManager.declineFriendRequest as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.declineFriendRequest as Mock).mockResolvedValue({ success: true });
 
       await harness.trigger('friends:declineRequest', { requestId: 'req-1' });
 
@@ -355,7 +356,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error on failure', async () => {
-      (friendsManager.declineFriendRequest as jest.Mock).mockResolvedValue({ success: false });
+      (friendsManager.declineFriendRequest as Mock).mockResolvedValue({ success: false });
 
       await harness.trigger('friends:declineRequest', { requestId: 'req-1' });
 
@@ -366,7 +367,7 @@ describe('friendsHandler', () => {
     });
 
     it('handles exception gracefully', async () => {
-      (friendsManager.declineFriendRequest as jest.Mock).mockRejectedValue(new Error('fail'));
+      (friendsManager.declineFriendRequest as Mock).mockRejectedValue(new Error('fail'));
 
       await harness.trigger('friends:declineRequest', { requestId: 'req-1' });
 
@@ -381,7 +382,7 @@ describe('friendsHandler', () => {
 
   describe('friends:unfriend', () => {
     it('unfriends successfully and notifies both', async () => {
-      (friendsManager.unfriend as jest.Mock).mockResolvedValue({ success: true });
+      (friendsManager.unfriend as Mock).mockResolvedValue({ success: true });
 
       await harness.trigger('friends:unfriend', { friendUserId: 'user-b' });
 
@@ -408,7 +409,7 @@ describe('friendsHandler', () => {
     });
 
     it('returns error on failure', async () => {
-      (friendsManager.unfriend as jest.Mock).mockResolvedValue({ success: false });
+      (friendsManager.unfriend as Mock).mockResolvedValue({ success: false });
 
       await harness.trigger('friends:unfriend', { friendUserId: 'user-b' });
 
@@ -423,13 +424,13 @@ describe('friendsHandler', () => {
 
   describe('friends:searchUsers', () => {
     const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      ilike: jest.fn().mockReturnThis(),
-      neq: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      or: jest.fn(),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      ilike: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      or: vi.fn(),
     };
 
     beforeEach(() => {
@@ -502,18 +503,18 @@ describe('friendsHandler', () => {
       const receivedRow = { id: 'req-2', user_id: 'user-c', friend_id: 'user-a', created_at: '2026-01-02T00:00:00Z' };
 
       const makeEqChain = (resolveData: any) => ({
-        eq: jest.fn().mockReturnValue({ data: resolveData }),
+        eq: vi.fn().mockReturnValue({ data: resolveData }),
       });
 
       // Track from() calls: first two are friends queries, third is profiles batch
       let fromCallIndex = 0;
       const mockSupabase: any = {
-        from: jest.fn().mockImplementation((table: string) => {
+        from: vi.fn().mockImplementation((table: string) => {
           fromCallIndex++;
           if (table === 'profiles') {
             return {
-              select: jest.fn().mockReturnValue({
-                in: jest.fn().mockResolvedValue({
+              select: vi.fn().mockReturnValue({
+                in: vi.fn().mockResolvedValue({
                   data: [
                     { id: 'user-b', username: 'bob', display_name: 'Bob', avatar_emoji: '😎', avatar_color: '#ff0', avatar_image: null },
                     { id: 'user-c', username: 'charlie', display_name: 'Charlie', avatar_emoji: '🎩', avatar_color: '#0f0', avatar_image: null },
@@ -524,8 +525,8 @@ describe('friendsHandler', () => {
           }
           // friends table: distinguish sent vs received by eq column
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockImplementation((col: string) => {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockImplementation((col: string) => {
                 if (col === 'user_id') return makeEqChain([sentRow]);
                 return makeEqChain([receivedRow]);
               }),

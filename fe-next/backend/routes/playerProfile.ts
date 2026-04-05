@@ -4,7 +4,7 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-const { getSupabase } = require('../modules/supabaseServer');
+import { getSupabase } from '../modules/supabaseServer';
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
@@ -16,6 +16,25 @@ const PUBLIC_PROFILE_COLUMNS = [
   'total_words', 'casual_wins', 'ranked_wins', 'longest_word', 'longest_word_length',
   'achievement_counts', 'created_at',
 ].join(', ');
+
+interface ProfileRow {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_config: unknown | null;
+  country_code: string | null;
+  current_level: number | null;
+  total_xp: number | null;
+  total_games: number | null;
+  total_score: number | null;
+  total_words: number | null;
+  casual_wins: number | null;
+  ranked_wins: number | null;
+  longest_word: string | null;
+  longest_word_length: number | null;
+  achievement_counts: Record<string, number> | null;
+  created_at: string | null;
+}
 
 /**
  * Validate player ID format (UUID)
@@ -52,7 +71,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       .eq(isUuid ? 'id' : 'username', id)
       .single();
 
-    const { data: profile, error } = await query;
+    const { data: profileRaw, error } = await query;
+    const profile = profileRaw as ProfileRow | null;
 
     if (error || !profile) {
       res.status(404).json({ error: 'PLAYER_NOT_FOUND', message: 'Player not found' });

@@ -2,6 +2,7 @@
  * Tests for wordPactManager
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   createPact,
   getPact,
@@ -14,7 +15,7 @@ import {
 // Helper: create a chainable mock where every method returns the same object
 // and the final awaitable resolves to `result`.
 function createChain(result: { data: unknown; error: unknown }) {
-  const chain: Record<string, jest.Mock> = {};
+  const chain: Record<string, Mock> = {};
   const handler = {
     get(_target: unknown, prop: string) {
       if (prop === 'then') {
@@ -22,7 +23,7 @@ function createChain(result: { data: unknown; error: unknown }) {
         return (resolve: (v: unknown) => void) => resolve(result);
       }
       if (!chain[prop]) {
-        chain[prop] = jest.fn().mockReturnValue(new Proxy({}, handler));
+        chain[prop] = vi.fn().mockReturnValue(new Proxy({}, handler));
       }
       return chain[prop];
     },
@@ -30,16 +31,19 @@ function createChain(result: { data: unknown; error: unknown }) {
   return new Proxy({}, handler);
 }
 
-const mockFrom = jest.fn();
-const mockSupabase = { from: mockFrom };
+const { mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockSupabase = { from: mockFrom };
+  return { mockFrom, mockSupabase };
+});
 
-jest.mock('../supabaseServer', () => ({
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
-  default: { debug: jest.fn(), info: jest.fn(), error: jest.fn(), warn: jest.fn() },
+  default: { debug: vi.fn(), info: vi.fn(), error: vi.fn(), warn: vi.fn() },
 }));
 
 const PLAYER_A = 'player-aaa';
@@ -77,7 +81,7 @@ describe('computeMultiplier', () => {
 });
 
 describe('createPact', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('creates a pact when neither player has one', async () => {
     // Call 1: select().eq().or() → no existing pacts
@@ -110,7 +114,7 @@ describe('createPact', () => {
 });
 
 describe('getPact', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('returns null when no active pact', async () => {
     mockFrom.mockReturnValueOnce(
@@ -146,7 +150,7 @@ describe('getPact', () => {
 });
 
 describe('recordPactPlay', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('returns null when no pact exists', async () => {
     mockFrom.mockReturnValueOnce(
@@ -198,7 +202,7 @@ describe('recordPactPlay', () => {
 });
 
 describe('resetDailyPacts', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('returns 0 when no stale pacts', async () => {
     mockFrom.mockReturnValueOnce(
@@ -237,7 +241,7 @@ describe('resetDailyPacts', () => {
 });
 
 describe('dissolvePact', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sets active to false and returns true', async () => {
     mockFrom.mockReturnValueOnce(

@@ -3,8 +3,8 @@
  * Tests for centralized error handling system
  */
 
-const {
-  AppError,
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { AppError,
   ErrorCodes,
   ErrorSeverity,
   ErrorRegistry,
@@ -12,9 +12,7 @@ const {
   createError,
   isAppError,
   generateCorrelationId,
-  wrapRouteHandler
-} = require('../utils/errorHandler');
-
+  wrapRouteHandler } from '../utils/errorHandler';
 describe('ErrorCodes', () => {
   it('should define game error codes', () => {
     expect(ErrorCodes.GAME_NOT_FOUND).toBe('GAME_NOT_FOUND');
@@ -188,7 +186,7 @@ describe('emitError', () => {
   beforeEach(() => {
     mockSocket = {
       id: 'socket-123',
-      emit: jest.fn()
+      emit: vi.fn()
     };
   });
 
@@ -253,14 +251,14 @@ describe('wrapRouteHandler', () => {
       headers: {}
     };
     mockRes = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn()
     };
-    mockNext = jest.fn();
+    mockNext = vi.fn();
   });
 
   it('should call handler and pass through on success', async () => {
-    const handler = jest.fn().mockResolvedValue({ data: 'success' });
+    const handler = vi.fn().mockResolvedValue({ data: 'success' });
     const wrapped = wrapRouteHandler(handler);
 
     await wrapped(mockReq, mockRes, mockNext);
@@ -270,7 +268,7 @@ describe('wrapRouteHandler', () => {
   });
 
   it('should handle AppError and return appropriate status', async () => {
-    const handler = jest.fn().mockRejectedValue(
+    const handler = vi.fn().mockRejectedValue(
       new AppError(ErrorCodes.GAME_NOT_FOUND)
     );
     const wrapped = wrapRouteHandler(handler);
@@ -284,7 +282,7 @@ describe('wrapRouteHandler', () => {
   });
 
   it('should handle unknown errors with 500 status', async () => {
-    const handler = jest.fn().mockRejectedValue(new Error('Unknown error'));
+    const handler = vi.fn().mockRejectedValue(new Error('Unknown error'));
     const wrapped = wrapRouteHandler(handler);
 
     await wrapped(mockReq, mockRes, mockNext);
@@ -298,7 +296,7 @@ describe('wrapRouteHandler', () => {
 
   it('should use correlation ID from header if provided', async () => {
     mockReq.headers['x-correlation-id'] = 'existing-cid';
-    const handler = jest.fn().mockResolvedValue({});
+    const handler = vi.fn().mockResolvedValue({});
     const wrapped = wrapRouteHandler(handler);
 
     await wrapped(mockReq, mockRes, mockNext);

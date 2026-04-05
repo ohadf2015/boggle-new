@@ -4,6 +4,22 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import type { MascotClipShape, MascotBorderColor } from './Mascot';
+
+const CLIP_CLASSES: Record<MascotClipShape, string> = {
+  none: '',
+  circle: 'rounded-full overflow-hidden',
+  'rounded-square': 'rounded-neo overflow-hidden',
+};
+
+const BORDER_CLASSES: Record<MascotBorderColor, string> = {
+  pink: 'border-[3px] border-neo-pink shadow-hard',
+  lime: 'border-[3px] border-neo-lime shadow-hard',
+  cyan: 'border-[3px] border-neo-cyan shadow-hard',
+  purple: 'border-[3px] border-neo-purple shadow-hard',
+  white: 'border-[3px] border-neo-white shadow-hard',
+  none: '',
+};
 
 /**
  * Celebration mascot variants
@@ -18,24 +34,24 @@ export type CelebrationVariant = 'trophy' | 'celebration';
 type MascotSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const SIZE_CLASSES: Record<MascotSize, string> = {
-  xs: 'w-10 h-10',
-  sm: 'w-16 h-16',
-  md: 'w-24 h-24',
-  lg: 'w-32 h-32',
-  xl: 'w-40 h-40',
+  xs: 'w-[100px] h-[100px]',
+  sm: 'w-28 h-28',
+  md: 'w-32 h-32',
+  lg: 'w-40 h-40',
+  xl: 'w-48 h-48',
 };
 
 const SIZE_PIXELS: Record<MascotSize, number> = {
-  xs: 40,
-  sm: 64,
-  md: 96,
-  lg: 128,
-  xl: 160,
+  xs: 100,
+  sm: 112,
+  md: 128,
+  lg: 160,
+  xl: 192,
 };
 
 const VARIANT_PATHS: Record<CelebrationVariant, string> = {
-  trophy: '/mascot/trophy-nobg.gif',
-  celebration: '/mascot/celebration-nobg.gif',
+  trophy: '/mascot/trophy.gif',
+  celebration: '/mascot/celebration.gif',
 };
 
 interface CelebrationMascotProps {
@@ -49,6 +65,12 @@ interface CelebrationMascotProps {
   priority?: boolean;
   /** Alt text override */
   alt?: string;
+  /** Clip shape to mask GIF background */
+  clipShape?: MascotClipShape;
+  /** Border color when using a clip shape */
+  clipBorder?: MascotBorderColor;
+  /** Background behind the GIF inside the clip */
+  clipBg?: string;
 }
 
 /**
@@ -70,12 +92,16 @@ export const CelebrationMascot = memo(function CelebrationMascot({
   className = '',
   priority = false,
   alt,
+  clipShape = 'circle',
+  clipBorder = 'white',
+  clipBg = 'bg-neo-navy',
 }: CelebrationMascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   const imageSrc = VARIANT_PATHS[variant];
   const altText = alt || `Lexi mascot - ${variant}`;
+  const hasClip = clipShape !== 'none';
 
   return (
     <AdaptiveMotion.div
@@ -95,15 +121,17 @@ export const CelebrationMascot = memo(function CelebrationMascot({
         ease: 'easeInOut',
       }}
     >
-      <Image
-        src={imageSrc}
-        alt={altText}
-        width={SIZE_PIXELS[size]}
-        height={SIZE_PIXELS[size]}
-        className="object-contain drop-shadow-lg"
-        priority={priority}
-        unoptimized
-      />
+      <div className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}>
+        <Image
+          src={imageSrc}
+          alt={altText}
+          width={SIZE_PIXELS[size]}
+          height={SIZE_PIXELS[size]}
+          className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+          priority={priority}
+          unoptimized
+        />
+      </div>
     </AdaptiveMotion.div>
   );
 });

@@ -6,6 +6,7 @@
 
 import logger from '../utils/logger';
 import { getSupabase, isSupabaseConfigured } from './supabase';
+import * as admin from 'firebase-admin';
 
 export interface FCMPayload {
   title: string;
@@ -27,8 +28,6 @@ const STALE_TOKEN_ERRORS = [
  */
 function getFirebaseApp() {
   try {
-    const admin = require('firebase-admin');
-
     if (admin.apps.length > 0) {
       return admin.app();
     }

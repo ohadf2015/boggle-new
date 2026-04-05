@@ -7,32 +7,32 @@
  */
 
 // Mock logger before anything else
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 // Mock persistence — no Redis in unit tests
-jest.mock('../gameState/persistence', () => ({
-  persistGameState: jest.fn(),
-  persistGameStateNow: jest.fn().mockResolvedValue(undefined),
-  restoreGameFromRedis: jest.fn().mockResolvedValue(null),
-  restoreAllGamesFromRedis: jest.fn().mockResolvedValue(0),
-  getAllGameCodesFromRedis: jest.fn().mockResolvedValue([]),
-  deleteGameFromRedis: jest.fn(),
-  clearPersistTimer: jest.fn(),
+vi.mock('../gameState/persistence', () => ({
+  persistGameState: vi.fn(),
+  persistGameStateNow: vi.fn().mockResolvedValue(undefined),
+  restoreGameFromRedis: vi.fn().mockResolvedValue(null),
+  restoreAllGamesFromRedis: vi.fn().mockResolvedValue(0),
+  getAllGameCodesFromRedis: vi.fn().mockResolvedValue([]),
+  deleteGameFromRedis: vi.fn(),
+  clearPersistTimer: vi.fn(),
 }));
 
 // Mock engagement timeout cleanup
-jest.mock('../../services/gameLifecycle/gameResults', () => ({
-  clearEngagementTimeouts: jest.fn(),
+vi.mock('../../services/gameLifecycle/gameResults', () => ({
+  clearEngagementTimeouts: vi.fn(),
 }));
 
  
-const gsm = require('../gameStateManager');
-
+import { vi, type Mock, type MockInstance } from 'vitest';
+import gsm from '../gameStateManager';
 function defaultCreationData(overrides: Record<string, any> = {}) {
   return {
     hostSocketId: 'socket-host',

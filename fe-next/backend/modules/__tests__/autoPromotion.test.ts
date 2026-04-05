@@ -3,39 +3,45 @@
  * Verifies automatic word promotion pipeline logic
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { AutoPromotionResult } from '../autoPromotion';
 
 // Mock supabaseServer
-const mockRpc = jest.fn();
-const mockUpsert = jest.fn();
-const mockFrom = jest.fn(() => ({ upsert: mockUpsert }));
-const mockSupabase = { rpc: mockRpc, from: mockFrom };
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => mockSupabase),
+const { mockRpc, mockUpsert, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockRpc = vi.fn();
+  const mockUpsert = vi.fn();
+  const mockFrom = vi.fn(() => ({ upsert: mockUpsert }));
+  const mockSupabase = { rpc: mockRpc, from: mockFrom };
+  return { mockRpc, mockUpsert, mockFrom, mockSupabase };
+});
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => mockSupabase),
 }));
 
 // Mock communityWordManager
-const mockAddToCommunityCache = jest.fn();
-jest.mock('../../modules/communityWordManager', () => ({
+const { mockAddToCommunityCache, mockGetVerifiedWords, mockMarkWordPromoted } = vi.hoisted(() => ({
+  mockAddToCommunityCache: vi.fn(),
+  mockGetVerifiedWords: vi.fn(),
+  mockMarkWordPromoted: vi.fn(),
+}));
+vi.mock('../../modules/communityWordManager', () => ({
   addToCommunityCache: mockAddToCommunityCache,
 }));
 
 // Mock milogWordVerifier
-const mockGetVerifiedWords = jest.fn();
-const mockMarkWordPromoted = jest.fn();
-jest.mock('../../services/milogWordVerifier', () => ({
+vi.mock('../../services/milogWordVerifier', () => ({
   getVerifiedWordsForPromotion: mockGetVerifiedWords,
   markWordPromoted: mockMarkWordPromoted,
 }));
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
   default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
@@ -53,9 +59,10 @@ describe('AutoPromotion', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     _resetLockForTesting();
     mockUpsert.mockResolvedValue({ error: null });
+    mockFrom.mockReturnValue({ upsert: mockUpsert });
     mockRpc.mockResolvedValue({ data: null, error: null });
     mockAddToCommunityCache.mockResolvedValue(undefined);
     mockGetVerifiedWords.mockResolvedValue([]);

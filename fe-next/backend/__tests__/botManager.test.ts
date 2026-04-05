@@ -4,26 +4,27 @@
  */
 
 // Mock dependencies
-jest.mock('../modules/supabaseServer', () => ({
-  getPopularPlayerWords: jest.fn().mockResolvedValue({ data: [] }),
-  getSupabase: jest.fn().mockReturnValue(null),
+vi.mock('../modules/supabaseServer', () => ({
+  getPopularPlayerWords: vi.fn().mockResolvedValue({ data: [] }),
+  getSupabase: vi.fn().mockReturnValue(null),
 }));
 
-jest.mock('../modules/boggleSolver', () => ({
-  findWordsForBots: jest.fn().mockReturnValue({
+vi.mock('../modules/boggleSolver', () => ({
+  findWordsForBots: vi.fn().mockReturnValue({
     easy: ['cat', 'dog', 'rat', 'bat'],
     medium: ['hello', 'world', 'games', 'words'],
     hard: ['testing', 'playing', 'working'],
   }),
 }));
 
-jest.mock('../utils/logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../utils/logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   addBot,
   removeBot,
@@ -477,7 +478,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord increments word index', () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -486,7 +487,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord adds word to wordsFound', () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -495,7 +496,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord updates score', () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -504,7 +505,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord increments combo level', () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -513,7 +514,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord calls callback with correct data', () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -528,7 +529,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord does nothing when inactive', () => {
       const bot = createMockBot({ isActive: false });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -538,7 +539,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord does nothing when all words submitted', () => {
       const bot = createMockBot({ currentWordIndex: 3 });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 
@@ -547,7 +548,7 @@ describe('Bot Behavior', () => {
 
     test('submitBotWord skips duplicate words', () => {
       const bot = createMockBot({ wordsFound: ['hello'] });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       submitBotWord(bot, callback);
 

@@ -8,22 +8,23 @@
  * - Multiple students: all receive updates
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Namespace, Socket } from 'socket.io';
 import { z } from 'zod';
 import { registerLobbyHandlers } from '../lobby';
 import type { DuelSocket } from '../types';
 
 // Mock duels module to avoid importing broken server utilities
-jest.mock('@/lib/supabase/education/duels', () => ({
-  getPendingDuelsForStudent: jest.fn().mockResolvedValue({ data: [], error: null }),
+vi.mock('@/lib/supabase/education/duels', () => ({
+  getPendingDuelsForStudent: vi.fn().mockResolvedValue({ data: [], error: null }),
 }));
 
 // Valid UUID for testing
 const VALID_CLASSROOM_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
 describe('Duel Lobby Handlers', () => {
-  let mockNamespace: jest.Mocked<Namespace>;
-  let mockSocket: jest.Mocked<DuelSocket>;
+  let mockNamespace: Mocked<Namespace>;
+  let mockSocket: Mocked<DuelSocket>;
   let mockRoom: Set<string>;
 
   beforeEach(() => {
@@ -38,29 +39,29 @@ describe('Duel Lobby Handlers', () => {
         displayName: 'Test User',
         classroomIds: ['classroom-1'],
       },
-      on: jest.fn(),
-      emit: jest.fn(),
-      join: jest.fn((room: string) => {
+      on: vi.fn(),
+      emit: vi.fn(),
+      join: vi.fn((room: string) => {
         mockRoom.add(room);
         return Promise.resolve();
       }),
-      leave: jest.fn((room: string) => {
+      leave: vi.fn((room: string) => {
         mockRoom.delete(room);
         return Promise.resolve();
       }),
       rooms: mockRoom,
-    } as unknown as jest.Mocked<DuelSocket>;
+    } as unknown as Mocked<DuelSocket>;
 
     // Mock namespace
     mockNamespace = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn(),
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn(),
       sockets: new Map(),
-    } as unknown as jest.Mocked<Namespace>;
+    } as unknown as Mocked<Namespace>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==========================================
@@ -81,7 +82,7 @@ describe('Duel Lobby Handlers', () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
       // Get the handler
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -95,7 +96,7 @@ describe('Duel Lobby Handlers', () => {
     it('should emit lobby-state to joining socket', async () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -113,7 +114,7 @@ describe('Duel Lobby Handlers', () => {
     it('should broadcast lobby-update to room when student joins', async () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -134,7 +135,7 @@ describe('Duel Lobby Handlers', () => {
     it('should reject invalid classroomId', async () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -160,21 +161,21 @@ describe('Duel Lobby Handlers', () => {
           displayName: 'Test User 2',
           classroomIds: [classroomId],
         },
-        on: jest.fn(),
-        emit: jest.fn(),
-        join: jest.fn(),
+        on: vi.fn(),
+        emit: vi.fn(),
+        join: vi.fn(),
         rooms: new Set<string>(),
-      } as unknown as jest.Mocked<DuelSocket>;
+      } as unknown as Mocked<DuelSocket>;
 
       // Register both sockets
       registerLobbyHandlers(mockNamespace, mockSocket);
       registerLobbyHandlers(mockNamespace, mockSocket2);
 
       // Get handlers
-      const handler1 = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler1 = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
-      const handler2 = (mockSocket2.on as jest.Mock).mock.calls.find(
+      const handler2 = (mockSocket2.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -183,7 +184,7 @@ describe('Duel Lobby Handlers', () => {
       await handler2({ classroomId });
 
       // Second join should show 2 opponents
-      const emitCalls = (mockNamespace.emit as jest.Mock).mock.calls;
+      const emitCalls = (mockNamespace.emit as Mock).mock.calls;
       const lobbyUpdateCalls = emitCalls.filter(call => call[0] === 'duel:lobby-update');
       const lastUpdate = lobbyUpdateCalls[lobbyUpdateCalls.length - 1];
 
@@ -212,13 +213,13 @@ describe('Duel Lobby Handlers', () => {
       const classroomId = VALID_CLASSROOM_ID;
 
       // Join first
-      const joinHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const joinHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
       await joinHandler({ classroomId });
 
       // Then leave
-      const leaveHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const leaveHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:leave-lobby'
       )?.[1];
       await leaveHandler({ classroomId });
@@ -232,17 +233,17 @@ describe('Duel Lobby Handlers', () => {
       const classroomId = VALID_CLASSROOM_ID;
 
       // Join first
-      const joinHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const joinHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
       await joinHandler({ classroomId });
 
       // Clear previous calls
-      (mockNamespace.emit as jest.Mock).mockClear();
-      (mockNamespace.to as jest.Mock).mockClear();
+      (mockNamespace.emit as Mock).mockClear();
+      (mockNamespace.to as Mock).mockClear();
 
       // Then leave
-      const leaveHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const leaveHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:leave-lobby'
       )?.[1];
       await leaveHandler({ classroomId });
@@ -277,17 +278,17 @@ describe('Duel Lobby Handlers', () => {
       const classroomId = VALID_CLASSROOM_ID;
 
       // Join lobby
-      const joinHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const joinHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
       await joinHandler({ classroomId });
 
       // Clear previous calls
-      (mockNamespace.emit as jest.Mock).mockClear();
-      (mockNamespace.to as jest.Mock).mockClear();
+      (mockNamespace.emit as Mock).mockClear();
+      (mockNamespace.to as Mock).mockClear();
 
       // Disconnect (synchronous handler, no await)
-      const disconnectHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnect'
       )?.[1];
       disconnectHandler();
@@ -306,7 +307,7 @@ describe('Duel Lobby Handlers', () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
       // Disconnect without joining
-      const disconnectHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const disconnectHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'disconnect'
       )?.[1];
 
@@ -323,7 +324,7 @@ describe('Duel Lobby Handlers', () => {
     it('should validate classroomId is a UUID', async () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 
@@ -341,7 +342,7 @@ describe('Duel Lobby Handlers', () => {
     it('should handle missing classroomId', async () => {
       registerLobbyHandlers(mockNamespace, mockSocket);
 
-      const handler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const handler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:join-lobby'
       )?.[1];
 

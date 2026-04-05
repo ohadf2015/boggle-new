@@ -1,57 +1,60 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 import { configureHealthRoutes } from '@/server/healthRoutes';
+import { getRedisClient } from '../../redisClient';
+import { checkPoolHealth } from '../../db/supabasePool';
 
 // Mock Redis
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    ping: jest.fn().mockResolvedValue('PONG'),
-    quit: jest.fn().mockResolvedValue('OK'),
+vi.mock('ioredis', () => {
+  return vi.fn().mockImplementation(() => ({
+    ping: vi.fn().mockResolvedValue('PONG'),
+    quit: vi.fn().mockResolvedValue('OK'),
   }));
 });
 
 // Mock Supabase
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        limit: jest.fn().mockResolvedValue({ data: [{ id: '1' }], error: null }),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        limit: vi.fn().mockResolvedValue({ data: [{ id: '1' }], error: null }),
       })),
     })),
   })),
 }));
 
 // Mock backend dependencies
-jest.mock('../../redisClient', () => ({
-  isRedisAvailable: jest.fn(() => true),
-  getRedisMetrics: jest.fn().mockResolvedValue({ connected: true }),
-  getRedisClient: jest.fn(() => ({
-    ping: jest.fn().mockResolvedValue('PONG'),
+vi.mock('../../redisClient', () => ({
+  isRedisAvailable: vi.fn(() => true),
+  getRedisMetrics: vi.fn().mockResolvedValue({ connected: true }),
+  getRedisClient: vi.fn(() => ({
+    ping: vi.fn().mockResolvedValue('PONG'),
   })),
 }));
 
-jest.mock('../../redis/circuitBreaker', () => ({
+vi.mock('../../redis/circuitBreaker', () => ({
   circuitBreaker: {
-    getState: jest.fn(() => ({ state: 'CLOSED', failureCount: 0 })),
+    getState: vi.fn(() => ({ state: 'CLOSED', failureCount: 0 })),
   },
 }));
 
-jest.mock('../../db/supabasePool', () => ({
-  checkPoolHealth: jest.fn().mockResolvedValue({ ok: true, latencyMs: 5 }),
+vi.mock('../../db/supabasePool', () => ({
+  checkPoolHealth: vi.fn().mockResolvedValue({ ok: true, latencyMs: 5 }),
 }));
 
-jest.mock('../../modules/gameStateManager', () => ({
-  getAllGames: jest.fn(() => []),
+vi.mock('../../modules/gameStateManager', () => ({
+  getAllGames: vi.fn(() => []),
 }));
 
-jest.mock('../../utils/metrics', () => ({
-  getMetrics: jest.fn(() => ({})),
-  getRoomMetrics: jest.fn(() => ({})),
-  resetAll: jest.fn(),
+vi.mock('../../utils/metrics', () => ({
+  getMetrics: vi.fn(() => ({})),
+  getRoomMetrics: vi.fn(() => ({})),
+  resetAll: vi.fn(),
 }));
 
-jest.mock('../../dictionary', () => ({
-  getMemoryStats: jest.fn(() => [{ language: 'en', wordCount: 100, estimatedBytes: 1024 }]),
+vi.mock('../../dictionary', () => ({
+  getMemoryStats: vi.fn(() => [{ language: 'en', wordCount: 100, estimatedBytes: 1024 }]),
 }));
 
 function createApp() {
@@ -71,7 +74,7 @@ describe('Health Routes', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('GET /health/live', () => {
@@ -118,10 +121,9 @@ describe('Health Routes', () => {
     });
 
     it('returns degraded when Redis fails', async () => {
-      const { getRedisClient } = require('../../redisClient');
-      (getRedisClient as jest.Mock).mockReturnValueOnce({
-        ping: jest.fn().mockRejectedValue(new Error('Connection refused')),
-      });
+      vi.mocked(getRedisClient).mockReturnValueOnce({
+        ping: vi.fn().mockRejectedValue(new Error('Connection refused')),
+      } as any);
 
       const res = await request(app).get('/health/ready');
       expect(res.status).toBe(200);
@@ -131,8 +133,7 @@ describe('Health Routes', () => {
     });
 
     it('returns degraded when Supabase pool check fails', async () => {
-      const { checkPoolHealth } = require('../../db/supabasePool');
-      (checkPoolHealth as jest.Mock).mockResolvedValueOnce({ ok: false, latencyMs: 10, error: 'No pool' });
+      vi.mocked(checkPoolHealth).mockResolvedValueOnce({ ok: false, latencyMs: 10, error: 'No pool' } as any);
 
       const res = await request(app).get('/health/ready');
       expect(res.body.checks.supabase.status).toBe('error');

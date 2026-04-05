@@ -620,9 +620,9 @@ const he = {
     "wordsFound": "{{count}} מילים"
   },
   "roundEvent": {
-    "blizzardWarning": "❄️ סופת שלגים בדרך!",
-    "lightningWarning": "⚡ סיבוב ברק!",
-    "meteorWarning": "🌟 מטאור בדרך!",
+    "blizzardWarning": "סופת שלגים!",
+    "lightningWarning": "מכת ברק!",
+    "meteorWarning": "מטר מטאורים!",
     "active": "פעיל"
   },
   "specialWord": {
@@ -807,6 +807,7 @@ const he = {
     "code": "קוד",
     "joinViaLink": "לחצו להצטרפות",
     "qrCodeTitle": "סרקו לקרב",
+    "qrCodeAlt": "קוד QR להצטרפות למשחק - קוד חדר {{code}}",
     "codeCopied": "הקוד הועתק! 🎯",
     "codeCopyError": "לא הצליח",
     "buttonLabel": "הזמן",
@@ -1242,6 +1243,7 @@ const he = {
   },
   "hostView": {
     "lobby": "חדר מלחמה",
+    "lobbyTitle": "לובי מרובה משתתפים",
     "waitingForPlayers": "אוספים לוחמים...",
     "startGame": "GO!",
     "startBattle": "התחל קרב!",
@@ -1388,6 +1390,8 @@ const he = {
     "difficultyTooltipTimer": "יותר זמן = יותר מילים",
     "roomChat": "צ'אט חדר",
     "bot": "בוט",
+    "gameLanguage": "שפת המשחק",
+    "languageChangedNotification": "{{name}} שינה את שפת המשחק ל{{language}}",
     "addFriend": "הוסף את {name}",
     "requestSent": "הבקשה נשלחה"
   },
@@ -2389,6 +2393,13 @@ const he = {
     "later": "אחר כך"
   },
   "tutorial": {
+    "step1Title": "מצאו מילים",
+    "step1Desc": "החליקו על אותיות כדי ליצור מילים. ככל שהמילה ארוכה יותר, כך תקבלו יותר נקודות!",
+    "step2Title": "צברו נקודות",
+    "step2Desc": "שרשרו קומבואים ומצאו מילים נדירות כדי להכפיל את הניקוד. מהירות חשובה!",
+    "step3Title": "נצחו במשחק",
+    "step3Desc": "השיגו יותר נקודות מהיריבים לפני שהזמן נגמר. טפסו בטבלה!",
+    "uiLanguage": "שפת תצוגה",
     "multiDirection": "החליקו לכל כיוון! מילים יכולות לזגזג על הלוח.",
     "skip": "דלג",
     "prev": "חזרה",
@@ -3634,7 +3645,10 @@ const he = {
     "hints": "רמזים חינמיים נוספו",
     "streakFreezes": "הקפאות רצף נוספו",
     "titleUnlocked": "תואר בלעדי נפתח!",
-    "claimButton": "קבלו את הבונוס!"
+    "claimButton": "קבלו את הבונוס!",
+    "claimed": "הבונוס הופעל!",
+    "claimError": "נכשל — לחצו לנסות שוב",
+    "tapToRetry": "משהו השתבש. לחצו על הכפתור כדי לנסות שוב."
   },
   "calendar": {
     "title": "פרסים יומיים",
@@ -5024,6 +5038,10 @@ const he = {
       "firstTry": "בניסיון ראשון!",
       "guesses": "ניחושים",
       "wordsFound": "מילים נמצאו",
+      "extraTryPenalty": "קנס ניסיון נוסף",
+      "extraTry": "ניסיון נוסף",
+      "extraTries": "ניסיונות נוספים",
+      "points": "נק׳",
       "improve": {
         "speed": "סיימו מהר יותר",
         "accuracy": "נחשו פחות פעמים",

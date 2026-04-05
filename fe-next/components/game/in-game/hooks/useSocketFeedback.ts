@@ -29,6 +29,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       comboLevel?: number;
       fireRoundActive?: boolean;
       fireRoundBonus?: number;
+      goldenBonus?: number;
       fromLesson?: boolean;
     }): void => {
       // Track when the last word was found for inactivity-based trail visibility
@@ -42,6 +43,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         score: data.score,
         fireRoundActive: data.fireRoundActive,
         fireRoundBonus: data.fireRoundBonus,
+        goldenBonus: data.goldenBonus,
         fromLesson: data.fromLesson,
         longWordLabel,
         timestamp: Date.now(),

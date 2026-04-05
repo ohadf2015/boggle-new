@@ -5,86 +5,90 @@
  * wordValidatorPool.findAllWordsAsync, keeping the event loop free.
  */
 
-const mockFindAllWordsAsync = jest.fn();
-const mockGetCachedTrie = jest.fn();
-const mockGetGame = jest.fn();
-const mockBroadcastToRoom = jest.fn();
-const mockGetGameRoom = jest.fn(() => 'room:TEST');
-const mockLogger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+const { mockFindAllWordsAsync, mockGetCachedTrie, mockGetGame, mockBroadcastToRoom, mockGetGameRoom, mockLogger } = vi.hoisted(() => {
+  const mockFindAllWordsAsync = vi.fn();
+  const mockGetCachedTrie = vi.fn();
+  const mockGetGame = vi.fn();
+  const mockBroadcastToRoom = vi.fn();
+  const mockGetGameRoom = vi.fn(() => 'room:TEST');
+  const mockLogger = { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() };
+  return { mockFindAllWordsAsync, mockGetCachedTrie, mockGetGame, mockBroadcastToRoom, mockGetGameRoom, mockLogger };
+});
 
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
   findAllWordsAsync: mockFindAllWordsAsync,
-  isWordOnBoardAsync: jest.fn(),
-  getWordPathAsync: jest.fn(),
-  makePositionsMapAsync: jest.fn(),
+  isWordOnBoardAsync: vi.fn(),
+  getWordPathAsync: vi.fn(),
+  makePositionsMapAsync: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/boggleSolver', () => ({
+vi.mock('../../../backend/modules/boggleSolver', () => ({
   // findAllWords should NOT be called directly — only via the pool
-  findAllWords: jest.fn(() => { throw new Error('findAllWords called directly — must use pool'); }),
+  findAllWords: vi.fn(() => { throw new Error('findAllWords called directly — must use pool'); }),
   getCachedTrie: mockGetCachedTrie,
 }));
 
-jest.mock('../../../backend/modules/gameStateManager', () => ({
+vi.mock('../../../backend/modules/gameStateManager', () => ({
   getGame: mockGetGame,
-  updateGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getGameUsers: jest.fn(() => []),
-  getSocketIdByUsername: jest.fn(),
-  canTransitionGameState: jest.fn(() => true),
-  transitionGameState: jest.fn(),
-  resetGameForNewRound: jest.fn(),
+  updateGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getGameUsers: vi.fn(() => []),
+  getSocketIdByUsername: vi.fn(),
+  canTransitionGameState: vi.fn(() => true),
+  transitionGameState: vi.fn(),
+  resetGameForNewRound: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
+vi.mock('../../../backend/utils/socketHelpers', () => ({
   broadcastToRoom: mockBroadcastToRoom,
   getGameRoom: mockGetGameRoom,
-  safeEmit: jest.fn(),
-  getSocketById: jest.fn(),
+  safeEmit: vi.fn(),
+  getSocketById: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/logger', () => ({
+vi.mock('../../../backend/utils/logger', () => ({
   __esModule: true,
   default: mockLogger,
 }));
-jest.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: jest.fn(() => new Map()) }));
-jest.mock('../../../backend/utils/errorHandler', () => ({ emitError: jest.fn(), ErrorMessages: {} }));
-jest.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: jest.fn(() => true) }));
-jest.mock('../../../backend/utils/gameStartCoordinator', () => ({ default: { prepareGame: jest.fn() } }));
-jest.mock('../../../backend/utils/timerManager', () => ({ clearGameTimer: jest.fn() }));
-jest.mock('../../../backend/utils/metrics', () => ({ ensureGame: jest.fn() }));
-jest.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: jest.fn(() => [['A']]) }));
-jest.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: jest.fn() }));
-jest.mock('../../../backend/utils/socketValidation', () => ({
-  validatePayload: jest.fn(() => ({ success: true, data: {} })),
+vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: vi.fn(() => new Map()) }));
+vi.mock('../../../backend/utils/errorHandler', () => ({ emitError: vi.fn(), ErrorMessages: {} }));
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: { checkRateLimit: vi.fn(() => true) } }));
+vi.mock('../../../backend/utils/gameStartCoordinator', () => ({ default: { prepareGame: vi.fn() } }));
+vi.mock('../../../backend/utils/timerManager', () => ({ default: { clearGameTimer: vi.fn() }, clearGameTimer: vi.fn() }));
+vi.mock('../../../backend/utils/metrics', () => ({ ensureGame: vi.fn() }));
+vi.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: vi.fn(() => [['A']]) }));
+vi.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: vi.fn() }));
+vi.mock('../../../backend/utils/socketValidation', () => ({
+  validatePayload: vi.fn(() => ({ success: true, data: {} })),
   startGameSchema: {},
 }));
-jest.mock('../../../backend/handlers/shared', () => ({ startGameTimer: jest.fn() }));
-jest.mock('../../../backend/modules/botManager', () => ({ stopAllBots: jest.fn() }));
-jest.mock('../../../backend/modules/notificationService', () => ({ notifyGameStarted: jest.fn() }));
-jest.mock('../../../backend/modules/gameModeSelector', () => ({
-  selectNextGameMode: jest.fn(() => 'classic'),
+vi.mock('../../../backend/handlers/shared', () => ({ startGameTimer: vi.fn() }));
+vi.mock('../../../backend/modules/botManager', () => ({ stopAllBots: vi.fn() }));
+vi.mock('../../../backend/modules/notificationService', () => ({ notifyGameStarted: vi.fn() }));
+vi.mock('../../../backend/modules/gameModeSelector', () => ({
+  selectNextGameMode: vi.fn(() => 'classic'),
   ALL_GAME_MODES: [],
 }));
-jest.mock('../../../backend/handlers/gameLifecycleHandler', () => ({ initializePlayerData: jest.fn() }));
-jest.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: jest.fn(() => null) }));
-jest.mock('../../../backend/modules/blastModeManager', () => ({
-  initBlastModeState: jest.fn(),
-  hashStringToSeed: jest.fn(() => 0),
+vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: vi.fn(), ensurePlayerState: vi.fn() }));
+vi.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: vi.fn(() => null) }));
+vi.mock('../../../backend/modules/blastModeManager', () => ({
+  initBlastModeState: vi.fn(),
+  hashStringToSeed: vi.fn(() => 0),
 }));
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
-  initWordHuntState: jest.fn(),
-  selectTargetWordWithFallback: jest.fn(),
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  initWordHuntState: vi.fn(),
+  selectTargetWordWithFallback: vi.fn(),
 }));
-jest.mock('../../../backend/services/gameLifecycle/autoAddBots', () => ({ autoAddBotsForSoloPlayer: jest.fn() }));
-jest.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
+vi.mock('../../../backend/services/gameLifecycle/autoAddBots', () => ({ autoAddBotsForSoloPlayer: vi.fn() }));
+vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
   HUNT_TARGET_MIN_LENGTH: 4,
   HUNT_TARGET_MAX_LENGTH: 8,
 }));
-jest.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
+vi.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
 
 // Import the internal function under test via the module's exports.
 // We test the observable side-effect: broadcastToRoom called with totalBoardWords.
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { emitTotalBoardWordsForTest } from '../gameStartHandler';
 
 const GRID = [
@@ -98,7 +102,7 @@ describe('emitTotalBoardWords (PERF-012)', () => {
   const gameCode = 'TEST';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetCachedTrie.mockReturnValue({});
     const mockGame = { totalBoardWords: 0 };
     mockGetGame.mockReturnValue(mockGame);

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   getDailyChallengeDate,
   clearWordHuntResultForRetry,
@@ -22,6 +22,7 @@ interface UseRetryChallengeProps {
 interface UseRetryChallengeReturn {
   handleRetryChallenge: () => Promise<void>;
   justResetRef: React.RefObject<boolean>;
+  extraTries: number;
 }
 
 export function useRetryChallenge({
@@ -35,6 +36,7 @@ export function useRetryChallenge({
   setPhase,
 }: UseRetryChallengeProps): UseRetryChallengeReturn {
   const justResetRef = useRef(false);
+  const [extraTries, setExtraTries] = useState(0);
 
   const handleRetryChallenge = useCallback(async () => {
     try {
@@ -65,6 +67,8 @@ export function useRetryChallenge({
             neoErrorToast(t('errors.resetFailed'), { icon: '⚠️', duration: 4000 });
             return;
           }
+          // Track the extra tries count from the server response
+          setExtraTries(resetResult.extraTries || 0);
         } catch (serverError) {
           console.warn('Failed to reset server attempt:', serverError);
           neoErrorToast(t('errors.networkError'), { icon: '📡', duration: 4000 });
@@ -93,5 +97,5 @@ export function useRetryChallenge({
     }
   }, [gameLanguage, isAuthenticated, profile, t, setStoredResult, setGameResult, setWasReset, setPhase]);
 
-  return { handleRetryChallenge, justResetRef };
+  return { handleRetryChallenge, justResetRef, extraTries };
 }

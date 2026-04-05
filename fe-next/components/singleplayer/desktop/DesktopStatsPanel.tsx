@@ -59,14 +59,14 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
   t,
 }) => {
   return (
-    <div className="h-full flex flex-col gap-5 p-4 bg-neo-navy/50 rounded-neo border-2 border-neo-black/30">
+    <div className="h-full flex flex-col gap-3 p-3 bg-neo-navy/50 rounded-neo border-2 border-neo-black/30">
       {/* Timer Section - Large and prominent */}
       {!isPracticeMode && (
         <div className="flex flex-col items-center">
           <CircularTimer
             remainingTime={remainingTime}
             totalTime={totalTime}
-            size="lg"
+            size="md"
           />
         </div>
       )}
@@ -81,14 +81,14 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
           className="w-full"
         >
           <div
-            className="px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard"
+            className="px-3 py-2 rounded-neo border-3 border-neo-black shadow-hard"
             style={{ background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-lime) 100%)' }}
           >
             <div className="text-center">
               <div className="text-[8px] font-bold uppercase tracking-widest text-neo-black/60 mb-0.5">
                 {t('common.score')}
               </div>
-              <div className="text-4xl font-black text-neo-black leading-none tracking-tighter">
+              <div className="text-3xl font-black text-neo-black leading-none tracking-tighter">
                 {formatScore(score)}
               </div>
             </div>

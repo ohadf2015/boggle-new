@@ -5,58 +5,59 @@
  * eliminatedPlayers. Reconnecting clients miss individual elimination events.
  */
 
-jest.mock('../../../modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  updateGame: jest.fn(),
+vi.mock('../../../modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  updateGame: vi.fn(),
 }));
 
-jest.mock('../../../modules/communityWordManager', () => ({
-  resetGameAIValidationCount: jest.fn(),
+vi.mock('../../../modules/communityWordManager', () => ({
+  resetGameAIValidationCount: vi.fn(),
 }));
 
-jest.mock('../../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockReturnValue('room:HUNT01'),
+vi.mock('../../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockReturnValue('room:HUNT01'),
 }));
 
-jest.mock('../../../utils/timerManager', () => ({
-  clearGameTimer: jest.fn(),
-  setGameTimer: jest.fn(),
+vi.mock('../../../utils/timerManager', () => ({ default: {
+  clearGameTimer: vi.fn(),
+  setGameTimer: vi.fn(),
+}, clearGameTimer: vi.fn(), setGameTimer: vi.fn() }));
+
+vi.mock('../botGame', () => ({
+  startBotsForGame: vi.fn(),
 }));
 
-jest.mock('../botGame', () => ({
-  startBotsForGame: jest.fn(),
+vi.mock('../gameEnd', () => ({
+  endGame: vi.fn(),
 }));
 
-jest.mock('../gameEnd', () => ({
-  endGame: jest.fn(),
+vi.mock('../../../modules/wordHuntManager', () => ({
+  drainLife: vi.fn(),
+  areAllPlayersEliminated: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../modules/wordHuntManager', () => ({
-  drainLife: jest.fn(),
-  areAllPlayersEliminated: jest.fn().mockReturnValue(false),
-}));
-
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getGame } from '../../../modules/gameStateManager';
 import { broadcastToRoom } from '../../../utils/socketHelpers';
 import { drainLife } from '../../../modules/wordHuntManager';
 import { startGameTimer } from '../gameTimer';
 
-const mockGetGame = getGame as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
-const mockDrainLife = drainLife as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
+const mockDrainLife = drainLife as Mock;
 
 describe('gameTimer wordHuntLifeUpdate includes eliminatedPlayers', () => {
   let mockIo: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockIo = {};
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should include eliminatedPlayers array in wordHuntLifeUpdate payload', () => {
@@ -86,7 +87,7 @@ describe('gameTimer wordHuntLifeUpdate includes eliminatedPlayers', () => {
 
     // WHEN: timer ticks
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     // THEN: wordHuntLifeUpdate includes eliminatedPlayers
     const lifeUpdateCall = mockBroadcastToRoom.mock.calls.find(
@@ -126,7 +127,7 @@ describe('gameTimer wordHuntLifeUpdate includes eliminatedPlayers', () => {
 
     // WHEN: timer ticks
     startGameTimer(mockIo, 'HUNT01', 60);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     // THEN: wordHuntLifeUpdate includes bob in eliminatedPlayers
     // (after the newly eliminated are pushed to huntState.eliminatedPlayers)

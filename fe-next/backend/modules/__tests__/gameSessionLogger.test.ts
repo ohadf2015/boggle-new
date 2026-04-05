@@ -3,35 +3,37 @@
  * Verifies guest and authenticated game session logging
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   logGameSession,
   updateGameSession,
   getGameSessions,
   getGameSessionStats,
+  _resetSupabaseForTesting,
   type GameSessionData,
   type GameSessionUpdateData,
   type GameSessionFilters,
 } from '../gameSessionLogger';
 
 // Mock Supabase
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(() => ({ data: { id: 'mock-session-id' }, error: null })),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      insert: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(() => ({ data: { id: 'mock-session-id' }, error: null })),
         })),
       })),
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({ error: null })),
+      update: vi.fn(() => ({
+        eq: vi.fn(() => ({ error: null })),
       })),
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            order: jest.fn(() => ({ data: [], error: null })),
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            order: vi.fn(() => ({ data: [], error: null })),
           })),
         })),
-        order: jest.fn(() => ({ data: [], error: null })),
+        order: vi.fn(() => ({ data: [], error: null })),
       })),
     })),
   })),
@@ -43,7 +45,8 @@ process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
 
 describe('Game Session Logger', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    _resetSupabaseForTesting();
   });
 
   describe('logGameSession', () => {

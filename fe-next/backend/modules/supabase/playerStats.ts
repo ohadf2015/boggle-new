@@ -289,6 +289,24 @@ export async function updatePlayerStats(
     playerCount: gameStats.totalPlayers || 1,
   });
 
+  // Apply comeback XP multiplier if active
+  const { data: engagement } = await client
+    .from('player_engagement')
+    .select('comeback_xp_multiplier, comeback_bonus_expires_at')
+    .eq('player_id', playerId)
+    .single();
+
+  if (
+    engagement?.comeback_xp_multiplier &&
+    engagement.comeback_xp_multiplier > 1 &&
+    engagement.comeback_bonus_expires_at &&
+    new Date(engagement.comeback_bonus_expires_at) > new Date()
+  ) {
+    const multiplier = Number(engagement.comeback_xp_multiplier);
+    xpResult.totalXp = Math.round(xpResult.totalXp * multiplier);
+    logger.info('XP', `Comeback bonus ${multiplier}x applied for ${playerId}: ${xpResult.totalXp} XP`);
+  }
+
   const oldLevel = profile.current_level || getLevelFromXp(profile.total_xp || 0);
 
   // Retry helper for deadlock recovery (PostgreSQL error code 40P01)

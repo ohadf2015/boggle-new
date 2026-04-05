@@ -11,6 +11,7 @@ import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/valid
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar, setStoredUsername } from '@/utils/profileStorage';
@@ -57,6 +58,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
   t,
 }) => {
   const { profile, updateProfile } = useAuth();
+  const avatarPremium = useAvatarPremium();
 
   const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig | null>(null);
   const [isAuthAvatarPickerOpen, setIsAuthAvatarPickerOpen] = useState(false);
@@ -178,6 +180,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
         onClose={() => setIsAuthAvatarPickerOpen(false)}
         onSave={handleAuthAvatarSave}
         initialConfig={currentConfig}
+        premium={avatarPremium}
       />
 
       {!isAuthenticated && !isProfileLoading && (

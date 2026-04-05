@@ -265,7 +265,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
       {/* Header */}
       <div className={`py-3 px-4 flex-shrink-0 ${variant === 'standalone' ? 'border-b-3 border-neo-black' : 'border-b-2 border-neo-white/10'}`}>
-        <h3 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
+        <h2 className={`text-base font-black uppercase flex items-center gap-2 ${variant === 'standalone' ? 'text-neo-black' : 'text-neo-cream'}`}>
           <MessageSquare className="text-neo-pink" />
           {t('chat.title')}
           {unreadCount > 0 && (
@@ -279,7 +279,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
               </Badge>
             </AdaptiveMotion.div>
           )}
-        </h3>
+        </h2>
       </div>
       <CardContent className="flex-1 flex flex-col p-3 gap-3 min-h-0 overflow-hidden">
         {/* Messages Area with Virtual Scrolling */}
@@ -395,6 +395,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             onKeyDown={handleKeyDown}
             onFocus={handleInputFocus}
             placeholder={t('chat.placeholder')}
+            aria-label={t('chat.placeholder')}
             maxLength={200}
             className="flex-1 min-w-0 text-sm"
             dir="auto"

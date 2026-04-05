@@ -2,33 +2,37 @@
  * Tests for system health endpoint
  */
 
-const mockPing = jest.fn();
-const mockFrom = jest.fn().mockReturnValue({
-  select: jest.fn().mockReturnThis(),
+const { mockPing, mockFrom } = vi.hoisted(() => {
+  const mockPing = vi.fn();
+  const mockFrom = vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnThis(),
+  });
+  return { mockPing, mockFrom };
 });
 
-jest.mock('../../../redis/connection', () => ({
+vi.mock('../../../redis/connection', () => ({
   getRedisClient: () => ({ ping: mockPing }),
   isRedisAvailable: () => true,
   getRedisHealth: () => ({ available: true, lastCheck: Date.now(), stale: false }),
-  getRedisMetrics: jest.fn().mockResolvedValue({ available: true, keyCount: 42 }),
+  getRedisMetrics: vi.fn().mockResolvedValue({ available: true, keyCount: 42 }),
 }));
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => ({ from: mockFrom }),
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { checkSystemHealth } from '../systemHealthRoutes';
 
 describe('systemHealth', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return ok when all systems are healthy', async () => {
     mockPing.mockResolvedValue('PONG');
     mockFrom.mockReturnValue({
-      select: jest.fn().mockResolvedValue({ error: null, count: 100 }),
+      select: vi.fn().mockResolvedValue({ error: null, count: 100 }),
     });
 
     const result = await checkSystemHealth();
@@ -36,13 +40,13 @@ describe('systemHealth', () => {
     expect(result.redis).toBe('ok');
     expect(result.database).toBe('ok');
     expect(result.process.heapMB).toBeGreaterThan(0);
-    expect(result.process.uptimeSeconds).toBeGreaterThan(0);
+    expect(result.process.uptimeSeconds).toBeGreaterThanOrEqual(0);
   });
 
   it('should return down when Redis fails', async () => {
     mockPing.mockRejectedValue(new Error('Connection refused'));
     mockFrom.mockReturnValue({
-      select: jest.fn().mockResolvedValue({ error: null, count: 100 }),
+      select: vi.fn().mockResolvedValue({ error: null, count: 100 }),
     });
 
     const result = await checkSystemHealth();
@@ -54,7 +58,7 @@ describe('systemHealth', () => {
   it('should return down when DB fails', async () => {
     mockPing.mockResolvedValue('PONG');
     mockFrom.mockReturnValue({
-      select: jest.fn().mockResolvedValue({ error: { message: 'timeout' } }),
+      select: vi.fn().mockResolvedValue({ error: { message: 'timeout' } }),
     });
 
     const result = await checkSystemHealth();

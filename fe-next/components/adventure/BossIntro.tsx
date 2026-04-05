@@ -115,7 +115,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               transition={{ delay: 0.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="absolute -bottom-2 -right-4"
             >
-              <Mascot variant="scared" size="sm" />
+              <Mascot variant="scared" size="sm" clipBorder="purple" />
             </AdaptiveMotion.div>
           </div>
 

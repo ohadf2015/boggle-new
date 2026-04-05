@@ -16,7 +16,7 @@ import type { ComebackStatus } from '@/shared/types/engagement';
 const SESSION_KEY = 'comeback_bonus_checked';
 
 export default function ComebackBonusWrapper() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [status, setStatus] = useState<ComebackStatus | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const checked = useRef(false);
@@ -52,6 +52,7 @@ export default function ComebackBonusWrapper() {
       isOpen={isOpen}
       daysAway={status.daysAway ?? 0}
       tier={status.tier}
+      playerName={profile?.display_name || profile?.username}
       onClose={() => setIsOpen(false)}
       onClaimed={() => setIsOpen(false)}
     />

@@ -41,6 +41,8 @@ export interface WordFeedback {
   message?: string;
   fireRoundActive?: boolean;
   fireRoundBonus?: number;
+  /** Golden letter bonus points */
+  goldenBonus?: number;
   timestamp: number;
   /** Name of the player who found this word first (for foundByOther type) */
   foundBy?: string;
@@ -386,6 +388,25 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   {visibleFeedback.fireRoundBonus ? `🔥+${visibleFeedback.fireRoundBonus}` : '🔥2x'}
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {/* Golden letter bonus indicator */}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.goldenBonus && visibleFeedback.goldenBonus > 0 && (
+                <motion.span
+                  key="golden"
+                  initial={{ scale: 0, rotate: -15 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0 }}
+                  transition={{ delay: 0.25, ...SPRING_PRESETS.snappy }}
+                  className={cn(
+                    'bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-900 font-black rounded-md border-2 border-amber-600/60 shadow-[0_0_10px_rgba(255,215,0,0.5)]',
+                    compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
+                  )}
+                >
+                  ★+{visibleFeedback.goldenBonus}
                 </motion.span>
               )}
             </AnimatePresence>

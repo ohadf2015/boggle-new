@@ -5,23 +5,24 @@
  * in addition to making target guesses.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Bot } from '../../../modules/botBehavior';
 import type { BotSubmission } from '../types';
 
 // Mock dependencies
-jest.mock('../../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
-jest.mock('../../../modules/gameStateManager', () => ({
-  addPlayerWord: jest.fn(),
-  updatePlayerScore: jest.fn(),
-  trackBotWord: jest.fn(),
-  getLeaderboard: jest.fn(() => []),
-  getGame: jest.fn(() => ({
+vi.mock('../../../modules/gameStateManager', () => ({
+  addPlayerWord: vi.fn(),
+  updatePlayerScore: vi.fn(),
+  trackBotWord: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
+  getGame: vi.fn(() => ({
     gameMode: 'word-hunt',
     letterGrid: [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']],
     wordHuntState: {
@@ -31,37 +32,37 @@ jest.mock('../../../modules/gameStateManager', () => ({
       eliminatedPlayers: [],
     },
   })),
-  recordFirstFinder: jest.fn(),
+  recordFirstFinder: vi.fn(),
 }));
 
-jest.mock('../../../modules/blastModeManager', () => ({
-  calculateBlastTileBonus: jest.fn(() => 0),
-  getTilesOnPath: jest.fn(() => []),
-  recordBlastMove: jest.fn(),
+vi.mock('../../../modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn(() => 0),
+  getTilesOnPath: vi.fn(() => []),
+  recordBlastMove: vi.fn(),
 }));
 
-jest.mock('../../../modules/wordHuntManager', () => ({
-  validateTargetGuess: jest.fn(() => ['absent', 'absent', 'absent']),
-  recordTargetFound: jest.fn(() => ({ bonus: 50, isFirstFinder: true })),
-  penalizeWrongGuess: jest.fn(() => ({ eliminated: false })),
-  restoreLife: jest.fn(),
-  getLifeBonus: jest.fn(() => 1),
+vi.mock('../../../modules/wordHuntManager', () => ({
+  validateTargetGuess: vi.fn(() => ['absent', 'absent', 'absent']),
+  recordTargetFound: vi.fn(() => ({ bonus: 50, isFirstFinder: true })),
+  penalizeWrongGuess: vi.fn(() => ({ eliminated: false })),
+  restoreLife: vi.fn(),
+  getLifeBonus: vi.fn(() => 1),
 }));
 
-jest.mock('../../../modules/boggleSolver', () => ({
-  findAllWords: jest.fn(() => ['cat', 'dog', 'run', 'cog', 'rug']),
-  findWordsForBots: jest.fn(() => ({
+vi.mock('../../../modules/boggleSolver', () => ({
+  findAllWords: vi.fn(() => ['cat', 'dog', 'run', 'cog', 'rug']),
+  findWordsForBots: vi.fn(() => ({
     easy: ['cat', 'dog', 'run'],
     medium: ['cog', 'rug'],
     hard: [],
   })),
-  getCachedTrie: jest.fn(() => ({})),
+  getCachedTrie: vi.fn(() => ({})),
 }));
 
-jest.mock('../../../modules/botManager', () => {
+vi.mock('../../../modules/botManager', () => {
   return {
-    getGameBots: jest.fn(() => []),
-    startBot: jest.fn(async (bot: Bot, _grid: any, _language: any, onWordSubmit: any, _duration: number, _startTime: number) => {
+    getGameBots: vi.fn(() => []),
+    startBot: vi.fn(async (bot: Bot, _grid: any, _language: any, onWordSubmit: any, _duration: number, _startTime: number) => {
       // Simulate bot finding words
       bot.isActive = true;
       bot.wordsToFind = ['cat', 'run', 'rug'];
@@ -93,29 +94,29 @@ jest.mock('../../../modules/botManager', () => {
         }
       }, 100);
     }),
-    stopBot: jest.fn(),
+    stopBot: vi.fn(),
   };
 });
 
-jest.mock('../gameEnd', () => ({
-  endGame: jest.fn(),
+vi.mock('../gameEnd', () => ({
+  endGame: vi.fn(),
 }));
 
-jest.mock('../../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  volatileBroadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn((code: string) => `game:${code}`),
+vi.mock('../../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((code: string) => `game:${code}`),
 }));
 
-jest.mock('../../../../shared/constants/wordHuntMultiplayerConstants', () => ({
+vi.mock('../../../../shared/constants/wordHuntMultiplayerConstants', () => ({
   BOARD_WORD_SCORE_PER_LETTER: 2,
 }));
 
-jest.mock('../../../dictionary', () => ({
-  ensureLanguageLoaded: jest.fn(),
+vi.mock('../../../dictionary', () => ({
+  ensureLanguageLoaded: vi.fn(),
 }));
 
-jest.mock('../../../modules/botConfig', () => ({
+vi.mock('../../../modules/botConfig', () => ({
   BOT_CONFIG: {
     TIMING: { medium: { minDelay: 2000, maxDelay: 5000, startDelay: 1000 } },
     WORDS: { medium: { maxWordLength: 7, wordsPerMinute: 4, focusOnShort: false, missChance: 0, wrongWordChance: 0 } },
@@ -160,21 +161,21 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
   let mockBot: Bot;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     mockBot = createMockBot();
 
     mockIo = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn(),
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn(),
     };
 
-    (botManager.getGameBots as jest.Mock).mockReturnValue([mockBot]);
+    (botManager.getGameBots as Mock).mockReturnValue([mockBot]);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should call startBot for regular word finding in word-hunt mode', () => {
@@ -198,7 +199,7 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
 
     // Advance past the simulated bot word submissions
-    jest.advanceTimersByTime(150);
+    vi.advanceTimersByTime(150);
 
     // Bot should have submitted regular words via addPlayerWord
     expect(addPlayerWord).toHaveBeenCalledWith(
@@ -220,7 +221,7 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
 
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
 
-    jest.advanceTimersByTime(150);
+    vi.advanceTimersByTime(150);
 
     expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
       mockIo,
@@ -238,7 +239,7 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
 
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
 
-    jest.advanceTimersByTime(150);
+    vi.advanceTimersByTime(150);
 
     expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
       mockIo,
@@ -257,7 +258,7 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
 
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
 
-    jest.advanceTimersByTime(150);
+    vi.advanceTimersByTime(150);
 
     expect(broadcastToRoom).toHaveBeenCalledWith(
       mockIo,
@@ -276,7 +277,7 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
 
     // Advance past the 100ms setTimeout for word hunt loop
-    jest.advanceTimersByTime(200);
+    vi.advanceTimersByTime(200);
 
     // getGameBots should be called again for the word hunt loop
     expect(botManager.getGameBots).toHaveBeenCalledTimes(2);

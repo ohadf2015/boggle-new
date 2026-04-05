@@ -2,35 +2,39 @@
  * Tests for optimized stats routes using RPC + caching
  */
 
-const mockRpc = jest.fn();
-const mockFrom = jest.fn().mockReturnValue({
-  select: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  gte: jest.fn().mockReturnThis(),
-  is: jest.fn().mockReturnThis(),
-  not: jest.fn().mockReturnThis(),
-  single: jest.fn().mockResolvedValue({ data: null, error: null }),
+const { mockRpc, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockRpc = vi.fn();
+  const mockFrom = vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    gte: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    not: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data: null, error: null }),
+  });
+  const mockSupabase = { rpc: mockRpc, from: mockFrom };
+  return { mockRpc, mockFrom, mockSupabase };
 });
-const mockSupabase = { rpc: mockRpc, from: mockFrom };
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
 // Mock Redis cache — always miss so we test the fetch logic
-jest.mock('../../../redis/connection', () => ({
+vi.mock('../../../redis/connection', () => ({
   getRedisClient: () => ({
-    get: jest.fn().mockResolvedValue(null),
-    setex: jest.fn().mockResolvedValue('OK'),
+    get: vi.fn().mockResolvedValue(null),
+    setex: vi.fn().mockResolvedValue('OK'),
   }),
   isRedisAvailable: () => true,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { fetchDashboardStats } from '../statsService';
 
 describe('statsService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call all 3 RPCs in parallel', async () => {

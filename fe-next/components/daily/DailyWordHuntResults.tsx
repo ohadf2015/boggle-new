@@ -186,6 +186,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       setLeaderboardKey(prev => prev + 1);
       fetchStats();
     },
+    extraTries: result.extraTries,
     t,
   });
 

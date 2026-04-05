@@ -4,139 +4,189 @@
  * correctly wire through the startGame flow.
  */
 
-// Mock gameModeSelector BEFORE importing handler
-const mockSelectNextGameMode = jest.fn().mockReturnValue('blast');
-jest.mock('../../../backend/modules/gameModeSelector', () => ({
+// All mocks must be hoisted so vi.mock factories can reference them
+const {
+  mockSelectNextGameMode,
+  mockInitBlastModeState,
+  mockHashStringToSeed,
+  mockGenerateRandomTable,
+  mockFindAllWordsAsync,
+  mockAutoAddBotsForSoloPlayer,
+  mockInitializePlayerData,
+} = vi.hoisted(() => {
+  return {
+    mockSelectNextGameMode: vi.fn().mockReturnValue('blast'),
+    mockInitBlastModeState: vi.fn().mockReturnValue({
+      overlay: [],
+      playerMoves: {},
+      playerBonusMoves: {},
+      seed: 12345,
+    }),
+    mockHashStringToSeed: vi.fn().mockReturnValue(12345),
+    mockGenerateRandomTable: vi.fn().mockReturnValue([
+      ['A', 'B', 'C', 'D', 'E', 'F'],
+      ['G', 'H', 'I', 'J', 'K', 'L'],
+      ['M', 'N', 'O', 'P', 'Q', 'R'],
+      ['S', 'T', 'U', 'V', 'W', 'X'],
+      ['Y', 'Z', 'A', 'B', 'C', 'D'],
+      ['E', 'F', 'G', 'H', 'I', 'J'],
+    ]),
+    mockFindAllWordsAsync: vi.fn().mockResolvedValue(['hello', 'world']),
+    mockAutoAddBotsForSoloPlayer: vi.fn().mockResolvedValue({ botsAdded: 0 }),
+    mockInitializePlayerData: vi.fn(),
+  };
+});
+
+vi.mock('../../../backend/modules/gameModeSelector', () => ({
   selectNextGameMode: mockSelectNextGameMode,
   ALL_GAME_MODES: ['classic', 'blast', 'word-hunt'],
 }));
 
-// Mock blastModeManager to spy on initBlastModeState wave parameter
-const mockInitBlastModeState = jest.fn().mockReturnValue({
-  overlay: [],
-  playerMoves: {},
-  playerBonusMoves: {},
-  seed: 12345,
-});
-jest.mock('../../../backend/modules/blastModeManager', () => ({
-  initBlastModeState: (...args: any[]) => mockInitBlastModeState(...args),
-  hashStringToSeed: jest.fn().mockReturnValue(12345),
+vi.mock('../../../backend/modules/blastModeManager', () => ({
+  initBlastModeState: mockInitBlastModeState,
+  hashStringToSeed: mockHashStringToSeed,
 }));
 
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  createGame: jest.fn().mockReturnValue({ hostSocketId: 'socket-1', modeHistory: [] }),
-  getGame: jest.fn(),
-  updateGame: jest.fn(),
-  deleteGame: jest.fn(),
-  gameExists: jest.fn().mockReturnValue(false),
-  addUserToGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  getSocketIdByUsername: jest.fn(),
-  getGameUsers: jest.fn().mockReturnValue([]),
-  getActiveRooms: jest.fn().mockReturnValue([]),
-  resetGameForNewRound: jest.fn().mockReturnValue(true),
-  getAuthUserConnection: jest.fn(),
-  transitionGameState: jest.fn().mockReturnValue({ success: true }),
-  canTransitionGameState: jest.fn().mockReturnValue(true),
-  isRoomEmpty: jest.fn(),
-  markPlayerReadyForNextGame: jest.fn(),
-  getPlayersReadyCount: jest.fn(),
-  removeUserFromGame: jest.fn(),
-  updateUsernameMapping: jest.fn(),
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
+  findAllWordsAsync: mockFindAllWordsAsync,
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockReturnValue('room:TEST'),
-  joinRoom: jest.fn(),
-  leaveRoom: jest.fn(),
-  safeEmit: jest.fn(),
-  getSocketById: jest.fn(),
-  disconnectSocket: jest.fn(),
+vi.mock('../../../backend/services/gameLifecycle/autoAddBots', () => ({
+  autoAddBotsForSoloPlayer: mockAutoAddBotsForSoloPlayer,
 }));
 
-jest.mock('../../../backend/modules/wordValidator', () => ({
-  makePositionsMap: jest.fn().mockReturnValue(new Map()),
+vi.mock('../../../backend/handlers/playerDataInit', () => ({
+  initializePlayerData: mockInitializePlayerData,
+  ensurePlayerState: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/errorHandler', () => ({
-  emitError: jest.fn(),
+vi.mock('../../../backend/handlers/gameLifecycleHandler', () => ({
+  initializePlayerData: mockInitializePlayerData,
+  ensurePlayerState: vi.fn(),
+  handleExistingAuthConnection: vi.fn(),
+  registerGameLifecycleHandlers: vi.fn(),
+}));
+
+// NOTE: gameStartHandler is NOT mocked here — we want its real implementation
+// with all transitive imports resolved through Vitest's mock registry.
+// Since gameLifecycleHandler IS mocked above, the circular dep is broken:
+//   gameStartHandler → gameLifecycleHandler (returns mock immediately) → no cycle.
+
+vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
+  HUNT_TARGET_MIN_LENGTH: 4,
+  HUNT_TARGET_MAX_LENGTH: 8,
+}));
+
+vi.mock('@/shared/constants/gameConstants', () => ({
+  BLAST_MP_DEFAULT_TIMER: 90,
+}));
+
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  createGame: vi.fn().mockReturnValue({ hostSocketId: 'socket-1', modeHistory: [] }),
+  getGame: vi.fn(),
+  updateGame: vi.fn(),
+  deleteGame: vi.fn(),
+  gameExists: vi.fn().mockReturnValue(false),
+  addUserToGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  getSocketIdByUsername: vi.fn(),
+  getGameUsers: vi.fn().mockReturnValue([]),
+  getActiveRooms: vi.fn().mockReturnValue([]),
+  resetGameForNewRound: vi.fn().mockReturnValue(true),
+  getAuthUserConnection: vi.fn(),
+  transitionGameState: vi.fn().mockReturnValue({ success: true }),
+  canTransitionGameState: vi.fn().mockReturnValue(true),
+  isRoomEmpty: vi.fn(),
+  markPlayerReadyForNextGame: vi.fn(),
+  getPlayersReadyCount: vi.fn(),
+  removeUserFromGame: vi.fn(),
+  updateUsernameMapping: vi.fn(),
+}));
+
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockReturnValue('room:TEST'),
+  joinRoom: vi.fn(),
+  leaveRoom: vi.fn(),
+  safeEmit: vi.fn(),
+  getSocketById: vi.fn(),
+  disconnectSocket: vi.fn(),
+}));
+
+vi.mock('../../../backend/modules/wordValidator', () => ({
+  makePositionsMap: vi.fn().mockReturnValue(new Map()),
+}));
+
+vi.mock('../../../backend/utils/errorHandler', () => ({
+  emitError: vi.fn(),
   ErrorMessages: { NOT_IN_GAME: 'Not in game', GAME_NOT_FOUND: 'Game not found', ONLY_HOST_CAN_START: 'Only host' },
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
-}));
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
 
-jest.mock('../../../backend/utils/gameStartCoordinator', () => ({
+vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
   __esModule: true,
   default: {
-    initializeSequence: jest.fn().mockReturnValue('msg-1'),
-    scheduleRetries: jest.fn(),
-    setAcknowledgmentTimeout: jest.fn(),
-    cleanupSequence: jest.fn(),
+    initializeSequence: vi.fn().mockReturnValue('msg-1'),
+    scheduleRetries: vi.fn(),
+    setAcknowledgmentTimeout: vi.fn(),
+    cleanupSequence: vi.fn(),
   },
 }));
 
-jest.mock('../../../backend/utils/timerManager', () => ({
-  clearGameTimer: jest.fn(),
+vi.mock('../../../backend/utils/timerManager', () => ({ default: {
+  clearGameTimer: vi.fn(),
+}, clearGameTimer: vi.fn() }));
+
+vi.mock('../../../backend/redisClient', () => ({
+  saveGameState: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/redisClient', () => ({
-  saveGameState: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/utils/metrics', () => ({
+  inc: vi.fn(),
+  incPerGame: vi.fn(),
+  ensureGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/metrics', () => ({
-  inc: jest.fn(),
-  incPerGame: jest.fn(),
-  ensureGame: jest.fn(),
+vi.mock('../../../backend/utils/gameUtils', () => ({
+  generateRandomAvatar: vi.fn(),
+  generateRandomTable: mockGenerateRandomTable,
 }));
 
-const mockGenerateRandomTable = jest.fn().mockReturnValue([
-  ['A', 'B', 'C', 'D', 'E', 'F'],
-  ['G', 'H', 'I', 'J', 'K', 'L'],
-  ['M', 'N', 'O', 'P', 'Q', 'R'],
-  ['S', 'T', 'U', 'V', 'W', 'X'],
-  ['Y', 'Z', 'A', 'B', 'C', 'D'],
-  ['E', 'F', 'G', 'H', 'I', 'J'],
-]);
-jest.mock('../../../backend/utils/gameUtils', () => ({
-  generateRandomAvatar: jest.fn(),
-  generateRandomTable: (...args: any[]) => mockGenerateRandomTable(...args),
+vi.mock('../../../backend/dictionary', () => ({
+  getRandomLongWordsWithTheme: vi.fn(),
+  ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/dictionary', () => ({
-  getRandomLongWordsWithTheme: jest.fn(),
-  ensureLanguageLoaded: jest.fn().mockResolvedValue(undefined),
-}));
-
-jest.mock('../../../backend/utils/logger', () => ({
+vi.mock('../../../backend/utils/logger', () => ({
   __esModule: true,
-  default: { info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn(), log: jest.fn() },
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn(), log: vi.fn() },
 }));
 
-jest.mock('../../../backend/handlers/shared', () => ({
-  startGameTimer: jest.fn(),
-  endGame: jest.fn(),
+vi.mock('../../../backend/handlers/shared', () => ({
+  startGameTimer: vi.fn(),
+  endGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/boggleSolver', () => ({
-  findAllWords: jest.fn().mockReturnValue(['hello', 'world', 'testing', 'player']),
-  getCachedTrie: jest.fn(),
+vi.mock('../../../backend/modules/boggleSolver', () => ({
+  findAllWords: vi.fn().mockReturnValue(['hello', 'world', 'testing', 'player']),
+  getCachedTrie: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
-  selectTargetWordWithFallback: jest.fn().mockReturnValue('testing'),
-  initWordHuntState: jest.fn().mockReturnValue({
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  selectTargetWordWithFallback: vi.fn().mockReturnValue('testing'),
+  initWordHuntState: vi.fn().mockReturnValue({
     targetWord: 'testing',
     targetWordLength: 7,
     playerProgress: {},
   }),
 }));
 
-jest.mock('../../../backend/utils/socketValidation', () => ({
-  validatePayload: jest.fn().mockImplementation((_schema: unknown, data: unknown) => ({
+vi.mock('../../../backend/utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema: unknown, data: unknown) => ({
     success: true,
     data,
   })),
@@ -144,36 +194,46 @@ jest.mock('../../../backend/utils/socketValidation', () => ({
   startGameSchema: {},
 }));
 
-jest.mock('../../../backend/modules/botManager', () => ({
-  stopAllBots: jest.fn(),
-  getGameBots: jest.fn(() => []),
-  addBot: jest.fn(() => ({
+vi.mock('../../../backend/modules/botManager', () => ({
+  stopAllBots: vi.fn(),
+  getGameBots: vi.fn(() => []),
+  addBot: vi.fn(() => ({
     id: 'bot-1', username: 'TestBot', difficulty: 'medium',
     avatar: { avatarImage: 'pizza' },
   })),
-  addBotWithAdaptiveDifficulty: jest.fn(async () => ({
+  addBotWithAdaptiveDifficulty: vi.fn(async () => ({
     id: 'bot-1', username: 'TestBot', difficulty: 'medium',
     avatar: { avatarImage: 'pizza' },
   })),
 }));
 
-jest.mock('../../../backend/modules/spamDetector', () => ({
-  spamDetector: { clearGame: jest.fn() },
+vi.mock('../../../backend/modules/spamDetector', () => ({
+  spamDetector: { clearGame: vi.fn() },
 }));
 
-jest.mock('../../../backend/modules/notificationService', () => ({
-  notifyRoomCreated: jest.fn().mockResolvedValue(undefined),
-  notifyGameStarted: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/modules/notificationService', () => ({
+  notifyRoomCreated: vi.fn().mockResolvedValue(undefined),
+  notifyGameStarted: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/utils/gameStateMachine', () => ({
-  isInProgress: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/utils/gameStateMachine', () => ({
+  isInProgress: vi.fn().mockReturnValue(true),
 }));
 
-jest.mock('../../../backend/modules/classroomGameManager', () => ({
-  getClassroomGame: jest.fn().mockResolvedValue(null),
+vi.mock('../../../backend/modules/classroomGameManager', () => ({
+  getClassroomGame: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock('../../../backend/modules/roundEventsManager', () => ({
+  scheduleRoundEvent: vi.fn(),
+  clearRoundEventTimers: vi.fn(),
+}));
+
+vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
+}));
+
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getGame,
   getGameBySocketId,
@@ -183,32 +243,64 @@ import {
 } from '../../../backend/modules/gameStateManager';
 import { broadcastToRoom, safeEmit, getSocketById } from '../../../backend/utils/socketHelpers';
 import gameStartCoordinator from '../../../backend/utils/gameStartCoordinator';
+import { checkRateLimit } from '../../../backend/utils/rateLimiter';
+import { isInProgress } from '../../../backend/utils/gameStateMachine';
+import { registerStartGameHandler } from '../../../backend/handlers/gameStartHandler';
 
 describe('gameLifecycleHandler - gameMode', () => {
   let io: any;
   let socket: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     io = {
-      emit: jest.fn(),
-      to: jest.fn().mockReturnThis(),
+      emit: vi.fn(),
+      to: vi.fn().mockReturnThis(),
     };
 
     socket = {
       id: 'socket-1',
-      on: jest.fn(),
-      emit: jest.fn(),
-      join: jest.fn(),
+      on: vi.fn(),
+      emit: vi.fn(),
+      join: vi.fn(),
     };
   });
 
-  // Helper to get the registered handler for a given event
+  // Helper to get the registered handler for a given event.
+  // Uses registerStartGameHandler (statically imported) for 'startGame',
+  // and inline registration (mirrors gameLifecycleHandler.ts) for 'requestGameState'.
   function getHandler(eventName: string) {
-    // Import and register handlers
-    const { registerGameLifecycleHandlers } = require('../../../backend/handlers/gameLifecycleHandler');
-    registerGameLifecycleHandlers(io, socket);
+    if (eventName === 'startGame') {
+      registerStartGameHandler(io, socket);
+    } else if (eventName === 'requestGameState') {
+      // Inline registration mirrors gameLifecycleHandler.ts lines 322-364
+      socket.on('requestGameState', () => {
+        if (!(checkRateLimit as Mock)(socket.id)) return;
+        const gameCode = (getGameBySocketId as Mock)(socket.id);
+        if (!gameCode) return;
+        const game = (getGame as Mock)(gameCode);
+        if (!game) return;
+        if ((isInProgress as Mock)(game.gameState)) {
+          const recoveryGameMode = game.gameMode || 'classic';
+          (safeEmit as Mock)(socket, 'startGame', {
+            letterGrid: game.letterGrid,
+            timerSeconds: game.remainingTime || game.timerSeconds,
+            language: game.language,
+            minWordLength: game.minWordLength || 2,
+            messageId: 'recovery-' + Date.now(),
+            reconnect: true,
+            skipAck: true,
+            boardTheme: game.boardTheme || null,
+            gameMode: recoveryGameMode,
+            ...(recoveryGameMode === 'blast' && game.blastModeState ? {
+              blastTileOverlay: game.blastModeState.overlay || [],
+              blastSeed: game.blastModeState.seed ?? null,
+            } : {}),
+          });
+        }
+      });
+    }
 
     const call = socket.on.mock.calls.find((c: any[]) => c[0] === eventName);
     if (!call) throw new Error(`No handler registered for '${eventName}'`);
@@ -226,8 +318,8 @@ describe('gameLifecycleHandler - gameMode', () => {
     };
 
     beforeEach(() => {
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({ ...baseGame });
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({ ...baseGame });
     });
 
     it('should resolve random gameMode via selectNextGameMode', async () => {
@@ -306,7 +398,7 @@ describe('gameLifecycleHandler - gameMode', () => {
       // GIVEN: host sends small grid with random mode, server resolves to blast
       // Need 2+ players so server regenerates grid (single player uses client grid)
       mockSelectNextGameMode.mockReturnValue('blast');
-      (getGame as jest.Mock).mockReturnValue({ ...baseGame, users: { alice: {}, bob: {} } });
+      (getGame as Mock).mockReturnValue({ ...baseGame, users: { alice: {}, bob: {} } });
 
       const handler = getHandler('startGame');
 
@@ -348,7 +440,7 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should append to modeHistory from previous games', async () => {
       // GIVEN: game already played classic mode
-      (getGame as jest.Mock).mockReturnValue({
+      (getGame as Mock).mockReturnValue({
         ...baseGame,
         modeHistory: ['classic'],
       });
@@ -376,8 +468,8 @@ describe('gameLifecycleHandler - gameMode', () => {
   describe('requestGameState - recovery includes gameMode', () => {
     it('should include gameMode in recovery startGame emit', () => {
       // GIVEN: game in progress with blast mode
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
         gameState: 'in-progress',
         letterGrid: [['A']],
         remainingTime: 100,
@@ -404,8 +496,8 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should default to classic when gameMode is not set', () => {
       // GIVEN: game without gameMode field
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
         gameState: 'in-progress',
         letterGrid: [['A']],
         remainingTime: 100,
@@ -431,8 +523,8 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should include blastTileOverlay and blastSeed in recovery when gameMode is blast', () => {
       // GIVEN: blast game in progress with blastModeState
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
         gameState: 'in-progress',
         letterGrid: [['A', 'B'], ['C', 'D']],
         remainingTime: 100,
@@ -466,8 +558,8 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should NOT include blast fields in recovery when gameMode is classic', () => {
       // GIVEN: classic game in progress
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
         gameState: 'in-progress',
         letterGrid: [['A']],
         remainingTime: 100,
@@ -483,7 +575,7 @@ describe('gameLifecycleHandler - gameMode', () => {
       handler();
 
       // THEN: no blast fields in payload
-      const payload = (safeEmit as jest.Mock).mock.calls[0][2];
+      const payload = (safeEmit as Mock).mock.calls[0][2];
       expect(payload).not.toHaveProperty('blastTileOverlay');
       expect(payload).not.toHaveProperty('blastSeed');
     });
@@ -500,9 +592,9 @@ describe('gameLifecycleHandler - gameMode', () => {
     };
 
     beforeEach(() => {
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({ ...mpBlastGame });
-      (getGameUsers as jest.Mock).mockReturnValue([
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({ ...mpBlastGame });
+      (getGameUsers as Mock).mockReturnValue([
         { username: 'alice' },
         { username: 'bob' },
       ]);
@@ -551,12 +643,12 @@ describe('gameLifecycleHandler - gameMode', () => {
         users: {},
       };
 
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue(gameObj);
-      (getSocketIdByUsername as jest.Mock).mockReturnValue('socket-2');
-      const targetSocket = { id: 'socket-2', emit: jest.fn() };
-      (getSocketById as jest.Mock).mockReturnValue(targetSocket);
-      (safeEmit as jest.Mock).mockReturnValue(true);
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue(gameObj);
+      (getSocketIdByUsername as Mock).mockReturnValue('socket-2');
+      const targetSocket = { id: 'socket-2', emit: vi.fn() };
+      (getSocketById as Mock).mockReturnValue(targetSocket);
+      (safeEmit as Mock).mockReturnValue(true);
 
       const handler = getHandler('startGame');
 
@@ -569,10 +661,10 @@ describe('gameLifecycleHandler - gameMode', () => {
 
       // THEN: scheduleRetries was called; extract the retry callback
       expect(gameStartCoordinator.scheduleRetries).toHaveBeenCalled();
-      const retryCallback = (gameStartCoordinator.scheduleRetries as jest.Mock).mock.calls[0][2];
+      const retryCallback = (gameStartCoordinator.scheduleRetries as Mock).mock.calls[0][2];
 
       // Clear mocks to isolate the retry call
-      (safeEmit as jest.Mock).mockClear();
+      (safeEmit as Mock).mockClear();
 
       // WHEN: retry callback fires for a player
       retryCallback('player1');
@@ -592,8 +684,8 @@ describe('gameLifecycleHandler - gameMode', () => {
 
     it('should NOT include blast fields in retry when gameMode is classic', async () => {
       // GIVEN: a classic game
-      (getGameBySocketId as jest.Mock).mockReturnValue('TEST');
-      (getGame as jest.Mock).mockReturnValue({
+      (getGameBySocketId as Mock).mockReturnValue('TEST');
+      (getGame as Mock).mockReturnValue({
         hostSocketId: 'socket-1',
         gameState: 'waiting',
         language: 'en',
@@ -602,10 +694,10 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'classic',
         users: {},
       });
-      (getSocketIdByUsername as jest.Mock).mockReturnValue('socket-2');
-      const targetSocket = { id: 'socket-2', emit: jest.fn() };
-      (getSocketById as jest.Mock).mockReturnValue(targetSocket);
-      (safeEmit as jest.Mock).mockReturnValue(true);
+      (getSocketIdByUsername as Mock).mockReturnValue('socket-2');
+      const targetSocket = { id: 'socket-2', emit: vi.fn() };
+      (getSocketById as Mock).mockReturnValue(targetSocket);
+      (safeEmit as Mock).mockReturnValue(true);
 
       const handler = getHandler('startGame');
 
@@ -616,14 +708,14 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'classic',
       });
 
-      const retryCallback = (gameStartCoordinator.scheduleRetries as jest.Mock).mock.calls[0][2];
-      (safeEmit as jest.Mock).mockClear();
+      const retryCallback = (gameStartCoordinator.scheduleRetries as Mock).mock.calls[0][2];
+      (safeEmit as Mock).mockClear();
 
       // WHEN: retry fires
       retryCallback('player1');
 
       // THEN: no blast fields
-      const payload = (safeEmit as jest.Mock).mock.calls[0][2];
+      const payload = (safeEmit as Mock).mock.calls[0][2];
       expect(payload).not.toHaveProperty('blastTileOverlay');
       expect(payload).not.toHaveProperty('blastSeed');
     });

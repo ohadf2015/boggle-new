@@ -8,7 +8,7 @@ import type { AdminRequest, InvalidWordStatsRow } from './types';
 import { auditLog } from './middleware';
 import logger from '../../utils/logger';
 
-const { getSupabase } = require('../../modules/supabaseServer');
+import { getSupabase } from '../../modules/supabaseServer';
 
 const router: Router = express.Router();
 
@@ -18,6 +18,7 @@ const router: Router = express.Router();
 router.get('/', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const language = (req.query.language as string) || null;
     const minCount = parseInt(req.query.minCount as string) || 3;
     const search = (req.query.search as string) || null;
@@ -69,6 +70,7 @@ router.get('/', async (req: AdminRequest, res: Response): Promise<void> => {
  */
 router.post('/approve', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
+  if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
   const { word, language, addToDictionary } = req.body;
 
   if (!word || !language) {
@@ -148,6 +150,7 @@ router.post('/approve', async (req: AdminRequest, res: Response): Promise<void> 
  */
 router.post('/dismiss', async (req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
+  if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
   const { word, language, reason } = req.body;
 
   if (!word || !language) {
@@ -206,6 +209,7 @@ router.post('/auto-promote', async (req: AdminRequest, res: Response): Promise<v
  */
 router.get('/auto-promote-stats', async (_req: AdminRequest, res: Response): Promise<void> => {
   const supabase = getSupabase();
+  if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
 
   try {
     const { count: autoPromotedCount, error: countError } = await supabase

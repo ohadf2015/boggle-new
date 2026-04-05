@@ -3,66 +3,67 @@
  * Covers: presenceUpdate, presenceHeartbeat, ping/pong, connection health check
  */
 
-jest.mock('../../utils/logger', () => {
-  const l = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+vi.mock('../../utils/logger', () => {
+  const l = { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() };
   return { __esModule: true, default: l, ...l };
 });
 
-jest.mock('../../utils/rateLimiter', () => ({
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
   __esModule: true,
-  checkRateLimit: jest.fn().mockReturnValue(true),
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  updateUserPresence: vi.fn(),
+  updateUserHeartbeat: vi.fn(),
+  forEachGame: vi.fn(),
 }));
 
-jest.mock('../../modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  updateUserPresence: jest.fn(),
-  updateUserHeartbeat: jest.fn(),
-  forEachGame: jest.fn(),
+vi.mock('../../utils/socketHelpers', () => ({
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((code: string) => `game:${code}`),
 }));
 
-jest.mock('../../utils/socketHelpers', () => ({
-  volatileBroadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn((code: string) => `game:${code}`),
+vi.mock('./../../handlers/kickHandler', () => ({
+  checkAutoKickInactive: vi.fn(),
 }));
 
-jest.mock('./../../handlers/kickHandler', () => ({
-  checkAutoKickInactive: jest.fn(),
-}));
-
-jest.mock('../../utils/socketValidation', () => ({
-  validatePayload: jest.fn().mockReturnValue({ success: true, data: {} }),
+vi.mock('../../utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockReturnValue({ success: true, data: {} }),
   presenceUpdateSchema: {},
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerPresenceHandlers } from '../presenceHandler';
 import { getGame, getGameBySocketId, getUsernameBySocketId, updateUserPresence, updateUserHeartbeat } from '../../modules/gameStateManager';
 import { volatileBroadcastToRoom } from '../../utils/socketHelpers';
 import { checkRateLimit } from '../../utils/rateLimiter';
 import { validatePayload } from '../../utils/socketValidation';
 
-const mockGetGame = getGame as jest.MockedFunction<typeof getGame>;
-const mockGetGameBySocketId = getGameBySocketId as jest.MockedFunction<typeof getGameBySocketId>;
-const mockGetUsernameBySocketId = getUsernameBySocketId as jest.MockedFunction<typeof getUsernameBySocketId>;
-const mockUpdateUserPresence = updateUserPresence as jest.MockedFunction<typeof updateUserPresence>;
-const mockUpdateUserHeartbeat = updateUserHeartbeat as jest.MockedFunction<typeof updateUserHeartbeat>;
-const mockVolatileBroadcast = volatileBroadcastToRoom as jest.MockedFunction<typeof volatileBroadcastToRoom>;
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
-const mockValidatePayload = validatePayload as jest.MockedFunction<typeof validatePayload>;
+const mockGetGame = getGame as MockedFunction<typeof getGame>;
+const mockGetGameBySocketId = getGameBySocketId as MockedFunction<typeof getGameBySocketId>;
+const mockGetUsernameBySocketId = getUsernameBySocketId as MockedFunction<typeof getUsernameBySocketId>;
+const mockUpdateUserPresence = updateUserPresence as MockedFunction<typeof updateUserPresence>;
+const mockUpdateUserHeartbeat = updateUserHeartbeat as MockedFunction<typeof updateUserHeartbeat>;
+const mockVolatileBroadcast = volatileBroadcastToRoom as MockedFunction<typeof volatileBroadcastToRoom>;
+const mockCheckRateLimit = checkRateLimit as MockedFunction<typeof checkRateLimit>;
+const mockValidatePayload = validatePayload as MockedFunction<typeof validatePayload>;
 
 function createTestHarness() {
   const handlers = new Map<string, Function>();
   const socket: any = {
     id: 'socket-1',
-    emit: jest.fn(),
-    on: jest.fn((event: string, handler: Function) => {
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
       handlers.set(event, handler);
     }),
   };
   const io: any = {
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   };
 
   registerPresenceHandlers(io, socket);
@@ -78,7 +79,7 @@ function createTestHarness() {
 
 describe('presenceHandler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckRateLimit.mockReturnValue(true);
     mockGetGameBySocketId.mockReturnValue('GAME01');
     mockGetUsernameBySocketId.mockReturnValue('TestUser');
@@ -181,15 +182,15 @@ describe('presenceHandler', () => {
   describe('latencyCheck', () => {
     it('should invoke callback for RTT measurement', () => {
       const { trigger } = createTestHarness();
-      const callback = jest.fn();
+      const callback = vi.fn();
       const handler = (trigger as any);
 
       // latencyCheck passes data + callback
       const handlers = new Map<string, Function>();
       const socket: any = {
         id: 'socket-1',
-        emit: jest.fn(),
-        on: jest.fn((event: string, h: Function) => { handlers.set(event, h); }),
+        emit: vi.fn(),
+        on: vi.fn((event: string, h: Function) => { handlers.set(event, h); }),
       };
       registerPresenceHandlers({} as any, socket);
       const latencyHandler = handlers.get('latencyCheck')!;

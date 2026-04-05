@@ -192,10 +192,10 @@ export function DesktopGameLayout({
 
       {/* 3-Column Desktop Layout */}
       <div
-        className="flex w-full h-full max-h-full gap-4 p-4 overflow-hidden"
+        className="flex w-full h-full max-h-full gap-3 p-3 overflow-hidden"
         style={{
           display: 'grid',
-          gridTemplateColumns: isTv ? '320px 1fr 320px' : '280px 1fr 280px',
+          gridTemplateColumns: isTv ? '300px 1fr 300px' : '230px 1fr 230px',
           gridTemplateRows: '1fr',
         }}
       >
@@ -220,7 +220,7 @@ export function DesktopGameLayout({
         </div>
 
         {/* Center - Game Area */}
-        <div className="flex flex-col items-center justify-between h-full min-w-0 min-h-0 gap-2 relative z-10 overflow-hidden">
+        <div className="flex flex-col items-center justify-between h-full min-w-0 min-h-0 gap-1 relative z-10 overflow-hidden">
           {/* Header: Quit + Coins + Pause */}
           <div className="flex items-center justify-between w-full px-2 shrink-0">
             {/* Quit - btn-neo red */}
@@ -311,7 +311,7 @@ export function DesktopGameLayout({
               )}
             </AdaptiveAnimatePresence>
 
-            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 90cqh)', height: 'min(100cqw, 90cqh)', maxWidth: '600px', maxHeight: '600px' }}>
+            <div className="desktop-grid-container game-board-container" style={{ width: 'min(100cqw, 95cqh)', height: 'min(100cqw, 95cqh)', maxWidth: '520px', maxHeight: '520px' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}

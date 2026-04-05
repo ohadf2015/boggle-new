@@ -3,39 +3,40 @@
  * Tests for duplicate handling, AI timeout fallbacks, database errors, and error recovery
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { validateWordWithAI } from '@/utils/dailyChallenge/wikipediaWordProcessor';
 import type { Language } from '@/shared/types/game';
 
 // Mock dependencies
-jest.mock('@/lib/ai-service', () => ({
+vi.mock('@/lib/ai-service', () => ({
   gameAIService: {
-    checkDatabaseOnly: jest.fn(),
-    validateAndSaveWord: jest.fn(),
+    checkDatabaseOnly: vi.fn(),
+    validateAndSaveWord: vi.fn(),
   },
 }));
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      upsert: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      upsert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
     })),
   })),
 }));
 
 describe('Wikipedia pipeline edge cases', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('duplicate word handling', () => {
     it('should skip promotion for words already in dictionary', async () => {
       // GIVEN: Word already exists in community_words
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockResolvedValue({
+      (gameAIService.checkDatabaseOnly as Mock).mockResolvedValue({
         source: 'database',
         isValid: true,
       });
@@ -61,7 +62,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // integration test, but we verify the validateWordWithAI handles it
 
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockResolvedValue({
+      (gameAIService.checkDatabaseOnly as Mock).mockResolvedValue({
         source: 'database',
         isValid: true,
       });
@@ -81,7 +82,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: Word with score >= 85
       // AND: AI service times out
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Connection timeout')
       );
 
@@ -98,7 +99,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: Word with score < 85
       // AND: AI service times out
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Connection timeout')
       );
 
@@ -114,7 +115,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: High-scoring word that fails format validation (too short)
       // AND: AI service times out
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Connection timeout')
       );
 
@@ -136,7 +137,7 @@ describe('Wikipedia pipeline edge cases', () => {
       const { gameAIService } = await import('@/lib/ai-service');
 
       // Mock database check to fail
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Database connection error')
       );
 
@@ -151,10 +152,10 @@ describe('Wikipedia pipeline edge cases', () => {
 
     it('should log database errors with context', async () => {
       // GIVEN: Database error occurs
-      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
 
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Database connection lost')
       );
 
@@ -176,7 +177,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: No GOOGLE_APPLICATION_CREDENTIALS (simulated by error)
       // AND: High-scoring word
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Application Default Credentials not found')
       );
 
@@ -193,7 +194,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: High-scoring Hebrew word
       // AND: AI unavailable
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Service unavailable')
       );
 
@@ -209,7 +210,7 @@ describe('Wikipedia pipeline edge cases', () => {
       // GIVEN: High-scoring word with numbers
       // AND: AI unavailable
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Service unavailable')
       );
 
@@ -226,7 +227,7 @@ describe('Wikipedia pipeline edge cases', () => {
     it('should handle undefined score gracefully', async () => {
       // GIVEN: No score provided (optional parameter)
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockRejectedValue(
+      (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
         new Error('Timeout')
       );
 
@@ -241,7 +242,7 @@ describe('Wikipedia pipeline edge cases', () => {
     it('should handle AI returning invalid from database check', async () => {
       // GIVEN: Word exists in database but marked invalid
       const { gameAIService } = await import('@/lib/ai-service');
-      (gameAIService.checkDatabaseOnly as jest.Mock).mockResolvedValue({
+      (gameAIService.checkDatabaseOnly as Mock).mockResolvedValue({
         source: 'database',
         isValid: false,
       });
@@ -251,7 +252,7 @@ describe('Wikipedia pipeline edge cases', () => {
 
       // THEN: Should continue to AI validation, not use fallback
       // (because checkDatabaseOnly didn't throw, it just returned invalid)
-      (gameAIService.validateAndSaveWord as jest.Mock).mockResolvedValue({
+      (gameAIService.validateAndSaveWord as Mock).mockResolvedValue({
         isValid: false,
         reason: 'Not a real word',
       });

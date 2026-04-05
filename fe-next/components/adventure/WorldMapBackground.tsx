@@ -54,10 +54,10 @@ export function WorldMapBackground({
 
   // Nebula clouds — pre-blurred radial gradients replace blur(100-120px) filters
   const nebulaClouds = useMemo(() => [
-    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.08)', size: 500 },
-    { left: '75%', top: '35%', color: 'rgba(236, 72, 153, 0.06)', size: 480 },
-    { left: '5%', top: '60%', color: 'rgba(34, 211, 238, 0.07)', size: 460 },
-    { left: '70%', top: '80%', color: 'rgba(251, 191, 36, 0.06)', size: 450 },
+    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.08)', width: 700, height: 350, radius: '60% 40% 55% 45% / 45% 55% 40% 60%' },
+    { left: '65%', top: '35%', color: 'rgba(236, 72, 153, 0.06)', width: 650, height: 300, radius: '45% 55% 60% 40% / 50% 40% 55% 45%' },
+    { left: '0%',  top: '60%', color: 'rgba(34, 211, 238, 0.07)', width: 680, height: 320, radius: '55% 45% 40% 60% / 40% 60% 45% 55%' },
+    { left: '60%', top: '80%', color: 'rgba(251, 191, 36, 0.06)', width: 620, height: 280, radius: '40% 60% 50% 50% / 55% 45% 60% 40%' },
   ], []);
 
   const shootingStars = useMemo(() => [
@@ -88,9 +88,10 @@ export function WorldMapBackground({
             style={{
               left: nebula.left,
               top: nebula.top,
-              width: nebula.size * 2,
-              height: nebula.size * 2,
-              background: `radial-gradient(circle, ${nebula.color} 0%, ${nebula.color.replace(/[\d.]+\)$/, '0)')} 40%, transparent 60%)`,
+              width: nebula.width,
+              height: nebula.height,
+              borderRadius: nebula.radius,
+              background: `radial-gradient(ellipse 70% 50% at 40% 50%, ${nebula.color} 0%, ${nebula.color.replace(/[\d.]+\)$/, '0.03)')} 50%, transparent 70%), radial-gradient(ellipse 50% 60% at 65% 45%, ${nebula.color.replace(/[\d.]+\)$/, '0.05)')} 0%, transparent 60%)`,
               '--nebula-duration': `${12 + i * 2}s`,
             } as React.CSSProperties}
           />

@@ -27,6 +27,7 @@
  */
 
 const EventEmitter = require('events');
+const { registerAllHandlers } = require('../../handlers');
 
 // ==========================================
 // Mock Socket Implementation
@@ -344,7 +345,6 @@ function createTestEnvironment() {
 
       // Register all handlers
       try {
-        const { registerAllHandlers } = require('../../handlers');
         registerAllHandlers(io, socket);
       } catch (e) {
         console.warn('Could not register handlers:', e.message);

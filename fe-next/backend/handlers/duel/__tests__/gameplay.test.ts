@@ -3,6 +3,7 @@
  * TDD tests for score submission and duel completion
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerGameplayHandlers } from '../gameplay';
@@ -12,28 +13,28 @@ import { isWordOnBoardAsync } from '@/backend/modules/wordValidatorPool';
 import { calculateWordScore } from '@/backend/modules/scoringEngine.types';
 
 // Mock dependencies
-jest.mock('@/backend/modules/supabase/client');
-jest.mock('@/backend/modules/wordValidatorPool');
-jest.mock('@/backend/dictionary');
-jest.mock('@/backend/modules/scoringEngine.types');
-jest.mock('@/backend/utils/logger');
+vi.mock('@/backend/modules/supabase/client');
+vi.mock('@/backend/modules/wordValidatorPool');
+vi.mock('@/backend/dictionary');
+vi.mock('@/backend/modules/scoringEngine.types');
+vi.mock('@/backend/utils/logger');
 
-const mockedGetSupabase = jest.mocked(getSupabase);
-const mockedIsDictionaryWord = jest.mocked(isDictionaryWord);
-const mockedIsWordOnBoardAsync = jest.mocked(isWordOnBoardAsync);
-const mockedCalculateWordScore = jest.mocked(calculateWordScore);
+const mockedGetSupabase = vi.mocked(getSupabase);
+const mockedIsDictionaryWord = vi.mocked(isDictionaryWord);
+const mockedIsWordOnBoardAsync = vi.mocked(isWordOnBoardAsync);
+const mockedCalculateWordScore = vi.mocked(calculateWordScore);
 
 describe('Duel Gameplay Handlers', () => {
   let mockSocket: Partial<DuelSocket>;
   let mockNamespace: Partial<Namespace>;
   let mockSupabaseClient: any;
-  let mockFrom: jest.Mock;
+  let mockFrom: Mock;
   let emittedEvents: Array<{ event: string; data: any }>;
   let roomEmittedEvents: Array<{ room: string; event: string; data: any }>;
 
   beforeEach(() => {
     // Clear mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     emittedEvents = [];
     roomEmittedEvents = [];
 
@@ -44,18 +45,18 @@ describe('Duel Gameplay Handlers', () => {
         displayName: 'Player 1',
         classroomIds: ['classroom-1'],
       },
-      emit: jest.fn((event: string, data: any) => {
+      emit: vi.fn((event: string, data: any) => {
         emittedEvents.push({ event, data });
       }),
-      on: jest.fn(),
+      on: vi.fn(),
     } as any;
 
     // Setup mock namespace
     mockNamespace = {
-      to: jest.fn().mockReturnValue({
-        emit: jest.fn((event: string, data: any) => {
-          const roomCall = (mockNamespace.to as jest.Mock).mock.calls[
-            (mockNamespace.to as jest.Mock).mock.calls.length - 1
+      to: vi.fn().mockReturnValue({
+        emit: vi.fn((event: string, data: any) => {
+          const roomCall = (mockNamespace.to as Mock).mock.calls[
+            (mockNamespace.to as Mock).mock.calls.length - 1
           ];
           const room = roomCall[0];
           roomEmittedEvents.push({ room, event, data });
@@ -64,11 +65,11 @@ describe('Duel Gameplay Handlers', () => {
     } as any;
 
     // Setup Supabase mock - configured per test via mockFrom.mockImplementation
-    mockFrom = jest.fn();
+    mockFrom = vi.fn();
 
     mockSupabaseClient = {
       from: mockFrom,
-      rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
+      rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
 
     // Mock getSupabase
@@ -85,9 +86,9 @@ describe('Duel Gameplay Handlers', () => {
 
       // Setup Supabase mock chains
       // Chain 1: Fetch duel
-      const duelSelectMock = jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const duelSelectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: {
               id: '550e8400-e29b-41d4-a716-446655440001',
               status: 'active',
@@ -109,9 +110,9 @@ describe('Duel Gameplay Handlers', () => {
       });
 
       // Chain 2: Fetch lesson
-      const lessonSelectMock = jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const lessonSelectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: { language: 'en' },
             error: null,
           }),
@@ -119,9 +120,9 @@ describe('Duel Gameplay Handlers', () => {
       });
 
       // Chain 3: Insert turn
-      const turnInsertMock = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const turnInsertMock = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 6, words_found: ['test', 'word'] },
             error: null,
           }),
@@ -129,10 +130,10 @@ describe('Duel Gameplay Handlers', () => {
       });
 
       // Chain 4: Update duel
-      const duelUpdateMock = jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+      const duelUpdateMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: '550e8400-e29b-41d4-a716-446655440001',
                 challenger_id: 'user-1',
@@ -184,7 +185,7 @@ describe('Duel Gameplay Handlers', () => {
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
       // Get the registered handler
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -247,9 +248,9 @@ describe('Duel Gameplay Handlers', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'student_duels') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: {
                     id: '550e8400-e29b-41d4-a716-446655440001',
                     status: 'active',
@@ -268,7 +269,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -290,9 +291,9 @@ describe('Duel Gameplay Handlers', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'student_duels') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: {
                     id: '550e8400-e29b-41d4-a716-446655440001',
                     status: 'completed',
@@ -310,7 +311,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -328,19 +329,19 @@ describe('Duel Gameplay Handlers', () => {
       };
 
       // Build full Supabase chain for: duel fetch, lesson fetch, turn insert, duel update
-      const turnInsertMock = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      const turnInsertMock = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 0, words_found: [] },
             error: null,
           }),
         }),
       });
 
-      const duelUpdateMock = jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
+      const duelUpdateMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
               data: {
                 id: '550e8400-e29b-41d4-a716-446655440001',
                 challenger_id: 'user-1',
@@ -357,9 +358,9 @@ describe('Duel Gameplay Handlers', () => {
       mockFrom.mockImplementation((table: string) => {
         if (table === 'student_duels') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: {
                     id: '550e8400-e29b-41d4-a716-446655440001',
                     status: 'active',
@@ -377,9 +378,9 @@ describe('Duel Gameplay Handlers', () => {
         }
         if (table === 'vocabulary_lessons') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: { language: 'en' },
                   error: null,
                 }),
@@ -395,7 +396,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -443,10 +444,10 @@ describe('Duel Gameplay Handlers', () => {
 
       // Build the completion update chain: update -> eq -> eq -> select
       const completionUpdateMock = options.completionResult
-        ? jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                select: jest.fn().mockResolvedValue(options.completionResult),
+        ? vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                select: vi.fn().mockResolvedValue(options.completionResult),
               }),
             }),
           })
@@ -458,9 +459,9 @@ describe('Duel Gameplay Handlers', () => {
           if (studentDuelsCallCount === 1) {
             // First call: fetch duel
             return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
                     data: options.duelData,
                     error: null,
                   }),
@@ -470,10 +471,10 @@ describe('Duel Gameplay Handlers', () => {
           } else if (studentDuelsCallCount === 2) {
             // Second call: update score
             return {
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  select: jest.fn().mockReturnValue({
-                    single: jest.fn().mockResolvedValue({
+              update: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  select: vi.fn().mockReturnValue({
+                    single: vi.fn().mockResolvedValue({
                       data: options.updatedDuelData,
                       error: null,
                     }),
@@ -489,9 +490,9 @@ describe('Duel Gameplay Handlers', () => {
         }
         if (table === 'vocabulary_lessons') {
           return {
-            select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
                   data: { language: 'en' },
                   error: null,
                 }),
@@ -504,9 +505,9 @@ describe('Duel Gameplay Handlers', () => {
           if (duelTurnsCallCount === 1) {
             // First call: insert turn
             return {
-              insert: jest.fn().mockReturnValue({
-                select: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
+              insert: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
                     data: { id: '550e8400-e29b-41d4-a716-446655440002', score: 5, words_found: ['test'] },
                     error: null,
                   }),
@@ -516,8 +517,8 @@ describe('Duel Gameplay Handlers', () => {
           } else {
             // Second call: count query (check if both players submitted)
             return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({
                   count: 2,
                   error: null,
                 }),
@@ -567,7 +568,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -636,7 +637,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -699,7 +700,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -744,7 +745,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -769,7 +770,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 
@@ -786,7 +787,7 @@ describe('Duel Gameplay Handlers', () => {
 
       registerGameplayHandlers(mockNamespace as Namespace, mockSocket as DuelSocket);
 
-      const submitScoreHandler = (mockSocket.on as jest.Mock).mock.calls.find(
+      const submitScoreHandler = (mockSocket.on as Mock).mock.calls.find(
         (call) => call[0] === 'duel:submit-score'
       )?.[1];
 

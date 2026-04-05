@@ -390,6 +390,7 @@ export function LevelUpCelebration({
                   size="md"
                   delay={0.8}
                   className="drop-shadow-lg"
+                  clipBorder="lime"
                 />
               </div>
             )}

@@ -369,6 +369,11 @@ body {
   background-size: 20px 20px, 60px 60px;
 }
 
+/* Hebrew body: use Heebo for clean, modern Hebrew with proper weight support */
+[dir="rtl"] body {
+  font-family: var(--font-heebo-hebrew), var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -589,6 +594,64 @@ body {
       #f5f5f3 100%);
   }
 
+  /* Golden Tile - Full golden gradient for classic MP special tiles */
+  .golden-tile-bg {
+    background: linear-gradient(145deg,
+      #ffe066 0%,
+      #fbbf24 35%,
+      #f59e0b 65%,
+      #d97706 100%) !important;
+    border-color: rgba(180, 120, 0, 0.6) !important;
+  }
+
+  /* Golden tile sparkle crosses (matching adventure tile-gold-sparkle pattern) */
+  .golden-tile-sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .golden-tile-sparkle::before,
+  .golden-tile-sparkle::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 2px;
+  }
+  .golden-tile-sparkle::before {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .golden-tile-sparkle::after {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .golden-tile-sparkle--1 {
+    top: 12%;
+    right: 14%;
+    animation: golden-sparkle-twinkle 1.8s ease-in-out infinite;
+  }
+  .golden-tile-sparkle--2 {
+    bottom: 16%;
+    left: 12%;
+    animation: golden-sparkle-twinkle 1.8s ease-in-out 0.6s infinite;
+  }
+  .golden-tile-sparkle--3 {
+    top: 50%;
+    left: 6%;
+    animation: golden-sparkle-twinkle 1.8s ease-in-out 1.2s infinite;
+  }
+
+  @keyframes golden-sparkle-twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.6); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
   /* Letter Tile Gradient (Cream variant) - For onboarding grids */
   .letter-tile-gradient-cream {
     background:
@@ -724,16 +787,16 @@ body {
     text-shadow: 2px 2px 0px rgb(var(--neo-black));
   }
 
-  /* Hebrew titles: use Rubik (better Hebrew glyph support), no stroke/shadow */
+  /* Hebrew titles: use Heebo for clean feel, no stroke/shadow */
   [dir="rtl"] .neo-title {
-    font-family: var(--font-rubik), Rubik, sans-serif;
+    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
     -webkit-text-stroke: 0;
     text-shadow: none;
     letter-spacing: 0;
   }
 
   [dir="rtl"] .neo-title-sm {
-    font-family: var(--font-rubik), Rubik, sans-serif;
+    font-family: var(--font-heebo-hebrew), var(--font-rubik), Rubik, sans-serif;
     -webkit-text-stroke: 0;
     text-shadow: none;
     letter-spacing: 0;
@@ -1198,6 +1261,98 @@ body {
     25% { filter: brightness(1.3); }
     50% { filter: brightness(1); }
     75% { filter: brightness(1.2); }
+  }
+
+  /* ── Gem glow stages — progressive amber→gold→white as hits deplete ── */
+  .blast-tile-gem-glow-3 {
+    box-shadow: 0 0 8px rgba(255,191,0,0.3), inset 0 0 6px rgba(255,191,0,0.15);
+  }
+  .blast-tile-gem-glow-2 {
+    box-shadow: 0 0 14px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,215,0,0.25);
+    animation: blast-gem-glow-pulse 1.2s ease-in-out infinite;
+  }
+  .blast-tile-gem-glow-1 {
+    box-shadow: 0 0 20px rgba(255,255,200,0.7), inset 0 0 14px rgba(255,255,255,0.35);
+    animation: blast-gem-glow-pulse 0.7s ease-in-out infinite;
+  }
+  @keyframes blast-gem-glow-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+  }
+
+  /* ── Gem golden flash on final clear ── */
+  .blast-tile-gem-golden-flash {
+    animation: blast-gem-golden-flash 350ms ease-out forwards;
+  }
+  @keyframes blast-gem-golden-flash {
+    0% { filter: brightness(2) saturate(1.5); box-shadow: 0 0 30px rgba(255,215,0,0.9); }
+    100% { filter: brightness(1) saturate(1); box-shadow: 0 0 0 transparent; }
+  }
+
+  /* ── Frozen cracked — white crack lines via pseudo-element ── */
+  .blast-tile-frozen-cracked {
+    position: relative;
+  }
+  .blast-tile-frozen-cracked::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background:
+      linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.6) 31%, transparent 32%),
+      linear-gradient(45deg, transparent 55%, rgba(255,255,255,0.5) 56%, transparent 57%),
+      linear-gradient(170deg, transparent 40%, rgba(200,230,255,0.4) 41%, transparent 42%);
+    pointer-events: none;
+    animation: blast-frozen-crack-appear 200ms ease-out forwards;
+  }
+  @keyframes blast-frozen-crack-appear {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Frozen emerge — burst outward when frozen tile clears ── */
+  .blast-tile-frozen-emerge {
+    animation: blast-frozen-emerge 400ms ease-out forwards;
+  }
+  @keyframes blast-frozen-emerge {
+    0% { transform: scale(1); filter: brightness(1.8) hue-rotate(-20deg); opacity: 1; }
+    50% { transform: scale(1.3); filter: brightness(2) hue-rotate(0deg); }
+    100% { transform: scale(0.6); filter: brightness(1); opacity: 0; }
+  }
+
+  /* ── Ice shimmer — traveling highlight sheen ── */
+  .blast-tile-ice-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .blast-tile-ice-shimmer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(200,240,255,0.25) 37%,
+      rgba(255,255,255,0.35) 50%,
+      rgba(200,240,255,0.25) 63%,
+      transparent 75%
+    );
+    background-size: 250% 100%;
+    animation: blast-ice-shimmer 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes blast-ice-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -50% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blast-tile-gem-glow-1,
+    .blast-tile-gem-glow-2 { animation: none; }
+    .blast-tile-gem-golden-flash { animation: none; }
+    .blast-tile-frozen-emerge { animation: none; }
+    .blast-tile-ice-shimmer::before { animation: none; }
   }
 
   /* ── Shared glow pulse: opacity-only for GPU compositing ── */
@@ -2379,13 +2534,11 @@ html {
   overflow: hidden;
 }
 
-/* Game view container - scroll-free, fills viewport exactly */
+/* Game view container - scroll-free, fills available space */
 .game-view-container {
-  height: 100vh;
-  height: 100svh;
-  height: 100dvh;
-  max-height: 100vh;
-  max-height: 100svh;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
   max-height: 100dvh;
   width: 100%;
   overflow: hidden;
@@ -2584,4 +2737,23 @@ body.crazygames-embed .game-view-container,
   animation-name: low-hp-pulse;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
+}
+
+/* ── Round Event Tile Effects ── */
+@keyframes ice-crystal-shimmer {
+  0% { background-position: -100% 0; }
+  50% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@keyframes electric-flicker {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes heat-shimmer {
+  0% { background-position: 0 0; }
+  50% { background-position: 0 -100%; }
+  100% { background-position: 0 0; }
 }

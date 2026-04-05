@@ -3,21 +3,25 @@
  * Tests host kick and auto-kick inactive players
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Server, Socket } from 'socket.io';
 
 // Mock dependencies
-const mockGetGame = jest.fn();
-const mockGetGameBySocketId = jest.fn();
-const mockGetSocketIdByUsername = jest.fn();
-const mockRemoveUserFromGame = jest.fn();
-const mockGetGameUsers = jest.fn();
-const mockGetActiveRooms = jest.fn();
-const mockIsRoomEmpty = jest.fn();
-const mockClearSocketMappingsForLeave = jest.fn();
-const mockGetNextEligibleHost = jest.fn();
-const mockTransferHost = jest.fn();
+const { mockGetGame, mockGetGameBySocketId, mockGetSocketIdByUsername, mockRemoveUserFromGame, mockGetGameUsers, mockGetActiveRooms, mockIsRoomEmpty, mockClearSocketMappingsForLeave, mockGetNextEligibleHost, mockTransferHost } = vi.hoisted(() => {
+  const mockGetGame = vi.fn();
+  const mockGetGameBySocketId = vi.fn();
+  const mockGetSocketIdByUsername = vi.fn();
+  const mockRemoveUserFromGame = vi.fn();
+  const mockGetGameUsers = vi.fn();
+  const mockGetActiveRooms = vi.fn();
+  const mockIsRoomEmpty = vi.fn();
+  const mockClearSocketMappingsForLeave = vi.fn();
+  const mockGetNextEligibleHost = vi.fn();
+  const mockTransferHost = vi.fn();
+  return { mockGetGame, mockGetGameBySocketId, mockGetSocketIdByUsername, mockRemoveUserFromGame, mockGetGameUsers, mockGetActiveRooms, mockIsRoomEmpty, mockClearSocketMappingsForLeave, mockGetNextEligibleHost, mockTransferHost };
+});
 
-jest.mock('../../modules/gameStateManager.js', () => ({
+vi.mock('../../modules/gameStateManager.js', () => ({
   getGame: (...args: unknown[]) => mockGetGame(...args),
   getGameBySocketId: (...args: unknown[]) => mockGetGameBySocketId(...args),
   getSocketIdByUsername: (...args: unknown[]) => mockGetSocketIdByUsername(...args),
@@ -30,14 +34,14 @@ jest.mock('../../modules/gameStateManager.js', () => ({
   transferHost: (...args: unknown[]) => mockTransferHost(...args),
 }));
 
-const mockBroadcastToRoom = jest.fn();
-const mockBroadcastActiveRooms = jest.fn();
-const mockGetGameRoom = jest.fn().mockReturnValue('game:TEST123');
-const mockSafeEmit = jest.fn();
-const mockGetSocketById = jest.fn();
-const mockLeaveRoom = jest.fn();
+const mockBroadcastToRoom = vi.fn();
+const mockBroadcastActiveRooms = vi.fn();
+const mockGetGameRoom = vi.fn().mockReturnValue('game:TEST123');
+const mockSafeEmit = vi.fn();
+const mockGetSocketById = vi.fn();
+const mockLeaveRoom = vi.fn();
 
-jest.mock('../../utils/socketHelpers.js', () => ({
+vi.mock('../../utils/socketHelpers.js', () => ({
   broadcastToRoom: (...args: unknown[]) => mockBroadcastToRoom(...args),
   broadcastActiveRooms: (...args: unknown[]) => mockBroadcastActiveRooms(...args),
   getGameRoom: (...args: unknown[]) => mockGetGameRoom(...args),
@@ -46,23 +50,23 @@ jest.mock('../../utils/socketHelpers.js', () => ({
   leaveRoom: (...args: unknown[]) => mockLeaveRoom(...args),
 }));
 
-const mockCheckRateLimit = jest.fn().mockReturnValue(true);
-jest.mock('../../utils/rateLimiter.js', () => ({
+const mockCheckRateLimit = vi.fn().mockReturnValue(true);
+vi.mock('../../utils/rateLimiter.js', () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
 }));
 
-jest.mock('../../utils/logger.js', () => ({
+vi.mock('../../utils/logger.js', () => ({
   __esModule: true,
-  default: { info: jest.fn(), warn: jest.fn(), debug: jest.fn(), error: jest.fn() },
+  default: { info: vi.fn(), warn: vi.fn(), debug: vi.fn(), error: vi.fn() },
 }));
 
-jest.mock('../../utils/gameStartCoordinator.js', () => {
-  const coordinator = { handlePlayerDisconnect: jest.fn(), cleanupSequence: jest.fn() };
+vi.mock('../../utils/gameStartCoordinator.js', () => {
+  const coordinator = { handlePlayerDisconnect: vi.fn(), cleanupSequence: vi.fn() };
   return { default: coordinator, __esModule: true };
 });
 
-jest.mock('../../utils/playerCleanup.js', () => ({
-  cleanupPlayerData: jest.fn(),
+vi.mock('../../utils/playerCleanup.js', () => ({
+  cleanupPlayerData: vi.fn(),
 }));
 
 import { registerKickHandler } from '../kickHandler';
@@ -72,8 +76,8 @@ function createMockSocket(id = 'host-socket-1'): Socket {
   const handlers: Record<string, Function> = {};
   return {
     id,
-    on: jest.fn((event: string, handler: Function) => { handlers[event] = handler; }),
-    emit: jest.fn(),
+    on: vi.fn((event: string, handler: Function) => { handlers[event] = handler; }),
+    emit: vi.fn(),
     data: {},
     _handlers: handlers,
   } as unknown as Socket & { _handlers: Record<string, Function> };
@@ -82,8 +86,8 @@ function createMockSocket(id = 'host-socket-1'): Socket {
 function createMockIO(): Server {
   return {
     sockets: { sockets: new Map() },
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   } as unknown as Server;
 }
 
@@ -107,7 +111,7 @@ describe('kickHandler', () => {
   let socket: Socket & { _handlers: Record<string, Function> };
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockCheckRateLimit.mockReturnValue(true);
     mockGetGameRoom.mockReturnValue('game:TEST123');
     io = createMockIO();

@@ -1,22 +1,23 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { GameStartCoordinator, type TimeoutStats } from '../gameStartCoordinator';
 
-jest.mock('../logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 describe('GameStartCoordinator', () => {
   let coordinator: GameStartCoordinator;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     coordinator = new GameStartCoordinator();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ==========================================
@@ -143,11 +144,11 @@ describe('GameStartCoordinator', () => {
       // Now re-init with same players to get a new scenario where timer started
       // Actually, let's use the timeout path instead
       const id2 = coordinator.initializeSequence('GAME2', ['alice', 'bob'], 60);
-      coordinator.setAcknowledgmentTimeout('GAME2', 3000, jest.fn());
+      coordinator.setAcknowledgmentTimeout('GAME2', 3000, vi.fn());
       coordinator.recordAcknowledgment('GAME2', 'alice', id2);
 
       // Force timeout - timer starts without bob
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
 
       // bob ACKs late
       const result = coordinator.recordAcknowledgment('GAME2', 'bob', id2);
@@ -163,7 +164,7 @@ describe('GameStartCoordinator', () => {
   describe('race condition: timeout fires before all players ACK', () => {
     it('timeout starts timer with partial ACKs and reports missing players', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 3000, onTimeout);
 
@@ -171,7 +172,7 @@ describe('GameStartCoordinator', () => {
       coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
 
       // Timeout fires
-      jest.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(3000);
 
       expect(onTimeout).toHaveBeenCalledTimes(1);
       const stats: TimeoutStats = onTimeout.mock.calls[0][0];
@@ -187,7 +188,7 @@ describe('GameStartCoordinator', () => {
 
     it('timeout does NOT fire if all ACKs arrive before deadline', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 3000, onTimeout);
 
@@ -195,28 +196,28 @@ describe('GameStartCoordinator', () => {
       coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
 
       // Timeout cleared by allReady path
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       expect(onTimeout).not.toHaveBeenCalled();
     });
 
     it('timeout does NOT fire if sequence was cancelled', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 3000, onTimeout);
       coordinator.cancelSequence('GAME1');
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(onTimeout).not.toHaveBeenCalled();
     });
 
     it('zero ACKs at timeout reports all players missing', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 1000, onTimeout);
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       const stats: TimeoutStats = onTimeout.mock.calls[0][0];
       expect(stats.acknowledged).toBe(0);
@@ -225,10 +226,10 @@ describe('GameStartCoordinator', () => {
 
     it('late ACK after timeout is accepted but marked late', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 1000, onTimeout);
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       // Timer already started via timeout
       expect(onTimeout).toHaveBeenCalled();
@@ -301,7 +302,7 @@ describe('GameStartCoordinator', () => {
 
     it('clears ack timeout when disconnect triggers start', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 3000, onTimeout);
       coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
@@ -310,7 +311,7 @@ describe('GameStartCoordinator', () => {
       coordinator.handlePlayerDisconnect('GAME1', 'bob');
 
       // Timeout should have been cleared
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(onTimeout).not.toHaveBeenCalled();
     });
 
@@ -330,40 +331,40 @@ describe('GameStartCoordinator', () => {
   describe('scheduleRetries', () => {
     it('retries with exponential backoff for failed sends', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const sendFn = jest.fn().mockReturnValue(false); // always fails
+      const sendFn = vi.fn().mockReturnValue(false); // always fails
 
       coordinator.scheduleRetries('GAME1', ['bob'], sendFn);
 
       // 4 retries at 100, 200, 400, 800ms
-      jest.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
       expect(sendFn).toHaveBeenCalledTimes(1);
       expect(sendFn).toHaveBeenCalledWith('bob');
 
-      jest.advanceTimersByTime(200);
+      vi.advanceTimersByTime(200);
       expect(sendFn).toHaveBeenCalledTimes(2);
 
-      jest.advanceTimersByTime(400);
+      vi.advanceTimersByTime(400);
       expect(sendFn).toHaveBeenCalledTimes(3);
 
-      jest.advanceTimersByTime(800);
+      vi.advanceTimersByTime(800);
       expect(sendFn).toHaveBeenCalledTimes(4);
 
       // No more retries after max
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(sendFn).toHaveBeenCalledTimes(4);
     });
 
     it('stops retrying if send succeeds', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const sendFn = jest.fn().mockReturnValue(true); // succeeds first try
+      const sendFn = vi.fn().mockReturnValue(true); // succeeds first try
 
       coordinator.scheduleRetries('GAME1', ['bob'], sendFn);
 
-      jest.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
       expect(sendFn).toHaveBeenCalledTimes(1);
 
       // No further retries since send succeeded
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(sendFn).toHaveBeenCalledTimes(1);
     });
 
@@ -371,27 +372,27 @@ describe('GameStartCoordinator', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
       coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
 
-      const sendFn = jest.fn();
+      const sendFn = vi.fn();
       coordinator.scheduleRetries('GAME1', ['bob'], sendFn);
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(sendFn).not.toHaveBeenCalled();
     });
 
     it('does not retry if sequence cancelled', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const sendFn = jest.fn();
+      const sendFn = vi.fn();
 
       coordinator.scheduleRetries('GAME1', ['bob'], sendFn);
       coordinator.cancelSequence('GAME1');
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(sendFn).not.toHaveBeenCalled();
     });
 
     it('does not retry if timer already started', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      const sendFn = jest.fn().mockReturnValue(false);
+      const sendFn = vi.fn().mockReturnValue(false);
 
       coordinator.scheduleRetries('GAME1', ['bob'], sendFn);
 
@@ -399,7 +400,7 @@ describe('GameStartCoordinator', () => {
       coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
       coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       // retries should not fire since timer started
       expect(sendFn).not.toHaveBeenCalled();
     });
@@ -412,7 +413,7 @@ describe('GameStartCoordinator', () => {
   describe('cancelSequence', () => {
     it('removes sequence and clears all timeouts', () => {
       coordinator.initializeSequence('GAME1', ['alice', 'bob'], 60);
-      coordinator.setAcknowledgmentTimeout('GAME1', 3000, jest.fn());
+      coordinator.setAcknowledgmentTimeout('GAME1', 3000, vi.fn());
 
       coordinator.cancelSequence('GAME1');
 
@@ -494,7 +495,7 @@ describe('GameStartCoordinator', () => {
   describe('disconnect during timeout window', () => {
     it('disconnect resolves sequence before timeout fires', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice', 'bob', 'charlie'], 60);
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       coordinator.setAcknowledgmentTimeout('GAME1', 5000, onTimeout);
 
@@ -503,12 +504,12 @@ describe('GameStartCoordinator', () => {
       coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
 
       // charlie disconnects at 2000ms
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       const result = coordinator.handlePlayerDisconnect('GAME1', 'charlie');
       expect(result).toEqual({ startTimer: true });
 
       // timeout should not fire
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(onTimeout).not.toHaveBeenCalled();
     });
   });

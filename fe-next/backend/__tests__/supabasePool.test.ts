@@ -1,11 +1,12 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getPooledSupabaseClient, checkPoolHealth } from '../db/supabasePool';
 
 // Mock createClient
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        limit: jest.fn(() => Promise.resolve({ data: [{ id: '1' }], error: null })),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        limit: vi.fn(() => Promise.resolve({ data: [{ id: '1' }], error: null })),
       })),
     })),
   })),
@@ -24,7 +25,7 @@ describe('supabasePool', () => {
 
   afterEach(() => {
     process.env = originalEnv;
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it('creates a pooled client with correct config', () => {

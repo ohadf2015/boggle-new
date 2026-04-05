@@ -1,22 +1,23 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerMatchmakingHandlers } from '../matchmakingHandler';
 import { MatchmakingQueue } from '../../services/matchmakingQueue';
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 function createMockSocket(id = 'socket-1') {
   const handlers: Record<string, Function> = {};
   const userId = `user-${id}`;
   return {
     id,
-    on: jest.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: Function) => {
       handlers[event] = handler;
     }),
-    emit: jest.fn(),
+    emit: vi.fn(),
     _handlers: handlers,
     data: { verifiedUserId: userId },
     handshake: { auth: { authUserId: userId } },
@@ -25,10 +26,10 @@ function createMockSocket(id = 'socket-1') {
 
 function createMockIo() {
   const mockSocket = {
-    emit: jest.fn(),
+    emit: vi.fn(),
   };
   return {
-    to: jest.fn(() => mockSocket),
+    to: vi.fn(() => mockSocket),
     _mockSocket: mockSocket,
   };
 }
@@ -39,7 +40,7 @@ describe('matchmakingHandler', () => {
   let queue: MatchmakingQueue;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     io = createMockIo();
     socket = createMockSocket('socket-1');
     queue = new MatchmakingQueue();
@@ -47,7 +48,7 @@ describe('matchmakingHandler', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     queue.destroy();
   });
 
@@ -101,7 +102,7 @@ describe('matchmakingHandler', () => {
     });
 
     // Advance past the matching interval (2s)
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
 
     // Both sockets should receive matchFound via io.to(socketId).emit
     const toCalls = io.to.mock.calls;
@@ -130,7 +131,7 @@ describe('matchmakingHandler', () => {
     });
 
     // Advance 60 seconds
-    jest.advanceTimersByTime(60000);
+    vi.advanceTimersByTime(60000);
 
     expect(socket.emit).toHaveBeenCalledWith('matchmakingTimeout');
   });

@@ -1,30 +1,31 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { handleGiftSend, clearGiftDedup } from '../giftHandler';
 
 // Mock dependencies
-jest.mock('../../utils/logger', () => {
-  const l = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+vi.mock('../../utils/logger', () => {
+  const l = { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() };
   return { __esModule: true, default: l, ...l };
 });
 
-jest.mock('../../utils/socialHelpers', () => ({
-  getAuthUserId: jest.fn(),
-  broadcastToUser: jest.fn(),
-  getUserProfile: jest.fn().mockResolvedValue({ username: 'Alice', displayName: null, avatar: { emoji: '👤', color: '#808080' }, isOnline: true }),
+vi.mock('../../utils/socialHelpers', () => ({
+  getAuthUserId: vi.fn(),
+  broadcastToUser: vi.fn(),
+  getUserProfile: vi.fn().mockResolvedValue({ username: 'Alice', displayName: null, avatar: { emoji: '👤', color: '#808080' }, isOnline: true }),
 }));
 
-jest.mock('../../modules/friendsManager', () => ({
-  areFriends: jest.fn(),
-  isBlocked: jest.fn().mockResolvedValue(false),
+vi.mock('../../modules/friendsManager', () => ({
+  areFriends: vi.fn(),
+  isBlocked: vi.fn().mockResolvedValue(false),
 }));
 
-const mockSupabaseSelect = jest.fn();
-const mockSupabaseRpc = jest.fn();
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn().mockResolvedValue({ data: { coins: 100 }, error: null }),
+const mockSupabaseSelect = vi.fn();
+const mockSupabaseRpc = vi.fn();
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn().mockResolvedValue({ data: { coins: 100 }, error: null }),
           gte: mockSupabaseSelect,
         })),
         head: true,
@@ -41,28 +42,28 @@ import { areFriends } from '../../modules/friendsManager';
 describe('giftHandler', () => {
   const mockSocket = {
     id: 'socket-1',
-    emit: jest.fn(),
+    emit: vi.fn(),
     authUserId: 'user-1',
     data: { verifiedUserId: 'user-1', username: 'Alice' },
   };
 
   const mockIo = {
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     clearGiftDedup();
-    (getAuthUserId as jest.Mock).mockReturnValue('user-1');
-    (areFriends as jest.Mock).mockResolvedValue(true);
+    (getAuthUserId as Mock).mockReturnValue('user-1');
+    (areFriends as Mock).mockResolvedValue(true);
     mockSupabaseSelect.mockResolvedValue({ count: 0, error: null });
     mockSupabaseRpc.mockResolvedValue({ error: null });
   });
 
   describe('handleGiftSend', () => {
     test('should reject unauthenticated user', async () => {
-      (getAuthUserId as jest.Mock).mockReturnValue(null);
+      (getAuthUserId as Mock).mockReturnValue(null);
 
       const result = await handleGiftSend(
         mockSocket as any,
@@ -86,7 +87,7 @@ describe('giftHandler', () => {
     });
 
     test('should reject gift to non-friend', async () => {
-      (areFriends as jest.Mock).mockResolvedValue(false);
+      (areFriends as Mock).mockResolvedValue(false);
 
       const result = await handleGiftSend(
         mockSocket as any,

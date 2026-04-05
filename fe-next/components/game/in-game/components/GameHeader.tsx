@@ -83,7 +83,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
         <ExitRoomButton
           onClick={onExitRoom}
           label={t('playerView.exit')}
-          className="w-10 h-10 md:w-12 md:h-12"
+          className="!min-h-[40px] !min-w-[40px] w-10 h-10 md:w-12 md:h-12 !border-2 !shadow-hard-sm !text-xs !px-2"
         />
       )}
       {onShowTutorial && (

@@ -32,6 +32,8 @@ const {
   getCacheStats,
   addWordToBlacklist,
 } = require('./botBehavior');
+import { getRecentGames } from '../services/playerGameHistory';
+import { calculatePlayerLevel, selectBotDifficulty } from '../services/adaptiveDifficulty';
 import logger from '../utils/logger';
 
 // Re-export types
@@ -114,9 +116,6 @@ export async function addBotWithAdaptiveDifficulty(
 
   if (userId) {
     try {
-      const { getRecentGames } = require('../services/playerGameHistory');
-      const { calculatePlayerLevel, selectBotDifficulty } = require('../services/adaptiveDifficulty');
-
       const recentGames = await getRecentGames(userId);
       const playerLevel = await calculatePlayerLevel(recentGames);
       difficulty = selectBotDifficulty(playerLevel);

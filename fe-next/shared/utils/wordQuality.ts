@@ -41,11 +41,23 @@ const WORD_BLACKLIST = new Set([
 ]);
 
 /**
+ * Hebrew words that should NEVER appear as Word Hunt targets.
+ * Rare/obscure words that most players won't recognize.
+ */
+const HEBREW_WORD_BLACKLIST = new Set([
+  'רומבולה',    // Rombula - obscure Italian lottery game
+  'פיליבסטר',  // Filibuster - political jargon, too niche
+]);
+
+/**
  * Check if a word passes quality filters for Word Hunt target selection.
  * Applied when falling back to non-curated dictionary words.
  */
-export function isWordHuntQuality(word: string): boolean {
+export function isWordHuntQuality(word: string, language?: string): boolean {
   const lower = word.toLowerCase();
+
+  // Language-specific blacklists
+  if (language === 'he' && HEBREW_WORD_BLACKLIST.has(word)) return false;
 
   if (WORD_BLACKLIST.has(lower)) return false;
   if (lower.length < 4) return false;

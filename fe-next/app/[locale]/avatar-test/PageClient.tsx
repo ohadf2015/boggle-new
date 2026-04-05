@@ -137,6 +137,7 @@ export default function AvatarTestPageClient() {
         onClose={() => setIsBuilderOpen(false)}
         onSave={setSavedConfig}
         initialConfig={savedConfig}
+        premium={null}
       />
     </div>
   );

@@ -460,6 +460,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         size="2xl"
                         animated={true}
                         className="drop-shadow-2xl"
+                        clipBorder="cyan"
                       />
                     </motion.div>
 

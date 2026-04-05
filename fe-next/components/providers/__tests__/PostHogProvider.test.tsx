@@ -65,29 +65,15 @@ describe('PostHogProvider', () => {
     delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
   });
 
-  it('initializes PostHog with opt_out_capturing_by_default', () => {
+  it('initializes PostHog with capturing enabled by default', () => {
     render(<PostHogProvider><div>child</div></PostHogProvider>);
 
     expect(ph.init).toHaveBeenCalledWith('test-key', expect.objectContaining({
       api_host: 'https://us.i.posthog.com',
-      opt_out_capturing_by_default: true,
+      opt_out_capturing_by_default: false,
       capture_pageview: false,
       capture_pageleave: true,
     }));
-  });
-
-  it('opts in when analytics consent is already granted', () => {
-    mockHasConsentValue = true;
-    render(<PostHogProvider><div>child</div></PostHogProvider>);
-
-    expect(ph.opt_in_capturing).toHaveBeenCalled();
-  });
-
-  it('stays opted out when analytics consent is denied', () => {
-    mockHasConsentValue = false;
-    render(<PostHogProvider><div>child</div></PostHogProvider>);
-
-    expect(ph.opt_in_capturing).not.toHaveBeenCalled();
   });
 
   it('subscribes to consent changes', () => {

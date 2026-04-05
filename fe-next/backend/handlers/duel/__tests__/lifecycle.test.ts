@@ -3,21 +3,22 @@
  * Tests for create, accept, decline, cancel duel handlers
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from '../types';
 import { registerLifecycleHandlers } from '../lifecycle';
 import { generateRandomTable } from '@/backend/utils/gameUtils';
 
 // Mock dependencies
-jest.mock('@/backend/utils/logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('@/backend/utils/logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
-jest.mock('@/backend/utils/gameUtils', () => ({
-  generateRandomTable: jest.fn(() => [
+vi.mock('@/backend/utils/gameUtils', () => ({
+  generateRandomTable: vi.fn(() => [
     ['A', 'B', 'C', 'D'],
     ['E', 'F', 'G', 'H'],
     ['I', 'J', 'K', 'L'],
@@ -26,27 +27,27 @@ jest.mock('@/backend/utils/gameUtils', () => ({
 }));
 
 // Mock Supabase
-const mockSupabaseFrom = jest.fn();
-const mockSupabaseSelect = jest.fn();
-const mockSupabaseEq = jest.fn();
-const mockSupabaseSingle = jest.fn();
-const mockSupabaseInsert = jest.fn();
-const mockSupabaseUpdate = jest.fn();
+const mockSupabaseFrom = vi.fn();
+const mockSupabaseSelect = vi.fn();
+const mockSupabaseEq = vi.fn();
+const mockSupabaseSingle = vi.fn();
+const mockSupabaseInsert = vi.fn();
+const mockSupabaseUpdate = vi.fn();
 
-jest.mock('@/backend/modules/supabase/client', () => ({
-  getSupabase: jest.fn(() => ({
+vi.mock('@/backend/modules/supabase/client', () => ({
+  getSupabase: vi.fn(() => ({
     from: mockSupabaseFrom,
   })),
 }));
 
 describe('Duel Lifecycle Handlers', () => {
-  let mockNamespace: jest.Mocked<Namespace>;
-  let mockSocket: jest.Mocked<DuelSocket>;
+  let mockNamespace: Mocked<Namespace>;
+  let mockSocket: Mocked<DuelSocket>;
   let socketHandlers: Record<string, Function>;
-  let opponentSocket: jest.Mocked<DuelSocket>;
+  let opponentSocket: Mocked<DuelSocket>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Reset Supabase mock chains for read operations
     mockSupabaseFrom.mockReturnValue({
@@ -72,8 +73,8 @@ describe('Duel Lifecycle Handlers', () => {
     });
 
     // Insert chain (for duel:create)
-    const mockInsertSelect = jest.fn();
-    const mockInsertSingle = jest.fn();
+    const mockInsertSelect = vi.fn();
+    const mockInsertSingle = vi.fn();
     mockInsertSelect.mockReturnValue({
       single: mockInsertSingle,
     });
@@ -86,10 +87,10 @@ describe('Duel Lifecycle Handlers', () => {
     });
 
     // Update chain (for duel:accept)
-    const mockUpdateEq1 = jest.fn();
-    const mockUpdateEq2 = jest.fn();
-    const mockUpdateSelect = jest.fn();
-    const mockUpdateSingle = jest.fn();
+    const mockUpdateEq1 = vi.fn();
+    const mockUpdateEq2 = vi.fn();
+    const mockUpdateSelect = vi.fn();
+    const mockUpdateSingle = vi.fn();
 
     mockUpdateEq1.mockReturnValue({
       eq: mockUpdateEq2,
@@ -117,29 +118,29 @@ describe('Duel Lifecycle Handlers', () => {
         displayName: 'TestUser',
         classroomIds: ['classroom-1'],
       },
-      on: jest.fn((event: string, handler: Function) => {
+      on: vi.fn((event: string, handler: Function) => {
         socketHandlers[event] = handler;
       }),
-      emit: jest.fn(),
-      join: jest.fn(),
-    } as unknown as jest.Mocked<DuelSocket>;
+      emit: vi.fn(),
+      join: vi.fn(),
+    } as unknown as Mocked<DuelSocket>;
 
     // Create opponent socket mock
     opponentSocket = {
       id: 'opponent-socket-id',
       data: { userId: '550e8400-e29b-41d4-a716-446655440099', displayName: 'OpponentUser', classroomIds: [] },
-      emit: jest.fn(),
-      join: jest.fn(),
-    } as unknown as jest.Mocked<DuelSocket>;
+      emit: vi.fn(),
+      join: vi.fn(),
+    } as unknown as Mocked<DuelSocket>;
 
     // Mock namespace
     mockNamespace = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn(),
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn(),
       sockets: new Map([
         ['opponent-socket-id', opponentSocket],
       ]),
-    } as unknown as jest.Mocked<Namespace>;
+    } as unknown as Mocked<Namespace>;
 
     // Register handlers
     registerLifecycleHandlers(mockNamespace, mockSocket);

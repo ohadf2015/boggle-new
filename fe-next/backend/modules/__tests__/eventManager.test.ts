@@ -3,6 +3,7 @@
  * Tests for seasonal/limited-time events framework
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   getActiveEvents,
   getUpcomingEvents,
@@ -23,12 +24,12 @@ const callLog: Array<{ method: string; args: unknown[] }> = [];
 let singleResults: Array<{ data: unknown; error: unknown }> = [];
 let singleCallIndex = 0;
 
-function createChain(terminalData: { data: unknown[]; error: null } = { data: [], error: null }): Record<string, jest.Mock> {
-  const chain: Record<string, jest.Mock> = {};
+function createChain(terminalData: { data: unknown[]; error: null } = { data: [], error: null }): Record<string, Mock> {
+  const chain: Record<string, Mock> = {};
   const methods = ['select', 'insert', 'update', 'eq', 'gte', 'lte', 'lt', 'order', 'limit', 'single', 'from'];
 
   for (const method of methods) {
-    chain[method] = jest.fn((...args: unknown[]) => {
+    chain[method] = vi.fn((...args: unknown[]) => {
       callLog.push({ method, args });
       if (method === 'single') {
         const result = singleResults[singleCallIndex] ?? { data: null, error: null };
@@ -52,9 +53,9 @@ function createChain(terminalData: { data: unknown[]; error: null } = { data: []
   return chain;
 }
 
-let mockChain: Record<string, jest.Mock>;
+let mockChain: Record<string, Mock>;
 
-jest.mock('../supabaseServer', () => ({
+vi.mock('../supabaseServer', () => ({
   getSupabase: () => ({
     from: (...args: unknown[]) => {
       callLog.push({ method: 'from', args });

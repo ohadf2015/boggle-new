@@ -5,17 +5,18 @@
  * TDD: RED phase - These tests MUST fail initially
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Socket } from 'socket.io';
 import type { GameState } from '../../modules/gameState/types';
 
 // Mock dependencies
-jest.mock('../../modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
+vi.mock('../../modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
 }));
 
-jest.mock('../../../hooks/wordIntegrationLogic', () => ({
-  checkWordIntegration: jest.fn(),
+vi.mock('../../../hooks/wordIntegrationLogic', () => ({
+  checkWordIntegration: vi.fn(),
 }));
 
 import { getGame, getGameBySocketId } from '../../modules/gameStateManager';
@@ -25,15 +26,15 @@ import { checkWordIntegration } from '@/hooks/wordIntegrationLogic';
 import { handleSelectVocabularyWord, registerVocabularyHandlers } from '../vocabularyHandler';
 
 describe('vocabularyHandler', () => {
-  let mockSocket: jest.Mocked<Socket>;
+  let mockSocket: Mocked<Socket>;
   let mockGame: GameState;
 
   beforeEach(() => {
     // Create mock socket with writable id
     mockSocket = {
-      emit: jest.fn(),
-      on: jest.fn(),
-    } as unknown as jest.Mocked<Socket>;
+      emit: vi.fn(),
+      on: vi.fn(),
+    } as unknown as Mocked<Socket>;
     Object.defineProperty(mockSocket, 'id', {
       value: 'host-socket-123',
       writable: true,
@@ -71,12 +72,12 @@ describe('vocabularyHandler', () => {
     } as GameState;
 
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup default mock returns
-    (getGame as jest.Mock).mockReturnValue(mockGame);
-    (getGameBySocketId as jest.Mock).mockReturnValue('TEST123');
-    (checkWordIntegration as jest.Mock).mockReturnValue({
+    (getGame as Mock).mockReturnValue(mockGame);
+    (getGameBySocketId as Mock).mockReturnValue('TEST123');
+    (checkWordIntegration as Mock).mockReturnValue({
       word: 'cat',
       canIntegrate: true,
       reason: undefined,
@@ -195,7 +196,7 @@ describe('vocabularyHandler', () => {
     it('should normalize word before adding (uppercase to lowercase)', async () => {
       // GIVEN: Uppercase word
       const payload = { word: 'ELEPHANT', include: true };
-      (checkWordIntegration as jest.Mock).mockReturnValue({
+      (checkWordIntegration as Mock).mockReturnValue({
         word: 'elephant',
         canIntegrate: true,
         reason: undefined,
@@ -214,7 +215,7 @@ describe('vocabularyHandler', () => {
     it('should include canIntegrate status from useWordIntegration', async () => {
       // GIVEN: Word that cannot be integrated
       const payload = { word: 'XYZ', include: true };
-      (checkWordIntegration as jest.Mock).mockReturnValue({
+      (checkWordIntegration as Mock).mockReturnValue({
         word: 'xyz',
         canIntegrate: false,
         reason: 'word_not_in_dictionary',
@@ -243,7 +244,7 @@ describe('vocabularyHandler', () => {
     it('should handle multiple selected words', async () => {
       // GIVEN: Multiple words already selected
       mockGame.selectedVocabulary = new Set(['CAT', 'DOG', 'BIRD']);
-      (checkWordIntegration as jest.Mock).mockImplementation((word: string) => ({
+      (checkWordIntegration as Mock).mockImplementation((word: string) => ({
         word: word.toLowerCase(),
         canIntegrate: true,
         reason: undefined,
@@ -271,7 +272,7 @@ describe('vocabularyHandler', () => {
   describe('registerVocabularyHandlers', () => {
     it('should register selectVocabularyWord event handler', () => {
       // GIVEN: Mock socket and getGame function
-      const mockGetGame = jest.fn().mockReturnValue(mockGame);
+      const mockGetGame = vi.fn().mockReturnValue(mockGame);
 
       // WHEN: Registering handlers
       registerVocabularyHandlers(mockSocket, mockGetGame);

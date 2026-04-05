@@ -3,30 +3,33 @@
  * Tests auto-promotion logic for high-scoring validated words
  */
 
-import { jest } from '@jest/globals';
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Language } from '@/shared/types/game';
 
 // Mock dependencies
-const mockValidateWordWithAI = jest.fn<() => Promise<{ valid: boolean; reason: string }>>();
-const mockUpdateWordValidationStatus = jest.fn<() => Promise<void>>();
-const mockCheckDatabaseOnly = jest.fn<() => Promise<{ source: string; isValid: boolean }>>();
-const mockValidateAndSaveWord = jest.fn<() => Promise<{ isValid: boolean; source: string }>>();
+const { mockValidateWordWithAI, mockUpdateWordValidationStatus, mockCheckDatabaseOnly, mockValidateAndSaveWord } = vi.hoisted(() => {
+  const mockValidateWordWithAI = vi.fn<() => Promise<{ valid: boolean; reason: string }>>();
+  const mockUpdateWordValidationStatus = vi.fn<() => Promise<void>>();
+  const mockCheckDatabaseOnly = vi.fn<() => Promise<{ source: string; isValid: boolean }>>();
+  const mockValidateAndSaveWord = vi.fn<() => Promise<{ isValid: boolean; source: string }>>();
+  return { mockValidateWordWithAI, mockUpdateWordValidationStatus, mockCheckDatabaseOnly, mockValidateAndSaveWord };
+});
 
-jest.unstable_mockModule('@/utils/dailyChallenge/wikipediaWordProcessor', () => ({
+vi.mock('@/utils/dailyChallenge/wikipediaWordProcessor', () => ({
   validateWordWithAI: mockValidateWordWithAI,
   updateWordValidationStatus: mockUpdateWordValidationStatus,
-  rankWordsByInterest: jest.fn<(candidates: unknown) => Array<{ word: string; score: number; source: string; url?: string }>>((candidates: unknown) => {
+  rankWordsByInterest: vi.fn<(candidates: unknown) => Array<{ word: string; score: number; source: string; url?: string }>>((candidates: unknown) => {
     const candidateList = candidates as Array<{ word: string; score: number; source: string; url?: string }>;
     return candidateList.map(c => c);
   }),
-  getRecentlyUsedWords: jest.fn<() => Promise<Set<string>>>().mockResolvedValue(new Set<string>()),
-  selectBestWord: jest.fn<(candidates: unknown) => { word: string; score: number; source: string; url?: string } | null>((candidates: unknown) => {
+  getRecentlyUsedWords: vi.fn<() => Promise<Set<string>>>().mockResolvedValue(new Set<string>()),
+  selectBestWord: vi.fn<(candidates: unknown) => { word: string; score: number; source: string; url?: string } | null>((candidates: unknown) => {
     const candidateList = candidates as Array<{ word: string; score: number; source: string; url?: string }>;
     return candidateList[0] || null;
   }),
 }));
 
-jest.unstable_mockModule('@/lib/ai-service', () => ({
+vi.mock('@/lib/ai-service', () => ({
   gameAIService: {
     checkDatabaseOnly: mockCheckDatabaseOnly,
     validateAndSaveWord: mockValidateAndSaveWord,
@@ -35,7 +38,7 @@ jest.unstable_mockModule('@/lib/ai-service', () => ({
 
 describe('auto-promotion of high-scoring candidates', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should promote validated words with score >= 80 to community_words', async () => {

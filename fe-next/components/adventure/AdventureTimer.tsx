@@ -36,8 +36,11 @@ interface AdventureTimerProps {
    * (legacy callers, tests that pass the value directly).
    */
   timeRemaining?: number;
-  /** Size variant */
-  size?: 'compact' | 'normal' | 'large';
+  /**
+   * Size variant.
+   * - `embedded`: no border/bg/icon — just digits, for nesting inside another pill.
+   */
+  size?: 'compact' | 'normal' | 'large' | 'embedded';
   /** Additional CSS classes */
   className?: string;
 }
@@ -49,7 +52,7 @@ interface FlipDigitProps {
 
 interface AdventureTimerDisplayProps {
   timeRemaining: number;
-  size: 'compact' | 'normal' | 'large';
+  size: 'compact' | 'normal' | 'large' | 'embedded';
   className?: string;
 }
 
@@ -122,14 +125,18 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
     const isCritical = urgencyState === 'critical';
     const shouldPulse = isDanger;
 
+    const isEmbedded = size === 'embedded';
+
     // Size classes
-    const sizeClasses = {
+    const sizeClasses: Record<string, string> = {
+      embedded: 'text-xs gap-0',
       compact: 'text-sm sm:text-base px-2.5 py-1.5 gap-1.5',
       normal: 'text-lg px-3 py-2 gap-2',
       large: 'text-3xl px-4 py-3 gap-3',
     };
 
-    const iconSizes = {
+    const iconSizes: Record<string, string> = {
+      embedded: 'w-3 h-3',
       compact: 'w-4 h-4 sm:w-5 sm:h-5',
       normal: 'w-5 h-5',
       large: 'w-8 h-8',
@@ -145,12 +152,12 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
         aria-label={`${timeRemaining} seconds remaining`}
         aria-live={isDanger ? 'assertive' : 'polite'}
         className={cn(
-          'flex items-center rounded-neo border-2 font-black backdrop-blur-sm',
+          'flex items-center font-black',
           'transition-all duration-300',
           sizeClasses[size],
-          themeLevel.bg,
-          themeLevel.text,
-          themeLevel.shadow,
+          isEmbedded
+            ? cn('relative', isDanger ? 'text-neo-red' : themeLevel.text)
+            : cn('rounded-neo border-2 backdrop-blur-sm', themeLevel.bg, themeLevel.text, themeLevel.shadow),
           className
         )}
         animate={shouldPulse ? {
@@ -158,19 +165,21 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
         } : {}}
         transition={{ duration: 0.5, repeat: shouldPulse ? Infinity : 0 }}
       >
-        {/* Icon */}
-        <div className="relative">
-          {isCritical ? (
-            <AdaptiveMotion.div
-              animate={{ rotate: [0, 15, -15, 0] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            >
-              <AlertTriangle className={iconSizes[size]} />
-            </AdaptiveMotion.div>
-          ) : (
-            <Clock className={iconSizes[size]} />
-          )}
-        </div>
+        {/* Icon — hidden in embedded mode */}
+        {!isEmbedded && (
+          <div className="relative">
+            {isCritical ? (
+              <AdaptiveMotion.div
+                animate={{ rotate: [0, 15, -15, 0] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+              >
+                <AlertTriangle className={iconSizes[size]} />
+              </AdaptiveMotion.div>
+            ) : (
+              <Clock className={iconSizes[size]} />
+            )}
+          </div>
+        )}
 
         {/* Time display with flip animation */}
         <div dir="ltr" className="flex items-center font-mono tabular-nums">
@@ -192,8 +201,8 @@ const AdventureTimerDisplay = memo<AdventureTimerDisplayProps>(
           <FlipDigit digit={secOnes} />
         </div>
 
-        {/* Urgency glow effect — opacity-only animation (GPU-composited) */}
-        {isDanger && (
+        {/* Urgency glow effect — hidden in embedded mode (parent handles theming) */}
+        {isDanger && !isEmbedded && (
           <AdaptiveMotion.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             style={{ boxShadow: '0 0 25px rgba(255, 0, 0, 0.6)' }}

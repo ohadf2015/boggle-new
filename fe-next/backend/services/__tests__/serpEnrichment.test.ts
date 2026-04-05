@@ -3,12 +3,13 @@
  * Verifies that trends are enriched with news articles, related searches, and PAA
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { enrichTrendWithNews, enrichTrendsWithNews, type TrendingTopic } from '../serpApiClient';
 import axios from 'axios';
 
 // Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
 describe('SERP API Trend Enrichment', () => {
   const mockTrend: TrendingTopic = {
@@ -20,7 +21,7 @@ describe('SERP API Trend Enrichment', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     process.env.SERPAPI_KEY = 'test-api-key';
   });
 
@@ -135,7 +136,7 @@ describe('SERP API Trend Enrichment', () => {
     });
 
     it('should add delays between API calls to avoid rate limiting', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       const trends = [
         { ...mockTrend, query: 'Trend 1' },
@@ -147,13 +148,13 @@ describe('SERP API Trend Enrichment', () => {
       const enrichPromise = enrichTrendsWithNews(trends, 'en', 2);
 
       // Fast-forward through delays
-      await jest.runAllTimersAsync();
+      await vi.runAllTimersAsync();
 
       const enriched = await enrichPromise;
 
       expect(enriched).toHaveLength(2);
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 });

@@ -5,17 +5,33 @@
  * TDD RED phase - test before implementation
  */
 
-import { addBotWithAdaptiveDifficulty } from '../botManager';
-import { getRecentGames } from '../../services/playerGameHistory';
-import { calculatePlayerLevel, selectBotDifficulty } from '../../services/adaptiveDifficulty';
+import { vi, type Mock } from 'vitest';
 
-// Mock dependencies
-jest.mock('../../services/playerGameHistory');
-jest.mock('../../services/adaptiveDifficulty');
+// Mock logger to suppress output
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn(),
+} }));
+
+const { mockGetRecentGames, mockCalculatePlayerLevel, mockSelectBotDifficulty } = vi.hoisted(() => ({
+  mockGetRecentGames: vi.fn(),
+  mockCalculatePlayerLevel: vi.fn(),
+  mockSelectBotDifficulty: vi.fn(),
+}));
+
+vi.mock('../../services/playerGameHistory', () => ({
+  getRecentGames: mockGetRecentGames,
+}));
+
+vi.mock('../../services/adaptiveDifficulty', () => ({
+  calculatePlayerLevel: mockCalculatePlayerLevel,
+  selectBotDifficulty: mockSelectBotDifficulty,
+}));
+
+import { addBotWithAdaptiveDifficulty } from '../botManager';
 
 describe('botManager - Adaptive Difficulty', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('addBotWithAdaptiveDifficulty', () => {
@@ -29,18 +45,18 @@ describe('botManager - Adaptive Difficulty', () => {
         ...Array(8).fill({ placement: 2, score: 50, wordCount: 5 }), // Losses
       ];
 
-      (getRecentGames as jest.Mock).mockResolvedValue(recentGames);
-      (calculatePlayerLevel as jest.Mock).mockResolvedValue('beginner');
-      (selectBotDifficulty as jest.Mock).mockReturnValue('easy');
+      mockGetRecentGames.mockResolvedValue(recentGames);
+      mockCalculatePlayerLevel.mockResolvedValue('beginner');
+      mockSelectBotDifficulty.mockReturnValue('easy');
 
       // WHEN
       const bot = await addBotWithAdaptiveDifficulty(gameCode, userId);
 
       // THEN - Bot should have easy difficulty
       expect(bot.difficulty).toBe('easy');
-      expect(getRecentGames).toHaveBeenCalledWith(userId);
-      expect(calculatePlayerLevel).toHaveBeenCalledWith(recentGames);
-      expect(selectBotDifficulty).toHaveBeenCalledWith('beginner');
+      expect(mockGetRecentGames).toHaveBeenCalledWith(userId);
+      expect(mockCalculatePlayerLevel).toHaveBeenCalledWith(recentGames);
+      expect(mockSelectBotDifficulty).toHaveBeenCalledWith('beginner');
     });
 
     it('should create medium bot for intermediate players', async () => {
@@ -52,9 +68,9 @@ describe('botManager - Adaptive Difficulty', () => {
         ...Array(5).fill({ placement: 2, score: 50, wordCount: 5 }),   // Losses
       ];
 
-      (getRecentGames as jest.Mock).mockResolvedValue(recentGames);
-      (calculatePlayerLevel as jest.Mock).mockResolvedValue('intermediate');
-      (selectBotDifficulty as jest.Mock).mockReturnValue('medium');
+      mockGetRecentGames.mockResolvedValue(recentGames);
+      mockCalculatePlayerLevel.mockResolvedValue('intermediate');
+      mockSelectBotDifficulty.mockReturnValue('medium');
 
       // WHEN
       const bot = await addBotWithAdaptiveDifficulty(gameCode, userId);
@@ -72,9 +88,9 @@ describe('botManager - Adaptive Difficulty', () => {
         ...Array(2).fill({ placement: 2, score: 50, wordCount: 5 }),   // Losses
       ];
 
-      (getRecentGames as jest.Mock).mockResolvedValue(recentGames);
-      (calculatePlayerLevel as jest.Mock).mockResolvedValue('advanced');
-      (selectBotDifficulty as jest.Mock).mockReturnValue('hard');
+      mockGetRecentGames.mockResolvedValue(recentGames);
+      mockCalculatePlayerLevel.mockResolvedValue('advanced');
+      mockSelectBotDifficulty.mockReturnValue('hard');
 
       // WHEN
       const bot = await addBotWithAdaptiveDifficulty(gameCode, userId);
@@ -88,9 +104,9 @@ describe('botManager - Adaptive Difficulty', () => {
       const gameCode = 'TEST000';
       const userId = 'user-new';
 
-      (getRecentGames as jest.Mock).mockResolvedValue([]);
-      (calculatePlayerLevel as jest.Mock).mockResolvedValue('beginner');
-      (selectBotDifficulty as jest.Mock).mockReturnValue('easy');
+      mockGetRecentGames.mockResolvedValue([]);
+      mockCalculatePlayerLevel.mockResolvedValue('beginner');
+      mockSelectBotDifficulty.mockReturnValue('easy');
 
       // WHEN
       const bot = await addBotWithAdaptiveDifficulty(gameCode, userId);
@@ -109,8 +125,8 @@ describe('botManager - Adaptive Difficulty', () => {
 
       // THEN - Should use manual difficulty, no adaptive logic called
       expect(bot.difficulty).toBe(manualDifficulty);
-      expect(getRecentGames).not.toHaveBeenCalled();
-      expect(calculatePlayerLevel).not.toHaveBeenCalled();
+      expect(mockGetRecentGames).not.toHaveBeenCalled();
+      expect(mockCalculatePlayerLevel).not.toHaveBeenCalled();
     });
 
     it('should handle errors gracefully and default to medium difficulty', async () => {
@@ -118,7 +134,7 @@ describe('botManager - Adaptive Difficulty', () => {
       const gameCode = 'TEST222';
       const userId = 'user-error';
 
-      (getRecentGames as jest.Mock).mockRejectedValue(new Error('Database error'));
+      mockGetRecentGames.mockRejectedValue(new Error('Database error'));
 
       // WHEN
       const bot = await addBotWithAdaptiveDifficulty(gameCode, userId);

@@ -5,17 +5,18 @@
  * TDD RED phase - test before implementation
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getRecentGames } from '../playerGameHistory';
 import { getSupabase } from '../../modules/supabase';
 
 // Mock Supabase
-jest.mock('../../modules/supabase', () => ({
-  getSupabase: jest.fn(),
+vi.mock('../../modules/supabase', () => ({
+  getSupabase: vi.fn(),
 }));
 
 describe('playerGameHistory', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getRecentGames', () => {
@@ -31,11 +32,11 @@ describe('playerGameHistory', () => {
           created_at: new Date(Date.now() - i * 1000000).toISOString(),
         }));
 
-      const mockFrom = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue({
                 data: mockGames,
                 error: null,
               }),
@@ -44,7 +45,7 @@ describe('playerGameHistory', () => {
         }),
       });
 
-      (getSupabase as jest.Mock).mockReturnValue({
+      (getSupabase as Mock).mockReturnValue({
         from: mockFrom,
       });
 
@@ -65,11 +66,11 @@ describe('playerGameHistory', () => {
       // GIVEN - User with no games
       const userId = 'user-456';
 
-      const mockFrom = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue({
                 data: [],
                 error: null,
               }),
@@ -78,7 +79,7 @@ describe('playerGameHistory', () => {
         }),
       });
 
-      (getSupabase as jest.Mock).mockReturnValue({
+      (getSupabase as Mock).mockReturnValue({
         from: mockFrom,
       });
 
@@ -93,11 +94,11 @@ describe('playerGameHistory', () => {
       // GIVEN - Database error
       const userId = 'user-789';
 
-      const mockFrom = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue({
                 data: null,
                 error: { message: 'Database error' },
               }),
@@ -106,7 +107,7 @@ describe('playerGameHistory', () => {
         }),
       });
 
-      (getSupabase as jest.Mock).mockReturnValue({
+      (getSupabase as Mock).mockReturnValue({
         from: mockFrom,
       });
 
@@ -126,11 +127,11 @@ describe('playerGameHistory', () => {
         { placement: 1, score: 90, word_count: 9, created_at: new Date().toISOString() },
       ];
 
-      const mockFrom = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue({
+      const mockFrom = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue({
                 data: mockGames,
                 error: null,
               }),
@@ -139,7 +140,7 @@ describe('playerGameHistory', () => {
         }),
       });
 
-      (getSupabase as jest.Mock).mockReturnValue({
+      (getSupabase as Mock).mockReturnValue({
         from: mockFrom,
       });
 

@@ -3,44 +3,39 @@
  * Verifies that the first-finder bonus is applied to player score.
  */
 
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  updatePlayerScore: jest.fn(),
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  updatePlayerScore: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
-  validateTargetGuess: jest.fn(),
-  recordTargetFound: jest.fn(),
-  penalizeWrongGuess: jest.fn(),
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  validateTargetGuess: vi.fn(),
+  recordTargetFound: vi.fn(),
+  penalizeWrongGuess: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockImplementation((code: string) => `game:${code}`),
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockImplementation((code: string) => `game:${code}`),
 }));
 
-jest.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
-  endGame: jest.fn(),
+vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
+  endGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
-}));
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
 
-const {
-  getGame,
+import { vi, type Mock, type MockInstance } from 'vitest';
+import { getGame,
   getGameBySocketId,
   getUsernameBySocketId,
-  updatePlayerScore,
-} = require('../../../backend/modules/gameStateManager');
-
-const {
-  validateTargetGuess,
-  recordTargetFound,
-} = require('../../../backend/modules/wordHuntManager');
-
+  updatePlayerScore, } from '../../../backend/modules/gameStateManager';
+import { validateTargetGuess,
+  recordTargetFound, } from '../../../backend/modules/wordHuntManager';
 import { handleSubmitTargetWord } from '../wordHuntHandler';
 
 function makeHuntGame() {
@@ -62,14 +57,14 @@ function makeHuntGame() {
 function makeMockSocket() {
   return {
     id: 'socket-p1',
-    emit: jest.fn(),
+    emit: vi.fn(),
   };
 }
 
 describe('wordHuntHandler - first finder bonus scoring', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.clearAllMocks();
+    vi.useFakeTimers();
+    vi.clearAllMocks();
     getGameBySocketId.mockReturnValue('HUNT1');
     getUsernameBySocketId.mockReturnValue('player1');
     getGame.mockReturnValue(makeHuntGame());
@@ -81,7 +76,7 @@ describe('wordHuntHandler - first finder bonus scoring', () => {
     recordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 500 });
 
     const socket = makeMockSocket();
-    const io = { on: jest.fn() } as any;
+    const io = { on: vi.fn() } as any;
 
     // WHEN: Player submits the correct target word
     handleSubmitTargetWord(io, socket as any, { guess: 'apple' });
@@ -96,7 +91,7 @@ describe('wordHuntHandler - first finder bonus scoring', () => {
     recordTargetFound.mockReturnValue({ isFirstFinder: false, bonus: 0 });
 
     const socket = makeMockSocket();
-    const io = { on: jest.fn() } as any;
+    const io = { on: vi.fn() } as any;
 
     // WHEN: Player submits the correct target word
     handleSubmitTargetWord(io, socket as any, { guess: 'apple' });

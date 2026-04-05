@@ -4,27 +4,28 @@
  * returning the same results as the synchronous boggleSolver.findAllWords.
  */
 
-jest.mock('../../modules/boggleSolver', () => ({
-  findAllWords: jest.fn(),
-  getCachedTrie: jest.fn(),
+vi.mock('../../modules/boggleSolver', () => ({
+  findAllWords: vi.fn(),
+  getCachedTrie: vi.fn(),
 }));
 
-jest.mock('../../modules/wordValidator', () => ({
-  isWordOnBoard: jest.fn(),
-  getWordPath: jest.fn(),
-  makePositionsMap: jest.fn(),
+vi.mock('../../modules/wordValidator', () => ({
+  isWordOnBoard: vi.fn(),
+  getWordPath: vi.fn(),
+  makePositionsMap: vi.fn(),
 }));
 
-jest.mock('../../utils/logger', () => ({
-  default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() },
+vi.mock('../../utils/logger', () => ({
+  default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { WordValidatorPool } from '../wordValidatorPool';
 import * as boggleSolver from '../../modules/boggleSolver';
 import type { FindWordsOptions } from '../../modules/boggleSolver';
 
-const mockFindAllWords = boggleSolver.findAllWords as jest.MockedFunction<typeof boggleSolver.findAllWords>;
-const mockGetCachedTrie = boggleSolver.getCachedTrie as jest.MockedFunction<typeof boggleSolver.getCachedTrie>;
+const mockFindAllWords = boggleSolver.findAllWords as MockedFunction<typeof boggleSolver.findAllWords>;
+const mockGetCachedTrie = boggleSolver.getCachedTrie as MockedFunction<typeof boggleSolver.getCachedTrie>;
 
 const SIMPLE_GRID = [
   ['C', 'A', 'T'],

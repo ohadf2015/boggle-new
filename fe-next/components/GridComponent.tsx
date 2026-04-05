@@ -51,6 +51,10 @@ interface GridComponentProps {
   cellFilter?: (row: number, col: number) => boolean;
   /** Golden letter positions from backend startGame payload */
   goldenLetters?: Array<{ row: number; col: number }>;
+  /** Round event tile states */
+  frozenTiles?: Set<string>;
+  chargedTiles?: Set<string>;
+  meteorTiles?: Set<string>;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -77,6 +81,9 @@ const GridComponent = memo<GridComponentProps>(({
   isTypingMode = false,
   cellFilter,
   goldenLetters = [],
+  frozenTiles,
+  chargedTiles,
+  meteorTiles,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -449,6 +456,10 @@ const GridComponent = memo<GridComponentProps>(({
                 ? getSelectionEscalation(selectionIdx, selectedCells.length, effectiveCombo)
                 : null;
 
+              const isFrozen = frozenTiles?.has(cellKey) ?? false;
+              const isCharged = chargedTiles?.has(cellKey) ?? false;
+              const isMeteor = meteorTiles?.has(cellKey) ?? false;
+
               return (
                 <GridCell
                   key={cellKey}
@@ -465,6 +476,9 @@ const GridComponent = memo<GridComponentProps>(({
                   isGolden={isGolden}
                   isEliminated={isEliminated}
                   isHovered={isHovered}
+                  isFrozen={isFrozen}
+                  isCharged={isCharged}
+                  isMeteor={isMeteor}
                   highlightedOrder={highlightedOrder}
                   selectionIdx={selectionIdx}
                   escalation={escalation}

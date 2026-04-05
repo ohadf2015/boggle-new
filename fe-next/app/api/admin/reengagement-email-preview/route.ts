@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     he: 'צ', ja: 'あ', sv: 'S', es: 'P',
   };
 
-  const { html } = generateReengagementEmailHtml({
+  const { html } = await generateReengagementEmailHtml({
     recipientName: previewNames[language] || 'Alex',
     firstLetter: previewLetters[language] || 'W',
     language,

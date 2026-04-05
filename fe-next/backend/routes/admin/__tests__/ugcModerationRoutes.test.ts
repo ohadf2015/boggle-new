@@ -2,25 +2,29 @@
  * UGC Moderation Admin Routes - Unit Tests
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 
 // Mock supabaseServer before importing routes
-const mockFrom = jest.fn();
-const mockSelect = jest.fn();
-const mockEq = jest.fn();
-const mockIn = jest.fn();
-const mockUpdate = jest.fn();
-const mockSingle = jest.fn();
+const { mockFrom, mockSelect, mockEq, mockIn, mockUpdate, mockSingle } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockSelect = vi.fn();
+  const mockEq = vi.fn();
+  const mockIn = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockSingle = vi.fn();
+  return { mockFrom, mockSelect, mockEq, mockIn, mockUpdate, mockSingle };
+});
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => ({
     from: mockFrom,
   }),
 }));
 
-jest.mock('../middleware', () => ({
-  auditLog: jest.fn(),
+vi.mock('../middleware', () => ({
+  auditLog: vi.fn(),
 }));
 
 import ugcModerationRoutes from '../ugcModerationRoutes';
@@ -34,7 +38,7 @@ function createApp() {
 
 describe('ugcModerationRoutes', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('GET /ugc/pending', () => {

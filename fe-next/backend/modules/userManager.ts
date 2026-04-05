@@ -491,6 +491,9 @@ export function cleanupStaleAuthConnections(activeGameCodes: Set<string>): numbe
   return cleaned;
 }
 
+// Test-only named exports for internal maps
+export { socketToGame as _socketToGame, socketToUsername as _socketToUsername, usernameToSocket as _usernameToSocket, authUserConnections as _authUserConnections };
+
 // CommonJS exports for backward compatibility
 module.exports = {
   // User CRUD

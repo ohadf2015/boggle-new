@@ -1,26 +1,25 @@
 // Mock ioredis
-const store = new Map<string, string>();
+const { store } = vi.hoisted(() => ({ store: new Map<string, string>() }));
 
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    get: jest.fn((key: string) => Promise.resolve(store.get(key) || null)),
-    setex: jest.fn((key: string, _ttl: number, value: string) => {
+vi.mock('ioredis', () => {
+  class MockRedis {
+    get = vi.fn((key: string) => Promise.resolve(store.get(key) || null));
+    setex = vi.fn((key: string, _ttl: number, value: string) => {
       store.set(key, value);
       return Promise.resolve('OK');
-    }),
-    del: jest.fn((...keys: string[]) => {
+    });
+    del = vi.fn((...keys: string[]) => {
       keys.forEach((k) => store.delete(k));
       return Promise.resolve(keys.length);
-    }),
-    keys: jest.fn((pattern: string) => {
+    });
+    keys = vi.fn((pattern: string) => {
       const prefix = pattern.replace('*', '');
       const matched = [...store.keys()].filter((k) => k.startsWith(prefix));
       return Promise.resolve(matched);
-    }),
-    scanStream: jest.fn((opts: { match: string; count?: number }) => {
+    });
+    scanStream = vi.fn((opts: { match: string; count?: number }) => {
       const prefix = opts.match.replace('*', '');
       const matched = [...store.keys()].filter((k) => k.startsWith(prefix));
-      // Return an async iterable that yields one chunk
       return {
         [Symbol.asyncIterator]() {
           let done = false;
@@ -35,11 +34,13 @@ jest.mock('ioredis', () => {
           };
         },
       };
-    }),
-    quit: jest.fn(() => Promise.resolve()),
-  }));
+    });
+    quit = vi.fn(() => Promise.resolve());
+  }
+  return { default: MockRedis };
 });
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { cacheAside, invalidateCache, closeCacheClient } from '../../cache/redisCache';
 
 describe('redisCache', () => {

@@ -2,27 +2,31 @@
  * Tests for SERP API budget monitoring and cache fallback logic
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getMonthlyApiCallCount, getRemainingMonthlyBudget } from '../serpApiClient';
 
 // Mock Supabase - chain: from().select().gte()
-const mockGte = jest.fn();
-const mockSelect = jest.fn(() => ({ gte: mockGte }));
-const mockFrom = jest.fn(() => ({ select: mockSelect }));
+const { mockGte, mockSelect, mockFrom } = vi.hoisted(() => {
+  const mockGte = vi.fn();
+  const mockSelect = vi.fn(() => ({ gte: mockGte }));
+  const mockFrom = vi.fn(() => ({ select: mockSelect }));
+  return { mockGte, mockSelect, mockFrom };
+});
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
     from: mockFrom,
   })),
 }));
 
 // Mock Redis
-jest.mock('../../redisClient', () => ({
-  getRedisClient: jest.fn(() => null),
+vi.mock('../../redisClient', () => ({
+  getRedisClient: vi.fn(() => null),
 }));
 
 describe('SERP API Budget Monitor', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     delete process.env.SERP_MONTHLY_BUDGET;
   });
 

@@ -1,8 +1,9 @@
-jest.mock('../../../utils/logger', () => ({
-  default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+vi.mock('../../../utils/logger', () => ({
+  default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
   __esModule: true,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   initShadowClash,
   startShadowClash,
@@ -19,8 +20,8 @@ function createMockIO() {
   const privateEmits = new Map<string, Array<{ event: string; data: unknown }>>();
 
   return {
-    to: jest.fn((target: string) => ({
-      emit: jest.fn((event: string, data: unknown) => {
+    to: vi.fn((target: string) => ({
+      emit: vi.fn((event: string, data: unknown) => {
         emitted.push({ event, data, room: target });
         if (!target.startsWith('party:')) {
           // Private emit to a socket ID
@@ -49,13 +50,13 @@ describe('shadowClashEngine', () => {
 
   afterEach(() => {
     cleanupShadowClash(ROOM);
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe('initShadowClash + startShadowClash', () => {
     it('should assign exactly 2 shadows, 1 seer, and 2 citizens for 5 players (medic requires 6+)', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
@@ -73,7 +74,7 @@ describe('shadowClashEngine', () => {
     });
 
     it('should send partner info to shadows', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
@@ -91,7 +92,7 @@ describe('shadowClashEngine', () => {
     });
 
     it('should broadcast dealing phase to room', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
@@ -103,13 +104,13 @@ describe('shadowClashEngine', () => {
     });
 
     it('should start night phase after dealing delay', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
 
       // Advance past dealing animation (5s)
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       const nightEvents = io.emitted.filter(e => e.event === 'party:shadow:nightStart');
       expect(nightEvents.length).toBe(1);
@@ -119,22 +120,22 @@ describe('shadowClashEngine', () => {
 
   describe('night actions', () => {
     it('should send night action prompts to all alive players', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000); // past dealing
+      vi.advanceTimersByTime(5000); // past dealing
 
       const nightActions = io.emitted.filter(e => e.event === 'party:shadow:nightAction');
       expect(nightActions.length).toBe(5); // All 5 players get an action prompt
     });
 
     it('should send decoy "wait" action to citizens', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       const waitActions = io.emitted.filter(
         e => e.event === 'party:shadow:nightAction' && (e.data as any).action === 'wait'
@@ -143,11 +144,11 @@ describe('shadowClashEngine', () => {
     });
 
     it('should send seer result immediately when seer investigates', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
 
       // Find seer socket
       const seerAction = io.emitted.find(
@@ -168,12 +169,12 @@ describe('shadowClashEngine', () => {
 
   describe('night resolution', () => {
     it('should resolve night after 30s timeout and emit dawn', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000); // dealing
-      jest.advanceTimersByTime(30000); // night timeout
+      vi.advanceTimersByTime(5000); // dealing
+      vi.advanceTimersByTime(30000); // night timeout
 
       const dawnEvents = io.emitted.filter(e => e.event === 'party:shadow:dawn');
       expect(dawnEvents.length).toBe(1);
@@ -182,13 +183,13 @@ describe('shadowClashEngine', () => {
 
   describe('voting', () => {
     it('should start discussion after dawn', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000); // dealing
-      jest.advanceTimersByTime(30000); // night
-      jest.advanceTimersByTime(5000); // dawn reveal
+      vi.advanceTimersByTime(5000); // dealing
+      vi.advanceTimersByTime(30000); // night
+      vi.advanceTimersByTime(5000); // dawn reveal
 
       const discussEvents = io.emitted.filter(e => e.event === 'party:shadow:discussionStart');
       expect(discussEvents.length).toBe(1);
@@ -196,11 +197,11 @@ describe('shadowClashEngine', () => {
     });
 
     it('should allow calling vote early', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000 + 30000 + 5000); // to discussion
+      vi.advanceTimersByTime(5000 + 30000 + 5000); // to discussion
 
       callVoteEarly(io as any, ROOM, 's1');
 
@@ -209,12 +210,12 @@ describe('shadowClashEngine', () => {
     });
 
     it('should resolve vote when all players vote', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000 + 30000 + 5000); // to discussion
-      jest.advanceTimersByTime(120000); // discussion timeout → trial
+      vi.advanceTimersByTime(5000 + 30000 + 5000); // to discussion
+      vi.advanceTimersByTime(120000); // discussion timeout → trial
 
       // All alive players vote for Alice
       for (const [socketId] of PLAYERS) {
@@ -227,11 +228,11 @@ describe('shadowClashEngine', () => {
     });
 
     it('should skip elimination when majority votes skip', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);
-      jest.advanceTimersByTime(5000 + 30000 + 5000 + 120000); // to trial
+      vi.advanceTimersByTime(5000 + 30000 + 5000 + 120000); // to trial
 
       for (const [socketId] of PLAYERS) {
         submitVote(io as any, ROOM, socketId, 'skip');
@@ -245,7 +246,7 @@ describe('shadowClashEngine', () => {
 
   describe('win conditions', () => {
     it('should end game when all shadows are eliminated', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 10);
       startShadowClash(io as any, ROOM);
@@ -259,7 +260,7 @@ describe('shadowClashEngine', () => {
 
       // Play through rounds eliminating shadows
       // Round 1: deal + night + dawn + discussion + trial
-      jest.advanceTimersByTime(5000 + 30000 + 5000 + 120000); // to trial
+      vi.advanceTimersByTime(5000 + 30000 + 5000 + 120000); // to trial
 
       // Vote out first shadow
       for (const [socketId] of PLAYERS) {
@@ -267,7 +268,7 @@ describe('shadowClashEngine', () => {
       }
 
       // Advance to next round
-      jest.advanceTimersByTime(6000 + 30000 + 5000 + 120000); // verdict → night → dawn → discussion → trial
+      vi.advanceTimersByTime(6000 + 30000 + 5000 + 120000); // verdict → night → dawn → discussion → trial
 
       // Vote out second shadow
       const aliveIds = Array.from(PLAYERS.keys()).filter(id => !shadowSocketIds.includes(id) || id === shadowSocketIds[1]);
@@ -278,7 +279,7 @@ describe('shadowClashEngine', () => {
       // Check for game over
       const gameOverEvents = io.emitted.filter(e => e.event === 'party:shadow:gameOver');
       // May need more time advancement for the verdict → game-over transition
-      jest.advanceTimersByTime(10000);
+      vi.advanceTimersByTime(10000);
 
       const allGameOvers = io.emitted.filter(e => e.event === 'party:shadow:gameOver');
       if (allGameOvers.length > 0) {
@@ -289,7 +290,7 @@ describe('shadowClashEngine', () => {
 
   describe('cleanupShadowClash', () => {
     it('should clear all timers and delete state', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initShadowClash(ROOM, PLAYERS, 'standard', 4);
       startShadowClash(io as any, ROOM);

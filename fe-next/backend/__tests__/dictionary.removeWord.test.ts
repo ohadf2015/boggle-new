@@ -3,26 +3,27 @@
  * TDD: Written before implementation (RED phase)
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 
 // Mock the logger to avoid noisy output
-jest.mock('../utils/logger', () => ({
+vi.mock('../utils/logger', () => ({
   __esModule: true,
   default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
 // Mock external dependencies that dictionary.ts uses
-jest.mock('an-array-of-english-words', () => ['hello', 'world'], { virtual: true });
-jest.mock('an-array-of-spanish-words', () => ['hola', 'mundo'], { virtual: true });
-jest.mock('../modules/communityWordManager', () => ({
-  isWordCommunityValid: jest.fn(() => false),
+vi.mock('an-array-of-english-words', () => ['hello', 'world'], { virtual: true });
+vi.mock('an-array-of-spanish-words', () => ['hola', 'mundo'], { virtual: true });
+vi.mock('../modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(() => false),
 }));
 
 describe('removeApprovedWord', () => {
@@ -37,10 +38,10 @@ describe('removeApprovedWord', () => {
     }
   });
 
-  beforeEach(() => {
-    jest.resetModules();
+  beforeEach(async () => {
+    vi.resetModules();
     // Fresh import to reset singleton state
-    const dictModule = require('../dictionary');
+    const dictModule = await import('../dictionary');
     removeApprovedWord = dictModule.removeApprovedWord;
     dictionary = dictModule.dictionary;
   });
@@ -90,7 +91,7 @@ describe('removeApprovedWord', () => {
 
   it('should rewrite approved file without the word', async () => {
     // Create a mock approved file with multiple words
-    const approvedFile = path.join(path.dirname(require.resolve('../dictionary')), 'hebrew_words_approved.txt');
+    const approvedFile = path.join(path.resolve(__dirname, '..'), 'hebrew_words_approved.txt');
 
     // Ensure the file exists with test content
     const originalContent = 'מילה\nבדיקה\nשלום\n';

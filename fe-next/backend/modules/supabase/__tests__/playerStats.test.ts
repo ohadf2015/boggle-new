@@ -3,37 +3,35 @@
  * Validates XP calculation and profile updates
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { updatePlayerStats, ensureProfileExists } from '../playerStats';
-import type { GameStats } from '../client';
-
 // Mock dependencies
-jest.mock('../client', () => ({
-  getSupabase: jest.fn(),
+vi.mock('../client', () => ({
+  getSupabase: vi.fn(),
 }));
 
-jest.mock('../../xpManager', () => ({
-  calculateGameXp: jest.fn(),
-  getLevelFromXp: jest.fn(),
-  checkLevelUp: jest.fn(),
-  getTitleForLevel: jest.fn(),
+vi.mock('../../xpManager', () => ({
+  calculateGameXp: vi.fn(),
+  getLevelFromXp: vi.fn(),
+  checkLevelUp: vi.fn(),
+  getTitleForLevel: vi.fn(),
 }));
 
-jest.mock('../../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+} }));
 
-const { getSupabase } = require('../client');
-const { calculateGameXp, getLevelFromXp, checkLevelUp } = require('../../xpManager');
-const logger = require('../../../utils/logger');
-
+import { getSupabase, type GameStats } from '../client';
+import { calculateGameXp, getLevelFromXp, checkLevelUp } from '../../xpManager';
+import logger from '../../../utils/logger';
 describe('updatePlayerStats', () => {
   let mockClient: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup default mocks
     calculateGameXp.mockReturnValue({
@@ -51,16 +49,16 @@ describe('updatePlayerStats', () => {
 
     // Setup mock Supabase client
     mockClient = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-      update: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      rpc: jest.fn().mockResolvedValue({ data: [{ new_total_xp: 600, new_level: 7, xp_granted: 100 }], error: null }),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      update: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      rpc: vi.fn().mockResolvedValue({ data: [{ new_total_xp: 600, new_level: 7, xp_granted: 100 }], error: null }),
       auth: {
         admin: {
-          getUserById: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+          getUserById: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
         },
       },
     };
@@ -332,18 +330,18 @@ describe('ensureProfileExists', () => {
   let mockClient: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup mock Supabase client
     mockClient = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-      insert: jest.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      insert: vi.fn().mockReturnThis(),
       auth: {
         admin: {
-          getUserById: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+          getUserById: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
         },
       },
     };

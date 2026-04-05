@@ -11,19 +11,19 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 type MascotSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const SIZE_CLASSES: Record<MascotSize, string> = {
-  xs: 'w-10 h-10',
-  sm: 'w-16 h-16',
-  md: 'w-24 h-24',
-  lg: 'w-32 h-32',
-  xl: 'w-40 h-40',
+  xs: 'w-[100px] h-[100px]',
+  sm: 'w-28 h-28',
+  md: 'w-32 h-32',
+  lg: 'w-40 h-40',
+  xl: 'w-48 h-48',
 };
 
 const SIZE_PIXELS: Record<MascotSize, number> = {
-  xs: 40,
-  sm: 64,
-  md: 96,
-  lg: 128,
-  xl: 160,
+  xs: 100,
+  sm: 112,
+  md: 128,
+  lg: 160,
+  xl: 192,
 };
 
 interface DJMascotProps {
@@ -80,15 +80,17 @@ export const DJMascot = memo(function DJMascot({
         ease: 'easeInOut',
       }}
     >
-      <Image
-        src="/mascot/dj-nobg.gif"
-        alt={altText}
-        width={SIZE_PIXELS[size]}
-        height={SIZE_PIXELS[size]}
-        className="object-contain drop-shadow-lg"
-        priority={priority}
-        unoptimized
-      />
+      <div className="w-full h-full rounded-full overflow-hidden border-3 border-neo-pink bg-neo-navy">
+        <Image
+          src="/mascot/dj.gif"
+          alt={altText}
+          width={SIZE_PIXELS[size]}
+          height={SIZE_PIXELS[size]}
+          className="object-contain scale-110 drop-shadow-lg"
+          priority={priority}
+          unoptimized
+        />
+      </div>
     </AdaptiveMotion.div>
   );
 });

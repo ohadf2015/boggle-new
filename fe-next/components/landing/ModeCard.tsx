@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Trophy, Clock, Signal } from 'lucide-react';
@@ -63,6 +64,8 @@ interface ModeCardProps {
   difficulty?: 1 | 2 | 3;
   /** Difficulty label (e.g., "Easy", "Medium", "Hard") */
   difficultyLabel?: string;
+  /** Path to custom mode sticker image — replaces the small icon box with a large floating sticker */
+  modeImage?: string;
 }
 
 /**
@@ -91,6 +94,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   duration,
   difficulty,
   difficultyLabel,
+  modeImage,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -175,7 +179,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         // Container query setup for responsive children
         'cq-container',
         locked ? 'cursor-not-allowed' : 'cursor-pointer',
-        'relative overflow-hidden',
+        'relative',
+        'overflow-hidden',
         // Full height to fill grid cell
         'h-full',
         // Colors - grayscale filter when locked for visual distinction
@@ -249,29 +254,67 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </motion.div>
       )}
 
-      {/* Header with icon, title, and arrow in one row */}
-      <div className={cn('flex items-center', secondary ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4')} style={{ marginBottom: secondary ? 'clamp(0.125rem, 1cqw, 0.5rem)' : 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
-        {/* Icon - container-relative sizing */}
-        <div
+      {/* Mode character — large blended illustration anchored to bottom-end */}
+      {modeImage && !secondary && (
+        <motion.div
           className={cn(
-            'rounded-neo border-neo-black',
-            secondary ? 'border shadow-hard-xs' : 'border-2 shadow-hard-sm',
-            'flex items-center justify-center shrink-0',
-            styles.iconBg
+            'absolute pointer-events-none',
+            isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
           )}
           style={{
-            width: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
-            height: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
+            width: 'clamp(5rem, 40cqw, 10rem)',
+            height: 'clamp(5rem, 40cqw, 10rem)',
           }}
+          initial={{ scale: 0.6, opacity: 0, y: 20 }}
+          whileInView={{ scale: 1, opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          animate={isHovered
+            ? { scale: 1.08, y: -6, rotate: isRTL ? -5 : 5 }
+            : { scale: 1, y: 0, rotate: 0 }
+          }
+          transition={{ type: 'spring', stiffness: 300, damping: 18 }}
         >
-          <span className={styles.iconText} style={{ fontSize: secondary ? 'clamp(0.75rem, 4cqw, 1.25rem)' : 'clamp(1rem, 5cqw, 1.75rem)' }}>
-            {icon}
-          </span>
-        </div>
+          <Image
+            src={modeImage}
+            alt=""
+            fill
+            className={cn(
+              'object-contain',
+              'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+              isHovered ? 'brightness-110' : 'brightness-100'
+            )}
+            style={{
+              filter: isHovered ? 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))' : undefined,
+              transition: 'filter 0.3s ease',
+            }}
+            sizes="(max-width: 640px) 96px, 192px"
+          />
+        </motion.div>
+      )}
 
-        {/* Title - container-relative font size */}
-        {/* drop-shadow-lg added for WCAG AA contrast compliance on gradient backgrounds */}
-        {/* White text for locked state for better contrast on dimmed purple background */}
+      {/* Header with icon/title and arrow */}
+      <div className={cn('flex items-center', secondary ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4')} style={{ marginBottom: secondary ? 'clamp(0.125rem, 1cqw, 0.5rem)' : 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
+        {/* Icon box — only shown when no modeImage or secondary */}
+        {(!modeImage || secondary) && (
+          <div
+            className={cn(
+              'rounded-neo border-neo-black',
+              secondary ? 'border shadow-hard-xs' : 'border-2 shadow-hard-sm',
+              'flex items-center justify-center shrink-0',
+              styles.iconBg
+            )}
+            style={{
+              width: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
+              height: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
+            }}
+          >
+            <span className={styles.iconText} style={{ fontSize: secondary ? 'clamp(0.75rem, 4cqw, 1.25rem)' : 'clamp(1rem, 5cqw, 1.75rem)' }}>
+              {icon}
+            </span>
+          </div>
+        )}
+
+        {/* Title */}
         <h2
           className={cn(
             'font-black uppercase tracking-tight flex-1 min-w-0 drop-shadow-lg',
@@ -285,14 +328,15 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {title}
         </h2>
 
-        {/* Arrow/Lock indicator - min 44x44px touch target for WCAG compliance */}
+        {/* Arrow/Lock indicator — hidden on mobile, visible on hover (desktop) */}
         <div
           className={cn(
             'min-w-[44px] min-h-[44px]',
             'rounded-full border-neo-black',
             secondary ? 'border' : 'border-2',
             'flex items-center justify-center shrink-0',
-            'transition-transform duration-200 ease-out',
+            'transition-all duration-200 ease-out',
+            !locked && 'opacity-0 group-hover:opacity-100',
             !locked && (isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'),
             locked ? 'bg-neo-black/80 text-neo-white' : styles.arrow
           )}

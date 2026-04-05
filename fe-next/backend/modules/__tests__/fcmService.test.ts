@@ -3,45 +3,49 @@
  * Tests for Firebase Cloud Messaging push notification sending
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { sendToUser, sendToUsers, type FCMPayload } from '../fcmService';
 
 // Mock firebase-admin
-const mockSendEachForMulticast = jest.fn();
-const mockApp = {
-  messaging: () => ({
-    sendEachForMulticast: mockSendEachForMulticast,
-  }),
-};
-jest.mock('firebase-admin', () => ({
+const { mockSendEachForMulticast, mockApp } = vi.hoisted(() => {
+  const mockSendEachForMulticast = vi.fn();
+  const mockApp = {
+    messaging: () => ({
+      sendEachForMulticast: mockSendEachForMulticast,
+    }),
+  };
+  return { mockSendEachForMulticast, mockApp };
+});
+vi.mock('firebase-admin', () => ({
   apps: [mockApp], // Non-empty so getFirebaseApp returns existing app
-  initializeApp: jest.fn(() => mockApp),
+  initializeApp: vi.fn(() => mockApp),
   credential: {
-    cert: jest.fn(() => 'mock-credential'),
+    cert: vi.fn(() => 'mock-credential'),
   },
-  app: jest.fn(() => mockApp),
+  app: vi.fn(() => mockApp),
 }));
 
 // Mock supabase
-const mockFrom = jest.fn();
-const mockUpdate = jest.fn();
-const mockEq = jest.fn();
-const mockIn = jest.fn();
-const mockSelect = jest.fn();
+const mockFrom = vi.fn();
+const mockUpdate = vi.fn();
+const mockEq = vi.fn();
+const mockIn = vi.fn();
+const mockSelect = vi.fn();
 
-jest.mock('../supabase', () => ({
-  getSupabase: jest.fn(() => ({
+vi.mock('../supabase', () => ({
+  getSupabase: vi.fn(() => ({
     from: mockFrom,
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 describe('fcmService', () => {
   const mockPayload: FCMPayload = {
@@ -51,7 +55,7 @@ describe('fcmService', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default: supabase returns tokens
     mockFrom.mockReturnValue({ select: mockSelect });
     mockSelect.mockReturnValue({ eq: mockEq });

@@ -103,13 +103,13 @@ describe('InteractiveMascot - Lazy Loading', () => {
     // THEN: preloadAllMascotImages() should NOT have been called
     // So we should NOT see all 7 mascot GIFs being preloaded via Image constructor
     const allMascotPaths = [
-      '/mascot/main-nobg.gif',
-      '/mascot/play-nobg.gif',
-      '/mascot/study-nobg.gif',
-      '/mascot/oops-nobg.gif',
-      '/mascot/celebration-nobg.gif',
-      '/mascot/dj-nobg.gif',
-      '/mascot/trophy-nobg.gif',
+      '/mascot/main.gif',
+      '/mascot/play.gif',
+      '/mascot/study.gif',
+      '/mascot/oops.gif',
+      '/mascot/celebration.gif',
+      '/mascot/dj.gif',
+      '/mascot/trophy.gif',
     ];
 
     // VERIFY: preloadAllMascotImages was NOT called (no Image constructor calls)
@@ -170,14 +170,14 @@ describe('InteractiveMascot - Lazy Loading', () => {
     // THEN: Only the hover and click target variants should be preloaded
     // happy → hover: gaming, click: celebration
     expect(mockImageConstructorCalls.length).toBe(2);
-    expect(mockImageConstructorCalls.includes('/mascot/play-nobg.gif')).toBe(true); // gaming (hover)
-    expect(mockImageConstructorCalls.includes('/mascot/celebration-nobg.gif')).toBe(true); // celebration (click)
+    expect(mockImageConstructorCalls.includes('/mascot/play.gif')).toBe(true); // gaming (hover)
+    expect(mockImageConstructorCalls.includes('/mascot/celebration.gif')).toBe(true); // celebration (click)
 
     // AND: Other unused variants should NOT be preloaded
-    expect(mockImageConstructorCalls.includes('/mascot/main-nobg.gif')).toBe(false); // happy (already shown via Next Image)
-    expect(mockImageConstructorCalls.includes('/mascot/study-nobg.gif')).toBe(false); // thinking
-    expect(mockImageConstructorCalls.includes('/mascot/oops-nobg.gif')).toBe(false); // oops
-    expect(mockImageConstructorCalls.includes('/mascot/dj-nobg.gif')).toBe(false); // dj
-    expect(mockImageConstructorCalls.includes('/mascot/trophy-nobg.gif')).toBe(false); // trophy
+    expect(mockImageConstructorCalls.includes('/mascot/main.gif')).toBe(false); // happy (already shown via Next Image)
+    expect(mockImageConstructorCalls.includes('/mascot/study.gif')).toBe(false); // thinking
+    expect(mockImageConstructorCalls.includes('/mascot/oops.gif')).toBe(false); // oops
+    expect(mockImageConstructorCalls.includes('/mascot/dj.gif')).toBe(false); // dj
+    expect(mockImageConstructorCalls.includes('/mascot/trophy.gif')).toBe(false); // trophy
   });
 });

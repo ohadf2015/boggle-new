@@ -22,47 +22,47 @@ describe('GIF Mascot Integration', () => {
   describe('getMascotImagePath', () => {
     it('should return GIF path for happy variant', () => {
       const path = getMascotImagePath('happy');
-      expect(path).toBe('/mascot/main-nobg.gif');
+      expect(path).toBe('/mascot/main.gif');
     });
 
     it('should return GIF path for gaming variant', () => {
       const path = getMascotImagePath('gaming');
-      expect(path).toBe('/mascot/play-nobg.gif');
+      expect(path).toBe('/mascot/play.gif');
     });
 
     it('should return GIF path for thinking variant', () => {
       const path = getMascotImagePath('thinking');
-      expect(path).toBe('/mascot/study-nobg.gif');
+      expect(path).toBe('/mascot/study.gif');
     });
 
     it('should return GIF path for oops variant', () => {
       const path = getMascotImagePath('oops');
-      expect(path).toBe('/mascot/oops-nobg.gif');
+      expect(path).toBe('/mascot/oops.gif');
     });
 
     it('should return GIF paths for all 20 base variants', () => {
       ALL_BASE_VARIANTS.forEach((variant) => {
         const path = getMascotImagePath(variant);
         expect(path).toContain('.gif');
-        expect(path).toContain('-nobg.gif');
+        expect(path).toContain('.gif');
         expect(path).not.toContain('.png');
       });
     });
 
     it('should return correct paths for new variants', () => {
-      expect(getMascotImagePath('panic')).toBe('/mascot/panic-nobg.gif');
-      expect(getMascotImagePath('crying')).toBe('/mascot/crying-nobg.gif');
-      expect(getMascotImagePath('onfire')).toBe('/mascot/onfire-nobg.gif');
-      expect(getMascotImagePath('bored')).toBe('/mascot/bored-nobg.gif');
-      expect(getMascotImagePath('mindblown')).toBe('/mascot/mindblown-nobg.gif');
-      expect(getMascotImagePath('encouraging')).toBe('/mascot/encouraging-nobg.gif');
-      expect(getMascotImagePath('explorer')).toBe('/mascot/explorer-nobg.gif');
-      expect(getMascotImagePath('flexing')).toBe('/mascot/flexing-nobg.gif');
-      expect(getMascotImagePath('scared')).toBe('/mascot/scared-nobg.gif');
-      expect(getMascotImagePath('shopkeeper')).toBe('/mascot/shopkeeper-nobg.gif');
-      expect(getMascotImagePath('spectating')).toBe('/mascot/spectating-nobg.gif');
-      expect(getMascotImagePath('waving')).toBe('/mascot/waving-nobg.gif');
-      expect(getMascotImagePath('powerup')).toBe('/mascot/powerup-nobg.gif');
+      expect(getMascotImagePath('panic')).toBe('/mascot/panic.gif');
+      expect(getMascotImagePath('crying')).toBe('/mascot/crying.gif');
+      expect(getMascotImagePath('onfire')).toBe('/mascot/onfire.gif');
+      expect(getMascotImagePath('bored')).toBe('/mascot/bored.gif');
+      expect(getMascotImagePath('mindblown')).toBe('/mascot/mindblown.gif');
+      expect(getMascotImagePath('encouraging')).toBe('/mascot/encouraging.gif');
+      expect(getMascotImagePath('explorer')).toBe('/mascot/explorer.gif');
+      expect(getMascotImagePath('flexing')).toBe('/mascot/flexing.gif');
+      expect(getMascotImagePath('scared')).toBe('/mascot/scared.gif');
+      expect(getMascotImagePath('shopkeeper')).toBe('/mascot/shopkeeper.gif');
+      expect(getMascotImagePath('spectating')).toBe('/mascot/spectating.gif');
+      expect(getMascotImagePath('waving')).toBe('/mascot/waving.gif');
+      expect(getMascotImagePath('powerup')).toBe('/mascot/powerup.gif');
     });
   });
 
@@ -82,7 +82,7 @@ describe('GIF Mascot Integration', () => {
     it('should have MASCOT_IMAGES entry for every base variant', () => {
       BASE_VARIANTS.forEach((variant) => {
         expect(MASCOT_IMAGES[variant]).toBeDefined();
-        expect(MASCOT_IMAGES[variant]).toContain('-nobg.gif');
+        expect(MASCOT_IMAGES[variant]).toContain('.gif');
       });
     });
   });
@@ -162,7 +162,7 @@ describe('GIF Mascot Integration', () => {
 
       const img = screen.getByRole('img');
       expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute('src', '/mascot/onfire-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/onfire.gif');
     });
 
     it('should render extended variants (mapped to GIF)', () => {
@@ -195,22 +195,22 @@ describe('GIF Mascot Integration', () => {
   describe('GIF Mapping Correctness', () => {
     it('should map main.gif to happy variant', () => {
       const path = getMascotImagePath('happy');
-      expect(path).toContain('main-nobg.gif');
+      expect(path).toContain('main.gif');
     });
 
     it('should map play.gif to gaming variant', () => {
       const path = getMascotImagePath('gaming');
-      expect(path).toContain('play-nobg.gif');
+      expect(path).toContain('play.gif');
     });
 
     it('should map study.gif to thinking variant', () => {
       const path = getMascotImagePath('thinking');
-      expect(path).toContain('study-nobg.gif');
+      expect(path).toContain('study.gif');
     });
 
     it('should map oops.gif to oops variant', () => {
       const path = getMascotImagePath('oops');
-      expect(path).toContain('oops-nobg.gif');
+      expect(path).toContain('oops.gif');
     });
   });
 
@@ -221,7 +221,7 @@ describe('GIF Mascot Integration', () => {
         expect(() => isGifVariant(variant)).not.toThrow();
         const path = getMascotImagePath(variant);
         expect(path).toContain('.gif');
-        expect(path).toContain('-nobg.gif');
+        expect(path).toContain('.gif');
       });
     });
   });

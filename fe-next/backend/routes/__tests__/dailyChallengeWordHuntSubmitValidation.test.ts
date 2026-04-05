@@ -11,19 +11,20 @@
  * puzzle number) should still block.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { isWordValidForDailyChallenge } from '../dailyChallenge/utils';
 import { isDictionaryWord } from '../../dictionary';
 import { isWordCommunityValid } from '../../modules/communityWordManager';
 
-jest.mock('../../dictionary');
-jest.mock('../../modules/communityWordManager');
+vi.mock('../../dictionary');
+vi.mock('../../modules/communityWordManager');
 
-const mockIsDictionaryWord = isDictionaryWord as jest.MockedFunction<typeof isDictionaryWord>;
-const mockIsWordCommunityValid = isWordCommunityValid as jest.MockedFunction<typeof isWordCommunityValid>;
+const mockIsDictionaryWord = isDictionaryWord as MockedFunction<typeof isDictionaryWord>;
+const mockIsWordCommunityValid = isWordCommunityValid as MockedFunction<typeof isWordCommunityValid>;
 
 describe('isWordValidForDailyChallenge', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return true when word is in dictionary', () => {

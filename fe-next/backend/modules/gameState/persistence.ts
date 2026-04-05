@@ -6,23 +6,10 @@
 import type { GameState, RedisClient } from './types';
 
 import logger from '../../utils/logger';
-
-// Redis client (lazy loaded to avoid circular dependencies)
-let redisClient: RedisClient | null = null;
+import * as redisClientModule from '../../redisClient';
 
 function getRedisClient(): RedisClient {
-  if (!redisClient) {
-    try {
-      redisClient = require('../../redisClient');
-    } catch {
-      redisClient = {
-        saveGameState: async () => {},
-        getGameState: async () => null,
-        deleteGameState: async () => {}
-      };
-    }
-  }
-  return redisClient as RedisClient;
+  return redisClientModule as unknown as RedisClient;
 }
 
 // Debounce timers for persistence

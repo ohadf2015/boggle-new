@@ -3,6 +3,7 @@
  * Tests for game event → push notification wiring
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   notifyFriendRequest,
   notifyFriendAccepted,
@@ -10,33 +11,36 @@ import {
 } from '../pushNotificationTriggers';
 
 // Mock fcmService
-const mockSendToUser = jest.fn();
-jest.mock('../fcmService', () => ({
+const { mockSendToUser } = vi.hoisted(() => {
+  const mockSendToUser = vi.fn();
+  return { mockSendToUser };
+});
+vi.mock('../fcmService', () => ({
   sendToUser: (...args: unknown[]) => mockSendToUser(...args),
 }));
 
 // Mock supabase for notification history
-const mockInsert = jest.fn();
-jest.mock('../supabase', () => ({
-  getSupabase: jest.fn(() => ({
-    from: jest.fn(() => ({
+const mockInsert = vi.fn();
+vi.mock('../supabase', () => ({
+  getSupabase: vi.fn(() => ({
+    from: vi.fn(() => ({
       insert: mockInsert,
     })),
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 describe('pushNotificationTriggers', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockInsert.mockResolvedValue({ error: null });
     mockSendToUser.mockResolvedValue(undefined);
   });

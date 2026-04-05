@@ -1,3 +1,4 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerHostHandlers } from '../hostHandler';
 import {
   getGame,
@@ -6,26 +7,26 @@ import {
   reactivateHost,
 } from '../../modules/gameStateManager';
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
-jest.mock('../../modules/gameStateManager');
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
+vi.mock('../../modules/gameStateManager');
 
-const mockGetGame = getGame as jest.Mock;
-const mockGetGameBySocketId = getGameBySocketId as jest.Mock;
-const mockMarkHostActive = markHostActive as jest.Mock;
-const mockReactivateHost = reactivateHost as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockGetGameBySocketId = getGameBySocketId as Mock;
+const mockMarkHostActive = markHostActive as Mock;
+const mockReactivateHost = reactivateHost as Mock;
 
 function createMockSocket(id = 'socket-host') {
   const handlers: Record<string, Function> = {};
   return {
     socket: {
       id,
-      on: jest.fn((event: string, handler: Function) => { handlers[event] = handler; }),
-      emit: jest.fn(),
+      on: vi.fn((event: string, handler: Function) => { handlers[event] = handler; }),
+      emit: vi.fn(),
     } as any,
     handlers,
   };
@@ -49,7 +50,7 @@ describe('hostHandler', () => {
   const mockIo = {} as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('registers hostKeepAlive and hostReactivate handlers', () => {

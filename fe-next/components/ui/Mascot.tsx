@@ -35,26 +35,26 @@ export type MascotVariant =
  * Mascot GIF paths (ALL mascots use animated GIFs)
  */
 export const MASCOT_IMAGES: Record<MascotVariant, string> = {
-  happy: '/mascot/main-nobg.gif',
-  gaming: '/mascot/play-nobg.gif',
-  thinking: '/mascot/study-nobg.gif',
-  oops: '/mascot/oops-nobg.gif',
-  celebration: '/mascot/celebration-nobg.gif',
-  dj: '/mascot/dj-nobg.gif',
-  trophy: '/mascot/trophy-nobg.gif',
-  panic: '/mascot/panic-nobg.gif',
-  crying: '/mascot/crying-nobg.gif',
-  onfire: '/mascot/onfire-nobg.gif',
-  bored: '/mascot/bored-nobg.gif',
-  mindblown: '/mascot/mindblown-nobg.gif',
-  encouraging: '/mascot/encouraging-nobg.gif',
-  explorer: '/mascot/explorer-nobg.gif',
-  flexing: '/mascot/flexing-nobg.gif',
-  scared: '/mascot/scared-nobg.gif',
-  shopkeeper: '/mascot/shopkeeper-nobg.gif',
-  spectating: '/mascot/spectating-nobg.gif',
-  waving: '/mascot/waving-nobg.gif',
-  powerup: '/mascot/powerup-nobg.gif',
+  happy: '/mascot/main.gif',
+  gaming: '/mascot/play.gif',
+  thinking: '/mascot/study.gif',
+  oops: '/mascot/oops.gif',
+  celebration: '/mascot/celebration.gif',
+  dj: '/mascot/dj.gif',
+  trophy: '/mascot/trophy.gif',
+  panic: '/mascot/panic.gif',
+  crying: '/mascot/crying.gif',
+  onfire: '/mascot/onfire.gif',
+  bored: '/mascot/bored.gif',
+  mindblown: '/mascot/mindblown.gif',
+  encouraging: '/mascot/encouraging.gif',
+  explorer: '/mascot/explorer.gif',
+  flexing: '/mascot/flexing.gif',
+  scared: '/mascot/scared.gif',
+  shopkeeper: '/mascot/shopkeeper.gif',
+  spectating: '/mascot/spectating.gif',
+  waving: '/mascot/waving.gif',
+  powerup: '/mascot/powerup.gif',
 };
 
 /**
@@ -85,21 +85,47 @@ export function isGifVariant(variant: MascotVariant): boolean {
 type MascotSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 const SIZE_CLASSES: Record<MascotSize, string> = {
-  xs: 'w-10 h-10',
-  sm: 'w-16 h-16',
-  md: 'w-24 h-24',
-  lg: 'w-32 h-32',
-  xl: 'w-40 h-40',
-  '2xl': 'w-48 h-48',
+  xs: 'w-[100px] h-[100px]',
+  sm: 'w-28 h-28',
+  md: 'w-32 h-32',
+  lg: 'w-40 h-40',
+  xl: 'w-48 h-48',
+  '2xl': 'w-56 h-56',
 };
 
 const SIZE_PIXELS: Record<MascotSize, number> = {
-  xs: 40,
-  sm: 64,
-  md: 96,
-  lg: 128,
-  xl: 160,
-  '2xl': 192,
+  xs: 100,
+  sm: 112,
+  md: 128,
+  lg: 160,
+  xl: 192,
+  '2xl': 224,
+};
+
+/**
+ * Clip shape for mascot container.
+ * Use when GIF has a background that can't be removed (e.g. white-on-white).
+ * Matches the comeback-hero circle style: rounded-full + overflow-hidden + neo border.
+ */
+export type MascotClipShape = 'none' | 'circle' | 'rounded-square';
+
+/** Tailwind classes for each clip shape */
+const CLIP_CLASSES: Record<MascotClipShape, string> = {
+  none: '',
+  circle: 'rounded-full overflow-hidden',
+  'rounded-square': 'rounded-neo overflow-hidden',
+};
+
+/** Border color presets matching neo color families */
+export type MascotBorderColor = 'pink' | 'lime' | 'cyan' | 'purple' | 'white' | 'none';
+
+const BORDER_CLASSES: Record<MascotBorderColor, string> = {
+  pink: 'border-[3px] border-neo-pink shadow-hard',
+  lime: 'border-[3px] border-neo-lime shadow-hard',
+  cyan: 'border-[3px] border-neo-cyan shadow-hard',
+  purple: 'border-[3px] border-neo-purple shadow-hard',
+  white: 'border-[3px] border-neo-white shadow-hard',
+  none: '',
 };
 
 interface MascotProps {
@@ -115,6 +141,12 @@ interface MascotProps {
   priority?: boolean;
   /** Alt text override */
   alt?: string;
+  /** Clip shape to mask GIF background. Use for GIFs with non-transparent backgrounds. */
+  clipShape?: MascotClipShape;
+  /** Border color when using a clip shape (default: 'none') */
+  clipBorder?: MascotBorderColor;
+  /** Background behind the GIF inside the clip (default: 'bg-neo-navy') */
+  clipBg?: string;
 }
 
 /**
@@ -394,6 +426,9 @@ export const Mascot = memo(function Mascot({
   className = '',
   priority = false,
   alt,
+  clipShape = 'circle',
+  clipBorder = 'white',
+  clipBg = 'bg-neo-navy',
 }: MascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -404,10 +439,10 @@ export const Mascot = memo(function Mascot({
   const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
-  // Automatically prioritize 'happy' variant (main mascot) if priority not explicitly set
   const shouldPrioritize = priority ?? (variant === 'happy');
-  // Use lazy loading for non-priority mascots
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
+
+  const hasClip = clipShape !== 'none';
 
   return (
     <motion.div
@@ -415,16 +450,20 @@ export const Mascot = memo(function Mascot({
       variants={animationVariants}
       animate={shouldAnimate ? 'animate' : undefined}
     >
-      <Image
-        src={imageSrc}
-        alt={altText}
-        width={SIZE_PIXELS[size]}
-        height={SIZE_PIXELS[size]}
-        className="object-contain drop-shadow-lg"
-        priority={shouldPrioritize}
-        loading={loadingStrategy as 'lazy' | undefined}
-        unoptimized={isGif}
-      />
+      <div
+        className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}
+      >
+        <Image
+          src={imageSrc}
+          alt={altText}
+          width={SIZE_PIXELS[size]}
+          height={SIZE_PIXELS[size]}
+          className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+          priority={shouldPrioritize}
+          loading={loadingStrategy as 'lazy' | undefined}
+          unoptimized={isGif}
+        />
+      </div>
     </motion.div>
   );
 });
@@ -440,6 +479,9 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   priority = false,
   alt,
   delay = 0,
+  clipShape = 'circle',
+  clipBorder = 'white',
+  clipBg = 'bg-neo-navy',
 }: MascotProps & { delay?: number }) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -450,10 +492,10 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const isGif = isGifVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
-  // Automatically prioritize 'happy' variant (main mascot) if priority not explicitly set
   const shouldPrioritize = priority ?? (variant === 'happy');
-  // Use lazy loading for non-priority mascots
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
+
+  const hasClip = clipShape !== 'none';
 
   return (
     <motion.div
@@ -472,16 +514,20 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
         variants={loopVariants}
         animate={shouldAnimate ? 'animate' : undefined}
       >
-        <Image
-          src={imageSrc}
-          alt={altText}
-          width={SIZE_PIXELS[size]}
-          height={SIZE_PIXELS[size]}
-          className="object-contain drop-shadow-lg"
-          priority={shouldPrioritize}
-          loading={loadingStrategy as 'lazy' | undefined}
-          unoptimized={isGif}
-        />
+        <div
+          className={`w-full h-full ${CLIP_CLASSES[clipShape]} ${BORDER_CLASSES[clipBorder]} ${hasClip ? clipBg : ''}`}
+        >
+          <Image
+            src={imageSrc}
+            alt={altText}
+            width={SIZE_PIXELS[size]}
+            height={SIZE_PIXELS[size]}
+            className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
+            priority={shouldPrioritize}
+            loading={loadingStrategy as 'lazy' | undefined}
+            unoptimized={isGif}
+          />
+        </div>
       </motion.div>
     </motion.div>
   );

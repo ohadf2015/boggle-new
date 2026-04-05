@@ -266,6 +266,13 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   const [roundEvent, setRoundEvent] = useState<RoundEventState | null>(null);
   const roundEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Round event tile effects — frozen (blizzard), charged (lightning), meteor (crater)
+  const [eventTiles, setEventTiles] = useState<{
+    frozen: Set<string>;
+    charged: Set<string>;
+    meteor: Set<string>;
+  }>({ frozen: new Set(), charged: new Set(), meteor: new Set() });
+
   // Special word toast state
   const [specialWordEvent, setSpecialWordEvent] = useState<SpecialWordEvent | null>(null);
   const specialWordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -309,9 +316,29 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       setRoundEvent({ type, phase: 'warning' });
     };
 
-    const handleRoundEventStart = (data: { eventType: string; duration: number }) => {
+    const handleRoundEventStart = (data: { eventType: string; duration: number; data?: Record<string, unknown> }) => {
       const type = data.eventType as RoundEventState['type'];
       setRoundEvent({ type, phase: 'active', duration: data.duration });
+
+      // Extract affected tiles from event data
+      const eventData = data.data ?? {};
+      if (type === 'blizzard' && eventData.blizzard) {
+        const bd = eventData.blizzard as { frozenTiles?: Array<{ row: number; col: number }> };
+        if (bd.frozenTiles) {
+          setEventTiles(prev => ({ ...prev, frozen: new Set(bd.frozenTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      } else if (type === 'lightning' && eventData.lightning) {
+        const ld = eventData.lightning as { chargedTiles?: Array<{ row: number; col: number }> };
+        if (ld.chargedTiles) {
+          setEventTiles(prev => ({ ...prev, charged: new Set(ld.chargedTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      } else if (type === 'meteor' && eventData.meteor) {
+        const md = eventData.meteor as { affectedTiles?: Array<{ row: number; col: number }> };
+        if (md.affectedTiles) {
+          setEventTiles(prev => ({ ...prev, meteor: new Set(md.affectedTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      }
+
       if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
       roundEventTimerRef.current = setTimeout(() => {
         setRoundEvent(null);
@@ -321,6 +348,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     const handleRoundEventEnd = () => {
       if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
       setRoundEvent(null);
+      setEventTiles({ frozen: new Set(), charged: new Set(), meteor: new Set() });
     };
 
     const handleSpecialWordFound = (data: { word: string; bonus?: number; username?: string }) => {
@@ -501,6 +529,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     onWordHuntGuess,
     goldenLetters,
     roundEvent,
+    eventTiles,
     specialWordEvent,
     timerUrgencyState,
     onTimerState: setTimerUrgencyState,

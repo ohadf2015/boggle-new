@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sun, Moon, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -147,7 +147,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, labe
 }
 
 export default function SettingsPageClient(): React.JSX.Element {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { t, language, setLanguage } = useLanguage();
   const { volume: musicVolume, setVolume: setMusicVolume, isMuted: musicMuted, toggleMute: toggleMusicMute } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
@@ -222,22 +222,6 @@ export default function SettingsPageClient(): React.JSX.Element {
               {t('settings.appearance')}
             </h2>
             <div className="space-y-3">
-              <SettingRow
-                icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-pink" /> : <Sun className="w-5 h-5 text-neo-lime" />}
-                label={t('settings.theme')}
-                description={isDarkMode ? t('settings.dark') : t('settings.light')}
-                isDarkMode={isDarkMode}
-              >
-                <ToggleButton
-                  isOn={isDarkMode}
-                  onToggle={toggleTheme}
-                  isDarkMode={isDarkMode}
-                  label={t('settings.theme')}
-                  onLabel={t('settings.dark')}
-                  offLabel={t('settings.light')}
-                />
-              </SettingRow>
-
               <SettingRow
                 icon={<Languages className="w-5 h-5 text-neo-cyan" />}
                 label={t('settings.language')}

@@ -3,6 +3,7 @@
  * Tests the invalid word submission tracking and approval system
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
 
@@ -19,24 +20,29 @@ interface AdminRequest extends Request {
 }
 
 // Mock supabaseServer module
-const mockSupabaseFrom = jest.fn();
-const mockSupabaseRpc = jest.fn();
+const { mockSupabaseFrom, mockSupabaseRpc } = vi.hoisted(() => {
+  const mockSupabaseFrom = vi.fn();
+  const mockSupabaseRpc = vi.fn();
+  return { mockSupabaseFrom, mockSupabaseRpc };
+});
 
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({
     from: mockSupabaseFrom,
     rpc: mockSupabaseRpc,
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
+
+import { getSupabase } from '../../modules/supabaseServer';
 
 // Create a minimal Express app for testing with mocked auth
 const createTestApp = () => {
@@ -60,25 +66,25 @@ const createTestApp = () => {
 // Helper to setup mock chain
 const setupMockQuery = (data: unknown, error: Error | null = null, count: number | null = null) => {
   const mockChain = {
-    select: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    upsert: jest.fn().mockReturnThis(),
-    delete: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    is: jest.fn().mockReturnThis(),
-    gte: jest.fn().mockReturnThis(),
-    ilike: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
-    range: jest.fn().mockReturnThis(),
-    single: jest.fn().mockResolvedValue({ data, error }),
-    throwOnError: jest.fn().mockReturnThis(),
-    then: jest.fn((resolve) => resolve({ data, error, count })),
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    upsert: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    gte: vi.fn().mockReturnThis(),
+    ilike: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    range: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data, error }),
+    throwOnError: vi.fn().mockReturnThis(),
+    then: vi.fn((resolve) => resolve({ data, error, count })),
   };
   // Allow async iteration
   mockChain.select.mockImplementation(() => {
     const selectChain = { ...mockChain };
-    selectChain.then = jest.fn((resolve) => resolve({ data, error, count }));
+    selectChain.then = vi.fn((resolve) => resolve({ data, error, count }));
     return selectChain;
   });
   return mockChain;
@@ -88,7 +94,7 @@ describe('Admin Invalid Words API', () => {
   let app: express.Express;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     app = createTestApp();
   });
 
@@ -138,7 +144,6 @@ describe('Admin Invalid Words API', () => {
 
       // Add the route handler inline for this test
       app.get('/api/admin/invalid-words', async (req: AdminRequest, res: Response) => {
-        const { getSupabase } = require('../../modules/supabaseServer');
         const supabase = getSupabase();
 
         const language = (req.query.language as string) || null;
@@ -235,7 +240,6 @@ describe('Admin Invalid Words API', () => {
       });
 
       app.get('/api/admin/invalid-words', async (req: AdminRequest, res: Response) => {
-        const { getSupabase } = require('../../modules/supabaseServer');
         const supabase = getSupabase();
 
         const language = (req.query.language as string) || null;
@@ -306,7 +310,6 @@ describe('Admin Invalid Words API', () => {
       });
 
       app.post('/api/admin/invalid-words/approve', async (req: AdminRequest, res: Response) => {
-        const { getSupabase } = require('../../modules/supabaseServer');
         const supabase = getSupabase();
 
         const { word, language } = req.body;
@@ -400,15 +403,14 @@ describe('Admin Invalid Words API', () => {
 
     it('should return 404 if word not found in invalid submissions', async () => {
       const lookupQuery = {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } }),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } }),
       };
 
       mockSupabaseFrom.mockReturnValue(lookupQuery);
 
       app.post('/api/admin/invalid-words/approve', async (req: AdminRequest, res: Response) => {
-        const { getSupabase } = require('../../modules/supabaseServer');
         const supabase = getSupabase();
 
         const { word, language } = req.body;
@@ -445,15 +447,14 @@ describe('Admin Invalid Words API', () => {
   describe('POST /api/admin/invalid-words/dismiss', () => {
     it('should dismiss a word by marking it as reviewed', async () => {
       const updateQuery = {
-        update: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        then: jest.fn((resolve) => resolve({ data: null, error: null })),
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        then: vi.fn((resolve) => resolve({ data: null, error: null })),
       };
 
       mockSupabaseFrom.mockReturnValue(updateQuery);
 
       app.post('/api/admin/invalid-words/dismiss', async (req: AdminRequest, res: Response) => {
-        const { getSupabase } = require('../../modules/supabaseServer');
         const supabase = getSupabase();
 
         const { word, language, reason } = req.body;
@@ -496,7 +497,6 @@ describe('recordPlayerWrongWord function', () => {
     // This tests the updated function signature with reason parameter
     mockSupabaseRpc.mockResolvedValue({ error: null });
 
-    const { getSupabase } = require('../../modules/supabaseServer');
     const client = getSupabase();
 
     await client.rpc('record_invalid_word_submission', {

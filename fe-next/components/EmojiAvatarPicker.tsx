@@ -263,6 +263,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
           isOpen={showBuilder}
           onClose={() => setShowBuilder(false)}
           onSave={handleCustomAvatarSave}
+          premium={null}
         />
       )}
     </AnimatePresence>,

@@ -3,25 +3,29 @@
  * Tests for GET /api/player-profile/:id
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 
 // Create mock supabase with chainable methods
-const mockSupabase = {
-  from: jest.fn(),
-};
+const { mockSupabase } = vi.hoisted(() => {
+  const mockSupabase = {
+    from: vi.fn(),
+  };
+  return { mockSupabase };
+});
 
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => mockSupabase),
-  isSupabaseConfigured: jest.fn(() => true),
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => mockSupabase),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 import playerProfileRouter from '../playerProfile';
 
@@ -59,29 +63,29 @@ function setupMocks(profile: unknown, profileError: unknown = null, higherCount 
   mockSupabase.from
     // 1st call: fetch profile
     .mockReturnValueOnce({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: profile, error: profileError }),
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: profile, error: profileError }),
         }),
       }),
     })
     // 2nd call: count higher scores
     .mockReturnValueOnce({
-      select: jest.fn().mockReturnValue({
-        gt: jest.fn().mockResolvedValue({ count: higherCount, error: null }),
+      select: vi.fn().mockReturnValue({
+        gt: vi.fn().mockResolvedValue({ count: higherCount, error: null }),
       }),
     })
     // 3rd call: count total players
     .mockReturnValueOnce({
-      select: jest.fn().mockReturnValue({
-        gte: jest.fn().mockResolvedValue({ count: totalPlayers, error: null }),
+      select: vi.fn().mockReturnValue({
+        gte: vi.fn().mockResolvedValue({ count: totalPlayers, error: null }),
       }),
     });
 }
 
 describe('GET /api/player-profile/:id', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns public profile for valid player ID', async () => {
@@ -107,9 +111,9 @@ describe('GET /api/player-profile/:id', () => {
 
   it('returns 404 for non-existent player ID', async () => {
     mockSupabase.from.mockReturnValueOnce({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: null,
             error: { code: 'PGRST116', message: 'Not found' },
           }),
@@ -125,9 +129,9 @@ describe('GET /api/player-profile/:id', () => {
 
   it('returns 404 for non-existent username', async () => {
     mockSupabase.from.mockReturnValueOnce({
-      select: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
             data: null,
             error: { code: 'PGRST116', message: 'Not found' },
           }),

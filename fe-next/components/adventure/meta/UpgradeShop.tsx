@@ -66,7 +66,7 @@ export function UpgradeShop({
     <div className={cn('flex flex-col gap-4', className)}>
       {/* Header */}
       <div className="flex items-center gap-3">
-        <MascotWithEntrance variant="shopkeeper" size="md" delay={0.2} />
+        <MascotWithEntrance variant="shopkeeper" size="md" delay={0.2} clipBorder="purple" />
         <div>
           <h2 className="font-neo-display font-bold text-xl">{t('adventure.shop.title')}</h2>
           <div className="flex items-center gap-1.5 mt-1">

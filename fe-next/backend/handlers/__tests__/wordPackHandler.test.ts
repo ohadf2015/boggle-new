@@ -3,39 +3,40 @@
  * TDD: Tests written before implementation
  */
 
-jest.mock('../../modules/gameStateManager.js', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
+vi.mock('../../modules/gameStateManager.js', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
 }));
 
-jest.mock('../../modules/supabase/ugcPacks.js', () => ({
-  getPackById: jest.fn(),
+vi.mock('../../modules/supabase/ugcPacks.js', () => ({
+  getPackById: vi.fn(),
 }));
 
-jest.mock('../../utils/socketHelpers.js', () => ({
-  broadcastToRoom: jest.fn(),
+vi.mock('../../utils/socketHelpers.js', () => ({
+  broadcastToRoom: vi.fn(),
 }));
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerWordPackHandler } from '../wordPackHandler';
 import { getGame, getGameBySocketId } from '../../modules/gameStateManager.js';
 import { getPackById } from '../../modules/supabase/ugcPacks.js';
 import { broadcastToRoom } from '../../utils/socketHelpers.js';
 
-const mockGetGameBySocketId = getGameBySocketId as jest.Mock;
-const mockGetGame = getGame as jest.Mock;
-const mockGetPackById = getPackById as jest.Mock;
-const mockBroadcast = broadcastToRoom as jest.Mock;
+const mockGetGameBySocketId = getGameBySocketId as Mock;
+const mockGetGame = getGame as Mock;
+const mockGetPackById = getPackById as Mock;
+const mockBroadcast = broadcastToRoom as Mock;
 
 type MockSocket = {
   id: string;
-  emit: jest.Mock;
+  emit: Mock;
   on: (event: string, cb: Function) => void;
   _handlers: Record<string, Function>;
 };
@@ -44,7 +45,7 @@ function makeSocket(): MockSocket {
   const _handlers: Record<string, Function> = {};
   return {
     id: 'socket-1',
-    emit: jest.fn(),
+    emit: vi.fn(),
     on: (event: string, cb: Function) => { _handlers[event] = cb; },
     _handlers,
   };
@@ -76,12 +77,12 @@ function makePack(overrides: Record<string, unknown> = {}) {
 
 describe('registerWordPackHandler', () => {
   let socket: MockSocket;
-  let io: { to: jest.Mock };
+  let io: { to: Mock };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     socket = makeSocket();
-    io = { to: jest.fn().mockReturnThis() };
+    io = { to: vi.fn().mockReturnThis() };
   });
 
   it('fetches pack and sets game.selectedVocabulary on valid apply-word-pack', async () => {

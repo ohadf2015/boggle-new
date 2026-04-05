@@ -2,6 +2,7 @@
  * Tests for role-based access control middleware
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { requireAdminRole, hasPermission, type AdminRole } from '../rbac';
 
 describe('RBAC', () => {
@@ -33,8 +34,8 @@ describe('RBAC', () => {
   describe('requireAdminRole middleware', () => {
     const createMockReqRes = (role?: AdminRole) => {
       const req = { adminUser: role ? { id: '1', email: 'a@b.com', admin_role: role } : undefined } as never;
-      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as never;
-      const next = jest.fn();
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as never;
+      const next = vi.fn();
       return { req, res, next };
     };
 
@@ -48,7 +49,7 @@ describe('RBAC', () => {
       const { req, res, next } = createMockReqRes('viewer');
       requireAdminRole('superadmin')(req, res, next);
       expect(next).not.toHaveBeenCalled();
-      expect((res as { status: jest.Mock }).status).toHaveBeenCalledWith(403);
+      expect((res as { status: Mock }).status).toHaveBeenCalledWith(403);
     });
 
     it('should return 403 when no adminUser', () => {

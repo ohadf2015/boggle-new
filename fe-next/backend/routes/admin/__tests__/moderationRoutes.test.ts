@@ -2,41 +2,45 @@
  * Tests for moderation routes (ban, suspend, investigate, queue)
  */
 
-const mockInsert = jest.fn().mockResolvedValue({ error: null });
-const mockUpdate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
-const mockSelectChain = {
-  eq: jest.fn().mockReturnThis(),
-  is: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue({ data: [], error: null }),
-  single: jest.fn().mockResolvedValue({ data: { id: '1', username: 'alice' }, error: null }),
-  range: jest.fn().mockResolvedValue({ data: [], count: 0, error: null }),
-  in: jest.fn().mockReturnThis(),
-};
-const mockSelect = jest.fn().mockReturnValue(mockSelectChain);
-const mockFrom = jest.fn().mockReturnValue({
-  select: mockSelect,
-  insert: mockInsert,
-  update: mockUpdate,
+const { mockInsert, mockUpdate, mockSelectChain, mockSelect, mockFrom, mockSupabase } = vi.hoisted(() => {
+  const mockInsert = vi.fn().mockResolvedValue({ error: null });
+  const mockUpdate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) });
+  const mockSelectChain = {
+    eq: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue({ data: [], error: null }),
+    single: vi.fn().mockResolvedValue({ data: { id: '1', username: 'alice' }, error: null }),
+    range: vi.fn().mockResolvedValue({ data: [], count: 0, error: null }),
+    in: vi.fn().mockReturnThis(),
+  };
+  const mockSelect = vi.fn().mockReturnValue(mockSelectChain);
+  const mockFrom = vi.fn().mockReturnValue({
+    select: mockSelect,
+    insert: mockInsert,
+    update: mockUpdate,
+  });
+  const mockSupabase = { from: mockFrom };
+  return { mockInsert, mockUpdate, mockSelectChain, mockSelect, mockFrom, mockSupabase };
 });
-const mockSupabase = { from: mockFrom };
 
-jest.mock('../../../modules/supabaseServer', () => ({
+vi.mock('../../../modules/supabaseServer', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../../redis/connection', () => ({
+vi.mock('../../../redis/connection', () => ({
   getRedisClient: () => null,
   isRedisAvailable: () => false,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   fetchPlayerInvestigation,
   fetchModerationQueue,
 } from '../moderationRoutes';
 
 describe('moderationRoutes', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   describe('fetchPlayerInvestigation', () => {
     it('should query profile, games, and moderation history in parallel', async () => {

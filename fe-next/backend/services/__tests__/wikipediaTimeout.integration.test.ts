@@ -3,12 +3,13 @@
  * This test calls the actual Wikipedia API to verify timeout behavior
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import axios from 'axios';
 import { fetchFeaturedContent } from '../wikipediaWordFetcher';
 
 describe('Wikipedia API Timeout Reproduction', () => {
   // Increase Jest timeout for this suite to match new server maxDuration
-  jest.setTimeout(100000);
+  vi.setConfig({ testTimeout: 100000 });
 
   test('should fetch Wikipedia featured content without timeout (EN)', async () => {
     // GIVEN: Current date for fetching featured content

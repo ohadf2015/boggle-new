@@ -381,6 +381,11 @@ module.exports = {
           "0%, 100%": { boxShadow: "0 0 6px rgba(255,215,0,0.4), 0 0 2px rgba(255,215,0,0.2)" },
           "50%": { boxShadow: "0 0 14px rgba(255,215,0,0.8), 0 0 6px rgba(255,215,0,0.5)" },
         },
+        // Simple fade-in for deferred content (prevents pop-in flicker)
+        "fadeIn": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
         // Hero entrance animations (CSS-only, no Framer Motion needed)
         "fadeInUp": {
           "0%": { opacity: "0", transform: "translateY(20px)" },
@@ -599,6 +604,7 @@ module.exports = {
         'neo': ['var(--font-fredoka)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
         'neo-display': ['var(--font-fredoka)', 'Fredoka', 'sans-serif'],
         'neo-body': ['var(--font-rubik)', 'Rubik', 'sans-serif'],
+        'neo-body-he': ['var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Rubik', 'sans-serif'],
         sans: ['var(--font-rubik)', 'Rubik', 'sans-serif'],
       },
       // Additional spacing for better component composition

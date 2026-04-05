@@ -32,6 +32,8 @@ interface UseResultSubmissionProps {
   guestPlayer: GuestDailyPlayer | null;
   countryCodeReady: boolean;
   onSubmitSuccess: () => void;
+  /** Number of coin-paid retries */
+  extraTries?: number;
   /** Translation function for error messages */
   t?: (key: string) => string;
 }
@@ -48,6 +50,7 @@ export function useResultSubmission({
   guestPlayer,
   countryCodeReady,
   onSubmitSuccess,
+  extraTries = 0,
   t,
 }: UseResultSubmissionProps) {
   const hasSubmittedRef = useRef(false);
@@ -174,6 +177,9 @@ export function useResultSubmission({
             });
           }
 
+          // Add extra tries for retry penalty tracking
+          if (extraTries > 0) bodyData.extraTries = extraTries;
+
           // Add survival mode fields if present
           if (result.wordsDiscovered) bodyData.wordsDiscovered = result.wordsDiscovered;
           if (result.lifeRemaining !== undefined) bodyData.lifeRemaining = result.lifeRemaining;
@@ -245,6 +251,7 @@ export function useResultSubmission({
     guestPlayer,
     countryCodeReady,
     onSubmitSuccess,
+    extraTries,
     t,
   ]);
 

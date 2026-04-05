@@ -37,6 +37,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/brain/drills/memory-hunt",
   "/brain/drills/pattern-switcher",
   "/brain/drills/rare-gems",
+  "/comeback-test",
   "/community",
   "/community/create",
   "/contact",

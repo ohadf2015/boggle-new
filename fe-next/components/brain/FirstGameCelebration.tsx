@@ -294,6 +294,7 @@ export default function FirstGameCelebration({
               size="sm"
               delay={1.0}
               className="drop-shadow-lg"
+              clipBorder="purple"
             />
           </div>
         </motion.div>

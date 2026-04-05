@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors, type PerformanceMode } from './index';
 import GridCellEffects from './GridCellEffects';
+import RoundEventTileEffects from './RoundEventTileEffects';
 import DoubleClickIndicator from './DoubleClickIndicator';
 import { getSelectionEscalation, getEscalationBackground, getEscalationShake } from './selectionEscalation';
 
@@ -27,6 +28,9 @@ export interface GridCellProps {
   isGolden: boolean;
   isEliminated: boolean;
   isHovered: boolean;
+  isFrozen: boolean;
+  isCharged: boolean;
+  isMeteor: boolean;
   highlightedOrder: number | undefined;
   selectionIdx: number;
   escalation: ReturnType<typeof getSelectionEscalation> | null;
@@ -56,6 +60,7 @@ const GridCell = memo<GridCellProps>(({
   cell, row, col,
   isSelected, isFirstSelected, isLastSelected, isFading, isFocused,
   isAdjacentHint, isHighlighted, isGolden, isEliminated, isHovered,
+  isFrozen, isCharged, isMeteor,
   highlightedOrder, selectionIdx, escalation, shakeOffset,
   effectiveRenderMode, earthquakePhase, getPhaseAnimation,
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
@@ -169,7 +174,10 @@ const GridCell = memo<GridCellProps>(({
           : isEliminated
             ? "bg-gray-400/60 text-gray-500/50 border border-gray-400/30 shadow-none cursor-not-allowed"
             : "letter-tile-gradient text-neo-black border-2 border-neo-black/30 shadow-sm hover:shadow-md hover:border-neo-black/50 active:shadow-none",
-      isGolden && !isSelected && !isEliminated && "ring-2 ring-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.6)] animate-golden-pulse",
+      isGolden && !isSelected && !isEliminated && "golden-tile-bg ring-2 ring-amber-400/80 shadow-[0_0_14px_rgba(255,215,0,0.7)] animate-golden-pulse",
+      isFrozen && !isSelected && "ring-2 ring-cyan-300/90 shadow-[0_0_16px_rgba(96,165,250,0.6)] cursor-not-allowed opacity-70",
+      isCharged && !isSelected && "ring-2 ring-yellow-300/90 shadow-[0_0_16px_rgba(250,204,21,0.7)] animate-pulse",
+      isMeteor && !isSelected && "ring-2 ring-orange-400/90 shadow-[0_0_16px_rgba(251,146,60,0.7)]",
       isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
       isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
       isHovered && isLastSelected && selectedCellsLength >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
@@ -211,6 +219,18 @@ const GridCell = memo<GridCellProps>(({
           ].filter(Boolean).join(', '),
         } : {}),
       } : {}),
+      ...(isFrozen && !isSelected ? {
+        background: 'linear-gradient(135deg, rgba(186,230,253,0.6), rgba(147,197,253,0.4), rgba(186,230,253,0.6))',
+        pointerEvents: 'none' as const,
+      } : {}),
+      ...(isCharged && !isSelected ? {
+        background: 'linear-gradient(135deg, rgba(254,240,138,0.5), rgba(253,224,71,0.3), rgba(254,240,138,0.5))',
+        backgroundSize: '200% 200%',
+        animation: 'gradient-x 2s ease infinite',
+      } : {}),
+      ...(isMeteor && !isSelected ? {
+        background: 'linear-gradient(135deg, rgba(253,186,116,0.5), rgba(251,146,60,0.3), rgba(253,186,116,0.5))',
+      } : {}),
       ...(isHighlighted && isTypingMode && highlightedOrder !== undefined ? {
         animationDelay: `${(highlightedOrder - 1) * 50}ms`,
         animationFillMode: 'both',
@@ -242,13 +262,28 @@ const GridCell = memo<GridCellProps>(({
     </span>
 
     {isGolden && !isEliminated && (
-      <span
-        className="absolute top-0.5 right-0.5 text-[8px] leading-none pointer-events-none select-none z-10"
-        aria-hidden="true"
-      >
-        ⭐
-      </span>
+      <>
+        <div className="golden-tile-sparkle golden-tile-sparkle--1" />
+        <div className="golden-tile-sparkle golden-tile-sparkle--2" />
+        <div className="golden-tile-sparkle golden-tile-sparkle--3" />
+        <span
+          className="absolute top-0 right-0.5 text-[7px] font-black leading-none pointer-events-none select-none z-10 text-amber-900/80 drop-shadow-[0_0_2px_rgba(255,215,0,0.8)]"
+          aria-hidden="true"
+        >
+          ★
+        </span>
+      </>
     )}
+
+    {/* Round event tile effects (frozen/charged/meteor) */}
+    <RoundEventTileEffects
+      isFrozen={isFrozen}
+      isCharged={isCharged}
+      isMeteor={isMeteor}
+      isSelected={isSelected}
+      row={row}
+      col={col}
+    />
 
     {isHighlighted && highlightedOrder !== undefined && (
       <span

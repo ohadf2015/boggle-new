@@ -57,26 +57,26 @@ describe('InteractiveMascot', () => {
     it('renders the correct image source for variant', () => {
       render(<InteractiveMascot variant="thinking" />);
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/study.gif');
     });
   });
 
   describe('size variants', () => {
-    it('applies xs size class', () => {
+    it('applies xs size class (100px minimum)', () => {
       const { container } = render(<InteractiveMascot variant="happy" size="xs" />);
-      const sizeContainer = container.querySelector('.w-10');
+      const sizeContainer = container.querySelector('.w-\\[100px\\]');
       expect(sizeContainer).toBeInTheDocument();
     });
 
     it('applies md size class by default', () => {
       const { container } = render(<InteractiveMascot variant="happy" />);
-      const sizeContainer = container.querySelector('.w-24');
+      const sizeContainer = container.querySelector('.w-32');
       expect(sizeContainer).toBeInTheDocument();
     });
 
     it('applies xl size class', () => {
       const { container } = render(<InteractiveMascot variant="happy" size="xl" />);
-      const sizeContainer = container.querySelector('.w-40');
+      const sizeContainer = container.querySelector('.w-48');
       expect(sizeContainer).toBeInTheDocument();
     });
   });
@@ -86,35 +86,35 @@ describe('InteractiveMascot', () => {
       render(<InteractiveMascot variant="confused" />);
       const img = screen.getByRole('img');
       // 'confused' falls back to 'thinking' (which is now a GIF variant)
-      expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/study.gif');
     });
 
     it('renders activity variant mapped to GIF (eating_pizza → happy)', () => {
       render(<InteractiveMascot variant="eating_pizza" />);
       const img = screen.getByRole('img');
       // eating_pizza maps to happy GIF
-      expect(img).toHaveAttribute('src', '/mascot/main-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/main.gif');
     });
 
     it('renders gaming variant with GIF', () => {
       render(<InteractiveMascot variant="gaming" />);
       const img = screen.getByRole('img');
       // gaming is a base GIF variant
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/play.gif');
     });
 
     it('renders activity variant mapped to GIF (skateboarding → gaming)', () => {
       render(<InteractiveMascot variant="skateboarding" />);
       const img = screen.getByRole('img');
       // skateboarding maps to gaming GIF
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/play.gif');
     });
 
     it('renders activity variant mapped to GIF (dancing → dj)', () => {
       render(<InteractiveMascot variant="dancing" />);
       const img = screen.getByRole('img');
       // dancing maps to dj GIF
-      expect(img).toHaveAttribute('src', '/mascot/dj-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/dj.gif');
     });
   });
 
@@ -133,7 +133,7 @@ describe('InteractiveMascot', () => {
 
       // The component should now show the hover variant (gaming GIF)
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/play.gif');
     });
 
     it('reverts to base variant on mouse leave', () => {
@@ -150,7 +150,7 @@ describe('InteractiveMascot', () => {
       fireEvent.mouseLeave(button);
 
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/main-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/main.gif');
     });
 
     it('calls onHover callback', () => {
@@ -188,7 +188,7 @@ describe('InteractiveMascot', () => {
 
       const img = screen.getByRole('img');
       // celebrating maps to happy, but we're using gaming directly for testing
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/play.gif');
     });
 
     it('calls onClick callback', () => {
@@ -223,14 +223,14 @@ describe('InteractiveMascot', () => {
       fireEvent.click(button);
 
       // Immediately after click, should show click variant (gaming GIF)
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/play.gif');
 
       // After duration, should revert to base
       await act(async () => {
         vi.advanceTimersByTime(500);
       });
 
-      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/main-nobg.gif');
+      expect(screen.getByRole('img')).toHaveAttribute('src', '/mascot/main.gif');
 
       vi.useRealTimers();
     });
@@ -335,7 +335,7 @@ describe('InteractiveMascot', () => {
 
       // 'happy' defaults to 'gaming' on hover (updated for GIF variants)
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/play-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/play.gif');
     });
 
     it('uses default click transition when clickVariant not specified', () => {
@@ -351,7 +351,7 @@ describe('InteractiveMascot', () => {
 
       // 'happy' defaults to 'celebration' on click
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/celebration-nobg.gif');
+      expect(img).toHaveAttribute('src', '/mascot/celebration.gif');
     });
   });
 });
@@ -373,7 +373,7 @@ describe('InteractiveMascotWithEntrance', () => {
       />
     );
     const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', '/mascot/study-nobg.gif');
+    expect(img).toHaveAttribute('src', '/mascot/study.gif');
   });
 
   it('accepts delay prop', () => {

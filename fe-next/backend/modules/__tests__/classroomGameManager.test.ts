@@ -3,6 +3,7 @@
  * Manages Redis-backed classroom multiplayer games
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   createClassroomGame,
   getClassroomGame,
@@ -15,24 +16,24 @@ import {
 import { getRedisClient } from '../../redisClient';
 
 // Mock Redis client
-jest.mock('../../redisClient');
+vi.mock('../../redisClient');
 
 const mockRedis = {
-  setex: jest.fn(),
-  get: jest.fn(),
-  del: jest.fn(),
-  sadd: jest.fn(),
-  smembers: jest.fn(),
-  srem: jest.fn(),
+  setex: vi.fn(),
+  get: vi.fn(),
+  del: vi.fn(),
+  sadd: vi.fn(),
+  smembers: vi.fn(),
+  srem: vi.fn(),
 };
 
 beforeAll(() => {
-  (getRedisClient as jest.Mock).mockReturnValue(mockRedis);
+  (getRedisClient as Mock).mockReturnValue(mockRedis);
 });
 
 describe('ClassroomGameManager', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('createClassroomGame', () => {
@@ -90,7 +91,7 @@ describe('ClassroomGameManager', () => {
       await createClassroomGame(gameData);
 
       // THEN
-      const savedJson = (mockRedis.setex as jest.Mock).mock.calls[0][2];
+      const savedJson = (mockRedis.setex as Mock).mock.calls[0][2];
       const saved = JSON.parse(savedJson);
       expect(saved.classroomId).toBe('classroom-99');
       expect(saved.lessonIds).toEqual(['lesson-A', 'lesson-B']);
@@ -98,7 +99,7 @@ describe('ClassroomGameManager', () => {
 
     it('should throw error if Redis fails', async () => {
       // GIVEN
-      (mockRedis.setex as jest.Mock).mockRejectedValue(new Error('Redis error'));
+      (mockRedis.setex as Mock).mockRejectedValue(new Error('Redis error'));
 
       // WHEN & THEN
       await expect(
@@ -128,7 +129,7 @@ describe('ClassroomGameManager', () => {
         players: [],
       };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
 
       // WHEN
       const result = await getClassroomGame(gameCode);
@@ -140,7 +141,7 @@ describe('ClassroomGameManager', () => {
 
     it('should return null if game does not exist', async () => {
       // GIVEN
-      (mockRedis.get as jest.Mock).mockResolvedValue(null);
+      (mockRedis.get as Mock).mockResolvedValue(null);
 
       // WHEN
       const result = await getClassroomGame('NONEXISTENT');
@@ -158,8 +159,8 @@ describe('ClassroomGameManager', () => {
       const game1 = { gameCode: 'GAME1', classroomId };
       const game2 = { gameCode: 'GAME2', classroomId };
 
-      (mockRedis.smembers as jest.Mock).mockResolvedValue(gameCodes);
-      (mockRedis.get as jest.Mock)
+      (mockRedis.smembers as Mock).mockResolvedValue(gameCodes);
+      (mockRedis.get as Mock)
         .mockResolvedValueOnce(JSON.stringify(game1))
         .mockResolvedValueOnce(JSON.stringify(game2));
 
@@ -173,7 +174,7 @@ describe('ClassroomGameManager', () => {
 
     it('should return empty array if no active games', async () => {
       // GIVEN
-      (mockRedis.smembers as jest.Mock).mockResolvedValue([]);
+      (mockRedis.smembers as Mock).mockResolvedValue([]);
 
       // WHEN
       const result = await getActiveClassroomGames('classroom-1');
@@ -188,8 +189,8 @@ describe('ClassroomGameManager', () => {
       const gameCodes = ['GAME1', 'GAME2'];
       const game1 = { gameCode: 'GAME1', classroomId };
 
-      (mockRedis.smembers as jest.Mock).mockResolvedValue(gameCodes);
-      (mockRedis.get as jest.Mock)
+      (mockRedis.smembers as Mock).mockResolvedValue(gameCodes);
+      (mockRedis.get as Mock)
         .mockResolvedValueOnce(JSON.stringify(game1))
         .mockResolvedValueOnce(null); // GAME2 expired
 
@@ -208,9 +209,9 @@ describe('ClassroomGameManager', () => {
       const classroomId = 'classroom-1';
       const gameData = { gameCode, classroomId };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
-      (mockRedis.del as jest.Mock).mockResolvedValue(1);
-      (mockRedis.srem as jest.Mock).mockResolvedValue(1);
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.del as Mock).mockResolvedValue(1);
+      (mockRedis.srem as Mock).mockResolvedValue(1);
 
       // WHEN
       await deleteClassroomGame(gameCode);
@@ -225,7 +226,7 @@ describe('ClassroomGameManager', () => {
 
     it('should not fail if game does not exist', async () => {
       // GIVEN
-      (mockRedis.get as jest.Mock).mockResolvedValue(null);
+      (mockRedis.get as Mock).mockResolvedValue(null);
 
       // WHEN & THEN
       await expect(deleteClassroomGame('NONEXISTENT')).resolves.not.toThrow();
@@ -243,8 +244,8 @@ describe('ClassroomGameManager', () => {
         players: [],
       };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
-      (mockRedis.setex as jest.Mock).mockResolvedValue('OK');
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.setex as Mock).mockResolvedValue('OK');
 
       // WHEN
       await addPlayerToClassroomGame(gameCode, player);
@@ -267,15 +268,15 @@ describe('ClassroomGameManager', () => {
         players: [player],
       };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
-      (mockRedis.setex as jest.Mock).mockResolvedValue('OK');
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.setex as Mock).mockResolvedValue('OK');
 
       // WHEN
       await addPlayerToClassroomGame(gameCode, player);
 
       // THEN - player list should still have only 1 player
       const savedData = JSON.parse(
-        (mockRedis.setex as jest.Mock).mock.calls[0][2]
+        (mockRedis.setex as Mock).mock.calls[0][2]
       );
       expect(savedData.players).toHaveLength(1);
     });
@@ -297,7 +298,7 @@ describe('ClassroomGameManager', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
       };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
 
       // WHEN
       const result = await getClassroomGameByCode('ABC123');
@@ -312,7 +313,7 @@ describe('ClassroomGameManager', () => {
 
     it('should return null if game does not exist', async () => {
       // GIVEN
-      (mockRedis.get as jest.Mock).mockResolvedValue(null);
+      (mockRedis.get as Mock).mockResolvedValue(null);
 
       // WHEN
       const result = await getClassroomGameByCode('NONEXISTENT');
@@ -334,15 +335,15 @@ describe('ClassroomGameManager', () => {
         players: [player1, player2],
       };
 
-      (mockRedis.get as jest.Mock).mockResolvedValue(JSON.stringify(gameData));
-      (mockRedis.setex as jest.Mock).mockResolvedValue('OK');
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify(gameData));
+      (mockRedis.setex as Mock).mockResolvedValue('OK');
 
       // WHEN
       await removePlayerFromClassroomGame(gameCode, 'student-1');
 
       // THEN
       const savedData = JSON.parse(
-        (mockRedis.setex as jest.Mock).mock.calls[0][2]
+        (mockRedis.setex as Mock).mock.calls[0][2]
       );
       expect(savedData.players).toHaveLength(1);
       expect(savedData.players[0].userId).toBe('student-2');

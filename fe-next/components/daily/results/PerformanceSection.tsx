@@ -8,10 +8,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Target, BookOpen, Coins, Lock } from 'lucide-react';
+import { Zap, Target, BookOpen, Coins, Lock, RotateCcw } from 'lucide-react';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
 import type { CoinRewardMode } from '@/components/results/CoinRewardDisplay';
+
+const EXTRA_TRY_PENALTY = 150;
 
 export interface PerformanceSectionProps {
   coinReward: { awarded: number; breakdown: { base: number; efficiency: number; streak: number } } | null;
@@ -23,6 +25,7 @@ export interface PerformanceSectionProps {
   lifeRemaining: number;
   wordsDiscovered: number;
   guessesUsed: number;
+  extraTries?: number;
   t: (key: string) => string;
 }
 
@@ -42,10 +45,12 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   lifeRemaining,
   wordsDiscovered,
   guessesUsed,
+  extraTries = 0,
   t,
 }) => {
   const isTeasing = coinRewardMode === 'teasing';
   const breakdown = getScoreBreakdown(lifeRemaining, guessesUsed, wordsDiscovered, solved);
+  const retryPenalty = extraTries * EXTRA_TRY_PENALTY;
 
   if (!solved || breakdown.total === 0) return null;
 
@@ -129,6 +134,31 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
           </motion.div>
         ))}
       </div>
+
+      {/* Extra Try Penalty — visible deduction */}
+      {retryPenalty > 0 && (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+          className="mt-3 pt-3 border-t border-neo-black/30"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <RotateCcw className="w-4 h-4 text-neo-red" />
+              <span className="text-xs font-medium text-slate-300">
+                {t('wordHunt.score.extraTryPenalty')}
+              </span>
+            </div>
+            <span className="font-black text-neo-red">
+              -{retryPenalty}
+            </span>
+          </div>
+          <div className="text-[10px] text-slate-500 mt-1">
+            {extraTries} {extraTries === 1 ? t('wordHunt.score.extraTry') : t('wordHunt.score.extraTries')} × {EXTRA_TRY_PENALTY} {t('wordHunt.score.points')}
+          </div>
+        </motion.div>
+      )}
 
       {/* Coin Reward — Compact inline display */}
       {coinReward && coinReward.awarded > 0 && (

@@ -32,19 +32,19 @@ interface EmptyStateProps {
 }
 
 const TYPE_CONFIG: Record<EmptyStateType, { icon: ReactNode; mascot: MascotVariant; emoji: string }> = {
-  'no-words': { icon: <Search className="w-full h-full" />, mascot: 'happy', emoji: '🔎' },
+  'no-words': { icon: <Search className="w-full h-full" />, mascot: 'explorer', emoji: '🔎' },
   'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'waving', emoji: '👋' },
-  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'happy', emoji: '🎮' },
+  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'bored', emoji: '🎮' },
   'no-results': { icon: <Trophy className="w-full h-full" />, mascot: 'thinking', emoji: '📊' },
   'error': { icon: null, mascot: 'oops', emoji: '😅' },
-  'custom': { icon: null, mascot: 'happy', emoji: '✨' },
+  'custom': { icon: null, mascot: 'encouraging', emoji: '✨' },
 };
 
 // Map size to mascot size
-const SIZE_TO_MASCOT: Record<'sm' | 'md' | 'lg', 'sm' | 'md' | 'lg'> = {
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
+const SIZE_TO_MASCOT: Record<'sm' | 'md' | 'lg', 'xs' | 'sm' | 'md'> = {
+  sm: 'xs',
+  md: 'sm',
+  lg: 'md',
 };
 
 /**

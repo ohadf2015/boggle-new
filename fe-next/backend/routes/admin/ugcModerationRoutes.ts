@@ -8,7 +8,7 @@ import type { AdminRequest } from './types';
 import { auditLog } from './middleware';
 import logger from '../../utils/logger';
 
-const { getSupabase } = require('../../modules/supabaseServer');
+import { getSupabase } from '../../modules/supabaseServer';
 
 const router: Router = express.Router();
 
@@ -34,6 +34,7 @@ export function resolveUGCTable(raw: unknown): UGCTable {
 router.get('/ugc/pending', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const table = resolveUGCTable(req.query.table);
 
     const { data, error } = await supabase
@@ -61,6 +62,7 @@ router.get('/ugc/pending', async (req: AdminRequest, res: Response): Promise<voi
 router.post('/ugc/:id/approve', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const { id } = req.params;
     const table = resolveUGCTable(req.query.table);
 
@@ -92,6 +94,7 @@ router.post('/ugc/:id/approve', async (req: AdminRequest, res: Response): Promis
 router.post('/ugc/:id/reject', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
     const { id } = req.params;
     const table = resolveUGCTable(req.query.table);
     const reason = req.body?.reason || '';

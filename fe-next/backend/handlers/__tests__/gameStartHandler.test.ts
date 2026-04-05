@@ -15,59 +15,62 @@
 
 // ─── Mocks (must come before imports) ─────────────────────────────────────
 
-const mockCheckRateLimit = jest.fn(() => true);
-const mockValidatePayload = jest.fn();
-const mockEmitError = jest.fn();
-const mockGetGame = jest.fn();
-const mockUpdateGame = jest.fn();
-const mockGetGameBySocketId = jest.fn();
-const mockGetGameUsers = jest.fn(() => []);
-const mockGetSocketIdByUsername = jest.fn();
-const mockCanTransitionGameState = jest.fn(() => true);
-const mockTransitionGameState = jest.fn(() => ({ success: true }));
-const mockResetGameForNewRound = jest.fn(() => true);
-const mockBroadcastToRoom = jest.fn();
-const mockGetGameRoom = jest.fn((code: string) => `room:${code}`);
-const mockSafeEmit = jest.fn();
-const mockGetSocketById = jest.fn();
-const mockMakePositionsMap = jest.fn(() => new Map());
-const mockEnsureGame = jest.fn();
-const mockGenerateRandomTable = jest.fn(() => [['X', 'Y'], ['Z', 'W']]);
-const mockEnsureLanguageLoaded = jest.fn(() => Promise.resolve());
-const mockClearGameTimer = jest.fn();
-const mockGameStartCoordinator = {
-  cleanupSequence: jest.fn(),
-  initializeSequence: jest.fn(() => 'msg-id-123'),
-  scheduleRetries: jest.fn(),
-  setAcknowledgmentTimeout: jest.fn(),
-};
-const mockStopAllBots = jest.fn();
-const mockNotifyGameStarted = jest.fn(() => Promise.resolve());
-const mockSelectNextGameMode = jest.fn(() => 'classic');
-const mockInitializePlayerData = jest.fn();
-const mockGetClassroomGame = jest.fn(() => Promise.resolve(null));
-const mockInitBlastModeState = jest.fn(() => ({ overlay: [], seed: 42, playerLives: {} }));
-const mockHashStringToSeed = jest.fn(() => 42);
-const mockInitWordHuntState = jest.fn(() => ({ targetWordLength: 5, targetCategory: null, playerLives: {} }));
-const mockSelectTargetWordWithFallback = jest.fn(() => 'brave');
-const mockFindAllWordsAsync = jest.fn(() => Promise.resolve(['brave', 'braves', 'rave']));
-const mockGetCachedTrie = jest.fn(() => ({}));
-const mockAutoAddBotsForSoloPlayer = jest.fn(() => Promise.resolve({ botsAdded: 0 }));
-const mockStartGameTimer = jest.fn();
+const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger } = vi.hoisted(() => {
+  const mockCheckRateLimit = vi.fn(() => true);
+  const mockValidatePayload = vi.fn();
+  const mockEmitError = vi.fn();
+  const mockGetGame = vi.fn();
+  const mockUpdateGame = vi.fn();
+  const mockGetGameBySocketId = vi.fn();
+  const mockGetGameUsers = vi.fn(() => []);
+  const mockGetSocketIdByUsername = vi.fn();
+  const mockCanTransitionGameState = vi.fn(() => true);
+  const mockTransitionGameState = vi.fn(() => ({ success: true }));
+  const mockResetGameForNewRound = vi.fn(() => true);
+  const mockBroadcastToRoom = vi.fn();
+  const mockGetGameRoom = vi.fn((code: string) => `room:${code}`);
+  const mockSafeEmit = vi.fn();
+  const mockGetSocketById = vi.fn();
+  const mockMakePositionsMap = vi.fn(() => new Map());
+  const mockEnsureGame = vi.fn();
+  const mockGenerateRandomTable = vi.fn(() => [['X', 'Y'], ['Z', 'W']]);
+  const mockEnsureLanguageLoaded = vi.fn(() => Promise.resolve());
+  const mockClearGameTimer = vi.fn();
+  const mockGameStartCoordinator = {
+    cleanupSequence: vi.fn(),
+    initializeSequence: vi.fn(() => 'msg-id-123'),
+    scheduleRetries: vi.fn(),
+    setAcknowledgmentTimeout: vi.fn(),
+  };
+  const mockStopAllBots = vi.fn();
+  const mockNotifyGameStarted = vi.fn(() => Promise.resolve());
+  const mockSelectNextGameMode = vi.fn(() => 'classic');
+  const mockInitializePlayerData = vi.fn();
+  const mockGetClassroomGame = vi.fn(() => Promise.resolve(null));
+  const mockInitBlastModeState = vi.fn(() => ({ overlay: [], seed: 42, playerLives: {} }));
+  const mockHashStringToSeed = vi.fn(() => 42);
+  const mockInitWordHuntState = vi.fn(() => ({ targetWordLength: 5, targetCategory: null, playerLives: {} }));
+  const mockSelectTargetWordWithFallback = vi.fn(() => 'brave');
+  const mockFindAllWordsAsync = vi.fn(() => Promise.resolve(['brave', 'braves', 'rave']));
+  const mockGetCachedTrie = vi.fn(() => ({}));
+  const mockAutoAddBotsForSoloPlayer = vi.fn(() => Promise.resolve({ botsAdded: 0 }));
+  const mockStartGameTimer = vi.fn();
+  const mockLogger = {
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  };
+  return { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger };
+});
 
-const mockLogger = {
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-};
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: mockCheckRateLimit }));
-jest.mock('../../../backend/utils/socketValidation', () => ({
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: mockCheckRateLimit, default: { checkRateLimit: mockCheckRateLimit } }));
+vi.mock('../../../backend/utils/socketValidation', () => ({
   validatePayload: mockValidatePayload,
   startGameSchema: {},
 }));
-jest.mock('../../../backend/utils/errorHandler', () => ({
+vi.mock('../../../backend/utils/errorHandler', () => ({
   emitError: mockEmitError,
   ErrorMessages: {
     NOT_IN_GAME: 'NOT_IN_GAME',
@@ -75,7 +78,7 @@ jest.mock('../../../backend/utils/errorHandler', () => ({
     ONLY_HOST_CAN_START: 'ONLY_HOST_CAN_START',
   },
 }));
-jest.mock('../../../backend/modules/gameStateManager', () => ({
+vi.mock('../../../backend/modules/gameStateManager', () => ({
   getGame: mockGetGame,
   updateGame: mockUpdateGame,
   getGameBySocketId: mockGetGameBySocketId,
@@ -85,57 +88,58 @@ jest.mock('../../../backend/modules/gameStateManager', () => ({
   transitionGameState: mockTransitionGameState,
   resetGameForNewRound: mockResetGameForNewRound,
 }));
-jest.mock('../../../backend/utils/socketHelpers', () => ({
+vi.mock('../../../backend/utils/socketHelpers', () => ({
   broadcastToRoom: mockBroadcastToRoom,
   getGameRoom: mockGetGameRoom,
   safeEmit: mockSafeEmit,
   getSocketById: mockGetSocketById,
 }));
-jest.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: mockMakePositionsMap }));
-jest.mock('../../../backend/utils/metrics', () => ({ ensureGame: mockEnsureGame }));
-jest.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: mockGenerateRandomTable }));
-jest.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: mockEnsureLanguageLoaded }));
-jest.mock('../../../backend/utils/timerManager', () => ({ clearGameTimer: mockClearGameTimer }));
-jest.mock('../../../backend/utils/gameStartCoordinator', () => ({
+vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: mockMakePositionsMap }));
+vi.mock('../../../backend/utils/metrics', () => ({ ensureGame: mockEnsureGame }));
+vi.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: mockGenerateRandomTable }));
+vi.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: mockEnsureLanguageLoaded }));
+vi.mock('../../../backend/utils/timerManager', () => ({ default: { clearGameTimer: mockClearGameTimer }, clearGameTimer: mockClearGameTimer }));
+vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
   __esModule: true,
   default: mockGameStartCoordinator,
 }));
-jest.mock('../../../backend/modules/botManager', () => ({ stopAllBots: mockStopAllBots }));
-jest.mock('../../../backend/modules/notificationService', () => ({ notifyGameStarted: mockNotifyGameStarted }));
-jest.mock('../../../backend/modules/gameModeSelector', () => ({
+vi.mock('../../../backend/modules/botManager', () => ({ stopAllBots: mockStopAllBots }));
+vi.mock('../../../backend/modules/notificationService', () => ({ notifyGameStarted: mockNotifyGameStarted }));
+vi.mock('../../../backend/modules/gameModeSelector', () => ({
   selectNextGameMode: mockSelectNextGameMode,
   ALL_GAME_MODES: ['classic', 'blast', 'word-hunt'],
 }));
-jest.mock('../../../backend/handlers/gameLifecycleHandler', () => ({ initializePlayerData: mockInitializePlayerData }));
-jest.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: mockGetClassroomGame }));
-jest.mock('../../../backend/modules/blastModeManager', () => ({
+vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: mockInitializePlayerData, ensurePlayerState: vi.fn() }));
+vi.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: mockGetClassroomGame }));
+vi.mock('../../../backend/modules/blastModeManager', () => ({
   initBlastModeState: mockInitBlastModeState,
   hashStringToSeed: mockHashStringToSeed,
 }));
-jest.mock('../../../backend/modules/wordHuntManager', () => ({
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
   initWordHuntState: mockInitWordHuntState,
   selectTargetWordWithFallback: mockSelectTargetWordWithFallback,
 }));
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
   findAllWordsAsync: mockFindAllWordsAsync,
-  isWordOnBoardAsync: jest.fn(),
-  getWordPathAsync: jest.fn(),
-  makePositionsMapAsync: jest.fn(),
+  isWordOnBoardAsync: vi.fn(),
+  getWordPathAsync: vi.fn(),
+  makePositionsMapAsync: vi.fn(),
 }));
-jest.mock('../../../backend/modules/boggleSolver', () => ({ getCachedTrie: mockGetCachedTrie }));
-jest.mock('../../../backend/services/gameLifecycle/autoAddBots', () => ({
+vi.mock('../../../backend/modules/boggleSolver', () => ({ getCachedTrie: mockGetCachedTrie }));
+vi.mock('../../../backend/services/gameLifecycle/autoAddBots', () => ({
   autoAddBotsForSoloPlayer: mockAutoAddBotsForSoloPlayer,
 }));
-jest.mock('../../../backend/handlers/shared', () => ({ startGameTimer: mockStartGameTimer }));
-jest.mock('../../../backend/utils/logger', () => ({ __esModule: true, default: mockLogger }));
-jest.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
+vi.mock('../../../backend/handlers/shared', () => ({ startGameTimer: mockStartGameTimer }));
+vi.mock('../../../backend/utils/logger', () => ({ __esModule: true, default: mockLogger }));
+vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
   HUNT_TARGET_MIN_LENGTH: 4,
   HUNT_TARGET_MAX_LENGTH: 8,
 }));
-jest.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
+vi.mock('@/shared/constants/gameConstants', () => ({ BLAST_MP_DEFAULT_TIMER: 90 }));
 
 // ─── Import after mocks ────────────────────────────────────────────────────
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerStartGameHandler } from '../gameStartHandler';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -147,10 +151,10 @@ function createMockSocket(id = 'socket-host') {
   return {
     socket: {
       id,
-      on: jest.fn((event: string, handler: Function) => {
+      on: vi.fn((event: string, handler: Function) => {
         handlers[event] = handler;
       }),
-      emit: jest.fn(),
+      emit: vi.fn(),
     } as any,
     handlers,
   };
@@ -195,10 +199,10 @@ async function triggerStartGame(handlers: Record<string, Function>, payload: Rec
 // ─── Tests ────────────────────────────────────────────────────────────────
 
 describe('registerStartGameHandler', () => {
-  const mockIo = { to: jest.fn() } as any;
+  const mockIo = { to: vi.fn() } as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default: validation passes, data passes through as-is
     mockValidatePayload.mockImplementation((_schema: any, data: any) => ({ success: true, data }));
     // Default: socket IS the host, IS in a game

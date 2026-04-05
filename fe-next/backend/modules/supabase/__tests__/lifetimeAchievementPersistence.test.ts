@@ -1,3 +1,4 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 /**
  * Tests for lifetime achievement persistence
  * Verifies that lifetime achievements are saved to achievement_counts in DB
@@ -7,43 +8,43 @@
 // Tests use processGameResults via require() after mocks are set up
 
 // Mock dependencies
-jest.mock('../playerStats', () => ({
-  updatePlayerStats: jest.fn(),
-  ensureProfileExists: jest.fn().mockResolvedValue(true),
+vi.mock('../playerStats', () => ({
+  updatePlayerStats: vi.fn(),
+  ensureProfileExists: vi.fn().mockResolvedValue(true),
 }));
 
-jest.mock('../gameResults', () => ({
-  recordGameResult: jest.fn().mockResolvedValue({ data: {}, error: null }),
+vi.mock('../gameResults', () => ({
+  recordGameResult: vi.fn().mockResolvedValue({ data: {}, error: null }),
 }));
 
-jest.mock('../leaderboard', () => ({
-  updateLeaderboardEntry: jest.fn().mockResolvedValue({ data: {}, error: null }),
-  updateRankedProgress: jest.fn().mockResolvedValue({ data: {}, error: null }),
+vi.mock('../leaderboard', () => ({
+  updateLeaderboardEntry: vi.fn().mockResolvedValue({ data: {}, error: null }),
+  updateRankedProgress: vi.fn().mockResolvedValue({ data: {}, error: null }),
 }));
 
-jest.mock('../guestTokens', () => ({
-  updateGuestStats: jest.fn(),
+vi.mock('../guestTokens', () => ({
+  updateGuestStats: vi.fn(),
 }));
 
-jest.mock('../../achievementManager', () => ({
-  checkLifetimeAchievements: jest.fn(),
+vi.mock('../../achievementManager', () => ({
+  checkLifetimeAchievements: vi.fn(),
 }));
 
-jest.mock('../../../utils/logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
-jest.mock('../client', () => ({
-  isSupabaseConfigured: jest.fn().mockReturnValue(true),
-  getSupabase: jest.fn().mockReturnValue({
-    from: jest.fn().mockReturnValue({
-      update: jest.fn().mockReturnValue({
-        eq: jest.fn().mockReturnValue({
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: {}, error: null }),
+vi.mock('../client', () => ({
+  isSupabaseConfigured: vi.fn().mockReturnValue(true),
+  getSupabase: vi.fn().mockReturnValue({
+    from: vi.fn().mockReturnValue({
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: {}, error: null }),
           }),
         }),
       }),
@@ -52,22 +53,22 @@ jest.mock('../client', () => ({
 }));
 
 // Mock game session logger
-jest.mock('../../gameSessionLogger', () => ({
-  logGameSession: jest.fn().mockResolvedValue(null),
+vi.mock('../../gameSessionLogger', () => ({
+  logGameSession: vi.fn().mockResolvedValue(null),
 }));
 
 // Mock Redis cache invalidation
-jest.mock('../../../redisClient', () => ({
-  invalidateUserLeaderboardCaches: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../redisClient', () => ({
+  invalidateUserLeaderboardCaches: vi.fn().mockResolvedValue(undefined),
 }));
 
-const { updatePlayerStats } = require('../playerStats') as { updatePlayerStats: jest.Mock };
-const { checkLifetimeAchievements } = require('../../achievementManager') as { checkLifetimeAchievements: jest.Mock };
-const { getSupabase } = require('../client') as { getSupabase: jest.Mock };
+const { updatePlayerStats } = require('../playerStats') as { updatePlayerStats: Mock };
+const { checkLifetimeAchievements } = require('../../achievementManager') as { checkLifetimeAchievements: Mock };
+const { getSupabase } = require('../client') as { getSupabase: Mock };
 
 describe('Lifetime Achievement Persistence', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it.skip('should save lifetime achievements to achievement_counts when newly earned', async () => {
@@ -90,14 +91,14 @@ describe('Lifetime Achievement Persistence', () => {
       { key: 'VETERAN', icon: '🎖️' },
     ]);
 
-    const mockUpdate = jest.fn().mockReturnValue({
-      eq: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: {}, error: null }),
+    const mockUpdate = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: {}, error: null }),
         }),
       }),
     });
-    const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
+    const mockFrom = vi.fn().mockReturnValue({ update: mockUpdate });
     getSupabase.mockReturnValue({ from: mockFrom });
 
     const { processGameResults } = require('../gameProcessing');

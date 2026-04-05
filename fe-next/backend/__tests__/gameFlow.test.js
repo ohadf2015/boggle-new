@@ -3,11 +3,10 @@
  * Tests the complete game lifecycle from creation to results
  */
 
-const { createGame, getGame, deleteGame, clearAllGames } = require('../modules/gameStateManager');
-const { validateWordOnBoard } = require('../modules/wordValidator');
-const { calculateWordScore } = require('../modules/scoringEngine');
-const { addBot, getGameBots, cleanupGameBots } = require('../modules/botManager');
-
+import { createGame, getGame, deleteGame, clearAllGames } from '../modules/gameStateManager';
+import { validateWordOnBoard } from '../modules/wordValidator';
+import { calculateWordScore } from '../modules/scoringEngine';
+import { addBot, getGameBots, cleanupGameBots } from '../modules/botManager';
 // Helper to create game data matching the actual API
 function createGameData(hostUsername, options = {}) {
   return {

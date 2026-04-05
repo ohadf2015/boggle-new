@@ -6,6 +6,7 @@ import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { Pencil } from 'lucide-react';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 
 export interface AvatarSelectorButtonProps {
   selectedAvatar?: CustomAvatarConfig | null;
@@ -23,6 +24,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
   size = 'md'
 }) => {
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
 
   const currentConfig = selectedAvatar ?? getOrCreateStoredCustomAvatar();
 
@@ -95,6 +97,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
         onClose={() => setIsBuilderOpen(false)}
         onSave={handleSave}
         initialConfig={currentConfig}
+        premium={avatarPremium}
       />
     </>
   );

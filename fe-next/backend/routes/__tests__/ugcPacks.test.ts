@@ -3,23 +3,27 @@
  * TDD: RED phase — tests written before implementation
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
 // Mock ugcPacks DB helpers
-const mockCreatePack = jest.fn();
-const mockGetPackById = jest.fn();
-const mockGetPackGallery = jest.fn();
-const mockUpdatePack = jest.fn();
-const mockSoftDeletePack = jest.fn();
-const mockToggleUpvote = jest.fn();
-const mockRecordPackPlay = jest.fn();
-const mockSubmitPackReport = jest.fn();
-const mockGetCreatorPacks = jest.fn();
+const { mockCreatePack, mockGetPackById, mockGetPackGallery, mockUpdatePack, mockSoftDeletePack, mockToggleUpvote, mockRecordPackPlay, mockSubmitPackReport, mockGetCreatorPacks } = vi.hoisted(() => {
+  const mockCreatePack = vi.fn();
+  const mockGetPackById = vi.fn();
+  const mockGetPackGallery = vi.fn();
+  const mockUpdatePack = vi.fn();
+  const mockSoftDeletePack = vi.fn();
+  const mockToggleUpvote = vi.fn();
+  const mockRecordPackPlay = vi.fn();
+  const mockSubmitPackReport = vi.fn();
+  const mockGetCreatorPacks = vi.fn();
+  return { mockCreatePack, mockGetPackById, mockGetPackGallery, mockUpdatePack, mockSoftDeletePack, mockToggleUpvote, mockRecordPackPlay, mockSubmitPackReport, mockGetCreatorPacks };
+});
 
-jest.mock('../../modules/supabase/ugcPacks', () => ({
+vi.mock('../../modules/supabase/ugcPacks', () => ({
   createPack: (...args: unknown[]) => mockCreatePack(...args),
   getPackById: (...args: unknown[]) => mockGetPackById(...args),
   getPackGallery: (...args: unknown[]) => mockGetPackGallery(...args),
@@ -31,17 +35,20 @@ jest.mock('../../modules/supabase/ugcPacks', () => ({
   getCreatorPacks: (...args: unknown[]) => mockGetCreatorPacks(...args),
 }));
 
-jest.mock('../../modules/ugcModeration', () => ({
-  validateUgcText: jest.fn((_text: string, _field: string, _max: number) => ({ valid: true })),
+vi.mock('../../modules/ugcModeration', () => ({
+  validateUgcText: vi.fn((_text: string, _field: string, _max: number) => ({ valid: true })),
   REPORT_REASONS: ['inappropriate', 'spam', 'unplayable', 'offensive'],
 }));
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
+
+import ugcPacksRouter from '../ugcPacks';
+import { validateUgcText } from '../../modules/ugcModeration';
 
 // ─── Test App Factory ─────────────────────────────────────────────────────────
 
@@ -61,7 +68,6 @@ function createTestApp(authenticated = true) {
     next();
   });
 
-  const ugcPacksRouter = require('../ugcPacks').default;
   app.use('/api/ugc/packs', ugcPacksRouter);
 
   return app;
@@ -93,7 +99,7 @@ const basePack = {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-afterEach(() => jest.clearAllMocks());
+afterEach(() => vi.clearAllMocks());
 
 // ── POST /validate ────────────────────────────────────────────────────────────
 
@@ -180,8 +186,7 @@ describe('POST /api/ugc/packs', () => {
   });
 
   it('returns 400 when name fails UGC validation', async () => {
-    const { validateUgcText } = require('../../modules/ugcModeration');
-    (validateUgcText as jest.Mock).mockReturnValueOnce({ valid: false, error: 'profanity', field: 'name' });
+    (validateUgcText as Mock).mockReturnValueOnce({ valid: false, error: 'profanity', field: 'name' });
 
     const app = createTestApp();
     const res = await request(app)

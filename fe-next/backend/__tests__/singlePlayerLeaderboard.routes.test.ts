@@ -5,29 +5,30 @@
  * the singlePlayerLeaderboard routes were not registered in server/index.ts
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import express, { Application } from 'express';
 import request from 'supertest';
 import singlePlayerLeaderboardRoutes from '../routes/singlePlayerLeaderboard';
 
 // Mock Supabase
-jest.mock('../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
+vi.mock('../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
         // For GET /leaderboard endpoint
-        gt: jest.fn(() => ({
-          order: jest.fn(() => ({
-            limit: jest.fn(() => Promise.resolve({ data: [], error: null }))
+        gt: vi.fn(() => ({
+          order: vi.fn(() => ({
+            limit: vi.fn(() => Promise.resolve({ data: [], error: null }))
           }))
         })),
         // For GET /stats/:fingerprint endpoint
-        eq: jest.fn(() => ({
-          single: jest.fn(() => Promise.resolve({ data: null, error: { code: 'PGRST116', message: 'not found' } }))
+        eq: vi.fn(() => ({
+          single: vi.fn(() => Promise.resolve({ data: null, error: { code: 'PGRST116', message: 'not found' } }))
         }))
       }))
     }))
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 describe('Single Player Leaderboard Routes', () => {

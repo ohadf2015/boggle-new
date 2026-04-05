@@ -4,26 +4,31 @@
  * not existing ones from a previous connection to the same game.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { Server, Socket } from 'socket.io';
 
 // Mock dependencies before imports
-const mockGetGame = jest.fn();
-const mockGetAuthUserConnection = jest.fn();
-const mockGetSocketIdByUsername = jest.fn();
-const mockAddUserToGame = jest.fn();
-const mockUpdateUserSocketId = jest.fn();
-const mockRemoveUserFromGame = jest.fn();
-const mockGetGameUsers = jest.fn();
-const mockGetActiveRooms = jest.fn();
-const mockIsRoomEmpty = jest.fn();
-const mockRestoreGameFromRedis = jest.fn();
-const mockUpdateHostSocketId = jest.fn();
-const mockGetLeaderboard = jest.fn();
-const mockGetTournamentIdFromGame = jest.fn();
-const mockGetGameSpectators = jest.fn();
-const mockAddSpectatorToGame = jest.fn();
+const { mockGetGame, mockGetAuthUserConnection, mockGetSocketIdByUsername, mockAddUserToGame, mockUpdateUserSocketId, mockRemoveUserFromGame, mockGetGameUsers, mockGetActiveRooms, mockIsRoomEmpty, mockRestoreGameFromRedis, mockUpdateHostSocketId, mockGetLeaderboard, mockGetTournamentIdFromGame, mockGetGameSpectators, mockAddSpectatorToGame, mockGetSocketById } = vi.hoisted(() => {
+  const mockGetGame = vi.fn();
+  const mockGetAuthUserConnection = vi.fn();
+  const mockGetSocketIdByUsername = vi.fn();
+  const mockAddUserToGame = vi.fn();
+  const mockUpdateUserSocketId = vi.fn();
+  const mockRemoveUserFromGame = vi.fn();
+  const mockGetGameUsers = vi.fn();
+  const mockGetActiveRooms = vi.fn();
+  const mockIsRoomEmpty = vi.fn();
+  const mockRestoreGameFromRedis = vi.fn();
+  const mockUpdateHostSocketId = vi.fn();
+  const mockGetLeaderboard = vi.fn();
+  const mockGetTournamentIdFromGame = vi.fn();
+  const mockGetGameSpectators = vi.fn();
+  const mockAddSpectatorToGame = vi.fn();
+  const mockGetSocketById = vi.fn();
+  return { mockGetGame, mockGetAuthUserConnection, mockGetSocketIdByUsername, mockAddUserToGame, mockUpdateUserSocketId, mockRemoveUserFromGame, mockGetGameUsers, mockGetActiveRooms, mockIsRoomEmpty, mockRestoreGameFromRedis, mockUpdateHostSocketId, mockGetLeaderboard, mockGetTournamentIdFromGame, mockGetGameSpectators, mockAddSpectatorToGame, mockGetSocketById };
+});
 
-jest.mock('../../modules/gameStateManager', () => ({
+vi.mock('../../modules/gameStateManager', () => ({
   getGame: mockGetGame,
   getAuthUserConnection: mockGetAuthUserConnection,
   getSocketIdByUsername: mockGetSocketIdByUsername,
@@ -39,81 +44,93 @@ jest.mock('../../modules/gameStateManager', () => ({
   getTournamentIdFromGame: mockGetTournamentIdFromGame,
   getGameSpectators: mockGetGameSpectators,
   addSpectatorToGame: mockAddSpectatorToGame,
-  upgradeSpectatorToPlayer: jest.fn(),
-  deleteGame: jest.fn(),
-  transferHost: jest.fn(),
-  getNextEligibleHost: jest.fn(),
-  clearSocketMappingsForLeave: jest.fn(),
-  isSpectator: jest.fn(),
+  upgradeSpectatorToPlayer: vi.fn(),
+  deleteGame: vi.fn(),
+  transferHost: vi.fn(),
+  getNextEligibleHost: vi.fn(),
+  clearSocketMappingsForLeave: vi.fn(),
+  isSpectator: vi.fn(),
 }));
 
-jest.mock('../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  broadcastToRoomExceptSender: jest.fn(),
-  getGameRoom: jest.fn((code: string) => `game:${code}`),
-  joinRoom: jest.fn(),
-  leaveRoom: jest.fn(),
-  safeEmit: jest.fn(),
-  getSocketById: jest.fn(),
-  disconnectSocket: jest.fn(),
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  broadcastToRoomExceptSender: vi.fn(),
+  getGameRoom: vi.fn((code: string) => `game:${code}`),
+  joinRoom: vi.fn(),
+  leaveRoom: vi.fn(),
+  safeEmit: vi.fn(),
+  getSocketById: mockGetSocketById,
+  disconnectSocket: vi.fn(),
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../utils/errorHandler', () => ({
-  emitError: jest.fn(),
+vi.mock('../../utils/errorHandler', () => ({
+  emitError: vi.fn(),
   ErrorMessages: { GAME_NOT_FOUND: 'Game not found' },
 }));
 
-jest.mock('../../utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../utils/timerManager', () => ({ default: {
+  clearGameTimer: vi.fn(),
+}, clearGameTimer: vi.fn() }));
+
+vi.mock('../../modules/botManager', () => ({
+  cleanupGameBots: vi.fn(),
 }));
 
-jest.mock('../../utils/timerManager', () => ({
-  clearGameTimer: jest.fn(),
+vi.mock('../../modules/tournamentManager', () => ({
+  addPlayerMidTournament: vi.fn(),
+  getTournament: vi.fn(),
+  getTournamentStandings: vi.fn(),
 }));
 
-jest.mock('../../modules/botManager', () => ({
-  cleanupGameBots: jest.fn(),
+vi.mock('../../utils/gameUtils', () => ({
+  generateRandomAvatar: vi.fn().mockReturnValue({ color: 'blue', icon: 'cat' }),
 }));
 
-jest.mock('../../modules/tournamentManager', () => ({
-  addPlayerMidTournament: jest.fn(),
-  getTournament: jest.fn(),
-  getTournamentStandings: jest.fn(),
-}));
-
-jest.mock('../../utils/gameUtils', () => ({
-  generateRandomAvatar: jest.fn().mockReturnValue({ color: 'blue', icon: 'cat' }),
-}));
-
-jest.mock('../../modules/achievementManager', () => ({
+vi.mock('../../modules/achievementManager', () => ({
   ACHIEVEMENT_ICONS: {},
 }));
 
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
-jest.mock('../../utils/socketValidation', () => ({
-  validatePayload: jest.fn().mockImplementation((_schema, data) => ({ success: true, data })),
+vi.mock('../../utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema, data) => ({ success: true, data })),
   joinGameSchema: {},
   leaveRoomSchema: {},
 }));
 
-jest.mock('../../utils/consts', () => ({
+vi.mock('../../utils/consts', () => ({
   MAX_PLAYERS_PER_ROOM: 8,
 }));
 
-jest.mock('../../utils/gameStateMachine', () => ({
-  isInProgress: jest.fn().mockReturnValue(false),
-  canJoinFreely: jest.fn().mockReturnValue(true),
-  shouldSendGameState: jest.fn().mockReturnValue(false),
+vi.mock('../../utils/gameStateMachine', () => ({
+  isInProgress: vi.fn().mockReturnValue(false),
+  canJoinFreely: vi.fn().mockReturnValue(true),
+  shouldSendGameState: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../modules/notificationService', () => ({
-  notifyPlayerJoined: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../modules/notificationService', () => ({
+  notifyPlayerJoined: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(),
+  getWordScore: vi.fn(),
+  voteOnWord: vi.fn(),
+}));
+
+vi.mock('../../modules/communityWordHybridValidation', () => ({
+  setPendingVotesRef: vi.fn(),
+  shouldUseAIValidation: vi.fn(),
+  SELF_HEALING_CONFIG: {},
 }));
 
 // Import after mocks
@@ -124,19 +141,19 @@ describe('PlayerJoinHandler - Invite Link Bug', () => {
   let mockSocket: Partial<Socket>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockSocket = {
       id: 'new-socket-123',
-      emit: jest.fn(),
-      join: jest.fn(),
-      leave: jest.fn(),
+      emit: vi.fn(),
+      join: vi.fn(),
+      leave: vi.fn(),
       data: {},
     };
 
     mockIo = {
-      emit: jest.fn(),
-      to: jest.fn().mockReturnThis(),
+      emit: vi.fn(),
+      to: vi.fn().mockReturnThis(),
     };
   });
 
@@ -157,8 +174,7 @@ describe('PlayerJoinHandler - Invite Link Bug', () => {
       });
 
       // Mock that old socket is NOT connected (user is rejoining fresh via invite link)
-      const { getSocketById } = require('../../utils/socketHelpers');
-      getSocketById.mockReturnValue(null); // No active old socket
+      mockGetSocketById.mockReturnValue(null); // No active old socket
 
       // WHEN: User joins same game via invite link with new username
       const result = await handleExistingAuthConnectionJoin(
@@ -197,10 +213,9 @@ describe('PlayerJoinHandler - Invite Link Bug', () => {
       const mockOldSocket = {
         connected: true,
         data: {},
-        emit: jest.fn(),
+        emit: vi.fn(),
       };
-      const { getSocketById } = require('../../utils/socketHelpers');
-      getSocketById.mockReturnValue(mockOldSocket);
+      mockGetSocketById.mockReturnValue(mockOldSocket);
 
       // WHEN: User opens another tab with same game
       const result = await handleExistingAuthConnectionJoin(

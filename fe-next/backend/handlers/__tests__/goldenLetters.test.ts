@@ -3,73 +3,74 @@
  * Tests golden letter injection at game start and bonus/detection during word validation.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { GameState } from '../../modules/gameState/types';
 
 // ===== Mocks =====
 
-jest.mock('../../modules/gameStateManager', () => ({
-  addPlayerWord: jest.fn(),
-  updatePlayerScore: jest.fn(),
-  getLeaderboard: jest.fn(() => []),
-  recordFirstFinder: jest.fn(),
-  removePeerRejectedWordScore: jest.fn(),
-  getGame: jest.fn(),
-  updateGame: jest.fn(),
+vi.mock('../../modules/gameStateManager', () => ({
+  addPlayerWord: vi.fn(),
+  updatePlayerScore: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
+  recordFirstFinder: vi.fn(),
+  removePeerRejectedWordScore: vi.fn(),
+  getGame: vi.fn(),
+  updateGame: vi.fn(),
 }));
 
-jest.mock('../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  broadcastToRoomExceptSender: jest.fn(),
-  volatileBroadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn((gc: string) => `room:${gc}`),
-  getSocketById: jest.fn(),
-  safeEmit: jest.fn(),
+vi.mock('../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  broadcastToRoomExceptSender: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((gc: string) => `room:${gc}`),
+  getSocketById: vi.fn(),
+  safeEmit: vi.fn(),
 }));
 
-jest.mock('../../modules/scoringEngine', () => ({
-  calculateWordScore: jest.fn((_word: string, combo: number) => _word.length - 1 + combo),
+vi.mock('../../modules/scoringEngine', () => ({
+  calculateWordScore: vi.fn((_word: string, combo: number) => _word.length - 1 + combo),
 }));
 
-jest.mock('../../modules/achievementManager', () => ({
-  checkAndAwardAchievements: jest.fn(() => []),
+vi.mock('../../modules/achievementManager', () => ({
+  checkAndAwardAchievements: vi.fn(() => []),
 }));
 
-jest.mock('../../modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn(() => false),
-  savePlayerWord: jest.fn(),
-  recordPlayerWrongWord: jest.fn(),
+vi.mock('../../modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn(() => false),
+  savePlayerWord: vi.fn(),
+  recordPlayerWrongWord: vi.fn(),
 }));
 
-jest.mock('../../modules/botManager', () => ({
-  addWordToBlacklist: jest.fn(),
+vi.mock('../../modules/botManager', () => ({
+  addWordToBlacklist: vi.fn(),
 }));
 
-jest.mock('../../utils/metrics', () => ({
-  inc: jest.fn(),
-  incPerGame: jest.fn(),
+vi.mock('../../utils/metrics', () => ({
+  inc: vi.fn(),
+  incPerGame: vi.fn(),
 }));
 
-jest.mock('../../utils/logger', () => ({
-  default: { info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn() },
+vi.mock('../../utils/logger', () => ({
+  default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-jest.mock('../engagementHandler', () => ({
-  processLongWordEngagement: jest.fn(),
+vi.mock('../engagementHandler', () => ({
+  processLongWordEngagement: vi.fn(),
 }));
 
-jest.mock('../../modules/blastModeManager', () => ({
-  calculateBlastTileBonus: jest.fn(() => 0),
-  getTilesOnPath: jest.fn(() => []),
-  recordBlastMove: jest.fn(() => null),
+vi.mock('../../modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn(() => 0),
+  getTilesOnPath: vi.fn(() => []),
+  recordBlastMove: vi.fn(() => null),
 }));
 
-jest.mock('../../modules/wordHuntManager', () => ({
-  restoreLife: jest.fn(),
-  getLifeBonus: jest.fn(() => 1),
-  computeDiscoveryClues: jest.fn(() => ({ greenPositions: [], knownLetters: [] })),
+vi.mock('../../modules/wordHuntManager', () => ({
+  restoreLife: vi.fn(),
+  getLifeBonus: vi.fn(() => 1),
+  computeDiscoveryClues: vi.fn(() => ({ greenPositions: [], knownLetters: [] })),
 }));
 
-jest.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
+vi.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
   BOARD_WORD_SCORE_PER_LETTER: 2,
 }));
 
@@ -78,9 +79,9 @@ jest.mock('@/shared/constants/wordHuntMultiplayerConstants', () => ({
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 
-const mockBroadcast = broadcastToRoom as jest.Mock;
-const mockUpdateScore = updatePlayerScore as jest.Mock;
-const mockAddWord = addPlayerWord as jest.Mock;
+const mockBroadcast = broadcastToRoom as Mock;
+const mockUpdateScore = updatePlayerScore as Mock;
+const mockAddWord = addPlayerWord as Mock;
 
 // We test handleValidatedWord indirectly via the exported test helper
 // Instead, we test the logic inline here with controlled game states.

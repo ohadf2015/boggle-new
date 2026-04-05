@@ -11,6 +11,7 @@
  * Run with: npm run test:backend -- --testPathPattern="wikipediaE2E" --runInBand --verbose
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Language } from '@/shared/types/game';
 
 // Set up test environment
@@ -21,28 +22,28 @@ beforeAll(() => {
 });
 
 // Mock environment for tests
-jest.mock('@/lib/ai-service', () => ({
+vi.mock('@/lib/ai-service', () => ({
   gameAIService: {
-    validateAndSaveWord: jest.fn().mockResolvedValue({
+    validateAndSaveWord: vi.fn().mockResolvedValue({
       isValid: true,
       reason: 'Test validated',
       source: 'ai'
     }),
-    checkDatabaseOnly: jest.fn().mockResolvedValue({
+    checkDatabaseOnly: vi.fn().mockResolvedValue({
       isValid: false,
       source: 'database'
     }),
-    checkCommunityWords: jest.fn().mockResolvedValue(false),
-    checkWordScores: jest.fn().mockResolvedValue(false)
+    checkCommunityWords: vi.fn().mockResolvedValue(false),
+    checkWordScores: vi.fn().mockResolvedValue(false)
   }
 }));
 
 describe('Wikipedia Pipeline E2E', () => {
   // Increase Jest timeout for this suite to allow Wikipedia API calls
-  jest.setTimeout(100000);
+  vi.setConfig({ testTimeout: 100000 });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Success Criterion 1: Admin can extract words from Wikipedia', () => {
@@ -74,7 +75,7 @@ describe('Wikipedia Pipeline E2E', () => {
   describe('Success Criterion 2: Words appear in dictionary and validate in gameplay', () => {
     it('should validate high-scoring words and add to community_words', async () => {
       const { gameAIService } = await import('@/lib/ai-service');
-      const validateAndSaveWord = gameAIService.validateAndSaveWord as jest.Mock;
+      const validateAndSaveWord = gameAIService.validateAndSaveWord as Mock;
 
       // Simulate high-scoring word validation
       const word = 'AURORA';
@@ -94,7 +95,7 @@ describe('Wikipedia Pipeline E2E', () => {
 
     it('should recognize promoted words during gameplay validation', async () => {
       const { gameAIService } = await import('@/lib/ai-service');
-      const checkDatabaseOnly = gameAIService.checkDatabaseOnly as jest.Mock;
+      const checkDatabaseOnly = gameAIService.checkDatabaseOnly as Mock;
 
       // After promotion, word should be in database
       checkDatabaseOnly.mockResolvedValueOnce({
@@ -164,7 +165,7 @@ describe('Wikipedia Pipeline E2E', () => {
   describe('Success Criterion 5: Edge case handling', () => {
     it('should handle duplicate words gracefully', async () => {
       const { gameAIService } = await import('@/lib/ai-service');
-      const checkDatabaseOnly = gameAIService.checkDatabaseOnly as jest.Mock;
+      const checkDatabaseOnly = gameAIService.checkDatabaseOnly as Mock;
 
       // Simulate word already in dictionary
       checkDatabaseOnly.mockResolvedValueOnce({
@@ -217,7 +218,7 @@ describe('Wikipedia Pipeline E2E', () => {
 
 describe('Wikipedia Pipeline Fallback Behavior', () => {
   // Increase Jest timeout for this suite to allow Wikipedia API calls
-  jest.setTimeout(100000);
+  vi.setConfig({ testTimeout: 100000 });
 
   it('should fallback to local JSON when Wikipedia unavailable', async () => {
     const { populateWikipediaWords } = await import('../wikipediaWordPopulator');

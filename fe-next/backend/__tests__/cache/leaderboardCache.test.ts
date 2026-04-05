@@ -1,13 +1,13 @@
-const sorted = new Map<string, Map<string, number>>();
+const { sorted } = vi.hoisted(() => ({ sorted: new Map<string, Map<string, number>>() }));
 
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => ({
-    zadd: jest.fn((key: string, score: number, member: string) => {
+vi.mock('ioredis', () => {
+  class MockRedis {
+    zadd = vi.fn((key: string, score: number, member: string) => {
       if (!sorted.has(key)) sorted.set(key, new Map());
       sorted.get(key)!.set(member, score);
       return Promise.resolve(1);
-    }),
-    zrevrange: jest.fn(
+    });
+    zrevrange = vi.fn(
       (key: string, start: number, stop: number, withScores?: string) => {
         const entries = sorted.get(key);
         if (!entries) return Promise.resolve([]);
@@ -20,22 +20,24 @@ jest.mock('ioredis', () => {
           );
         return Promise.resolve(arr.map(([k]) => k));
       }
-    ),
-    zrevrank: jest.fn((key: string, member: string) => {
+    );
+    zrevrank = vi.fn((key: string, member: string) => {
       const entries = sorted.get(key);
       if (!entries || !entries.has(member)) return Promise.resolve(null);
       const arr = [...entries.entries()].sort((a, b) => b[1] - a[1]);
       return Promise.resolve(arr.findIndex(([k]) => k === member));
-    }),
-    zscore: jest.fn((key: string, member: string) => {
+    });
+    zscore = vi.fn((key: string, member: string) => {
       const entries = sorted.get(key);
       if (!entries || !entries.has(member)) return Promise.resolve(null);
       return Promise.resolve(String(entries.get(member)));
-    }),
-    quit: jest.fn(() => Promise.resolve()),
-  }));
+    });
+    quit = vi.fn(() => Promise.resolve());
+  }
+  return { default: MockRedis };
 });
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   updateLeaderboardScore,
   getTopPlayers,

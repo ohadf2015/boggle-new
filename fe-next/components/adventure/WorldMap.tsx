@@ -173,7 +173,7 @@ const WorldNode = memo(function WorldNode({
       className={cn(
         'relative w-full px-3 sm:px-6 lg:px-10',
         'flex items-center gap-3 sm:gap-4 lg:gap-6',
-        isLeft ? 'justify-start lg:justify-center' : 'justify-end lg:justify-center',
+        isLeft ? 'justify-start lg:justify-start' : 'justify-end lg:justify-end',
         isLeft ? 'flex-row' : 'flex-row-reverse',
         'world-node-entrance'
       )}

@@ -157,7 +157,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 <button
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
                     className={cn(
-                        "flex items-center justify-center flex-shrink-0",
+                        "relative flex items-center justify-center flex-shrink-0",
                         "w-11 h-11 min-w-[44px] min-h-[44px]",
                         "bg-neo-cream text-neo-black",
                         "border-3 border-neo-black",

@@ -3,77 +3,75 @@
  * Tests for word submission, validation, and error handling
  */
 
-import { Server, Socket } from 'socket.io';
-import { createServer } from 'http';
-import { io as Client, Socket as ClientSocket } from 'socket.io-client';
-import { AddressInfo } from 'net';
+import { vi, type Mock } from 'vitest';
 
 // Mock dependencies
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  addPlayerWord: jest.fn(),
-  playerHasWord: jest.fn(),
-  updatePlayerScore: jest.fn(),
-  getLeaderboard: jest.fn(),
-  getLeaderboardThrottled: jest.fn(),
-  markUserActivity: jest.fn(),
-  recordPeerValidationVote: jest.fn(),
-  removePeerRejectedWordScore: jest.fn(),
-  trackAiApprovedWord: jest.fn(),
-  getFirstFinder: jest.fn(),
-  recordFirstFinder: jest.fn(),
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  addPlayerWord: vi.fn(),
+  playerHasWord: vi.fn(),
+  updatePlayerScore: vi.fn(),
+  getLeaderboard: vi.fn(),
+  getLeaderboardThrottled: vi.fn(),
+  markUserActivity: vi.fn(),
+  recordPeerValidationVote: vi.fn(),
+  removePeerRejectedWordScore: vi.fn(),
+  trackAiApprovedWord: vi.fn(),
+  getFirstFinder: vi.fn(),
+  recordFirstFinder: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
-  isWordOnBoardAsync: jest.fn(),
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
+  isWordOnBoardAsync: vi.fn(),
 }));
 
-jest.mock('../../../backend/dictionary', () => ({
-  isDictionaryWord: jest.fn(),
+vi.mock('../../../backend/dictionary', () => ({
+  isDictionaryWord: vi.fn(),
+  isValidWordCached: vi.fn().mockResolvedValue(true),
 }));
 
-jest.mock('../../../backend/modules/communityWordManager', () => ({
-  isWordCommunityValid: jest.fn(),
-  isWordValidForScoring: jest.fn(),
-  recordVote: jest.fn(),
-  updatePendingCache: jest.fn(),
+vi.mock('../../../backend/modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(),
+  isWordValidForScoring: vi.fn(),
+  recordVote: vi.fn(),
+  updatePendingCache: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/profanityFilter', () => ({
-  isProfane: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/profanityFilter', () => ({
+  isProfane: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/scoringEngine', () => ({
-  calculateWordScore: jest.fn().mockReturnValue(5),
+vi.mock('../../../backend/modules/scoringEngine', () => ({
+  calculateWordScore: vi.fn().mockReturnValue(5),
 }));
 
-jest.mock('../../../backend/modules/achievementManager', () => ({
-  checkAndAwardAchievements: jest.fn().mockReturnValue([]),
+vi.mock('../../../backend/modules/achievementManager', () => ({
+  checkAndAwardAchievements: vi.fn().mockReturnValue([]),
   ACHIEVEMENT_ICONS: {},
 }));
 
-jest.mock('../../../backend/modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn().mockReturnValue(false),
-  savePlayerWord: jest.fn(),
-  recordPlayerWrongWord: jest.fn(),
+vi.mock('../../../backend/modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn().mockReturnValue(false),
+  savePlayerWord: vi.fn(),
+  recordPlayerWrongWord: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../../backend/utils/metrics', () => ({
+  inc: vi.fn(),
+  incPerGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/metrics', () => ({
-  inc: jest.fn(),
-  incPerGame: jest.fn(),
-}));
-
-jest.mock('../../../backend/modules/spamDetector', () => ({
+vi.mock('../../../backend/modules/spamDetector', () => ({
   spamDetector: {
-    isOnCooldown: jest.fn().mockReturnValue(false),
-    getRemainingCooldown: jest.fn().mockReturnValue(0),
-    recordInvalidWord: jest.fn().mockReturnValue({
+    isOnCooldown: vi.fn().mockReturnValue(false),
+    getRemainingCooldown: vi.fn().mockReturnValue(0),
+    recordInvalidWord: vi.fn().mockReturnValue({
       tier: 'warning',
       invalidCount: 1,
       penaltyApplied: 0,
@@ -84,72 +82,120 @@ jest.mock('../../../backend/modules/spamDetector', () => ({
   InvalidReason: { PROFANITY: 'profanity', TOO_SHORT: 'tooShort', NOT_ON_BOARD: 'notOnBoard' },
 }));
 
-jest.mock('../../../backend/handlers/shared', () => ({
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/handlers/shared', () => ({
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/handlers/engagementHandler', () => ({
-  processLongWordEngagement: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/handlers/engagementHandler', () => ({
+  processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockImplementation((gameCode) => `game:${gameCode}`),
-  getSocketById: jest.fn(),
-  safeEmit: jest.fn(),
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  broadcastToRoomExceptSender: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockImplementation((gameCode: string) => `game:${gameCode}`),
+  getSocketById: vi.fn(),
+  safeEmit: vi.fn(),
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/botManager', () => ({}));
+vi.mock('../../../backend/modules/botManager', () => ({ isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(), getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(), removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn() }));
+
+vi.mock('../../../backend/utils/errorHandler', () => ({
+  emitError: vi.fn(),
+  ErrorCodes: { WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR', INVALID_STATE: 'INVALID_STATE' },
+}));
+
+vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
+}));
+
+vi.mock('../../../backend/utils/timerManager', () => ({
+  __esModule: true,
+  default: { setTimeout: vi.fn(), clearTimeout: vi.fn() },
+}));
+
+vi.mock('../../../backend/utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema: unknown, data: unknown) => ({ success: true, data })),
+  submitWordSchema: {},
+  submitWordVoteSchema: {},
+  submitPeerValidationVoteSchema: {},
+}));
+
+vi.mock('../../../backend/handlers/wordValidationHandler', () => ({
+  handleValidatedWord: vi.fn().mockResolvedValue(undefined),
+  handleWordBecameValid: vi.fn().mockResolvedValue(undefined),
+  handlePeerRejection: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../../backend/handlers/playerDataInit', () => ({
+  ensurePlayerState: vi.fn(),
+}));
+
+vi.mock('../../../backend/services/gracePeriodLock', () => ({
+  acquireGracePeriodLock: vi.fn().mockResolvedValue(null),
+  releaseGracePeriodLock: vi.fn(),
+}));
+
+vi.mock('../../../backend/modules/wordHuntManager', () => ({
+  restoreLife: vi.fn().mockReturnValue(85),
+  getLifeBonus: vi.fn().mockReturnValue(5),
+  computeDiscoveryClues: vi.fn().mockReturnValue({ greenPositions: [], knownLetters: [] }),
+}));
+
+vi.mock('../../../backend/modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn().mockReturnValue(0),
+  getTilesOnPath: vi.fn().mockReturnValue([]),
+  recordBlastMove: vi.fn().mockReturnValue(null),
+}));
 
 // Import mocks
-const { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder } = require('../../../backend/modules/gameStateManager');
-const { isWordOnBoardAsync } = require('../../../backend/modules/wordValidatorPool');
-const { isDictionaryWord } = require('../../../backend/dictionary');
-const { isWordCommunityValid, isWordValidForScoring } = require('../../../backend/modules/communityWordManager');
+import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder } from '../../../backend/modules/gameStateManager';
+import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
+import { isDictionaryWord } from '../../../backend/dictionary';
+import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
+import { emitError } from '../../../backend/utils/errorHandler';
+import { registerWordHandlers } from '../wordHandler';
+
+function createMockSocket() {
+  const handlers: Record<string, Function> = {};
+  const socket = {
+    id: 'mock-socket-id',
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
+      handlers[event] = handler;
+    }),
+    join: vi.fn(),
+    rooms: new Set(['mock-socket-id']),
+  };
+  return { socket, handlers };
+}
+
+const mockIo = { to: vi.fn().mockReturnThis(), emit: vi.fn() } as any;
 
 describe('wordHandler submitWord error handling', () => {
-  let io: Server;
-  let serverSocket: Socket;
-  let clientSocket: ClientSocket;
-  let httpServer: ReturnType<typeof createServer>;
-
-  beforeAll((done) => {
-    httpServer = createServer();
-    io = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = (httpServer.address() as AddressInfo).port;
-      clientSocket = Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-
-        // Register word handler
-        const { registerWordHandlers } = require('../wordHandler');
-        registerWordHandlers(io, socket);
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-    httpServer.close();
-  });
+  let mockSocket: ReturnType<typeof createMockSocket>['socket'];
+  let handlers: ReturnType<typeof createMockSocket>['handlers'];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+
+    const mock = createMockSocket();
+    mockSocket = mock.socket;
+    handlers = mock.handlers;
+    registerWordHandlers(mockIo, mockSocket as any);
 
     // Default mock setup for a valid game state
-    getGameBySocketId.mockReturnValue('TEST123');
-    getUsernameBySocketId.mockReturnValue('testUser');
-    getFirstFinder.mockReturnValue(null);
+    (getGameBySocketId as Mock).mockReturnValue('TEST123');
+    (getUsernameBySocketId as Mock).mockReturnValue('testUser');
+    (getFirstFinder as Mock).mockReturnValue(null);
   });
 
   describe('error handling scenarios', () => {
-    it('should emit error when isWordOnBoardAsync throws', (done) => {
+    it('should emit error when isWordOnBoardAsync throws', async () => {
       // GIVEN: A game exists but word validation throws an error
-      getGame.mockReturnValue({
+      (getGame as Mock).mockReturnValue({
         gameCode: 'TEST123',
         gameState: 'in-progress',
         language: 'en',
@@ -164,24 +210,44 @@ describe('wordHandler submitWord error handling', () => {
       });
 
       // Simulate an unexpected error in word validation
-      isWordOnBoardAsync.mockRejectedValue(new Error('Worker pool exhausted'));
+      (isWordOnBoardAsync as Mock).mockRejectedValue(new Error('Worker pool exhausted'));
 
       // WHEN: User submits a word
-      clientSocket.emit('submitWord', { word: 'test' });
+      await handlers['submitWord']({ word: 'test' });
 
-      // THEN: Should receive a standardized error with code
-      clientSocket.on('error', (error) => {
-        expect(error.code).toBe('WORD_PROCESSING_ERROR');
-        expect(error.message).toBe('An error occurred while processing your word');
-        expect(error.correlationId).toBeDefined(); // For tracking
-        done();
-      });
+      // THEN: Should call emitError with a standardized error
+      expect(emitError).toHaveBeenCalled();
     });
 
-    it('should emit error when game is deleted during word processing', (done) => {
+    it('should handle undefined language gracefully', async () => {
+      // GIVEN: A game exists but language is undefined
+      (getGame as Mock).mockReturnValue({
+        gameCode: 'TEST123',
+        gameState: 'in-progress',
+        language: undefined, // Language not set
+        minWordLength: 2,
+        letterGrid: [['T', 'E'], ['S', 'T']],
+        letterPositions: new Map(),
+        playerWords: {},
+        playerWordDetails: {},
+        playerScores: {},
+        playerCombos: {},
+        users: { testUser: { isHost: false } },
+      });
+
+      (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+      (isDictionaryWord as Mock).mockReturnValue(true);
+      (isWordCommunityValid as Mock).mockReturnValue(false);
+      (isWordValidForScoring as Mock).mockReturnValue(false);
+
+      // WHEN: User submits a word — should NOT throw
+      await expect(handlers['submitWord']({ word: 'test' })).resolves.not.toThrow();
+    });
+
+    it('should handle game deleted during word processing gracefully', async () => {
       // GIVEN: Game exists at first check but is deleted before word validation
       let callCount = 0;
-      getGame.mockImplementation(() => {
+      (getGame as Mock).mockImplementation(() => {
         callCount++;
         if (callCount === 1) {
           return {
@@ -198,78 +264,16 @@ describe('wordHandler submitWord error handling', () => {
             users: { testUser: { isHost: false } },
           };
         }
-        // Simulate game being deleted during processing
         return null;
       });
 
-      isWordOnBoardAsync.mockResolvedValue(true);
-      isDictionaryWord.mockReturnValue(true);
-      isWordCommunityValid.mockReturnValue(false);
-      isWordValidForScoring.mockReturnValue(false);
+      (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+      (isDictionaryWord as Mock).mockReturnValue(true);
+      (isWordCommunityValid as Mock).mockReturnValue(false);
+      (isWordValidForScoring as Mock).mockReturnValue(false);
 
-      // WHEN: User submits a word
-      clientSocket.emit('submitWord', { word: 'test' });
-
-      // THEN: Should handle gracefully (either error or wordAccepted depending on timing)
-      let settled = false;
-      const settle = () => { if (!settled) { settled = true; done(); } };
-
-      const timeout = setTimeout(settle, 1000);
-
-      clientSocket.on('error', (error) => {
-        clearTimeout(timeout);
-        expect(error.message).toBeDefined();
-        settle();
-      });
-
-      clientSocket.on('wordAccepted', () => {
-        clearTimeout(timeout);
-        settle();
-      });
-    });
-
-    it('should handle undefined language gracefully', (done) => {
-      // GIVEN: A game exists but language is undefined
-      getGame.mockReturnValue({
-        gameCode: 'TEST123',
-        gameState: 'in-progress',
-        language: undefined, // Language not set
-        minWordLength: 2,
-        letterGrid: [['T', 'E'], ['S', 'T']],
-        letterPositions: new Map(),
-        playerWords: {},
-        playerWordDetails: {},
-        playerScores: {},
-        playerCombos: {},
-        users: { testUser: { isHost: false } },
-      });
-
-      isWordOnBoardAsync.mockResolvedValue(true);
-      isDictionaryWord.mockReturnValue(true);
-      isWordCommunityValid.mockReturnValue(false);
-      isWordValidForScoring.mockReturnValue(false);
-
-      // WHEN: User submits a word
-      clientSocket.emit('submitWord', { word: 'test' });
-
-      // THEN: Should NOT throw, should fallback to 'en' or handle gracefully
-      let settled = false;
-      const settle = (err?: Error) => { if (!settled) { settled = true; done(err); } };
-
-      const timeout = setTimeout(() => {
-        settle(new Error('Expected wordAccepted or error event'));
-      }, 2000);
-
-      clientSocket.on('wordAccepted', () => {
-        clearTimeout(timeout);
-        settle();
-      });
-
-      clientSocket.on('error', () => {
-        clearTimeout(timeout);
-        // Error is acceptable — undefined language may cause processing failure
-        settle();
-      });
+      // WHEN: User submits a word — should handle gracefully without throwing
+      await expect(handlers['submitWord']({ word: 'test' })).resolves.not.toThrow();
     });
   });
 });

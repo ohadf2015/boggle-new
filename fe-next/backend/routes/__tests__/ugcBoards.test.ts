@@ -5,26 +5,27 @@
  * TDD: Tests written before implementation.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 
 // ---- Mock Supabase helpers ----
-jest.mock('../../modules/supabase/ugcBoards', () => ({
-  createBoard: jest.fn(),
-  getBoardByCode: jest.fn(),
-  getGallery: jest.fn(),
-  recordPlay: jest.fn(),
-  upsertRating: jest.fn(),
-  submitReport: jest.fn(),
-  getCreatorBoards: jest.fn(),
-  getFeaturedBoards: jest.fn(),
-  getBoardLeaderboard: jest.fn(),
-  uploadBoardCoverImage: jest.fn(),
+vi.mock('../../modules/supabase/ugcBoards', () => ({
+  createBoard: vi.fn(),
+  getBoardByCode: vi.fn(),
+  getGallery: vi.fn(),
+  recordPlay: vi.fn(),
+  upsertRating: vi.fn(),
+  submitReport: vi.fn(),
+  getCreatorBoards: vi.fn(),
+  getFeaturedBoards: vi.fn(),
+  getBoardLeaderboard: vi.fn(),
+  uploadBoardCoverImage: vi.fn(),
 }));
 
 // ---- Mock grid generation & solver ----
-jest.mock('../../../utils/dailyChallenge/gridPathFinding', () => ({
-  embedMultipleWordsInGrid: jest.fn(() => [
+vi.mock('../../../utils/dailyChallenge/gridPathFinding', () => ({
+  embedMultipleWordsInGrid: vi.fn(() => [
     ['c', 'a', 't', 's'],
     ['d', 'o', 'g', 'x'],
     ['r', 'u', 'n', 'z'],
@@ -32,8 +33,8 @@ jest.mock('../../../utils/dailyChallenge/gridPathFinding', () => ({
   ]),
 }));
 
-jest.mock('../../modules/boggleSolver', () => ({
-  findWordsForBots: jest.fn(() => ({
+vi.mock('../../modules/boggleSolver', () => ({
+  findWordsForBots: vi.fn(() => ({
     easy: ['cat', 'dog', 'run', 'play', 'cats', 'dogs', 'runs', 'plays'],
     medium: ['plat', 'clan', 'gory', 'dory'],
     hard: ['alto', 'oral', 'trod', 'star'],
@@ -41,35 +42,35 @@ jest.mock('../../modules/boggleSolver', () => ({
 }));
 
 // ---- Mock UGC moderation ----
-jest.mock('../../modules/ugcModeration', () => ({
-  validateUgcText: jest.fn(() => ({ valid: true })),
+vi.mock('../../modules/ugcModeration', () => ({
+  validateUgcText: vi.fn(() => ({ valid: true })),
   REPORT_REASONS: ['inappropriate', 'spam', 'unplayable', 'offensive'],
 }));
 
 // ---- Mock customPuzzle utils ----
-jest.mock('../../../utils/customPuzzle', () => ({
-  generatePuzzleCode: jest.fn(() => 'abc12345'),
-  isValidPuzzleCode: jest.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
+vi.mock('../../../utils/customPuzzle', () => ({
+  generatePuzzleCode: vi.fn(() => 'abc12345'),
+  isValidPuzzleCode: vi.fn((code: string) => /^[a-z0-9]{8}$/.test(code)),
 }));
 
 // ---- Mock Supabase server for auth ----
-const mockAuthGetUser = jest.fn();
-jest.mock('../../modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({
+const mockAuthGetUser = vi.fn();
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({
     auth: {
       getUser: mockAuthGetUser,
     },
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 // ---- Mock logger ----
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 import {
   createBoard,
@@ -84,6 +85,8 @@ import {
 } from '../../modules/supabase/ugcBoards';
 
 import ugcBoardsRouter from '../ugcBoards';
+import { findWordsForBots } from '../../modules/boggleSolver';
+import { validateUgcText } from '../../modules/ugcModeration';
 
 // ---- App setup ----
 const app = express();
@@ -128,7 +131,7 @@ function setupAuthFail() {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 // ============================================================
@@ -176,8 +179,7 @@ describe('POST /api/ugc/boards/generate', () => {
   });
 
   it('computes EASY difficulty when word count >= 30', async () => {
-    const { findWordsForBots } = require('../../modules/boggleSolver');
-    (findWordsForBots as jest.Mock).mockReturnValueOnce({
+    (findWordsForBots as Mock).mockReturnValueOnce({
       easy: Array(15).fill('word'),
       medium: Array(10).fill('word'),
       hard: Array(10).fill('word'),
@@ -192,8 +194,7 @@ describe('POST /api/ugc/boards/generate', () => {
   });
 
   it('computes HARD difficulty when word count < 15', async () => {
-    const { findWordsForBots } = require('../../modules/boggleSolver');
-    (findWordsForBots as jest.Mock).mockReturnValueOnce({
+    (findWordsForBots as Mock).mockReturnValueOnce({
       easy: Array(5).fill('word'),
       medium: Array(3).fill('word'),
       hard: Array(2).fill('word'),
@@ -215,7 +216,7 @@ describe('POST /api/ugc/boards/generate', () => {
 describe('POST /api/ugc/boards/publish', () => {
   it('creates board and returns board_code for authenticated user', async () => {
     setupAuth();
-    (createBoard as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (createBoard as Mock).mockResolvedValue(MOCK_BOARD);
 
     const res = await request(app)
       .post('/api/ugc/boards/publish')
@@ -270,8 +271,7 @@ describe('POST /api/ugc/boards/publish', () => {
 
   it('returns 400 when title fails moderation', async () => {
     setupAuth();
-    const { validateUgcText } = require('../../modules/ugcModeration');
-    (validateUgcText as jest.Mock).mockReturnValueOnce({ valid: false, error: 'profanity', field: 'title' });
+    (validateUgcText as Mock).mockReturnValueOnce({ valid: false, error: 'profanity', field: 'title' });
 
     const res = await request(app)
       .post('/api/ugc/boards/publish')
@@ -299,7 +299,7 @@ describe('POST /api/ugc/boards/publish', () => {
 
 describe('GET /api/ugc/boards/:boardCode', () => {
   it('returns board for valid code', async () => {
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
 
     const res = await request(app).get('/api/ugc/boards/abc12345');
 
@@ -308,7 +308,7 @@ describe('GET /api/ugc/boards/:boardCode', () => {
   });
 
   it('returns 404 when board not found', async () => {
-    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+    (getBoardByCode as Mock).mockResolvedValue(null);
 
     const res = await request(app).get('/api/ugc/boards/zzzzzzzz');
 
@@ -328,7 +328,7 @@ describe('GET /api/ugc/boards/:boardCode', () => {
 
 describe('GET /api/ugc/boards/gallery', () => {
   it('returns paginated gallery with default params', async () => {
-    (getGallery as jest.Mock).mockResolvedValue({ boards: [MOCK_BOARD], total: 1 });
+    (getGallery as Mock).mockResolvedValue({ boards: [MOCK_BOARD], total: 1 });
 
     const res = await request(app).get('/api/ugc/boards/gallery');
 
@@ -342,7 +342,7 @@ describe('GET /api/ugc/boards/gallery', () => {
   });
 
   it('passes sort, language, difficulty filters', async () => {
-    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+    (getGallery as Mock).mockResolvedValue({ boards: [], total: 0 });
 
     const res = await request(app).get('/api/ugc/boards/gallery?sort=popular&language=en&difficulty=HARD&page=2&limit=10');
 
@@ -357,7 +357,7 @@ describe('GET /api/ugc/boards/gallery', () => {
   });
 
   it('caps limit at 50', async () => {
-    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+    (getGallery as Mock).mockResolvedValue({ boards: [], total: 0 });
 
     await request(app).get('/api/ugc/boards/gallery?limit=999');
 
@@ -365,7 +365,7 @@ describe('GET /api/ugc/boards/gallery', () => {
   });
 
   it('sets Cache-Control header', async () => {
-    (getGallery as jest.Mock).mockResolvedValue({ boards: [], total: 0 });
+    (getGallery as Mock).mockResolvedValue({ boards: [], total: 0 });
 
     const res = await request(app).get('/api/ugc/boards/gallery');
 
@@ -380,8 +380,8 @@ describe('GET /api/ugc/boards/gallery', () => {
 describe('POST /api/ugc/boards/:boardCode/play', () => {
   it('records play for authenticated user', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (recordPlay as jest.Mock).mockResolvedValue(undefined);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (recordPlay as Mock).mockResolvedValue(undefined);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/play')
@@ -393,8 +393,8 @@ describe('POST /api/ugc/boards/:boardCode/play', () => {
   });
 
   it('records play for guest (no auth header)', async () => {
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (recordPlay as jest.Mock).mockResolvedValue(undefined);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (recordPlay as Mock).mockResolvedValue(undefined);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/play')
@@ -413,7 +413,7 @@ describe('POST /api/ugc/boards/:boardCode/play', () => {
   });
 
   it('returns 404 when board not found', async () => {
-    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+    (getBoardByCode as Mock).mockResolvedValue(null);
 
     const res = await request(app)
       .post('/api/ugc/boards/zzzzzzzz/play')
@@ -430,8 +430,8 @@ describe('POST /api/ugc/boards/:boardCode/play', () => {
 describe('POST /api/ugc/boards/:boardCode/rate', () => {
   it('upserts rating for authenticated user', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (upsertRating as jest.Mock).mockResolvedValue(undefined);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (upsertRating as Mock).mockResolvedValue(undefined);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/rate')
@@ -481,8 +481,8 @@ describe('POST /api/ugc/boards/:boardCode/rate', () => {
 describe('POST /api/ugc/boards/:boardCode/report', () => {
   it('submits report for authenticated user', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (submitReport as jest.Mock).mockResolvedValue({ flagged: false });
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (submitReport as Mock).mockResolvedValue({ flagged: false });
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/report')
@@ -504,7 +504,7 @@ describe('POST /api/ugc/boards/:boardCode/report', () => {
 
   it('returns 400 for invalid reason', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/report')
@@ -516,8 +516,8 @@ describe('POST /api/ugc/boards/:boardCode/report', () => {
 
   it('returns flagged: true when auto-flag triggered', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (submitReport as jest.Mock).mockResolvedValue({ flagged: true });
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (submitReport as Mock).mockResolvedValue({ flagged: true });
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/report')
@@ -536,7 +536,7 @@ describe('POST /api/ugc/boards/:boardCode/report', () => {
 describe('GET /api/ugc/boards/mine', () => {
   it('returns creator boards for authenticated user', async () => {
     setupAuth();
-    (getCreatorBoards as jest.Mock).mockResolvedValue([MOCK_BOARD]);
+    (getCreatorBoards as Mock).mockResolvedValue([MOCK_BOARD]);
 
     const res = await request(app)
       .get('/api/ugc/boards/mine')
@@ -560,8 +560,7 @@ describe('GET /api/ugc/boards/mine', () => {
 
 describe('GET /api/ugc/boards/featured', () => {
   it('returns featured boards', async () => {
-    const { getFeaturedBoards } = require('../../modules/supabase/ugcBoards');
-    (getFeaturedBoards as jest.Mock).mockResolvedValue([MOCK_BOARD]);
+    (getFeaturedBoards as Mock).mockResolvedValue([MOCK_BOARD]);
 
     const res = await request(app).get('/api/ugc/boards/featured');
 
@@ -571,8 +570,7 @@ describe('GET /api/ugc/boards/featured', () => {
   });
 
   it('sets 5-min Cache-Control header', async () => {
-    const { getFeaturedBoards } = require('../../modules/supabase/ugcBoards');
-    (getFeaturedBoards as jest.Mock).mockResolvedValue([]);
+    (getFeaturedBoards as Mock).mockResolvedValue([]);
 
     const res = await request(app).get('/api/ugc/boards/featured');
 
@@ -592,8 +590,8 @@ const PNG_BUFFER = Buffer.from([0x89, 0x50, 0x4E, 0x47, ...Array(100).fill(0)]);
 describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
   it('uploads image and returns public URL for board owner', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (uploadBoardCoverImage as jest.Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.jpg');
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (uploadBoardCoverImage as Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.jpg');
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/cover-image')
@@ -610,8 +608,8 @@ describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
 
   it('accepts PNG images', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
-    (uploadBoardCoverImage as jest.Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.png');
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
+    (uploadBoardCoverImage as Mock).mockResolvedValue('https://storage.example.com/board-covers/user-456/abc12345.png');
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/cover-image')
@@ -646,7 +644,7 @@ describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
 
   it('returns 404 when board not found', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(null);
+    (getBoardByCode as Mock).mockResolvedValue(null);
 
     const res = await request(app)
       .post('/api/ugc/boards/zzzzzzzz/cover-image')
@@ -659,7 +657,7 @@ describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
 
   it('returns 403 when user does not own the board', async () => {
     setupAuth({ id: 'different-user', email: 'other@example.com' });
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/cover-image')
@@ -684,7 +682,7 @@ describe('POST /api/ugc/boards/:boardCode/cover-image', () => {
 
   it('rejects magic bytes mismatch', async () => {
     setupAuth();
-    (getBoardByCode as jest.Mock).mockResolvedValue(MOCK_BOARD);
+    (getBoardByCode as Mock).mockResolvedValue(MOCK_BOARD);
 
     const res = await request(app)
       .post('/api/ugc/boards/abc12345/cover-image')

@@ -620,9 +620,9 @@ const sv = {
     "wordsFound": "{{count}} ord"
   },
   "roundEvent": {
-    "blizzardWarning": "❄️ Snöstorm på väg!",
-    "lightningWarning": "⚡ Blixtomgång!",
-    "meteorWarning": "🌟 Meteorstrike!",
+    "blizzardWarning": "Snöstorm!",
+    "lightningWarning": "Blixtnedslag!",
+    "meteorWarning": "Meteorskur!",
     "active": "Aktiv"
   },
   "specialWord": {
@@ -807,6 +807,7 @@ const sv = {
     "code": "Kod",
     "joinViaLink": "Tryck för att gå med",
     "qrCodeTitle": "Skanna för Strid",
+    "qrCodeAlt": "QR-kod för att gå med i spelet - rumskod {{code}}",
     "codeCopied": "Kod kopierad! 🎯",
     "codeCopyError": "Kunde inte kopiera",
     "buttonLabel": "Bjud in",
@@ -1225,6 +1226,7 @@ const sv = {
   },
   "hostView": {
     "lobby": "Krigsrummet",
+    "lobbyTitle": "Flerspelarlobby",
     "waitingForPlayers": "Samlar krigare...",
     "startGame": "KÖR!",
     "startBattle": "Starta strid!",
@@ -1371,6 +1373,8 @@ const sv = {
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
     "difficultyTooltipTimer": "Längre tid = fler ord hittade",
     "bot": "Bot",
+    "gameLanguage": "Spelspråk",
+    "languageChangedNotification": "{{name}} ändrade spelspråket till {{language}}",
     "addFriend": "Lägg till {name}",
     "requestSent": "Förfrågan skickad"
   },
@@ -2370,6 +2374,13 @@ const sv = {
     "later": "Senare"
   },
   "tutorial": {
+    "step1Title": "Hitta ord",
+    "step1Desc": "Svep över bokstäver för att bilda ord. Ju längre ord, desto fler poäng!",
+    "step2Title": "Poängmaskinen",
+    "step2Desc": "Kedja ihop kombos och hitta sällsynta ord för att multiplicera dina poäng. Hastighet räknas!",
+    "step3Title": "Vinn matchen",
+    "step3Desc": "Slå dina motståndare innan tiden tar slut. Klättra på topplistan!",
+    "uiLanguage": "Visningsspråk",
     "multiDirection": "Svep i alla riktningar! Ord kan sicksacka över rutnätet.",
     "skip": "Hoppa över",
     "prev": "Tillbaka",
@@ -3248,7 +3259,10 @@ const sv = {
     "hints": "Gratisledtrådar tillagda",
     "streakFreezes": "Seriefrysningar tillagda",
     "titleUnlocked": "Exklusiv titel upplåst!",
-    "claimButton": "Hämta min bonus"
+    "claimButton": "Hämta min bonus",
+    "claimed": "Bonus aktiverad!",
+    "claimError": "Misslyckades — Tryck för att försöka igen",
+    "tapToRetry": "Något gick fel. Tryck på knappen för att försöka igen."
   },
   "calendar": {
     "title": "Dagens byte",
@@ -5012,6 +5026,10 @@ const sv = {
       "lifeLeft": "liv kvar",
       "firstTry": "Första försöket!",
       "guesses": "gissningar",
+      "extraTryPenalty": "Straff för extra försök",
+      "extraTry": "extra försök",
+      "extraTries": "extra försök",
+      "points": "poäng",
       "wordsFound": "ord hittade",
       "improve": {
         "speed": "Bli snabbare",

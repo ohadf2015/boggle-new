@@ -73,7 +73,7 @@ const DailyChallenge: React.FC = () => {
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
   // Retry challenge hook
-  const { handleRetryChallenge, justResetRef } = useRetryChallenge({
+  const { handleRetryChallenge, justResetRef, extraTries } = useRetryChallenge({
     gameLanguage,
     isAuthenticated,
     profile: isAuthenticated && profile ? { id: profile.id } : null,
@@ -283,6 +283,7 @@ const DailyChallenge: React.FC = () => {
       clueTokensSpent: result.clueTokensSpent,
       hintsUnlocked: result.hintsUnlocked,
       efficiencyScore: result.efficiencyScore,
+      extraTries,
       streakDays: 0,
       completedAt: new Date().toISOString(),
     };

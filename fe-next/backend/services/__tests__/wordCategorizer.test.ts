@@ -1,7 +1,8 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { classifyWordSync, categorizeWord, CATEGORIES } from '../wordCategorizer';
 
 // Mock Redis to avoid connection in tests
-jest.mock('../../cache/redisCache', () => ({
+vi.mock('../../cache/redisCache', () => ({
   getCacheClient: () => null,
 }));
 

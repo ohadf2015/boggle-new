@@ -86,6 +86,7 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
             size="lg"
             animated
             className="drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]"
+            clipBorder="pink"
           />
         </motion.div>
       </div>

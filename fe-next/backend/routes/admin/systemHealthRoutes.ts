@@ -9,7 +9,7 @@ import { successResponse, errorResponse } from './responseHelpers';
 import { getRedisClient, isRedisAvailable, getRedisMetrics } from '../../redis/connection';
 import logger from '../../utils/logger';
 
-const { getSupabase } = require('../../modules/supabaseServer');
+import { getSupabase } from '../../modules/supabaseServer';
 
 const router: Router = express.Router();
 
@@ -29,7 +29,7 @@ export async function checkSystemHealth(): Promise<SystemHealthResult> {
 
   const [redisResult, dbResult] = await Promise.allSettled([
     redis ? redis.ping() : Promise.reject(new Error('no client')),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    supabase ? supabase.from('profiles').select('id', { count: 'exact', head: true }) : Promise.reject(new Error('no client')),
   ]);
 
   const redisOk = redisResult.status === 'fulfilled';

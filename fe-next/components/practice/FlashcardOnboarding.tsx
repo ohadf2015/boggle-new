@@ -95,7 +95,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
             <div className="p-6 text-center">
               {/* Mascot */}
               <div className="flex justify-center mb-4">
-                <Mascot variant="thinking" size="md" animated />
+                <Mascot variant="thinking" size="md" animated clipBorder="purple" />
               </div>
 
               {/* Title */}

@@ -5,67 +5,67 @@
  * per difficulty level, with initial ceilings before any human scores.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getBestHumanScore, shouldBotScore } from '../botGame';
 
 // Mock gameStateManager
-jest.mock('../../../modules/gameStateManager', () => ({
-  getLeaderboard: jest.fn(),
-  addPlayerWord: jest.fn(),
-  updatePlayerScore: jest.fn(),
-  trackBotWord: jest.fn(),
-  getGame: jest.fn(),
-  recordFirstFinder: jest.fn(),
+vi.mock('../../../modules/gameStateManager', () => ({
+  getLeaderboard: vi.fn(),
+  addPlayerWord: vi.fn(),
+  updatePlayerScore: vi.fn(),
+  trackBotWord: vi.fn(),
+  getGame: vi.fn(),
+  recordFirstFinder: vi.fn(),
 }));
 
 // Mock botManager
-jest.mock('../../../modules/botManager', () => ({
-  getGameBots: jest.fn(() => []),
-  startBot: jest.fn(),
-  isBot: jest.fn(),
+vi.mock('../../../modules/botManager', () => ({
+  getGameBots: vi.fn(() => []),
+  startBot: vi.fn(),
+  isBot: vi.fn(),
 }));
 
 // Mock socketHelpers
-jest.mock('../../../utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  volatileBroadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn((code: string) => `room:${code}`),
+vi.mock('../../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((code: string) => `room:${code}`),
 }));
 
 // Mock logger
-jest.mock('../../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
 // Mock botWordHunt
-jest.mock('../botWordHunt', () => ({
-  startBotsForWordHunt: jest.fn(),
+vi.mock('../botWordHunt', () => ({
+  startBotsForWordHunt: vi.fn(),
 }));
 
 // Mock blastModeManager
-jest.mock('../../../modules/blastModeManager', () => ({
-  calculateBlastTileBonus: jest.fn(),
-  getTilesOnPath: jest.fn(),
-  recordBlastMove: jest.fn(),
+vi.mock('../../../modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn(),
+  getTilesOnPath: vi.fn(),
+  recordBlastMove: vi.fn(),
 }));
 
 // Mock wordHuntManager
-jest.mock('../../../modules/wordHuntManager', () => ({
-  restoreLife: jest.fn(),
-  getLifeBonus: jest.fn(),
+vi.mock('../../../modules/wordHuntManager', () => ({
+  restoreLife: vi.fn(),
+  getLifeBonus: vi.fn(),
 }));
 
-const { getLeaderboard } = require('../../../modules/gameStateManager');
-
+import { getLeaderboard } from '../../../modules/gameStateManager';
 describe('Bot Score Cap', () => {
-  let mathRandomSpy: jest.SpyInstance;
+  let mathRandomSpy: MockInstance;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Fix variance at 1.0 (middle) for deterministic tests
-    mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    mathRandomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
   });
 
   afterEach(() => {

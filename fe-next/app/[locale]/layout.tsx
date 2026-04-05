@@ -20,7 +20,7 @@ import AnimationsLoader from '@/components/AnimationsLoader';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { ChurnSignalTracker } from '@/components/engagement/ChurnSignalTracker';
-import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew } from '../fonts';
+import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
 const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
@@ -184,7 +184,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     // Locale-aware font preloading: Hebrew pages get all 4 font variables,
     // non-Hebrew pages skip Hebrew font preloads (~60-80KB saved)
     const fontClasses = validLocale === 'he'
-      ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''}`
+      ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''} ${heeboHebrew.variable || ''}`
       : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
 
     // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
@@ -576,6 +576,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <CrazyGamesScriptServer />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
+                {/* Dark-only theme — static string literal, no user input, safe from XSS */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `document.documentElement.classList.add('dark')`,
+                    }}
+                />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"

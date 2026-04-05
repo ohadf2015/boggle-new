@@ -67,17 +67,13 @@ interface WordFeedbackModalProps {
  * Makes voting fun with humorous commentary
  */
 const getWittySentences = (t: (key: string, params?: Record<string, string>) => string, word: string, player: string) => {
-  // Apply Hebrew final letter normalization for display
   const displayWord = applyHebrewFinalLetters(word);
   return [
-    t('wordFeedback.witty1', { player, word: displayWord }) || `${player} claims "${displayWord}" is totally a word...`,
+    t('wordFeedback.witty1', { player, word: displayWord }) || `Real word or bluff?`,
     t('wordFeedback.witty2', { player, word: displayWord }),
-    t('wordFeedback.witty3', { player, word: displayWord }) || `${player} found "${displayWord}" in their brain dictionary`,
-    t('wordFeedback.witty4', { player, word: displayWord }) || `Webster called, they want to know about "${displayWord}"`,
     t('wordFeedback.witty5', { player, word: displayWord }),
-    t('wordFeedback.witty6', { player, word: displayWord }) || `Is "${displayWord}" a stroke of genius or madness?`,
-    t('wordFeedback.witty7', { player, word: displayWord }) || `${player} swears this is a real word!`,
-    t('wordFeedback.witty8', { player, word: displayWord }) || `The dictionary committee awaits your verdict on "${displayWord}"`,
+    t('wordFeedback.witty6', { player, word: displayWord }) || `Genius or madness?`,
+    t('wordFeedback.witty7', { player, word: displayWord }) || `Legit or legend?`,
   ];
 };
 
@@ -121,7 +117,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         const randomIndex = Math.floor(Math.random() * validSentences.length);
         setEncouragementSentence(validSentences[randomIndex] ?? '');
       } else {
-        setEncouragementSentence(`${currentWord.submittedBy} claims "${currentWord.word}" is totally a word...`);
+        setEncouragementSentence(`Real word or bluff?`);
       }
       setRemainingTime(timeoutSeconds);
       setHasVoted(false);
@@ -261,21 +257,19 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             >
               {encouragementSentence}
             </motion.p>
-            {/* Submitter Info - Shows who found this word */}
+            {/* Submitter Info */}
             {currentWord.submittedBy && (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-center gap-2 text-neo-gray"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center gap-1"
               >
-                {currentWord.submitterAvatar && (
-                  <Avatar
-
-                    size="sm"
-                  />
-                )}
-                <span className="text-sm text-white font-semibold">
-                  {t('wordFeedback.submittedBy')}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
+                <Avatar
+                  userId={currentWord.submittedBy}
+                  size="xl"
+                />
+                <span className="text-xs text-neo-cream/70 font-semibold">
+                  {currentWord.submittedBy}
                 </span>
               </motion.div>
             )}

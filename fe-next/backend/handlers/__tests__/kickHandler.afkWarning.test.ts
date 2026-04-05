@@ -3,18 +3,22 @@
  * Tests that players receive a warning before being auto-kicked for inactivity
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Server } from 'socket.io';
 
-const mockGetGame = jest.fn();
-const mockGetSocketIdByUsername = jest.fn();
-const mockGetGameUsers = jest.fn();
-const mockGetActiveRooms = jest.fn();
-const mockRemoveUserFromGame = jest.fn();
-const mockClearSocketMappingsForLeave = jest.fn();
+const { mockGetGame, mockGetSocketIdByUsername, mockGetGameUsers, mockGetActiveRooms, mockRemoveUserFromGame, mockClearSocketMappingsForLeave } = vi.hoisted(() => {
+  const mockGetGame = vi.fn();
+  const mockGetSocketIdByUsername = vi.fn();
+  const mockGetGameUsers = vi.fn();
+  const mockGetActiveRooms = vi.fn();
+  const mockRemoveUserFromGame = vi.fn();
+  const mockClearSocketMappingsForLeave = vi.fn();
+  return { mockGetGame, mockGetSocketIdByUsername, mockGetGameUsers, mockGetActiveRooms, mockRemoveUserFromGame, mockClearSocketMappingsForLeave };
+});
 
-jest.mock('../../modules/gameStateManager.js', () => ({
+vi.mock('../../modules/gameStateManager.js', () => ({
   getGame: (...args: unknown[]) => mockGetGame(...args),
-  getGameBySocketId: jest.fn(),
+  getGameBySocketId: vi.fn(),
   getSocketIdByUsername: (...args: unknown[]) => mockGetSocketIdByUsername(...args),
   removeUserFromGame: (...args: unknown[]) => mockRemoveUserFromGame(...args),
   getGameUsers: (...args: unknown[]) => mockGetGameUsers(...args),
@@ -22,14 +26,14 @@ jest.mock('../../modules/gameStateManager.js', () => ({
   clearSocketMappingsForLeave: (...args: unknown[]) => mockClearSocketMappingsForLeave(...args),
 }));
 
-const mockSafeEmit = jest.fn();
-const mockGetSocketById = jest.fn();
-const mockBroadcastToRoom = jest.fn();
-const mockBroadcastActiveRooms = jest.fn();
-const mockGetGameRoom = jest.fn().mockReturnValue('game:TEST123');
-const mockLeaveRoom = jest.fn();
+const mockSafeEmit = vi.fn();
+const mockGetSocketById = vi.fn();
+const mockBroadcastToRoom = vi.fn();
+const mockBroadcastActiveRooms = vi.fn();
+const mockGetGameRoom = vi.fn().mockReturnValue('game:TEST123');
+const mockLeaveRoom = vi.fn();
 
-jest.mock('../../utils/socketHelpers.js', () => ({
+vi.mock('../../utils/socketHelpers.js', () => ({
   broadcastToRoom: (...args: unknown[]) => mockBroadcastToRoom(...args),
   broadcastActiveRooms: (...args: unknown[]) => mockBroadcastActiveRooms(...args),
   getGameRoom: (...args: unknown[]) => mockGetGameRoom(...args),
@@ -38,22 +42,22 @@ jest.mock('../../utils/socketHelpers.js', () => ({
   leaveRoom: (...args: unknown[]) => mockLeaveRoom(...args),
 }));
 
-jest.mock('../../utils/rateLimiter.js', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../utils/rateLimiter.js', () => ({
+  checkRateLimit: vi.fn().mockReturnValue(true),
 }));
 
-jest.mock('../../utils/logger.js', () => ({
+vi.mock('../../utils/logger.js', () => ({
   __esModule: true,
-  default: { info: jest.fn(), warn: jest.fn(), debug: jest.fn(), error: jest.fn() },
+  default: { info: vi.fn(), warn: vi.fn(), debug: vi.fn(), error: vi.fn() },
 }));
 
-jest.mock('../../utils/gameStartCoordinator.js', () => ({
-  default: { handlePlayerDisconnect: jest.fn() },
+vi.mock('../../utils/gameStartCoordinator.js', () => ({
+  default: { handlePlayerDisconnect: vi.fn() },
   __esModule: true,
 }));
 
-jest.mock('../../utils/playerCleanup.js', () => ({
-  cleanupPlayerData: jest.fn(),
+vi.mock('../../utils/playerCleanup.js', () => ({
+  cleanupPlayerData: vi.fn(),
 }));
 
 import { checkAfkWarnings } from '../kickHandler';
@@ -61,8 +65,8 @@ import { checkAfkWarnings } from '../kickHandler';
 function createMockIO(): Server {
   return {
     sockets: { sockets: new Map() },
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   } as unknown as Server;
 }
 
@@ -71,7 +75,7 @@ describe('AFK Warning', () => {
   const AFK_WARNING_MS = AFK_KICK_MS - 30000; // 2.5 minutes = warning threshold
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockGetGameRoom.mockReturnValue('game:TEST123');
   });
 

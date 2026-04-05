@@ -3,62 +3,63 @@
  * Covers: sendMessage, getMessages, markRead, typing, deleteMessage, getThreads, auth checks
  */
 
-jest.mock('../../utils/logger', () => {
-  const l = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() };
+vi.mock('../../utils/logger', () => {
+  const l = { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() };
   return { __esModule: true, default: l, ...l };
 });
 
-jest.mock('../../utils/rateLimiter', () => ({
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
   __esModule: true,
-  checkRateLimit: jest.fn().mockReturnValue(true),
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../utils/errorHandler', () => ({
+  __esModule: true,
+  emitError: vi.fn(),
 }));
 
-jest.mock('../../utils/errorHandler', () => ({
+vi.mock('../../modules/friendsManager');
+vi.mock('../../modules/supabaseServer');
+vi.mock('../../utils/socialHelpers');
+vi.mock('../../utils/profanityFilter', () => ({
   __esModule: true,
-  emitError: jest.fn(),
+  cleanProfanity: vi.fn((s: string) => s),
+}));
+vi.mock('../../utils/sanitize', () => ({
+  __esModule: true,
+  sanitizeHtml: vi.fn((s: string) => s),
+}));
+vi.mock('../../modules/pushNotificationTriggers', () => ({
+  __esModule: true,
+  notifyDirectMessage: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../modules/friendsManager');
-jest.mock('../../modules/supabaseServer');
-jest.mock('../../utils/socialHelpers');
-jest.mock('../../utils/profanityFilter', () => ({
-  __esModule: true,
-  cleanProfanity: jest.fn((s: string) => s),
-}));
-jest.mock('../../utils/sanitize', () => ({
-  __esModule: true,
-  sanitizeHtml: jest.fn((s: string) => s),
-}));
-jest.mock('../../modules/pushNotificationTriggers', () => ({
-  __esModule: true,
-  notifyDirectMessage: jest.fn().mockResolvedValue(undefined),
-}));
-
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerFriendMessagingHandlers } from '../friendMessagingHandler';
 import * as friendsManager from '../../modules/friendsManager';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../../utils/socialHelpers';
 import { emitError } from '../../utils/errorHandler';
 import { checkRateLimit } from '../../utils/rateLimiter';
 
-const mockGetAuthUserId = getAuthUserId as jest.MockedFunction<typeof getAuthUserId>;
-const mockBroadcastToUser = broadcastToUser as jest.MockedFunction<typeof broadcastToUser>;
-const mockGetUserProfile = getUserProfile as jest.MockedFunction<typeof getUserProfile>;
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
-const mockEmitError = emitError as jest.MockedFunction<typeof emitError>;
+const mockGetAuthUserId = getAuthUserId as MockedFunction<typeof getAuthUserId>;
+const mockBroadcastToUser = broadcastToUser as MockedFunction<typeof broadcastToUser>;
+const mockGetUserProfile = getUserProfile as MockedFunction<typeof getUserProfile>;
+const mockCheckRateLimit = checkRateLimit as MockedFunction<typeof checkRateLimit>;
+const mockEmitError = emitError as MockedFunction<typeof emitError>;
 
 function createTestHarness() {
   const handlers = new Map<string, Function>();
   const socket: any = {
     id: 'socket-1',
-    emit: jest.fn(),
-    on: jest.fn((event: string, handler: Function) => {
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
       handlers.set(event, handler);
     }),
     authUserId: 'user-a',
   };
   const io: any = {
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
+    to: vi.fn().mockReturnThis(),
+    emit: vi.fn(),
   };
 
   registerFriendMessagingHandlers(io, socket);
@@ -81,7 +82,7 @@ const PROFILE_A = {
 
 describe('friendMessagingHandler', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetAuthUserId.mockReturnValue('user-a');
     mockCheckRateLimit.mockReturnValue(true);
     mockGetUserProfile.mockResolvedValue(PROFILE_A);
@@ -124,7 +125,7 @@ describe('friendMessagingHandler', () => {
         isRead: false,
         isDeleted: false,
       };
-      (friendsManager.sendMessage as jest.Mock).mockResolvedValue({
+      (friendsManager.sendMessage as Mock).mockResolvedValue({
         success: true,
         message: mockMessage,
       });
@@ -152,7 +153,7 @@ describe('friendMessagingHandler', () => {
     });
 
     it('should handle manager failure gracefully', async () => {
-      (friendsManager.sendMessage as jest.Mock).mockResolvedValue({
+      (friendsManager.sendMessage as Mock).mockResolvedValue({
         success: false,
         errorCode: 'NOT_FRIENDS',
       });
@@ -178,7 +179,7 @@ describe('friendMessagingHandler', () => {
 
   describe('friends:typing', () => {
     it('should broadcast typing indicator to recipient', async () => {
-      (friendsManager.areFriends as jest.Mock).mockResolvedValue(true);
+      (friendsManager.areFriends as Mock).mockResolvedValue(true);
 
       const { trigger } = createTestHarness();
       await trigger('friends:typing', { recipientUserId: 'user-b', isTyping: true });
@@ -196,7 +197,7 @@ describe('friendMessagingHandler', () => {
     });
 
     it('should not broadcast typing to non-friends', async () => {
-      (friendsManager.areFriends as jest.Mock).mockResolvedValue(false);
+      (friendsManager.areFriends as Mock).mockResolvedValue(false);
 
       const { trigger } = createTestHarness();
       await trigger('friends:typing', { recipientUserId: 'user-b', isTyping: true });

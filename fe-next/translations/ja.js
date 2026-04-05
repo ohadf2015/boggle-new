@@ -620,9 +620,9 @@ const ja = {
     "wordsFound": "{{count}}語"
   },
   "roundEvent": {
-    "blizzardWarning": "❄️ 吹雪が来る！",
-    "lightningWarning": "⚡ 雷ラウンド！",
-    "meteorWarning": "🌟 流星落下！",
+    "blizzardWarning": "吹雪襲来！",
+    "lightningWarning": "雷撃！",
+    "meteorWarning": "流星群！",
     "active": "発動中"
   },
   "specialWord": {
@@ -807,6 +807,7 @@ const ja = {
     "code": "コード",
     "joinViaLink": "タップして参加",
     "qrCodeTitle": "スキャンでバトル",
+    "qrCodeAlt": "ゲーム参加用QRコード - ルームコード {{code}}",
     "codeCopied": "コードコピー完了！🎯",
     "codeCopyError": "コピーできなかった",
     "buttonLabel": "招待",
@@ -1225,6 +1226,7 @@ const ja = {
   },
   "hostView": {
     "lobby": "ロビー",
+    "lobbyTitle": "マルチプレイヤーロビー",
     "waitingForPlayers": "戦士集合中...",
     "startGame": "GO！",
     "startBattle": "バトル開始！",
@@ -1371,6 +1373,8 @@ const ja = {
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
     "difficultyTooltipTimer": "長い時間＝たくさん見つかる",
     "bot": "ボット",
+    "gameLanguage": "ゲーム言語",
+    "languageChangedNotification": "{{name}}がゲーム言語を{{language}}に変更しました",
     "addFriend": "{name}を追加",
     "requestSent": "リクエスト送信済み"
   },
@@ -2371,6 +2375,13 @@ const ja = {
     "later": "後で"
   },
   "tutorial": {
+    "step1Title": "単語を見つけよう",
+    "step1Desc": "文字をスワイプして単語を作ろう。長い単語ほど高得点！",
+    "step2Title": "高得点を狙え",
+    "step2Desc": "コンボをつなげてレアな単語を見つけてスコアを倍増。スピードも大事！",
+    "step3Title": "勝利をつかめ",
+    "step3Desc": "制限時間内に相手を上回ろう。リーダーボードを駆け上がれ！",
+    "uiLanguage": "表示言語",
     "multiDirection": "どの方向にもスワイプ！単語はグリッド上をジグザグに進めます。",
     "skip": "スキップ",
     "prev": "戻る",
@@ -3248,7 +3259,10 @@ const ja = {
     "hints": "無料ヒントが追加されました",
     "streakFreezes": "ストリークフリーズが追加されました",
     "titleUnlocked": "限定タイトルが解除されました！",
-    "claimButton": "ボーナスを受け取る"
+    "claimButton": "ボーナスを受け取る",
+    "claimed": "ボーナス有効化！",
+    "claimError": "失敗 — タップして再試行",
+    "tapToRetry": "エラーが発生しました。ボタンをタップして再試行してください。"
   },
   "calendar": {
     "title": "デイリー報酬",
@@ -5064,6 +5078,10 @@ const ja = {
       "lifeLeft": "ライフ残り",
       "firstTry": "一発正解！",
       "guesses": "回推測",
+      "extraTryPenalty": "再挑戦ペナルティ",
+      "extraTry": "回再挑戦",
+      "extraTries": "回再挑戦",
+      "points": "ポイント",
       "wordsFound": "単語発見",
       "improve": {
         "speed": "もっと速くクリアしよう",

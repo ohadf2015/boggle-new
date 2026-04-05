@@ -3,6 +3,7 @@
  * TDD: RED phase - tests written before implementation
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
 
@@ -21,32 +22,37 @@ interface AdminRequest extends Request {
 
 // ==================== Mocks ====================
 
-const mockSupabaseFrom = jest.fn();
+const { mockSupabaseFrom } = vi.hoisted(() => {
+  const mockSupabaseFrom = vi.fn();
+  return { mockSupabaseFrom };
+});
 
-jest.mock('../../../backend/modules/supabaseServer', () => ({
-  getSupabase: jest.fn(() => ({
+vi.mock('../../modules/supabaseServer', () => ({
+  getSupabase: vi.fn(() => ({
     from: mockSupabaseFrom,
   })),
-  isSupabaseConfigured: jest.fn(() => true),
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
-jest.mock('../../../backend/utils/logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+} }));
+
+import playerRoutes from '../admin/playerRoutes';
 
 // ==================== Test Helpers ====================
 
 /** Build a mock Supabase query chain that resolves with given data/error. */
 const buildMockChain = (data: unknown, error: Error | null = null) => {
   const chain = {
-    select: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    single: jest.fn().mockResolvedValue({ data, error }),
-    then: jest.fn((resolve: (v: { data: unknown; error: Error | null }) => void) =>
+    select: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data, error }),
+    then: vi.fn((resolve: (v: { data: unknown; error: Error | null }) => void) =>
       resolve({ data, error })
     ),
   };
@@ -69,6 +75,8 @@ const createTestApp = (override?: Partial<AdminUser>) => {
     next();
   });
 
+  app.use('/', playerRoutes);
+
   return app;
 };
 
@@ -78,12 +86,8 @@ describe('POST /api/admin/users/:userId/set-teacher-role', () => {
   let app: express.Express;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     app = createTestApp();
-
-    // Attach the route under test
-    const playerRoutes = require('../admin/playerRoutes').default;
-    app.use('/', playerRoutes);
   });
 
   it('should set user_role to teacher when requester is admin', async () => {

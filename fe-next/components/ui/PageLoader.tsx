@@ -24,9 +24,9 @@ interface PageLoaderProps {
 
 // Size mappings for the spinner ring
 const SPINNER_SIZES = {
-  sm: { ring: 'w-20 h-20', mascot: 'xs' as const },
-  md: { ring: 'w-28 h-28', mascot: 'sm' as const },
-  lg: { ring: 'w-36 h-36', mascot: 'md' as const },
+  sm: { ring: 'w-32 h-32', mascot: 'xs' as const },
+  md: { ring: 'w-36 h-36', mascot: 'xs' as const },
+  lg: { ring: 'w-44 h-44', mascot: 'sm' as const },
 };
 
 /**
@@ -100,6 +100,7 @@ export const PageLoader = memo(function PageLoader({
               size={spinnerSize.mascot}
               animated={true}
               priority={true}
+              clipBorder="cyan"
             />
           </div>
         </div>

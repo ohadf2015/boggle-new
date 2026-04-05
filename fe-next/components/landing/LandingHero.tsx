@@ -21,14 +21,15 @@ interface LandingHeroProps {
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait }: { isMobilePortrait: boolean }) {
   return (
     <IdleMascotWithEntrance
-      baseVariant="happy"
+      baseVariant="waving"
       size="xl"
-      sizeClassName={isMobilePortrait ? 'w-16 h-16' : 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40'}
+      sizeClassName={isMobilePortrait ? 'w-[100px] h-[100px]' : 'w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48'}
       enableHover={!isMobilePortrait}
       enableClick
       hoverVariant="excited"
       clickVariant="celebrating"
       clickAnimation="bounce"
+      clipBorder="lime"
       delay={0.1}
     />
   );

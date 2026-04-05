@@ -2,9 +2,12 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut } from 'lucide-react';
+import { BookOpen, LogOut, Pencil, Check, X } from 'lucide-react';
 import RoomChat from '../../components/RoomChat';
+import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
+import { LanguageSelector } from '../../components/join/LanguageSelector';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,12 +18,16 @@ import { MobileShareSection } from './pre-game/MobileShareSection';
 import { PresetInfoDrawer } from './pre-game/PresetInfoDrawer';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
-import { DJMascotWithEntrance } from '@/components/ui/DJMascot';
 import {
   DesktopLobbyLayout,
   InviteCard,
 } from './pre-game/desktop';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
+import Avatar from '@/components/Avatar';
+import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -87,12 +94,15 @@ interface HostPreGameViewProps {
   onRegenerateBoard?: () => void;
   tournamentCreating: boolean;
   lessonData?: LessonData | null;
+  onNameChange?: (newName: string) => void;
+  onAvatarChange?: (config: CustomAvatarConfig) => void;
 }
 
 // ==================== Component ====================
 
 function HostPreGameView({
   gameCode,
+  roomLanguage,
   username,
   t,
   timerValue,
@@ -107,9 +117,35 @@ function HostPreGameView({
   onExitRoom,
   tournamentCreating,
   lessonData,
+  onNameChange,
+  onAvatarChange,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated, updateProfile } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+
+  // Avatar & name editing state
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
+  const currentAvatar = getOrCreateStoredCustomAvatar();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState(username);
+
+  const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
+    setStoredCustomAvatar(config);
+    onAvatarChange?.(config);
+    setIsAvatarBuilderOpen(false);
+    await updateProfile({ avatar_config: config }).catch(() => {});
+  }, [onAvatarChange, updateProfile]);
+
+  const handleSaveName = useCallback(() => {
+    const trimmed = editNameValue.trim();
+    if (trimmed && trimmed !== username) {
+      onNameChange?.(trimmed);
+    }
+    setIsEditingName(false);
+  }, [editNameValue, username, onNameChange]);
+
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
   const storeGameMode = useGameMode();
@@ -236,6 +272,11 @@ function HostPreGameView({
     };
   }, [botCountdown, socket, gameCode, onStartGame]);
 
+  // Handle host changing the room language
+  const handleRoomLanguageChange = useCallback((newLang: import('@/shared/types/game').Language) => {
+    socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
+  }, [socket, gameCode]);
+
   const cancelBotCountdown = useCallback(() => {
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
@@ -288,16 +329,75 @@ function HostPreGameView({
         </div>
       )}
 
-      {/* Header — compact */}
+      {/* Header — compact with editable avatar & name */}
       <header className="flex-shrink-0 px-3 py-1.5 bg-neo-navy/95 border-b-2 border-neo-black sticky top-0 z-20">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <DJMascotWithEntrance size="sm" delay={0.3} />
-            <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
-              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+            {/* Clickable avatar */}
+            <button
+              data-testid="host-edit-avatar-button"
+              onClick={() => setIsAvatarBuilderOpen(true)}
+              className="relative flex-shrink-0 group"
             >
-              {username}
-            </span>
+              <div className="w-10 h-10 rounded-full border-2 border-neo-black overflow-hidden shadow-hard-sm ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy transition-transform group-hover:scale-105 group-active:scale-95">
+                <Avatar
+                  customAvatar={currentAvatar}
+                  size="lg"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="absolute -bottom-0.5 -end-0.5 w-5 h-5 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+                <Pencil className="w-2.5 h-2.5 text-neo-black" />
+              </div>
+            </button>
+
+            {/* Editable name */}
+            {isEditingName ? (
+              <div className="flex items-center gap-1.5 min-w-0">
+                <input
+                  data-testid="host-name-edit-input"
+                  type="text"
+                  value={editNameValue}
+                  onChange={(e) => setEditNameValue(e.target.value)}
+                  maxLength={20}
+                  className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-2 py-1 text-sm font-black focus:outline-none focus:ring-2 focus:ring-neo-cyan w-full max-w-[150px]"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') { setIsEditingName(false); setEditNameValue(username); }
+                  }}
+                />
+                <button
+                  data-testid="host-name-save-button"
+                  onClick={handleSaveName}
+                  className="w-7 h-7 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm flex-shrink-0"
+                >
+                  <Check className="w-3.5 h-3.5 text-neo-black" />
+                </button>
+                <button
+                  onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                  className="w-7 h-7 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo flex-shrink-0"
+                >
+                  <X className="w-3.5 h-3.5 text-neo-cream" />
+                </button>
+              </div>
+            ) : (
+              <button
+                data-testid="host-edit-name-button"
+                onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                className="flex items-center gap-1.5 min-w-0 group"
+                {...(!isAuthenticated ? {} : { disabled: true })}
+              >
+                <span className="text-base font-neo-display font-bold text-neo-cream leading-none truncate"
+                  style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.15)' }}
+                >
+                  {username}
+                </span>
+                {!isAuthenticated && (
+                  <Pencil className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                )}
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
@@ -314,6 +414,7 @@ function HostPreGameView({
 
       {/* Main Content */}
       <main className="flex-1 min-h-0 overflow-y-auto bg-neo-navy/95 flex flex-col">
+        <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
         {/* Desktop Layout */}
         <div className="hidden lg:flex lg:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
@@ -323,13 +424,22 @@ function HostPreGameView({
                 <StartButton onStartGame={onStartGame} disabled={isStartDisabled} tournamentCreating={tournamentCreating} playerCount={filteredPlayersForDisplay.length} t={t} />
                 <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
                 <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
+                {/* Language Selector */}
+                <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 p-3">
+                  <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
+                  <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
+                </div>
               </>
             }
             rightContent={
               <>
                 <InviteCard gameCode={gameCode} t={t} desktop />
                 <div data-testid="desktop-chat-area" className="flex-1 min-h-0 bg-neo-navy-light/50 rounded-neo-lg border-3 border-neo-white/10 overflow-hidden">
-                  <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+                  {isOnCrazyGamesPlatform ? (
+                    <LobbyTutorialPanel t={t} />
+                  ) : (
+                    <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+                  )}
                 </div>
               </>
             }
@@ -344,9 +454,19 @@ function HostPreGameView({
             <PlayerRoster players={filteredPlayersForDisplay} username={username} gameCode={gameCode} maxPlayers={maxPlayers} hostLabel={hostLabel} t={t} />
             <BattleModeCard hostPlaying={hostPlaying} setHostPlaying={setHostPlaying} selectedGameMode={selectedGameMode} setSelectedGameMode={setSelectedGameMode} gameCode={gameCode} playersReady={playersReady} t={t} isAdmin={isAdmin} />
 
-            {/* Chat */}
+            {/* Language Selector */}
+            <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 p-3">
+              <label className="text-xs font-black uppercase text-neo-cream/70 mb-1.5 block">{t('hostView.gameLanguage')}</label>
+              <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={handleRoomLanguageChange} hideLabel />
+            </div>
+
+            {/* Chat or Tutorial (CrazyGames) */}
             <div className="bg-neo-navy-light/50 rounded-neo-lg border-2 border-neo-white/10 overflow-hidden h-64">
-              <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+              {isOnCrazyGamesPlatform ? (
+                <LobbyTutorialPanel t={t} />
+              ) : (
+                <RoomChat username="Host" isHost={true} gameCode={gameCode} className="h-full" onNewMessage={() => {}} variant="embedded" />
+              )}
             </div>
           </div>
 
@@ -359,6 +479,13 @@ function HostPreGameView({
 
       <PresetInfoDrawer openPreset={presetInfoOpen} onClose={() => setPresetInfoOpen(null)} onSelectPreset={() => setPresetInfoOpen(null)} t={t} />
       <TvTutorialOverlay onComplete={() => setShowTvTutorial(false)} onSkip={() => setShowTvTutorial(false)} t={t} forceShow={showTvTutorial} />
+      <AvatarBuilderModal
+        isOpen={isAvatarBuilderOpen}
+        onClose={() => setIsAvatarBuilderOpen(false)}
+        onSave={handleAvatarSave}
+        initialConfig={currentAvatar}
+        premium={avatarPremium}
+      />
     </div>
   );
 }

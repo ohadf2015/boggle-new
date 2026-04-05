@@ -105,6 +105,7 @@ export function InviteCard({
                   includeMargin={false}
                   bgColor="#ffffff"
                   fgColor="#000000"
+                  title={t('share.qrCodeAlt', { code: gameCode })}
                 />
               </motion.div>
               {/* Room Code below QR */}
@@ -207,6 +208,7 @@ export function InviteCard({
                 includeMargin={false}
                 bgColor="#ffffff"
                 fgColor="#000000"
+                title={t('share.qrCodeAlt', { code: gameCode })}
               />
             </motion.div>
 
@@ -304,6 +306,7 @@ export function InviteCard({
               includeMargin={false}
               bgColor="#ffffff"
               fgColor="#000000"
+              title={t('share.qrCodeAlt', { code: gameCode })}
             />
           </motion.div>
         </div>

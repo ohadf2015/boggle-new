@@ -4,23 +4,21 @@
  *         Word Hunt state reset, spectator upgrade guard, ACK+reset deadlock
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { GameStartCoordinator } from '../utils/gameStartCoordinator';
 
-const {
-  createGame,
+import { createGame,
   getGame,
   resetGameForNewRound,
   updateGame,
   clearAllGames,
   upgradeSpectatorToPlayer,
   addSpectatorToGame,
-  addUserToGame,
-} = require('../modules/gameStateManager');
-
+  addUserToGame, } from '../modules/gameStateManager';
 describe('Race Condition Fixes', () => {
   afterEach(() => {
     clearAllGames();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ================================================================
@@ -34,7 +32,7 @@ describe('Race Condition Fixes', () => {
     });
 
     test('should start timer exactly once when all players ACK before timeout', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const timeoutCalls: number[] = [];
 
       coordinator.initializeSequence('game1', ['p1', 'p2', 'p3'], 180);
@@ -50,12 +48,12 @@ describe('Race Condition Fixes', () => {
       expect(result.allReady).toBe(true);
 
       // Advance past timeout - should NOT fire
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(timeoutCalls).toHaveLength(0);
     });
 
     test('should start timer exactly once when timeout fires before all ACKs', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const timeoutCalls: number[] = [];
 
       coordinator.initializeSequence('game1', ['p1', 'p2', 'p3'], 180);
@@ -70,7 +68,7 @@ describe('Race Condition Fixes', () => {
       coordinator.recordAcknowledgment('game1', 'p2', messageId);
 
       // Timeout fires
-      jest.advanceTimersByTime(3500);
+      vi.advanceTimersByTime(3500);
       expect(timeoutCalls).toHaveLength(1);
 
       // Late ACK should report timer already started
@@ -79,7 +77,7 @@ describe('Race Condition Fixes', () => {
     });
 
     test('should not call timeout callback if sequence was cancelled', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const timeoutCalls: number[] = [];
 
       coordinator.initializeSequence('game1', ['p1', 'p2'], 180);
@@ -90,7 +88,7 @@ describe('Race Condition Fixes', () => {
       // Cancel (simulating game reset)
       coordinator.cancelSequence('game1');
 
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(timeoutCalls).toHaveLength(0);
     });
   });
@@ -100,7 +98,7 @@ describe('Race Condition Fixes', () => {
   // ================================================================
   describe('Issue #2: Host reconnection thread-safety', () => {
     test('should clear previous reconnection timeout on duplicate disconnect', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
 
       const game = createGame('HOST_TEST', {
         hostSocketId: 'host-socket',
@@ -120,7 +118,7 @@ describe('Race Condition Fixes', () => {
         firstCalls.push('second');
       }, 30000);
 
-      jest.advanceTimersByTime(35000);
+      vi.advanceTimersByTime(35000);
 
       // Only second timeout should fire
       expect(firstCalls).toEqual(['second']);
@@ -234,7 +232,7 @@ describe('Race Condition Fixes', () => {
     });
 
     test('should mark sequence as cancelled preventing timeout from firing', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const timerCalls: number[] = [];
 
       coordinator.initializeSequence('game1', ['p1', 'p2'], 180);
@@ -250,7 +248,7 @@ describe('Race Condition Fixes', () => {
       coordinator.cleanupSequence('game1');
 
       // Timeout should NOT fire after cancellation
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
       expect(timerCalls).toHaveLength(0);
     });
 

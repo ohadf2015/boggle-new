@@ -38,7 +38,11 @@ function replaceViHoisted(code) {
 }
 
 function preprocessVitest(src) {
-  if (!src.includes("from 'vitest'") && !src.includes('from "vitest"')) {
+  // Check for vitest import OR bare vi.mock/vi.fn usage (some files skip the import)
+  const hasVitestImport = src.includes("from 'vitest'") || src.includes('from "vitest"');
+  const hasViUsage = /\bvi\.(mock|fn|spyOn|mocked|unmock|hoisted|useFakeTimers|useRealTimers|advanceTimersByTime|runAllTimers|resetAllMocks|clearAllMocks|restoreAllMocks|resetModules|setSystemTime|stubGlobal|dynamicImportSettled)\b/.test(src);
+
+  if (!hasVitestImport && !hasViUsage) {
     return src;
   }
 

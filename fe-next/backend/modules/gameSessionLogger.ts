@@ -3,7 +3,7 @@
  * Handles logging game sessions to database for analytics and history tracking
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { type SupabaseClient, createClient } from '@supabase/supabase-js';
 
 import logger from '../utils/logger';
 
@@ -27,6 +27,11 @@ function captureBackgroundErrorSafe(
 // Create Supabase client (lazy loaded)
 let supabase: SupabaseClient | null = null;
 
+/** Test-only: reset the cached client */
+export function _resetSupabaseForTesting(): void {
+  supabase = null;
+}
+
 function getSupabaseClient(): SupabaseClient | null {
   if (supabase) return supabase;
 
@@ -38,7 +43,6 @@ function getSupabaseClient(): SupabaseClient | null {
     return null;
   }
 
-  const { createClient } = require('@supabase/supabase-js');
   supabase = createClient(supabaseUrl, supabaseServiceKey);
   return supabase;
 }

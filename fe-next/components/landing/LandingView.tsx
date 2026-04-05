@@ -128,11 +128,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
 
-  const [isDesktopWidth, setIsDesktopWidth] = useState(false);
+  const [isDesktopWidth, setIsDesktopWidth] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= 1024;
+  });
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const check = () => setIsDesktopWidth(window.innerWidth >= 1024);
-    check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
@@ -209,23 +211,23 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
 
         {/* Leaderboard — mobile only (desktop shows in hero sidebar) */}
         {hydrated && isMobilePortrait && (
-          <div className="w-full max-w-4xl mx-auto">
+          <div className="w-full max-w-4xl mx-auto animate-[fadeIn_0.3s_ease-out]">
             <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
           </div>
         )}
 
         {/* Engagement widgets — compact, below game modes. Max 3 to avoid overload */}
         {hydrated && isAuthenticated && (
-          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
+          <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full animate-[fadeIn_0.3s_ease-out]">
             <UrgencyCard />
             <GhostRivalWidget />
             <VaultCardConnected />
           </div>
         )}
 
-        {/* Below-fold sections — deferred until after first paint */}
+        {/* Below-fold sections — deferred until after first paint, fade in smoothly */}
         {hydrated && (
-          <>
+          <div className="flex flex-col gap-6 sm:gap-8 animate-[fadeIn_0.3s_ease-out]">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
               <div className="lg:flex-1">
                 <LandingYourRank />
@@ -240,7 +242,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData }) => {
             <div className="w-full max-w-4xl mx-auto">
               <LandingShareBanner onShareClick={() => setShowShareModal(true)} />
             </div>
-          </>
+          </div>
         )}
       </section>
 

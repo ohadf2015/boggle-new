@@ -164,6 +164,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           onClose={() => setIsBuilderOpen(false)}
           onSave={handleBuilderSave}
           initialConfig={avatar}
+          premium={null}
         />
 
         {/* Name input */}

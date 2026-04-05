@@ -1,8 +1,9 @@
-jest.mock('../../../utils/logger', () => ({
-  default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+vi.mock('../../../utils/logger', () => ({
+  default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
   __esModule: true,
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   initCaptionClash,
   startCaptionRound,
@@ -20,8 +21,8 @@ function createMockIO() {
   const toRooms = new Map<string, typeof emitted>();
 
   return {
-    to: jest.fn((room: string) => ({
-      emit: jest.fn((event: string, data: unknown) => {
+    to: vi.fn((room: string) => ({
+      emit: vi.fn((event: string, data: unknown) => {
         emitted.push({ event, data, room });
         if (!toRooms.has(room)) toRooms.set(room, []);
         toRooms.get(room)!.push({ event, data, room });
@@ -45,8 +46,8 @@ describe('captionClashEngine', () => {
 
   afterEach(() => {
     cleanupCaptionClash(ROOM);
-    jest.clearAllTimers();
-    jest.useRealTimers();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe('initCaptionClash', () => {
@@ -73,7 +74,7 @@ describe('captionClashEngine', () => {
 
   describe('startCaptionRound', () => {
     it('should increment round and emit imageReady', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 5);
 
@@ -89,7 +90,7 @@ describe('captionClashEngine', () => {
     });
 
     it('should mark last-1 round as speed round (15s)', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
 
@@ -113,7 +114,7 @@ describe('captionClashEngine', () => {
 
   describe('submitCaption', () => {
     it('should store submission and broadcast count', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
       startCaptionRound(io as any, ROOM);
@@ -128,7 +129,7 @@ describe('captionClashEngine', () => {
     });
 
     it('should broadcast word cloud on submission', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
       startCaptionRound(io as any, ROOM);
@@ -140,7 +141,7 @@ describe('captionClashEngine', () => {
     });
 
     it('should truncate captions to 200 chars', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
       startCaptionRound(io as any, ROOM);
@@ -155,7 +156,7 @@ describe('captionClashEngine', () => {
     });
 
     it('should auto-advance when all players submit', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
       startCaptionRound(io as any, ROOM);
@@ -167,7 +168,7 @@ describe('captionClashEngine', () => {
       // Should have advanced to lineup — check for revealCaption events
       const revealEvents = io.emitted.filter(e => e.event === 'party:caption:revealCaption');
       // Reveals are delayed via setTimeout, advance timers
-      jest.advanceTimersByTime(20000);
+      vi.advanceTimersByTime(20000);
       const revealEventsAfter = io.emitted.filter(e => e.event === 'party:caption:revealCaption');
       expect(revealEventsAfter.length).toBeGreaterThan(0);
     });
@@ -175,7 +176,7 @@ describe('captionClashEngine', () => {
 
   describe('submitLaugh', () => {
     it('should increment laugh count and broadcast', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const io = createMockIO();
       initCaptionClash(ROOM, PLAYERS, 3);
       startCaptionRound(io as any, ROOM);
@@ -184,7 +185,7 @@ describe('captionClashEngine', () => {
       submitCaption(io as any, ROOM, 'socket1', 'Caption 1');
       submitCaption(io as any, ROOM, 'socket2', 'Caption 2');
       submitCaption(io as any, ROOM, 'socket3', 'Caption 3');
-      jest.advanceTimersByTime(5000); // advance to lineup
+      vi.advanceTimersByTime(5000); // advance to lineup
 
       // Get a submission ID
       const state = getCaptionGameState(ROOM);

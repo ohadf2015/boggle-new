@@ -173,7 +173,7 @@ const AdventureHub = memo<AdventureHubProps>(({
       </AdaptiveMotion.div>
 
       {/* Content area */}
-      <div className="flex flex-col gap-4 px-4 py-4 flex-1">
+      <div className="flex flex-col gap-4 px-4 py-4 pb-20 flex-1">
 
         {/* Streak + Daily Quests — single compact row */}
         <AdaptiveMotion.div

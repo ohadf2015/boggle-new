@@ -2,10 +2,11 @@
  * UGC Content Moderation - Unit Tests
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { validateUgcText, shouldAutoFlag, getReportReasons, ModerationStatus } from '../ugcModeration';
 
-jest.mock('../../utils/profanityFilter', () => ({
-  isProfane: jest.fn((text: string) => text?.toLowerCase().includes('badword')),
+vi.mock('../../utils/profanityFilter', () => ({
+  isProfane: vi.fn((text: string) => text?.toLowerCase().includes('badword')),
 }));
 
 describe('ugcModeration', () => {

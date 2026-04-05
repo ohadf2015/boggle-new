@@ -3,14 +3,11 @@
  * Tests for board word validation logic
  */
 
-const {
-  validateWordOnBoard,
+import { validateWordOnBoard,
   getWordPath,
   makePositionsMap,
   normalizeHebrewLetter,
-  normalizeHebrewWord
-} = require('../modules/wordValidator');
-
+  normalizeHebrewWord } from '../modules/wordValidator';
 describe('Word Validator', () => {
 
   // Sample 3x3 board for testing

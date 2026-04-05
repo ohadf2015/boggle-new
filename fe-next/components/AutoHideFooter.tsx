@@ -6,6 +6,7 @@ import Footer from './Footer';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsDesktop } from '@/hooks/useDesktopLayout';
 
 interface AutoHideFooterProps {
   className?: string;
@@ -22,9 +23,10 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   const { isInGame } = useNavigation();
   const { t, language } = useLanguage();
   const pathname = usePathname();
+  const isDesktop = useIsDesktop();
 
-  // TV fullscreen: no footer at all
-  if (isTvFullscreen) {
+  // TV fullscreen or desktop gameplay: no footer at all
+  if (isTvFullscreen || (isInGame && isDesktop)) {
     return null;
   }
 
@@ -33,7 +35,7 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
     path => cleanPath.startsWith(path)
   );
 
-  // Game routes or active gameplay: compact legal-only footer (AdSense requirement)
+  // Game routes or active gameplay on mobile: compact legal-only footer (AdSense requirement)
   if (isInGame || isGameRoute) {
     return (
       <footer

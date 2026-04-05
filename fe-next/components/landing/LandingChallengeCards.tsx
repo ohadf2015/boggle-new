@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Swords, BookOpen, Users, Map, Bomb } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -68,6 +68,7 @@ export function LandingChallengeCards({
               description={t('landing.arenaDesc')}
               href={`/${language}/multiplayer`}
               icon={<Swords className="w-6 h-6" />}
+              modeImage="/modes/arena.png"
               variant="pink"
               liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
@@ -88,6 +89,7 @@ export function LandingChallengeCards({
               description={t('landing.practiceDesc')}
               href={`/${language}/singleplayer?mode=practice`}
               icon={<BookOpen className="w-6 h-6" />}
+              modeImage="/modes/practice.png"
               variant="cyan"
               personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
               duration={t('landing.duration').replace('{time}', '1-3')}
@@ -112,6 +114,7 @@ export function LandingChallengeCards({
               description={t('landing.adventureModeDesc')}
               href={`/${language}/adventure`}
               icon={<Map className="w-6 h-6" />}
+              modeImage="/modes/adventure.png"
               variant="lime"
               duration={t('landing.duration').replace('{time}', '2-5')}
               difficulty={2}
@@ -126,7 +129,7 @@ export function LandingChallengeCards({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
+    <div className="w-full max-w-5xl mx-auto xl:max-w-6xl">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-stretch">
         {cardOrder.map((mode, index) => renderCard(mode, index))}
 
@@ -138,6 +141,7 @@ export function LandingChallengeCards({
               description={t('landing.blastModeDesc')}
               href={`/${language}/blast`}
               icon={<Bomb className="w-6 h-6" />}
+              modeImage="/modes/blast.png"
               variant="orange"
               secondary
               badge="ADMIN"

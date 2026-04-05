@@ -7,6 +7,7 @@ import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { cn } from '@/lib/utils';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 
 interface AvatarSelectorProps {
   selectedAvatar: CustomAvatarConfig | null;
@@ -27,6 +28,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
 }) => {
   const { t } = useLanguage();
   const [isBuilderOpen, _setIsBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
 
   const setIsBuilderOpen = useCallback((open: boolean) => {
     _setIsBuilderOpen(open);
@@ -62,6 +64,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
           onClose={() => setIsBuilderOpen(false)}
           onSave={handleSave}
           initialConfig={currentConfig}
+          premium={avatarPremium}
         />
       </div>
     );
@@ -105,6 +108,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
         onClose={() => setIsBuilderOpen(false)}
         onSave={handleSave}
         initialConfig={currentConfig}
+        premium={avatarPremium}
       />
     </div>
   );

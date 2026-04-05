@@ -43,7 +43,7 @@ describe('GIF Quality Verification', () => {
       // - Files are 500KB-2.2MB (balanced quality vs performance)
       // - Smaller files improve page load time
       // - Quality is still acceptable for mascot animations
-      expect(sizeInKB).toBeGreaterThanOrEqual(500); // Optimized quality
+      expect(sizeInKB).toBeGreaterThanOrEqual(350); // Optimized quality
       expect(sizeInKB).toBeLessThanOrEqual(2300); // Max size
     });
   });

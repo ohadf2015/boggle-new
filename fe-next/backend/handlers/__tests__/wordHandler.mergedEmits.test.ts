@@ -9,81 +9,79 @@
  * - NO separate blastComboSync broadcast
  */
 
-import { Server, Socket } from 'socket.io';
-import { createServer } from 'http';
-import { io as Client, Socket as ClientSocket } from 'socket.io-client';
-import { AddressInfo } from 'net';
+import { vi, type Mock } from 'vitest';
 
 // Mock all dependencies (same as wordHandler.blast.test.ts)
-jest.mock('../../../backend/modules/gameStateManager', () => ({
-  getGame: jest.fn(),
-  getGameBySocketId: jest.fn(),
-  getUsernameBySocketId: jest.fn(),
-  addPlayerWord: jest.fn(),
-  playerHasWord: jest.fn(),
-  updatePlayerScore: jest.fn(),
-  getLeaderboard: jest.fn(),
-  getLeaderboardThrottled: jest.fn(),
-  markUserActivity: jest.fn(),
-  recordPeerValidationVote: jest.fn(),
-  removePeerRejectedWordScore: jest.fn(),
-  trackAiApprovedWord: jest.fn(),
-  getFirstFinder: jest.fn(),
-  recordFirstFinder: jest.fn(),
+vi.mock('../../../backend/modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(),
+  getUsernameBySocketId: vi.fn(),
+  addPlayerWord: vi.fn(),
+  playerHasWord: vi.fn(),
+  updatePlayerScore: vi.fn(),
+  getLeaderboard: vi.fn(),
+  getLeaderboardThrottled: vi.fn(),
+  markUserActivity: vi.fn(),
+  recordPeerValidationVote: vi.fn(),
+  removePeerRejectedWordScore: vi.fn(),
+  trackAiApprovedWord: vi.fn(),
+  getFirstFinder: vi.fn(),
+  recordFirstFinder: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/wordValidatorPool', () => ({
-  isWordOnBoardAsync: jest.fn(),
+vi.mock('../../../backend/modules/wordValidatorPool', () => ({
+  isWordOnBoardAsync: vi.fn(),
 }));
 
-jest.mock('../../../backend/dictionary', () => ({
-  isDictionaryWord: jest.fn(),
+vi.mock('../../../backend/dictionary', () => ({
+  isDictionaryWord: vi.fn(),
+  isValidWordCached: vi.fn(),
 }));
 
-jest.mock('../../../backend/modules/communityWordManager', () => ({
-  isWordCommunityValid: jest.fn(),
-  isWordValidForScoring: jest.fn(),
-  recordVote: jest.fn(),
-  updatePendingCache: jest.fn(),
+vi.mock('../../../backend/modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(),
+  isWordValidForScoring: vi.fn(),
+  recordVote: vi.fn(),
+  updatePendingCache: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/profanityFilter', () => ({
-  isProfane: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/profanityFilter', () => ({
+  isProfane: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/scoringEngine', () => ({
-  calculateWordScore: jest.fn().mockReturnValue(5),
+vi.mock('../../../backend/modules/scoringEngine', () => ({
+  calculateWordScore: vi.fn().mockReturnValue(5),
 }));
 
-jest.mock('../../../backend/modules/achievementManager', () => ({
-  checkAndAwardAchievements: jest.fn().mockReturnValue([]),
+vi.mock('../../../backend/modules/achievementManager', () => ({
+  checkAndAwardAchievements: vi.fn().mockReturnValue([]),
   ACHIEVEMENT_ICONS: {},
 }));
 
-jest.mock('../../../backend/modules/supabaseServer', () => ({
-  isSupabaseConfigured: jest.fn().mockReturnValue(false),
-  savePlayerWord: jest.fn(),
-  recordPlayerWrongWord: jest.fn(),
+vi.mock('../../../backend/modules/supabaseServer', () => ({
+  isSupabaseConfigured: vi.fn().mockReturnValue(false),
+  savePlayerWord: vi.fn(),
+  recordPlayerWrongWord: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/rateLimiter', () => ({
-  checkRateLimit: jest.fn().mockReturnValue(true),
+vi.mock('../../../backend/utils/rateLimiter', () => ({ checkRateLimit: vi.fn().mockReturnValue(true), default: {
+  checkRateLimit: vi.fn().mockReturnValue(true),
+} }));
+
+vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
 
-jest.mock('../../../backend/middleware/rateLimiterRedis', () => ({
-  checkSocketRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+vi.mock('../../../backend/utils/metrics', () => ({
+  inc: vi.fn(),
+  incPerGame: vi.fn(),
 }));
 
-jest.mock('../../../backend/utils/metrics', () => ({
-  inc: jest.fn(),
-  incPerGame: jest.fn(),
-}));
-
-jest.mock('../../../backend/modules/spamDetector', () => ({
+vi.mock('../../../backend/modules/spamDetector', () => ({
   spamDetector: {
-    isOnCooldown: jest.fn().mockReturnValue(false),
-    getRemainingCooldown: jest.fn().mockReturnValue(0),
-    recordInvalidWord: jest.fn().mockReturnValue({
+    isOnCooldown: vi.fn().mockReturnValue(false),
+    getRemainingCooldown: vi.fn().mockReturnValue(0),
+    recordInvalidWord: vi.fn().mockReturnValue({
       tier: 'warning',
       invalidCount: 1,
       penaltyApplied: 0,
@@ -94,45 +92,66 @@ jest.mock('../../../backend/modules/spamDetector', () => ({
   InvalidReason: { PROFANITY: 'profanity', TOO_SHORT: 'tooShort', NOT_ON_BOARD: 'notOnBoard', REJECTED: 'rejected' },
 }));
 
-jest.mock('../../../backend/handlers/shared', () => ({
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/handlers/shared', () => ({
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/handlers/engagementHandler', () => ({
-  processLongWordEngagement: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/handlers/engagementHandler', () => ({
+  processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('../../../backend/utils/socketHelpers', () => ({
-  broadcastToRoom: jest.fn(),
-  getGameRoom: jest.fn().mockImplementation((gameCode: string) => `game:${gameCode}`),
-  getSocketById: jest.fn(),
-  safeEmit: jest.fn(),
-  isSocketMigrating: jest.fn().mockReturnValue(false),
+vi.mock('../../../backend/utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  broadcastToRoomExceptSender: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn().mockImplementation((gameCode: string) => `game:${gameCode}`),
+  getSocketById: vi.fn(),
+  safeEmit: vi.fn(),
+  isSocketMigrating: vi.fn().mockReturnValue(false),
 }));
 
-jest.mock('../../../backend/modules/botManager', () => ({}));
+vi.mock('../../../backend/modules/botManager', () => ({ isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(), getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(), removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn() }));
 
-jest.mock('../../../backend/services/gracePeriodLock', () => ({
-  acquireGracePeriodLock: jest.fn().mockResolvedValue(null),
-  releaseGracePeriodLock: jest.fn().mockResolvedValue(undefined),
+vi.mock('../../../backend/utils/errorHandler', () => ({
+  emitError: vi.fn(),
+  ErrorCodes: { WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR', INVALID_STATE: 'INVALID_STATE' },
 }));
 
-jest.mock('../../../backend/modules/blastModeManager', () => ({
-  calculateBlastTileBonus: jest.fn().mockReturnValue(10),
-  getTilesOnPath: jest.fn().mockReturnValue(['bomb', 'gold']),
-  recordBlastMove: jest.fn().mockReturnValue({ movesUsed: 4, bonusMove: true }),
+vi.mock('../../../backend/utils/timerManager', () => ({
+  __esModule: true,
+  default: { setTimeout: vi.fn(), clearTimeout: vi.fn() },
 }));
 
-const {
-  getGame,
-  getGameBySocketId,
-  getUsernameBySocketId,
-  getFirstFinder,
-} = require('../../../backend/modules/gameStateManager');
-const { isWordOnBoardAsync } = require('../../../backend/modules/wordValidatorPool');
-const { isDictionaryWord } = require('../../../backend/dictionary');
-const { isWordCommunityValid, isWordValidForScoring } = require('../../../backend/modules/communityWordManager');
-const { broadcastToRoom } = require('../../../backend/utils/socketHelpers');
+vi.mock('../../../backend/utils/socketValidation', () => ({
+  validatePayload: vi.fn().mockImplementation((_schema: unknown, data: unknown) => ({ success: true, data })),
+  submitWordSchema: {},
+  submitWordVoteSchema: {},
+  submitPeerValidationVoteSchema: {},
+}));
+
+// wordValidationHandler NOT mocked — real implementation needed for wordAccepted/broadcastToRoom
+
+vi.mock('../../../backend/handlers/playerDataInit', () => ({
+  ensurePlayerState: vi.fn(),
+}));
+
+vi.mock('../../../backend/services/gracePeriodLock', () => ({
+  acquireGracePeriodLock: vi.fn().mockResolvedValue(null),
+  releaseGracePeriodLock: vi.fn(),
+}));
+
+vi.mock('../../../backend/modules/blastModeManager', () => ({
+  calculateBlastTileBonus: vi.fn().mockReturnValue(10),
+  getTilesOnPath: vi.fn().mockReturnValue(['bomb', 'gold']),
+  recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 4, bonusMove: true }),
+}));
+
+import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder } from '../../../backend/modules/gameStateManager';
+import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
+import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
+import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
+import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
+import { registerWordHandlers } from '../wordHandler';
 
 function makeBlastGame(overrides = {}) {
   return {
@@ -160,149 +179,112 @@ function makeBlastGame(overrides = {}) {
   };
 }
 
+function createMockSocket() {
+  const handlers: Record<string, Function> = {};
+  const socket = {
+    id: 'mock-socket-id',
+    emit: vi.fn(),
+    on: vi.fn((event: string, handler: Function) => {
+      handlers[event] = handler;
+    }),
+    join: vi.fn(),
+    rooms: new Set(['mock-socket-id']),
+  };
+  return { socket, handlers };
+}
+
+const mockIo = { to: vi.fn().mockReturnThis(), emit: vi.fn() } as any;
+
 describe('wordHandler - merged blast emits (Fix 2)', () => {
-  let io: Server;
-  let serverSocket: Socket;
-  let clientSocket: ClientSocket;
-  let httpServer: ReturnType<typeof createServer>;
-
-  beforeAll((done) => {
-    httpServer = createServer();
-    io = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = (httpServer.address() as AddressInfo).port;
-      clientSocket = Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-        const { registerWordHandlers } = require('../wordHandler');
-        registerWordHandlers(io, socket);
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-    httpServer.close();
-  });
+  let mockSocket: ReturnType<typeof createMockSocket>['socket'];
+  let handlers: ReturnType<typeof createMockSocket>['handlers'];
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    getGameBySocketId.mockReturnValue('MERGE1');
-    getUsernameBySocketId.mockReturnValue('testUser');
-    getFirstFinder.mockReturnValue(null);
-    getGame.mockReturnValue(makeBlastGame());
-    isWordOnBoardAsync.mockResolvedValue(true);
-    isDictionaryWord.mockReturnValue(true);
-    isWordCommunityValid.mockReturnValue(false);
-    isWordValidForScoring.mockReturnValue(false);
+    vi.clearAllMocks();
+
+    const mock = createMockSocket();
+    mockSocket = mock.socket;
+    handlers = mock.handlers;
+    registerWordHandlers(mockIo, mockSocket as any);
+
+    (getGameBySocketId as Mock).mockReturnValue('MERGE1');
+    (getUsernameBySocketId as Mock).mockReturnValue('testUser');
+    (getFirstFinder as Mock).mockReturnValue(null);
+    (getGame as Mock).mockReturnValue(makeBlastGame());
+    (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+    (isValidWordCached as Mock).mockResolvedValue(true);
+    (isDictionaryWord as Mock).mockReturnValue(true);
+    (isWordCommunityValid as Mock).mockReturnValue(false);
+    (isWordValidForScoring as Mock).mockReturnValue(false);
   });
 
   describe('wordAccepted includes blast field when in blast mode', () => {
-    it('should include blast field in wordAccepted payload when gameMode is blast', (done) => {
-      const timeout = setTimeout(() => {
-        done(new Error('Timeout waiting for wordAccepted'));
-      }, 5000);
+    it('should include blast field in wordAccepted payload when gameMode is blast', async () => {
+      await handlers['submitWord']({ word: 'test', comboType: 'bomb_gold' });
 
-      clientSocket.once('wordAccepted', (data: any) => {
-        clearTimeout(timeout);
-        try {
-          expect(data.blast).toBeDefined();
-          expect(data.blast.tilesCleared).toBeDefined();
-          expect(data.blast.movesUsed).toBeDefined();
-          expect(data.blast.bonusMove).toBeDefined();
-          done();
-        } catch (e) {
-          done(e);
-        }
-      });
-
-      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_gold' });
+      const wordAcceptedCall = (mockSocket.emit as Mock).mock.calls.find(
+        (call: any[]) => call[0] === 'wordAccepted'
+      );
+      expect(wordAcceptedCall).toBeDefined();
+      const data = wordAcceptedCall[1];
+      expect(data.blast).toBeDefined();
+      expect(data.blast.tilesCleared).toBeDefined();
+      expect(data.blast.movesUsed).toBeDefined();
+      expect(data.blast.bonusMove).toBeDefined();
     });
 
-    it('should NOT include blast field in wordAccepted when gameMode is classic', (done) => {
-      getGame.mockReturnValue(makeBlastGame({ gameMode: 'classic', blastModeState: null }));
+    it('should NOT include blast field in wordAccepted when gameMode is classic', async () => {
+      (getGame as Mock).mockReturnValue(makeBlastGame({ gameMode: 'classic', blastModeState: null }));
 
-      const timeout = setTimeout(() => {
-        done(new Error('Timeout waiting for wordAccepted'));
-      }, 5000);
+      await handlers['submitWord']({ word: 'test' });
 
-      clientSocket.once('wordAccepted', (data: any) => {
-        clearTimeout(timeout);
-        try {
-          expect(data.blast).toBeUndefined();
-          done();
-        } catch (e) {
-          done(e);
-        }
-      });
-
-      clientSocket.emit('submitWord', { word: 'test' });
+      const wordAcceptedCall = (mockSocket.emit as Mock).mock.calls.find(
+        (call: any[]) => call[0] === 'wordAccepted'
+      );
+      expect(wordAcceptedCall).toBeDefined();
+      const data = wordAcceptedCall[1];
+      expect(data.blast).toBeUndefined();
     });
 
-    it('should NOT emit separate blastWordAccepted event', (done) => {
-      let blastWordAcceptedReceived = false;
-      clientSocket.on('blastWordAccepted', () => {
-        blastWordAcceptedReceived = true;
-      });
+    it('should NOT emit separate blastWordAccepted event', async () => {
+      await handlers['submitWord']({ word: 'test', comboType: 'bomb_gold' });
 
-      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_gold' });
-
-      clientSocket.once('wordAccepted', () => {
-        setTimeout(() => {
-          expect(blastWordAcceptedReceived).toBe(false);
-          clientSocket.off('blastWordAccepted');
-          done();
-        }, 200);
-      });
+      const blastWordAcceptedCall = (mockSocket.emit as Mock).mock.calls.find(
+        (call: any[]) => call[0] === 'blastWordAccepted'
+      );
+      expect(blastWordAcceptedCall).toBeUndefined();
     });
   });
 
   describe('playerFoundWord includes comboSync field when comboType present', () => {
-    it('should include comboSync in playerFoundWord payload when comboType is provided', (done) => {
-      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_bomb' });
+    it('should include comboSync in playerFoundWord payload when comboType is provided', async () => {
+      await handlers['submitWord']({ word: 'test', comboType: 'bomb_bomb' });
 
-      clientSocket.once('wordAccepted', () => {
-        setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-          expect(foundWordCall).toBeDefined();
-          const payload = foundWordCall[3];
-          expect(payload.comboSync).toBeDefined();
-          expect(payload.comboSync.comboType).toBe('bomb_bomb');
-          expect(payload.comboSync.username).toBe('testUser');
-          done();
-        }, 150);
-      });
+      const calls = (broadcastToRoom as Mock).mock.calls;
+      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+      expect(foundWordCall).toBeDefined();
+      const payload = foundWordCall[3];
+      expect(payload.comboSync).toBeDefined();
+      expect(payload.comboSync.comboType).toBe('bomb_bomb');
+      expect(payload.comboSync.username).toBe('testUser');
     });
 
-    it('should NOT include comboSync in playerFoundWord when comboType is absent', (done) => {
-      clientSocket.emit('submitWord', { word: 'test' });
+    it('should NOT include comboSync in playerFoundWord when comboType is absent', async () => {
+      await handlers['submitWord']({ word: 'test' });
 
-      clientSocket.once('wordAccepted', () => {
-        setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-          expect(foundWordCall).toBeDefined();
-          const payload = foundWordCall[3];
-          expect(payload.comboSync).toBeUndefined();
-          done();
-        }, 150);
-      });
+      const calls = (broadcastToRoom as Mock).mock.calls;
+      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
+      expect(foundWordCall).toBeDefined();
+      const payload = foundWordCall[3];
+      expect(payload.comboSync).toBeUndefined();
     });
 
-    it('should NOT emit separate blastComboSync broadcast', (done) => {
-      clientSocket.emit('submitWord', { word: 'test', comboType: 'bomb_bomb' });
+    it('should NOT emit separate blastComboSync broadcast', async () => {
+      await handlers['submitWord']({ word: 'test', comboType: 'bomb_bomb' });
 
-      clientSocket.once('wordAccepted', () => {
-        setTimeout(() => {
-          const calls = broadcastToRoom.mock.calls;
-          const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
-          expect(comboSyncCall).toBeUndefined();
-          done();
-        }, 150);
-      });
+      const calls = (broadcastToRoom as Mock).mock.calls;
+      const comboSyncCall = calls.find((call: any[]) => call[2] === 'blastComboSync');
+      expect(comboSyncCall).toBeUndefined();
     });
   });
 });

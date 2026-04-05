@@ -2,44 +2,45 @@
  * Tests for dailyMissionsManager
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { getDailyMissions, completeMission, checkAndClaimGrandSlam } from '../dailyMissionsManager';
 
 // Mock supabaseServer
-const mockSelect = jest.fn();
-const mockEq = jest.fn();
-const mockSingle = jest.fn();
-const mockUpdate = jest.fn();
-const mockUpsert = jest.fn();
+const { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable } = vi.hoisted(() => {
+  const mockSelect = vi.fn();
+  const mockEq = vi.fn();
+  const mockSingle = vi.fn();
+  const mockUpdate = vi.fn();
+  const mockUpsert = vi.fn();
+  const mockRpc = vi.fn().mockResolvedValue({ error: null });
+  const chainable = {
+    select: mockSelect,
+    eq: mockEq,
+    single: mockSingle,
+    update: mockUpdate,
+    upsert: mockUpsert,
+  };
+  mockSelect.mockReturnValue(chainable);
+  mockEq.mockReturnValue(chainable);
+  mockUpdate.mockReturnValue(chainable);
+  mockUpsert.mockReturnValue(chainable);
+  const mockFrom = vi.fn().mockReturnValue(chainable);
+  const mockSupabase = { from: mockFrom, rpc: mockRpc };
+  return { mockSelect, mockEq, mockSingle, mockUpdate, mockUpsert, mockRpc, mockFrom, mockSupabase, chainable };
+});
 
-const chainable = {
-  select: mockSelect,
-  eq: mockEq,
-  single: mockSingle,
-  update: mockUpdate,
-  upsert: mockUpsert,
-};
 
-// Each method returns the chain
-mockSelect.mockReturnValue(chainable);
-mockEq.mockReturnValue(chainable);
-mockUpdate.mockReturnValue(chainable);
-mockUpsert.mockReturnValue(chainable);
-
-const mockRpc = jest.fn().mockResolvedValue({ error: null });
-const mockFrom = jest.fn().mockReturnValue(chainable);
-const mockSupabase = { from: mockFrom, rpc: mockRpc };
-
-jest.mock('../supabase/client', () => ({
+vi.mock('../supabase/client', () => ({
   getSupabase: () => mockSupabase,
 }));
 
-jest.mock('../../utils/logger', () => ({
+vi.mock('../../utils/logger', () => ({
   __esModule: true,
   default: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -63,7 +64,7 @@ const FULL_ROW = {
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   // Reset chain
   mockSelect.mockReturnValue(chainable);
   mockEq.mockReturnValue(chainable);
@@ -132,7 +133,7 @@ describe('completeMission', () => {
 
     // update call
     mockEq.mockReturnValue(chainable);
-    mockUpdate.mockReturnValue({ eq: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) });
+    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
 
     // getDailyMissions (return updated)
     mockSingle
@@ -159,7 +160,7 @@ describe('checkAndClaimGrandSlam', () => {
     mockSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
 
     // update grand_slam_claimed
-    mockUpdate.mockReturnValue({ eq: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) });
+    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
 
     const result = await checkAndClaimGrandSlam(PLAYER_ID);
 

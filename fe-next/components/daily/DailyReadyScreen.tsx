@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2 } from 'lucide-react';
+import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
@@ -225,7 +225,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
-          <MascotWithEntrance variant="explorer" size="md" delay={0.1} />
+          <MascotWithEntrance variant="explorer" size="md" delay={0.1} clipBorder="cyan" />
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}
@@ -334,9 +334,9 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <Button
               onClick={() => setShowCreateChallenge(true)}
               variant="outline"
-              className="w-full max-w-btn py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+              className="w-full max-w-btn py-3.5 text-lg font-black bg-gradient-to-r from-neo-purple to-neo-pink text-neo-white border-neo-thick border-neo-white rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 uppercase"
             >
-              <span className="text-xl">🛠️</span>
+              <Sparkles className="w-5 h-5" />
               {t('daily.createCustomChallenge')}
             </Button>
           </motion.div>

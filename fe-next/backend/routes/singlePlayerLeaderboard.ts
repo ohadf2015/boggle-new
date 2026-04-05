@@ -4,7 +4,7 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
@@ -57,7 +57,7 @@ router.post('/sync-score', async (req: Request, res: Response): Promise<void> =>
     // Check if guest already has a single-player leaderboard entry
     const { data: existing, error: fetchError } = await supabase
       .from('single_player_leaderboard')
-      .select('guest_fingerprint, total_score, games_played, best_score')
+      .select('guest_fingerprint, total_score, games_played, best_score, longest_word')
       .eq('guest_fingerprint', guestFingerprint)
       .single();
 

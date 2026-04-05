@@ -93,6 +93,21 @@ export const rubikHebrew = localFont({
   preload: false,
 });
 
+// Hebrew gamified body font — Heebo: clean, modern, variable weight 400-700
+export const heeboHebrew = localFont({
+  src: [
+    {
+      path: '../public/fonts/heebo-hebrew.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-heebo-hebrew',
+  fallback: ['var(--font-rubik-hebrew)', 'system-ui', 'Arial', 'sans-serif'],
+  preload: false,
+});
+
 /**
  * Combined exports — used by app/[locale]/layout.tsx.
  * Include both Latin and Hebrew sources so the browser can load

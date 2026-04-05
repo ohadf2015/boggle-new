@@ -3,6 +3,7 @@
  * Verifies Hebrew words against milog.co.il dictionary
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import axios from 'axios';
 import {
   verifyWordOnMilog,
@@ -12,15 +13,15 @@ import {
 } from '../milogWordVerifier';
 
 // Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+vi.mock('axios');
+const mockedAxios = axios as Mocked<typeof axios>;
 
 // Mock Redis client - use a single instance for all tests
-const mockRedisGet = jest.fn();
-const mockRedisSetex = jest.fn();
-const mockRedisDel = jest.fn();
-jest.mock('../../redisClient', () => ({
-  getRedisClient: jest.fn(() => ({
+const mockRedisGet = vi.fn();
+const mockRedisSetex = vi.fn();
+const mockRedisDel = vi.fn();
+vi.mock('../../redisClient', () => ({
+  getRedisClient: vi.fn(() => ({
     get: mockRedisGet,
     setex: mockRedisSetex,
     del: mockRedisDel,
@@ -28,16 +29,16 @@ jest.mock('../../redisClient', () => ({
 }));
 
 // Mock Supabase client
-const mockRpc = jest.fn();
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
+const mockRpc = vi.fn();
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
     rpc: mockRpc,
   })),
 }));
 
 describe('MilogWordVerifier', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('parseVerificationResult', () => {

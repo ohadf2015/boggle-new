@@ -1,3 +1,4 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerConnectionHandlers } from '../connectionHandler';
 import {
   getGame,
@@ -26,61 +27,61 @@ import { cleanupGameBots } from '../../modules/botManager';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
 
 // Logger must be mocked before any module that transitively requires it
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
-jest.mock('../../modules/gameStateManager');
-jest.mock('../../utils/socketHelpers');
-jest.mock('../../utils/timerManager', () => {
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
+vi.mock('../../modules/gameStateManager');
+vi.mock('../../utils/socketHelpers');
+vi.mock('../../utils/timerManager', () => {
   const callbacks: Map<string, () => void> = new Map();
   const mockTimerManager = {
-    setTimeout: jest.fn((key: string, callback: () => void, _delay: number) => {
+    setTimeout: vi.fn((key: string, callback: () => void, _delay: number) => {
       callbacks.set(key, callback);
       // Use real setTimeout so jest.advanceTimersByTime works
       setTimeout(callback, _delay);
       return key;
     }),
-    clearTimer: jest.fn((key: string) => {
+    clearTimer: vi.fn((key: string) => {
       callbacks.delete(key);
     }),
   };
   return {
     __esModule: true,
     default: mockTimerManager,
-    clearGameTimer: jest.fn(),
-    setGameTimer: jest.fn(),
+    clearGameTimer: vi.fn(),
+    setGameTimer: vi.fn(),
   };
 });
-jest.mock('../../utils/rateLimiter');
-jest.mock('../../utils/playerCleanup');
-jest.mock('../../modules/botManager');
-jest.mock('../../utils/gameStartCoordinator', () => ({
+vi.mock('../../utils/rateLimiter', () => ({ default: { checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1'), resetRateLimit: vi.fn() }, checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1'), resetRateLimit: vi.fn() }));
+vi.mock('../../utils/playerCleanup');
+vi.mock('../../modules/botManager');
+vi.mock('../../utils/gameStartCoordinator', () => ({
   __esModule: true,
-  default: { handlePlayerDisconnect: jest.fn() },
+  default: { handlePlayerDisconnect: vi.fn() },
 }));
 
-const mockGetGame = getGame as jest.Mock;
-const mockGetGameBySocketId = getGameBySocketId as jest.Mock;
-const mockGetUsernameBySocketId = getUsernameBySocketId as jest.Mock;
-const mockRemoveUserFromGame = removeUserFromGame as jest.Mock;
-const mockGetGameUsers = getGameUsers as jest.Mock;
-const mockGetActiveRooms = getActiveRooms as jest.Mock;
-const mockDeleteGame = deleteGame as jest.Mock;
-const mockIsRoomEmpty = isRoomEmpty as jest.Mock;
-const mockGetNextEligibleHost = getNextEligibleHost as jest.Mock;
-const mockTransferHost = transferHost as jest.Mock;
-const mockBroadcastToRoom = broadcastToRoom as jest.Mock;
+const mockGetGame = getGame as Mock;
+const mockGetGameBySocketId = getGameBySocketId as Mock;
+const mockGetUsernameBySocketId = getUsernameBySocketId as Mock;
+const mockRemoveUserFromGame = removeUserFromGame as Mock;
+const mockGetGameUsers = getGameUsers as Mock;
+const mockGetActiveRooms = getActiveRooms as Mock;
+const mockDeleteGame = deleteGame as Mock;
+const mockIsRoomEmpty = isRoomEmpty as Mock;
+const mockGetNextEligibleHost = getNextEligibleHost as Mock;
+const mockTransferHost = transferHost as Mock;
+const mockBroadcastToRoom = broadcastToRoom as Mock;
 
-const mockGetGameRoom = getGameRoom as jest.Mock;
-const mockClearGameTimer = clearGameTimer as jest.Mock;
-const mockTimerManager = timerManager as jest.Mocked<typeof timerManager>;
-const mockResetRateLimit = resetRateLimit as jest.Mock;
-const mockCleanupPlayerData = cleanupPlayerData as jest.Mock;
-const mockCleanupGameBots = cleanupGameBots as jest.Mock;
-const mockHandlePlayerDisconnect = gameStartCoordinator.handlePlayerDisconnect as jest.Mock;
+const mockGetGameRoom = getGameRoom as Mock;
+const mockClearGameTimer = clearGameTimer as Mock;
+const mockTimerManager = timerManager as Mocked<typeof timerManager>;
+const mockResetRateLimit = resetRateLimit as Mock;
+const mockCleanupPlayerData = cleanupPlayerData as Mock;
+const mockCleanupGameBots = cleanupGameBots as Mock;
+const mockHandlePlayerDisconnect = gameStartCoordinator.handlePlayerDisconnect as Mock;
 
 function createMockSocket(id = 'socket-host') {
   const handlers: Record<string, Function> = {};
@@ -88,7 +89,7 @@ function createMockSocket(id = 'socket-host') {
     socket: {
       id,
       data: {},
-      on: jest.fn((event: string, handler: Function) => { handlers[event] = handler; }),
+      on: vi.fn((event: string, handler: Function) => { handlers[event] = handler; }),
     } as any,
     handlers,
   };
@@ -112,15 +113,15 @@ describe('connectionHandler', () => {
   const mockIo = {} as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockGetGameRoom.mockReturnValue('game:GAME1');
     mockGetActiveRooms.mockReturnValue([]);
     mockGetGameUsers.mockReturnValue([]);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('registers disconnect handler', () => {
@@ -201,7 +202,7 @@ describe('connectionHandler', () => {
       handlers['disconnect']('transport close');
 
       // After timeout fires, getGame returns game with user still disconnected
-      jest.advanceTimersByTime(120000);
+      vi.advanceTimersByTime(120000);
 
       expect(mockCleanupPlayerData).toHaveBeenCalledWith(game, 'Player1');
       expect(mockRemoveUserFromGame).toHaveBeenCalledWith('GAME1', 'Player1');
@@ -222,7 +223,7 @@ describe('connectionHandler', () => {
       // Simulate reconnect: clear disconnected flag
       game.users.Player1.disconnected = false;
 
-      jest.advanceTimersByTime(120000);
+      vi.advanceTimersByTime(120000);
 
       // Should not remove because disconnected is false
       expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
@@ -367,7 +368,7 @@ describe('connectionHandler', () => {
       handlers['disconnect']('transport close');
 
       // After grace period, getGame still returns the game and hostSocketId unchanged
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
 
       expect(mockBroadcastToRoom).toHaveBeenCalledWith(
         mockIo, 'game:GAME1', 'hostLeftRoomClosing',
@@ -394,7 +395,7 @@ describe('connectionHandler', () => {
       mockGetNextEligibleHost.mockReturnValue('Player1');
       mockTransferHost.mockReturnValue({ success: true });
 
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
 
       expect(mockTransferHost).toHaveBeenCalledWith('GAME1', 'Player1');
       expect(mockDeleteGame).not.toHaveBeenCalled();
@@ -432,7 +433,7 @@ describe('connectionHandler', () => {
       // Simulate host reconnect: hostSocketId changes
       game.hostSocketId = 'new-socket-host';
 
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
 
       // Should not close because hostSocketId changed
       expect(mockDeleteGame).not.toHaveBeenCalled();
@@ -512,7 +513,7 @@ describe('connectionHandler', () => {
 
       mockIsRoomEmpty.mockReturnValue(true); // at timeout
 
-      jest.advanceTimersByTime(120000);
+      vi.advanceTimersByTime(120000);
 
       expect(mockDeleteGame).toHaveBeenCalledWith('GAME1');
     });
@@ -535,7 +536,7 @@ describe('connectionHandler', () => {
       // Game deleted before timeout
       mockGetGame.mockReturnValue(null);
 
-      jest.advanceTimersByTime(120000);
+      vi.advanceTimersByTime(120000);
 
       expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
     });
@@ -555,7 +556,7 @@ describe('connectionHandler', () => {
 
       mockGetGame.mockReturnValue(null);
 
-      jest.advanceTimersByTime(30000);
+      vi.advanceTimersByTime(30000);
 
       expect(mockDeleteGame).not.toHaveBeenCalled();
     });

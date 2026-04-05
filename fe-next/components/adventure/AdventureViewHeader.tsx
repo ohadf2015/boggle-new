@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Star, Sparkles, Map, Zap } from 'lucide-react';
+import { ArrowLeft, Star, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MusicControls from '@/components/MusicControls';
@@ -27,81 +27,53 @@ export default function AdventureViewHeader({
   worldName,
   hasHub,
 }: AdventureViewHeaderProps): React.JSX.Element {
-  // On worldMap: returning players (hasHub) go back to hub via onBack;
-  // new players go to home page via Link
   const worldMapUsesHistoryBack = viewState === 'worldMap' && hasHub;
 
+  const backClass = cn(
+    'flex items-center justify-center w-10 h-10 rounded-neo',
+    'text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10',
+    'transition-colors'
+  );
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-3 sm:px-6 lg:px-8 bg-neo-navy border-b border-neo-white/10 flex-shrink-0" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
+    <header className="fixed top-0 left-0 right-0 z-30 px-4 py-2 sm:px-6 lg:px-8 bg-neo-navy/90 backdrop-blur-sm flex-shrink-0" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Back button */}
+        {/* Back — ghost icon, no border */}
         {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (
-          <button
-            onClick={onBack}
-            aria-label={t('common.back')}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
-              'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
-              'text-neo-white font-bold hover:bg-neo-navy-light',
-              'transition-colors shadow-hard-sm'
-            )}
-          >
+          <button onClick={onBack} aria-label={t('common.back')} className={backClass}>
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-            <span className="hidden sm:inline">
-              {t('common.back')}
-            </span>
           </button>
         ) : (
-          <Link
-            href="/"
-            aria-label={t('common.back')}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2 whitespace-nowrap',
-              'bg-neo-navy border-2 border-neo-white/20 rounded-neo',
-              'text-neo-white font-bold hover:bg-neo-navy-light',
-              'transition-colors shadow-hard-sm'
-            )}
-          >
+          <Link href="/" aria-label={t('common.back')} className={backClass}>
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-            <span className="hidden sm:inline">{t('common.back')}</span>
           </Link>
         )}
 
-        {/* Title + Breadcrumb */}
-        <div className="flex flex-col items-center">
-          <div className="flex items-center gap-2">
-            <Map className="w-4 h-4 sm:w-6 sm:h-6 text-neo-lime" />
-            <h1 className="text-sm sm:text-xl font-black text-neo-white uppercase tracking-tight">
-              {t('adventure.title')}
-            </h1>
-            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-neo-yellow hidden sm:block" />
-          </div>
-          {viewState === 'levelGrid' && worldName && (
-            <p className="text-xs text-neo-white/50 font-bold mt-0.5">
-              {t('adventure.worldMap')} › {worldName}
-            </p>
-          )}
-        </div>
+        {/* Breadcrumb — world name on levelGrid, section title on worldMap */}
+        {viewState === 'levelGrid' && worldName ? (
+          <p className="text-xs sm:text-sm font-bold text-neo-white/50 truncate max-w-[40%] text-center">
+            {worldName}
+          </p>
+        ) : (
+          <p className="text-xs sm:text-sm font-bold text-neo-white/50 truncate max-w-[40%] text-center">
+            {t('adventure.title')}
+          </p>
+        )}
 
-        {/* Player Stats and Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Total Stars */}
-          <div className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-3 bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo">
-            <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
-            <span className="font-bold text-neo-yellow text-sm">
-              {totalStars}
-            </span>
+        {/* Stats + Music — compact cluster */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-neo-lime">
+            <Star className="w-4 h-4 fill-neo-lime" />
+            <span className="font-black text-sm tabular-nums">{totalStars}</span>
           </div>
-
-          {/* Player Level */}
-          <div className="flex items-center gap-1 px-2 py-1.5 sm:gap-1.5 sm:px-3 bg-neo-purple/20 border-2 border-neo-purple rounded-neo">
-            <Zap className="w-4 h-4 text-neo-purple" />
-            <span className="font-bold text-neo-purple text-sm">
+          <span className="w-px h-4 bg-neo-white/15" />
+          <div className="flex items-center gap-1 text-neo-purple-light">
+            <Zap className="w-3.5 h-3.5" />
+            <span className="font-bold text-xs tabular-nums">
               {t('adventure.levelWithNumber', { level: playerLevel })}
             </span>
           </div>
-
-          {/* Sound Controller */}
+          <span className="w-px h-4 bg-neo-white/15" />
           <MusicControls />
         </div>
       </div>

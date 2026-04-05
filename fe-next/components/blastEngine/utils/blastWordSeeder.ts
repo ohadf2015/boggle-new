@@ -6,6 +6,19 @@
 import type { Language } from '@/shared/types/game';
 import { generateBlastLetter, createSeededRandom } from '@/components/blast/utils/blastLetterGenerator';
 
+/**
+ * Hebrew final-form → regular-form mapping.
+ * Blast tiles are individual letters, so final forms (sofit) should not appear.
+ */
+const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
+  'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ',
+};
+
+/** Replace Hebrew final-form letters with their regular equivalents. */
+function normalizeFinalLetters(word: string): string {
+  return word.replace(/[ךםןףץ]/g, (ch) => HEBREW_FINAL_TO_REGULAR[ch] || ch);
+}
+
 // Common short words per language (3-5 letters, high frequency)
 const SEED_WORDS: Record<string, string[]> = {
   en: [
@@ -110,8 +123,10 @@ export function generateSeededLetterGrid(
   const targetWords = 4 + Math.floor(rng() * 5);
   let placed = 0;
 
-  for (const word of words) {
+  for (const rawWord of words) {
     if (placed >= targetWords) break;
+    // Normalize Hebrew final letters so sofit forms don't appear on tiles
+    const word = langKey === 'he' ? normalizeFinalLetters(rawWord) : rawWord;
     if (word.length > size) continue; // word too long for grid
 
     // Try random positions and directions

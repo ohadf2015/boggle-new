@@ -1,3 +1,4 @@
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { checkSocketRateLimit, checkConnectionRateLimit, httpRateLimitMiddleware } from '../middleware/rateLimiterRedis';
 
 describe('rateLimiterRedis', () => {
@@ -55,7 +56,7 @@ describe('rateLimiterRedis', () => {
         status: () => res,
         json: () => {},
       };
-      const next = jest.fn();
+      const next = vi.fn();
 
       await middleware(req, res, next);
       expect(next).toHaveBeenCalled();

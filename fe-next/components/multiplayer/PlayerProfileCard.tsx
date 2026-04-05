@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 
 interface PlayerProfileCardProps {
   username: string;
@@ -35,6 +36,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
 }) => {
   const { t } = useLanguage();
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
   const [isEditingName, setIsEditingName] = useState(forceNameEdit);
   const [showNameError, setShowNameError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -146,6 +148,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
         onClose={() => setIsBuilderOpen(false)}
         onSave={(config) => { onAvatarChange(config); setIsBuilderOpen(false); }}
         initialConfig={currentConfig}
+        premium={avatarPremium}
       />
     </>
   );

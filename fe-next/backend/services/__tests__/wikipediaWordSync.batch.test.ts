@@ -5,13 +5,14 @@
  * Bug: Syncing 2687 words in single upsert causes database timeout.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { storeWikipediaWordCandidates } from '../wikipediaWordFetcher';
 
 // Track upsert calls
 let upsertCalls: Array<{ data: unknown[]; options: unknown }> = [];
 
 // Mock Supabase
-jest.mock('@supabase/supabase-js', () => ({
+vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     from: () => ({
       upsert: (data: unknown[], options: unknown) => {

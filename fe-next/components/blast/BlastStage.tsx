@@ -254,10 +254,10 @@ export function BlastStage({
         </div>
       )}
 
-      {/* 3. Board — AAA Royal Blast ornate frame, fills most of screen */}
+      {/* 3. Board — AAA Royal Blast ornate frame, constrained to leave room for HUD + word area */}
       <div
         className={cn(
-          'flex-1 flex flex-col items-center justify-center px-2 pt-1 relative z-30 min-h-0',
+          'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 relative z-30 min-h-0',
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 2 ? 'animate-neo-wobble' :
           sequencerState?.phase === 'clearing' ? 'animate-neo-wobble' : '',
@@ -271,7 +271,7 @@ export function BlastStage({
       >
         {/* Ornate board frame — golden trim with recessed interior */}
         <div
-          className="relative w-full max-w-[min(90vw,90dvh-180px)] sm:max-w-[min(420px,88dvh-180px)] md:max-w-[min(480px,85dvh-180px)] lg:max-w-[min(500px,55dvh)]"
+          className="relative w-full max-w-[min(84vw,68dvh)] sm:max-w-[min(400px,65dvh)] md:max-w-[min(440px,62dvh)] lg:max-w-[min(480px,50dvh)]"
           style={{
             padding: '6px',
             borderRadius: '20px',

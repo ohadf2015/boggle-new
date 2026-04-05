@@ -25,7 +25,7 @@ vi.mock('../AvatarRenderer', () => ({ __esModule: true, default: () => <div data
 vi.mock('../PartPreview', () => ({ __esModule: true, default: () => <div data-testid="part-preview" /> }));
 
 describe('AvatarBuilderModal', () => {
-  const defaultProps = { isOpen: true, onClose: vi.fn(), onSave: vi.fn() };
+  const defaultProps = { isOpen: true, onClose: vi.fn(), onSave: vi.fn(), premium: null as null };
 
   beforeEach(() => vi.clearAllMocks());
 

@@ -10,15 +10,25 @@
  */
 
 // Use require to access CommonJS exports including internal maps
-const userManager = require('../modules/userManager');
-
+import { vi, type Mock, type MockInstance } from 'vitest';
+import {
+  addUserToGame,
+  removeUserFromGame,
+  getUserBySocketId,
+  updateUserSocketId,
+  _socketToGame,
+  _socketToUsername,
+  _usernameToSocket,
+  _authUserConnections,
+  getAuthUserConnection,
+} from '../modules/userManager';
 // Mock logger
-jest.mock('../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 interface GameBase {
   users: Record<string, any>;
@@ -42,10 +52,10 @@ describe('Auth User Stats Recording', () => {
 
   beforeEach(() => {
     // Clear any existing mappings between tests
-    userManager._socketToGame.clear();
-    userManager._socketToUsername.clear();
-    userManager._usernameToSocket.clear();
-    userManager._authUserConnections.clear();
+    _socketToGame.clear();
+    _socketToUsername.clear();
+    _usernameToSocket.clear();
+    _authUserConnections.clear();
   });
 
   describe('addUserToGame', () => {
@@ -56,7 +66,7 @@ describe('Auth User Stats Recording', () => {
       const socketId = 'socket-123';
       const authUserId = 'auth-user-uuid';
 
-      userManager.addUserToGame(game, gameCode, username, socketId, {
+      addUserToGame(game, gameCode, username, socketId, {
         authUserId,
         guestTokenHash: null,
       });
@@ -72,7 +82,7 @@ describe('Auth User Stats Recording', () => {
       const socketId = 'socket-456';
       const guestTokenHash = 'guest-token-hash';
 
-      userManager.addUserToGame(game, gameCode, username, socketId, {
+      addUserToGame(game, gameCode, username, socketId, {
         authUserId: null,
         guestTokenHash,
       });
@@ -93,7 +103,7 @@ describe('Auth User Stats Recording', () => {
       const authUserId = 'auth-user-uuid';
 
       // First, add user with authUserId
-      userManager.addUserToGame(game, gameCode, username, originalSocketId, {
+      addUserToGame(game, gameCode, username, originalSocketId, {
         authUserId,
         guestTokenHash: null,
       });
@@ -103,7 +113,7 @@ describe('Auth User Stats Recording', () => {
 
       // Now simulate reconnection WITHOUT auth context (undefined values)
       // This was the bug: authContext with null values would clear the authUserId
-      userManager.updateUserSocketId(game, gameCode, username, newSocketId, {
+      updateUserSocketId(game, gameCode, username, newSocketId, {
         authUserId: undefined,
         guestTokenHash: undefined,
       });
@@ -122,14 +132,14 @@ describe('Auth User Stats Recording', () => {
       const authUserId = 'auth-user-uuid';
 
       // Add user with authUserId
-      userManager.addUserToGame(game, gameCode, username, originalSocketId, {
+      addUserToGame(game, gameCode, username, originalSocketId, {
         authUserId,
         guestTokenHash: null,
       });
 
       // Simulate reconnection with null auth context
       // This was the exact bug pattern
-      userManager.updateUserSocketId(game, gameCode, username, newSocketId, {
+      updateUserSocketId(game, gameCode, username, newSocketId, {
         authUserId: null,
         guestTokenHash: null,
       });
@@ -148,13 +158,13 @@ describe('Auth User Stats Recording', () => {
       const newAuthUserId = 'new-auth-uuid';
 
       // Add user with original authUserId
-      userManager.addUserToGame(game, gameCode, username, originalSocketId, {
+      addUserToGame(game, gameCode, username, originalSocketId, {
         authUserId: originalAuthUserId,
         guestTokenHash: null,
       });
 
       // Reconnect with NEW auth data (legitimate auth update)
-      userManager.updateUserSocketId(game, gameCode, username, newSocketId, {
+      updateUserSocketId(game, gameCode, username, newSocketId, {
         authUserId: newAuthUserId,
         guestTokenHash: null,
       });
@@ -172,13 +182,13 @@ describe('Auth User Stats Recording', () => {
       const guestTokenHash = 'original-guest-hash';
 
       // Add guest user
-      userManager.addUserToGame(game, gameCode, username, originalSocketId, {
+      addUserToGame(game, gameCode, username, originalSocketId, {
         authUserId: null,
         guestTokenHash,
       });
 
       // Reconnect without guest token
-      userManager.updateUserSocketId(game, gameCode, username, newSocketId, {
+      updateUserSocketId(game, gameCode, username, newSocketId, {
         authUserId: null,
         guestTokenHash: null,
       });
@@ -197,12 +207,12 @@ describe('Auth User Stats Recording', () => {
       const socketId = 'socket-123';
       const authUserId = 'auth-user-uuid';
 
-      userManager.addUserToGame(game, gameCode, username, socketId, {
+      addUserToGame(game, gameCode, username, socketId, {
         authUserId,
         guestTokenHash: null,
       });
 
-      const userInfo = userManager.getUserBySocketId(games, socketId);
+      const userInfo = getUserBySocketId(games, socketId);
 
       expect(userInfo).toBeDefined();
       expect(userInfo?.authUserId).toBe(authUserId);
@@ -218,12 +228,12 @@ describe('Auth User Stats Recording', () => {
       const socketId = 'socket-123';
       const authUserId = 'auth-user-uuid';
 
-      userManager.addUserToGame(game, gameCode, username, socketId, {
+      addUserToGame(game, gameCode, username, socketId, {
         authUserId,
         guestTokenHash: null,
       });
 
-      const connection = userManager.getAuthUserConnection(authUserId);
+      const connection = getAuthUserConnection(authUserId);
 
       expect(connection).toBeDefined();
       expect(connection?.gameCode).toBe(gameCode);
@@ -240,18 +250,18 @@ describe('Auth User Stats Recording', () => {
       const authUserId = 'auth-user-uuid';
 
       // Add user
-      userManager.addUserToGame(game, gameCode, username, originalSocketId, {
+      addUserToGame(game, gameCode, username, originalSocketId, {
         authUserId,
         guestTokenHash: null,
       });
 
       // Reconnect (even without passing authUserId)
-      userManager.updateUserSocketId(game, gameCode, username, newSocketId, {
+      updateUserSocketId(game, gameCode, username, newSocketId, {
         authUserId: undefined,
         guestTokenHash: undefined,
       });
 
-      const connection = userManager.getAuthUserConnection(authUserId);
+      const connection = getAuthUserConnection(authUserId);
 
       // Connection should be updated with new socket
       expect(connection).toBeDefined();

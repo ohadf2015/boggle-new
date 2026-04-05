@@ -5,34 +5,65 @@
  * to ensure the split maintains backward compatibility.
  */
 
-const { createTestEnvironment, customMatchers } = require('../helpers/socketTestHelper');
-const { _resetBroadcastThrottle } = require('../../utils/socketHelpers');
-
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { createTestEnvironment, customMatchers } from '../helpers/socketTestHelper';
 // Add custom matchers
 expect.extend(customMatchers);
 
+// Mock classroom game manager — no Redis in integration tests
+vi.mock('../../modules/classroomGameManager', () => ({
+  getClassroomGame: vi.fn().mockResolvedValue(null),
+  getClassroomGameByCode: vi.fn().mockResolvedValue(null),
+  updateClassroomGameState: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock gameStartCoordinator to prevent infinite timer loops under fake timers
+vi.mock('../../utils/gameStartCoordinator', () => ({
+  default: {
+    initializeSequence: vi.fn().mockReturnValue('mock-message-id'),
+    scheduleRetries: vi.fn(),
+    setAcknowledgmentTimeout: vi.fn(),
+    clearGame: vi.fn(),
+    cleanupSequence: vi.fn(),
+    handleAcknowledgment: vi.fn(),
+    cancelRetries: vi.fn(),
+  },
+}));
+
+// Mock round events manager to prevent async timer chains under fake timers
+vi.mock('../../modules/roundEventsManager', () => ({
+  scheduleRoundEvent: vi.fn(),
+  cancelRoundEvents: vi.fn(),
+}));
+
+// Reset throttle via dynamic import
+async function resetBroadcastThrottle() {
+  const { _resetBroadcastThrottle } = await import('../../utils/socketHelpers');
+  _resetBroadcastThrottle();
+}
+
 // Increase timeout for dictionary loading during parallel test execution
 // Integration tests may take longer under heavy parallel load
-jest.setTimeout(45000);
+vi.setConfig({ testTimeout: 45000 });
 
 describe('Game Lifecycle Handler', () => {
   let env;
 
   // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
   beforeAll(async () => {
-    const { ensureLanguageLoaded } = require('../../dictionary');
+    const { ensureLanguageLoaded } = await import('../../dictionary');
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(() => {
-    _resetBroadcastThrottle();
+  beforeEach(async () => {
+    await resetBroadcastThrottle();
     env = createTestEnvironment();
-    jest.useFakeTimers({ advanceTimers: true });
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('createGame', () => {
@@ -247,15 +278,15 @@ describe('Game Lifecycle Handler', () => {
 describe('Player Join Handler', () => {
   let env;
 
-  beforeEach(() => {
-    _resetBroadcastThrottle();
+  beforeEach(async () => {
+    await resetBroadcastThrottle();
     env = createTestEnvironment();
-    jest.useFakeTimers({ advanceTimers: true });
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('join', () => {
@@ -388,7 +419,7 @@ describe('Player Join Handler', () => {
       });
 
       // Flush throttled broadcast
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
 
       expect(playerSocket.getEmittedEvents()).toContainEvent('activeRooms');
     });
@@ -398,15 +429,15 @@ describe('Player Join Handler', () => {
 describe('Room Management Handler', () => {
   let env;
 
-  beforeEach(() => {
-    _resetBroadcastThrottle();
+  beforeEach(async () => {
+    await resetBroadcastThrottle();
     env = createTestEnvironment();
-    jest.useFakeTimers({ advanceTimers: true });
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('closeRoom', () => {
@@ -456,7 +487,7 @@ describe('Room Management Handler', () => {
       await hostSocket.receiveEvent('closeRoom', {});
 
       // Flush throttled broadcast
-      jest.advanceTimersByTime(500);
+      vi.advanceTimersByTime(500);
 
       // Host left lobby on game join — doesn't receive activeRooms
       expect(hostSocket.getEmittedEvents()).not.toContainEvent('activeRooms');
@@ -542,19 +573,19 @@ describe('Handler Integration', () => {
 
   // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
   beforeAll(async () => {
-    const { ensureLanguageLoaded } = require('../../dictionary');
+    const { ensureLanguageLoaded } = await import('../../dictionary');
     await ensureLanguageLoaded('en');
   });
 
-  beforeEach(() => {
-    _resetBroadcastThrottle();
+  beforeEach(async () => {
+    await resetBroadcastThrottle();
     env = createTestEnvironment();
-    jest.useFakeTimers({ advanceTimers: true });
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
     env.cleanup();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('full game lifecycle with multiple players', async () => {

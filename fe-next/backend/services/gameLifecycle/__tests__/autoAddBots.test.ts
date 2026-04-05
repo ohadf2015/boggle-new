@@ -4,32 +4,39 @@
  * Verifies that bots are automatically added when a solo player starts a game.
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { autoAddBotsForSoloPlayer } from '../autoAddBots';
 
 // Mock gameStateManager
-jest.mock('../../../modules/gameStateManager', () => ({
-  addUserToGame: jest.fn(),
-  getGameUsers: jest.fn(() => []),
+vi.mock('../../../modules/gameStateManager', () => ({
+  addUserToGame: vi.fn(),
+  getGameUsers: vi.fn(() => []),
 }));
 
-// Mock botManager
-jest.mock('../../../modules/botManager', () => ({
-  getGameBots: jest.fn(),
-  addBot: jest.fn(),
-  addBotWithAdaptiveDifficulty: jest.fn(),
+// Mock botManager — module.exports is the default export for CJS modules
+const { mockBotManager } = vi.hoisted(() => {
+  const mockBotManager = {
+    getGameBots: vi.fn(),
+    addBot: vi.fn(),
+    addBotWithAdaptiveDifficulty: vi.fn(),
+  };
+  return { mockBotManager };
+});
+vi.mock('../../../modules/botManager', () => ({
+  default: mockBotManager,
+  ...mockBotManager,
 }));
 
 // Mock logger
-jest.mock('../../../utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
-}));
+vi.mock('../../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+} }));
 
-const { addUserToGame } = require('../../../modules/gameStateManager');
-const botManager = require('../../../modules/botManager');
-
+import { addUserToGame } from '../../../modules/gameStateManager';
+import botManager from '../../../modules/botManager';
 function setupBotMocks() {
   let callCount = 0;
 
@@ -58,7 +65,7 @@ function setupBotMocks() {
 
 describe('autoAddBotsForSoloPlayer', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     setupBotMocks();
   });
 

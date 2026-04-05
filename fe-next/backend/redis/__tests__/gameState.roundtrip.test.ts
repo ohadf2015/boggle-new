@@ -5,42 +5,43 @@
  */
 
 // Mock logger
-jest.mock('../../utils/logger', () => ({
-  info: jest.fn(),
-  debug: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../../utils/logger', () => ({ default: {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 // Capture hset calls and return them from hgetall
 let storedHash: Record<string, string> = {};
 
 const mockPipeline = {
-  hset: jest.fn((key: string, field: string, value: string) => {
+  hset: vi.fn((key: string, field: string, value: string) => {
     storedHash[field] = value;
     return mockPipeline;
   }),
-  expire: jest.fn(() => mockPipeline),
-  exec: jest.fn(async () => []),
+  expire: vi.fn(() => mockPipeline),
+  exec: vi.fn(async () => []),
 };
 
 const mockRedisClient = {
-  pipeline: jest.fn(() => mockPipeline),
-  hgetall: jest.fn(async () => ({ ...storedHash })),
-  del: jest.fn(async () => 1),
+  pipeline: vi.fn(() => mockPipeline),
+  hgetall: vi.fn(async () => ({ ...storedHash })),
+  del: vi.fn(async () => 1),
 };
 
-jest.mock('../connection', () => ({
+vi.mock('../connection', () => ({
   getRedisClient: () => mockRedisClient,
   isRedisAvailable: () => true,
 }));
 
-jest.mock('../circuitBreaker', () => ({
+vi.mock('../circuitBreaker', () => ({
   circuitBreaker: {
     execute: (fn: () => Promise<unknown>) => fn(),
   },
 }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import { saveGameState, getGameState } from '../gameState';
 import { restoreGameFromRedis } from '../../modules/gameState/persistence';
 import type { GameState } from '../../modules/gameState/types';
@@ -48,7 +49,7 @@ import type { GameState } from '../../modules/gameState/types';
 describe('Game state round-trip serialization', () => {
   beforeEach(() => {
     storedHash = {};
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('preserves all fields through save → get → restore cycle', async () => {
@@ -185,18 +186,7 @@ describe('Game state round-trip serialization', () => {
     // --- Act: restore into in-memory GameState (reconstructs Map/Set) ---
     const games: Record<string, GameState> = {};
 
-    // Mock the redisClient used by persistence.ts (different module)
-    jest.doMock('../../redisClient', () => ({
-      saveGameState: jest.fn(),
-      getGameState: jest.fn().mockResolvedValue(redisState),
-      deleteGameState: jest.fn(),
-    }));
-
-    // Re-import to pick up the new mock
-    jest.resetModules();
-    const { restoreGameFromRedis: restore } = require('../../modules/gameState/persistence');
-
-    const restored = await restore('ROUND_TRIP', games);
+    const restored = await restoreGameFromRedis('ROUND_TRIP', games);
     expect(restored).not.toBeNull();
 
     // --- Assert: Map reconstructed ---

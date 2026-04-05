@@ -255,7 +255,7 @@ export async function sendReengagementEmail(
   const recipientName = recipient.display_name || recipient.username || 'Word Hunter';
 
   const { generateReengagementEmailHtml } = await import('./reengagementEmailTemplate');
-  const { subject, html, text } = generateReengagementEmailHtml({
+  const { subject, html, text } = await generateReengagementEmailHtml({
     recipientName,
     firstLetter,
     language,
@@ -323,7 +323,7 @@ export async function sendTestReengagementEmail(
   const locale = language === 'he' ? 'he' : language === 'sv' ? 'sv' : language === 'ja' ? 'ja' : language === 'es' ? 'es' : 'en';
 
   const { generateReengagementEmailHtml } = await import('./reengagementEmailTemplate');
-  const { subject, html, text } = generateReengagementEmailHtml({
+  const { subject, html, text } = await generateReengagementEmailHtml({
     recipientName,
     firstLetter,
     language,
