@@ -261,8 +261,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/mascot/waving.gif');
-    expect(html).toContain('alt="Lexi"');
+    expect(html).toContain('/static/mascot-waving.gif');
+    expect(html).toContain('alt="Lexi waving hello"');
   });
 
   test('should use logo image with LexiClash branding', async () => {
@@ -275,8 +275,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_english-min.webp');
-    expect(html).toContain('alt="LexiClash"');
+    // Text logo instead of WEBP image
+    expect(html).toContain('LEXICLASH');
   });
 
   test('should include greeting, tiles, mascot, and CTA', async () => {
@@ -289,16 +289,15 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    // Greeting text
-    expect(html).toContain('We miss you');
-    // Word hunt tile row with mystery tiles
-    expect(html).toContain('tile-letter');
-    // CTA link
-    expect(html).toContain('cta-link');
+    // Greeting text (witty version)
+    expect(html).toContain('where');
+    expect(html).toContain('you go');
     // Mascot image (waving gif)
-    expect(html).toContain('waving.gif');
+    expect(html).toContain('mascot-waving.gif');
     // Accessible mascot alt text
-    expect(html).toContain('alt="Lexi"');
+    expect(html).toContain('alt="Lexi waving hello"');
+    // CTA button
+    expect(html).toContain('cta-btn');
   });
 
   test('should use Hebrew logo for Hebrew language', async () => {
@@ -311,7 +310,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('/logos/lexiclash_logo_hebrew-min.webp');
+    // Text logo, no WEBP — same for all languages
+    expect(html).toContain('LEXICLASH');
   });
 
   test('should generate Hebrew template with RTL direction and flipped shadows', async () => {
@@ -327,7 +327,7 @@ describe('generateReengagementEmailHtml', () => {
     expect(html).toContain('dir="rtl"');
     expect(html).toContain('יוסי');
     expect(html).toContain('ש');
-    expect(html).toContain('התגעגענו');
+    expect(html).toContain('לאן נעלמת');
     // RTL shadow direction (negative x offset)
     expect(html).toContain('-6px 6px 0px');
     // RTL play arrow (left-pointing ◀)
@@ -349,7 +349,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Erik');
-    expect(html).toContain('Vi saknar dig');
+    expect(html).toContain('vart tog du');
   });
 
   test('should generate Japanese template', async () => {
@@ -363,7 +363,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Taro');
-    expect(html).toContain('お待ちしています');
+    expect(html).toContain('どこ行っちゃったの');
   });
 
   test('should generate Spanish template', async () => {
@@ -377,7 +377,7 @@ describe('generateReengagementEmailHtml', () => {
     });
 
     expect(html).toContain('Maria');
-    expect(html).toContain('Te extrañamos');
+    expect(html).toContain('a dónde te fuiste');
   });
 
   test('should have localized footer links for all languages', async () => {
@@ -390,7 +390,7 @@ describe('generateReengagementEmailHtml', () => {
       playUrl: '#',
       baseUrl: 'https://example.com',
     });
-    expect(esHtml).toContain('Cancelar suscripción');
+    expect(esHtml).toContain('Cancelar suscripci');
     expect(esHtml).toContain('Privacidad');
     expect(esHtml).toContain('/es/privacy');
 
@@ -441,7 +441,8 @@ describe('generateReengagementEmailHtml', () => {
       baseUrl: 'https://example.com',
     });
 
-    expect(html).toContain('We miss you');
+    expect(html).toContain('where');
+    expect(html).toContain('you go');
   });
 
   test('should display first letter as large tile in all languages', async () => {

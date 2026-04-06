@@ -20,7 +20,8 @@ interface EmailTemplateParams {
   language: string;
   unsubscribeUrl: string;
   playUrl: string;
-  baseUrl: string;
+  /** @deprecated No longer used — image base is derived from NODE_ENV */
+  baseUrl?: string;
 }
 
 /**
@@ -31,11 +32,11 @@ export async function generateReengagementEmailHtml(params: EmailTemplateParams)
   html: string;
   text: string;
 }> {
-  const { recipientName, firstLetter, language, unsubscribeUrl, playUrl, baseUrl } = params;
+  const { recipientName, firstLetter, language, unsubscribeUrl, playUrl } = params;
 
   const subject = getReengagementSubject(language, firstLetter, recipientName);
 
-  const props = { recipientName, firstLetter, language, unsubscribeUrl, playUrl, baseUrl };
+  const props = { recipientName, firstLetter, language, unsubscribeUrl, playUrl };
 
   const [html, text] = await Promise.all([
     render(ReengagementEmail(props)),
