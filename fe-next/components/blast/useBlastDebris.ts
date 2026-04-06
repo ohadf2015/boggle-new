@@ -38,8 +38,8 @@ export function useBlastDebris(
 ) {
   const debrisRef = useRef<DebrisFragment[]>([]);
   const debrisContainerRef = useRef<Container | null>(null);
-  const lightningIntervalsRef = useRef<ReturnType<typeof setInterval>[]>([]);
-  const lightningRafsRef = useRef<number[]>([]);
+  const lightningIntervalsRef = useRef<Set<ReturnType<typeof setInterval>>>(new Set());
+  const lightningRafsRef = useRef<Set<number>>(new Set());
 
   // Create debris container on mount
   useEffect(() => {
@@ -53,9 +53,9 @@ export function useBlastDebris(
       }
       debrisRef.current = [];
       for (const iid of lightningIntervalsRef.current) clearInterval(iid);
-      lightningIntervalsRef.current = [];
+      lightningIntervalsRef.current.clear();
       for (const rid of lightningRafsRef.current) cancelAnimationFrame(rid);
-      lightningRafsRef.current = [];
+      lightningRafsRef.current.clear();
       camera.removeChild(container);
       container.destroy();
     };
@@ -146,18 +146,22 @@ export function useBlastDebris(
     container.addChild(flash);
 
     const flashStart = performance.now();
+    let flashRafId = 0;
+    const rafs = lightningRafsRef.current;
     const fadeFlash = () => {
       const elapsed = performance.now() - flashStart;
       if (elapsed >= LIGHTNING_FLASH_DURATION) {
         flash.destroy();
+        rafs.delete(flashRafId);
         return;
       }
       flash.alpha = 0.8 * (1 - elapsed / LIGHTNING_FLASH_DURATION);
-      const rid = requestAnimationFrame(fadeFlash);
-      lightningRafsRef.current.push(rid);
+      rafs.delete(flashRafId);
+      flashRafId = requestAnimationFrame(fadeFlash);
+      rafs.add(flashRafId);
     };
-    const initialRid = requestAnimationFrame(fadeFlash);
-    lightningRafsRef.current.push(initialRid);
+    flashRafId = requestAnimationFrame(fadeFlash);
+    rafs.add(flashRafId);
 
     const drawBolt = (offsetX: number) => {
       const bolt = new Graphics();
@@ -182,6 +186,7 @@ export function useBlastDebris(
       flashCount++;
       if (flashCount >= 6) {
         clearInterval(boltFlashInterval);
+        lightningIntervalsRef.current.delete(boltFlashInterval);
         boltA.destroy();
         boltB.destroy();
         return;
@@ -189,7 +194,7 @@ export function useBlastDebris(
       boltA.visible = flashCount % 2 === 0;
       boltB.visible = flashCount % 2 === 1;
     }, 50);
-    lightningIntervalsRef.current.push(boltFlashInterval);
+    lightningIntervalsRef.current.add(boltFlashInterval);
   }, [cellSize]);
 
   // Spawn thin elongated debris flung horizontally from lightning-cleared cells

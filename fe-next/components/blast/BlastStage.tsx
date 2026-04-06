@@ -119,7 +119,7 @@ export function BlastStage({
   comboStreakArcRef,
   t,
 }: BlastStageProps) {
-  const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete } = gameState;
+  const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
 
   const [showTileGuide, setShowTileGuide] = useState(false);
 
@@ -363,7 +363,30 @@ export function BlastStage({
         </div>
       </div>
 
-      {/* 5. Dead-end notification */}
+      {/* 5a. Out of moves notification */}
+      <AdaptiveAnimatePresence>
+        {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
+          <AdaptiveMotion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="overflow-hidden px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full flex-shrink-0 pb-safe"
+          >
+            <div className={cn(
+              'border-3 border-neo-black rounded-neo shadow-hard-sm p-3',
+              'bg-neo-red/20 border border-neo-red/60',
+              'flex items-center justify-center gap-2',
+            )}>
+              <span className="font-bold text-neo-red text-sm sm:text-base">
+                {t('blast.outOfMoves')}
+              </span>
+            </div>
+          </AdaptiveMotion.div>
+        )}
+      </AdaptiveAnimatePresence>
+
+      {/* 5b. Dead-end notification (no words remaining) */}
       <AdaptiveAnimatePresence>
         {noWordsRemaining && !isComplete && (
           <AdaptiveMotion.div

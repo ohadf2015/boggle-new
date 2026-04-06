@@ -142,7 +142,7 @@ function EffectsWorker({
   const prevWaveRef = useRef(false);
   const crossFlashRef = useRef<Graphics | null>(null);
   const crossFlashRafRef = useRef<number>(0);
-  const magnetTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const magnetTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const bloomRef = useRef<InstanceType<typeof BloomFilter> | null>(null);
   const shockwaveRef = useRef<InstanceType<typeof ShockwaveFilter> | null>(null);
   const shockwaveRafRef = useRef<number>(0);
@@ -151,7 +151,7 @@ function EffectsWorker({
   useEffect(() => {
     return () => {
       for (const tid of magnetTimersRef.current) clearTimeout(tid);
-      magnetTimersRef.current = [];
+      magnetTimersRef.current.clear();
       cancelAnimationFrame(crossFlashRafRef.current);
       if (crossFlashRef.current) { crossFlashRef.current.destroy(); crossFlashRef.current = null; }
     };
@@ -334,10 +334,11 @@ function EffectsWorker({
       } else if (tile.type === 'magnet') {
         particles.burst(VORTEX_PULL, x, y);
         const tid = setTimeout(() => {
+          magnetTimersRef.current.delete(tid);
           particles.burst(VORTEX_EXPLOSION, x, y);
           physics.applyExplosion({ x, y }, 0.005, cellSize * 3.5);
         }, 280);
-        magnetTimersRef.current.push(tid);
+        magnetTimersRef.current.add(tid);
       // Diamond: crystalline shards + mini shockwave
       } else if (tile.type === 'diamond') {
         particles.burst(DIAMOND_SHARDS, x, y);
