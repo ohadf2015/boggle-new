@@ -231,8 +231,8 @@ export function BlastGame({
     comboStreak.pauseTimer();
     let chainLevel = 0;
     let cascadeResult = engine.startCascade();
+    cascadeResult.commit?.(); // Commit BEFORE animation so tiles render at new positions (CSS keyframe handles visual fall)
     await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
-    cascadeResult.commit?.();
 
     // Chain cascades: match-3 clusters + auto-formed words after gravity
     const cascadeBonusMult = waveConfig?.cascadeChainBonus ?? CASCADE_CHAIN_BONUS_MULTIPLIER;
@@ -318,10 +318,10 @@ export function BlastGame({
         vibrateBlastCascade();
       }
 
-      // Run gravity for this chain level, then animate + commit before next iteration
+      // Run gravity for this chain level — commit before animation so tiles render at new positions
       cascadeResult = engine.startCascade();
-      await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
       cascadeResult.commit?.();
+      await sequencer.animateCascade(cascadeResult.gravity, chainLevel);
     }
 
     // Mark cascade sequence as complete — releases the interactivity gate

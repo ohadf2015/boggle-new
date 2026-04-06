@@ -358,9 +358,9 @@ export function useBlastEngine(
       shouldRefill,
     );
 
-    // Update refs immediately so subsequent engine calls see latest state,
-    // but defer React state updates — caller should call commitCascade()
-    // after animation completes so tiles don't snap to new positions mid-fall.
+    // Update refs immediately so subsequent engine calls see latest state.
+    // Caller should call commit() BEFORE animation so tiles render at new
+    // positions — the CSS keyframe handles the visual fall transition.
     effectiveGridRef.current = gravityResult.newGrid;
      
     tileStatesRef.current = gravityResult.newTileStates;
@@ -368,9 +368,9 @@ export function useBlastEngine(
     return {
       gravity: gravityResult,
       hasNewWords: false,
-      /** Call after sequencer animation completes to commit to React state.
-       *  Reads from refs (not captured closure) so a submitWord() between
-       *  startCascade() and commit() won't be overwritten. */
+      /** Call BEFORE sequencer animation to commit to React state.
+       *  Tiles must be at new positions so CSS keyframe fall works correctly.
+       *  Reads from refs (not captured closure) for consistency. */
       commit: () => {
         setCurrentGrid(effectiveGridRef.current);
         setTileStates(tileStatesRef.current);
