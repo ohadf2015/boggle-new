@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { BlastTileState, BlastTileType } from '@/shared/types/blast';
 import type { BlastGameConfig } from '@/components/blast/types';
 import { generateTileStates, nextTileUid } from '@/components/blast/utils/blastTileGeneration';
@@ -247,10 +247,19 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
 
   const totalTiles = size * size;
 
+  // Combo window: reset combo only after no new words for 2s
+  const comboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Refs to avoid stale closures in async callbacks
+  const letterGridRef = useRef(letterGrid);
+  const tileStatesRef = useRef(tileStates);
+  useEffect(() => { letterGridRef.current = letterGrid; }, [letterGrid]);
+  useEffect(() => { tileStatesRef.current = tileStates; }, [tileStates]);
+
   // ─── Clear a set of tiles + trigger special effects + gravity ──────
 
   const clearTilesAndCascade = useCallback(
-    (word: string, path: Array<{ row: number; col: number }>, grid: string[][], states: BlastTileState[][]) => {
+    (word: string, path: Array<{ row: number; col: number }>, _grid: string[][], states: BlastTileState[][]) => {
       const toClear: ClearedTile[] = [];
       const clearSet = new Set<string>();
 
@@ -284,6 +293,15 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
       setTilesCleared(prev => prev + toClear.length);
       setComboLevel(prev => prev + 1);
 
+      // Reset combo window — combo resets 2s after last word
+      if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
+      comboTimerRef.current = setTimeout(() => { setComboLevel(0); }, 2000);
+
+      // Increment cascade level when special tiles trigger chain reactions
+      if (toClear.length > path.length) {
+        setCascadeLevel(prev => prev + 1);
+      }
+
       // Score fly from path center
       const midCell = path[Math.floor(path.length / 2)];
       setLastScoreFly({ score: wordScore, row: midCell.row, col: midCell.col, tier: Math.min(word.length - 2, 5) });
@@ -296,7 +314,10 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
 
       // Gravity after clear animation (TileRenderer takes ~300ms for clearing)
       setTimeout(() => {
-        const { grid: newGrid, tileStates: newStates2 } = applyGravity(grid, newStates, size, language);
+        // Use refs to get current state — avoids stale closure
+        const currentGrid = letterGridRef.current;
+        const currentStates = tileStatesRef.current;
+        const { grid: newGrid, tileStates: newStates2 } = applyGravity(currentGrid, currentStates, size, language);
         setLetterGrid(newGrid);
         setTileStates(newStates2);
 
@@ -309,7 +330,6 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
           });
 
           setIsProcessing(false);
-          setComboLevel(0);
         }, 400);
       }, 350);
     },
@@ -323,6 +343,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
       if (isProcessing || movesRemaining <= 0) return;
 
       const path = pathRef.current;
+      const currentGrid = letterGridRef.current;
 
       // Already in path? Check if it's the previous tile (backtrack)
       const existingIdx = path.findIndex(p => p.row === row && p.col === col);
@@ -331,7 +352,7 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
           // Backtrack: remove last tile
           path.pop();
           setSelectedPath([...path]);
-          setCurrentWord(path.map(p => letterGrid[p.row]?.[p.col] ?? '').join(''));
+          setCurrentWord(path.map(p => currentGrid[p.row]?.[p.col] ?? '').join(''));
         }
         return;
       }
@@ -342,17 +363,20 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
         if (!isAdjacent(last, { row, col })) return;
       }
 
-      // Tile must not be cleared
-      if (tileStates[row]?.[col]?.isCleared) return;
+      // Tile must not be cleared — use ref to avoid stale closure
+      if (tileStatesRef.current[row]?.[col]?.isCleared) return;
 
       path.push({ row, col });
       setSelectedPath([...path]);
-      setCurrentWord(path.map(p => letterGrid[p.row]?.[p.col] ?? '').join(''));
+      setCurrentWord(path.map(p => currentGrid[p.row]?.[p.col] ?? '').join(''));
     },
-    [isProcessing, movesRemaining, letterGrid, tileStates],
+    [isProcessing, movesRemaining],
   );
 
   // ─── Submit word (called on pointer up) ────────────────────────────
+
+  const wordsFoundRef = useRef(wordsFound);
+  useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
 
   const submitWord = useCallback(async () => {
     const path = [...pathRef.current];
@@ -364,11 +388,14 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
       return;
     }
 
-    const word = path.map(p => letterGrid[p.row]?.[p.col] ?? '').join('');
+    // Use refs for current state to avoid stale closures
+    const currentGrid = letterGridRef.current;
+    const currentStates = tileStatesRef.current;
+    const word = path.map(p => currentGrid[p.row]?.[p.col] ?? '').join('');
     setCurrentWord('');
 
     // Check if already found this word
-    if (wordsFound.includes(word.toLowerCase())) return;
+    if (wordsFoundRef.current.includes(word.toLowerCase())) return;
 
     const valid = await isValidWord(word, language);
     if (!valid) {
@@ -380,8 +407,8 @@ export function useBlastGameLoop({ config, wave, language, movesAllowed }: GameL
     setMovesRemaining(prev => prev - 1);
     setMovesUsed(prev => prev + 1);
 
-    clearTilesAndCascade(word, path, letterGrid, tileStates);
-  }, [letterGrid, language, wordsFound, tileStates, clearTilesAndCascade]);
+    clearTilesAndCascade(word, path, currentGrid, currentStates);
+  }, [language, clearTilesAndCascade]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
 

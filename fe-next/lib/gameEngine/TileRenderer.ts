@@ -94,9 +94,9 @@ export class TileRenderer {
   setTiles(tiles: TileData[]): void {
     const newIds = new Set(tiles.map((t) => t.id));
 
-    // Remove tiles no longer present
+    // Remove tiles no longer present — but keep tiles mid-clearing animation
     for (const [id, sprite] of this.tiles) {
-      if (!newIds.has(id)) {
+      if (!newIds.has(id) && sprite.animState !== 'clearing') {
         this.container.removeChild(sprite.container);
         sprite.container.destroy({ children: true });
         this.tiles.delete(id);
@@ -114,14 +114,16 @@ export class TileRenderer {
         existing.targetX = pos.x;
         existing.targetY = pos.y;
 
-        // Check if position changed (tile fell)
+        // Check if position changed (tile fell) — allow from idle or appearing
         if (
           Math.abs(existing.container.y - pos.y) > 1 &&
-          existing.animState === 'idle'
+          (existing.animState === 'idle' || existing.animState === 'appearing')
         ) {
           existing.fallFromY = existing.container.y;
           existing.animState = 'falling';
           existing.animProgress = 0;
+          existing.container.scale.set(1);
+          existing.container.alpha = 1;
         }
 
         this.drawTile(existing);
@@ -390,7 +392,7 @@ export class TileRenderer {
         color: glowColors[data.variant],
         outerStrength: 2,
         innerStrength: 0.5,
-        quality: 0.3,
+        quality: 0.5,
       });
       tileContainer.filters = [glow];
     }

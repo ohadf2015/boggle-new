@@ -109,7 +109,7 @@ export function BlastGameCanvas({
     debrisRef.current = debris;
 
     // Create floor wall for debris to land on
-    physics.createWall(cw / 2, floorY + 10, cw, 20);
+    const wallId = physics.createWall(cw / 2, floorY + 10, cw, 20);
 
     // Ambient background particles
     particles.create(AMBIENT_BOKEH).emit(cw / 2, ch / 2);
@@ -131,6 +131,7 @@ export function BlastGameCanvas({
       tween.destroy();
       trail.destroy();
       debris.destroy();
+      try { physics.removeBody(wallId); } catch { /* */ }
       try { particles.clear(); } catch { /* */ }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

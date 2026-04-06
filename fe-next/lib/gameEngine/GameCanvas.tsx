@@ -102,8 +102,13 @@ export function GameCanvas({
       const camera = new Container();
       app.stage.addChild(camera);
 
+      // Particle layer — added to camera but re-sorted to top after
+      // children (like TileRenderer) attach. We use a high zIndex so
+      // particles always render in front of game tiles.
       const particleLayer = new Container();
+      particleLayer.zIndex = 1000;
       camera.addChild(particleLayer);
+      camera.sortableChildren = true;
 
       const physics = enablePhysics
         ? new PhysicsWorld(physicsConfig ?? { gravity: { x: 0, y: 1 } })
