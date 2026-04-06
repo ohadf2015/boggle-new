@@ -13,6 +13,7 @@ interface PlayerInfo {
   username: string;
   avatar?: AvatarType;
   isBot?: boolean;
+  isHost?: boolean;
 }
 
 interface StickyReadyBarProps {
@@ -59,7 +60,7 @@ export default function StickyReadyBar({
   currentPlayerRank,
   winnerUsername,
   readyCount: rawReadyCount,
-  totalPlayers: rawTotalPlayers,
+  totalPlayers: _rawTotalPlayers,
   readyUsernames = [],
   players = [],
   onStartGame,
@@ -75,10 +76,12 @@ export default function StickyReadyBar({
 
   const isRevenge = currentPlayerRank > 1 && !!winnerUsername;
 
+  // Exclude host from ready tracking — host clicks "Start Game", not "Ready"
+  const nonHostPlayers = useMemo(() => players.filter(p => !p.isHost), [players]);
   // Count bots as always-ready for display purposes
-  const botCount = useMemo(() => players.filter(p => p.isBot).length, [players]);
+  const botCount = useMemo(() => nonHostPlayers.filter(p => p.isBot).length, [nonHostPlayers]);
   const readyCount = rawReadyCount + botCount;
-  const totalPlayers = rawTotalPlayers;
+  const totalPlayers = nonHostPlayers.length > 0 ? nonHostPlayers.length : _rawTotalPlayers;
 
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
 
@@ -346,12 +349,12 @@ export default function StickyReadyBar({
         {/* Contextual CTA button */}
         {renderCtaButton()}
 
-        {/* Status Footer — ready avatar stack (show ALL players including host) */}
+        {/* Status Footer — ready avatar stack (excludes host — host clicks Start, not Ready) */}
         {totalPlayers > 0 && (
           <div className="flex items-center justify-center gap-4" aria-live="polite" aria-label={`${readyCount}/${totalPlayers}`}>
             {/* Avatar dots with colored rings — bots always show as ready */}
             <div className="flex -space-x-1.5 rtl:space-x-reverse">
-              {players.slice(0, 6).map((player) => {
+              {nonHostPlayers.slice(0, 6).map((player) => {
                 const isReady = player.isBot || readySet.has(player.username);
                 return (
                   <div

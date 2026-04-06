@@ -189,6 +189,12 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     }
   }, [isAvailable]);
 
+  const clearData = useCallback(async (): Promise<void> => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      await window.CrazyGames.SDK.data.clear();
+    }
+  }, [isAvailable]);
+
   // User handlers
   const getUser = useCallback(async () => {
     if (isAvailable && window.CrazyGames?.SDK) return window.CrazyGames.SDK.user.getUser();
@@ -336,6 +342,13 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     if (isAvailable && window.CrazyGames?.SDK?.payment) await window.CrazyGames.SDK.payment.trackOrder(provider, order);
   }, [isAvailable]);
 
+  // Leaderboard
+  const submitLeaderboardScore = useCallback(async (score: number): Promise<void> => {
+    if (isAvailable && window.CrazyGames?.SDK?.leaderboard) {
+      await window.CrazyGames.SDK.leaderboard.submitScore(score);
+    }
+  }, [isAvailable]);
+
   const value: CrazyGamesContextType = {
     isAvailable,
     isOnCrazyGamesPlatform: environment === 'crazygames',
@@ -347,7 +360,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     gameplayStart, gameplayStop, loadingStart, loadingStop, happyTime,
     showMidgameAd, showRewardedAd, hasAdblock,
     requestBanner, requestResponsiveBanner, clearBanner, clearAllBanners,
-    saveData, loadData, removeData,
+    saveData, loadData, removeData, clearData,
     getUser, showAuthPrompt, isUserAccountAvailable, getSystemInfo,
     inviteLink, showInviteButton, hideInviteButton, getInviteParam, getInviteParams,
     isInstantMultiplayer,
@@ -356,6 +369,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     addAuthListener, removeAuthListener,
     getUserToken, listFriends, showAccountLinkPrompt,
     getXsollaUserToken, trackOrder,
+    submitLeaderboardScore,
   };
 
   return (

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback, useMemo, memo, useState, useDeferredValue } from 'react';
+import { useRef, useEffect, useCallback, useMemo, memo, useState, useDeferredValue } from 'react';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
 import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
 import type { WordFeedback } from './WordFormingArea';
@@ -160,7 +161,17 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     }
   }, [remainingTime, gameActive, playTimesUpSound]);
 
-  // CrazyGames SDK lifecycle
+  // CrazyGames SDK lifecycle — clear stale banners when game starts
+  const { clearAllBanners } = useCrazyGames();
+  const hasClearedBannersRef = useRef(false);
+  useEffect(() => {
+    if (gameActive && !hasClearedBannersRef.current) {
+      hasClearedBannersRef.current = true;
+      clearAllBanners();
+    }
+    if (!gameActive) hasClearedBannersRef.current = false;
+  }, [gameActive, clearAllBanners]);
+
   const isGameOver = remainingTime === 0;
   useCrazyGamesLifecycle({
     isGameActive: gameActive && !isGameOver,

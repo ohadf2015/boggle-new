@@ -38,6 +38,7 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdPlacement } from '@/hooks/useAdPlacement';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -372,6 +373,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     isGameOver: true,
     isWinner: isCurrentUserWinner,
   });
+
+  // Submit score to CrazyGames leaderboard after multiplayer game
+  const { submitLeaderboardScore } = useCrazyGames();
+  useEffect(() => {
+    if (currentPlayerData?.score != null && currentPlayerData.score > 0) {
+      submitLeaderboardScore(currentPlayerData.score);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount
+  }, []);
 
   // MP signup nudge — non-intrusive bottom sheet + toast for guests
   const {
@@ -856,7 +866,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               readyCount={readyUsernames.length}
               totalPlayers={sortedScores.length}
               readyUsernames={readyUsernames}
-              players={sortedScores.map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot }))}
+              players={sortedScores.map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot, isHost: p.isHost }))}
               onStartGame={handleStartGame}
               onMarkReady={handleMarkReady}
               selectedGameMode={selectedGameMode}

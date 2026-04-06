@@ -25,6 +25,8 @@ interface BattleModeCardProps {
   isAdmin?: boolean;
   /** Compact layout with tighter padding for mobile */
   compact?: boolean;
+  /** Optional slot rendered at the bottom of the card (e.g. language selector) */
+  children?: React.ReactNode;
 }
 
 // ==================== Mode Visual Configs ====================
@@ -216,6 +218,7 @@ export function BattleModeCard({
   t,
   isAdmin = false,
   compact = false,
+  children,
 }: BattleModeCardProps): React.ReactElement {
   const [sparkMode, setSparkMode] = useState<GameModeOption | null>(null);
 
@@ -368,6 +371,13 @@ export function BattleModeCard({
             {t('hostView.broadcastModeTitle')}
           </label>
         </div>
+
+        {/* Optional footer slot (e.g. language selector) */}
+        {children && (
+          <div className="relative mt-3 pt-3 border-t border-neo-white/10">
+            {children}
+          </div>
+        )}
       </div>
 
     </section>

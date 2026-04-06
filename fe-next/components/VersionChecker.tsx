@@ -104,10 +104,10 @@ export function VersionChecker() {
     };
   }, [checkForUpdates]);
 
-  // Auto-update after 10 seconds of showing banner
+  // Auto-update almost immediately - brief flash so user knows why page reloaded
   useEffect(() => {
     if (newVersionAvailable) {
-      const timeout = setTimeout(forceUpdate, 10000);
+      const timeout = setTimeout(forceUpdate, 1500);
       return () => clearTimeout(timeout);
     }
     return undefined;

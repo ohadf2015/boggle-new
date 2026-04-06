@@ -35,6 +35,7 @@ const LANGUAGE_FLAGS: Record<string, string> = {
 export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => {
   const [step, setStep] = useState(0);
   const { language, setLanguage } = useLanguage();
+  const isRTL = language === 'he';
 
   const currentStep = TUTORIAL_STEPS[step];
   const Icon = STEP_ICONS[currentStep.iconKey];
@@ -49,9 +50,9 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: isRTL ? 20 : -20 }}
             transition={{ duration: 0.2 }}
             className="flex flex-col items-center gap-2"
           >
@@ -70,12 +71,12 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
         {/* Step Dots & Navigation */}
         <div className="flex items-center gap-3 mt-2">
           <button
-            onClick={handlePrev}
-            disabled={step === 0}
+            onClick={isRTL ? handleNext : handlePrev}
+            disabled={isRTL ? step === TUTORIAL_STEPS.length - 1 : step === 0}
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-            aria-label={t('common.previous')}
+            aria-label={isRTL ? t('common.next') : t('common.previous')}
           >
-            <ChevronLeft className="w-4 h-4 text-neo-cream" />
+            <ChevronRight className="w-4 h-4 text-neo-cream" />
           </button>
           <div className="flex gap-1.5">
             {TUTORIAL_STEPS.map((_, i) => (
@@ -86,12 +87,12 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             ))}
           </div>
           <button
-            onClick={handleNext}
-            disabled={step === TUTORIAL_STEPS.length - 1}
+            onClick={isRTL ? handlePrev : handleNext}
+            disabled={isRTL ? step === 0 : step === TUTORIAL_STEPS.length - 1}
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-            aria-label={t('common.next')}
+            aria-label={isRTL ? t('common.previous') : t('common.next')}
           >
-            <ChevronRight className="w-4 h-4 text-neo-cream" />
+            <ChevronLeft className="w-4 h-4 text-neo-cream" />
           </button>
         </div>
       </div>

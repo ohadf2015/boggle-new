@@ -7,6 +7,7 @@ import Avatar from '../../../components/Avatar';
 import { useNativeShare } from '../../../hooks/useNativeShare';
 import { getJoinUrl, copyJoinUrl } from '../../../utils/share';
 import { useSocket } from '../../../utils/SocketContext';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { cn } from '../../../lib/utils';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -74,6 +75,8 @@ const playerEntranceVariants = {
 export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabel, t, compact = false }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
   const { tryNativeShare } = useNativeShare();
+  const { language } = useLanguage();
+  const isRTL = language === 'he';
   const [showBotPicker, setShowBotPicker] = useState(false);
 
   const isFull = players.length >= maxPlayers;
@@ -276,10 +279,10 @@ export function PlayerRoster({ players, username, gameCode, maxPlayers, hostLabe
                       ]).map((diff, i) => (
                         <motion.button
                           key={diff.key}
-                          initial={{ opacity: 0, x: -12 }}
+                          initial={{ opacity: 0, x: isRTL ? 12 : -12 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: i * 0.06, type: 'spring', stiffness: 500, damping: 25 }}
-                          whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                          whileHover={{ x: isRTL ? -4 : 4, backgroundColor: 'rgba(255,255,255,0.1)' }}
                           whileTap={{ scale: 0.96 }}
                           onClick={() => handleAddBot(diff.key)}
                           className="flex items-center gap-2 px-2 py-2 rounded-md text-start transition-colors"

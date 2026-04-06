@@ -291,9 +291,9 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       iconBgClass: 'bg-neo-cyan',
       dotClass: 'bg-neo-cyan',
       tips: [
-        t('game.swipeLetters'),
-        t('game.diagonalWorks'),
-        t('game.comboExplanation'),
+        t('help.swipeLetters'),
+        t('help.diagonalWorks'),
+        t('help.comboExplanation'),
       ],
     },
     blast: {
@@ -303,8 +303,8 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       dotClass: 'bg-neo-pink',
       tips: [
         t('blast.blastModeDesc'),
-        t('game.swipeLetters'),
-        t('game.comboExplanation'),
+        t('help.swipeLetters'),
+        t('help.comboExplanation'),
       ],
     },
     'word-hunt': {
@@ -315,7 +315,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
       tips: [
         t('tutorial.wordHunt.welcome.description'),
         t('tutorial.wordHunt.lifeSystem.description'),
-        t('game.swipeLetters'),
+        t('help.swipeLetters'),
       ],
     },
   };
@@ -339,7 +339,7 @@ const MultiplayerLobbyView: React.FC<MultiplayerLobbyViewProps> = ({
             </div>
             <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
               <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
-              {t('game.howToPlay')}
+              {t('help.howToPlay')}
             </h3>
           </div>
           <ul className="space-y-2">

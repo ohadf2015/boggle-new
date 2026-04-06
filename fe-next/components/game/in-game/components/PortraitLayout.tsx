@@ -344,7 +344,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-y-hidden lg:overflow-x-visible transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
+      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-y-auto lg:overflow-hidden transition-all duration-500 ease-in-out pb-16 lg:pb-2 px-2 lg:px-3 xl:px-4 lg:h-[100dvh] lg:max-h-[100dvh]">
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -363,7 +363,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-auto lg:overflow-y-auto lg:overflow-x-visible lg:max-h-full">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && (
             <div
@@ -552,7 +552,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               comboGlow
             )}
           >
-            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[clamp(280px,50dvh,520px)] mx-auto">
+            <div className="relative w-full max-w-[min(600px,85vw)] lg:max-w-[clamp(280px,45dvh,480px)] mx-auto">
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
@@ -645,7 +645,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Right Column: Leaderboard + Chat (Desktop) */}
         {!gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 flex-shrink-0 min-h-0 max-h-[calc(100vh-2rem)]">
+          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 flex-shrink-0 min-h-0 overflow-y-auto">
             <GameLeaderboard
               leaderboard={deferredLeaderboard}
               username={username}

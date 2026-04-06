@@ -18,6 +18,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useGameMode } from '@/hooks/gameState';
+import { LANGUAGE_FLAGS, getLanguageName } from '@/lib/languageConfig';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -55,6 +56,7 @@ const MAX_PLAYERS = 8;
 
 const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   gameCode,
+  gameLanguage,
   username,
   t,
   playersReady,
@@ -289,9 +291,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       iconBgClass: 'bg-neo-cyan',
       dotClass: 'bg-neo-cyan',
       tips: [
-        t('game.swipeLetters'),
-        t('game.diagonalWorks'),
-        t('game.comboExplanation'),
+        t('help.swipeLetters'),
+        t('help.diagonalWorks'),
+        t('help.comboExplanation'),
       ],
     },
     blast: {
@@ -301,8 +303,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       dotClass: 'bg-neo-pink',
       tips: [
         t('blast.blastModeDesc'),
-        t('game.swipeLetters'),
-        t('game.comboExplanation'),
+        t('help.swipeLetters'),
+        t('help.comboExplanation'),
       ],
     },
     'word-hunt': {
@@ -313,7 +315,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       tips: [
         t('tutorial.wordHunt.welcome.description'),
         t('tutorial.wordHunt.lifeSystem.description'),
-        t('game.swipeLetters'),
+        t('help.swipeLetters'),
       ],
     },
   };
@@ -337,7 +339,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </div>
             <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
               <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
-              {t('game.howToPlay')}
+              {t('help.howToPlay')}
             </h3>
           </div>
           <ul className="space-y-2">
@@ -394,6 +396,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <MobileShareSection gameCode={gameCode} t={t} compact />
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            {gameLanguage && (
+              <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
+                <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
+                <span className="text-xs font-black text-neo-cream uppercase">
+                  {getLanguageName(gameLanguage, true)}
+                </span>
+              </div>
+            )}
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">

@@ -149,6 +149,9 @@ export interface CrazyGamesSDKInterface {
     getXsollaUserToken: () => Promise<string | null>;
     trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
   };
+  leaderboard?: {
+    submitScore: (score: number) => Promise<void>;
+  };
 }
 
 // Context type exposed by CrazyGamesProvider
@@ -180,6 +183,7 @@ export interface CrazyGamesContextType {
   saveData: (key: string, value: string) => Promise<void>;
   loadData: (key: string) => Promise<string | null>;
   removeData: (key: string) => Promise<void>;
+  clearData: () => Promise<void>;
   // User
   getUser: () => Promise<{ username: string; profilePictureUrl: string } | null>;
   showAuthPrompt: () => Promise<{ username: string; profilePictureUrl: string } | null>;
@@ -207,6 +211,8 @@ export interface CrazyGamesContextType {
   // In-game purchases (Xsolla)
   getXsollaUserToken: () => Promise<string | null>;
   trackOrder: (provider: string, order: XsollaOrder) => Promise<void>;
+  // Leaderboard
+  submitLeaderboardScore: (score: number) => Promise<void>;
 }
 
 /**
@@ -236,6 +242,7 @@ export const CRAZYGAMES_NOOP_CONTEXT: CrazyGamesContextType = {
   saveData: async () => {},
   loadData: async () => null,
   removeData: async () => {},
+  clearData: async () => {},
   getUser: async () => null,
   showAuthPrompt: async () => null,
   isUserAccountAvailable: async () => false,
@@ -258,4 +265,5 @@ export const CRAZYGAMES_NOOP_CONTEXT: CrazyGamesContextType = {
   showAccountLinkPrompt: async () => {},
   getXsollaUserToken: async () => null,
   trackOrder: async () => {},
+  submitLeaderboardScore: async () => {},
 };
