@@ -525,7 +525,7 @@ export function BlastGame({
   }
 
   return (
-    <div className="relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
+    <div className="blast-game relative flex-1 flex flex-col h-full" data-testid="blast-game-root">
       <BlastStage
         grid={engine.grid}
         tileStates={engine.tileStates}

@@ -119,9 +119,11 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
     }
     case 'falling': {
       // Tile is at its destination row; CSS keyframe animates FROM --fall-from TO 0
+      // Duration scales with distance for realistic gravity feel
       const dist = fallOffset ?? 0;
+      const fallDuration = Math.max(250, 180 + dist * 0.8);
       return {
-        animation: `blastTileFall 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+        animation: `blastTileFall ${fallDuration}ms cubic-bezier(0.4, 0, 0.6, 1) forwards`,
         '--fall-from': `-${dist}px`,
       } as React.CSSProperties;
     }
@@ -129,12 +131,12 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
       return {
         '--spawn-from': `${-(spawnOffset ?? 40)}px`,
         opacity: 0,
-        animation: 'blastTileAppear 200ms ease-out forwards',
+        animation: 'blastTileAppear 320ms cubic-bezier(0.34, 1.2, 0.64, 1) forwards',
       } as React.CSSProperties;
     case 'landing':
       return {
-        transform: 'scaleY(1.15) scaleX(0.88)',
-        transition: 'transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transform: 'scaleY(1.08) scaleX(0.94)',
+        transition: 'transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1)',
       };
     default:
       return {};
@@ -220,7 +222,7 @@ export const BlastTile = memo(function BlastTile({
       onClick={onClick}
       className={[
         'relative aspect-square flex items-center justify-center',
-        'border-3 border-neo-black rounded-xl',
+        'border-2 border-white/10 rounded-xl',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
         'select-none',
         // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
@@ -308,8 +310,8 @@ export const BlastTile = memo(function BlastTile({
       {isLocked && (
         <span
           data-testid="locked-overlay"
-          className={`absolute inset-0 rounded-xl pointer-events-none z-20 flex items-center justify-center ${
-            isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-white/30 backdrop-blur-[1px]'
+          className={`absolute inset-0 rounded-xl pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
+            isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-blue-900/40 backdrop-blur-[1px]'
           }`}
           aria-hidden="true"
         >
@@ -318,7 +320,12 @@ export const BlastTile = memo(function BlastTile({
               {TILE_VISUALS[innerType]?.indicator ?? '?'}
             </span>
           ) : (
-            <span className="text-[clamp(0.6rem,2.5cqw,1rem)]">🔒</span>
+            <span className="blast-lock-hint flex flex-col items-center">
+              <span className="text-[clamp(0.55rem,2.2cqw,0.85rem)]">🔒</span>
+              <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none mt-[-1px]">
+                ✦ nearby ✦
+              </span>
+            </span>
           )}
         </span>
       )}
