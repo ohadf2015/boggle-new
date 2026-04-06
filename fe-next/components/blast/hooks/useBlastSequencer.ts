@@ -31,7 +31,7 @@ export interface SequencerState {
 export interface UseBlastSequencerReturn {
   state: SequencerState;
   animateWordClear: (clearedTiles: Array<{ row: number; col: number; type: string }>) => Promise<void>;
-  animateCascade: (gravity: GravityResult, chainLevel: number) => Promise<void>;
+  animateCascade: (gravity: GravityResult, chainLevel: number, commitFn?: () => void) => Promise<void>;
   reset: () => void;
 }
 
@@ -150,6 +150,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
   const animateCascade = useCallback(async (
     gravity: GravityResult,
     chainLevel: number,
+    commitFn?: () => void,
   ): Promise<void> => {
     if (runningRef.current) return; // guard against concurrent execution
     runningRef.current = true;
@@ -159,9 +160,31 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
     try {
       const speed = ANIM_TIMING.chainSpeedFn(chainLevel);
 
+      // Build falling tiles state upfront so we can set it BEFORE the grid commits,
+      // preventing the 1-frame flash where tiles appear at destination without animation.
+      const fallTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
+        row: t.row, col: t.col, phase: 'falling' as AnimPhase,
+        fallDistance: t.fallDistance, column: t.col,
+      }));
+      const appearTiles: TileAnimState[] = gravity.newTiles.map((t) => ({
+        row: t.row, col: t.col, phase: 'appearing' as AnimPhase,
+        spawnOffset: t.spawnOffset, column: t.col,
+      }));
+
+      // Pre-set falling + appearing state BEFORE grid commit so tiles render with
+      // animation from frame 1. Combine both so new tiles also start hidden.
+      const preFallTiles = [...fallTiles, ...appearTiles];
+      if (preFallTiles.length > 0) {
+        commit({ phase: 'falling', activeTiles: preFallTiles, isAnimating: true, chainLevel }, token);
+      }
+
+      // Now commit grid state — tiles move to new positions but CSS --fall-from
+      // is already set, so they animate smoothly from their old visual position.
+      if (commitFn) commitFn();
+
       // Phase 0: Anticipation beat — brief dramatic pause before cascade resolves
       if (gravity.clearedTiles.length > 0 && chainLevel >= 1) {
-        commit({ phase: 'anticipation', activeTiles: [], isAnimating: true, chainLevel }, token);
+        commit({ phase: 'anticipation', activeTiles: preFallTiles, isAnimating: true, chainLevel }, token);
         await wait(ANIM_TIMING.chainPause * 2 * speed, timersRef.current);
         if (cancelled()) return;
       }
@@ -171,7 +194,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         const clearTiles: TileAnimState[] = gravity.clearedTiles.map((t) => ({
           row: t.row, col: t.col, phase: 'clearing' as AnimPhase,
         }));
-        commit({ phase: 'clearing', activeTiles: clearTiles, isAnimating: true, chainLevel }, token);
+        commit({ phase: 'clearing', activeTiles: [...clearTiles, ...fallTiles, ...appearTiles], isAnimating: true, chainLevel }, token);
         const clearDur = (ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * gravity.clearedTiles.length) * speed;
         await wait(clearDur, timersRef.current);
         if (cancelled()) return;
@@ -181,10 +204,6 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
 
       // Phase 2: Falling
       if (gravity.fallingTiles.length > 0) {
-        const fallTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
-          row: t.row, col: t.col, phase: 'falling' as AnimPhase,
-          fallDistance: t.fallDistance, column: t.col,
-        }));
         commit({ ...workingRef.current, phase: 'falling', activeTiles: fallTiles, chainLevel }, token);
         const maxFall = gravity.fallingTiles.reduce((m, t) => Math.max(m, t.fallDistance), 0);
         const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall) * speed;

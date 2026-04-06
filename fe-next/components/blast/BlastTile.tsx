@@ -222,8 +222,11 @@ export const BlastTile = memo(function BlastTile({
         'relative aspect-square flex items-center justify-center',
         'border-3 border-neo-black rounded-xl',
         'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
-        'transition-transform duration-100 select-none',
-        'active:scale-95 active:translate-y-[2px] active:brightness-110',
+        'select-none',
+        // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
+        ...(effectivePhase === 'idle' || effectivePhase === 'selected'
+          ? ['transition-transform duration-100', 'active:scale-95 active:translate-y-[2px] active:brightness-110']
+          : []),
         visual.bg,
         visual.text ?? 'text-neo-navy',
         type !== 'standard' ? `blast-tile-${type}` : '',
